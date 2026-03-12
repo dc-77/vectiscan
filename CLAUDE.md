@@ -20,15 +20,15 @@ Die Gutachten-KI belegt bereits api.vectigal.tech. VectiScan nutzt deshalb:
 - scan-api.vectigal.tech → Backend API (Fastify, Port 4000)
 
 ## Tech-Stack
-| Komponente      | Technologie                            |
-|-----------------|----------------------------------------|
-| Frontend        | Next.js 15 (App Router), Tailwind CSS  |
-| Backend-API     | Node.js, Fastify, TypeScript           |
-| Datenbank       | PostgreSQL 16.4-alpine                 |
-| Queue           | Redis 7.4-alpine + BullMQ             |
-| Scan-Worker     | Python 3.12, debian:bookworm-slim Base |
-| Report-Worker   | Python 3.12, ReportLab, Claude API     |
-| Object Storage  | MinIO (S3-kompatibel)                  |
+| Komponente      | Technologie                                          |
+|-----------------|------------------------------------------------------|
+| Frontend        | Next.js 15 (App Router), Tailwind CSS                |
+| Backend-API     | Node.js, Fastify, TypeScript                         |
+| Datenbank       | PostgreSQL 16.4-alpine                               |
+| Queue           | Redis 7.4-alpine + BullMQ                           |
+| Scan-Worker     | Python 3.12, debian:bookworm-slim Base               |
+| Report-Worker   | Python 3.12, Claude API, pentest-report-generator Skill |
+| Object Storage  | MinIO (S3-kompatibel)                                |
 
 ## Repo-Struktur
 Mono-Repo mit vier Diensten: frontend/, api/, scan-worker/, report-worker/.
@@ -94,12 +94,19 @@ Hosts werden sequenziell gescannt (kein paralleles Scanning im Prototyp).
 
 ## Report-Worker
 1. Rohdaten aus MinIO laden (scan-rawdata/<scanId>.tar.gz)
-2. Tool-Outputs parsen und strukturieren
-3. Claude API aufrufen (Sonnet, JSON-Output, deutscher Text)
-4. PDF mit ReportLab generieren
-5. PDF nach MinIO hochladen (scan-reports/<scanId>.pdf)
-6. Scan-Status auf report_complete setzen
-Prompt-Struktur und Output-Format: siehe docs/architecture.md Abschnitt 11.
+2. Tool-Outputs parsen und strukturieren (parser.py)
+3. Claude API aufrufen (claude_client.py, Sonnet, JSON-Output, deutscher Text)
+4. Claude-Output auf report_data-Struktur mappen (report_mapper.py)
+5. PDF generieren via generate_report() aus dem Skill (generate_report.py)
+6. PDF nach MinIO hochladen (scan-reports/<scanId>.pdf)
+7. Scan-Status auf report_complete setzen
+
+Die PDF-Generierung nutzt den pentest-report-generator Skill. Das Script
+generate_report.py und die Referenz report_structure.md liegen im Repo.
+Das Claude-Output-Format ist so gestaltet, dass die Finding-Felder (id, title,
+severity, cvss_score, cvss_vector, cwe, affected, description, evidence,
+impact, recommendation) 1:1 auf die report_data-Struktur des Skills mappen.
+Siehe docs/architecture.md für Prompt-Struktur und Mapping-Beispiele.
 
 ## CI/CD
 Multi-Image-Build nach dem Muster aus dem Betriebshandbuch (Beispiel C: Gutachten-KI).
@@ -113,4 +120,5 @@ Deploy-Sleep: 15 Sekunden (7 Container brauchen Zeit für Healthchecks).
 - docs/API-SPEC.md — API-Spezifikation
 - docs/DB-SCHEMA.sql — Datenbankschema
 - docs/SCAN-TOOLS.md — Alle Scan-Tools mit Argumenten und Output-Format
-- docs/architecture.md — Architektur-Auszüge aus der Gesamtplanung
+- docs/architecture.md — Architektur-Auszüge inkl. Claude-Prompt und Skill-Integration
+- references/report_structure.md — PDF-Layout-Referenz (Farbschema, Sektionen, Finding-Template)

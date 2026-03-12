@@ -1,0 +1,65 @@
+# VectiScan CI/CD Pipeline
+# Multi-Image-Build nach Betriebshandbuch Beispiel C
+
+stages:
+  - build
+  - scan
+  - deploy
+
+variables:
+  BASE_IMAGE: ${CI_REGISTRY_IMAGE}
+
+# --- Build Stage ---
+
+build-frontend:
+  stage: build
+  tags: [vectigal]
+  script:
+    - docker build -t ${BASE_IMAGE}/frontend:${CI_COMMIT_SHORT_SHA} ./frontend
+    - docker push ${BASE_IMAGE}/frontend:${CI_COMMIT_SHORT_SHA}
+
+build-api:
+  stage: build
+  tags: [vectigal]
+  script:
+    - docker build -t ${BASE_IMAGE}/api:${CI_COMMIT_SHORT_SHA} ./api
+    - docker push ${BASE_IMAGE}/api:${CI_COMMIT_SHORT_SHA}
+
+build-scan-worker:
+  stage: build
+  tags: [vectigal]
+  script:
+    - docker build -t ${BASE_IMAGE}/scan-worker:${CI_COMMIT_SHORT_SHA} ./scan-worker
+    - docker push ${BASE_IMAGE}/scan-worker:${CI_COMMIT_SHORT_SHA}
+
+build-report-worker:
+  stage: build
+  tags: [vectigal]
+  script:
+    - docker build -t ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA} ./report-worker
+    - docker push ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
+
+# --- Trivy Scan Stage ---
+
+trivy-scan:
+  stage: scan
+  tags: [vectigal]
+  script:
+    - trivy image --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/frontend:${CI_COMMIT_SHORT_SHA}
+    - trivy image --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/api:${CI_COMMIT_SHORT_SHA}
+    - trivy image --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/scan-worker:${CI_COMMIT_SHORT_SHA}
+    - trivy image --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
+
+# --- Deploy Stage ---
+
+deploy:
+  stage: deploy
+  tags: [vectigal]
+  only:
+    - main
+  script:
+    - docker compose pull
+    - docker compose up -d
+    - sleep 15
+  environment:
+    name: production

@@ -1,0 +1,23 @@
+# docker-compose.dev.yml — Lokale Entwicklung (ohne Registry-Images)
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend/src:/app/src
+
+  api:
+    build: ./api
+    volumes:
+      - ./api/src:/app/src
+
+  scan-worker:
+    build: ./scan-worker
+    volumes:
+      - ./scan-worker/scanner:/app/scanner
+
+  report-worker:
+    build: ./report-worker
+    volumes:
+      - ./report-worker/reporter:/app/reporter
