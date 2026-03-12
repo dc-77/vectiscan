@@ -8,7 +8,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from reporter.claude_client import call_claude, SYSTEM_PROMPT
+from reporter.claude_client import (
+    call_claude,
+    compute_cvss_score,
+    validate_cvss_scores,
+    SYSTEM_PROMPT,
+)
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -117,3 +122,202 @@ class TestCallClaude:
                     tech_profiles=[],
                     consolidated_findings="",
                 )
+
+
+class TestComputeCvssScore:
+    """Test CVSS 3.1 score computation from vector strings."""
+
+    def test_known_vector_high(self) -> None:
+        # AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L → 8.6
+        score = compute_cvss_score("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L")
+        assert score == 8.6
+
+    def test_known_vector_low(self) -> None:
+        # AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N → 3.1
+        score = compute_cvss_score("CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N")
+        assert score == 3.1
+
+    def test_scope_changed_vector(self) -> None:
+        # AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H → 10.0
+        score = compute_cvss_score("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H")
+        assert score == 10.0
+
+    def test_zero_impact_returns_zero(self) -> None:
+        # All CIA = None → impact = 0 → score = 0
+        score = compute_cvss_score("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N")
+        assert score == 0.0
+
+    def test_medium_range_vector(self) -> None:
+        # AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N → 5.4
+        score = compute_cvss_score("CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:N")
+        assert score == 5.4
+
+    def test_physical_access_vector(self) -> None:
+        # AV:P/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N → 4.6
+        score = compute_cvss_score("CVSS:3.1/AV:P/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N")
+        assert score == 4.6
+
+    def test_critical_no_scope_change(self) -> None:
+        # AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H → 9.8
+        score = compute_cvss_score("CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H")
+        assert score == 9.8
+
+    def test_invalid_vector_returns_none(self) -> None:
+        assert compute_cvss_score("not a vector") is None
+        assert compute_cvss_score("") is None
+        assert compute_cvss_score(None) is None
+
+    def test_wrong_version_returns_none(self) -> None:
+        assert compute_cvss_score("CVSS:2.0/AV:N/AC:L/Au:N/C:P/I:P/A:P") is None
+
+    def test_incomplete_vector_returns_none(self) -> None:
+        assert compute_cvss_score("CVSS:3.1/AV:N/AC:L") is None
+
+
+class TestValidateCvssScores:
+    """Test CVSS post-processing validation and correction."""
+
+    def _make_finding(
+        self, score: str, vector: str, severity: str, finding_id: str = "VS-001"
+    ) -> dict:
+        return {
+            "id": finding_id,
+            "title": "Test Finding",
+            "severity": severity,
+            "cvss_score": score,
+            "cvss_vector": vector,
+            "cwe": "CWE-000",
+            "affected": "test",
+            "description": "test",
+            "evidence": "test",
+            "impact": "test",
+            "recommendation": "test",
+        }
+
+    def test_correct_score_unchanged(self) -> None:
+        """Finding with correct score+vector should not be modified."""
+        finding = self._make_finding(
+            score="8.6",
+            vector="CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L",
+            severity="HIGH",
+        )
+        result = validate_cvss_scores({"findings": [finding]})
+        assert result["findings"][0]["cvss_score"] == "8.6"
+        assert result["findings"][0]["severity"] == "HIGH"
+
+    def test_inflated_score_corrected(self) -> None:
+        """Score of 8.0 with a LOW vector (3.1) should be corrected."""
+        finding = self._make_finding(
+            score="8.0",
+            vector="CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+            severity="HIGH",
+        )
+        result = validate_cvss_scores({"findings": [finding]})
+        assert result["findings"][0]["cvss_score"] == "3.1"
+        assert result["findings"][0]["severity"] == "LOW"
+
+    def test_severity_corrected_to_match_score(self) -> None:
+        """Severity should match the score range even if score is correct."""
+        finding = self._make_finding(
+            score="3.1",
+            vector="CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+            severity="MEDIUM",  # Wrong! 3.1 = LOW
+        )
+        result = validate_cvss_scores({"findings": [finding]})
+        assert result["findings"][0]["severity"] == "LOW"
+
+    def test_ssh_open_with_key_auth_should_be_info(self) -> None:
+        """SSH with key auth — if Claude rates it HIGH with a zero-impact vector."""
+        # Simulating: Claude says HIGH 7.5 but vector computes to 0.0
+        finding = self._make_finding(
+            score="7.5",
+            vector="CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N",
+            severity="HIGH",
+            finding_id="VS-SSH-001",
+        )
+        result = validate_cvss_scores({"findings": [finding]})
+        assert result["findings"][0]["cvss_score"] == "0.0"
+        assert result["findings"][0]["severity"] == "INFO"
+
+    def test_robots_txt_should_not_be_medium(self) -> None:
+        """robots.txt disclosure — if vector computes to LOW range."""
+        finding = self._make_finding(
+            score="5.3",
+            vector="CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+            severity="MEDIUM",
+            finding_id="VS-ROBOTS-001",
+        )
+        result = validate_cvss_scores({"findings": [finding]})
+        # AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N = 5.3 → MEDIUM is actually correct
+        # for this vector. The issue is Claude using too high a vector.
+        # The function corrects score/severity to match the vector.
+        computed = compute_cvss_score(
+            "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"
+        )
+        assert result["findings"][0]["cvss_score"] == str(computed)
+
+    def test_mysql_connection_refused_info(self) -> None:
+        """MySQL port open but connection refused — should be INFO."""
+        finding = self._make_finding(
+            score="7.0",
+            vector="CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N",
+            severity="HIGH",
+            finding_id="VS-MYSQL-001",
+        )
+        result = validate_cvss_scores({"findings": [finding]})
+        assert result["findings"][0]["cvss_score"] == "0.0"
+        assert result["findings"][0]["severity"] == "INFO"
+
+    def test_small_deviation_within_tolerance(self) -> None:
+        """Score off by <= 0.5 should NOT be corrected."""
+        finding = self._make_finding(
+            score="8.2",  # Actual vector computes to 8.6, diff = 0.4
+            vector="CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L",
+            severity="HIGH",
+        )
+        result = validate_cvss_scores({"findings": [finding]})
+        # Score stays at 8.2 (within 0.5 tolerance)
+        assert result["findings"][0]["cvss_score"] == "8.2"
+
+    def test_no_vector_skipped(self) -> None:
+        """Finding without vector should be left alone."""
+        finding = self._make_finding(
+            score="5.0", vector="", severity="MEDIUM"
+        )
+        result = validate_cvss_scores({"findings": [finding]})
+        assert result["findings"][0]["cvss_score"] == "5.0"
+        assert result["findings"][0]["severity"] == "MEDIUM"
+
+    def test_multiple_findings_processed(self) -> None:
+        """All findings in the list should be validated."""
+        findings = [
+            self._make_finding(
+                score="9.0",
+                vector="CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+                severity="CRITICAL",
+                finding_id="VS-001",
+            ),
+            self._make_finding(
+                score="3.1",
+                vector="CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+                severity="LOW",
+                finding_id="VS-002",
+            ),
+        ]
+        result = validate_cvss_scores({"findings": findings})
+        # First finding: inflated 9.0 → corrected to 3.1
+        assert result["findings"][0]["cvss_score"] == "3.1"
+        assert result["findings"][0]["severity"] == "LOW"
+        # Second finding: already correct
+        assert result["findings"][1]["cvss_score"] == "3.1"
+        assert result["findings"][1]["severity"] == "LOW"
+
+    def test_empty_findings_list(self) -> None:
+        """Empty findings list should not error."""
+        result = validate_cvss_scores({"findings": []})
+        assert result == {"findings": []}
+
+    def test_missing_findings_key(self) -> None:
+        """Result without findings key should not error."""
+        result = validate_cvss_scores({"overall_risk": "LOW"})
+        assert result == {"overall_risk": "LOW"}

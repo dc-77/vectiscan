@@ -1,6 +1,7 @@
 """Claude API Client — Aufruf + JSON-Parsing der Antwort."""
 
 import json
+import math
 import os
 import time
 from typing import Any
@@ -21,6 +22,7 @@ REGELN FÜR CVSS-SCORING:
 - Scope Change (S:C) erfordert Nachweis
 - Information Disclosure ist fast nie über LOW (3.0-3.9)
 - Immer den vollständigen CVSS-Vektorstring angeben
+- Der numerische cvss_score MUSS exakt zum CVSS-Vektor passen
 
 CVSS-REFERENZWERTE (häufige Findings):
 - DB-Port exponiert, Auth funktioniert: HIGH (7.0-8.5)
@@ -30,6 +32,25 @@ CVSS-REFERENZWERTE (häufige Findings):
 - SSH ohne fail2ban: LOW (3.0-4.0)
 - Info Disclosure (robots.txt, Banner): LOW (2.0-3.5)
 - Gute Security-Header: INFORMATIONAL (positiver Befund)
+
+HÄUFIG FALSCH BEWERTETE FINDINGS — Korrekte Scores:
+- SSH Port 22 offen, Key-Auth konfiguriert, Passwort-Auth deaktiviert:
+  → INFO, CVSS 0.0, kein Vektor nötig — das ist Standard-Konfiguration
+- SSH Port 22 offen, Passwort-Auth erlaubt, kein fail2ban:
+  → LOW 3.1, CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N
+- robots.txt enthält /admin oder /backup Pfade:
+  → LOW 2.5 — reine Information Disclosure ohne direkten Zugriff
+  → NICHT MEDIUM — robots.txt verrät nur Pfadnamen, kein Exploit
+- MySQL/PostgreSQL Port offen, Connection refused oder Auth required:
+  → INFO — Port ist erreichbar aber kein unautorisierter Zugriff möglich
+  → NICHT HIGH — Connection refused = kein Risiko
+- HTTP statt HTTPS ohne Redirect (kein Login-Formular):
+  → LOW 3.7, CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N
+- Server-Version im Banner sichtbar (z.B. "nginx/1.24"):
+  → INFO — reine Information, kein direkter Angriff
+  → NICHT LOW — Version im Banner allein ist kein Risiko
+- Port offen aber Service antwortet nicht oder lehnt ab:
+  → INFO — offener Port allein ohne erreichbaren Dienst ist kein Befund
 
 REGELN FÜR TONALITÄT:
 - Professionell und sachlich, nicht alarmistisch
@@ -79,6 +100,139 @@ Antworte ausschließlich in JSON nach folgendem Schema:
   ]
 }
 """
+
+
+# ---------------------------------------------------------------------------
+# CVSS 3.1 score calculation from vector string
+# ---------------------------------------------------------------------------
+
+# Metric value weights per CVSS 3.1 specification
+_AV = {"N": 0.85, "A": 0.62, "L": 0.55, "P": 0.20}
+_AC = {"L": 0.77, "H": 0.44}
+_PR_U = {"N": 0.85, "L": 0.62, "H": 0.27}  # Scope Unchanged
+_PR_C = {"N": 0.85, "L": 0.68, "H": 0.50}  # Scope Changed
+_UI = {"N": 0.85, "R": 0.62}
+_C = {"H": 0.56, "L": 0.22, "N": 0.0}
+_I = {"H": 0.56, "L": 0.22, "N": 0.0}
+_A = {"H": 0.56, "L": 0.22, "N": 0.0}
+
+_SEVERITY_RANGES = [
+    (0.0, 0.0, "INFO"),
+    (0.1, 3.9, "LOW"),
+    (4.0, 6.9, "MEDIUM"),
+    (7.0, 8.9, "HIGH"),
+    (9.0, 10.0, "CRITICAL"),
+]
+
+
+def _roundup(x: float) -> float:
+    """CVSS 3.1 roundup function: smallest tenth >= x."""
+    return math.ceil(x * 10) / 10
+
+
+def compute_cvss_score(vector: str) -> float | None:
+    """Compute CVSS 3.1 base score from a vector string.
+
+    Returns None if the vector is malformed or cannot be parsed.
+    """
+    if not vector or not vector.startswith("CVSS:3.1/"):
+        return None
+
+    try:
+        parts = {}
+        for segment in vector.split("/")[1:]:  # skip "CVSS:3.1"
+            key, val = segment.split(":")
+            parts[key] = val
+
+        scope_changed = parts["S"] == "C"
+        pr_table = _PR_C if scope_changed else _PR_U
+
+        iss = 1 - (1 - _C[parts["C"]]) * (1 - _I[parts["I"]]) * (1 - _A[parts["A"]])
+
+        if scope_changed:
+            impact = 7.52 * (iss - 0.029) - 3.25 * (iss - 0.02) ** 15
+        else:
+            impact = 6.42 * iss
+
+        exploitability = (
+            8.22 * _AV[parts["AV"]] * _AC[parts["AC"]]
+            * pr_table[parts["PR"]] * _UI[parts["UI"]]
+        )
+
+        if impact <= 0:
+            return 0.0
+
+        if scope_changed:
+            score = _roundup(min(1.08 * (impact + exploitability), 10.0))
+        else:
+            score = _roundup(min(impact + exploitability, 10.0))
+
+        return score
+    except (KeyError, ValueError, IndexError):
+        return None
+
+
+def _severity_for_score(score: float) -> str:
+    """Return severity label for a CVSS score."""
+    for low, high, label in _SEVERITY_RANGES:
+        if low <= score <= high:
+            return label
+    return "CRITICAL"
+
+
+def validate_cvss_scores(result: dict[str, Any]) -> dict[str, Any]:
+    """Validate and correct CVSS scores in Claude's response.
+
+    For each finding with a cvss_vector:
+    - Compute the correct score from the vector
+    - If the reported score diverges by > 0.5, replace it with the computed score
+    - Adjust severity label if the corrected score falls in a different range
+    """
+    findings = result.get("findings", [])
+    corrected_count = 0
+
+    for finding in findings:
+        vector = finding.get("cvss_vector", "")
+        reported_score_str = finding.get("cvss_score", "0")
+
+        try:
+            reported_score = float(reported_score_str)
+        except (ValueError, TypeError):
+            reported_score = 0.0
+
+        computed = compute_cvss_score(vector)
+        if computed is None:
+            # Can't validate without a parseable vector
+            continue
+
+        if abs(computed - reported_score) > 0.5:
+            log.warning(
+                "cvss_score_corrected",
+                finding_id=finding.get("id"),
+                reported=reported_score,
+                computed=computed,
+                vector=vector,
+            )
+            finding["cvss_score"] = str(computed)
+            corrected_count += 1
+
+        # Always ensure severity matches the (possibly corrected) score
+        actual_score = float(finding["cvss_score"])
+        correct_severity = _severity_for_score(actual_score)
+        if finding.get("severity") != correct_severity:
+            log.warning(
+                "cvss_severity_corrected",
+                finding_id=finding.get("id"),
+                old_severity=finding.get("severity"),
+                new_severity=correct_severity,
+                score=actual_score,
+            )
+            finding["severity"] = correct_severity
+
+    if corrected_count:
+        log.info("cvss_validation_complete", corrected=corrected_count)
+
+    return result
 
 
 def call_claude(
@@ -155,6 +309,8 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 findings=len(result.get("findings", [])),
                 positive=len(result.get("positive_findings", [])),
             )
+            # Post-process: validate and correct CVSS scores
+            result = validate_cvss_scores(result)
             return result
 
         except anthropic.RateLimitError as e:
