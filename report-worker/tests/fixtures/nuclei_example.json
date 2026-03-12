@@ -1,0 +1,3 @@
+{"template-id":"ssl-weak-cipher","info":{"name":"Weak SSL/TLS Cipher Detected","severity":"medium","description":"The server supports weak cipher suites.","reference":["https://cwe.mitre.org/data/definitions/326.html"]},"matched-at":"https://beispiel.de:443"}
+{"template-id":"http-missing-security-headers","info":{"name":"Missing X-Frame-Options Header","severity":"low","description":"The X-Frame-Options header is not set."},"matched-at":"https://beispiel.de"}
+{"template-id":"cve-2024-12345","info":{"name":"Critical RCE in Example Service","severity":"critical","description":"Remote code execution vulnerability.","reference":["https://nvd.nist.gov/vuln/detail/CVE-2024-12345"]},"matched-at":"https://beispiel.de:8080"}

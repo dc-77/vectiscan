@@ -1,0 +1,379 @@
+"""Phase 2 — Deep scan per host."""
+
+import json
+import os
+import subprocess
+from typing import Any, Callable, Optional
+
+import structlog
+
+from scanner.tools import run_tool
+
+log = structlog.get_logger()
+
+SECURITY_HEADERS = [
+    "x-frame-options",
+    "x-content-type-options",
+    "strict-transport-security",
+    "content-security-policy",
+    "x-xss-protection",
+    "referrer-policy",
+    "permissions-policy",
+]
+
+
+def run_testssl(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dict[str, Any]]:
+    """Run testssl.sh to check TLS/SSL configuration.
+
+    Only called when has_ssl=true. Returns parsed results or None on failure.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    output_path = f"{phase2_dir}/testssl.json"
+
+    cmd = [
+        "testssl.sh",
+        "--jsonfile", output_path,
+        "--quiet",
+        fqdn,
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd,
+        timeout=300,
+        output_path=output_path,
+        scan_id=scan_id,
+        host_ip=ip,
+        phase=2,
+        tool_name="testssl",
+    )
+
+    if exit_code not in (0, 1):
+        # testssl returns 1 for findings, which is normal
+        log.warning("testssl_failed", fqdn=fqdn, exit_code=exit_code)
+        return None
+
+    try:
+        with open(output_path, "r") as f:
+            data = json.load(f)
+        log.info("testssl_complete", fqdn=fqdn, findings=len(data) if isinstance(data, list) else 1)
+        return data
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        log.warning("testssl_parse_error", fqdn=fqdn, error=str(e))
+        return None
+
+
+def run_nikto(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dict[str, Any]]:
+    """Run nikto web server scanner.
+
+    Returns parsed results or None on failure.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    output_path = f"{phase2_dir}/nikto.json"
+
+    cmd = [
+        "nikto",
+        "-h", fqdn,
+        "-Format", "json",
+        "-output", output_path,
+        "-Tuning", "1234567890",
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd,
+        timeout=600,
+        output_path=output_path,
+        scan_id=scan_id,
+        host_ip=ip,
+        phase=2,
+        tool_name="nikto",
+    )
+
+    if exit_code != 0 and exit_code != 1:
+        log.warning("nikto_failed", fqdn=fqdn, exit_code=exit_code)
+        return None
+
+    try:
+        with open(output_path, "r") as f:
+            data = json.load(f)
+        log.info("nikto_complete", fqdn=fqdn)
+        return data
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        log.warning("nikto_parse_error", fqdn=fqdn, error=str(e))
+        return None
+
+
+def run_nuclei(fqdn: str, ip: str, host_dir: str, scan_id: str) -> list[dict[str, Any]]:
+    """Run nuclei vulnerability scanner.
+
+    Returns list of findings or empty list on failure.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    output_path = f"{phase2_dir}/nuclei.json"
+
+    cmd = [
+        "nuclei",
+        "-u", fqdn,
+        "-severity", "low,medium,high,critical",
+        "-json",
+        "-o", output_path,
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd,
+        timeout=900,
+        output_path=output_path,
+        scan_id=scan_id,
+        host_ip=ip,
+        phase=2,
+        tool_name="nuclei",
+    )
+
+    if exit_code != 0 and exit_code != 1:
+        log.warning("nuclei_failed", fqdn=fqdn, exit_code=exit_code)
+        return []
+
+    findings: list[dict[str, Any]] = []
+    try:
+        with open(output_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    findings.append(json.loads(line))
+        log.info("nuclei_complete", fqdn=fqdn, findings=len(findings))
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        log.warning("nuclei_parse_error", fqdn=fqdn, error=str(e))
+
+    return findings
+
+
+def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[str]:
+    """Run gobuster directory brute-force.
+
+    Returns path to output file or None on failure.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    output_path = f"{phase2_dir}/gobuster_dir.txt"
+
+    cmd = [
+        "gobuster", "dir",
+        "-u", f"https://{fqdn}",
+        "-w", "/usr/share/wordlists/common.txt",
+        "-o", output_path,
+        "-q",
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd,
+        timeout=600,
+        output_path=output_path,
+        scan_id=scan_id,
+        host_ip=ip,
+        phase=2,
+        tool_name="gobuster_dir",
+    )
+
+    if exit_code != 0:
+        log.warning("gobuster_dir_failed", fqdn=fqdn, exit_code=exit_code)
+        return None
+
+    log.info("gobuster_dir_complete", fqdn=fqdn)
+    return output_path
+
+
+def run_gowitness(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[str]:
+    """Run gowitness to take a screenshot.
+
+    Returns path to screenshot directory or None on failure.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    cmd = [
+        "gowitness", "single",
+        f"https://{fqdn}",
+        "--screenshot-path", f"{phase2_dir}/",
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd,
+        timeout=30,
+        output_path=None,
+        scan_id=scan_id,
+        host_ip=ip,
+        phase=2,
+        tool_name="gowitness",
+    )
+
+    if exit_code != 0:
+        log.warning("gowitness_failed", fqdn=fqdn, exit_code=exit_code)
+        return None
+
+    log.info("gowitness_complete", fqdn=fqdn)
+    return phase2_dir
+
+
+def run_header_check(fqdn: str, ip: str, host_dir: str, scan_id: str) -> dict[str, Any]:
+    """Check HTTP security headers using curl.
+
+    Evaluates presence of key security headers and produces a score.
+    Saves analysis to {host_dir}/phase2/headers.json.
+    Returns the analysis dict.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    output_path = f"{phase2_dir}/headers.json"
+    url = f"https://{fqdn}"
+
+    cmd = ["curl", "-sI", url]
+
+    # Capture stdout directly for header parsing
+    raw_headers = ""
+    try:
+        proc = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        raw_headers = proc.stdout
+        log.info("header_check_fetched", fqdn=fqdn, exit_code=proc.returncode)
+    except subprocess.TimeoutExpired:
+        log.warning("header_check_timeout", fqdn=fqdn)
+    except Exception as e:
+        log.error("header_check_error", fqdn=fqdn, error=str(e))
+
+    # Parse headers into dict
+    headers: dict[str, str] = {}
+    for line in raw_headers.splitlines():
+        if ":" in line:
+            key, _, value = line.partition(":")
+            headers[key.strip()] = value.strip()
+
+    # Evaluate security headers
+    security_headers: dict[str, dict[str, Any]] = {}
+    present_count = 0
+
+    for header_name in SECURITY_HEADERS:
+        # Find header case-insensitively
+        value = None
+        for k, v in headers.items():
+            if k.lower() == header_name:
+                value = v
+                break
+
+        present = value is not None
+        if present:
+            present_count += 1
+
+        security_headers[header_name] = {
+            "present": present,
+            "value": value,
+        }
+
+    total = len(SECURITY_HEADERS)
+    score = f"{present_count}/{total}"
+
+    analysis: dict[str, Any] = {
+        "url": url,
+        "headers": headers,
+        "security_headers": security_headers,
+        "score": score,
+    }
+
+    # Save to disk
+    try:
+        with open(output_path, "w") as f:
+            json.dump(analysis, f, indent=2)
+    except Exception as e:
+        log.error("header_check_save_error", fqdn=fqdn, error=str(e))
+
+    log.info("header_check_complete", fqdn=fqdn, score=score)
+    return analysis
+
+
+def run_phase2(
+    ip: str,
+    fqdns: list[str],
+    tech_profile: dict[str, Any],
+    scan_dir: str,
+    scan_id: str,
+    progress_callback: Callable[[str, str, str], None],
+) -> dict[str, Any]:
+    """Orchestrate Phase 2 (deep scan) for a single host.
+
+    Args:
+        ip: Host IP address.
+        fqdns: List of FQDNs resolving to this IP.
+        tech_profile: Tech profile from Phase 1.
+        scan_dir: Base scan directory (e.g. /tmp/scan-<scanId>).
+        scan_id: Scan UUID.
+        progress_callback: Called after each tool with (scan_id, tool_name, status).
+
+    Returns:
+        Results summary dict.
+    """
+    host_dir = f"{scan_dir}/hosts/{ip}"
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    primary_fqdn = fqdns[0] if fqdns else ip
+    has_ssl = tech_profile.get("has_ssl", False)
+
+    log.info("phase2_start", ip=ip, fqdn=primary_fqdn, scan_id=scan_id, has_ssl=has_ssl)
+
+    results: dict[str, Any] = {
+        "ip": ip,
+        "fqdn": primary_fqdn,
+        "tools_run": [],
+    }
+
+    # testssl (only if SSL present)
+    if has_ssl:
+        testssl_result = run_testssl(primary_fqdn, ip, host_dir, scan_id)
+        results["testssl"] = testssl_result
+        results["tools_run"].append("testssl")
+        progress_callback(scan_id, "testssl", "complete")
+    else:
+        log.info("testssl_skipped", ip=ip, reason="no_ssl")
+
+    # nikto
+    nikto_result = run_nikto(primary_fqdn, ip, host_dir, scan_id)
+    results["nikto"] = nikto_result
+    results["tools_run"].append("nikto")
+    progress_callback(scan_id, "nikto", "complete")
+
+    # nuclei
+    nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, scan_id)
+    results["nuclei"] = nuclei_result
+    results["tools_run"].append("nuclei")
+    progress_callback(scan_id, "nuclei", "complete")
+
+    # gobuster dir
+    gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, scan_id)
+    results["gobuster_dir"] = gobuster_result
+    results["tools_run"].append("gobuster_dir")
+    progress_callback(scan_id, "gobuster_dir", "complete")
+
+    # gowitness
+    gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, scan_id)
+    results["gowitness"] = gowitness_result
+    results["tools_run"].append("gowitness")
+    progress_callback(scan_id, "gowitness", "complete")
+
+    # header check
+    header_result = run_header_check(primary_fqdn, ip, host_dir, scan_id)
+    results["headers"] = header_result
+    results["tools_run"].append("header_check")
+    progress_callback(scan_id, "header_check", "complete")
+
+    log.info("phase2_complete", ip=ip, scan_id=scan_id, tools_run=len(results["tools_run"]))
+    return results

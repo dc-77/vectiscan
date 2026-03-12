@@ -63,3 +63,8 @@ export async function getScanReport(id: string): Promise<ApiResponse<ReportData>
   const res = await fetch(`${API_URL}/api/scans/${id}/report`);
   return res.json();
 }
+
+export async function cancelScan(id: string): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/scans/${id}`, { method: 'DELETE' });
+  return res.json();
+}

@@ -1,44 +1,172 @@
-version: "3.9"
+networks:
+  proxy-net:
+    external: true
+  vectiscan-internal:
+    driver: bridge
+
+volumes:
+  vectiscan-pg-data:
+  vectiscan-redis-data:
+  vectiscan-minio-data:
 
 services:
   frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
+    image: git-extern.bergersysteme.com:5050/team/vectiscan/frontend:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: https://scan-api.vectigal.tech
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vectiscan-web.rule=Host(`scan.vectigal.tech`)"
+      - "traefik.http.routers.vectiscan-web.middlewares=security-headers@file,rate-limit@file,internal-only@file"
+      - "traefik.http.services.vectiscan-web.loadbalancer.server.port=3000"
     depends_on:
-      - api
+      api:
+        condition: service_started
+    networks:
+      - proxy-net
+      - vectiscan-internal
 
   api:
-    build: ./api
-    ports:
-      - "4000:4000"
+    image: git-extern.bergersysteme.com:5050/team/vectiscan/api:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vectiscan-api.rule=Host(`scan-api.vectigal.tech`)"
+      - "traefik.http.routers.vectiscan-api.middlewares=security-headers@file,rate-limit@file,internal-only@file"
+      - "traefik.http.services.vectiscan-api.loadbalancer.server.port=4000"
+      - "traefik.http.services.vectiscan-api.loadbalancer.healthcheck.path=/health"
+      - "traefik.http.services.vectiscan-api.loadbalancer.healthcheck.interval=15s"
     depends_on:
-      - db
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - proxy-net
+      - vectiscan-internal
 
   scan-worker:
-    build: ./scan-worker
+    image: git-extern.bergersysteme.com:5050/team/vectiscan/scan-worker:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
     depends_on:
-      - redis
-      - db
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+    networks:
+      - vectiscan-internal
 
   report-worker:
-    build: ./report-worker
-    depends_on:
-      - redis
-      - db
-
-  db:
-    image: postgres:16-alpine
+    image: git-extern.bergersysteme.com:5050/team/vectiscan/report-worker:${TAG:-latest}
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: vectiscan
-      POSTGRES_USER: vectiscan
-      POSTGRES_PASSWORD: changeme
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+    depends_on:
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks:
+      - vectiscan-internal
+
+  postgres:
+    image: postgres:16.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - vectiscan-pg-data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-vectiscan}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vectiscan-internal
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - vectiscan-redis-data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    networks:
+      - vectiscan-internal
 
-volumes:
-  db-data:
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - vectiscan-minio-data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    networks:
+      - vectiscan-internal

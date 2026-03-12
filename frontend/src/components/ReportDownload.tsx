@@ -5,9 +5,10 @@ import { getScanReport, ReportData } from '@/lib/api';
 
 interface Props {
   scanId: string;
+  onNewScan?: () => void;
 }
 
-export default function ReportDownload({ scanId }: Props) {
+export default function ReportDownload({ scanId, onNewScan }: Props) {
   const [report, setReport] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,13 +40,23 @@ export default function ReportDownload({ scanId }: Props) {
       <p className="text-sm text-gray-400">
         {report.fileName}{sizeKB > 0 && ` (${sizeKB} KB)`}
       </p>
-      <a
-        href={report.downloadUrl}
-        download={report.fileName}
-        className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
-      >
-        PDF herunterladen
-      </a>
+      <div className="flex flex-col items-center gap-3">
+        <a
+          href={report.downloadUrl}
+          download={report.fileName}
+          className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+        >
+          PDF herunterladen
+        </a>
+        {onNewScan && (
+          <button
+            onClick={onNewScan}
+            className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+          >
+            Neuen Scan starten
+          </button>
+        )}
+      </div>
     </div>
   );
 }

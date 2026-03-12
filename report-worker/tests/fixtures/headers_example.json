@@ -1,0 +1,34 @@
+{
+  "url": "https://beispiel.de",
+  "security_headers": {
+    "Strict-Transport-Security": {
+      "present": true,
+      "value": "max-age=31536000; includeSubDomains"
+    },
+    "X-Frame-Options": {
+      "present": false,
+      "recommendation": "Set X-Frame-Options to DENY or SAMEORIGIN."
+    },
+    "X-Content-Type-Options": {
+      "present": true,
+      "value": "nosniff"
+    },
+    "Content-Security-Policy": {
+      "present": false,
+      "recommendation": "Implement a Content Security Policy."
+    },
+    "X-XSS-Protection": {
+      "present": true,
+      "value": "1; mode=block"
+    },
+    "Referrer-Policy": {
+      "present": false,
+      "recommendation": "Set Referrer-Policy header."
+    },
+    "Permissions-Policy": {
+      "present": false,
+      "recommendation": "Set Permissions-Policy header."
+    }
+  },
+  "score": 43
+}
