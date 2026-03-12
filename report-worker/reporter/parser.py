@@ -251,16 +251,16 @@ def parse_testssl_json(path: str) -> list[dict[str, Any]]:
     return findings
 
 
-def parse_nikto_json(path: str) -> dict[str, Any]:
+def parse_nikto_json(path: str) -> list[dict[str, Any]]:
     """Parse nikto JSON output.
 
-    Returns dict with key ``"vulnerabilities"`` containing a list of::
+    Returns list of::
 
-        {"id": "...", "msg": "...", "url": "...", "method": "...", "tool": "nikto"}
+        {"id": "...", "msg": "...", "url": "...", "method": "..."}
     """
     data = _read_json(path)
     if data is None:
-        return {"vulnerabilities": []}
+        return []
 
     # nikto JSON can be a single object or a list of host results.
     host_results: list[dict[str, Any]]
@@ -269,7 +269,7 @@ def parse_nikto_json(path: str) -> dict[str, Any]:
     elif isinstance(data, dict):
         host_results = [data]
     else:
-        return {"vulnerabilities": []}
+        return []
 
     vulns: list[dict[str, Any]] = []
     for host_result in host_results:
@@ -282,29 +282,92 @@ def parse_nikto_json(path: str) -> dict[str, Any]:
                     "msg": v.get("msg", v.get("message", "")),
                     "url": v.get("url", v.get("uri", "")),
                     "method": v.get("method", "GET"),
-                    "tool": "nikto",
                 }
             )
 
     log.info("nikto_parsed", path=path, vulnerabilities=len(vulns))
-    return {"vulnerabilities": vulns}
+    return vulns
 
 
 def parse_headers_json(path: str) -> dict[str, Any]:
     """Parse security headers analysis JSON.
 
-    Returns the parsed JSON structure directly (passthrough).  The scan-worker
-    already writes a structured ``headers.json`` with ``url``,
-    ``security_headers`` and ``score`` keys.
+    Returns::
 
-    Returns an empty dict on missing / malformed files.
+        {
+            "url": "...",
+            "score": "3/7",
+            "missing": ["strict-transport-security", ...],
+            "present": ["x-frame-options", ...],
+            "details": {...}
+        }
+
+    On missing / malformed files returns a dict with empty defaults.
     """
+    default: dict[str, Any] = {
+        "url": "",
+        "score": "0/0",
+        "missing": [],
+        "present": [],
+        "details": {},
+    }
+
     data = _read_json(path)
     if data is None:
-        return {}
+        return default
 
-    log.info("headers_parsed", path=path)
-    return data
+    result: dict[str, Any] = {
+        "url": data.get("url", ""),
+        "details": data,
+    }
+
+    # The seven standard security headers we evaluate.
+    security_headers = [
+        "strict-transport-security",
+        "content-security-policy",
+        "x-frame-options",
+        "x-content-type-options",
+        "x-xss-protection",
+        "referrer-policy",
+        "permissions-policy",
+    ]
+
+    # Determine which dict contains the actual header evaluation.
+    raw_headers: dict[str, Any]
+    if isinstance(data.get("security_headers"), dict):
+        raw_headers = data["security_headers"]
+    elif isinstance(data.get("headers"), dict):
+        raw_headers = data["headers"]
+    else:
+        # Treat the whole file as a flat header->value mapping.
+        raw_headers = data
+
+    # Build a lowercase lookup of keys that are marked present.
+    # If entries are dicts with a "present" boolean, use that; otherwise
+    # assume a key's mere existence means it is present.
+    present_lower: set[str] = set()
+    for key, val in raw_headers.items():
+        k_lower = str(key).lower()
+        if isinstance(val, dict):
+            if val.get("present", False):
+                present_lower.add(k_lower)
+        else:
+            present_lower.add(k_lower)
+
+    missing: list[str] = []
+    present: list[str] = []
+    for hdr in security_headers:
+        if hdr in present_lower:
+            present.append(hdr)
+        else:
+            missing.append(hdr)
+
+    result["missing"] = missing
+    result["present"] = present
+    result["score"] = f"{len(present)}/{len(security_headers)}"
+
+    log.info("headers_parsed", path=path, score=result["score"])
+    return result
 
 
 def parse_gobuster_dir(path: str) -> list[str]:
@@ -517,27 +580,16 @@ def consolidate_findings(
 
         # --- Security headers ---
         headers = data.get("headers", {})
-        sec_hdrs = headers.get("security_headers", {})
-        if sec_hdrs:
-            present_names = [
-                k for k, v in sec_hdrs.items()
-                if isinstance(v, dict) and v.get("present")
-            ]
-            missing_names = [
-                k for k, v in sec_hdrs.items()
-                if isinstance(v, dict) and not v.get("present")
-            ]
+        if headers.get("missing") or headers.get("present"):
             lines.append("")
             lines.append("--- SECURITY HEADERS ---")
             if headers.get("url"):
                 lines.append(f"  URL: {headers['url']}")
-            score = headers.get("score")
-            if score is not None:
-                lines.append(f"  Score: {score}")
-            if present_names:
-                lines.append(f"  Present: {', '.join(present_names)}")
-            if missing_names:
-                lines.append(f"  Missing: {', '.join(missing_names)}")
+            lines.append(f"  Score: {headers.get('score', 'N/A')}")
+            if headers.get("present"):
+                lines.append(f"  Present: {', '.join(headers['present'])}")
+            if headers.get("missing"):
+                lines.append(f"  Missing: {', '.join(headers['missing'])}")
 
         # --- Gobuster directories ---
         gobuster = data.get("gobuster_dir", [])
@@ -668,8 +720,7 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             str(phase2 / "testssl.json")
         )
 
-        nikto_result = parse_nikto_json(str(phase2 / "nikto.json"))
-        host_data["nikto"] = nikto_result.get("vulnerabilities", [])
+        host_data["nikto"] = parse_nikto_json(str(phase2 / "nikto.json"))
 
         host_data["headers"] = parse_headers_json(
             str(phase2 / "headers.json")
@@ -707,8 +758,7 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             host_data["testssl"] = parse_testssl_json(
                 str(phase2 / "testssl.json")
             )
-            nikto_result = parse_nikto_json(str(phase2 / "nikto.json"))
-            host_data["nikto"] = nikto_result.get("vulnerabilities", [])
+            host_data["nikto"] = parse_nikto_json(str(phase2 / "nikto.json"))
             host_data["headers"] = parse_headers_json(
                 str(phase2 / "headers.json")
             )
