@@ -1,65 +1,177 @@
+# =============================================================================
 # VectiScan CI/CD Pipeline
-# Multi-Image-Build nach Betriebshandbuch Beispiel C
+# =============================================================================
+# Multi-image build pipeline for the VectiScan security scanning platform.
+# Builds four services, scans with Trivy, runs tests, and deploys via
+# docker compose on vectigal-docker02.
+# =============================================================================
+
+variables:
+  REGISTRY: git-extern.bergersysteme.com:5050
+  BASE_IMAGE: ${REGISTRY}/${CI_PROJECT_PATH}
+  APP_NAME: vectiscan
+  DEPLOY_PATH: /opt/apps/${APP_NAME}
 
 stages:
   - build
   - scan
+  - test
   - deploy
 
-variables:
-  BASE_IMAGE: ${CI_REGISTRY_IMAGE}
+# =============================================================================
+# BUILD STAGE — Build & push Docker images for all four services
+# =============================================================================
 
-# --- Build Stage ---
+.build-base:
+  stage: build
+  tags: [vectigal]
+  script:
+    - docker build -f ${SERVICE}/Dockerfile -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest .
+    - docker push ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
+    - docker push ${BASE_IMAGE}/${SERVICE}:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
 
 build-frontend:
-  stage: build
-  tags: [vectigal]
-  script:
-    - docker build -t ${BASE_IMAGE}/frontend:${CI_COMMIT_SHORT_SHA} ./frontend
-    - docker push ${BASE_IMAGE}/frontend:${CI_COMMIT_SHORT_SHA}
+  extends: .build-base
+  variables:
+    SERVICE: frontend
 
 build-api:
-  stage: build
-  tags: [vectigal]
-  script:
-    - docker build -t ${BASE_IMAGE}/api:${CI_COMMIT_SHORT_SHA} ./api
-    - docker push ${BASE_IMAGE}/api:${CI_COMMIT_SHORT_SHA}
+  extends: .build-base
+  variables:
+    SERVICE: api
 
 build-scan-worker:
-  stage: build
-  tags: [vectigal]
-  script:
-    - docker build -t ${BASE_IMAGE}/scan-worker:${CI_COMMIT_SHORT_SHA} ./scan-worker
-    - docker push ${BASE_IMAGE}/scan-worker:${CI_COMMIT_SHORT_SHA}
+  extends: .build-base
+  variables:
+    SERVICE: scan-worker
 
 build-report-worker:
-  stage: build
-  tags: [vectigal]
-  script:
-    - docker build -t ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA} ./report-worker
-    - docker push ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
+  extends: .build-base
+  variables:
+    SERVICE: report-worker
 
-# --- Trivy Scan Stage ---
+# =============================================================================
+# SCAN STAGE — Trivy vulnerability scan for each image (CRITICAL only)
+# =============================================================================
 
-trivy-scan:
+.trivy-base:
   stage: scan
   tags: [vectigal]
   script:
-    - trivy image --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/frontend:${CI_COMMIT_SHORT_SHA}
-    - trivy image --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/api:${CI_COMMIT_SHORT_SHA}
-    - trivy image --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/scan-worker:${CI_COMMIT_SHORT_SHA}
-    - trivy image --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
+    - trivy image --exit-code 1 --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
 
-# --- Deploy Stage ---
+trivy-frontend:
+  extends: .trivy-base
+  variables:
+    SERVICE: frontend
 
-deploy:
-  stage: deploy
+trivy-api:
+  extends: .trivy-base
+  variables:
+    SERVICE: api
+
+trivy-scan-worker:
+  extends: .trivy-base
+  variables:
+    SERVICE: scan-worker
+
+trivy-report-worker:
+  extends: .trivy-base
+  variables:
+    SERVICE: report-worker
+
+# =============================================================================
+# TEST STAGE — Unit tests for API and both workers
+# =============================================================================
+
+test-api:
+  stage: test
   tags: [vectigal]
-  only:
-    - main
+  image: node:20-alpine
   script:
+    - cd api && npm ci && npm test
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+test-scan-worker:
+  stage: test
+  tags: [vectigal]
+  image: python:3.12-slim
+  script:
+    - cd scan-worker && pip install -r requirements.txt && pytest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+test-report-worker:
+  stage: test
+  tags: [vectigal]
+  image: python:3.12-slim
+  script:
+    - cd report-worker && pip install -r requirements.txt && pytest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+# =============================================================================
+# DEPLOY STAGE — Rolling deploy, manual deploy, and rollback
+# =============================================================================
+
+.deploy-base:
+  tags: [vectigal]
+  script:
+    - cd ${DEPLOY_PATH}
+    - cp docker-compose.yml docker-compose.yml.bak
+    - cp .env .env.bak
     - docker compose pull
-    - docker compose up -d
+    - TAG=${TAG} docker compose up -d --remove-orphans
+    # Give all 7 containers time to pass health checks
     - sleep 15
+    - docker compose ps --format json | python3 -c "import sys,json; containers=json.loads(sys.stdin.read()); exit(0 if all(c.get('Health','')=='healthy' or c.get('State')=='running' for c in containers) else 1)"
   environment:
     name: production
+    url: https://scan.vectigal.tech
+
+deploy-auto:
+  extends: .deploy-base
+  stage: deploy
+  variables:
+    TAG: latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+deploy-manual:
+  extends: .deploy-base
+  stage: deploy
+  variables:
+    TAG: ${CI_COMMIT_SHORT_SHA}
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+
+rollback:
+  stage: deploy
+  tags: [vectigal]
+  when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  script:
+    - cd ${DEPLOY_PATH}
+    - cp docker-compose.yml.bak docker-compose.yml
+    - cp .env.bak .env
+    - docker compose pull
+    - docker compose up -d --remove-orphans
+    - sleep 15
+    - docker compose ps
+  environment:
+    name: production
+    url: https://scan.vectigal.tech
