@@ -115,6 +115,9 @@ build-frontend, build-api, build-scan-worker, build-report-worker.
 Trivy-Scan-Stage zwischen Build und Deploy (--severity CRITICAL, --ignore-unfixed).
 Deploy-Sleep: 15 Sekunden (7 Container brauchen Zeit für Healthchecks).
 
+## Arbeitsweise
+- Am Ende jeder abgeschlossenen Aufgabe: Kontext-Auslastung ausgeben (geschätzter %-Wert)
+
 ## Wichtige Referenz-Dokumente
 - docs/PROTOTYPE-SCOPE.md — Was ist im Prototyp drin, was nicht
 - docs/API-SPEC.md — API-Spezifikation
