@@ -1,4 +1,4 @@
-"""BullMQ Consumer — Orchestriert die Report-Generierung."""
+"""BullMQ Consumer — Orchestriert die Scan-Phasen."""
 
 import signal
 import sys
@@ -11,11 +11,11 @@ log = structlog.get_logger()
 
 
 def wait_for_jobs(redis_client: redis.Redis) -> None:
-    """Block and wait for report jobs on the Redis queue."""
-    log.info("waiting_for_jobs", queue="report:pending")
+    """Block and wait for scan jobs on the Redis queue."""
+    log.info("waiting_for_jobs", queue="scan:pending")
     while True:
         try:
-            result = redis_client.blpop("report:pending", timeout=5)
+            result = redis_client.blpop("scan:pending", timeout=5)
             if result:
                 _, job_data = result
                 log.info("job_received", data=job_data.decode())
@@ -25,14 +25,14 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
 
 
 def main() -> None:
-    """Entry point for the report worker."""
-    log.info("report_worker_started")
+    """Entry point for the scan worker."""
+    log.info("scan_worker_started")
 
     redis_url = "redis://localhost:6379"
     redis_client = redis.from_url(redis_url)
 
     def shutdown(signum: int, frame: object) -> None:
-        log.info("report_worker_shutdown", signal=signum)
+        log.info("scan_worker_shutdown", signal=signum)
         sys.exit(0)
 
     signal.signal(signal.SIGTERM, shutdown)
