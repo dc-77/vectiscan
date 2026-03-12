@@ -1,0 +1,58 @@
+{
+  "overall_risk": "HIGH",
+  "overall_description": "Die Sicherheitsbewertung von beispiel.de ergab mehrere Schwachstellen, darunter einen exponierten Datenbankport und fehlende Security-Header. Es wurden auch positive Befunde wie korrekte TLS-Konfiguration identifiziert.",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Exponierter MySQL/MariaDB-Port",
+      "severity": "HIGH",
+      "cvss_score": "8.6",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L",
+      "cwe": "CWE-284",
+      "affected": "88.99.35.112:3306 (beispiel.de)",
+      "description": "Der MariaDB-Port 3306 ist öffentlich erreichbar. Obwohl eine Authentifizierung erforderlich ist, stellt die Exposition ein erhöhtes Risiko dar.",
+      "evidence": "$ nmap -sV 88.99.35.112\n3306/tcp open mysql MariaDB 10.11.6",
+      "impact": "Angreifer können Brute-Force-Angriffe auf die Datenbank durchführen oder bekannte Schwachstellen in MariaDB ausnutzen.",
+      "recommendation": "<b>Kurzfristig (Tage):</b> Zugriff auf Port 3306 per Firewall auf autorisierte IPs beschränken.\n<b>Mittelfristig:</b> Datenbank hinter ein VPN oder privates Netzwerk verschieben."
+    },
+    {
+      "id": "VS-2026-002",
+      "title": "Fehlende Security-Header",
+      "severity": "LOW",
+      "cvss_score": "3.1",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-693",
+      "affected": "https://beispiel.de",
+      "description": "Mehrere empfohlene Security-Header fehlen: X-Frame-Options, Content-Security-Policy, Referrer-Policy, Permissions-Policy.",
+      "evidence": "HTTP/1.1 200 OK\nServer: nginx/1.24.0\nStrict-Transport-Security: max-age=31536000",
+      "impact": "Erhöhtes Risiko für Clickjacking- und Cross-Site-Scripting-Angriffe.",
+      "recommendation": "<b>Kurzfristig:</b> X-Frame-Options: DENY und CSP-Header in der Webserver-Konfiguration setzen.\n<b>Mittelfristig:</b> Vollständige Security-Header-Policy implementieren."
+    }
+  ],
+  "positive_findings": [
+    {
+      "title": "Korrekte TLS-Konfiguration",
+      "description": "Alle Hosts nutzen TLS 1.2+, keine veralteten Cipher-Suites. HSTS ist mit includeSubDomains aktiviert."
+    }
+  ],
+  "recommendations": [
+    {
+      "timeframe": "Sofort",
+      "action": "MySQL-Port 3306 per Firewall sperren",
+      "finding_refs": ["001"],
+      "effort": "1-2 h"
+    },
+    {
+      "timeframe": "Woche 1",
+      "action": "Fehlende Security-Header konfigurieren",
+      "finding_refs": ["002"],
+      "effort": "2-4 h"
+    },
+    {
+      "timeframe": "Monat 1",
+      "action": "Datenbank in privates Netzwerk migrieren",
+      "finding_refs": ["001"],
+      "effort": "4-8 h"
+    }
+  ]
+}
