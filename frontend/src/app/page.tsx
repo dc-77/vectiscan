@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { createScan, getScanStatus, ScanStatus } from '@/lib/api';
+import { createScan, getScanStatus, cancelScan, ScanStatus } from '@/lib/api';
+import VectiScanLogo from '@/components/VectiScanLogo';
 import ScanProgress from '@/components/ScanProgress';
 import HostList from '@/components/HostList';
 import ReportDownload from '@/components/ReportDownload';
@@ -15,6 +16,7 @@ export default function Home() {
   const [scan, setScan] = useState<ScanStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const stopPolling = useCallback(() => {
@@ -77,10 +79,24 @@ export default function Home() {
   };
 
   const handleRetry = () => {
+    stopPolling();
     setDomain('');
     setScanId(null);
     setScan(null);
     setError(null);
+    setCancelling(false);
+  };
+
+  const handleCancel = async () => {
+    if (!scanId) return;
+    setCancelling(true);
+    try {
+      await cancelScan(scanId);
+      stopPolling();
+      handleRetry();
+    } catch {
+      setCancelling(false);
+    }
   };
 
   const isScanning = scanId && scan && scan.status !== 'report_complete' && scan.status !== 'failed';
@@ -90,8 +106,8 @@ export default function Home() {
       <div className="w-full max-w-2xl space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-white tracking-tight">VectiScan</h1>
-          <p className="text-gray-400">Automated Security Scanning Platform</p>
+          <VectiScanLogo className="mb-4" />
+          <p className="text-gray-400">Automatisierte Security-Scan-Plattform</p>
         </div>
 
         {/* Domain Input Form */}
@@ -125,7 +141,13 @@ export default function Home() {
         )}
 
         {/* Scan Progress */}
-        {scan && isScanning && <ScanProgress scan={scan} />}
+        {scan && isScanning && (
+          <ScanProgress
+            scan={scan}
+            onCancel={handleCancel}
+            cancelling={cancelling}
+          />
+        )}
 
         {/* Host List */}
         {scan && scan.progress.discoveredHosts.length > 0 && scan.status !== 'failed' && (
@@ -134,24 +156,12 @@ export default function Home() {
 
         {/* Report Download */}
         {scan && scan.status === 'report_complete' && scanId && (
-          <ReportDownload scanId={scanId} />
+          <ReportDownload scanId={scanId} onNewScan={handleRetry} />
         )}
 
         {/* Error State */}
         {scan && scan.status === 'failed' && (
           <ScanError error={scan.error} onRetry={handleRetry} />
-        )}
-
-        {/* New Scan button after completion */}
-        {scan && scan.status === 'report_complete' && (
-          <div className="text-center">
-            <button
-              onClick={handleRetry}
-              className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
-            >
-              Neuen Scan starten
-            </button>
-          </div>
         )}
       </div>
     </main>

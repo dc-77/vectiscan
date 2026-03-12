@@ -24,17 +24,40 @@ const PHASE_COLORS: Record<string, string> = {
   failed: 'bg-red-500',
 };
 
-interface Props {
-  scan: ScanStatus;
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return '< 1 min';
+  const m = Math.round(seconds / 60);
+  if (m < 60) return `~${m} min`;
+  const h = Math.floor(m / 60);
+  const rm = m % 60;
+  return `~${h}h ${rm}m`;
 }
 
-export default function ScanProgress({ scan }: Props) {
-  const { status, progress, domain } = scan;
+interface Props {
+  scan: ScanStatus;
+  onCancel?: () => void;
+  cancelling?: boolean;
+}
+
+export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
+  const { status, progress, domain, startedAt } = scan;
   const label = PHASE_LABELS[status] || status;
   const color = PHASE_COLORS[status] || 'bg-gray-500';
   const percent = progress.hostsTotal > 0
     ? Math.round((progress.hostsCompleted / progress.hostsTotal) * 100)
     : 0;
+
+  // Estimate remaining time based on elapsed time and progress
+  let estimatedRemaining: string | null = null;
+  if (startedAt && progress.hostsTotal > 0 && progress.hostsCompleted > 0) {
+    const elapsedMs = Date.now() - new Date(startedAt).getTime();
+    const elapsedSec = elapsedMs / 1000;
+    const perHost = elapsedSec / progress.hostsCompleted;
+    const remaining = perHost * (progress.hostsTotal - progress.hostsCompleted);
+    // Add ~2min buffer for report generation if still scanning
+    const reportBuffer = status.startsWith('scan_') ? 120 : 0;
+    estimatedRemaining = formatDuration(remaining + reportBuffer);
+  }
 
   return (
     <div className="rounded-lg bg-[#1e293b] p-6 space-y-4">
@@ -66,10 +89,27 @@ export default function ScanProgress({ scan }: Props) {
           </div>
           <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 rounded-full transition-all duration-500"
+              className="h-full bg-blue-500 rounded-full transition-all duration-1000 ease-in-out"
               style={{ width: `${percent}%` }}
             />
           </div>
+          {estimatedRemaining && (
+            <div className="text-xs text-gray-500 text-right" data-testid="time-estimate">
+              Geschätzte Restzeit: {estimatedRemaining}
+            </div>
+          )}
+        </div>
+      )}
+
+      {onCancel && (
+        <div className="pt-2 border-t border-gray-700">
+          <button
+            onClick={onCancel}
+            disabled={cancelling}
+            className="text-red-400 hover:text-red-300 disabled:text-gray-600 text-sm transition-colors"
+          >
+            {cancelling ? 'Wird abgebrochen...' : 'Scan abbrechen'}
+          </button>
         </div>
       )}
     </div>
