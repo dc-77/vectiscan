@@ -1,4 +1,9 @@
 import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import { initDb } from './lib/db.js';
+import { initBuckets } from './lib/minio.js';
+import { healthRoutes } from './routes/health.js';
+import { scanRoutes } from './routes/scans.js';
 
 export function buildServer() {
   const server = Fastify({
@@ -10,9 +15,9 @@ export function buildServer() {
     },
   });
 
-  server.get('/health', async () => {
-    return { success: true, data: { status: 'ok' } };
-  });
+  server.register(cors, { origin: true });
+  server.register(healthRoutes);
+  server.register(scanRoutes);
 
   return server;
 }
@@ -23,6 +28,12 @@ async function start() {
   const host = process.env.HOST || '0.0.0.0';
 
   try {
+    await initDb();
+    server.log.info('Database initialized');
+
+    await initBuckets();
+    server.log.info('MinIO buckets verified');
+
     await server.listen({ port, host });
     server.log.info(`VectiScan API started on ${host}:${port}`);
   } catch (err) {
