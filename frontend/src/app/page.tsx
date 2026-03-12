@@ -1,7 +1,159 @@
+'use client';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { createScan, getScanStatus, ScanStatus } from '@/lib/api';
+import ScanProgress from '@/components/ScanProgress';
+import HostList from '@/components/HostList';
+import ReportDownload from '@/components/ReportDownload';
+import ScanError from '@/components/ScanError';
+
+const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
 export default function Home() {
+  const [domain, setDomain] = useState('');
+  const [scanId, setScanId] = useState<string | null>(null);
+  const [scan, setScan] = useState<ScanStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const pollStatus = useCallback(async (id: string) => {
+    try {
+      const res = await getScanStatus(id);
+      if (res.success && res.data) {
+        setScan(res.data);
+        if (res.data.status === 'report_complete' || res.data.status === 'failed') {
+          stopPolling();
+        }
+      }
+    } catch {
+      // Network error — keep polling
+    }
+  }, [stopPolling]);
+
+  const startPolling = useCallback((id: string) => {
+    stopPolling();
+    pollStatus(id);
+    intervalRef.current = setInterval(() => pollStatus(id), 3000);
+  }, [pollStatus, stopPolling]);
+
+  useEffect(() => {
+    return () => stopPolling();
+  }, [stopPolling]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setScan(null);
+    setScanId(null);
+
+    const trimmed = domain.trim().toLowerCase();
+    if (!DOMAIN_REGEX.test(trimmed)) {
+      setError('Ungültige Domain. Bitte einen gültigen FQDN eingeben (ohne http://, Pfad oder Port).');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await createScan(trimmed);
+      if (res.success && res.data) {
+        setScanId(res.data.id);
+        startPolling(res.data.id);
+      } else {
+        setError(res.error || 'Unbekannter Fehler');
+      }
+    } catch {
+      setError('API nicht erreichbar. Läuft der Backend-Server?');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRetry = () => {
+    setDomain('');
+    setScanId(null);
+    setScan(null);
+    setError(null);
+  };
+
+  const isScanning = scanId && scan && scan.status !== 'report_complete' && scan.status !== 'failed';
+
   return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-4xl font-bold">VectiScan</h1>
+    <main className="min-h-screen flex flex-col items-center px-4 py-12">
+      <div className="w-full max-w-2xl space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold text-white tracking-tight">VectiScan</h1>
+          <p className="text-gray-400">Automated Security Scanning Platform</p>
+        </div>
+
+        {/* Domain Input Form */}
+        {!scanId && (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                placeholder="beispiel.de"
+                disabled={submitting}
+                className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                disabled={submitting || !domain.trim()}
+                className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
+              >
+                {submitting ? 'Startet...' : 'Scan starten'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Error Toast */}
+        {error && !scanId && (
+          <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* Scan Progress */}
+        {scan && isScanning && <ScanProgress scan={scan} />}
+
+        {/* Host List */}
+        {scan && scan.progress.discoveredHosts.length > 0 && scan.status !== 'failed' && (
+          <HostList hosts={scan.progress.discoveredHosts} />
+        )}
+
+        {/* Report Download */}
+        {scan && scan.status === 'report_complete' && scanId && (
+          <ReportDownload scanId={scanId} />
+        )}
+
+        {/* Error State */}
+        {scan && scan.status === 'failed' && (
+          <ScanError error={scan.error} onRetry={handleRetry} />
+        )}
+
+        {/* New Scan button after completion */}
+        {scan && scan.status === 'report_complete' && (
+          <div className="text-center">
+            <button
+              onClick={handleRetry}
+              className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+            >
+              Neuen Scan starten
+            </button>
+          </div>
+        )}
+      </div>
     </main>
   );
 }
