@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  api:
+    build: ./api
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
+      - redis
+
+  scan-worker:
+    build: ./scan-worker
+    depends_on:
+      - redis
+      - db
+
+  report-worker:
+    build: ./report-worker
+    depends_on:
+      - redis
+      - db
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: vectiscan
+      POSTGRES_USER: vectiscan
+      POSTGRES_PASSWORD: changeme
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  db-data:

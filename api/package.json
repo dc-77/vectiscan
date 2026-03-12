@@ -1,0 +1,9 @@
+{
+  "name": "vectiscan-api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "echo 'TODO: configure API server'",
+    "dev": "echo 'TODO: configure dev mode'"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "vectiscan-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "echo 'TODO: configure frontend framework'",
+    "build": "echo 'TODO: configure build'"
+  }
+}
