@@ -85,7 +85,7 @@ WORKDIR /opt/scanner
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 
-COPY scanner/ /opt/scanner/
+COPY scanner/ /opt/scanner/scanner/
 
 # ── 7. Verification ────────────────────────────────────────────────
 RUN nmap --version; \
