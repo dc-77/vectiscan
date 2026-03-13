@@ -95,8 +95,8 @@ RUN nmap --version && \
     gobuster version && \
     dnsx -version && \
     gowitness version && \
-    /opt/testssl.sh/testssl.sh --help || true && \
-    nikto -Version && \
+    (/opt/testssl.sh/testssl.sh --help || true) && \
+    perl /opt/nikto/program/nikto.pl -Version && \
     wafw00f --version && \
     webtech --help
 
