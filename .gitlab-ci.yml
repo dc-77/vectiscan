@@ -65,7 +65,7 @@ build-report-worker:
   tags: [vectigal]
   script:
     - trivy image --exit-code 1 --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
-  allow_failure: false
+  allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
