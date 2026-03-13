@@ -1,0 +1,27 @@
+{
+  "name": "@e2e/vectiscan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "test:e2e:headed": "playwright test --config e2e/playwright.config.ts --headed",
+    "test:e2e:health": "playwright test --config e2e/playwright.config.ts health",
+    "test:e2e:auth": "playwright test --config e2e/playwright.config.ts auth",
+    "test:e2e:scan": "playwright test --config e2e/playwright.config.ts scan"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:40603/git/dc-77/vectiscan"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}
