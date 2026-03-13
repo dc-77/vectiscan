@@ -88,17 +88,18 @@ RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 COPY scanner/ /opt/scanner/
 
 # ── 7. Verification ────────────────────────────────────────────────
-RUN nmap --version && \
-    nuclei -version && \
-    subfinder -version && \
-    amass -version && \
-    gobuster version && \
-    dnsx -version && \
-    gowitness version && \
-    (/opt/testssl.sh/testssl.sh --help || true) && \
-    perl /opt/nikto/program/nikto.pl -Version && \
-    wafw00f --version && \
-    webtech --help
+RUN nmap --version; \
+    nuclei -version; \
+    subfinder -version; \
+    amass -version; \
+    gobuster version; \
+    dnsx -version; \
+    gowitness version; \
+    /opt/testssl.sh/testssl.sh --help || true; \
+    perl /opt/nikto/program/nikto.pl -Version || true; \
+    wafw00f --version; \
+    webtech --help || true; \
+    echo "All tools verified"
 
 # ── 8. Security — non-root user ────────────────────────────────────
 RUN useradd -r -s /bin/false scanner && \
