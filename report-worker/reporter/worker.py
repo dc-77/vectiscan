@@ -37,7 +37,7 @@ MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY", "minioadmin")
 MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY", "minioadmin")
 MINIO_SECURE = os.environ.get("MINIO_SECURE", "false").lower() == "true"
 
-QUEUE_NAME = "report:pending"
+QUEUE_NAME = "report-pending"
 RAWDATA_BUCKET = "scan-rawdata"
 REPORTS_BUCKET = "scan-reports"
 BLPOP_TIMEOUT = 5  # seconds

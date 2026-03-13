@@ -98,7 +98,7 @@ def test_upload_to_minio_creates_bucket_if_missing(mock_get_client: MagicMock, t
 
 @patch("scanner.upload.redis")
 def test_enqueue_report_job_pushes_correct_payload(mock_redis_module: MagicMock) -> None:
-    """enqueue_report_job pushes correct JSON to report:pending queue."""
+    """enqueue_report_job pushes correct JSON to report-pending queue."""
     from scanner.upload import enqueue_report_job
 
     mock_redis_client = MagicMock()
@@ -118,7 +118,7 @@ def test_enqueue_report_job_pushes_correct_payload(mock_redis_module: MagicMock)
     queue_name = mock_redis_client.rpush.call_args[0][0]
     payload_json = mock_redis_client.rpush.call_args[0][1]
 
-    assert queue_name == "report:pending"
+    assert queue_name == "report-pending"
 
     payload = json.loads(payload_json)
     assert payload["scanId"] == "scan-abc"

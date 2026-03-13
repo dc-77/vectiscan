@@ -65,7 +65,7 @@ def enqueue_report_job(
     host_inventory: dict,
     tech_profiles: list[dict],
 ) -> None:
-    """Push a job to the report:pending queue in Redis."""
+    """Push a job to the report-pending queue in Redis."""
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
     r = redis.from_url(redis_url)
 
@@ -76,5 +76,5 @@ def enqueue_report_job(
         "techProfiles": tech_profiles,
     })
 
-    r.rpush("report:pending", job_data)
+    r.rpush("report-pending", job_data)
     log.info("report_job_enqueued", scan_id=scan_id)

@@ -152,10 +152,10 @@ def _finalize(
 
 def wait_for_jobs(redis_client: redis.Redis) -> None:
     """Block and wait for scan jobs on the Redis queue."""
-    log.info("waiting_for_jobs", queue="scan:pending")
+    log.info("waiting_for_jobs", queue="scan-pending")
     while True:
         try:
-            result = redis_client.blpop("scan:pending", timeout=5)
+            result = redis_client.blpop("scan-pending", timeout=5)
             if result is None:
                 continue
 

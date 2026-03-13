@@ -9,7 +9,7 @@ function getRedisConnection() {
   };
 }
 
-export const scanQueue = new Queue('scan:pending', {
+export const scanQueue = new Queue('scan-pending', {
   connection: getRedisConnection(),
   defaultJobOptions: {
     attempts: 3,
@@ -19,7 +19,7 @@ export const scanQueue = new Queue('scan:pending', {
   },
 });
 
-export const reportQueue = new Queue('report:pending', {
+export const reportQueue = new Queue('report-pending', {
   connection: getRedisConnection(),
   defaultJobOptions: {
     attempts: 3,
