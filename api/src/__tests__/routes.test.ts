@@ -79,7 +79,7 @@ describe('API Routes', () => {
       expect(body.data.status).toBe('created');
       expect(mockScanQueueAdd).toHaveBeenCalledWith('scan', {
         scanId: '550e8400-e29b-41d4-a716-446655440000',
-        domain: 'example.com',
+        targetDomain: 'example.com',
       });
     });
 
