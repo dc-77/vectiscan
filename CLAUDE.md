@@ -8,7 +8,7 @@ kein E-Mail-Versand. Nur: Domain eingeben → Scannen → PDF-Report herunterlad
 ## Zielumgebung
 - Server: vectigal-docker02 (Debian 13, 192.168.8.44, DMZ)
 - Reverse Proxy: Traefik v3.6 (Auto-Discovery über Labels)
-- Registry: git-extern.bergersysteme.com:5050
+- Registry: ghcr.io/dc-77/vectiscan
 - CI/CD: GitLab Runner auf vectigal-docker02 (Shell Executor, Tag: vectigal)
 - Zugriff: nur internes Netzwerk (Traefik-Middleware: internal-only@file)
 - DNS: *.vectigal.tech zeigt auf den Server

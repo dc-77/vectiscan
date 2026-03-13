@@ -11,7 +11,7 @@ volumes:
 
 services:
   frontend:
-    image: git-extern.bergersysteme.com:5050/team/vectiscan/frontend:${TAG:-latest}
+    image: ghcr.io/dc-77/vectiscan/frontend:${TAG:-latest}
     restart: unless-stopped
     environment:
       NEXT_PUBLIC_API_URL: https://scan-api.vectigal.tech
@@ -33,7 +33,7 @@ services:
       - vectiscan-internal
 
   api:
-    image: git-extern.bergersysteme.com:5050/team/vectiscan/api:${TAG:-latest}
+    image: ghcr.io/dc-77/vectiscan/api:${TAG:-latest}
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
@@ -71,7 +71,7 @@ services:
       - vectiscan-internal
 
   scan-worker:
-    image: git-extern.bergersysteme.com:5050/team/vectiscan/scan-worker:${TAG:-latest}
+    image: ghcr.io/dc-77/vectiscan/scan-worker:${TAG:-latest}
     restart: unless-stopped
     environment:
       REDIS_URL: redis://redis:6379
@@ -94,7 +94,7 @@ services:
       - vectiscan-internal
 
   report-worker:
-    image: git-extern.bergersysteme.com:5050/team/vectiscan/report-worker:${TAG:-latest}
+    image: ghcr.io/dc-77/vectiscan/report-worker:${TAG:-latest}
     restart: unless-stopped
     environment:
       REDIS_URL: redis://redis:6379

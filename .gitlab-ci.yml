@@ -7,8 +7,8 @@
 # =============================================================================
 
 variables:
-  REGISTRY: git-extern.bergersysteme.com:5050
-  BASE_IMAGE: ${REGISTRY}/${CI_PROJECT_PATH}
+  REGISTRY: ghcr.io
+  BASE_IMAGE: ${REGISTRY}/dc-77/vectiscan
   APP_NAME: vectiscan
   DEPLOY_PATH: /opt/apps/${APP_NAME}
 
@@ -25,6 +25,8 @@ stages:
 .build-base:
   stage: build
   tags: [vectigal]
+  before_script:
+    - echo "${GHCR_TOKEN}" | docker login ghcr.io -u dc-77 --password-stdin
   script:
     - docker build -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest ${SERVICE}/
     - docker push ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
@@ -132,6 +134,8 @@ test-report-worker:
 
 .deploy-base:
   tags: [vectigal]
+  before_script:
+    - echo "${GHCR_TOKEN}" | docker login ghcr.io -u dc-77 --password-stdin
   script:
     - cd ${DEPLOY_PATH}
     - cp docker-compose.yml docker-compose.yml.bak
