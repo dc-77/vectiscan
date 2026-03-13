@@ -111,7 +111,7 @@ test-scan-worker:
   tags: [vectigal]
   image: python:3.12-slim
   script:
-    - cd scan-worker && pip install -r requirements.txt && pytest
+    - cd scan-worker && python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt && pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -122,7 +122,7 @@ test-report-worker:
   tags: [vectigal]
   image: python:3.12-slim
   script:
-    - cd report-worker && pip install -r requirements.txt && pytest
+    - cd report-worker && python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt && pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
