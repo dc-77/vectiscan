@@ -62,7 +62,7 @@ def test_wordlists() -> None:
 
 
 def test_entrypoint() -> None:
-    """Entrypoint must invoke worker.py via python3."""
+    """Entrypoint must invoke scanner module via python3."""
     content = _read_dockerfile()
-    assert "worker.py" in content
+    assert '"-m", "scanner"' in content
     assert "python3" in content
