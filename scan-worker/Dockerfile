@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       ca-certificates curl wget unzip jq dnsutils git \
       python3 python3-pip python3-venv \
-      nmap nikto sslscan openssl && \
+      nmap nikto openssl && \
     rm -rf /var/lib/apt/lists/*
 
 # ── 2. Go binaries — pinned versions ────────────────────────────────
