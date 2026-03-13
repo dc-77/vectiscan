@@ -155,7 +155,7 @@ test-report-worker:
     - docker compose pull
     - TAG=${TAG} docker compose up -d --remove-orphans
     # Give all 7 containers time to pass health checks
-    - sleep 15
+    - sleep 30
     - docker compose ps
     - docker compose ps --format json | python3 -c "import sys,json; containers=[json.loads(line) for line in sys.stdin if line.strip()]; unhealthy=[c['Name'] for c in containers if c.get('Health','') not in ('','healthy') or c.get('State')!='running']; print('Unhealthy:',unhealthy) if unhealthy else print('All healthy'); exit(1 if unhealthy else 0)"
   environment:
@@ -192,7 +192,7 @@ rollback:
     - cp .env.bak .env
     - docker compose pull
     - docker compose up -d --remove-orphans
-    - sleep 15
+    - sleep 30
     - docker compose ps
   environment:
     name: production
