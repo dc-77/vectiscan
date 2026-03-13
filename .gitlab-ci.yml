@@ -31,6 +31,7 @@ stages:
     - docker push ${BASE_IMAGE}/${SERVICE}:latest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
 
 build-frontend:
@@ -65,6 +66,7 @@ build-report-worker:
   allow_failure: false
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
 
 trivy-frontend:
@@ -99,6 +101,7 @@ test-api:
     - cd api && npm ci && npm test
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
 
 test-scan-worker:
@@ -109,6 +112,7 @@ test-scan-worker:
     - cd scan-worker && pip install -r requirements.txt && pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
 
 test-report-worker:
@@ -119,6 +123,7 @@ test-report-worker:
     - cd report-worker && pip install -r requirements.txt && pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
 
 # =============================================================================
