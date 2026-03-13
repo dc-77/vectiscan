@@ -70,7 +70,7 @@ def test_upload_to_minio_calls_fput_object(mock_get_client: MagicMock, tmp_path:
 
     result = upload_to_minio(archive_path, "scan-456")
 
-    assert result == "scan-rawdata/scan-456.tar.gz"
+    assert result == "scan-456.tar.gz"
     mock_client.fput_object.assert_called_once_with(
         "scan-rawdata", "scan-456.tar.gz", archive_path,
     )
