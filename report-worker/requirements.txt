@@ -1,1 +1,6 @@
-# TODO: Add report worker dependencies
+redis==5.2.1
+minio==7.2.15
+psycopg2-binary==2.9.10
+anthropic==0.52.0
+reportlab==4.4.0
+structlog==25.1.0

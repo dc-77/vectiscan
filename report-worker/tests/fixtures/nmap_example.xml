@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sV -sC -T4 --top-ports 1000 -oX nmap.xml 88.99.35.112" start="1710000000" startstr="Wed Mar 12 10:00:00 2026" version="7.94" xmloutputversion="1.05">
+  <host starttime="1710000000" endtime="1710000060">
+    <status state="up" reason="syn-ack"/>
+    <address addr="88.99.35.112" addrtype="ipv4"/>
+    <hostnames>
+      <hostname name="beispiel.de" type="PTR"/>
+    </hostnames>
+    <ports>
+      <port protocol="tcp" portid="22">
+        <state state="open" reason="syn-ack"/>
+        <service name="ssh" product="OpenSSH" version="8.9p1"/>
+      </port>
+      <port protocol="tcp" portid="80">
+        <state state="open" reason="syn-ack"/>
+        <service name="http" product="nginx" version="1.24.0"/>
+      </port>
+      <port protocol="tcp" portid="443">
+        <state state="open" reason="syn-ack"/>
+        <service name="https" product="nginx" version="1.24.0"/>
+      </port>
+      <port protocol="tcp" portid="3306">
+        <state state="open" reason="syn-ack"/>
+        <service name="mysql" product="MariaDB" version="10.11.6"/>
+      </port>
+      <port protocol="tcp" portid="8080">
+        <state state="closed" reason="reset"/>
+        <service name="http-proxy"/>
+      </port>
+    </ports>
+  </host>
+</nmaprun>

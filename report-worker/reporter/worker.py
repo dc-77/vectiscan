@@ -1,2 +1,307 @@
 """BullMQ Consumer — Orchestriert die Report-Generierung."""
-# TODO: Implement BullMQ consumer for report:pending queue
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import signal
+import sys
+import tarfile
+import tempfile
+import time
+from datetime import datetime
+from pathlib import Path
+
+import psycopg2
+import psycopg2.extras
+import redis
+import structlog
+from minio import Minio
+
+from reporter.claude_client import call_claude
+from reporter.generate_report import generate_report
+from reporter.parser import parse_scan_data
+from reporter.report_mapper import map_to_report_data
+
+log = structlog.get_logger()
+
+# ---------------------------------------------------------------------------
+# Configuration (all via environment variables)
+# ---------------------------------------------------------------------------
+
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan")
+MINIO_ENDPOINT = os.environ.get("MINIO_ENDPOINT", "minio:9000")
+MINIO_ACCESS_KEY = os.environ.get("MINIO_ACCESS_KEY", "minioadmin")
+MINIO_SECRET_KEY = os.environ.get("MINIO_SECRET_KEY", "minioadmin")
+MINIO_SECURE = os.environ.get("MINIO_SECURE", "false").lower() == "true"
+
+QUEUE_NAME = "report:pending"
+RAWDATA_BUCKET = "scan-rawdata"
+REPORTS_BUCKET = "scan-reports"
+BLPOP_TIMEOUT = 5  # seconds
+
+
+# ---------------------------------------------------------------------------
+# Database helpers
+# ---------------------------------------------------------------------------
+
+def _get_db_connection() -> psycopg2.extensions.connection:
+    """Create a new database connection."""
+    return psycopg2.connect(DATABASE_URL)
+
+
+def _create_report_record(
+    conn: psycopg2.extensions.connection,
+    scan_id: str,
+    minio_path: str,
+    file_size_bytes: int,
+) -> str:
+    """Insert a row into the reports table and return the new report id."""
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO reports (scan_id, minio_bucket, minio_path, file_size_bytes)
+            VALUES (%s, %s, %s, %s)
+            RETURNING id
+            """,
+            (scan_id, REPORTS_BUCKET, minio_path, file_size_bytes),
+        )
+        report_id = cur.fetchone()[0]
+    conn.commit()
+    return str(report_id)
+
+
+def _update_scan_status(
+    conn: psycopg2.extensions.connection,
+    scan_id: str,
+    status: str,
+    error_message: str | None = None,
+) -> None:
+    """Update the scan status (and optionally the error_message)."""
+    with conn.cursor() as cur:
+        if error_message is not None:
+            cur.execute(
+                """
+                UPDATE scans
+                   SET status = %s, error_message = %s, updated_at = NOW()
+                 WHERE id = %s
+                """,
+                (status, error_message, scan_id),
+            )
+        else:
+            cur.execute(
+                """
+                UPDATE scans
+                   SET status = %s, updated_at = NOW()
+                 WHERE id = %s
+                """,
+                (status, scan_id),
+            )
+    conn.commit()
+
+
+# ---------------------------------------------------------------------------
+# MinIO helpers
+# ---------------------------------------------------------------------------
+
+def _get_minio_client() -> Minio:
+    """Create a MinIO client."""
+    return Minio(
+        MINIO_ENDPOINT,
+        access_key=MINIO_ACCESS_KEY,
+        secret_key=MINIO_SECRET_KEY,
+        secure=MINIO_SECURE,
+    )
+
+
+def _download_rawdata(minio_client: Minio, raw_data_path: str, dest: Path) -> Path:
+    """Download the tar.gz from MinIO and return the local file path."""
+    local_tar = dest / "rawdata.tar.gz"
+    minio_client.fget_object(RAWDATA_BUCKET, raw_data_path, str(local_tar))
+    log.info("rawdata_downloaded", path=raw_data_path, size=local_tar.stat().st_size)
+    return local_tar
+
+
+def _upload_report(minio_client: Minio, local_path: Path, minio_path: str) -> int:
+    """Upload the PDF to MinIO and return file size in bytes."""
+    # Ensure the bucket exists
+    if not minio_client.bucket_exists(REPORTS_BUCKET):
+        minio_client.make_bucket(REPORTS_BUCKET)
+
+    file_size = local_path.stat().st_size
+    minio_client.fput_object(
+        REPORTS_BUCKET,
+        minio_path,
+        str(local_path),
+        content_type="application/pdf",
+    )
+    log.info("report_uploaded", bucket=REPORTS_BUCKET, path=minio_path, size=file_size)
+    return file_size
+
+
+# ---------------------------------------------------------------------------
+# Job processing
+# ---------------------------------------------------------------------------
+
+def process_job(job_data: dict) -> None:
+    """Process a single report-generation job end-to-end.
+
+    Expected *job_data* keys:
+      - scanId            (str, UUID)
+      - rawDataPath       (str, e.g. "<scanId>.tar.gz")
+      - hostInventory     (dict, Phase-0 host inventory)
+      - techProfiles      (list[dict], per-host technology profiles)
+    """
+    scan_id: str = job_data["scanId"]
+    raw_data_path: str = job_data["rawDataPath"]
+    host_inventory: dict = job_data["hostInventory"]
+    tech_profiles: list[dict] = job_data["techProfiles"]
+
+    work_dir = Path(tempfile.mkdtemp(prefix=f"report-{scan_id}-"))
+    log.info("job_started", scan_id=scan_id, work_dir=str(work_dir))
+
+    conn: psycopg2.extensions.connection | None = None
+
+    try:
+        # -- Clients ----------------------------------------------------------
+        minio_client = _get_minio_client()
+        conn = _get_db_connection()
+
+        # -- 1. Download raw data from MinIO ----------------------------------
+        tar_path = _download_rawdata(minio_client, raw_data_path, work_dir)
+
+        # -- 2. Extract tar.gz ------------------------------------------------
+        extract_dir = work_dir / "scan-data"
+        extract_dir.mkdir()
+        with tarfile.open(tar_path, "r:gz") as tar:
+            tar.extractall(path=extract_dir)  # noqa: S202
+        log.info("rawdata_extracted", dest=str(extract_dir))
+
+        # -- 3. Parse scan data -----------------------------------------------
+        parsed = parse_scan_data(str(extract_dir))
+        parsed_inventory = parsed["host_inventory"]
+        parsed_profiles = parsed["tech_profiles"]
+        consolidated_findings = parsed["consolidated_findings"]
+        log.info("scan_data_parsed", hosts=len(parsed_inventory.get("hosts", [])))
+
+        # Use parsed inventory/profiles, fall back to job payload
+        effective_inventory = parsed_inventory if parsed_inventory.get("hosts") else host_inventory
+        effective_profiles = parsed_profiles if parsed_profiles else tech_profiles
+        domain = effective_inventory.get("domain", "unknown")
+
+        # -- 4. Call Claude API for analysis ----------------------------------
+        claude_output = call_claude(
+            domain=domain,
+            host_inventory=effective_inventory,
+            tech_profiles=effective_profiles,
+            consolidated_findings=consolidated_findings,
+        )
+        log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
+
+        # -- 5. Map Claude output to report_data ------------------------------
+        scan_meta = {
+            "domain": domain,
+            "scanId": scan_id,
+            "startedAt": datetime.now().isoformat(),
+        }
+        report_data = map_to_report_data(
+            claude_output=claude_output,
+            scan_meta=scan_meta,
+            host_inventory=effective_inventory,
+        )
+        log.info("report_data_mapped")
+
+        # -- 6. Generate PDF --------------------------------------------------
+        pdf_path = work_dir / f"{scan_id}.pdf"
+        generate_report(report_data, str(pdf_path))
+        log.info("pdf_generated", path=str(pdf_path), size=pdf_path.stat().st_size)
+
+        # -- 7. Upload PDF to MinIO -------------------------------------------
+        minio_pdf_path = f"{scan_id}.pdf"
+        file_size = _upload_report(minio_client, pdf_path, minio_pdf_path)
+
+        # -- 8. Create report record in DB ------------------------------------
+        report_id = _create_report_record(conn, scan_id, minio_pdf_path, file_size)
+        log.info("report_record_created", report_id=report_id)
+
+        # -- 9. Update scan status to report_complete -------------------------
+        _update_scan_status(conn, scan_id, "report_complete")
+        log.info("job_completed", scan_id=scan_id)
+
+    except Exception:
+        log.exception("job_failed", scan_id=scan_id)
+        # Best-effort: mark the scan as failed in the database
+        try:
+            if conn is None:
+                conn = _get_db_connection()
+            import traceback
+            err_msg = traceback.format_exc()[-500:]  # keep last 500 chars
+            _update_scan_status(conn, scan_id, "failed", error_message=err_msg)
+        except Exception:
+            log.exception("failed_to_update_scan_status", scan_id=scan_id)
+    finally:
+        # -- 10. Clean up /tmp ------------------------------------------------
+        try:
+            shutil.rmtree(work_dir, ignore_errors=True)
+            log.info("work_dir_cleaned", path=str(work_dir))
+        except Exception:
+            log.warning("cleanup_failed", path=str(work_dir))
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+
+# ---------------------------------------------------------------------------
+# Queue consumer loop
+# ---------------------------------------------------------------------------
+
+def wait_for_jobs(redis_client: redis.Redis) -> None:
+    """Block and wait for report jobs on the Redis queue."""
+    log.info("waiting_for_jobs", queue=QUEUE_NAME)
+    while True:
+        try:
+            result = redis_client.blpop(QUEUE_NAME, timeout=BLPOP_TIMEOUT)
+            if result is None:
+                continue
+
+            _, raw_data = result
+            try:
+                job_data = json.loads(raw_data)
+            except json.JSONDecodeError:
+                log.error("invalid_job_data", data=raw_data.decode(errors="replace"))
+                continue
+
+            log.info("job_received", scan_id=job_data.get("scanId"))
+            process_job(job_data)
+
+        except redis.ConnectionError:
+            log.warning("redis_connection_lost", retry_in_seconds=5)
+            time.sleep(5)
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    """Entry point for the report worker."""
+    log.info("report_worker_started")
+
+    redis_client = redis.from_url(REDIS_URL)
+
+    def shutdown(signum: int, frame: object) -> None:
+        log.info("report_worker_shutdown", signal=signum)
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, shutdown)
+    signal.signal(signal.SIGINT, shutdown)
+
+    wait_for_jobs(redis_client)
+
+
+if __name__ == "__main__":
+    main()

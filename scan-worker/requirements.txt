@@ -1,1 +1,4 @@
-# TODO: Add scan worker dependencies
+redis==5.2.1
+minio==7.2.15
+psycopg2-binary==2.9.10
+structlog==25.1.0

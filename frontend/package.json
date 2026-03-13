@@ -3,7 +3,30 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "echo 'TODO: configure frontend framework'",
-    "build": "echo 'TODO: configure build'"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "next": "^15.3.3",
+    "playwright": "^1.58.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.7",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.21",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.7",
+    "ts-jest": "^29.3.4",
+    "typescript": "^5.8.3"
   }
 }
