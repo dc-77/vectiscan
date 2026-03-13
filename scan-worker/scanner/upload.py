@@ -15,7 +15,7 @@ log = structlog.get_logger()
 def get_minio_client() -> Minio:
     """Create MinIO client from environment variables."""
     return Minio(
-        os.environ.get("MINIO_ENDPOINT", "minio:9000"),
+        f"{os.environ.get('MINIO_ENDPOINT', 'minio')}:{os.environ.get('MINIO_PORT', '9000')}",
         access_key=os.environ.get("MINIO_ACCESS_KEY", "minioadmin"),
         secret_key=os.environ.get("MINIO_SECRET_KEY", "minioadmin"),
         secure=os.environ.get("MINIO_SECURE", "false").lower() == "true",
