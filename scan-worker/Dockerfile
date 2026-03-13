@@ -101,4 +101,4 @@ RUN useradd -r -s /bin/false scanner && \
     chown -R scanner:scanner /opt/scanner
 
 USER scanner
-ENTRYPOINT ["python3", "worker.py"]
+ENTRYPOINT ["python3", "-m", "scanner"]
