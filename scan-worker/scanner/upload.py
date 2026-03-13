@@ -50,7 +50,7 @@ def upload_to_minio(archive_path: str, scan_id: str) -> str:
     object_name = f"{scan_id}.tar.gz"
     client.fput_object(bucket, object_name, archive_path)
 
-    minio_path = f"{bucket}/{object_name}"
+    minio_path = object_name
     log.info("uploaded_to_minio", scan_id=scan_id, path=minio_path)
 
     # Clean up local archive
