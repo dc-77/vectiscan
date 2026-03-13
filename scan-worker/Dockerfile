@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       ca-certificates curl wget unzip jq dnsutils git \
       python3 python3-pip python3-venv \
-      nmap nikto openssl && \
+      nmap openssl libnet-ssleay-perl && \
     rm -rf /var/lib/apt/lists/*
 
 # ── 2. Go binaries — pinned versions ────────────────────────────────
@@ -64,6 +64,10 @@ RUN nuclei -update-templates
 # ── 3. testssl.sh ───────────────────────────────────────────────────
 RUN git clone --depth 1 https://github.com/drwetter/testssl.sh.git /opt/testssl.sh
 ENV PATH="/opt/testssl.sh:${PATH}"
+
+# ── 3b. nikto (not in bookworm-slim repos) ────────────────────────
+RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto
+ENV PATH="/opt/nikto/program:${PATH}"
 
 # ── 4. Python packages ─────────────────────────────────────────────
 RUN pip3 install --no-cache-dir --break-system-packages wafw00f webtech
