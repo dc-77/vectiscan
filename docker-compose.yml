@@ -42,6 +42,7 @@ services:
       MINIO_PORT: "9000"
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      VECTISCAN_ACCESS_PASSWORD: ${VECTISCAN_ACCESS_PASSWORD}
     deploy:
       resources:
         limits:

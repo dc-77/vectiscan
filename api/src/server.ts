@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { initDb } from './lib/db.js';
 import { initBuckets } from './lib/minio.js';
+import { authRoutes } from './routes/auth.js';
 import { healthRoutes } from './routes/health.js';
 import { scanRoutes } from './routes/scans.js';
 
@@ -16,6 +17,7 @@ export function buildServer() {
   });
 
   server.register(cors, { origin: true });
+  server.register(authRoutes);
   server.register(healthRoutes);
   server.register(scanRoutes);
 

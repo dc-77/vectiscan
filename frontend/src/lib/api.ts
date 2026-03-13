@@ -68,3 +68,12 @@ export async function cancelScan(id: string): Promise<ApiResponse<null>> {
   const res = await fetch(`${API_URL}/api/scans/${id}`, { method: 'DELETE' });
   return res.json();
 }
+
+export async function verifyPassword(password: string): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/auth/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password }),
+  });
+  return res.json();
+}
