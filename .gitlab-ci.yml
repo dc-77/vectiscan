@@ -156,7 +156,7 @@ test-report-worker:
     - TAG=${TAG} docker compose up -d --remove-orphans
     # Give all 7 containers time to pass health checks
     - sleep 15
-    - docker compose ps --format json | python3 -c "import sys,json; containers=json.loads(sys.stdin.read()); exit(0 if all(c.get('Health','')=='healthy' or c.get('State')=='running' for c in containers) else 1)"
+    - docker compose ps --format json | python3 -c "import sys,json; containers=[json.loads(line) for line in sys.stdin if line.strip()]; exit(0 if all(c.get('Health','')=='healthy' or c.get('State')=='running' for c in containers) else 1)"
   environment:
     name: production
     url: https://scan.vectigal.tech
