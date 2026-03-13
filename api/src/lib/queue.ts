@@ -1,30 +1,26 @@
-import { Queue } from 'bullmq';
+import { createClient } from 'redis';
 
-function getRedisConnection() {
-  const url = process.env.REDIS_URL || 'redis://localhost:6379';
-  const parsed = new URL(url);
-  return {
-    host: parsed.hostname,
-    port: Number(parsed.port) || 6379,
-  };
+let redisClient: ReturnType<typeof createClient> | null = null;
+
+async function getRedisClient() {
+  if (!redisClient) {
+    const url = process.env.REDIS_URL || 'redis://localhost:6379';
+    redisClient = createClient({ url });
+    await redisClient.connect();
+  }
+  return redisClient;
 }
 
-export const scanQueue = new Queue('scan-pending', {
-  connection: getRedisConnection(),
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: { type: 'exponential', delay: 5000 },
-    removeOnComplete: 100,
-    removeOnFail: 500,
+export const scanQueue = {
+  async add(_name: string, data: Record<string, unknown>) {
+    const client = await getRedisClient();
+    await client.rPush('scan-pending', JSON.stringify(data));
   },
-});
+};
 
-export const reportQueue = new Queue('report-pending', {
-  connection: getRedisConnection(),
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: { type: 'exponential', delay: 5000 },
-    removeOnComplete: 100,
-    removeOnFail: 500,
+export const reportQueue = {
+  async add(_name: string, data: Record<string, unknown>) {
+    const client = await getRedisClient();
+    await client.rPush('report-pending', JSON.stringify(data));
   },
-});
+};
