@@ -26,7 +26,7 @@ stages:
   stage: build
   tags: [vectigal]
   script:
-    - docker build -f ${SERVICE}/Dockerfile -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest .
+    - docker build -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest ${SERVICE}/
     - docker push ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
     - docker push ${BASE_IMAGE}/${SERVICE}:latest
   rules:
