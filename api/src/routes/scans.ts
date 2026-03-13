@@ -31,7 +31,7 @@ export async function scanRoutes(server: FastifyInstance): Promise<void> {
 
     const scan = result.rows[0];
 
-    await scanQueue.add('scan', { scanId: scan.id, domain: scan.domain });
+    await scanQueue.add('scan', { scanId: scan.id, targetDomain: scan.domain });
 
     return reply.status(201).send({
       success: true,
