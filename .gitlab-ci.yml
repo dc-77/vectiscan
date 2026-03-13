@@ -138,8 +138,20 @@ test-report-worker:
     - echo "${GHCR_TOKEN}" | docker login ghcr.io -u dc-77 --password-stdin
   script:
     - cd ${DEPLOY_PATH}
-    - cp docker-compose.yml docker-compose.yml.bak
-    - cp .env .env.bak
+    - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
+    - cp .env .env.bak 2>/dev/null || true
+    - |
+      cat > .env <<ENVEOF
+      DB_NAME=${DB_NAME}
+      DB_USER=${DB_USER}
+      DB_PASSWORD=${DB_PASSWORD}
+      MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      VECTISCAN_ACCESS_PASSWORD=${VECTISCAN_ACCESS_PASSWORD}
+      ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      ENVEOF
+    - sed -i 's/^[[:space:]]*//' .env
+    - cp ${CI_PROJECT_DIR}/docker-compose.yml .
     - docker compose pull
     - TAG=${TAG} docker compose up -d --remove-orphans
     # Give all 7 containers time to pass health checks
