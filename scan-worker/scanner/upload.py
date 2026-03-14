@@ -64,6 +64,7 @@ def enqueue_report_job(
     minio_path: str,
     host_inventory: dict,
     tech_profiles: list[dict],
+    package: str = "professional",
 ) -> None:
     """Push a job to the report-pending queue in Redis."""
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
@@ -74,7 +75,8 @@ def enqueue_report_job(
         "rawDataPath": minio_path,
         "hostInventory": host_inventory,
         "techProfiles": tech_profiles,
+        "package": package,
     })
 
     r.rpush("report-pending", job_data)
-    log.info("report_job_enqueued", scan_id=scan_id)
+    log.info("report_job_enqueued", scan_id=scan_id, package=package)

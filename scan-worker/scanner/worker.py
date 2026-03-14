@@ -12,6 +12,7 @@ from typing import Any
 import redis
 import structlog
 
+from scanner.packages import get_config
 from scanner.phase0 import run_phase0
 from scanner.phase1 import run_phase1
 from scanner.phase2 import run_phase2
@@ -26,25 +27,26 @@ from scanner.upload import enqueue_report_job, pack_results, upload_to_minio
 
 log = structlog.get_logger()
 
-SCAN_TIMEOUT = 7200  # 120 minutes
 
-
-def _process_job(scan_id: str, domain: str) -> None:
+def _process_job(scan_id: str, domain: str, package: str = "professional") -> None:
     """Run the full three-phase scan pipeline for a single job."""
     scan_dir = f"/tmp/scan-{scan_id}"
     os.makedirs(scan_dir, exist_ok=True)
+
+    config = get_config(package)
 
     start = time.monotonic()
 
     def _check_timeout() -> None:
         elapsed = time.monotonic() - start
-        if elapsed >= SCAN_TIMEOUT:
+        if elapsed >= config["total_timeout"]:
             raise TimeoutError(f"Scan timeout after {int(elapsed)}s")
 
     # Write meta.json
     meta = {
         "scanId": scan_id,
         "domain": domain,
+        "package": package,
         "startedAt": datetime.now(timezone.utc).isoformat(),
     }
     with open(f"{scan_dir}/meta.json", "w") as f:
@@ -55,7 +57,7 @@ def _process_job(scan_id: str, domain: str) -> None:
 
     # ── Phase 0: DNS Reconnaissance ─────────────────────────
     update_progress(scan_id, "dns_recon", "starting")
-    host_inventory = run_phase0(domain, scan_dir, scan_id)
+    host_inventory = run_phase0(domain, scan_dir, scan_id, config)
     set_discovered_hosts(scan_id, host_inventory)
 
     hosts = host_inventory.get("hosts", [])
@@ -65,7 +67,7 @@ def _process_job(scan_id: str, domain: str) -> None:
     if hosts_total == 0:
         log.warning("no_hosts_found", scan_id=scan_id, domain=domain)
         # Still complete — report worker handles empty inventory
-        _finalize(scan_id, scan_dir, host_inventory, [])
+        _finalize(scan_id, scan_dir, host_inventory, [], package)
         return
 
     _check_timeout()
@@ -86,7 +88,7 @@ def _process_job(scan_id: str, domain: str) -> None:
 
         update_progress(scan_id, "scan_phase1", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
-        tech_profile = run_phase1(ip, fqdns, scan_dir, scan_id, p1_callback)
+        tech_profile = run_phase1(ip, fqdns, scan_dir, scan_id, p1_callback, config)
         tech_profiles.append(tech_profile)
 
         _check_timeout()
@@ -98,12 +100,12 @@ def _process_job(scan_id: str, domain: str) -> None:
 
         update_progress(scan_id, "scan_phase2", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
-        run_phase2(ip, fqdns, tech_profile, scan_dir, scan_id, p2_callback)
+        run_phase2(ip, fqdns, tech_profile, scan_dir, scan_id, p2_callback, config)
 
         log.info("host_complete", scan_id=scan_id, ip=ip, idx=idx + 1, total=hosts_total)
 
     # ── Finalize ────────────────────────────────────────────
-    _finalize(scan_id, scan_dir, host_inventory, tech_profiles)
+    _finalize(scan_id, scan_dir, host_inventory, tech_profiles, package)
 
 
 def _finalize(
@@ -111,6 +113,7 @@ def _finalize(
     scan_dir: str,
     host_inventory: dict[str, Any],
     tech_profiles: list[dict[str, Any]],
+    package: str = "professional",
 ) -> None:
     """Pack results, upload to MinIO, enqueue report job."""
     hosts_total = len(host_inventory.get("hosts", []))
@@ -135,7 +138,7 @@ def _finalize(
     minio_path = upload_to_minio(archive_path, scan_id)
 
     # Enqueue report generation
-    enqueue_report_job(scan_id, minio_path, host_inventory, tech_profiles)
+    enqueue_report_job(scan_id, minio_path, host_inventory, tech_profiles, package)
 
     # Mark scan as complete
     set_scan_complete(scan_id)
@@ -163,11 +166,12 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
             job = json.loads(job_data.decode())
             scan_id = job["scanId"]
             domain = job["targetDomain"]
+            package = job.get("package", "professional")
 
             log.info("job_received", scan_id=scan_id, domain=domain)
 
             try:
-                _process_job(scan_id, domain)
+                _process_job(scan_id, domain, package)
             except TimeoutError as e:
                 log.error("scan_timeout", scan_id=scan_id, error=str(e))
                 set_scan_failed(scan_id, str(e))

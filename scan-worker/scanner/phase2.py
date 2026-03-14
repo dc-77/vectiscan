@@ -307,6 +307,7 @@ def run_phase2(
     scan_dir: str,
     scan_id: str,
     progress_callback: Callable[[str, str, str], None],
+    config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Orchestrate Phase 2 (deep scan) for a single host.
 
@@ -317,10 +318,15 @@ def run_phase2(
         scan_dir: Base scan directory (e.g. /tmp/scan-<scanId>).
         scan_id: Scan UUID.
         progress_callback: Called after each tool with (scan_id, tool_name, status).
+        config: Package configuration dict (optional).
 
     Returns:
         Results summary dict.
     """
+    phase2_tools = None
+    if config:
+        phase2_tools = config.get("phase2_tools")
+
     host_dir = f"{scan_dir}/hosts/{ip}"
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
@@ -336,44 +342,62 @@ def run_phase2(
         "tools_run": [],
     }
 
-    # testssl (only if SSL present)
-    if has_ssl:
+    # testssl (only if SSL present and in package)
+    if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
         testssl_result = run_testssl(primary_fqdn, ip, host_dir, scan_id)
         results["testssl"] = testssl_result
         results["tools_run"].append("testssl")
         progress_callback(scan_id, "testssl", "complete")
     else:
-        log.info("testssl_skipped", ip=ip, reason="no_ssl")
+        if not has_ssl:
+            log.info("testssl_skipped", ip=ip, reason="no_ssl")
+        else:
+            log.info("testssl_skipped", ip=ip, reason="not_in_package")
 
     # nikto
-    nikto_result = run_nikto(primary_fqdn, ip, host_dir, scan_id)
-    results["nikto"] = nikto_result
-    results["tools_run"].append("nikto")
-    progress_callback(scan_id, "nikto", "complete")
+    if phase2_tools is None or "nikto" in phase2_tools:
+        nikto_result = run_nikto(primary_fqdn, ip, host_dir, scan_id)
+        results["nikto"] = nikto_result
+        results["tools_run"].append("nikto")
+        progress_callback(scan_id, "nikto", "complete")
+    else:
+        log.info("nikto_skipped", ip=ip, reason="not_in_package")
 
     # nuclei
-    nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, scan_id)
-    results["nuclei"] = nuclei_result
-    results["tools_run"].append("nuclei")
-    progress_callback(scan_id, "nuclei", "complete")
+    if phase2_tools is None or "nuclei" in phase2_tools:
+        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, scan_id)
+        results["nuclei"] = nuclei_result
+        results["tools_run"].append("nuclei")
+        progress_callback(scan_id, "nuclei", "complete")
+    else:
+        log.info("nuclei_skipped", ip=ip, reason="not_in_package")
 
     # gobuster dir
-    gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, scan_id)
-    results["gobuster_dir"] = gobuster_result
-    results["tools_run"].append("gobuster_dir")
-    progress_callback(scan_id, "gobuster_dir", "complete")
+    if phase2_tools is None or "gobuster_dir" in phase2_tools:
+        gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, scan_id)
+        results["gobuster_dir"] = gobuster_result
+        results["tools_run"].append("gobuster_dir")
+        progress_callback(scan_id, "gobuster_dir", "complete")
+    else:
+        log.info("gobuster_dir_skipped", ip=ip, reason="not_in_package")
 
     # gowitness
-    gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, scan_id)
-    results["gowitness"] = gowitness_result
-    results["tools_run"].append("gowitness")
-    progress_callback(scan_id, "gowitness", "complete")
+    if phase2_tools is None or "gowitness" in phase2_tools:
+        gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, scan_id)
+        results["gowitness"] = gowitness_result
+        results["tools_run"].append("gowitness")
+        progress_callback(scan_id, "gowitness", "complete")
+    else:
+        log.info("gowitness_skipped", ip=ip, reason="not_in_package")
 
     # header check
-    header_result = run_header_check(primary_fqdn, ip, host_dir, scan_id)
-    results["headers"] = header_result
-    results["tools_run"].append("header_check")
-    progress_callback(scan_id, "header_check", "complete")
+    if phase2_tools is None or "headers" in phase2_tools:
+        header_result = run_header_check(primary_fqdn, ip, host_dir, scan_id)
+        results["headers"] = header_result
+        results["tools_run"].append("header_check")
+        progress_callback(scan_id, "header_check", "complete")
+    else:
+        log.info("headers_skipped", ip=ip, reason="not_in_package")
 
     log.info("phase2_complete", ip=ip, scan_id=scan_id, tools_run=len(results["tools_run"]))
     return results

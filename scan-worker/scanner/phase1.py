@@ -58,7 +58,7 @@ def _parse_nmap_xml(xml_path: str) -> dict[str, Any]:
     return result
 
 
-def run_nmap(ip: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
+def run_nmap(ip: str, scan_dir: str, scan_id: str, nmap_ports: str = "--top-ports 1000") -> dict[str, Any]:
     """Run nmap service/version scan against a host.
 
     Returns parsed results dict with open ports and services.
@@ -70,9 +70,12 @@ def run_nmap(ip: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
     xml_path = f"{phase1_dir}/nmap.xml"
     txt_path = f"{phase1_dir}/nmap.txt"
 
+    # Parse nmap_ports string into args (e.g. "--top-ports 100" -> ["--top-ports", "100"])
+    nmap_port_args = nmap_ports.split()
+
     cmd = [
         "nmap", "-sV", "-sC", "-T4",
-        "--top-ports", "1000",
+        *nmap_port_args,
         "-oX", xml_path,
         "-oN", txt_path,
         ip,
@@ -280,6 +283,7 @@ def run_phase1(
     scan_dir: str,
     scan_id: str,
     progress_callback: Callable[[str, str, str], None],
+    config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Orchestrate Phase 1 (technology detection) for a single host.
 
@@ -289,10 +293,13 @@ def run_phase1(
         scan_dir: Base scan directory (e.g. /tmp/scan-<scanId>).
         scan_id: Scan UUID.
         progress_callback: Called after each tool with (scan_id, tool_name, status).
+        config: Package configuration dict (optional).
 
     Returns:
         Tech profile dict for this host.
     """
+    nmap_ports = config["nmap_ports"] if config else "--top-ports 1000"
+
     host_dir = f"{scan_dir}/hosts/{ip}"
     phase1_dir = f"{host_dir}/phase1"
     os.makedirs(phase1_dir, exist_ok=True)
@@ -300,7 +307,7 @@ def run_phase1(
     log.info("phase1_start", ip=ip, fqdns=fqdns, scan_id=scan_id)
 
     # Run nmap
-    nmap_result = run_nmap(ip, scan_dir, scan_id)
+    nmap_result = run_nmap(ip, scan_dir, scan_id, nmap_ports)
     progress_callback(scan_id, "nmap", "complete")
 
     # Use first FQDN for web-based tools
