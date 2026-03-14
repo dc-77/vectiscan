@@ -299,7 +299,7 @@ function HomeContent() {
             <p className="text-gray-400">Automatisierte Security-Scan-Plattform</p>
             <Link
               href="/dashboard"
-              className="inline-block text-gray-600 hover:text-gray-400 text-sm transition-colors mt-1"
+              className="inline-block bg-[#1e293b] hover:bg-[#253347] text-gray-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors mt-2"
             >
               Dashboard
             </Link>
