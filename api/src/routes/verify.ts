@@ -68,7 +68,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
       // Prototyp: Scan direkt starten (kein Zahlungsflow)
       await scanQueue.add('scan', {
         orderId,
-        domain: order.target_url,
+        targetDomain: order.target_url,
         package: order.package,
       });
 
@@ -127,7 +127,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
 
     await scanQueue.add('scan', {
       orderId,
-      domain: order.target_url,
+      targetDomain: order.target_url,
       package: order.package,
     });
 
