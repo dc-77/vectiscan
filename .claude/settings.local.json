@@ -6,7 +6,11 @@
       "Bash(git push:*)",
       "Bash(git add:*)",
       "Bash(git fetch:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(git pull:*)",
+      "Bash(ssh vectigal-docker02:*)",
+      "Bash(git commit:*)",
+      "Bash(cd:*)"
     ]
   }
 }
