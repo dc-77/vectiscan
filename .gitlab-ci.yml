@@ -85,6 +85,8 @@ trivy-scan-worker:
   extends: .trivy-base
   variables:
     SERVICE: scan-worker
+  rules:
+    - when: never
 
 trivy-report-worker:
   extends: .trivy-base
