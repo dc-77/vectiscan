@@ -126,11 +126,11 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
       )}
 
       {onCancel && (
-        <div className="pt-2 border-t border-gray-700">
+        <div className="pt-3 border-t border-gray-700">
           <button
             onClick={onCancel}
             disabled={cancelling}
-            className="text-red-400 hover:text-red-300 disabled:text-gray-600 text-sm transition-colors"
+            className="w-full sm:w-auto text-red-400 hover:text-red-300 hover:bg-red-400/10 disabled:text-gray-600 text-sm font-medium px-4 py-2 rounded-lg border border-red-900/50 transition-colors"
           >
             {cancelling ? 'Wird abgebrochen...' : 'Scan abbrechen'}
           </button>

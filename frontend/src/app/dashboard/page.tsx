@@ -176,14 +176,14 @@ export default function Dashboard() {
     <main className="min-h-screen px-4 py-8 md:px-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <VectiScanLogo />
-            <h1 className="text-xl font-semibold text-white">Dashboard</h1>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="hidden sm:block"><VectiScanLogo /></div>
+            <h1 className="text-lg sm:text-xl font-semibold text-white truncate">Dashboard</h1>
           </div>
           <Link
             href="/"
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors shrink-0 whitespace-nowrap"
           >
             + Neuer Scan
           </Link>
@@ -241,95 +241,79 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Orders table */}
+        {/* Orders list */}
         {!loading && filtered.length > 0 && (
-          <div className="rounded-lg border border-gray-700 overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-[#0C1222] text-left text-xs font-mono text-gray-500 uppercase tracking-wider">
-                  <th className="px-4 py-3">Domain</th>
-                  <th className="px-4 py-3">Paket</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 hidden md:table-cell">Erstellt</th>
-                  <th className="px-4 py-3 text-right">Aktion</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-800">
-                {filtered.map((order) => {
-                  const pkg = PACKAGE_STYLES[order.package] || PACKAGE_STYLES.professional;
-                  const statusLabel = PHASE_LABELS[order.status] || order.status;
-                  const statusColor = PHASE_COLORS[order.status] || 'bg-gray-500';
-                  const active = isActive(order.status);
-                  const needsVerify = order.status === 'verification_pending' || order.status === 'verified';
-                  const isRunning = active && !needsVerify;
+          <div className="space-y-3">
+            {filtered.map((order) => {
+              const pkg = PACKAGE_STYLES[order.package] || PACKAGE_STYLES.professional;
+              const statusLabel = PHASE_LABELS[order.status] || order.status;
+              const statusColor = PHASE_COLORS[order.status] || 'bg-gray-500';
+              const active = isActive(order.status);
+              const needsVerify = order.status === 'verification_pending' || order.status === 'verified';
+              const isRunning = active && !needsVerify;
 
-                  const rowHref = needsVerify
-                    ? `/verify/${order.id}`
-                    : isRunning
-                      ? `/?orderId=${order.id}`
-                      : undefined;
+              const rowHref = needsVerify
+                ? `/verify/${order.id}`
+                : isRunning
+                  ? `/?orderId=${order.id}`
+                  : undefined;
 
-                  return (
-                    <tr
-                      key={order.id}
-                      className={`bg-[#1e293b] hover:bg-[#253347] transition-colors ${rowHref ? 'cursor-pointer' : ''}`}
-                      onClick={rowHref ? () => router.push(rowHref) : undefined}
-                    >
-                      <td className="px-4 py-3">
-                        <span className="font-mono text-cyan-400 text-sm">{order.domain}</span>
-                        <span className="block text-xs text-gray-600 md:hidden">{formatDate(order.createdAt)}</span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${pkg.bg} ${pkg.text}`}>
-                          {pkg.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`${statusColor} text-white text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1.5`}>
-                          {active && (
-                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                          )}
-                          {statusLabel}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-500 font-mono hidden md:table-cell">
-                        {formatDate(order.createdAt)}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        {needsVerify && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
-                            className="text-xs text-yellow-400 hover:text-yellow-300 font-medium transition-colors"
-                          >
-                            Verifizieren
-                          </button>
-                        )}
-                        {isRunning && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
-                            className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors"
-                          >
-                            Live View
-                          </button>
-                        )}
-                        {order.status === 'report_complete' && order.hasReport && (
-                          <a
-                            href={getReportDownloadUrl(order.id)}
-                            className="text-xs text-green-400 hover:text-green-300 font-medium transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            PDF Download
-                          </a>
-                        )}
-                        {(order.status === 'failed' || order.status === 'cancelled') && (
-                          <span className="text-xs text-gray-600">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+              return (
+                <div
+                  key={order.id}
+                  className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-4 transition-colors ${rowHref ? 'cursor-pointer' : ''}`}
+                  onClick={rowHref ? () => router.push(rowHref) : undefined}
+                >
+                  {/* Row 1: Domain + Status */}
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="font-mono text-cyan-400 text-sm truncate">{order.domain}</span>
+                    <span className={`${statusColor} text-white text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 shrink-0`}>
+                      {active && (
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                      )}
+                      {statusLabel}
+                    </span>
+                  </div>
+
+                  {/* Row 2: Package + Date + Action */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded ${pkg.bg} ${pkg.text}`}>
+                        {pkg.label}
+                      </span>
+                      <span className="text-xs text-gray-600">{formatDate(order.createdAt)}</span>
+                    </div>
+                    <div className="shrink-0">
+                      {needsVerify && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
+                          className="text-xs text-yellow-400 hover:text-yellow-300 font-medium px-3 py-1.5 bg-yellow-400/10 rounded-lg transition-colors"
+                        >
+                          Verifizieren
+                        </button>
+                      )}
+                      {isRunning && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
+                          className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-blue-400/10 rounded-lg transition-colors"
+                        >
+                          Live View
+                        </button>
+                      )}
+                      {order.status === 'report_complete' && order.hasReport && (
+                        <a
+                          href={getReportDownloadUrl(order.id)}
+                          className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors inline-block"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          PDF Download
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
