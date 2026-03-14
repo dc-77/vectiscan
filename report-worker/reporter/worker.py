@@ -205,6 +205,7 @@ def process_job(job_data: dict) -> None:
         parsed_inventory = parsed["host_inventory"]
         parsed_profiles = parsed["tech_profiles"]
         consolidated_findings = parsed["consolidated_findings"]
+        host_screenshots = parsed.get("host_screenshots", {})
         log.info("scan_data_parsed", hosts=len(parsed_inventory.get("hosts", [])))
 
         # Use parsed inventory/profiles, fall back to job payload
@@ -237,6 +238,7 @@ def process_job(job_data: dict) -> None:
             scan_meta=scan_meta,
             host_inventory=effective_inventory,
             package=package,
+            host_screenshots=host_screenshots,
         )
         log.info("report_data_mapped")
 

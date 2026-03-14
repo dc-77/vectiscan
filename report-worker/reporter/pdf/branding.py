@@ -20,6 +20,7 @@ PDF-ADAPTION (weißes Papier):
 """
 
 from reportlab.lib.colors import HexColor
+from reportlab.lib.units import mm
 
 
 # ============================================================================
@@ -148,3 +149,17 @@ FONT_SIZE_TABLE_CELL = 8
 FONT_SIZE_FOOTER = 7
 FONT_SIZE_COVER_TITLE = 28
 FONT_SIZE_COVER_SUBTITLE = 14
+
+
+# ============================================================================
+# SPACING — tunable whitespace constants
+# ============================================================================
+
+SPACING_SECTION = 12 * mm       # Between major sections (H1 → content)
+SPACING_SUBSECTION = 8 * mm     # Between subsections (H2 → content)
+SPACING_FINDING = 6 * mm        # After each finding block
+SPACING_PARAGRAPH = 4 * mm      # Between paragraphs within a section
+SPACING_COVER_ELEMENT = 10 * mm # Between cover page elements
+
+# Orphan control — minimum lines to keep with a heading before a page break
+MIN_LINES_BEFORE_BREAK = 3

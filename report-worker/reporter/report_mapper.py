@@ -64,9 +64,9 @@ def _map_basic_finding(f: dict[str, Any]) -> dict[str, Any]:
         "id": f["id"],
         "title": f["title"],
         "severity": f["severity"],
-        "cvss_score": "N/A",
-        "cvss_vector": "N/A",
-        "cwe": "N/A",
+        "cvss_score": "—",
+        "cvss_vector": "—",
+        "cwe": "—",
         "affected": f["affected"],
         "description": f["description"],
         "evidence": "—",
@@ -86,9 +86,9 @@ def _map_positive_finding(f: dict[str, Any]) -> dict[str, Any]:
         "id": f.get("id", "VS-2026-POS"),
         "title": f["title"],
         "severity": "INFO",
-        "cvss_score": "N/A",
-        "cvss_vector": "N/A",
-        "cwe": "N/A",
+        "cvss_score": "—",
+        "cvss_vector": "—",
+        "cwe": "—",
         "affected": f.get("affected", "Gesamte Infrastruktur"),
         "description": f["description"],
         "evidence": f.get("evidence", "—"),
@@ -545,6 +545,44 @@ def _build_appendices(
     return appendices
 
 
+# ---------------------------------------------------------------------------
+# Helper: Screenshot data for PDF embedding
+# ---------------------------------------------------------------------------
+
+
+def _build_screenshot_data(
+    host_inventory: dict[str, Any],
+    host_screenshots: dict[str, list[str]] | None,
+) -> list[dict[str, Any]]:
+    """Build a list of screenshot entries for the PDF generator.
+
+    Returns a list of dicts, each with:
+        - label: human-readable host label (IP + FQDNs)
+        - paths: list of absolute file paths to screenshot images
+    Only includes hosts that actually have screenshots.
+    """
+    if not host_screenshots:
+        return []
+
+    hosts = host_inventory.get("hosts", [])
+    # Build IP -> FQDNs lookup
+    fqdn_lookup: dict[str, list[str]] = {}
+    for h in hosts:
+        ip = h.get("ip", "")
+        if ip:
+            fqdn_lookup[ip] = h.get("fqdns", [])
+
+    entries: list[dict[str, Any]] = []
+    for ip, paths in host_screenshots.items():
+        if not paths:
+            continue
+        fqdns = fqdn_lookup.get(ip, [])
+        label = f"{ip} ({', '.join(fqdns)})" if fqdns else ip
+        entries.append({"label": label, "paths": paths})
+
+    return entries
+
+
 # ===========================================================================
 # Package-specific mappers
 # ===========================================================================
@@ -554,6 +592,7 @@ def map_professional_report(
     claude_output: dict[str, Any],
     scan_meta: dict[str, Any],
     host_inventory: dict[str, Any],
+    host_screenshots: dict[str, list[str]] | None = None,
 ) -> dict[str, Any]:
     """Map Claude API output to report_data for the Professional package.
 
@@ -629,6 +668,7 @@ def map_professional_report(
         "findings": mapped_findings,
         "recommendations": _build_recommendations(recommendations, styles),
         "appendices": _build_appendices(findings, styles),
+        "screenshots": _build_screenshot_data(host_inventory, host_screenshots),
         "disclaimer": (
             "<b>Haftungsausschluss:</b> Dieser Bericht gibt den Sicherheitsstatus "
             "zum Zeitpunkt der Prüfung wieder. Sicherheitsbewertungen sind "
@@ -641,6 +681,7 @@ def map_basic_report(
     claude_output: dict[str, Any],
     scan_meta: dict[str, Any],
     host_inventory: dict[str, Any],
+    host_screenshots: dict[str, list[str]] | None = None,
 ) -> dict[str, Any]:
     """Map Claude API output to report_data for the Basic package.
 
@@ -715,6 +756,7 @@ def map_basic_report(
         "findings_section_label": "3&nbsp;&nbsp;&nbsp;Befunde",
         "findings": mapped_findings,
         "recommendations": _build_basic_recommendations(top_recommendations, styles),
+        "screenshots": _build_screenshot_data(host_inventory, host_screenshots),
         "appendices": [],
         "disclaimer": (
             "<b>Haftungsausschluss:</b> Dieser Bericht gibt den Sicherheitsstatus "
@@ -793,6 +835,7 @@ def map_nis2_report(
     claude_output: dict[str, Any],
     scan_meta: dict[str, Any],
     host_inventory: dict[str, Any],
+    host_screenshots: dict[str, list[str]] | None = None,
 ) -> dict[str, Any]:
     """Map Claude API output to report_data for the NIS2 Compliance package.
 
@@ -808,7 +851,7 @@ def map_nis2_report(
         report_data dict ready for generate_report()
     """
     # Start with professional report as base
-    report_data = map_professional_report(claude_output, scan_meta, host_inventory)
+    report_data = map_professional_report(claude_output, scan_meta, host_inventory, host_screenshots)
 
     domain = scan_meta.get("domain", "unknown")
     scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
@@ -900,6 +943,7 @@ def map_to_report_data(
     scan_meta: dict[str, Any],
     host_inventory: dict[str, Any],
     package: str = "professional",
+    host_screenshots: dict[str, list[str]] | None = None,
 ) -> dict[str, Any]:
     """Dispatch to the correct package-specific mapper.
 
@@ -908,6 +952,7 @@ def map_to_report_data(
         scan_meta: Scan metadata dict
         host_inventory: Host inventory JSON from phase 0
         package: One of 'basic', 'professional', 'nis2'
+        host_screenshots: Dict mapping host IP to list of screenshot file paths
 
     Returns:
         report_data dict ready for generate_report()
@@ -918,4 +963,4 @@ def map_to_report_data(
         "nis2": map_nis2_report,
     }
     mapper = mappers.get(package, map_professional_report)
-    return mapper(claude_output, scan_meta, host_inventory)
+    return mapper(claude_output, scan_meta, host_inventory, host_screenshots)

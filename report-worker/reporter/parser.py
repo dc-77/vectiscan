@@ -370,6 +370,59 @@ def parse_headers_json(path: str) -> dict[str, Any]:
     return result
 
 
+def find_gowitness_screenshots(phase2_dir: str) -> list[str]:
+    """Find gowitness screenshot files (PNG/JPEG) in a phase2 directory.
+
+    Looks for image files produced by gowitness.  Common locations:
+    - ``<phase2>/gowitness/screenshots/*.png``
+    - ``<phase2>/gowitness/*.png``
+    - ``<phase2>/screenshots/*.png``
+    - ``<phase2>/*.png`` (fallback)
+
+    Returns:
+        Sorted list of absolute file paths to screenshot images.
+    """
+    phase2_path = Path(phase2_dir)
+    image_extensions = {".png", ".jpg", ".jpeg"}
+    screenshots: list[str] = []
+
+    # Priority search locations
+    search_dirs = [
+        phase2_path / "gowitness" / "screenshots",
+        phase2_path / "gowitness",
+        phase2_path / "screenshots",
+    ]
+
+    for search_dir in search_dirs:
+        if search_dir.is_dir():
+            for f in sorted(search_dir.iterdir()):
+                if f.is_file() and f.suffix.lower() in image_extensions:
+                    screenshots.append(str(f))
+            if screenshots:
+                break  # Stop at the first directory that has screenshots
+
+    # Fallback: look for any PNG/JPEG directly in phase2
+    if not screenshots:
+        for f in sorted(phase2_path.iterdir()):
+            if (
+                f.is_file()
+                and f.suffix.lower() in image_extensions
+                and "gowitness" in f.stem.lower()
+            ):
+                screenshots.append(str(f))
+
+    if screenshots:
+        log.info(
+            "gowitness_screenshots_found",
+            dir=phase2_dir,
+            count=len(screenshots),
+        )
+    else:
+        log.debug("no_gowitness_screenshots", dir=phase2_dir)
+
+    return screenshots
+
+
 def parse_gobuster_dir(path: str) -> list[str]:
     """Parse gobuster directory scan output.
 
@@ -729,6 +782,10 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             str(phase2 / "gobuster_dir.txt")
         )
 
+        host_data["screenshots"] = find_gowitness_screenshots(
+            str(phase2)
+        )
+
         host_results[ip] = host_data
 
     # Defensive fallback: if inventory listed no hosts but the hosts/ directory
@@ -765,6 +822,9 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             host_data["gobuster_dir"] = parse_gobuster_dir(
                 str(phase2 / "gobuster_dir.txt")
             )
+            host_data["screenshots"] = find_gowitness_screenshots(
+                str(phase2)
+            )
             host_results[ip] = host_data
 
     # 5. Consolidate all findings into prompt text
@@ -777,9 +837,24 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
         findings_length=len(consolidated),
     )
 
+    # 6. Collect gowitness screenshots per host
+    host_screenshots: dict[str, list[str]] = {}
+    for ip, data in host_results.items():
+        shots = data.get("screenshots", [])
+        if shots:
+            host_screenshots[ip] = shots
+
+    if host_screenshots:
+        log.info(
+            "gowitness_screenshots_total",
+            hosts_with_screenshots=len(host_screenshots),
+            total_screenshots=sum(len(v) for v in host_screenshots.values()),
+        )
+
     return {
         "host_inventory": host_inventory,
         "tech_profiles": tech_profiles,
         "consolidated_findings": consolidated,
+        "host_screenshots": host_screenshots,
         "meta": meta,
     }
