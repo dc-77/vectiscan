@@ -107,8 +107,18 @@ function HomeContent() {
   }, [searchParams, authenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Redirect to verify page if order still needs verification
+  // Skip redirect briefly after arriving from verify page to avoid race condition
+  const fromVerifyRef = useRef(false);
   useEffect(() => {
-    if (order && orderId && (order.status === 'verification_pending' || order.status === 'verified')) {
+    if (searchParams.get('orderId')) {
+      fromVerifyRef.current = true;
+      const timer = setTimeout(() => { fromVerifyRef.current = false; }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (order && orderId && !fromVerifyRef.current && (order.status === 'verification_pending' || order.status === 'verified')) {
       stopPolling();
       router.replace(`/verify/${orderId}`);
     }
