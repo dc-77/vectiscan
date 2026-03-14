@@ -221,7 +221,7 @@ export default function Home() {
 
         {/* Report Download */}
         {scan && scan.status === 'report_complete' && scanId && (
-          <ReportDownload scanId={scanId} onNewScan={handleRetry} />
+          <ReportDownload scanId={scanId} domain={scan.domain} onNewScan={handleRetry} />
         )}
 
         {/* Error State */}
