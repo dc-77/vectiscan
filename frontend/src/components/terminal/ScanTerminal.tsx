@@ -13,6 +13,8 @@ interface ScanTerminalProps {
   isScanning: boolean;
   isComplete: boolean;
   isError: boolean;
+  /** Compact mode: no title bar or status bar (used when embedded below ScanProgress) */
+  compact?: boolean;
 }
 
 export default function ScanTerminal({
@@ -22,6 +24,7 @@ export default function ScanTerminal({
   isScanning,
   isComplete,
   isError,
+  compact = false,
 }: ScanTerminalProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +35,43 @@ export default function ScanTerminal({
     }
   }, [lines.length]);
 
-  // Border glow when actively scanning
+  // Compact mode — no border/title/status, just the terminal content
+  if (compact) {
+    return (
+      <div
+        ref={scrollRef}
+        className="p-3 overflow-y-auto font-mono text-xs leading-relaxed"
+        style={{
+          fontFamily: "'Fira Mono', 'Consolas', 'Liberation Mono', monospace",
+          maxHeight: '280px',
+          minHeight: '120px',
+          backgroundColor: 'rgba(12, 18, 34, 0.95)',
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#1E3A5F #0C1222',
+        }}
+      >
+        {lines.map((line, i) => (
+          <TerminalLine
+            key={line.id}
+            line={line}
+            animate={i >= lines.length - 5}
+          />
+        ))}
+
+        {isScanning && currentTool && (
+          <ToolProgress tool={currentTool} host={currentHost || undefined} />
+        )}
+
+        {isScanning && (
+          <div className="mt-1">
+            <span className="text-[#38BDF8] animate-pulse">▌</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Full mode — standalone terminal with border, title bar, status bar
   const borderClass = isScanning
     ? 'border-[#1E3A5F] shadow-[0_0_15px_rgba(56,189,248,0.15)]'
     : isError
@@ -64,7 +103,6 @@ export default function ScanTerminal({
           fontFamily: "'Fira Mono', 'Consolas', 'Liberation Mono', monospace",
           maxHeight: '500px',
           minHeight: '300px',
-          // Custom scrollbar
           scrollbarWidth: 'thin',
           scrollbarColor: '#1E3A5F #0C1222',
         }}
@@ -73,16 +111,14 @@ export default function ScanTerminal({
           <TerminalLine
             key={line.id}
             line={line}
-            animate={i >= lines.length - 5} // Only animate last 5 lines
+            animate={i >= lines.length - 5}
           />
         ))}
 
-        {/* Show animated progress for current tool */}
         {isScanning && currentTool && (
           <ToolProgress tool={currentTool} host={currentHost || undefined} />
         )}
 
-        {/* Blinking cursor */}
         {isScanning && (
           <div className="mt-1">
             <span className="text-[#38BDF8] animate-pulse">▌</span>
