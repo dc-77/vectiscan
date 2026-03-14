@@ -120,6 +120,15 @@ export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[
   return res.json();
 }
 
+export async function manualVerify(orderId: string): Promise<ApiResponse<VerificationCheckResult>> {
+  const res = await fetch(`${API_URL}/api/verify/manual`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId }),
+  });
+  return res.json();
+}
+
 export async function verifyPassword(password: string): Promise<ApiResponse<null>> {
   const res = await fetch(`${API_URL}/api/auth/verify`, {
     method: 'POST',

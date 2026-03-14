@@ -86,6 +86,56 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
     });
   });
 
+  // POST /api/verify/manual — Skip verification (prototype only)
+  server.post<{ Body: CheckBody }>('/api/verify/manual', async (request: FastifyRequest<{ Body: CheckBody }>, reply: FastifyReply) => {
+    const { orderId } = request.body || {};
+
+    if (!orderId || !UUID_REGEX.test(orderId)) {
+      return reply.status(400).send({ success: false, error: 'Invalid or missing orderId' });
+    }
+
+    const result = await query<{
+      id: string;
+      target_url: string;
+      status: string;
+      package: string;
+      verified_at: Date | null;
+    }>(
+      'SELECT id, target_url, status, package, verified_at FROM orders WHERE id = $1',
+      [orderId],
+    );
+
+    if (result.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Order nicht gefunden' });
+    }
+
+    const order = result.rows[0];
+
+    if (order.verified_at) {
+      return reply.send({ success: true, data: { verified: true, method: 'manual' } });
+    }
+
+    await query(
+      "UPDATE orders SET status = 'scanning', verified_at = NOW(), verification_method = 'manual', scan_started_at = NOW() WHERE id = $1",
+      [orderId],
+    );
+
+    await query(
+      'INSERT INTO audit_log (order_id, action, details, ip_address) VALUES ($1, $2, $3, $4)',
+      [orderId, 'manual_verification', '{"method":"manual"}', request.ip],
+    );
+
+    await scanQueue.add('scan', {
+      orderId,
+      domain: order.target_url,
+      package: order.package,
+    });
+
+    await publishEvent(orderId, { type: 'status', orderId, status: 'scanning' });
+
+    return reply.send({ success: true, data: { verified: true, method: 'manual' } });
+  });
+
   // GET /api/verify/status/:orderId
   server.get<{ Params: StatusParams }>('/api/verify/status/:orderId', async (request: FastifyRequest<{ Params: StatusParams }>, reply: FastifyReply) => {
     const { orderId } = request.params;

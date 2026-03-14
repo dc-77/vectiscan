@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getVerificationStatus, checkVerification } from '@/lib/api';
+import { getVerificationStatus, checkVerification, manualVerify } from '@/lib/api';
 import VectiScanLogo from '@/components/VectiScanLogo';
 
 type Tab = 'dns_txt' | 'file' | 'meta_tag';
@@ -90,9 +90,22 @@ export default function VerifyPage() {
   }, [orderId]);
 
   const handleManualVerify = useCallback(async () => {
-    setVerified(true);
-    setVerifiedMethod('manual');
-  }, []);
+    setChecking(true);
+    setError(null);
+    try {
+      const res = await manualVerify(orderId);
+      if (res.success && res.data?.verified) {
+        setVerified(true);
+        setVerifiedMethod('manual');
+      } else {
+        setError(res.error || 'Manuelle Verifizierung fehlgeschlagen.');
+      }
+    } catch {
+      setError('API nicht erreichbar.');
+    } finally {
+      setChecking(false);
+    }
+  }, [orderId]);
 
   const copyToClipboard = useCallback(async (text: string, key: string) => {
     try {
@@ -142,7 +155,7 @@ export default function VerifyPage() {
             <span className="text-green-300 font-medium">
               Verifiziert!{verifiedMethod && ` (${verifiedMethod})`}
             </span>
-            <p className="text-green-400/70 text-sm mt-1">Weiterleitung zum Checkout...</p>
+            <p className="text-green-400/70 text-sm mt-1">Scan wird gestartet...</p>
           </div>
         )}
 
