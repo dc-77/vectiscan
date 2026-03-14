@@ -106,9 +106,17 @@ function HomeContent() {
     }
   }, [searchParams, authenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Redirect to verify page if order still needs verification
+  useEffect(() => {
+    if (order && orderId && (order.status === 'verification_pending' || order.status === 'verified')) {
+      stopPolling();
+      router.replace(`/verify/${orderId}`);
+    }
+  }, [order?.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Initialize terminal once order data is available (from polling)
   useEffect(() => {
-    if (order && orderId && !showReport) {
+    if (order && orderId && !showReport && order.status !== 'verification_pending' && order.status !== 'verified') {
       initTerminal(order.domain, order.package);
     }
   }, [order?.domain, order?.package]); // eslint-disable-line react-hooks/exhaustive-deps
