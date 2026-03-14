@@ -2,14 +2,10 @@
 
 ## Paket-Integration
 
-### P1: Audit-Trail Tool-Versionen leer
-- **Betrifft:** NIS2-Paket
-- **Beschreibung:** Die Audit-Trail-Seite zeigt keine Tool-Versionen an.
-  Der `tools`-Array im Audit-Trail ist immer leer, da die tatsächlichen
-  Tool-Versionen zur Laufzeit noch nicht erfasst werden.
-- **Workaround:** Tool-Versionen können nachträglich aus den Docker-Images
-  gelesen werden.
-- **Priorität:** Niedrig (kosmetisch)
+### ~~P1: Audit-Trail Tool-Versionen leer~~ (BEHOBEN)
+- **Status:** Behoben — Tool-Versionen werden beim Scan-Start erfasst
+  (`_collect_tool_versions()` in `worker.py`), in `meta.json` geschrieben
+  und vom Report-Worker in den NIS2-Audit-Trail übernommen.
 
 ### P2: Lieferketten-Seite Layout bei vielen Findings
 - **Betrifft:** NIS2-Paket
@@ -30,27 +26,22 @@
 ### P4: Keine E-Mail-Benachrichtigung bei Scan-Abschluss
 - **Betrifft:** Alle Pakete
 - **Beschreibung:** Es gibt keine E-Mail-Benachrichtigung, wenn ein Scan
-  abgeschlossen ist. Der Benutzer muss die Status-Seite manuell
-  refreshen.
-- **Workaround:** Browser-Tab offen lassen (Polling alle 3 Sekunden).
+  abgeschlossen ist.
+- **Workaround:** Browser-Tab offen lassen — Updates kommen jetzt via
+  WebSocket in Echtzeit (Fallback: HTTP-Polling alle 15s).
 - **Priorität:** Prototyp-Scope — kein E-Mail-Versand vorgesehen.
 
-### P5: CVSS-Score-Validierung nur prompt-basiert
-- **Betrifft:** Professional, NIS2
-- **Beschreibung:** Die CVSS-Scores werden von Claude generiert und nicht
-  programmatisch validiert. Es gibt keine Prüfung, ob der numerische
-  Score zum CVSS-Vektor passt.
-- **Workaround:** Der Prompt enthält strenge Scoring-Regeln mit
-  Referenzwerten.
-- **Priorität:** Mittel
+### ~~P5: CVSS-Score-Validierung nur prompt-basiert~~ (BEHOBEN)
+- **Status:** Behoben — `validate_cvss_scores()` in `claude_client.py`
+  prüft jetzt: Vektor-Syntax (8 Pflichtmetriken, gültige Werte),
+  Score-Berechnung nach CVSS 3.1-Spec (Toleranz 0.1 statt 0.5),
+  und Severity ↔ Score-Konsistenz.
 
-### P6: Scan-Timeout unterschiedlich pro Paket, aber Frontend zeigt generisches Timeout
-- **Betrifft:** Basic-Paket
-- **Beschreibung:** Basic hat 10 Minuten Timeout, Professional/NIS2
-  haben 120 Minuten. Das Frontend zeigt bei Timeout eine generische
-  Fehlermeldung ohne Paket-spezifische Information.
-- **Workaround:** Keine — tritt selten auf.
-- **Priorität:** Niedrig
+### ~~P6: Scan-Timeout unterschiedlich pro Paket, aber Frontend zeigt generisches Timeout~~ (BEHOBEN)
+- **Status:** Behoben — Timeout-Meldung enthält jetzt Paketnamen und
+  Zeitlimit (z.B. "Das Basic (~10 Min.)-Paket hat das Zeitlimit von
+  10 Minuten überschritten"). Frontend zeigt bei Timeouts einen
+  eigenen Hinweis mit Handlungsempfehlung.
 
 ## Allgemein (vor Paket-Integration)
 

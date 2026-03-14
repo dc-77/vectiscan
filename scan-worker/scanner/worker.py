@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import signal
+import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -28,6 +29,47 @@ from scanner.upload import enqueue_report_job, pack_results, upload_to_minio
 log = structlog.get_logger()
 
 
+# Tool version commands — each returns (tool_name, version_string)
+_VERSION_COMMANDS: list[tuple[str, list[str]]] = [
+    ("nmap", ["nmap", "--version"]),
+    ("nuclei", ["nuclei", "-version"]),
+    ("subfinder", ["subfinder", "-version"]),
+    ("amass", ["amass", "-version"]),
+    ("gobuster", ["gobuster", "version"]),
+    ("dnsx", ["dnsx", "-version"]),
+    ("gowitness", ["gowitness", "version"]),
+    ("testssl.sh", ["/opt/testssl.sh/testssl.sh", "--version"]),
+    ("nikto", ["perl", "/opt/nikto/program/nikto.pl", "-Version"]),
+    ("wafw00f", ["wafw00f", "--version"]),
+]
+
+
+def _collect_tool_versions() -> list[str]:
+    """Collect installed tool versions at scan start.
+
+    Returns a list of strings like ["nmap 7.94", "nuclei 3.7.1", ...].
+    """
+    versions: list[str] = []
+    for tool_name, cmd in _VERSION_COMMANDS:
+        try:
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=10,
+            )
+            output = (result.stdout + result.stderr).strip()
+            # Extract version number from first line
+            first_line = output.split("\n")[0].strip()
+            # Try to find a version pattern (digits.digits...)
+            import re
+            match = re.search(r"(\d+\.\d+[\.\d]*)", first_line)
+            if match:
+                versions.append(f"{tool_name} {match.group(1)}")
+            else:
+                versions.append(f"{tool_name} (installed)")
+        except Exception:
+            versions.append(f"{tool_name} (not found)")
+    return versions
+
+
 def _process_job(scan_id: str, domain: str, package: str = "professional") -> None:
     """Run the full three-phase scan pipeline for a single job."""
     scan_dir = f"/tmp/scan-{scan_id}"
@@ -37,10 +79,22 @@ def _process_job(scan_id: str, domain: str, package: str = "professional") -> No
 
     start = time.monotonic()
 
+    # Package-specific timeout labels
+    _PACKAGE_LABELS = {"basic": "Basic (~10 Min.)", "professional": "Professional (~45 Min.)", "nis2": "NIS2 (~45 Min.)"}
+    _package_label = _PACKAGE_LABELS.get(package, package)
+    _timeout_minutes = config["total_timeout"] // 60
+
     def _check_timeout() -> None:
         elapsed = time.monotonic() - start
         if elapsed >= config["total_timeout"]:
-            raise TimeoutError(f"Scan timeout after {int(elapsed)}s")
+            raise TimeoutError(
+                f"Scan-Timeout: Das {_package_label}-Paket hat das Zeitlimit "
+                f"von {_timeout_minutes} Minuten überschritten."
+            )
+
+    # Collect tool versions before scanning
+    tool_versions = _collect_tool_versions()
+    log.info("tool_versions_collected", count=len(tool_versions))
 
     # Write meta.json
     meta = {
@@ -48,6 +102,7 @@ def _process_job(scan_id: str, domain: str, package: str = "professional") -> No
         "domain": domain,
         "package": package,
         "startedAt": datetime.now(timezone.utc).isoformat(),
+        "toolVersions": tool_versions,
     }
     with open(f"{scan_dir}/meta.json", "w") as f:
         json.dump(meta, f, indent=2)
