@@ -59,6 +59,10 @@ export async function getScanStatus(id: string): Promise<ApiResponse<ScanStatus>
   return res.json();
 }
 
+export function getReportDownloadUrl(id: string): string {
+  return `${API_URL}/api/scans/${id}/report`;
+}
+
 export async function getScanReport(id: string): Promise<ApiResponse<ReportData>> {
   const res = await fetch(`${API_URL}/api/scans/${id}/report`);
   return res.json();

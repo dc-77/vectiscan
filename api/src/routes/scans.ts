@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { query } from '../lib/db.js';
 import { scanQueue } from '../lib/queue.js';
-import { getPresignedUrl } from '../lib/minio.js';
+import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 
 interface CreateScanBody {
@@ -120,17 +120,15 @@ export async function scanRoutes(server: FastifyInstance): Promise<void> {
     const fileSize = report.file_size_bytes as number;
     const createdAt = report.created_at as Date;
 
-    const downloadUrl = await getPresignedUrl(bucket, path);
     const dateStr = createdAt.toISOString().split('T')[0];
     const fileName = `vectiscan-${domain}-${dateStr}.pdf`;
 
-    return {
-      success: true,
-      data: {
-        downloadUrl,
-        fileName,
-        fileSize,
-      },
-    };
+    const stream = await minioClient.getObject(bucket, path);
+
+    return reply
+      .header('Content-Type', 'application/pdf')
+      .header('Content-Disposition', `attachment; filename="${fileName}"`)
+      .header('Content-Length', fileSize)
+      .send(stream);
   });
 }

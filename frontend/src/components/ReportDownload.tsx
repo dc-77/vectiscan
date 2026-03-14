@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getScanReport, ReportData } from '@/lib/api';
+import { getScanReport, getReportDownloadUrl, ReportData } from '@/lib/api';
 
 interface Props {
   scanId: string;
@@ -42,7 +42,7 @@ export default function ReportDownload({ scanId, onNewScan }: Props) {
       </p>
       <div className="flex flex-col items-center gap-3">
         <a
-          href={report.downloadUrl}
+          href={getReportDownloadUrl(scanId)}
           download={report.fileName}
           className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
         >
