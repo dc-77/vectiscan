@@ -10,7 +10,9 @@
       "Bash(git pull:*)",
       "Bash(ssh vectigal-docker02:*)",
       "Bash(git commit:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)"
     ]
   }
 }
