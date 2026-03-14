@@ -65,39 +65,45 @@ export function useWebSocket(
   const connect = useCallback((id: string) => {
     cleanup();
 
-    const ws = new WebSocket(getWsUrl(id));
-    wsRef.current = ws;
+    try {
+      const ws = new WebSocket(getWsUrl(id));
+      wsRef.current = ws;
 
-    ws.onopen = () => {
-      reconnectAttempt.current = 0;
-      setConnected(true);
-      onConnectionChange?.(true);
-    };
+      ws.onopen = () => {
+        reconnectAttempt.current = 0;
+        setConnected(true);
+        onConnectionChange?.(true);
+      };
 
-    ws.onmessage = (event) => {
-      try {
-        const msg: WsMessage = JSON.parse(event.data);
-        onMessage(msg);
-      } catch {
-        // Ignore malformed messages
-      }
-    };
+      ws.onmessage = (event) => {
+        try {
+          const msg: WsMessage = JSON.parse(event.data);
+          onMessage(msg);
+        } catch {
+          // Ignore malformed messages
+        }
+      };
 
-    ws.onclose = () => {
+      ws.onclose = () => {
+        setConnected(false);
+        onConnectionChange?.(false);
+
+        // Reconnect with exponential backoff (max 10s)
+        if (reconnectAttempt.current < 5) {
+          const delay = Math.min(1000 * 2 ** reconnectAttempt.current, 10000);
+          reconnectAttempt.current += 1;
+          reconnectTimer.current = setTimeout(() => connect(id), delay);
+        }
+      };
+
+      ws.onerror = () => {
+        // onclose will fire after onerror — reconnect happens there
+      };
+    } catch {
+      // WebSocket blocked by CSP or unavailable — fall back to polling
       setConnected(false);
       onConnectionChange?.(false);
-
-      // Reconnect with exponential backoff (max 10s)
-      if (reconnectAttempt.current < 5) {
-        const delay = Math.min(1000 * 2 ** reconnectAttempt.current, 10000);
-        reconnectAttempt.current += 1;
-        reconnectTimer.current = setTimeout(() => connect(id), delay);
-      }
-    };
-
-    ws.onerror = () => {
-      // onclose will fire after onerror — reconnect happens there
-    };
+    }
   }, [cleanup, onMessage, onConnectionChange]);
 
   useEffect(() => {
