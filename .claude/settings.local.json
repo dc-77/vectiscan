@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 -c \"import secrets; [print\\(secrets.token_urlsafe\\(24\\)\\) for _ in range\\(4\\)]\")"
+      "Bash(python3 -c \"import secrets; [print\\(secrets.token_urlsafe\\(24\\)\\) for _ in range\\(4\\)]\")",
+      "Bash(gh run:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)"
     ]
   }
 }
