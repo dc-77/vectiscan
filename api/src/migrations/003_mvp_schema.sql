@@ -46,7 +46,7 @@ CREATE TABLE orders (
         CHECK (package IN ('basic', 'professional', 'nis2')),
     CONSTRAINT chk_orders_verification_method
         CHECK (verification_method IS NULL
-            OR verification_method IN ('dns_txt', 'file', 'meta_tag'))
+            OR verification_method IN ('dns_txt', 'file', 'meta_tag', 'manual'))
 );
 
 CREATE INDEX idx_orders_status ON orders(status);
