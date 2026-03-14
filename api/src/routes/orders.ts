@@ -89,7 +89,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
   // POST /api/scans — backwards compat redirect
   server.post('/api/scans', async (_request, reply) => {
-    return reply.redirect(307, '/api/orders');
+    return reply.redirect('/api/orders', 307);
   });
 
   // GET /api/orders/:id
@@ -231,14 +231,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
   // Backwards-compat redirects for old scan endpoints
   server.get<{ Params: OrderParams }>('/api/scans/:id', async (request, reply) => {
-    return reply.redirect(301, `/api/orders/${request.params.id}`);
+    return reply.redirect(`/api/orders/${request.params.id}`, 301);
   });
 
   server.get<{ Params: OrderParams }>('/api/scans/:id/report', async (request, reply) => {
-    return reply.redirect(301, `/api/orders/${request.params.id}/report`);
+    return reply.redirect(`/api/orders/${request.params.id}/report`, 301);
   });
 
   server.delete<{ Params: OrderParams }>('/api/scans/:id', async (request, reply) => {
-    return reply.redirect(307, `/api/orders/${request.params.id}`);
+    return reply.redirect(`/api/orders/${request.params.id}`, 307);
   });
 }
