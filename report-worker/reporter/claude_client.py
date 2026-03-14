@@ -9,6 +9,8 @@ from typing import Any
 import anthropic
 import structlog
 
+from reporter.prompts import get_system_prompt
+
 log = structlog.get_logger()
 
 # System prompt from docs/architecture.md — copy VERBATIM
@@ -100,6 +102,12 @@ Antworte ausschließlich in JSON nach folgendem Schema:
   ]
 }
 """
+
+MAX_TOKENS_BY_PACKAGE: dict[str, int] = {
+    "basic": 2048,
+    "professional": 4096,
+    "nis2": 6144,
+}
 
 
 # ---------------------------------------------------------------------------
@@ -240,6 +248,7 @@ def call_claude(
     host_inventory: dict[str, Any],
     tech_profiles: list[dict[str, Any]],
     consolidated_findings: str,
+    package: str = "professional",
 ) -> dict[str, Any]:
     """Call Claude API to analyze scan data and generate findings.
 
@@ -277,6 +286,9 @@ SCAN-ERGEBNISSE:
 Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
 """
 
+    system_prompt = get_system_prompt(package)
+    max_tokens = MAX_TOKENS_BY_PACKAGE.get(package, 4096)
+
     # Retry logic: 3 attempts with backoff for rate limits
     max_retries = 3
     for attempt in range(max_retries):
@@ -285,8 +297,8 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
 
             response = client.messages.create(
                 model="claude-sonnet-4-20250514",
-                max_tokens=4096,
-                system=SYSTEM_PROMPT,
+                max_tokens=max_tokens,
+                system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
                 timeout=60.0,
             )

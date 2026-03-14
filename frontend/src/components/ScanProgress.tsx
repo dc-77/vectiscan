@@ -39,10 +39,18 @@ interface Props {
   cancelling?: boolean;
 }
 
+const PACKAGE_LABELS: Record<string, { label: string; color: string; textColor: string }> = {
+  basic:        { label: 'Basic',        color: '#38BDF8', textColor: '#0F172A' },
+  professional: { label: 'Professional', color: '#38BDF8', textColor: '#0F172A' },
+  nis2:         { label: 'NIS2',         color: '#EAB308', textColor: '#0F172A' },
+};
+
 export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
   const { status, progress, domain, startedAt } = scan;
   const label = PHASE_LABELS[status] || status;
   const color = PHASE_COLORS[status] || 'bg-gray-500';
+  const pkgInfo = PACKAGE_LABELS[scan.package] || PACKAGE_LABELS.professional;
+  const scanLabel = scan.package === 'basic' ? 'Quick Scan läuft' : 'Scan läuft';
   const percent = progress.hostsTotal > 0
     ? Math.round((progress.hostsCompleted / progress.hostsTotal) * 100)
     : 0;
@@ -62,11 +70,25 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
   return (
     <div className="rounded-lg bg-[#1e293b] p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">{domain}</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold text-white">{domain}</h2>
+          <span
+            className="text-xs font-bold px-2.5 py-0.5 rounded-full"
+            style={{ backgroundColor: pkgInfo.color, color: pkgInfo.textColor }}
+            data-testid="package-badge"
+          >
+            {pkgInfo.label}
+          </span>
+        </div>
         <span className={`${color} text-white text-xs font-medium px-3 py-1 rounded-full`}>
           {label}
         </span>
       </div>
+      {scan.estimatedDuration && status !== 'report_complete' && (
+        <div className="text-sm text-gray-400" data-testid="scan-label">
+          {scanLabel} — geschätzte Dauer: {scan.estimatedDuration}
+        </div>
+      )}
 
       {progress.currentTool && (
         <div className="text-sm text-gray-400">

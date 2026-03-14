@@ -158,9 +158,10 @@ def process_job(job_data: dict) -> None:
     raw_data_path: str = job_data["rawDataPath"]
     host_inventory: dict = job_data["hostInventory"]
     tech_profiles: list[dict] = job_data["techProfiles"]
+    package: str = job_data.get("package", "professional")
 
     work_dir = Path(tempfile.mkdtemp(prefix=f"report-{scan_id}-"))
-    log.info("job_started", scan_id=scan_id, work_dir=str(work_dir))
+    log.info("job_started", scan_id=scan_id, package=package, work_dir=str(work_dir))
 
     conn: psycopg2.extensions.connection | None = None
 
@@ -197,6 +198,7 @@ def process_job(job_data: dict) -> None:
             host_inventory=effective_inventory,
             tech_profiles=effective_profiles,
             consolidated_findings=consolidated_findings,
+            package=package,
         )
         log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
 
@@ -205,11 +207,13 @@ def process_job(job_data: dict) -> None:
             "domain": domain,
             "scanId": scan_id,
             "startedAt": datetime.now().isoformat(),
+            "package": package,
         }
         report_data = map_to_report_data(
             claude_output=claude_output,
             scan_meta=scan_meta,
             host_inventory=effective_inventory,
+            package=package,
         )
         log.info("report_data_mapped")
 
@@ -228,7 +232,7 @@ def process_job(job_data: dict) -> None:
 
         # -- 9. Update scan status to report_complete -------------------------
         _update_scan_status(conn, scan_id, "report_complete")
-        log.info("job_completed", scan_id=scan_id)
+        log.info("job_completed", scan_id=scan_id, package=package)
 
     except Exception:
         log.exception("job_failed", scan_id=scan_id)

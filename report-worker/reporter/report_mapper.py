@@ -16,91 +16,6 @@ log = structlog.get_logger()
 _SEVERITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
 
 
-def map_to_report_data(
-    claude_output: dict[str, Any],
-    scan_meta: dict[str, Any],
-    host_inventory: dict[str, Any],
-) -> dict[str, Any]:
-    """Map Claude API output to the report_data structure for PDF generation.
-
-    German labels throughout. VectiScan branding.
-
-    Args:
-        claude_output: Parsed JSON from Claude API (overall_risk, findings, etc.)
-        scan_meta: Scan metadata dict with domain, startedAt, scanId, etc.
-        host_inventory: Host inventory JSON from phase 0
-
-    Returns:
-        report_data dict ready for generate_report()
-    """
-    styles = create_styles()
-
-    domain = scan_meta.get("domain", "unknown")
-    scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
-    scan_id = scan_meta.get("scanId", "unknown")
-    hosts = host_inventory.get("hosts", [])
-    hosts_count = len(hosts)
-
-    findings = claude_output.get("findings", [])
-    positive_findings = claude_output.get("positive_findings", [])
-    recommendations = claude_output.get("recommendations", [])
-
-    severity_counts = _count_by_severity(findings)
-    finding_summary = ", ".join(
-        f"{count} {sev}" for sev, count in severity_counts.items() if count > 0
-    )
-
-    # Map findings to report format
-    mapped_findings = [_map_finding(f) for f in findings]
-    mapped_findings += [_map_positive_finding(f) for f in positive_findings]
-
-    log.info(
-        "report_mapper",
-        domain=domain,
-        findings=len(mapped_findings),
-        severities=severity_counts,
-    )
-
-    return {
-        "meta": {
-            "title": f"Security Assessment — {domain}",
-            "author": "VectiScan Automated Security Assessment",
-            "header_left": "VECTISCAN — SECURITY ASSESSMENT",
-            "header_right": domain,
-            "footer_left": f"Vertraulich  |  {scan_date}",
-            "classification_label": (
-                "KLASSIFIZIERUNG: VERTRAULICH — NUR FÜR AUTORISIERTE EMPFÄNGER"
-            ),
-        },
-        "cover": {
-            "cover_subtitle": "AUTOMATED SECURITY ASSESSMENT",
-            "cover_title": f"Sicherheitsbewertung<br/>{domain}",
-            "cover_meta": [
-                ["Ziel:", f"{domain} ({hosts_count} Hosts)"],
-                ["Datum:", scan_date],
-                ["Methodik:", "PTES (automatisiert)"],
-                ["Scoring:", "CVSS v3.1"],
-                ["Klassifizierung:", "Vertraulich"],
-                ["Befunde:", finding_summary],
-            ],
-        },
-        "toc": _build_toc(findings, positive_findings),
-        "executive_summary": _build_executive_summary(
-            claude_output, domain, styles, severity_counts
-        ),
-        "scope": _build_scope(domain, host_inventory, scan_meta, styles),
-        "findings_section_label": "3&nbsp;&nbsp;&nbsp;Befunde",
-        "findings": mapped_findings,
-        "recommendations": _build_recommendations(recommendations, styles),
-        "appendices": _build_appendices(findings, styles),
-        "disclaimer": (
-            "<b>Haftungsausschluss:</b> Dieser Bericht gibt den Sicherheitsstatus "
-            "zum Zeitpunkt der Pr\u00fcfung wieder. Sicherheitsbewertungen sind "
-            "Momentaufnahmen. Regelm\u00e4\u00dfige Wiederholungspr\u00fcfungen werden empfohlen."
-        ),
-    }
-
-
 # ---------------------------------------------------------------------------
 # Helper: Severity counting
 # ---------------------------------------------------------------------------
@@ -138,7 +53,29 @@ def _map_finding(f: dict[str, Any]) -> dict[str, Any]:
         # Deutsche Labels
         "label_description": "Beschreibung",
         "label_evidence": "Nachweis",
-        "label_impact": "Gesch\u00e4ftsauswirkung",
+        "label_impact": "Geschäftsauswirkung",
+        "label_recommendation": "Empfehlung",
+    }
+
+
+def _map_basic_finding(f: dict[str, Any]) -> dict[str, Any]:
+    """Map a basic-package Claude finding (no CVSS, CWE, or evidence)."""
+    return {
+        "id": f["id"],
+        "title": f["title"],
+        "severity": f["severity"],
+        "cvss_score": "N/A",
+        "cvss_vector": "N/A",
+        "cwe": "N/A",
+        "affected": f["affected"],
+        "description": f["description"],
+        "evidence": "—",
+        "impact": f.get("impact", "—"),
+        "recommendation": f["recommendation"],
+        # Deutsche Labels
+        "label_description": "Beschreibung",
+        "label_evidence": "Nachweis",
+        "label_impact": "Geschäftsauswirkung",
         "label_recommendation": "Empfehlung",
     }
 
@@ -154,8 +91,8 @@ def _map_positive_finding(f: dict[str, Any]) -> dict[str, Any]:
         "cwe": "N/A",
         "affected": f.get("affected", "Gesamte Infrastruktur"),
         "description": f["description"],
-        "evidence": f.get("evidence", "\u2014"),
-        "impact": "Positiver Befund \u2014 korrekte Konfiguration.",
+        "evidence": f.get("evidence", "—"),
+        "impact": "Positiver Befund — korrekte Konfiguration.",
         "recommendation": "Aktuelle Konfiguration beibehalten.",
         "label_description": "Beschreibung",
         "label_evidence": "Nachweis",
@@ -177,9 +114,9 @@ def _build_toc(
     toc: list[tuple[str, str, bool]] = [
         ("1", "Zusammenfassung", False),
         ("1.1", "Gesamtbewertung", True),
-        ("1.2", "Befund\u00fcbersicht", True),
+        ("1.2", "Befundübersicht", True),
         ("2", "Umfang &amp; Methodik", False),
-        ("2.1", "Pr\u00fcfungsumfang", True),
+        ("2.1", "Prüfungsumfang", True),
         ("2.2", "Methodik", True),
         ("3", "Befunde", False),
     ]
@@ -188,18 +125,28 @@ def _build_toc(
     for f in findings:
         finding_id = f.get("id", f"VS-2026-{idx:03d}")
         title = f.get("title", "Befund")
-        toc.append((f"3.{idx}", f"{finding_id} \u2014 {title}", True))
+        toc.append((f"3.{idx}", f"{finding_id} — {title}", True))
         idx += 1
 
     for f in positive_findings:
         title = f.get("title", "Positiver Befund")
-        toc.append((f"3.{idx}", f"VS-2026-POS \u2014 {title}", True))
+        toc.append((f"3.{idx}", f"VS-2026-POS — {title}", True))
         idx += 1
 
-    toc.append(("4", "Ma\u00dfnahmenplan", False))
+    toc.append(("4", "Maßnahmenplan", False))
     toc.append(("A", "Anhang: CVSS-Referenz", False))
 
     return toc
+
+
+def _build_basic_toc() -> list[tuple[str, str, bool]]:
+    """Build simplified TOC for basic package (no sub-items)."""
+    return [
+        ("1", "Zusammenfassung", False),
+        ("2", "Umfang &amp; Methodik", False),
+        ("3", "Befunde", False),
+        ("4", "Empfehlungen", False),
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -243,9 +190,9 @@ def _build_executive_summary(
             },
         },
         {
-            "title": "1.2&nbsp;&nbsp;&nbsp;Befund\u00fcbersicht",
+            "title": "1.2&nbsp;&nbsp;&nbsp;Befundübersicht",
             "paragraphs": [
-                f"Im Rahmen der automatisierten Sicherheitspr\u00fcfung von <b>{domain}</b> "
+                f"Im Rahmen der automatisierten Sicherheitsprüfung von <b>{domain}</b> "
                 f"wurden insgesamt <b>{total_findings} Befunde</b> identifiziert.",
             ],
             "table": {
@@ -294,11 +241,11 @@ def _build_scope(
 
     subsections = [
         {
-            "title": "2.1&nbsp;&nbsp;&nbsp;Pr\u00fcfungsumfang",
+            "title": "2.1&nbsp;&nbsp;&nbsp;Prüfungsumfang",
             "paragraphs": [
-                f"Ziel der Pr\u00fcfung war die Domain <b>{domain}</b>. "
+                f"Ziel der Prüfung war die Domain <b>{domain}</b>. "
                 f"Im Rahmen der DNS-Reconnaissance wurden <b>{len(hosts)} Hosts</b> "
-                f"identifiziert und in die Pr\u00fcfung einbezogen.",
+                f"identifiziert und in die Prüfung einbezogen.",
             ],
             "table": {
                 "header": [
@@ -312,8 +259,8 @@ def _build_scope(
         {
             "title": "2.2&nbsp;&nbsp;&nbsp;Methodik",
             "paragraphs": [
-                "Die Pr\u00fcfung wurde als automatisierter Security-Scan nach dem "
-                "PTES-Standard (Penetration Testing Execution Standard) durchgef\u00fchrt. "
+                "Die Prüfung wurde als automatisierter Security-Scan nach dem "
+                "PTES-Standard (Penetration Testing Execution Standard) durchgeführt. "
                 "Der Scan umfasste drei Phasen:",
                 "<b>Phase 0 — DNS-Reconnaissance:</b> Subdomain-Enumeration mittels "
                 "Certificate Transparency Logs, passiver Enumeration (subfinder), "
@@ -324,8 +271,66 @@ def _build_scope(
                 "<b>Phase 2 — Tiefer Scan:</b> SSL/TLS-Analyse (testssl.sh), "
                 "Schwachstellen-Scan (nikto, nuclei), Directory-Enumeration "
                 "(gobuster) und Screenshots (gowitness) pro Host.",
-                f"Die Pr\u00fcfung wurde am <b>{scan_date}</b> durchgef\u00fchrt. "
+                f"Die Prüfung wurde am <b>{scan_date}</b> durchgeführt. "
                 "Die Bewertung erfolgt nach CVSS v3.1.",
+            ],
+        },
+    ]
+
+    return {
+        "section_label": "2&nbsp;&nbsp;&nbsp;Umfang &amp; Methodik",
+        "subsections": subsections,
+    }
+
+
+def _build_basic_scope(
+    domain: str,
+    host_inventory: dict[str, Any],
+    scan_meta: dict[str, Any],
+    styles: Any,
+) -> dict[str, Any]:
+    """Build simplified scope section for basic package."""
+    hosts = host_inventory.get("hosts", [])
+    scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
+
+    # Build host table rows
+    host_rows = []
+    for h in hosts:
+        ip = h.get("ip", "N/A")
+        fqdns = ", ".join(h.get("fqdns", []))
+        host_rows.append(
+            [
+                Paragraph(ip, styles["TableCell"]),
+                Paragraph(fqdns, styles["TableCell"]),
+            ]
+        )
+
+    subsections = [
+        {
+            "title": "2.1&nbsp;&nbsp;&nbsp;Prüfungsumfang",
+            "paragraphs": [
+                f"Ziel der Prüfung war die Domain <b>{domain}</b>. "
+                f"Es wurden <b>{len(hosts)} Hosts</b> identifiziert und geprüft.",
+            ],
+            "table": {
+                "header": [
+                    Paragraph("<b>IP-Adresse</b>", styles["TableHeader"]),
+                    Paragraph("<b>FQDNs</b>", styles["TableHeader"]),
+                ],
+                "rows": host_rows,
+                "widths": [50 * mm, 120 * mm],
+            },
+        },
+        {
+            "title": "2.2&nbsp;&nbsp;&nbsp;Methodik",
+            "paragraphs": [
+                "Die Prüfung wurde als automatisierter Schnellscan durchgeführt. "
+                "Folgende Prüfungen wurden vorgenommen:",
+                "<b>Port-Scan:</b> Identifikation offener Ports und Dienste (nmap).",
+                "<b>Header-Analyse:</b> Prüfung der HTTP-Sicherheitsheader.",
+                "<b>SSL-Check:</b> Bewertung der SSL/TLS-Konfiguration (testssl.sh).",
+                "<b>Screenshot:</b> Visuelle Dokumentation der Web-Oberflächen (gowitness).",
+                f"Die Prüfung wurde am <b>{scan_date}</b> durchgeführt.",
             ],
         },
     ]
@@ -364,21 +369,56 @@ def _build_recommendations(
 
     header = [
         Paragraph("<b>Zeitrahmen</b>", styles["TableHeader"]),
-        Paragraph("<b>Ma\u00dfnahme</b>", styles["TableHeader"]),
+        Paragraph("<b>Maßnahme</b>", styles["TableHeader"]),
         Paragraph("<b>Befund-Ref.</b>", styles["TableHeader"]),
         Paragraph("<b>Aufwand</b>", styles["TableHeader"]),
     ]
 
     return {
-        "section_label": "4&nbsp;&nbsp;&nbsp;Ma\u00dfnahmenplan",
+        "section_label": "4&nbsp;&nbsp;&nbsp;Maßnahmenplan",
         "paragraphs": [
-            "Die folgende Tabelle fasst die empfohlenen Ma\u00dfnahmen zusammen, "
+            "Die folgende Tabelle fasst die empfohlenen Maßnahmen zusammen, "
             "priorisiert nach Dringlichkeit und Schweregrad der zugrunde liegenden Befunde.",
         ],
         "table": {
             "header": header,
             "rows": table_rows,
             "widths": [28 * mm, 95 * mm, 22 * mm, 25 * mm],
+        },
+    }
+
+
+def _build_basic_recommendations(
+    top_recommendations: list[dict[str, Any]],
+    styles: Any,
+) -> dict[str, Any]:
+    """Build simplified recommendations for basic package (2 columns only)."""
+    table_rows = []
+    for rec in top_recommendations[:3]:
+        action = rec.get("action", "—")
+        timeframe = rec.get("timeframe", "—")
+
+        table_rows.append(
+            [
+                Paragraph(action, styles["TableCell"]),
+                Paragraph(timeframe, styles["TableCellCenter"]),
+            ]
+        )
+
+    header = [
+        Paragraph("<b>Maßnahme</b>", styles["TableHeader"]),
+        Paragraph("<b>Zeitrahmen</b>", styles["TableHeader"]),
+    ]
+
+    return {
+        "section_label": "4&nbsp;&nbsp;&nbsp;Empfehlungen",
+        "paragraphs": [
+            "Die folgende Tabelle fasst die wichtigsten empfohlenen Maßnahmen zusammen.",
+        ],
+        "table": {
+            "header": header,
+            "rows": table_rows,
+            "widths": [130 * mm, 40 * mm],
         },
     }
 
@@ -446,7 +486,7 @@ def _build_appendices(
         ],
         [
             Paragraph("dnsx", styles["TableCell"]),
-            Paragraph("DNS-Validierung und -Aufl\u00f6sung", styles["TableCell"]),
+            Paragraph("DNS-Validierung und -Auflösung", styles["TableCell"]),
             Paragraph("Phase 0", styles["TableCellCenter"]),
         ],
         [
@@ -503,3 +543,378 @@ def _build_appendices(
     )
 
     return appendices
+
+
+# ===========================================================================
+# Package-specific mappers
+# ===========================================================================
+
+
+def map_professional_report(
+    claude_output: dict[str, Any],
+    scan_meta: dict[str, Any],
+    host_inventory: dict[str, Any],
+) -> dict[str, Any]:
+    """Map Claude API output to report_data for the Professional package.
+
+    German labels throughout. VectiScan branding.
+
+    Args:
+        claude_output: Parsed JSON from Claude API (overall_risk, findings, etc.)
+        scan_meta: Scan metadata dict with domain, startedAt, scanId, etc.
+        host_inventory: Host inventory JSON from phase 0
+
+    Returns:
+        report_data dict ready for generate_report()
+    """
+    styles = create_styles()
+
+    domain = scan_meta.get("domain", "unknown")
+    scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
+    scan_id = scan_meta.get("scanId", "unknown")
+    hosts = host_inventory.get("hosts", [])
+    hosts_count = len(hosts)
+
+    findings = claude_output.get("findings", [])
+    positive_findings = claude_output.get("positive_findings", [])
+    recommendations = claude_output.get("recommendations", [])
+
+    severity_counts = _count_by_severity(findings)
+    finding_summary = ", ".join(
+        f"{count} {sev}" for sev, count in severity_counts.items() if count > 0
+    )
+
+    # Map findings to report format
+    mapped_findings = [_map_finding(f) for f in findings]
+    mapped_findings += [_map_positive_finding(f) for f in positive_findings]
+
+    log.info(
+        "report_mapper.professional",
+        domain=domain,
+        findings=len(mapped_findings),
+        severities=severity_counts,
+    )
+
+    return {
+        "meta": {
+            "title": f"Security Assessment — {domain}",
+            "author": "VectiScan Automated Security Assessment",
+            "header_left": "VECTISCAN — SECURITY ASSESSMENT",
+            "header_right": domain,
+            "footer_left": f"Vertraulich  |  {scan_date}",
+            "classification_label": (
+                "KLASSIFIZIERUNG: VERTRAULICH — NUR FÜR AUTORISIERTE EMPFÄNGER"
+            ),
+        },
+        "cover": {
+            "cover_subtitle": "AUTOMATED SECURITY ASSESSMENT",
+            "cover_title": f"Sicherheitsbewertung<br/>{domain}",
+            "package": "professional",
+            "cover_meta": [
+                ["Ziel:", f"{domain} ({hosts_count} Hosts)"],
+                ["Datum:", scan_date],
+                ["Paket:", "Professional"],
+                ["Methodik:", "PTES (automatisiert)"],
+                ["Scoring:", "CVSS v3.1"],
+                ["Klassifizierung:", "Vertraulich"],
+                ["Befunde:", finding_summary],
+            ],
+        },
+        "toc": _build_toc(findings, positive_findings),
+        "executive_summary": _build_executive_summary(
+            claude_output, domain, styles, severity_counts
+        ),
+        "scope": _build_scope(domain, host_inventory, scan_meta, styles),
+        "findings_section_label": "3&nbsp;&nbsp;&nbsp;Befunde",
+        "findings": mapped_findings,
+        "recommendations": _build_recommendations(recommendations, styles),
+        "appendices": _build_appendices(findings, styles),
+        "disclaimer": (
+            "<b>Haftungsausschluss:</b> Dieser Bericht gibt den Sicherheitsstatus "
+            "zum Zeitpunkt der Prüfung wieder. Sicherheitsbewertungen sind "
+            "Momentaufnahmen. Regelmäßige Wiederholungsprüfungen werden empfohlen."
+        ),
+    }
+
+
+def map_basic_report(
+    claude_output: dict[str, Any],
+    scan_meta: dict[str, Any],
+    host_inventory: dict[str, Any],
+) -> dict[str, Any]:
+    """Map Claude API output to report_data for the Basic package.
+
+    Simplified report: no CVSS vectors/scores, no appendices, no evidence,
+    max 3 top recommendations, simplified TOC and scope.
+
+    Args:
+        claude_output: Parsed JSON from Claude API (basic schema)
+        scan_meta: Scan metadata dict with domain, startedAt, scanId, etc.
+        host_inventory: Host inventory JSON from phase 0
+
+    Returns:
+        report_data dict ready for generate_report()
+    """
+    styles = create_styles()
+
+    domain = scan_meta.get("domain", "unknown")
+    scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
+    scan_id = scan_meta.get("scanId", "unknown")
+    hosts = host_inventory.get("hosts", [])
+    hosts_count = len(hosts)
+
+    findings = claude_output.get("findings", [])
+    positive_findings = claude_output.get("positive_findings", [])
+    top_recommendations = claude_output.get("top_recommendations", [])
+
+    severity_counts = _count_by_severity(findings)
+    finding_summary = ", ".join(
+        f"{count} {sev}" for sev, count in severity_counts.items() if count > 0
+    )
+
+    # Map findings to basic report format (no CVSS, CWE, evidence)
+    mapped_findings = [_map_basic_finding(f) for f in findings]
+    mapped_findings += [_map_positive_finding(f) for f in positive_findings]
+
+    log.info(
+        "report_mapper.basic",
+        domain=domain,
+        findings=len(mapped_findings),
+        severities=severity_counts,
+    )
+
+    return {
+        "meta": {
+            "title": f"Security Assessment — {domain}",
+            "author": "VectiScan Automated Security Assessment",
+            "header_left": "VECTISCAN — SECURITY ASSESSMENT",
+            "header_right": domain,
+            "footer_left": f"Vertraulich  |  {scan_date}",
+            "classification_label": (
+                "KLASSIFIZIERUNG: VERTRAULICH — NUR FÜR AUTORISIERTE EMPFÄNGER"
+            ),
+        },
+        "cover": {
+            "cover_subtitle": "AUTOMATED SECURITY ASSESSMENT",
+            "cover_title": f"Sicherheitsbewertung<br/>{domain}",
+            "package": "basic",
+            "cover_meta": [
+                ["Ziel:", f"{domain} ({hosts_count} Hosts)"],
+                ["Datum:", scan_date],
+                ["Paket:", "Basic"],
+                ["Methodik:", "Automatisierter Schnellscan"],
+                ["Klassifizierung:", "Vertraulich"],
+                ["Befunde:", finding_summary],
+            ],
+        },
+        "toc": _build_basic_toc(),
+        "executive_summary": _build_executive_summary(
+            claude_output, domain, styles, severity_counts
+        ),
+        "scope": _build_basic_scope(domain, host_inventory, scan_meta, styles),
+        "findings_section_label": "3&nbsp;&nbsp;&nbsp;Befunde",
+        "findings": mapped_findings,
+        "recommendations": _build_basic_recommendations(top_recommendations, styles),
+        "appendices": [],
+        "disclaimer": (
+            "<b>Haftungsausschluss:</b> Dieser Bericht gibt den Sicherheitsstatus "
+            "zum Zeitpunkt der Prüfung wieder. Sicherheitsbewertungen sind "
+            "Momentaufnahmen. Regelmäßige Wiederholungsprüfungen werden empfohlen."
+        ),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Helper: Compliance Summary Validation
+# ---------------------------------------------------------------------------
+
+# Expected compliance values for scan-based assessment
+_COMPLIANCE_OVERRIDES = {
+    "nr1_risikoanalyse": "PARTIAL",        # Scan is only one part of risk analysis
+    "nr2_vorfallbewaeltigung": "PARTIAL",   # Preventive scan, not reactive capability
+    "nr4_lieferkette": "COVERED",           # Report itself is the proof
+    "nr5_schwachstellenmanagement": "COVERED",  # Core scan function
+    "nr6_wirksamkeitsbewertung": "COVERED",     # Scan evaluates effectiveness
+}
+# nr8_kryptografie is NOT overridden — depends on whether TLS was scanned
+
+_VALID_COMPLIANCE_VALUES = {"COVERED", "PARTIAL", "NOT_IN_SCOPE"}
+
+
+def _validate_compliance_summary(
+    summary: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate and correct obvious compliance summary errors.
+
+    Enforces rules:
+    - Nr. 1 (Risikoanalyse): always PARTIAL (scan is only part of risk analysis)
+    - Nr. 2 (Vorfallbewältigung): always PARTIAL (preventive, not reactive)
+    - Nr. 4 (Lieferkette): always COVERED (report is the proof)
+    - Nr. 5 (Schwachstellenmanagement): always COVERED (core function)
+    - Nr. 6 (Wirksamkeitsbewertung): always COVERED (scan evaluates effectiveness)
+    - Nr. 8 (Kryptografie): NOT overridden — depends on TLS scan results
+
+    Returns:
+        Corrected compliance summary dict.
+    """
+    corrected = dict(summary)
+
+    for key, expected_value in _COMPLIANCE_OVERRIDES.items():
+        current = corrected.get(key)
+        if current != expected_value:
+            log.warning(
+                "compliance_summary_corrected",
+                field=key,
+                was=current,
+                now=expected_value,
+            )
+            corrected[key] = expected_value
+
+    # Validate all values are valid
+    for key, value in corrected.items():
+        if key == "scope_note":
+            continue
+        if value not in _VALID_COMPLIANCE_VALUES:
+            log.warning("invalid_compliance_value", field=key, value=value)
+            corrected[key] = "PARTIAL"
+
+    # Ensure scope_note exists
+    if "scope_note" not in corrected:
+        corrected["scope_note"] = (
+            "Dieser Scan deckt die externe Angriffsoberfläche ab. "
+            "Interne Prozesse, Schulungen und organisatorische Maßnahmen "
+            "können durch einen externen Scan nicht bewertet werden."
+        )
+
+    return corrected
+
+
+def map_nis2_report(
+    claude_output: dict[str, Any],
+    scan_meta: dict[str, Any],
+    host_inventory: dict[str, Any],
+) -> dict[str, Any]:
+    """Map Claude API output to report_data for the NIS2 Compliance package.
+
+    Extends professional mapper output with NIS2-specific sections:
+    compliance summary, audit trail, and supply chain summary.
+
+    Args:
+        claude_output: Parsed JSON from Claude API (NIS2 schema with nis2_ref, etc.)
+        scan_meta: Scan metadata dict with domain, startedAt, scanId, etc.
+        host_inventory: Host inventory JSON from phase 0
+
+    Returns:
+        report_data dict ready for generate_report()
+    """
+    # Start with professional report as base
+    report_data = map_professional_report(claude_output, scan_meta, host_inventory)
+
+    domain = scan_meta.get("domain", "unknown")
+    scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
+    scan_id = scan_meta.get("scanId", "unknown")
+    package = scan_meta.get("package", "nis2")
+
+    # Update cover meta: change Paket to NIS2 Compliance, add Regulatorik row
+    cover_meta = report_data["cover"]["cover_meta"]
+    for i, row in enumerate(cover_meta):
+        if row[0] == "Paket:":
+            cover_meta[i] = ["Paket:", "NIS2 Compliance"]
+            break
+    # Insert Regulatorik row after Paket
+    for i, row in enumerate(cover_meta):
+        if row[0] == "Paket:":
+            cover_meta.insert(i + 1, ["Regulatorik:", "§30 BSIG (NIS2)"])
+            break
+
+    # Update package badge
+    report_data["cover"]["package"] = "nis2"
+
+    # Add NIS2-specific TOC entries after section 4
+    toc = report_data["toc"]
+    # Remove appendix entries (they come after section 4)
+    appendix_entries = [(n, t, s) for n, t, s in toc if n.startswith("A") or n.startswith("B")]
+    toc = [entry for entry in toc if not (entry[0].startswith("A") or entry[0].startswith("B"))]
+    # Add NIS2 sections
+    toc.append(("5", "NIS2-Compliance-Übersicht", False))
+    toc.append(("6", "Audit-Trail", False))
+    toc.append(("7", "Lieferketten-Bewertung", False))
+    # Re-add appendix entries
+    toc.extend(appendix_entries)
+    report_data["toc"] = toc
+
+    # Add nis2_ref to findings if present in claude_output
+    claude_findings = claude_output.get("findings", [])
+    claude_findings_by_id = {f.get("id"): f for f in claude_findings}
+    for finding in report_data["findings"]:
+        finding_id = finding.get("id")
+        claude_finding = claude_findings_by_id.get(finding_id, {})
+        if claude_finding.get("nis2_ref"):
+            finding["nis2_ref"] = claude_finding["nis2_ref"]
+
+    # Build audit trail from scan_meta
+    audit_trail = {
+        "scanId": scan_id,
+        "domain": domain,
+        "startedAt": scan_meta.get("startedAt", "—"),
+        "completedAt": scan_meta.get("completedAt", "—"),
+        "duration": scan_meta.get("duration", "—"),
+        "hosts_scanned": len(host_inventory.get("hosts", [])),
+        "package": package,
+        "tools": [],  # Tool versions placeholder — populated at runtime
+    }
+
+    # Add NIS2 data to report_data
+    report_data["nis2"] = {
+        "compliance_summary": _validate_compliance_summary(
+            claude_output.get("nis2_compliance_summary", {})
+        ),
+        "audit_trail": audit_trail,
+        "supply_chain": claude_output.get("supply_chain_summary", {}),
+    }
+
+    # Store scan_meta for supply chain page rendering
+    report_data["scan_meta"] = {
+        "domain": domain,
+        "date": scan_date,
+    }
+
+    log.info(
+        "report_mapper.nis2",
+        domain=domain,
+        findings=len(report_data["findings"]),
+        nis2_sections=list(report_data["nis2"].keys()),
+    )
+
+    return report_data
+
+
+# ===========================================================================
+# Dispatcher
+# ===========================================================================
+
+
+def map_to_report_data(
+    claude_output: dict[str, Any],
+    scan_meta: dict[str, Any],
+    host_inventory: dict[str, Any],
+    package: str = "professional",
+) -> dict[str, Any]:
+    """Dispatch to the correct package-specific mapper.
+
+    Args:
+        claude_output: Parsed JSON from Claude API
+        scan_meta: Scan metadata dict
+        host_inventory: Host inventory JSON from phase 0
+        package: One of 'basic', 'professional', 'nis2'
+
+    Returns:
+        report_data dict ready for generate_report()
+    """
+    mappers = {
+        "basic": map_basic_report,
+        "professional": map_professional_report,
+        "nis2": map_nis2_report,
+    }
+    mapper = mappers.get(package, map_professional_report)
+    return mapper(claude_output, scan_meta, host_inventory)

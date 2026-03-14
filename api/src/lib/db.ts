@@ -51,8 +51,24 @@ CREATE TABLE IF NOT EXISTS reports (
 );
 `;
 
+const MIGRATION_002_SQL = `
+ALTER TABLE scans ADD COLUMN IF NOT EXISTS package VARCHAR(20) NOT NULL DEFAULT 'professional';
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'chk_scans_package'
+  ) THEN
+    ALTER TABLE scans ADD CONSTRAINT chk_scans_package
+      CHECK (package IN ('basic', 'professional', 'nis2'));
+  END IF;
+END
+$$;
+`;
+
 export async function initDb(): Promise<void> {
   await pool.query(MIGRATION_SQL);
+  await pool.query(MIGRATION_002_SQL);
 }
 
 export async function query<T extends pg.QueryResultRow = Record<string, unknown>>(

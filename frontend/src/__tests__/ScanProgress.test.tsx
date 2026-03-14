@@ -6,6 +6,8 @@ const baseScan: ScanStatus = {
   id: '123',
   domain: 'example.com',
   status: 'dns_recon',
+  package: 'professional',
+  estimatedDuration: '~45 Minuten',
   progress: {
     phase: 'phase0',
     currentTool: null,

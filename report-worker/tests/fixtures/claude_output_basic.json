@@ -1,0 +1,42 @@
+{
+  "overall_risk": "MEDIUM",
+  "overall_description": "Die Sicherheitsbewertung zeigt ein mittleres Risiko mit einigen offenen Ports.",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "HTTP ohne HTTPS-Redirect",
+      "severity": "MEDIUM",
+      "affected": "example.com:80",
+      "description": "Der Webserver ist über HTTP erreichbar ohne automatische Weiterleitung zu HTTPS.",
+      "recommendation": "HTTPS-Redirect einrichten und HSTS-Header aktivieren."
+    },
+    {
+      "id": "VS-2026-002",
+      "title": "Veraltete TLS-Version",
+      "severity": "LOW",
+      "affected": "example.com:443",
+      "description": "TLS 1.0 und 1.1 sind noch aktiviert.",
+      "recommendation": "TLS 1.0 und 1.1 deaktivieren, nur TLS 1.2+ zulassen."
+    }
+  ],
+  "positive_findings": [
+    {
+      "title": "Security-Header vorhanden",
+      "description": "X-Content-Type-Options und X-Frame-Options sind korrekt konfiguriert."
+    }
+  ],
+  "top_recommendations": [
+    {
+      "action": "HTTPS-Redirect konfigurieren",
+      "timeframe": "Sofort"
+    },
+    {
+      "action": "TLS 1.0/1.1 deaktivieren",
+      "timeframe": "Woche 1"
+    },
+    {
+      "action": "HSTS-Header aktivieren",
+      "timeframe": "Woche 1"
+    }
+  ]
+}

@@ -1,27 +1,9 @@
 #!/usr/bin/env python3
 """
-Pentest Report PDF Generator — Template Script
-================================================
-This is the core rendering engine for the pentest-report-generator skill.
-It provides all PDF styling, layout, and formatting components.
-
-USAGE:
-  Customize the REPORT_DATA dict at the bottom with engagement-specific content,
-  then run: python scripts/generate_report.py
-
-The script handles:
-  - Professional cover page with classification bar
-  - PTES-aligned section structure
-  - Severity-colored finding headers with CVSS badges
-  - Consistent table styling throughout
-  - Proper page headers/footers with page numbering
-  - Evidence blocks in monospace on gray background
-
-CUSTOMIZATION:
-  1. Edit REPORT_DATA with engagement-specific info
-  2. Edit FINDINGS list with actual findings
-  3. Edit RECOMMENDATIONS list
-  4. Run the script
+Pentest Report PDF Generator — VectiScan Branded
+=================================================
+PDF rendering engine with VectiScan CI branding.
+All colors, fonts, and company data come from reporter.pdf.branding.
 """
 
 from reportlab.lib.pagesizes import A4
@@ -35,38 +17,14 @@ from reportlab.platypus import (
 )
 import os
 
-# ============================================================================
-# COLOR SCHEME
-# ============================================================================
-COLORS = {
-    "primary":      HexColor("#1a1a2e"),
-    "secondary":    HexColor("#16213e"),
-    "accent":       HexColor("#0f3460"),
-    "light_accent": HexColor("#e2e8f0"),
-    "text":         HexColor("#2d3748"),
-    "muted":        HexColor("#718096"),
-    "bg_light":     HexColor("#f7fafc"),
-    "white":        HexColor("#ffffff"),
-    "critical":     HexColor("#c53030"),
-    "high":         HexColor("#dd6b20"),
-    "medium":       HexColor("#d69e2e"),
-    "low":          HexColor("#38a169"),
-    "info":         HexColor("#3182ce"),
-}
-
-SEVERITY_COLORS = {
-    "CRITICAL": COLORS["critical"],
-    "KRITISCH": COLORS["critical"],
-    "HIGH":     COLORS["high"],
-    "HOCH":     COLORS["high"],
-    "MEDIUM":   COLORS["medium"],
-    "MITTEL":   COLORS["medium"],
-    "LOW":      COLORS["low"],
-    "NIEDRIG":  COLORS["low"],
-    "INFO":     COLORS["info"],
-    "INFORMATIONAL": COLORS["info"],
-    "INFORMATIV": COLORS["info"],
-}
+from reporter.pdf.branding import (
+    COLORS, SEVERITY_COLORS, PACKAGE_BADGES,
+    COMPANY_NAME, CLASSIFICATION_LABEL_DE, LOGO_PATH,
+    FONT_BODY, FONT_HEADING, FONT_MONO,
+    FONT_SIZE_BODY, FONT_SIZE_HEADING1, FONT_SIZE_HEADING2,
+    FONT_SIZE_EVIDENCE, FONT_SIZE_TABLE_HEADER, FONT_SIZE_TABLE_CELL,
+    FONT_SIZE_FOOTER, FONT_SIZE_COVER_TITLE, FONT_SIZE_COVER_SUBTITLE,
+)
 
 WIDTH, HEIGHT = A4
 
@@ -105,9 +63,9 @@ class FindingHeader(Flowable):
         self.canv.setFillColor(self.color)
         self.canv.roundRect(0, 0, self.width, self.height, 2 * mm, fill=1, stroke=0)
         self.canv.setFillColor(COLORS["white"])
-        self.canv.setFont("Helvetica-Bold", 9)
+        self.canv.setFont(FONT_HEADING, 9)
         self.canv.drawString(4 * mm, self.height - 5.5 * mm, self.finding_id)
-        self.canv.setFont("Helvetica-Bold", 11)
+        self.canv.setFont(FONT_HEADING, 11)
         # Truncate title if too long
         title = self.title
         if len(title) > 65:
@@ -117,9 +75,9 @@ class FindingHeader(Flowable):
         self.canv.setFillColor(HexColor("#00000033"))
         self.canv.roundRect(badge_x, 3 * mm, 26 * mm, 12 * mm, 2 * mm, fill=1, stroke=0)
         self.canv.setFillColor(COLORS["white"])
-        self.canv.setFont("Helvetica-Bold", 8)
+        self.canv.setFont(FONT_HEADING, 8)
         self.canv.drawCentredString(badge_x + 13 * mm, 11 * mm, "CVSS v3.1")
-        self.canv.setFont("Helvetica-Bold", 10)
+        self.canv.setFont(FONT_HEADING, 10)
         self.canv.drawCentredString(badge_x + 13 * mm, 4.5 * mm, str(self.cvss_score))
 
 
@@ -132,20 +90,20 @@ def create_styles():
     C = COLORS
 
     defs = {
-        "CoverTitle":       dict(fontName="Helvetica-Bold", fontSize=28, leading=34, textColor=C["white"]),
-        "CoverSubtitle":    dict(fontName="Helvetica", fontSize=14, leading=20, textColor=HexColor("#a0aec0")),
-        "SectionTitle":     dict(fontName="Helvetica-Bold", fontSize=18, leading=24, textColor=C["primary"], spaceBefore=16, spaceAfter=8),
-        "SubsectionTitle":  dict(fontName="Helvetica-Bold", fontSize=13, leading=18, textColor=C["accent"], spaceBefore=12, spaceAfter=6),
-        "BodyText2":        dict(fontName="Helvetica", fontSize=9.5, leading=14, textColor=C["text"], alignment=TA_JUSTIFY, spaceAfter=6),
-        "FindingLabel":     dict(fontName="Helvetica-Bold", fontSize=9, leading=13, textColor=C["accent"], spaceBefore=8, spaceAfter=3),
-        "FindingBody":      dict(fontName="Helvetica", fontSize=9, leading=13, textColor=C["text"], alignment=TA_JUSTIFY, spaceAfter=4),
-        "Evidence":         dict(fontName="Courier", fontSize=7.5, leading=10.5, textColor=C["text"], backColor=HexColor("#edf2f7"),
+        "CoverTitle":       dict(fontName=FONT_HEADING, fontSize=FONT_SIZE_COVER_TITLE, leading=34, textColor=C["white"]),
+        "CoverSubtitle":    dict(fontName=FONT_BODY, fontSize=FONT_SIZE_COVER_SUBTITLE, leading=20, textColor=HexColor("#a0aec0")),
+        "SectionTitle":     dict(fontName=FONT_HEADING, fontSize=FONT_SIZE_HEADING1, leading=24, textColor=C["primary"], spaceBefore=16, spaceAfter=8),
+        "SubsectionTitle":  dict(fontName=FONT_HEADING, fontSize=FONT_SIZE_HEADING2, leading=18, textColor=C["accent"], spaceBefore=12, spaceAfter=6),
+        "BodyText2":        dict(fontName=FONT_BODY, fontSize=FONT_SIZE_BODY, leading=14, textColor=C["text"], alignment=TA_JUSTIFY, spaceAfter=6),
+        "FindingLabel":     dict(fontName=FONT_HEADING, fontSize=9, leading=13, textColor=C["accent"], spaceBefore=8, spaceAfter=3),
+        "FindingBody":      dict(fontName=FONT_BODY, fontSize=9, leading=13, textColor=C["text"], alignment=TA_JUSTIFY, spaceAfter=4),
+        "Evidence":         dict(fontName=FONT_MONO, fontSize=FONT_SIZE_EVIDENCE, leading=10.5, textColor=C["text"], backColor=C["bg_evidence"],
                                  borderPadding=(6, 8, 6, 8), spaceAfter=6, leftIndent=4*mm, rightIndent=4*mm),
-        "TableHeader":      dict(fontName="Helvetica-Bold", fontSize=8, leading=11, textColor=C["white"], alignment=TA_CENTER),
-        "TableCell":        dict(fontName="Helvetica", fontSize=8, leading=11, textColor=C["text"]),
-        "TableCellCenter":  dict(fontName="Helvetica", fontSize=8, leading=11, textColor=C["text"], alignment=TA_CENTER),
-        "TOCEntry":         dict(fontName="Helvetica", fontSize=10, leading=18, textColor=C["text"]),
-        "TOCSubEntry":      dict(fontName="Helvetica", fontSize=9, leading=16, textColor=C["muted"], leftIndent=10*mm),
+        "TableHeader":      dict(fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER, leading=11, textColor=C["white"], alignment=TA_CENTER),
+        "TableCell":        dict(fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL, leading=11, textColor=C["text"]),
+        "TableCellCenter":  dict(fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL, leading=11, textColor=C["text"], alignment=TA_CENTER),
+        "TOCEntry":         dict(fontName=FONT_BODY, fontSize=10, leading=18, textColor=C["text"]),
+        "TOCSubEntry":      dict(fontName=FONT_BODY, fontSize=9, leading=16, textColor=C["muted"], leftIndent=10*mm),
     }
     for name, kw in defs.items():
         styles.add(ParagraphStyle(name=name, **kw))
@@ -157,20 +115,34 @@ def create_styles():
 # ============================================================================
 
 def draw_cover(canvas_obj, doc):
-    """Draw cover page background."""
+    """Draw cover page background with VectiScan branding."""
     canvas_obj.saveState()
-    canvas_obj.setFillColor(COLORS["primary"])
+    # Full cover background — dark navy
+    canvas_obj.setFillColor(COLORS["cover_bg"])
     canvas_obj.rect(0, 0, WIDTH, HEIGHT, fill=1, stroke=0)
-    canvas_obj.setFillColor(COLORS["accent"])
+    # Left accent bar — cyan stripe
+    canvas_obj.setFillColor(COLORS["cover_accent_bar"])
     canvas_obj.rect(0, 0, 8 * mm, HEIGHT, fill=1, stroke=0)
-    canvas_obj.setFillColor(HexColor("#0f346020"))
+    # Right geometric overlay
+    canvas_obj.setFillColor(COLORS["cover_overlay"])
+    canvas_obj.setFillAlpha(0.12)
     canvas_obj.rect(120 * mm, 0, 90 * mm, HEIGHT, fill=1, stroke=0)
-    # Classification bar
-    canvas_obj.setFillColor(COLORS["critical"])
+    canvas_obj.setFillAlpha(1.0)
+    # Logo (if available)
+    if LOGO_PATH and os.path.isfile(LOGO_PATH):
+        canvas_obj.drawImage(
+            LOGO_PATH,
+            WIDTH - 50 * mm, HEIGHT - 45 * mm,
+            width=30 * mm, height=30 * mm,
+            preserveAspectRatio=True, mask="auto",
+        )
+    # Classification bar — cyan accent (not red)
+    canvas_obj.setFillColor(COLORS["accent"])
     canvas_obj.rect(0, 0, WIDTH, 12 * mm, fill=1, stroke=0)
-    canvas_obj.setFillColor(COLORS["white"])
-    canvas_obj.setFont("Helvetica-Bold", 8)
-    label = getattr(doc, "_classification_label", "CLASSIFICATION: CONFIDENTIAL")
+    # Classification text — dark on cyan
+    canvas_obj.setFillColor(COLORS["primary"])
+    canvas_obj.setFont(FONT_HEADING, 8)
+    label = getattr(doc, "_classification_label", CLASSIFICATION_LABEL_DE)
     canvas_obj.drawCentredString(WIDTH / 2, 4 * mm, label)
     canvas_obj.restoreState()
 
@@ -179,22 +151,24 @@ def draw_normal(canvas_obj, doc):
     """Draw header/footer for content pages."""
     canvas_obj.saveState()
     meta = getattr(doc, "_meta", {})
-    # Header bar
+    # Header bar — primary navy
     canvas_obj.setFillColor(COLORS["primary"])
     canvas_obj.rect(0, HEIGHT - 14 * mm, WIDTH, 14 * mm, fill=1, stroke=0)
     canvas_obj.setFillColor(COLORS["white"])
-    canvas_obj.setFont("Helvetica-Bold", 8)
-    canvas_obj.drawString(20 * mm, HEIGHT - 9.5 * mm, meta.get("header_left", "PENETRATION TEST REPORT"))
-    canvas_obj.setFont("Helvetica", 8)
+    canvas_obj.setFont(FONT_HEADING, 8)
+    canvas_obj.drawString(20 * mm, HEIGHT - 9.5 * mm, meta.get("header_left", "VECTISCAN — SECURITY ASSESSMENT"))
+    canvas_obj.setFont(FONT_BODY, 8)
     canvas_obj.drawRightString(WIDTH - 20 * mm, HEIGHT - 9.5 * mm, meta.get("header_right", ""))
+    # Accent line under header — cyan, 0.8pt
     canvas_obj.setStrokeColor(COLORS["accent"])
-    canvas_obj.setLineWidth(0.5)
+    canvas_obj.setLineWidth(0.8)
     canvas_obj.line(20 * mm, HEIGHT - 14.5 * mm, WIDTH - 20 * mm, HEIGHT - 14.5 * mm)
-    # Footer
+    # Footer — muted text
     canvas_obj.setFillColor(COLORS["muted"])
-    canvas_obj.setFont("Helvetica", 7)
+    canvas_obj.setFont(FONT_BODY, FONT_SIZE_FOOTER)
     canvas_obj.drawString(20 * mm, 10 * mm, meta.get("footer_left", "Confidential"))
     canvas_obj.drawRightString(WIDTH - 20 * mm, 10 * mm, f"Page {doc.page}")
+    # Footer divider — light_accent
     canvas_obj.setStrokeColor(COLORS["light_accent"])
     canvas_obj.setLineWidth(0.3)
     canvas_obj.line(20 * mm, 15 * mm, WIDTH - 20 * mm, 15 * mm)
@@ -226,24 +200,75 @@ def styled_table(header_row, data_rows, col_widths, styles):
 # SECTION BUILDERS
 # ============================================================================
 
+class PackageBadge(Flowable):
+    """Narrow badge bar showing the package type on the cover page."""
+    def __init__(self, package_name):
+        Flowable.__init__(self)
+        badge = PACKAGE_BADGES.get(package_name, PACKAGE_BADGES["professional"])
+        self.bg_color = badge["color"]
+        self.text_color = badge["text_color"]
+        self.label = badge["label"]
+        self.width = 50 * mm
+        self.height = 8 * mm
+
+    def draw(self):
+        self.canv.setFillColor(self.bg_color)
+        self.canv.roundRect(0, 0, self.width, self.height, 2 * mm, fill=1, stroke=0)
+        self.canv.setFillColor(self.text_color)
+        self.canv.setFont(FONT_HEADING, 9)
+        self.canv.drawCentredString(self.width / 2, 2.5 * mm, self.label)
+
+
+class NIS2RefBadge(Flowable):
+    """Narrow badge bar showing §30 BSIG reference under a finding header."""
+    def __init__(self, nis2_ref_text):
+        Flowable.__init__(self)
+        self.nis2_ref_text = nis2_ref_text
+        self.width = 170 * mm
+        self.height = 6 * mm
+
+    def draw(self):
+        # Background
+        self.canv.setFillColor(COLORS["bg_light"])
+        self.canv.rect(0, 0, self.width, self.height, fill=1, stroke=0)
+        # Left accent border
+        self.canv.setFillColor(COLORS["accent"])
+        self.canv.rect(0, 0, 2 * mm, self.height, fill=1, stroke=0)
+        # Text
+        self.canv.setFillColor(COLORS["accent"])
+        self.canv.setFont(FONT_BODY, 7.5)
+        self.canv.drawString(5 * mm, 1.8 * mm, f"§30 BSIG: {self.nis2_ref_text}")
+
+
+def build_package_badge(story, package_name):
+    """Add a package badge bar below the cover title."""
+    story.append(Spacer(1, 3 * mm))
+    story.append(PackageBadge(package_name))
+
+
 def build_cover(story, styles, data):
     """Build cover page."""
     story.append(Spacer(1, 50 * mm))
-    story.append(Paragraph(data.get("cover_subtitle", "PENETRATION TEST"), styles["CoverSubtitle"]))
+    story.append(Paragraph(data.get("cover_subtitle", "AUTOMATED SECURITY ASSESSMENT"), styles["CoverSubtitle"]))
     story.append(Spacer(1, 3 * mm))
     story.append(Paragraph(data.get("cover_title", "Security Assessment"), styles["CoverTitle"]))
+    story.append(Spacer(1, 3 * mm))
+    # Package badge (if specified)
+    package = data.get("package")
+    if package and package in PACKAGE_BADGES:
+        build_package_badge(story, package)
     story.append(Spacer(1, 8 * mm))
-    story.append(HorizontalLine(80 * mm, HexColor("#4a5568"), 0.5))
+    story.append(HorizontalLine(80 * mm, COLORS["cover_rule"], 0.5))
     story.append(Spacer(1, 8 * mm))
 
     meta_rows = data.get("cover_meta", [])
     if meta_rows:
         meta_table = Table(meta_rows, colWidths=[35 * mm, 100 * mm])
         meta_table.setStyle(TableStyle([
-            ("FONT", (0, 0), (0, -1), "Helvetica", 9),
-            ("FONT", (1, 0), (1, -1), "Helvetica-Bold", 9),
-            ("TEXTCOLOR", (0, 0), (0, -1), HexColor("#718096")),
-            ("TEXTCOLOR", (1, 0), (1, -1), HexColor("#e2e8f0")),
+            ("FONT", (0, 0), (0, -1), FONT_BODY, 9),
+            ("FONT", (1, 0), (1, -1), FONT_HEADING, 9),
+            ("TEXTCOLOR", (0, 0), (0, -1), COLORS["cover_meta_label"]),
+            ("TEXTCOLOR", (1, 0), (1, -1), COLORS["cover_meta_value"]),
             ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ("TOPPADDING", (0, 0), (-1, -1), 3),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
@@ -277,14 +302,19 @@ def build_finding(story, styles, f):
     story.append(FindingHeader(f["id"], f["title"], f["severity"], f["cvss_score"], color))
     story.append(Spacer(1, 3 * mm))
 
+    # NIS2 reference badge (if present)
+    if f.get("nis2_ref"):
+        story.append(NIS2RefBadge(f["nis2_ref"]))
+        story.append(Spacer(1, 2 * mm))
+
     # Metadata row
     meta_data = [
-        [Paragraph("<b>CVSS Vector</b>", ParagraphStyle("x", fontName="Helvetica-Bold", fontSize=7, textColor=COLORS["muted"])),
-         Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName="Helvetica-Bold", fontSize=7, textColor=COLORS["muted"])),
-         Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName="Helvetica-Bold", fontSize=7, textColor=COLORS["muted"]))],
-        [Paragraph(f.get("cvss_vector", "N/A"), ParagraphStyle("x", fontName="Courier", fontSize=7, textColor=COLORS["text"])),
-         Paragraph(f.get("cwe", "N/A"), ParagraphStyle("x", fontName="Helvetica", fontSize=7.5, textColor=COLORS["text"])),
-         Paragraph(f.get("affected", "N/A"), ParagraphStyle("x", fontName="Helvetica", fontSize=7.5, textColor=COLORS["text"]))],
+        [Paragraph("<b>CVSS Vector</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7, textColor=COLORS["muted"])),
+         Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7, textColor=COLORS["muted"])),
+         Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7, textColor=COLORS["muted"]))],
+        [Paragraph(f.get("cvss_vector", "N/A"), ParagraphStyle("x", fontName=FONT_MONO, fontSize=7, textColor=COLORS["text"])),
+         Paragraph(f.get("cwe", "N/A"), ParagraphStyle("x", fontName=FONT_BODY, fontSize=7.5, textColor=COLORS["text"])),
+         Paragraph(f.get("affected", "N/A"), ParagraphStyle("x", fontName=FONT_BODY, fontSize=7.5, textColor=COLORS["text"]))],
     ]
     meta_table = Table(meta_data, colWidths=[85 * mm, 25 * mm, 60 * mm])
     meta_table.setStyle(TableStyle([
@@ -326,7 +356,7 @@ def build_info_box(story, text, color=None):
     """Colored info box (for PCI-DSS notes, disclaimers, etc.)."""
     bg = color or HexColor("#ebf4ff")
     tc = COLORS["accent"] if color is None else COLORS["text"]
-    data = [[Paragraph(text, ParagraphStyle("x", fontName="Helvetica", fontSize=8.5, leading=12, textColor=tc))]]
+    data = [[Paragraph(text, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8.5, leading=12, textColor=tc))]]
     table = Table(data, colWidths=[170 * mm])
     table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), bg),
@@ -344,9 +374,9 @@ def build_risk_box(story, label, level, description):
     level_upper = level.upper()
     level_color = SEVERITY_COLORS.get(level_upper, COLORS["high"])
     data = [
-        [Paragraph(f"<b>{label}</b>", ParagraphStyle("x", fontName="Helvetica-Bold", fontSize=10, textColor=COLORS["white"], alignment=TA_CENTER)),
-         Paragraph(f"<b>{level}</b>", ParagraphStyle("x", fontName="Helvetica-Bold", fontSize=10, textColor=COLORS["white"], alignment=TA_CENTER))],
-        [Paragraph(description, ParagraphStyle("x", fontName="Helvetica", fontSize=9, textColor=COLORS["white"], leading=13, alignment=TA_JUSTIFY)), ""],
+        [Paragraph(f"<b>{label}</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=10, textColor=COLORS["white"], alignment=TA_CENTER)),
+         Paragraph(f"<b>{level}</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=10, textColor=COLORS["white"], alignment=TA_CENTER))],
+        [Paragraph(description, ParagraphStyle("x", fontName=FONT_BODY, fontSize=9, textColor=COLORS["white"], leading=13, alignment=TA_JUSTIFY)), ""],
     ]
     table = Table(data, colWidths=[130 * mm, 40 * mm])
     table.setStyle(TableStyle([
@@ -361,6 +391,243 @@ def build_risk_box(story, label, level, description):
         ("RIGHTPADDING", (0, 0), (-1, -1), 8),
     ]))
     story.append(table)
+
+
+# ============================================================================
+# NIS2 FLOWABLES & SECTIONS
+# ============================================================================
+
+_NIS2_REQUIREMENTS = {
+    "nr1_risikoanalyse": ("Nr. 1", "Risikoanalyse und Sicherheitskonzepte",
+                          "CVSS-bewertete Findings liefern dokumentierte Risikoanalyse"),
+    "nr2_vorfallbewaeltigung": ("Nr. 2", "Bewältigung von Sicherheitsvorfällen",
+                                "Identifizierte Angriffsvektoren ermöglichen proaktive Prävention"),
+    "nr4_lieferkette": ("Nr. 4", "Sicherheit der Lieferkette",
+                        "Report dient als Nachweis geprüfter Web-Infrastruktur"),
+    "nr5_schwachstellenmanagement": ("Nr. 5", "Schwachstellenmanagement",
+                                     "Automatisierte Schwachstellenerkennung mit Priorisierung"),
+    "nr6_wirksamkeitsbewertung": ("Nr. 6", "Bewertung der Wirksamkeit von Maßnahmen",
+                                   "Scan dokumentiert Wirksamkeit getroffener Maßnahmen"),
+    "nr8_kryptografie": ("Nr. 8", "Konzepte für Kryptografie und Verschlüsselung",
+                          "testssl.sh bewertet TLS-Konfiguration und Cipher-Suites"),
+}
+
+_COVERAGE_LABELS = {
+    "COVERED": ("✓ Abgedeckt", COLORS["nis2_covered"]),
+    "PARTIAL": ("◐ Teilweise", COLORS["nis2_partial"]),
+    "NOT_IN_SCOPE": ("— Nicht im Scope", COLORS["nis2_out"]),
+}
+
+
+def build_compliance_summary(story, styles, nis2_data):
+    """Build NIS2 compliance summary section with §30 BSIG table."""
+    story.append(PageBreak())
+    story.append(Paragraph("NIS2-Compliance-Übersicht (§30 BSIG)", styles["SectionTitle"]))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, 4 * mm))
+
+    # Intro paragraph
+    story.append(Paragraph(
+        "Die folgende Übersicht zeigt, inwieweit die Ergebnisse dieses Security Assessments "
+        "die Anforderungen des §30 Abs. 2 BSIG (Umsetzungsgesetz der NIS2-Richtlinie) "
+        "adressieren. Die Bewertung bezieht sich ausschließlich auf die durch den externen "
+        "Scan prüfbaren Aspekte.",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, 3 * mm))
+
+    # Scope note info box
+    scope_note = nis2_data.get("scope_note", "")
+    if scope_note:
+        build_info_box(story, scope_note)
+        story.append(Spacer(1, 4 * mm))
+
+    # Compliance table
+    header_style = ParagraphStyle("th", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER,
+                                   leading=11, textColor=COLORS["white"], alignment=TA_CENTER)
+    cell_style = ParagraphStyle("td", fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+
+    header_row = [
+        Paragraph("<b>§30 BSIG</b>", header_style),
+        Paragraph("<b>Anforderung</b>", header_style),
+        Paragraph("<b>Abdeckung</b>", header_style),
+        Paragraph("<b>Erläuterung</b>", header_style),
+    ]
+
+    data_rows = []
+    for key, (nr, req_name, explanation) in _NIS2_REQUIREMENTS.items():
+        status = nis2_data.get(key, "NOT_IN_SCOPE")
+        label_text, label_color = _COVERAGE_LABELS.get(status, _COVERAGE_LABELS["NOT_IN_SCOPE"])
+        coverage_style = ParagraphStyle("cov", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_CELL,
+                                         leading=11, textColor=label_color, alignment=TA_CENTER)
+        data_rows.append([
+            Paragraph(nr, cell_style),
+            Paragraph(req_name, cell_style),
+            Paragraph(label_text, coverage_style),
+            Paragraph(explanation, cell_style),
+        ])
+
+    col_widths = [25 * mm, 45 * mm, 30 * mm, 70 * mm]
+    table = styled_table(header_row, data_rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, 6 * mm))
+
+
+def build_audit_trail(story, styles, audit_data):
+    """Build audit trail section for NIS2 compliance."""
+    story.append(Paragraph("Audit-Trail", styles["SectionTitle"]))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, 4 * mm))
+
+    story.append(Paragraph(
+        "Die folgenden Informationen dienen der Nachvollziehbarkeit "
+        "für Auditzwecke gemäß §39 BSIG.",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, 3 * mm))
+
+    # Audit data table
+    cell_label = ParagraphStyle("al", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+    cell_value = ParagraphStyle("av", fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+    header_style = ParagraphStyle("th", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER,
+                                   leading=11, textColor=COLORS["white"], alignment=TA_CENTER)
+
+    header_row = [
+        Paragraph("<b>Eigenschaft</b>", header_style),
+        Paragraph("<b>Wert</b>", header_style),
+    ]
+
+    # Build tool versions string
+    tools = audit_data.get("tools", [])
+    tools_str = "<br/>".join(tools) if tools else "—"
+
+    data_rows = [
+        [Paragraph("Scan-Zeitpunkt (Start)", cell_label),
+         Paragraph(str(audit_data.get("scan_start", "—")), cell_value)],
+        [Paragraph("Scan-Zeitpunkt (Ende)", cell_label),
+         Paragraph(str(audit_data.get("scan_end", "—")), cell_value)],
+        [Paragraph("Scan-Dauer", cell_label),
+         Paragraph(str(audit_data.get("duration", "—")), cell_value)],
+        [Paragraph("Methodik", cell_label),
+         Paragraph("PTES (automatisiert)", cell_value)],
+        [Paragraph("Scoring-System", cell_label),
+         Paragraph("CVSS v3.1", cell_value)],
+        [Paragraph("Gescannte Hosts", cell_label),
+         Paragraph(str(audit_data.get("hosts_scanned", "—")), cell_value)],
+        [Paragraph("Scan-Tiefe", cell_label),
+         Paragraph("Professional", cell_value)],
+        [Paragraph("Tool-Versionen", cell_label),
+         Paragraph(tools_str, cell_value)],
+    ]
+
+    col_widths = [45 * mm, 125 * mm]
+    table = styled_table(header_row, data_rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, 6 * mm))
+
+    # Hint box
+    build_info_box(story, "Alle Tool-Aufrufe werden geloggt und sind "
+                   "auf Anfrage für Auditzwecke verfügbar.")
+    story.append(Spacer(1, 6 * mm))
+
+
+def build_supply_chain_page(story, styles, supply_chain_data, scan_meta):
+    """Build supply chain summary page (standalone 1-pager for §30 Abs. 2 Nr. 4 BSIG)."""
+    story.append(PageBreak())
+    story.append(Paragraph("Lieferketten-Zusammenfassung", styles["SectionTitle"]))
+    story.append(Paragraph(
+        "Nachweis gemäß §30 Abs. 2 Nr. 4 BSIG — Sicherheit der Lieferkette",
+        styles["SubsectionTitle"],
+    ))
+    story.append(Spacer(1, 4 * mm))
+
+    # Risk box
+    overall_rating = supply_chain_data.get("overall_rating", "MEDIUM")
+    recommendation = supply_chain_data.get("recommendation", "")
+    build_risk_box(story, "Gesamtbewertung für Auftraggeber", overall_rating, recommendation)
+    story.append(Spacer(1, 6 * mm))
+
+    # Key metrics table
+    header_style = ParagraphStyle("th", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER,
+                                   leading=11, textColor=COLORS["white"], alignment=TA_CENTER)
+    cell_label = ParagraphStyle("al", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+    cell_value = ParagraphStyle("av", fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+
+    header_row = [
+        Paragraph("<b>Kennzahl</b>", header_style),
+        Paragraph("<b>Wert</b>", header_style),
+    ]
+
+    data_rows = [
+        [Paragraph("Geprüfte Domain", cell_label),
+         Paragraph(str(scan_meta.get("domain", "—")), cell_value)],
+        [Paragraph("Scan-Datum", cell_label),
+         Paragraph(str(scan_meta.get("date", "—")), cell_value)],
+        [Paragraph("Gesamtrisiko", cell_label),
+         Paragraph(overall_rating, cell_value)],
+        [Paragraph("Kritische/Hohe Befunde", cell_label),
+         Paragraph(str(supply_chain_data.get("key_findings_count", 0)), cell_value)],
+        [Paragraph("Positive Befunde", cell_label),
+         Paragraph(str(supply_chain_data.get("positive_count", 0)), cell_value)],
+        [Paragraph("Methodik", cell_label),
+         Paragraph("PTES / CVSS v3.1", cell_value)],
+    ]
+
+    col_widths = [55 * mm, 115 * mm]
+    table = styled_table(header_row, data_rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, 6 * mm))
+
+    # Note text
+    story.append(Paragraph(
+        "Vollständige technische Details sind im Hauptbericht dokumentiert.",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, 4 * mm))
+
+    # Signature line
+    story.append(Spacer(1, 12 * mm))
+    sig_style = ParagraphStyle("sig", fontName=FONT_BODY, fontSize=8, leading=12,
+                                textColor=COLORS["muted"])
+    story.append(Paragraph("Bestätigung durch Auftraggeber:", sig_style))
+    story.append(Spacer(1, 10 * mm))
+
+    # Two signature blocks side by side
+    sig_header = ParagraphStyle("sigh", fontName=FONT_HEADING, fontSize=7.5, leading=10,
+                                 textColor=COLORS["muted"])
+    sig_cell = ParagraphStyle("sigc", fontName=FONT_BODY, fontSize=8, leading=10,
+                               textColor=COLORS["text"])
+    sig_rows = [
+        [Paragraph("<b>Datum / Unterschrift</b>", sig_header),
+         Paragraph("<b>Name / Funktion</b>", sig_header)],
+        [Paragraph("______________________________", sig_cell),
+         Paragraph("______________________________", sig_cell)],
+    ]
+    sig_table = Table(sig_rows, colWidths=[85 * mm, 85 * mm])
+    sig_table.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "BOTTOM"),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+    ]))
+    story.append(sig_table)
+    story.append(Spacer(1, 6 * mm))
+
+    # Footer
+    story.append(HorizontalLine(170 * mm, COLORS["light_accent"], 0.5))
+    story.append(Spacer(1, 3 * mm))
+    footer_style = ParagraphStyle("scf", fontName=FONT_BODY, fontSize=7.5, leading=10,
+                                   textColor=COLORS["muted"], alignment=TA_CENTER)
+    story.append(Paragraph(
+        "Erstellt mit VectiScan — Automated Security Assessment — vectigal.tech",
+        footer_style,
+    ))
 
 
 # ============================================================================
@@ -412,6 +679,7 @@ def generate_report(report_data, output_path):
 
     styles = create_styles()
     story = []
+    nis2 = report_data.get("nis2")
 
     # --- Cover ---
     build_cover(story, styles, report_data.get("cover", {}))
@@ -443,6 +711,10 @@ def generate_report(report_data, output_path):
                 story.append(Spacer(1, 6 * mm))
 
         story.append(PageBreak())
+
+    # --- NIS2 Compliance Summary (after Executive Summary) ---
+    if nis2 and nis2.get("compliance_summary"):
+        build_compliance_summary(story, styles, nis2["compliance_summary"])
 
     # --- Scope & Methodology ---
     scope = report_data.get("scope", {})
@@ -497,6 +769,10 @@ def generate_report(report_data, output_path):
             story.append(styled_table(t["header"], t["rows"], t["widths"], styles))
         story.append(PageBreak())
 
+    # --- NIS2 Audit Trail (after Recommendations, before Appendices) ---
+    if nis2 and nis2.get("audit_trail"):
+        build_audit_trail(story, styles, nis2["audit_trail"])
+
     # --- Appendices ---
     for appendix in report_data.get("appendices", []):
         story.append(Paragraph(appendix["title"], styles["SectionTitle"]))
@@ -511,6 +787,10 @@ def generate_report(report_data, output_path):
             story.append(Spacer(1, 8 * mm))
         for p in appendix.get("paragraphs", []):
             story.append(Paragraph(p, styles["BodyText2"]))
+
+    # --- NIS2 Supply Chain Page (before Disclaimer) ---
+    if nis2 and nis2.get("supply_chain"):
+        build_supply_chain_page(story, styles, nis2["supply_chain"], report_data.get("scan_meta", {}))
 
     # --- Disclaimer ---
     disclaimer = report_data.get("disclaimer")
@@ -539,14 +819,15 @@ if __name__ == "__main__":
         "meta": {
             "title": "Penetration Test Report",
             "author": "Security Assessment",
-            "header_left": "PENETRATION TEST REPORT",
+            "header_left": "VECTISCAN — SECURITY ASSESSMENT",
             "header_right": "Example Target  |  example.com",
             "footer_left": "Confidential  |  11 March 2026",
-            "classification_label": "CLASSIFICATION: CONFIDENTIAL — AUTHORIZED RECIPIENTS ONLY",
+            "classification_label": CLASSIFICATION_LABEL_DE,
         },
         "cover": {
-            "cover_subtitle": "PENETRATION TEST",
+            "cover_subtitle": "AUTOMATED SECURITY ASSESSMENT",
             "cover_title": "Security Assessment<br/>Example Target",
+            "package": "professional",
             "cover_meta": [
                 ["Target:", "example.com (192.168.1.1)"],
                 ["Date:", "11 March 2026"],
@@ -639,4 +920,4 @@ if __name__ == "__main__":
         ),
     }
 
-    generate_report(example_data, "/mnt/user-data/outputs/example_pentest_report.pdf")
+    generate_report(example_data, "/mnt/user-data/outputs/vectiscan-branded-test.pdf")

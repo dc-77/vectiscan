@@ -4,6 +4,7 @@ export interface ScanData {
   id: string;
   domain: string;
   status: string;
+  package: string;
   createdAt: string;
 }
 
@@ -26,6 +27,8 @@ export interface ScanStatus {
   id: string;
   domain: string;
   status: string;
+  package: string;
+  estimatedDuration: string;
   progress: ScanProgress;
   startedAt: string | null;
   finishedAt: string | null;
@@ -45,11 +48,11 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-export async function createScan(domain: string): Promise<ApiResponse<ScanData>> {
+export async function createScan(domain: string, pkg: string = 'professional'): Promise<ApiResponse<ScanData>> {
   const res = await fetch(`${API_URL}/api/scans`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ domain }),
+    body: JSON.stringify({ domain, package: pkg }),
   });
   return res.json();
 }

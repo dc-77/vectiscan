@@ -1,0 +1,93 @@
+{
+  "overall_risk": "HIGH",
+  "overall_description": "Die Infrastruktur weist mehrere Schwachstellen auf, darunter einen exponierten Datenbankport.",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "MySQL-Port exponiert ohne Zugriffsbeschränkung",
+      "severity": "HIGH",
+      "cvss_score": "7.5",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "cwe": "CWE-284",
+      "affected": "88.99.35.112:3306",
+      "description": "Der MySQL-Port 3306 ist öffentlich erreichbar und akzeptiert Verbindungen.",
+      "evidence": "$ nmap -sV 88.99.35.112\n3306/tcp open mysql MariaDB 10.11.6",
+      "impact": "Unautorisierter Datenbankzugriff könnte zu Datenverlust führen.",
+      "recommendation": "<b>Kurzfristig:</b> Firewall-Regel für Port 3306 erstellen.\n<b>Mittelfristig:</b> VPN-basierter Zugriff.",
+      "nis2_ref": "§30 Abs. 2 Nr. 5 BSIG"
+    },
+    {
+      "id": "VS-2026-002",
+      "title": "HTTP ohne HTTPS-Redirect",
+      "severity": "MEDIUM",
+      "cvss_score": "5.3",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-319",
+      "affected": "example.com:80",
+      "description": "HTTP-Traffic wird nicht auf HTTPS umgeleitet.",
+      "evidence": "$ curl -I http://example.com\nHTTP/1.1 200 OK",
+      "impact": "Man-in-the-Middle-Angriffe auf unverschlüsselten Traffic möglich.",
+      "recommendation": "<b>Kurzfristig:</b> HTTPS-Redirect aktivieren.",
+      "nis2_ref": "§30 Abs. 2 Nr. 8 BSIG"
+    },
+    {
+      "id": "VS-2026-003",
+      "title": "Server-Banner sichtbar",
+      "severity": "INFO",
+      "cvss_score": "0.0",
+      "cvss_vector": "N/A",
+      "cwe": "CWE-200",
+      "affected": "example.com:443",
+      "description": "Der Server gibt seine Version im HTTP-Header preis.",
+      "evidence": "Server: nginx/1.24.0",
+      "impact": "Informationsgewinn für potenzielle Angreifer.",
+      "recommendation": "Server-Version in der nginx-Konfiguration ausblenden.",
+      "nis2_ref": "§30 Abs. 2 Nr. 5 BSIG"
+    }
+  ],
+  "positive_findings": [
+    {
+      "title": "Korrekte TLS-Konfiguration",
+      "description": "Alle Hosts nutzen TLS 1.2+, keine veralteten Cipher-Suites."
+    },
+    {
+      "title": "DNSSEC aktiviert",
+      "description": "Die Domain nutzt DNSSEC zur Absicherung der DNS-Auflösung."
+    }
+  ],
+  "recommendations": [
+    {
+      "timeframe": "Sofort",
+      "action": "MySQL-Port 3306 per Firewall schließen",
+      "finding_refs": ["001"],
+      "effort": "1-2 h"
+    },
+    {
+      "timeframe": "Tag 1-3",
+      "action": "HTTPS-Redirect einrichten",
+      "finding_refs": ["002"],
+      "effort": "1 h"
+    },
+    {
+      "timeframe": "Woche 1",
+      "action": "Server-Banner ausblenden",
+      "finding_refs": ["003"],
+      "effort": "30 min"
+    }
+  ],
+  "nis2_compliance_summary": {
+    "nr1_risikoanalyse": "PARTIAL",
+    "nr2_vorfallbewaeltigung": "PARTIAL",
+    "nr4_lieferkette": "COVERED",
+    "nr5_schwachstellenmanagement": "COVERED",
+    "nr6_wirksamkeitsbewertung": "COVERED",
+    "nr8_kryptografie": "PARTIAL",
+    "scope_note": "Dieser Scan deckt die externe Angriffsoberfläche ab."
+  },
+  "supply_chain_summary": {
+    "overall_rating": "MEDIUM",
+    "key_findings_count": 1,
+    "positive_count": 2,
+    "recommendation": "Behebung der identifizierten Schwachstellen wird empfohlen."
+  }
+}

@@ -4,8 +4,18 @@ import { scanQueue } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 
+const VALID_PACKAGES = ['basic', 'professional', 'nis2'] as const;
+type ScanPackage = typeof VALID_PACKAGES[number];
+
+const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
+  basic: '~10 Minuten',
+  professional: '~45 Minuten',
+  nis2: '~45 Minuten',
+};
+
 interface CreateScanBody {
   domain: string;
+  package?: string;
 }
 
 interface ScanParams {
@@ -16,6 +26,7 @@ export async function scanRoutes(server: FastifyInstance): Promise<void> {
   // POST /api/scans
   server.post<{ Body: CreateScanBody }>('/api/scans', async (request, reply) => {
     const { domain } = request.body || {};
+    const pkg = (request.body?.package || 'professional') as string;
 
     if (!isValidDomain(domain)) {
       return reply.status(400).send({
@@ -24,14 +35,21 @@ export async function scanRoutes(server: FastifyInstance): Promise<void> {
       });
     }
 
-    const result = await query<{ id: string; domain: string; status: string; created_at: Date }>(
-      'INSERT INTO scans (domain) VALUES ($1) RETURNING id, domain, status, created_at',
-      [domain],
+    if (!VALID_PACKAGES.includes(pkg as ScanPackage)) {
+      return reply.status(400).send({
+        success: false,
+        error: 'Invalid package. Must be basic, professional, or nis2.',
+      });
+    }
+
+    const result = await query<{ id: string; domain: string; status: string; package: string; created_at: Date }>(
+      'INSERT INTO scans (domain, package) VALUES ($1, $2) RETURNING id, domain, status, package, created_at',
+      [domain, pkg],
     );
 
     const scan = result.rows[0];
 
-    await scanQueue.add('scan', { scanId: scan.id, targetDomain: scan.domain });
+    await scanQueue.add('scan', { scanId: scan.id, targetDomain: scan.domain, package: scan.package });
 
     return reply.status(201).send({
       success: true,
@@ -39,6 +57,7 @@ export async function scanRoutes(server: FastifyInstance): Promise<void> {
         id: scan.id,
         domain: scan.domain,
         status: scan.status,
+        package: scan.package,
         createdAt: scan.created_at.toISOString(),
       },
     });
@@ -54,7 +73,7 @@ export async function scanRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const result = await query(
-      `SELECT id, domain, status, discovered_hosts, hosts_total, hosts_completed,
+      `SELECT id, domain, status, package, discovered_hosts, hosts_total, hosts_completed,
               current_phase, current_tool, current_host,
               started_at, finished_at, error_message, created_at
        FROM scans WHERE id = $1`,
@@ -71,12 +90,16 @@ export async function scanRoutes(server: FastifyInstance): Promise<void> {
     const reportResult = await query('SELECT id FROM reports WHERE scan_id = $1', [id]);
     const hasReport = reportResult.rows.length > 0;
 
+    const scanPackage = (scan.package || 'professional') as ScanPackage;
+
     return {
       success: true,
       data: {
         id: scan.id,
         domain: scan.domain,
         status: scan.status,
+        package: scanPackage,
+        estimatedDuration: ESTIMATED_DURATIONS[scanPackage],
         progress: {
           phase: scan.current_phase || null,
           currentTool: scan.current_tool || null,

@@ -434,6 +434,7 @@ def merge_and_group(
     dns_records: dict[str, Any],
     zone_transfer: dict[str, Any],
     scan_dir: str,
+    max_hosts: int = 10,
 ) -> dict[str, Any]:
     """Deduplicate subdomains, group by IP, create host_inventory.json."""
     output_path = os.path.join(scan_dir, "phase0", "host_inventory.json")
@@ -481,12 +482,12 @@ def merge_and_group(
             "rdns": rdns,
         })
 
-    # Limit to MAX_HOSTS
+    # Limit to max_hosts
     skipped_hosts: list[dict[str, Any]] = []
-    if len(hosts) > MAX_HOSTS:
-        log.warning("hosts_limited", total=len(hosts), max=MAX_HOSTS)
-        skipped_hosts = hosts[MAX_HOSTS:]
-        hosts = hosts[:MAX_HOSTS]
+    if len(hosts) > max_hosts:
+        log.warning("hosts_limited", total=len(hosts), max=max_hosts)
+        skipped_hosts = hosts[max_hosts:]
+        hosts = hosts[:max_hosts]
 
     inventory: dict[str, Any] = {
         "domain": domain,
@@ -519,7 +520,7 @@ def merge_and_group(
     return inventory
 
 
-def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
+def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] | None = None) -> dict[str, Any]:
     """
     Orchestrate Phase 0: DNS Reconnaissance.
 
@@ -528,6 +529,11 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
 
     Overall timeout: 10 minutes.
     """
+    # Use config if provided, otherwise default to professional
+    phase0_timeout = config["phase0_timeout"] if config else PHASE0_TIMEOUT
+    max_hosts = config["max_hosts"] if config else MAX_HOSTS
+    phase0_tools = config["phase0_tools"] if config else ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]
+
     phase0_start = time.monotonic()
     phase0_dir = os.path.join(scan_dir, "phase0")
     os.makedirs(phase0_dir, exist_ok=True)
@@ -538,10 +544,10 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
 
     def _time_remaining() -> float:
         elapsed = time.monotonic() - phase0_start
-        return max(0, PHASE0_TIMEOUT - elapsed)
+        return max(0, phase0_timeout - elapsed)
 
     # --- crt.sh ---
-    if _time_remaining() > 0:
+    if _time_remaining() > 0 and "crtsh" in phase0_tools:
         try:
             subs = run_crtsh(domain, scan_dir, scan_id)
             all_subdomains.extend(subs)
@@ -550,7 +556,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
             log.error("phase0_crtsh_error", error=str(e))
 
     # --- subfinder ---
-    if _time_remaining() > 0:
+    if _time_remaining() > 0 and "subfinder" in phase0_tools:
         try:
             subs = run_subfinder(domain, scan_dir, scan_id)
             all_subdomains.extend(subs)
@@ -559,7 +565,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
             log.error("phase0_subfinder_error", error=str(e))
 
     # --- amass ---
-    if _time_remaining() > 0:
+    if _time_remaining() > 0 and "amass" in phase0_tools:
         try:
             subs = run_amass(domain, scan_dir, scan_id)
             all_subdomains.extend(subs)
@@ -568,7 +574,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
             log.error("phase0_amass_error", error=str(e))
 
     # --- gobuster dns ---
-    if _time_remaining() > 0:
+    if _time_remaining() > 0 and "gobuster_dns" in phase0_tools:
         try:
             subs = run_gobuster_dns(domain, scan_dir, scan_id)
             all_subdomains.extend(subs)
@@ -578,7 +584,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
 
     # --- zone transfer ---
     zone_transfer: dict[str, Any] = {"success": False, "data": {}}
-    if _time_remaining() > 0:
+    if _time_remaining() > 0 and "axfr" in phase0_tools:
         try:
             zone_transfer = run_zone_transfer(domain, scan_dir, scan_id)
             log.info("phase0_zone_transfer_done", success=zone_transfer["success"])
@@ -599,7 +605,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
 
     # --- dnsx validation ---
     dnsx_results: list[dict[str, Any]] = []
-    if _time_remaining() > 0:
+    if _time_remaining() > 0 and "dnsx" in phase0_tools:
         try:
             unique_subs = sorted(set(s.lower() for s in all_subdomains if s))
             dnsx_results = run_dnsx(unique_subs, scan_dir, scan_id)
@@ -615,6 +621,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
         dns_records=dns_records,
         zone_transfer=zone_transfer,
         scan_dir=scan_dir,
+        max_hosts=max_hosts,
     )
 
     elapsed_ms = int((time.monotonic() - phase0_start) * 1000)

@@ -7,6 +7,7 @@ import ScanProgress from '@/components/ScanProgress';
 import HostList from '@/components/HostList';
 import ReportDownload from '@/components/ReportDownload';
 import ScanError from '@/components/ScanError';
+import PackageSelector, { ScanPackage } from '@/components/PackageSelector';
 
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
@@ -16,6 +17,7 @@ export default function Home() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
   const [domain, setDomain] = useState('');
+  const [selectedPackage, setSelectedPackage] = useState<ScanPackage>('professional');
   const [scanId, setScanId] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -93,7 +95,7 @@ export default function Home() {
 
     setSubmitting(true);
     try {
-      const res = await createScan(trimmed);
+      const res = await createScan(trimmed, selectedPackage);
       if (res.success && res.data) {
         setScanId(res.data.id);
         startPolling(res.data.id);
@@ -110,6 +112,7 @@ export default function Home() {
   const handleRetry = () => {
     stopPolling();
     setDomain('');
+    setSelectedPackage('professional');
     setScanId(null);
     setScan(null);
     setError(null);
@@ -168,17 +171,17 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center px-4 py-12">
-      <div className="w-full max-w-2xl space-y-8">
+      <div className="w-full max-w-5xl space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
           <VectiScanLogo className="mb-4" />
           <p className="text-gray-400">Automatisierte Security-Scan-Plattform</p>
         </div>
 
-        {/* Domain Input Form */}
+        {/* Domain Input + Package Selection */}
         {!scanId && (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex gap-3">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="flex gap-3 max-w-2xl mx-auto">
               <input
                 type="text"
                 value={domain}
@@ -195,6 +198,7 @@ export default function Home() {
                 {submitting ? 'Startet...' : 'Scan starten'}
               </button>
             </div>
+            <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />
           </form>
         )}
 
