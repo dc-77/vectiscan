@@ -156,6 +156,29 @@ Ordne jedem Finding den relevanten §30 BSIG-Absatz zu:
 - Nr. 6: Bewertung der Wirksamkeit von Maßnahmen
 - Nr. 8: Konzepte für Kryptografie und Verschlüsselung
 
+ZUORDNUNGSREGELN FÜR §30 BSIG:
+Ordne jeden Finding-Typ konsistent dem richtigen Absatz zu:
+- Exponierte Ports (DB, FTP, SSH, etc.) → Nr. 5 (Schwachstellenmanagement)
+- Fehlende Firewall-Regeln → Nr. 5 (Schwachstellenmanagement)
+- Fehlende Security-Header → Nr. 5 (Schwachstellenmanagement)
+- Information Disclosure (Banner, robots.txt) → Nr. 5 (Schwachstellenmanagement)
+- TLS-Probleme (veraltete Versionen, schwache Cipher) → Nr. 8 (Kryptografie)
+- HTTP ohne HTTPS-Redirect → Nr. 8 (Kryptografie)
+- Fehlende HSTS-Header → Nr. 8 (Kryptografie)
+- Zertifikatsprobleme (abgelaufen, self-signed) → Nr. 8 (Kryptografie)
+- Positive TLS-Konfiguration → Nr. 8 (Kryptografie, positiv)
+- Positive Security-Header → Nr. 5 (Schwachstellenmanagement, positiv)
+- DNSSEC aktiviert → Nr. 8 (Kryptografie, positiv)
+- Allgemeine Sicherheitsrisiken → Nr. 1 (Risikoanalyse)
+
+REGELN FÜR COMPLIANCE-SUMMARY-WERTE:
+- Nr. 1 (Risikoanalyse): Immer PARTIAL — ein Scan ist nur ein Teil der Risikoanalyse
+- Nr. 2 (Vorfallbewältigung): Immer PARTIAL — ein präventiver Scan erkennt Schwachstellen, aber die Reaktionsfähigkeit auf Vorfälle kann nicht geprüft werden
+- Nr. 4 (Lieferkette): COVERED — der Report selbst ist der Nachweis
+- Nr. 5 (Schwachstellenmanagement): COVERED — Kernfunktion des Scans
+- Nr. 6 (Wirksamkeitsbewertung): COVERED — der Scan bewertet die Wirksamkeit der Maßnahmen
+- Nr. 8 (Kryptografie): COVERED wenn TLS geprüft, PARTIAL wenn nur Header geprüft
+
 Erstelle eine Compliance-Summary pro §30-Anforderung:
 COVERED = Dieser Scan adressiert die Anforderung vollständig
 PARTIAL = Dieser Scan adressiert die Anforderung teilweise

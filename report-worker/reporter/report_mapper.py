@@ -724,6 +724,71 @@ def map_basic_report(
     }
 
 
+# ---------------------------------------------------------------------------
+# Helper: Compliance Summary Validation
+# ---------------------------------------------------------------------------
+
+# Expected compliance values for scan-based assessment
+_COMPLIANCE_OVERRIDES = {
+    "nr1_risikoanalyse": "PARTIAL",        # Scan is only one part of risk analysis
+    "nr2_vorfallbewaeltigung": "PARTIAL",   # Preventive scan, not reactive capability
+    "nr4_lieferkette": "COVERED",           # Report itself is the proof
+    "nr5_schwachstellenmanagement": "COVERED",  # Core scan function
+    "nr6_wirksamkeitsbewertung": "COVERED",     # Scan evaluates effectiveness
+}
+# nr8_kryptografie is NOT overridden — depends on whether TLS was scanned
+
+_VALID_COMPLIANCE_VALUES = {"COVERED", "PARTIAL", "NOT_IN_SCOPE"}
+
+
+def _validate_compliance_summary(
+    summary: dict[str, Any],
+) -> dict[str, Any]:
+    """Validate and correct obvious compliance summary errors.
+
+    Enforces rules:
+    - Nr. 1 (Risikoanalyse): always PARTIAL (scan is only part of risk analysis)
+    - Nr. 2 (Vorfallbewältigung): always PARTIAL (preventive, not reactive)
+    - Nr. 4 (Lieferkette): always COVERED (report is the proof)
+    - Nr. 5 (Schwachstellenmanagement): always COVERED (core function)
+    - Nr. 6 (Wirksamkeitsbewertung): always COVERED (scan evaluates effectiveness)
+    - Nr. 8 (Kryptografie): NOT overridden — depends on TLS scan results
+
+    Returns:
+        Corrected compliance summary dict.
+    """
+    corrected = dict(summary)
+
+    for key, expected_value in _COMPLIANCE_OVERRIDES.items():
+        current = corrected.get(key)
+        if current != expected_value:
+            log.warning(
+                "compliance_summary_corrected",
+                field=key,
+                was=current,
+                now=expected_value,
+            )
+            corrected[key] = expected_value
+
+    # Validate all values are valid
+    for key, value in corrected.items():
+        if key == "scope_note":
+            continue
+        if value not in _VALID_COMPLIANCE_VALUES:
+            log.warning("invalid_compliance_value", field=key, value=value)
+            corrected[key] = "PARTIAL"
+
+    # Ensure scope_note exists
+    if "scope_note" not in corrected:
+        corrected["scope_note"] = (
+            "Dieser Scan deckt die externe Angriffsoberfläche ab. "
+            "Interne Prozesse, Schulungen und organisatorische Maßnahmen "
+            "können durch einen externen Scan nicht bewertet werden."
+        )
+
+    return corrected
+
+
 def map_nis2_report(
     claude_output: dict[str, Any],
     scan_meta: dict[str, Any],
@@ -801,7 +866,9 @@ def map_nis2_report(
 
     # Add NIS2 data to report_data
     report_data["nis2"] = {
-        "compliance_summary": claude_output.get("nis2_compliance_summary", {}),
+        "compliance_summary": _validate_compliance_summary(
+            claude_output.get("nis2_compliance_summary", {})
+        ),
         "audit_trail": audit_trail,
         "supply_chain": claude_output.get("supply_chain_summary", {}),
     }

@@ -590,6 +590,35 @@ def build_supply_chain_page(story, styles, supply_chain_data, scan_meta):
     ))
     story.append(Spacer(1, 4 * mm))
 
+    # Signature line
+    story.append(Spacer(1, 12 * mm))
+    sig_style = ParagraphStyle("sig", fontName=FONT_BODY, fontSize=8, leading=12,
+                                textColor=COLORS["muted"])
+    story.append(Paragraph("Bestätigung durch Auftraggeber:", sig_style))
+    story.append(Spacer(1, 10 * mm))
+
+    # Two signature blocks side by side
+    sig_header = ParagraphStyle("sigh", fontName=FONT_HEADING, fontSize=7.5, leading=10,
+                                 textColor=COLORS["muted"])
+    sig_cell = ParagraphStyle("sigc", fontName=FONT_BODY, fontSize=8, leading=10,
+                               textColor=COLORS["text"])
+    sig_rows = [
+        [Paragraph("<b>Datum / Unterschrift</b>", sig_header),
+         Paragraph("<b>Name / Funktion</b>", sig_header)],
+        [Paragraph("______________________________", sig_cell),
+         Paragraph("______________________________", sig_cell)],
+    ]
+    sig_table = Table(sig_rows, colWidths=[85 * mm, 85 * mm])
+    sig_table.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "BOTTOM"),
+        ("TOPPADDING", (0, 0), (-1, -1), 2),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 0),
+    ]))
+    story.append(sig_table)
+    story.append(Spacer(1, 6 * mm))
+
     # Footer
     story.append(HorizontalLine(170 * mm, COLORS["light_accent"], 0.5))
     story.append(Spacer(1, 3 * mm))

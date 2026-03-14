@@ -42,7 +42,7 @@
       "evidence": "Server: nginx/1.24.0",
       "impact": "Informationsgewinn für potenzielle Angreifer.",
       "recommendation": "Server-Version in der nginx-Konfiguration ausblenden.",
-      "nis2_ref": "§30 Abs. 2 Nr. 1 BSIG"
+      "nis2_ref": "§30 Abs. 2 Nr. 5 BSIG"
     }
   ],
   "positive_findings": [
@@ -77,7 +77,7 @@
   ],
   "nis2_compliance_summary": {
     "nr1_risikoanalyse": "PARTIAL",
-    "nr2_vorfallbewaeltigung": "NOT_IN_SCOPE",
+    "nr2_vorfallbewaeltigung": "PARTIAL",
     "nr4_lieferkette": "COVERED",
     "nr5_schwachstellenmanagement": "COVERED",
     "nr6_wirksamkeitsbewertung": "COVERED",
