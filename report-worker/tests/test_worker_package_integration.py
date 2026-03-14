@@ -23,7 +23,7 @@ def base_job_data():
 @patch("reporter.worker.generate_report")
 @patch("reporter.worker._upload_report")
 @patch("reporter.worker._create_report_record")
-@patch("reporter.worker._update_scan_status")
+@patch("reporter.worker._update_order_status")
 def test_package_passed_to_claude(
     mock_status, mock_create, mock_upload, mock_gen,
     mock_map, mock_claude, mock_parse, mock_download,
@@ -37,7 +37,7 @@ def test_package_passed_to_claude(
     mock_claude.return_value = {"overall_risk": "LOW", "findings": []}
     mock_map.return_value = {}
     mock_upload.return_value = 1000
-    mock_create.return_value = "report-id"
+    mock_create.return_value = ("report-id", "token-123")
 
     # Mock tarfile
     with patch("tarfile.open"):
@@ -58,7 +58,7 @@ def test_package_passed_to_claude(
 @patch("reporter.worker.generate_report")
 @patch("reporter.worker._upload_report")
 @patch("reporter.worker._create_report_record")
-@patch("reporter.worker._update_scan_status")
+@patch("reporter.worker._update_order_status")
 def test_package_passed_to_mapper(
     mock_status, mock_create, mock_upload, mock_gen,
     mock_map, mock_claude, mock_parse, mock_download,
@@ -72,7 +72,7 @@ def test_package_passed_to_mapper(
     mock_claude.return_value = {"overall_risk": "LOW", "findings": []}
     mock_map.return_value = {}
     mock_upload.return_value = 1000
-    mock_create.return_value = "report-id"
+    mock_create.return_value = ("report-id", "token-123")
 
     with patch("tarfile.open"):
         with patch("tempfile.mkdtemp", return_value=str(tmp_path)):
@@ -92,7 +92,7 @@ def test_package_passed_to_mapper(
 @patch("reporter.worker.generate_report")
 @patch("reporter.worker._upload_report")
 @patch("reporter.worker._create_report_record")
-@patch("reporter.worker._update_scan_status")
+@patch("reporter.worker._update_order_status")
 def test_default_package_professional(
     mock_status, mock_create, mock_upload, mock_gen,
     mock_map, mock_claude, mock_parse, mock_download,
@@ -106,7 +106,7 @@ def test_default_package_professional(
     mock_claude.return_value = {"overall_risk": "LOW", "findings": []}
     mock_map.return_value = {}
     mock_upload.return_value = 1000
-    mock_create.return_value = "report-id"
+    mock_create.return_value = ("report-id", "token-123")
 
     with patch("tarfile.open"):
         with patch("tempfile.mkdtemp", return_value=str(tmp_path)):
@@ -134,7 +134,7 @@ def test_package_in_scan_meta(base_job_data, tmp_path):
          patch("reporter.worker.map_to_report_data", side_effect=capture_mapper), \
          patch("reporter.worker.generate_report"), \
          patch("reporter.worker._upload_report", return_value=1000), \
-         patch("reporter.worker._create_report_record", return_value="rid"), \
+         patch("reporter.worker._create_report_record", return_value=("rid", "tok")), \
          patch("reporter.worker._update_scan_status"), \
          patch("tarfile.open"), \
          patch("tempfile.mkdtemp", return_value=str(tmp_path)), \

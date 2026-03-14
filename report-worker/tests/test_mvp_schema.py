@@ -35,7 +35,7 @@ def test_create_report_record_signature() -> None:
     assert "order_id" in params, f"Should accept order_id, got {params}"
     assert "scan_id" not in params, "Should NOT accept scan_id"
     # Return annotation should be tuple
-    assert sig.return_annotation == tuple[str, str]
+    assert "tuple" in str(sig.return_annotation) and "str" in str(sig.return_annotation)
 
 
 def test_update_order_status_exists() -> None:

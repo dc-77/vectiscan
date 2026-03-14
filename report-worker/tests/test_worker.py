@@ -33,7 +33,7 @@ class TestProcessJob:
     @patch("reporter.worker.generate_report")
     @patch("reporter.worker._upload_report")
     @patch("reporter.worker._create_report_record")
-    @patch("reporter.worker._update_scan_status")
+    @patch("reporter.worker._update_order_status")
     @patch("reporter.worker.shutil")
     def test_process_job_success(
         self,
@@ -67,7 +67,7 @@ class TestProcessJob:
         mock_claude.return_value = {"overall_risk": "HIGH", "findings": []}
         mock_map.return_value = {"meta": {}, "findings": []}
         mock_upload.return_value = 12345
-        mock_create_record.return_value = "report-id-123"
+        mock_create_record.return_value = ("report-id-123", "token-456")
 
         # generate_report is mocked — create a fake PDF so pdf_path.stat() works
         def fake_generate(data, path):
@@ -91,12 +91,13 @@ class TestProcessJob:
         mock_gen_report.assert_called_once()
         mock_upload.assert_called_once()
         mock_create_record.assert_called_once()
-        mock_update_status.assert_called_with(mock_conn, "scan-123", "report_complete")
+        mock_update_status.assert_called_with(mock_conn, "scan-123", "report_complete"
+        )
 
     @patch("reporter.worker._get_db_connection")
     @patch("reporter.worker._get_minio_client")
     @patch("reporter.worker._download_rawdata")
-    @patch("reporter.worker._update_scan_status")
+    @patch("reporter.worker._update_order_status")
     @patch("reporter.worker.shutil")
     def test_process_job_failure_updates_status(
         self,

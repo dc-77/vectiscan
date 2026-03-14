@@ -28,7 +28,7 @@ def test_nis2_has_audit_trail(nis2_output, scan_meta, host_inventory):
     """NIS2 report should include audit trail."""
     result = map_nis2_report(nis2_output, scan_meta, host_inventory)
     assert "audit_trail" in result["nis2"]
-    assert result["nis2"]["audit_trail"]["scanId"] == scan_meta["scanId"]
+    assert result["nis2"]["audit_trail"]["orderId"] == scan_meta["orderId"]
 
 def test_nis2_has_supply_chain(nis2_output, scan_meta, host_inventory):
     """NIS2 report should include supply chain summary."""
