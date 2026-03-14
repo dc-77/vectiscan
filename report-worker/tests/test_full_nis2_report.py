@@ -148,9 +148,7 @@ class TestFullNIS2Report:
     def test_generates_example_pdf(self, tmp_path):
         """Generate a viewable NIS2 example PDF."""
         data = _full_nis2_report_data()
-        output_dir = "/mnt/user-data/outputs"
-        os.makedirs(output_dir, exist_ok=True)
-        path = os.path.join(output_dir, "vectiscan-nis2-test.pdf")
+        path = str(tmp_path / "vectiscan-nis2-test.pdf")
         generate_report(data, path)
         assert os.path.isfile(path)
         assert os.path.getsize(path) > 5000
