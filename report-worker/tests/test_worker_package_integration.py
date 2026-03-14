@@ -135,7 +135,7 @@ def test_package_in_scan_meta(base_job_data, tmp_path):
          patch("reporter.worker.generate_report"), \
          patch("reporter.worker._upload_report", return_value=1000), \
          patch("reporter.worker._create_report_record", return_value=("rid", "tok")), \
-         patch("reporter.worker._update_scan_status"), \
+         patch("reporter.worker._update_order_status"), \
          patch("tarfile.open"), \
          patch("tempfile.mkdtemp", return_value=str(tmp_path)), \
          patch("shutil.rmtree"):
