@@ -14,6 +14,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=builder /app/dist ./dist
+COPY src/migrations ./dist/migrations
 USER vectiscan
 EXPOSE 4000
 CMD ["node", "dist/server.js"]
