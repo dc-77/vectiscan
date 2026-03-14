@@ -125,3 +125,17 @@ Deploy-Sleep: 15 Sekunden (7 Container brauchen Zeit für Healthchecks).
 - docs/SCAN-TOOLS.md — Alle Scan-Tools mit Argumenten und Output-Format
 - docs/architecture.md — Architektur-Auszüge inkl. Claude-Prompt und Skill-Integration
 - references/report_structure.md — PDF-Layout-Referenz (Farbschema, Sektionen, Finding-Template)
+
+## Drei Pakete (Basic, Professional, NIS2)
+Der Prototyp läuft. Jetzt werden drei Pakete implementiert:
+- Basic: Schnellscan (~10 Min), weniger Tools, kompakter Report ohne CVSS-Vektoren
+- Professional: Vollscan (~45 Min), wie der aktuelle Prototyp
+- NIS2 Compliance: Gleicher Scan wie Pro, Report mit §30 BSIG-Mapping, Audit-Trail, Lieferketten-1-Seiter
+
+Das Paket wird bei POST /api/scans mitgegeben und steuert:
+- Scan-Worker: Welche Tools laufen (scanner/packages.py)
+- Claude-Prompt: Drei Varianten (reporter/prompts.py)
+- Report-Mapper: Drei Mapper-Funktionen (reporter/report_mapper.py)
+- PDF-Engine: NIS2-Sections + Branding (reporter/pdf/generate_report.py)
+
+Branding: Alle Farben kommen aus reporter/pdf/branding.py (VectiScan CI). NICHT hardcoden.
