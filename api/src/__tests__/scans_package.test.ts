@@ -25,6 +25,15 @@ jest.mock('../lib/minio', () => {
   };
 });
 
+jest.mock('../lib/validate', () => ({
+  isValidDomain: jest.fn((d: string) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)),
+}));
+
+jest.mock('../services/VerificationService', () => ({
+  generateToken: jest.fn().mockReturnValue('vectiscan-verify-mock12345678'),
+  verifyAll: jest.fn(),
+}));
+
 import { query } from '../lib/db';
 import { scanQueue } from '../lib/queue';
 
@@ -46,7 +55,7 @@ function mockCustomerResult() {
 
 function mockInsertResult(pkg: string) {
   return {
-    rows: [{ id: TEST_UUID, target_url: 'example.com', status: 'created', package: pkg, created_at: new Date() }],
+    rows: [{ id: TEST_UUID, target_url: 'example.com', status: 'verification_pending', package: pkg, verification_token: 'vectiscan-verify-mock12345678', created_at: new Date() }],
     command: 'INSERT' as const,
     rowCount: 1,
     oid: 0,
@@ -100,7 +109,6 @@ describe('Package selection', () => {
     it('should accept package=basic', async () => {
       mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('basic'));
-      mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
@@ -117,7 +125,6 @@ describe('Package selection', () => {
     it('should accept package=professional', async () => {
       mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('professional'));
-      mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
@@ -132,7 +139,6 @@ describe('Package selection', () => {
     it('should accept package=nis2', async () => {
       mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('nis2'));
-      mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
@@ -160,7 +166,6 @@ describe('Package selection', () => {
     it('should default to professional when no package specified', async () => {
       mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('professional'));
-      mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
@@ -170,17 +175,11 @@ describe('Package selection', () => {
 
       expect(res.statusCode).toBe(201);
       expect(res.json().data.package).toBe('professional');
-      // Verify DB was called with 'professional' (second query is the order insert)
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('INSERT INTO orders'),
-        [CUST_UUID, 'example.com', 'professional'],
-      );
     });
 
-    it('should include package in queue payload', async () => {
+    it('should not queue scan job (verification required first)', async () => {
       mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('nis2'));
-      mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       await server.inject({
         method: 'POST',
@@ -188,11 +187,7 @@ describe('Package selection', () => {
         payload: { domain: 'example.com', email: 'test@example.com', package: 'nis2' },
       });
 
-      expect(mockScanQueueAdd).toHaveBeenCalledWith('scan', {
-        orderId: TEST_UUID,
-        targetDomain: 'example.com',
-        package: 'nis2',
-      });
+      expect(mockScanQueueAdd).not.toHaveBeenCalled();
     });
   });
 

@@ -3,6 +3,7 @@ import { query } from '../lib/db.js';
 import { scanQueue, publishEvent } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
+import { generateToken } from '../services/VerificationService.js';
 
 const VALID_PACKAGES = ['basic', 'professional', 'nis2'] as const;
 type ScanPackage = typeof VALID_PACKAGES[number];
@@ -60,15 +61,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     );
     const customerId = customerResult.rows[0].id;
 
-    // Insert order
-    const result = await query<{ id: string; target_url: string; status: string; package: string; created_at: Date }>(
-      'INSERT INTO orders (customer_id, target_url, package) VALUES ($1, $2, $3) RETURNING id, target_url, status, package, created_at',
-      [customerId, domain, pkg],
+    // Insert order with verification token
+    const verificationToken = generateToken();
+    const result = await query<{ id: string; target_url: string; status: string; package: string; verification_token: string; created_at: Date }>(
+      "INSERT INTO orders (customer_id, target_url, package, verification_token, status) VALUES ($1, $2, $3, $4, 'verification_pending') RETURNING id, target_url, status, package, verification_token, created_at",
+      [customerId, domain, pkg, verificationToken],
     );
 
     const order = result.rows[0];
-
-    await scanQueue.add('scan', { orderId: order.id, targetDomain: domain, package: order.package });
 
     return reply.status(201).send({
       success: true,
@@ -77,7 +77,12 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         domain: order.target_url,
         status: order.status,
         package: order.package,
-        createdAt: order.created_at.toISOString(),
+        verificationToken: order.verification_token,
+        verificationInstructions: {
+          dns_txt: `Create a TXT record at _vectiscan-verify.${domain} with value: ${order.verification_token}`,
+          file: `Place a file at https://${domain}/.well-known/vectiscan-verify.txt containing: ${order.verification_token}`,
+          meta_tag: `Add <meta name="vectiscan-verify" content="${order.verification_token}"> to your homepage`,
+        },
       },
     });
   });

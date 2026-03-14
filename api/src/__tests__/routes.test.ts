@@ -26,6 +26,15 @@ jest.mock('../lib/minio', () => {
   };
 });
 
+jest.mock('../lib/validate', () => ({
+  isValidDomain: jest.fn((d: string) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)),
+}));
+
+jest.mock('../services/VerificationService', () => ({
+  generateToken: jest.fn().mockReturnValue('vectiscan-verify-mock12345678'),
+  verifyAll: jest.fn(),
+}));
+
 import { query } from '../lib/db';
 import { scanQueue } from '../lib/queue';
 import { getPresignedUrl } from '../lib/minio';
@@ -72,13 +81,12 @@ describe('API Routes', () => {
       });
       // Second call: order insert
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: '550e8400-e29b-41d4-a716-446655440000', target_url: 'example.com', status: 'created', package: 'professional', created_at: now }],
+        rows: [{ id: '550e8400-e29b-41d4-a716-446655440000', target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'vectiscan-verify-mock12345678', created_at: now }],
         command: 'INSERT',
         rowCount: 1,
         oid: 0,
         fields: [],
       });
-      mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
@@ -91,13 +99,10 @@ describe('API Routes', () => {
       expect(body.success).toBe(true);
       expect(body.data.id).toBe('550e8400-e29b-41d4-a716-446655440000');
       expect(body.data.domain).toBe('example.com');
-      expect(body.data.status).toBe('created');
+      expect(body.data.status).toBe('verification_pending');
       expect(body.data.package).toBe('professional');
-      expect(mockScanQueueAdd).toHaveBeenCalledWith('scan', {
-        orderId: '550e8400-e29b-41d4-a716-446655440000',
-        targetDomain: 'example.com',
-        package: 'professional',
-      });
+      expect(body.data.verificationToken).toBe('vectiscan-verify-mock12345678');
+      expect(mockScanQueueAdd).not.toHaveBeenCalled();
     });
 
     it('should reject invalid domain', async () => {
