@@ -466,6 +466,21 @@ def merge_and_group(
             # CNAME exists but no A/AAAA -> dangling CNAME
             dangling_cnames.append(host)
 
+    # Ensure base domain is present — fallback via socket if dnsx missed it
+    domain_in_results = any(
+        domain.lower() in (h.lower().rstrip(".") for h in fqdns)
+        for fqdns in ip_to_fqdns.values()
+    )
+    if not domain_in_results:
+        try:
+            infos = socket.getaddrinfo(domain, None, proto=socket.IPPROTO_TCP)
+            fallback_ips = sorted({info[4][0] for info in infos})
+            for fb_ip in fallback_ips:
+                ip_to_fqdns[fb_ip].add(domain.lower())
+            log.info("base_domain_fallback", domain=domain, ips=fallback_ips)
+        except (socket.gaierror, OSError) as e:
+            log.warning("base_domain_resolve_failed", domain=domain, error=str(e))
+
     # Build hosts list
     hosts: list[dict[str, Any]] = []
     for ip, fqdns in sorted(ip_to_fqdns.items()):
