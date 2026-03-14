@@ -429,6 +429,101 @@ def find_gowitness_screenshots(phase2_dir: str) -> list[str]:
     return screenshots
 
 
+def parse_httpx(httpx_data: dict | None) -> dict[str, Any]:
+    """Parse httpx probe results."""
+    if not httpx_data:
+        return {}
+    return {
+        "status_code": httpx_data.get("status_code"),
+        "title": httpx_data.get("title", ""),
+        "server": httpx_data.get("webserver", ""),
+        "technologies": httpx_data.get("tech", []),
+        "content_length": httpx_data.get("content_length"),
+        "final_url": httpx_data.get("url", ""),
+    }
+
+
+def parse_katana(urls: list[str]) -> dict[str, Any]:
+    """Parse katana crawler results."""
+    if not urls:
+        return {}
+
+    # Categorize discovered URLs
+    interesting = []
+    forms = []
+    api_endpoints = []
+
+    for url in urls:
+        lower = url.lower()
+        if any(kw in lower for kw in ["/admin", "/login", "/wp-admin", "/config", "/backup", "/.env", "/.git"]):
+            interesting.append(url)
+        elif any(kw in lower for kw in ["/api/", "/graphql", "/rest/", "/v1/", "/v2/"]):
+            api_endpoints.append(url)
+        elif "?" in url:
+            forms.append(url)
+
+    return {
+        "total_urls": len(urls),
+        "interesting_paths": interesting[:20],  # Cap at 20
+        "api_endpoints": api_endpoints[:20],
+        "parameterized_urls": forms[:20],
+    }
+
+
+def parse_wpscan(wpscan_data: dict | None) -> dict[str, Any]:
+    """Parse WPScan results."""
+    if not wpscan_data:
+        return {}
+
+    wp_version = wpscan_data.get("version", {})
+    plugins = wpscan_data.get("plugins", {})
+    themes = wpscan_data.get("themes", {})
+    users = wpscan_data.get("users", {})
+    interesting = wpscan_data.get("interesting_findings", [])
+
+    # Extract vulnerable plugins
+    vulnerable_plugins = []
+    for name, info in plugins.items():
+        vulns = info.get("vulnerabilities", [])
+        if vulns:
+            vulnerable_plugins.append({
+                "name": name,
+                "version": info.get("version", {}).get("number", "unknown"),
+                "vulnerabilities": [
+                    {"title": v.get("title", ""), "cve": v.get("references", {}).get("cve", []), "fixed_in": v.get("fixed_in")}
+                    for v in vulns
+                ],
+            })
+
+    # Extract vulnerable themes
+    vulnerable_themes = []
+    for name, info in themes.items():
+        vulns = info.get("vulnerabilities", [])
+        if vulns:
+            vulnerable_themes.append({
+                "name": name,
+                "version": info.get("version", {}).get("number", "unknown"),
+                "vulnerabilities": [
+                    {"title": v.get("title", ""), "cve": v.get("references", {}).get("cve", [])}
+                    for v in vulns
+                ],
+            })
+
+    return {
+        "wordpress_version": wp_version.get("number", "unknown") if isinstance(wp_version, dict) else str(wp_version),
+        "wp_version_vulnerable": wp_version.get("status", "") == "insecure" if isinstance(wp_version, dict) else False,
+        "plugins_found": len(plugins),
+        "vulnerable_plugins": vulnerable_plugins,
+        "themes_found": len(themes),
+        "vulnerable_themes": vulnerable_themes,
+        "users_found": list(users.keys()) if isinstance(users, dict) else [],
+        "interesting_findings": [
+            {"url": f.get("url", ""), "type": f.get("type", ""), "description": ", ".join(f.get("interesting_entries", []))}
+            for f in interesting
+        ],
+    }
+
+
 def parse_gobuster_dir(path: str) -> list[str]:
     """Parse gobuster directory scan output.
 
@@ -660,6 +755,61 @@ def consolidate_findings(
             if len(gobuster) > 50:
                 lines.append(f"  ... and {len(gobuster) - 50} more")
 
+        # --- httpx ---
+        httpx = data.get("httpx", {})
+        if httpx:
+            lines.append("")
+            lines.append("--- HTTP PROBE (httpx) ---")
+            if httpx.get("status_code"):
+                lines.append(f"  Status: {httpx['status_code']}")
+            if httpx.get("title"):
+                lines.append(f"  Title: {httpx['title']}")
+            if httpx.get("server"):
+                lines.append(f"  Server: {httpx['server']}")
+            if httpx.get("final_url"):
+                lines.append(f"  Final URL: {httpx['final_url']}")
+            if httpx.get("technologies"):
+                lines.append(f"  Technologies: {', '.join(httpx['technologies'])}")
+
+        # --- katana ---
+        katana = data.get("katana", {})
+        if katana:
+            lines.append("")
+            lines.append("--- WEB CRAWLER (katana) ---")
+            lines.append(f"  Total URLs discovered: {katana.get('total_urls', 0)}")
+            if katana.get("interesting_paths"):
+                lines.append("  Interesting paths:")
+                for p in katana["interesting_paths"][:10]:
+                    lines.append(f"    {p}")
+            if katana.get("api_endpoints"):
+                lines.append("  API endpoints:")
+                for p in katana["api_endpoints"][:10]:
+                    lines.append(f"    {p}")
+            if katana.get("parameterized_urls"):
+                lines.append(f"  Parameterized URLs: {len(katana['parameterized_urls'])}")
+
+        # --- wpscan ---
+        wpscan = data.get("wpscan", {})
+        if wpscan:
+            lines.append("")
+            lines.append("--- WORDPRESS SCAN (wpscan) ---")
+            lines.append(f"  WordPress Version: {wpscan.get('wordpress_version', 'unknown')}")
+            if wpscan.get("wp_version_vulnerable"):
+                lines.append("  [WARNING] WordPress version is INSECURE")
+            lines.append(f"  Plugins found: {wpscan.get('plugins_found', 0)}")
+            for vp in wpscan.get("vulnerable_plugins", []):
+                lines.append(f"  [VULN] Plugin: {vp['name']} ({vp.get('version', 'unknown')})")
+                for v in vp.get("vulnerabilities", []):
+                    lines.append(f"    - {v.get('title', '')}")
+                    if v.get("cve"):
+                        lines.append(f"      CVE: {', '.join(v['cve'])}")
+            for vt in wpscan.get("vulnerable_themes", []):
+                lines.append(f"  [VULN] Theme: {vt['name']} ({vt.get('version', 'unknown')})")
+                for v in vt.get("vulnerabilities", []):
+                    lines.append(f"    - {v.get('title', '')}")
+            if wpscan.get("users_found"):
+                lines.append(f"  Users enumerated: {', '.join(wpscan['users_found'])}")
+
         sections.append("\n".join(lines))
 
     # --- DNS section ---
@@ -792,6 +942,35 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             str(phase2)
         )
 
+        # httpx
+        httpx_path = os.path.join(str(phase2), "httpx.json")
+        if os.path.isfile(httpx_path):
+            try:
+                with open(httpx_path) as f:
+                    lines = [json.loads(l) for l in f if l.strip()]
+                    host_data["httpx"] = parse_httpx(lines[0] if lines else None)
+            except Exception:
+                pass
+
+        # katana
+        katana_path = os.path.join(str(phase2), "katana.txt")
+        if os.path.isfile(katana_path):
+            try:
+                with open(katana_path) as f:
+                    urls = [l.strip() for l in f if l.strip()]
+                host_data["katana"] = parse_katana(urls)
+            except Exception:
+                pass
+
+        # wpscan
+        wpscan_path = os.path.join(str(phase2), "wpscan.json")
+        if os.path.isfile(wpscan_path):
+            try:
+                with open(wpscan_path) as f:
+                    host_data["wpscan"] = parse_wpscan(json.load(f))
+            except Exception:
+                pass
+
         host_results[ip] = host_data
 
     # Defensive fallback: if inventory listed no hosts but the hosts/ directory
@@ -831,6 +1010,36 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             host_data["screenshots"] = find_gowitness_screenshots(
                 str(phase2)
             )
+
+            # httpx
+            httpx_path = os.path.join(str(phase2), "httpx.json")
+            if os.path.isfile(httpx_path):
+                try:
+                    with open(httpx_path) as f:
+                        lines = [json.loads(l) for l in f if l.strip()]
+                        host_data["httpx"] = parse_httpx(lines[0] if lines else None)
+                except Exception:
+                    pass
+
+            # katana
+            katana_path = os.path.join(str(phase2), "katana.txt")
+            if os.path.isfile(katana_path):
+                try:
+                    with open(katana_path) as f:
+                        urls = [l.strip() for l in f if l.strip()]
+                    host_data["katana"] = parse_katana(urls)
+                except Exception:
+                    pass
+
+            # wpscan
+            wpscan_path = os.path.join(str(phase2), "wpscan.json")
+            if os.path.isfile(wpscan_path):
+                try:
+                    with open(wpscan_path) as f:
+                        host_data["wpscan"] = parse_wpscan(json.load(f))
+                except Exception:
+                    pass
+
             host_results[ip] = host_data
 
     # 5. Consolidate all findings into prompt text

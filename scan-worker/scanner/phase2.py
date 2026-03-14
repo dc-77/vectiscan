@@ -300,6 +300,128 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[s
     return analysis
 
 
+def run_httpx(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
+    """Run httpx for HTTP probing and technology detection."""
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+    output_path = f"{phase2_dir}/httpx.json"
+
+    cmd = [
+        "httpx",
+        "-u", fqdn,
+        "-json",
+        "-o", output_path,
+        "-status-code",
+        "-title",
+        "-tech-detect",
+        "-server",
+        "-content-length",
+        "-follow-redirects",
+        "-silent",
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd, timeout=60, output_path=output_path,
+        order_id=order_id, host_ip=ip, phase=2, tool_name="httpx",
+    )
+
+    if exit_code != 0:
+        log.warning("httpx_failed", fqdn=fqdn, exit_code=exit_code)
+        return None
+
+    try:
+        results = []
+        with open(output_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    results.append(json.loads(line))
+        log.info("httpx_complete", fqdn=fqdn, results=len(results))
+        return results[0] if results else None
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        log.warning("httpx_parse_error", fqdn=fqdn, error=str(e))
+        return None
+
+
+def run_katana(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[str]:
+    """Run katana web crawler to discover endpoints."""
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+    output_path = f"{phase2_dir}/katana.txt"
+
+    cmd = [
+        "katana",
+        "-u", f"https://{fqdn}",
+        "-o", output_path,
+        "-depth", "3",
+        "-js-crawl",
+        "-known-files", "all",
+        "-silent",
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd, timeout=300, output_path=output_path,
+        order_id=order_id, host_ip=ip, phase=2, tool_name="katana",
+    )
+
+    if exit_code != 0:
+        log.warning("katana_failed", fqdn=fqdn, exit_code=exit_code)
+        return []
+
+    try:
+        with open(output_path, "r") as f:
+            urls = [line.strip() for line in f if line.strip()]
+        log.info("katana_complete", fqdn=fqdn, urls_found=len(urls))
+        return urls
+    except FileNotFoundError:
+        return []
+
+
+def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
+    """Run WPScan WordPress vulnerability scanner.
+
+    Only called when CMS is detected as WordPress.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+    output_path = f"{phase2_dir}/wpscan.json"
+
+    api_token = os.environ.get("WPSCAN_API_TOKEN", "")
+
+    cmd = [
+        "wpscan",
+        "--url", f"https://{fqdn}",
+        "--format", "json",
+        "--output", output_path,
+        "--enumerate", "vp,vt,u1-5",  # vulnerable plugins, themes, users
+        "--random-user-agent",
+        "--no-banner",
+    ]
+    if api_token:
+        cmd.extend(["--api-token", api_token])
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd, timeout=600, output_path=output_path,
+        order_id=order_id, host_ip=ip, phase=2, tool_name="wpscan",
+    )
+
+    # WPScan returns various exit codes: 0=ok, 5=vulnerabilities found
+    if exit_code not in (0, 5):
+        log.warning("wpscan_failed", fqdn=fqdn, exit_code=exit_code)
+        return None
+
+    try:
+        with open(output_path, "r") as f:
+            data = json.load(f)
+        vuln_count = len(data.get("interesting_findings", []))
+        plugins = len(data.get("plugins", {}))
+        log.info("wpscan_complete", fqdn=fqdn, vulns=vuln_count, plugins=plugins)
+        return data
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        log.warning("wpscan_parse_error", fqdn=fqdn, error=str(e))
+        return None
+
+
 def run_phase2(
     ip: str,
     fqdns: list[str],
@@ -398,6 +520,36 @@ def run_phase2(
         progress_callback(order_id, "header_check", "complete")
     else:
         log.info("headers_skipped", ip=ip, reason="not_in_package")
+
+    # httpx — HTTP probing
+    if phase2_tools is None or "httpx" in phase2_tools:
+        httpx_result = run_httpx(primary_fqdn, ip, host_dir, order_id)
+        results["httpx"] = httpx_result
+        results["tools_run"].append("httpx")
+        progress_callback(order_id, "httpx", "complete")
+    else:
+        log.info("httpx_skipped", ip=ip, reason="not_in_package")
+
+    # katana — web crawler
+    if phase2_tools is None or "katana" in phase2_tools:
+        katana_result = run_katana(primary_fqdn, ip, host_dir, order_id)
+        results["katana"] = katana_result
+        results["tools_run"].append("katana")
+        progress_callback(order_id, "katana", "complete")
+    else:
+        log.info("katana_skipped", ip=ip, reason="not_in_package")
+
+    # wpscan — CMS-adaptive: only if WordPress detected
+    cms = tech_profile.get("cms", "")
+    if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
+        wpscan_result = run_wpscan(primary_fqdn, ip, host_dir, order_id)
+        results["wpscan"] = wpscan_result
+        results["tools_run"].append("wpscan")
+        progress_callback(order_id, "wpscan", "complete")
+    elif cms and cms.lower() != "wordpress":
+        log.info("wpscan_skipped", ip=ip, reason=f"cms_is_{cms}")
+    else:
+        log.info("wpscan_skipped", ip=ip, reason="no_cms_or_not_in_package")
 
     log.info("phase2_complete", ip=ip, order_id=order_id, tools_run=len(results["tools_run"]))
     return results

@@ -58,6 +58,22 @@ RUN curl -fsSL https://github.com/owasp-amass/amass/releases/download/v5.0.1/ama
     chmod +x /usr/local/bin/amass && \
     rm -rf /tmp/amass.tar.gz /tmp/amass_linux_amd64
 
+# httpx v1.6.10
+RUN curl -fsSL https://github.com/projectdiscovery/httpx/releases/download/v1.6.10/httpx_1.6.10_linux_amd64.zip \
+      -o /tmp/httpx.zip && \
+    unzip /tmp/httpx.zip -d /tmp/httpx && \
+    mv /tmp/httpx/httpx /usr/local/bin/httpx && \
+    chmod +x /usr/local/bin/httpx && \
+    rm -rf /tmp/httpx /tmp/httpx.zip
+
+# katana v1.1.3
+RUN curl -fsSL https://github.com/projectdiscovery/katana/releases/download/v1.1.3/katana_1.1.3_linux_amd64.zip \
+      -o /tmp/katana.zip && \
+    unzip /tmp/katana.zip -d /tmp/katana && \
+    mv /tmp/katana/katana /usr/local/bin/katana && \
+    chmod +x /usr/local/bin/katana && \
+    rm -rf /tmp/katana /tmp/katana.zip
+
 # nuclei templates
 RUN nuclei -update-templates
 
@@ -68,6 +84,14 @@ ENV PATH="/opt/testssl.sh:${PATH}"
 # ── 3b. nikto (not in bookworm-slim repos) ────────────────────────
 RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto
 ENV PATH="/opt/nikto/program:${PATH}"
+
+# ── 3c. WPScan — Ruby-based WordPress scanner ────────────────────
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ruby ruby-dev build-essential libcurl4-openssl-dev zlib1g-dev && \
+    gem install wpscan --no-document && \
+    apt-get purge -y build-essential ruby-dev && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
 
 # ── 4. Python packages ─────────────────────────────────────────────
 RUN pip3 install --no-cache-dir --break-system-packages wafw00f webtech
@@ -99,6 +123,9 @@ RUN nmap --version; \
     perl /opt/nikto/program/nikto.pl -Version || true; \
     wafw00f --version; \
     webtech --help || true; \
+    httpx -version; \
+    katana -version; \
+    wpscan --version; \
     echo "All tools verified"
 
 # ── 8. Security — non-root user ────────────────────────────────────
