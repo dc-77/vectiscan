@@ -1,0 +1,13 @@
+{
+  "domain": "example.com",
+  "hosts": [
+    {
+      "ip": "88.99.35.112",
+      "fqdns": ["example.com", "www.example.com"]
+    },
+    {
+      "ip": "88.99.35.113",
+      "fqdns": ["mail.example.com"]
+    }
+  ]
+}
