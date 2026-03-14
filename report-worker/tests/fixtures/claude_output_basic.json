@@ -6,6 +6,9 @@
       "id": "VS-2026-001",
       "title": "HTTP ohne HTTPS-Redirect",
       "severity": "MEDIUM",
+      "cvss_score": "5.3",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-319",
       "affected": "example.com:80",
       "description": "Der Webserver ist über HTTP erreichbar ohne automatische Weiterleitung zu HTTPS.",
       "recommendation": "HTTPS-Redirect einrichten und HSTS-Header aktivieren."
@@ -14,6 +17,9 @@
       "id": "VS-2026-002",
       "title": "Veraltete TLS-Version",
       "severity": "LOW",
+      "cvss_score": "3.7",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-326",
       "affected": "example.com:443",
       "description": "TLS 1.0 und 1.1 sind noch aktiviert.",
       "recommendation": "TLS 1.0 und 1.1 deaktivieren, nur TLS 1.2+ zulassen."

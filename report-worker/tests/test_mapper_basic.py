@@ -18,14 +18,13 @@ def scan_meta():
 def host_inventory():
     return json.loads((FIXTURES / "host_inventory.json").read_text())
 
-def test_basic_no_cvss(basic_output, scan_meta, host_inventory):
-    """Basic findings should have em dash for CVSS fields."""
+def test_basic_has_cvss(basic_output, scan_meta, host_inventory):
+    """Basic findings should have CVSS scores from Claude."""
     result = map_basic_report(basic_output, scan_meta, host_inventory)
     for f in result["findings"]:
         if f["severity"] != "INFO":  # skip positive findings
-            assert f["cvss_score"] == "\u2014"
-            assert f["cvss_vector"] == "\u2014"
-            assert f["cwe"] == "\u2014"
+            assert f["cvss_score"] != "\u2014", f"Finding {f['id']} should have a CVSS score"
+            assert f["cvss_vector"].startswith("CVSS:3.1/")
 
 def test_basic_no_appendices(basic_output, scan_meta, host_inventory):
     """Basic report should have empty appendices."""
@@ -53,9 +52,9 @@ def test_basic_cover_meta_has_paket(basic_output, scan_meta, host_inventory):
     assert len(paket_rows) == 1
     assert paket_rows[0][1] == "Basic"
 
-def test_basic_no_evidence_in_findings(basic_output, scan_meta, host_inventory):
-    """Basic findings should not have evidence details."""
+def test_basic_evidence_optional(basic_output, scan_meta, host_inventory):
+    """Basic findings may or may not have evidence."""
     result = map_basic_report(basic_output, scan_meta, host_inventory)
     for f in result["findings"]:
-        if f["severity"] != "INFO":
-            assert f["evidence"] == "\u2014"
+        # evidence field should exist (may be "—" or actual content)
+        assert "evidence" in f

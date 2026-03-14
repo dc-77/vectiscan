@@ -8,7 +8,7 @@ verständliche Befunde umwandelt.
 REGELN FÜR BEWERTUNG:
 - Bewerte nur, was der Scan tatsächlich nachweisen kann
 - Verwende Severity-Labels: CRITICAL, HIGH, MEDIUM, LOW, INFO
-- Kein CVSS-Scoring oder Vektor nötig — nur das Severity-Label
+- Jeder Finding MUSS einen CVSS v3.1 Score und Vektor haben
 - Maximal 5-8 Findings, fokussiert auf die wichtigsten Risiken
 - Management-tauglich formulieren, kein Fachjargon
 
@@ -34,6 +34,9 @@ Antworte ausschließlich in JSON nach folgendem Schema:
       "id": "VS-2026-001",
       "title": "Kurzer, verständlicher Titel",
       "severity": "HIGH",
+      "cvss_score": "7.5",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "cwe": "CWE-200",
       "affected": "Betroffenes System oder Dienst",
       "description": "Kurz, 2-3 Sätze. Verständlich für Nicht-Techniker.",
       "recommendation": "1 konkreter Satz zur Behebung"

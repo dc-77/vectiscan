@@ -60,17 +60,17 @@ def _map_finding(f: dict[str, Any]) -> dict[str, Any]:
 
 
 def _map_basic_finding(f: dict[str, Any]) -> dict[str, Any]:
-    """Map a basic-package Claude finding (no CVSS, CWE, or evidence)."""
+    """Map a basic-package Claude finding."""
     return {
         "id": f["id"],
         "title": f["title"],
         "severity": f["severity"],
-        "cvss_score": "—",
-        "cvss_vector": "—",
-        "cwe": "—",
+        "cvss_score": f.get("cvss_score", "—"),
+        "cvss_vector": f.get("cvss_vector", "—"),
+        "cwe": f.get("cwe", "—"),
         "affected": f["affected"],
         "description": f["description"],
-        "evidence": "—",
+        "evidence": f.get("evidence", "—"),
         "impact": f.get("impact", "—"),
         "recommendation": f["recommendation"],
         # Deutsche Labels
