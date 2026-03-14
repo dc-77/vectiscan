@@ -25,7 +25,8 @@ export const reportQueue = {
   },
 };
 
-export async function publishEvent(scanId: string, event: Record<string, unknown>): Promise<void> {
+export async function publishEvent(orderId: string, event: Record<string, unknown>): Promise<void> {
   const client = await getRedisClient();
-  await client.publish(`scan:events:${scanId}`, JSON.stringify(event));
+  // Channel name kept as scan:events:{id} for backward compat with workers
+  await client.publish(`scan:events:${orderId}`, JSON.stringify(event));
 }

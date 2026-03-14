@@ -70,9 +70,9 @@ def _collect_tool_versions() -> list[str]:
     return versions
 
 
-def _process_job(scan_id: str, domain: str, package: str = "professional") -> None:
+def _process_job(order_id: str, domain: str, package: str = "professional") -> None:
     """Run the full three-phase scan pipeline for a single job."""
-    scan_dir = f"/tmp/scan-{scan_id}"
+    scan_dir = f"/tmp/scan-{order_id}"
     os.makedirs(scan_dir, exist_ok=True)
 
     config = get_config(package)
@@ -98,7 +98,7 @@ def _process_job(scan_id: str, domain: str, package: str = "professional") -> No
 
     # Write meta.json
     meta = {
-        "scanId": scan_id,
+        "orderId": order_id,
         "domain": domain,
         "package": package,
         "startedAt": datetime.now(timezone.utc).isoformat(),
@@ -107,22 +107,22 @@ def _process_job(scan_id: str, domain: str, package: str = "professional") -> No
     with open(f"{scan_dir}/meta.json", "w") as f:
         json.dump(meta, f, indent=2)
 
-    log.info("scan_start", scan_id=scan_id, domain=domain)
-    set_scan_started(scan_id)
+    log.info("scan_start", order_id=order_id, domain=domain)
+    set_scan_started(order_id)
 
     # ── Phase 0: DNS Reconnaissance ─────────────────────────
-    update_progress(scan_id, "dns_recon", "starting")
-    host_inventory = run_phase0(domain, scan_dir, scan_id, config)
-    set_discovered_hosts(scan_id, host_inventory)
+    update_progress(order_id, "dns_recon", "starting")
+    host_inventory = run_phase0(domain, scan_dir, order_id, config)
+    set_discovered_hosts(order_id, host_inventory)
 
     hosts = host_inventory.get("hosts", [])
     hosts_total = len(hosts)
-    log.info("phase0_done", scan_id=scan_id, hosts_found=hosts_total)
+    log.info("phase0_done", order_id=order_id, hosts_found=hosts_total)
 
     if hosts_total == 0:
-        log.warning("no_hosts_found", scan_id=scan_id, domain=domain)
+        log.warning("no_hosts_found", order_id=order_id, domain=domain)
         # Still complete — report worker handles empty inventory
-        _finalize(scan_id, scan_dir, host_inventory, [], package)
+        _finalize(order_id, scan_dir, host_inventory, [], package)
         return
 
     _check_timeout()
@@ -137,34 +137,34 @@ def _process_job(scan_id: str, domain: str, package: str = "professional") -> No
         _check_timeout()
 
         # Phase 1: Technology detection
-        def p1_callback(sid: str, tool: str, status: str) -> None:
-            update_progress(sid, "scan_phase1", tool, host=ip,
+        def p1_callback(oid: str, tool: str, status: str) -> None:
+            update_progress(oid, "scan_phase1", tool, host=ip,
                             hosts_completed=idx, hosts_total=hosts_total)
 
-        update_progress(scan_id, "scan_phase1", "starting", host=ip,
+        update_progress(order_id, "scan_phase1", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
-        tech_profile = run_phase1(ip, fqdns, scan_dir, scan_id, p1_callback, config)
+        tech_profile = run_phase1(ip, fqdns, scan_dir, order_id, p1_callback, config)
         tech_profiles.append(tech_profile)
 
         _check_timeout()
 
         # Phase 2: Deep scan
-        def p2_callback(sid: str, tool: str, status: str) -> None:
-            update_progress(sid, "scan_phase2", tool, host=ip,
+        def p2_callback(oid: str, tool: str, status: str) -> None:
+            update_progress(oid, "scan_phase2", tool, host=ip,
                             hosts_completed=idx, hosts_total=hosts_total)
 
-        update_progress(scan_id, "scan_phase2", "starting", host=ip,
+        update_progress(order_id, "scan_phase2", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
-        run_phase2(ip, fqdns, tech_profile, scan_dir, scan_id, p2_callback, config)
+        run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config)
 
-        log.info("host_complete", scan_id=scan_id, ip=ip, idx=idx + 1, total=hosts_total)
+        log.info("host_complete", order_id=order_id, ip=ip, idx=idx + 1, total=hosts_total)
 
     # ── Finalize ────────────────────────────────────────────
-    _finalize(scan_id, scan_dir, host_inventory, tech_profiles, package)
+    _finalize(order_id, scan_dir, host_inventory, tech_profiles, package)
 
 
 def _finalize(
-    scan_id: str,
+    order_id: str,
     scan_dir: str,
     host_inventory: dict[str, Any],
     tech_profiles: list[dict[str, Any]],
@@ -173,7 +173,7 @@ def _finalize(
     """Pack results, upload to MinIO, enqueue report job."""
     hosts_total = len(host_inventory.get("hosts", []))
 
-    update_progress(scan_id, "scan_complete", "uploading",
+    update_progress(order_id, "scan_complete", "uploading",
                     hosts_completed=hosts_total, hosts_total=hosts_total)
 
     # Update meta.json with finish timestamp
@@ -189,14 +189,14 @@ def _finalize(
         log.error("meta_update_failed", error=str(e))
 
     # Pack and upload
-    archive_path = pack_results(scan_dir, scan_id)
-    minio_path = upload_to_minio(archive_path, scan_id)
+    archive_path = pack_results(scan_dir, order_id)
+    minio_path = upload_to_minio(archive_path, order_id)
 
     # Enqueue report generation
-    enqueue_report_job(scan_id, minio_path, host_inventory, tech_profiles, package)
+    enqueue_report_job(order_id, minio_path, host_inventory, tech_profiles, package)
 
     # Mark scan as complete
-    set_scan_complete(scan_id)
+    set_scan_complete(order_id)
 
     # Cleanup scan directory
     try:
@@ -205,7 +205,7 @@ def _finalize(
     except Exception as e:
         log.warning("scan_dir_cleanup_failed", error=str(e))
 
-    log.info("scan_complete", scan_id=scan_id)
+    log.info("scan_complete", order_id=order_id)
 
 
 def wait_for_jobs(redis_client: redis.Redis) -> None:
@@ -219,24 +219,24 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
 
             _, job_data = result
             job = json.loads(job_data.decode())
-            scan_id = job["scanId"]
+            order_id = job["orderId"]
             domain = job["targetDomain"]
             package = job.get("package", "professional")
 
-            log.info("job_received", scan_id=scan_id, domain=domain)
+            log.info("job_received", order_id=order_id, domain=domain)
 
             try:
-                _process_job(scan_id, domain, package)
+                _process_job(order_id, domain, package)
             except TimeoutError as e:
-                log.error("scan_timeout", scan_id=scan_id, error=str(e))
-                set_scan_failed(scan_id, str(e))
-                scan_dir = f"/tmp/scan-{scan_id}"
+                log.error("scan_timeout", order_id=order_id, error=str(e))
+                set_scan_failed(order_id, str(e))
+                scan_dir = f"/tmp/scan-{order_id}"
                 if os.path.exists(scan_dir):
                     shutil.rmtree(scan_dir, ignore_errors=True)
             except Exception as e:
-                log.error("scan_failed", scan_id=scan_id, error=str(e))
-                set_scan_failed(scan_id, str(e))
-                scan_dir = f"/tmp/scan-{scan_id}"
+                log.error("scan_failed", order_id=order_id, error=str(e))
+                set_scan_failed(order_id, str(e))
+                scan_dir = f"/tmp/scan-{order_id}"
                 if os.path.exists(scan_dir):
                     shutil.rmtree(scan_dir, ignore_errors=True)
 

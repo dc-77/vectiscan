@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { createScan, getScanStatus, cancelScan, verifyPassword, ScanStatus } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { createOrder, getOrderStatus, cancelOrder, verifyPassword, OrderStatus } from '@/lib/api';
 import VectiScanLogo from '@/components/VectiScanLogo';
 import ScanProgress from '@/components/ScanProgress';
 import ReportDownload from '@/components/ReportDownload';
@@ -14,14 +15,16 @@ import { useWebSocket, WsMessage } from '@/hooks/useWebSocket';
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
 export default function Home() {
+  const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
+  const [email, setEmail] = useState('');
   const [domain, setDomain] = useState('');
   const [selectedPackage, setSelectedPackage] = useState<ScanPackage>('professional');
-  const [scanId, setScanId] = useState<string | null>(null);
-  const [scan, setScan] = useState<ScanStatus | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [order, setOrder] = useState<OrderStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
@@ -32,11 +35,11 @@ export default function Home() {
 
   const { lines, processStatus, initTerminal, reset: resetTerminal } = useTerminalFeed();
 
-  // WebSocket message handler — updates scan state from real-time events
+  // WebSocket message handler — updates order state from real-time events
   const handleWsMessage = useCallback((msg: WsMessage) => {
     if (msg.type === 'connected') return;
 
-    setScan((prev) => {
+    setOrder((prev) => {
       if (!prev) return prev;
       const updated = { ...prev };
 
@@ -73,7 +76,7 @@ export default function Home() {
     setWsConnected(connected);
   }, []);
 
-  const { close: closeWs } = useWebSocket(scanId, {
+  const { close: closeWs } = useWebSocket(orderId, {
     onMessage: handleWsMessage,
     onConnectionChange: handleWsConnectionChange,
   });
@@ -112,9 +115,9 @@ export default function Home() {
 
   const pollStatus = useCallback(async (id: string) => {
     try {
-      const res = await getScanStatus(id);
+      const res = await getOrderStatus(id);
       if (res.success && res.data) {
-        setScan(res.data);
+        setOrder(res.data);
         processStatus(res.data);
       }
     } catch {
@@ -133,24 +136,29 @@ export default function Home() {
     return () => stopPolling();
   }, [stopPolling]);
 
-  // Stop polling when scan completes or fails
+  // Stop polling when order completes or fails
   useEffect(() => {
-    if (!scan) return;
-    if (scan.status === 'report_complete') {
+    if (!order) return;
+    if (order.status === 'report_complete') {
       stopPolling();
       closeWs();
       setTimeout(() => setShowReport(true), 500);
-    } else if (scan.status === 'failed' || scan.status === 'cancelled') {
+    } else if (order.status === 'failed' || order.status === 'cancelled') {
       stopPolling();
       closeWs();
     }
-  }, [scan?.status]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [order?.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setScan(null);
-    setScanId(null);
+    setOrder(null);
+    setOrderId(null);
+
+    if (!email.trim()) {
+      setError('Bitte eine E-Mail-Adresse eingeben.');
+      return;
+    }
 
     const trimmed = domain.trim().toLowerCase();
     if (!DOMAIN_REGEX.test(trimmed)) {
@@ -160,13 +168,9 @@ export default function Home() {
 
     setSubmitting(true);
     try {
-      const res = await createScan(trimmed, selectedPackage);
+      const res = await createOrder(email.trim(), trimmed, selectedPackage);
       if (res.success && res.data) {
-        setScanId(res.data.id);
-        initTerminal(trimmed, selectedPackage);
-        setShowReport(false);
-        setTerminalOpen(true);
-        startPolling(res.data.id);
+        router.push(`/verify/${res.data.id}`);
       } else {
         setError(res.error || 'Unbekannter Fehler');
       }
@@ -182,19 +186,20 @@ export default function Home() {
     closeWs();
     resetTerminal();
     setShowReport(false);
+    setEmail('');
     setDomain('');
     setSelectedPackage('professional');
-    setScanId(null);
-    setScan(null);
+    setOrderId(null);
+    setOrder(null);
     setError(null);
     setCancelling(false);
   };
 
   const handleCancel = async () => {
-    if (!scanId) return;
+    if (!orderId) return;
     setCancelling(true);
     try {
-      await cancelScan(scanId);
+      await cancelOrder(orderId);
       stopPolling();
       handleRetry();
     } catch {
@@ -202,7 +207,7 @@ export default function Home() {
     }
   };
 
-  const isScanning = scanId && scan && scan.status !== 'report_complete' && scan.status !== 'failed' && scan.status !== 'cancelled';
+  const isScanning = orderId && order && order.status !== 'report_complete' && order.status !== 'failed' && order.status !== 'cancelled';
 
   if (!authenticated) {
     return (
@@ -251,43 +256,53 @@ export default function Home() {
           </div>
         )}
 
-        {/* Form — only when no scan is running */}
-        {!scanId && !showReport && (
+        {/* Form — only when no order is running */}
+        {!orderId && !showReport && (
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex gap-3 max-w-2xl mx-auto">
+            <div className="flex flex-col gap-3 max-w-2xl mx-auto">
               <input
-                type="text"
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                placeholder="beispiel.de"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="ihre@email.de"
                 disabled={submitting}
-                className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono disabled:opacity-50"
+                className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
               />
-              <button
-                type="submit"
-                disabled={submitting || !domain.trim()}
-                className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
-              >
-                {submitting ? 'Startet...' : 'Scan starten'}
-              </button>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  placeholder="beispiel.de"
+                  disabled={submitting}
+                  className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={submitting || !domain.trim() || !email.trim()}
+                  className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
+                >
+                  {submitting ? 'Startet...' : 'Scan starten'}
+                </button>
+              </div>
             </div>
             <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />
           </form>
         )}
 
         {/* Error Toast */}
-        {error && !scanId && (
+        {error && !orderId && (
           <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
             {error}
           </div>
         )}
 
         {/* Scan in progress: Professional status card + terminal box */}
-        {scan && scan.status !== 'report_complete' && scan.status !== 'cancelled' && (
+        {order && order.status !== 'report_complete' && order.status !== 'cancelled' && (
           <>
             {/* Primary: ScanProgress with progress bar and status */}
             <ScanProgress
-              scan={scan}
+              scan={order}
               onCancel={isScanning ? handleCancel : undefined}
               cancelling={cancelling}
             />
@@ -299,7 +314,7 @@ export default function Home() {
                 className="w-full flex items-center justify-between px-4 py-2.5 bg-[#0C1222] hover:bg-[#0F172A] transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${isScanning ? 'bg-[#38BDF8] animate-pulse' : scan.status === 'failed' ? 'bg-red-500' : 'bg-[#4B7399]'}`} />
+                  <span className={`w-2 h-2 rounded-full ${isScanning ? 'bg-[#38BDF8] animate-pulse' : order.status === 'failed' ? 'bg-red-500' : 'bg-[#4B7399]'}`} />
                   <span className="text-xs font-mono text-[#4B7399]">Terminal Log</span>
                   <span className="text-xs text-[#1E3A5F] font-mono">{lines.length} lines</span>
                 </div>
@@ -311,11 +326,11 @@ export default function Home() {
               {terminalOpen && (
                 <ScanTerminal
                   lines={lines}
-                  currentTool={scan.progress.currentTool || null}
-                  currentHost={scan.progress.currentHost || null}
+                  currentTool={order.progress.currentTool || null}
+                  currentHost={order.progress.currentHost || null}
                   isScanning={!!isScanning}
-                  isComplete={scan.status === 'report_complete'}
-                  isError={scan.status === 'failed'}
+                  isComplete={order.status === 'report_complete'}
+                  isError={order.status === 'failed'}
                   compact
                 />
               )}
@@ -324,19 +339,19 @@ export default function Home() {
         )}
 
         {/* Report download */}
-        {showReport && scan?.status === 'report_complete' && (
+        {showReport && order?.status === 'report_complete' && (
           <div className="animate-fadeIn">
             <ReportDownload
-              scanId={scan.id}
-              domain={scan.domain}
+              orderId={order.id}
+              domain={order.domain}
               onNewScan={handleRetry}
             />
           </div>
         )}
 
         {/* Error or cancelled — with retry button */}
-        {(scan?.status === 'failed' || scan?.status === 'cancelled') && (
-          <ScanError error={scan.error} onRetry={handleRetry} />
+        {(order?.status === 'failed' || order?.status === 'cancelled') && (
+          <ScanError error={order.error} onRetry={handleRetry} />
         )}
       </div>
     </main>

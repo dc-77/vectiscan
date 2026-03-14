@@ -21,7 +21,7 @@ def _get_db():
 
 
 def update_progress(
-    scan_id: str,
+    order_id: str,
     phase: str,
     tool: str,
     host: Optional[str] = None,
@@ -31,7 +31,7 @@ def update_progress(
     """Update scan progress in Redis and PostgreSQL.
 
     Args:
-        scan_id: UUID of the scan
+        order_id: UUID of the order
         phase: Current phase name (dns_recon, scan_phase1, scan_phase2)
         tool: Current tool name
         host: Current host IP (if applicable)
@@ -42,7 +42,7 @@ def update_progress(
     status = phase  # dns_recon, scan_phase1, scan_phase2
 
     progress_data = {
-        "scanId": scan_id,
+        "orderId": order_id,
         "status": status,
         "currentPhase": phase,
         "currentTool": tool,
@@ -56,20 +56,20 @@ def update_progress(
     try:
         r = _get_redis()
         payload = json.dumps(progress_data)
-        r.set(f"scan:progress:{scan_id}", payload, ex=3600)
-        r.publish(f"scan:events:{scan_id}", json.dumps({
+        r.set(f"order:progress:{order_id}", payload, ex=3600)
+        r.publish(f"scan:events:{order_id}", json.dumps({
             "type": "progress",
             **progress_data,
         }))
     except Exception as e:
-        log.error("redis_progress_failed", scan_id=scan_id, error=str(e))
+        log.error("redis_progress_failed", order_id=order_id, error=str(e))
 
     # PostgreSQL — persistent
     try:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE scans
+                """UPDATE orders
                    SET status = %s,
                        current_phase = %s,
                        current_tool = %s,
@@ -78,122 +78,122 @@ def update_progress(
                        hosts_total = %s,
                        updated_at = NOW()
                    WHERE id = %s""",
-                (status, phase, tool, host, hosts_completed, hosts_total, scan_id),
+                (status, phase, tool, host, hosts_completed, hosts_total, order_id),
             )
         conn.commit()
         conn.close()
     except Exception as e:
-        log.error("db_progress_failed", scan_id=scan_id, error=str(e))
+        log.error("db_progress_failed", order_id=order_id, error=str(e))
 
-    log.debug("progress_updated", scan_id=scan_id, phase=phase, tool=tool, host=host)
+    log.debug("progress_updated", order_id=order_id, phase=phase, tool=tool, host=host)
 
 
-def set_scan_started(scan_id: str) -> None:
+def set_scan_started(order_id: str) -> None:
     """Mark scan as started with timestamp."""
     try:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE scans SET started_at = NOW(), status = 'dns_recon', updated_at = NOW() WHERE id = %s""",
-                (scan_id,),
+                """UPDATE orders SET started_at = NOW(), status = 'dns_recon', updated_at = NOW() WHERE id = %s""",
+                (order_id,),
             )
         conn.commit()
         conn.close()
     except Exception as e:
-        log.error("set_started_failed", scan_id=scan_id, error=str(e))
+        log.error("set_started_failed", order_id=order_id, error=str(e))
 
 
-def set_scan_complete(scan_id: str) -> None:
+def set_scan_complete(order_id: str) -> None:
     """Mark scan as complete with timestamp."""
     try:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE scans SET status = 'scan_complete', finished_at = NOW(), updated_at = NOW() WHERE id = %s""",
-                (scan_id,),
+                """UPDATE orders SET status = 'scan_complete', finished_at = NOW(), updated_at = NOW() WHERE id = %s""",
+                (order_id,),
             )
         conn.commit()
         conn.close()
     except Exception as e:
-        log.error("set_complete_failed", scan_id=scan_id, error=str(e))
+        log.error("set_complete_failed", order_id=order_id, error=str(e))
 
     # Update Redis too + publish event
     try:
         r = _get_redis()
-        progress = r.get(f"scan:progress:{scan_id}")
+        progress = r.get(f"order:progress:{order_id}")
         if progress:
             data = json.loads(progress)
             data["status"] = "scan_complete"
             data["updatedAt"] = datetime.now(timezone.utc).isoformat()
-            r.set(f"scan:progress:{scan_id}", json.dumps(data), ex=3600)
-        r.publish(f"scan:events:{scan_id}", json.dumps({
+            r.set(f"order:progress:{order_id}", json.dumps(data), ex=3600)
+        r.publish(f"scan:events:{order_id}", json.dumps({
             "type": "status",
-            "scanId": scan_id,
+            "orderId": order_id,
             "status": "scan_complete",
             "updatedAt": datetime.now(timezone.utc).isoformat(),
         }))
     except Exception as e:
-        log.error("redis_complete_failed", scan_id=scan_id, error=str(e))
+        log.error("redis_complete_failed", order_id=order_id, error=str(e))
 
 
-def set_scan_failed(scan_id: str, error_message: str) -> None:
+def set_scan_failed(order_id: str, error_message: str) -> None:
     """Mark scan as failed with error message."""
     try:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE scans SET status = 'failed', error_message = %s, finished_at = NOW(), updated_at = NOW() WHERE id = %s""",
-                (error_message, scan_id),
+                """UPDATE orders SET status = 'failed', error_message = %s, finished_at = NOW(), updated_at = NOW() WHERE id = %s""",
+                (error_message, order_id),
             )
         conn.commit()
         conn.close()
     except Exception as e:
-        log.error("set_failed_failed", scan_id=scan_id, error=str(e))
+        log.error("set_failed_failed", order_id=order_id, error=str(e))
 
     # Update Redis too + publish event
     try:
         r = _get_redis()
         data = {
-            "scanId": scan_id,
+            "orderId": order_id,
             "status": "failed",
             "error": error_message,
             "updatedAt": datetime.now(timezone.utc).isoformat(),
         }
-        r.set(f"scan:progress:{scan_id}", json.dumps(data), ex=3600)
-        r.publish(f"scan:events:{scan_id}", json.dumps({
+        r.set(f"order:progress:{order_id}", json.dumps(data), ex=3600)
+        r.publish(f"scan:events:{order_id}", json.dumps({
             "type": "error",
             **data,
         }))
     except Exception as e:
-        log.error("redis_failed_failed", scan_id=scan_id, error=str(e))
+        log.error("redis_failed_failed", order_id=order_id, error=str(e))
 
 
-def set_discovered_hosts(scan_id: str, host_inventory: dict) -> None:
-    """Store discovered hosts in the scans table."""
+def set_discovered_hosts(order_id: str, host_inventory: dict) -> None:
+    """Store discovered hosts in the orders table."""
     hosts = host_inventory.get("hosts", [])
     try:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE scans
+                """UPDATE orders
                    SET discovered_hosts = %s, hosts_total = %s, updated_at = NOW()
                    WHERE id = %s""",
-                (json.dumps(host_inventory), len(hosts), scan_id),
+                (json.dumps(host_inventory), len(hosts), order_id),
             )
         conn.commit()
         conn.close()
     except Exception as e:
-        log.error("set_hosts_failed", scan_id=scan_id, error=str(e))
+        log.error("set_hosts_failed", order_id=order_id, error=str(e))
 
     # Publish hosts discovered event
     try:
         r = _get_redis()
-        r.publish(f"scan:events:{scan_id}", json.dumps({
+        r.publish(f"scan:events:{order_id}", json.dumps({
             "type": "hosts_discovered",
-            "scanId": scan_id,
+            "orderId": order_id,
             "hostsTotal": len(hosts),
             "hosts": hosts,
             "updatedAt": datetime.now(timezone.utc).isoformat(),
         }))
     except Exception as e:
-        log.error("redis_hosts_publish_failed", scan_id=scan_id, error=str(e))
+        log.error("redis_hosts_publish_failed", order_id=order_id, error=str(e))

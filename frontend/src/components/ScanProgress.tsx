@@ -1,6 +1,6 @@
 'use client';
 
-import { ScanStatus } from '@/lib/api';
+import { OrderStatus } from '@/lib/api';
 
 const PHASE_LABELS: Record<string, string> = {
   created: 'Erstellt',
@@ -36,7 +36,7 @@ function formatDuration(seconds: number): string {
 }
 
 interface Props {
-  scan: ScanStatus;
+  scan: OrderStatus;
   onCancel?: () => void;
   cancelling?: boolean;
 }

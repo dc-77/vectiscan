@@ -76,6 +76,29 @@ CVSS-REFERENZWERTE (häufige Findings):
 - Info Disclosure (robots.txt, Banner): LOW (2.0-3.5)
 - Gute Security-Header: INFORMATIONAL (positiver Befund)
 
+CVSS-REFERENZWERTE FÜR DNS-FINDINGS:
+- Kein DKIM konfiguriert (SPF und DMARC vorhanden):
+  → MEDIUM 4.3, CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N
+  → E-Mail-Authentifizierung ist geschwächt, Phishing-Risiko erhöht
+- DMARC-Policy auf 'none' (kein Enforcement):
+  → MEDIUM 5.3, CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+  → Keine Durchsetzung, Spoofing ungehindert möglich
+- DMARC-Policy auf 'quarantine' statt 'reject':
+  → LOW 3.7, CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N
+  → Teilweise Durchsetzung, aber nicht vollständig blockiert
+- Kein SPF-Record vorhanden:
+  → MEDIUM 5.3, CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N
+- SPF mit ~all (Softfail) statt -all (Hardfail):
+  → LOW 3.7, CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N
+- Zone Transfer (AXFR) möglich:
+  → HIGH 7.5, CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
+  → Vollständige DNS-Zone kann abgerufen werden
+- Dangling CNAME (Subdomain Takeover möglich):
+  → HIGH 8.2, CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L
+
+WICHTIG: Jeder Finding MUSS einen cvss_score und cvss_vector haben.
+Nur bei INFO-Severity (Score 0.0) darf der Vektor "N/A" sein.
+
 HÄUFIG FALSCH BEWERTETE FINDINGS — Korrekte Scores:
 - SSH Port 22 offen, Key-Auth konfiguriert, Passwort-Auth deaktiviert:
   → INFO, CVSS 0.0, kein Vektor nötig — das ist Standard-Konfiguration

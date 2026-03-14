@@ -22,20 +22,20 @@ def get_minio_client() -> Minio:
     )
 
 
-def pack_results(scan_dir: str, scan_id: str) -> str:
+def pack_results(scan_dir: str, order_id: str) -> str:
     """Pack scan results directory into a tar.gz archive.
 
     Returns path to the created archive.
     """
-    archive_path = f"/tmp/{scan_id}.tar.gz"
+    archive_path = f"/tmp/{order_id}.tar.gz"
     with tarfile.open(archive_path, "w:gz") as tar:
-        tar.add(scan_dir, arcname=scan_id)
+        tar.add(scan_dir, arcname=order_id)
 
-    log.info("results_packed", scan_id=scan_id, archive=archive_path)
+    log.info("results_packed", order_id=order_id, archive=archive_path)
     return archive_path
 
 
-def upload_to_minio(archive_path: str, scan_id: str) -> str:
+def upload_to_minio(archive_path: str, order_id: str) -> str:
     """Upload tar.gz to MinIO scan-rawdata bucket.
 
     Returns the MinIO object path.
@@ -47,11 +47,11 @@ def upload_to_minio(archive_path: str, scan_id: str) -> str:
     if not client.bucket_exists(bucket):
         client.make_bucket(bucket)
 
-    object_name = f"{scan_id}.tar.gz"
+    object_name = f"{order_id}.tar.gz"
     client.fput_object(bucket, object_name, archive_path)
 
     minio_path = object_name
-    log.info("uploaded_to_minio", scan_id=scan_id, path=minio_path)
+    log.info("uploaded_to_minio", order_id=order_id, path=minio_path)
 
     # Clean up local archive
     os.remove(archive_path)
@@ -60,7 +60,7 @@ def upload_to_minio(archive_path: str, scan_id: str) -> str:
 
 
 def enqueue_report_job(
-    scan_id: str,
+    order_id: str,
     minio_path: str,
     host_inventory: dict,
     tech_profiles: list[dict],
@@ -71,7 +71,7 @@ def enqueue_report_job(
     r = redis.from_url(redis_url)
 
     job_data = json.dumps({
-        "scanId": scan_id,
+        "orderId": order_id,
         "rawDataPath": minio_path,
         "hostInventory": host_inventory,
         "techProfiles": tech_profiles,
@@ -79,4 +79,4 @@ def enqueue_report_job(
     })
 
     r.rpush("report-pending", job_data)
-    log.info("report_job_enqueued", scan_id=scan_id, package=package)
+    log.info("report_job_enqueued", order_id=order_id, package=package)

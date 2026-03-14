@@ -561,7 +561,7 @@ def map_professional_report(
 
     Args:
         claude_output: Parsed JSON from Claude API (overall_risk, findings, etc.)
-        scan_meta: Scan metadata dict with domain, startedAt, scanId, etc.
+        scan_meta: Scan metadata dict with domain, startedAt, orderId, etc.
         host_inventory: Host inventory JSON from phase 0
 
     Returns:
@@ -571,7 +571,7 @@ def map_professional_report(
 
     domain = scan_meta.get("domain", "unknown")
     scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
-    scan_id = scan_meta.get("scanId", "unknown")
+    order_id = scan_meta.get("orderId", scan_meta.get("scanId", "unknown"))
     hosts = host_inventory.get("hosts", [])
     hosts_count = len(hosts)
 
@@ -649,7 +649,7 @@ def map_basic_report(
 
     Args:
         claude_output: Parsed JSON from Claude API (basic schema)
-        scan_meta: Scan metadata dict with domain, startedAt, scanId, etc.
+        scan_meta: Scan metadata dict with domain, startedAt, orderId, etc.
         host_inventory: Host inventory JSON from phase 0
 
     Returns:
@@ -659,7 +659,7 @@ def map_basic_report(
 
     domain = scan_meta.get("domain", "unknown")
     scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
-    scan_id = scan_meta.get("scanId", "unknown")
+    order_id = scan_meta.get("orderId", scan_meta.get("scanId", "unknown"))
     hosts = host_inventory.get("hosts", [])
     hosts_count = len(hosts)
 
@@ -801,7 +801,7 @@ def map_nis2_report(
 
     Args:
         claude_output: Parsed JSON from Claude API (NIS2 schema with nis2_ref, etc.)
-        scan_meta: Scan metadata dict with domain, startedAt, scanId, etc.
+        scan_meta: Scan metadata dict with domain, startedAt, orderId, etc.
         host_inventory: Host inventory JSON from phase 0
 
     Returns:
@@ -812,7 +812,7 @@ def map_nis2_report(
 
     domain = scan_meta.get("domain", "unknown")
     scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
-    scan_id = scan_meta.get("scanId", "unknown")
+    order_id = scan_meta.get("orderId", scan_meta.get("scanId", "unknown"))
     package = scan_meta.get("package", "nis2")
 
     # Update cover meta: change Paket to NIS2 Compliance, add Regulatorik row
@@ -855,7 +855,7 @@ def map_nis2_report(
     # Build audit trail from scan_meta
     tool_versions = scan_meta.get("toolVersions", [])
     audit_trail = {
-        "scanId": scan_id,
+        "orderId": order_id,
         "domain": domain,
         "startedAt": scan_meta.get("startedAt", "—"),
         "completedAt": scan_meta.get("completedAt", "—"),
