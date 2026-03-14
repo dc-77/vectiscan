@@ -66,7 +66,7 @@ export default function VerifyPage() {
   useEffect(() => {
     if (verified) {
       if (pollRef.current) clearInterval(pollRef.current);
-      const timer = setTimeout(() => router.push(`/checkout/${orderId}`), 2000);
+      const timer = setTimeout(() => router.push(`/?orderId=${orderId}`), 2000);
       return () => clearTimeout(timer);
     }
   }, [verified, orderId, router]);
