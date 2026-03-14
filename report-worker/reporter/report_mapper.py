@@ -7,6 +7,7 @@ from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph
 
 from reporter.generate_report import create_styles
+from reporter.pdf.branding import CLASSIFICATION_LABEL_DE
 
 import structlog
 
@@ -641,9 +642,7 @@ def map_professional_report(
             "header_left": "VECTISCAN — SECURITY ASSESSMENT",
             "header_right": domain,
             "footer_left": f"Vertraulich  |  {scan_date}",
-            "classification_label": (
-                "KLASSIFIZIERUNG: VERTRAULICH — NUR FÜR AUTORISIERTE EMPFÄNGER"
-            ),
+            "classification_label": CLASSIFICATION_LABEL_DE,
         },
         "cover": {
             "cover_subtitle": "AUTOMATED SECURITY ASSESSMENT",
@@ -731,9 +730,7 @@ def map_basic_report(
             "header_left": "VECTISCAN — SECURITY ASSESSMENT",
             "header_right": domain,
             "footer_left": f"Vertraulich  |  {scan_date}",
-            "classification_label": (
-                "KLASSIFIZIERUNG: VERTRAULICH — NUR FÜR AUTORISIERTE EMPFÄNGER"
-            ),
+            "classification_label": CLASSIFICATION_LABEL_DE,
         },
         "cover": {
             "cover_subtitle": "AUTOMATED SECURITY ASSESSMENT",

@@ -401,15 +401,21 @@ def find_gowitness_screenshots(phase2_dir: str) -> list[str]:
             if screenshots:
                 break  # Stop at the first directory that has screenshots
 
-    # Fallback: look for any PNG/JPEG directly in phase2
+    # Fallback: look for screenshot.png directly in phase2 (gowitness single output)
     if not screenshots:
-        for f in sorted(phase2_path.iterdir()):
-            if (
-                f.is_file()
-                and f.suffix.lower() in image_extensions
-                and "gowitness" in f.stem.lower()
-            ):
-                screenshots.append(str(f))
+        # Check for the standard gowitness output filename first
+        standard_name = phase2_path / "screenshot.png"
+        if standard_name.is_file():
+            screenshots.append(str(standard_name))
+        else:
+            # Also check for any image file in phase2 that could be a screenshot
+            for f in sorted(phase2_path.iterdir()):
+                if (
+                    f.is_file()
+                    and f.suffix.lower() in image_extensions
+                    and f.stem.lower() in ("screenshot", "gowitness")
+                ):
+                    screenshots.append(str(f))
 
     if screenshots:
         log.info(

@@ -89,12 +89,9 @@ class FindingHeader(Flowable):
         self.canv.setFillColor(COLORS["white"])
 
         if self._is_unrated():
-            # Show subtle "Nicht bewertet" badge instead of N/A
-            self.canv.setFont(FONT_BODY, 7)
-            self.canv.drawCentredString(badge_x + 13 * mm, 11 * mm, "CVSS")
-            self.canv.setFillColor(HexColor("#FFFFFF99"))  # semi-transparent white
-            self.canv.setFont(FONT_BODY, 7.5)
-            self.canv.drawCentredString(badge_x + 13 * mm, 5 * mm, "Nicht bewertet")
+            # Show prominent severity-only badge (no CVSS)
+            self.canv.setFont(FONT_HEADING, 10)
+            self.canv.drawCentredString(badge_x + 13 * mm, 7 * mm, self.severity.upper())
         else:
             self.canv.setFont(FONT_HEADING, 8)
             self.canv.drawCentredString(badge_x + 13 * mm, 11 * mm, "CVSS v3.1")
@@ -117,17 +114,17 @@ def create_styles():
                                  spaceBefore=16, spaceAfter=10, keepWithNext=True),
         "SubsectionTitle":  dict(fontName=FONT_HEADING, fontSize=FONT_SIZE_HEADING2, leading=18, textColor=C["accent"],
                                  spaceBefore=14, spaceAfter=8, keepWithNext=True),
-        "BodyText2":        dict(fontName=FONT_BODY, fontSize=FONT_SIZE_BODY, leading=14, textColor=C["text"],
-                                 alignment=TA_JUSTIFY, spaceAfter=8),
-        "FindingLabel":     dict(fontName=FONT_HEADING, fontSize=9, leading=13, textColor=C["accent"],
-                                 spaceBefore=10, spaceAfter=4, keepWithNext=True),
-        "FindingBody":      dict(fontName=FONT_BODY, fontSize=9, leading=13, textColor=C["text"],
+        "BodyText2":        dict(fontName=FONT_BODY, fontSize=FONT_SIZE_BODY, leading=15, textColor=C["text"],
                                  alignment=TA_JUSTIFY, spaceAfter=6),
-        "Evidence":         dict(fontName=FONT_MONO, fontSize=FONT_SIZE_EVIDENCE, leading=10.5, textColor=C["text"], backColor=C["bg_evidence"],
-                                 borderPadding=(6, 8, 6, 8), spaceAfter=8, leftIndent=4*mm, rightIndent=4*mm),
-        "TableHeader":      dict(fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER, leading=11, textColor=C["white"], alignment=TA_CENTER),
-        "TableCell":        dict(fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL, leading=11, textColor=C["text"]),
-        "TableCellCenter":  dict(fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL, leading=11, textColor=C["text"], alignment=TA_CENTER),
+        "FindingLabel":     dict(fontName=FONT_HEADING, fontSize=10, leading=14, textColor=C["accent"],
+                                 spaceBefore=8, spaceAfter=3, keepWithNext=True),
+        "FindingBody":      dict(fontName=FONT_BODY, fontSize=FONT_SIZE_BODY, leading=15, textColor=C["text"],
+                                 alignment=TA_JUSTIFY, spaceAfter=4),
+        "Evidence":         dict(fontName=FONT_MONO, fontSize=FONT_SIZE_EVIDENCE, leading=12, textColor=C["text"], backColor=C["bg_evidence"],
+                                 borderPadding=(6, 8, 6, 8), spaceAfter=6, leftIndent=4*mm, rightIndent=4*mm),
+        "TableHeader":      dict(fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER, leading=13, textColor=C["white"], alignment=TA_CENTER),
+        "TableCell":        dict(fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL, leading=13, textColor=C["text"]),
+        "TableCellCenter":  dict(fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL, leading=13, textColor=C["text"], alignment=TA_CENTER),
         "TOCEntry":         dict(fontName=FONT_BODY, fontSize=10, leading=18, textColor=C["text"]),
         "TOCSubEntry":      dict(fontName=FONT_BODY, fontSize=9, leading=16, textColor=C["muted"], leftIndent=10*mm),
         "ScreenshotLabel":  dict(fontName=FONT_HEADING, fontSize=9, leading=13, textColor=C["accent"],
@@ -341,16 +338,32 @@ def build_finding(story, styles, f):
         header_group.append(NIS2RefBadge(f["nis2_ref"]))
         header_group.append(Spacer(1, 3 * mm))
 
-    # Metadata row
-    meta_data = [
-        [Paragraph("<b>CVSS Vector</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7, textColor=COLORS["muted"])),
-         Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7, textColor=COLORS["muted"])),
-         Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7, textColor=COLORS["muted"]))],
-        [Paragraph(f.get("cvss_vector", "\u2014"), ParagraphStyle("x", fontName=FONT_MONO, fontSize=7, textColor=COLORS["text"])),
-         Paragraph(f.get("cwe", "\u2014"), ParagraphStyle("x", fontName=FONT_BODY, fontSize=7.5, textColor=COLORS["text"])),
-         Paragraph(f.get("affected", "\u2014"), ParagraphStyle("x", fontName=FONT_BODY, fontSize=7.5, textColor=COLORS["text"]))],
-    ]
-    meta_table = Table(meta_data, colWidths=[85 * mm, 25 * mm, 60 * mm])
+    # Metadata row — only show CVSS/CWE columns when they have real values
+    _dash_values = ("\u2014", "", "N/A", "None", None)
+    cvss_vector = f.get("cvss_vector", "\u2014")
+    cwe = f.get("cwe", "\u2014")
+    affected = f.get("affected", "\u2014")
+    has_cvss_meta = cvss_vector not in _dash_values or cwe not in _dash_values
+
+    if has_cvss_meta:
+        # Full metadata row with CVSS Vector, CWE, and Affected Systems
+        meta_data = [
+            [Paragraph("<b>CVSS Vector</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
+             Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
+             Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"]))],
+            [Paragraph(cvss_vector, ParagraphStyle("x", fontName=FONT_MONO, fontSize=7.5, textColor=COLORS["text"])),
+             Paragraph(cwe, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
+             Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"]))],
+        ]
+        meta_table = Table(meta_data, colWidths=[85 * mm, 25 * mm, 60 * mm])
+    else:
+        # Simplified metadata row — only Affected Systems (for Basic package)
+        meta_data = [
+            [Paragraph("<b>Betroffene Systeme</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"]))],
+            [Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"]))],
+        ]
+        meta_table = Table(meta_data, colWidths=[170 * mm])
+
     meta_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), COLORS["bg_light"]),
         ("TOPPADDING", (0, 0), (-1, 0), 4),
@@ -371,17 +384,21 @@ def build_finding(story, styles, f):
     # Use KeepTogether so the header + meta + description stays on one page
     story.append(KeepTogether(header_group))
 
-    # Evidence (separate block, can flow to next page)
-    story.append(Spacer(1, 2 * mm))
-    ev_label = f.get("label_evidence", "Evidence")
-    story.append(Paragraph(ev_label, styles["FindingLabel"]))
-    story.append(Paragraph(f["evidence"], styles["Evidence"]))
+    # Evidence (separate block, can flow to next page) — hide if empty
+    evidence_text = f.get("evidence", "\u2014")
+    if evidence_text not in ("\u2014", "", "N/A", None):
+        story.append(Spacer(1, 2 * mm))
+        ev_label = f.get("label_evidence", "Evidence")
+        story.append(Paragraph(ev_label, styles["FindingLabel"]))
+        story.append(Paragraph(evidence_text, styles["Evidence"]))
 
-    # Impact
-    story.append(Spacer(1, 2 * mm))
-    imp_label = f.get("label_impact", "Business Impact")
-    story.append(Paragraph(imp_label, styles["FindingLabel"]))
-    story.append(Paragraph(f["impact"], styles["FindingBody"]))
+    # Impact — hide if empty
+    impact_text = f.get("impact", "\u2014")
+    if impact_text not in ("\u2014", "", "N/A", None):
+        story.append(Spacer(1, 2 * mm))
+        imp_label = f.get("label_impact", "Business Impact")
+        story.append(Paragraph(imp_label, styles["FindingLabel"]))
+        story.append(Paragraph(impact_text, styles["FindingBody"]))
 
     # Recommendation
     story.append(Spacer(1, 2 * mm))
@@ -390,7 +407,7 @@ def build_finding(story, styles, f):
     story.append(Paragraph(f["recommendation"], styles["FindingBody"]))
 
     # Spacing after finding
-    story.append(Spacer(1, SPACING_SECTION))
+    story.append(Spacer(1, SPACING_FINDING))
 
 
 def build_screenshots_section(story, styles, screenshots):

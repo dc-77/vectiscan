@@ -31,8 +31,8 @@ COMPANY_NAME = "VectiScan"
 COMPANY_TAGLINE = "Automated Security Assessment"
 COMPANY_URL = "https://vectigal.tech"
 COMPANY_LEGAL = "Vectigal GmbH"
-CLASSIFICATION_LABEL_DE = "KLASSIFIZIERUNG: VERTRAULICH — NUR FÜR AUTORISIERTE EMPFÄNGER"
-CLASSIFICATION_LABEL_EN = "CLASSIFICATION: CONFIDENTIAL — AUTHORIZED RECIPIENTS ONLY"
+CLASSIFICATION_LABEL_DE = "KLASSIFIZIERUNG: VERTRAULICH \u2014 NUR F\u00dcR AUTORISIERTE EMPF\u00c4NGER"
+CLASSIFICATION_LABEL_EN = "CLASSIFICATION: CONFIDENTIAL \u2014 AUTHORIZED RECIPIENTS ONLY"
 
 # Logo — auf None setzen solange kein Logo vorhanden, dann wird Text-Fallback genutzt
 LOGO_PATH = None  # z.B. "reporter/pdf/assets/vectiscan-logo.png"
@@ -140,12 +140,12 @@ FONT_HEADING = "Helvetica-Bold"
 FONT_MONO = "Courier"
 
 # Größen
-FONT_SIZE_BODY = 9.5
+FONT_SIZE_BODY = 10.5
 FONT_SIZE_HEADING1 = 18
 FONT_SIZE_HEADING2 = 13
-FONT_SIZE_EVIDENCE = 7.5
-FONT_SIZE_TABLE_HEADER = 8
-FONT_SIZE_TABLE_CELL = 8
+FONT_SIZE_EVIDENCE = 8.5
+FONT_SIZE_TABLE_HEADER = 9
+FONT_SIZE_TABLE_CELL = 9
 FONT_SIZE_FOOTER = 7
 FONT_SIZE_COVER_TITLE = 28
 FONT_SIZE_COVER_SUBTITLE = 14
@@ -155,11 +155,11 @@ FONT_SIZE_COVER_SUBTITLE = 14
 # SPACING — tunable whitespace constants
 # ============================================================================
 
-SPACING_SECTION = 12 * mm       # Between major sections (H1 → content)
-SPACING_SUBSECTION = 8 * mm     # Between subsections (H2 → content)
-SPACING_FINDING = 6 * mm        # After each finding block
-SPACING_PARAGRAPH = 4 * mm      # Between paragraphs within a section
-SPACING_COVER_ELEMENT = 10 * mm # Between cover page elements
+SPACING_SECTION = 8 * mm        # Between major sections (H1 → content)
+SPACING_SUBSECTION = 5 * mm     # Between subsections (H2 → content)
+SPACING_FINDING = 4 * mm        # After each finding block
+SPACING_PARAGRAPH = 2 * mm      # Between paragraphs within a section
+SPACING_COVER_ELEMENT = 6 * mm  # Between cover page elements
 
 # Orphan control — minimum lines to keep with a heading before a page break
 MIN_LINES_BEFORE_BREAK = 3
