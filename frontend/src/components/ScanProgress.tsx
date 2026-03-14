@@ -11,6 +11,7 @@ const PHASE_LABELS: Record<string, string> = {
   report_generating: 'Report wird generiert',
   report_complete: 'Fertig',
   failed: 'Fehlgeschlagen',
+  cancelled: 'Abgebrochen',
 };
 
 const PHASE_COLORS: Record<string, string> = {
@@ -22,6 +23,7 @@ const PHASE_COLORS: Record<string, string> = {
   report_generating: 'bg-amber-500',
   report_complete: 'bg-green-500',
   failed: 'bg-red-500',
+  cancelled: 'bg-orange-500',
 };
 
 function formatDuration(seconds: number): string {

@@ -34,8 +34,8 @@ class TestPhase0Packages:
         mock_amass.assert_not_called()
         mock_gobuster.assert_not_called()
         mock_zone.assert_not_called()
-        # dnsx is not in basic phase0_tools, so should not be called
-        mock_dnsx.assert_not_called()
+        # dnsx is required for IP resolution, even in basic
+        mock_dnsx.assert_called_once()
         # DNS records should always be collected
         mock_dns.assert_called_once()
 

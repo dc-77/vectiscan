@@ -27,7 +27,7 @@ class TestGetConfig:
 
     def test_basic_phase0_tools_limited(self):
         config = get_config("basic")
-        assert config["phase0_tools"] == ["crtsh", "subfinder"]
+        assert config["phase0_tools"] == ["crtsh", "subfinder", "dnsx"]
 
     def test_basic_total_timeout(self):
         config = get_config("basic")

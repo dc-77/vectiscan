@@ -24,3 +24,8 @@ export const reportQueue = {
     await client.rPush('report-pending', JSON.stringify(data));
   },
 };
+
+export async function publishEvent(scanId: string, event: Record<string, unknown>): Promise<void> {
+  const client = await getRedisClient();
+  await client.publish(`scan:events:${scanId}`, JSON.stringify(event));
+}

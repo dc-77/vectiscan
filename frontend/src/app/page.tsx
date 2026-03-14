@@ -140,7 +140,7 @@ export default function Home() {
       stopPolling();
       closeWs();
       setTimeout(() => setShowReport(true), 500);
-    } else if (scan.status === 'failed') {
+    } else if (scan.status === 'failed' || scan.status === 'cancelled') {
       stopPolling();
       closeWs();
     }
@@ -202,7 +202,7 @@ export default function Home() {
     }
   };
 
-  const isScanning = scanId && scan && scan.status !== 'report_complete' && scan.status !== 'failed';
+  const isScanning = scanId && scan && scan.status !== 'report_complete' && scan.status !== 'failed' && scan.status !== 'cancelled';
 
   if (!authenticated) {
     return (
@@ -283,7 +283,7 @@ export default function Home() {
         )}
 
         {/* Scan in progress: Professional status card + terminal box */}
-        {scan && scan.status !== 'report_complete' && (
+        {scan && scan.status !== 'report_complete' && scan.status !== 'cancelled' && (
           <>
             {/* Primary: ScanProgress with progress bar and status */}
             <ScanProgress
@@ -334,8 +334,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Error — with retry button */}
-        {scan?.status === 'failed' && (
+        {/* Error or cancelled — with retry button */}
+        {(scan?.status === 'failed' || scan?.status === 'cancelled') && (
           <ScanError error={scan.error} onRetry={handleRetry} />
         )}
       </div>
