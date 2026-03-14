@@ -23,6 +23,6 @@ export async function getPresignedUrl(
   bucket: string,
   objectName: string,
 ): Promise<string> {
-  const thirtyDays = 30 * 24 * 60 * 60;
-  return minioClient.presignedGetObject(bucket, objectName, thirtyDays);
+  const sevenDays = 7 * 24 * 60 * 60;
+  return minioClient.presignedGetObject(bucket, objectName, sevenDays);
 }
