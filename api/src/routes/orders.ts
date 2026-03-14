@@ -233,7 +233,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const status = order.status as string;
 
     // Only cancel orders that are still running
-    const cancellableStatuses = ['created', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
+    const cancellableStatuses = ['verification_pending', 'verified', 'created', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
     if (!cancellableStatuses.includes(status)) {
       return reply.status(409).send({
         success: false,
