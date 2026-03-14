@@ -219,6 +219,27 @@ class PackageBadge(Flowable):
         self.canv.drawCentredString(self.width / 2, 2.5 * mm, self.label)
 
 
+class NIS2RefBadge(Flowable):
+    """Narrow badge bar showing §30 BSIG reference under a finding header."""
+    def __init__(self, nis2_ref_text):
+        Flowable.__init__(self)
+        self.nis2_ref_text = nis2_ref_text
+        self.width = 170 * mm
+        self.height = 6 * mm
+
+    def draw(self):
+        # Background
+        self.canv.setFillColor(COLORS["bg_light"])
+        self.canv.rect(0, 0, self.width, self.height, fill=1, stroke=0)
+        # Left accent border
+        self.canv.setFillColor(COLORS["accent"])
+        self.canv.rect(0, 0, 2 * mm, self.height, fill=1, stroke=0)
+        # Text
+        self.canv.setFillColor(COLORS["accent"])
+        self.canv.setFont(FONT_BODY, 7.5)
+        self.canv.drawString(5 * mm, 1.8 * mm, f"§30 BSIG: {self.nis2_ref_text}")
+
+
 def build_package_badge(story, package_name):
     """Add a package badge bar below the cover title."""
     story.append(Spacer(1, 3 * mm))
@@ -280,6 +301,11 @@ def build_finding(story, styles, f):
 
     story.append(FindingHeader(f["id"], f["title"], f["severity"], f["cvss_score"], color))
     story.append(Spacer(1, 3 * mm))
+
+    # NIS2 reference badge (if present)
+    if f.get("nis2_ref"):
+        story.append(NIS2RefBadge(f["nis2_ref"]))
+        story.append(Spacer(1, 2 * mm))
 
     # Metadata row
     meta_data = [
@@ -368,6 +394,214 @@ def build_risk_box(story, label, level, description):
 
 
 # ============================================================================
+# NIS2 FLOWABLES & SECTIONS
+# ============================================================================
+
+_NIS2_REQUIREMENTS = {
+    "nr1_risikoanalyse": ("Nr. 1", "Risikoanalyse und Sicherheitskonzepte",
+                          "CVSS-bewertete Findings liefern dokumentierte Risikoanalyse"),
+    "nr2_vorfallbewaeltigung": ("Nr. 2", "Bewältigung von Sicherheitsvorfällen",
+                                "Identifizierte Angriffsvektoren ermöglichen proaktive Prävention"),
+    "nr4_lieferkette": ("Nr. 4", "Sicherheit der Lieferkette",
+                        "Report dient als Nachweis geprüfter Web-Infrastruktur"),
+    "nr5_schwachstellenmanagement": ("Nr. 5", "Schwachstellenmanagement",
+                                     "Automatisierte Schwachstellenerkennung mit Priorisierung"),
+    "nr6_wirksamkeitsbewertung": ("Nr. 6", "Bewertung der Wirksamkeit von Maßnahmen",
+                                   "Scan dokumentiert Wirksamkeit getroffener Maßnahmen"),
+    "nr8_kryptografie": ("Nr. 8", "Konzepte für Kryptografie und Verschlüsselung",
+                          "testssl.sh bewertet TLS-Konfiguration und Cipher-Suites"),
+}
+
+_COVERAGE_LABELS = {
+    "COVERED": ("✓ Abgedeckt", COLORS["nis2_covered"]),
+    "PARTIAL": ("◐ Teilweise", COLORS["nis2_partial"]),
+    "NOT_IN_SCOPE": ("— Nicht im Scope", COLORS["nis2_out"]),
+}
+
+
+def build_compliance_summary(story, styles, nis2_data):
+    """Build NIS2 compliance summary section with §30 BSIG table."""
+    story.append(PageBreak())
+    story.append(Paragraph("NIS2-Compliance-Übersicht (§30 BSIG)", styles["SectionTitle"]))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, 4 * mm))
+
+    # Intro paragraph
+    story.append(Paragraph(
+        "Die folgende Übersicht zeigt, inwieweit die Ergebnisse dieses Security Assessments "
+        "die Anforderungen des §30 Abs. 2 BSIG (Umsetzungsgesetz der NIS2-Richtlinie) "
+        "adressieren. Die Bewertung bezieht sich ausschließlich auf die durch den externen "
+        "Scan prüfbaren Aspekte.",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, 3 * mm))
+
+    # Scope note info box
+    scope_note = nis2_data.get("scope_note", "")
+    if scope_note:
+        build_info_box(story, scope_note)
+        story.append(Spacer(1, 4 * mm))
+
+    # Compliance table
+    header_style = ParagraphStyle("th", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER,
+                                   leading=11, textColor=COLORS["white"], alignment=TA_CENTER)
+    cell_style = ParagraphStyle("td", fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+
+    header_row = [
+        Paragraph("<b>§30 BSIG</b>", header_style),
+        Paragraph("<b>Anforderung</b>", header_style),
+        Paragraph("<b>Abdeckung</b>", header_style),
+        Paragraph("<b>Erläuterung</b>", header_style),
+    ]
+
+    data_rows = []
+    for key, (nr, req_name, explanation) in _NIS2_REQUIREMENTS.items():
+        status = nis2_data.get(key, "NOT_IN_SCOPE")
+        label_text, label_color = _COVERAGE_LABELS.get(status, _COVERAGE_LABELS["NOT_IN_SCOPE"])
+        coverage_style = ParagraphStyle("cov", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_CELL,
+                                         leading=11, textColor=label_color, alignment=TA_CENTER)
+        data_rows.append([
+            Paragraph(nr, cell_style),
+            Paragraph(req_name, cell_style),
+            Paragraph(label_text, coverage_style),
+            Paragraph(explanation, cell_style),
+        ])
+
+    col_widths = [25 * mm, 45 * mm, 30 * mm, 70 * mm]
+    table = styled_table(header_row, data_rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, 6 * mm))
+
+
+def build_audit_trail(story, styles, audit_data):
+    """Build audit trail section for NIS2 compliance."""
+    story.append(Paragraph("Audit-Trail", styles["SectionTitle"]))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, 4 * mm))
+
+    story.append(Paragraph(
+        "Die folgenden Informationen dienen der Nachvollziehbarkeit "
+        "für Auditzwecke gemäß §39 BSIG.",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, 3 * mm))
+
+    # Audit data table
+    cell_label = ParagraphStyle("al", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+    cell_value = ParagraphStyle("av", fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+    header_style = ParagraphStyle("th", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER,
+                                   leading=11, textColor=COLORS["white"], alignment=TA_CENTER)
+
+    header_row = [
+        Paragraph("<b>Eigenschaft</b>", header_style),
+        Paragraph("<b>Wert</b>", header_style),
+    ]
+
+    # Build tool versions string
+    tools = audit_data.get("tools", [])
+    tools_str = "<br/>".join(tools) if tools else "—"
+
+    data_rows = [
+        [Paragraph("Scan-Zeitpunkt (Start)", cell_label),
+         Paragraph(str(audit_data.get("scan_start", "—")), cell_value)],
+        [Paragraph("Scan-Zeitpunkt (Ende)", cell_label),
+         Paragraph(str(audit_data.get("scan_end", "—")), cell_value)],
+        [Paragraph("Scan-Dauer", cell_label),
+         Paragraph(str(audit_data.get("duration", "—")), cell_value)],
+        [Paragraph("Methodik", cell_label),
+         Paragraph("PTES (automatisiert)", cell_value)],
+        [Paragraph("Scoring-System", cell_label),
+         Paragraph("CVSS v3.1", cell_value)],
+        [Paragraph("Gescannte Hosts", cell_label),
+         Paragraph(str(audit_data.get("hosts_scanned", "—")), cell_value)],
+        [Paragraph("Scan-Tiefe", cell_label),
+         Paragraph("Professional", cell_value)],
+        [Paragraph("Tool-Versionen", cell_label),
+         Paragraph(tools_str, cell_value)],
+    ]
+
+    col_widths = [45 * mm, 125 * mm]
+    table = styled_table(header_row, data_rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, 6 * mm))
+
+    # Hint box
+    build_info_box(story, "Alle Tool-Aufrufe werden geloggt und sind "
+                   "auf Anfrage für Auditzwecke verfügbar.")
+    story.append(Spacer(1, 6 * mm))
+
+
+def build_supply_chain_page(story, styles, supply_chain_data, scan_meta):
+    """Build supply chain summary page (standalone 1-pager for §30 Abs. 2 Nr. 4 BSIG)."""
+    story.append(PageBreak())
+    story.append(Paragraph("Lieferketten-Zusammenfassung", styles["SectionTitle"]))
+    story.append(Paragraph(
+        "Nachweis gemäß §30 Abs. 2 Nr. 4 BSIG — Sicherheit der Lieferkette",
+        styles["SubsectionTitle"],
+    ))
+    story.append(Spacer(1, 4 * mm))
+
+    # Risk box
+    overall_rating = supply_chain_data.get("overall_rating", "MEDIUM")
+    recommendation = supply_chain_data.get("recommendation", "")
+    build_risk_box(story, "Gesamtbewertung für Auftraggeber", overall_rating, recommendation)
+    story.append(Spacer(1, 6 * mm))
+
+    # Key metrics table
+    header_style = ParagraphStyle("th", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_HEADER,
+                                   leading=11, textColor=COLORS["white"], alignment=TA_CENTER)
+    cell_label = ParagraphStyle("al", fontName=FONT_HEADING, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+    cell_value = ParagraphStyle("av", fontName=FONT_BODY, fontSize=FONT_SIZE_TABLE_CELL,
+                                 leading=11, textColor=COLORS["text"])
+
+    header_row = [
+        Paragraph("<b>Kennzahl</b>", header_style),
+        Paragraph("<b>Wert</b>", header_style),
+    ]
+
+    data_rows = [
+        [Paragraph("Geprüfte Domain", cell_label),
+         Paragraph(str(scan_meta.get("domain", "—")), cell_value)],
+        [Paragraph("Scan-Datum", cell_label),
+         Paragraph(str(scan_meta.get("date", "—")), cell_value)],
+        [Paragraph("Gesamtrisiko", cell_label),
+         Paragraph(overall_rating, cell_value)],
+        [Paragraph("Kritische/Hohe Befunde", cell_label),
+         Paragraph(str(supply_chain_data.get("key_findings_count", 0)), cell_value)],
+        [Paragraph("Positive Befunde", cell_label),
+         Paragraph(str(supply_chain_data.get("positive_count", 0)), cell_value)],
+        [Paragraph("Methodik", cell_label),
+         Paragraph("PTES / CVSS v3.1", cell_value)],
+    ]
+
+    col_widths = [55 * mm, 115 * mm]
+    table = styled_table(header_row, data_rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, 6 * mm))
+
+    # Note text
+    story.append(Paragraph(
+        "Vollständige technische Details sind im Hauptbericht dokumentiert.",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, 4 * mm))
+
+    # Footer
+    story.append(HorizontalLine(170 * mm, COLORS["light_accent"], 0.5))
+    story.append(Spacer(1, 3 * mm))
+    footer_style = ParagraphStyle("scf", fontName=FONT_BODY, fontSize=7.5, leading=10,
+                                   textColor=COLORS["muted"], alignment=TA_CENTER)
+    story.append(Paragraph(
+        "Erstellt mit VectiScan — Automated Security Assessment — vectigal.tech",
+        footer_style,
+    ))
+
+
+# ============================================================================
 # MAIN REPORT BUILDER
 # ============================================================================
 
@@ -416,6 +650,7 @@ def generate_report(report_data, output_path):
 
     styles = create_styles()
     story = []
+    nis2 = report_data.get("nis2")
 
     # --- Cover ---
     build_cover(story, styles, report_data.get("cover", {}))
@@ -447,6 +682,10 @@ def generate_report(report_data, output_path):
                 story.append(Spacer(1, 6 * mm))
 
         story.append(PageBreak())
+
+    # --- NIS2 Compliance Summary (after Executive Summary) ---
+    if nis2 and nis2.get("compliance_summary"):
+        build_compliance_summary(story, styles, nis2["compliance_summary"])
 
     # --- Scope & Methodology ---
     scope = report_data.get("scope", {})
@@ -501,6 +740,10 @@ def generate_report(report_data, output_path):
             story.append(styled_table(t["header"], t["rows"], t["widths"], styles))
         story.append(PageBreak())
 
+    # --- NIS2 Audit Trail (after Recommendations, before Appendices) ---
+    if nis2 and nis2.get("audit_trail"):
+        build_audit_trail(story, styles, nis2["audit_trail"])
+
     # --- Appendices ---
     for appendix in report_data.get("appendices", []):
         story.append(Paragraph(appendix["title"], styles["SectionTitle"]))
@@ -515,6 +758,10 @@ def generate_report(report_data, output_path):
             story.append(Spacer(1, 8 * mm))
         for p in appendix.get("paragraphs", []):
             story.append(Paragraph(p, styles["BodyText2"]))
+
+    # --- NIS2 Supply Chain Page (before Disclaimer) ---
+    if nis2 and nis2.get("supply_chain"):
+        build_supply_chain_page(story, styles, nis2["supply_chain"], report_data.get("scan_meta", {}))
 
     # --- Disclaimer ---
     disclaimer = report_data.get("disclaimer")
