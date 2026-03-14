@@ -10,7 +10,8 @@ import sys
 import tarfile
 import tempfile
 import time
-from datetime import datetime
+import uuid
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import psycopg2
@@ -54,50 +55,52 @@ def _get_db_connection() -> psycopg2.extensions.connection:
 
 def _create_report_record(
     conn: psycopg2.extensions.connection,
-    scan_id: str,
+    order_id: str,
     minio_path: str,
     file_size_bytes: int,
-) -> str:
-    """Insert a row into the reports table and return the new report id."""
+) -> tuple[str, str]:
+    """Insert a row into the reports table and return (report_id, download_token)."""
+    download_token = str(uuid.uuid4())
+    expires_at = datetime.now(timezone.utc) + timedelta(days=30)
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO reports (scan_id, minio_bucket, minio_path, file_size_bytes)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO reports (order_id, minio_bucket, minio_path, file_size_bytes, download_token, expires_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
-            (scan_id, REPORTS_BUCKET, minio_path, file_size_bytes),
+            (order_id, REPORTS_BUCKET, minio_path, file_size_bytes, download_token, expires_at),
         )
         report_id = cur.fetchone()[0]
     conn.commit()
-    return str(report_id)
+    return str(report_id), download_token
 
 
-def _update_scan_status(
+def _update_order_status(
     conn: psycopg2.extensions.connection,
-    scan_id: str,
+    order_id: str,
     status: str,
     error_message: str | None = None,
 ) -> None:
-    """Update the scan status (and optionally the error_message)."""
+    """Update the order status (and optionally the error_message)."""
     with conn.cursor() as cur:
         if error_message is not None:
             cur.execute(
                 """
-                UPDATE scans
+                UPDATE orders
                    SET status = %s, error_message = %s, updated_at = NOW()
                  WHERE id = %s
                 """,
-                (status, error_message, scan_id),
+                (status, error_message, order_id),
             )
         else:
             cur.execute(
                 """
-                UPDATE scans
+                UPDATE orders
                    SET status = %s, updated_at = NOW()
                  WHERE id = %s
                 """,
-                (status, scan_id),
+                (status, order_id),
             )
     conn.commit()
 
@@ -107,14 +110,14 @@ def _update_scan_status(
         r = redis.from_url(redis_url)
         event: dict = {
             "type": "status",
-            "scanId": scan_id,
+            "orderId": order_id,
             "status": status,
         }
         if error_message:
             event["error"] = error_message
-        r.publish(f"scan:events:{scan_id}", json.dumps(event))
+        r.publish(f"scan:events:{order_id}", json.dumps(event))
     except Exception as e:
-        log.error("redis_publish_failed", scan_id=scan_id, error=str(e))
+        log.error("redis_publish_failed", order_id=order_id, error=str(e))
 
 
 # ---------------------------------------------------------------------------
@@ -137,6 +140,8 @@ def _download_rawdata(minio_client: Minio, raw_data_path: str, dest: Path) -> Pa
     minio_client.fget_object(RAWDATA_BUCKET, raw_data_path, str(local_tar))
     log.info("rawdata_downloaded", path=raw_data_path, size=local_tar.stat().st_size)
     return local_tar
+
+
 
 
 def _upload_report(minio_client: Minio, local_path: Path, minio_path: str) -> int:
@@ -164,19 +169,19 @@ def process_job(job_data: dict) -> None:
     """Process a single report-generation job end-to-end.
 
     Expected *job_data* keys:
-      - scanId            (str, UUID)
-      - rawDataPath       (str, e.g. "<scanId>.tar.gz")
+      - orderId            (str, UUID)
+      - rawDataPath       (str, e.g. "<orderId>.tar.gz")
       - hostInventory     (dict, Phase-0 host inventory)
       - techProfiles      (list[dict], per-host technology profiles)
     """
-    scan_id: str = job_data["scanId"]
+    order_id: str = job_data.get("orderId", job_data.get("scanId", ""))
     raw_data_path: str = job_data["rawDataPath"]
     host_inventory: dict = job_data["hostInventory"]
     tech_profiles: list[dict] = job_data["techProfiles"]
     package: str = job_data.get("package", "professional")
 
-    work_dir = Path(tempfile.mkdtemp(prefix=f"report-{scan_id}-"))
-    log.info("job_started", scan_id=scan_id, package=package, work_dir=str(work_dir))
+    work_dir = Path(tempfile.mkdtemp(prefix=f"report-{order_id}-"))
+    log.info("job_started", order_id=order_id, package=package, work_dir=str(work_dir))
 
     conn: psycopg2.extensions.connection | None = None
 
@@ -221,7 +226,7 @@ def process_job(job_data: dict) -> None:
         parsed_meta = parsed.get("meta", {})
         scan_meta = {
             "domain": domain,
-            "scanId": scan_id,
+            "orderId": order_id,
             "startedAt": parsed_meta.get("startedAt", datetime.now().isoformat()),
             "completedAt": parsed_meta.get("finishedAt", datetime.now().isoformat()),
             "package": package,
@@ -236,33 +241,33 @@ def process_job(job_data: dict) -> None:
         log.info("report_data_mapped")
 
         # -- 6. Generate PDF --------------------------------------------------
-        pdf_path = work_dir / f"{scan_id}.pdf"
+        pdf_path = work_dir / f"{order_id}.pdf"
         generate_report(report_data, str(pdf_path))
         log.info("pdf_generated", path=str(pdf_path), size=pdf_path.stat().st_size)
 
         # -- 7. Upload PDF to MinIO -------------------------------------------
-        minio_pdf_path = f"{scan_id}.pdf"
+        minio_pdf_path = f"{order_id}.pdf"
         file_size = _upload_report(minio_client, pdf_path, minio_pdf_path)
 
         # -- 8. Create report record in DB ------------------------------------
-        report_id = _create_report_record(conn, scan_id, minio_pdf_path, file_size)
-        log.info("report_record_created", report_id=report_id)
+        report_id, download_token = _create_report_record(conn, order_id, minio_pdf_path, file_size)
+        log.info("report_record_created", report_id=report_id, download_token=download_token)
 
-        # -- 9. Update scan status to report_complete -------------------------
-        _update_scan_status(conn, scan_id, "report_complete")
-        log.info("job_completed", scan_id=scan_id, package=package)
+        # -- 9. Update order status to report_complete -------------------------
+        _update_order_status(conn, order_id, "report_complete")
+        log.info("job_completed", order_id=order_id, package=package)
 
     except Exception:
-        log.exception("job_failed", scan_id=scan_id)
-        # Best-effort: mark the scan as failed in the database
+        log.exception("job_failed", order_id=order_id)
+        # Best-effort: mark the order as failed in the database
         try:
             if conn is None:
                 conn = _get_db_connection()
             import traceback
             err_msg = traceback.format_exc()[-500:]  # keep last 500 chars
-            _update_scan_status(conn, scan_id, "failed", error_message=err_msg)
+            _update_order_status(conn, order_id, "failed", error_message=err_msg)
         except Exception:
-            log.exception("failed_to_update_scan_status", scan_id=scan_id)
+            log.exception("failed_to_update_order_status", order_id=order_id)
     finally:
         # -- 10. Clean up /tmp ------------------------------------------------
         try:
@@ -297,7 +302,7 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
                 log.error("invalid_job_data", data=raw_data.decode(errors="replace"))
                 continue
 
-            log.info("job_received", scan_id=job_data.get("scanId"))
+            log.info("job_received", order_id=job_data.get("orderId", job_data.get("scanId")))
             process_job(job_data)
 
         except redis.ConnectionError:

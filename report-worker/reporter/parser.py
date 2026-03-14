@@ -646,7 +646,7 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
 
     Args:
         scan_dir: Path to the extracted scan directory,
-                  e.g. ``/tmp/report-{scanId}/{scanId}``
+                  e.g. ``/tmp/report-{orderId}/{orderId}``
 
     Returns::
 

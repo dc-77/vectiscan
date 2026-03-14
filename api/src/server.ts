@@ -6,7 +6,7 @@ import { initBuckets } from './lib/minio.js';
 import { initWsManager } from './lib/ws-manager.js';
 import { authRoutes } from './routes/auth.js';
 import { healthRoutes } from './routes/health.js';
-import { scanRoutes } from './routes/scans.js';
+import { orderRoutes } from './routes/orders.js';
 import { wsRoutes } from './routes/ws.js';
 
 export function buildServer() {
@@ -23,7 +23,7 @@ export function buildServer() {
   server.register(websocket);
   server.register(authRoutes);
   server.register(healthRoutes);
-  server.register(scanRoutes);
+  server.register(orderRoutes);
   server.register(wsRoutes);
 
   return server;

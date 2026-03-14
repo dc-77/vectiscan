@@ -21,7 +21,7 @@ def run_tool(
     cmd: list[str],
     timeout: int,
     output_path: Optional[str] = None,
-    scan_id: Optional[str] = None,
+    order_id: Optional[str] = None,
     host_ip: Optional[str] = None,
     phase: int = 0,
     tool_name: str = "",
@@ -33,7 +33,7 @@ def run_tool(
         cmd: Command and arguments as list
         timeout: Timeout in seconds
         output_path: Optional path where tool writes its output
-        scan_id: Scan UUID for DB logging
+        order_id: Order UUID for DB logging
         host_ip: Host IP for DB logging
         phase: Scan phase (0, 1, 2)
         tool_name: Name of the tool
@@ -65,9 +65,9 @@ def run_tool(
             log.debug("tool_stderr", tool=tool_name, stderr=result.stderr[:500])
 
         # Save result to scan_results table
-        if scan_id:
+        if order_id:
             _save_result(
-                scan_id=scan_id,
+                order_id=order_id,
                 host_ip=host_ip,
                 phase=phase,
                 tool_name=tool_name,
@@ -82,9 +82,9 @@ def run_tool(
         duration_ms = int((time.monotonic() - start) * 1000)
         log.warning("tool_timeout", tool=tool_name, timeout=timeout)
 
-        if scan_id:
+        if order_id:
             _save_result(
-                scan_id=scan_id,
+                order_id=order_id,
                 host_ip=host_ip,
                 phase=phase,
                 tool_name=tool_name,
@@ -99,9 +99,9 @@ def run_tool(
         duration_ms = int((time.monotonic() - start) * 1000)
         log.error("tool_error", tool=tool_name, error=str(e))
 
-        if scan_id:
+        if order_id:
             _save_result(
-                scan_id=scan_id,
+                order_id=order_id,
                 host_ip=host_ip,
                 phase=phase,
                 tool_name=tool_name,
@@ -114,7 +114,7 @@ def run_tool(
 
 
 def _save_result(
-    scan_id: str,
+    order_id: str,
     host_ip: Optional[str],
     phase: int,
     tool_name: str,
@@ -127,9 +127,9 @@ def _save_result(
         conn = get_db_connection()
         with conn.cursor() as cur:
             cur.execute(
-                """INSERT INTO scan_results (scan_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms)
+                """INSERT INTO scan_results (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms)
                    VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (scan_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms),
+                (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms),
             )
         conn.commit()
         conn.close()

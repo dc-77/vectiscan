@@ -19,7 +19,7 @@ PHASE0_TIMEOUT = 600  # 10 Minuten Gesamt-Timeout
 MAX_HOSTS = 10
 
 
-def run_crtsh(domain: str, scan_dir: str, scan_id: str) -> list[str]:
+def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Query crt.sh for certificate transparency subdomains. Timeout 30s."""
     output_path = os.path.join(scan_dir, "phase0", "crtsh.json")
     subdomains: list[str] = []
@@ -29,7 +29,7 @@ def run_crtsh(domain: str, scan_dir: str, scan_id: str) -> list[str]:
         cmd=cmd,
         timeout=30,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         phase=0,
         tool_name="crtsh",
     )
@@ -64,7 +64,7 @@ def run_crtsh(domain: str, scan_dir: str, scan_id: str) -> list[str]:
     return subdomains
 
 
-def run_subfinder(domain: str, scan_dir: str, scan_id: str) -> list[str]:
+def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Run subfinder for passive subdomain enumeration. Timeout 120s."""
     output_path = os.path.join(scan_dir, "phase0", "subfinder.json")
     subdomains: list[str] = []
@@ -78,7 +78,7 @@ def run_subfinder(domain: str, scan_dir: str, scan_id: str) -> list[str]:
         cmd=cmd,
         timeout=120,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         phase=0,
         tool_name="subfinder",
     )
@@ -108,7 +108,7 @@ def run_subfinder(domain: str, scan_dir: str, scan_id: str) -> list[str]:
     return subdomains
 
 
-def run_amass(domain: str, scan_dir: str, scan_id: str) -> list[str]:
+def run_amass(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Run amass passive enumeration. Timeout 300s (5 Min)."""
     output_path = os.path.join(scan_dir, "phase0", "amass.json")
     subdomains: list[str] = []
@@ -122,7 +122,7 @@ def run_amass(domain: str, scan_dir: str, scan_id: str) -> list[str]:
         cmd=cmd,
         timeout=300,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         phase=0,
         tool_name="amass",
     )
@@ -152,7 +152,7 @@ def run_amass(domain: str, scan_dir: str, scan_id: str) -> list[str]:
     return subdomains
 
 
-def run_gobuster_dns(domain: str, scan_dir: str, scan_id: str) -> list[str]:
+def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Run gobuster DNS brute-force. Timeout 180s (3 Min)."""
     output_path = os.path.join(scan_dir, "phase0", "gobuster_dns.txt")
     subdomains: list[str] = []
@@ -168,7 +168,7 @@ def run_gobuster_dns(domain: str, scan_dir: str, scan_id: str) -> list[str]:
         cmd=cmd,
         timeout=180,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         phase=0,
         tool_name="gobuster_dns",
     )
@@ -198,7 +198,7 @@ def run_gobuster_dns(domain: str, scan_dir: str, scan_id: str) -> list[str]:
     return subdomains
 
 
-def run_zone_transfer(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
+def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, Any]:
     """Attempt DNS zone transfer via AXFR. Timeout 30s per NS."""
     output_path = os.path.join(scan_dir, "phase0", "zone_transfer.txt")
     result_data: dict[str, Any] = {"success": False, "data": {}}
@@ -231,7 +231,7 @@ def run_zone_transfer(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any
         exit_code, duration_ms = run_tool(
             cmd=cmd,
             timeout=30,
-            scan_id=scan_id,
+            order_id=order_id,
             phase=0,
             tool_name=f"zone_transfer_{ns}",
         )
@@ -266,7 +266,7 @@ def run_zone_transfer(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any
     return result_data
 
 
-def run_dnsx(subdomains: list[str], scan_dir: str, scan_id: str) -> list[dict[str, Any]]:
+def run_dnsx(subdomains: list[str], scan_dir: str, order_id: str) -> list[dict[str, Any]]:
     """Validate subdomains with dnsx and resolve IPs. Timeout 60s."""
     output_path = os.path.join(scan_dir, "phase0", "dnsx_validation.json")
     validated: list[dict[str, Any]] = []
@@ -296,7 +296,7 @@ def run_dnsx(subdomains: list[str], scan_dir: str, scan_id: str) -> list[dict[st
             cmd=cmd,
             timeout=60,
             output_path=output_path,
-            scan_id=scan_id,
+            order_id=order_id,
             phase=0,
             tool_name="dnsx",
         )
@@ -331,7 +331,7 @@ def run_dnsx(subdomains: list[str], scan_dir: str, scan_id: str) -> list[dict[st
     return validated
 
 
-def collect_dns_records(domain: str, scan_dir: str, scan_id: str) -> dict[str, Any]:
+def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, Any]:
     """Collect SPF, DMARC, DKIM, MX, NS records via dig. Saves to dns_records.json."""
     output_path = os.path.join(scan_dir, "phase0", "dns_records.json")
     records: dict[str, Any] = {
@@ -418,7 +418,7 @@ def collect_dns_records(domain: str, scan_dir: str, scan_id: str) -> dict[str, A
     run_tool(
         cmd=["echo", "dns_records_collected"],
         timeout=5,
-        scan_id=scan_id,
+        order_id=order_id,
         phase=0,
         tool_name="dns_records",
     )
@@ -535,7 +535,7 @@ def merge_and_group(
     return inventory
 
 
-def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] | None = None) -> dict[str, Any]:
+def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any] | None = None) -> dict[str, Any]:
     """
     Orchestrate Phase 0: DNS Reconnaissance.
 
@@ -553,7 +553,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] 
     phase0_dir = os.path.join(scan_dir, "phase0")
     os.makedirs(phase0_dir, exist_ok=True)
 
-    log.info("phase0_start", domain=domain, scan_id=scan_id)
+    log.info("phase0_start", domain=domain, order_id=order_id)
 
     all_subdomains: list[str] = []
 
@@ -564,7 +564,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] 
     # --- crt.sh ---
     if _time_remaining() > 0 and "crtsh" in phase0_tools:
         try:
-            subs = run_crtsh(domain, scan_dir, scan_id)
+            subs = run_crtsh(domain, scan_dir, order_id)
             all_subdomains.extend(subs)
             log.info("phase0_crtsh_done", found=len(subs))
         except Exception as e:
@@ -573,7 +573,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] 
     # --- subfinder ---
     if _time_remaining() > 0 and "subfinder" in phase0_tools:
         try:
-            subs = run_subfinder(domain, scan_dir, scan_id)
+            subs = run_subfinder(domain, scan_dir, order_id)
             all_subdomains.extend(subs)
             log.info("phase0_subfinder_done", found=len(subs))
         except Exception as e:
@@ -582,7 +582,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] 
     # --- amass ---
     if _time_remaining() > 0 and "amass" in phase0_tools:
         try:
-            subs = run_amass(domain, scan_dir, scan_id)
+            subs = run_amass(domain, scan_dir, order_id)
             all_subdomains.extend(subs)
             log.info("phase0_amass_done", found=len(subs))
         except Exception as e:
@@ -591,7 +591,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] 
     # --- gobuster dns ---
     if _time_remaining() > 0 and "gobuster_dns" in phase0_tools:
         try:
-            subs = run_gobuster_dns(domain, scan_dir, scan_id)
+            subs = run_gobuster_dns(domain, scan_dir, order_id)
             all_subdomains.extend(subs)
             log.info("phase0_gobuster_done", found=len(subs))
         except Exception as e:
@@ -601,7 +601,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] 
     zone_transfer: dict[str, Any] = {"success": False, "data": {}}
     if _time_remaining() > 0 and "axfr" in phase0_tools:
         try:
-            zone_transfer = run_zone_transfer(domain, scan_dir, scan_id)
+            zone_transfer = run_zone_transfer(domain, scan_dir, order_id)
             log.info("phase0_zone_transfer_done", success=zone_transfer["success"])
         except Exception as e:
             log.error("phase0_zone_transfer_error", error=str(e))
@@ -610,7 +610,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] 
     dns_records: dict[str, Any] = {"spf": None, "dmarc": None, "dkim": False, "mx": [], "ns": []}
     if _time_remaining() > 0:
         try:
-            dns_records = collect_dns_records(domain, scan_dir, scan_id)
+            dns_records = collect_dns_records(domain, scan_dir, order_id)
             log.info("phase0_dns_records_done")
         except Exception as e:
             log.error("phase0_dns_records_error", error=str(e))
@@ -623,7 +623,7 @@ def run_phase0(domain: str, scan_dir: str, scan_id: str, config: dict[str, Any] 
     if _time_remaining() > 0 and "dnsx" in phase0_tools:
         try:
             unique_subs = sorted(set(s.lower() for s in all_subdomains if s))
-            dnsx_results = run_dnsx(unique_subs, scan_dir, scan_id)
+            dnsx_results = run_dnsx(unique_subs, scan_dir, order_id)
             log.info("phase0_dnsx_done", validated=len(dnsx_results))
         except Exception as e:
             log.error("phase0_dnsx_error", error=str(e))

@@ -1,22 +1,22 @@
 'use client';
 
 import { useEffect, useRef, useCallback, useState } from 'react';
-import type { ScanStatus } from '@/lib/api';
+import type { OrderStatus } from '@/lib/api';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 /** Derive WebSocket URL from the API URL (http→ws, https→wss). */
-function getWsUrl(scanId: string): string {
+function getWsUrl(orderId: string): string {
   const url = new URL(API_URL);
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   url.pathname = '/ws';
-  url.searchParams.set('scanId', scanId);
+  url.searchParams.set('orderId', orderId);
   return url.toString();
 }
 
 export interface WsMessage {
   type: 'connected' | 'progress' | 'status' | 'hosts_discovered' | 'error';
-  scanId?: string;
+  orderId?: string;
   status?: string;
   currentPhase?: string;
   currentTool?: string;
@@ -36,13 +36,13 @@ interface UseWebSocketOptions {
 }
 
 /**
- * Hook that connects to the VectiScan WebSocket endpoint for a scan.
+ * Hook that connects to the VectiScan WebSocket endpoint for an order.
  *
  * Returns `connected` state. When disconnected, the parent component
  * should fall back to HTTP polling.
  */
 export function useWebSocket(
-  scanId: string | null,
+  orderId: string | null,
   { onMessage, onConnectionChange }: UseWebSocketOptions,
 ) {
   const wsRef = useRef<WebSocket | null>(null);
@@ -101,11 +101,11 @@ export function useWebSocket(
   }, [cleanup, onMessage, onConnectionChange]);
 
   useEffect(() => {
-    if (scanId) {
-      connect(scanId);
+    if (orderId) {
+      connect(orderId);
     }
     return cleanup;
-  }, [scanId, connect, cleanup]);
+  }, [orderId, connect, cleanup]);
 
   return { connected, close: cleanup };
 }

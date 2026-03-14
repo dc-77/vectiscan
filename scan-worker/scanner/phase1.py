@@ -58,7 +58,7 @@ def _parse_nmap_xml(xml_path: str) -> dict[str, Any]:
     return result
 
 
-def run_nmap(ip: str, scan_dir: str, scan_id: str, nmap_ports: str = "--top-ports 1000") -> dict[str, Any]:
+def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-ports 1000") -> dict[str, Any]:
     """Run nmap service/version scan against a host.
 
     Returns parsed results dict with open ports and services.
@@ -85,7 +85,7 @@ def run_nmap(ip: str, scan_dir: str, scan_id: str, nmap_ports: str = "--top-port
         cmd=cmd,
         timeout=300,
         output_path=xml_path,
-        scan_id=scan_id,
+        order_id=order_id,
         host_ip=ip,
         phase=1,
         tool_name="nmap",
@@ -98,7 +98,7 @@ def run_nmap(ip: str, scan_dir: str, scan_id: str, nmap_ports: str = "--top-port
     return _parse_nmap_xml(xml_path)
 
 
-def run_webtech(fqdn: str, host_dir: str, scan_id: str) -> dict[str, Any]:
+def run_webtech(fqdn: str, host_dir: str, order_id: str) -> dict[str, Any]:
     """Run webtech to detect web technologies.
 
     Captures stdout as JSON and saves to host_dir/phase1/webtech.json.
@@ -141,7 +141,7 @@ def run_webtech(fqdn: str, host_dir: str, scan_id: str) -> dict[str, Any]:
         return {}
 
 
-def run_wafw00f(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dict[str, Any]]:
+def run_wafw00f(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
     """Run wafw00f to detect WAF.
 
     Returns WAF info dict or None if no WAF detected.
@@ -157,7 +157,7 @@ def run_wafw00f(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dic
         cmd=cmd,
         timeout=30,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         host_ip=ip,
         phase=1,
         tool_name="wafw00f",
@@ -281,7 +281,7 @@ def run_phase1(
     ip: str,
     fqdns: list[str],
     scan_dir: str,
-    scan_id: str,
+    order_id: str,
     progress_callback: Callable[[str, str, str], None],
     config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -290,9 +290,9 @@ def run_phase1(
     Args:
         ip: Host IP address.
         fqdns: List of FQDNs resolving to this IP.
-        scan_dir: Base scan directory (e.g. /tmp/scan-<scanId>).
-        scan_id: Scan UUID.
-        progress_callback: Called after each tool with (scan_id, tool_name, status).
+        scan_dir: Base scan directory (e.g. /tmp/scan-<orderId>).
+        order_id: Order UUID.
+        progress_callback: Called after each tool with (order_id, tool_name, status).
         config: Package configuration dict (optional).
 
     Returns:
@@ -304,22 +304,22 @@ def run_phase1(
     phase1_dir = f"{host_dir}/phase1"
     os.makedirs(phase1_dir, exist_ok=True)
 
-    log.info("phase1_start", ip=ip, fqdns=fqdns, scan_id=scan_id)
+    log.info("phase1_start", ip=ip, fqdns=fqdns, order_id=order_id)
 
     # Run nmap
-    nmap_result = run_nmap(ip, scan_dir, scan_id, nmap_ports)
-    progress_callback(scan_id, "nmap", "complete")
+    nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports)
+    progress_callback(order_id, "nmap", "complete")
 
     # Use first FQDN for web-based tools
     primary_fqdn = fqdns[0] if fqdns else ip
 
     # Run webtech
-    webtech_result = run_webtech(primary_fqdn, host_dir, scan_id)
-    progress_callback(scan_id, "webtech", "complete")
+    webtech_result = run_webtech(primary_fqdn, host_dir, order_id)
+    progress_callback(order_id, "webtech", "complete")
 
     # Run wafw00f
-    wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, scan_id)
-    progress_callback(scan_id, "wafw00f", "complete")
+    wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, order_id)
+    progress_callback(order_id, "wafw00f", "complete")
 
     # Build combined tech profile
     tech_profile = build_tech_profile(
@@ -331,5 +331,5 @@ def run_phase1(
         host_dir=host_dir,
     )
 
-    log.info("phase1_complete", ip=ip, scan_id=scan_id)
+    log.info("phase1_complete", ip=ip, order_id=order_id)
     return tech_profile

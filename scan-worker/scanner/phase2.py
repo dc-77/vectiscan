@@ -22,7 +22,7 @@ SECURITY_HEADERS = [
 ]
 
 
-def run_testssl(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dict[str, Any]]:
+def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
     """Run testssl.sh to check TLS/SSL configuration.
 
     Only called when has_ssl=true. Returns parsed results or None on failure.
@@ -43,7 +43,7 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dic
         cmd=cmd,
         timeout=300,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         host_ip=ip,
         phase=2,
         tool_name="testssl",
@@ -64,7 +64,7 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dic
         return None
 
 
-def run_nikto(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dict[str, Any]]:
+def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
     """Run nikto web server scanner.
 
     Returns parsed results or None on failure.
@@ -86,7 +86,7 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dict[
         cmd=cmd,
         timeout=600,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         host_ip=ip,
         phase=2,
         tool_name="nikto",
@@ -106,7 +106,7 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[dict[
         return None
 
 
-def run_nuclei(fqdn: str, ip: str, host_dir: str, scan_id: str) -> list[dict[str, Any]]:
+def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[dict[str, Any]]:
     """Run nuclei vulnerability scanner.
 
     Returns list of findings or empty list on failure.
@@ -128,7 +128,7 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, scan_id: str) -> list[dict[str
         cmd=cmd,
         timeout=900,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         host_ip=ip,
         phase=2,
         tool_name="nuclei",
@@ -152,7 +152,7 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, scan_id: str) -> list[dict[str
     return findings
 
 
-def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[str]:
+def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[str]:
     """Run gobuster directory brute-force.
 
     Returns path to output file or None on failure.
@@ -174,7 +174,7 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optiona
         cmd=cmd,
         timeout=600,
         output_path=output_path,
-        scan_id=scan_id,
+        order_id=order_id,
         host_ip=ip,
         phase=2,
         tool_name="gobuster_dir",
@@ -188,7 +188,7 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optiona
     return output_path
 
 
-def run_gowitness(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[str]:
+def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[str]:
     """Run gowitness to take a screenshot.
 
     Returns path to screenshot directory or None on failure.
@@ -206,7 +206,7 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[s
         cmd=cmd,
         timeout=30,
         output_path=None,
-        scan_id=scan_id,
+        order_id=order_id,
         host_ip=ip,
         phase=2,
         tool_name="gowitness",
@@ -220,7 +220,7 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, scan_id: str) -> Optional[s
     return phase2_dir
 
 
-def run_header_check(fqdn: str, ip: str, host_dir: str, scan_id: str) -> dict[str, Any]:
+def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[str, Any]:
     """Check HTTP security headers using curl.
 
     Evaluates presence of key security headers and produces a score.
@@ -305,7 +305,7 @@ def run_phase2(
     fqdns: list[str],
     tech_profile: dict[str, Any],
     scan_dir: str,
-    scan_id: str,
+    order_id: str,
     progress_callback: Callable[[str, str, str], None],
     config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -315,9 +315,9 @@ def run_phase2(
         ip: Host IP address.
         fqdns: List of FQDNs resolving to this IP.
         tech_profile: Tech profile from Phase 1.
-        scan_dir: Base scan directory (e.g. /tmp/scan-<scanId>).
-        scan_id: Scan UUID.
-        progress_callback: Called after each tool with (scan_id, tool_name, status).
+        scan_dir: Base scan directory (e.g. /tmp/scan-<orderId>).
+        order_id: Order UUID.
+        progress_callback: Called after each tool with (order_id, tool_name, status).
         config: Package configuration dict (optional).
 
     Returns:
@@ -334,7 +334,7 @@ def run_phase2(
     primary_fqdn = fqdns[0] if fqdns else ip
     has_ssl = tech_profile.get("has_ssl", False)
 
-    log.info("phase2_start", ip=ip, fqdn=primary_fqdn, scan_id=scan_id, has_ssl=has_ssl)
+    log.info("phase2_start", ip=ip, fqdn=primary_fqdn, order_id=order_id, has_ssl=has_ssl)
 
     results: dict[str, Any] = {
         "ip": ip,
@@ -344,10 +344,10 @@ def run_phase2(
 
     # testssl (only if SSL present and in package)
     if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
-        testssl_result = run_testssl(primary_fqdn, ip, host_dir, scan_id)
+        testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id)
         results["testssl"] = testssl_result
         results["tools_run"].append("testssl")
-        progress_callback(scan_id, "testssl", "complete")
+        progress_callback(order_id, "testssl", "complete")
     else:
         if not has_ssl:
             log.info("testssl_skipped", ip=ip, reason="no_ssl")
@@ -356,48 +356,48 @@ def run_phase2(
 
     # nikto
     if phase2_tools is None or "nikto" in phase2_tools:
-        nikto_result = run_nikto(primary_fqdn, ip, host_dir, scan_id)
+        nikto_result = run_nikto(primary_fqdn, ip, host_dir, order_id)
         results["nikto"] = nikto_result
         results["tools_run"].append("nikto")
-        progress_callback(scan_id, "nikto", "complete")
+        progress_callback(order_id, "nikto", "complete")
     else:
         log.info("nikto_skipped", ip=ip, reason="not_in_package")
 
     # nuclei
     if phase2_tools is None or "nuclei" in phase2_tools:
-        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, scan_id)
+        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id)
         results["nuclei"] = nuclei_result
         results["tools_run"].append("nuclei")
-        progress_callback(scan_id, "nuclei", "complete")
+        progress_callback(order_id, "nuclei", "complete")
     else:
         log.info("nuclei_skipped", ip=ip, reason="not_in_package")
 
     # gobuster dir
     if phase2_tools is None or "gobuster_dir" in phase2_tools:
-        gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, scan_id)
+        gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, order_id)
         results["gobuster_dir"] = gobuster_result
         results["tools_run"].append("gobuster_dir")
-        progress_callback(scan_id, "gobuster_dir", "complete")
+        progress_callback(order_id, "gobuster_dir", "complete")
     else:
         log.info("gobuster_dir_skipped", ip=ip, reason="not_in_package")
 
     # gowitness
     if phase2_tools is None or "gowitness" in phase2_tools:
-        gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, scan_id)
+        gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, order_id)
         results["gowitness"] = gowitness_result
         results["tools_run"].append("gowitness")
-        progress_callback(scan_id, "gowitness", "complete")
+        progress_callback(order_id, "gowitness", "complete")
     else:
         log.info("gowitness_skipped", ip=ip, reason="not_in_package")
 
     # header check
     if phase2_tools is None or "headers" in phase2_tools:
-        header_result = run_header_check(primary_fqdn, ip, host_dir, scan_id)
+        header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)
         results["headers"] = header_result
         results["tools_run"].append("header_check")
-        progress_callback(scan_id, "header_check", "complete")
+        progress_callback(order_id, "header_check", "complete")
     else:
         log.info("headers_skipped", ip=ip, reason="not_in_package")
 
-    log.info("phase2_complete", ip=ip, scan_id=scan_id, tools_run=len(results["tools_run"]))
+    log.info("phase2_complete", ip=ip, order_id=order_id, tools_run=len(results["tools_run"]))
     return results

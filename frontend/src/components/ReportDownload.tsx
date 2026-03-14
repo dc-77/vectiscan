@@ -3,12 +3,12 @@
 import { getReportDownloadUrl } from '@/lib/api';
 
 interface Props {
-  scanId: string;
+  orderId: string;
   domain: string;
   onNewScan?: () => void;
 }
 
-export default function ReportDownload({ scanId, domain, onNewScan }: Props) {
+export default function ReportDownload({ orderId, domain, onNewScan }: Props) {
   const dateStr = new Date().toISOString().split('T')[0];
   const fileName = `vectiscan-${domain}-${dateStr}.pdf`;
 
@@ -19,7 +19,7 @@ export default function ReportDownload({ scanId, domain, onNewScan }: Props) {
       <p className="text-sm text-gray-400">{fileName}</p>
       <div className="flex flex-col items-center gap-3">
         <a
-          href={getReportDownloadUrl(scanId)}
+          href={getReportDownloadUrl(orderId)}
           download={fileName}
           className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
         >

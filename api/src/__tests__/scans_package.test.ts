@@ -1,5 +1,5 @@
 import Fastify, { FastifyInstance } from 'fastify';
-import { scanRoutes } from '../routes/scans';
+import { orderRoutes } from '../routes/orders';
 
 // Mock the lib modules
 jest.mock('../lib/db', () => ({
@@ -11,6 +11,7 @@ jest.mock('../lib/db', () => ({
 jest.mock('../lib/queue', () => ({
   scanQueue: { add: jest.fn() },
   reportQueue: { add: jest.fn() },
+  publishEvent: jest.fn(),
 }));
 
 jest.mock('../lib/minio', () => {
@@ -31,10 +32,11 @@ const mockQuery = query as jest.MockedFunction<typeof query>;
 const mockScanQueueAdd = scanQueue.add as jest.MockedFunction<typeof scanQueue.add>;
 
 const TEST_UUID = '550e8400-e29b-41d4-a716-446655440000';
+const CUST_UUID = 'cust-0000-0000-0000-000000000001';
 
-function mockInsertResult(pkg: string) {
+function mockCustomerResult() {
   return {
-    rows: [{ id: TEST_UUID, domain: 'example.com', status: 'created', package: pkg, created_at: new Date() }],
+    rows: [{ id: CUST_UUID }],
     command: 'INSERT' as const,
     rowCount: 1,
     oid: 0,
@@ -42,21 +44,32 @@ function mockInsertResult(pkg: string) {
   };
 }
 
-function mockScanRow(pkg: string) {
+function mockInsertResult(pkg: string) {
+  return {
+    rows: [{ id: TEST_UUID, target_url: 'example.com', status: 'created', package: pkg, created_at: new Date() }],
+    command: 'INSERT' as const,
+    rowCount: 1,
+    oid: 0,
+    fields: [],
+  };
+}
+
+function mockOrderRow(pkg: string) {
   return {
     rows: [{
       id: TEST_UUID,
-      domain: 'example.com',
+      target_url: 'example.com',
       status: 'created',
       package: pkg,
+      customer_id: CUST_UUID,
       discovered_hosts: null,
       hosts_total: 0,
       hosts_completed: 0,
       current_phase: null,
       current_tool: null,
       current_host: null,
-      started_at: null,
-      finished_at: null,
+      scan_started_at: null,
+      scan_finished_at: null,
       error_message: null,
       created_at: new Date(),
     }],
@@ -75,7 +88,7 @@ describe('Package selection', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     server = Fastify({ logger: false });
-    await server.register(scanRoutes);
+    await server.register(orderRoutes);
     await server.ready();
   });
 
@@ -83,15 +96,16 @@ describe('Package selection', () => {
     await server.close();
   });
 
-  describe('POST /api/scans with package', () => {
+  describe('POST /api/orders with package', () => {
     it('should accept package=basic', async () => {
+      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('basic'));
       mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
-        url: '/api/scans',
-        payload: { domain: 'example.com', package: 'basic' },
+        url: '/api/orders',
+        payload: { domain: 'example.com', email: 'test@example.com', package: 'basic' },
       });
 
       expect(res.statusCode).toBe(201);
@@ -101,13 +115,14 @@ describe('Package selection', () => {
     });
 
     it('should accept package=professional', async () => {
+      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('professional'));
       mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
-        url: '/api/scans',
-        payload: { domain: 'example.com', package: 'professional' },
+        url: '/api/orders',
+        payload: { domain: 'example.com', email: 'test@example.com', package: 'professional' },
       });
 
       expect(res.statusCode).toBe(201);
@@ -115,13 +130,14 @@ describe('Package selection', () => {
     });
 
     it('should accept package=nis2', async () => {
+      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('nis2'));
       mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
-        url: '/api/scans',
-        payload: { domain: 'example.com', package: 'nis2' },
+        url: '/api/orders',
+        payload: { domain: 'example.com', email: 'test@example.com', package: 'nis2' },
       });
 
       expect(res.statusCode).toBe(201);
@@ -131,8 +147,8 @@ describe('Package selection', () => {
     it('should reject invalid package', async () => {
       const res = await server.inject({
         method: 'POST',
-        url: '/api/scans',
-        payload: { domain: 'example.com', package: 'invalid' },
+        url: '/api/orders',
+        payload: { domain: 'example.com', email: 'test@example.com', package: 'invalid' },
       });
 
       expect(res.statusCode).toBe(400);
@@ -142,49 +158,51 @@ describe('Package selection', () => {
     });
 
     it('should default to professional when no package specified', async () => {
+      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('professional'));
       mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       const res = await server.inject({
         method: 'POST',
-        url: '/api/scans',
-        payload: { domain: 'example.com' },
+        url: '/api/orders',
+        payload: { domain: 'example.com', email: 'test@example.com' },
       });
 
       expect(res.statusCode).toBe(201);
       expect(res.json().data.package).toBe('professional');
-      // Verify DB was called with 'professional'
+      // Verify DB was called with 'professional' (second query is the order insert)
       expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('INSERT INTO scans'),
-        ['example.com', 'professional'],
+        expect.stringContaining('INSERT INTO orders'),
+        [CUST_UUID, 'example.com', 'professional'],
       );
     });
 
     it('should include package in queue payload', async () => {
+      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('nis2'));
       mockScanQueueAdd.mockResolvedValueOnce({} as never);
 
       await server.inject({
         method: 'POST',
-        url: '/api/scans',
-        payload: { domain: 'example.com', package: 'nis2' },
+        url: '/api/orders',
+        payload: { domain: 'example.com', email: 'test@example.com', package: 'nis2' },
       });
 
       expect(mockScanQueueAdd).toHaveBeenCalledWith('scan', {
-        scanId: TEST_UUID,
+        orderId: TEST_UUID,
         targetDomain: 'example.com',
         package: 'nis2',
       });
     });
   });
 
-  describe('GET /api/scans/:id with package', () => {
+  describe('GET /api/orders/:id with package', () => {
     it('should return package and estimatedDuration for basic', async () => {
       mockQuery
-        .mockResolvedValueOnce(mockScanRow('basic'))
+        .mockResolvedValueOnce(mockOrderRow('basic'))
         .mockResolvedValueOnce(emptyResult);
 
-      const res = await server.inject({ method: 'GET', url: `/api/scans/${TEST_UUID}` });
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}` });
       expect(res.statusCode).toBe(200);
       const body = res.json();
       expect(body.data.package).toBe('basic');
@@ -193,10 +211,10 @@ describe('Package selection', () => {
 
     it('should return package and estimatedDuration for professional', async () => {
       mockQuery
-        .mockResolvedValueOnce(mockScanRow('professional'))
+        .mockResolvedValueOnce(mockOrderRow('professional'))
         .mockResolvedValueOnce(emptyResult);
 
-      const res = await server.inject({ method: 'GET', url: `/api/scans/${TEST_UUID}` });
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}` });
       const body = res.json();
       expect(body.data.package).toBe('professional');
       expect(body.data.estimatedDuration).toBe('~45 Minuten');
@@ -204,10 +222,10 @@ describe('Package selection', () => {
 
     it('should return package and estimatedDuration for nis2', async () => {
       mockQuery
-        .mockResolvedValueOnce(mockScanRow('nis2'))
+        .mockResolvedValueOnce(mockOrderRow('nis2'))
         .mockResolvedValueOnce(emptyResult);
 
-      const res = await server.inject({ method: 'GET', url: `/api/scans/${TEST_UUID}` });
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}` });
       const body = res.json();
       expect(body.data.package).toBe('nis2');
       expect(body.data.estimatedDuration).toBe('~45 Minuten');

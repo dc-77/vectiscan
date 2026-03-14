@@ -1,14 +1,14 @@
 /**
- * WebSocket Manager — Redis Pub/Sub → WebSocket broadcast.
+ * WebSocket Manager — Redis Pub/Sub -> WebSocket broadcast.
  *
- * Subscribes to `scan:events:{scanId}` channels and forwards
+ * Subscribes to `scan:events:{orderId}` channels and forwards
  * messages to connected WebSocket clients.
  */
 import { createClient, type RedisClientType } from 'redis';
 import { type WebSocket } from 'ws';
 import { type FastifyBaseLogger } from 'fastify';
 
-/** Map of scanId → Set of connected WebSocket clients */
+/** Map of orderId -> Set of connected WebSocket clients */
 const clients = new Map<string, Set<WebSocket>>();
 
 let subscriber: RedisClientType | null = null;
@@ -27,14 +27,14 @@ export async function initWsManager(log: FastifyBaseLogger): Promise<void> {
   log.info('WebSocket manager: Redis subscriber connected');
 }
 
-export function subscribe(scanId: string, ws: WebSocket): void {
-  if (!clients.has(scanId)) {
-    clients.set(scanId, new Set());
+export function subscribe(orderId: string, ws: WebSocket): void {
+  if (!clients.has(orderId)) {
+    clients.set(orderId, new Set());
 
-    // Subscribe to Redis channel for this scan
-    const channel = `scan:events:${scanId}`;
+    // Subscribe to Redis channel for this order (channel name kept for backward compat)
+    const channel = `scan:events:${orderId}`;
     subscriber?.subscribe(channel, (message) => {
-      const sockets = clients.get(scanId);
+      const sockets = clients.get(orderId);
       if (!sockets) return;
 
       for (const socket of sockets) {
@@ -43,25 +43,25 @@ export function subscribe(scanId: string, ws: WebSocket): void {
         }
       }
     }).catch((err) => {
-      logger?.error({ err, scanId }, 'Failed to subscribe to Redis channel');
+      logger?.error({ err, orderId }, 'Failed to subscribe to Redis channel');
     });
   }
 
-  clients.get(scanId)!.add(ws);
-  logger?.debug({ scanId, clients: clients.get(scanId)!.size }, 'WebSocket client subscribed');
+  clients.get(orderId)!.add(ws);
+  logger?.debug({ orderId, clients: clients.get(orderId)!.size }, 'WebSocket client subscribed');
 }
 
-export function unsubscribe(scanId: string, ws: WebSocket): void {
-  const sockets = clients.get(scanId);
+export function unsubscribe(orderId: string, ws: WebSocket): void {
+  const sockets = clients.get(orderId);
   if (!sockets) return;
 
   sockets.delete(ws);
 
   if (sockets.size === 0) {
-    clients.delete(scanId);
-    const channel = `scan:events:${scanId}`;
+    clients.delete(orderId);
+    const channel = `scan:events:${orderId}`;
     subscriber?.unsubscribe(channel).catch((err) => {
-      logger?.error({ err, scanId }, 'Failed to unsubscribe from Redis channel');
+      logger?.error({ err, orderId }, 'Failed to unsubscribe from Redis channel');
     });
   }
 }
