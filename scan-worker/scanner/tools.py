@@ -15,7 +15,11 @@ log = structlog.get_logger()
 
 def get_db_connection():
     """Get PostgreSQL connection from DATABASE_URL env var."""
-    return psycopg2.connect(os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"))
+    return psycopg2.connect(
+        os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"),
+        connect_timeout=10,
+        options="-c statement_timeout=30000",
+    )
 
 
 def _kill_process_group(proc: subprocess.Popen) -> None:

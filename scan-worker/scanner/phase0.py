@@ -481,24 +481,32 @@ def merge_and_group(
         for fqdns in ip_to_fqdns.values()
     )
     if not domain_in_results:
+        old_timeout = socket.getdefaulttimeout()
         try:
+            socket.setdefaulttimeout(10)
             infos = socket.getaddrinfo(domain, None, proto=socket.IPPROTO_TCP)
             fallback_ips = sorted({info[4][0] for info in infos})
             for fb_ip in fallback_ips:
                 ip_to_fqdns[fb_ip].add(domain.lower())
             log.info("base_domain_fallback", domain=domain, ips=fallback_ips)
-        except (socket.gaierror, OSError) as e:
+        except (socket.gaierror, socket.timeout, OSError) as e:
             log.warning("base_domain_resolve_failed", domain=domain, error=str(e))
+        finally:
+            socket.setdefaulttimeout(old_timeout)
 
     # Build hosts list
     hosts: list[dict[str, Any]] = []
     for ip, fqdns in sorted(ip_to_fqdns.items()):
-        # Attempt reverse DNS
+        # Attempt reverse DNS (with 5s timeout to prevent hangs)
         rdns = ""
+        old_timeout = socket.getdefaulttimeout()
         try:
+            socket.setdefaulttimeout(5)
             rdns = socket.gethostbyaddr(ip)[0]
-        except (socket.herror, socket.gaierror, OSError):
+        except (socket.herror, socket.gaierror, socket.timeout, OSError):
             pass
+        finally:
+            socket.setdefaulttimeout(old_timeout)
 
         hosts.append({
             "ip": ip,

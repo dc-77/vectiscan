@@ -17,7 +17,11 @@ def _get_redis() -> redis.Redis:
 
 
 def _get_db():
-    return psycopg2.connect(os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"))
+    return psycopg2.connect(
+        os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"),
+        connect_timeout=10,
+        options="-c statement_timeout=30000",
+    )
 
 
 def update_progress(
