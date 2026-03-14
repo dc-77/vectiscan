@@ -35,10 +35,10 @@ class TestGetConfig:
 
     def test_professional_phase2_has_all_tools(self):
         config = get_config("professional")
-        expected = ["testssl", "nikto", "nuclei", "gobuster_dir", "gowitness", "headers"]
+        expected = ["testssl", "nikto", "nuclei", "gobuster_dir", "gowitness", "headers", "httpx", "katana", "wpscan"]
         for tool in expected:
             assert tool in config["phase2_tools"]
-        assert len(config["phase2_tools"]) == 6
+        assert len(config["phase2_tools"]) == 9
 
     def test_professional_max_hosts(self):
         config = get_config("professional")
