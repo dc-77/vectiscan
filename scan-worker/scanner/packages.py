@@ -4,7 +4,7 @@ from typing import Any
 
 PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
     "basic": {
-        "phase0_tools": ["crtsh", "subfinder"],
+        "phase0_tools": ["crtsh", "subfinder", "dnsx"],
         "phase0_timeout": 300,        # 5 Minuten
         "max_hosts": 3,
         "nmap_ports": "--top-ports 100",

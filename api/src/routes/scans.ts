@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { query } from '../lib/db.js';
-import { scanQueue } from '../lib/queue.js';
+import { scanQueue, publishEvent } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 
@@ -153,5 +153,51 @@ export async function scanRoutes(server: FastifyInstance): Promise<void> {
       .header('Content-Disposition', `attachment; filename="${fileName}"`)
       .header('Content-Length', fileSize)
       .send(stream);
+  });
+
+  // DELETE /api/scans/:id — Cancel a running scan
+  server.delete<{ Params: ScanParams }>('/api/scans/:id', async (request, reply) => {
+    const { id } = request.params;
+
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!UUID_REGEX.test(id)) {
+      return reply.status(400).send({ success: false, error: 'Invalid scan ID format' });
+    }
+
+    const result = await query(
+      'SELECT id, status FROM scans WHERE id = $1',
+      [id],
+    );
+
+    if (result.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Scan not found' });
+    }
+
+    const scan = result.rows[0] as Record<string, unknown>;
+    const status = scan.status as string;
+
+    // Only cancel scans that are still running
+    const cancellableStatuses = ['created', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
+    if (!cancellableStatuses.includes(status)) {
+      return reply.status(409).send({
+        success: false,
+        error: `Scan cannot be cancelled in status: ${status}`,
+      });
+    }
+
+    await query(
+      "UPDATE scans SET status = 'cancelled', error_message = 'Vom Benutzer abgebrochen', finished_at = NOW(), updated_at = NOW() WHERE id = $1",
+      [id],
+    );
+
+    // Notify via Redis Pub/Sub so WebSocket clients get the update
+    await publishEvent(id, {
+      type: 'status',
+      scanId: id,
+      status: 'cancelled',
+      error: 'Vom Benutzer abgebrochen',
+    });
+
+    return { success: true, data: null };
   });
 }
