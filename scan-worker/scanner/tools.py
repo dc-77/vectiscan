@@ -1,7 +1,8 @@
-"""Tool-Runner — subprocess wrapper with timeout and logging."""
+"""Tool-Runner — subprocess wrapper with timeout and process-group kill."""
 
 import json
 import os
+import signal
 import subprocess
 import time
 from typing import Optional
@@ -17,6 +18,18 @@ def get_db_connection():
     return psycopg2.connect(os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"))
 
 
+def _kill_process_group(proc: subprocess.Popen) -> None:
+    """Kill the entire process group so child processes don't linger."""
+    try:
+        os.killpg(proc.pid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        # Process already exited or we lack permission — try direct kill
+        try:
+            proc.kill()
+        except ProcessLookupError:
+            pass
+
+
 def run_tool(
     cmd: list[str],
     timeout: int,
@@ -28,6 +41,9 @@ def run_tool(
 ) -> tuple[int, int]:
     """
     Run an external tool as subprocess with timeout.
+
+    Uses start_new_session=True so that on timeout the entire process group
+    (including child processes spawned by the tool) can be killed cleanly.
 
     Args:
         cmd: Command and arguments as list
@@ -44,15 +60,18 @@ def run_tool(
     log.info("tool_start", tool=tool_name, cmd=" ".join(cmd), timeout=timeout)
     start = time.monotonic()
 
+    proc: Optional[subprocess.Popen] = None
     try:
-        result = subprocess.run(
+        proc = subprocess.Popen(
             cmd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            timeout=timeout,
+            start_new_session=True,
         )
+        stdout, stderr = proc.communicate(timeout=timeout)
         duration_ms = int((time.monotonic() - start) * 1000)
-        exit_code = result.returncode
+        exit_code = proc.returncode
 
         log.info(
             "tool_complete",
@@ -61,8 +80,8 @@ def run_tool(
             duration_ms=duration_ms,
         )
 
-        if result.stderr:
-            log.debug("tool_stderr", tool=tool_name, stderr=result.stderr[:500])
+        if stderr:
+            log.debug("tool_stderr", tool=tool_name, stderr=stderr[:500])
 
         # Save result to scan_results table
         if order_id:
@@ -71,7 +90,7 @@ def run_tool(
                 host_ip=host_ip,
                 phase=phase,
                 tool_name=tool_name,
-                raw_output=result.stdout[:50000] if result.stdout else None,
+                raw_output=stdout[:50000] if stdout else None,
                 exit_code=exit_code,
                 duration_ms=duration_ms,
             )
@@ -81,6 +100,15 @@ def run_tool(
     except subprocess.TimeoutExpired:
         duration_ms = int((time.monotonic() - start) * 1000)
         log.warning("tool_timeout", tool=tool_name, timeout=timeout)
+
+        # Kill entire process group — prevents orphaned child processes
+        if proc is not None:
+            _kill_process_group(proc)
+            # Drain remaining pipe data to avoid zombies
+            try:
+                proc.communicate(timeout=5)
+            except (subprocess.TimeoutExpired, Exception):
+                proc.kill()
 
         if order_id:
             _save_result(
@@ -98,6 +126,14 @@ def run_tool(
     except Exception as e:
         duration_ms = int((time.monotonic() - start) * 1000)
         log.error("tool_error", tool=tool_name, error=str(e))
+
+        # Clean up process if it was started
+        if proc is not None:
+            _kill_process_group(proc)
+            try:
+                proc.communicate(timeout=5)
+            except Exception:
+                pass
 
         if order_id:
             _save_result(

@@ -41,6 +41,9 @@ _VERSION_COMMANDS: list[tuple[str, list[str]]] = [
     ("testssl.sh", ["/opt/testssl.sh/testssl.sh", "--version"]),
     ("nikto", ["perl", "/opt/nikto/program/nikto.pl", "-Version"]),
     ("wafw00f", ["wafw00f", "--version"]),
+    ("httpx", ["httpx", "-version"]),
+    ("katana", ["katana", "-version"]),
+    ("wpscan", ["wpscan", "--version"]),
 ]
 
 
@@ -54,6 +57,7 @@ def _collect_tool_versions() -> list[str]:
         try:
             result = subprocess.run(
                 cmd, capture_output=True, text=True, timeout=10,
+                start_new_session=True,
             )
             output = (result.stdout + result.stderr).strip()
             # Extract version number from first line

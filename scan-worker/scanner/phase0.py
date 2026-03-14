@@ -2,6 +2,7 @@
 
 import json
 import os
+import signal
 import socket
 import subprocess
 import tempfile
@@ -21,10 +22,11 @@ MAX_HOSTS = 10
 
 def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Query crt.sh for certificate transparency subdomains. Timeout 30s."""
-    output_path = os.path.join(scan_dir, "phase0", "crtsh.json")
+    output_path = os.path.join(scan_dir, "phase0", "crtsh_raw.json")
     subdomains: list[str] = []
 
-    cmd = ["curl", "-s", f"https://crt.sh/?q=%.{domain}&output=json"]
+    # Use curl -o to write directly to file — avoids needing a second call
+    cmd = ["curl", "-s", "-o", output_path, f"https://crt.sh/?q=%.{domain}&output=json"]
     exit_code, duration_ms = run_tool(
         cmd=cmd,
         timeout=30,
@@ -38,11 +40,13 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
         log.warning("crtsh_failed", exit_code=exit_code)
         return subdomains
 
-    # Re-run curl to capture stdout (run_tool logs to DB but doesn't return stdout)
+    # Parse the saved file
+    parsed_path = os.path.join(scan_dir, "phase0", "crtsh.json")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        if result.returncode == 0 and result.stdout.strip():
-            entries = json.loads(result.stdout)
+        with open(output_path, "r") as f:
+            raw = f.read().strip()
+        if raw:
+            entries = json.loads(raw)
             seen: set[str] = set()
             for entry in entries:
                 name_value = entry.get("name_value", "")
@@ -54,11 +58,11 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
                         seen.add(name)
             subdomains = sorted(seen)
 
-            with open(output_path, "w") as f:
+            with open(parsed_path, "w") as f:
                 json.dump({"subdomains": subdomains, "raw_count": len(entries)}, f, indent=2)
 
             log.info("crtsh_complete", subdomains_found=len(subdomains))
-    except (json.JSONDecodeError, subprocess.TimeoutExpired, Exception) as e:
+    except (json.JSONDecodeError, FileNotFoundError, Exception) as e:
         log.warning("crtsh_parse_error", error=str(e))
 
     return subdomains
@@ -209,6 +213,7 @@ def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, An
         ns_result = subprocess.run(
             ["dig", "NS", domain, "+short"],
             capture_output=True, text=True, timeout=15,
+            start_new_session=True,
         )
         nameservers = [
             ns.strip().rstrip(".")
@@ -228,19 +233,13 @@ def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, An
     # Step 2: try AXFR against each NS
     for ns in nameservers:
         cmd = ["dig", f"@{ns}", domain, "AXFR"]
-        exit_code, duration_ms = run_tool(
-            cmd=cmd,
-            timeout=30,
-            order_id=order_id,
-            phase=0,
-            tool_name=f"zone_transfer_{ns}",
-        )
 
         try:
-            axfr_result = subprocess.run(
-                cmd, capture_output=True, text=True, timeout=30,
+            axfr_proc = subprocess.Popen(
+                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                text=True, start_new_session=True,
             )
-            output = axfr_result.stdout
+            output, _ = axfr_proc.communicate(timeout=30)
             all_output.append(f"=== NS: {ns} ===\n{output}\n")
 
             # Check if transfer succeeded (contains actual records, not just SOA)
@@ -252,6 +251,15 @@ def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, An
                 result_data["success"] = True
                 result_data["data"][ns] = output
                 log.warning("zone_transfer_success", ns=ns, domain=domain)
+        except subprocess.TimeoutExpired:
+            if axfr_proc is not None:
+                try:
+                    os.killpg(axfr_proc.pid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError):
+                    axfr_proc.kill()
+                axfr_proc.wait()
+            all_output.append(f"=== NS: {ns} === TIMEOUT\n")
+            log.warning("zone_transfer_timeout", ns=ns)
         except Exception as e:
             all_output.append(f"=== NS: {ns} === ERROR: {e}\n")
             log.warning("zone_transfer_error", ns=ns, error=str(e))
@@ -348,6 +356,7 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
             result = subprocess.run(
                 ["dig", qname, qtype, "+short"],
                 capture_output=True, text=True, timeout=timeout,
+                start_new_session=True,
             )
             return result.stdout.strip()
         except Exception as e:

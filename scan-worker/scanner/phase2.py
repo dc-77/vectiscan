@@ -2,6 +2,7 @@
 
 import json
 import os
+import signal
 import subprocess
 from typing import Any, Callable, Optional
 
@@ -235,19 +236,27 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[s
 
     cmd = ["curl", "-sI", url]
 
-    # Capture stdout directly for header parsing
+    # Capture stdout directly for header parsing — use Popen with process group
     raw_headers = ""
+    curl_proc = None
     try:
-        proc = subprocess.run(
+        curl_proc = subprocess.Popen(
             cmd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            timeout=10,
+            start_new_session=True,
         )
-        raw_headers = proc.stdout
-        log.info("header_check_fetched", fqdn=fqdn, exit_code=proc.returncode)
+        raw_headers, _ = curl_proc.communicate(timeout=10)
+        log.info("header_check_fetched", fqdn=fqdn, exit_code=curl_proc.returncode)
     except subprocess.TimeoutExpired:
         log.warning("header_check_timeout", fqdn=fqdn)
+        if curl_proc is not None:
+            try:
+                os.killpg(curl_proc.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                curl_proc.kill()
+            curl_proc.wait()
     except Exception as e:
         log.error("header_check_error", fqdn=fqdn, error=str(e))
 

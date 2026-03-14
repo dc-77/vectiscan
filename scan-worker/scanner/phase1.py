@@ -2,6 +2,7 @@
 
 import json
 import os
+import signal
 import subprocess
 import xml.etree.ElementTree as ET
 from typing import Any, Callable, Optional
@@ -111,17 +112,20 @@ def run_webtech(fqdn: str, host_dir: str, order_id: str) -> dict[str, Any]:
 
     cmd = ["webtech", "-u", f"https://{fqdn}", "--json"]
 
-    # webtech outputs JSON to stdout; capture it via subprocess
+    # webtech outputs JSON to stdout; use Popen with process group for clean timeout
+    webtech_proc = None
     try:
-        proc = subprocess.run(
+        webtech_proc = subprocess.Popen(
             cmd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
-            timeout=60,
+            start_new_session=True,
         )
+        stdout, _ = webtech_proc.communicate(timeout=60)
 
-        if proc.stdout:
-            tech_data = json.loads(proc.stdout)
+        if stdout:
+            tech_data = json.loads(stdout)
             with open(output_path, "w") as f:
                 json.dump(tech_data, f, indent=2)
             log.info("webtech_complete", fqdn=fqdn, techs=len(tech_data) if isinstance(tech_data, list) else 1)
@@ -132,6 +136,12 @@ def run_webtech(fqdn: str, host_dir: str, order_id: str) -> dict[str, Any]:
 
     except subprocess.TimeoutExpired:
         log.warning("webtech_timeout", fqdn=fqdn)
+        if webtech_proc is not None:
+            try:
+                os.killpg(webtech_proc.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                webtech_proc.kill()
+            webtech_proc.wait()
         return {}
     except json.JSONDecodeError as e:
         log.warning("webtech_json_error", fqdn=fqdn, error=str(e))
