@@ -244,7 +244,7 @@ describe('Verification API', () => {
 
     it('should verify and update order on success', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', verification_token: 'tok', status: 'verification_pending', verified_at: null, verification_method: null }],
+        rows: [{ id: orderId, target_url: 'example.com', verification_token: 'tok', status: 'verification_pending', package: 'professional', verified_at: null, verification_method: null }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
       mockVerifyAll.mockResolvedValueOnce({ verified: true, method: 'file' });
@@ -254,9 +254,9 @@ describe('Verification API', () => {
       const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { orderId } });
       expect(res.json()).toEqual({ success: true, data: { verified: true, method: 'file' } });
 
-      // Verify UPDATE was called
+      // Verify UPDATE was called with scanning status
       expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining("status = 'verified'"),
+        expect.stringContaining("status = 'scanning'"),
         ['file', orderId],
       );
       // Verify audit_log INSERT
@@ -264,11 +264,17 @@ describe('Verification API', () => {
         expect.stringContaining('audit_log'),
         [orderId, 'verification_success', expect.stringContaining('"method":"file"'), expect.any(String)],
       );
+      // Verify scan was enqueued
+      expect(mockScanQueueAdd).toHaveBeenCalledWith('scan', {
+        orderId,
+        domain: 'example.com',
+        package: 'professional',
+      });
     });
 
     it('should return verified:false without DB update on failure', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', verification_token: 'tok', status: 'verification_pending', verified_at: null, verification_method: null }],
+        rows: [{ id: orderId, target_url: 'example.com', verification_token: 'tok', status: 'verification_pending', package: 'professional', verified_at: null, verification_method: null }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
       mockVerifyAll.mockResolvedValueOnce({ verified: false, method: null });
