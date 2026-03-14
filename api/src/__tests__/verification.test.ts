@@ -267,7 +267,7 @@ describe('Verification API', () => {
       // Verify scan was enqueued
       expect(mockScanQueueAdd).toHaveBeenCalledWith('scan', {
         orderId,
-        domain: 'example.com',
+        targetDomain: 'example.com',
         package: 'professional',
       });
     });
