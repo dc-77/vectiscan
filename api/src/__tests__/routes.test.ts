@@ -62,7 +62,7 @@ describe('API Routes', () => {
     it('should create scan for valid domain', async () => {
       const now = new Date();
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: '550e8400-e29b-41d4-a716-446655440000', domain: 'example.com', status: 'created', created_at: now }],
+        rows: [{ id: '550e8400-e29b-41d4-a716-446655440000', domain: 'example.com', status: 'created', package: 'professional', created_at: now }],
         command: 'INSERT',
         rowCount: 1,
         oid: 0,
@@ -82,9 +82,11 @@ describe('API Routes', () => {
       expect(body.data.id).toBe('550e8400-e29b-41d4-a716-446655440000');
       expect(body.data.domain).toBe('example.com');
       expect(body.data.status).toBe('created');
+      expect(body.data.package).toBe('professional');
       expect(mockScanQueueAdd).toHaveBeenCalledWith('scan', {
         scanId: '550e8400-e29b-41d4-a716-446655440000',
         targetDomain: 'example.com',
+        package: 'professional',
       });
     });
 
@@ -123,6 +125,7 @@ describe('API Routes', () => {
             id: scanId,
             domain: 'example.com',
             status: 'scan_phase2',
+            package: 'professional',
             discovered_hosts: [{ ip: '1.2.3.4', fqdns: ['example.com'], status: 'scanning' }],
             hosts_total: 1,
             hosts_completed: 0,
