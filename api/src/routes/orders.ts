@@ -87,6 +87,34 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     });
   });
 
+  // GET /api/orders — list all orders
+  server.get('/api/orders', async (_request, _reply) => {
+    const result = await query(
+      `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
+              o.scan_started_at, o.scan_finished_at, o.created_at,
+              c.email,
+              EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
+       FROM orders o
+       JOIN customers c ON o.customer_id = c.id
+       ORDER BY o.created_at DESC`,
+    );
+
+    const orders = result.rows.map((row: Record<string, unknown>) => ({
+      id: row.id,
+      domain: row.target_url,
+      email: row.email,
+      package: row.package,
+      status: row.status,
+      hasReport: row.has_report === true || row.has_report === 't',
+      error: row.error_message || null,
+      startedAt: row.scan_started_at ? (row.scan_started_at as Date).toISOString() : null,
+      finishedAt: row.scan_finished_at ? (row.scan_finished_at as Date).toISOString() : null,
+      createdAt: (row.created_at as Date).toISOString(),
+    }));
+
+    return { success: true, data: { orders } };
+  });
+
   // POST /api/scans — backwards compat redirect
   server.post('/api/scans', async (_request, reply) => {
     return reply.redirect('/api/orders', 307);

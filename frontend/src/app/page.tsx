@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createOrder, getOrderStatus, cancelOrder, verifyPassword, OrderStatus } from '@/lib/api';
+import Link from 'next/link';
 import VectiScanLogo from '@/components/VectiScanLogo';
 import ScanProgress from '@/components/ScanProgress';
 import ReportDownload from '@/components/ReportDownload';
@@ -15,7 +16,16 @@ import { useWebSocket, WsMessage } from '@/hooks/useWebSocket';
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
 export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
@@ -86,6 +96,16 @@ export default function Home() {
       setAuthenticated(true);
     }
   }, []);
+
+  // Resume scan from orderId query param (from dashboard or verify redirect)
+  useEffect(() => {
+    const paramOrderId = searchParams.get('orderId');
+    if (paramOrderId && !orderId && authenticated) {
+      setOrderId(paramOrderId);
+      initTerminal();
+      startPolling(paramOrderId);
+    }
+  }, [searchParams, authenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -253,6 +273,12 @@ export default function Home() {
           <div className="text-center space-y-2">
             <VectiScanLogo className="mb-4" />
             <p className="text-gray-400">Automatisierte Security-Scan-Plattform</p>
+            <Link
+              href="/dashboard"
+              className="inline-block text-gray-600 hover:text-gray-400 text-sm transition-colors mt-1"
+            >
+              Dashboard
+            </Link>
           </div>
         )}
 

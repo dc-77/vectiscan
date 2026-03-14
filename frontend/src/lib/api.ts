@@ -102,6 +102,24 @@ export async function checkVerification(orderId: string): Promise<ApiResponse<Ve
   return res.json();
 }
 
+export interface OrderListItem {
+  id: string;
+  domain: string;
+  email: string;
+  package: string;
+  status: string;
+  hasReport: boolean;
+  error: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  createdAt: string;
+}
+
+export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[] }>> {
+  const res = await fetch(`${API_URL}/api/orders`);
+  return res.json();
+}
+
 export async function verifyPassword(password: string): Promise<ApiResponse<null>> {
   const res = await fetch(`${API_URL}/api/auth/verify`, {
     method: 'POST',
