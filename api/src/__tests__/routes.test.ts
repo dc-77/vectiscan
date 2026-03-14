@@ -14,11 +14,16 @@ jest.mock('../lib/queue', () => ({
   reportQueue: { add: jest.fn() },
 }));
 
-jest.mock('../lib/minio', () => ({
-  minioClient: {},
-  initBuckets: jest.fn(),
-  getPresignedUrl: jest.fn(),
-}));
+jest.mock('../lib/minio', () => {
+  const { Readable } = require('stream');
+  return {
+    minioClient: {
+      getObject: jest.fn().mockResolvedValue(Readable.from(Buffer.from('fake-pdf-content'))),
+    },
+    initBuckets: jest.fn(),
+    getPresignedUrl: jest.fn(),
+  };
+});
 
 import { query } from '../lib/db';
 import { scanQueue } from '../lib/queue';
@@ -174,7 +179,7 @@ describe('API Routes', () => {
   describe('GET /api/scans/:id/report', () => {
     const scanId = '550e8400-e29b-41d4-a716-446655440000';
 
-    it('should return presigned URL when report exists', async () => {
+    it('should stream PDF when report exists', async () => {
       mockQuery.mockResolvedValueOnce({
         rows: [{
           minio_bucket: 'scan-reports',
@@ -188,15 +193,11 @@ describe('API Routes', () => {
         oid: 0,
         fields: [],
       });
-      mockGetPresignedUrl.mockResolvedValueOnce('http://minio:9000/scan-reports/test.pdf?signed=1');
 
       const res = await server.inject({ method: 'GET', url: `/api/scans/${scanId}/report` });
       expect(res.statusCode).toBe(200);
-      const body = res.json();
-      expect(body.success).toBe(true);
-      expect(body.data.downloadUrl).toContain('minio');
-      expect(body.data.fileName).toContain('example.com');
-      expect(body.data.fileSize).toBe(245760);
+      expect(res.headers['content-type']).toBe('application/pdf');
+      expect(res.headers['content-disposition']).toContain('example.com');
     });
 
     it('should return 404 when no report exists', async () => {
