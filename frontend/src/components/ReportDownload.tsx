@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { getReportDownloadUrl } from '@/lib/api';
 
 interface Props {
@@ -25,6 +26,12 @@ export default function ReportDownload({ orderId, domain, onNewScan }: Props) {
         >
           PDF herunterladen
         </a>
+        <Link
+          href="/dashboard"
+          className="inline-block bg-[#1e293b] hover:bg-[#253347] text-gray-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors"
+        >
+          Dashboard
+        </Link>
         {onNewScan && (
           <button
             onClick={onNewScan}

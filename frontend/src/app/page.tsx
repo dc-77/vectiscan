@@ -204,9 +204,15 @@ function HomeContent() {
       return;
     }
 
-    const trimmed = domain.trim().toLowerCase();
+    // Strip protocol, path, port, trailing slash from input
+    let trimmed = domain.trim().toLowerCase()
+      .replace(/^https?:\/\//, '')  // remove http:// or https://
+      .replace(/\/.*$/, '')          // remove path
+      .replace(/:\d+$/, '')          // remove port
+      .replace(/\.$/, '');           // remove trailing dot
+
     if (!DOMAIN_REGEX.test(trimmed)) {
-      setError('Ungültige Domain. Bitte einen gültigen FQDN eingeben (ohne http://, Pfad oder Port).');
+      setError('Ungültige Domain. Beispiel: beispiel.de');
       return;
     }
 
