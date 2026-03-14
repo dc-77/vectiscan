@@ -209,17 +209,20 @@ export function useTerminalFeed() {
         case 'report_complete':
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '  PDF generieren', indent: 1, status: 'done',
+            text: '  ✓ PDF generieren', indent: 1, status: 'done',
           });
           newLines.push({ id: lineId(), timestamp: now, text: '' });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '  ██████████████████████████████████████ 100%', indent: 1,
+            text: '─'.repeat(50),
           });
-          newLines.push({ id: lineId(), timestamp: now, text: '' });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '  REPORT FERTIG ✓', isHeader: true, indent: 1,
+            text: '  ▸ ASSESSMENT COMPLETE', isHeader: true, indent: 1,
+          });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '  Report bereit zum Download', indent: 1,
           });
           break;
 
@@ -241,10 +244,9 @@ export function useTerminalFeed() {
       if (lastToolRef.current) {
         const host = progress.currentHost || '';
         const toolLabel = lastToolRef.current;
-        const dots = '.'.repeat(Math.max(2, 40 - toolLabel.length - (host ? host.length + 1 : 0)));
         newLines.push({
           id: lineId(), timestamp: now,
-          text: `  ${toolLabel}${host ? ' ' + host : ''} ${dots}`,
+          text: `  ✓ ${toolLabel}${host ? ' → ' + host : ''}`,
           indent: 1, status: 'done',
         });
       }
