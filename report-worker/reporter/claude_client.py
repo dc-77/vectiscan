@@ -188,13 +188,63 @@ def _severity_for_score(score: float) -> str:
     return "CRITICAL"
 
 
+_VALID_CVSS_METRICS = {
+    "AV": {"N", "A", "L", "P"},
+    "AC": {"L", "H"},
+    "PR": {"N", "L", "H"},
+    "UI": {"N", "R"},
+    "S": {"U", "C"},
+    "C": {"H", "L", "N"},
+    "I": {"H", "L", "N"},
+    "A": {"H", "L", "N"},
+}
+
+_REQUIRED_METRICS = {"AV", "AC", "PR", "UI", "S", "C", "I", "A"}
+
+
+def validate_cvss_vector(vector: str) -> str | None:
+    """Validate CVSS 3.1 vector syntax.
+
+    Returns None if valid, or an error description if invalid.
+    """
+    if not vector or not vector.startswith("CVSS:3.1/"):
+        return "missing CVSS:3.1/ prefix"
+
+    try:
+        parts = {}
+        for segment in vector.split("/")[1:]:
+            key, val = segment.split(":")
+            parts[key] = val
+    except ValueError:
+        return "malformed metric segment"
+
+    # Check all required metrics are present
+    missing = _REQUIRED_METRICS - set(parts.keys())
+    if missing:
+        return f"missing metrics: {', '.join(sorted(missing))}"
+
+    # Check for unexpected metrics
+    extra = set(parts.keys()) - _REQUIRED_METRICS
+    if extra:
+        return f"unexpected metrics: {', '.join(sorted(extra))}"
+
+    # Check each metric value is valid
+    for metric, value in parts.items():
+        valid_values = _VALID_CVSS_METRICS.get(metric)
+        if valid_values and value not in valid_values:
+            return f"invalid value {metric}:{value}"
+
+    return None
+
+
 def validate_cvss_scores(result: dict[str, Any]) -> dict[str, Any]:
     """Validate and correct CVSS scores in Claude's response.
 
     For each finding with a cvss_vector:
+    - Validate vector syntax (all 8 metrics, valid values)
     - Compute the correct score from the vector
-    - If the reported score diverges by > 0.5, replace it with the computed score
-    - Adjust severity label if the corrected score falls in a different range
+    - If the reported score diverges by > 0.1, replace it with the computed score
+    - Ensure severity label matches the computed score
     """
     findings = result.get("findings", [])
     corrected_count = 0
@@ -208,12 +258,27 @@ def validate_cvss_scores(result: dict[str, Any]) -> dict[str, Any]:
         except (ValueError, TypeError):
             reported_score = 0.0
 
-        computed = compute_cvss_score(vector)
-        if computed is None:
-            # Can't validate without a parseable vector
+        # Skip findings without CVSS (e.g. INFO findings, basic package)
+        if not vector or vector == "N/A":
             continue
 
-        if abs(computed - reported_score) > 0.5:
+        # Validate vector syntax
+        vector_error = validate_cvss_vector(vector)
+        if vector_error:
+            log.warning(
+                "cvss_vector_invalid",
+                finding_id=finding.get("id"),
+                vector=vector,
+                error=vector_error,
+            )
+            # Cannot compute score from invalid vector — keep as-is
+            continue
+
+        computed = compute_cvss_score(vector)
+        if computed is None:
+            continue
+
+        if abs(computed - reported_score) > 0.1:
             log.warning(
                 "cvss_score_corrected",
                 finding_id=finding.get("id"),

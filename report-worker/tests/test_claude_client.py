@@ -269,15 +269,15 @@ class TestValidateCvssScores:
         assert result["findings"][0]["severity"] == "INFO"
 
     def test_small_deviation_within_tolerance(self) -> None:
-        """Score off by <= 0.5 should NOT be corrected."""
+        """Score off by <= 0.1 should NOT be corrected."""
         finding = self._make_finding(
-            score="8.2",  # Actual vector computes to 8.6, diff = 0.4
+            score="8.5",  # Actual vector computes to 8.6, diff = 0.1
             vector="CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L",
             severity="HIGH",
         )
         result = validate_cvss_scores({"findings": [finding]})
-        # Score stays at 8.2 (within 0.5 tolerance)
-        assert result["findings"][0]["cvss_score"] == "8.2"
+        # Score stays at 8.5 (within 0.1 tolerance)
+        assert result["findings"][0]["cvss_score"] == "8.5"
 
     def test_no_vector_skipped(self) -> None:
         """Finding without vector should be left alone."""

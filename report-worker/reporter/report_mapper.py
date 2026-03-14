@@ -853,6 +853,7 @@ def map_nis2_report(
             finding["nis2_ref"] = claude_finding["nis2_ref"]
 
     # Build audit trail from scan_meta
+    tool_versions = scan_meta.get("toolVersions", [])
     audit_trail = {
         "scanId": scan_id,
         "domain": domain,
@@ -861,7 +862,7 @@ def map_nis2_report(
         "duration": scan_meta.get("duration", "—"),
         "hosts_scanned": len(host_inventory.get("hosts", [])),
         "package": package,
-        "tools": [],  # Tool versions placeholder — populated at runtime
+        "tools": tool_versions,
     }
 
     # Add NIS2 data to report_data

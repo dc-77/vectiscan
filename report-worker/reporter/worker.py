@@ -101,6 +101,21 @@ def _update_scan_status(
             )
     conn.commit()
 
+    # Publish status event via Redis Pub/Sub for WebSocket
+    try:
+        redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+        r = redis.from_url(redis_url)
+        event: dict = {
+            "type": "status",
+            "scanId": scan_id,
+            "status": status,
+        }
+        if error_message:
+            event["error"] = error_message
+        r.publish(f"scan:events:{scan_id}", json.dumps(event))
+    except Exception as e:
+        log.error("redis_publish_failed", scan_id=scan_id, error=str(e))
+
 
 # ---------------------------------------------------------------------------
 # MinIO helpers
@@ -203,11 +218,14 @@ def process_job(job_data: dict) -> None:
         log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
 
         # -- 5. Map Claude output to report_data ------------------------------
+        parsed_meta = parsed.get("meta", {})
         scan_meta = {
             "domain": domain,
             "scanId": scan_id,
-            "startedAt": datetime.now().isoformat(),
+            "startedAt": parsed_meta.get("startedAt", datetime.now().isoformat()),
+            "completedAt": parsed_meta.get("finishedAt", datetime.now().isoformat()),
             "package": package,
+            "toolVersions": parsed_meta.get("toolVersions", []),
         }
         report_data = map_to_report_data(
             claude_output=claude_output,

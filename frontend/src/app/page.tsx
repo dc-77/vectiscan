@@ -9,6 +9,7 @@ import PackageSelector, { ScanPackage } from '@/components/PackageSelector';
 import NoiseMatrix from '@/components/terminal/NoiseMatrix';
 import ScanTerminal from '@/components/terminal/ScanTerminal';
 import { useTerminalFeed } from '@/components/terminal/useTerminalFeed';
+import { useWebSocket, WsMessage } from '@/hooks/useWebSocket';
 
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
@@ -27,9 +28,56 @@ export default function Home() {
   const [showTerminal, setShowTerminal] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
+  const [wsConnected, setWsConnected] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { lines, processStatus, initTerminal, reset: resetTerminal } = useTerminalFeed();
+
+  // WebSocket message handler — updates scan state from real-time events
+  const handleWsMessage = useCallback((msg: WsMessage) => {
+    if (msg.type === 'connected') return;
+
+    setScan((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev };
+
+      if (msg.type === 'progress') {
+        updated.status = msg.status || prev.status;
+        updated.progress = {
+          ...prev.progress,
+          phase: msg.currentPhase ?? prev.progress.phase,
+          currentTool: msg.currentTool ?? prev.progress.currentTool,
+          currentHost: msg.currentHost ?? prev.progress.currentHost,
+          hostsCompleted: msg.hostsCompleted ?? prev.progress.hostsCompleted,
+          hostsTotal: msg.hostsTotal ?? prev.progress.hostsTotal,
+          discoveredHosts: prev.progress.discoveredHosts,
+        };
+      } else if (msg.type === 'hosts_discovered' && msg.hosts) {
+        updated.progress = {
+          ...prev.progress,
+          hostsTotal: msg.hostsTotal ?? prev.progress.hostsTotal,
+          discoveredHosts: msg.hosts.map((h) => ({ ...h, status: 'pending' })),
+        };
+      } else if (msg.type === 'status') {
+        updated.status = msg.status || prev.status;
+      } else if (msg.type === 'error') {
+        updated.status = 'failed';
+        updated.error = msg.error || prev.error;
+      }
+
+      processStatus(updated);
+      return updated;
+    });
+  }, [processStatus]);
+
+  const handleWsConnectionChange = useCallback((connected: boolean) => {
+    setWsConnected(connected);
+  }, []);
+
+  const { close: closeWs } = useWebSocket(scanId, {
+    onMessage: handleWsMessage,
+    onConnectionChange: handleWsConnectionChange,
+  });
 
   useEffect(() => {
     if (sessionStorage.getItem('vectiscan_auth') === 'true') {
@@ -69,35 +117,45 @@ export default function Home() {
       if (res.success && res.data) {
         setScan(res.data);
         processStatus(res.data);
-        if (res.data.status === 'report_complete') {
-          stopPolling();
-          // Wait 2 seconds to show the "REPORT FERTIG" message, then transition
-          setTimeout(() => {
-            setTransitioning(true);
-            setTimeout(() => {
-              setShowTerminal(false);
-              setShowReport(true);
-              setTransitioning(false);
-            }, 800);
-          }, 2000);
-        } else if (res.data.status === 'failed') {
-          stopPolling();
-        }
+        // Completion/failure handling is in the useEffect above
       }
     } catch {
       // Network error — keep polling
     }
-  }, [stopPolling, processStatus]);
+  }, [processStatus]);
 
   const startPolling = useCallback((id: string) => {
     stopPolling();
+    // Poll immediately for initial state, then continue as fallback
     pollStatus(id);
-    intervalRef.current = setInterval(() => pollStatus(id), 3000);
-  }, [pollStatus, stopPolling]);
+    // Use slower polling interval when WebSocket is connected (just a safety net)
+    const interval = wsConnected ? 15000 : 3000;
+    intervalRef.current = setInterval(() => pollStatus(id), interval);
+  }, [pollStatus, stopPolling, wsConnected]);
 
   useEffect(() => {
     return () => stopPolling();
   }, [stopPolling]);
+
+  // Stop polling and transition when scan completes or fails (works for both WS and polling)
+  useEffect(() => {
+    if (!scan) return;
+    if (scan.status === 'report_complete') {
+      stopPolling();
+      closeWs();
+      setTimeout(() => {
+        setTransitioning(true);
+        setTimeout(() => {
+          setShowTerminal(false);
+          setShowReport(true);
+          setTransitioning(false);
+        }, 800);
+      }, 2000);
+    } else if (scan.status === 'failed') {
+      stopPolling();
+      closeWs();
+    }
+  }, [scan?.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,6 +190,7 @@ export default function Home() {
 
   const handleRetry = () => {
     stopPolling();
+    closeWs();
     resetTerminal();
     setShowTerminal(false);
     setShowReport(false);

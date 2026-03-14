@@ -2,10 +2,16 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ScanError from '@/components/ScanError';
 
 describe('ScanError', () => {
-  it('should show error message', () => {
-    render(<ScanError error="Timeout exceeded" onRetry={() => {}} />);
+  it('should show generic error message for non-timeout errors', () => {
+    render(<ScanError error="Something went wrong" onRetry={() => {}} />);
     expect(screen.getByText('Scan fehlgeschlagen')).toBeInTheDocument();
-    expect(screen.getByText('Timeout exceeded')).toBeInTheDocument();
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+  });
+
+  it('should show timeout-specific heading for timeout errors', () => {
+    render(<ScanError error="Scan-Timeout: Das Basic-Paket hat das Zeitlimit überschritten." onRetry={() => {}} />);
+    expect(screen.getByText('Scan-Zeitlimit erreicht')).toBeInTheDocument();
+    expect(screen.getByText(/Versuchen Sie es erneut/)).toBeInTheDocument();
   });
 
   it('should call onRetry when button clicked', () => {

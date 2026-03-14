@@ -52,10 +52,15 @@ def update_progress(
         "updatedAt": datetime.now(timezone.utc).isoformat(),
     }
 
-    # Redis — fast polling (SET with 1h expiry)
+    # Redis — fast polling (SET with 1h expiry) + Pub/Sub for WebSocket
     try:
         r = _get_redis()
-        r.set(f"scan:progress:{scan_id}", json.dumps(progress_data), ex=3600)
+        payload = json.dumps(progress_data)
+        r.set(f"scan:progress:{scan_id}", payload, ex=3600)
+        r.publish(f"scan:events:{scan_id}", json.dumps({
+            "type": "progress",
+            **progress_data,
+        }))
     except Exception as e:
         log.error("redis_progress_failed", scan_id=scan_id, error=str(e))
 
@@ -112,7 +117,7 @@ def set_scan_complete(scan_id: str) -> None:
     except Exception as e:
         log.error("set_complete_failed", scan_id=scan_id, error=str(e))
 
-    # Update Redis too
+    # Update Redis too + publish event
     try:
         r = _get_redis()
         progress = r.get(f"scan:progress:{scan_id}")
@@ -121,6 +126,12 @@ def set_scan_complete(scan_id: str) -> None:
             data["status"] = "scan_complete"
             data["updatedAt"] = datetime.now(timezone.utc).isoformat()
             r.set(f"scan:progress:{scan_id}", json.dumps(data), ex=3600)
+        r.publish(f"scan:events:{scan_id}", json.dumps({
+            "type": "status",
+            "scanId": scan_id,
+            "status": "scan_complete",
+            "updatedAt": datetime.now(timezone.utc).isoformat(),
+        }))
     except Exception as e:
         log.error("redis_complete_failed", scan_id=scan_id, error=str(e))
 
@@ -139,7 +150,7 @@ def set_scan_failed(scan_id: str, error_message: str) -> None:
     except Exception as e:
         log.error("set_failed_failed", scan_id=scan_id, error=str(e))
 
-    # Update Redis too
+    # Update Redis too + publish event
     try:
         r = _get_redis()
         data = {
@@ -149,6 +160,10 @@ def set_scan_failed(scan_id: str, error_message: str) -> None:
             "updatedAt": datetime.now(timezone.utc).isoformat(),
         }
         r.set(f"scan:progress:{scan_id}", json.dumps(data), ex=3600)
+        r.publish(f"scan:events:{scan_id}", json.dumps({
+            "type": "error",
+            **data,
+        }))
     except Exception as e:
         log.error("redis_failed_failed", scan_id=scan_id, error=str(e))
 
@@ -169,3 +184,16 @@ def set_discovered_hosts(scan_id: str, host_inventory: dict) -> None:
         conn.close()
     except Exception as e:
         log.error("set_hosts_failed", scan_id=scan_id, error=str(e))
+
+    # Publish hosts discovered event
+    try:
+        r = _get_redis()
+        r.publish(f"scan:events:{scan_id}", json.dumps({
+            "type": "hosts_discovered",
+            "scanId": scan_id,
+            "hostsTotal": len(hosts),
+            "hosts": hosts,
+            "updatedAt": datetime.now(timezone.utc).isoformat(),
+        }))
+    except Exception as e:
+        log.error("redis_hosts_publish_failed", scan_id=scan_id, error=str(e))
