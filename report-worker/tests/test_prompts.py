@@ -10,15 +10,15 @@ from reporter.prompts import (
 
 
 class TestSystemPromptBasic:
-    def test_no_cvss_vector(self):
-        assert "CVSS-Vektorstring" not in SYSTEM_PROMPT_BASIC
-        assert "cvss_vector" not in SYSTEM_PROMPT_BASIC
+    def test_has_cvss(self):
+        assert "cvss_score" in SYSTEM_PROMPT_BASIC
+        assert "cvss_vector" in SYSTEM_PROMPT_BASIC
 
     def test_no_bsig(self):
         assert "§30 BSIG" not in SYSTEM_PROMPT_BASIC
 
-    def test_no_cwe(self):
-        assert '"cwe"' not in SYSTEM_PROMPT_BASIC
+    def test_has_cwe(self):
+        assert '"cwe"' in SYSTEM_PROMPT_BASIC
 
     def test_max_findings_instruction(self):
         assert "5-8 Findings" in SYSTEM_PROMPT_BASIC
