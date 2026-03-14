@@ -21,7 +21,7 @@ def test_run_tool_success(mock_subprocess: MagicMock, mock_save: MagicMock) -> N
     exit_code, duration_ms = run_tool(
         cmd=["echo", "hello"],
         timeout=30,
-        scan_id="scan-1",
+        order_id="scan-1",
         tool_name="echo",
     )
 
@@ -47,7 +47,7 @@ def test_run_tool_timeout_returns_minus1(mock_subprocess: MagicMock, mock_save: 
     exit_code, duration_ms = run_tool(
         cmd=["slow-tool"],
         timeout=10,
-        scan_id="scan-2",
+        order_id="scan-2",
         tool_name="slow",
     )
 
@@ -66,7 +66,7 @@ def test_run_tool_exception_returns_minus2(mock_subprocess: MagicMock, mock_save
     exit_code, duration_ms = run_tool(
         cmd=["nonexistent-binary"],
         timeout=30,
-        scan_id="scan-3",
+        order_id="scan-3",
         tool_name="missing",
     )
 
@@ -76,8 +76,8 @@ def test_run_tool_exception_returns_minus2(mock_subprocess: MagicMock, mock_save
 
 @patch("scanner.tools._save_result")
 @patch("scanner.tools.subprocess.run")
-def test_save_result_called_when_scan_id_provided(mock_subprocess: MagicMock, mock_save: MagicMock) -> None:
-    """_save_result is called when scan_id is not None."""
+def test_save_result_called_when_order_id_provided(mock_subprocess: MagicMock, mock_save: MagicMock) -> None:
+    """_save_result is called when order_id is not None."""
     from scanner.tools import run_tool
 
     mock_subprocess.return_value = MagicMock(returncode=0, stdout="ok", stderr="")
@@ -85,7 +85,7 @@ def test_save_result_called_when_scan_id_provided(mock_subprocess: MagicMock, mo
     run_tool(
         cmd=["tool"],
         timeout=30,
-        scan_id="scan-4",
+        order_id="scan-4",
         host_ip="10.0.0.1",
         phase=1,
         tool_name="testtool",
@@ -93,7 +93,7 @@ def test_save_result_called_when_scan_id_provided(mock_subprocess: MagicMock, mo
 
     mock_save.assert_called_once()
     call_kwargs = mock_save.call_args[1]
-    assert call_kwargs["scan_id"] == "scan-4"
+    assert call_kwargs["order_id"] == "scan-4"
     assert call_kwargs["host_ip"] == "10.0.0.1"
     assert call_kwargs["phase"] == 1
     assert call_kwargs["tool_name"] == "testtool"
@@ -102,8 +102,8 @@ def test_save_result_called_when_scan_id_provided(mock_subprocess: MagicMock, mo
 
 @patch("scanner.tools._save_result")
 @patch("scanner.tools.subprocess.run")
-def test_save_result_not_called_when_scan_id_is_none(mock_subprocess: MagicMock, mock_save: MagicMock) -> None:
-    """_save_result is NOT called when scan_id is None."""
+def test_save_result_not_called_when_order_id_is_none(mock_subprocess: MagicMock, mock_save: MagicMock) -> None:
+    """_save_result is NOT called when order_id is None."""
     from scanner.tools import run_tool
 
     mock_subprocess.return_value = MagicMock(returncode=0, stdout="", stderr="")
@@ -111,7 +111,7 @@ def test_save_result_not_called_when_scan_id_is_none(mock_subprocess: MagicMock,
     run_tool(
         cmd=["tool"],
         timeout=30,
-        scan_id=None,
+        order_id=None,
         tool_name="testtool",
     )
 
@@ -120,7 +120,7 @@ def test_save_result_not_called_when_scan_id_is_none(mock_subprocess: MagicMock,
 
 @patch("scanner.tools._save_result")
 @patch("scanner.tools.subprocess.run")
-def test_save_result_called_on_timeout_with_scan_id(mock_subprocess: MagicMock, mock_save: MagicMock) -> None:
+def test_save_result_called_on_timeout_with_order_id(mock_subprocess: MagicMock, mock_save: MagicMock) -> None:
     """_save_result is called with exit_code=-1 when subprocess times out."""
     from scanner.tools import run_tool
 
@@ -129,7 +129,7 @@ def test_save_result_called_on_timeout_with_scan_id(mock_subprocess: MagicMock, 
     run_tool(
         cmd=["slow"],
         timeout=5,
-        scan_id="scan-5",
+        order_id="scan-5",
         tool_name="slow",
     )
 
@@ -139,7 +139,7 @@ def test_save_result_called_on_timeout_with_scan_id(mock_subprocess: MagicMock, 
 
 @patch("scanner.tools._save_result")
 @patch("scanner.tools.subprocess.run")
-def test_save_result_called_on_exception_with_scan_id(mock_subprocess: MagicMock, mock_save: MagicMock) -> None:
+def test_save_result_called_on_exception_with_order_id(mock_subprocess: MagicMock, mock_save: MagicMock) -> None:
     """_save_result is called with exit_code=-2 on general exception."""
     from scanner.tools import run_tool
 
@@ -148,7 +148,7 @@ def test_save_result_called_on_exception_with_scan_id(mock_subprocess: MagicMock
     run_tool(
         cmd=["broken"],
         timeout=30,
-        scan_id="scan-6",
+        order_id="scan-6",
         tool_name="broken",
     )
 

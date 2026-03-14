@@ -108,7 +108,7 @@ def test_enqueue_report_job_pushes_correct_payload(mock_redis_module: MagicMock)
     tech_profiles = [{"ip": "1.1.1.1", "has_ssl": True}]
 
     enqueue_report_job(
-        scan_id="scan-abc",
+        order_id="scan-abc",
         minio_path="scan-rawdata/scan-abc.tar.gz",
         host_inventory=host_inventory,
         tech_profiles=tech_profiles,
@@ -121,7 +121,7 @@ def test_enqueue_report_job_pushes_correct_payload(mock_redis_module: MagicMock)
     assert queue_name == "report-pending"
 
     payload = json.loads(payload_json)
-    assert payload["scanId"] == "scan-abc"
+    assert payload["orderId"] == "scan-abc"
     assert payload["rawDataPath"] == "scan-rawdata/scan-abc.tar.gz"
     assert payload["hostInventory"] == host_inventory
     assert payload["techProfiles"] == tech_profiles

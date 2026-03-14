@@ -55,11 +55,13 @@ def test_merge_and_group_max_10_hosts(tmp_path: Path) -> None:
     scan_dir = str(tmp_path)
     (tmp_path / "phase0").mkdir()
 
-    # Create 15 unique IPs
-    all_subdomains = [f"host{i}.example.com" for i in range(15)]
+    # Create 15 unique IPs (include base domain to avoid DNS fallback)
+    all_subdomains = ["example.com"] + [f"host{i}.example.com" for i in range(14)]
     dnsx_results = [
+        {"host": "example.com", "a": ["10.0.0.100"]},
+    ] + [
         {"host": f"host{i}.example.com", "a": [f"10.0.0.{i}"]}
-        for i in range(15)
+        for i in range(14)
     ]
 
     with patch("scanner.phase0.socket.gethostbyaddr", side_effect=OSError):

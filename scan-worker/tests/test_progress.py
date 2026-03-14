@@ -19,7 +19,7 @@ def test_update_progress_redis_set(mock_redis_factory: MagicMock, mock_db_factor
     mock_db_factory.return_value = mock_conn
 
     update_progress(
-        scan_id="abc-123",
+        order_id="abc-123",
         phase="scan_phase1",
         tool="nmap",
         host="10.0.0.1",
@@ -30,11 +30,11 @@ def test_update_progress_redis_set(mock_redis_factory: MagicMock, mock_db_factor
     # Verify Redis SET with correct key
     mock_redis.set.assert_called_once()
     redis_call_args = mock_redis.set.call_args
-    assert redis_call_args[0][0] == "scan:progress:abc-123"
+    assert redis_call_args[0][0] == "order:progress:abc-123"
 
     # Verify the JSON payload
     payload = json.loads(redis_call_args[0][1])
-    assert payload["scanId"] == "abc-123"
+    assert payload["orderId"] == "abc-123"
     assert payload["status"] == "scan_phase1"
     assert payload["currentTool"] == "nmap"
     assert payload["currentHost"] == "10.0.0.1"
@@ -61,7 +61,7 @@ def test_update_progress_postgres_update(mock_redis_factory: MagicMock, mock_db_
     mock_db_factory.return_value = mock_conn
 
     update_progress(
-        scan_id="abc-123",
+        order_id="abc-123",
         phase="scan_phase2",
         tool="nuclei",
         host="10.0.0.2",
@@ -74,7 +74,7 @@ def test_update_progress_postgres_update(mock_redis_factory: MagicMock, mock_db_
     sql = mock_cursor.execute.call_args[0][0]
     params = mock_cursor.execute.call_args[0][1]
 
-    assert "UPDATE scans" in sql
+    assert "UPDATE orders" in sql
     assert params == ("scan_phase2", "scan_phase2", "nuclei", "10.0.0.2", 3, 5, "abc-123")
     mock_conn.commit.assert_called_once()
     mock_conn.close.assert_called_once()
@@ -95,7 +95,7 @@ def test_set_scan_failed_updates_redis_and_db(mock_redis_factory: MagicMock, moc
     mock_conn.cursor.return_value.__exit__ = MagicMock(return_value=False)
     mock_db_factory.return_value = mock_conn
 
-    set_scan_failed("scan-xyz", "Timeout exceeded")
+    set_scan_failed(order_id="scan-xyz", error_message="Timeout exceeded")
 
     # Verify DB update
     mock_cursor.execute.assert_called_once()
@@ -109,11 +109,11 @@ def test_set_scan_failed_updates_redis_and_db(mock_redis_factory: MagicMock, moc
     # Verify Redis update
     mock_redis.set.assert_called_once()
     redis_args = mock_redis.set.call_args
-    assert redis_args[0][0] == "scan:progress:scan-xyz"
+    assert redis_args[0][0] == "order:progress:scan-xyz"
     payload = json.loads(redis_args[0][1])
     assert payload["status"] == "failed"
     assert payload["error"] == "Timeout exceeded"
-    assert payload["scanId"] == "scan-xyz"
+    assert payload["orderId"] == "scan-xyz"
 
 
 @patch("scanner.progress._get_db")
