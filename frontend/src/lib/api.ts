@@ -76,6 +76,32 @@ export async function cancelOrder(id: string): Promise<ApiResponse<null>> {
   return res.json();
 }
 
+export interface VerificationStatus {
+  verified: boolean;
+  method: string | null;
+  token: string;
+  domain: string;
+}
+
+export interface VerificationCheckResult {
+  verified: boolean;
+  method?: string;
+}
+
+export async function getVerificationStatus(orderId: string): Promise<ApiResponse<VerificationStatus>> {
+  const res = await fetch(`${API_URL}/api/verify/status/${orderId}`);
+  return res.json();
+}
+
+export async function checkVerification(orderId: string): Promise<ApiResponse<VerificationCheckResult>> {
+  const res = await fetch(`${API_URL}/api/verify/check`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderId }),
+  });
+  return res.json();
+}
+
 export async function verifyPassword(password: string): Promise<ApiResponse<null>> {
   const res = await fetch(`${API_URL}/api/auth/verify`, {
     method: 'POST',

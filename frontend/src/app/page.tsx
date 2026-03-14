@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { createOrder, getOrderStatus, cancelOrder, verifyPassword, OrderStatus } from '@/lib/api';
 import VectiScanLogo from '@/components/VectiScanLogo';
 import ScanProgress from '@/components/ScanProgress';
@@ -14,6 +15,7 @@ import { useWebSocket, WsMessage } from '@/hooks/useWebSocket';
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
 export default function Home() {
+  const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
@@ -168,11 +170,7 @@ export default function Home() {
     try {
       const res = await createOrder(email.trim(), trimmed, selectedPackage);
       if (res.success && res.data) {
-        setOrderId(res.data.id);
-        initTerminal(trimmed, selectedPackage);
-        setShowReport(false);
-        setTerminalOpen(true);
-        startPolling(res.data.id);
+        router.push(`/verify/${res.data.id}`);
       } else {
         setError(res.error || 'Unbekannter Fehler');
       }
