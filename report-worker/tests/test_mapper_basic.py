@@ -19,13 +19,13 @@ def host_inventory():
     return json.loads((FIXTURES / "host_inventory.json").read_text())
 
 def test_basic_no_cvss(basic_output, scan_meta, host_inventory):
-    """Basic findings should have N/A for CVSS fields."""
+    """Basic findings should have em dash for CVSS fields."""
     result = map_basic_report(basic_output, scan_meta, host_inventory)
     for f in result["findings"]:
         if f["severity"] != "INFO":  # skip positive findings
-            assert f["cvss_score"] == "N/A"
-            assert f["cvss_vector"] == "N/A"
-            assert f["cwe"] == "N/A"
+            assert f["cvss_score"] == "\u2014"
+            assert f["cvss_vector"] == "\u2014"
+            assert f["cwe"] == "\u2014"
 
 def test_basic_no_appendices(basic_output, scan_meta, host_inventory):
     """Basic report should have empty appendices."""

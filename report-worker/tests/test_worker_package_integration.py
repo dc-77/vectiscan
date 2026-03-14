@@ -122,7 +122,7 @@ def test_package_in_scan_meta(base_job_data, tmp_path):
 
     captured_meta = {}
 
-    def capture_mapper(claude_output, scan_meta, host_inventory, package="professional"):
+    def capture_mapper(claude_output, scan_meta, host_inventory, package="professional", host_screenshots=None):
         captured_meta.update(scan_meta)
         return {}
 

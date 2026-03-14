@@ -86,7 +86,7 @@ class TestMapPositiveFinding:
         f = claude_output["positive_findings"][0]
         mapped = _map_positive_finding(f)
         assert mapped["severity"] == "INFO"
-        assert mapped["cvss_score"] == "N/A"
+        assert mapped["cvss_score"] == "\u2014"
         assert mapped["label_impact"] == "Bewertung"
         assert mapped["title"] == "Korrekte TLS-Konfiguration"
 
