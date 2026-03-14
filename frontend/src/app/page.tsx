@@ -102,10 +102,16 @@ function HomeContent() {
     const paramOrderId = searchParams.get('orderId');
     if (paramOrderId && !orderId && authenticated) {
       setOrderId(paramOrderId);
-      initTerminal();
       startPolling(paramOrderId);
     }
   }, [searchParams, authenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Initialize terminal once order data is available (from polling)
+  useEffect(() => {
+    if (order && orderId && !showReport) {
+      initTerminal(order.domain, order.package);
+    }
+  }, [order?.domain, order?.package]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
