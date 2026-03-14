@@ -23,7 +23,7 @@ const FEATURES: Feature[] = [
   { name: '§30 BSIG Compliance-Mapping',      basic: false, professional: false, nis2: true },
   { name: 'NIS2 Audit-Trail',                 basic: false, professional: false, nis2: true },
   { name: 'Lieferketten-Zusammenfassung',     basic: false, professional: false, nis2: true },
-  { name: 'Max. Hosts',                       basic: '3',   professional: '10',  nis2: '10' },
+  { name: 'Max. Hosts',                       basic: '5',   professional: '10',  nis2: '10' },
 ];
 
 interface PackageInfo {

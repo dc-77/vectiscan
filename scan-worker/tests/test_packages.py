@@ -19,7 +19,7 @@ class TestGetConfig:
 
     def test_basic_max_hosts(self):
         config = get_config("basic")
-        assert config["max_hosts"] == 3
+        assert config["max_hosts"] == 5
 
     def test_basic_nmap_ports(self):
         config = get_config("basic")

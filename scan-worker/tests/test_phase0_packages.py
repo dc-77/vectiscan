@@ -72,15 +72,15 @@ class TestPhase0Packages:
     @patch("scanner.phase0.run_amass", return_value=[])
     @patch("scanner.phase0.run_subfinder", return_value=[])
     @patch("scanner.phase0.run_crtsh", return_value=[])
-    def test_basic_max_hosts_limits_to_3(
+    def test_basic_max_hosts_limits_to_5(
         self, mock_crtsh, mock_subfinder, mock_amass, mock_gobuster,
         mock_zone, mock_dns, mock_dnsx, tmp_path
     ):
-        """When 5 hosts are discovered, basic config should limit to 3."""
-        # Make dnsx return 5 validated hosts with different IPs
+        """When 8 hosts are discovered, basic config should limit to 5."""
+        # Make dnsx return 8 validated hosts with different IPs
         mock_dnsx.return_value = [
             {"host": f"h{i}.example.com", "a": [f"1.2.3.{i}"]}
-            for i in range(5)
+            for i in range(8)
         ]
         from scanner.phase0 import run_phase0
         config = get_config("basic")
@@ -91,4 +91,4 @@ class TestPhase0Packages:
         config_with_dnsx = {**config, "phase0_tools": [*config["phase0_tools"], "dnsx"]}
         inventory = run_phase0("example.com", scan_dir, "test-id", config_with_dnsx)
 
-        assert len(inventory["hosts"]) <= 3
+        assert len(inventory["hosts"]) <= 5

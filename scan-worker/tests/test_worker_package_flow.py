@@ -29,7 +29,7 @@ class TestWorkerPackageFlow:
         mock_get_config.return_value = {
             "phase0_tools": ["crtsh", "subfinder"],
             "phase0_timeout": 300,
-            "max_hosts": 3,
+            "max_hosts": 5,
             "nmap_ports": "--top-ports 100",
             "phase1_tools": ["nmap", "webtech", "wafw00f"],
             "phase2_tools": ["testssl", "headers", "gowitness"],
@@ -62,7 +62,7 @@ class TestWorkerPackageFlow:
         mock_get_config.return_value = {
             "phase0_tools": ["crtsh"],
             "phase0_timeout": 300,
-            "max_hosts": 3,
+            "max_hosts": 5,
             "nmap_ports": "--top-ports 100",
             "phase1_tools": ["nmap"],
             "phase2_tools": ["testssl"],

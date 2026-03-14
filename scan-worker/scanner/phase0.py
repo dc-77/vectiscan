@@ -497,10 +497,31 @@ def merge_and_group(
             "rdns": rdns,
         })
 
+    # Prioritize hosts: base domain first, then web hosts, then others
+    # Mail/autodiscover hosts are deprioritized so web assets get scanned
+    def _host_priority(host: dict[str, Any]) -> tuple[int, str]:
+        fqdns_lower = [f.lower() for f in host["fqdns"]]
+        # Priority 0: host that serves the base domain itself
+        if domain.lower() in fqdns_lower:
+            return (0, host["ip"])
+        # Priority 1: www subdomain
+        if f"www.{domain.lower()}" in fqdns_lower:
+            return (1, host["ip"])
+        # Priority 3: mail/autodiscover/mx — deprioritize
+        mail_keywords = ("mail.", "mx.", "smtp.", "imap.", "pop.", "autodiscover.", "exchange.")
+        if any(f.startswith(kw) for f in fqdns_lower for kw in mail_keywords):
+            return (3, host["ip"])
+        # Priority 2: everything else (web hosts, portals, apps)
+        return (2, host["ip"])
+
+    hosts.sort(key=_host_priority)
+
     # Limit to max_hosts
     skipped_hosts: list[dict[str, Any]] = []
     if len(hosts) > max_hosts:
-        log.warning("hosts_limited", total=len(hosts), max=max_hosts)
+        log.warning("hosts_limited", total=len(hosts), max=max_hosts,
+                    kept=[h["ip"] for h in hosts[:max_hosts]],
+                    skipped=[h["ip"] for h in hosts[max_hosts:]])
         skipped_hosts = hosts[max_hosts:]
         hosts = hosts[:max_hosts]
 

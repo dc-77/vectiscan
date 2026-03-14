@@ -6,7 +6,7 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
     "basic": {
         "phase0_tools": ["crtsh", "subfinder", "dnsx"],
         "phase0_timeout": 300,        # 5 Minuten
-        "max_hosts": 3,
+        "max_hosts": 5,
         "nmap_ports": "--top-ports 100",
         "phase1_tools": ["nmap", "webtech", "wafw00f"],
         "phase2_tools": ["testssl", "headers", "gowitness"],
