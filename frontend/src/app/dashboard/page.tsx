@@ -260,12 +260,20 @@ export default function Dashboard() {
                   const statusLabel = PHASE_LABELS[order.status] || order.status;
                   const statusColor = PHASE_COLORS[order.status] || 'bg-gray-500';
                   const active = isActive(order.status);
+                  const needsVerify = order.status === 'verification_pending' || order.status === 'verified';
+                  const isRunning = active && !needsVerify;
+
+                  const rowHref = needsVerify
+                    ? `/verify/${order.id}`
+                    : isRunning
+                      ? `/?orderId=${order.id}`
+                      : undefined;
 
                   return (
                     <tr
                       key={order.id}
-                      className={`bg-[#1e293b] hover:bg-[#253347] transition-colors ${active ? 'cursor-pointer' : ''}`}
-                      onClick={active ? () => router.push(`/?orderId=${order.id}`) : undefined}
+                      className={`bg-[#1e293b] hover:bg-[#253347] transition-colors ${rowHref ? 'cursor-pointer' : ''}`}
+                      onClick={rowHref ? () => router.push(rowHref) : undefined}
                     >
                       <td className="px-4 py-3">
                         <span className="font-mono text-cyan-400 text-sm">{order.domain}</span>
@@ -288,7 +296,15 @@ export default function Dashboard() {
                         {formatDate(order.createdAt)}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        {active && (
+                        {needsVerify && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
+                            className="text-xs text-yellow-400 hover:text-yellow-300 font-medium transition-colors"
+                          >
+                            Verifizieren
+                          </button>
+                        )}
+                        {isRunning && (
                           <button
                             onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
                             className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors"
