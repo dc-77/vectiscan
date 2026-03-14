@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createScan, getScanStatus, cancelScan, verifyPassword, ScanStatus } from '@/lib/api';
 import VectiScanLogo from '@/components/VectiScanLogo';
-import ScanProgress from '@/components/ScanProgress';
-import HostList from '@/components/HostList';
 import ReportDownload from '@/components/ReportDownload';
 import ScanError from '@/components/ScanError';
 import PackageSelector, { ScanPackage } from '@/components/PackageSelector';
+import NoiseMatrix from '@/components/terminal/NoiseMatrix';
+import ScanTerminal from '@/components/terminal/ScanTerminal';
+import { useTerminalFeed } from '@/components/terminal/useTerminalFeed';
 
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
@@ -23,7 +24,12 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const { lines, processStatus, initTerminal, reset: resetTerminal } = useTerminalFeed();
 
   useEffect(() => {
     if (sessionStorage.getItem('vectiscan_auth') === 'true') {
@@ -62,14 +68,26 @@ export default function Home() {
       const res = await getScanStatus(id);
       if (res.success && res.data) {
         setScan(res.data);
-        if (res.data.status === 'report_complete' || res.data.status === 'failed') {
+        processStatus(res.data);
+        if (res.data.status === 'report_complete') {
+          stopPolling();
+          // Wait 2 seconds to show the "REPORT FERTIG" message, then transition
+          setTimeout(() => {
+            setTransitioning(true);
+            setTimeout(() => {
+              setShowTerminal(false);
+              setShowReport(true);
+              setTransitioning(false);
+            }, 800);
+          }, 2000);
+        } else if (res.data.status === 'failed') {
           stopPolling();
         }
       }
     } catch {
       // Network error — keep polling
     }
-  }, [stopPolling]);
+  }, [stopPolling, processStatus]);
 
   const startPolling = useCallback((id: string) => {
     stopPolling();
@@ -98,6 +116,9 @@ export default function Home() {
       const res = await createScan(trimmed, selectedPackage);
       if (res.success && res.data) {
         setScanId(res.data.id);
+        initTerminal(trimmed, selectedPackage);
+        setShowTerminal(true);
+        setShowReport(false);
         startPolling(res.data.id);
       } else {
         setError(res.error || 'Unbekannter Fehler');
@@ -111,6 +132,9 @@ export default function Home() {
 
   const handleRetry = () => {
     stopPolling();
+    resetTerminal();
+    setShowTerminal(false);
+    setShowReport(false);
     setDomain('');
     setSelectedPackage('professional');
     setScanId(null);
@@ -170,66 +194,91 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-4 py-12">
-      <div className="w-full max-w-5xl space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-2">
-          <VectiScanLogo className="mb-4" />
-          <p className="text-gray-400">Automatisierte Security-Scan-Plattform</p>
-        </div>
+    <main className="min-h-screen relative">
+      {/* Noise Matrix — only during scanning */}
+      {showTerminal && <NoiseMatrix active={!!isScanning} />}
 
-        {/* Domain Input + Package Selection */}
-        {!scanId && (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex gap-3 max-w-2xl mx-auto">
-              <input
-                type="text"
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                placeholder="beispiel.de"
-                disabled={submitting}
-                className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono disabled:opacity-50"
-              />
-              <button
-                type="submit"
-                disabled={submitting || !domain.trim()}
-                className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
-              >
-                {submitting ? 'Startet...' : 'Scan starten'}
-              </button>
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 py-12">
+        {/* Form section — hide when terminal is shown */}
+        {!scanId && !showReport && (
+          <div className={`w-full max-w-5xl space-y-8 transition-opacity duration-300 ${showTerminal ? 'opacity-0' : 'opacity-100'}`}>
+            {/* Header */}
+            <div className="text-center space-y-2">
+              <VectiScanLogo className="mb-4" />
+              <p className="text-gray-400">Automatisierte Security-Scan-Plattform</p>
             </div>
-            <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />
-          </form>
-        )}
 
-        {/* Error Toast */}
-        {error && !scanId && (
-          <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
-            {error}
+            {/* Domain Input + Package Selection */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="flex gap-3 max-w-2xl mx-auto">
+                <input
+                  type="text"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  placeholder="beispiel.de"
+                  disabled={submitting}
+                  className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={submitting || !domain.trim()}
+                  className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
+                >
+                  {submitting ? 'Startet...' : 'Scan starten'}
+                </button>
+              </div>
+              <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />
+            </form>
+
+            {/* Error Toast */}
+            {error && (
+              <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
+                {error}
+              </div>
+            )}
           </div>
         )}
 
-        {/* Scan Progress */}
-        {scan && isScanning && (
-          <ScanProgress
-            scan={scan}
-            onCancel={handleCancel}
-            cancelling={cancelling}
-          />
+        {/* Terminal section */}
+        {showTerminal && (
+          <div className={`w-full transition-opacity duration-500 ${transitioning ? 'opacity-0' : 'opacity-100'}`}>
+            <ScanTerminal
+              lines={lines}
+              currentTool={scan?.progress.currentTool || null}
+              currentHost={scan?.progress.currentHost || null}
+              isScanning={!!isScanning}
+              isComplete={scan?.status === 'report_complete'}
+              isError={scan?.status === 'failed'}
+            />
+
+            {/* Cancel button below terminal */}
+            {isScanning && (
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={handleCancel}
+                  disabled={cancelling}
+                  className="px-4 py-2 text-sm text-gray-400 border border-gray-700 rounded-lg hover:border-red-500 hover:text-red-400 transition-colors"
+                >
+                  {cancelling ? 'Wird abgebrochen...' : 'Scan abbrechen'}
+                </button>
+              </div>
+            )}
+          </div>
         )}
 
-        {/* Host List */}
-        {scan && scan.progress.discoveredHosts.length > 0 && scan.status !== 'failed' && (
-          <HostList hosts={scan.progress.discoveredHosts} />
+        {/* Report download — after terminal fades out */}
+        {showReport && scan?.status === 'report_complete' && (
+          <div className="animate-fadeIn">
+            <ReportDownload
+              scanId={scan.id}
+              domain={scan.domain}
+              onNewScan={handleRetry}
+            />
+          </div>
         )}
 
-        {/* Report Download */}
-        {scan && scan.status === 'report_complete' && scanId && (
-          <ReportDownload scanId={scanId} domain={scan.domain} onNewScan={handleRetry} />
-        )}
-
-        {/* Error State */}
-        {scan && scan.status === 'failed' && (
+        {/* Error — shown after terminal, with retry button */}
+        {scan?.status === 'failed' && !showTerminal && (
           <ScanError error={scan.error} onRetry={handleRetry} />
         )}
       </div>
