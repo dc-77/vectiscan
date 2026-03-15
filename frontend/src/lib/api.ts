@@ -208,6 +208,64 @@ export async function deleteOrderPermanent(id: string): Promise<ApiResponse<null
   return handleResponse(res);
 }
 
+// --- Profile ---
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/auth/password`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  return handleResponse(res);
+}
+
+// --- Admin: Users ---
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  role: string;
+  customerId: string | null;
+  orderCount: number;
+  createdAt: string;
+}
+
+export async function listUsers(): Promise<ApiResponse<{ users: AdminUser[] }>> {
+  const res = await fetch(`${API_URL}/api/admin/users`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function changeUserRole(userId: string, role: string): Promise<ApiResponse<{ id: string; email: string; role: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/users/${userId}/role`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify({ role }),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteUser(userId: string): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export interface AdminStats {
+  users: { total: number; admins: number };
+  orders: { total: number; today: number; byStatus: Record<string, number> };
+}
+
+export async function getAdminStats(): Promise<ApiResponse<AdminStats>> {
+  const res = await fetch(`${API_URL}/api/admin/stats`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
 export async function manualVerify(orderId: string): Promise<ApiResponse<VerificationCheckResult>> {
   const res = await fetch(`${API_URL}/api/verify/manual`, {
     method: 'POST',

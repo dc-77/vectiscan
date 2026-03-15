@@ -6,6 +6,7 @@ import { isValidDomain } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
 import { verifyJwt } from '../lib/auth.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { audit } from '../lib/audit.js';
 
 async function streamReport(reply: FastifyReply, report: Record<string, unknown>) {
   const bucket = report.minio_bucket as string;
@@ -85,6 +86,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     );
 
     const order = result.rows[0];
+
+    audit({ orderId: order.id, action: 'order.created', details: { domain, package: pkg }, ip: request.ip });
 
     return reply.status(201).send({
       success: true,
@@ -246,6 +249,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       // Increment download count
       await query('UPDATE reports SET download_count = download_count + 1 WHERE order_id = $1', [id]);
 
+      audit({ orderId: id, action: 'report.downloaded', details: { via: 'download_token' }, ip: request.ip });
+
       return streamReport(reply, report);
     }
 
@@ -283,6 +288,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     if (result.rows.length === 0) {
       return reply.status(404).send({ success: false, error: 'Report not yet available' });
     }
+
+    audit({ orderId: id, action: 'report.downloaded', details: { via: 'jwt', userId: user.sub }, ip: request.ip });
 
     return streamReport(reply, result.rows[0] as Record<string, unknown>);
   });
@@ -334,7 +341,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       // Delete order (CASCADE removes scan_results + reports)
       await query('DELETE FROM orders WHERE id = $1', [id]);
 
-      server.log.info({ orderId: id, admin: user.email }, 'Order permanently deleted by admin');
+      // orderId: null because the order + its audit_log entries were just deleted (FK constraint)
+      audit({ orderId: null, action: 'order.deleted', details: { deletedOrderId: id, admin: user.email, domain: order.target_url }, ip: request.ip });
 
       return { success: true, data: null };
     }
@@ -353,6 +361,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       "UPDATE orders SET status = 'cancelled', error_message = 'Vom Benutzer abgebrochen', scan_finished_at = NOW(), updated_at = NOW() WHERE id = $1",
       [id],
     );
+
+    audit({ orderId: id, action: 'order.cancelled', details: { userId: user.sub, previousStatus: status }, ip: request.ip });
 
     // Notify via Redis Pub/Sub so WebSocket clients get the update
     await publishEvent(id, {

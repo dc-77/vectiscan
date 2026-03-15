@@ -162,7 +162,15 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {userEmail && (
-              <span className="text-xs text-gray-500 hidden sm:inline">{userEmail}</span>
+              <Link href="/profile" className="text-xs text-gray-500 hover:text-white hidden sm:inline transition-colors">{userEmail}</Link>
+            )}
+            {admin && (
+              <Link
+                href="/admin"
+                className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 text-sm font-medium px-3 py-2 rounded-lg transition-colors"
+              >
+                Admin
+              </Link>
             )}
             <Link
               href="/"

@@ -50,6 +50,10 @@ jest.mock('../lib/auth', () => ({
   }),
 }));
 
+jest.mock('../lib/audit', () => ({
+  audit: jest.fn().mockResolvedValue(undefined),
+}));
+
 jest.mock('../lib/email', () => ({
   sendScanCompleteEmail: jest.fn().mockResolvedValue(undefined),
   sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
