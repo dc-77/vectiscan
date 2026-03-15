@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 interface Props {
   error: string | null;
   onRetry: () => void;
@@ -29,12 +31,20 @@ export default function ScanError({ error, onRetry }: Props) {
           Versuchen Sie es erneut oder wählen Sie ein Paket mit längerem Zeitlimit.
         </p>
       )}
-      <button
-        onClick={onRetry}
-        className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
-      >
-        Neuen Scan starten
-      </button>
+      <div className="flex flex-col items-center gap-3">
+        <button
+          onClick={onRetry}
+          className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+        >
+          Neuen Scan starten
+        </button>
+        <Link
+          href="/dashboard"
+          className="inline-block bg-[#1e293b] hover:bg-[#253347] text-gray-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors"
+        >
+          Dashboard
+        </Link>
+      </div>
     </div>
   );
 }
