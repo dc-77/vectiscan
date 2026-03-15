@@ -39,8 +39,8 @@ export default function ToolProgress({ tool, host }: ToolProgressProps) {
       setFrame(f => f + 1);
       setElapsed(Math.floor((Date.now() - startRef.current) / 1000));
 
-      // Random burst — ~8% chance per tick
-      if (Math.random() < 0.08) {
+      // Random burst — ~3% chance per tick
+      if (Math.random() < 0.03) {
         setBurst({ pos: Math.floor(Math.random() * 18), age: 0 });
       }
       // Age out bursts
@@ -55,8 +55,8 @@ export default function ToolProgress({ tool, host }: ToolProgressProps) {
 
   const spinner = SPINNER_FRAMES[frame % SPINNER_FRAMES.length];
 
-  // Cycling data fragment — pick two for more activity
-  const fragmentIdx = Math.floor(frame / 10) % DATA_FRAGMENTS.length;
+  // Cycling data fragment
+  const fragmentIdx = Math.floor(frame / 12) % DATA_FRAGMENTS.length;
   const fragment1 = DATA_FRAGMENTS[fragmentIdx];
   const fragment2 = DATA_FRAGMENTS[(fragmentIdx + 7) % DATA_FRAGMENTS.length];
 
