@@ -12,7 +12,8 @@ import ScanError from '@/components/ScanError';
 import PackageSelector, { ScanPackage } from '@/components/PackageSelector';
 import ScanTerminal from '@/components/terminal/ScanTerminal';
 import { useTerminalFeed } from '@/components/terminal/useTerminalFeed';
-import { useWebSocket, WsMessage } from '@/hooks/useWebSocket';
+import { useWebSocket, WsMessage, AiStrategy, AiConfig } from '@/hooks/useWebSocket';
+import ScanIntelligence, { HostNode, ToolOutputEntry } from '@/components/ScanIntelligence';
 
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
@@ -40,11 +41,54 @@ function HomeContent() {
   const [wsConnected, setWsConnected] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Intelligence panel state
+  const [aiStrategy, setAiStrategy] = useState<AiStrategy | null>(null);
+  const [aiConfigs, setAiConfigs] = useState<Record<string, AiConfig>>({});
+  const [toolOutputs, setToolOutputs] = useState<ToolOutputEntry[]>([]);
+  const [intelligenceHosts, setIntelligenceHosts] = useState<HostNode[]>([]);
+
   const { lines, processStatus, initTerminal, reset: resetTerminal } = useTerminalFeed();
 
-  // WebSocket message handler — updates order state from real-time events
+  // Build HostNode list from discovered hosts + AI strategy
+  const updateIntelligenceHosts = useCallback((
+    discoveredHosts: Array<{ ip: string; fqdns: string[]; status?: string }>,
+    strategy: AiStrategy | null,
+    currentHost: string | null,
+  ) => {
+    const skipIps = new Set(
+      (strategy?.hosts || []).filter(h => h.action === 'skip').map(h => h.ip)
+    );
+    const nodes: HostNode[] = discoveredHosts.map(h => ({
+      ip: h.ip,
+      fqdns: h.fqdns,
+      status: skipIps.has(h.ip) ? 'skipped' as const
+        : h.ip === currentHost ? 'scanning' as const
+        : h.status === 'scanned' ? 'scanned' as const
+        : 'discovered' as const,
+      reasoning: strategy?.hosts.find(s => s.ip === h.ip)?.reasoning,
+    }));
+    setIntelligenceHosts(nodes);
+  }, []);
+
+  // WebSocket message handler
   const handleWsMessage = useCallback((msg: WsMessage) => {
     if (msg.type === 'connected') return;
+
+    // Handle AI events
+    if (msg.type === 'ai_strategy' && msg.strategy) {
+      setAiStrategy(msg.strategy);
+      return;
+    }
+    if (msg.type === 'ai_config' && msg.ip && msg.config) {
+      setAiConfigs(prev => ({ ...prev, [msg.ip!]: msg.config! }));
+      return;
+    }
+    if (msg.type === 'tool_output' && msg.tool && msg.summary) {
+      setToolOutputs(prev => [...prev.slice(-50), {
+        tool: msg.tool!, host: msg.host || '', summary: msg.summary!, ts: Date.now(),
+      }]);
+      return;
+    }
 
     setOrder((prev) => {
       if (!prev) return prev;
@@ -79,6 +123,17 @@ function HomeContent() {
     });
   }, [processStatus]);
 
+  // Update intelligence hosts when order changes
+  useEffect(() => {
+    if (order?.progress.discoveredHosts) {
+      updateIntelligenceHosts(
+        order.progress.discoveredHosts,
+        aiStrategy,
+        order.progress.currentHost,
+      );
+    }
+  }, [order?.progress.discoveredHosts, order?.progress.currentHost, aiStrategy, updateIntelligenceHosts]);
+
   const handleWsConnectionChange = useCallback((connected: boolean) => {
     setWsConnected(connected);
   }, []);
@@ -97,7 +152,7 @@ function HomeContent() {
     setReady(true);
   }, [router]);
 
-  // Resume scan from orderId query param (from dashboard or verify redirect)
+  // Resume scan from orderId query param
   useEffect(() => {
     const paramOrderId = searchParams.get('orderId');
     if (paramOrderId && !orderId && ready) {
@@ -106,8 +161,6 @@ function HomeContent() {
     }
   }, [searchParams, ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Redirect to verify page if order still needs verification
-  // Skip redirect briefly after arriving from verify page to avoid race condition
   const fromVerifyRef = useRef(false);
   useEffect(() => {
     if (searchParams.get('orderId')) {
@@ -124,7 +177,6 @@ function HomeContent() {
     }
   }, [order?.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Initialize terminal once order data is available (from polling)
   useEffect(() => {
     if (order && orderId && !showReport && order.status !== 'verification_pending' && order.status !== 'verified') {
       initTerminal(order.domain, order.package);
@@ -145,9 +197,7 @@ function HomeContent() {
         setOrder(res.data);
         processStatus(res.data);
       }
-    } catch {
-      // Network error — keep polling
-    }
+    } catch { /* keep polling */ }
   }, [processStatus]);
 
   const startPolling = useCallback((id: string) => {
@@ -161,7 +211,6 @@ function HomeContent() {
     return () => stopPolling();
   }, [stopPolling]);
 
-  // Stop polling when order completes or fails
   useEffect(() => {
     if (!order) return;
     if (order.status === 'report_complete') {
@@ -180,12 +229,8 @@ function HomeContent() {
     setOrder(null);
     setOrderId(null);
 
-    // Strip protocol, path, port, trailing slash from input
     let trimmed = domain.trim().toLowerCase()
-      .replace(/^https?:\/\//, '')  // remove http:// or https://
-      .replace(/\/.*$/, '')          // remove path
-      .replace(/:\d+$/, '')          // remove port
-      .replace(/\.$/, '');           // remove trailing dot
+      .replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '').replace(/\.$/, '');
 
     if (!DOMAIN_REGEX.test(trimmed)) {
       setError('Ungültige Domain. Beispiel: beispiel.de');
@@ -218,6 +263,10 @@ function HomeContent() {
     setOrder(null);
     setError(null);
     setCancelling(false);
+    setAiStrategy(null);
+    setAiConfigs({});
+    setToolOutputs([]);
+    setIntelligenceHosts([]);
   };
 
   const handleCancel = async () => {
@@ -243,47 +292,29 @@ function HomeContent() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-4xl space-y-6">
-        {/* Header — always visible when no report shown */}
+      <div className={`w-full space-y-6 ${isScanning ? 'max-w-7xl' : 'max-w-4xl'}`}>
+        {/* Header */}
         {!showReport && (
           <div className="text-center space-y-2">
             <VectiScanLogo className="mb-4" />
             <p className="text-gray-400">Automatisierte Security-Scan-Plattform</p>
             <div className="flex items-center justify-center gap-2 mt-2">
-              <Link
-                href="/dashboard"
-                className="bg-[#1e293b] hover:bg-[#253347] text-gray-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors"
-              >
-                Dashboard
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors"
-              >
-                Abmelden
-              </button>
+              <Link href="/dashboard" className="bg-[#1e293b] hover:bg-[#253347] text-gray-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors">Dashboard</Link>
+              <button onClick={handleLogout} className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors">Abmelden</button>
             </div>
           </div>
         )}
 
-        {/* Form — only when no order is running */}
+        {/* Form */}
         {!orderId && !showReport && (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col gap-3 max-w-2xl mx-auto">
               <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  placeholder="beispiel.de"
-                  disabled={submitting}
-                  className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono disabled:opacity-50"
-                />
-                <button
-                  type="submit"
-                  disabled={submitting || !domain.trim()}
-                  className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
-                >
+                <input type="text" value={domain} onChange={(e) => setDomain(e.target.value)}
+                  placeholder="beispiel.de" disabled={submitting}
+                  className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono disabled:opacity-50" />
+                <button type="submit" disabled={submitting || !domain.trim()}
+                  className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors">
                   {submitting ? 'Startet...' : 'Scan starten'}
                 </button>
               </div>
@@ -292,50 +323,49 @@ function HomeContent() {
           </form>
         )}
 
-        {/* Error Toast */}
         {error && !orderId && (
-          <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
-            {error}
-          </div>
+          <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">{error}</div>
         )}
 
-        {/* Scan in progress: Professional status card + terminal box */}
+        {/* Scanning: Split-screen command center */}
         {order && order.status !== 'report_complete' && order.status !== 'cancelled' && (
           <>
-            {/* Primary: ScanProgress with progress bar and status */}
-            <ScanProgress
-              scan={order}
-              onCancel={isScanning ? handleCancel : undefined}
-              cancelling={cancelling}
-            />
+            <ScanProgress scan={order} onCancel={isScanning ? handleCancel : undefined} cancelling={cancelling} />
 
-            {/* Secondary: Collapsible terminal log */}
-            <div className="rounded-lg border border-[#1E3A5F]/50 overflow-hidden">
-              <button
-                onClick={() => setTerminalOpen(!terminalOpen)}
-                className="w-full flex items-center justify-between px-4 py-2.5 bg-[#0C1222] hover:bg-[#0F172A] transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${isScanning ? 'bg-[#38BDF8] animate-pulse' : order.status === 'failed' ? 'bg-red-500' : 'bg-[#4B7399]'}`} />
-                  <span className="text-xs font-mono text-[#4B7399]">Terminal Log</span>
-                  <span className="text-xs text-[#1E3A5F] font-mono">{lines.length} lines</span>
+            <div className="flex gap-4 items-stretch">
+              {/* Left: Terminal */}
+              <div className="flex-1 min-w-0 lg:max-w-[58%]">
+                <div className="rounded-lg border border-[#1E3A5F]/50 overflow-hidden h-full">
+                  <button onClick={() => setTerminalOpen(!terminalOpen)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 bg-[#0C1222] hover:bg-[#0F172A] transition-colors">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${isScanning ? 'bg-[#38BDF8] animate-pulse' : order.status === 'failed' ? 'bg-red-500' : 'bg-[#4B7399]'}`} />
+                      <span className="text-xs font-mono text-[#4B7399]">Terminal Log</span>
+                      <span className="text-xs text-[#1E3A5F] font-mono">{lines.length} lines</span>
+                    </div>
+                    <span className="text-[#4B7399] text-xs">{terminalOpen ? '\u25B2 Einklappen' : '\u25BC Aufklappen'}</span>
+                  </button>
+                  {terminalOpen && (
+                    <ScanTerminal lines={lines} currentTool={order.progress.currentTool || null}
+                      currentHost={order.progress.currentHost || null} isScanning={!!isScanning}
+                      isComplete={order.status === 'report_complete'} isError={order.status === 'failed'} compact />
+                  )}
                 </div>
-                <span className="text-[#4B7399] text-xs">
-                  {terminalOpen ? '▲ Einklappen' : '▼ Aufklappen'}
-                </span>
-              </button>
+              </div>
 
-              {terminalOpen && (
-                <ScanTerminal
-                  lines={lines}
-                  currentTool={order.progress.currentTool || null}
-                  currentHost={order.progress.currentHost || null}
-                  isScanning={!!isScanning}
-                  isComplete={order.status === 'report_complete'}
-                  isError={order.status === 'failed'}
-                  compact
+              {/* Right: Intelligence Panel (hidden on mobile) */}
+              <div className="hidden lg:block lg:w-[42%] shrink-0">
+                <ScanIntelligence
+                  domain={order.domain}
+                  hosts={intelligenceHosts}
+                  currentHost={order.progress.currentHost}
+                  currentTool={order.progress.currentTool}
+                  currentPhase={order.progress.phase}
+                  aiStrategy={aiStrategy}
+                  aiConfigs={aiConfigs}
+                  toolOutputs={toolOutputs}
                 />
-              )}
+              </div>
             </div>
           </>
         )}
@@ -343,15 +373,11 @@ function HomeContent() {
         {/* Report download */}
         {showReport && order?.status === 'report_complete' && (
           <div className="animate-fadeIn">
-            <ReportDownload
-              orderId={order.id}
-              domain={order.domain}
-              onNewScan={handleRetry}
-            />
+            <ReportDownload orderId={order.id} domain={order.domain} onNewScan={handleRetry} />
           </div>
         )}
 
-        {/* Error or cancelled — with retry button */}
+        {/* Error/cancelled */}
         {(order?.status === 'failed' || order?.status === 'cancelled') && (
           <ScanError error={order.error} onRetry={handleRetry} />
         )}

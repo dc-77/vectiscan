@@ -22,6 +22,7 @@ from scanner.phase0 import run_phase0
 from scanner.phase1 import run_phase1
 from scanner.phase2 import run_phase2
 from scanner.progress import (
+    publish_event,
     set_discovered_hosts,
     set_scan_complete,
     set_scan_failed,
@@ -210,6 +211,9 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
              skip=len(hosts) - hosts_total,
              notes=strategy.get("strategy_notes", ""))
 
+    # Publish AI strategy event for frontend visualization
+    publish_event(order_id, {"type": "ai_strategy", "strategy": strategy})
+
     # Update discovered hosts count to reflect actual scan targets
     set_discovered_hosts(order_id, {**host_inventory, "hosts": scan_hosts})
 
@@ -249,6 +253,9 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
         _save_result(order_id=order_id, host_ip=ip, phase=1,
                      tool_name="ai_phase2_config", raw_output=adaptive_json,
                      exit_code=0, duration_ms=0)
+
+        # Publish AI config event for frontend visualization
+        publish_event(order_id, {"type": "ai_config", "ip": ip, "config": adaptive_config})
 
         # Phase 2: Deep scan (with adaptive config)
         def p2_callback(oid: str, tool: str, status: str) -> None:

@@ -51,8 +51,8 @@ const PACKAGE_LABELS: Record<string, string> = {
 const PHASE0_TOOLS_BASIC = ['crt.sh', 'subfinder'];
 const PHASE0_TOOLS_PRO = ['crt.sh', 'subfinder', 'amass', 'gobuster DNS', 'Zone-Transfer', 'dnsx Validierung'];
 const PHASE1_TOOLS = ['nmap', 'webtech', 'wafw00f'];
-const PHASE2_TOOLS_BASIC = ['testssl.sh', 'headers', 'gowitness'];
-const PHASE2_TOOLS_PRO = ['testssl.sh', 'nikto', 'nuclei', 'gobuster dir', 'gowitness', 'headers'];
+const PHASE2_TOOLS_BASIC = ['testssl.sh', 'headers', 'gowitness', 'httpx'];
+const PHASE2_TOOLS_PRO = ['testssl.sh', 'nikto', 'nuclei', 'gobuster dir', 'gowitness', 'headers', 'httpx', 'katana', 'wpscan'];
 
 function ts(): string {
   return new Date().toLocaleTimeString('de-DE', {

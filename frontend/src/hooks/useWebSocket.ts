@@ -14,8 +14,29 @@ function getWsUrl(orderId: string): string {
   return url.toString();
 }
 
+export interface AiHostDecision {
+  ip: string;
+  action: 'scan' | 'skip';
+  priority: number | null;
+  reasoning: string;
+}
+
+export interface AiStrategy {
+  hosts: AiHostDecision[];
+  strategy_notes: string;
+}
+
+export interface AiConfig {
+  nuclei_tags?: string[];
+  nuclei_exclude_tags?: string[];
+  nikto_tuning?: string;
+  gobuster_wordlist?: string;
+  skip_tools?: string[];
+  reasoning?: string;
+}
+
 export interface WsMessage {
-  type: 'connected' | 'progress' | 'status' | 'hosts_discovered' | 'error';
+  type: 'connected' | 'progress' | 'status' | 'hosts_discovered' | 'error' | 'tool_output' | 'ai_strategy' | 'ai_config';
   orderId?: string;
   status?: string;
   currentPhase?: string;
@@ -26,6 +47,14 @@ export interface WsMessage {
   hosts?: Array<{ ip: string; fqdns: string[] }>;
   error?: string;
   updatedAt?: string;
+  // tool_output events
+  tool?: string;
+  host?: string;
+  summary?: string;
+  // AI events
+  strategy?: AiStrategy;
+  ip?: string;
+  config?: AiConfig;
 }
 
 interface UseWebSocketOptions {

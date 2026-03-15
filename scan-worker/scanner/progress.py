@@ -208,6 +208,19 @@ def set_discovered_hosts(order_id: str, host_inventory: dict) -> None:
         log.error("redis_hosts_publish_failed", order_id=order_id, error=str(e))
 
 
+def publish_event(order_id: str, event: dict) -> None:
+    """Publish a generic event via Redis pub/sub for WebSocket forwarding."""
+    try:
+        r = _get_redis()
+        if "updatedAt" not in event:
+            event["updatedAt"] = datetime.now(timezone.utc).isoformat()
+        if "orderId" not in event:
+            event["orderId"] = order_id
+        r.publish(f"scan:events:{order_id}", json.dumps(event))
+    except Exception as e:
+        log.error("publish_event_failed", order_id=order_id, event_type=event.get("type"), error=str(e))
+
+
 def publish_tool_output(
     order_id: str,
     tool: str,
