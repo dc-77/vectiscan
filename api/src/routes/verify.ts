@@ -56,7 +56,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
 
     if (verification.verified) {
       await query(
-        "UPDATE orders SET status = 'scanning', verified_at = NOW(), verification_method = $1, scan_started_at = NOW() WHERE id = $2",
+        "UPDATE orders SET status = 'queued', verified_at = NOW(), verification_method = $1 WHERE id = $2",
         [verification.method, orderId],
       );
 
@@ -72,7 +72,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
         package: order.package,
       });
 
-      await publishEvent(orderId, { type: 'status', orderId, status: 'scanning' });
+      await publishEvent(orderId, { type: 'status', orderId, status: 'queued' });
 
       return reply.send({
         success: true,
@@ -116,7 +116,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
     }
 
     await query(
-      "UPDATE orders SET status = 'scanning', verified_at = NOW(), verification_method = 'manual', scan_started_at = NOW() WHERE id = $1",
+      "UPDATE orders SET status = 'queued', verified_at = NOW(), verification_method = 'manual' WHERE id = $1",
       [orderId],
     );
 
@@ -131,7 +131,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
       package: order.package,
     });
 
-    await publishEvent(orderId, { type: 'status', orderId, status: 'scanning' });
+    await publishEvent(orderId, { type: 'status', orderId, status: 'queued' });
 
     return reply.send({ success: true, data: { verified: true, method: 'manual' } });
   });

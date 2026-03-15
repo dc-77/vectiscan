@@ -98,7 +98,7 @@ def set_scan_started(order_id: str) -> None:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE orders SET started_at = NOW(), status = 'dns_recon', updated_at = NOW() WHERE id = %s""",
+                """UPDATE orders SET scan_started_at = NOW(), status = 'dns_recon', updated_at = NOW() WHERE id = %s""",
                 (order_id,),
             )
         conn.commit()

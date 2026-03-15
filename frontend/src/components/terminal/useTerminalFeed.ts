@@ -36,7 +36,7 @@ export interface TerminalLine {
   indent?: number;
 }
 
-type ScanPhase = 'idle' | 'starting' | 'dns_recon' | 'scan_phase1' | 'scan_phase2'
+type ScanPhase = 'idle' | 'starting' | 'queued' | 'dns_recon' | 'scan_phase1' | 'scan_phase2'
   | 'scan_complete' | 'report_generating' | 'report_complete' | 'failed';
 
 const PACKAGE_LABELS: Record<string, string> = {
@@ -124,6 +124,14 @@ export function useTerminalFeed() {
       lastStatusRef.current = status;
 
       switch (status) {
+        case 'queued':
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '⏳ Scan in Warteschlange — wird gestartet, sobald ein Worker frei ist',
+            status: 'running',
+          });
+          break;
+
         case 'dns_recon':
           newLines.push({
             id: lineId(), timestamp: now,

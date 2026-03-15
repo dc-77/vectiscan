@@ -9,6 +9,7 @@ import VectiScanLogo from '@/components/VectiScanLogo';
 const PHASE_LABELS: Record<string, string> = {
   verification_pending: 'Verifizierung',
   created: 'Erstellt',
+  queued: 'In Warteschlange',
   scanning: 'Startet...',
   dns_recon: 'DNS-Recon',
   scan_phase1: 'Phase 1',
@@ -24,6 +25,7 @@ const PHASE_LABELS: Record<string, string> = {
 const PHASE_COLORS: Record<string, string> = {
   verification_pending: 'bg-yellow-600',
   created: 'bg-gray-500',
+  queued: 'bg-indigo-500',
   scanning: 'bg-blue-500',
   dns_recon: 'bg-purple-500',
   scan_phase1: 'bg-blue-500',
@@ -44,7 +46,7 @@ const PACKAGE_STYLES: Record<string, { label: string; bg: string; text: string }
 
 type StatusFilter = 'all' | 'active' | 'done' | 'failed';
 
-const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
+const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
 const DONE_STATUSES = ['report_complete'];
 const FAILED_STATUSES = ['failed', 'cancelled'];
 
