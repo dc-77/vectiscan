@@ -110,6 +110,11 @@ RUN mkdir -p /usr/share/wordlists && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt \
       -o /usr/share/wordlists/common.txt
 
+# Curated wordlists for AI-adaptive scanning
+COPY wordlists/wordpress.txt /usr/share/wordlists/wordpress.txt
+COPY wordlists/api-endpoints.txt /usr/share/wordlists/api-endpoints.txt
+COPY wordlists/cms-common.txt /usr/share/wordlists/cms-common.txt
+
 # ── 6. Scanner code ────────────────────────────────────────────────
 WORKDIR /opt/scanner
 

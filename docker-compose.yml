@@ -84,6 +84,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     deploy:
       replicas: 3
       resources:

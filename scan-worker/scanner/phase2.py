@@ -68,7 +68,8 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[di
         return None
 
 
-def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
+def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str,
+              adaptive_config: dict[str, Any] | None = None) -> Optional[dict[str, Any]]:
     """Run nikto web server scanner.
 
     Returns parsed results or None on failure.
@@ -78,12 +79,18 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict
 
     output_path = f"{phase2_dir}/nikto.json"
 
+    # AI-adaptive tuning
+    tuning = "1234567890"
+    if adaptive_config and adaptive_config.get("nikto_tuning"):
+        tuning = adaptive_config["nikto_tuning"]
+        log.info("nikto_adaptive_tuning", ip=ip, tuning=tuning)
+
     cmd = [
         "nikto.pl",
         "-h", fqdn,
         "-Format", "json",
         "-output", output_path,
-        "-Tuning", "1234567890",
+        "-Tuning", tuning,
     ]
 
     exit_code, duration_ms = run_tool(
@@ -110,7 +117,8 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict
         return None
 
 
-def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[dict[str, Any]]:
+def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str,
+               adaptive_config: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     """Run nuclei vulnerability scanner.
 
     Returns list of findings or empty list on failure.
@@ -127,6 +135,17 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[dict[st
         "-jsonl",
         "-o", output_path,
     ]
+
+    # AI-adaptive: filter templates by technology tags
+    if adaptive_config:
+        tags = adaptive_config.get("nuclei_tags")
+        if tags:
+            cmd.extend(["-tags", ",".join(tags)])
+            log.info("nuclei_adaptive_tags", ip=ip, tags=tags)
+        exclude_tags = adaptive_config.get("nuclei_exclude_tags")
+        if exclude_tags:
+            cmd.extend(["-exclude-tags", ",".join(exclude_tags)])
+            log.info("nuclei_adaptive_exclude", ip=ip, exclude=exclude_tags)
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
@@ -156,7 +175,16 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[dict[st
     return findings
 
 
-def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[str]:
+WORDLIST_MAP = {
+    "common": "/usr/share/wordlists/common.txt",
+    "wordpress": "/usr/share/wordlists/wordpress.txt",
+    "api": "/usr/share/wordlists/api-endpoints.txt",
+    "cms": "/usr/share/wordlists/cms-common.txt",
+}
+
+
+def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
+                     adaptive_config: dict[str, Any] | None = None) -> Optional[str]:
     """Run gobuster directory brute-force.
 
     Returns path to output file or None on failure.
@@ -166,10 +194,21 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str) -> Option
 
     output_path = f"{phase2_dir}/gobuster_dir.txt"
 
+    # AI-adaptive wordlist selection
+    wl_key = "common"
+    if adaptive_config and adaptive_config.get("gobuster_wordlist"):
+        wl_key = adaptive_config["gobuster_wordlist"]
+    wordlist = WORDLIST_MAP.get(wl_key, WORDLIST_MAP["common"])
+    # Fallback to common.txt if selected wordlist doesn't exist on disk
+    if not os.path.isfile(wordlist):
+        wordlist = WORDLIST_MAP["common"]
+    if wl_key != "common":
+        log.info("gobuster_adaptive_wordlist", ip=ip, wordlist=wl_key)
+
     cmd = [
         "gobuster", "dir",
         "-u", f"https://{fqdn}",
-        "-w", "/usr/share/wordlists/common.txt",
+        "-w", wordlist,
         "-o", output_path,
         "-q",
     ]
@@ -447,6 +486,7 @@ def run_phase2(
     order_id: str,
     progress_callback: Callable[[str, str, str], None],
     config: dict[str, Any] | None = None,
+    adaptive_config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Orchestrate Phase 2 (deep scan) for a single host.
 
@@ -466,6 +506,9 @@ def run_phase2(
     if config:
         phase2_tools = config.get("phase2_tools")
 
+    # AI-adaptive skip list
+    ai_skip = set(adaptive_config.get("skip_tools", [])) if adaptive_config else set()
+
     host_dir = f"{scan_dir}/hosts/{ip}"
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
@@ -473,7 +516,8 @@ def run_phase2(
     primary_fqdn = fqdns[0] if fqdns else ip
     has_ssl = tech_profile.get("has_ssl", False)
 
-    log.info("phase2_start", ip=ip, fqdn=primary_fqdn, order_id=order_id, has_ssl=has_ssl)
+    log.info("phase2_start", ip=ip, fqdn=primary_fqdn, order_id=order_id, has_ssl=has_ssl,
+             ai_skip=list(ai_skip) if ai_skip else None)
 
     results: dict[str, Any] = {
         "ip": ip,
@@ -500,8 +544,8 @@ def run_phase2(
             log.info("testssl_skipped", ip=ip, reason="not_in_package")
 
     # nikto
-    if phase2_tools is None or "nikto" in phase2_tools:
-        nikto_result = run_nikto(primary_fqdn, ip, host_dir, order_id)
+    if (phase2_tools is None or "nikto" in phase2_tools) and "nikto" not in ai_skip:
+        nikto_result = run_nikto(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
         results["nikto"] = nikto_result
         results["tools_run"].append("nikto")
         progress_callback(order_id, "nikto", "complete")
@@ -514,8 +558,8 @@ def run_phase2(
         log.info("nikto_skipped", ip=ip, reason="not_in_package")
 
     # nuclei
-    if phase2_tools is None or "nuclei" in phase2_tools:
-        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id)
+    if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip:
+        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
         results["nuclei"] = nuclei_result
         results["tools_run"].append("nuclei")
         progress_callback(order_id, "nuclei", "complete")
@@ -532,8 +576,8 @@ def run_phase2(
         log.info("nuclei_skipped", ip=ip, reason="not_in_package")
 
     # gobuster dir
-    if phase2_tools is None or "gobuster_dir" in phase2_tools:
-        gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, order_id)
+    if (phase2_tools is None or "gobuster_dir" in phase2_tools) and "gobuster_dir" not in ai_skip:
+        gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
         results["gobuster_dir"] = gobuster_result
         results["tools_run"].append("gobuster_dir")
         progress_callback(order_id, "gobuster_dir", "complete")
@@ -550,7 +594,7 @@ def run_phase2(
         log.info("gobuster_dir_skipped", ip=ip, reason="not_in_package")
 
     # gowitness
-    if phase2_tools is None or "gowitness" in phase2_tools:
+    if (phase2_tools is None or "gowitness" in phase2_tools) and "gowitness" not in ai_skip:
         gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, order_id)
         results["gowitness"] = gowitness_result
         results["tools_run"].append("gowitness")
@@ -594,7 +638,7 @@ def run_phase2(
         log.info("httpx_skipped", ip=ip, reason="not_in_package")
 
     # katana — web crawler
-    if phase2_tools is None or "katana" in phase2_tools:
+    if (phase2_tools is None or "katana" in phase2_tools) and "katana" not in ai_skip:
         katana_result = run_katana(primary_fqdn, ip, host_dir, order_id)
         results["katana"] = katana_result
         results["tools_run"].append("katana")

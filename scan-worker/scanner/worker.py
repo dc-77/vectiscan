@@ -29,6 +29,7 @@ from scanner.progress import (
     update_progress,
 )
 from scanner.upload import enqueue_report_job, pack_results, upload_to_minio
+from scanner.ai_strategy import plan_host_strategy, plan_phase2_config
 
 log = structlog.get_logger()
 
@@ -160,21 +161,62 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
     set_discovered_hosts(order_id, host_inventory)
 
     hosts = host_inventory.get("hosts", [])
-    hosts_total = len(hosts)
-    log.info("phase0_done", order_id=order_id, hosts_found=hosts_total)
+    log.info("phase0_done", order_id=order_id, hosts_found=len(hosts))
 
-    if hosts_total == 0:
+    if len(hosts) == 0:
         log.warning("no_hosts_found", order_id=order_id, domain=domain)
-        # Still complete — report worker handles empty inventory
         _finalize(order_id, scan_dir, host_inventory, [], package)
         return
 
     _check_timeout()
 
+    # ── AI Host Strategy: prioritize and filter hosts ─────
+    strategy = plan_host_strategy(host_inventory, domain, package)
+
+    # Save strategy to scan results and disk
+    strategy_json = json.dumps(strategy, indent=2, ensure_ascii=False)
+    strategy_path = os.path.join(scan_dir, "phase0", "host_strategy.json")
+    try:
+        with open(strategy_path, "w") as f:
+            f.write(strategy_json)
+    except Exception:
+        pass
+
+    from scanner.tools import _save_result
+    _save_result(order_id=order_id, host_ip=None, phase=0,
+                 tool_name="ai_host_strategy", raw_output=strategy_json,
+                 exit_code=0, duration_ms=0)
+
+    # Build scan list from strategy
+    ip_to_host = {h["ip"]: h for h in hosts}
+    scan_hosts: list[dict[str, Any]] = []
+    for sh in sorted(strategy.get("hosts", []), key=lambda h: h.get("priority") or 999):
+        if sh.get("action") == "scan" and sh["ip"] in ip_to_host:
+            entry = ip_to_host[sh["ip"]]
+            entry["_reasoning"] = sh.get("reasoning", "")
+            scan_hosts.append(entry)
+        elif sh.get("action") == "skip":
+            _save_result(order_id=order_id, host_ip=sh["ip"], phase=0,
+                         tool_name="ai_host_skip", raw_output=f"SKIP: {sh.get('reasoning', 'Kein Grund angegeben')}",
+                         exit_code=0, duration_ms=0)
+            log.info("host_skipped_by_ai", ip=sh["ip"], reasoning=sh.get("reasoning"))
+
+    # Fallback if strategy returned nothing scannable
+    if not scan_hosts:
+        scan_hosts = hosts
+
+    hosts_total = len(scan_hosts)
+    log.info("ai_strategy_applied", scan=hosts_total,
+             skip=len(hosts) - hosts_total,
+             notes=strategy.get("strategy_notes", ""))
+
+    # Update discovered hosts count to reflect actual scan targets
+    set_discovered_hosts(order_id, {**host_inventory, "hosts": scan_hosts})
+
     # ── Phase 1 + 2: Per-Host scanning (sequential) ────────
     tech_profiles: list[dict[str, Any]] = []
 
-    for idx, host in enumerate(hosts):
+    for idx, host in enumerate(scan_hosts):
         ip = host["ip"]
         fqdns = host["fqdns"]
 
@@ -192,7 +234,7 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
         def p1_callback(oid: str, tool: str, status: str) -> None:
             update_progress(oid, "scan_phase1", tool, host=ip,
                             hosts_completed=idx, hosts_total=hosts_total)
-            _check_timeout()  # Check cancel/timeout between each tool
+            _check_timeout()
 
         update_progress(order_id, "scan_phase1", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
@@ -201,16 +243,24 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
 
         _check_timeout()
 
-        # Phase 2: Deep scan
+        # AI Phase 2 config: adapt tools to discovered tech stack
+        adaptive_config = plan_phase2_config(tech_profile, host_inventory, package)
+        adaptive_json = json.dumps(adaptive_config, indent=2, ensure_ascii=False)
+        _save_result(order_id=order_id, host_ip=ip, phase=1,
+                     tool_name="ai_phase2_config", raw_output=adaptive_json,
+                     exit_code=0, duration_ms=0)
+
+        # Phase 2: Deep scan (with adaptive config)
         def p2_callback(oid: str, tool: str, status: str) -> None:
             update_progress(oid, "scan_phase2", tool, host=ip,
                             hosts_completed=idx, hosts_total=hosts_total)
-            _check_timeout()  # Check cancel/timeout between each tool
+            _check_timeout()
 
         update_progress(order_id, "scan_phase2", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
         _check_timeout()
-        run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config)
+        run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
+                   adaptive_config=adaptive_config)
 
         log.info("host_complete", order_id=order_id, ip=ip, idx=idx + 1, total=hosts_total)
 
