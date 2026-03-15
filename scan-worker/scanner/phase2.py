@@ -34,12 +34,12 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[di
     output_path = f"{phase2_dir}/testssl.json"
 
     cmd = [
-        "testssl.sh",
+        "bash", "/opt/testssl.sh/testssl.sh",
         "--jsonfile", output_path,
         "--quiet",
         "--ip", "one",
         "--warnings", "off",
-        fqdn,
+        f"https://{fqdn}",
     ]
 
     exit_code, duration_ms = run_tool(
@@ -199,10 +199,13 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
 
+    chrome_path = os.environ.get("CHROME_PATH", "/usr/bin/chromium")
     cmd = [
         "gowitness", "scan", "single",
         "-u", f"https://{fqdn}",
         "--screenshot-path", f"{phase2_dir}/",
+        "--chrome-path", chrome_path,
+        "--no-sandbox",
     ]
 
     exit_code, duration_ms = run_tool(

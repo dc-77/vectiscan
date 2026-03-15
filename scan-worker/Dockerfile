@@ -6,10 +6,15 @@ LABEL maintainer="VectiScan" \
 # ── 1. System packages ──────────────────────────────────────────────
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      ca-certificates curl wget unzip jq dnsutils git \
+      ca-certificates curl wget unzip jq dnsutils git bash \
       python3 python3-pip python3-venv \
-      nmap openssl libnet-ssleay-perl && \
+      nmap openssl libnet-ssleay-perl \
+      chromium && \
     rm -rf /var/lib/apt/lists/*
+
+# gowitness/katana need Chrome — set path
+ENV CHROME_PATH="/usr/bin/chromium"
+ENV CHROMIUM_PATH="/usr/bin/chromium"
 
 # ── 2. Go binaries — pinned versions ────────────────────────────────
 
