@@ -35,6 +35,18 @@ jest.mock('../services/VerificationService', () => ({
   verifyAll: jest.fn(),
 }));
 
+jest.mock('../lib/auth', () => ({
+  hashPassword: jest.fn().mockResolvedValue('$2a$12$mockhash'),
+  verifyPasswordHash: jest.fn().mockResolvedValue(true),
+  generateJwt: jest.fn().mockReturnValue('mock-jwt-token'),
+  verifyJwt: jest.fn().mockReturnValue({
+    sub: 'user-uuid-1234',
+    role: 'admin',
+    customerId: 'cust-0000-0000-0000-000000000001',
+    email: 'admin@test.com',
+  }),
+}));
+
 import { query } from '../lib/db';
 import { scanQueue } from '../lib/queue';
 
@@ -43,6 +55,7 @@ const mockScanQueueAdd = scanQueue.add as jest.MockedFunction<typeof scanQueue.a
 
 const TEST_UUID = '550e8400-e29b-41d4-a716-446655440000';
 const CUST_UUID = 'cust-0000-0000-0000-000000000001';
+const AUTH_HEADER = { authorization: 'Bearer mock-jwt-token' };
 
 function mockCustomerResult() {
   return {
@@ -108,13 +121,13 @@ describe('Package selection', () => {
 
   describe('POST /api/orders with package', () => {
     it('should accept package=basic', async () => {
-      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('basic'));
 
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
-        payload: { domain: 'example.com', email: 'test@example.com', package: 'basic' },
+        headers: AUTH_HEADER,
+        payload: { domain: 'example.com', package: 'basic' },
       });
 
       expect(res.statusCode).toBe(201);
@@ -124,13 +137,13 @@ describe('Package selection', () => {
     });
 
     it('should accept package=professional', async () => {
-      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('professional'));
 
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
-        payload: { domain: 'example.com', email: 'test@example.com', package: 'professional' },
+        headers: AUTH_HEADER,
+        payload: { domain: 'example.com', package: 'professional' },
       });
 
       expect(res.statusCode).toBe(201);
@@ -138,13 +151,13 @@ describe('Package selection', () => {
     });
 
     it('should accept package=nis2', async () => {
-      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('nis2'));
 
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
-        payload: { domain: 'example.com', email: 'test@example.com', package: 'nis2' },
+        headers: AUTH_HEADER,
+        payload: { domain: 'example.com', package: 'nis2' },
       });
 
       expect(res.statusCode).toBe(201);
@@ -155,7 +168,8 @@ describe('Package selection', () => {
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
-        payload: { domain: 'example.com', email: 'test@example.com', package: 'invalid' },
+        headers: AUTH_HEADER,
+        payload: { domain: 'example.com', package: 'invalid' },
       });
 
       expect(res.statusCode).toBe(400);
@@ -165,13 +179,13 @@ describe('Package selection', () => {
     });
 
     it('should default to professional when no package specified', async () => {
-      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('professional'));
 
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
-        payload: { domain: 'example.com', email: 'test@example.com' },
+        headers: AUTH_HEADER,
+        payload: { domain: 'example.com' },
       });
 
       expect(res.statusCode).toBe(201);
@@ -179,13 +193,13 @@ describe('Package selection', () => {
     });
 
     it('should not queue scan job (verification required first)', async () => {
-      mockQuery.mockResolvedValueOnce(mockCustomerResult());
       mockQuery.mockResolvedValueOnce(mockInsertResult('nis2'));
 
       await server.inject({
         method: 'POST',
         url: '/api/orders',
-        payload: { domain: 'example.com', email: 'test@example.com', package: 'nis2' },
+        headers: AUTH_HEADER,
+        payload: { domain: 'example.com', package: 'nis2' },
       });
 
       expect(mockScanQueueAdd).not.toHaveBeenCalled();
@@ -198,7 +212,7 @@ describe('Package selection', () => {
         .mockResolvedValueOnce(mockOrderRow('basic'))
         .mockResolvedValueOnce(emptyResult);
 
-      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}` });
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
       expect(res.statusCode).toBe(200);
       const body = res.json();
       expect(body.data.package).toBe('basic');
@@ -210,7 +224,7 @@ describe('Package selection', () => {
         .mockResolvedValueOnce(mockOrderRow('professional'))
         .mockResolvedValueOnce(emptyResult);
 
-      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}` });
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
       const body = res.json();
       expect(body.data.package).toBe('professional');
       expect(body.data.estimatedDuration).toBe('~45 Minuten');
@@ -221,7 +235,7 @@ describe('Package selection', () => {
         .mockResolvedValueOnce(mockOrderRow('nis2'))
         .mockResolvedValueOnce(emptyResult);
 
-      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}` });
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
       const body = res.json();
       expect(body.data.package).toBe('nis2');
       expect(body.data.estimatedDuration).toBe('~45 Minuten');

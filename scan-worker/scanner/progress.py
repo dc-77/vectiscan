@@ -17,7 +17,11 @@ def _get_redis() -> redis.Redis:
 
 
 def _get_db():
-    return psycopg2.connect(os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"))
+    return psycopg2.connect(
+        os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"),
+        connect_timeout=10,
+        options="-c statement_timeout=30000",
+    )
 
 
 def update_progress(
@@ -99,7 +103,7 @@ def set_scan_started(order_id: str) -> None:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE orders SET started_at = NOW(), status = 'dns_recon', updated_at = NOW() WHERE id = %s""",
+                """UPDATE orders SET scan_started_at = NOW(), status = 'dns_recon', updated_at = NOW() WHERE id = %s""",
                 (order_id,),
             )
         conn.commit()

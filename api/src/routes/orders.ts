@@ -1,9 +1,31 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
 import { scanQueue, publishEvent, getProgressFromRedis } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
+import { verifyJwt } from '../lib/auth.js';
+import { requireAuth } from '../middleware/requireAuth.js';
+import { audit } from '../lib/audit.js';
+
+async function streamReport(reply: FastifyReply, report: Record<string, unknown>) {
+  const bucket = report.minio_bucket as string;
+  const objectPath = report.minio_path as string;
+  const domain = report.target_url as string;
+  const fileSize = report.file_size_bytes as number;
+  const createdAt = report.created_at as Date;
+
+  const dateStr = createdAt.toISOString().split('T')[0];
+  const fileName = `vectiscan-${domain}-${dateStr}.pdf`;
+
+  const stream = await minioClient.getObject(bucket, objectPath);
+
+  return reply
+    .header('Content-Type', 'application/pdf')
+    .header('Content-Disposition', `attachment; filename="${fileName}"`)
+    .header('Content-Length', fileSize)
+    .send(stream);
+}
 
 const VALID_PACKAGES = ['basic', 'professional', 'nis2'] as const;
 type ScanPackage = typeof VALID_PACKAGES[number];
@@ -15,10 +37,8 @@ const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
 };
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface CreateOrderBody {
-  email: string;
   domain: string;
   package?: string;
 }
@@ -28,17 +48,11 @@ interface OrderParams {
 }
 
 export async function orderRoutes(server: FastifyInstance): Promise<void> {
-  // POST /api/orders
-  server.post<{ Body: CreateOrderBody }>('/api/orders', async (request, reply) => {
-    const { domain, email } = request.body || {};
+  // POST /api/orders — requireAuth, customer_id from JWT
+  server.post<{ Body: CreateOrderBody }>('/api/orders', { preHandler: [requireAuth] }, async (request, reply) => {
+    const user = request.user!;
+    const { domain } = request.body || {};
     const pkg = (request.body?.package || 'professional') as string;
-
-    if (!email || !EMAIL_REGEX.test(email)) {
-      return reply.status(400).send({
-        success: false,
-        error: 'Invalid or missing email address.',
-      });
-    }
 
     if (!isValidDomain(domain)) {
       return reply.status(400).send({
@@ -54,12 +68,15 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       });
     }
 
-    // Find or create customer
-    const customerResult = await query<{ id: string }>(
-      'INSERT INTO customers (email) VALUES ($1) ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING id',
-      [email],
-    );
-    const customerId = customerResult.rows[0].id;
+    // Resolve customer_id: admins without customer_id get one created
+    let customerId = user.customerId;
+    if (!customerId) {
+      const customerResult = await query<{ id: string }>(
+        'INSERT INTO customers (email) VALUES ($1) ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING id',
+        [user.email],
+      );
+      customerId = customerResult.rows[0].id;
+    }
 
     // Insert order with verification token
     const verificationToken = generateToken();
@@ -69,6 +86,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     );
 
     const order = result.rows[0];
+
+    audit({ orderId: order.id, action: 'order.created', details: { domain, package: pkg }, ip: request.ip });
 
     return reply.status(201).send({
       success: true,
@@ -87,18 +106,37 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     });
   });
 
-  // GET /api/orders — list all orders
-  server.get('/api/orders', async (_request, _reply) => {
-    const result = await query(
-      `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
-              o.scan_started_at, o.scan_finished_at, o.created_at,
-              o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
-              c.email,
-              EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
-       FROM orders o
-       JOIN customers c ON o.customer_id = c.id
-       ORDER BY o.created_at DESC`,
-    );
+  // GET /api/orders — requireAuth, admin sees all, customer sees own
+  server.get('/api/orders', { preHandler: [requireAuth] }, async (request) => {
+    const user = request.user!;
+
+    let sql: string;
+    let params: unknown[];
+
+    if (user.role === 'admin') {
+      sql = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
+                    o.scan_started_at, o.scan_finished_at, o.created_at,
+                    o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
+                    c.email,
+                    EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
+             FROM orders o
+             JOIN customers c ON o.customer_id = c.id
+             ORDER BY o.created_at DESC`;
+      params = [];
+    } else {
+      sql = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
+                    o.scan_started_at, o.scan_finished_at, o.created_at,
+                    o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
+                    c.email,
+                    EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
+             FROM orders o
+             JOIN customers c ON o.customer_id = c.id
+             WHERE o.customer_id = $1
+             ORDER BY o.created_at DESC`;
+      params = [user.customerId];
+    }
+
+    const result = await query(sql, params);
 
     const orders = result.rows.map((row: Record<string, unknown>) => ({
       id: row.id,
@@ -125,9 +163,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     return reply.redirect('/api/orders', 307);
   });
 
-  // GET /api/orders/:id
-  server.get<{ Params: OrderParams }>('/api/orders/:id', async (request, reply) => {
+  // GET /api/orders/:id — requireAuth, ownership check
+  server.get<{ Params: OrderParams }>('/api/orders/:id', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
+    const user = request.user!;
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
@@ -147,6 +186,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const order = result.rows[0] as Record<string, unknown>;
+
+    // Ownership check: customer can only see own orders
+    if (user.role !== 'admin' && order.customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
 
     // Check if report exists
     const reportResult = await query('SELECT id FROM reports WHERE order_id = $1', [id]);
@@ -186,12 +230,65 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     };
   });
 
-  // GET /api/orders/:id/report
+  // GET /api/orders/:id/report — auth via JWT or download_token
   server.get<{ Params: OrderParams }>('/api/orders/:id/report', async (request, reply) => {
     const { id } = request.params;
+    const queryParams = request.query as Record<string, string>;
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+    }
+
+    // Auth strategy 1: download_token from email link (no login needed)
+    const downloadToken = queryParams.download_token;
+    if (downloadToken) {
+      const tokenCheck = await query(
+        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, o.target_url
+         FROM reports r JOIN orders o ON r.order_id = o.id
+         WHERE r.order_id = $1 AND r.download_token = $2`,
+        [id, downloadToken],
+      );
+
+      if (tokenCheck.rows.length === 0) {
+        return reply.status(403).send({ success: false, error: 'Invalid download token' });
+      }
+
+      const report = tokenCheck.rows[0] as Record<string, unknown>;
+      const expiresAt = report.expires_at as Date | null;
+      if (expiresAt && new Date() > expiresAt) {
+        return reply.status(410).send({ success: false, error: 'Download link expired' });
+      }
+
+      // Increment download count
+      await query('UPDATE reports SET download_count = download_count + 1 WHERE order_id = $1', [id]);
+
+      audit({ orderId: id, action: 'report.downloaded', details: { via: 'download_token' }, ip: request.ip });
+
+      return streamReport(reply, report);
+    }
+
+    // Auth strategy 2: JWT (Bearer token or ?token= query param)
+    const header = request.headers.authorization;
+    const jwtToken = header?.startsWith('Bearer ') ? header.slice(7) : queryParams.token;
+
+    if (!jwtToken) {
+      return reply.status(401).send({ success: false, error: 'Authentication required' });
+    }
+
+    let user;
+    try {
+      user = verifyJwt(jwtToken);
+    } catch {
+      return reply.status(401).send({ success: false, error: 'Invalid or expired token' });
+    }
+
+    // Ownership check
+    const ownerCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [id]);
+    if (ownerCheck.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Order not found' });
+    }
+    if (user.role !== 'admin' && (ownerCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
     const result = await query(
@@ -205,23 +302,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(404).send({ success: false, error: 'Report not yet available' });
     }
 
-    const report = result.rows[0] as Record<string, unknown>;
-    const bucket = report.minio_bucket as string;
-    const objectPath = report.minio_path as string;
-    const domain = report.target_url as string;
-    const fileSize = report.file_size_bytes as number;
-    const createdAt = report.created_at as Date;
+    audit({ orderId: id, action: 'report.downloaded', details: { via: 'jwt', userId: user.sub }, ip: request.ip });
 
-    const dateStr = createdAt.toISOString().split('T')[0];
-    const fileName = `vectiscan-${domain}-${dateStr}.pdf`;
-
-    const stream = await minioClient.getObject(bucket, objectPath);
-
-    return reply
-      .header('Content-Type', 'application/pdf')
-      .header('Content-Disposition', `attachment; filename="${fileName}"`)
-      .header('Content-Length', fileSize)
-      .send(stream);
+    return streamReport(reply, result.rows[0] as Record<string, unknown>);
   });
 
   // GET /api/orders/:id/results — Raw scan results per tool
@@ -264,16 +347,19 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     };
   });
 
-  // DELETE /api/orders/:id — Cancel a running order
-  server.delete<{ Params: OrderParams }>('/api/orders/:id', async (request, reply) => {
+  // DELETE /api/orders/:id — soft cancel or admin hard delete
+  server.delete<{ Params: OrderParams }>('/api/orders/:id', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
+    const user = request.user!;
+    const queryParams = request.query as Record<string, string>;
+    const permanent = queryParams.permanent === 'true';
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
     }
 
     const result = await query(
-      'SELECT id, status FROM orders WHERE id = $1',
+      'SELECT id, status, customer_id FROM orders WHERE id = $1',
       [id],
     );
 
@@ -282,10 +368,41 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const order = result.rows[0] as Record<string, unknown>;
-    const status = order.status as string;
 
-    // Only cancel orders that are still running
-    const cancellableStatuses = ['verification_pending', 'verified', 'created', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
+    // Ownership check
+    if (user.role !== 'admin' && order.customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
+
+    // Admin hard delete: ?permanent=true
+    if (permanent) {
+      if (user.role !== 'admin') {
+        return reply.status(403).send({ success: false, error: 'Only admins can permanently delete orders' });
+      }
+
+      // Clean up MinIO objects (best-effort, don't block on errors)
+      try {
+        await minioClient.removeObject('scan-rawdata', `${id}.tar.gz`);
+      } catch { /* ignore — file may not exist */ }
+      try {
+        await minioClient.removeObject('scan-reports', `${id}.pdf`);
+      } catch { /* ignore — file may not exist */ }
+
+      // Delete audit_log entries (no CASCADE on this FK)
+      await query('DELETE FROM audit_log WHERE order_id = $1', [id]);
+
+      // Delete order (CASCADE removes scan_results + reports)
+      await query('DELETE FROM orders WHERE id = $1', [id]);
+
+      // orderId: null because the order + its audit_log entries were just deleted (FK constraint)
+      audit({ orderId: null, action: 'order.deleted', details: { deletedOrderId: id, admin: user.email, domain: order.target_url }, ip: request.ip });
+
+      return { success: true, data: null };
+    }
+
+    // Soft cancel: only for running orders
+    const status = order.status as string;
+    const cancellableStatuses = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
     if (!cancellableStatuses.includes(status)) {
       return reply.status(409).send({
         success: false,
@@ -297,6 +414,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       "UPDATE orders SET status = 'cancelled', error_message = 'Vom Benutzer abgebrochen', scan_finished_at = NOW(), updated_at = NOW() WHERE id = $1",
       [id],
     );
+
+    audit({ orderId: id, action: 'order.cancelled', details: { userId: user.sub, previousStatus: status }, ip: request.ip });
 
     // Notify via Redis Pub/Sub so WebSocket clients get the update
     await publishEvent(id, {

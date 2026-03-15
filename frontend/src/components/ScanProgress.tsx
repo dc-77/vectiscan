@@ -4,6 +4,7 @@ import { OrderStatus } from '@/lib/api';
 
 const PHASE_LABELS: Record<string, string> = {
   created: 'Erstellt',
+  queued: 'In Warteschlange',
   dns_recon: 'DNS-Reconnaissance',
   scan_phase1: 'Phase 1 — Technologie-Erkennung',
   scan_phase2: 'Phase 2 — Tiefer Scan',
@@ -16,6 +17,7 @@ const PHASE_LABELS: Record<string, string> = {
 
 const PHASE_COLORS: Record<string, string> = {
   created: 'bg-gray-500',
+  queued: 'bg-indigo-500',
   dns_recon: 'bg-purple-500',
   scan_phase1: 'bg-blue-500',
   scan_phase2: 'bg-cyan-500',

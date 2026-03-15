@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
 import { scanQueue, publishEvent } from '../lib/queue.js';
 import { verifyAll } from '../services/VerificationService.js';
+import { audit } from '../lib/audit.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -56,14 +57,11 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
 
     if (verification.verified) {
       await query(
-        "UPDATE orders SET status = 'scanning', verified_at = NOW(), verification_method = $1, scan_started_at = NOW() WHERE id = $2",
+        "UPDATE orders SET status = 'queued', verified_at = NOW(), verification_method = $1 WHERE id = $2",
         [verification.method, orderId],
       );
 
-      await query(
-        'INSERT INTO audit_log (order_id, action, details, ip_address) VALUES ($1, $2, $3, $4)',
-        [orderId, 'verification_success', JSON.stringify({ method: verification.method }), request.ip],
-      );
+      audit({ orderId, action: 'order.verified', details: { method: verification.method, domain }, ip: request.ip });
 
       // Prototyp: Scan direkt starten (kein Zahlungsflow)
       await scanQueue.add('scan', {
@@ -72,7 +70,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
         package: order.package,
       });
 
-      await publishEvent(orderId, { type: 'status', orderId, status: 'scanning' });
+      await publishEvent(orderId, { type: 'status', orderId, status: 'queued' });
 
       return reply.send({
         success: true,
@@ -116,14 +114,11 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
     }
 
     await query(
-      "UPDATE orders SET status = 'scanning', verified_at = NOW(), verification_method = 'manual', scan_started_at = NOW() WHERE id = $1",
+      "UPDATE orders SET status = 'queued', verified_at = NOW(), verification_method = 'manual' WHERE id = $1",
       [orderId],
     );
 
-    await query(
-      'INSERT INTO audit_log (order_id, action, details, ip_address) VALUES ($1, $2, $3, $4)',
-      [orderId, 'manual_verification', '{"method":"manual"}', request.ip],
-    );
+    audit({ orderId, action: 'order.verified', details: { method: 'manual', domain: order.target_url }, ip: request.ip });
 
     await scanQueue.add('scan', {
       orderId,
@@ -131,7 +126,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
       package: order.package,
     });
 
-    await publishEvent(orderId, { type: 'status', orderId, status: 'scanning' });
+    await publishEvent(orderId, { type: 'status', orderId, status: 'queued' });
 
     return reply.send({ success: true, data: { verified: true, method: 'manual' } });
   });
