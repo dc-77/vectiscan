@@ -58,7 +58,10 @@ function HomeContent() {
     const skipIps = new Set(
       (strategy?.hosts || []).filter(h => h.action === 'skip').map(h => h.ip)
     );
-    const nodes: HostNode[] = discoveredHosts.map(h => ({
+    // discoveredHosts may be an array or a host_inventory object with .hosts
+    const hostList = Array.isArray(discoveredHosts) ? discoveredHosts
+      : (discoveredHosts as Record<string, unknown>)?.hosts as typeof discoveredHosts || [];
+    const nodes: HostNode[] = hostList.map(h => ({
       ip: h.ip,
       fqdns: h.fqdns,
       status: skipIps.has(h.ip) ? 'skipped' as const
@@ -109,7 +112,7 @@ function HomeContent() {
         updated.progress = {
           ...prev.progress,
           hostsTotal: msg.hostsTotal ?? prev.progress.hostsTotal,
-          discoveredHosts: msg.hosts.map((h) => ({ ...h, status: 'pending' })),
+          discoveredHosts: (msg.hosts || []).map((h) => ({ ...h, status: 'pending' })),
         };
       } else if (msg.type === 'status') {
         updated.status = msg.status || prev.status;

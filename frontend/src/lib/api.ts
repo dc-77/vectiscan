@@ -123,9 +123,10 @@ export async function getOrderReport(id: string): Promise<ApiResponse<ReportData
 }
 
 export async function cancelOrder(id: string): Promise<ApiResponse<null>> {
+  const token = getToken();
   const res = await fetch(`${API_URL}/api/orders/${id}`, {
     method: 'DELETE',
-    headers: authHeaders(),
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
   });
   return handleResponse(res);
 }
@@ -256,9 +257,10 @@ export async function getFindings(orderId: string): Promise<ApiResponse<Findings
 }
 
 export async function deleteOrderPermanent(id: string): Promise<ApiResponse<null>> {
+  const token = getToken();
   const res = await fetch(`${API_URL}/api/orders/${id}?permanent=true`, {
     method: 'DELETE',
-    headers: authHeaders(),
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
   });
   return handleResponse(res);
 }
