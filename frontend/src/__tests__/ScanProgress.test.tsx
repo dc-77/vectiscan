@@ -15,6 +15,8 @@ const baseScan: OrderStatus = {
     hostsTotal: 0,
     hostsCompleted: 0,
     discoveredHosts: [],
+    toolOutput: null,
+    lastCompletedTool: null,
   },
   startedAt: '2026-03-12T14:30:00Z',
   finishedAt: null,

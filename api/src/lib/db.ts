@@ -13,6 +13,7 @@ const MIGRATION_003_PATH = path.join(__dirname, '..', 'migrations', '003_mvp_sch
 const MIGRATION_004_PATH = path.join(__dirname, '..', 'migrations', '004_add_manual_verification.sql');
 const MIGRATION_005_PATH = path.join(__dirname, '..', 'migrations', '005_users.sql');
 const MIGRATION_006_PATH = path.join(__dirname, '..', 'migrations', '006_password_reset.sql');
+const MIGRATION_007_PATH = path.join(__dirname, '..', 'migrations', '007_report_findings_data.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -65,6 +66,19 @@ export async function initDb(): Promise<void> {
 
   if (!resetColCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_006_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 007: findings_data JSONB on reports
+  const findingsColCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.columns
+      WHERE table_name = 'reports' AND column_name = 'findings_data'
+    ) AS exists
+  `);
+
+  if (!findingsColCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_007_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

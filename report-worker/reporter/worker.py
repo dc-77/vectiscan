@@ -53,11 +53,39 @@ def _get_db_connection() -> psycopg2.extensions.connection:
     return psycopg2.connect(DATABASE_URL)
 
 
+def _build_findings_data(claude_output: dict, package: str, report_data: dict | None = None) -> dict:
+    """Build a JSON-serializable findings_data dict from Claude output."""
+    findings = claude_output.get("findings", [])
+    severity_order = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+    counts: dict[str, int] = {s: 0 for s in severity_order}
+    for f in findings:
+        sev = (f.get("severity") or "INFO").upper()
+        if sev in counts:
+            counts[sev] += 1
+
+    data: dict = {
+        "overall_risk": claude_output.get("overall_risk"),
+        "overall_description": claude_output.get("overall_description"),
+        "severity_counts": counts,
+        "findings": findings,
+        "positive_findings": claude_output.get("positive_findings", []),
+        "recommendations": claude_output.get("recommendations", []),
+        "package": package,
+    }
+
+    # NIS2: attach compliance summary if available
+    if package == "nis2" and report_data and report_data.get("nis2"):
+        data["nis2_compliance_summary"] = report_data["nis2"].get("compliance_summary")
+
+    return data
+
+
 def _create_report_record(
     conn: psycopg2.extensions.connection,
     order_id: str,
     minio_path: str,
     file_size_bytes: int,
+    findings_data: dict | None = None,
 ) -> tuple[str, str]:
     """Insert a row into the reports table and return (report_id, download_token)."""
     download_token = str(uuid.uuid4())
@@ -65,11 +93,12 @@ def _create_report_record(
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO reports (order_id, minio_bucket, minio_path, file_size_bytes, download_token, expires_at)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO reports (order_id, minio_bucket, minio_path, file_size_bytes, download_token, expires_at, findings_data)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
-            (order_id, REPORTS_BUCKET, minio_path, file_size_bytes, download_token, expires_at),
+            (order_id, REPORTS_BUCKET, minio_path, file_size_bytes, download_token, expires_at,
+             json.dumps(findings_data) if findings_data else None),
         )
         report_id = cur.fetchone()[0]
     conn.commit()
@@ -251,8 +280,9 @@ def process_job(job_data: dict) -> None:
         minio_pdf_path = f"{order_id}.pdf"
         file_size = _upload_report(minio_client, pdf_path, minio_pdf_path)
 
-        # -- 8. Create report record in DB ------------------------------------
-        report_id, download_token = _create_report_record(conn, order_id, minio_pdf_path, file_size)
+        # -- 8. Build findings_data and create report record in DB ---------------
+        findings_data = _build_findings_data(claude_output, package, report_data)
+        report_id, download_token = _create_report_record(conn, order_id, minio_pdf_path, file_size, findings_data)
         log.info("report_record_created", report_id=report_id, download_token=download_token)
 
         # -- 9. Update order status to report_complete -------------------------

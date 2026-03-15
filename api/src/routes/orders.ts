@@ -113,26 +113,22 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     let sql: string;
     let params: unknown[];
 
-    if (user.role === 'admin') {
-      sql = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
+    const baseSelect = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
                     o.scan_started_at, o.scan_finished_at, o.created_at,
                     o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
                     c.email,
-                    EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
+                    EXISTS(SELECT 1 FROM reports r2 WHERE r2.order_id = o.id) AS has_report,
+                    r.findings_data->>'overall_risk' AS overall_risk,
+                    r.findings_data->'severity_counts' AS severity_counts
              FROM orders o
              JOIN customers c ON o.customer_id = c.id
-             ORDER BY o.created_at DESC`;
+             LEFT JOIN reports r ON r.order_id = o.id`;
+
+    if (user.role === 'admin') {
+      sql = `${baseSelect} ORDER BY o.created_at DESC`;
       params = [];
     } else {
-      sql = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
-                    o.scan_started_at, o.scan_finished_at, o.created_at,
-                    o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
-                    c.email,
-                    EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
-             FROM orders o
-             JOIN customers c ON o.customer_id = c.id
-             WHERE o.customer_id = $1
-             ORDER BY o.created_at DESC`;
+      sql = `${baseSelect} WHERE o.customer_id = $1 ORDER BY o.created_at DESC`;
       params = [user.customerId];
     }
 
@@ -153,6 +149,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       startedAt: row.scan_started_at ? (row.scan_started_at as Date).toISOString() : null,
       finishedAt: row.scan_finished_at ? (row.scan_finished_at as Date).toISOString() : null,
       createdAt: (row.created_at as Date).toISOString(),
+      overallRisk: (row.overall_risk as string) || null,
+      severityCounts: row.severity_counts || null,
     }));
 
     return { success: true, data: { orders } };
@@ -345,6 +343,32 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       success: true,
       data: { results },
     };
+  });
+
+  // GET /api/orders/:id/findings — structured findings from report
+  server.get<{ Params: OrderParams }>('/api/orders/:id/findings', { preHandler: [requireAuth] }, async (request, reply) => {
+    const { id } = request.params;
+    const user = request.user!;
+
+    if (!UUID_REGEX.test(id)) {
+      return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+    }
+
+    // Ownership check
+    const orderCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [id]);
+    if (orderCheck.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Order not found' });
+    }
+    if (user.role !== 'admin' && (orderCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
+
+    const result = await query('SELECT findings_data FROM reports WHERE order_id = $1', [id]);
+    if (result.rows.length === 0 || !(result.rows[0] as Record<string, unknown>).findings_data) {
+      return reply.status(404).send({ success: false, error: 'Keine Befunddaten verfügbar' });
+    }
+
+    return { success: true, data: (result.rows[0] as Record<string, unknown>).findings_data };
   });
 
   // DELETE /api/orders/:id — soft cancel or admin hard delete

@@ -3,9 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, getReportDownloadUrl, deleteOrderPermanent, getScanResults, OrderListItem, ScanResult } from '@/lib/api';
+import { listOrders, getReportDownloadUrl, deleteOrderPermanent, getScanResults, getFindings, OrderListItem, ScanResult, FindingsData } from '@/lib/api';
 import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
 import VectiScanLogo from '@/components/VectiScanLogo';
+import SeverityBar from '@/components/SeverityBar';
+import FindingsViewer from '@/components/FindingsViewer';
+import RecommendationsViewer from '@/components/RecommendationsViewer';
 
 const PHASE_LABELS: Record<string, string> = {
   verification_pending: 'Verifizierung',
@@ -45,7 +48,15 @@ const PACKAGE_STYLES: Record<string, { label: string; bg: string; text: string }
   nis2:         { label: 'NIS2',         bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
 };
 
+const RISK_BADGE: Record<string, { bg: string; text: string }> = {
+  CRITICAL: { bg: 'bg-red-600/20',    text: 'text-red-400' },
+  HIGH:     { bg: 'bg-orange-600/20',  text: 'text-orange-400' },
+  MEDIUM:   { bg: 'bg-yellow-600/20',  text: 'text-yellow-400' },
+  LOW:      { bg: 'bg-green-600/20',   text: 'text-green-400' },
+};
+
 type StatusFilter = 'all' | 'active' | 'done' | 'failed';
+type DetailTab = 'findings' | 'recommendations' | 'raw' | 'nis2';
 
 const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
 const DONE_STATUSES = ['report_complete'];
@@ -68,6 +79,14 @@ function formatDate(iso: string): string {
   });
 }
 
+function formatDuration(startedAt: string | null, finishedAt: string | null): string | null {
+  if (!startedAt || !finishedAt) return null;
+  const ms = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
+  const min = Math.round(ms / 60000);
+  if (min < 1) return '< 1 Min';
+  return `${min} Min`;
+}
+
 export default function Dashboard() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
@@ -80,10 +99,14 @@ export default function Dashboard() {
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  // Raw scan results viewer
-  const [expandedResults, setExpandedResults] = useState<string | null>(null);
+  // Detail panel state
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<DetailTab>('findings');
+
+  // Cached data per order
   const [scanResults, setScanResults] = useState<Record<string, ScanResult[]>>({});
-  const [resultsLoading, setResultsLoading] = useState<string | null>(null);
+  const [findingsCache, setFindingsCache] = useState<Record<string, FindingsData>>({});
+  const [detailLoading, setDetailLoading] = useState<string | null>(null);
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
 
   useEffect(() => {
@@ -126,9 +149,7 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (order: OrderListItem) => {
-    if (!confirm(`Order für ${order.domain} endgültig löschen? Dies kann nicht rückgängig gemacht werden.`)) {
-      return;
-    }
+    if (!confirm(`Order für ${order.domain} endgültig löschen? Dies kann nicht rückgängig gemacht werden.`)) return;
     try {
       const res = await deleteOrderPermanent(order.id);
       if (res.success) {
@@ -141,33 +162,71 @@ export default function Dashboard() {
     }
   };
 
-  const toggleResults = useCallback(async (orderId: string) => {
-    if (expandedResults === orderId) {
-      setExpandedResults(null);
+  const toggleDetails = useCallback(async (orderId: string, tab: DetailTab = 'findings') => {
+    if (expandedOrder === orderId) {
+      setExpandedOrder(null);
       setExpandedTool(null);
       return;
     }
-    setExpandedResults(orderId);
+    setExpandedOrder(orderId);
+    setActiveTab(tab);
     setExpandedTool(null);
 
-    // Only fetch if not already cached
-    if (!scanResults[orderId]) {
-      setResultsLoading(orderId);
+    // Lazy-load findings
+    if (tab === 'findings' || tab === 'recommendations') {
+      if (!findingsCache[orderId]) {
+        setDetailLoading(orderId);
+        try {
+          const res = await getFindings(orderId);
+          if (res.success && res.data) {
+            setFindingsCache(prev => ({ ...prev, [orderId]: res.data as FindingsData }));
+          }
+        } catch { /* silent */ }
+        finally { setDetailLoading(null); }
+      }
+    }
+
+    // Lazy-load raw results
+    if (tab === 'raw' && !scanResults[orderId]) {
+      setDetailLoading(orderId);
       try {
         const res = await getScanResults(orderId);
         if (res.success && res.data) {
           setScanResults(prev => ({ ...prev, [orderId]: res.data!.results }));
         }
-      } catch {
-        // silently fail
-      } finally {
-        setResultsLoading(null);
-      }
+      } catch { /* silent */ }
+      finally { setDetailLoading(null); }
     }
-  }, [expandedResults, scanResults]);
+  }, [expandedOrder, findingsCache, scanResults]);
+
+  const switchTab = useCallback(async (orderId: string, tab: DetailTab) => {
+    setActiveTab(tab);
+    setExpandedTool(null);
+
+    if ((tab === 'findings' || tab === 'recommendations') && !findingsCache[orderId]) {
+      setDetailLoading(orderId);
+      try {
+        const res = await getFindings(orderId);
+        if (res.success && res.data) {
+          setFindingsCache(prev => ({ ...prev, [orderId]: res.data as FindingsData }));
+        }
+      } catch { /* silent */ }
+      finally { setDetailLoading(null); }
+    }
+
+    if (tab === 'raw' && !scanResults[orderId]) {
+      setDetailLoading(orderId);
+      try {
+        const res = await getScanResults(orderId);
+        if (res.success && res.data) {
+          setScanResults(prev => ({ ...prev, [orderId]: res.data!.results }));
+        }
+      } catch { /* silent */ }
+      finally { setDetailLoading(null); }
+    }
+  }, [findingsCache, scanResults]);
 
   const filtered = filterOrders(orders, filter);
-
   const counts = {
     all: orders.length,
     active: orders.filter(o => isActive(o.status)).length,
@@ -186,9 +245,7 @@ export default function Dashboard() {
             <div className="hidden sm:block"><VectiScanLogo /></div>
             <h1 className="text-lg sm:text-xl font-semibold text-white truncate">Dashboard</h1>
             {admin && (
-              <span className="text-xs font-medium px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">
-                Admin
-              </span>
+              <span className="text-xs font-medium px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">Admin</span>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -196,25 +253,10 @@ export default function Dashboard() {
               <Link href="/profile" className="text-xs text-gray-500 hover:text-white hidden sm:inline transition-colors">{userEmail}</Link>
             )}
             {admin && (
-              <Link
-                href="/admin"
-                className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 text-sm font-medium px-3 py-2 rounded-lg transition-colors"
-              >
-                Admin
-              </Link>
+              <Link href="/admin" className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 text-sm font-medium px-3 py-2 rounded-lg transition-colors">Admin</Link>
             )}
-            <Link
-              href="/"
-              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
-            >
-              + Neuer Scan
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg border border-gray-700 transition-colors"
-            >
-              Abmelden
-            </button>
+            <Link href="/" className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors whitespace-nowrap">+ Neuer Scan</Link>
+            <button onClick={handleLogout} className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg border border-gray-700 transition-colors">Abmelden</button>
           </div>
         </div>
 
@@ -226,47 +268,25 @@ export default function Dashboard() {
             ['done', 'Fertig', counts.done],
             ['failed', 'Fehlgeschlagen', counts.failed],
           ] as [StatusFilter, string, number][]).map(([key, label, count]) => (
-            <button
-              key={key}
-              onClick={() => setFilter(key)}
+            <button key={key} onClick={() => setFilter(key)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                filter === key
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-[#1e293b] text-gray-400 hover:text-white hover:bg-[#253347]'
+                filter === key ? 'bg-blue-600 text-white' : 'bg-[#1e293b] text-gray-400 hover:text-white hover:bg-[#253347]'
               }`}
-            >
-              {label} ({count})
-            </button>
+            >{label} ({count})</button>
           ))}
           {lastUpdate && (
-            <span className="ml-auto text-xs text-gray-600 font-mono">
-              Aktualisiert: {lastUpdate.toLocaleTimeString('de-DE')}
-            </span>
+            <span className="ml-auto text-xs text-gray-600 font-mono">Aktualisiert: {lastUpdate.toLocaleTimeString('de-DE')}</span>
           )}
         </div>
 
-        {/* Error */}
         {error && (
-          <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
-            {error}
-          </div>
+          <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">{error}</div>
         )}
-
-        {/* Loading */}
-        {loading && (
-          <div className="text-center py-12 text-gray-500">Lade Aufträge...</div>
-        )}
-
-        {/* Empty state */}
+        {loading && <div className="text-center py-12 text-gray-500">Lade Aufträge...</div>}
         {!loading && orders.length === 0 && (
           <div className="text-center py-16 space-y-4">
             <p className="text-gray-500 text-lg">Noch keine Aufträge</p>
-            <Link
-              href="/"
-              className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors"
-            >
-              Ersten Scan starten
-            </Link>
+            <Link href="/" className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors">Ersten Scan starten</Link>
           </div>
         )}
 
@@ -280,26 +300,13 @@ export default function Dashboard() {
               const active = isActive(order.status);
               const needsVerify = order.status === 'verification_pending' || order.status === 'verified';
               const isRunning = active && !needsVerify;
+              const isDone = order.status === 'report_complete';
+              const hasDetails = ['scan_complete', 'report_generating', 'report_complete'].includes(order.status);
+              const isExpanded = expandedOrder === order.id;
+              const duration = formatDuration(order.startedAt, order.finishedAt);
+              const riskBadge = order.overallRisk ? RISK_BADGE[order.overallRisk.toUpperCase()] : null;
 
-              const rowHref = needsVerify
-                ? `/verify/${order.id}`
-                : isRunning
-                  ? `/?orderId=${order.id}`
-                  : undefined;
-
-              // Show results button for orders that have completed scanning
-              const hasResults = ['scan_complete', 'report_generating', 'report_complete'].includes(order.status);
-              const isExpanded = expandedResults === order.id;
-              const orderResults = scanResults[order.id] || [];
-              const isLoadingResults = resultsLoading === order.id;
-
-              // Group results by phase and host
-              const groupedResults: Record<string, ScanResult[]> = {};
-              for (const r of orderResults) {
-                const key = `Phase ${r.phase}${r.hostIp ? ` — ${r.hostIp}` : ''}`;
-                if (!groupedResults[key]) groupedResults[key] = [];
-                groupedResults[key].push(r);
-              }
+              const rowHref = needsVerify ? `/verify/${order.id}` : isRunning ? `/?orderId=${order.id}` : undefined;
 
               return (
                 <div key={order.id} className="space-y-0">
@@ -307,93 +314,90 @@ export default function Dashboard() {
                     className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-4 transition-colors ${rowHref ? 'cursor-pointer' : ''} ${isExpanded ? 'rounded-b-none border-b-0' : ''}`}
                     onClick={rowHref ? () => router.push(rowHref) : undefined}
                   >
-                    {/* Row 1: Domain + Status */}
+                    {/* Row 1: Domain + Status + Risk */}
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="font-mono text-cyan-400 text-sm truncate">{order.domain}</span>
-                        {admin && (
-                          <span className="text-xs text-gray-500 truncate hidden sm:inline">{order.email}</span>
-                        )}
+                        {admin && <span className="text-xs text-gray-500 truncate hidden sm:inline">{order.email}</span>}
                       </div>
-                      <span className={`${statusColor} text-white text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 shrink-0`}>
-                        {active && (
-                          <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {riskBadge && isDone && (
+                          <span className={`${riskBadge.bg} ${riskBadge.text} text-xs font-bold px-2 py-0.5 rounded uppercase`}>
+                            {order.overallRisk}
+                          </span>
                         )}
-                        {statusLabel}
-                      </span>
+                        <span className={`${statusColor} text-white text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1.5`}>
+                          {active && <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />}
+                          {statusLabel}
+                        </span>
+                      </div>
                     </div>
+
+                    {/* Severity mini-bar for completed scans */}
+                    {isDone && order.severityCounts && (
+                      <div className="mb-2">
+                        <SeverityBar counts={order.severityCounts} compact />
+                      </div>
+                    )}
 
                     {/* Progress bar for running scans */}
                     {isRunning && order.hostsTotal > 0 && (
                       <div className="mb-2">
                         <div className="flex justify-between text-xs text-gray-500 mb-1">
                           <span className="font-mono truncate">
-                            {order.currentTool && (
-                              <>{order.currentTool}{order.currentHost ? ` → ${order.currentHost}` : ''}</>
-                            )}
+                            {order.currentTool && <>{order.currentTool}{order.currentHost ? ` \u2192 ${order.currentHost}` : ''}</>}
                           </span>
                           <span className="shrink-0 ml-2">{order.hostsCompleted}/{order.hostsTotal} Hosts</span>
                         </div>
                         <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-blue-500 rounded-full transition-all duration-1000"
-                            style={{ width: `${Math.round((order.hostsCompleted / order.hostsTotal) * 100)}%` }}
-                          />
+                          <div className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                               style={{ width: `${Math.round((order.hostsCompleted / order.hostsTotal) * 100)}%` }} />
                         </div>
                       </div>
                     )}
 
-                    {/* Row 2: Package + Date + Action */}
+                    {/* Row 2: Package + Hosts + Duration + Date + Actions */}
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${pkg.bg} ${pkg.text}`}>
-                          {pkg.label}
-                        </span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${pkg.bg} ${pkg.text}`}>{pkg.label}</span>
+                        {isDone && order.hostsTotal > 0 && (
+                          <span className="text-xs text-gray-600">{order.hostsTotal} Hosts</span>
+                        )}
+                        {duration && <span className="text-xs text-gray-600">{duration}</span>}
                         <span className="text-xs text-gray-600">{formatDate(order.createdAt)}</span>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        {hasResults && (
+                        {hasDetails && (
                           <button
-                            onClick={(e) => { e.stopPropagation(); toggleResults(order.id); }}
+                            onClick={(e) => { e.stopPropagation(); toggleDetails(order.id, isDone ? 'findings' : 'raw'); }}
                             className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
-                              isExpanded
-                                ? 'text-purple-300 bg-purple-400/20'
-                                : 'text-purple-400 hover:text-purple-300 bg-purple-400/10'
+                              isExpanded ? 'text-cyan-300 bg-cyan-400/20' : 'text-cyan-400 hover:text-cyan-300 bg-cyan-400/10'
                             }`}
                           >
-                            {isExpanded ? 'Ergebnisse ausblenden' : 'Scan-Ergebnisse'}
+                            {isExpanded ? 'Details ausblenden' : 'Details'}
                           </button>
                         )}
                         {needsVerify && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
-                            className="text-xs text-yellow-400 hover:text-yellow-300 font-medium px-3 py-1.5 bg-yellow-400/10 rounded-lg transition-colors"
-                          >
+                          <button onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
+                            className="text-xs text-yellow-400 hover:text-yellow-300 font-medium px-3 py-1.5 bg-yellow-400/10 rounded-lg transition-colors">
                             Verifizieren
                           </button>
                         )}
                         {isRunning && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
-                            className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-blue-400/10 rounded-lg transition-colors"
-                          >
+                          <button onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
+                            className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-blue-400/10 rounded-lg transition-colors">
                             Live View
                           </button>
                         )}
-                        {order.status === 'report_complete' && order.hasReport && (
-                          <a
-                            href={getReportDownloadUrl(order.id)}
-                            className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors inline-block"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            PDF Download
+                        {isDone && order.hasReport && (
+                          <a href={getReportDownloadUrl(order.id)} onClick={(e) => e.stopPropagation()}
+                            className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors inline-block">
+                            PDF
                           </a>
                         )}
                         {admin && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); handleDelete(order); }}
-                            className="text-xs text-red-400 hover:text-red-300 font-medium px-3 py-1.5 bg-red-400/10 rounded-lg transition-colors"
-                          >
+                          <button onClick={(e) => { e.stopPropagation(); handleDelete(order); }}
+                            className="text-xs text-red-400 hover:text-red-300 font-medium px-3 py-1.5 bg-red-400/10 rounded-lg transition-colors">
                             Löschen
                           </button>
                         )}
@@ -401,76 +405,60 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Expandable raw results panel */}
+                  {/* Expandable detail panel with tabs */}
                   {isExpanded && (
                     <div className="bg-[#0f172a] border border-gray-800 border-t-0 rounded-b-lg overflow-hidden">
-                      {isLoadingResults && (
-                        <div className="px-4 py-6 text-center text-gray-500 text-sm">
-                          Scan-Ergebnisse laden...
-                        </div>
+                      {/* Tab bar */}
+                      <div className="flex border-b border-gray-800">
+                        {isDone && (
+                          <>
+                            <button onClick={() => switchTab(order.id, 'findings')}
+                              className={`px-4 py-2.5 text-xs font-medium transition-colors ${
+                                activeTab === 'findings' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-500 hover:text-gray-300'
+                              }`}>Befunde</button>
+                            <button onClick={() => switchTab(order.id, 'recommendations')}
+                              className={`px-4 py-2.5 text-xs font-medium transition-colors ${
+                                activeTab === 'recommendations' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-500 hover:text-gray-300'
+                              }`}>Empfehlungen</button>
+                          </>
+                        )}
+                        {admin && (
+                          <button onClick={() => switchTab(order.id, 'raw')}
+                            className={`px-4 py-2.5 text-xs font-medium transition-colors ${
+                              activeTab === 'raw' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-500 hover:text-gray-300'
+                            }`}>Rohdaten</button>
+                        )}
+                      </div>
+
+                      {/* Loading */}
+                      {detailLoading === order.id && (
+                        <div className="px-4 py-8 text-center text-gray-500 text-sm">Daten laden...</div>
                       )}
 
-                      {!isLoadingResults && orderResults.length === 0 && (
-                        <div className="px-4 py-6 text-center text-gray-600 text-sm">
-                          Keine Scan-Ergebnisse vorhanden.
-                        </div>
+                      {/* Findings tab */}
+                      {activeTab === 'findings' && detailLoading !== order.id && findingsCache[order.id] && (
+                        <FindingsViewer data={findingsCache[order.id]} />
+                      )}
+                      {activeTab === 'findings' && detailLoading !== order.id && !findingsCache[order.id] && (
+                        <div className="px-4 py-8 text-center text-gray-600 text-sm">Keine Befunddaten verfügbar.</div>
                       )}
 
-                      {!isLoadingResults && orderResults.length > 0 && (
-                        <div className="divide-y divide-gray-800/50">
-                          {Object.entries(groupedResults).map(([group, results]) => (
-                            <div key={group}>
-                              <div className="px-4 py-2 bg-[#1e293b]/50 text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                {group}
-                              </div>
-                              <div className="divide-y divide-gray-800/30">
-                                {results.map((result) => {
-                                  const toolId = `${order.id}-${result.id}`;
-                                  const isToolExpanded = expandedTool === toolId;
-                                  const exitOk = result.exitCode === 0 || result.exitCode === 1;
-                                  const durationSec = result.durationMs ? (result.durationMs / 1000).toFixed(1) : '?';
+                      {/* Recommendations tab */}
+                      {activeTab === 'recommendations' && detailLoading !== order.id && findingsCache[order.id] && (
+                        <RecommendationsViewer recommendations={findingsCache[order.id].recommendations} />
+                      )}
+                      {activeTab === 'recommendations' && detailLoading !== order.id && !findingsCache[order.id] && (
+                        <div className="px-4 py-8 text-center text-gray-600 text-sm">Keine Empfehlungen verfügbar.</div>
+                      )}
 
-                                  return (
-                                    <div key={result.id}>
-                                      <button
-                                        onClick={() => setExpandedTool(isToolExpanded ? null : toolId)}
-                                        className="w-full px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-[#1e293b]/30 transition-colors text-left"
-                                      >
-                                        <div className="flex items-center gap-2 min-w-0">
-                                          <span className={`w-2 h-2 rounded-full shrink-0 ${exitOk ? 'bg-green-500' : 'bg-red-500'}`} />
-                                          <span className="text-sm font-mono text-cyan-400 truncate">{result.toolName}</span>
-                                        </div>
-                                        <div className="flex items-center gap-3 shrink-0 text-xs text-gray-500">
-                                          <span>{durationSec}s</span>
-                                          <span className={`font-mono ${exitOk ? 'text-green-600' : 'text-red-600'}`}>
-                                            exit {result.exitCode}
-                                          </span>
-                                          <span className="text-gray-700">{isToolExpanded ? '▲' : '▼'}</span>
-                                        </div>
-                                      </button>
-
-                                      {isToolExpanded && result.rawOutput && (
-                                        <div className="px-4 pb-3">
-                                          <pre className="bg-[#0c1222] border border-gray-800 rounded-lg p-3 text-xs font-mono text-gray-400 overflow-x-auto max-h-80 overflow-y-auto whitespace-pre-wrap break-all"
-                                               style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}
-                                          >
-                                            {result.rawOutput}
-                                          </pre>
-                                        </div>
-                                      )}
-
-                                      {isToolExpanded && !result.rawOutput && (
-                                        <div className="px-4 pb-3 text-xs text-gray-600 italic">
-                                          Keine Rohausgabe gespeichert.
-                                        </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                      {/* Raw results tab (admin only) */}
+                      {activeTab === 'raw' && detailLoading !== order.id && (
+                        <RawResultsPanel
+                          orderId={order.id}
+                          results={scanResults[order.id] || []}
+                          expandedTool={expandedTool}
+                          setExpandedTool={setExpandedTool}
+                        />
                       )}
                     </div>
                   )}
@@ -480,13 +468,73 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Filtered empty */}
         {!loading && orders.length > 0 && filtered.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            Keine Aufträge mit diesem Filter.
-          </div>
+          <div className="text-center py-12 text-gray-500">Keine Aufträge mit diesem Filter.</div>
         )}
       </div>
     </main>
+  );
+}
+
+/** Raw scan results panel — extracted for clarity */
+function RawResultsPanel({ orderId, results, expandedTool, setExpandedTool }: {
+  orderId: string;
+  results: ScanResult[];
+  expandedTool: string | null;
+  setExpandedTool: (id: string | null) => void;
+}) {
+  if (results.length === 0) {
+    return <div className="px-4 py-8 text-center text-gray-600 text-sm">Keine Rohdaten vorhanden.</div>;
+  }
+
+  const grouped: Record<string, ScanResult[]> = {};
+  for (const r of results) {
+    const key = `Phase ${r.phase}${r.hostIp ? ` \u2014 ${r.hostIp}` : ''}`;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(r);
+  }
+
+  return (
+    <div className="divide-y divide-gray-800/50">
+      {Object.entries(grouped).map(([group, items]) => (
+        <div key={group}>
+          <div className="px-4 py-2 bg-[#1e293b]/50 text-xs font-medium text-gray-400 uppercase tracking-wider">{group}</div>
+          <div className="divide-y divide-gray-800/30">
+            {items.map((result) => {
+              const toolId = `${orderId}-${result.id}`;
+              const isOpen = expandedTool === toolId;
+              const exitOk = result.exitCode === 0 || result.exitCode === 1;
+              const sec = result.durationMs ? (result.durationMs / 1000).toFixed(1) : '?';
+
+              return (
+                <div key={result.id}>
+                  <button onClick={() => setExpandedTool(isOpen ? null : toolId)}
+                    className="w-full px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-[#1e293b]/30 transition-colors text-left">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${exitOk ? 'bg-green-500' : 'bg-red-500'}`} />
+                      <span className="text-sm font-mono text-cyan-400 truncate">{result.toolName}</span>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0 text-xs text-gray-500">
+                      <span>{sec}s</span>
+                      <span className={`font-mono ${exitOk ? 'text-green-600' : 'text-red-600'}`}>exit {result.exitCode}</span>
+                      <span className="text-gray-700">{isOpen ? '\u25B2' : '\u25BC'}</span>
+                    </div>
+                  </button>
+                  {isOpen && result.rawOutput && (
+                    <div className="px-4 pb-3">
+                      <pre className="bg-[#0c1222] border border-gray-800 rounded-lg p-3 text-xs font-mono text-gray-400 overflow-x-auto max-h-80 overflow-y-auto whitespace-pre-wrap break-all"
+                           style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>{result.rawOutput}</pre>
+                    </div>
+                  )}
+                  {isOpen && !result.rawOutput && (
+                    <div className="px-4 pb-3 text-xs text-gray-600 italic">Keine Rohausgabe gespeichert.</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

@@ -175,6 +175,48 @@ export interface OrderListItem {
   startedAt: string | null;
   finishedAt: string | null;
   createdAt: string;
+  overallRisk: string | null;
+  severityCounts: Record<string, number> | null;
+}
+
+// --- Findings ---
+
+export interface Finding {
+  id: string;
+  title: string;
+  severity: string;
+  cvss_score: string;
+  cvss_vector: string;
+  cwe: string;
+  affected: string;
+  description: string;
+  evidence: string;
+  impact: string;
+  recommendation: string;
+  nis2_ref?: string;
+}
+
+export interface PositiveFinding {
+  title: string;
+  description: string;
+}
+
+export interface Recommendation {
+  timeframe: string;
+  action: string;
+  finding_refs: string[];
+  effort: string;
+}
+
+export interface FindingsData {
+  overall_risk: string;
+  overall_description: string;
+  severity_counts: Record<string, number>;
+  findings: Finding[];
+  positive_findings: PositiveFinding[];
+  recommendations: Recommendation[];
+  package: string;
+  nis2_compliance_summary?: Record<string, string> | null;
 }
 
 export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[] }>> {
@@ -205,6 +247,13 @@ export async function resetPassword(token: string, password: string): Promise<Ap
 }
 
 // --- Admin ---
+
+export async function getFindings(orderId: string): Promise<ApiResponse<FindingsData>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/findings`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
 
 export async function deleteOrderPermanent(id: string): Promise<ApiResponse<null>> {
   const res = await fetch(`${API_URL}/api/orders/${id}?permanent=true`, {
