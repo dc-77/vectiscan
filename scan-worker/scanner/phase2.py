@@ -76,7 +76,7 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict
     output_path = f"{phase2_dir}/nikto.json"
 
     cmd = [
-        "nikto",
+        "nikto.pl",
         "-h", fqdn,
         "-Format", "json",
         "-output", output_path,
@@ -173,7 +173,7 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str) -> Option
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=600,
+        timeout=120,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,

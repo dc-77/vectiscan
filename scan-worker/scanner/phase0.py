@@ -27,7 +27,7 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     cmd = ["curl", "-s", f"https://crt.sh/?q=%.{domain}&output=json"]
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=30,
+        timeout=60,
         output_path=output_path,
         order_id=order_id,
         phase=0,
@@ -40,7 +40,7 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
     # Re-run curl to capture stdout (run_tool logs to DB but doesn't return stdout)
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
         if result.returncode == 0 and result.stdout.strip():
             entries = json.loads(result.stdout)
             seen: set[str] = set()

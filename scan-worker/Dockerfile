@@ -82,7 +82,8 @@ RUN git clone --depth 1 https://github.com/drwetter/testssl.sh.git /opt/testssl.
 ENV PATH="/opt/testssl.sh:${PATH}"
 
 # ── 3b. nikto (not in bookworm-slim repos) ────────────────────────
-RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto
+RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto && \
+    ln -s /opt/nikto/program/nikto.pl /usr/local/bin/nikto
 ENV PATH="/opt/nikto/program:${PATH}"
 
 # ── 3c. WPScan — Ruby-based WordPress scanner ────────────────────
