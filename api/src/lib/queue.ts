@@ -30,3 +30,16 @@ export async function publishEvent(orderId: string, event: Record<string, unknow
   // Channel name kept as scan:events:{id} for backward compat with workers
   await client.publish(`scan:events:${orderId}`, JSON.stringify(event));
 }
+
+export async function getProgressFromRedis(orderId: string): Promise<Record<string, unknown> | null> {
+  try {
+    const client = await getRedisClient();
+    const raw = await client.get(`order:progress:${orderId}`);
+    if (raw) {
+      return JSON.parse(raw) as Record<string, unknown>;
+    }
+  } catch {
+    // Redis unavailable — fall back to DB data
+  }
+  return null;
+}

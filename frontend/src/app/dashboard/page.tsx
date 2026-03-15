@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, getReportDownloadUrl, verifyPassword, OrderListItem } from '@/lib/api';
+import { listOrders, getReportDownloadUrl, verifyPassword, getScanResults, OrderListItem, ScanResult } from '@/lib/api';
 import VectiScanLogo from '@/components/VectiScanLogo';
 
 const PHASE_LABELS: Record<string, string> = {
@@ -78,6 +78,12 @@ export default function Dashboard() {
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
+  // Raw scan results viewer
+  const [expandedResults, setExpandedResults] = useState<string | null>(null);
+  const [scanResults, setScanResults] = useState<Record<string, ScanResult[]>>({});
+  const [resultsLoading, setResultsLoading] = useState<string | null>(null);
+  const [expandedTool, setExpandedTool] = useState<string | null>(null);
+
   useEffect(() => {
     if (sessionStorage.getItem('vectiscan_auth') === 'true') {
       setAuthenticated(true);
@@ -126,6 +132,31 @@ export default function Dashboard() {
     const interval = setInterval(fetchOrders, 30000);
     return () => clearInterval(interval);
   }, [authenticated, fetchOrders]);
+
+  const toggleResults = useCallback(async (orderId: string) => {
+    if (expandedResults === orderId) {
+      setExpandedResults(null);
+      setExpandedTool(null);
+      return;
+    }
+    setExpandedResults(orderId);
+    setExpandedTool(null);
+
+    // Only fetch if not already cached
+    if (!scanResults[orderId]) {
+      setResultsLoading(orderId);
+      try {
+        const res = await getScanResults(orderId);
+        if (res.success && res.data) {
+          setScanResults(prev => ({ ...prev, [orderId]: res.data!.results }));
+        }
+      } catch {
+        // silently fail
+      } finally {
+        setResultsLoading(null);
+      }
+    }
+  }, [expandedResults, scanResults]);
 
   const filtered = filterOrders(orders, filter);
 
@@ -258,59 +289,160 @@ export default function Dashboard() {
                   ? `/?orderId=${order.id}`
                   : undefined;
 
+              // Show results button for orders that have completed scanning
+              const hasResults = ['scan_complete', 'report_generating', 'report_complete'].includes(order.status);
+              const isExpanded = expandedResults === order.id;
+              const orderResults = scanResults[order.id] || [];
+              const isLoadingResults = resultsLoading === order.id;
+
+              // Group results by phase and host
+              const groupedResults: Record<string, ScanResult[]> = {};
+              for (const r of orderResults) {
+                const key = `Phase ${r.phase}${r.hostIp ? ` — ${r.hostIp}` : ''}`;
+                if (!groupedResults[key]) groupedResults[key] = [];
+                groupedResults[key].push(r);
+              }
+
               return (
-                <div
-                  key={order.id}
-                  className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-4 transition-colors ${rowHref ? 'cursor-pointer' : ''}`}
-                  onClick={rowHref ? () => router.push(rowHref) : undefined}
-                >
-                  {/* Row 1: Domain + Status */}
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="font-mono text-cyan-400 text-sm truncate">{order.domain}</span>
-                    <span className={`${statusColor} text-white text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 shrink-0`}>
-                      {active && (
-                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                      )}
-                      {statusLabel}
-                    </span>
+                <div key={order.id} className="space-y-0">
+                  <div
+                    className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-4 transition-colors ${rowHref ? 'cursor-pointer' : ''} ${isExpanded ? 'rounded-b-none border-b-0' : ''}`}
+                    onClick={rowHref ? () => router.push(rowHref) : undefined}
+                  >
+                    {/* Row 1: Domain + Status */}
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="font-mono text-cyan-400 text-sm truncate">{order.domain}</span>
+                      <span className={`${statusColor} text-white text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 shrink-0`}>
+                        {active && (
+                          <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                        )}
+                        {statusLabel}
+                      </span>
+                    </div>
+
+                    {/* Row 2: Package + Date + Action */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${pkg.bg} ${pkg.text}`}>
+                          {pkg.label}
+                        </span>
+                        <span className="text-xs text-gray-600">{formatDate(order.createdAt)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {hasResults && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleResults(order.id); }}
+                            className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
+                              isExpanded
+                                ? 'text-purple-300 bg-purple-400/20'
+                                : 'text-purple-400 hover:text-purple-300 bg-purple-400/10'
+                            }`}
+                          >
+                            {isExpanded ? 'Ergebnisse ausblenden' : 'Scan-Ergebnisse'}
+                          </button>
+                        )}
+                        {needsVerify && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
+                            className="text-xs text-yellow-400 hover:text-yellow-300 font-medium px-3 py-1.5 bg-yellow-400/10 rounded-lg transition-colors"
+                          >
+                            Verifizieren
+                          </button>
+                        )}
+                        {isRunning && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
+                            className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-blue-400/10 rounded-lg transition-colors"
+                          >
+                            Live View
+                          </button>
+                        )}
+                        {order.status === 'report_complete' && order.hasReport && (
+                          <a
+                            href={getReportDownloadUrl(order.id)}
+                            className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors inline-block"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            PDF Download
+                          </a>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Row 2: Package + Date + Action */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded ${pkg.bg} ${pkg.text}`}>
-                        {pkg.label}
-                      </span>
-                      <span className="text-xs text-gray-600">{formatDate(order.createdAt)}</span>
+                  {/* Expandable raw results panel */}
+                  {isExpanded && (
+                    <div className="bg-[#0f172a] border border-gray-800 border-t-0 rounded-b-lg overflow-hidden">
+                      {isLoadingResults && (
+                        <div className="px-4 py-6 text-center text-gray-500 text-sm">
+                          Scan-Ergebnisse laden...
+                        </div>
+                      )}
+
+                      {!isLoadingResults && orderResults.length === 0 && (
+                        <div className="px-4 py-6 text-center text-gray-600 text-sm">
+                          Keine Scan-Ergebnisse vorhanden.
+                        </div>
+                      )}
+
+                      {!isLoadingResults && orderResults.length > 0 && (
+                        <div className="divide-y divide-gray-800/50">
+                          {Object.entries(groupedResults).map(([group, results]) => (
+                            <div key={group}>
+                              <div className="px-4 py-2 bg-[#1e293b]/50 text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                {group}
+                              </div>
+                              <div className="divide-y divide-gray-800/30">
+                                {results.map((result) => {
+                                  const toolId = `${order.id}-${result.id}`;
+                                  const isToolExpanded = expandedTool === toolId;
+                                  const exitOk = result.exitCode === 0 || result.exitCode === 1;
+                                  const durationSec = result.durationMs ? (result.durationMs / 1000).toFixed(1) : '?';
+
+                                  return (
+                                    <div key={result.id}>
+                                      <button
+                                        onClick={() => setExpandedTool(isToolExpanded ? null : toolId)}
+                                        className="w-full px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-[#1e293b]/30 transition-colors text-left"
+                                      >
+                                        <div className="flex items-center gap-2 min-w-0">
+                                          <span className={`w-2 h-2 rounded-full shrink-0 ${exitOk ? 'bg-green-500' : 'bg-red-500'}`} />
+                                          <span className="text-sm font-mono text-cyan-400 truncate">{result.toolName}</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 shrink-0 text-xs text-gray-500">
+                                          <span>{durationSec}s</span>
+                                          <span className={`font-mono ${exitOk ? 'text-green-600' : 'text-red-600'}`}>
+                                            exit {result.exitCode}
+                                          </span>
+                                          <span className="text-gray-700">{isToolExpanded ? '▲' : '▼'}</span>
+                                        </div>
+                                      </button>
+
+                                      {isToolExpanded && result.rawOutput && (
+                                        <div className="px-4 pb-3">
+                                          <pre className="bg-[#0c1222] border border-gray-800 rounded-lg p-3 text-xs font-mono text-gray-400 overflow-x-auto max-h-80 overflow-y-auto whitespace-pre-wrap break-all"
+                                               style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}
+                                          >
+                                            {result.rawOutput}
+                                          </pre>
+                                        </div>
+                                      )}
+
+                                      {isToolExpanded && !result.rawOutput && (
+                                        <div className="px-4 pb-3 text-xs text-gray-600 italic">
+                                          Keine Rohausgabe gespeichert.
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div className="shrink-0">
-                      {needsVerify && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
-                          className="text-xs text-yellow-400 hover:text-yellow-300 font-medium px-3 py-1.5 bg-yellow-400/10 rounded-lg transition-colors"
-                        >
-                          Verifizieren
-                        </button>
-                      )}
-                      {isRunning && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
-                          className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-blue-400/10 rounded-lg transition-colors"
-                        >
-                          Live View
-                        </button>
-                      )}
-                      {order.status === 'report_complete' && order.hasReport && (
-                        <a
-                          href={getReportDownloadUrl(order.id)}
-                          className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors inline-block"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          PDF Download
-                        </a>
-                      )}
-                    </div>
-                  </div>
+                  )}
                 </div>
               );
             })}

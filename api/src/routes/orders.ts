@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { query } from '../lib/db.js';
-import { scanQueue, publishEvent } from '../lib/queue.js';
+import { scanQueue, publishEvent, getProgressFromRedis } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
@@ -149,6 +149,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
     const orderPackage = (order.package || 'professional') as ScanPackage;
 
+    // Read tool output summary from Redis (fast, non-blocking)
+    const redisProgress = await getProgressFromRedis(id);
+    const toolOutput = redisProgress?.toolOutput as string | undefined;
+    const lastCompletedTool = redisProgress?.lastCompletedTool as string | undefined;
+
     return {
       success: true,
       data: {
@@ -165,6 +170,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
           hostsTotal: order.hosts_total || 0,
           hostsCompleted: order.hosts_completed || 0,
           discoveredHosts: order.discovered_hosts || [],
+          toolOutput: toolOutput || null,
+          lastCompletedTool: lastCompletedTool || null,
         },
         startedAt: order.scan_started_at ? (order.scan_started_at as Date).toISOString() : null,
         finishedAt: order.scan_finished_at ? (order.scan_finished_at as Date).toISOString() : null,
@@ -210,6 +217,46 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       .header('Content-Disposition', `attachment; filename="${fileName}"`)
       .header('Content-Length', fileSize)
       .send(stream);
+  });
+
+  // GET /api/orders/:id/results — Raw scan results per tool
+  server.get<{ Params: OrderParams }>('/api/orders/:id/results', async (request, reply) => {
+    const { id } = request.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+    }
+
+    // Verify order exists
+    const orderResult = await query('SELECT id, status FROM orders WHERE id = $1', [id]);
+    if (orderResult.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Order not found' });
+    }
+
+    // Fetch all scan_results for this order
+    const resultsQuery = await query(
+      `SELECT id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms, created_at
+       FROM scan_results
+       WHERE order_id = $1
+       ORDER BY phase ASC, created_at ASC`,
+      [id],
+    );
+
+    const results = resultsQuery.rows.map((row: Record<string, unknown>) => ({
+      id: row.id,
+      hostIp: row.host_ip || null,
+      phase: row.phase,
+      toolName: row.tool_name,
+      rawOutput: row.raw_output || null,
+      exitCode: row.exit_code,
+      durationMs: row.duration_ms,
+      createdAt: (row.created_at as Date).toISOString(),
+    }));
+
+    return {
+      success: true,
+      data: { results },
+    };
   });
 
   // DELETE /api/orders/:id — Cancel a running order

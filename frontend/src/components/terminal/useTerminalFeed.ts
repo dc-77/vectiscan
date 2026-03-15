@@ -10,6 +10,8 @@ interface ScanProgress {
   hostsTotal: number;
   hostsCompleted: number;
   discoveredHosts: Array<{ ip: string; fqdns: string[]; status: string }>;
+  toolOutput: string | null;
+  lastCompletedTool: string | null;
 }
 
 interface ScanStatus {
@@ -75,6 +77,7 @@ export function useTerminalFeed() {
   const initializedRef = useRef(false);
   const phase0DoneRef = useRef(false);
   const phase1DoneRef = useRef(false);
+  const lastToolOutputRef = useRef<string>('');
 
   const addLines = useCallback((newLines: TerminalLine[]) => {
     setLines(prev => {
@@ -249,8 +252,25 @@ export function useTerminalFeed() {
           text: `  ✓ ${toolLabel}${host ? ' → ' + host : ''}`,
           indent: 1, status: 'done',
         });
+        // Show tool output summary if available
+        if (progress.toolOutput && progress.toolOutput !== lastToolOutputRef.current) {
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: `    └ ${progress.toolOutput}`,
+            indent: 2,
+          });
+          lastToolOutputRef.current = progress.toolOutput;
+        }
       }
       lastToolRef.current = currentTool;
+    } else if (progress.toolOutput && progress.toolOutput !== lastToolOutputRef.current) {
+      // Tool output arrived but tool hasn't changed yet — show it
+      newLines.push({
+        id: lineId(), timestamp: now,
+        text: `    └ ${progress.toolOutput}`,
+        indent: 2,
+      });
+      lastToolOutputRef.current = progress.toolOutput;
     }
 
     // Host completion changes
@@ -278,6 +298,7 @@ export function useTerminalFeed() {
     initializedRef.current = false;
     phase0DoneRef.current = false;
     phase1DoneRef.current = false;
+    lastToolOutputRef.current = '';
     lineCounter = 0;
   }, []);
 

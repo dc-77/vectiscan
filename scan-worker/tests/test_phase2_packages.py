@@ -18,6 +18,7 @@ class TestPhase2Packages:
             "open_ports": [80, 443],
         }
 
+    @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
     @patch("scanner.phase2.run_gobuster_dir", return_value="/tmp/gobuster.txt")
@@ -26,7 +27,7 @@ class TestPhase2Packages:
     @patch("scanner.phase2.run_testssl", return_value={})
     def test_basic_only_runs_testssl_headers_gowitness(
         self, mock_testssl, mock_nikto, mock_nuclei,
-        mock_gobuster, mock_gowitness, mock_headers, tmp_path
+        mock_gobuster, mock_gowitness, mock_headers, mock_publish, tmp_path
     ):
         from scanner.phase2 import run_phase2
         config = get_config("basic")
@@ -45,6 +46,7 @@ class TestPhase2Packages:
         mock_gowitness.assert_called_once()
         mock_headers.assert_called_once()
 
+    @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
     @patch("scanner.phase2.run_gobuster_dir", return_value="/tmp/gobuster.txt")
@@ -53,7 +55,7 @@ class TestPhase2Packages:
     @patch("scanner.phase2.run_testssl", return_value={})
     def test_professional_runs_all_tools(
         self, mock_testssl, mock_nikto, mock_nuclei,
-        mock_gobuster, mock_gowitness, mock_headers, tmp_path
+        mock_gobuster, mock_gowitness, mock_headers, mock_publish, tmp_path
     ):
         from scanner.phase2 import run_phase2
         config = get_config("professional")
@@ -72,6 +74,7 @@ class TestPhase2Packages:
         mock_gowitness.assert_called_once()
         mock_headers.assert_called_once()
 
+    @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
     @patch("scanner.phase2.run_gobuster_dir", return_value="/tmp/gobuster.txt")
@@ -80,7 +83,7 @@ class TestPhase2Packages:
     @patch("scanner.phase2.run_testssl", return_value={})
     def test_basic_tools_run_list(
         self, mock_testssl, mock_nikto, mock_nuclei,
-        mock_gobuster, mock_gowitness, mock_headers, tmp_path
+        mock_gobuster, mock_gowitness, mock_headers, mock_publish, tmp_path
     ):
         """Verify tools_run list only contains actually executed tools."""
         from scanner.phase2 import run_phase2
