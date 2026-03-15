@@ -114,12 +114,10 @@ def test_run_crtsh_parses_subdomains(tmp_path: Path) -> None:
         {"name_value": "*.example.com"},  # wildcard — should strip *. prefix
     ])
 
-    mock_proc = MagicMock()
-    mock_proc.returncode = 0
-    mock_proc.stdout = crtsh_json
+    # run_tool is mocked (simulates curl -o), so write the file manually
+    (phase0_dir / "crtsh_raw.json").write_text(crtsh_json)
 
-    with patch("scanner.phase0.run_tool", return_value=(0, 100)), \
-         patch("scanner.phase0.subprocess.run", return_value=mock_proc):
+    with patch("scanner.phase0.run_tool", return_value=(0, 100)):
         subs = run_crtsh("example.com", scan_dir, "test-scan-id")
 
     assert "example.com" in subs
