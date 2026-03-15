@@ -178,6 +178,36 @@ export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[
   return handleResponse(res);
 }
 
+// --- Password Reset ---
+
+export async function forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  return res.json();
+}
+
+export async function resetPassword(token: string, password: string): Promise<ApiResponse<AuthResponse>> {
+  const res = await fetch(`${API_URL}/api/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, password }),
+  });
+  return res.json();
+}
+
+// --- Admin ---
+
+export async function deleteOrderPermanent(id: string): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/orders/${id}?permanent=true`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
 export async function manualVerify(orderId: string): Promise<ApiResponse<VerificationCheckResult>> {
   const res = await fetch(`${API_URL}/api/verify/manual`, {
     method: 'POST',

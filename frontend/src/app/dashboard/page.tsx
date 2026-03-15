@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, getReportDownloadUrl, OrderListItem } from '@/lib/api';
+import { listOrders, getReportDownloadUrl, deleteOrderPermanent, OrderListItem } from '@/lib/api';
 import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
 import VectiScanLogo from '@/components/VectiScanLogo';
 
@@ -117,6 +117,22 @@ export default function Dashboard() {
   const handleLogout = () => {
     clearToken();
     router.replace('/login');
+  };
+
+  const handleDelete = async (order: OrderListItem) => {
+    if (!confirm(`Order für ${order.domain} endgültig löschen? Dies kann nicht rückgängig gemacht werden.`)) {
+      return;
+    }
+    try {
+      const res = await deleteOrderPermanent(order.id);
+      if (res.success) {
+        setOrders((prev) => prev.filter((o) => o.id !== order.id));
+      } else {
+        setError(res.error || 'Fehler beim Löschen');
+      }
+    } catch {
+      setError('Fehler beim Löschen');
+    }
   };
 
   const filtered = filterOrders(orders, filter);
@@ -287,6 +303,14 @@ export default function Dashboard() {
                         >
                           PDF Download
                         </a>
+                      )}
+                      {admin && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDelete(order); }}
+                          className="text-xs text-red-400 hover:text-red-300 font-medium px-3 py-1.5 bg-red-400/10 rounded-lg transition-colors ml-1"
+                        >
+                          Löschen
+                        </button>
                       )}
                     </div>
                   </div>

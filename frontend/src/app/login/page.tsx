@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { login, register } from '@/lib/api';
 import { setToken } from '@/lib/auth';
 import VectiScanLogo from '@/components/VectiScanLogo';
@@ -132,6 +133,15 @@ export default function LoginPage() {
           <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm text-center">
             {error}
           </div>
+        )}
+
+        {tab === 'login' && (
+          <Link
+            href="/forgot-password"
+            className="block text-center text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            Passwort vergessen?
+          </Link>
         )}
       </div>
     </main>

@@ -1,6 +1,7 @@
 import Fastify, { FastifyInstance } from 'fastify';
 import { healthRoutes } from '../routes/health';
 import { orderRoutes } from '../routes/orders';
+import { authRoutes } from '../routes/auth';
 
 // Mock the lib modules
 jest.mock('../lib/db', () => ({
@@ -20,6 +21,7 @@ jest.mock('../lib/minio', () => {
   return {
     minioClient: {
       getObject: jest.fn().mockResolvedValue(Readable.from(Buffer.from('fake-pdf-content'))),
+      removeObject: jest.fn().mockResolvedValue(undefined),
     },
     initBuckets: jest.fn(),
     getPresignedUrl: jest.fn(),
@@ -48,15 +50,24 @@ jest.mock('../lib/auth', () => ({
   }),
 }));
 
+jest.mock('../lib/email', () => ({
+  sendScanCompleteEmail: jest.fn().mockResolvedValue(undefined),
+  sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
+}));
+
 import { query } from '../lib/db';
 import { scanQueue } from '../lib/queue';
 import { getPresignedUrl } from '../lib/minio';
+import { minioClient } from '../lib/minio';
 import { verifyJwt } from '../lib/auth';
+import { publishEvent } from '../lib/queue';
 
 const mockQuery = query as jest.MockedFunction<typeof query>;
 const mockScanQueueAdd = scanQueue.add as jest.MockedFunction<typeof scanQueue.add>;
 const mockGetPresignedUrl = getPresignedUrl as jest.MockedFunction<typeof getPresignedUrl>;
 const mockVerifyJwt = verifyJwt as jest.MockedFunction<typeof verifyJwt>;
+const mockMinioRemoveObject = minioClient.removeObject as jest.MockedFunction<typeof minioClient.removeObject>;
+const mockPublishEvent = publishEvent as jest.MockedFunction<typeof publishEvent>;
 
 const AUTH_HEADER = { authorization: 'Bearer mock-jwt-token' };
 
@@ -64,17 +75,29 @@ describe('API Routes', () => {
   let server: FastifyInstance;
 
   beforeEach(async () => {
-    jest.clearAllMocks();
-    // Reset default mock for verifyJwt
+    jest.resetAllMocks();
+    // Re-set default mocks after resetAllMocks
     mockVerifyJwt.mockReturnValue({
       sub: 'user-uuid-1234',
       role: 'admin',
       customerId: 'cust-uuid-1234',
       email: 'admin@test.com',
     } as ReturnType<typeof verifyJwt>);
+    mockMinioRemoveObject.mockResolvedValue(undefined as never);
+    mockPublishEvent.mockResolvedValue(undefined as never);
+    const { Readable } = require('stream');
+    (minioClient.getObject as jest.Mock).mockResolvedValue(Readable.from(Buffer.from('fake-pdf-content')));
+    const { isValidDomain } = require('../lib/validate');
+    (isValidDomain as jest.Mock).mockImplementation((d: string) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d));
+    const { generateToken } = require('../services/VerificationService');
+    (generateToken as jest.Mock).mockReturnValue('vectiscan-verify-mock12345678');
+    const { hashPassword, generateJwt } = require('../lib/auth');
+    (hashPassword as jest.Mock).mockResolvedValue('$2a$12$mockhash');
+    (generateJwt as jest.Mock).mockReturnValue('mock-jwt-token');
     server = Fastify({ logger: false });
     await server.register(healthRoutes);
     await server.register(orderRoutes);
+    await server.register(authRoutes);
     await server.ready();
   });
 
@@ -419,6 +442,217 @@ describe('API Routes', () => {
       });
       expect(res.statusCode).toBe(404);
       expect(res.json().error).toBe('Report not yet available');
+    });
+  });
+
+  describe('DELETE /api/orders/:id — admin permanent delete', () => {
+    const orderId = '550e8400-e29b-41d4-a716-446655440000';
+
+    it('should permanently delete order for admin', async () => {
+      // Order lookup
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: orderId, status: 'report_complete', customer_id: 'cust-uuid-1234' }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      // audit_log delete
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'DELETE', rowCount: 0, oid: 0, fields: [] });
+      // order delete
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'DELETE', rowCount: 1, oid: 0, fields: [] });
+
+      const res = await server.inject({
+        method: 'DELETE',
+        url: `/api/orders/${orderId}?permanent=true`,
+        headers: AUTH_HEADER,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.json().success).toBe(true);
+      expect(mockMinioRemoveObject).toHaveBeenCalledTimes(2);
+    });
+
+    it('should deny permanent delete for customer', async () => {
+      mockVerifyJwt.mockReturnValue({
+        sub: 'user-uuid-5678',
+        role: 'customer',
+        customerId: 'cust-uuid-1234',
+        email: 'customer@test.com',
+      } as ReturnType<typeof verifyJwt>);
+
+      // Order lookup
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: orderId, status: 'report_complete', customer_id: 'cust-uuid-1234' }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'DELETE',
+        url: `/api/orders/${orderId}?permanent=true`,
+        headers: AUTH_HEADER,
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
+
+    it('should soft-cancel order without permanent flag', async () => {
+      // Order lookup
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: orderId, status: 'scanning', customer_id: 'cust-uuid-1234' }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      // Update status
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'UPDATE', rowCount: 1, oid: 0, fields: [] });
+
+      const res = await server.inject({
+        method: 'DELETE',
+        url: `/api/orders/${orderId}`,
+        headers: AUTH_HEADER,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(mockMinioRemoveObject).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /api/orders/:id/report — download_token auth', () => {
+    const orderId = '550e8400-e29b-41d4-a716-446655440000';
+
+    it('should allow download via download_token', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{
+          minio_bucket: 'scan-reports',
+          minio_path: `${orderId}.pdf`,
+          file_size_bytes: 1024,
+          created_at: new Date('2026-03-12T15:00:00Z'),
+          expires_at: new Date('2027-01-01T00:00:00Z'),
+          target_url: 'example.com',
+        }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      // download_count update
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'UPDATE', rowCount: 1, oid: 0, fields: [] });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}/report?download_token=valid-token-123`,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers['content-type']).toBe('application/pdf');
+    });
+
+    it('should reject invalid download_token', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [],
+        command: 'SELECT', rowCount: 0, oid: 0, fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}/report?download_token=bad-token`,
+      });
+
+      expect(res.statusCode).toBe(403);
+    });
+
+    it('should reject expired download_token', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{
+          minio_bucket: 'scan-reports',
+          minio_path: `${orderId}.pdf`,
+          file_size_bytes: 1024,
+          created_at: new Date('2026-03-12T15:00:00Z'),
+          expires_at: new Date('2025-01-01T00:00:00Z'), // expired
+          target_url: 'example.com',
+        }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}/report?download_token=expired-token`,
+      });
+
+      expect(res.statusCode).toBe(410);
+    });
+  });
+
+  describe('POST /api/auth/forgot-password', () => {
+    it('should return 200 even for non-existent email', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [],
+        command: 'SELECT', rowCount: 0, oid: 0, fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'POST',
+        url: '/api/auth/forgot-password',
+        payload: { email: 'nobody@test.com' },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.json().success).toBe(true);
+    });
+
+    it('should return 400 for invalid email', async () => {
+      const res = await server.inject({
+        method: 'POST',
+        url: '/api/auth/forgot-password',
+        payload: { email: 'invalid' },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+  });
+
+  describe('POST /api/auth/reset-password', () => {
+    it('should reset password with valid token', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{
+          id: 'user-uuid-1234',
+          email: 'user@test.com',
+          role: 'customer',
+          customer_id: 'cust-uuid-1234',
+          reset_token_expires_at: new Date(Date.now() + 3600000),
+        }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      // Password update
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'UPDATE', rowCount: 1, oid: 0, fields: [] });
+
+      const res = await server.inject({
+        method: 'POST',
+        url: '/api/auth/reset-password',
+        payload: { token: 'valid-reset-token', password: 'newpassword123' },
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.json().success).toBe(true);
+      expect(res.json().data.token).toBeDefined();
+    });
+
+    it('should reject invalid token', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [],
+        command: 'SELECT', rowCount: 0, oid: 0, fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'POST',
+        url: '/api/auth/reset-password',
+        payload: { token: 'bad-token', password: 'newpassword123' },
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it('should reject short password', async () => {
+      const res = await server.inject({
+        method: 'POST',
+        url: '/api/auth/reset-password',
+        payload: { token: 'some-token', password: 'short' },
+      });
+
+      expect(res.statusCode).toBe(400);
     });
   });
 

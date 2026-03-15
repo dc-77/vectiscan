@@ -12,6 +12,7 @@ export const pool = new Pool({
 const MIGRATION_003_PATH = path.join(__dirname, '..', 'migrations', '003_mvp_schema.sql');
 const MIGRATION_004_PATH = path.join(__dirname, '..', 'migrations', '004_add_manual_verification.sql');
 const MIGRATION_005_PATH = path.join(__dirname, '..', 'migrations', '005_users.sql');
+const MIGRATION_006_PATH = path.join(__dirname, '..', 'migrations', '006_password_reset.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -51,6 +52,19 @@ export async function initDb(): Promise<void> {
 
   if (!usersCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_005_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 006: Password reset columns on users
+  const resetColCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.columns
+      WHERE table_name = 'users' AND column_name = 'reset_token'
+    ) AS exists
+  `);
+
+  if (!resetColCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_006_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

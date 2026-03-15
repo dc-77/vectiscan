@@ -1,10 +1,30 @@
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
 import { scanQueue, publishEvent } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
+import { verifyJwt } from '../lib/auth.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+
+async function streamReport(reply: FastifyReply, report: Record<string, unknown>) {
+  const bucket = report.minio_bucket as string;
+  const objectPath = report.minio_path as string;
+  const domain = report.target_url as string;
+  const fileSize = report.file_size_bytes as number;
+  const createdAt = report.created_at as Date;
+
+  const dateStr = createdAt.toISOString().split('T')[0];
+  const fileName = `vectiscan-${domain}-${dateStr}.pdf`;
+
+  const stream = await minioClient.getObject(bucket, objectPath);
+
+  return reply
+    .header('Content-Type', 'application/pdf')
+    .header('Content-Disposition', `attachment; filename="${fileName}"`)
+    .header('Content-Length', fileSize)
+    .send(stream);
+}
 
 const VALID_PACKAGES = ['basic', 'professional', 'nis2'] as const;
 type ScanPackage = typeof VALID_PACKAGES[number];
@@ -194,13 +214,54 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     };
   });
 
-  // GET /api/orders/:id/report — requireAuth, ownership check
-  server.get<{ Params: OrderParams }>('/api/orders/:id/report', { preHandler: [requireAuth] }, async (request, reply) => {
+  // GET /api/orders/:id/report — auth via JWT or download_token
+  server.get<{ Params: OrderParams }>('/api/orders/:id/report', async (request, reply) => {
     const { id } = request.params;
-    const user = request.user!;
+    const queryParams = request.query as Record<string, string>;
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+    }
+
+    // Auth strategy 1: download_token from email link (no login needed)
+    const downloadToken = queryParams.download_token;
+    if (downloadToken) {
+      const tokenCheck = await query(
+        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, o.target_url
+         FROM reports r JOIN orders o ON r.order_id = o.id
+         WHERE r.order_id = $1 AND r.download_token = $2`,
+        [id, downloadToken],
+      );
+
+      if (tokenCheck.rows.length === 0) {
+        return reply.status(403).send({ success: false, error: 'Invalid download token' });
+      }
+
+      const report = tokenCheck.rows[0] as Record<string, unknown>;
+      const expiresAt = report.expires_at as Date | null;
+      if (expiresAt && new Date() > expiresAt) {
+        return reply.status(410).send({ success: false, error: 'Download link expired' });
+      }
+
+      // Increment download count
+      await query('UPDATE reports SET download_count = download_count + 1 WHERE order_id = $1', [id]);
+
+      return streamReport(reply, report);
+    }
+
+    // Auth strategy 2: JWT (Bearer token or ?token= query param)
+    const header = request.headers.authorization;
+    const jwtToken = header?.startsWith('Bearer ') ? header.slice(7) : queryParams.token;
+
+    if (!jwtToken) {
+      return reply.status(401).send({ success: false, error: 'Authentication required' });
+    }
+
+    let user;
+    try {
+      user = verifyJwt(jwtToken);
+    } catch {
+      return reply.status(401).send({ success: false, error: 'Invalid or expired token' });
     }
 
     // Ownership check
@@ -223,29 +284,15 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(404).send({ success: false, error: 'Report not yet available' });
     }
 
-    const report = result.rows[0] as Record<string, unknown>;
-    const bucket = report.minio_bucket as string;
-    const objectPath = report.minio_path as string;
-    const domain = report.target_url as string;
-    const fileSize = report.file_size_bytes as number;
-    const createdAt = report.created_at as Date;
-
-    const dateStr = createdAt.toISOString().split('T')[0];
-    const fileName = `vectiscan-${domain}-${dateStr}.pdf`;
-
-    const stream = await minioClient.getObject(bucket, objectPath);
-
-    return reply
-      .header('Content-Type', 'application/pdf')
-      .header('Content-Disposition', `attachment; filename="${fileName}"`)
-      .header('Content-Length', fileSize)
-      .send(stream);
+    return streamReport(reply, result.rows[0] as Record<string, unknown>);
   });
 
-  // DELETE /api/orders/:id — requireAuth, ownership check
+  // DELETE /api/orders/:id — soft cancel or admin hard delete
   server.delete<{ Params: OrderParams }>('/api/orders/:id', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
     const user = request.user!;
+    const queryParams = request.query as Record<string, string>;
+    const permanent = queryParams.permanent === 'true';
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
@@ -267,9 +314,33 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    const status = order.status as string;
+    // Admin hard delete: ?permanent=true
+    if (permanent) {
+      if (user.role !== 'admin') {
+        return reply.status(403).send({ success: false, error: 'Only admins can permanently delete orders' });
+      }
 
-    // Only cancel orders that are still running
+      // Clean up MinIO objects (best-effort, don't block on errors)
+      try {
+        await minioClient.removeObject('scan-rawdata', `${id}.tar.gz`);
+      } catch { /* ignore — file may not exist */ }
+      try {
+        await minioClient.removeObject('scan-reports', `${id}.pdf`);
+      } catch { /* ignore — file may not exist */ }
+
+      // Delete audit_log entries (no CASCADE on this FK)
+      await query('DELETE FROM audit_log WHERE order_id = $1', [id]);
+
+      // Delete order (CASCADE removes scan_results + reports)
+      await query('DELETE FROM orders WHERE id = $1', [id]);
+
+      server.log.info({ orderId: id, admin: user.email }, 'Order permanently deleted by admin');
+
+      return { success: true, data: null };
+    }
+
+    // Soft cancel: only for running orders
+    const status = order.status as string;
     const cancellableStatuses = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
     if (!cancellableStatuses.includes(status)) {
       return reply.status(409).send({
