@@ -70,7 +70,8 @@ export async function sendScanCompleteEmail(
           </p>
         </div>
       `,
-      idempotencyKey: `scan-complete-${orderId}`,
+    }, {
+      headers: { 'Idempotency-Key': `scan-complete-${orderId}` },
     });
 
     if (error) {
