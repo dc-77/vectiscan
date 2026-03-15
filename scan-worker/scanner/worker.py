@@ -13,6 +13,8 @@ from typing import Any
 import redis
 import structlog
 
+import socket as _socket
+
 import psycopg2
 
 from scanner.packages import get_config
@@ -49,6 +51,20 @@ def _is_cancelled(order_id: str) -> bool:
         return row is not None and row[0] == "cancelled"
     except Exception:
         return False
+
+
+def _is_host_reachable(ip: str, timeout: int = 5) -> bool:
+    """Quick TCP connect check on port 80 and 443. Returns True if either responds."""
+    for port in (443, 80):
+        try:
+            sock = _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM)
+            sock.settimeout(timeout)
+            sock.connect((ip, port))
+            sock.close()
+            return True
+        except (OSError, _socket.timeout):
+            pass
+    return False
 
 
 # Tool version commands — each returns (tool_name, version_string)
@@ -159,6 +175,14 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
         fqdns = host["fqdns"]
 
         _check_timeout()
+
+        # Quick reachability check — skip unreachable hosts
+        if not _is_host_reachable(ip):
+            log.warning("host_unreachable", ip=ip, fqdns=fqdns, order_id=order_id)
+            update_progress(order_id, "scan_phase1", "skipped", host=ip,
+                            hosts_completed=idx + 1, hosts_total=hosts_total)
+            tech_profiles.append({"ip": ip, "fqdns": fqdns, "skipped": True, "reason": "unreachable"})
+            continue
 
         # Phase 1: Technology detection
         def p1_callback(oid: str, tool: str, status: str) -> None:
