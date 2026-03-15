@@ -72,6 +72,7 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
     cmd = [
         "subfinder", "-d", domain,
         "-silent", "-json",
+        "-disable-update-check",
         "-o", output_path,
     ]
     exit_code, duration_ms = run_tool(
@@ -159,8 +160,8 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
     cmd = [
         "gobuster", "dns",
-        "-d", domain,
-        "-w", "/usr/share/wordlists/subdomains-top5000.txt",
+        "--domain", domain,
+        "--wordlist", "/usr/share/wordlists/subdomains-top5000.txt",
         "-q",
         "-o", output_path,
     ]

@@ -131,7 +131,8 @@ RUN nmap --version; \
 
 # ── 8. Security — non-root user ────────────────────────────────────
 RUN useradd -r -s /bin/false scanner && \
-    chown -R scanner:scanner /opt/scanner
+    mkdir -p /home/scanner/.config/subfinder && \
+    chown -R scanner:scanner /opt/scanner /home/scanner
 
 USER scanner
 ENTRYPOINT ["python3", "-m", "scanner"]

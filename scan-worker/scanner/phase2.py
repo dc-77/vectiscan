@@ -37,6 +37,8 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[di
         "testssl.sh",
         "--jsonfile", output_path,
         "--quiet",
+        "--ip", "one",
+        "--warnings", "off",
         fqdn,
     ]
 
@@ -121,7 +123,7 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[dict[st
         "nuclei",
         "-u", fqdn,
         "-severity", "low,medium,high,critical",
-        "-json",
+        "-jsonl",
         "-o", output_path,
     ]
 
@@ -198,8 +200,8 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[
     os.makedirs(phase2_dir, exist_ok=True)
 
     cmd = [
-        "gowitness", "single",
-        f"https://{fqdn}",
+        "gowitness", "scan", "single",
+        "-u", f"https://{fqdn}",
         "--screenshot-path", f"{phase2_dir}/",
     ]
 
@@ -355,7 +357,7 @@ def run_katana(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[str]:
         "-u", f"https://{fqdn}",
         "-o", output_path,
         "-depth", "3",
-        "-js-crawl",
+        "-jsluice",
         "-known-files", "all",
         "-silent",
     ]
