@@ -206,7 +206,9 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[
         "-u", f"https://{fqdn}",
         "--screenshot-path", f"{phase2_dir}/",
         "--chrome-path", chrome_path,
-        "--no-sandbox",
+        "--chrome-arg=--no-sandbox",
+        "--chrome-arg=--disable-gpu",
+        "--chrome-arg=--disable-dev-shm-usage",
     ]
 
     exit_code, duration_ms = run_tool(

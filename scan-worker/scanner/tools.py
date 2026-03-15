@@ -87,6 +87,16 @@ def run_tool(
         if stderr:
             log.debug("tool_stderr", tool=tool_name, stderr=stderr[:500])
 
+        # Determine raw output: prefer stdout, fall back to output file
+        raw = stdout
+        if not raw and output_path:
+            try:
+                if os.path.isfile(output_path):
+                    with open(output_path, "r", errors="replace") as f:
+                        raw = f.read()
+            except Exception:
+                pass
+
         # Save result to scan_results table
         if order_id:
             _save_result(
@@ -94,7 +104,7 @@ def run_tool(
                 host_ip=host_ip,
                 phase=phase,
                 tool_name=tool_name,
-                raw_output=stdout[:50000] if stdout else None,
+                raw_output=raw[:50000] if raw else None,
                 exit_code=exit_code,
                 duration_ms=duration_ms,
             )

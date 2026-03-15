@@ -165,7 +165,7 @@ def run_wafw00f(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[di
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=30,
+        timeout=60,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
