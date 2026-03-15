@@ -92,6 +92,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const result = await query(
       `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
               o.scan_started_at, o.scan_finished_at, o.created_at,
+              o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
               c.email,
               EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
        FROM orders o
@@ -107,6 +108,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       status: row.status,
       hasReport: row.has_report === true || row.has_report === 't',
       error: row.error_message || null,
+      hostsTotal: (row.hosts_total as number) || 0,
+      hostsCompleted: (row.hosts_completed as number) || 0,
+      currentTool: (row.current_tool as string) || null,
+      currentHost: (row.current_host as string) || null,
       startedAt: row.scan_started_at ? (row.scan_started_at as Date).toISOString() : null,
       finishedAt: row.scan_finished_at ? (row.scan_finished_at as Date).toISOString() : null,
       createdAt: (row.created_at as Date).toISOString(),

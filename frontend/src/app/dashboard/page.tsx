@@ -320,6 +320,26 @@ export default function Dashboard() {
                       </span>
                     </div>
 
+                    {/* Progress bar for running scans */}
+                    {isRunning && order.hostsTotal > 0 && (
+                      <div className="mb-2">
+                        <div className="flex justify-between text-xs text-gray-500 mb-1">
+                          <span className="font-mono truncate">
+                            {order.currentTool && (
+                              <>{order.currentTool}{order.currentHost ? ` → ${order.currentHost}` : ''}</>
+                            )}
+                          </span>
+                          <span className="shrink-0 ml-2">{order.hostsCompleted}/{order.hostsTotal} Hosts</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-500 rounded-full transition-all duration-1000"
+                            style={{ width: `${Math.round((order.hostsCompleted / order.hostsTotal) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
                     {/* Row 2: Package + Date + Action */}
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">

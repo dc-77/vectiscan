@@ -112,6 +112,10 @@ export interface OrderListItem {
   status: string;
   hasReport: boolean;
   error: string | null;
+  hostsTotal: number;
+  hostsCompleted: number;
+  currentTool: string | null;
+  currentHost: string | null;
   startedAt: string | null;
   finishedAt: string | null;
   createdAt: string;
