@@ -4,6 +4,7 @@ import { scanQueue, publishEvent } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 const VALID_PACKAGES = ['basic', 'professional', 'nis2'] as const;
 type ScanPackage = typeof VALID_PACKAGES[number];
@@ -15,10 +16,8 @@ const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
 };
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface CreateOrderBody {
-  email: string;
   domain: string;
   package?: string;
 }
@@ -28,17 +27,11 @@ interface OrderParams {
 }
 
 export async function orderRoutes(server: FastifyInstance): Promise<void> {
-  // POST /api/orders
-  server.post<{ Body: CreateOrderBody }>('/api/orders', async (request, reply) => {
-    const { domain, email } = request.body || {};
+  // POST /api/orders — requireAuth, customer_id from JWT
+  server.post<{ Body: CreateOrderBody }>('/api/orders', { preHandler: [requireAuth] }, async (request, reply) => {
+    const user = request.user!;
+    const { domain } = request.body || {};
     const pkg = (request.body?.package || 'professional') as string;
-
-    if (!email || !EMAIL_REGEX.test(email)) {
-      return reply.status(400).send({
-        success: false,
-        error: 'Invalid or missing email address.',
-      });
-    }
 
     if (!isValidDomain(domain)) {
       return reply.status(400).send({
@@ -54,12 +47,15 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       });
     }
 
-    // Find or create customer
-    const customerResult = await query<{ id: string }>(
-      'INSERT INTO customers (email) VALUES ($1) ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING id',
-      [email],
-    );
-    const customerId = customerResult.rows[0].id;
+    // Resolve customer_id: admins without customer_id get one created
+    let customerId = user.customerId;
+    if (!customerId) {
+      const customerResult = await query<{ id: string }>(
+        'INSERT INTO customers (email) VALUES ($1) ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING id',
+        [user.email],
+      );
+      customerId = customerResult.rows[0].id;
+    }
 
     // Insert order with verification token
     const verificationToken = generateToken();
@@ -87,17 +83,35 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     });
   });
 
-  // GET /api/orders — list all orders
-  server.get('/api/orders', async (_request, _reply) => {
-    const result = await query(
-      `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
-              o.scan_started_at, o.scan_finished_at, o.created_at,
-              c.email,
-              EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
-       FROM orders o
-       JOIN customers c ON o.customer_id = c.id
-       ORDER BY o.created_at DESC`,
-    );
+  // GET /api/orders — requireAuth, admin sees all, customer sees own
+  server.get('/api/orders', { preHandler: [requireAuth] }, async (request) => {
+    const user = request.user!;
+
+    let sql: string;
+    let params: unknown[];
+
+    if (user.role === 'admin') {
+      sql = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
+                    o.scan_started_at, o.scan_finished_at, o.created_at,
+                    c.email,
+                    EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
+             FROM orders o
+             JOIN customers c ON o.customer_id = c.id
+             ORDER BY o.created_at DESC`;
+      params = [];
+    } else {
+      sql = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
+                    o.scan_started_at, o.scan_finished_at, o.created_at,
+                    c.email,
+                    EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
+             FROM orders o
+             JOIN customers c ON o.customer_id = c.id
+             WHERE o.customer_id = $1
+             ORDER BY o.created_at DESC`;
+      params = [user.customerId];
+    }
+
+    const result = await query(sql, params);
 
     const orders = result.rows.map((row: Record<string, unknown>) => ({
       id: row.id,
@@ -120,9 +134,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     return reply.redirect('/api/orders', 307);
   });
 
-  // GET /api/orders/:id
-  server.get<{ Params: OrderParams }>('/api/orders/:id', async (request, reply) => {
+  // GET /api/orders/:id — requireAuth, ownership check
+  server.get<{ Params: OrderParams }>('/api/orders/:id', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
+    const user = request.user!;
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
@@ -142,6 +157,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const order = result.rows[0] as Record<string, unknown>;
+
+    // Ownership check: customer can only see own orders
+    if (user.role !== 'admin' && order.customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
 
     // Check if report exists
     const reportResult = await query('SELECT id FROM reports WHERE order_id = $1', [id]);
@@ -174,12 +194,22 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     };
   });
 
-  // GET /api/orders/:id/report
-  server.get<{ Params: OrderParams }>('/api/orders/:id/report', async (request, reply) => {
+  // GET /api/orders/:id/report — requireAuth, ownership check
+  server.get<{ Params: OrderParams }>('/api/orders/:id/report', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
+    const user = request.user!;
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+    }
+
+    // Ownership check
+    const ownerCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [id]);
+    if (ownerCheck.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Order not found' });
+    }
+    if (user.role !== 'admin' && (ownerCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
     const result = await query(
@@ -212,16 +242,17 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       .send(stream);
   });
 
-  // DELETE /api/orders/:id — Cancel a running order
-  server.delete<{ Params: OrderParams }>('/api/orders/:id', async (request, reply) => {
+  // DELETE /api/orders/:id — requireAuth, ownership check
+  server.delete<{ Params: OrderParams }>('/api/orders/:id', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
+    const user = request.user!;
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
     }
 
     const result = await query(
-      'SELECT id, status FROM orders WHERE id = $1',
+      'SELECT id, status, customer_id FROM orders WHERE id = $1',
       [id],
     );
 
@@ -230,6 +261,12 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const order = result.rows[0] as Record<string, unknown>;
+
+    // Ownership check
+    if (user.role !== 'admin' && order.customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
+
     const status = order.status as string;
 
     // Only cancel orders that are still running

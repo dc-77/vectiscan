@@ -1,3 +1,5 @@
+import { getToken, clearToken, AuthResponse } from './auth';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export interface OrderData {
@@ -48,33 +50,85 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-export async function createOrder(email: string, domain: string, pkg: string = 'professional'): Promise<ApiResponse<OrderData>> {
-  const res = await fetch(`${API_URL}/api/orders`, {
+function authHeaders(): Record<string, string> {
+  const token = getToken();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+async function handleResponse<T>(res: Response): Promise<ApiResponse<T>> {
+  if (res.status === 401) {
+    clearToken();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+    return { success: false, error: 'Sitzung abgelaufen. Bitte erneut anmelden.' };
+  }
+  return res.json();
+}
+
+// --- Auth ---
+
+export async function login(email: string, password: string): Promise<ApiResponse<AuthResponse>> {
+  const res = await fetch(`${API_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, domain, package: pkg }),
+    body: JSON.stringify({ email, password }),
   });
   return res.json();
 }
 
-export async function getOrderStatus(id: string): Promise<ApiResponse<OrderStatus>> {
-  const res = await fetch(`${API_URL}/api/orders/${id}`);
+export async function register(email: string, password: string): Promise<ApiResponse<AuthResponse>> {
+  const res = await fetch(`${API_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
   return res.json();
+}
+
+// --- Orders ---
+
+export async function createOrder(domain: string, pkg: string = 'professional'): Promise<ApiResponse<OrderData>> {
+  const res = await fetch(`${API_URL}/api/orders`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ domain, package: pkg }),
+  });
+  return handleResponse(res);
+}
+
+export async function getOrderStatus(id: string): Promise<ApiResponse<OrderStatus>> {
+  const res = await fetch(`${API_URL}/api/orders/${id}`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
 }
 
 export function getReportDownloadUrl(id: string): string {
-  return `${API_URL}/api/orders/${id}/report`;
+  const token = getToken();
+  return `${API_URL}/api/orders/${id}/report${token ? `?token=${token}` : ''}`;
 }
 
 export async function getOrderReport(id: string): Promise<ApiResponse<ReportData>> {
-  const res = await fetch(`${API_URL}/api/orders/${id}/report`);
-  return res.json();
+  const res = await fetch(`${API_URL}/api/orders/${id}/report`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
 }
 
 export async function cancelOrder(id: string): Promise<ApiResponse<null>> {
-  const res = await fetch(`${API_URL}/api/orders/${id}`, { method: 'DELETE' });
-  return res.json();
+  const res = await fetch(`${API_URL}/api/orders/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
 }
+
+// --- Verification ---
 
 export interface VerificationStatus {
   verified: boolean;
@@ -89,17 +143,19 @@ export interface VerificationCheckResult {
 }
 
 export async function getVerificationStatus(orderId: string): Promise<ApiResponse<VerificationStatus>> {
-  const res = await fetch(`${API_URL}/api/verify/status/${orderId}`);
-  return res.json();
+  const res = await fetch(`${API_URL}/api/verify/status/${orderId}`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
 }
 
 export async function checkVerification(orderId: string): Promise<ApiResponse<VerificationCheckResult>> {
   const res = await fetch(`${API_URL}/api/verify/check`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ orderId }),
   });
-  return res.json();
+  return handleResponse(res);
 }
 
 export interface OrderListItem {
@@ -116,24 +172,17 @@ export interface OrderListItem {
 }
 
 export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[] }>> {
-  const res = await fetch(`${API_URL}/api/orders`);
-  return res.json();
+  const res = await fetch(`${API_URL}/api/orders`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
 }
 
 export async function manualVerify(orderId: string): Promise<ApiResponse<VerificationCheckResult>> {
   const res = await fetch(`${API_URL}/api/verify/manual`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ orderId }),
   });
-  return res.json();
-}
-
-export async function verifyPassword(password: string): Promise<ApiResponse<null>> {
-  const res = await fetch(`${API_URL}/api/auth/verify`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password }),
-  });
-  return res.json();
+  return handleResponse(res);
 }

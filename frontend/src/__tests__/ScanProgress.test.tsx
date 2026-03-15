@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import ScanProgress from '@/components/ScanProgress';
-import { ScanStatus } from '@/lib/api';
+import { OrderStatus } from '@/lib/api';
 
-const baseScan: ScanStatus = {
+const baseScan: OrderStatus = {
   id: '123',
   domain: 'example.com',
   status: 'dns_recon',
@@ -30,7 +30,7 @@ describe('ScanProgress', () => {
   });
 
   it('should show current tool when scanning', () => {
-    const scan: ScanStatus = {
+    const scan: OrderStatus = {
       ...baseScan,
       status: 'scan_phase2',
       progress: {
@@ -48,7 +48,7 @@ describe('ScanProgress', () => {
   });
 
   it('should show report generating status', () => {
-    const scan: ScanStatus = {
+    const scan: OrderStatus = {
       ...baseScan,
       status: 'report_generating',
     };
@@ -58,7 +58,7 @@ describe('ScanProgress', () => {
 
   it('should show estimated remaining time when hosts are being scanned', () => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-    const scan: ScanStatus = {
+    const scan: OrderStatus = {
       ...baseScan,
       status: 'scan_phase2',
       startedAt: fiveMinutesAgo,
@@ -76,7 +76,7 @@ describe('ScanProgress', () => {
   });
 
   it('should not show estimated time when no hosts completed', () => {
-    const scan: ScanStatus = {
+    const scan: OrderStatus = {
       ...baseScan,
       status: 'scan_phase1',
       progress: {
@@ -109,7 +109,7 @@ describe('ScanProgress', () => {
   });
 
   it('should use smooth transition on progress bar', () => {
-    const scan: ScanStatus = {
+    const scan: OrderStatus = {
       ...baseScan,
       status: 'scan_phase2',
       progress: {

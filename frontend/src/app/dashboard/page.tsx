@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, getReportDownloadUrl, verifyPassword, OrderListItem } from '@/lib/api';
+import { listOrders, getReportDownloadUrl, OrderListItem } from '@/lib/api';
+import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
 import VectiScanLogo from '@/components/VectiScanLogo';
 
 const PHASE_LABELS: Record<string, string> = {
@@ -69,10 +70,9 @@ function formatDate(iso: string): string {
 
 export default function Dashboard() {
   const router = useRouter();
-  const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [authLoading, setAuthLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [admin, setAdmin] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,29 +81,14 @@ export default function Dashboard() {
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
   useEffect(() => {
-    if (sessionStorage.getItem('vectiscan_auth') === 'true') {
-      setAuthenticated(true);
+    if (!isLoggedIn()) {
+      router.replace('/login');
+      return;
     }
-  }, []);
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-    setAuthLoading(true);
-    try {
-      const res = await verifyPassword(password);
-      if (res.success) {
-        sessionStorage.setItem('vectiscan_auth', 'true');
-        setAuthenticated(true);
-      } else {
-        setAuthError(res.error || 'Falsches Passwort');
-      }
-    } catch {
-      setAuthError('API nicht erreichbar.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
+    setAdmin(isAdmin());
+    setUserEmail(getUser()?.email || null);
+    setReady(true);
+  }, [router]);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -123,11 +108,16 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (!authenticated) return;
+    if (!ready) return;
     fetchOrders();
     const interval = setInterval(fetchOrders, 30000);
     return () => clearInterval(interval);
-  }, [authenticated, fetchOrders]);
+  }, [ready, fetchOrders]);
+
+  const handleLogout = () => {
+    clearToken();
+    router.replace('/login');
+  };
 
   const filtered = filterOrders(orders, filter);
 
@@ -138,41 +128,7 @@ export default function Dashboard() {
     failed: orders.filter(o => FAILED_STATUSES.includes(o.status)).length,
   };
 
-  if (!authenticated) {
-    return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-sm space-y-6">
-          <div className="text-center space-y-2">
-            <VectiScanLogo className="mb-4" />
-            <p className="text-gray-400">Zugang zum Dashboard</p>
-          </div>
-          <form onSubmit={handleAuth} className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Passwort eingeben"
-              autoFocus
-              disabled={authLoading}
-              className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={authLoading || !password.trim()}
-              className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
-            >
-              {authLoading ? 'Prüfe...' : 'Anmelden'}
-            </button>
-          </form>
-          {authError && (
-            <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm text-center">
-              {authError}
-            </div>
-          )}
-        </div>
-      </main>
-    );
-  }
+  if (!ready) return null;
 
   return (
     <main className="min-h-screen px-4 py-8 md:px-8">
@@ -182,13 +138,29 @@ export default function Dashboard() {
           <div className="flex items-center gap-3 min-w-0">
             <div className="hidden sm:block"><VectiScanLogo /></div>
             <h1 className="text-lg sm:text-xl font-semibold text-white truncate">Dashboard</h1>
+            {admin && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">
+                Admin
+              </span>
+            )}
           </div>
-          <Link
-            href="/"
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors shrink-0 whitespace-nowrap"
-          >
-            + Neuer Scan
-          </Link>
+          <div className="flex items-center gap-2 shrink-0">
+            {userEmail && (
+              <span className="text-xs text-gray-500 hidden sm:inline">{userEmail}</span>
+            )}
+            <Link
+              href="/"
+              className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors whitespace-nowrap"
+            >
+              + Neuer Scan
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg border border-gray-700 transition-colors"
+            >
+              Abmelden
+            </button>
+          </div>
         </div>
 
         {/* Filter pills */}
@@ -268,7 +240,12 @@ export default function Dashboard() {
                 >
                   {/* Row 1: Domain + Status */}
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="font-mono text-cyan-400 text-sm truncate">{order.domain}</span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="font-mono text-cyan-400 text-sm truncate">{order.domain}</span>
+                      {admin && (
+                        <span className="text-xs text-gray-500 truncate hidden sm:inline">{order.email}</span>
+                      )}
+                    </div>
                     <span className={`${statusColor} text-white text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1.5 shrink-0`}>
                       {active && (
                         <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />

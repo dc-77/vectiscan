@@ -4,29 +4,35 @@ import * as api from '@/lib/api';
 
 // Mock the API module
 jest.mock('@/lib/api', () => ({
-  createScan: jest.fn(),
-  getScanStatus: jest.fn(),
-  cancelScan: jest.fn(),
-  verifyPassword: jest.fn(),
+  createOrder: jest.fn(),
+  getOrderStatus: jest.fn(),
+  cancelOrder: jest.fn(),
   getReportDownloadUrl: jest.fn(),
-  getScanReport: jest.fn(),
+  getOrderReport: jest.fn(),
+  login: jest.fn(),
+  register: jest.fn(),
+  listOrders: jest.fn(),
 }));
 
-const mockCreateScan = api.createScan as jest.MockedFunction<typeof api.createScan>;
+// Mock the auth module
+jest.mock('@/lib/auth', () => ({
+  isLoggedIn: jest.fn().mockReturnValue(true),
+  getToken: jest.fn().mockReturnValue('mock-token'),
+  setToken: jest.fn(),
+  clearToken: jest.fn(),
+  getUser: jest.fn().mockReturnValue({ id: '1', email: 'test@test.com', role: 'customer' }),
+  isAdmin: jest.fn().mockReturnValue(false),
+}));
+
+const mockCreateOrder = api.createOrder as jest.MockedFunction<typeof api.createOrder>;
 
 describe('Page submit with package', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Simulate authenticated state
-    sessionStorage.setItem('vectiscan_auth', 'true');
-  });
-
-  afterEach(() => {
-    sessionStorage.clear();
   });
 
   it('should submit with default professional package', async () => {
-    mockCreateScan.mockResolvedValueOnce({
+    mockCreateOrder.mockResolvedValueOnce({
       success: true,
       data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'professional', createdAt: new Date().toISOString() },
     });
@@ -40,12 +46,12 @@ describe('Page submit with package', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockCreateScan).toHaveBeenCalledWith('example.com', 'professional');
+      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'professional');
     });
   });
 
   it('should submit with selected basic package', async () => {
-    mockCreateScan.mockResolvedValueOnce({
+    mockCreateOrder.mockResolvedValueOnce({
       success: true,
       data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'basic', createdAt: new Date().toISOString() },
     });
@@ -63,12 +69,12 @@ describe('Page submit with package', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockCreateScan).toHaveBeenCalledWith('example.com', 'basic');
+      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'basic');
     });
   });
 
   it('should submit with selected nis2 package', async () => {
-    mockCreateScan.mockResolvedValueOnce({
+    mockCreateOrder.mockResolvedValueOnce({
       success: true,
       data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'nis2', createdAt: new Date().toISOString() },
     });
@@ -86,7 +92,7 @@ describe('Page submit with package', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockCreateScan).toHaveBeenCalledWith('example.com', 'nis2');
+      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'nis2');
     });
   });
 

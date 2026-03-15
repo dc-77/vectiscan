@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createOrder, getOrderStatus, cancelOrder, verifyPassword, OrderStatus } from '@/lib/api';
+import { createOrder, getOrderStatus, cancelOrder, OrderStatus } from '@/lib/api';
+import { isLoggedIn, clearToken } from '@/lib/auth';
 import Link from 'next/link';
 import VectiScanLogo from '@/components/VectiScanLogo';
 import ScanProgress from '@/components/ScanProgress';
@@ -26,11 +27,7 @@ export default function Home() {
 function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState('');
-  const [authError, setAuthError] = useState<string | null>(null);
-  const [authLoading, setAuthLoading] = useState(false);
-  const [email, setEmail] = useState('');
+  const [ready, setReady] = useState(false);
   const [domain, setDomain] = useState('');
   const [selectedPackage, setSelectedPackage] = useState<ScanPackage>('professional');
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -91,20 +88,23 @@ function HomeContent() {
     onConnectionChange: handleWsConnectionChange,
   });
 
+  // Auth check
   useEffect(() => {
-    if (sessionStorage.getItem('vectiscan_auth') === 'true') {
-      setAuthenticated(true);
+    if (!isLoggedIn()) {
+      router.replace('/login');
+      return;
     }
-  }, []);
+    setReady(true);
+  }, [router]);
 
   // Resume scan from orderId query param (from dashboard or verify redirect)
   useEffect(() => {
     const paramOrderId = searchParams.get('orderId');
-    if (paramOrderId && !orderId && authenticated) {
+    if (paramOrderId && !orderId && ready) {
       setOrderId(paramOrderId);
       startPolling(paramOrderId);
     }
-  }, [searchParams, authenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [searchParams, ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Redirect to verify page if order still needs verification
   // Skip redirect briefly after arriving from verify page to avoid race condition
@@ -130,25 +130,6 @@ function HomeContent() {
       initTerminal(order.domain, order.package);
     }
   }, [order?.domain, order?.package]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError(null);
-    setAuthLoading(true);
-    try {
-      const res = await verifyPassword(password);
-      if (res.success) {
-        sessionStorage.setItem('vectiscan_auth', 'true');
-        setAuthenticated(true);
-      } else {
-        setAuthError(res.error || 'Falsches Passwort');
-      }
-    } catch {
-      setAuthError('API nicht erreichbar.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
 
   const stopPolling = useCallback(() => {
     if (intervalRef.current) {
@@ -199,11 +180,6 @@ function HomeContent() {
     setOrder(null);
     setOrderId(null);
 
-    if (!email.trim()) {
-      setError('Bitte eine E-Mail-Adresse eingeben.');
-      return;
-    }
-
     // Strip protocol, path, port, trailing slash from input
     let trimmed = domain.trim().toLowerCase()
       .replace(/^https?:\/\//, '')  // remove http:// or https://
@@ -218,7 +194,7 @@ function HomeContent() {
 
     setSubmitting(true);
     try {
-      const res = await createOrder(email.trim(), trimmed, selectedPackage);
+      const res = await createOrder(trimmed, selectedPackage);
       if (res.success && res.data) {
         router.push(`/verify/${res.data.id}`);
       } else {
@@ -236,7 +212,6 @@ function HomeContent() {
     closeWs();
     resetTerminal();
     setShowReport(false);
-    setEmail('');
     setDomain('');
     setSelectedPackage('professional');
     setOrderId(null);
@@ -257,43 +232,14 @@ function HomeContent() {
     }
   };
 
+  const handleLogout = () => {
+    clearToken();
+    router.replace('/login');
+  };
+
   const isScanning = orderId && order && order.status !== 'report_complete' && order.status !== 'failed' && order.status !== 'cancelled';
 
-  if (!authenticated) {
-    return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-sm space-y-6">
-          <div className="text-center space-y-2">
-            <VectiScanLogo className="mb-4" />
-            <p className="text-gray-400">Zugang zum Security-Scanner</p>
-          </div>
-          <form onSubmit={handleAuth} className="space-y-4">
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Passwort eingeben"
-              autoFocus
-              disabled={authLoading}
-              className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={authLoading || !password.trim()}
-              className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
-            >
-              {authLoading ? 'Prüfe...' : 'Anmelden'}
-            </button>
-          </form>
-          {authError && (
-            <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm text-center">
-              {authError}
-            </div>
-          )}
-        </div>
-      </main>
-    );
-  }
+  if (!ready) return null;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
@@ -303,12 +249,20 @@ function HomeContent() {
           <div className="text-center space-y-2">
             <VectiScanLogo className="mb-4" />
             <p className="text-gray-400">Automatisierte Security-Scan-Plattform</p>
-            <Link
-              href="/dashboard"
-              className="inline-block bg-[#1e293b] hover:bg-[#253347] text-gray-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors mt-2"
-            >
-              Dashboard
-            </Link>
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <Link
+                href="/dashboard"
+                className="bg-[#1e293b] hover:bg-[#253347] text-gray-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-4 py-2 rounded-lg border border-gray-700 transition-colors"
+              >
+                Abmelden
+              </button>
+            </div>
           </div>
         )}
 
@@ -316,14 +270,6 @@ function HomeContent() {
         {!orderId && !showReport && (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col gap-3 max-w-2xl mx-auto">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="ihre@email.de"
-                disabled={submitting}
-                className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
-              />
               <div className="flex gap-3">
                 <input
                   type="text"
@@ -335,7 +281,7 @@ function HomeContent() {
                 />
                 <button
                   type="submit"
-                  disabled={submitting || !domain.trim() || !email.trim()}
+                  disabled={submitting || !domain.trim()}
                   className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
                 >
                   {submitting ? 'Startet...' : 'Scan starten'}
