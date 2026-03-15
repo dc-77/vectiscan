@@ -21,6 +21,19 @@ export function buildServer() {
   });
 
   server.register(cors, { origin: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] });
+
+  // Allow DELETE requests with empty body (browsers may send Content-Length: 0)
+  server.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+    if (typeof body === 'string' && body.length === 0) {
+      done(null, undefined);
+    } else {
+      try {
+        done(null, JSON.parse(body as string));
+      } catch (err) {
+        done(err as Error, undefined);
+      }
+    }
+  });
   server.register(websocket);
   server.register(authRoutes);
   server.register(healthRoutes);
