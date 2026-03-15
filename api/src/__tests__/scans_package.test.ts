@@ -12,6 +12,7 @@ jest.mock('../lib/queue', () => ({
   scanQueue: { add: jest.fn() },
   reportQueue: { add: jest.fn() },
   publishEvent: jest.fn(),
+  getProgressFromRedis: jest.fn().mockResolvedValue(null),
 }));
 
 jest.mock('../lib/minio', () => {

@@ -153,8 +153,8 @@ def test_phase0_tools_called_with_correct_timeouts(tmp_path: Path) -> None:
 
     with patch("scanner.phase0.run_tool", mock_run):
         run_crtsh("example.com", scan_dir, "scan-1")
-        # crtsh timeout = 30
-        assert mock_run.call_args_list[-1][1]["timeout"] == 30 or mock_run.call_args_list[-1][0][1] == 30
+        # crtsh timeout = 60
+        assert mock_run.call_args_list[-1][1]["timeout"] == 60 or mock_run.call_args_list[-1][0][1] == 60
 
     mock_run.reset_mock()
     with patch("scanner.phase0.run_tool", mock_run):

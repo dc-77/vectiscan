@@ -29,7 +29,7 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     cmd = ["curl", "-s", "-o", output_path, f"https://crt.sh/?q=%.{domain}&output=json"]
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=30,
+        timeout=60,
         output_path=output_path,
         order_id=order_id,
         phase=0,
@@ -76,6 +76,7 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
     cmd = [
         "subfinder", "-d", domain,
         "-silent", "-json",
+        "-disable-update-check",
         "-o", output_path,
     ]
     exit_code, duration_ms = run_tool(
@@ -163,8 +164,8 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
     cmd = [
         "gobuster", "dns",
-        "-d", domain,
-        "-w", "/usr/share/wordlists/subdomains-top5000.txt",
+        "--domain", domain,
+        "--wordlist", "/usr/share/wordlists/subdomains-top5000.txt",
         "-q",
         "-o", output_path,
     ]

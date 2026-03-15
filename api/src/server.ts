@@ -20,7 +20,7 @@ export function buildServer() {
     },
   });
 
-  server.register(cors, { origin: true });
+  server.register(cors, { origin: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] });
   server.register(websocket);
   server.register(authRoutes);
   server.register(healthRoutes);

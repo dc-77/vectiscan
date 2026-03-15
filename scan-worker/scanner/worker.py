@@ -13,6 +13,10 @@ from typing import Any
 import redis
 import structlog
 
+import socket as _socket
+
+import psycopg2
+
 from scanner.packages import get_config
 from scanner.phase0 import run_phase0
 from scanner.phase1 import run_phase1
@@ -27,6 +31,40 @@ from scanner.progress import (
 from scanner.upload import enqueue_report_job, pack_results, upload_to_minio
 
 log = structlog.get_logger()
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan")
+
+
+class ScanCancelled(Exception):
+    """Raised when the order has been cancelled by the user."""
+    pass
+
+
+def _is_cancelled(order_id: str) -> bool:
+    """Check if the order has been cancelled in the database."""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        with conn.cursor() as cur:
+            cur.execute("SELECT status FROM orders WHERE id = %s", (order_id,))
+            row = cur.fetchone()
+        conn.close()
+        return row is not None and row[0] == "cancelled"
+    except Exception:
+        return False
+
+
+def _is_host_reachable(ip: str, timeout: int = 5) -> bool:
+    """Quick TCP connect check on port 80 and 443. Returns True if either responds."""
+    for port in (443, 80):
+        try:
+            sock = _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM)
+            sock.settimeout(timeout)
+            sock.connect((ip, port))
+            sock.close()
+            return True
+        except (OSError, _socket.timeout):
+            pass
+    return False
 
 
 # Tool version commands — each returns (tool_name, version_string)
@@ -95,6 +133,8 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
                 f"Scan-Timeout: Das {_package_label}-Paket hat das Zeitlimit "
                 f"von {_timeout_minutes} Minuten überschritten."
             )
+        if _is_cancelled(order_id):
+            raise ScanCancelled(f"Scan {order_id} wurde vom Benutzer abgebrochen.")
 
     # Collect tool versions before scanning
     tool_versions = _collect_tool_versions()
@@ -140,10 +180,19 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
 
         _check_timeout()
 
+        # Quick reachability check — skip unreachable hosts
+        if not _is_host_reachable(ip):
+            log.warning("host_unreachable", ip=ip, fqdns=fqdns, order_id=order_id)
+            update_progress(order_id, "scan_phase1", "skipped", host=ip,
+                            hosts_completed=idx + 1, hosts_total=hosts_total)
+            tech_profiles.append({"ip": ip, "fqdns": fqdns, "skipped": True, "reason": "unreachable"})
+            continue
+
         # Phase 1: Technology detection
         def p1_callback(oid: str, tool: str, status: str) -> None:
             update_progress(oid, "scan_phase1", tool, host=ip,
                             hosts_completed=idx, hosts_total=hosts_total)
+            _check_timeout()  # Check cancel/timeout between each tool
 
         update_progress(order_id, "scan_phase1", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
@@ -156,9 +205,11 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
         def p2_callback(oid: str, tool: str, status: str) -> None:
             update_progress(oid, "scan_phase2", tool, host=ip,
                             hosts_completed=idx, hosts_total=hosts_total)
+            _check_timeout()  # Check cancel/timeout between each tool
 
         update_progress(order_id, "scan_phase2", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
+        _check_timeout()
         run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config)
 
         log.info("host_complete", order_id=order_id, ip=ip, idx=idx + 1, total=hosts_total)
@@ -231,6 +282,11 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
 
             try:
                 _process_job(order_id, domain, package)
+            except ScanCancelled:
+                log.info("scan_cancelled", order_id=order_id)
+                scan_dir = f"/tmp/scan-{order_id}"
+                if os.path.exists(scan_dir):
+                    shutil.rmtree(scan_dir, ignore_errors=True)
             except TimeoutError as e:
                 log.error("scan_timeout", order_id=order_id, error=str(e))
                 set_scan_failed(order_id, str(e))

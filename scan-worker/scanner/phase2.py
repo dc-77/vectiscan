@@ -8,6 +8,7 @@ from typing import Any, Callable, Optional
 
 import structlog
 
+from scanner.progress import publish_tool_output
 from scanner.tools import run_tool
 
 log = structlog.get_logger()
@@ -34,10 +35,12 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[di
     output_path = f"{phase2_dir}/testssl.json"
 
     cmd = [
-        "testssl.sh",
+        "bash", "/opt/testssl.sh/testssl.sh",
         "--jsonfile", output_path,
         "--quiet",
-        fqdn,
+        "--ip", "one",
+        "--warnings", "off",
+        f"https://{fqdn}",
     ]
 
     exit_code, duration_ms = run_tool(
@@ -76,7 +79,7 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict
     output_path = f"{phase2_dir}/nikto.json"
 
     cmd = [
-        "nikto",
+        "nikto.pl",
         "-h", fqdn,
         "-Format", "json",
         "-output", output_path,
@@ -121,7 +124,7 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[dict[st
         "nuclei",
         "-u", fqdn,
         "-severity", "low,medium,high,critical",
-        "-json",
+        "-jsonl",
         "-o", output_path,
     ]
 
@@ -173,7 +176,7 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str) -> Option
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=600,
+        timeout=120,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -197,10 +200,13 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
 
+    chrome_path = os.environ.get("CHROME_PATH", "/usr/bin/chromium")
     cmd = [
-        "gowitness", "single",
-        f"https://{fqdn}",
+        "gowitness", "scan", "single",
+        "-u", f"https://{fqdn}",
         "--screenshot-path", f"{phase2_dir}/",
+        "--chrome-path", chrome_path,
+        "--no-sandbox",
     ]
 
     exit_code, duration_ms = run_tool(
@@ -363,7 +369,7 @@ def run_katana(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[str]:
         "-u", f"https://{fqdn}",
         "-o", output_path,
         "-depth", "3",
-        "-js-crawl",
+        "-jsluice",
         "-known-files", "all",
         "-silent",
     ]
@@ -479,6 +485,12 @@ def run_phase2(
         results["testssl"] = testssl_result
         results["tools_run"].append("testssl")
         progress_callback(order_id, "testssl", "complete")
+        # Publish tool output summary
+        if testssl_result:
+            count = len(testssl_result) if isinstance(testssl_result, list) else 1
+            publish_tool_output(order_id, "testssl", ip, f"{count} SSL/TLS checks completed")
+        else:
+            publish_tool_output(order_id, "testssl", ip, "No SSL findings")
     else:
         if not has_ssl:
             log.info("testssl_skipped", ip=ip, reason="no_ssl")
@@ -491,6 +503,11 @@ def run_phase2(
         results["nikto"] = nikto_result
         results["tools_run"].append("nikto")
         progress_callback(order_id, "nikto", "complete")
+        if nikto_result:
+            items = nikto_result.get("vulnerabilities", []) if isinstance(nikto_result, dict) else []
+            publish_tool_output(order_id, "nikto", ip, f"{len(items)} items found")
+        else:
+            publish_tool_output(order_id, "nikto", ip, "No findings")
     else:
         log.info("nikto_skipped", ip=ip, reason="not_in_package")
 
@@ -500,6 +517,15 @@ def run_phase2(
         results["nuclei"] = nuclei_result
         results["tools_run"].append("nuclei")
         progress_callback(order_id, "nuclei", "complete")
+        if nuclei_result:
+            severities = {}
+            for f in nuclei_result:
+                sev = f.get("info", {}).get("severity", "unknown")
+                severities[sev] = severities.get(sev, 0) + 1
+            parts = [f"{v} {k}" for k, v in sorted(severities.items())]
+            publish_tool_output(order_id, "nuclei", ip, f"{len(nuclei_result)} findings ({', '.join(parts)})")
+        else:
+            publish_tool_output(order_id, "nuclei", ip, "No vulnerabilities found")
     else:
         log.info("nuclei_skipped", ip=ip, reason="not_in_package")
 
@@ -509,6 +535,15 @@ def run_phase2(
         results["gobuster_dir"] = gobuster_result
         results["tools_run"].append("gobuster_dir")
         progress_callback(order_id, "gobuster_dir", "complete")
+        if gobuster_result:
+            try:
+                with open(gobuster_result, "r") as _f:
+                    line_count = sum(1 for _ in _f)
+                publish_tool_output(order_id, "gobuster_dir", ip, f"{line_count} paths discovered")
+            except Exception:
+                publish_tool_output(order_id, "gobuster_dir", ip, "Directory scan complete")
+        else:
+            publish_tool_output(order_id, "gobuster_dir", ip, "No paths found")
     else:
         log.info("gobuster_dir_skipped", ip=ip, reason="not_in_package")
 
@@ -518,6 +553,10 @@ def run_phase2(
         results["gowitness"] = gowitness_result
         results["tools_run"].append("gowitness")
         progress_callback(order_id, "gowitness", "complete")
+        if gowitness_result:
+            publish_tool_output(order_id, "gowitness", ip, "Screenshot captured")
+        else:
+            publish_tool_output(order_id, "gowitness", ip, "Screenshot failed")
     else:
         log.info("gowitness_skipped", ip=ip, reason="not_in_package")
 
@@ -527,6 +566,11 @@ def run_phase2(
         results["headers"] = header_result
         results["tools_run"].append("header_check")
         progress_callback(order_id, "header_check", "complete")
+        if header_result:
+            score = header_result.get("score", "?/?")
+            publish_tool_output(order_id, "header_check", ip, f"Security headers: {score}")
+        else:
+            publish_tool_output(order_id, "header_check", ip, "Header check failed")
     else:
         log.info("headers_skipped", ip=ip, reason="not_in_package")
 
@@ -536,6 +580,14 @@ def run_phase2(
         results["httpx"] = httpx_result
         results["tools_run"].append("httpx")
         progress_callback(order_id, "httpx", "complete")
+        if httpx_result:
+            status_code = httpx_result.get("status_code", "?")
+            title = (httpx_result.get("title", "") or "")[:40]
+            techs = httpx_result.get("tech", [])
+            tech_str = f", {len(techs)} technologies" if techs else ""
+            publish_tool_output(order_id, "httpx", ip, f"HTTP {status_code} {title}{tech_str}")
+        else:
+            publish_tool_output(order_id, "httpx", ip, "HTTP probe failed")
     else:
         log.info("httpx_skipped", ip=ip, reason="not_in_package")
 
@@ -545,6 +597,10 @@ def run_phase2(
         results["katana"] = katana_result
         results["tools_run"].append("katana")
         progress_callback(order_id, "katana", "complete")
+        if katana_result:
+            publish_tool_output(order_id, "katana", ip, f"{len(katana_result)} URLs crawled")
+        else:
+            publish_tool_output(order_id, "katana", ip, "No URLs discovered")
     else:
         log.info("katana_skipped", ip=ip, reason="not_in_package")
 
@@ -555,6 +611,12 @@ def run_phase2(
         results["wpscan"] = wpscan_result
         results["tools_run"].append("wpscan")
         progress_callback(order_id, "wpscan", "complete")
+        if wpscan_result:
+            vulns = len(wpscan_result.get("interesting_findings", []))
+            plugins = len(wpscan_result.get("plugins", {}))
+            publish_tool_output(order_id, "wpscan", ip, f"{vulns} findings, {plugins} plugins")
+        else:
+            publish_tool_output(order_id, "wpscan", ip, "WPScan failed")
     elif cms and cms.lower() != "wordpress":
         log.info("wpscan_skipped", ip=ip, reason=f"cms_is_{cms}")
     else:

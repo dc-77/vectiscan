@@ -10,6 +10,8 @@ interface ScanProgress {
   hostsTotal: number;
   hostsCompleted: number;
   discoveredHosts: Array<{ ip: string; fqdns: string[]; status: string }>;
+  toolOutput: string | null;
+  lastCompletedTool: string | null;
 }
 
 interface ScanStatus {
@@ -75,6 +77,7 @@ export function useTerminalFeed() {
   const initializedRef = useRef(false);
   const phase0DoneRef = useRef(false);
   const phase1DoneRef = useRef(false);
+  const lastToolOutputRef = useRef<string>('');
 
   const addLines = useCallback((newLines: TerminalLine[]) => {
     setLines(prev => {
@@ -118,10 +121,16 @@ export function useTerminalFeed() {
       initTerminal(domain, pkg);
     }
 
-    // Phase transitions — only emit when phase changes
-    if (status !== lastStatusRef.current) {
+    // Phase/host transitions — emit when phase OR host changes
+    const currentHost = progress.currentHost || '';
+    const phaseHostKey = `${status}:${currentHost}`;
+    const lastPhaseHostKey = `${lastStatusRef.current}:${lastHostRef.current}`;
+    const phaseOrHostChanged = phaseHostKey !== lastPhaseHostKey;
+
+    if (phaseOrHostChanged) {
       const prevStatus = lastStatusRef.current;
       lastStatusRef.current = status;
+      lastHostRef.current = currentHost;
 
       switch (status) {
         case 'queued':
@@ -161,25 +170,20 @@ export function useTerminalFeed() {
             }
           }
           // Phase 1 header with host info
-          const p1Host = progress.currentHost || '';
           newLines.push({
             id: lineId(), timestamp: now,
-            text: `▸ Phase 1: Technologie-Erkennung${p1Host ? ` [${p1Host}]` : ''}`,
+            text: `▸ Phase 1: Technologie-Erkennung${currentHost ? ` [${currentHost}]` : ''}`,
             isHeader: true,
           });
           break;
 
         case 'scan_phase2': {
-          if (!phase1DoneRef.current) {
-            phase1DoneRef.current = true;
-          }
           const hostLabel = progress.hostsTotal > 0
             ? ` [Host ${progress.hostsCompleted + 1}/${progress.hostsTotal}]`
             : '';
-          const p2Host = progress.currentHost || '';
           newLines.push({
             id: lineId(), timestamp: now,
-            text: `▸ Phase 2: Deep Scan${p2Host ? ` [${p2Host}]` : ''}${hostLabel}`,
+            text: `▸ Phase 2: Deep Scan${currentHost ? ` [${currentHost}]` : ''}${hostLabel}`,
             isHeader: true,
           });
           break;
@@ -257,8 +261,25 @@ export function useTerminalFeed() {
           text: `  ✓ ${toolLabel}${host ? ' → ' + host : ''}`,
           indent: 1, status: 'done',
         });
+        // Show tool output summary if available
+        if (progress.toolOutput && progress.toolOutput !== lastToolOutputRef.current) {
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: `    └ ${progress.toolOutput}`,
+            indent: 2,
+          });
+          lastToolOutputRef.current = progress.toolOutput;
+        }
       }
       lastToolRef.current = currentTool;
+    } else if (progress.toolOutput && progress.toolOutput !== lastToolOutputRef.current) {
+      // Tool output arrived but tool hasn't changed yet — show it
+      newLines.push({
+        id: lineId(), timestamp: now,
+        text: `    └ ${progress.toolOutput}`,
+        indent: 2,
+      });
+      lastToolOutputRef.current = progress.toolOutput;
     }
 
     // Host completion changes
@@ -286,6 +307,7 @@ export function useTerminalFeed() {
     initializedRef.current = false;
     phase0DoneRef.current = false;
     phase1DoneRef.current = false;
+    lastToolOutputRef.current = '';
     lineCounter = 0;
   }, []);
 

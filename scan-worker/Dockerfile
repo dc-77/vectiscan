@@ -6,10 +6,15 @@ LABEL maintainer="VectiScan" \
 # ── 1. System packages ──────────────────────────────────────────────
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      ca-certificates curl wget unzip jq dnsutils git \
+      ca-certificates curl wget unzip jq dnsutils git bash \
       python3 python3-pip python3-venv \
-      nmap openssl libnet-ssleay-perl && \
+      nmap openssl libnet-ssleay-perl \
+      chromium && \
     rm -rf /var/lib/apt/lists/*
+
+# gowitness/katana need Chrome — set path
+ENV CHROME_PATH="/usr/bin/chromium"
+ENV CHROMIUM_PATH="/usr/bin/chromium"
 
 # ── 2. Go binaries — pinned versions ────────────────────────────────
 
@@ -82,7 +87,8 @@ RUN git clone --depth 1 https://github.com/drwetter/testssl.sh.git /opt/testssl.
 ENV PATH="/opt/testssl.sh:${PATH}"
 
 # ── 3b. nikto (not in bookworm-slim repos) ────────────────────────
-RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto
+RUN git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto && \
+    ln -s /opt/nikto/program/nikto.pl /usr/local/bin/nikto
 ENV PATH="/opt/nikto/program:${PATH}"
 
 # ── 3c. WPScan — Ruby-based WordPress scanner ────────────────────
@@ -130,7 +136,8 @@ RUN nmap --version; \
 
 # ── 8. Security — non-root user ────────────────────────────────────
 RUN useradd -r -s /bin/false scanner && \
-    chown -R scanner:scanner /opt/scanner
+    mkdir -p /home/scanner/.config/subfinder && \
+    chown -R scanner:scanner /opt/scanner /home/scanner
 
 USER scanner
 ENTRYPOINT ["python3", "-m", "scanner"]

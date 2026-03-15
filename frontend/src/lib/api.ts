@@ -23,6 +23,8 @@ export interface OrderProgress {
   hostsTotal: number;
   hostsCompleted: number;
   discoveredHosts: HostInfo[];
+  toolOutput: string | null;
+  lastCompletedTool: string | null;
 }
 
 export interface OrderStatus {
@@ -166,6 +168,10 @@ export interface OrderListItem {
   status: string;
   hasReport: boolean;
   error: string | null;
+  hostsTotal: number;
+  hostsCompleted: number;
+  currentTool: string | null;
+  currentHost: string | null;
   startedAt: string | null;
   finishedAt: string | null;
   createdAt: string;
@@ -271,6 +277,24 @@ export async function manualVerify(orderId: string): Promise<ApiResponse<Verific
     method: 'POST',
     headers: authHeaders(),
     body: JSON.stringify({ orderId }),
+  });
+  return handleResponse(res);
+}
+
+export interface ScanResult {
+  id: string;
+  hostIp: string | null;
+  phase: number;
+  toolName: string;
+  rawOutput: string | null;
+  exitCode: number;
+  durationMs: number;
+  createdAt: string;
+}
+
+export async function getScanResults(orderId: string): Promise<ApiResponse<{ results: ScanResult[] }>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/results`, {
+    headers: authHeaders(),
   });
   return handleResponse(res);
 }

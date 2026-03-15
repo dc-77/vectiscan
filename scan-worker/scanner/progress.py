@@ -31,6 +31,7 @@ def update_progress(
     host: Optional[str] = None,
     hosts_completed: int = 0,
     hosts_total: int = 0,
+    tool_output: Optional[str] = None,
 ) -> None:
     """Update scan progress in Redis and PostgreSQL.
 
@@ -41,6 +42,7 @@ def update_progress(
         host: Current host IP (if applicable)
         hosts_completed: Number of hosts fully scanned
         hosts_total: Total number of hosts to scan
+        tool_output: Brief summary of the last completed tool's output
     """
     # Determine status from phase
     status = phase  # dns_recon, scan_phase1, scan_phase2
@@ -55,6 +57,9 @@ def update_progress(
         "hostsTotal": hosts_total,
         "updatedAt": datetime.now(timezone.utc).isoformat(),
     }
+
+    if tool_output is not None:
+        progress_data["toolOutput"] = tool_output
 
     # Redis — fast polling (SET with 1h expiry) + Pub/Sub for WebSocket
     try:
@@ -201,3 +206,38 @@ def set_discovered_hosts(order_id: str, host_inventory: dict) -> None:
         }))
     except Exception as e:
         log.error("redis_hosts_publish_failed", order_id=order_id, error=str(e))
+
+
+def publish_tool_output(
+    order_id: str,
+    tool: str,
+    host: str,
+    summary: str,
+) -> None:
+    """Publish a tool completion summary via Redis pub/sub and update progress key.
+
+    This is called after each tool completes to provide a brief output summary
+    that the frontend can display in the terminal view.
+    """
+    try:
+        r = _get_redis()
+        # Update the stored progress data with the latest tool output
+        progress_raw = r.get(f"order:progress:{order_id}")
+        if progress_raw:
+            data = json.loads(progress_raw)
+            data["toolOutput"] = summary
+            data["lastCompletedTool"] = tool
+            data["updatedAt"] = datetime.now(timezone.utc).isoformat()
+            r.set(f"order:progress:{order_id}", json.dumps(data), ex=3600)
+
+        # Also publish for WebSocket consumers
+        r.publish(f"scan:events:{order_id}", json.dumps({
+            "type": "tool_output",
+            "orderId": order_id,
+            "tool": tool,
+            "host": host,
+            "summary": summary,
+            "updatedAt": datetime.now(timezone.utc).isoformat(),
+        }))
+    except Exception as e:
+        log.error("tool_output_publish_failed", order_id=order_id, tool=tool, error=str(e))

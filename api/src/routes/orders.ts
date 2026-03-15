@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
-import { scanQueue, publishEvent } from '../lib/queue.js';
+import { scanQueue, publishEvent, getProgressFromRedis } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
@@ -116,6 +116,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     if (user.role === 'admin') {
       sql = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
                     o.scan_started_at, o.scan_finished_at, o.created_at,
+                    o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
                     c.email,
                     EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
              FROM orders o
@@ -125,6 +126,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     } else {
       sql = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
                     o.scan_started_at, o.scan_finished_at, o.created_at,
+                    o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
                     c.email,
                     EXISTS(SELECT 1 FROM reports r WHERE r.order_id = o.id) AS has_report
              FROM orders o
@@ -144,6 +146,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       status: row.status,
       hasReport: row.has_report === true || row.has_report === 't',
       error: row.error_message || null,
+      hostsTotal: (row.hosts_total as number) || 0,
+      hostsCompleted: (row.hosts_completed as number) || 0,
+      currentTool: (row.current_tool as string) || null,
+      currentHost: (row.current_host as string) || null,
       startedAt: row.scan_started_at ? (row.scan_started_at as Date).toISOString() : null,
       finishedAt: row.scan_finished_at ? (row.scan_finished_at as Date).toISOString() : null,
       createdAt: (row.created_at as Date).toISOString(),
@@ -192,6 +198,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
     const orderPackage = (order.package || 'professional') as ScanPackage;
 
+    // Read tool output summary from Redis (fast, non-blocking)
+    const redisProgress = await getProgressFromRedis(id);
+    const toolOutput = redisProgress?.toolOutput as string | undefined;
+    const lastCompletedTool = redisProgress?.lastCompletedTool as string | undefined;
+
     return {
       success: true,
       data: {
@@ -208,6 +219,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
           hostsTotal: order.hosts_total || 0,
           hostsCompleted: order.hosts_completed || 0,
           discoveredHosts: order.discovered_hosts || [],
+          toolOutput: toolOutput || null,
+          lastCompletedTool: lastCompletedTool || null,
         },
         startedAt: order.scan_started_at ? (order.scan_started_at as Date).toISOString() : null,
         finishedAt: order.scan_finished_at ? (order.scan_finished_at as Date).toISOString() : null,
@@ -292,6 +305,46 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     audit({ orderId: id, action: 'report.downloaded', details: { via: 'jwt', userId: user.sub }, ip: request.ip });
 
     return streamReport(reply, result.rows[0] as Record<string, unknown>);
+  });
+
+  // GET /api/orders/:id/results — Raw scan results per tool
+  server.get<{ Params: OrderParams }>('/api/orders/:id/results', async (request, reply) => {
+    const { id } = request.params;
+
+    if (!UUID_REGEX.test(id)) {
+      return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+    }
+
+    // Verify order exists
+    const orderResult = await query('SELECT id, status FROM orders WHERE id = $1', [id]);
+    if (orderResult.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Order not found' });
+    }
+
+    // Fetch all scan_results for this order
+    const resultsQuery = await query(
+      `SELECT id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms, created_at
+       FROM scan_results
+       WHERE order_id = $1
+       ORDER BY phase ASC, created_at ASC`,
+      [id],
+    );
+
+    const results = resultsQuery.rows.map((row: Record<string, unknown>) => ({
+      id: row.id,
+      hostIp: row.host_ip || null,
+      phase: row.phase,
+      toolName: row.tool_name,
+      rawOutput: row.raw_output || null,
+      exitCode: row.exit_code,
+      durationMs: row.duration_ms,
+      createdAt: (row.created_at as Date).toISOString(),
+    }));
+
+    return {
+      success: true,
+      data: { results },
+    };
   });
 
   // DELETE /api/orders/:id — soft cancel or admin hard delete
