@@ -88,7 +88,10 @@ def run_tool(
             log.debug("tool_stderr", tool=tool_name, stderr=stderr[:500])
 
         # Determine raw output: prefer stdout, fall back to output file
+        # Append stderr on failure so error details are visible in scan results
         raw = stdout
+        if stderr and exit_code not in (0, 1):
+            raw = f"{raw}\n--- STDERR ---\n{stderr}" if raw else stderr
         if not raw and output_path:
             try:
                 if os.path.isfile(output_path):

@@ -9,6 +9,7 @@ RUN apt-get update && \
       ca-certificates curl wget unzip jq dnsutils git bash \
       python3 python3-pip python3-venv \
       nmap openssl libnet-ssleay-perl \
+      procps bsdmainutils coreutils \
       chromium && \
     rm -rf /var/lib/apt/lists/*
 
