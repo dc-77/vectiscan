@@ -260,6 +260,81 @@ def validate_cvss_vector(vector: str) -> str | None:
     return None
 
 
+def validate_cwe_mappings(result: dict[str, Any]) -> dict[str, Any]:
+    """Validate CWE identifiers in findings — remove invalid ones, warn on unknown."""
+    import re
+    from reporter.cwe_reference import KNOWN_CWES
+
+    valid_pattern = re.compile(r'^CWE-\d{1,4}$')
+
+    for finding in result.get("findings", []):
+        cwe = finding.get("cwe", "")
+        if not cwe or cwe in ("", "—", "N/A"):
+            finding["cwe"] = ""
+            continue
+        if not valid_pattern.match(cwe):
+            log.warning("cwe_invalid_format", cwe=cwe, finding_id=finding.get("id"))
+            finding["cwe"] = ""
+            continue
+        if cwe not in KNOWN_CWES:
+            log.warning("cwe_unknown", cwe=cwe, finding_id=finding.get("id"))
+            # Keep it — it might be valid just uncommon
+
+    return result
+
+
+def cap_implausible_scores(result: dict[str, Any]) -> dict[str, Any]:
+    """Cap CVSS scores that are implausibly high for certain finding types."""
+    # keyword in title/description → maximum plausible CVSS score
+    score_limits = {
+        "robots.txt": 3.5,
+        "server banner": 2.5,
+        "server-version": 2.5,
+        "version im banner": 2.5,
+        "information disclosure": 4.0,
+        "security header": 5.5,
+        "security-header": 5.5,
+        "x-frame-options": 5.5,
+        "content-security-policy": 5.5,
+        "spf": 5.5,
+        "dmarc": 5.5,
+        "dkim": 4.5,
+        "directory listing": 5.5,
+        "verzeichnislisting": 5.5,
+        "banner": 2.5,
+        "connection refused": 0.0,
+    }
+
+    capped = 0
+    for finding in result.get("findings", []):
+        text = (finding.get("title", "") + " " + finding.get("description", "")).lower()
+        try:
+            score = float(finding.get("cvss_score", "0") or "0")
+        except (ValueError, TypeError):
+            continue
+
+        for keyword, max_score in score_limits.items():
+            if keyword in text and score > max_score:
+                log.warning("cvss_score_capped",
+                    finding_id=finding.get("id"),
+                    original=score, capped=max_score,
+                    keyword=keyword)
+                finding["cvss_score"] = str(max_score)
+                # Re-align severity
+                if max_score == 0.0:
+                    finding["severity"] = "INFO"
+                elif max_score < 4.0:
+                    finding["severity"] = "LOW"
+                elif max_score < 7.0:
+                    finding["severity"] = "MEDIUM"
+                capped += 1
+                break
+
+    if capped:
+        log.info("cvss_scores_capped", count=capped)
+    return result
+
+
 def validate_cvss_scores(result: dict[str, Any]) -> dict[str, Any]:
     """Validate and correct CVSS scores in Claude's response.
 
@@ -413,8 +488,13 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 findings=len(result.get("findings", [])),
                 positive=len(result.get("positive_findings", [])),
             )
-            # Post-process: validate and correct CVSS scores
+            # Post-process validation pipeline:
+            # 1. Cap implausible scores (e.g. robots.txt with CVSS 7.0)
+            result = cap_implausible_scores(result)
+            # 2. Validate/correct CVSS scores vs vectors
             result = validate_cvss_scores(result)
+            # 3. Validate CWE mappings
+            result = validate_cwe_mappings(result)
             return result
 
         except anthropic.RateLimitError as e:
