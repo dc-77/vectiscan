@@ -17,21 +17,8 @@ export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy }: 
   aiStrategy?.hosts.forEach(h => actionMap.set(h.ip, h.action.toUpperCase()));
 
   return (
-    <div className="px-3">
-      <div className="flex items-center gap-1.5 mb-1">
-        <span className="text-[9px] font-mono uppercase tracking-widest" style={{ color: COLORS.cyan }}>
-          Discovered Hosts
-        </span>
-        <span className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${COLORS.cyan}40, transparent)` }} />
-        <span className="text-[8px] font-mono" style={{ color: COLORS.gray }}>{hosts.length}</span>
-      </div>
-
-      <div className="overflow-y-auto rounded border"
-        style={{
-          maxHeight: 140,
-          borderColor: COLORS.borderDim,
-          background: `${COLORS.panel}80`,
-        }}>
+    <div className="h-full overflow-y-auto"
+      style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
         {/* Header */}
         <div className="flex items-center gap-2 px-2 py-0.5 border-b text-[8px] font-mono uppercase tracking-wider"
           style={{ borderColor: COLORS.borderDim, color: COLORS.grayDim }}>
@@ -103,6 +90,5 @@ export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy }: 
           );
         })}
       </div>
-    </div>
   );
 }

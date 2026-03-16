@@ -301,32 +301,50 @@ function HomeContent() {
     );
   }
 
-  // ─── UNIFIED LIVEVIEW ──────────────────────────────────
+  // ─── LIVEVIEW — CSS Grid Operations Center ─────────────
   if (order && isScanning) {
+    const panelBorder = 'rgba(30,58,95,0.3)';
+    const panelBg = 'rgba(12,18,34,0.6)';
+
     return (
-      <main className="flex-1 flex flex-col px-3 py-2 overflow-hidden" style={{ height: 'calc(100vh - 40px)' }}>
-        {/* ScanProgress — compact top bar */}
-        <div className="shrink-0 mb-2">
+      <main className="grid gap-2 px-3 py-2 overflow-hidden"
+        style={{
+          height: 'calc(100vh - 40px)',
+          gridTemplateAreas: '"progress progress progress" "terminal center ailog" "hosts hosts hosts"',
+          gridTemplateRows: 'auto 1fr auto',
+          gridTemplateColumns: '1fr 240px 1fr',
+        }}>
+
+        {/* ─── Row 1: ScanProgress ──────────────────── */}
+        <div style={{ gridArea: 'progress' }}>
           <ScanProgress scan={order} onCancel={handleCancel} cancelling={cancelling} />
         </div>
 
-        {/* AI Decision Log — PROMINENT, full width, scrollable */}
-        <div className="shrink-0 mb-1">
-          <AiDecisionFeed
-            aiStrategy={aiStrategy}
-            aiConfigs={aiConfigs}
-            hosts={intelligenceHosts}
-            toolOutputs={toolOutputs}
-          />
+        {/* ─── Row 2 Left: Terminal Log ─────────────── */}
+        <div className="rounded-lg border overflow-hidden flex flex-col"
+          style={{ gridArea: 'terminal', borderColor: panelBorder, background: panelBg }}>
+          <div className="flex items-center px-3 shrink-0 border-b"
+            style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
+            <span className={`w-1.5 h-1.5 rounded-full mr-2 ${isScanning ? 'bg-blue-500 animate-pulse' : 'bg-slate-600'}`} />
+            <span className="text-[10px] font-mono uppercase tracking-wider text-blue-500">Terminal Log</span>
+            <span className="ml-auto text-[9px] font-mono text-slate-700">{lines.length} lines</span>
+          </div>
+          <div className="flex-1 min-h-0">
+            <ScanTerminal lines={lines} currentTool={order.progress.currentTool || null}
+              currentHost={order.progress.currentHost || null} isScanning={!!isScanning}
+              isComplete={order.status === 'report_complete'} isError={order.status === 'failed'} compact />
+          </div>
         </div>
 
-        <HexDivider />
-
-        {/* Middle Row: Radar + Metrics + Terminal */}
-        <div className="flex-1 min-h-0 flex gap-3 my-1">
-          {/* Radar — fixed width */}
-          <div className="hidden lg:flex w-[220px] shrink-0 items-center justify-center rounded-lg border border-[#1E3A5F]/30"
-            style={{ background: 'rgba(12,18,34,0.6)' }}>
+        {/* ─── Row 2 Center: Radar + Metrics ────────── */}
+        <div className="hidden lg:flex rounded-lg border overflow-hidden flex-col"
+          style={{ gridArea: 'center', borderColor: panelBorder, background: panelBg }}>
+          <div className="flex items-center px-3 shrink-0 border-b"
+            style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2" />
+            <span className="text-[10px] font-mono uppercase tracking-wider text-blue-500">Tactical Map</span>
+          </div>
+          <div className="shrink-0 flex items-center justify-center py-1">
             <RadarTopology
               domain={order.domain}
               hosts={intelligenceHosts}
@@ -334,10 +352,8 @@ function HomeContent() {
               toolOutputs={toolOutputs}
             />
           </div>
-
-          {/* Metrics — fixed width */}
-          <div className="hidden lg:flex w-[180px] shrink-0 flex-col justify-center rounded-lg border border-[#1E3A5F]/30 py-2"
-            style={{ background: 'rgba(12,18,34,0.6)' }}>
+          <HexDivider />
+          <div className="flex-1 min-h-0 flex flex-col justify-center">
             <MetricsGrid
               currentPhase={order.progress.phase}
               currentTool={order.progress.currentTool}
@@ -345,33 +361,45 @@ function HomeContent() {
               toolOutputs={toolOutputs}
             />
           </div>
+        </div>
 
-          {/* Terminal Log — fills remaining space */}
-          <div className="flex-1 min-w-0 rounded-lg border border-[#1E3A5F]/30 overflow-hidden flex flex-col"
-            style={{ background: 'rgba(12,18,34,0.95)' }}>
-            <div className="flex items-center px-3 py-1 border-b border-[#1E3A5F]/30 shrink-0"
-              style={{ background: '#0C1222' }}>
-              <span className={`w-2 h-2 rounded-full mr-2 ${isScanning ? 'bg-blue-500 animate-pulse' : 'bg-slate-600'}`} />
-              <span className="text-[10px] font-mono text-slate-500">Terminal Log</span>
-              <span className="ml-auto text-[9px] font-mono text-slate-700">{lines.length}</span>
-            </div>
-            <div className="flex-1 min-h-0">
-              <ScanTerminal lines={lines} currentTool={order.progress.currentTool || null}
-                currentHost={order.progress.currentHost || null} isScanning={!!isScanning}
-                isComplete={order.status === 'report_complete'} isError={order.status === 'failed'} compact />
-            </div>
+        {/* ─── Row 2 Right: AI Decision Log ─────────── */}
+        <div className="rounded-lg border overflow-hidden flex flex-col"
+          style={{ gridArea: 'ailog', borderColor: panelBorder, background: panelBg }}>
+          <div className="flex items-center px-3 shrink-0 border-b"
+            style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
+            <span className={`w-1.5 h-1.5 rounded-full mr-2 ${aiStrategy ? 'bg-blue-500 animate-pulse' : 'bg-slate-600'}`} />
+            <span className="text-[10px] font-mono uppercase tracking-wider text-blue-500">AI Decision Log</span>
+            <span className="ml-auto text-[9px] font-mono text-slate-700">
+              {toolOutputs.length > 0 ? `${toolOutputs.length}` : ''}
+            </span>
+          </div>
+          <div className="flex-1 min-h-0">
+            <AiDecisionFeed
+              aiStrategy={aiStrategy}
+              aiConfigs={aiConfigs}
+              hosts={intelligenceHosts}
+              toolOutputs={toolOutputs}
+            />
           </div>
         </div>
 
-        <HexDivider />
-
-        {/* Host Discovery Matrix — full width bottom */}
-        <div className="shrink-0 mt-1">
-          <HostDiscoveryMatrix
-            hosts={intelligenceHosts}
-            currentHost={order.progress.currentHost}
-            aiStrategy={aiStrategy}
-          />
+        {/* ─── Row 3: Discovered Hosts ──────────────── */}
+        <div className="rounded-lg border overflow-hidden flex flex-col"
+          style={{ gridArea: 'hosts', borderColor: panelBorder, background: panelBg, maxHeight: 140 }}>
+          <div className="flex items-center px-3 shrink-0 border-b"
+            style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
+            <span className={`w-1.5 h-1.5 rounded-full mr-2 ${intelligenceHosts.length > 0 ? 'bg-blue-500' : 'bg-slate-600'}`} />
+            <span className="text-[10px] font-mono uppercase tracking-wider text-blue-500">Discovered Hosts</span>
+            <span className="ml-auto text-[9px] font-mono text-slate-700">{intelligenceHosts.length} hosts</span>
+          </div>
+          <div className="flex-1 min-h-0">
+            <HostDiscoveryMatrix
+              hosts={intelligenceHosts}
+              currentHost={order.progress.currentHost}
+              aiStrategy={aiStrategy}
+            />
+          </div>
         </div>
       </main>
     );

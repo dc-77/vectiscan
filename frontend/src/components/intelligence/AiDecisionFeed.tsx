@@ -5,45 +5,6 @@ import { COLORS, hostDisplayName } from './constants';
 import type { HostNode } from './constants';
 import type { AiStrategy, AiConfig } from '@/hooks/useWebSocket';
 
-// ─── Boot Sequence (shown while waiting for AI data) ───
-
-const BOOT_LINES = [
-  '> INITIALIZING NEURAL THREAT ENGINE...',
-  '> LOADING CVE DATABASE [2024-2026]...',
-  '> CALIBRATING SCAN VECTORS...',
-  '> AWAITING HOST DISCOVERY DATA...',
-];
-
-function BootSequence() {
-  const [lineIdx, setLineIdx] = useState(0);
-  const [charIdx, setCharIdx] = useState(0);
-
-  useEffect(() => {
-    const line = BOOT_LINES[lineIdx];
-    if (charIdx < line.length) {
-      const t = setTimeout(() => setCharIdx(c => c + 1), 25 + Math.random() * 35);
-      return () => clearTimeout(t);
-    }
-    // Line complete — pause then advance
-    const t = setTimeout(() => {
-      setLineIdx(i => (i + 1) % BOOT_LINES.length);
-      setCharIdx(0);
-    }, 1200);
-    return () => clearTimeout(t);
-  }, [lineIdx, charIdx]);
-
-  return (
-    <div className="space-y-1 py-2">
-      {BOOT_LINES.slice(0, lineIdx + 1).map((line, i) => (
-        <div key={i} className="text-[9px] font-mono leading-snug" style={{ color: i < lineIdx ? COLORS.grayDim : COLORS.amber }}>
-          {i < lineIdx ? line : line.slice(0, charIdx)}
-          {i === lineIdx && <span className="animate-pulse" style={{ color: COLORS.amber }}>{'\u2588'}</span>}
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // ─── Types ─────────────────────────────────────────────
 
 interface FeedEntry {
@@ -54,8 +15,8 @@ interface FeedEntry {
 }
 
 const TYPE_STYLES: Record<string, { border: string; icon: string; color: string }> = {
-  strategy: { border: COLORS.amber, icon: '\u25C9', color: COLORS.amber },
-  config: { border: COLORS.cyan, icon: '\u2699', color: COLORS.cyan },
+  strategy: { border: COLORS.cyan, icon: '\u25C9', color: COLORS.cyan },
+  config: { border: COLORS.cyanDim, icon: '\u2699', color: COLORS.cyanDim },
   skip: { border: COLORS.gray, icon: '\u2298', color: COLORS.gray },
   threat: { border: COLORS.red, icon: '\u26A0', color: COLORS.red },
   info: { border: COLORS.cyanDim, icon: '\u25B8', color: COLORS.cyanDim },
@@ -80,7 +41,6 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
   const prevConfigKeysRef = useRef<Set<string>>(new Set());
   const prevThreatCountRef = useRef(0);
 
-  // Helper: look up FQDN from hosts array by IP
   const labelForIp = (ip: string): string => {
     const h = hosts.find(host => host.ip === ip);
     return h ? hostDisplayName(h) : ip;
@@ -91,36 +51,18 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
     if (!aiStrategy || aiStrategy === prevStrategyRef.current) return;
     prevStrategyRef.current = aiStrategy;
     const now = Date.now();
-
     const entries: FeedEntry[] = [];
 
-    // Strategy notes
     if (aiStrategy.strategy_notes) {
-      entries.push({
-        id: `strat-notes-${now}`,
-        ts: now,
-        type: 'info',
-        text: aiStrategy.strategy_notes,
-      });
+      entries.push({ id: `strat-notes-${now}`, ts: now, type: 'info', text: aiStrategy.strategy_notes });
     }
 
-    // Per-host decisions
     aiStrategy.hosts.forEach(h => {
       const label = labelForIp(h.ip);
       if (h.action === 'skip') {
-        entries.push({
-          id: `skip-${h.ip}-${now}`,
-          ts: now,
-          type: 'skip',
-          text: `${label} \u2014 Skipped: ${h.reasoning}`,
-        });
+        entries.push({ id: `skip-${h.ip}-${now}`, ts: now, type: 'skip', text: `${label} \u2014 Skipped: ${h.reasoning}` });
       } else {
-        entries.push({
-          id: `scan-${h.ip}-${now}`,
-          ts: now,
-          type: 'strategy',
-          text: `Targeting ${label}${h.priority ? ` [P${h.priority}]` : ''} \u2014 ${h.reasoning}`,
-        });
+        entries.push({ id: `scan-${h.ip}-${now}`, ts: now, type: 'strategy', text: `Targeting ${label}${h.priority ? ` [P${h.priority}]` : ''} \u2014 ${h.reasoning}` });
       }
     });
 
@@ -132,7 +74,6 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
     const currentKeys = new Set(Object.keys(aiConfigs));
     const newKeys = [...currentKeys].filter(k => !prevConfigKeysRef.current.has(k));
     prevConfigKeysRef.current = currentKeys;
-
     if (newKeys.length === 0) return;
     const now = Date.now();
 
@@ -140,19 +81,11 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
       const cfg = aiConfigs[ip];
       const label = labelForIp(ip);
       const parts: string[] = [];
-
       if (cfg.nuclei_tags?.length) parts.push(`nuclei:[${cfg.nuclei_tags.join(',')}]`);
       if (cfg.gobuster_wordlist && cfg.gobuster_wordlist !== 'common') parts.push(`wordlist:${cfg.gobuster_wordlist}`);
       if (cfg.skip_tools?.length) parts.push(`skip:[${cfg.skip_tools.join(',')}]`);
-
       const detail = parts.length > 0 ? parts.join(' ') : 'default config';
-
-      return {
-        id: `cfg-${ip}-${now}`,
-        ts: now,
-        type: 'config' as const,
-        text: `${label} \u2014 ${detail}${cfg.reasoning ? ` \u2014 ${cfg.reasoning}` : ''}`,
-      };
+      return { id: `cfg-${ip}-${now}`, ts: now, type: 'config' as const, text: `${label} \u2014 ${detail}${cfg.reasoning ? ` \u2014 ${cfg.reasoning}` : ''}` };
     });
 
     setFeed(prev => [...prev, ...entries].slice(-50));
@@ -162,72 +95,51 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
   useEffect(() => {
     const threats = toolOutputs.filter(t => /CVE-|critical|HIGH|vuln/i.test(t.summary));
     if (threats.length <= prevThreatCountRef.current) return;
-
     const newThreats = threats.slice(prevThreatCountRef.current);
     prevThreatCountRef.current = threats.length;
-
     const entries: FeedEntry[] = newThreats.map(t => ({
-      id: `threat-${t.ts}-${t.tool}`,
-      ts: t.ts,
-      type: 'threat' as const,
+      id: `threat-${t.ts}-${t.tool}`, ts: t.ts, type: 'threat' as const,
       text: `${t.tool} @ ${labelForIp(t.host)}: ${t.summary}`,
     }));
-
     setFeed(prev => [...prev, ...entries].slice(-50));
   }, [toolOutputs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scroll
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
+    if (containerRef.current) containerRef.current.scrollTop = containerRef.current.scrollHeight;
   }, [feed]);
 
+  // ─── Render (no internal header — parent panel provides it) ───
   return (
-    <div className="px-3">
-      <div className="flex items-center gap-1.5 mb-1">
-        <span className="text-[11px] font-mono uppercase tracking-widest font-bold" style={{ color: COLORS.cyan }}>
-          AI Decision Log
-        </span>
-        <span className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${COLORS.cyan}40, transparent)` }} />
-        {feed.length > 0 && (
-          <span className="text-[10px] font-mono" style={{ color: COLORS.gray }}>{feed.length}</span>
-        )}
-      </div>
-      <div ref={containerRef} className="overflow-y-auto rounded border"
-        style={{
-          height: 160,
-          borderColor: 'rgba(30,58,95,0.3)',
-          background: 'rgba(12,18,34,0.6)',
-          scrollbarWidth: 'thin',
-          scrollbarColor: '#1E3A5F #0C1222',
-        }}>
-        {feed.length === 0 ? (
-          <BootSequence />
-        ) : (
-          <div className="space-y-0.5">
-            {feed.map((entry, i) => {
-              const style = TYPE_STYLES[entry.type] || TYPE_STYLES.info;
-              const isNew = i >= feed.length - 3;
-              return (
-                <div key={entry.id}
-                  className={`flex gap-2 py-1.5 pl-2 pr-2 border-l-[3px] ${isNew ? 'animate-feedSlideIn' : ''}`}
-                  style={{ borderColor: style.border }}>
-                  <span className="text-[10px] font-mono shrink-0 mt-0.5" style={{ color: COLORS.grayDim }}>
-                    {formatTime(entry.ts)}
-                  </span>
-                  <span className="text-[11px] shrink-0 mt-0.5" style={{ color: style.color }}>
-                    {style.icon}
-                  </span>
-                  <span className="text-[11px] font-mono leading-normal" style={{ color: COLORS.textDim }}>
-                    {entry.text}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+    <div ref={containerRef} className="h-full overflow-y-auto"
+      style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
+      {feed.length === 0 ? (
+        <div className="flex items-center justify-center h-full">
+          <span className="text-[10px] font-mono text-slate-600">// awaiting AI data</span>
+        </div>
+      ) : (
+        <div className="py-1">
+          {feed.map((entry, i) => {
+            const style = TYPE_STYLES[entry.type] || TYPE_STYLES.info;
+            const isNew = i >= feed.length - 3;
+            return (
+              <div key={entry.id}
+                className={`flex gap-2 py-1.5 px-2 border-l-[3px] ${isNew ? 'animate-feedSlideIn' : ''}`}
+                style={{ borderColor: style.border }}>
+                <span className="text-[10px] font-mono shrink-0 mt-0.5" style={{ color: COLORS.grayDim }}>
+                  {formatTime(entry.ts)}
+                </span>
+                <span className="text-[11px] shrink-0 mt-0.5" style={{ color: style.color }}>
+                  {style.icon}
+                </span>
+                <span className="text-[11px] font-mono leading-normal" style={{ color: COLORS.textDim }}>
+                  {entry.text}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes feedSlideIn {
