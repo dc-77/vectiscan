@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { login, register } from '@/lib/api';
 import { setToken } from '@/lib/auth';
+import VectiScanLogo from '@/components/VectiScanLogo';
 
 type Tab = 'login' | 'register';
 
@@ -56,7 +57,8 @@ export default function LoginPage() {
   return (
     <main className="flex-1 flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
+        <div className="text-center space-y-3">
+          <VectiScanLogo className="mb-2" />
           <p className="text-gray-400">
             {tab === 'login' ? 'Anmelden' : 'Konto erstellen'}
           </p>
