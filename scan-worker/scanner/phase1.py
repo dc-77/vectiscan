@@ -110,45 +110,56 @@ def run_webtech(fqdn: str, host_dir: str, order_id: str) -> dict[str, Any]:
 
     output_path = f"{phase1_dir}/webtech.json"
 
-    cmd = ["webtech", "-u", f"https://{fqdn}", "--json"]
+    # Try HTTPS first, fall back to HTTP if it fails
+    for scheme in ("https", "http"):
+        url = f"{scheme}://{fqdn}"
+        cmd = ["webtech", "-u", url, "--json"]
 
-    # webtech outputs JSON to stdout; use Popen with process group for clean timeout
-    webtech_proc = None
-    try:
-        webtech_proc = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            start_new_session=True,
-        )
-        stdout, _ = webtech_proc.communicate(timeout=60)
+        webtech_proc = None
+        try:
+            webtech_proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                start_new_session=True,
+            )
+            stdout, stderr = webtech_proc.communicate(timeout=60)
 
-        if stdout:
-            tech_data = json.loads(stdout)
-            with open(output_path, "w") as f:
-                json.dump(tech_data, f, indent=2)
-            log.info("webtech_complete", fqdn=fqdn, techs=len(tech_data) if isinstance(tech_data, list) else 1)
-            return tech_data
-        else:
-            log.warning("webtech_no_output", fqdn=fqdn)
-            return {}
+            if stderr:
+                log.debug("webtech_stderr", fqdn=fqdn, scheme=scheme, stderr=stderr[:300])
 
-    except subprocess.TimeoutExpired:
-        log.warning("webtech_timeout", fqdn=fqdn)
-        if webtech_proc is not None:
-            try:
-                os.killpg(webtech_proc.pid, signal.SIGKILL)
-            except (ProcessLookupError, PermissionError):
-                webtech_proc.kill()
-            webtech_proc.wait()
-        return {}
-    except json.JSONDecodeError as e:
-        log.warning("webtech_json_error", fqdn=fqdn, error=str(e))
-        return {}
-    except Exception as e:
-        log.error("webtech_error", fqdn=fqdn, error=str(e))
-        return {}
+            if stdout:
+                tech_data = json.loads(stdout)
+                with open(output_path, "w") as f:
+                    json.dump(tech_data, f, indent=2)
+                log.info("webtech_complete", fqdn=fqdn, scheme=scheme,
+                         techs=len(tech_data) if isinstance(tech_data, list) else 1)
+                return tech_data
+
+            # No stdout — try next scheme
+            log.warning("webtech_no_output", fqdn=fqdn, scheme=scheme)
+            continue
+
+        except subprocess.TimeoutExpired:
+            log.warning("webtech_timeout", fqdn=fqdn, scheme=scheme)
+            if webtech_proc is not None:
+                try:
+                    os.killpg(webtech_proc.pid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError):
+                    webtech_proc.kill()
+                webtech_proc.wait()
+            continue  # try next scheme
+        except json.JSONDecodeError as e:
+            log.warning("webtech_json_error", fqdn=fqdn, scheme=scheme, error=str(e))
+            continue  # try next scheme
+        except Exception as e:
+            log.error("webtech_error", fqdn=fqdn, scheme=scheme, error=str(e))
+            continue  # try next scheme
+
+    # Both schemes failed
+    log.warning("webtech_all_schemes_failed", fqdn=fqdn)
+    return {}
 
 
 def run_wafw00f(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:

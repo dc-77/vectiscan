@@ -253,14 +253,14 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[
     os.makedirs(phase2_dir, exist_ok=True)
 
     chrome_path = os.environ.get("CHROME_PATH", "/usr/bin/chromium")
+    # gowitness 3.x: chrome flags via environment, not --chrome-arg
+    os.environ["CHROMIUM_FLAGS"] = "--no-sandbox --disable-gpu --disable-dev-shm-usage"
     cmd = [
         "gowitness", "scan", "single",
         "-u", f"https://{fqdn}",
         "--screenshot-path", f"{phase2_dir}/",
         "--chrome-path", chrome_path,
-        "--chrome-arg=--no-sandbox",
-        "--chrome-arg=--disable-gpu",
-        "--chrome-arg=--disable-dev-shm-usage",
+        "--disable-logging",
     ]
 
     exit_code, duration_ms = run_tool(
@@ -465,6 +465,8 @@ def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dic
         "--enumerate", "vp,vt,u1-5",  # vulnerable plugins, themes, users
         "--random-user-agent",
         "--no-banner",
+        "--ignore-main-redirect",      # follow redirects (e.g. www → non-www)
+        "--disable-tls-checks",        # handle self-signed certs
     ]
     if api_token:
         cmd.extend(["--api-token", api_token])
