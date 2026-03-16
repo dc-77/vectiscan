@@ -34,6 +34,7 @@ export default function AppHeader() {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
+    { href: '/schedules', label: 'Zeitpläne' },
     { href: '/', label: 'Neuer Scan', exact: true },
     { href: '/profile', label: 'Profil' },
   ];

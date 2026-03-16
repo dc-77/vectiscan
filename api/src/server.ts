@@ -9,6 +9,8 @@ import { healthRoutes } from './routes/health.js';
 import { orderRoutes } from './routes/orders.js';
 import { verifyRoutes } from './routes/verify.js';
 import { wsRoutes } from './routes/ws.js';
+import { scheduleRoutes } from './routes/schedules.js';
+import { startScheduler } from './lib/scheduler.js';
 
 export function buildServer() {
   const server = Fastify({
@@ -40,6 +42,7 @@ export function buildServer() {
   server.register(orderRoutes);
   server.register(verifyRoutes);
   server.register(wsRoutes);
+  server.register(scheduleRoutes);
 
   return server;
 }
@@ -61,6 +64,9 @@ async function start() {
 
     await server.listen({ port, host });
     server.log.info(`VectiScan API started on ${host}:${port}`);
+
+    startScheduler();
+    server.log.info('Scan scheduler started');
   } catch (err) {
     server.log.error(err);
     process.exit(1);

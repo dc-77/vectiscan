@@ -328,6 +328,55 @@ export async function deleteUser(userId: string): Promise<ApiResponse<null>> {
   return handleResponse(res);
 }
 
+// --- Scan Schedules ---
+
+export interface ScanSchedule {
+  id: string;
+  domain: string;
+  package: string;
+  scheduleType: 'weekly' | 'monthly' | 'quarterly' | 'once';
+  scheduleLabel: string;
+  scheduledAt: string | null;
+  enabled: boolean;
+  lastScanAt: string | null;
+  nextScanAt: string;
+  lastOrderId: string | null;
+  createdAt: string;
+}
+
+export async function listSchedules(): Promise<ApiResponse<{ schedules: ScanSchedule[] }>> {
+  const res = await fetch(`${API_URL}/api/schedules`, { headers: authHeaders() });
+  return handleResponse(res);
+}
+
+export async function createSchedule(data: {
+  domain: string; package: string; scheduleType: string; scheduledAt?: string;
+}): Promise<ApiResponse<{ id: string }>> {
+  const res = await fetch(`${API_URL}/api/schedules`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function updateSchedule(id: string, data: Record<string, unknown>): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/schedules/${id}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function deleteSchedule(id: string): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/schedules/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
 export interface AdminStats {
   users: { total: number; admins: number };
   orders: { total: number; today: number; byStatus: Record<string, number> };
