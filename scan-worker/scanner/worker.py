@@ -231,6 +231,12 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
         ip = host["ip"]
         fqdns = host["fqdns"]
 
+        # If web_probe found a working FQDN, put it first for Phase 1/2
+        web_fqdn = host.get("web_probe", {}).get("web_fqdn")
+        if web_fqdn and web_fqdn in fqdns and fqdns[0] != web_fqdn:
+            fqdns = [web_fqdn] + [f for f in fqdns if f != web_fqdn]
+            log.info("web_fqdn_prioritized", ip=ip, web_fqdn=web_fqdn)
+
         _check_timeout()
 
         # Quick reachability check — skip unreachable hosts

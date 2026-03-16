@@ -600,6 +600,64 @@ def merge_and_group(
     return inventory
 
 
+def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str) -> list[dict[str, Any]]:
+    """Quick HTTP probe per host — determines which FQDNs serve web content.
+
+    Adds a 'web_probe' dict to each host with has_web, status, final_url, title, web_fqdn.
+    Uses httpx for fast probing (~1-5s per FQDN).
+    """
+    from scanner.tools import _save_result
+
+    for host in hosts:
+        probe: dict[str, Any] = {
+            "has_web": False, "status": None, "final_url": None,
+            "title": None, "web_fqdn": None,
+        }
+
+        for fqdn in host.get("fqdns", [])[:3]:
+            cmd = [
+                "httpx", "-u", fqdn, "-json", "-silent",
+                "-follow-redirects", "-status-code", "-title", "-timeout", "5",
+            ]
+            try:
+                result = subprocess.run(
+                    cmd, capture_output=True, text=True, timeout=10,
+                    start_new_session=True,
+                )
+                if result.stdout and result.stdout.strip():
+                    line = result.stdout.strip().split("\n")[0]
+                    data = json.loads(line)
+                    status = data.get("status_code") or data.get("status-code") or 0
+                    if status and 200 <= int(status) < 500:
+                        probe["has_web"] = True
+                        probe["status"] = int(status)
+                        probe["final_url"] = data.get("final_url") or data.get("url", "")
+                        probe["title"] = (data.get("title") or "")[:100]
+                        probe["web_fqdn"] = fqdn
+                        log.info("web_probe_found", ip=host["ip"], fqdn=fqdn,
+                                 status=status, title=probe["title"][:50])
+                        break
+            except (subprocess.TimeoutExpired, json.JSONDecodeError, Exception) as e:
+                log.debug("web_probe_error", ip=host["ip"], fqdn=fqdn, error=str(e))
+                continue
+
+        host["web_probe"] = probe
+
+    # Save probe results as a scan_result for debug visibility
+    probe_summary = {h["ip"]: h.get("web_probe", {}) for h in hosts}
+    _save_result(
+        order_id=order_id, host_ip=None, phase=0,
+        tool_name="web_probe",
+        raw_output=json.dumps(probe_summary, indent=2, ensure_ascii=False),
+        exit_code=0, duration_ms=0,
+    )
+
+    web_count = sum(1 for h in hosts if h.get("web_probe", {}).get("has_web"))
+    log.info("web_probe_complete", total=len(hosts), with_web=web_count)
+
+    return hosts
+
+
 def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any] | None = None) -> dict[str, Any]:
     """
     Orchestrate Phase 0: DNS Reconnaissance.
@@ -703,6 +761,9 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         scan_dir=scan_dir,
         max_hosts=max_hosts,
     )
+
+    # --- Web probe: quick HTTP check per host ---
+    inventory["hosts"] = _probe_web_hosts(inventory.get("hosts", []), order_id, scan_dir)
 
     elapsed_ms = int((time.monotonic() - phase0_start) * 1000)
     log.info(

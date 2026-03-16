@@ -75,11 +75,21 @@ WICHTIG ZU FQDNs:
 - Wenn ein Host sowohl die Basisdomain als auch Mail-FQDNs enthält, ist er IMMER ein Web-Host
 - Beurteile den Host nach seiner wichtigsten FQDN, nicht nach Mail-Subdomains
 
+WEB-PROBE DATEN:
+- Jeder Host kann ein "web_probe" Feld haben mit has_web, status, final_url, title
+- has_web=true: HTTP-Content vorhanden → Web-Scan (alle Tools)
+- has_web=false: Kein HTTP-Content → Port-Scan (nmap + testssl reichen)
+- final_url zeigt wohin Redirects führen → die relevante Scan-URL
+
 REGELN:
 - Basisdomain und www-Subdomain: IMMER scannen (action: "scan"), höchste Priorität
-- Webserver mit interaktivem Content (Apps, APIs, CMS, Shops): scan
-- Reine Mailserver (nur MX, SMTP, IMAP, kein Web-Content): skip
-- Parking-Pages, Redirect-only Hosts: skip
+- Webserver mit interaktivem Content (Apps, APIs, CMS, Shops): scan (hohe Priorität)
+- Mailserver (MX, SMTP, IMAP): scan mit NIEDRIGERER Priorität — NICHT skippen!
+  → Mailserver haben eigene Schwachstellen: offene Relays, veraltetes TLS,
+    SMTP-Auth-Brute-Force, exponierte IMAP/POP3-Ports
+  → Bei reinen Mailservern reichen testssl + nmap, kein Nuclei/Gobuster nötig
+- Autodiscover-Hosts (nur Exchange/Outlook-Konfiguration): skip (einzige Ausnahme)
+- Parking-Pages, Redirect auf externe Domain: skip
 - CDN-Edge-Nodes (nur CDN-IP, kein eigener Content): skip
 - Wenn unklar: lieber scannen als überspringen
 
