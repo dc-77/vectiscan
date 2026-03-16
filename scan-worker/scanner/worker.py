@@ -214,8 +214,15 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
     # Publish AI strategy event for frontend visualization
     publish_event(order_id, {"type": "ai_strategy", "strategy": strategy})
 
-    # Update discovered hosts count to reflect actual scan targets
-    set_discovered_hosts(order_id, {**host_inventory, "hosts": scan_hosts})
+    # Save ALL hosts (including skipped) with status markers for frontend
+    skip_ips = {sh["ip"] for sh in strategy.get("hosts", []) if sh.get("action") == "skip"}
+    all_hosts_with_status = []
+    for h in hosts:
+        entry = {**h}
+        if h["ip"] in skip_ips:
+            entry["status"] = "skipped"
+        all_hosts_with_status.append(entry)
+    set_discovered_hosts(order_id, {**host_inventory, "hosts": all_hosts_with_status})
 
     # ── Phase 1: Tech Detection (all hosts) ─────────────────
     tech_profiles: list[dict[str, Any]] = []

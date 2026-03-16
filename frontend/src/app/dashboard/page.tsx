@@ -282,7 +282,7 @@ export default function Dashboard() {
               const needsVerify = order.status === 'verification_pending' || order.status === 'verified';
               const isRunning = active && !needsVerify;
               const isDone = order.status === 'report_complete';
-              const hasDetails = ['scan_complete', 'report_generating', 'report_complete'].includes(order.status);
+              const hasDetails = !['created', 'queued', 'verification_pending', 'verified'].includes(order.status);
               const isExpanded = expandedOrder === order.id;
               const duration = formatDuration(order.startedAt, order.finishedAt);
               const riskBadge = order.overallRisk ? RISK_BADGE[order.overallRisk.toUpperCase()] : null;

@@ -110,6 +110,23 @@ export async function getOrderStatus(id: string): Promise<ApiResponse<OrderStatu
   return handleResponse(res);
 }
 
+export interface OrderEvents {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  aiStrategy: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  aiConfigs: Record<string, any>;
+  toolOutputs: Array<{ tool: string; host: string; summary: string; ts: string }>;
+  discoveredHosts: HostInfo[];
+  error: string | null;
+}
+
+export async function getOrderEvents(id: string): Promise<ApiResponse<OrderEvents>> {
+  const res = await fetch(`${API_URL}/api/orders/${id}/events`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
 export function getReportDownloadUrl(id: string): string {
   const token = getToken();
   return `${API_URL}/api/orders/${id}/report${token ? `?token=${token}` : ''}`;

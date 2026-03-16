@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createOrder, getOrderStatus, cancelOrder, OrderStatus } from '@/lib/api';
+import { createOrder, getOrderStatus, cancelOrder, getOrderEvents, OrderStatus } from '@/lib/api';
 import { isLoggedIn } from '@/lib/auth';
 import ScanProgress from '@/components/ScanProgress';
 import ReportDownload from '@/components/ReportDownload';
@@ -162,11 +162,28 @@ function HomeContent() {
     setReady(true);
   }, [router]);
 
+  // Load persisted events when resuming a scan (late-join)
+  const loadEvents = useCallback(async (id: string) => {
+    try {
+      const res = await getOrderEvents(id);
+      if (res.success && res.data) {
+        if (res.data.aiStrategy) setAiStrategy(res.data.aiStrategy as AiStrategy);
+        if (res.data.aiConfigs) setAiConfigs(res.data.aiConfigs as Record<string, AiConfig>);
+        if (res.data.toolOutputs?.length) {
+          setToolOutputs(res.data.toolOutputs.map(t => ({
+            ...t, ts: new Date(t.ts).getTime(),
+          })));
+        }
+      }
+    } catch { /* non-critical */ }
+  }, []);
+
   useEffect(() => {
     const paramOrderId = searchParams.get('orderId');
     if (paramOrderId && !orderId && ready) {
       setOrderId(paramOrderId);
       startPolling(paramOrderId);
+      loadEvents(paramOrderId);
     }
   }, [searchParams, ready]); // eslint-disable-line react-hooks/exhaustive-deps
 

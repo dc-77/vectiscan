@@ -345,6 +345,81 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     };
   });
 
+  // GET /api/orders/:id/events — LiveView event replay (AI strategy, configs, tool outputs)
+  server.get<{ Params: OrderParams }>('/api/orders/:id/events', { preHandler: [requireAuth] }, async (request, reply) => {
+    const { id } = request.params;
+    const user = request.user!;
+
+    if (!UUID_REGEX.test(id)) {
+      return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+    }
+
+    // Ownership check
+    const orderCheck = await query(
+      'SELECT customer_id, discovered_hosts, status, error_message FROM orders WHERE id = $1',
+      [id],
+    );
+    if (orderCheck.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Order not found' });
+    }
+    const order = orderCheck.rows[0] as Record<string, unknown>;
+    if (user.role !== 'admin' && order.customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
+
+    // Fetch AI strategy and configs from scan_results
+    const aiResults = await query(
+      `SELECT tool_name, host_ip, raw_output, created_at
+       FROM scan_results
+       WHERE order_id = $1 AND tool_name IN ('ai_host_strategy', 'ai_phase2_config')
+       ORDER BY created_at ASC`,
+      [id],
+    );
+
+    let aiStrategy = null;
+    const aiConfigs: Record<string, unknown> = {};
+
+    for (const row of aiResults.rows as Array<Record<string, unknown>>) {
+      try {
+        const parsed = JSON.parse(row.raw_output as string);
+        if (row.tool_name === 'ai_host_strategy') {
+          aiStrategy = parsed;
+        } else if (row.tool_name === 'ai_phase2_config' && row.host_ip) {
+          aiConfigs[row.host_ip as string] = parsed;
+        }
+      } catch { /* skip unparseable */ }
+    }
+
+    // Fetch tool output summaries (non-AI tools, first 150 chars of raw_output)
+    const toolResults = await query(
+      `SELECT tool_name, host_ip, LEFT(raw_output, 150) as summary, created_at
+       FROM scan_results
+       WHERE order_id = $1
+         AND tool_name NOT IN ('ai_host_strategy', 'ai_phase2_config', 'ai_host_skip')
+         AND exit_code >= 0
+       ORDER BY created_at ASC`,
+      [id],
+    );
+
+    const toolOutputs = (toolResults.rows as Array<Record<string, unknown>>).map(row => ({
+      tool: row.tool_name,
+      host: row.host_ip || '',
+      summary: ((row.summary as string) || '').split('\n')[0].slice(0, 100),
+      ts: new Date(row.created_at as string).toISOString(),
+    }));
+
+    return {
+      success: true,
+      data: {
+        aiStrategy,
+        aiConfigs,
+        toolOutputs,
+        discoveredHosts: order.discovered_hosts || [],
+        error: order.error_message || null,
+      },
+    };
+  });
+
   // GET /api/orders/:id/findings — structured findings from report
   server.get<{ Params: OrderParams }>('/api/orders/:id/findings', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;

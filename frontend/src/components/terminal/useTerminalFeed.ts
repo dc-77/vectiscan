@@ -151,7 +151,7 @@ export function useTerminalFeed() {
         case 'scan_phase1':
           if (!phase0DoneRef.current) {
             phase0DoneRef.current = true;
-            // Show discovered hosts
+            // Show discovered hosts + selected hosts
             if (!hostsShownRef.current && progress.discoveredHosts.length > 0) {
               hostsShownRef.current = true;
               newLines.push({ id: lineId(), timestamp: now, text: '' });
@@ -161,10 +161,27 @@ export function useTerminalFeed() {
               });
               for (const host of progress.discoveredHosts) {
                 const fqdns = host.fqdns.join(', ');
+                const skip = host.status === 'skipped' ? ' [SKIP]' : '';
                 newLines.push({
                   id: lineId(), timestamp: now,
-                  text: `  ${host.ip}  ${fqdns}`, isHost: true, indent: 1,
+                  text: `  ${host.ip}  ${fqdns}${skip}`, isHost: true, indent: 1,
                 });
+              }
+              // Show selected hosts (non-skipped)
+              const selected = progress.discoveredHosts.filter(h => h.status !== 'skipped');
+              if (selected.length < progress.discoveredHosts.length) {
+                newLines.push({ id: lineId(), timestamp: now, text: '' });
+                newLines.push({
+                  id: lineId(), timestamp: now,
+                  text: `▸ Hosts ausgewählt: ${selected.length} von ${progress.discoveredHosts.length}`, isHeader: true,
+                });
+                for (const host of selected) {
+                  const fqdns = host.fqdns.join(', ');
+                  newLines.push({
+                    id: lineId(), timestamp: now,
+                    text: `  ${host.ip}  ${fqdns}`, isHost: true, indent: 1,
+                  });
+                }
               }
               newLines.push({ id: lineId(), timestamp: now, text: '' });
             }
