@@ -109,8 +109,12 @@ export default function ScanDetailPage() {
 
   // Build IP → FQDNs lookup from discovered hosts
   const ipToFqdns: Record<string, string[]> = {};
-  const hosts = (aiData?.discoveredHosts || order.progress.discoveredHosts || []) as Array<{ ip: string; fqdns?: string[] }>;
-  for (const h of hosts) {
+  const rawHosts = aiData?.discoveredHosts || order.progress.discoveredHosts || [];
+  // discoveredHosts may be an array or an object with .hosts key
+  const hostList = Array.isArray(rawHosts) ? rawHosts
+    : (rawHosts as Record<string, unknown>)?.hosts || [];
+  const hostsArray = (Array.isArray(hostList) ? hostList : []) as Array<{ ip: string; fqdns?: string[] }>;
+  for (const h of hostsArray) {
     if (h.ip && h.fqdns?.length) ipToFqdns[h.ip] = h.fqdns;
   }
 
