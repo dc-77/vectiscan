@@ -251,7 +251,7 @@ export function useTerminalFeed() {
 
     // Tool changes within a phase
     const currentTool = progress.currentTool || '';
-    if (currentTool && currentTool !== lastToolRef.current) {
+    if (currentTool && currentTool !== 'starting' && currentTool !== lastToolRef.current) {
       // Mark previous tool as done
       if (lastToolRef.current) {
         const host = progress.currentHost || '';

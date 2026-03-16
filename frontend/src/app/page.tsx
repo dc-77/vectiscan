@@ -337,7 +337,7 @@ function HomeContent() {
 
             <div className="flex gap-4 items-stretch">
               {/* Left: Terminal */}
-              <div className="flex-1 min-w-0 lg:max-w-[58%]">
+              <div className="flex-1 min-w-0 lg:max-w-[48%]">
                 <div className="rounded-lg border border-[#1E3A5F]/50 overflow-hidden h-full">
                   <button onClick={() => setTerminalOpen(!terminalOpen)}
                     className="w-full flex items-center justify-between px-4 py-2.5 bg-[#0C1222] hover:bg-[#0F172A] transition-colors">
@@ -357,7 +357,7 @@ function HomeContent() {
               </div>
 
               {/* Right: Intelligence Panel (hidden on mobile) */}
-              <div className="hidden lg:block lg:w-[42%] shrink-0">
+              <div className="hidden lg:block lg:w-[52%] shrink-0">
                 <ScanIntelligence
                   domain={order.domain}
                   hosts={intelligenceHosts}

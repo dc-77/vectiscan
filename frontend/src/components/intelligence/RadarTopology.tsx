@@ -1,8 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { COLORS, STATUS_COLORS, hostDisplayName, truncate } from './constants';
 import type { HostNode, ToolOutputEntry } from './constants';
+
+const HEX = '0123456789ABCDEF';
+function rHex(n: number) { let s = ''; for (let i = 0; i < n; i++) s += HEX[Math.floor(Math.random() * 16)]; return s; }
 
 interface RadarTopologyProps {
   domain: string;
@@ -12,10 +15,17 @@ interface RadarTopologyProps {
 }
 
 export default function RadarTopology({ domain, hosts, currentHost, toolOutputs }: RadarTopologyProps) {
-  const size = 280;
+  const size = 210;
   const cx = size / 2;
   const cy = size / 2;
-  const radius = 105;
+  const radius = 80;
+
+  // Rotating hex coordinates in corners
+  const [hexCorners, setHexCorners] = useState(['0000', '0000', '0000', '0000']);
+  useEffect(() => {
+    const iv = setInterval(() => setHexCorners([rHex(4), rHex(4), rHex(4), rHex(4)]), 2000);
+    return () => clearInterval(iv);
+  }, []);
 
   // Hosts with threat indicators (CVE/critical mentions)
   const threatHosts = useMemo(() => {
@@ -38,7 +48,7 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
   }, [hosts, cx, cy]);
 
   return (
-    <div className="relative" style={{ width: size, height: size + 20, margin: '0 auto' }}>
+    <div className="relative" style={{ width: size, height: size + 16, margin: '0 auto' }}>
       <svg width={size} height={size} className="absolute inset-0">
         <defs>
           <radialGradient id="radarGrad2" cx="50%" cy="50%">
@@ -62,8 +72,16 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
         {/* Center glow */}
         <circle cx={cx} cy={cy} r={60} fill="url(#centerGlow)" />
 
+        {/* Hex corner coordinates */}
+        {[[6, 8], [size - 6, 8], [6, size - 4], [size - 6, size - 4]].map(([hx, hy], i) => (
+          <text key={`hex-${i}`} x={hx} y={hy} fill={COLORS.grayDim} fontSize="7"
+            fontFamily="monospace" textAnchor={i % 2 === 0 ? 'start' : 'end'}>
+            0x{hexCorners[i]}
+          </text>
+        ))}
+
         {/* Grid circles — 4 rings with pulse on outer */}
-        {[35, 60, 85, 110].map((r, i) => (
+        {[25, 45, 65, 85].map((r, i) => (
           <circle key={r} cx={cx} cy={cy} r={r} fill="none"
             stroke={COLORS.border} strokeWidth="0.5" opacity={0.2 + i * 0.05}>
             {i === 3 && (
@@ -77,8 +95,8 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
           const rad = (deg * Math.PI) / 180;
           return (
             <line key={deg}
-              x1={cx - 115 * Math.cos(rad)} y1={cy - 115 * Math.sin(rad)}
-              x2={cx + 115 * Math.cos(rad)} y2={cy + 115 * Math.sin(rad)}
+              x1={cx - 90 * Math.cos(rad)} y1={cy - 90 * Math.sin(rad)}
+              x2={cx + 90 * Math.cos(rad)} y2={cy + 90 * Math.sin(rad)}
               stroke={COLORS.border} strokeWidth="0.5" opacity="0.15" />
           );
         })}
@@ -168,7 +186,7 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
         {/* Radar sweep */}
         <g style={{ transformOrigin: `${cx}px ${cy}px`, animation: 'radarSpin 4s linear infinite' }}>
           <path
-            d={`M${cx},${cy} L${cx},${cy - 110} A110,110 0 0,1 ${cx + 110 * Math.sin(Math.PI / 5)},${cy - 110 * Math.cos(Math.PI / 5)} Z`}
+            d={`M${cx},${cy} L${cx},${cy - 85} A110,110 0 0,1 ${cx + 85 * Math.sin(Math.PI / 5)},${cy - 85 * Math.cos(Math.PI / 5)} Z`}
             fill="url(#radarGrad2)" opacity="0.35" />
         </g>
       </svg>

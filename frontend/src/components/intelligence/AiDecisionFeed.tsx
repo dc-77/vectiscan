@@ -5,6 +5,47 @@ import { COLORS, hostDisplayName } from './constants';
 import type { HostNode } from './constants';
 import type { AiStrategy, AiConfig } from '@/hooks/useWebSocket';
 
+// ─── Boot Sequence (shown while waiting for AI data) ───
+
+const BOOT_LINES = [
+  '> INITIALIZING NEURAL THREAT ENGINE...',
+  '> LOADING CVE DATABASE [2024-2026]...',
+  '> CALIBRATING SCAN VECTORS...',
+  '> AWAITING HOST DISCOVERY DATA...',
+];
+
+function BootSequence() {
+  const [lineIdx, setLineIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+
+  useEffect(() => {
+    const line = BOOT_LINES[lineIdx];
+    if (charIdx < line.length) {
+      const t = setTimeout(() => setCharIdx(c => c + 1), 25 + Math.random() * 35);
+      return () => clearTimeout(t);
+    }
+    // Line complete — pause then advance
+    const t = setTimeout(() => {
+      setLineIdx(i => (i + 1) % BOOT_LINES.length);
+      setCharIdx(0);
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [lineIdx, charIdx]);
+
+  return (
+    <div className="space-y-1 py-2">
+      {BOOT_LINES.slice(0, lineIdx + 1).map((line, i) => (
+        <div key={i} className="text-[9px] font-mono leading-snug" style={{ color: i < lineIdx ? COLORS.grayDim : COLORS.amber }}>
+          {i < lineIdx ? line : line.slice(0, charIdx)}
+          {i === lineIdx && <span className="animate-pulse" style={{ color: COLORS.amber }}>{'\u2588'}</span>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Types ─────────────────────────────────────────────
+
 interface FeedEntry {
   id: string;
   ts: number;
@@ -159,11 +200,7 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
           maskImage: 'linear-gradient(to bottom, transparent, black 8%, black 92%, transparent)',
         }}>
         {feed.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <span className="text-[10px] font-mono" style={{ color: COLORS.grayDim }}>
-              Waiting for AI analysis...
-            </span>
-          </div>
+          <BootSequence />
         ) : (
           <div className="space-y-0.5">
             {feed.map((entry, i) => {

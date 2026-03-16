@@ -19,7 +19,6 @@ function useAnimatedNumber(target: number, duration = 600): number {
 
     const tick = (now: number) => {
       const t = Math.min((now - start) / duration, 1);
-      // Ease-out cubic
       const eased = 1 - Math.pow(1 - t, 3);
       setDisplay(Math.round(from + (target - from) * eased));
       if (t < 1) {
@@ -46,11 +45,42 @@ interface MetricsGridProps {
 }
 
 export default function MetricsGrid({ currentPhase, currentTool, hosts, toolOutputs }: MetricsGridProps) {
-  const hostsCompleted = hosts.filter(h => h.status === 'scanned').length;
-  const hostsTotal = hosts.length;
-  const animatedCompleted = useAnimatedNumber(hostsCompleted);
+  const hostsActive = hosts.filter(h => h.status !== 'skipped').length;
+  const hostsScanned = hosts.filter(h => h.status === 'scanned').length;
+  const hostsScanning = hosts.filter(h => h.status === 'scanning').length;
 
-  // Threat level calculation
+  // Phase-aware progress
+  const isDnsRecon = currentPhase === 'dns_recon';
+  const isPhase1 = currentPhase === 'scan_phase1';
+  const isPhase2 = currentPhase === 'scan_phase2';
+
+  let progressValue: number;
+  let progressMax: number;
+  let progressLabel: string;
+
+  if (isDnsRecon) {
+    progressValue = 0;
+    progressMax = 1;
+    progressLabel = 'Discovering';
+  } else if (isPhase1) {
+    // During Phase 1: scanned means P1 done, scanning means currently in P1
+    progressValue = hostsScanned + hostsScanning;
+    progressMax = hostsActive;
+    progressLabel = `P1: ${progressValue}/${progressMax}`;
+  } else if (isPhase2) {
+    progressValue = hostsScanned;
+    progressMax = hostsActive;
+    progressLabel = `P2: ${hostsScanned}/${progressMax}`;
+  } else {
+    progressValue = hostsScanned;
+    progressMax = hostsActive || hosts.length;
+    progressLabel = hostsActive > 0 ? `${hostsScanned}/${progressMax}` : '\u2014';
+  }
+
+  const animatedValue = useAnimatedNumber(progressValue);
+  const progress = progressMax > 0 ? (progressValue / progressMax) * 100 : 0;
+
+  // Threat level
   const { level, color, threatCount } = useMemo(() => {
     const count = toolOutputs.filter(t => /CVE-|critical|HIGH|vuln/i.test(t.summary)).length;
     if (count === 0) return { level: 'LOW', color: COLORS.green, threatCount: count };
@@ -58,17 +88,18 @@ export default function MetricsGrid({ currentPhase, currentTool, hosts, toolOutp
     return { level: 'HIGH', color: COLORS.red, threatCount: count };
   }, [toolOutputs]);
 
-  const phaseLabel = currentPhase === 'dns_recon' ? 'DNS Recon'
-    : currentPhase === 'scan_phase1' ? 'Tech Detect'
-    : currentPhase === 'scan_phase2' ? 'Deep Scan'
+  const phaseLabel = isDnsRecon ? 'DNS Recon'
+    : isPhase1 ? 'Tech Detect'
+    : isPhase2 ? 'Deep Scan'
     : currentPhase || '\u2014';
 
-  const progress = hostsTotal > 0 ? (hostsCompleted / hostsTotal) * 100 : 0;
+  // Filter "starting" from tool display
+  const displayTool = currentTool && currentTool !== 'starting' ? currentTool : '\u2014';
 
   return (
     <div className="grid grid-cols-2 gap-1.5 px-3 pb-2">
       {/* Phase */}
-      <div className="rounded px-2 py-1.5 border"
+      <div className="rounded px-2 py-1 border"
         style={{ background: COLORS.panel, borderColor: COLORS.borderDim }}>
         <div className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: COLORS.grayDim }}>Phase</div>
         <div className="text-xs font-mono font-medium" style={{ color: COLORS.cyan }}>
@@ -77,23 +108,27 @@ export default function MetricsGrid({ currentPhase, currentTool, hosts, toolOutp
       </div>
 
       {/* Tool */}
-      <div className="rounded px-2 py-1.5 border"
+      <div className="rounded px-2 py-1 border"
         style={{ background: COLORS.panel, borderColor: COLORS.borderDim }}>
         <div className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: COLORS.grayDim }}>Tool</div>
         <div className="text-xs font-mono font-medium truncate" style={{ color: COLORS.amber }}>
-          {currentTool || '\u2014'}
+          {displayTool}
         </div>
       </div>
 
-      {/* Hosts with progress bar */}
-      <div className="rounded px-2 py-1.5 border"
+      {/* Hosts — phase-aware progress */}
+      <div className="rounded px-2 py-1 border"
         style={{ background: COLORS.panel, borderColor: COLORS.borderDim }}>
         <div className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: COLORS.grayDim }}>Hosts</div>
         <div className="text-xs font-mono font-medium" style={{ color: COLORS.white }}>
-          {animatedCompleted}/{hostsTotal || '\u2014'}
+          {isDnsRecon ? (
+            <span className="animate-pulse" style={{ color: COLORS.cyan }}>Discovering...</span>
+          ) : (
+            progressLabel
+          )}
         </div>
-        {hostsTotal > 0 && (
-          <div className="mt-1 h-[2px] rounded-full overflow-hidden" style={{ background: COLORS.borderDim }}>
+        {!isDnsRecon && progressMax > 0 && (
+          <div className="mt-0.5 h-[2px] rounded-full overflow-hidden" style={{ background: COLORS.borderDim }}>
             <div className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${progress}%`,
@@ -102,10 +137,16 @@ export default function MetricsGrid({ currentPhase, currentTool, hosts, toolOutp
               }} />
           </div>
         )}
+        {isDnsRecon && (
+          <div className="mt-0.5 h-[2px] rounded-full overflow-hidden" style={{ background: COLORS.borderDim }}>
+            <div className="h-full rounded-full animate-pulse"
+              style={{ width: '60%', background: COLORS.cyan, opacity: 0.5 }} />
+          </div>
+        )}
       </div>
 
       {/* Threat Level */}
-      <div className="rounded px-2 py-1.5 border"
+      <div className="rounded px-2 py-1 border"
         style={{ background: COLORS.panel, borderColor: COLORS.borderDim }}>
         <div className="text-[8px] uppercase tracking-wider mb-0.5" style={{ color: COLORS.grayDim }}>Threat Level</div>
         <div className="flex items-center gap-1.5">
@@ -118,8 +159,7 @@ export default function MetricsGrid({ currentPhase, currentTool, hosts, toolOutp
             </span>
           )}
         </div>
-        {/* Mini threat bar */}
-        <div className="mt-1 flex gap-px">
+        <div className="mt-0.5 flex gap-px">
           {[0, 1, 2, 3, 4].map(i => (
             <div key={i} className="h-[2px] flex-1 rounded-full transition-all duration-300"
               style={{

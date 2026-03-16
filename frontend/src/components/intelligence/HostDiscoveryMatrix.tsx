@@ -28,7 +28,7 @@ export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy }: 
 
       <div className="overflow-y-auto rounded border"
         style={{
-          maxHeight: 120,
+          maxHeight: '100%',
           borderColor: COLORS.borderDim,
           background: `${COLORS.panel}80`,
         }}>
