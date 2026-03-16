@@ -11,6 +11,122 @@ import RecommendationsViewer from '@/components/RecommendationsViewer';
 
 type Tab = 'findings' | 'recommendations' | 'debug';
 
+// ─── Scan Timeline Component ─────────────────────────────
+
+function formatDurationShort(ms: number): string {
+  const s = Math.round(ms / 1000);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const rs = s % 60;
+  return rs > 0 ? `${m}m ${rs}s` : `${m}m`;
+}
+
+const PHASE_COLORS: Record<number, string> = {
+  0: '#3b82f6', // blue-500
+  1: '#60a5fa', // blue-400
+  2: '#93c5fd', // blue-300
+};
+
+function ScanTimeline({ results, startedAt, finishedAt }: {
+  results: ScanResult[];
+  startedAt: string | null;
+  finishedAt: string | null;
+}) {
+  if (!results.length) return null;
+
+  // Total duration
+  const totalMs = startedAt && finishedAt
+    ? new Date(finishedAt).getTime() - new Date(startedAt).getTime()
+    : results.reduce((sum, r) => sum + (r.durationMs || 0), 0);
+
+  // Phase durations
+  const phaseDurations: Record<number, number> = {};
+  for (const r of results) {
+    if (r.durationMs > 0) {
+      phaseDurations[r.phase] = (phaseDurations[r.phase] || 0) + r.durationMs;
+    }
+  }
+
+  // Top tools by duration (exclude AI/internal tools with 0 duration)
+  const toolDurations = results
+    .filter(r => r.durationMs > 0 && !r.toolName.startsWith('ai_'))
+    .sort((a, b) => b.durationMs - a.durationMs)
+    .slice(0, 7);
+
+  const maxToolMs = toolDurations[0]?.durationMs || 1;
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">Scan Timeline</h3>
+      <div className="bg-[#1e293b] rounded-lg border border-gray-800 p-4 space-y-4">
+        {/* Total duration */}
+        <div>
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-slate-400">Gesamtdauer</span>
+            <span className="font-mono text-white">{formatDurationShort(totalMs)}</span>
+          </div>
+          <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-full bg-blue-500 rounded-full" style={{ width: '100%' }} />
+          </div>
+        </div>
+
+        {/* Phase breakdown */}
+        <div className="space-y-1.5">
+          {Object.entries(phaseDurations).sort(([a], [b]) => Number(a) - Number(b)).map(([phase, ms]) => {
+            const pct = totalMs > 0 ? Math.round((ms / totalMs) * 100) : 0;
+            const phaseNum = Number(phase);
+            const label = phaseNum === 0 ? 'Phase 0 — DNS' : phaseNum === 1 ? 'Phase 1 — Tech' : 'Phase 2 — Deep Scan';
+            return (
+              <div key={phase}>
+                <div className="flex justify-between text-[10px] mb-0.5">
+                  <span className="text-slate-500">{label}</span>
+                  <span className="font-mono text-slate-400">{formatDurationShort(ms)} ({pct}%)</span>
+                </div>
+                <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full rounded-full transition-all" style={{
+                    width: `${pct}%`,
+                    backgroundColor: PHASE_COLORS[phaseNum] || '#64748b',
+                  }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Top tools */}
+        {toolDurations.length > 0 && (
+          <div>
+            <div className="text-[10px] text-slate-500 mb-2">Top Tools nach Dauer</div>
+            <div className="space-y-1">
+              {toolDurations.map(r => {
+                const pct = Math.round((r.durationMs / maxToolMs) * 100);
+                const isTimeout = r.exitCode === -1;
+                const isFailed = r.exitCode !== 0 && r.exitCode !== 1 && r.exitCode !== -1;
+                return (
+                  <div key={r.id} className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-slate-400 w-20 shrink-0 truncate">{r.toolName}</span>
+                    <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{
+                        width: `${pct}%`,
+                        backgroundColor: isTimeout ? '#ef4444' : isFailed ? '#f59e0b' : '#3b82f6',
+                      }} />
+                    </div>
+                    <span className={`text-[10px] font-mono w-14 text-right shrink-0 ${
+                      isTimeout ? 'text-red-400' : 'text-slate-500'
+                    }`}>
+                      {(r.durationMs / 1000).toFixed(1)}s
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const PHASE_LABELS: Record<string, string> = {
   dns_recon: 'DNS-Recon', scan_phase1: 'Phase 1', scan_phase2: 'Phase 2',
   scan_complete: 'Scan fertig', report_generating: 'Report...', report_complete: 'Fertig',
@@ -217,6 +333,11 @@ export default function ScanDetailPage() {
           {/* Debug Tab (Admin only) */}
           {activeTab === 'debug' && admin && (
             <div className="space-y-6">
+              {/* Timeline */}
+              {scanResults && (
+                <ScanTimeline results={scanResults} startedAt={order.startedAt} finishedAt={order.finishedAt} />
+              )}
+
               {/* AI Decisions */}
               {aiData && (
                 <div>
