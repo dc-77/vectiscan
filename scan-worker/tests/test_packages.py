@@ -31,7 +31,7 @@ class TestGetConfig:
 
     def test_basic_total_timeout(self):
         config = get_config("basic")
-        assert config["total_timeout"] == 600
+        assert config["total_timeout"] == 900  # 15 minutes
 
     def test_professional_phase2_has_all_tools(self):
         config = get_config("professional")
