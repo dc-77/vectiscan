@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { listOrders, getReportDownloadUrl, deleteOrderPermanent, getScanResults, getFindings, OrderListItem, ScanResult, FindingsData } from '@/lib/api';
 import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
 import VectiScanLogo from '@/components/VectiScanLogo';
-import SeverityBar from '@/components/SeverityBar';
+import SeverityCounts from '@/components/SeverityCounts';
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
 
@@ -26,33 +26,33 @@ const PHASE_LABELS: Record<string, string> = {
   verified: 'Verifiziert',
 };
 
-const PHASE_COLORS: Record<string, string> = {
-  verification_pending: 'bg-yellow-600',
-  created: 'bg-gray-500',
-  queued: 'bg-indigo-500',
-  scanning: 'bg-blue-500',
-  dns_recon: 'bg-purple-500',
-  scan_phase1: 'bg-blue-500',
-  scan_phase2: 'bg-cyan-500',
-  scan_complete: 'bg-teal-500',
-  report_generating: 'bg-amber-500',
-  report_complete: 'bg-green-500',
-  failed: 'bg-red-500',
-  cancelled: 'bg-orange-500',
-  verified: 'bg-teal-500',
+const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
+  verification_pending: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  created:             { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  queued:              { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  scanning:            { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  dns_recon:           { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  scan_phase1:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  scan_phase2:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  scan_complete:       { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  report_generating:   { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  report_complete:     { bg: 'bg-slate-700',   text: 'text-slate-300' },
+  failed:              { bg: 'bg-red-500/15',  text: 'text-red-400' },
+  cancelled:           { bg: 'bg-red-500/15',  text: 'text-red-400' },
+  verified:            { bg: 'bg-blue-500/20', text: 'text-blue-400' },
 };
 
-const PACKAGE_STYLES: Record<string, { label: string; bg: string; text: string }> = {
-  basic:        { label: 'Basic',        bg: 'bg-sky-500/20', text: 'text-sky-400' },
-  professional: { label: 'Professional', bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  nis2:         { label: 'NIS2',         bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
+const PACKAGE_STYLES: Record<string, { label: string }> = {
+  basic:        { label: 'BASIC' },
+  professional: { label: 'PRO' },
+  nis2:         { label: 'NIS2' },
 };
 
-const RISK_BADGE: Record<string, { bg: string; text: string }> = {
-  CRITICAL: { bg: 'bg-red-600/20',    text: 'text-red-400' },
-  HIGH:     { bg: 'bg-orange-600/20',  text: 'text-orange-400' },
-  MEDIUM:   { bg: 'bg-yellow-600/20',  text: 'text-yellow-400' },
-  LOW:      { bg: 'bg-green-600/20',   text: 'text-green-400' },
+const RISK_BADGE: Record<string, { bg: string; text: string; border: string }> = {
+  CRITICAL: { bg: 'bg-red-500/10',    text: 'text-red-400',    border: 'border border-red-500/20' },
+  HIGH:     { bg: 'bg-red-500/10',    text: 'text-red-400/70', border: 'border border-red-500/15' },
+  MEDIUM:   { bg: 'bg-slate-700/50',  text: 'text-slate-400',  border: 'border border-slate-600' },
+  LOW:      { bg: 'bg-slate-800',     text: 'text-slate-500',  border: 'border border-slate-700' },
 };
 
 type StatusFilter = 'all' | 'active' | 'done' | 'failed';
@@ -245,7 +245,7 @@ export default function Dashboard() {
             <div className="hidden sm:block"><VectiScanLogo /></div>
             <h1 className="text-lg sm:text-xl font-semibold text-white truncate">Dashboard</h1>
             {admin && (
-              <span className="text-xs font-medium px-2 py-0.5 rounded bg-purple-500/20 text-purple-400">Admin</span>
+              <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-700 text-slate-400">Admin</span>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -253,7 +253,7 @@ export default function Dashboard() {
               <Link href="/profile" className="text-xs text-gray-500 hover:text-white hidden sm:inline transition-colors">{userEmail}</Link>
             )}
             {admin && (
-              <Link href="/admin" className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 text-sm font-medium px-3 py-2 rounded-lg transition-colors">Admin</Link>
+              <Link href="/admin" className="bg-slate-700 hover:bg-slate-600 text-slate-400 hover:text-blue-400 text-sm font-medium px-3 py-2 rounded-lg transition-colors">Admin</Link>
             )}
             <Link href="/" className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors whitespace-nowrap">+ Neuer Scan</Link>
             <button onClick={handleLogout} className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg border border-gray-700 transition-colors">Abmelden</button>
@@ -270,7 +270,7 @@ export default function Dashboard() {
           ] as [StatusFilter, string, number][]).map(([key, label, count]) => (
             <button key={key} onClick={() => setFilter(key)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                filter === key ? 'bg-blue-600 text-white' : 'bg-[#1e293b] text-gray-400 hover:text-white hover:bg-[#253347]'
+                filter === key ? 'bg-blue-500/15 text-blue-400 ring-1 ring-blue-500/30' : 'text-slate-500 hover:text-slate-300'
               }`}
             >{label} ({count})</button>
           ))}
@@ -292,11 +292,11 @@ export default function Dashboard() {
 
         {/* Orders list */}
         {!loading && filtered.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {filtered.map((order) => {
               const pkg = PACKAGE_STYLES[order.package] || PACKAGE_STYLES.professional;
               const statusLabel = PHASE_LABELS[order.status] || order.status;
-              const statusColor = PHASE_COLORS[order.status] || 'bg-gray-500';
+              const statusStyle = PHASE_COLORS[order.status] || { bg: 'bg-slate-700', text: 'text-slate-400' };
               const active = isActive(order.status);
               const needsVerify = order.status === 'verification_pending' || order.status === 'verified';
               const isRunning = active && !needsVerify;
@@ -311,34 +311,30 @@ export default function Dashboard() {
               return (
                 <div key={order.id} className="space-y-0">
                   <div
-                    className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-4 transition-colors ${rowHref ? 'cursor-pointer' : ''} ${isExpanded ? 'rounded-b-none border-b-0' : ''}`}
+                    className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-5 transition-colors ${rowHref ? 'cursor-pointer' : ''} ${isExpanded ? 'rounded-b-none border-b-0' : ''}`}
                     onClick={rowHref ? () => router.push(rowHref) : undefined}
                   >
-                    {/* Row 1: Domain + Status + Risk */}
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="font-mono text-cyan-400 text-sm truncate">{order.domain}</span>
-                        {admin && <span className="text-xs text-gray-500 truncate hidden sm:inline">{order.email}</span>}
+                    {/* Row 1: Domain + Severity Counts + Risk + Status */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="font-mono text-blue-400 text-sm truncate">{order.domain}</span>
+                        {admin && <span className="text-xs text-slate-600 truncate hidden sm:inline">{order.email}</span>}
+                        {isDone && order.severityCounts && (
+                          <SeverityCounts counts={order.severityCounts} />
+                        )}
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {riskBadge && isDone && (
-                          <span className={`${riskBadge.bg} ${riskBadge.text} text-xs font-bold px-2 py-0.5 rounded uppercase`}>
+                          <span className={`${riskBadge.bg} ${riskBadge.text} ${riskBadge.border} text-xs font-bold px-2 py-0.5 rounded uppercase`}>
                             {order.overallRisk}
                           </span>
                         )}
-                        <span className={`${statusColor} text-white text-xs font-medium px-2.5 py-1 rounded-full inline-flex items-center gap-1.5`}>
-                          {active && <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />}
+                        <span className={`${statusStyle.bg} ${statusStyle.text} text-xs font-medium px-2.5 py-1 rounded inline-flex items-center gap-1.5`}>
+                          {active && <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" />}
                           {statusLabel}
                         </span>
                       </div>
                     </div>
-
-                    {/* Severity mini-bar for completed scans */}
-                    {isDone && order.severityCounts && (
-                      <div className="mb-2">
-                        <SeverityBar counts={order.severityCounts} compact />
-                      </div>
-                    )}
 
                     {/* Progress bar for running scans */}
                     {isRunning && order.hostsTotal > 0 && (
@@ -356,48 +352,51 @@ export default function Dashboard() {
                       </div>
                     )}
 
-                    {/* Row 2: Package + Hosts + Duration + Date + Actions */}
+                    {/* Row 2: Package + Meta + Actions */}
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${pkg.bg} ${pkg.text}`}>{pkg.label}</span>
+                      <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate-600">
+                        <span className="font-mono uppercase tracking-wider text-slate-500">{pkg.label}</span>
                         {isDone && order.hostsTotal > 0 && (
-                          <span className="text-xs text-gray-600">{order.hostsTotal} Hosts</span>
+                          <><span className="text-slate-700">&middot;</span><span>{order.hostsTotal} Hosts</span></>
                         )}
-                        {duration && <span className="text-xs text-gray-600">{duration}</span>}
-                        <span className="text-xs text-gray-600">{formatDate(order.createdAt)}</span>
+                        {duration && (
+                          <><span className="text-slate-700">&middot;</span><span>{duration}</span></>
+                        )}
+                        <span className="text-slate-700">&middot;</span>
+                        <span>{formatDate(order.createdAt)}</span>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {hasDetails && (
                           <button
                             onClick={(e) => { e.stopPropagation(); toggleDetails(order.id, isDone ? 'findings' : 'raw'); }}
                             className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
-                              isExpanded ? 'text-cyan-300 bg-cyan-400/20' : 'text-cyan-400 hover:text-cyan-300 bg-cyan-400/10'
+                              isExpanded ? 'text-blue-400 bg-slate-700' : 'text-slate-400 hover:text-blue-400 bg-slate-800/50 hover:bg-slate-700/50'
                             }`}
                           >
-                            {isExpanded ? 'Details ausblenden' : 'Details'}
+                            {isExpanded ? 'Ausblenden' : 'Details'}
                           </button>
                         )}
                         {needsVerify && (
                           <button onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
-                            className="text-xs text-yellow-400 hover:text-yellow-300 font-medium px-3 py-1.5 bg-yellow-400/10 rounded-lg transition-colors">
+                            className="text-xs text-slate-400 hover:text-blue-400 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors">
                             Verifizieren
                           </button>
                         )}
                         {isRunning && (
                           <button onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
-                            className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-blue-400/10 rounded-lg transition-colors">
+                            className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors">
                             Live View
                           </button>
                         )}
                         {isDone && order.hasReport && (
                           <a href={getReportDownloadUrl(order.id)} onClick={(e) => e.stopPropagation()}
-                            className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors inline-block">
+                            className="text-xs text-slate-400 hover:text-blue-400 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors inline-block">
                             PDF
                           </a>
                         )}
                         {admin && (
                           <button onClick={(e) => { e.stopPropagation(); handleDelete(order); }}
-                            className="text-xs text-red-400 hover:text-red-300 font-medium px-3 py-1.5 bg-red-400/10 rounded-lg transition-colors">
+                            className="text-xs text-slate-400 hover:text-red-400 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors">
                             Löschen
                           </button>
                         )}
@@ -414,18 +413,18 @@ export default function Dashboard() {
                           <>
                             <button onClick={() => switchTab(order.id, 'findings')}
                               className={`px-4 py-2.5 text-xs font-medium transition-colors ${
-                                activeTab === 'findings' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-500 hover:text-gray-300'
+                                activeTab === 'findings' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'
                               }`}>Befunde</button>
                             <button onClick={() => switchTab(order.id, 'recommendations')}
                               className={`px-4 py-2.5 text-xs font-medium transition-colors ${
-                                activeTab === 'recommendations' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-500 hover:text-gray-300'
+                                activeTab === 'recommendations' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'
                               }`}>Empfehlungen</button>
                           </>
                         )}
                         {admin && (
                           <button onClick={() => switchTab(order.id, 'raw')}
                             className={`px-4 py-2.5 text-xs font-medium transition-colors ${
-                              activeTab === 'raw' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-500 hover:text-gray-300'
+                              activeTab === 'raw' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'
                             }`}>Rohdaten</button>
                         )}
                       </div>
@@ -512,7 +511,7 @@ function RawResultsPanel({ orderId, results, expandedTool, setExpandedTool }: {
                     className="w-full px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-[#1e293b]/30 transition-colors text-left">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${exitOk ? 'bg-green-500' : 'bg-red-500'}`} />
-                      <span className="text-sm font-mono text-cyan-400 truncate">{result.toolName}</span>
+                      <span className="text-sm font-mono text-blue-400 truncate">{result.toolName}</span>
                     </div>
                     <div className="flex items-center gap-3 shrink-0 text-xs text-gray-500">
                       <span>{sec}s</span>

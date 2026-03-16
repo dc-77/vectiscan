@@ -64,14 +64,6 @@ RUN curl -fsSL https://github.com/owasp-amass/amass/releases/download/v5.0.1/ama
     chmod +x /usr/local/bin/amass && \
     rm -rf /tmp/amass.tar.gz /tmp/amass_linux_amd64
 
-# httpx v1.6.10
-RUN curl -fsSL https://github.com/projectdiscovery/httpx/releases/download/v1.6.10/httpx_1.6.10_linux_amd64.zip \
-      -o /tmp/httpx.zip && \
-    unzip /tmp/httpx.zip -d /tmp/httpx && \
-    mv /tmp/httpx/httpx /usr/local/bin/httpx && \
-    chmod +x /usr/local/bin/httpx && \
-    rm -rf /tmp/httpx /tmp/httpx.zip
-
 # katana v1.1.3
 RUN curl -fsSL https://github.com/projectdiscovery/katana/releases/download/v1.1.3/katana_1.1.3_linux_amd64.zip \
       -o /tmp/katana.zip && \
@@ -120,6 +112,15 @@ WORKDIR /opt/scanner
 
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
+
+# httpx v1.6.10 — MUST come after pip install because anthropic pulls Python
+# httpx which installs an entry-point script that shadows the Go binary
+RUN curl -fsSL https://github.com/projectdiscovery/httpx/releases/download/v1.6.10/httpx_1.6.10_linux_amd64.zip \
+      -o /tmp/httpx.zip && \
+    unzip /tmp/httpx.zip -d /tmp/httpx && \
+    mv /tmp/httpx/httpx /usr/local/bin/httpx && \
+    chmod +x /usr/local/bin/httpx && \
+    rm -rf /tmp/httpx /tmp/httpx.zip
 
 COPY scanner/ /opt/scanner/scanner/
 
