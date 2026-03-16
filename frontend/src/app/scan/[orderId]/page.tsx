@@ -107,13 +107,25 @@ export default function ScanDetailPage() {
   const pkg = order.package === 'professional' ? 'PRO' : order.package.toUpperCase();
   const statusLabel = PHASE_LABELS[order.status] || order.status;
 
+  // Build IP → FQDNs lookup from discovered hosts
+  const ipToFqdns: Record<string, string[]> = {};
+  const hosts = (aiData?.discoveredHosts || order.progress.discoveredHosts || []) as Array<{ ip: string; fqdns?: string[] }>;
+  for (const h of hosts) {
+    if (h.ip && h.fqdns?.length) ipToFqdns[h.ip] = h.fqdns;
+  }
+
   // Group scan results by phase + host for debug view
   const groupedResults: Record<string, ScanResult[]> = {};
   if (scanResults) {
     for (const r of scanResults) {
-      const key = `Phase ${r.phase}${r.hostIp ? ` — ${r.hostIp}` : ''}`;
-      if (!groupedResults[key]) groupedResults[key] = [];
-      groupedResults[key].push(r);
+      let label = `Phase ${r.phase}`;
+      if (r.hostIp) {
+        const fqdns = ipToFqdns[r.hostIp];
+        label += ` — ${r.hostIp}`;
+        if (fqdns?.length) label += ` (${fqdns.join(', ')})`;
+      }
+      if (!groupedResults[label]) groupedResults[label] = [];
+      groupedResults[label].push(r);
     }
   }
 
