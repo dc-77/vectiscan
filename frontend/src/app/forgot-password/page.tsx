@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { forgotPassword } from '@/lib/api';
-import VectiScanLogo from '@/components/VectiScanLogo';
+
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -36,12 +36,9 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm space-y-6">
-        <div className="text-center space-y-2">
-          <VectiScanLogo className="mb-4" />
-          <p className="text-gray-400">Passwort zurücksetzen</p>
-        </div>
+        <p className="text-center text-gray-400">Passwort zurücksetzen</p>
 
         {sent ? (
           <div className="space-y-4">

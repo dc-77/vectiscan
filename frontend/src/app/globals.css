@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 body {
-  background-color: #0f172a;
+  background-color: #0C1222;
   color: #e2e8f0;
 }
 
@@ -18,4 +18,26 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Global scanline overlay */
+@keyframes scanlineScroll {
+  from { background-position-y: 0; }
+  to { background-position-y: 100px; }
+}
+
+.scanline-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: linear-gradient(transparent 50%, rgba(59,130,246,0.012) 50%);
+  background-size: 100% 4px;
+  animation: scanlineScroll 6s linear infinite;
+}
+
+/* Custom scrollbar for dark panels */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #1E3A5F #0C1222;
 }

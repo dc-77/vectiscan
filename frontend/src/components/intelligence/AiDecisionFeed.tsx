@@ -184,20 +184,23 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
   }, [feed]);
 
   return (
-    <div className="mx-3 mb-2">
+    <div className="px-3">
       <div className="flex items-center gap-1.5 mb-1">
-        <span className="text-[9px] font-mono uppercase tracking-widest" style={{ color: COLORS.amber }}>
+        <span className="text-[11px] font-mono uppercase tracking-widest font-bold" style={{ color: COLORS.cyan }}>
           AI Decision Log
         </span>
-        <span className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${COLORS.amber}40, transparent)` }} />
+        <span className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${COLORS.cyan}40, transparent)` }} />
         {feed.length > 0 && (
-          <span className="text-[8px] font-mono" style={{ color: COLORS.gray }}>{feed.length}</span>
+          <span className="text-[10px] font-mono" style={{ color: COLORS.gray }}>{feed.length}</span>
         )}
       </div>
-      <div ref={containerRef} className="overflow-hidden relative"
+      <div ref={containerRef} className="overflow-y-auto rounded border"
         style={{
-          height: 140,
-          maskImage: 'linear-gradient(to bottom, transparent, black 8%, black 92%, transparent)',
+          height: 160,
+          borderColor: 'rgba(30,58,95,0.3)',
+          background: 'rgba(12,18,34,0.6)',
+          scrollbarWidth: 'thin',
+          scrollbarColor: '#1E3A5F #0C1222',
         }}>
         {feed.length === 0 ? (
           <BootSequence />
@@ -208,15 +211,15 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
               const isNew = i >= feed.length - 3;
               return (
                 <div key={entry.id}
-                  className={`flex gap-1.5 py-0.5 pl-1.5 border-l-2 ${isNew ? 'animate-feedSlideIn' : ''}`}
+                  className={`flex gap-2 py-1.5 pl-2 pr-2 border-l-[3px] ${isNew ? 'animate-feedSlideIn' : ''}`}
                   style={{ borderColor: style.border }}>
-                  <span className="text-[8px] font-mono shrink-0 mt-px" style={{ color: COLORS.grayDim }}>
+                  <span className="text-[10px] font-mono shrink-0 mt-0.5" style={{ color: COLORS.grayDim }}>
                     {formatTime(entry.ts)}
                   </span>
-                  <span className="text-[9px] shrink-0 mt-px" style={{ color: style.color }}>
+                  <span className="text-[11px] shrink-0 mt-0.5" style={{ color: style.color }}>
                     {style.icon}
                   </span>
-                  <span className="text-[9px] font-mono leading-snug" style={{ color: COLORS.textDim }}>
+                  <span className="text-[11px] font-mono leading-normal" style={{ color: COLORS.textDim }}>
                     {entry.text}
                   </span>
                 </div>

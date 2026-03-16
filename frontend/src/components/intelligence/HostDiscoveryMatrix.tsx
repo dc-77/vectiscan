@@ -17,7 +17,7 @@ export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy }: 
   aiStrategy?.hosts.forEach(h => actionMap.set(h.ip, h.action.toUpperCase()));
 
   return (
-    <div className="mx-3 mb-2">
+    <div className="px-3">
       <div className="flex items-center gap-1.5 mb-1">
         <span className="text-[9px] font-mono uppercase tracking-widest" style={{ color: COLORS.cyan }}>
           Discovered Hosts
@@ -28,7 +28,7 @@ export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy }: 
 
       <div className="overflow-y-auto rounded border"
         style={{
-          maxHeight: '100%',
+          maxHeight: 140,
           borderColor: COLORS.borderDim,
           background: `${COLORS.panel}80`,
         }}>

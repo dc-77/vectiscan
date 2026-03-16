@@ -43,8 +43,8 @@ export default function ScanTerminal({
         className="p-3 overflow-y-auto font-mono text-xs leading-relaxed"
         style={{
           fontFamily: "'Fira Mono', 'Consolas', 'Liberation Mono', monospace",
-          maxHeight: 'calc(100vh - 280px)',
-          minHeight: '200px',
+          height: '100%',
+          minHeight: 0,
           backgroundColor: 'rgba(12, 18, 34, 0.95)',
           backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(56,189,248,0.015) 22px, rgba(56,189,248,0.015) 24px)',
           scrollbarWidth: 'thin',

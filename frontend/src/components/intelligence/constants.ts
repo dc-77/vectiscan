@@ -1,15 +1,17 @@
 // ─── Design Tokens ─────────────────────────────────────
 export const COLORS = {
-  base: '#0a0f1e',
+  base: '#0C1222',
   panel: '#0f172a',
   border: '#1E3A5F',
-  borderDim: 'rgba(30,58,95,0.5)',
-  cyan: '#38BDF8',
-  cyanDim: '#7DD3FC',
-  cyanGlow: 'rgba(56,189,248,0.4)',
-  amber: '#EAB308',
-  amberDim: '#D97706',
-  amberGlow: 'rgba(234,179,8,0.3)',
+  borderDim: 'rgba(30,58,95,0.3)',
+  // Primary accent — unified blue
+  cyan: '#3b82f6',
+  cyanDim: '#60a5fa',
+  cyanGlow: 'rgba(59,130,246,0.4)',
+  // Alert accent — kept for scanning states
+  amber: '#3b82f6',      // mapped to blue (was amber)
+  amberDim: '#60a5fa',
+  amberGlow: 'rgba(59,130,246,0.3)',
   green: '#16A34A',
   greenDim: '#22C55E',
   red: '#EF4444',

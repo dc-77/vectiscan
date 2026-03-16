@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getVerificationStatus, checkVerification, manualVerify } from '@/lib/api';
-import VectiScanLogo from '@/components/VectiScanLogo';
+
 
 type Tab = 'dns_txt' | 'file' | 'meta_tag';
 
@@ -119,7 +119,7 @@ export default function VerifyPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <main className="flex-1 flex items-center justify-center">
         <div className="text-gray-400">Laden...</div>
       </main>
     );
@@ -136,10 +136,8 @@ export default function VerifyPage() {
   const metaTag = `<meta name="vectiscan-verify" content="${token}">`;
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl space-y-6">
-        <VectiScanLogo className="mb-4" />
-
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-bold text-white">Domain verifizieren</h1>
           <p className="text-gray-400">

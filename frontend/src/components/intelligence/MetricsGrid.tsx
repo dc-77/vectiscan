@@ -97,7 +97,7 @@ export default function MetricsGrid({ currentPhase, currentTool, hosts, toolOutp
   const displayTool = currentTool && currentTool !== 'starting' ? currentTool : '\u2014';
 
   return (
-    <div className="grid grid-cols-2 gap-1.5 px-3 pb-2">
+    <div className="grid grid-cols-2 gap-1 px-1.5">
       {/* Phase */}
       <div className="rounded px-2 py-1 border"
         style={{ background: COLORS.panel, borderColor: COLORS.borderDim }}>

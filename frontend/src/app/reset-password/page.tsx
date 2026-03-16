@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { resetPassword } from '@/lib/api';
 import { setToken } from '@/lib/auth';
-import VectiScanLogo from '@/components/VectiScanLogo';
+
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -105,12 +105,9 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+    <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm space-y-6">
-        <div className="text-center space-y-2">
-          <VectiScanLogo className="mb-4" />
-          <p className="text-gray-400">Neues Passwort festlegen</p>
-        </div>
+        <p className="text-center text-gray-400">Neues Passwort festlegen</p>
 
         <Suspense fallback={<div className="text-center text-gray-500">Laden...</div>}>
           <ResetPasswordForm />

@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+
 import { changePassword } from '@/lib/api';
 import { isLoggedIn, getUser, clearToken } from '@/lib/auth';
-import VectiScanLogo from '@/components/VectiScanLogo';
+
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -79,18 +79,9 @@ export default function ProfilePage() {
   if (!ready) return null;
 
   return (
-    <main className="min-h-screen px-4 py-8 md:px-8">
+    <main className="flex-1 px-4 py-8 md:px-8">
       <div className="max-w-lg mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <VectiScanLogo />
-            <h1 className="text-lg font-semibold text-white">Profil</h1>
-          </div>
-          <Link href="/dashboard" className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg border border-gray-700 transition-colors">
-            Dashboard
-          </Link>
-        </div>
+        <h1 className="text-lg font-semibold text-white">Profil</h1>
 
         {/* Account Info */}
         <div className="bg-[#1e293b] rounded-lg border border-gray-800 p-5 space-y-3">

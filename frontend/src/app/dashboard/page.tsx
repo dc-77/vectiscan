@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { listOrders, getReportDownloadUrl, deleteOrderPermanent, getScanResults, getFindings, OrderListItem, ScanResult, FindingsData } from '@/lib/api';
 import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
-import VectiScanLogo from '@/components/VectiScanLogo';
 import SeverityCounts from '@/components/SeverityCounts';
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
@@ -237,28 +236,10 @@ export default function Dashboard() {
   if (!ready) return null;
 
   return (
-    <main className="min-h-screen px-4 py-8 md:px-8">
+    <main className="flex-1 px-4 py-6 md:px-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="hidden sm:block"><VectiScanLogo /></div>
-            <h1 className="text-lg sm:text-xl font-semibold text-white truncate">Dashboard</h1>
-            {admin && (
-              <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-700 text-slate-400">Admin</span>
-            )}
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {userEmail && (
-              <Link href="/profile" className="text-xs text-gray-500 hover:text-white hidden sm:inline transition-colors">{userEmail}</Link>
-            )}
-            {admin && (
-              <Link href="/admin" className="bg-slate-700 hover:bg-slate-600 text-slate-400 hover:text-blue-400 text-sm font-medium px-3 py-2 rounded-lg transition-colors">Admin</Link>
-            )}
-            <Link href="/" className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-3 py-2 rounded-lg transition-colors whitespace-nowrap">+ Neuer Scan</Link>
-            <button onClick={handleLogout} className="bg-[#1e293b] hover:bg-[#253347] text-gray-400 hover:text-white text-sm font-medium px-3 py-2 rounded-lg border border-gray-700 transition-colors">Abmelden</button>
-          </div>
-        </div>
+        {/* Title */}
+        <h1 className="text-lg font-semibold text-white">Dashboard</h1>
 
         {/* Filter pills */}
         <div className="flex items-center gap-2 flex-wrap">
