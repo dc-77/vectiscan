@@ -371,9 +371,24 @@ def run_phase1(
                 webtech_result["tech"] = existing + new_techs
     progress_callback(order_id, "webtech", "complete")
 
+    # Save webtech result to scan_results (was previously only in archive)
+    from scanner.tools import _save_result
+    _save_result(order_id=order_id, host_ip=ip, phase=1,
+                 tool_name="webtech",
+                 raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False) if webtech_result else None,
+                 exit_code=0 if webtech_result else 1,
+                 duration_ms=0)
+
     # Run wafw00f on primary FQDN
     wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, order_id)
     progress_callback(order_id, "wafw00f", "complete")
+
+    # Save wafw00f result to scan_results
+    _save_result(order_id=order_id, host_ip=ip, phase=1,
+                 tool_name="wafw00f",
+                 raw_output=json.dumps(wafw00f_result, indent=2, ensure_ascii=False) if wafw00f_result else None,
+                 exit_code=0 if wafw00f_result else 1,
+                 duration_ms=0)
 
     # Build combined tech profile
     tech_profile = build_tech_profile(

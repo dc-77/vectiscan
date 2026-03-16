@@ -86,7 +86,7 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str,
         log.info("nikto_adaptive_tuning", ip=ip, tuning=tuning)
 
     cmd = [
-        "nikto.pl",
+        "perl", "/opt/nikto/program/nikto.pl",
         "-h", fqdn,
         "-Format", "json",
         "-output", output_path,
@@ -118,7 +118,8 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str,
 
 
 def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str,
-               adaptive_config: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+               adaptive_config: dict[str, Any] | None = None,
+               timeout: int = 1500) -> list[dict[str, Any]]:
     """Run nuclei vulnerability scanner.
 
     Returns list of findings or empty list on failure.
@@ -149,7 +150,7 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=900,
+        timeout=timeout,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -560,7 +561,9 @@ def run_phase2(
 
     # nuclei
     if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip:
-        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
+        # Basic: 5 min timeout, Pro/NIS2: 25 min
+        nuclei_timeout = 300 if config.get("package") == "basic" else 1500
+        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config, timeout=nuclei_timeout)
         results["nuclei"] = nuclei_result
         results["tools_run"].append("nuclei")
         progress_callback(order_id, "nuclei", "complete")

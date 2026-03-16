@@ -3,11 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, getReportDownloadUrl, deleteOrderPermanent, getScanResults, getFindings, OrderListItem, ScanResult, FindingsData } from '@/lib/api';
+import { listOrders, getReportDownloadUrl, deleteOrderPermanent, OrderListItem } from '@/lib/api';
 import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
-import FindingsViewer from '@/components/FindingsViewer';
-import RecommendationsViewer from '@/components/RecommendationsViewer';
 
 const PHASE_LABELS: Record<string, string> = {
   verification_pending: 'Verifizierung',
@@ -55,7 +53,7 @@ const RISK_BADGE: Record<string, { bg: string; text: string; border: string }> =
 };
 
 type StatusFilter = 'all' | 'active' | 'done' | 'failed';
-type DetailTab = 'findings' | 'recommendations' | 'raw' | 'nis2';
+// Detail tabs moved to /scan/[orderId] page
 
 const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
 const DONE_STATUSES = ['report_complete'];
@@ -98,15 +96,7 @@ export default function Dashboard() {
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
-  // Detail panel state
-  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<DetailTab>('findings');
-
-  // Cached data per order
-  const [scanResults, setScanResults] = useState<Record<string, ScanResult[]>>({});
-  const [findingsCache, setFindingsCache] = useState<Record<string, FindingsData>>({});
-  const [detailLoading, setDetailLoading] = useState<string | null>(null);
-  const [expandedTool, setExpandedTool] = useState<string | null>(null);
+  // Detail panel removed — dedicated /scan/[orderId] page handles details
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -160,70 +150,6 @@ export default function Dashboard() {
       setError('Fehler beim Löschen');
     }
   };
-
-  const toggleDetails = useCallback(async (orderId: string, tab: DetailTab = 'findings') => {
-    if (expandedOrder === orderId) {
-      setExpandedOrder(null);
-      setExpandedTool(null);
-      return;
-    }
-    setExpandedOrder(orderId);
-    setActiveTab(tab);
-    setExpandedTool(null);
-
-    // Lazy-load findings
-    if (tab === 'findings' || tab === 'recommendations') {
-      if (!findingsCache[orderId]) {
-        setDetailLoading(orderId);
-        try {
-          const res = await getFindings(orderId);
-          if (res.success && res.data) {
-            setFindingsCache(prev => ({ ...prev, [orderId]: res.data as FindingsData }));
-          }
-        } catch { /* silent */ }
-        finally { setDetailLoading(null); }
-      }
-    }
-
-    // Lazy-load raw results
-    if (tab === 'raw' && !scanResults[orderId]) {
-      setDetailLoading(orderId);
-      try {
-        const res = await getScanResults(orderId);
-        if (res.success && res.data) {
-          setScanResults(prev => ({ ...prev, [orderId]: res.data!.results }));
-        }
-      } catch { /* silent */ }
-      finally { setDetailLoading(null); }
-    }
-  }, [expandedOrder, findingsCache, scanResults]);
-
-  const switchTab = useCallback(async (orderId: string, tab: DetailTab) => {
-    setActiveTab(tab);
-    setExpandedTool(null);
-
-    if ((tab === 'findings' || tab === 'recommendations') && !findingsCache[orderId]) {
-      setDetailLoading(orderId);
-      try {
-        const res = await getFindings(orderId);
-        if (res.success && res.data) {
-          setFindingsCache(prev => ({ ...prev, [orderId]: res.data as FindingsData }));
-        }
-      } catch { /* silent */ }
-      finally { setDetailLoading(null); }
-    }
-
-    if (tab === 'raw' && !scanResults[orderId]) {
-      setDetailLoading(orderId);
-      try {
-        const res = await getScanResults(orderId);
-        if (res.success && res.data) {
-          setScanResults(prev => ({ ...prev, [orderId]: res.data!.results }));
-        }
-      } catch { /* silent */ }
-      finally { setDetailLoading(null); }
-    }
-  }, [findingsCache, scanResults]);
 
   const filtered = filterOrders(orders, filter);
   const counts = {
@@ -283,7 +209,7 @@ export default function Dashboard() {
               const isRunning = active && !needsVerify;
               const isDone = order.status === 'report_complete';
               const hasDetails = !['created', 'queued', 'verification_pending', 'verified'].includes(order.status);
-              const isExpanded = expandedOrder === order.id;
+              // Detail expansion removed — uses /scan/[orderId]
               const duration = formatDuration(order.startedAt, order.finishedAt);
               const riskBadge = order.overallRisk ? RISK_BADGE[order.overallRisk.toUpperCase()] : null;
 
@@ -292,7 +218,7 @@ export default function Dashboard() {
               return (
                 <div key={order.id} className="space-y-0">
                   <div
-                    className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-5 transition-colors ${rowHref ? 'cursor-pointer' : ''} ${isExpanded ? 'rounded-b-none border-b-0' : ''}`}
+                    className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-5 transition-colors ${rowHref ? 'cursor-pointer' : ''}`}
                     onClick={rowHref ? () => router.push(rowHref) : undefined}
                   >
                     {/* Row 1: Domain + Severity Counts + Risk + Status */}
@@ -348,14 +274,10 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {hasDetails && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); toggleDetails(order.id, isDone ? 'findings' : 'raw'); }}
-                            className={`text-xs font-medium px-3 py-1.5 rounded-lg transition-colors ${
-                              isExpanded ? 'text-blue-400 bg-slate-700' : 'text-slate-400 hover:text-blue-400 bg-slate-800/50 hover:bg-slate-700/50'
-                            }`}
-                          >
-                            {isExpanded ? 'Ausblenden' : 'Details'}
-                          </button>
+                          <Link href={`/scan/${order.id}`} onClick={(e) => e.stopPropagation()}
+                            className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors text-slate-400 hover:text-blue-400 bg-slate-800/50 hover:bg-slate-700/50">
+                            Details
+                          </Link>
                         )}
                         {needsVerify && (
                           <button onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
@@ -385,63 +307,7 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Expandable detail panel with tabs */}
-                  {isExpanded && (
-                    <div className="bg-[#0f172a] border border-gray-800 border-t-0 rounded-b-lg overflow-hidden">
-                      {/* Tab bar */}
-                      <div className="flex border-b border-gray-800">
-                        {isDone && (
-                          <>
-                            <button onClick={() => switchTab(order.id, 'findings')}
-                              className={`px-4 py-2.5 text-xs font-medium transition-colors ${
-                                activeTab === 'findings' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'
-                              }`}>Befunde</button>
-                            <button onClick={() => switchTab(order.id, 'recommendations')}
-                              className={`px-4 py-2.5 text-xs font-medium transition-colors ${
-                                activeTab === 'recommendations' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'
-                              }`}>Empfehlungen</button>
-                          </>
-                        )}
-                        {admin && (
-                          <button onClick={() => switchTab(order.id, 'raw')}
-                            className={`px-4 py-2.5 text-xs font-medium transition-colors ${
-                              activeTab === 'raw' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'
-                            }`}>Rohdaten</button>
-                        )}
-                      </div>
-
-                      {/* Loading */}
-                      {detailLoading === order.id && (
-                        <div className="px-4 py-8 text-center text-gray-500 text-sm">Daten laden...</div>
-                      )}
-
-                      {/* Findings tab */}
-                      {activeTab === 'findings' && detailLoading !== order.id && findingsCache[order.id] && (
-                        <FindingsViewer data={findingsCache[order.id]} />
-                      )}
-                      {activeTab === 'findings' && detailLoading !== order.id && !findingsCache[order.id] && (
-                        <div className="px-4 py-8 text-center text-gray-600 text-sm">Keine Befunddaten verfügbar.</div>
-                      )}
-
-                      {/* Recommendations tab */}
-                      {activeTab === 'recommendations' && detailLoading !== order.id && findingsCache[order.id] && (
-                        <RecommendationsViewer recommendations={findingsCache[order.id].recommendations} />
-                      )}
-                      {activeTab === 'recommendations' && detailLoading !== order.id && !findingsCache[order.id] && (
-                        <div className="px-4 py-8 text-center text-gray-600 text-sm">Keine Empfehlungen verfügbar.</div>
-                      )}
-
-                      {/* Raw results tab (admin only) */}
-                      {activeTab === 'raw' && detailLoading !== order.id && (
-                        <RawResultsPanel
-                          orderId={order.id}
-                          results={scanResults[order.id] || []}
-                          expandedTool={expandedTool}
-                          setExpandedTool={setExpandedTool}
-                        />
-                      )}
-                    </div>
-                  )}
+                  {/* Detail panel removed — use /scan/[orderId] page */}
                 </div>
               );
             })}
@@ -456,65 +322,4 @@ export default function Dashboard() {
   );
 }
 
-/** Raw scan results panel — extracted for clarity */
-function RawResultsPanel({ orderId, results, expandedTool, setExpandedTool }: {
-  orderId: string;
-  results: ScanResult[];
-  expandedTool: string | null;
-  setExpandedTool: (id: string | null) => void;
-}) {
-  if (results.length === 0) {
-    return <div className="px-4 py-8 text-center text-gray-600 text-sm">Keine Rohdaten vorhanden.</div>;
-  }
-
-  const grouped: Record<string, ScanResult[]> = {};
-  for (const r of results) {
-    const key = `Phase ${r.phase}${r.hostIp ? ` \u2014 ${r.hostIp}` : ''}`;
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(r);
-  }
-
-  return (
-    <div className="divide-y divide-gray-800/50">
-      {Object.entries(grouped).map(([group, items]) => (
-        <div key={group}>
-          <div className="px-4 py-2 bg-[#1e293b]/50 text-xs font-medium text-gray-400 uppercase tracking-wider">{group}</div>
-          <div className="divide-y divide-gray-800/30">
-            {items.map((result) => {
-              const toolId = `${orderId}-${result.id}`;
-              const isOpen = expandedTool === toolId;
-              const exitOk = result.exitCode === 0 || result.exitCode === 1;
-              const sec = result.durationMs ? (result.durationMs / 1000).toFixed(1) : '?';
-
-              return (
-                <div key={result.id}>
-                  <button onClick={() => setExpandedTool(isOpen ? null : toolId)}
-                    className="w-full px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-[#1e293b]/30 transition-colors text-left">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className={`w-2 h-2 rounded-full shrink-0 ${exitOk ? 'bg-green-500' : 'bg-red-500'}`} />
-                      <span className="text-sm font-mono text-blue-400 truncate">{result.toolName}</span>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0 text-xs text-gray-500">
-                      <span>{sec}s</span>
-                      <span className={`font-mono ${exitOk ? 'text-green-600' : 'text-red-600'}`}>exit {result.exitCode}</span>
-                      <span className="text-gray-700">{isOpen ? '\u25B2' : '\u25BC'}</span>
-                    </div>
-                  </button>
-                  {isOpen && result.rawOutput && (
-                    <div className="px-4 pb-3">
-                      <pre className="bg-[#0c1222] border border-gray-800 rounded-lg p-3 text-xs font-mono text-gray-400 overflow-x-auto max-h-80 overflow-y-auto whitespace-pre-wrap break-all"
-                           style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>{result.rawOutput}</pre>
-                    </div>
-                  )}
-                  {isOpen && !result.rawOutput && (
-                    <div className="px-4 pb-3 text-xs text-gray-600 italic">Keine Rohausgabe gespeichert.</div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
+// RawResultsPanel moved to /scan/[orderId] detail page

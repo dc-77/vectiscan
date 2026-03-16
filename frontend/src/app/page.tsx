@@ -232,7 +232,7 @@ function HomeContent() {
     if (!order) return;
     if (order.status === 'report_complete') {
       stopPolling(); closeWs();
-      setTimeout(() => setShowReport(true), 500);
+      router.push(`/scan/${orderId}`);
     } else if (order.status === 'failed' || order.status === 'cancelled') {
       stopPolling(); closeWs();
     }
