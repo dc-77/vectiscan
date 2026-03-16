@@ -175,6 +175,14 @@ REGELN:
 - Bei WAF vorhanden: "dos" und "fuzz" ausschließen (werden geblockt)
 - nikto_tuning auf relevante Kategorien beschränken
 
+WICHTIG FÜR NUCLEI-TAGS (Performance):
+- Verwende NIEMALS den Tag "cve" allein — das matcht 3000+ Templates und dauert zu lange
+- Stattdessen: technologie-spezifische Tags wie "apache", "nginx", "wordpress", "shopware"
+- Kombiniere maximal 5-7 Tags für optimale Laufzeit
+- Die Tags "exposure" und "misconfig" sind effizient (wenige Templates, hoher Ertrag)
+- Gute Kombination: ["exposure", "misconfig", "tech-spezifisch", "ssl", "default-login"]
+- Schlechte Kombination: ["cve", "network", "dns"] — viel zu breit, Timeout garantiert
+
 Antworte NUR mit validem JSON, kein anderer Text."""
 
 PHASE2_CONFIG_SCHEMA = """{

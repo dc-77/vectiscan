@@ -127,13 +127,26 @@ def run_tool(
             except (subprocess.TimeoutExpired, Exception):
                 proc.kill()
 
+        # On timeout, try to read partial output from file (tools like nuclei write incrementally)
+        raw = f"TIMEOUT after {timeout}s"
+        if output_path:
+            try:
+                if os.path.isfile(output_path):
+                    with open(output_path, "r", errors="replace") as f:
+                        content = f.read()
+                    if content:
+                        raw = f"TIMEOUT after {timeout}s\n--- PARTIAL OUTPUT ({len(content)} chars) ---\n{content}"
+                        log.info("tool_timeout_partial_output", tool=tool_name, chars=len(content))
+            except Exception:
+                pass
+
         if order_id:
             _save_result(
                 order_id=order_id,
                 host_ip=host_ip,
                 phase=phase,
                 tool_name=tool_name,
-                raw_output=f"TIMEOUT after {timeout}s",
+                raw_output=raw[:50000],
                 exit_code=-1,
                 duration_ms=duration_ms,
             )

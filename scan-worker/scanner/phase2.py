@@ -119,10 +119,12 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str,
 
 def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str,
                adaptive_config: dict[str, Any] | None = None,
-               timeout: int = 1500) -> list[dict[str, Any]]:
+               timeout: int = 1500,
+               severity: str = "low,medium,high,critical") -> list[dict[str, Any]]:
     """Run nuclei vulnerability scanner.
 
     Returns list of findings or empty list on failure.
+    Nuclei writes JSONL incrementally — partial results are preserved on timeout.
     """
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
@@ -132,9 +134,14 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str,
     cmd = [
         "nuclei",
         "-u", fqdn,
-        "-severity", "low,medium,high,critical",
+        "-severity", severity,
         "-jsonl",
         "-o", output_path,
+        "-timeout", "5",           # Per-request timeout: 5s (default: 10)
+        "-retries", "1",           # 1 retry (default: 1)
+        "-no-interactsh",          # Skip out-of-band interaction checks (saves time)
+        "-c", "25",                # Concurrency: 25 templates parallel
+        "-rl", "150",              # Rate limit: 150 req/s
     ]
 
     # AI-adaptive: filter templates by technology tags
@@ -158,9 +165,14 @@ def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str,
         tool_name="nuclei",
     )
 
-    if exit_code != 0 and exit_code != 1:
+    # exit 0/1 = success, -1 = timeout (partial results in output file)
+    if exit_code not in (0, 1, -1):
         log.warning("nuclei_failed", fqdn=fqdn, exit_code=exit_code)
         return []
+
+    if exit_code == -1:
+        log.info("nuclei_timeout_partial", fqdn=fqdn, timeout=timeout,
+                 msg="Reading partial results from output file")
 
     findings: list[dict[str, Any]] = []
     try:
@@ -561,9 +573,14 @@ def run_phase2(
 
     # nuclei
     if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip:
-        # Basic: 5 min timeout, Pro/NIS2: 25 min
-        nuclei_timeout = 300 if config.get("package") == "basic" else 1500
-        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config, timeout=nuclei_timeout)
+        # Basic: 10 min, high/critical only. Pro/NIS2: 25 min, all severities.
+        is_basic = config.get("package") == "basic"
+        nuclei_timeout = 600 if is_basic else 1500
+        nuclei_severity = "high,critical" if is_basic else "low,medium,high,critical"
+        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
+                                   adaptive_config=adaptive_config,
+                                   timeout=nuclei_timeout,
+                                   severity=nuclei_severity)
         results["nuclei"] = nuclei_result
         results["tools_run"].append("nuclei")
         progress_callback(order_id, "nuclei", "complete")
