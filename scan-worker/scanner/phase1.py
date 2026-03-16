@@ -246,6 +246,30 @@ def build_tech_profile(
                 cms = tech
                 break
 
+    # Fallback CMS detection: probe well-known paths if webtech didn't find a CMS
+    if not cms and fqdns:
+        import urllib.request
+        import urllib.error
+        primary = fqdns[0]
+        wp_indicators = [
+            (f"https://{primary}/wp-login.php", "wordpress"),
+            (f"https://{primary}/wp-admin/", "wordpress"),
+            (f"http://{primary}/wp-login.php", "wordpress"),
+            (f"https://{primary}/backend/admin", "shopware"),
+            (f"https://{primary}/admin/login", "shopware"),
+        ]
+        for url, cms_name in wp_indicators:
+            try:
+                req = urllib.request.Request(url, method="HEAD",
+                    headers={"User-Agent": "VectiScan/1.0"})
+                resp = urllib.request.urlopen(req, timeout=5)
+                if resp.status in (200, 301, 302, 303, 307, 308):
+                    cms = cms_name.capitalize()
+                    log.info("cms_fallback_detected", cms=cms, url=url, status=resp.status)
+                    break
+            except (urllib.error.HTTPError, urllib.error.URLError, OSError, Exception):
+                continue
+
     # Determine WAF
     waf = None
     if wafw00f_result:

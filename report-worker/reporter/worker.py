@@ -69,7 +69,7 @@ def _build_findings_data(claude_output: dict, package: str, report_data: dict | 
         "severity_counts": counts,
         "findings": findings,
         "positive_findings": claude_output.get("positive_findings", []),
-        "recommendations": claude_output.get("recommendations", []),
+        "recommendations": claude_output.get("recommendations") or claude_output.get("top_recommendations", []),
         "package": package,
     }
 
