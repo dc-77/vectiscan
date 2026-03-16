@@ -69,10 +69,16 @@ def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
 
 HOST_STRATEGY_SYSTEM = """Du bist ein Security-Scanner-Orchestrator. Du entscheidest, welche Hosts gescannt werden.
 
+WICHTIG ZU FQDNs:
+- Jeder Host hat eine Liste von FQDNs die auf dieselbe IP zeigen
+- Die ERSTE FQDN in der Liste ist die relevanteste (Basisdomain vor www vor Subdomains)
+- Wenn ein Host sowohl die Basisdomain als auch Mail-FQDNs enthält, ist er IMMER ein Web-Host
+- Beurteile den Host nach seiner wichtigsten FQDN, nicht nach Mail-Subdomains
+
 REGELN:
-- Basisdomain und www-Subdomain: IMMER scannen (action: "scan")
-- Webserver mit interaktivem Content (Apps, APIs, CMS): scan
-- Reine Mailserver (nur MX, SMTP, IMAP): skip
+- Basisdomain und www-Subdomain: IMMER scannen (action: "scan"), höchste Priorität
+- Webserver mit interaktivem Content (Apps, APIs, CMS, Shops): scan
+- Reine Mailserver (nur MX, SMTP, IMAP, kein Web-Content): skip
 - Parking-Pages, Redirect-only Hosts: skip
 - CDN-Edge-Nodes (nur CDN-IP, kein eigener Content): skip
 - Wenn unklar: lieber scannen als überspringen
@@ -145,7 +151,7 @@ Antwort im Format:
 PHASE2_CONFIG_SYSTEM = """Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts.
 
 VERFÜGBARE NUCLEI-TAGS (wichtigste):
-wordpress, apache, nginx, iis, php, java, python, nodejs, rails, laravel, django, spring, tomcat, jboss, weblogic, coldfusion, drupal, joomla, magento, shopify, struts, exposure, network, ssl, dns, cve, default-login, misconfig, tech, token, sqli, xss, lfi, rfi, ssrf, redirect, upload
+wordpress, apache, nginx, iis, php, java, python, nodejs, rails, laravel, django, spring, tomcat, jboss, weblogic, coldfusion, drupal, joomla, magento, shopify, shopware, prestashop, struts, exposure, network, ssl, dns, cve, default-login, misconfig, tech, token, sqli, xss, lfi, rfi, ssrf, redirect, upload
 
 NIKTO-TUNING-KATEGORIEN:
 1=Interesting File, 2=Misconfiguration, 3=Information Disclosure, 4=Injection (XSS/Script), 5=Remote File Retrieval, 6=Denial of Service, 7=Remote File Retrieval (Server Wide), 8=Command Execution, 9=SQL Injection, 0=File Upload
@@ -164,6 +170,7 @@ REGELN:
 - Nuclei-Tags sollten zur erkannten Technologie passen
 - Immer "exposure" und "misconfig" als Tags einschließen
 - Bei WordPress: "wordpress" Tag UND wordpress Wordlist
+- Bei Shopware: "shopware" Tag UND cms Wordlist
 - Bei API-Hosts: "api" Wordlist, exposure + token Tags
 - Bei WAF vorhanden: "dos" und "fuzz" ausschließen (werden geblockt)
 - nikto_tuning auf relevante Kategorien beschränken

@@ -232,7 +232,8 @@ def build_tech_profile(
     else:
         techs = []
 
-    cms_names = {"wordpress", "joomla", "drupal", "typo3", "magento", "shopify", "wix"}
+    cms_names = {"wordpress", "joomla", "drupal", "typo3", "magento", "shopify",
+                  "shopware", "wix", "prestashop", "contao", "neos", "craft", "strapi", "ghost"}
     for tech in techs:
         if isinstance(tech, dict):
             name = tech.get("name", "").lower()
@@ -320,14 +321,33 @@ def run_phase1(
     nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports)
     progress_callback(order_id, "nmap", "complete")
 
-    # Use first FQDN for web-based tools
+    # Use the most relevant FQDN for web tools (base domain > www > subdomains > mail)
+    # fqdns list is already sorted by relevance from phase0
     primary_fqdn = fqdns[0] if fqdns else ip
 
-    # Run webtech
-    webtech_result = run_webtech(primary_fqdn, host_dir, order_id)
+    # Probe multiple non-mail FQDNs to detect different services per IP
+    from scanner.phase0 import _is_mail_only_fqdn
+    probe_fqdns = [f for f in fqdns if not _is_mail_only_fqdn(f)][:3]
+    if not probe_fqdns:
+        probe_fqdns = [primary_fqdn]
+
+    # Run webtech on all relevant FQDNs — merge results
+    webtech_result: list[dict] | dict | None = None
+    for fqdn in probe_fqdns:
+        result = run_webtech(fqdn, host_dir, order_id)
+        if result:
+            if webtech_result is None:
+                webtech_result = result
+            elif isinstance(webtech_result, list) and isinstance(result, list):
+                webtech_result.extend(result)
+            elif isinstance(webtech_result, dict) and isinstance(result, dict):
+                # Merge tech lists
+                existing = webtech_result.get("tech", [])
+                new_techs = result.get("tech", [])
+                webtech_result["tech"] = existing + new_techs
     progress_callback(order_id, "webtech", "complete")
 
-    # Run wafw00f
+    # Run wafw00f on primary FQDN
     wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, order_id)
     progress_callback(order_id, "wafw00f", "complete")
 

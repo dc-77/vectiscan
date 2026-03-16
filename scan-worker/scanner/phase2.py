@@ -513,6 +513,7 @@ def run_phase2(
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
 
+    # fqdns list is already sorted by relevance from phase0 (base domain first)
     primary_fqdn = fqdns[0] if fqdns else ip
     has_ssl = tech_profile.get("has_ssl", False)
 

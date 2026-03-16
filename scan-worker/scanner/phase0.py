@@ -437,6 +437,32 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
     return records
 
 
+_MAIL_PREFIXES = ("mail.", "email.", "mx.", "smtp.", "imap.", "pop.",
+                   "autodiscover.", "exchange.", "webmail.", "fin-mail.")
+
+
+def _sort_fqdns_by_relevance(fqdns: list[str], domain: str) -> list[str]:
+    """Sort FQDNs by scanning relevance: base domain first, www second, mail last."""
+    domain_lower = domain.lower()
+
+    def priority(fqdn: str) -> int:
+        f = fqdn.lower()
+        if f == domain_lower:
+            return 0  # Base domain always first
+        if f == f"www.{domain_lower}":
+            return 1  # www second
+        if any(f.startswith(p) for p in _MAIL_PREFIXES):
+            return 9  # Mail FQDNs last
+        return 5  # Everything else in the middle
+
+    return sorted(fqdns, key=lambda f: (priority(f), f))
+
+
+def _is_mail_only_fqdn(fqdn: str) -> bool:
+    """Check if an FQDN is purely mail-related."""
+    return any(fqdn.lower().startswith(p) for p in _MAIL_PREFIXES)
+
+
 def merge_and_group(
     domain: str,
     all_subdomains: list[str],
@@ -511,7 +537,7 @@ def merge_and_group(
 
         hosts.append({
             "ip": ip,
-            "fqdns": sorted(fqdns),
+            "fqdns": _sort_fqdns_by_relevance(list(fqdns), domain),
             "rdns": rdns,
         })
 
