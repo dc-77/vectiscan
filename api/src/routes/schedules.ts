@@ -3,7 +3,7 @@
  */
 import { FastifyInstance } from 'fastify';
 import { query } from '../lib/db.js';
-import { requireAuth } from './auth.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
