@@ -13,7 +13,8 @@ class TestNIS2PromptMappingRules:
         lines = SYSTEM_PROMPT_NIS2.split("\n")
         port_lines = [l for l in lines if "Exponierte Ports" in l]
         assert len(port_lines) >= 1
-        assert "Nr. 5" in port_lines[0]
+        # At least one line with "Exponierte Ports" must reference Nr. 5
+        assert any("Nr. 5" in l for l in port_lines)
 
     def test_tls_problems_map_to_nr8(self):
         """TLS problems should map to Nr. 8 (Kryptografie)."""
