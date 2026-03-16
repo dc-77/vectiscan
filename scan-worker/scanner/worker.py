@@ -217,7 +217,7 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
     # Update discovered hosts count to reflect actual scan targets
     set_discovered_hosts(order_id, {**host_inventory, "hosts": scan_hosts})
 
-    # ── Phase 1 + 2: Per-Host scanning (sequential) ────────
+    # ── Phase 1: Tech Detection (all hosts) ─────────────────
     tech_profiles: list[dict[str, Any]] = []
 
     for idx, host in enumerate(scan_hosts):
@@ -234,42 +234,62 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
             tech_profiles.append({"ip": ip, "fqdns": fqdns, "skipped": True, "reason": "unreachable"})
             continue
 
-        # Phase 1: Technology detection
-        def p1_callback(oid: str, tool: str, status: str) -> None:
-            update_progress(oid, "scan_phase1", tool, host=ip,
-                            hosts_completed=idx, hosts_total=hosts_total)
-            _check_timeout()
-
         update_progress(order_id, "scan_phase1", "starting", host=ip,
                         hosts_completed=idx, hosts_total=hosts_total)
+
+        def p1_callback(oid: str, tool: str, status: str, _ip: str = ip, _idx: int = idx) -> None:
+            update_progress(oid, "scan_phase1", tool, host=_ip,
+                            hosts_completed=_idx, hosts_total=hosts_total)
+            _check_timeout()
+
         tech_profile = run_phase1(ip, fqdns, scan_dir, order_id, p1_callback, config)
         tech_profiles.append(tech_profile)
 
+    log.info("phase1_complete", order_id=order_id, profiles=len(tech_profiles))
+
+    # ── AI Phase 2 Config (all hosts, after all Phase 1) ──
+    adaptive_configs: dict[str, dict[str, Any]] = {}
+
+    for host, profile in zip(scan_hosts, tech_profiles):
+        ip = host["ip"]
+        if profile.get("skipped"):
+            continue
+
         _check_timeout()
 
-        # AI Phase 2 config: adapt tools to discovered tech stack
-        adaptive_config = plan_phase2_config(tech_profile, host_inventory, package)
+        adaptive_config = plan_phase2_config(profile, host_inventory, package)
+        adaptive_configs[ip] = adaptive_config
+
         adaptive_json = json.dumps(adaptive_config, indent=2, ensure_ascii=False)
         _save_result(order_id=order_id, host_ip=ip, phase=1,
                      tool_name="ai_phase2_config", raw_output=adaptive_json,
                      exit_code=0, duration_ms=0)
-
-        # Publish AI config event for frontend visualization
         publish_event(order_id, {"type": "ai_config", "ip": ip, "config": adaptive_config})
 
-        # Phase 2: Deep scan (with adaptive config)
-        def p2_callback(oid: str, tool: str, status: str) -> None:
-            update_progress(oid, "scan_phase2", tool, host=ip,
-                            hosts_completed=idx, hosts_total=hosts_total)
-            _check_timeout()
+    log.info("ai_phase2_configs_complete", order_id=order_id, configs=len(adaptive_configs))
+
+    # ── Phase 2: Deep Scan (all hosts) ────────────────────
+    scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]
+    scannable_total = len(scannable)
+
+    for idx, (host, tech_profile) in enumerate(scannable):
+        ip = host["ip"]
+        fqdns = host["fqdns"]
+
+        _check_timeout()
 
         update_progress(order_id, "scan_phase2", "starting", host=ip,
-                        hosts_completed=idx, hosts_total=hosts_total)
-        _check_timeout()
-        run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
-                   adaptive_config=adaptive_config)
+                        hosts_completed=idx, hosts_total=scannable_total)
 
-        log.info("host_complete", order_id=order_id, ip=ip, idx=idx + 1, total=hosts_total)
+        def p2_callback(oid: str, tool: str, status: str, _ip: str = ip, _idx: int = idx) -> None:
+            update_progress(oid, "scan_phase2", tool, host=_ip,
+                            hosts_completed=_idx, hosts_total=scannable_total)
+            _check_timeout()
+
+        run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
+                   adaptive_config=adaptive_configs.get(ip, {}))
+
+        log.info("host_phase2_complete", order_id=order_id, ip=ip, idx=idx + 1, total=scannable_total)
 
     # ── Finalize ────────────────────────────────────────────
     _finalize(order_id, scan_dir, host_inventory, tech_profiles, package)

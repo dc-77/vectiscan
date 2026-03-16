@@ -18,12 +18,17 @@ HAIKU_MODEL = "claude-haiku-4-5-20251001"
 # ---------------------------------------------------------------------------
 
 def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
-    """Call Claude Haiku and return parsed JSON response."""
+    """Call Claude Haiku and return parsed JSON response.
+
+    On failure, returns {"_error": "reason"} so callers can include the
+    specific error in fallback reasoning shown to the user.
+    """
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         log.warning("ai_strategy_no_api_key", msg="ANTHROPIC_API_KEY not set, skipping AI strategy")
-        return {}
+        return {"_error": "ANTHROPIC_API_KEY nicht gesetzt"}
 
+    raw = ""
     try:
         import anthropic
         client = anthropic.Anthropic(api_key=api_key)
@@ -51,11 +56,11 @@ def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
         return json.loads(text)
 
     except json.JSONDecodeError as e:
-        log.error("haiku_json_parse_error", error=str(e), raw=raw[:500] if 'raw' in dir() else "")
-        return {}
+        log.error("haiku_json_parse_error", error=str(e), raw=raw[:500])
+        return {"_error": f"JSON-Parse-Fehler: {e}"}
     except Exception as e:
         log.error("haiku_call_error", error=str(e))
-        return {}
+        return {"_error": f"API-Fehler: {e}"}
 
 
 # ---------------------------------------------------------------------------
@@ -112,16 +117,18 @@ Antwort im Format:
 
     result = _call_haiku(HOST_STRATEGY_SYSTEM, user_prompt)
 
+    error_detail = result.get("_error", "")
     if not result or "hosts" not in result:
         # Fallback: scan all hosts in original order
-        log.warning("ai_host_strategy_fallback", reason="no valid AI response")
+        reason = error_detail or "Ungültige KI-Antwort"
+        log.warning("ai_host_strategy_fallback", reason=reason)
         return {
             "hosts": [
                 {"ip": h["ip"], "action": "scan", "priority": i + 1,
-                 "reasoning": "Fallback — KI-Strategie nicht verfügbar"}
+                 "reasoning": f"Fallback — {reason}"}
                 for i, h in enumerate(hosts)
             ],
-            "strategy_notes": "Fallback: alle Hosts scannen (KI nicht verfügbar)"
+            "strategy_notes": f"Fallback: alle Hosts scannen ({reason})"
         }
 
     log.info("ai_host_strategy_complete",
@@ -191,16 +198,18 @@ Antwort im Format:
 
     result = _call_haiku(PHASE2_CONFIG_SYSTEM, user_prompt)
 
+    error_detail = result.get("_error", "")
     if not result or "nuclei_tags" not in result:
         # Fallback: default config (all tools, all templates)
-        log.warning("ai_phase2_config_fallback", ip=tech_profile.get("ip"), reason="no valid AI response")
+        reason = error_detail or "Ungültige KI-Antwort"
+        log.warning("ai_phase2_config_fallback", ip=tech_profile.get("ip"), reason=reason)
         return {
             "nuclei_tags": [],
             "nuclei_exclude_tags": [],
             "nikto_tuning": "1234567890",
             "gobuster_wordlist": "common",
             "skip_tools": [],
-            "reasoning": "Fallback — KI-Konfiguration nicht verfügbar, Standard-Einstellungen"
+            "reasoning": f"Fallback — {reason}"
         }
 
     log.info("ai_phase2_config_complete",
