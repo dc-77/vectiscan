@@ -356,8 +356,13 @@ def validate_cvss_scores(result: dict[str, Any]) -> dict[str, Any]:
         except (ValueError, TypeError):
             reported_score = 0.0
 
+        # Normalize "N/A" vectors to empty string
+        if vector == "N/A":
+            finding["cvss_vector"] = ""
+            vector = ""
+
         # Skip findings without CVSS (e.g. INFO findings, basic package)
-        if not vector or vector == "N/A":
+        if not vector:
             continue
 
         # Validate vector syntax

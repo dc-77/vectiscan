@@ -11,8 +11,25 @@ REGELN FÜR BEWERTUNG:
 - Bewerte nur, was der Scan tatsächlich nachweisen kann
 - Verwende Severity-Labels: CRITICAL, HIGH, MEDIUM, LOW, INFO
 - Jeder Finding MUSS einen CVSS v3.1 Score und Vektor haben
+- Bei INFO-Severity (Score 0.0): cvss_vector und cvss_score auf "" setzen
 - Maximal 5-8 Findings, fokussiert auf die wichtigsten Risiken
 - Management-tauglich formulieren, kein Fachjargon
+
+CVSS-SCORING — STRENGE OBERGRENZEN:
+- Information Disclosure (Banner, robots.txt, Pfade): MAXIMAL LOW (2.0-3.5)
+- Fehlende Security Headers: MAXIMAL MEDIUM (4.0-5.5)
+- SSH mit Key-Auth: INFO (0.0)
+- DNS-Records (SPF/DMARC/DKIM): MAXIMAL MEDIUM (4.0-5.5)
+- Exponierte Ports MIT Auth: MAXIMAL MEDIUM (5.0-6.5)
+- CVSS > 7.0 NUR bei nachgewiesener RCE, Auth Bypass oder Data Breach
+- "Connection refused" = INFO (0.0)
+""" + CWE_PROMPT_BLOCK + """
+HÄUFIG FALSCH BEWERTET:
+- robots.txt mit /admin Pfaden: LOW 2.5 (NICHT MEDIUM)
+- Server-Version im Banner: INFO (NICHT LOW)
+- Port offen, Connection refused: INFO (NICHT HIGH)
+- SSH mit Key-Auth, Passwort-Auth deaktiviert: INFO (NICHT LOW)
+- HTTP ohne HTTPS ohne Login-Formular: LOW 3.7
 
 REGELN FÜR TONALITÄT:
 - Professionell und sachlich, nicht alarmistisch
@@ -112,7 +129,7 @@ CVSS-SCORING — STRENGE OBERGRENZEN:
 - "Connection refused" auf einem Port = INFO (0.0), NICHT HIGH
 """ + CWE_PROMPT_BLOCK + """
 WICHTIG: Jeder Finding MUSS einen cvss_score und cvss_vector haben.
-Nur bei INFO-Severity (Score 0.0) darf der Vektor "N/A" sein.
+Bei INFO-Severity (Score 0.0): cvss_vector und cvss_score auf "" setzen (leerer String).
 
 HÄUFIG FALSCH BEWERTETE FINDINGS — Korrekte Scores:
 - SSH Port 22 offen, Key-Auth konfiguriert, Passwort-Auth deaktiviert:
