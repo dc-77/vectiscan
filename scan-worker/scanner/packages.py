@@ -10,7 +10,7 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
         "nmap_ports": "--top-ports 100",
         "phase1_tools": ["nmap", "webtech", "wafw00f"],
         "phase2_tools": ["testssl", "headers", "gowitness", "httpx", "wpscan"],
-        "total_timeout": 600,         # 10 Minuten
+        "total_timeout": 900,         # 15 Minuten
     },
     "professional": {
         "phase0_tools": ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"],

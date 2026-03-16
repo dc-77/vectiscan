@@ -530,6 +530,17 @@ def run_phase2(
 
     # fqdns list is already sorted by relevance from phase0 (base domain first)
     primary_fqdn = fqdns[0] if fqdns else ip
+
+    # Never skip tools on the base domain — it's the most important target
+    domain = config.get("domain", "") if config else ""
+    if domain:
+        domain_lower = domain.lower()
+        fqdns_lower = [f.lower() for f in fqdns]
+        if domain_lower in fqdns_lower or f"www.{domain_lower}" in fqdns_lower:
+            if ai_skip:
+                log.info("ai_skip_overridden_base_domain", ip=ip, fqdn=primary_fqdn,
+                         original_skip=list(ai_skip))
+                ai_skip = set()  # Override: full scan on base domain
     has_ssl = tech_profile.get("has_ssl", False)
 
     log.info("phase2_start", ip=ip, fqdn=primary_fqdn, order_id=order_id, has_ssl=has_ssl,

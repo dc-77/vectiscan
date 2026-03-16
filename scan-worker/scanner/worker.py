@@ -120,6 +120,7 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
     os.makedirs(scan_dir, exist_ok=True)
 
     config = get_config(package)
+    config["domain"] = domain  # Pass domain to Phase 2 for base-domain protection
 
     start = time.monotonic()
 

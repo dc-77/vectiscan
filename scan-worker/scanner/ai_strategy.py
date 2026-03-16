@@ -173,8 +173,14 @@ GOBUSTER-WORDLISTS:
 - "cms" — CMS-Admin-Panels und typische CMS-Pfade
 
 TOOLS DIE ÜBERSPRUNGEN WERDEN KÖNNEN:
-katana (Crawler — unnötig bei einfachen Seiten oder bekanntem CMS)
-gowitness (Screenshot — unnötig bei reinen API-Hosts)
+katana (Crawler — nur bei reinen API-Hosts ohne HTML überspringen)
+gowitness (Screenshot — nur bei reinen API-Hosts ohne HTML überspringen)
+
+WICHTIG FÜR skip_tools:
+- Für die Basisdomain und www-Subdomain: skip_tools MUSS IMMER leer sein []
+- Für Hosts mit Web-Content (has_web=true): skip_tools MUSS leer sein []
+- skip_tools nur für reine API-Hosts (kein HTML), reine Mailserver, oder minimale Services
+- Im Zweifel: skip_tools leer lassen — lieber ein Tool zu viel als wichtige Findings verpassen
 
 REGELN:
 - Nuclei-Tags sollten zur erkannten Technologie passen

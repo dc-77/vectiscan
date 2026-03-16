@@ -142,10 +142,12 @@ export function useTerminalFeed() {
           break;
 
         case 'dns_recon':
-          newLines.push({
-            id: lineId(), timestamp: now,
-            text: '▸ Phase 0: DNS-Reconnaissance', isHeader: true,
-          });
+          if (!phase0DoneRef.current) {
+            newLines.push({
+              id: lineId(), timestamp: now,
+              text: '▸ Phase 0: DNS-Reconnaissance', isHeader: true,
+            });
+          }
           break;
 
         case 'scan_phase1':
