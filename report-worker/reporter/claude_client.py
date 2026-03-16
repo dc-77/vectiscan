@@ -403,6 +403,10 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 # Remove first line (```json) and last line (```)
                 json_text = "\n".join(lines[1:-1])
 
+            # Fix trailing commas before } or ] (common Claude JSON issue)
+            import re
+            json_text = re.sub(r',\s*([\]}])', r'\1', json_text)
+
             result = json.loads(json_text)
             log.info(
                 "claude_api_success",
@@ -433,7 +437,12 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 )
 
         except json.JSONDecodeError as e:
-            raise RuntimeError(f"Failed to parse Claude response as JSON: {e}")
+            if attempt < max_retries - 1:
+                log.warning("claude_json_parse_error", attempt=attempt + 1, error=str(e),
+                            raw_snippet=json_text[:200] if 'json_text' in dir() else "")
+                time.sleep(3)
+            else:
+                raise RuntimeError(f"Failed to parse Claude response as JSON: {e}")
 
         except Exception as e:
             raise RuntimeError(f"Claude API error: {e}")

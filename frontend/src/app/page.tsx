@@ -310,9 +310,9 @@ function HomeContent() {
       <main className="grid gap-2 px-3 py-2 overflow-hidden"
         style={{
           height: 'calc(100vh - 40px)',
-          gridTemplateAreas: '"progress progress progress" "terminal center ailog" "hosts hosts hosts"',
+          gridTemplateAreas: '"progress progress progress" "terminal ailog sidebar" "terminal ailog hosts"',
           gridTemplateRows: 'auto 1fr auto',
-          gridTemplateColumns: '1fr 240px 1fr',
+          gridTemplateColumns: '1fr 1fr 260px',
         }}>
 
         {/* ─── Row 1: ScanProgress ──────────────────── */}
@@ -336,9 +336,9 @@ function HomeContent() {
           </div>
         </div>
 
-        {/* ─── Row 2 Center: Radar + Metrics ────────── */}
+        {/* ─── Right: Radar + Metrics ───────────────── */}
         <div className="hidden lg:flex rounded-lg border overflow-hidden flex-col"
-          style={{ gridArea: 'center', borderColor: panelBorder, background: panelBg }}>
+          style={{ gridArea: 'sidebar', borderColor: panelBorder, background: panelBg }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2" />
@@ -384,9 +384,9 @@ function HomeContent() {
           </div>
         </div>
 
-        {/* ─── Row 3: Discovered Hosts ──────────────── */}
-        <div className="rounded-lg border overflow-hidden flex flex-col"
-          style={{ gridArea: 'hosts', borderColor: panelBorder, background: panelBg, maxHeight: 140 }}>
+        {/* ─── Right Bottom: Discovered Hosts ─────────── */}
+        <div className="hidden lg:flex rounded-lg border overflow-hidden flex-col"
+          style={{ gridArea: 'hosts', borderColor: panelBorder, background: panelBg }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
             <span className={`w-1.5 h-1.5 rounded-full mr-2 ${intelligenceHosts.length > 0 ? 'bg-blue-500' : 'bg-slate-600'}`} />
