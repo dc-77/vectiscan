@@ -14,6 +14,7 @@ const MIGRATION_004_PATH = path.join(__dirname, '..', 'migrations', '004_add_man
 const MIGRATION_005_PATH = path.join(__dirname, '..', 'migrations', '005_users.sql');
 const MIGRATION_006_PATH = path.join(__dirname, '..', 'migrations', '006_password_reset.sql');
 const MIGRATION_007_PATH = path.join(__dirname, '..', 'migrations', '007_report_findings_data.sql');
+const MIGRATION_008_PATH = path.join(__dirname, '..', 'migrations', '008_scan_schedules.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -79,6 +80,18 @@ export async function initDb(): Promise<void> {
 
   if (!findingsColCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_007_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 008: scan_schedules table
+  const schedulesCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables WHERE table_name = 'scan_schedules'
+    ) AS exists
+  `);
+
+  if (!schedulesCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_008_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 
