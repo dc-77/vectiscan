@@ -386,7 +386,8 @@ def run_phase1(
     from scanner.tools import _save_result
     _save_result(order_id=order_id, host_ip=ip, phase=1,
                  tool_name="webtech",
-                 raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False) if webtech_result else None,
+                 raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False) if webtech_result
+                     else f"webtech failed for all FQDNs: {', '.join(probe_fqdns)} (tried HTTPS + HTTP)",
                  exit_code=0 if webtech_result else 1,
                  duration_ms=0)
 
@@ -394,12 +395,7 @@ def run_phase1(
     wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, order_id)
     progress_callback(order_id, "wafw00f", "complete")
 
-    # Save wafw00f result to scan_results
-    _save_result(order_id=order_id, host_ip=ip, phase=1,
-                 tool_name="wafw00f",
-                 raw_output=json.dumps(wafw00f_result, indent=2, ensure_ascii=False) if wafw00f_result else None,
-                 exit_code=0 if wafw00f_result else 1,
-                 duration_ms=0)
+    # wafw00f already saved to scan_results by run_tool() inside run_wafw00f()
 
     # Build combined tech profile
     tech_profile = build_tech_profile(
