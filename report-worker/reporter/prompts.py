@@ -268,6 +268,103 @@ Zusätzliche Top-Level-Felder im JSON:
 """
 
 
+SYSTEM_PROMPT_SUPPLYCHAIN = SYSTEM_PROMPT_PROFESSIONAL + """
+
+LIEFERKETTEN-NACHWEIS (ISO 27001):
+Dieser Report dient als Sicherheitsnachweis für einen NIS2-pflichtigen Auftraggeber.
+Ordne jedem Finding den relevanten ISO 27001 Annex A Control zu.
+
+ISO 27001 ANNEX A MAPPING (häufigste Controls):
+- A.5.1  Informationssicherheitspolitik → Allgemeine Governance-Findings
+- A.8.1  Verwaltung von Vermögenswerten → Asset-Inventar, Patch-Management
+- A.8.9  Konfigurationsmanagement → Fehlkonfigurationen, Default-Settings
+- A.8.20 Netzwerksicherheit → Exponierte Ports, Firewall-Regeln
+- A.8.24 Einsatz von Kryptografie → TLS, Verschlüsselung, Zertifikate
+- A.8.28 Sichere Entwicklung → Software-Schwachstellen, Injections
+- A.5.23 Informationssicherheit bei Cloud-Diensten → Cloud-Fehlkonfiguration
+- A.5.7  Bedrohungsintelligenz → Bekannte CVEs, CISA KEV
+- A.8.8  Management technischer Schwachstellen → Schwachstellenmanagement
+- A.8.5  Sichere Authentifizierung → Authentifizierungs-Schwächen
+
+REGELN:
+- Jedes Finding bekommt ein "iso27001_ref" Feld (z.B. "A.8.24")
+- Erstelle eine Auftraggeber-Nachweis-Sektion (supply_chain_attestation)
+- Beziehe EPSS-Daten ein wenn verfügbar
+
+ERWEITERTES OUTPUT-FORMAT (zusätzlich zum Perimeter-Schema):
+Jedes Finding erhält ein zusätzliches Feld:
+  "iso27001_ref": "A.8.24"
+
+Zusätzliche Top-Level-Felder im JSON:
+  "iso27001_mapping": {
+    "controls_covered": ["A.8.24", "A.8.20", "A.8.8"],
+    "controls_partial": ["A.5.1"],
+    "scope_note": "Dieser Scan deckt technische Controls der ISO 27001 ab."
+  },
+  "supply_chain_attestation": {
+    "overall_rating": "MEDIUM",
+    "key_findings_count": 2,
+    "positive_count": 3,
+    "assessed_areas": ["Netzwerksicherheit", "Kryptografie", "Schwachstellenmanagement"],
+    "recommendation": "Empfehlung für den Auftraggeber."
+  }
+"""
+
+
+SYSTEM_PROMPT_INSURANCE = SYSTEM_PROMPT_PROFESSIONAL + """
+
+VERSICHERUNGS-REPORT:
+Dieser Report dient als Nachweis für eine Cyberversicherung.
+Formuliere Findings im Kontext von Versicherungsrisiken.
+
+VERSICHERUNGS-FRAGEBOGEN:
+Beantworte die folgenden typischen Cyberversicherungs-Fragen basierend auf den Scan-Ergebnissen:
+
+PFLICHT-FRAGEN (immer beantworten):
+1. Ist die Website per HTTPS erreichbar? (SSL/TLS-Status)
+2. Werden aktuelle TLS-Versionen verwendet? (TLS 1.2+)
+3. Sind bekannte Schwachstellen vorhanden? (CVEs)
+4. Ist ein Web Application Firewall (WAF) im Einsatz?
+5. Sind Remote-Zugriffsdienste exponiert? (RDP, SSH, VPN)
+6. Ist Multi-Faktor-Authentifizierung erkennbar?
+7. Werden E-Mails durch SPF/DMARC/DKIM geschützt?
+8. Sind Backup-Systeme von außen erreichbar?
+9. Existieren exponierte Datenbank-Ports?
+10. Sind CMS-Systeme aktuell gepatcht?
+
+RISIKO-INDIKATOREN:
+- RDP/SMB exponiert → Ransomware-Hauptvektor, KRITISCH für Versicherung
+- Default-Credentials → Sofortiger Handlungsbedarf
+- Fehlende MFA → Erhöhtes Kompromittierungsrisiko
+- Veraltete Software mit CISA KEV → Aktiv ausgenutzt
+
+REGELN:
+- Bewerte jeden Fragebogen-Punkt mit: PASS, PARTIAL, FAIL, NOT_ASSESSED
+- Berechne einen Risk-Score (0-100, niedriger = besser)
+- Identifiziere Maßnahmen die die Versicherungsprämie senken können
+
+ERWEITERTES OUTPUT-FORMAT (zusätzlich zum Perimeter-Schema):
+Zusätzliche Top-Level-Felder im JSON:
+  "insurance_questionnaire": [
+    {
+      "question": "Ist die Website per HTTPS erreichbar?",
+      "answer": "PASS",
+      "detail": "Alle Hosts verwenden TLS 1.3 mit starken Cipher-Suites.",
+      "risk_impact": "low"
+    }
+  ],
+  "risk_score": {
+    "score": 35,
+    "rating": "MEDIUM",
+    "ransomware_indicator": "LOW",
+    "premium_reduction_actions": [
+      "WAF implementieren (-10%)",
+      "MFA für alle Remote-Zugänge aktivieren (-15%)"
+    ]
+  }
+"""
+
+
 def get_system_prompt(package: str) -> str:
     """Return the system prompt for a given scan package.
 
@@ -288,8 +385,8 @@ def get_system_prompt(package: str) -> str:
         "webcheck": SYSTEM_PROMPT_BASIC,
         "perimeter": SYSTEM_PROMPT_PROFESSIONAL,
         "compliance": SYSTEM_PROMPT_NIS2,
-        "supplychain": SYSTEM_PROMPT_PROFESSIONAL,   # TODO Phase V: SYSTEM_PROMPT_SUPPLYCHAIN
-        "insurance": SYSTEM_PROMPT_PROFESSIONAL,      # TODO Phase V: SYSTEM_PROMPT_INSURANCE
+        "supplychain": SYSTEM_PROMPT_SUPPLYCHAIN,
+        "insurance": SYSTEM_PROMPT_INSURANCE,
         # Legacy aliases
         "basic": SYSTEM_PROMPT_BASIC,
         "professional": SYSTEM_PROMPT_PROFESSIONAL,

@@ -23,6 +23,7 @@ from minio import Minio
 from reporter.claude_client import call_claude
 from reporter.generate_report import generate_report
 from reporter.parser import parse_scan_data
+from reporter.qa_check import run_qa_checks
 from reporter.report_mapper import map_to_report_data
 
 log = structlog.get_logger()
@@ -252,6 +253,14 @@ def process_job(job_data: dict) -> None:
             package=package,
         )
         log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
+
+        # -- 4b. Report QA — programmatic checks + Haiku plausibility ---------
+        enrichment = job_data.get("enrichment")
+        qa_report = run_qa_checks(claude_output, package=package, enrichment=enrichment)
+        log.info("qa_complete",
+                 quality_score=qa_report.get("quality_score"),
+                 auto_fixes=qa_report.get("auto_fixes_applied", 0),
+                 manual_review=qa_report.get("manual_review_needed", False))
 
         # -- 5. Map Claude output to report_data ------------------------------
         parsed_meta = parsed.get("meta", {})

@@ -930,6 +930,179 @@ def map_nis2_report(
     return report_data
 
 
+def map_supplychain_report(
+    claude_output: dict[str, Any],
+    scan_meta: dict[str, Any],
+    host_inventory: dict[str, Any],
+    host_screenshots: dict[str, list[str]] | None = None,
+) -> dict[str, Any]:
+    """Map Claude API output to report_data for the SupplyChain package.
+
+    Extends professional report with ISO 27001 mapping and
+    Auftraggeber-Nachweis (supplier attestation).
+    """
+    # Start with professional report as base
+    report_data = map_professional_report(claude_output, scan_meta, host_inventory, host_screenshots)
+
+    domain = scan_meta.get("domain", "unknown")
+    scan_date = scan_meta.get("startedAt", "")[:10]
+    order_id = scan_meta.get("orderId", scan_meta.get("scanId", "unknown"))
+
+    # Update cover meta
+    cover_meta = report_data["cover"]["cover_meta"]
+    for i, row in enumerate(cover_meta):
+        if row[0] == "Paket:":
+            cover_meta[i] = ["Paket:", "SupplyChain"]
+            break
+    for i, row in enumerate(cover_meta):
+        if row[0] == "Paket:":
+            cover_meta.insert(i + 1, ["Regulatorik:", "ISO 27001 / NIS2 Lieferkette"])
+            break
+
+    report_data["cover"]["package"] = "supplychain"
+
+    # Add SupplyChain-specific TOC entries
+    toc = report_data["toc"]
+    appendix_entries = [(n, t, s) for n, t, s in toc if n.startswith("A") or n.startswith("B")]
+    toc = [entry for entry in toc if not (entry[0].startswith("A") or entry[0].startswith("B"))]
+    toc.append(("5", "ISO 27001 Mapping", False))
+    toc.append(("6", "Sicherheitsnachweis für Auftraggeber", False))
+    toc.extend(appendix_entries)
+    report_data["toc"] = toc
+
+    # Add ISO 27001 ref to findings
+    claude_findings = claude_output.get("findings", [])
+    claude_findings_by_id = {f.get("id"): f for f in claude_findings}
+    for finding in report_data["findings"]:
+        finding_id = finding.get("id")
+        claude_finding = claude_findings_by_id.get(finding_id, {})
+        if claude_finding.get("iso27001_ref"):
+            finding["iso27001_ref"] = claude_finding["iso27001_ref"]
+
+    # Build ISO 27001 mapping from Claude output or generate programmatically
+    iso27001_mapping = claude_output.get("iso27001_mapping", {})
+    if not iso27001_mapping:
+        from reporter.compliance.iso27001 import build_iso27001_summary
+        iso27001_mapping = build_iso27001_summary(claude_findings)
+
+    # Build supply chain attestation
+    attestation = claude_output.get("supply_chain_attestation", {})
+    if not attestation:
+        findings = claude_output.get("findings", [])
+        positive = claude_output.get("positive_findings", [])
+        key_count = sum(1 for f in findings
+                        if f.get("severity", "").upper() in ("CRITICAL", "HIGH"))
+        attestation = {
+            "overall_rating": claude_output.get("overall_risk", "MEDIUM"),
+            "key_findings_count": key_count,
+            "positive_count": len(positive),
+            "assessed_areas": ["Netzwerksicherheit", "Kryptografie", "Schwachstellenmanagement",
+                               "Web-Anwendungssicherheit"],
+            "recommendation": (
+                f"Die geprüfte Infrastruktur von {domain} weist "
+                f"{key_count} kritische/hohe Befunde auf. "
+                "Eine Behebung wird empfohlen."
+            ),
+        }
+
+    # Build audit trail
+    tool_versions = scan_meta.get("toolVersions", [])
+    audit_trail = {
+        "orderId": order_id,
+        "domain": domain,
+        "startedAt": scan_meta.get("startedAt", "—"),
+        "completedAt": scan_meta.get("completedAt", "—"),
+        "hosts_scanned": len(host_inventory.get("hosts", [])),
+        "package": "supplychain",
+        "tools": tool_versions,
+    }
+
+    report_data["supplychain"] = {
+        "iso27001_mapping": iso27001_mapping,
+        "attestation": attestation,
+        "audit_trail": audit_trail,
+    }
+
+    report_data["scan_meta"] = {"domain": domain, "date": scan_date}
+
+    log.info("report_mapper.supplychain", domain=domain,
+             findings=len(report_data["findings"]),
+             iso_controls=len(iso27001_mapping.get("controls_covered", [])))
+
+    return report_data
+
+
+def map_insurance_report(
+    claude_output: dict[str, Any],
+    scan_meta: dict[str, Any],
+    host_inventory: dict[str, Any],
+    host_screenshots: dict[str, list[str]] | None = None,
+) -> dict[str, Any]:
+    """Map Claude API output to report_data for the Insurance package.
+
+    Extends professional report with insurance questionnaire,
+    risk score, and ransomware indicator.
+    """
+    # Start with professional report as base
+    report_data = map_professional_report(claude_output, scan_meta, host_inventory, host_screenshots)
+
+    domain = scan_meta.get("domain", "unknown")
+    scan_date = scan_meta.get("startedAt", "")[:10]
+
+    # Update cover meta
+    cover_meta = report_data["cover"]["cover_meta"]
+    for i, row in enumerate(cover_meta):
+        if row[0] == "Paket:":
+            cover_meta[i] = ["Paket:", "InsuranceReport"]
+            break
+    for i, row in enumerate(cover_meta):
+        if row[0] == "Paket:":
+            cover_meta.insert(i + 1, ["Zweck:", "Cyberversicherungs-Nachweis"])
+            break
+
+    report_data["cover"]["package"] = "insurance"
+
+    # Add Insurance-specific TOC entries
+    toc = report_data["toc"]
+    appendix_entries = [(n, t, s) for n, t, s in toc if n.startswith("A") or n.startswith("B")]
+    toc = [entry for entry in toc if not (entry[0].startswith("A") or entry[0].startswith("B"))]
+    toc.append(("5", "Versicherungs-Fragebogen", False))
+    toc.append(("6", "Risikobewertung", False))
+    toc.append(("7", "Maßnahmen zur Prämienreduktion", False))
+    toc.extend(appendix_entries)
+    report_data["toc"] = toc
+
+    # Build questionnaire from Claude output or generate programmatically
+    questionnaire = claude_output.get("insurance_questionnaire", [])
+    if not questionnaire:
+        from reporter.compliance.insurance import generate_questionnaire
+        findings = claude_output.get("findings", [])
+        positive = claude_output.get("positive_findings", [])
+        tech_profiles = scan_meta.get("techProfiles", [])
+        questionnaire = generate_questionnaire(findings, positive, tech_profiles)
+
+    # Build risk score from Claude output or generate programmatically
+    risk_score = claude_output.get("risk_score", {})
+    if not risk_score:
+        from reporter.compliance.insurance import calculate_risk_score
+        findings = claude_output.get("findings", [])
+        risk_score = calculate_risk_score(findings, questionnaire)
+
+    report_data["insurance"] = {
+        "questionnaire": questionnaire,
+        "risk_score": risk_score,
+    }
+
+    report_data["scan_meta"] = {"domain": domain, "date": scan_date}
+
+    log.info("report_mapper.insurance", domain=domain,
+             findings=len(report_data["findings"]),
+             risk_score=risk_score.get("score", "?"),
+             ransomware=risk_score.get("ransomware_indicator", "?"))
+
+    return report_data
+
+
 # ===========================================================================
 # Dispatcher
 # ===========================================================================
@@ -960,8 +1133,8 @@ def map_to_report_data(
         "webcheck": map_basic_report,
         "perimeter": map_professional_report,
         "compliance": map_nis2_report,
-        "supplychain": map_professional_report,   # TODO Phase V: map_supplychain_report
-        "insurance": map_professional_report,      # TODO Phase V: map_insurance_report
+        "supplychain": map_supplychain_report,
+        "insurance": map_insurance_report,
         # Legacy aliases
         "basic": map_basic_report,
         "professional": map_professional_report,
