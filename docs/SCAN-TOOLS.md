@@ -1,5 +1,26 @@
 # VectiScan — Scan-Tools Referenz
 
+## Pakete
+
+Drei Pakete steuern, welche Tools in welcher Phase laufen:
+
+| | Basic | Professional | NIS2 |
+|---|---|---|---|
+| **Phase 0 Tools** | crtsh, subfinder, dnsx | crtsh, subfinder, amass, gobuster_dns, axfr, dnsx | = Professional |
+| **Phase 0 Timeout** | 5 Min | 10 Min | 10 Min |
+| **Max Hosts** | 5 | 10 | 10 |
+| **Nmap Ports** | `--top-ports 100` | `--top-ports 1000` | `--top-ports 1000` |
+| **Phase 1 Tools** | nmap, webtech, wafw00f | nmap, webtech, wafw00f | = Professional |
+| **Phase 2 Tools** | testssl, headers, gowitness, httpx, wpscan | testssl, nikto, nuclei, gobuster_dir, gowitness, headers, httpx, katana, wpscan | = Professional |
+| **Nuclei Severity** | high, critical | low, medium, high, critical | = Professional |
+| **Nuclei Timeout** | 10 Min | 25 Min | 25 Min |
+| **Gesamt-Timeout** | 15 Min | 120 Min | 120 Min |
+| **Geschätzte Dauer** | ~10 Min | ~45 Min | ~45 Min |
+
+Quelle: `scan-worker/scanner/packages.py`
+
+---
+
 ## Scan-Ablauf (Phase-First Architektur)
 
 ```
