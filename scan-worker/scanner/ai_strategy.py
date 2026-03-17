@@ -186,6 +186,19 @@ PHASE2_CONFIG_SYSTEM = """Du bist ein Security-Scanner-Orchestrator. Du konfigur
 VERFÜGBARE NUCLEI-TAGS (wichtigste):
 wordpress, apache, nginx, iis, php, java, python, nodejs, rails, laravel, django, spring, tomcat, jboss, weblogic, coldfusion, drupal, joomla, magento, shopify, shopware, prestashop, struts, exposure, network, ssl, dns, cve, default-login, misconfig, tech, token, sqli, xss, lfi, rfi, ssrf, redirect, upload
 
+CMS-SPEZIFISCHE NUCLEI-TAG-EMPFEHLUNGEN:
+- WordPress     → nuclei_tags: ["wordpress", "wp-plugin", "wp-theme"]
+- Shopware 5/6  → nuclei_tags: ["shopware", "php", "exposure", "misconfig"]
+- TYPO3         → nuclei_tags: ["typo3", "php", "exposure", "misconfig"]
+- Joomla        → nuclei_tags: ["joomla", "php", "exposure"]
+- Drupal        → nuclei_tags: ["drupal", "php", "exposure"]
+- Contao        → nuclei_tags: ["php", "exposure", "misconfig"]
+- Magento       → nuclei_tags: ["magento", "php", "exposure", "token"]
+- Strapi        → nuclei_tags: ["nodejs", "exposure", "misconfig", "api"]
+- Ghost         → nuclei_tags: ["nodejs", "exposure", "misconfig"]
+Wenn kein CMS erkannt: → Standard-Tags basierend auf Tech-Stack (Apache/nginx/PHP/Node)
+Wenn WordPress erkannt: → wpscan wird automatisch aktiviert
+
 NIKTO-TUNING-KATEGORIEN:
 1=Interesting File, 2=Misconfiguration, 3=Information Disclosure, 4=Injection (XSS/Script), 5=Remote File Retrieval, 6=Denial of Service, 7=Remote File Retrieval (Server Wide), 8=Command Execution, 9=SQL Injection, 0=File Upload
 
@@ -195,9 +208,29 @@ GOBUSTER-WORDLISTS:
 - "api" — API-Endpunkte (swagger, graphql, /api/v1, actuator)
 - "cms" — CMS-Admin-Panels und typische CMS-Pfade
 
+FFUF-KONFIGURATION:
+- ffuf_mode: "dir" (Default, Extension-Fuzzing), "vhost" (Virtual-Host-Discovery), "param" (Parameter-Discovery)
+- ffuf_extensions: Dateiendungen zum Fuzzen (z.B. ".php,.html,.js,.bak,.old,.conf")
+- Bei PHP-Servern: ".php,.phtml,.inc,.bak,.old,.conf"
+- Bei Node.js: ".js,.json,.env,.bak"
+- Bei statischen Seiten: ".html,.htm,.txt,.xml,.json"
+- Modus "vhost": Nur bei Hosts mit IP-basiertem Zugriff sinnvoll (suche versteckte VHosts)
+- Modus "param": Nur wenn katana-Ergebnisse vorliegen
+
+FEROXBUSTER-KONFIGURATION:
+- feroxbuster_depth: Rekursionstiefe 1–4 (Default: 2)
+  - Tiefe 1: Flach, schnell — für einfache Webseiten
+  - Tiefe 2: Standard — findet versteckte Admin-Bereiche
+  - Tiefe 3: Tief — für komplexe Apps mit verschachtelten Pfaden
+  - Tiefe 4: Maximal — nur bei verdächtigen Hosts mit vielen Verzeichnissen
+- feroxbuster_enabled: false → nur bei reinen API-Hosts ohne Directory-Struktur
+
+DALFOX-KONFIGURATION:
+- dalfox_enabled: true (Default) — XSS-Scanner auf katana-URLs mit Parametern
+- dalfox_enabled: false → bei statischen Seiten ohne dynamische Parameter
+
 TOOLS DIE ÜBERSPRUNGEN WERDEN KÖNNEN:
-katana (Crawler — nur bei reinen API-Hosts ohne HTML überspringen)
-gowitness (Screenshot — nur bei reinen API-Hosts ohne HTML überspringen)
+katana, gowitness, ffuf, feroxbuster, dalfox
 
 WICHTIG FÜR skip_tools:
 - Für die Basisdomain und www-Subdomain: skip_tools MUSS IMMER leer sein []
@@ -213,6 +246,9 @@ REGELN:
 - Bei API-Hosts: "api" Wordlist, exposure + token Tags
 - Bei WAF vorhanden: "dos" und "fuzz" ausschließen (werden geblockt)
 - nikto_tuning auf relevante Kategorien beschränken
+- ffuf_extensions passend zur Server-Technologie wählen
+- feroxbuster_depth erhöhen bei Hosts mit vielen Verzeichnissen
+- dalfox_enabled=false bei statischen Sites
 
 WICHTIG FÜR NUCLEI-TAGS (Performance):
 - Verwende NIEMALS den Tag "cve" allein — das matcht 3000+ Templates und dauert zu lange
@@ -229,6 +265,11 @@ PHASE2_CONFIG_SCHEMA = """{
   "nuclei_exclude_tags": ["dos", "fuzz"],
   "nikto_tuning": "1,2,3,4",
   "gobuster_wordlist": "common|wordpress|api|cms",
+  "ffuf_mode": "dir|vhost|param",
+  "ffuf_extensions": ".php,.html,.js,.bak,.old,.conf",
+  "feroxbuster_depth": 2,
+  "feroxbuster_enabled": true,
+  "dalfox_enabled": true,
   "skip_tools": [],
   "reasoning": "Kurze Begründung der Konfiguration"
 }"""
@@ -240,8 +281,28 @@ def plan_phase2_config(
     package: str,
 ) -> dict[str, Any]:
     """Use Haiku to configure Phase 2 tools based on discovered tech stack."""
+
+    # Build enriched input: tech profile + CMS details + Shodan services
+    enriched_profile = {**tech_profile}
+
+    # Include CMS fingerprinting details if available
+    cms_details = tech_profile.get("cms_details", {})
+    if cms_details:
+        enriched_profile["cms_fingerprint"] = cms_details
+
+    # Include Shodan service versions from host inventory (if available)
+    ip = tech_profile.get("ip", "")
+    hosts = host_inventory.get("hosts", [])
+    for h in hosts:
+        if h.get("ip") == ip:
+            passive_intel = h.get("passive_intel", {})
+            if passive_intel:
+                enriched_profile["shodan_services"] = passive_intel.get("shodan_services", {})
+                enriched_profile["abuseipdb_score"] = passive_intel.get("abuseipdb_score")
+            break
+
     user_prompt = f"""Host Tech-Profile:
-{json.dumps(tech_profile, indent=2, ensure_ascii=False)}
+{json.dumps(enriched_profile, indent=2, ensure_ascii=False)}
 
 Paket: {package}
 Domain: {host_inventory.get("domain", "unknown")}
@@ -262,6 +323,11 @@ Antwort im Format:
             "nuclei_exclude_tags": [],
             "nikto_tuning": "1234567890",
             "gobuster_wordlist": "common",
+            "ffuf_mode": "dir",
+            "ffuf_extensions": ".php,.html,.js,.bak,.old,.conf",
+            "feroxbuster_depth": 2,
+            "feroxbuster_enabled": True,
+            "dalfox_enabled": True,
             "skip_tools": [],
             "reasoning": f"Fallback — {reason}"
         }
@@ -269,6 +335,8 @@ Antwort im Format:
     log.info("ai_phase2_config_complete",
              ip=tech_profile.get("ip"),
              nuclei_tags=result.get("nuclei_tags"),
-             wordlist=result.get("gobuster_wordlist"))
+             wordlist=result.get("gobuster_wordlist"),
+             ffuf_mode=result.get("ffuf_mode"),
+             ferox_depth=result.get("feroxbuster_depth"))
 
     return result

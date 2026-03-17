@@ -9,6 +9,7 @@ from typing import Any, Callable, Optional
 
 import structlog
 
+from scanner.cms_fingerprinter import CMSFingerprinter, CMSResult
 from scanner.tools import run_tool
 
 log = structlog.get_logger()
@@ -233,53 +234,41 @@ def build_tech_profile(
                 server = f"{product}/{version}".rstrip("/") if version else product
                 break
 
-    # Determine CMS and version from webtech
+    # CMS detection via fingerprinting engine (replaces old webtech+fallback logic)
     cms = None
     cms_version = None
-    if isinstance(webtech_result, dict):
-        techs = webtech_result.get("tech", [])
-    elif isinstance(webtech_result, list):
-        techs = webtech_result
-    else:
-        techs = []
+    cms_confidence = 0.0
+    cms_details: dict[str, Any] = {}
+    primary_fqdn = fqdns[0] if fqdns else None
 
-    cms_names = {"wordpress", "joomla", "drupal", "typo3", "magento", "shopify",
-                  "shopware", "wix", "prestashop", "contao", "neos", "craft", "strapi", "ghost"}
-    for tech in techs:
-        if isinstance(tech, dict):
-            name = tech.get("name", "").lower()
-            if name in cms_names:
-                cms = tech.get("name")
-                cms_version = tech.get("version")
-                break
-        elif isinstance(tech, str):
-            if tech.lower() in cms_names:
+    if primary_fqdn:
+        fingerprinter = CMSFingerprinter(max_requests=20)
+        cms_result: CMSResult = fingerprinter.fingerprint(primary_fqdn, webtech_result=webtech_result)
+        if cms_result.cms and cms_result.confidence >= 0.5:
+            cms = cms_result.cms
+            cms_version = cms_result.version
+            cms_confidence = cms_result.confidence
+            cms_details = cms_result.to_dict()
+    else:
+        # No FQDN — fall back to webtech-only
+        if isinstance(webtech_result, dict):
+            techs = webtech_result.get("tech", [])
+        elif isinstance(webtech_result, list):
+            techs = webtech_result
+        else:
+            techs = []
+        cms_names = {"wordpress", "joomla", "drupal", "typo3", "magento", "shopify",
+                      "shopware", "wix", "prestashop", "contao", "neos", "craft", "strapi", "ghost"}
+        for tech in techs:
+            if isinstance(tech, dict):
+                name = tech.get("name", "").lower()
+                if name in cms_names:
+                    cms = tech.get("name")
+                    cms_version = tech.get("version")
+                    break
+            elif isinstance(tech, str) and tech.lower() in cms_names:
                 cms = tech
                 break
-
-    # Fallback CMS detection: probe well-known paths if webtech didn't find a CMS
-    if not cms and fqdns:
-        import urllib.request
-        import urllib.error
-        primary = fqdns[0]
-        wp_indicators = [
-            (f"https://{primary}/wp-login.php", "wordpress"),
-            (f"https://{primary}/wp-admin/", "wordpress"),
-            (f"http://{primary}/wp-login.php", "wordpress"),
-            (f"https://{primary}/backend/admin", "shopware"),
-            (f"https://{primary}/admin/login", "shopware"),
-        ]
-        for url, cms_name in wp_indicators:
-            try:
-                req = urllib.request.Request(url, method="HEAD",
-                    headers={"User-Agent": "VectiScan/1.0"})
-                resp = urllib.request.urlopen(req, timeout=5)
-                if resp.status in (200, 301, 302, 303, 307, 308):
-                    cms = cms_name.capitalize()
-                    log.info("cms_fallback_detected", cms=cms, url=url, status=resp.status)
-                    break
-            except (urllib.error.HTTPError, urllib.error.URLError, OSError, Exception):
-                continue
 
     # Determine WAF
     waf = None
@@ -304,6 +293,8 @@ def build_tech_profile(
         "fqdns": fqdns,
         "cms": cms,
         "cms_version": cms_version,
+        "cms_confidence": cms_confidence,
+        "cms_details": cms_details,
         "server": server,
         "waf": waf,
         "open_ports": sorted(open_ports),

@@ -195,6 +195,14 @@ WORDLIST_MAP = {
     "cms": "/usr/share/wordlists/cms-common.txt",
 }
 
+# SecLists paths for ffuf (installed from SecLists in Dockerfile)
+SECLISTS_DIR = "/usr/share/wordlists/seclists"
+FFUF_WORDLISTS = {
+    "dir": f"{SECLISTS_DIR}/Discovery/Web-Content/common.txt",
+    "vhost": f"{SECLISTS_DIR}/Discovery/DNS/subdomains-top1million-5000.txt",
+    "param": f"{SECLISTS_DIR}/Discovery/Web-Content/burp-parameter-names.txt",
+}
+
 
 def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
                      adaptive_config: dict[str, Any] | None = None) -> Optional[str]:
@@ -493,6 +501,324 @@ def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dic
         return None
 
 
+def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
+             adaptive_config: dict[str, Any] | None = None,
+             domain: str = "",
+             katana_urls: list[str] | None = None) -> Optional[list[dict[str, Any]]]:
+    """Run ffuf web fuzzer in AI-selected mode (dir, vhost, or param).
+
+    Returns list of findings or None on failure.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    # Determine mode from AI config (default: dir)
+    mode = "dir"
+    if adaptive_config:
+        mode = adaptive_config.get("ffuf_mode", "dir")
+
+    output_path = f"{phase2_dir}/ffuf_{mode}.json"
+
+    if mode == "dir":
+        # Directory/file discovery with extensions
+        extensions = ".php,.html,.js,.bak,.old,.conf"
+        if adaptive_config and adaptive_config.get("ffuf_extensions"):
+            extensions = adaptive_config["ffuf_extensions"]
+
+        wordlist = FFUF_WORDLISTS.get("dir", WORDLIST_MAP["common"])
+        if not os.path.isfile(wordlist):
+            wordlist = WORDLIST_MAP["common"]
+
+        cmd = [
+            "ffuf",
+            "-u", f"https://{fqdn}/FUZZ",
+            "-w", wordlist,
+            "-e", extensions,
+            "-mc", "200,301,302,403",
+            "-fc", "404",
+            "-t", "40",
+            "-rate", "100",
+            "-timeout", "5",
+            "-json",
+            "-o", output_path,
+            "-s",  # silent (no banner)
+        ]
+
+    elif mode == "vhost":
+        # Virtual host discovery
+        wordlist = FFUF_WORDLISTS.get("vhost", WORDLIST_MAP["common"])
+        if not os.path.isfile(wordlist):
+            log.warning("ffuf_vhost_wordlist_missing", path=wordlist)
+            return None
+
+        target_domain = domain or fqdn
+        cmd = [
+            "ffuf",
+            "-u", f"https://{ip}/",
+            "-H", f"Host: FUZZ.{target_domain}",
+            "-w", wordlist,
+            "-mc", "200,301,302",
+            "-json",
+            "-o", output_path,
+            "-t", "40",
+            "-rate", "100",
+            "-timeout", "5",
+            "-s",
+        ]
+
+    elif mode == "param":
+        # Parameter discovery on katana endpoints
+        if not katana_urls:
+            log.info("ffuf_param_skipped", ip=ip, reason="no_katana_urls")
+            return None
+
+        # Pick first URL with query string or first URL
+        target_url = None
+        for u in katana_urls:
+            if "?" in u:
+                # Use the base URL part
+                target_url = u.split("?")[0]
+                break
+        if not target_url:
+            target_url = katana_urls[0] if katana_urls else f"https://{fqdn}/"
+
+        wordlist = FFUF_WORDLISTS.get("param", WORDLIST_MAP["common"])
+        if not os.path.isfile(wordlist):
+            log.warning("ffuf_param_wordlist_missing", path=wordlist)
+            return None
+
+        cmd = [
+            "ffuf",
+            "-u", f"{target_url}?FUZZ=test",
+            "-w", wordlist,
+            "-mc", "200",
+            "-json",
+            "-o", output_path,
+            "-t", "40",
+            "-rate", "100",
+            "-timeout", "5",
+            "-s",
+        ]
+    else:
+        log.warning("ffuf_unknown_mode", mode=mode)
+        return None
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd,
+        timeout=180,
+        output_path=output_path,
+        order_id=order_id,
+        host_ip=ip,
+        phase=2,
+        tool_name=f"ffuf_{mode}",
+    )
+
+    if exit_code not in (0, 1, -1):
+        log.warning("ffuf_failed", fqdn=fqdn, mode=mode, exit_code=exit_code)
+        return None
+
+    try:
+        with open(output_path, "r") as f:
+            data = json.load(f)
+        results = data.get("results", []) if isinstance(data, dict) else data
+        log.info("ffuf_complete", fqdn=fqdn, mode=mode, findings=len(results))
+        return results
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        log.warning("ffuf_parse_error", fqdn=fqdn, mode=mode, error=str(e))
+        return None
+
+
+def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
+                    adaptive_config: dict[str, Any] | None = None,
+                    known_paths: set[str] | None = None) -> Optional[list[dict[str, Any]]]:
+    """Run feroxbuster for recursive directory brute-force.
+
+    Args:
+        known_paths: Paths already found by gobuster/ffuf — used for dedup.
+
+    Returns list of findings or None on failure.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    output_path = f"{phase2_dir}/feroxbuster.json"
+
+    # AI-controlled recursion depth (default: 2)
+    depth = 2
+    if adaptive_config and adaptive_config.get("feroxbuster_depth"):
+        depth = min(int(adaptive_config["feroxbuster_depth"]), 4)
+
+    wordlist = WORDLIST_MAP["common"]
+    if not os.path.isfile(wordlist):
+        log.warning("feroxbuster_wordlist_missing", path=wordlist)
+        return None
+
+    cmd = [
+        "feroxbuster",
+        "-u", f"https://{fqdn}",
+        "-w", wordlist,
+        "-d", str(depth),
+        "-t", "30",
+        "--rate-limit", "100",
+        "-s", "200,301,302,403",
+        "--json",
+        "-o", output_path,
+        "--dont-scan", "logout|signout|delete",
+        "--timeout", "5",
+        "--no-recursion-on", "403",
+        "--silent",
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd,
+        timeout=300,
+        output_path=output_path,
+        order_id=order_id,
+        host_ip=ip,
+        phase=2,
+        tool_name="feroxbuster",
+    )
+
+    if exit_code not in (0, 1, -1):
+        log.warning("feroxbuster_failed", fqdn=fqdn, exit_code=exit_code)
+        return None
+
+    # Parse JSONL output (feroxbuster writes one JSON object per line)
+    findings: list[dict[str, Any]] = []
+    dedup_count = 0
+    try:
+        with open(output_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                # Dedup against gobuster/ffuf known paths
+                path = entry.get("url", "")
+                if known_paths and path:
+                    # Extract path from URL
+                    from urllib.parse import urlparse
+                    parsed_path = urlparse(path).path
+                    if parsed_path in known_paths:
+                        dedup_count += 1
+                        continue
+                findings.append(entry)
+
+        log.info("feroxbuster_complete", fqdn=fqdn, findings=len(findings),
+                 dedup_removed=dedup_count, depth=depth)
+    except FileNotFoundError:
+        log.warning("feroxbuster_no_output", fqdn=fqdn)
+        return None
+
+    return findings if findings else None
+
+
+def run_dalfox(fqdn: str, ip: str, host_dir: str, order_id: str,
+               katana_urls: list[str] | None = None) -> Optional[list[dict[str, Any]]]:
+    """Run dalfox XSS scanner on URLs with parameters discovered by katana.
+
+    Only runs if katana found URLs with query parameters.
+    Returns list of XSS findings or None.
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    if not katana_urls:
+        log.info("dalfox_skipped", ip=ip, reason="no_katana_urls")
+        return None
+
+    # Filter only URLs with parameters
+    param_urls = [u for u in katana_urls if "?" in u]
+    if not param_urls:
+        log.info("dalfox_skipped", ip=ip, reason="no_urls_with_params")
+        return None
+
+    # Write URLs to a temp file for piping into dalfox
+    urls_file = f"{phase2_dir}/dalfox_input.txt"
+    with open(urls_file, "w") as f:
+        for url in param_urls[:100]:  # Cap at 100 URLs
+            f.write(url + "\n")
+
+    output_path = f"{phase2_dir}/dalfox.json"
+
+    cmd = [
+        "dalfox", "file", urls_file,
+        "--silence",
+        "--no-color",
+        "--format", "json",
+        "-o", output_path,
+        "--timeout", "5",
+        "--delay", "100",
+        "--skip-bav",  # Skip Blind XSS (too invasive for automated scanner)
+    ]
+
+    exit_code, duration_ms = run_tool(
+        cmd=cmd,
+        timeout=300,
+        output_path=output_path,
+        order_id=order_id,
+        host_ip=ip,
+        phase=2,
+        tool_name="dalfox",
+    )
+
+    if exit_code not in (0, 1, -1):
+        log.warning("dalfox_failed", fqdn=fqdn, exit_code=exit_code)
+        return None
+
+    # Parse JSONL output
+    findings: list[dict[str, Any]] = []
+    try:
+        with open(output_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    try:
+                        findings.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        continue
+        log.info("dalfox_complete", fqdn=fqdn, findings=len(findings),
+                 input_urls=len(param_urls))
+    except FileNotFoundError:
+        log.warning("dalfox_no_output", fqdn=fqdn)
+        return None
+
+    return findings if findings else None
+
+
+def _extract_paths_from_gobuster(output_path: str) -> set[str]:
+    """Extract discovered paths from gobuster output for dedup."""
+    paths: set[str] = set()
+    try:
+        with open(output_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    # gobuster dir output format: /path (Status: 200) [Size: 1234]
+                    parts = line.split()
+                    if parts:
+                        paths.add(parts[0])
+    except (FileNotFoundError, Exception):
+        pass
+    return paths
+
+
+def _extract_paths_from_ffuf(results: list[dict[str, Any]] | None) -> set[str]:
+    """Extract discovered paths from ffuf results for dedup."""
+    paths: set[str] = set()
+    if not results:
+        return paths
+    for r in results:
+        url = r.get("url", "") or r.get("input", {}).get("FUZZ", "")
+        if url:
+            from urllib.parse import urlparse
+            paths.add(urlparse(url).path)
+    return paths
+
+
 def run_phase2(
     ip: str,
     fqdns: list[str],
@@ -610,9 +936,11 @@ def run_phase2(
         log.info("nuclei_skipped", ip=ip, reason="not_in_package")
 
     # gobuster dir
+    gobuster_output_path: Optional[str] = None
     if (phase2_tools is None or "gobuster_dir" in phase2_tools) and "gobuster_dir" not in ai_skip:
         gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
         results["gobuster_dir"] = gobuster_result
+        gobuster_output_path = gobuster_result
         results["tools_run"].append("gobuster_dir")
         progress_callback(order_id, "gobuster_dir", "complete")
         if gobuster_result:
@@ -626,6 +954,94 @@ def run_phase2(
             publish_tool_output(order_id, "gobuster_dir", ip, "No paths found")
     else:
         log.info("gobuster_dir_skipped", ip=ip, reason="not_in_package")
+
+    # ffuf — web fuzzer (Perimeter+ only, AI-selected mode)
+    ffuf_result: Optional[list[dict[str, Any]]] = None
+    if (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip:
+        ffuf_result = run_ffuf(
+            primary_fqdn, ip, host_dir, order_id,
+            adaptive_config=adaptive_config,
+            domain=domain,
+        )
+        results["ffuf"] = ffuf_result
+        results["tools_run"].append("ffuf")
+        progress_callback(order_id, "ffuf", "complete")
+        if ffuf_result:
+            mode = adaptive_config.get("ffuf_mode", "dir") if adaptive_config else "dir"
+            publish_tool_output(order_id, "ffuf", ip, f"{len(ffuf_result)} results ({mode} mode)")
+        else:
+            publish_tool_output(order_id, "ffuf", ip, "No results")
+    else:
+        log.info("ffuf_skipped", ip=ip, reason="not_in_package_or_ai_skip")
+
+    # feroxbuster — recursive directory brute-force (Perimeter+ only)
+    # Dependency: runs after gobuster/ffuf, deduplicates known paths
+    if (phase2_tools is not None and "feroxbuster" in phase2_tools) and "feroxbuster" not in ai_skip:
+        ferox_enabled = True
+        if adaptive_config and adaptive_config.get("feroxbuster_enabled") is False:
+            ferox_enabled = False
+            log.info("feroxbuster_skipped", ip=ip, reason="ai_disabled")
+
+        if ferox_enabled:
+            # Collect known paths from gobuster + ffuf for dedup
+            known_paths: set[str] = set()
+            if gobuster_output_path:
+                known_paths.update(_extract_paths_from_gobuster(gobuster_output_path))
+            if ffuf_result:
+                known_paths.update(_extract_paths_from_ffuf(ffuf_result))
+
+            ferox_result = run_feroxbuster(
+                primary_fqdn, ip, host_dir, order_id,
+                adaptive_config=adaptive_config,
+                known_paths=known_paths if known_paths else None,
+            )
+            results["feroxbuster"] = ferox_result
+            results["tools_run"].append("feroxbuster")
+            progress_callback(order_id, "feroxbuster", "complete")
+            if ferox_result:
+                publish_tool_output(order_id, "feroxbuster", ip,
+                                    f"{len(ferox_result)} paths (recursive, dedup applied)")
+            else:
+                publish_tool_output(order_id, "feroxbuster", ip, "No new paths found")
+    else:
+        log.info("feroxbuster_skipped", ip=ip, reason="not_in_package")
+
+    # katana — web crawler (before dalfox, which depends on katana URLs)
+    katana_result: list[str] = []
+    if (phase2_tools is None or "katana" in phase2_tools) and "katana" not in ai_skip:
+        katana_result = run_katana(primary_fqdn, ip, host_dir, order_id)
+        results["katana"] = katana_result
+        results["tools_run"].append("katana")
+        progress_callback(order_id, "katana", "complete")
+        if katana_result:
+            publish_tool_output(order_id, "katana", ip, f"{len(katana_result)} URLs crawled")
+        else:
+            publish_tool_output(order_id, "katana", ip, "No URLs discovered")
+    else:
+        log.info("katana_skipped", ip=ip, reason="not_in_package")
+
+    # dalfox — XSS scanner (Perimeter+ only)
+    # Dependency: needs katana URLs with parameters
+    if (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip:
+        dalfox_enabled = True
+        if adaptive_config and adaptive_config.get("dalfox_enabled") is False:
+            dalfox_enabled = False
+            log.info("dalfox_skipped", ip=ip, reason="ai_disabled")
+
+        if dalfox_enabled:
+            dalfox_result = run_dalfox(
+                primary_fqdn, ip, host_dir, order_id,
+                katana_urls=katana_result if katana_result else None,
+            )
+            results["dalfox"] = dalfox_result
+            results["tools_run"].append("dalfox")
+            progress_callback(order_id, "dalfox", "complete")
+            if dalfox_result:
+                publish_tool_output(order_id, "dalfox", ip, f"{len(dalfox_result)} XSS findings")
+            else:
+                publish_tool_output(order_id, "dalfox", ip, "No XSS vulnerabilities found")
+    else:
+        log.info("dalfox_skipped", ip=ip, reason="not_in_package")
 
     # gowitness
     if (phase2_tools is None or "gowitness" in phase2_tools) and "gowitness" not in ai_skip:
@@ -670,19 +1086,6 @@ def run_phase2(
             publish_tool_output(order_id, "httpx", ip, "HTTP probe failed")
     else:
         log.info("httpx_skipped", ip=ip, reason="not_in_package")
-
-    # katana — web crawler
-    if (phase2_tools is None or "katana" in phase2_tools) and "katana" not in ai_skip:
-        katana_result = run_katana(primary_fqdn, ip, host_dir, order_id)
-        results["katana"] = katana_result
-        results["tools_run"].append("katana")
-        progress_callback(order_id, "katana", "complete")
-        if katana_result:
-            publish_tool_output(order_id, "katana", ip, f"{len(katana_result)} URLs crawled")
-        else:
-            publish_tool_output(order_id, "katana", ip, "No URLs discovered")
-    else:
-        log.info("katana_skipped", ip=ip, reason="not_in_package")
 
     # wpscan — CMS-adaptive: only if WordPress detected
     cms = tech_profile.get("cms", "")

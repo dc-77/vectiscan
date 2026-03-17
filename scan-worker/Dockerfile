@@ -73,6 +73,27 @@ RUN curl -fsSL https://github.com/projectdiscovery/katana/releases/download/v1.1
     chmod +x /usr/local/bin/katana && \
     rm -rf /tmp/katana /tmp/katana.zip
 
+# ffuf v2.1.0 (MIT)
+RUN curl -fsSL https://github.com/ffuf/ffuf/releases/download/v2.1.0/ffuf_2.1.0_linux_amd64.tar.gz \
+      -o /tmp/ffuf.tar.gz && \
+    tar xzf /tmp/ffuf.tar.gz -C /usr/local/bin/ ffuf && \
+    chmod +x /usr/local/bin/ffuf && \
+    rm -f /tmp/ffuf.tar.gz
+
+# feroxbuster v2.11.0 (MIT)
+RUN curl -fsSL https://github.com/epi052/feroxbuster/releases/download/v2.11.0/x86_64-linux-feroxbuster.tar.gz \
+      -o /tmp/feroxbuster.tar.gz && \
+    tar xzf /tmp/feroxbuster.tar.gz -C /usr/local/bin/ feroxbuster && \
+    chmod +x /usr/local/bin/feroxbuster && \
+    rm -f /tmp/feroxbuster.tar.gz
+
+# dalfox v2.9.3 (MIT)
+RUN curl -fsSL https://github.com/hahwul/dalfox/releases/download/v2.9.3/dalfox_2.9.3_linux_amd64.tar.gz \
+      -o /tmp/dalfox.tar.gz && \
+    tar xzf /tmp/dalfox.tar.gz -C /usr/local/bin/ dalfox && \
+    chmod +x /usr/local/bin/dalfox && \
+    rm -f /tmp/dalfox.tar.gz
+
 # nuclei templates
 RUN nuclei -update-templates
 
@@ -97,11 +118,18 @@ RUN apt-get update && \
 RUN pip3 install --no-cache-dir --break-system-packages wafw00f webtech
 
 # ── 5. Wordlists ───────────────────────────────────────────────────
-RUN mkdir -p /usr/share/wordlists && \
+RUN mkdir -p /usr/share/wordlists /usr/share/wordlists/seclists/Discovery/Web-Content \
+             /usr/share/wordlists/seclists/Discovery/DNS && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-5000.txt \
       -o /usr/share/wordlists/subdomains-top5000.txt && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt \
-      -o /usr/share/wordlists/common.txt
+      -o /usr/share/wordlists/common.txt && \
+    curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt \
+      -o /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt && \
+    curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-5000.txt \
+      -o /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt && \
+    curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/burp-parameter-names.txt \
+      -o /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt
 
 # Curated wordlists for AI-adaptive scanning
 COPY wordlists/wordpress.txt /usr/share/wordlists/wordpress.txt
@@ -140,6 +168,9 @@ RUN nmap --version; \
     httpx -version; \
     katana -version; \
     wpscan --version; \
+    ffuf -V; \
+    feroxbuster --version; \
+    dalfox version; \
     echo "All tools verified"
 
 # ── 8. Security — non-root user ────────────────────────────────────

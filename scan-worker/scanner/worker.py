@@ -99,6 +99,9 @@ _VERSION_COMMANDS: list[tuple[str, list[str]]] = [
     ("httpx", ["httpx", "-version"]),
     ("katana", ["katana", "-version"]),
     ("wpscan", ["wpscan", "--version"]),
+    ("ffuf", ["ffuf", "-V"]),
+    ("feroxbuster", ["feroxbuster", "--version"]),
+    ("dalfox", ["dalfox", "version"]),
 ]
 
 
