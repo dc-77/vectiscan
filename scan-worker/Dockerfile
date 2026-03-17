@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       ca-certificates curl wget unzip jq dnsutils git bash \
       python3 python3-pip python3-venv \
-      nmap openssl libnet-ssleay-perl \
+      nmap openssl libnet-ssleay-perl libjson-perl \
       procps bsdmainutils coreutils \
       chromium \
       whois ldnsutils && \
@@ -97,7 +97,8 @@ RUN curl -fsSL https://github.com/hahwul/dalfox/releases/download/v2.9.3/dalfox_
 # exploitdb/searchsploit (GPL v2 — local search only, no code linking)
 RUN git clone --depth 1 https://gitlab.com/exploit-database/exploitdb.git /opt/exploitdb && \
     ln -s /opt/exploitdb/searchsploit /usr/local/bin/searchsploit && \
-    sed -i 's|/opt/exploitdb|/opt/exploitdb|g' /opt/exploitdb/.searchsploit_rc || true
+    cp /opt/exploitdb/.searchsploit_rc /root/.searchsploit_rc 2>/dev/null || true && \
+    sed -i 's|/opt/exploitdb-papers|/opt/exploitdb/exploitdb-papers|g; s|/opt/exploitdb-bin-sploits|/opt/exploitdb/exploitdb-bin-sploits|g' /root/.searchsploit_rc 2>/dev/null || true
 
 # nuclei templates
 RUN nuclei -update-templates

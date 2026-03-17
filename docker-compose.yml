@@ -85,6 +85,11 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      SHODAN_API_KEY: ${SHODAN_API_KEY:-}
+      ABUSEIPDB_API_KEY: ${ABUSEIPDB_API_KEY:-}
+      SECURITYTRAILS_API_KEY: ${SECURITYTRAILS_API_KEY:-}
+      NVD_API_KEY: ${NVD_API_KEY:-}
+      WPSCAN_API_TOKEN: ${WPSCAN_API_TOKEN:-}
     deploy:
       replicas: 3
       resources:
