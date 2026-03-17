@@ -67,7 +67,7 @@ def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
 # Host Strategy (after Phase 0)
 # ---------------------------------------------------------------------------
 
-HOST_STRATEGY_SYSTEM = """Du bist ein Security-Scanner-Orchestrator. Du entscheidest, welche Hosts gescannt werden.
+HOST_STRATEGY_SYSTEM = """Du bist ein Security-Scanner-Orchestrator. Du entscheidest, welche Hosts gescannt werden und mit welcher Priorität.
 
 WICHTIG ZU FQDNs:
 - Jeder Host hat eine Liste von FQDNs die auf dieselbe IP zeigen
@@ -81,16 +81,29 @@ WEB-PROBE DATEN:
 - has_web=false: Kein HTTP-Content → Port-Scan (nmap + testssl reichen)
 - final_url zeigt wohin Redirects führen → die relevante Scan-URL
 
-REGELN:
+PASSIVE INTELLIGENCE (wenn verfügbar):
+- Jeder Host kann ein "passive_intel" Feld haben mit Daten aus Shodan, AbuseIPDB, WHOIS:
+  - shodan_ports: Bereits bekannte offene Ports pro IP
+  - shodan_services: Service-Versionen (z.B. {"443": "nginx 1.18", "22": "OpenSSH 7.9"})
+  - abuseipdb_score: IP-Reputation (0-100, höher = verdächtiger)
+  - is_tor: Ob die IP ein Tor-Exit-Node ist
+  - dnssec_signed: Ob die Domain DNSSEC-signiert ist
+  - whois_expiration: Domain-Ablaufdatum
+
+ERWEITERTE REGELN (Passive Intel):
+- Hosts mit veralteten Service-Versionen aus Shodan (alte OpenSSH, alte nginx) → Priorität 1
+- Hosts mit exponierten Management-Ports (22, 3389, 5900, 8080, 8443) aus Shodan → Priorität 1
+- Hosts mit hohem AbuseIPDB-Score (>50) → Priorität 1 (mögliche Kompromittierung)
+- Hosts mit nur Port 80/443 und niedrigem AbuseIPDB-Score → Priorität 2
+- Mailserver mit fehlender SPF/DMARC → scannen (nicht skippen!)
+
+STANDARD-REGELN:
 - Basisdomain und www-Subdomain: IMMER scannen (action: "scan"), höchste Priorität
 - Webserver mit interaktivem Content (Apps, APIs, CMS, Shops): scan (hohe Priorität)
 - Mailserver (MX, SMTP, IMAP): scan mit NIEDRIGERER Priorität — NICHT skippen!
-  → Mailserver haben eigene Schwachstellen: offene Relays, veraltetes TLS,
-    SMTP-Auth-Brute-Force, exponierte IMAP/POP3-Ports
-  → Bei reinen Mailservern reichen testssl + nmap, kein Nuclei/Gobuster nötig
-- Autodiscover-Hosts (nur Exchange/Outlook-Konfiguration): skip (einzige Ausnahme)
+- Autodiscover-Hosts (nur Exchange/Outlook-Konfiguration): skip
 - Parking-Pages, Redirect auf externe Domain: skip
-- CDN-Edge-Nodes (nur CDN-IP, kein eigener Content): skip
+- CDN-Edge-Nodes (nur CDN-IP, kein eigener Content): skip (außer bei has_web=true mit eigenem Content)
 - Wenn unklar: lieber scannen als überspringen
 
 Jeder Host braucht eine kurze Begründung (1 Satz).
@@ -100,9 +113,19 @@ Antworte NUR mit validem JSON, kein anderer Text."""
 
 HOST_STRATEGY_SCHEMA = """{
   "hosts": [
-    {"ip": "...", "action": "scan|skip", "priority": 1, "reasoning": "..."}
+    {
+      "ip": "...",
+      "action": "scan|skip",
+      "priority": 1,
+      "reasoning": "...",
+      "scan_hints": {
+        "shodan_ports": [21, 22, 80, 443],
+        "focus_areas": ["web_vulns", "ssl", "ftp_security"]
+      }
+    }
   ],
-  "strategy_notes": "Kurze Zusammenfassung der Strategie"
+  "strategy_notes": "Kurze Zusammenfassung der Strategie",
+  "passive_intel_summary": "Was die Passive Intelligence ergeben hat"
 }"""
 
 

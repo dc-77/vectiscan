@@ -3,3 +3,4 @@ minio==7.2.15
 psycopg2-binary==2.9.10
 structlog==25.1.0
 anthropic>=0.52.0
+requests>=2.31.0

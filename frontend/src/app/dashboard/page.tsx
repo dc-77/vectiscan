@@ -12,6 +12,7 @@ const PHASE_LABELS: Record<string, string> = {
   created: 'Erstellt',
   queued: 'In Warteschlange',
   scanning: 'Startet...',
+  passive_intel: 'Passive Intel',
   dns_recon: 'DNS-Recon',
   scan_phase1: 'Phase 1',
   scan_phase2: 'Phase 2',
@@ -28,6 +29,7 @@ const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   created:             { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   queued:              { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scanning:            { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  passive_intel:       { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   dns_recon:           { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scan_phase1:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scan_phase2:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
@@ -55,7 +57,7 @@ const RISK_BADGE: Record<string, { bg: string; text: string; border: string }> =
 type StatusFilter = 'all' | 'active' | 'done' | 'failed';
 // Detail tabs moved to /scan/[orderId] page
 
-const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
+const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'passive_intel', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
 const DONE_STATUSES = ['report_complete'];
 const FAILED_STATUSES = ['failed', 'cancelled'];
 

@@ -128,7 +128,7 @@ function ScanTimeline({ results, startedAt, finishedAt }: {
 }
 
 const PHASE_LABELS: Record<string, string> = {
-  dns_recon: 'DNS-Recon', scan_phase1: 'Phase 1', scan_phase2: 'Phase 2',
+  passive_intel: 'Passive Intel', dns_recon: 'DNS-Recon', scan_phase1: 'Phase 1', scan_phase2: 'Phase 2',
   scan_complete: 'Scan fertig', report_generating: 'Report...', report_complete: 'Fertig',
   failed: 'Fehlgeschlagen', cancelled: 'Abgebrochen',
 };

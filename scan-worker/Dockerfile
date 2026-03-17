@@ -10,7 +10,8 @@ RUN apt-get update && \
       python3 python3-pip python3-venv \
       nmap openssl libnet-ssleay-perl \
       procps bsdmainutils coreutils \
-      chromium && \
+      chromium \
+      whois ldnsutils && \
     rm -rf /var/lib/apt/lists/*
 
 # gowitness/katana need Chrome — set path

@@ -55,6 +55,21 @@ def _is_cancelled(order_id: str) -> bool:
         return False
 
 
+def _save_passive_intel_summary(order_id: str, phase0a_results: dict[str, Any]) -> None:
+    """Persist passive intel summary to orders.passive_intel_summary."""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE orders SET passive_intel_summary = %s WHERE id = %s",
+                (json.dumps(phase0a_results, default=str), order_id),
+            )
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        log.warning("passive_intel_save_failed", order_id=order_id, error=str(e))
+
+
 def _is_host_reachable(ip: str, timeout: int = 5) -> bool:
     """Quick TCP connect check on port 80 and 443. Returns True if either responds."""
     for port in (443, 80):
@@ -163,13 +178,48 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
     log.info("scan_start", order_id=order_id, domain=domain)
     set_scan_started(order_id)
 
-    # ── Phase 0: DNS Reconnaissance ─────────────────────────
+    # ── Phase 0a: Passive Intelligence (no contact to target) ──
+    from scanner.phase0a import run_phase0a, build_passive_intel_for_ai
+
+    phase0a_tools = config.get("phase0a_tools", [])
+    phase0a_results: dict[str, Any] = {}
+    if phase0a_tools:
+        update_progress(order_id, "passive_intel", "starting")
+
+        def p0a_callback(oid: str, tool: str, status: str) -> None:
+            update_progress(oid, "passive_intel", tool)
+            _check_timeout()
+
+        # Phase 0a runs before active discovery — no IPs known yet
+        phase0a_results = run_phase0a(
+            domain, [], scan_dir, order_id, config,
+            progress_callback=p0a_callback,
+        )
+
+        # Persist passive intel summary to DB
+        _save_passive_intel_summary(order_id, phase0a_results)
+
+        _check_timeout()
+
+    # ── Phase 0b: DNS Reconnaissance (active discovery) ────
     update_progress(order_id, "dns_recon", "starting")
     host_inventory = run_phase0(domain, scan_dir, order_id, config)
     set_discovered_hosts(order_id, host_inventory)
 
     hosts = host_inventory.get("hosts", [])
-    log.info("phase0_done", order_id=order_id, hosts_found=len(hosts))
+    log.info("phase0b_done", order_id=order_id, hosts_found=len(hosts))
+
+    # Re-run Shodan/AbuseIPDB with discovered IPs (if Phase 0a is enabled)
+    if phase0a_tools and hosts:
+        discovered_ips = [h["ip"] for h in hosts]
+        ip_enrichment = run_phase0a(
+            domain, discovered_ips, scan_dir, order_id,
+            {**config, "phase0a_tools": [t for t in phase0a_tools if t in ("shodan", "abuseipdb")]},
+        )
+        # Merge IP-specific results into phase0a_results
+        for key in ("shodan_hosts", "abuseipdb"):
+            if key in ip_enrichment:
+                phase0a_results.setdefault(key, {}).update(ip_enrichment[key])
 
     if len(hosts) == 0:
         log.warning("no_hosts_found", order_id=order_id, domain=domain)
@@ -179,7 +229,19 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
     _check_timeout()
 
     # ── AI Host Strategy: prioritize and filter hosts ─────
-    strategy = plan_host_strategy(host_inventory, domain, package)
+    # Enrich host inventory with passive intel for better AI decisions
+    enriched_inventory = {**host_inventory}
+    if phase0a_results:
+        enriched_hosts = []
+        for h in hosts:
+            enriched = {**h}
+            enriched["passive_intel"] = build_passive_intel_for_ai(phase0a_results, h["ip"])
+            enriched_hosts.append(enriched)
+        enriched_inventory["hosts"] = enriched_hosts
+        enriched_inventory["dns_security"] = phase0a_results.get("dns_security", {})
+        enriched_inventory["whois"] = phase0a_results.get("whois", {})
+
+    strategy = plan_host_strategy(enriched_inventory, domain, package)
 
     # Save strategy to scan results and disk
     strategy_json = json.dumps(strategy, indent=2, ensure_ascii=False)

@@ -301,7 +301,7 @@ Um in einer frischen Session an einem bestimmten Punkt weiterzuarbeiten:
 
 **Phase I starten:** "Wir setzen docs/PIPELINE-PLAN-v2.md um. Starte mit Phase I: Foundation."
 **Phase II starten:** "Wir setzen docs/PIPELINE-PLAN-v2.md um. Phase I ist abgeschlossen. Starte Phase II: Passive Intelligence."
-**Phase III starten:** "Wir setzen docs/PIPELINE-PLAN-v2.md um. Phase I ist abgeschlossen. Starte Phase III: Extended Deep Scan."
+**Phase III starten:** "Wir setzen docs/PIPELINE-PLAN-v2.md um. Phase II ist abgeschlossen. Starte Phase III: Extended Deep Scan."
 **Phase IV starten:** "Wir setzen docs/PIPELINE-PLAN-v2.md um. Phasen I–III sind abgeschlossen. Starte Phase IV: Correlation."
 **Phase V starten:** "Wir setzen docs/PIPELINE-PLAN-v2.md um. Phasen I–IV sind abgeschlossen. Starte Phase V: Reports."
 **Phase VI starten:** "Wir setzen docs/PIPELINE-PLAN-v2.md um. Phasen I–V sind abgeschlossen. Starte Phase VI: Integration."
