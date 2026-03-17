@@ -355,6 +355,12 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
             _check_timeout()
 
         tech_profile = run_phase1(ip, fqdns, scan_dir, order_id, p1_callback, config)
+
+        # Carry web_probe data from Phase 0 into tech_profile for Phase 2 decisions
+        web_probe = host.get("web_probe", {})
+        tech_profile["has_web"] = web_probe.get("has_web", True)  # default True for safety
+        tech_profile["web_fqdn"] = web_probe.get("web_fqdn")
+
         tech_profiles.append(tech_profile)
 
     log.info("phase1_complete", order_id=order_id, profiles=len(tech_profiles))

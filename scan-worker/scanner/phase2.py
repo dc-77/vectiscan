@@ -867,8 +867,10 @@ def run_phase2(
                          original_skip=list(ai_skip))
                 ai_skip = set()  # Override: full scan on base domain
     has_ssl = tech_profile.get("has_ssl", False)
+    has_web = tech_profile.get("has_web", True)  # default True for safety
 
-    log.info("phase2_start", ip=ip, fqdn=primary_fqdn, order_id=order_id, has_ssl=has_ssl,
+    log.info("phase2_start", ip=ip, fqdn=primary_fqdn, order_id=order_id,
+             has_ssl=has_ssl, has_web=has_web,
              ai_skip=list(ai_skip) if ai_skip else None)
 
     results: dict[str, Any] = {
@@ -895,8 +897,8 @@ def run_phase2(
         else:
             log.info("testssl_skipped", ip=ip, reason="not_in_package")
 
-    # nikto
-    if (phase2_tools is None or "nikto" in phase2_tools) and "nikto" not in ai_skip:
+    # nikto (web-only: skip if no web content detected)
+    if (phase2_tools is None or "nikto" in phase2_tools) and "nikto" not in ai_skip and has_web:
         nikto_result = run_nikto(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
         results["nikto"] = nikto_result
         results["tools_run"].append("nikto")
@@ -906,11 +908,13 @@ def run_phase2(
             publish_tool_output(order_id, "nikto", ip, f"{len(items)} items found")
         else:
             publish_tool_output(order_id, "nikto", ip, "No findings")
+    elif not has_web:
+        log.info("nikto_skipped", ip=ip, reason="no_web_content")
     else:
         log.info("nikto_skipped", ip=ip, reason="not_in_package")
 
-    # nuclei
-    if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip:
+    # nuclei (web-only: skip if no web content detected)
+    if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web:
         # Basic: 10 min, high/critical only. Pro/NIS2: 25 min, all severities.
         is_webcheck = config.get("package") in ("basic", "webcheck")
         nuclei_timeout = 600 if is_webcheck else 1500
@@ -931,12 +935,14 @@ def run_phase2(
             publish_tool_output(order_id, "nuclei", ip, f"{len(nuclei_result)} findings ({', '.join(parts)})")
         else:
             publish_tool_output(order_id, "nuclei", ip, "No vulnerabilities found")
+    elif not has_web:
+        log.info("nuclei_skipped", ip=ip, reason="no_web_content")
     else:
         log.info("nuclei_skipped", ip=ip, reason="not_in_package")
 
-    # gobuster dir
+    # gobuster dir (web-only)
     gobuster_output_path: Optional[str] = None
-    if (phase2_tools is None or "gobuster_dir" in phase2_tools) and "gobuster_dir" not in ai_skip:
+    if (phase2_tools is None or "gobuster_dir" in phase2_tools) and "gobuster_dir" not in ai_skip and has_web:
         gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
         results["gobuster_dir"] = gobuster_result
         gobuster_output_path = gobuster_result
@@ -954,9 +960,9 @@ def run_phase2(
     else:
         log.info("gobuster_dir_skipped", ip=ip, reason="not_in_package")
 
-    # ffuf — web fuzzer (Perimeter+ only, AI-selected mode)
+    # ffuf — web fuzzer (Perimeter+ only, web-only)
     ffuf_result: Optional[list[dict[str, Any]]] = None
-    if (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip:
+    if (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip and has_web:
         ffuf_result = run_ffuf(
             primary_fqdn, ip, host_dir, order_id,
             adaptive_config=adaptive_config,
@@ -973,9 +979,9 @@ def run_phase2(
     else:
         log.info("ffuf_skipped", ip=ip, reason="not_in_package_or_ai_skip")
 
-    # feroxbuster — recursive directory brute-force (Perimeter+ only)
+    # feroxbuster — recursive directory brute-force (Perimeter+ only, web-only)
     # Dependency: runs after gobuster/ffuf, deduplicates known paths
-    if (phase2_tools is not None and "feroxbuster" in phase2_tools) and "feroxbuster" not in ai_skip:
+    if (phase2_tools is not None and "feroxbuster" in phase2_tools) and "feroxbuster" not in ai_skip and has_web:
         ferox_enabled = True
         if adaptive_config and adaptive_config.get("feroxbuster_enabled") is False:
             ferox_enabled = False
@@ -1005,9 +1011,9 @@ def run_phase2(
     else:
         log.info("feroxbuster_skipped", ip=ip, reason="not_in_package")
 
-    # katana — web crawler (before dalfox, which depends on katana URLs)
+    # katana — web crawler (web-only, before dalfox which depends on katana URLs)
     katana_result: list[str] = []
-    if (phase2_tools is None or "katana" in phase2_tools) and "katana" not in ai_skip:
+    if (phase2_tools is None or "katana" in phase2_tools) and "katana" not in ai_skip and has_web:
         katana_result = run_katana(primary_fqdn, ip, host_dir, order_id)
         results["katana"] = katana_result
         results["tools_run"].append("katana")
@@ -1019,9 +1025,9 @@ def run_phase2(
     else:
         log.info("katana_skipped", ip=ip, reason="not_in_package")
 
-    # dalfox — XSS scanner (Perimeter+ only)
+    # dalfox — XSS scanner (Perimeter+ only, web-only)
     # Dependency: needs katana URLs with parameters
-    if (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip:
+    if (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip and has_web:
         dalfox_enabled = True
         if adaptive_config and adaptive_config.get("dalfox_enabled") is False:
             dalfox_enabled = False
