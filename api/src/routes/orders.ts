@@ -80,16 +80,49 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       customerId = customerResult.rows[0].id;
     }
 
-    // Insert order with verification token
-    const verificationToken = generateToken();
+    // Check if this customer already has a valid domain verification
+    const existingVerification = await query<{ id: string; verification_method: string; expires_at: Date }>(
+      `SELECT id, verification_method, expires_at FROM verified_domains
+       WHERE customer_id = $1 AND domain = $2 AND expires_at > NOW()`,
+      [customerId, domain],
+    );
+    const alreadyVerified = existingVerification.rows.length > 0;
+
+    // Insert order — skip verification if domain already verified for this customer
+    const initialStatus = alreadyVerified ? 'queued' : 'verification_pending';
+    const verificationToken = alreadyVerified ? '' : generateToken();
     const result = await query<{ id: string; target_url: string; status: string; package: string; verification_token: string; created_at: Date }>(
-      "INSERT INTO orders (customer_id, target_url, package, verification_token, status) VALUES ($1, $2, $3, $4, 'verification_pending') RETURNING id, target_url, status, package, verification_token, created_at",
-      [customerId, domain, pkg, verificationToken],
+      `INSERT INTO orders (customer_id, target_url, package, verification_token, status${alreadyVerified ? ', verified_at, verification_method' : ''})
+       VALUES ($1, $2, $3, $4, $5${alreadyVerified ? ', NOW(), $6' : ''})
+       RETURNING id, target_url, status, package, verification_token, created_at`,
+      alreadyVerified
+        ? [customerId, domain, pkg, verificationToken, initialStatus, existingVerification.rows[0].verification_method]
+        : [customerId, domain, pkg, verificationToken, initialStatus],
     );
 
     const order = result.rows[0];
 
-    audit({ orderId: order.id, action: 'order.created', details: { domain, package: pkg }, ip: request.ip });
+    audit({ orderId: order.id, action: 'order.created', details: { domain, package: pkg, reusedVerification: alreadyVerified }, ip: request.ip });
+
+    // If domain already verified for this customer → start scan immediately
+    if (alreadyVerified) {
+      await scanQueue.add('scan', {
+        orderId: order.id,
+        targetDomain: domain,
+        package: pkg,
+      });
+
+      return reply.status(201).send({
+        success: true,
+        data: {
+          id: order.id,
+          domain: order.target_url,
+          status: 'queued',
+          package: order.package,
+          alreadyVerified: true,
+        },
+      });
+    }
 
     return reply.status(201).send({
       success: true,

@@ -61,6 +61,21 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
         [verification.method, orderId],
       );
 
+      // Persist domain verification for this customer (reusable for 90 days)
+      const orderOwner = await query<{ customer_id: string }>(
+        'SELECT customer_id FROM orders WHERE id = $1',
+        [orderId],
+      );
+      if (orderOwner.rows.length > 0 && orderOwner.rows[0].customer_id) {
+        await query(
+          `INSERT INTO verified_domains (customer_id, domain, verification_method)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (customer_id, domain) DO UPDATE
+           SET verification_method = $3, verified_at = NOW(), expires_at = NOW() + INTERVAL '90 days'`,
+          [orderOwner.rows[0].customer_id, domain, verification.method],
+        );
+      }
+
       audit({ orderId, action: 'order.verified', details: { method: verification.method, domain }, ip: request.ip });
 
       // Prototyp: Scan direkt starten (kein Zahlungsflow)
@@ -117,6 +132,23 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
       "UPDATE orders SET status = 'queued', verified_at = NOW(), verification_method = 'manual' WHERE id = $1",
       [orderId],
     );
+
+    // Persist domain verification for this customer (reusable for 90 days)
+    {
+      const ownerResult = await query<{ customer_id: string }>(
+        'SELECT customer_id FROM orders WHERE id = $1',
+        [orderId],
+      );
+      if (ownerResult.rows.length > 0 && ownerResult.rows[0].customer_id) {
+        await query(
+          `INSERT INTO verified_domains (customer_id, domain, verification_method)
+           VALUES ($1, $2, 'manual')
+           ON CONFLICT (customer_id, domain) DO UPDATE
+           SET verification_method = 'manual', verified_at = NOW(), expires_at = NOW() + INTERVAL '90 days'`,
+          [ownerResult.rows[0].customer_id, order.target_url],
+        );
+      }
+    }
 
     audit({ orderId, action: 'order.verified', details: { method: 'manual', domain: order.target_url }, ip: request.ip });
 

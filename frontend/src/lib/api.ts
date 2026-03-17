@@ -8,6 +8,7 @@ export interface OrderData {
   status: string;
   package: string;
   createdAt: string;
+  alreadyVerified?: boolean;
 }
 
 export interface HostInfo {

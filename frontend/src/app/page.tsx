@@ -247,7 +247,14 @@ function HomeContent() {
     setSubmitting(true);
     try {
       const res = await createOrder(trimmed, selectedPackage);
-      if (res.success && res.data) { router.push(`/verify/${res.data.id}`); }
+      if (res.success && res.data) {
+        if (res.data.alreadyVerified || res.data.status === 'queued') {
+          // Domain already verified — skip verification, go to scan view
+          router.push(`/?orderId=${res.data.id}`);
+        } else {
+          router.push(`/verify/${res.data.id}`);
+        }
+      }
       else { setError(res.error || 'Unbekannter Fehler'); }
     } catch { setError('API nicht erreichbar. Läuft der Backend-Server?'); }
     finally { setSubmitting(false); }
