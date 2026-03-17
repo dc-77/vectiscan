@@ -76,9 +76,12 @@ class TestPerimeter:
         assert "cisa_kev" in config["phase3_tools"]
         assert "exploitdb" in config["phase3_tools"]
 
-    def test_nuclei_all_severities(self):
+    def test_nuclei_severities_no_info(self):
         config = get_config("perimeter")
-        assert "info" in config["nuclei_severity"]
+        assert "low" in config["nuclei_severity"]
+        assert "high" in config["nuclei_severity"]
+        assert "critical" in config["nuclei_severity"]
+        assert "info" not in config["nuclei_severity"]
 
 
 class TestComplianceSupplychainInsurance:
