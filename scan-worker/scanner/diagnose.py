@@ -63,7 +63,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "gobuster",
-        "version_cmd": ["gobuster", "version"],
+        "version_cmd": ["gobuster", "--help"],
         "category": "phase2",
     },
     {

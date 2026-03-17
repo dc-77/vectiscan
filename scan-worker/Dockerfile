@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       ca-certificates curl wget unzip jq dnsutils git bash \
       python3 python3-pip python3-venv \
-      nmap openssl libnet-ssleay-perl libjson-perl \
+      nmap openssl libnet-ssleay-perl libjson-perl libxml-writer-perl \
       procps bsdmainutils coreutils \
       chromium \
       whois ldnsutils && \
@@ -97,8 +97,9 @@ RUN curl -fsSL https://github.com/hahwul/dalfox/releases/download/v2.9.3/dalfox_
 # exploitdb/searchsploit (GPL v2 — local search only, no code linking)
 RUN git clone --depth 1 https://gitlab.com/exploit-database/exploitdb.git /opt/exploitdb && \
     ln -s /opt/exploitdb/searchsploit /usr/local/bin/searchsploit && \
-    cp /opt/exploitdb/.searchsploit_rc /root/.searchsploit_rc 2>/dev/null || true && \
-    sed -i 's|/opt/exploitdb-papers|/opt/exploitdb/exploitdb-papers|g; s|/opt/exploitdb-bin-sploits|/opt/exploitdb/exploitdb-bin-sploits|g' /root/.searchsploit_rc 2>/dev/null || true
+    cp /opt/exploitdb/.searchsploit_rc /etc/searchsploit_rc 2>/dev/null || true && \
+    sed -i 's|/opt/exploitdb-papers|/opt/exploitdb/exploitdb-papers|g; s|/opt/exploitdb-bin-sploits|/opt/exploitdb/exploitdb-bin-sploits|g' /etc/searchsploit_rc 2>/dev/null || true
+ENV SEARCHSPLOIT_RC=/etc/searchsploit_rc
 
 # nuclei templates
 RUN nuclei -update-templates
@@ -120,8 +121,8 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-# ── 4. Python packages ─────────────────────────────────────────────
-RUN pip3 install --no-cache-dir --break-system-packages wafw00f webtech
+# ── 4. Python packages (wafw00f only — webtech installed after requirements.txt) ──
+RUN pip3 install --no-cache-dir --break-system-packages wafw00f
 
 # ── 5. Wordlists ───────────────────────────────────────────────────
 RUN mkdir -p /usr/share/wordlists /usr/share/wordlists/seclists/Discovery/Web-Content \
@@ -146,7 +147,8 @@ COPY wordlists/cms-common.txt /usr/share/wordlists/cms-common.txt
 WORKDIR /opt/scanner
 
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt && \
+    pip3 install --no-cache-dir --break-system-packages webtech
 
 # httpx v1.6.10 — MUST come after pip install because anthropic pulls Python
 # httpx which installs an entry-point script that shadows the Go binary
