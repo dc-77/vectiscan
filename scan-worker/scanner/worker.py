@@ -21,6 +21,7 @@ from scanner.packages import get_config
 from scanner.phase0 import run_phase0
 from scanner.phase1 import run_phase1
 from scanner.phase2 import run_phase2
+from scanner.phase3 import run_phase3
 from scanner.progress import (
     publish_event,
     set_discovered_hosts,
@@ -70,6 +71,31 @@ def _save_passive_intel_summary(order_id: str, phase0a_results: dict[str, Any]) 
         log.warning("passive_intel_save_failed", order_id=order_id, error=str(e))
 
 
+def _save_phase3_data(order_id: str, phase3_result: dict[str, Any]) -> None:
+    """Persist Phase 3 correlation data and business impact score to orders table."""
+    try:
+        correlation_data = json.dumps(
+            phase3_result.get("correlated_findings", []),
+            default=str, ensure_ascii=False,
+        )
+        impact_score = phase3_result.get("business_impact_score", 0.0)
+
+        conn = psycopg2.connect(DATABASE_URL)
+        with conn.cursor() as cur:
+            cur.execute(
+                """UPDATE orders
+                   SET correlation_data = %s,
+                       business_impact_score = %s
+                   WHERE id = %s""",
+                (correlation_data, impact_score, order_id),
+            )
+        conn.commit()
+        conn.close()
+        log.info("phase3_data_saved", order_id=order_id, impact_score=impact_score)
+    except Exception as e:
+        log.warning("phase3_data_save_failed", order_id=order_id, error=str(e))
+
+
 def _is_host_reachable(ip: str, timeout: int = 5) -> bool:
     """Quick TCP connect check on port 80 and 443. Returns True if either responds."""
     for port in (443, 80):
@@ -102,6 +128,7 @@ _VERSION_COMMANDS: list[tuple[str, list[str]]] = [
     ("ffuf", ["ffuf", "-V"]),
     ("feroxbuster", ["feroxbuster", "--version"]),
     ("dalfox", ["dalfox", "version"]),
+    ("searchsploit", ["searchsploit", "--help"]),
 ]
 
 
@@ -357,6 +384,7 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
     scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]
     scannable_total = len(scannable)
 
+    phase2_results: list[dict[str, Any]] = []
     for idx, (host, tech_profile) in enumerate(scannable):
         ip = host["ip"]
         fqdns = host["fqdns"]
@@ -371,13 +399,56 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
                             hosts_completed=_idx, hosts_total=scannable_total)
             _check_timeout()
 
-        run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
-                   adaptive_config=adaptive_configs.get(ip, {}))
+        result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
+                            adaptive_config=adaptive_configs.get(ip, {}))
+        phase2_results.append(result)
 
         log.info("host_phase2_complete", order_id=order_id, ip=ip, idx=idx + 1, total=scannable_total)
 
+    # ── Phase 3: Correlation & Enrichment ──────────────────
+    phase3_result: dict[str, Any] = {}
+    phase3_tools = config.get("phase3_tools", [])
+    if phase3_tools and phase2_results:
+        _check_timeout()
+
+        update_progress(order_id, "scan_phase3", "starting")
+
+        def p3_callback(oid: str, tool: str, status: str) -> None:
+            update_progress(oid, "scan_phase3", tool)
+            _check_timeout()
+
+        config["package"] = package  # Ensure package is in config for Phase 3
+        phase3_result = run_phase3(
+            phase2_results=phase2_results,
+            tech_profiles=tech_profiles,
+            scan_dir=scan_dir,
+            order_id=order_id,
+            config=config,
+            progress_callback=p3_callback,
+            phase0a_results=phase0a_results if phase0a_results else None,
+        )
+
+        # Persist correlation data and business impact score to DB
+        _save_phase3_data(order_id, phase3_result)
+
+        # Save to scan_results for event replay
+        _save_result(order_id=order_id, host_ip=None, phase=3,
+                     tool_name="phase3_correlation",
+                     raw_output=json.dumps(phase3_result.get("phase3_summary", {}),
+                                           indent=2, ensure_ascii=False),
+                     exit_code=0, duration_ms=0)
+
+        publish_event(order_id, {
+            "type": "phase3_complete",
+            "summary": phase3_result.get("phase3_summary", {}),
+        })
+
+        log.info("phase3_integrated", order_id=order_id,
+                 findings=phase3_result.get("phase3_summary", {}).get("valid_findings", 0))
+
     # ── Finalize ────────────────────────────────────────────
-    _finalize(order_id, scan_dir, host_inventory, tech_profiles, package)
+    _finalize(order_id, scan_dir, host_inventory, tech_profiles, package,
+              phase3_result=phase3_result)
 
 
 def _finalize(
@@ -386,6 +457,7 @@ def _finalize(
     host_inventory: dict[str, Any],
     tech_profiles: list[dict[str, Any]],
     package: str = "perimeter",
+    phase3_result: dict[str, Any] | None = None,
 ) -> None:
     """Pack results, upload to MinIO, enqueue report job."""
     hosts_total = len(host_inventory.get("hosts", []))
@@ -409,8 +481,9 @@ def _finalize(
     archive_path = pack_results(scan_dir, order_id)
     minio_path = upload_to_minio(archive_path, order_id)
 
-    # Enqueue report generation
-    enqueue_report_job(order_id, minio_path, host_inventory, tech_profiles, package)
+    # Enqueue report generation (with Phase 3 enrichment data if available)
+    enqueue_report_job(order_id, minio_path, host_inventory, tech_profiles, package,
+                       phase3_result=phase3_result)
 
     # Mark scan as complete
     set_scan_complete(order_id)

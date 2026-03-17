@@ -1,4 +1,10 @@
-"""AI-powered scan strategy — uses Haiku for host prioritization and tool configuration."""
+"""AI-powered scan strategy — 4 decision points.
+
+1. Host Strategy (Haiku): after Phase 0, decide scan/skip per host
+2. Phase-2 Config (Haiku): after Phase 1, configure tools per host
+3. Phase-3 Prioritization (Sonnet): after Phase 2, cross-tool correlation reasoning
+4. Report QA (programmatic + Haiku): after report generation (Phase V)
+"""
 
 from __future__ import annotations
 
@@ -12,6 +18,7 @@ import structlog
 log = structlog.get_logger()
 
 HAIKU_MODEL = "claude-haiku-4-5-20251001"
+SONNET_MODEL = "claude-sonnet-4-6"
 
 # ---------------------------------------------------------------------------
 # Haiku client
@@ -338,5 +345,161 @@ Antwort im Format:
              wordlist=result.get("gobuster_wordlist"),
              ffuf_mode=result.get("ffuf_mode"),
              ferox_depth=result.get("feroxbuster_depth"))
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Sonnet client (for Phase 3 cross-tool reasoning)
+# ---------------------------------------------------------------------------
+
+def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 4096) -> dict[str, Any]:
+    """Call Claude Sonnet for complex reasoning tasks.
+
+    Used for Phase 3 cross-tool correlation where Haiku's reasoning
+    capability is insufficient.
+    """
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        log.warning("ai_sonnet_no_api_key")
+        return {"_error": "ANTHROPIC_API_KEY nicht gesetzt"}
+
+    raw = ""
+    try:
+        import anthropic
+        client = anthropic.Anthropic(api_key=api_key)
+
+        start = time.monotonic()
+        response = client.messages.create(
+            model=SONNET_MODEL,
+            max_tokens=max_tokens,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+        duration_ms = int((time.monotonic() - start) * 1000)
+
+        raw = response.content[0].text
+        log.info("sonnet_response", duration_ms=duration_ms,
+                 tokens=response.usage.output_tokens)
+
+        # Strip markdown code fences if present
+        text = raw.strip()
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+        if text.endswith("```"):
+            text = text.rsplit("```", 1)[0]
+        text = text.strip()
+
+        return json.loads(text)
+
+    except json.JSONDecodeError as e:
+        log.error("sonnet_json_parse_error", error=str(e), raw=raw[:500])
+        return {"_error": f"JSON-Parse-Fehler: {e}"}
+    except Exception as e:
+        log.error("sonnet_call_error", error=str(e))
+        return {"_error": f"API-Fehler: {e}"}
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 Prioritization (after Phase 2, uses Sonnet)
+# ---------------------------------------------------------------------------
+
+PHASE3_SYSTEM = """Du bist ein Senior-Pentester der Findings aus verschiedenen Security-Scanning-Tools analysiert.
+
+AUFGABE:
+Analysiere die aggregierten Findings und entscheide:
+1. Welche Findings haben hohe Konfidenz? (von mehreren Tools bestätigt, Version passt)
+2. Welche Findings haben niedrige Konfidenz? (nur ein Tool, kein Kontext)
+3. Welche Findings sind wahrscheinlich False Positives? (Version-Mismatch, WAF-Artefakt, CMS-Mismatch)
+
+KONFIDENZ-REGELN:
+- Gleiche CVE aus mehreren Tools → hohe Konfidenz
+- nuclei-Finding + passende Service-Version aus nmap → hohe Konfidenz
+- nikto-only Finding hinter WAF → niedrige Konfidenz
+- nuclei-Finding für falsche Technologie (z.B. WordPress-Template auf Shopware-Site) → False Positive
+- testssl-Finding + nuclei-SSL-Finding → merge zu einem Finding
+
+PRIORISIERUNG:
+- Findings mit CVSS ≥ 9.0 → immer "high" Priorität
+- Findings mit aktiven Exploits → immer "high" Priorität
+- Informational-Findings ohne Sicherheitswert → "low" Priorität
+
+Antworte NUR mit validem JSON, kein anderer Text."""
+
+PHASE3_SCHEMA = """{
+  "high_confidence_findings": [
+    {
+      "finding_ref": "tool:title or CVE-ID",
+      "confidence": 0.95,
+      "corroboration": ["tool1_match", "version_confirmed"],
+      "enrich_priority": "high"
+    }
+  ],
+  "low_confidence_findings": [
+    {
+      "finding_ref": "tool:title or CVE-ID",
+      "confidence": 0.3,
+      "reason": "Nur ein Tool, keine Bestätigung",
+      "enrich_priority": "low"
+    }
+  ],
+  "potential_false_positives": [
+    {
+      "finding_ref": "tool:title or CVE-ID",
+      "reason": "Version-Mismatch: Finding für nginx 1.18, aber nmap erkennt 1.24"
+    }
+  ],
+  "strategy_notes": "Zusammenfassung der Korrelationsanalyse"
+}"""
+
+
+def plan_phase3_prioritization(
+    finding_summary: list[dict[str, Any]],
+    tech_profiles: list[dict[str, Any]],
+    has_waf: bool = False,
+) -> dict[str, Any]:
+    """Use Sonnet to prioritize and correlate Phase 2 findings.
+
+    Args:
+        finding_summary: Condensed list of findings from all tools.
+        tech_profiles: Tech profiles from Phase 1 (for version cross-checking).
+        has_waf: Whether any host has a WAF detected.
+
+    Returns:
+        Prioritized finding list with confidence scores.
+    """
+    # Truncate finding summary to avoid excessive token usage
+    summary_truncated = finding_summary[:100]
+
+    user_prompt = f"""Phase-2 Scan-Ergebnisse ({len(finding_summary)} Findings, zeige die ersten {len(summary_truncated)}):
+
+{json.dumps(summary_truncated, indent=2, ensure_ascii=False)}
+
+Tech-Profiles der gescannten Hosts:
+{json.dumps(tech_profiles, indent=2, ensure_ascii=False)}
+
+WAF erkannt: {"Ja" if has_waf else "Nein"}
+
+Analysiere die Findings: Welche sind echt, welche sind False Positives?
+Antwort im Format:
+{PHASE3_SCHEMA}"""
+
+    result = _call_sonnet(PHASE3_SYSTEM, user_prompt)
+
+    error_detail = result.get("_error", "")
+    if not result or "high_confidence_findings" not in result:
+        reason = error_detail or "Ungültige KI-Antwort"
+        log.warning("ai_phase3_fallback", reason=reason)
+        return {
+            "high_confidence_findings": [],
+            "low_confidence_findings": [],
+            "potential_false_positives": [],
+            "strategy_notes": f"Fallback: programmatische Korrelation ({reason})",
+        }
+
+    high = len(result.get("high_confidence_findings", []))
+    low = len(result.get("low_confidence_findings", []))
+    fp = len(result.get("potential_false_positives", []))
+    log.info("ai_phase3_complete", high=high, low=low, fp=fp)
 
     return result

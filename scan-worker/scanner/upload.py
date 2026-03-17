@@ -65,18 +65,29 @@ def enqueue_report_job(
     host_inventory: dict,
     tech_profiles: list[dict],
     package: str = "perimeter",
+    phase3_result: dict | None = None,
 ) -> None:
     """Push a job to the report-pending queue in Redis."""
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
     r = redis.from_url(redis_url)
 
-    job_data = json.dumps({
+    job_payload: dict = {
         "orderId": order_id,
         "rawDataPath": minio_path,
         "hostInventory": host_inventory,
         "techProfiles": tech_profiles,
         "package": package,
-    })
+    }
+
+    # Include Phase 3 enrichment data for the report worker
+    if phase3_result:
+        job_payload["enrichment"] = phase3_result.get("enrichment", {})
+        job_payload["correlatedFindings"] = phase3_result.get("correlated_findings", [])
+        job_payload["businessImpactScore"] = phase3_result.get("business_impact_score", 0.0)
+        job_payload["phase3Summary"] = phase3_result.get("phase3_summary", {})
+
+    job_data = json.dumps(job_payload, default=str)
 
     r.rpush("report-pending", job_data)
-    log.info("report_job_enqueued", order_id=order_id, package=package)
+    log.info("report_job_enqueued", order_id=order_id, package=package,
+             has_phase3=bool(phase3_result))

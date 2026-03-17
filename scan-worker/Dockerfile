@@ -94,6 +94,11 @@ RUN curl -fsSL https://github.com/hahwul/dalfox/releases/download/v2.9.3/dalfox_
     chmod +x /usr/local/bin/dalfox && \
     rm -f /tmp/dalfox.tar.gz
 
+# exploitdb/searchsploit (GPL v2 — local search only, no code linking)
+RUN git clone --depth 1 https://gitlab.com/exploit-database/exploitdb.git /opt/exploitdb && \
+    ln -s /opt/exploitdb/searchsploit /usr/local/bin/searchsploit && \
+    sed -i 's|/opt/exploitdb|/opt/exploitdb|g' /opt/exploitdb/.searchsploit_rc || true
+
 # nuclei templates
 RUN nuclei -update-templates
 
@@ -171,12 +176,13 @@ RUN nmap --version; \
     ffuf -V; \
     feroxbuster --version; \
     dalfox version; \
+    searchsploit --help > /dev/null 2>&1 || true; \
     echo "All tools verified"
 
 # ── 8. Security — non-root user ────────────────────────────────────
 RUN useradd -r -s /bin/false scanner && \
     mkdir -p /home/scanner/.config/subfinder && \
-    chown -R scanner:scanner /opt/scanner /home/scanner
+    chown -R scanner:scanner /opt/scanner /home/scanner /opt/exploitdb
 
 USER scanner
 ENTRYPOINT ["python3", "-m", "scanner"]
