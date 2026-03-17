@@ -33,11 +33,11 @@ export default function AppHeader() {
   };
 
   const navItems = [
+    { href: '/', label: 'Neuer Scan', exact: true, highlight: true },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/schedules', label: 'Zeitpläne' },
-    { href: '/', label: 'Neuer Scan', exact: true },
     { href: '/profile', label: 'Profil' },
-  ];
+  ] as const;
 
   return (
     <header className="h-10 shrink-0 flex items-center justify-between px-4"
@@ -61,13 +61,16 @@ export default function AppHeader() {
       {!isAuth && authed && (
         <nav className="flex items-center gap-1">
           {navItems.map(item => {
-            const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
+            const isActive = 'exact' in item && item.exact ? pathname === item.href : pathname.startsWith(item.href);
+            const isHighlight = 'highlight' in item && item.highlight;
             return (
               <Link key={item.href} href={item.href}
                 className={`text-xs font-mono px-2 py-1.5 transition-colors ${
-                  isActive
-                    ? 'text-blue-400 border-b-2 border-blue-500'
-                    : 'text-slate-500 hover:text-slate-200'
+                  isHighlight && !isActive
+                    ? 'text-[#38BDF8] hover:text-[#7DD3FC]'
+                    : isActive
+                      ? 'text-blue-400 border-b-2 border-blue-500'
+                      : 'text-slate-500 hover:text-slate-200'
                 }`}>
                 {item.label}
               </Link>
