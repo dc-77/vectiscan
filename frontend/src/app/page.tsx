@@ -275,7 +275,7 @@ function HomeContent() {
   if (!orderId && !showReport) {
     return (
       <main className="flex-1 flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-2xl space-y-6">
+        <div className="w-full max-w-4xl space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex gap-3">
               <input type="text" value={domain} onChange={(e) => setDomain(e.target.value)}

@@ -2,37 +2,14 @@
 
 export type ScanPackage = 'webcheck' | 'perimeter' | 'compliance' | 'supplychain' | 'insurance';
 
-interface Feature {
-  name: string;
-  webcheck: boolean | string;
-  perimeter: boolean | string;
-  compliance: boolean | string;
-  supplychain: boolean | string;
-  insurance: boolean | string;
-}
-
-const FEATURES: Feature[] = [
-  { name: 'Port-Scan',            webcheck: 'Top 100', perimeter: 'Top 1000', compliance: 'Top 1000', supplychain: 'Top 1000', insurance: 'Top 1000' },
-  { name: 'SSL/TLS',              webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Security-Header',      webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'CMS-Erkennung',        webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Passive Intel',        webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Vuln-Scan',            webcheck: 'High/Crit', perimeter: 'Alle', compliance: 'Alle', supplychain: 'Alle', insurance: 'Alle' },
-  { name: 'Nikto / ffuf',         webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'XSS-Scanner',          webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Threat-Intel',         webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Korrelation',          webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: '§30 BSIG',             webcheck: false, perimeter: false, compliance: true,  supplychain: false, insurance: false },
-  { name: 'ISO 27001',            webcheck: false, perimeter: false, compliance: false, supplychain: true,  insurance: false },
-  { name: 'Vers.-Fragebogen',     webcheck: false, perimeter: false, compliance: false, supplychain: false, insurance: true },
-  { name: 'Max. Hosts',           webcheck: '3',   perimeter: '15',  compliance: '15',  supplychain: '15',  insurance: '15' },
-];
-
 interface PackageInfo {
   key: ScanPackage;
   title: string;
-  description: string;
+  subtitle: string;
+  reportFocus: string[];
   duration: string;
+  hosts: string;
+  tier: 'quick' | 'perimeter';
   badge?: string;
   badgeColor?: string;
   accentColor: string;
@@ -42,15 +19,21 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'webcheck',
     title: 'WebCheck',
-    description: 'Website, SSL/TLS, E-Mail-Schutz und CMS-Check.',
+    subtitle: 'SSL, Headers, CMS, E-Mail-Schutz — kompakter Report mit Ampel',
+    reportFocus: ['Top-100-Port-Scan', 'Mail-Security (SPF/DMARC/DKIM)', 'Ampelbewertung'],
     duration: '~15–20 Min',
+    hosts: '3',
+    tier: 'quick',
     accentColor: '#38BDF8',
   },
   {
     key: 'perimeter',
     title: 'PerimeterScan',
-    description: 'Volle Angriffsfläche: Passive Intel, Deep Scan, Fuzzing, Threat-Intel.',
+    subtitle: 'Vollständige Angriffsflächen-Analyse mit priorisiertem Maßnahmenplan.',
+    reportFocus: ['PTES-konformer Report', 'Executive Summary', 'Priorisierte Maßnahmen'],
     duration: '~60–90 Min',
+    hosts: '15',
+    tier: 'perimeter',
     badge: 'Empfohlen',
     badgeColor: '#38BDF8',
     accentColor: '#38BDF8',
@@ -58,8 +41,11 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'compliance',
     title: 'ComplianceScan',
-    description: 'Perimeter + §30 BSIG, BSI-Grundschutz, Audit-Trail.',
+    subtitle: 'Perimeter-Scan mit NIS2-Compliance-Nachweis.',
+    reportFocus: ['§30 BSIG-Mapping', 'BSI-Grundschutz-Refs', 'Audit-Trail'],
     duration: '~65–95 Min',
+    hosts: '15',
+    tier: 'perimeter',
     badge: 'NIS2',
     badgeColor: '#EAB308',
     accentColor: '#EAB308',
@@ -67,8 +53,11 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'supplychain',
     title: 'SupplyChain',
-    description: 'Perimeter + ISO 27001 Mapping, Auftraggeber-Nachweis.',
+    subtitle: 'Sicherheitsnachweis für NIS2-pflichtige Auftraggeber.',
+    reportFocus: ['ISO 27001 Annex A', 'Lieferanten-Nachweis', 'Auftraggeber-Kapitel'],
     duration: '~65–95 Min',
+    hosts: '15',
+    tier: 'perimeter',
     badge: 'ISO 27001',
     badgeColor: '#A78BFA',
     accentColor: '#A78BFA',
@@ -76,12 +65,20 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'insurance',
     title: 'InsuranceReport',
-    description: 'Perimeter + Fragebogen, Risk-Score, Ransomware-Indikator.',
+    subtitle: 'Nachweis für Cyberversicherung mit Risikobewertung.',
+    reportFocus: ['10-Punkte Fragebogen', 'Risk-Score', 'Ransomware-Indikator'],
     duration: '~65–95 Min',
+    hosts: '15',
+    tier: 'perimeter',
     badge: 'Versicherung',
     badgeColor: '#34D399',
     accentColor: '#34D399',
   },
+];
+
+const SHARED_CAPABILITIES = [
+  'Nmap Top-1000', 'Passive Intel', 'Nuclei', 'Nikto', 'ffuf',
+  'XSS-Scanner', 'Threat-Intel', 'Korrelation', '15 Hosts',
 ];
 
 interface Props {
@@ -89,89 +86,148 @@ interface Props {
   onSelect: (pkg: ScanPackage) => void;
 }
 
-function FeatureIcon({ value }: { value: boolean | string }) {
-  if (typeof value === 'string') {
-    return <span className="text-white font-medium text-sm">{value}</span>;
-  }
-  if (value) {
-    return <span className="text-[#22C55E]" aria-label="included">✓</span>;
-  }
-  return <span className="text-[#475569]" aria-label="not included">—</span>;
+function CheckCircle({ color }: { color: string }) {
+  return (
+    <span
+      className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center"
+      style={{ backgroundColor: color }}
+    >
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  );
 }
 
 export default function PackageSelector({ selected, onSelect }: Props) {
+  const webcheck = PACKAGES.find(p => p.key === 'webcheck')!;
+  const perimeterPkgs = PACKAGES.filter(p => p.tier === 'perimeter');
+
+  const isWcSelected = selected === 'webcheck';
+  const wcBorder = isWcSelected ? webcheck.accentColor : '#334155';
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" data-testid="package-selector">
-      {PACKAGES.map((pkg) => {
-        const isSelected = selected === pkg.key;
-        const borderColor = isSelected ? pkg.accentColor : '#334155';
-
-        return (
-          <div
-            key={pkg.key}
-            data-testid={`package-${pkg.key}`}
-            onClick={() => onSelect(pkg.key)}
-            className="relative rounded-xl p-5 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
-            style={{
-              borderWidth: '2px',
-              borderStyle: 'solid',
-              borderColor,
-              boxShadow: isSelected ? `0 0 20px ${pkg.accentColor}20` : 'none',
-            }}
-          >
-            {/* Badge */}
-            {pkg.badge && (
-              <span
-                className="absolute -top-3 left-4 text-xs font-bold px-3 py-0.5 rounded-full"
-                style={{
-                  backgroundColor: pkg.badgeColor,
-                  color: '#0F172A',
-                }}
-                data-testid={`badge-${pkg.key}`}
-              >
-                {pkg.badge}
-              </span>
-            )}
-
-            {/* Header */}
-            <div className="mb-3 mt-1">
-              <h3 className="text-white font-semibold text-lg">{pkg.title}</h3>
-              <p className="text-[#94A3B8] text-sm mt-1">{pkg.description}</p>
+    <div className="space-y-5" data-testid="package-selector">
+      {/* ── Tier 1: WebCheck ────────────────────────────────── */}
+      <div
+        data-testid="package-webcheck"
+        onClick={() => onSelect('webcheck')}
+        className="relative w-full rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
+        style={{
+          borderWidth: '2px',
+          borderStyle: 'solid',
+          borderColor: wcBorder,
+          boxShadow: isWcSelected ? `0 0 20px ${webcheck.accentColor}20` : 'none',
+        }}
+      >
+        {isWcSelected && <CheckCircle color={webcheck.accentColor} />}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-2xl shrink-0">&#9889;</span>
+            <div className="min-w-0">
+              <h3 className="text-white font-semibold text-base">WebCheck</h3>
+              <p className="text-[#94A3B8] text-sm mt-0.5">{webcheck.subtitle}</p>
             </div>
-
-            {/* Duration Badge */}
-            <span className="inline-block text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8] mb-4">
-              {pkg.duration}
+          </div>
+          <div className="flex items-center gap-2 sm:ml-auto shrink-0">
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8]">
+              {webcheck.duration}
             </span>
+            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8]">
+              max {webcheck.hosts} Hosts
+            </span>
+          </div>
+        </div>
+      </div>
 
-            {/* Feature List */}
-            <ul className="space-y-1.5 mb-4">
-              {FEATURES.map((f) => (
-                <li key={f.name} className="flex items-center justify-between text-sm">
-                  <span className="text-[#94A3B8] truncate mr-2">{f.name}</span>
-                  <FeatureIcon value={f[pkg.key]} />
-                </li>
-              ))}
-            </ul>
+      {/* ── Divider ─────────────────────────────────────────── */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-[#1E3A5F]" />
+        <span className="text-[10px] font-mono uppercase tracking-widest text-[#475569]">
+          Full Perimeter Scan
+        </span>
+        <div className="flex-1 h-px bg-[#1E3A5F]" />
+      </div>
+      <p className="text-center text-xs text-[#64748B] -mt-3">
+        Alle 4 Varianten scannen identisch — der Report-Typ macht den Unterschied.
+      </p>
 
-            {/* Select Button */}
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onSelect(pkg.key); }}
-              className="w-full py-2 rounded-lg text-sm font-medium transition-colors"
+      {/* ── Shared Capabilities ─────────────────────────────── */}
+      <div className="flex flex-wrap gap-1.5 justify-center">
+        {SHARED_CAPABILITIES.map((cap) => (
+          <span key={cap} className="text-[11px] text-[#64748B] bg-[#0F172A] px-2 py-0.5 rounded">
+            {cap}
+          </span>
+        ))}
+      </div>
+
+      {/* ── Tier 2: Perimeter Variants (2×2 Grid) ──────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {perimeterPkgs.map((pkg) => {
+          const isSelected = selected === pkg.key;
+          const borderColor = isSelected ? pkg.accentColor : (pkg.key === 'perimeter' ? `${pkg.accentColor}30` : '#334155');
+
+          return (
+            <div
+              key={pkg.key}
+              data-testid={`package-${pkg.key}`}
+              onClick={() => onSelect(pkg.key)}
+              className="relative rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
               style={{
-                backgroundColor: isSelected ? pkg.accentColor : 'transparent',
-                color: isSelected ? '#0F172A' : pkg.accentColor,
-                borderWidth: '1px',
+                borderWidth: '2px',
                 borderStyle: 'solid',
-                borderColor: pkg.accentColor,
+                borderColor,
+                boxShadow: isSelected ? `0 0 20px ${pkg.accentColor}20` : 'none',
               }}
             >
-              {isSelected ? 'Ausgewählt' : 'Scan starten'}
-            </button>
-          </div>
-        );
-      })}
+              {/* Badge */}
+              {pkg.badge && (
+                <span
+                  className={`absolute -top-2.5 left-4 font-bold px-3 py-0.5 rounded-full ${
+                    pkg.key === 'perimeter' ? 'text-sm px-4' : 'text-xs'
+                  }`}
+                  style={{ backgroundColor: pkg.badgeColor, color: '#0F172A' }}
+                  data-testid={`badge-${pkg.key}`}
+                >
+                  {pkg.badge}
+                </span>
+              )}
+
+              {/* Check circle */}
+              {isSelected && <CheckCircle color={pkg.accentColor} />}
+
+              {/* Content */}
+              <div className="mt-2">
+                <h3 className="text-white font-semibold text-base">{pkg.title}</h3>
+                <p className="text-[#94A3B8] text-xs mt-1">{pkg.subtitle}</p>
+
+                {/* Duration + Hosts */}
+                <div className="flex items-center gap-2 mt-2.5">
+                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#334155] text-[#94A3B8]">
+                    {pkg.duration}
+                  </span>
+                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#334155] text-[#94A3B8]">
+                    max {pkg.hosts} Hosts
+                  </span>
+                </div>
+
+                {/* Report Focus Bullets */}
+                <ul className="mt-3 space-y-1">
+                  {pkg.reportFocus.map((item) => (
+                    <li
+                      key={item}
+                      className="text-xs text-[#CBD5E1] pl-3"
+                      style={{ borderLeft: `2px solid ${pkg.accentColor}40` }}
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
