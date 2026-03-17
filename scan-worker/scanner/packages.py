@@ -26,7 +26,7 @@ _PERIMETER_BASE: dict[str, Any] = {
                      "fp_filter", "business_impact"],
     "phase3_timeout": 300,        # 5 Minuten
     "total_timeout": 7200,        # 120 Minuten
-    "nuclei_severity": "info,low,medium,high,critical",
+    "nuclei_severity": "low,medium,high,critical",
 }
 
 

@@ -445,6 +445,19 @@ def call_claude(
 
     client = anthropic.Anthropic(api_key=api_key)
 
+    # Safety-net: cap consolidated_findings to avoid Claude API timeout on large scans
+    MAX_FINDINGS_CHARS = 30000
+    if len(consolidated_findings) > MAX_FINDINGS_CHARS:
+        log.warning("consolidated_findings_truncated",
+                    original_len=len(consolidated_findings),
+                    truncated_to=MAX_FINDINGS_CHARS,
+                    domain=domain)
+        consolidated_findings = (
+            consolidated_findings[:MAX_FINDINGS_CHARS]
+            + f"\n\n--- GEKÜRZT: {len(consolidated_findings) - MAX_FINDINGS_CHARS} Zeichen entfernt "
+            "(vollständige Rohdaten im MinIO-Archiv) ---"
+        )
+
     # Build user prompt (from architecture.md)
     user_prompt = f"""
 Analysiere die folgenden Scan-Rohdaten für {domain}.
@@ -475,7 +488,7 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 max_tokens=max_tokens,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
-                timeout=60.0,
+                timeout=120.0,
             )
 
             # Extract text from response

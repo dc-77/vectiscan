@@ -268,7 +268,6 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[
         "-u", f"https://{fqdn}",
         "--screenshot-path", f"{phase2_dir}/",
         "--chrome-path", chrome_path,
-        "--disable-logging",
     ]
 
     exit_code, duration_ms = run_tool(
@@ -665,7 +664,7 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
         "-o", output_path,
         "--dont-scan", "logout|signout|delete",
         "--timeout", "5",
-        "--no-recursion-on", "403",
+        "--no-recursion",
         "--silent",
     ]
 
