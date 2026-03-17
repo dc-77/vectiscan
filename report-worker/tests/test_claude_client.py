@@ -81,7 +81,7 @@ class TestCallClaude:
                 consolidated_findings="",
             )
         call_args = mock_anthropic.messages.create.call_args
-        assert call_args.kwargs["model"] == "claude-sonnet-4-20250514"
+        assert call_args.kwargs["model"] == "claude-sonnet-4-6"
         assert call_args.kwargs["max_tokens"] == 4096
 
     def test_missing_api_key_raises(self) -> None:

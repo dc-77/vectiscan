@@ -93,12 +93,12 @@ def test_package_passed_to_mapper(
 @patch("reporter.worker._upload_report")
 @patch("reporter.worker._create_report_record")
 @patch("reporter.worker._update_order_status")
-def test_default_package_professional(
+def test_default_package_perimeter(
     mock_status, mock_create, mock_upload, mock_gen,
     mock_map, mock_claude, mock_parse, mock_download,
     mock_db, mock_minio, base_job_data, tmp_path
 ):
-    """Missing package should default to professional."""
+    """Missing package should default to perimeter."""
     # No "package" key in job_data
     mock_download.return_value = tmp_path / "raw.tar.gz"
     (tmp_path / "raw.tar.gz").write_bytes(b"")
@@ -114,7 +114,7 @@ def test_default_package_professional(
                 process_job(base_job_data)
 
     call_kwargs = mock_claude.call_args
-    assert call_kwargs.kwargs.get("package") == "professional" or (len(call_kwargs.args) > 4 and call_kwargs.args[4] == "professional")
+    assert call_kwargs.kwargs.get("package") == "perimeter" or (len(call_kwargs.args) > 4 and call_kwargs.args[4] == "perimeter")
 
 def test_package_in_scan_meta(base_job_data, tmp_path):
     """Package should appear in scan_meta passed to mapper."""

@@ -110,12 +110,14 @@ class TestGetSystemPrompt:
         assert get_system_prompt("compliance") is SYSTEM_PROMPT_NIS2
 
     def test_supplychain(self):
-        # TODO Phase V: should return SYSTEM_PROMPT_SUPPLYCHAIN
-        assert get_system_prompt("supplychain") is SYSTEM_PROMPT_PROFESSIONAL
+        prompt = get_system_prompt("supplychain")
+        assert "ISO 27001" in prompt
+        assert "supply_chain_attestation" in prompt
 
     def test_insurance(self):
-        # TODO Phase V: should return SYSTEM_PROMPT_INSURANCE
-        assert get_system_prompt("insurance") is SYSTEM_PROMPT_PROFESSIONAL
+        prompt = get_system_prompt("insurance")
+        assert "insurance_questionnaire" in prompt
+        assert "risk_score" in prompt
 
     # Legacy aliases still work
     def test_legacy_basic(self):
