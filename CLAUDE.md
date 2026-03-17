@@ -1,9 +1,9 @@
 # VectiScan — Prototyp
 
 ## Was ist VectiScan?
-Automatisierte Security-Scan-Plattform. Der Prototyp ist ein internes Tool zum
-Testen der Scanner- und Report-Pipeline. Kein Zahlungsflow, keine Domain-Verifizierung,
-kein E-Mail-Versand. Nur: Domain eingeben → Scannen → PDF-Report herunterladen.
+Automatisierte Security-Scan-Plattform mit drei Paketen (Basic, Professional, NIS2).
+Internes Tool hinter Traefik (internal-only). Benutzer registrieren sich, erstellen
+Scan-Orders, verifizieren ihre Domain, und erhalten einen PDF-Report.
 
 ## Zielumgebung
 - Server: vectigal-docker02 (Debian 13, 192.168.8.44, DMZ)
@@ -44,7 +44,7 @@ definiert alle Container. Docs liegen unter docs/.
 - Logging: strukturiertes JSON-Logging (pino für Node, structlog für Python)
 - Docker: Multi-Stage Builds, Non-Root User in allen Images
 - Alle Scan-Tool-Outputs als JSON (wo möglich), gespeichert unter
-  /tmp/scan-<scanId>/ mit der Verzeichnisstruktur aus docs/SCAN-TOOLS.md
+  /tmp/scan-<orderId>/ mit der Verzeichnisstruktur aus docs/SCAN-TOOLS.md
 
 ## Netzwerk-Architektur
 - proxy-net: Traefik ↔ Frontend, API (über Traefik erreichbar, internal-only)
@@ -71,42 +71,84 @@ API:
 SSL-Zertifikate werden automatisch per Let's Encrypt HTTP-01 gezogen.
 Kein certresolver-Label nötig — das ist der Traefik-Default.
 
-## API-Endpoints (Prototyp)
-Siehe docs/API-SPEC.md für Details.
-- POST /api/scans           → Neuen Scan starten (Body: { domain })
-- GET  /api/scans/:id       → Status + Fortschritt abrufen
-- GET  /api/scans/:id/report → Download-URL für PDF
-- GET  /health              → Health-Check für Traefik
+## Authentication
+- JWT-basierte Auth (Register, Login, Password-Reset)
+- Zwei Rollen: `customer` (sieht eigene Orders) und `admin` (sieht alles)
+- Middleware: `requireAuth` (JWT prüfen), `requireAdmin` (Admin-Rolle prüfen)
+- Report-Download: Auth via JWT oder Download-Token (für E-Mail-Links)
+
+## API-Endpoints
+Siehe docs/API-SPEC.md für vollständige Spezifikation.
+
+### Orders
+- POST /api/orders           → Neue Order anlegen (Body: { domain, package? })
+- GET  /api/orders           → Order-Liste (Admin: alle, Kunde: eigene)
+- GET  /api/orders/:id       → Status + Live-Fortschritt
+- DELETE /api/orders/:id     → Soft-Cancel oder Hard-Delete (?permanent=true)
+- GET  /api/orders/:id/report → PDF-Download (Auth via JWT oder Download-Token)
+- GET  /api/orders/:id/results → Raw Scan-Results pro Tool
+- GET  /api/orders/:id/events → AI-Strategie, AI-Configs, Tool-Outputs (Event Replay)
+- GET  /api/orders/:id/findings → Strukturierte Befunde aus dem Report
+
+### Auth
+- POST /api/auth/register, POST /api/auth/login, GET /api/auth/me
+- POST /api/auth/forgot-password, POST /api/auth/reset-password
+- PUT  /api/auth/password
+
+### Admin
+- GET /api/admin/users, PUT /api/admin/users/:id/role, DELETE /api/admin/users/:id
+- GET /api/admin/stats
+
+### Schedules
+- GET /api/schedules, POST /api/schedules, GET /api/schedules/:id
+- PUT /api/schedules/:id, DELETE /api/schedules/:id
+
+### Verification
+- POST /api/verify/check, POST /api/verify/manual, GET /api/verify/status/:orderId
+
+### WebSocket
+- GET /ws?orderId=<uuid> → Real-Time Progress mit Event-Replay
+
+### Health
+- GET /health → Health-Check für Traefik
 
 ## Datenbank
 Siehe docs/DB-SCHEMA.sql für das vollständige Schema.
-Drei Tabellen: scans, scan_results, reports.
-Kein customers-Table, keine Zahlungsfelder.
+Sieben Tabellen: customers, users, orders, scan_results, reports, audit_log, scan_schedules.
 
 ## Scan-Worker
-Drei-Phasen-Modell:
-- Phase 0: DNS-Reconnaissance (subfinder, amass, gobuster dns, crt.sh, dnsx)
-- Phase 1: Technologie-Erkennung pro Host (nmap, webtech, wafw00f)
-- Phase 2: Tiefer Scan pro Host (testssl.sh, nikto, nuclei, gobuster dir, gowitness)
+Phase-First-Architektur mit AI-Orchestrierung:
+1. Phase 0: DNS-Reconnaissance + Web-Probe (httpx)
+2. AI Host Strategy: Haiku entscheidet scan/skip pro Host
+3. Phase 1: Tech-Detection alle Hosts sequenziell (nmap, webtech, wafw00f)
+4. AI Phase 2 Config: Haiku konfiguriert Tools pro Host
+5. Phase 2: Deep-Scan alle Hosts sequenziell (testssl, nikto, nuclei, gobuster, etc.)
+
 Tool-Konfiguration und Timeouts: siehe docs/SCAN-TOOLS.md
-Max 10 Hosts, Gesamt-Timeout 120 Minuten.
-Hosts werden sequenziell gescannt (kein paralleles Scanning im Prototyp).
+Max Hosts: Basic 5, Pro/NIS2 10. Gesamt-Timeout: Basic 15 Min, Pro/NIS2 120 Min.
 
 ## Report-Worker
-1. Rohdaten aus MinIO laden (scan-rawdata/<scanId>.tar.gz)
+1. Rohdaten aus MinIO laden (scan-rawdata/<orderId>.tar.gz)
 2. Tool-Outputs parsen und strukturieren (parser.py)
 3. Claude API aufrufen (claude_client.py, Sonnet, JSON-Output, deutscher Text)
-4. Claude-Output auf report_data-Struktur mappen (report_mapper.py)
-5. PDF generieren via generate_report() aus dem Skill (generate_report.py)
-6. PDF nach MinIO hochladen (scan-reports/<scanId>.pdf)
-7. Scan-Status auf report_complete setzen
+   - Drei Prompt-Varianten: Basic, Professional, NIS2 (prompts.py)
+4. CWE-Validierung + CVSS-Score-Capping (cwe_reference.py)
+5. Claude-Output auf report_data-Struktur mappen (report_mapper.py)
+6. PDF generieren via generate_report() aus dem Skill (generate_report.py)
+7. PDF nach MinIO hochladen (scan-reports/<orderId>.pdf)
+8. Findings-Daten in reports.findings_data speichern (Dashboard)
+9. Order-Status auf report_complete setzen
 
-Die PDF-Generierung nutzt den pentest-report-generator Skill. Das Script
-generate_report.py und die Referenz report_structure.md liegen im Repo.
-Das Claude-Output-Format ist so gestaltet, dass die Finding-Felder (id, title,
-severity, cvss_score, cvss_vector, cwe, affected, description, evidence,
-impact, recommendation) 1:1 auf die report_data-Struktur des Skills mappen.
-Siehe docs/architecture.md für Prompt-Struktur und Mapping-Beispiele.
+## Frontend-Seiten
+- `/` — Landing, Order erstellen mit Package-Selector
+- `/login` — Login
+- `/forgot-password`, `/reset-password` — Passwort-Reset-Flow
+- `/dashboard` — Order-Liste, Findings-Viewer, Severity-Bars
+- `/scan/[orderId]` — Scan-Detail mit Live-Progress, AI Intelligence Panel, Debug-Mode
+- `/verify/[orderId]` — Domain-Verifizierung (DNS-TXT, File, Meta-Tag)
+- `/schedules` — Zeitplan-Verwaltung (CRUD)
+- `/profile` — Passwort ändern
+- `/admin` — Benutzerverwaltung, System-Statistiken
 
 ## CI/CD
 Multi-Image-Build nach dem Muster aus dem Betriebshandbuch (Beispiel C: Gutachten-KI).
@@ -119,20 +161,21 @@ Deploy-Sleep: 15 Sekunden (7 Container brauchen Zeit für Healthchecks).
 - Am Ende jeder abgeschlossenen Aufgabe: Kontext-Auslastung ausgeben (geschätzter %-Wert)
 
 ## Wichtige Referenz-Dokumente
-- docs/PROTOTYPE-SCOPE.md — Was ist im Prototyp drin, was nicht
+- docs/PROTOTYPE-SCOPE.md — Feature-Scope
 - docs/API-SPEC.md — API-Spezifikation
 - docs/DB-SCHEMA.sql — Datenbankschema
-- docs/SCAN-TOOLS.md — Alle Scan-Tools mit Argumenten und Output-Format
-- docs/architecture.md — Architektur-Auszüge inkl. Claude-Prompt und Skill-Integration
+- docs/SCAN-TOOLS.md — Alle Scan-Tools mit Argumenten, Paketen und Output-Format
+- docs/architecture.md — Architektur inkl. AI-Orchestrierung und Event-System
+- docs/STRUCTURE.md — Verzeichnisstruktur
 - references/report_structure.md — PDF-Layout-Referenz (Farbschema, Sektionen, Finding-Template)
 
 ## Drei Pakete (Basic, Professional, NIS2)
-Der Prototyp läuft. Jetzt werden drei Pakete implementiert:
-- Basic: Schnellscan (~10 Min), weniger Tools, kompakter Report ohne CVSS-Vektoren
-- Professional: Vollscan (~45 Min), wie der aktuelle Prototyp
+Die drei Pakete sind implementiert:
+- Basic: Schnellscan (~10 Min), weniger Tools, kompakter Report, max 5 Hosts
+- Professional: Vollscan (~45 Min), alle Tools, max 10 Hosts
 - NIS2 Compliance: Gleicher Scan wie Pro, Report mit §30 BSIG-Mapping, Audit-Trail, Lieferketten-1-Seiter
 
-Das Paket wird bei POST /api/scans mitgegeben und steuert:
+Das Paket wird bei POST /api/orders mitgegeben und steuert:
 - Scan-Worker: Welche Tools laufen (scanner/packages.py)
 - Claude-Prompt: Drei Varianten (reporter/prompts.py)
 - Report-Mapper: Drei Mapper-Funktionen (reporter/report_mapper.py)
