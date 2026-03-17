@@ -3,7 +3,11 @@
 
 BEGIN;
 
--- Step 1: Migrate existing data to new package names
+-- Step 1: Drop old CHECK constraints FIRST (before data migration)
+ALTER TABLE orders DROP CONSTRAINT IF EXISTS chk_orders_package;
+ALTER TABLE scan_schedules DROP CONSTRAINT IF EXISTS chk_schedule_package;
+
+-- Step 2: Migrate existing data to new package names
 UPDATE orders SET package = 'webcheck' WHERE package = 'basic';
 UPDATE orders SET package = 'perimeter' WHERE package = 'professional';
 UPDATE orders SET package = 'compliance' WHERE package = 'nis2';
@@ -12,12 +16,10 @@ UPDATE scan_schedules SET package = 'webcheck' WHERE package = 'basic';
 UPDATE scan_schedules SET package = 'perimeter' WHERE package = 'professional';
 UPDATE scan_schedules SET package = 'compliance' WHERE package = 'nis2';
 
--- Step 2: Update CHECK constraints to 5 packages
-ALTER TABLE orders DROP CONSTRAINT IF EXISTS chk_orders_package;
+-- Step 3: Add new CHECK constraints with 5 packages
 ALTER TABLE orders ADD CONSTRAINT chk_orders_package
     CHECK (package IN ('webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'));
 
-ALTER TABLE scan_schedules DROP CONSTRAINT IF EXISTS chk_schedule_package;
 ALTER TABLE scan_schedules ADD CONSTRAINT chk_schedule_package
     CHECK (package IN ('webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'));
 
