@@ -115,8 +115,6 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     let sql: string;
     let params: unknown[];
 
-    // NOTE: business_impact_score may not exist if migration 009 hasn't run yet.
-    // We use a subquery to safely handle missing columns.
     const baseSelect = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
                     o.scan_started_at, o.scan_finished_at, o.created_at,
                     o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
@@ -155,20 +153,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       createdAt: (row.created_at as Date).toISOString(),
       overallRisk: (row.overall_risk as string) || null,
       severityCounts: row.severity_counts || null,
-      businessImpactScore: null as number | null,
+      businessImpactScore: row.business_impact_score != null ? Number(row.business_impact_score) : null,
     }));
-
-    // Try to enrich with v2 business_impact_score (may not exist pre-migration)
-    try {
-      const bisResult = await query('SELECT id, business_impact_score FROM orders WHERE business_impact_score IS NOT NULL');
-      const bisMap = new Map(bisResult.rows.map((r: Record<string, unknown>) => [r.id, Number(r.business_impact_score)]));
-      for (const o of orders) {
-        const score = bisMap.get(o.id);
-        if (score != null) o.businessImpactScore = score;
-      }
-    } catch {
-      // Migration 009 not yet applied — column doesn't exist
-    }
 
     return { success: true, data: { orders } };
   });
@@ -195,24 +181,6 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
        FROM orders o WHERE o.id = $1`,
       [id],
     );
-
-    // v2 columns (may not exist if migration 009 hasn't run yet)
-    let passiveIntelSummary = null;
-    let correlationData = null;
-    let businessImpactScore = null;
-    try {
-      const v2 = await query(
-        `SELECT passive_intel_summary, correlation_data, business_impact_score FROM orders WHERE id = $1`,
-        [id],
-      );
-      if (v2.rows.length > 0) {
-        passiveIntelSummary = v2.rows[0].passive_intel_summary || null;
-        correlationData = v2.rows[0].correlation_data || null;
-        businessImpactScore = v2.rows[0].business_impact_score != null ? Number(v2.rows[0].business_impact_score) : null;
-      }
-    } catch {
-      // Migration 009 not yet applied — v2 columns don't exist
-    }
 
     if (result.rows.length === 0) {
       return reply.status(404).send({ success: false, error: 'Order not found' });
@@ -259,9 +227,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         finishedAt: order.scan_finished_at ? (order.scan_finished_at as Date).toISOString() : null,
         error: order.error_message || null,
         hasReport,
-        passiveIntelSummary,
-        correlationData,
-        businessImpactScore,
+        passiveIntelSummary: order.passive_intel_summary || null,
+        correlationData: order.correlation_data || null,
+        businessImpactScore: order.business_impact_score != null ? Number(order.business_impact_score) : null,
       },
     };
   });
