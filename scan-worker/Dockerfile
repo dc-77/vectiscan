@@ -95,11 +95,12 @@ RUN curl -fsSL https://github.com/hahwul/dalfox/releases/download/v2.9.3/dalfox_
     rm -f /tmp/dalfox.tar.gz
 
 # exploitdb/searchsploit (GPL v2 — local search only, no code linking)
+# Config goes to /home/scanner/.searchsploit_rc (scanner user's HOME)
 RUN git clone --depth 1 https://gitlab.com/exploit-database/exploitdb.git /opt/exploitdb && \
     ln -s /opt/exploitdb/searchsploit /usr/local/bin/searchsploit && \
-    cp /opt/exploitdb/.searchsploit_rc /etc/searchsploit_rc 2>/dev/null || true && \
-    sed -i 's|/opt/exploitdb-papers|/opt/exploitdb/exploitdb-papers|g; s|/opt/exploitdb-bin-sploits|/opt/exploitdb/exploitdb-bin-sploits|g' /etc/searchsploit_rc 2>/dev/null || true
-ENV SEARCHSPLOIT_RC=/etc/searchsploit_rc
+    mkdir -p /home/scanner && \
+    cp /opt/exploitdb/.searchsploit_rc /home/scanner/.searchsploit_rc 2>/dev/null || true && \
+    sed -i 's|/opt/exploitdb-papers|/opt/exploitdb/exploitdb-papers|g; s|/opt/exploitdb-bin-sploits|/opt/exploitdb/exploitdb-bin-sploits|g' /home/scanner/.searchsploit_rc 2>/dev/null || true
 
 # nuclei templates
 RUN nuclei -update-templates

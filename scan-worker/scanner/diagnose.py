@@ -35,7 +35,7 @@ TOOLS: list[dict[str, Any]] = [
     },
     {
         "name": "webtech",
-        "version_cmd": ["webtech", "--help"],
+        "version_cmd": ["python3", "-c", "import webtech; print('webtech', webtech.__version__ if hasattr(webtech, '__version__') else 'OK')"],
         "test_cmd": lambda domain: ["webtech", "-u", f"https://{domain}", "--json"],
         "category": "phase1",
     },
