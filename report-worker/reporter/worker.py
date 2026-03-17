@@ -74,7 +74,8 @@ def _build_findings_data(claude_output: dict, package: str, report_data: dict | 
     }
 
     # NIS2: attach compliance summary if available
-    if package == "nis2" and report_data and report_data.get("nis2"):
+    # Compliance / NIS2: attach compliance summary if available
+    if package in ("nis2", "compliance") and report_data and report_data.get("nis2"):
         data["nis2_compliance_summary"] = report_data["nis2"].get("compliance_summary")
 
     return data
@@ -207,7 +208,7 @@ def process_job(job_data: dict) -> None:
     raw_data_path: str = job_data["rawDataPath"]
     host_inventory: dict = job_data["hostInventory"]
     tech_profiles: list[dict] = job_data["techProfiles"]
-    package: str = job_data.get("package", "professional")
+    package: str = job_data.get("package", "perimeter")
 
     work_dir = Path(tempfile.mkdtemp(prefix=f"report-{order_id}-"))
     log.info("job_started", order_id=order_id, package=package, work_dir=str(work_dir))

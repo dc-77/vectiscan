@@ -114,7 +114,7 @@ def _collect_tool_versions() -> list[str]:
     return versions
 
 
-def _process_job(order_id: str, domain: str, package: str = "professional") -> None:
+def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None:
     """Run the full three-phase scan pipeline for a single job."""
     scan_dir = f"/tmp/scan-{order_id}"
     os.makedirs(scan_dir, exist_ok=True)
@@ -125,7 +125,13 @@ def _process_job(order_id: str, domain: str, package: str = "professional") -> N
     start = time.monotonic()
 
     # Package-specific timeout labels
-    _PACKAGE_LABELS = {"basic": "Basic (~10 Min.)", "professional": "Professional (~45 Min.)", "nis2": "NIS2 (~45 Min.)"}
+    _PACKAGE_LABELS = {
+        "webcheck": "WebCheck (~15–20 Min.)", "perimeter": "PerimeterScan (~60–90 Min.)",
+        "compliance": "ComplianceScan (~65–95 Min.)", "supplychain": "SupplyChain (~65–95 Min.)",
+        "insurance": "InsuranceReport (~65–95 Min.)",
+        # Legacy
+        "basic": "WebCheck (~15–20 Min.)", "professional": "PerimeterScan (~60–90 Min.)", "nis2": "ComplianceScan (~65–95 Min.)",
+    }
     _package_label = _PACKAGE_LABELS.get(package, package)
     _timeout_minutes = config["total_timeout"] // 60
 
@@ -314,7 +320,7 @@ def _finalize(
     scan_dir: str,
     host_inventory: dict[str, Any],
     tech_profiles: list[dict[str, Any]],
-    package: str = "professional",
+    package: str = "perimeter",
 ) -> None:
     """Pack results, upload to MinIO, enqueue report job."""
     hosts_total = len(host_inventory.get("hosts", []))
@@ -367,7 +373,7 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
             job = json.loads(job_data.decode())
             order_id = job["orderId"]
             domain = job["targetDomain"]
-            package = job.get("package", "professional")
+            package = job.get("package", "perimeter")
 
             log.info("job_received", order_id=order_id, domain=domain)
 

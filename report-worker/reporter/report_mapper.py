@@ -954,7 +954,15 @@ def map_to_report_data(
     Returns:
         report_data dict ready for generate_report()
     """
+    # v2 package names + legacy aliases
     mappers = {
+        # v2 names
+        "webcheck": map_basic_report,
+        "perimeter": map_professional_report,
+        "compliance": map_nis2_report,
+        "supplychain": map_professional_report,   # TODO Phase V: map_supplychain_report
+        "insurance": map_professional_report,      # TODO Phase V: map_insurance_report
+        # Legacy aliases
         "basic": map_basic_report,
         "professional": map_professional_report,
         "nis2": map_nis2_report,

@@ -40,7 +40,7 @@ export default function FindingsViewer({ data }: FindingsViewerProps) {
 
   const sorted = sortFindings(data.findings);
   const filtered = filter ? sorted.filter(f => f.severity?.toUpperCase() === filter) : sorted;
-  const isBasic = data.package === 'basic';
+  const isBasic = data.package === 'basic' || data.package === 'webcheck';
 
   const riskStyle = RISK_STYLE[data.overall_risk?.toUpperCase()] || 'bg-slate-700 text-slate-400';
 

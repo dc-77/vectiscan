@@ -1,29 +1,35 @@
 'use client';
 
-export type ScanPackage = 'basic' | 'professional' | 'nis2';
+export type ScanPackage = 'webcheck' | 'perimeter' | 'compliance' | 'supplychain' | 'insurance';
 
 interface Feature {
   name: string;
-  basic: boolean | string;
-  professional: boolean | string;
-  nis2: boolean | string;
+  webcheck: boolean | string;
+  perimeter: boolean | string;
+  compliance: boolean | string;
+  supplychain: boolean | string;
+  insurance: boolean | string;
 }
 
 const FEATURES: Feature[] = [
-  { name: 'Port-Scan',                        basic: true,  professional: true,  nis2: true },
-  { name: 'SSL/TLS-Analyse',                  basic: true,  professional: true,  nis2: true },
-  { name: 'Security-Header-Check',            basic: true,  professional: true,  nis2: true },
-  { name: 'CMS-/Framework-Erkennung',         basic: true,  professional: true,  nis2: true },
-  { name: 'Screenshot',                       basic: true,  professional: true,  nis2: true },
-  { name: 'DNS-Reconnaissance (vollständig)', basic: false, professional: true,  nis2: true },
-  { name: 'Vulnerability-Scan (Nuclei)',      basic: false, professional: true,  nis2: true },
-  { name: 'Web-Vulnerability-Scan (Nikto)',   basic: false, professional: true,  nis2: true },
-  { name: 'Directory-Bruteforce',             basic: false, professional: true,  nis2: true },
-  { name: 'CVSS v3.1 Scoring',               basic: false, professional: true,  nis2: true },
-  { name: '§30 BSIG Compliance-Mapping',      basic: false, professional: false, nis2: true },
-  { name: 'NIS2 Audit-Trail',                 basic: false, professional: false, nis2: true },
-  { name: 'Lieferketten-Zusammenfassung',     basic: false, professional: false, nis2: true },
-  { name: 'Max. Hosts',                       basic: '5',   professional: '10',  nis2: '10' },
+  { name: 'Port-Scan',                        webcheck: 'Top 100', perimeter: 'Top 1000', compliance: 'Top 1000', supplychain: 'Top 1000', insurance: 'Top 1000' },
+  { name: 'SSL/TLS-Analyse',                  webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Security-Header-Check',            webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'CMS-Fingerprinting',               webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Screenshot',                       webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Passive Intelligence (Shodan)',     webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'DNS-Reconnaissance (vollständig)', webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Vulnerability-Scan (Nuclei)',      webcheck: 'High/Crit', perimeter: 'Alle', compliance: 'Alle', supplychain: 'Alle', insurance: 'Alle' },
+  { name: 'Web-Vulnerability-Scan (Nikto)',   webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Directory-/Fuzzing (ffuf)',        webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'XSS-Scanner (dalfox)',             webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Threat-Intelligence (EPSS/KEV)',   webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Cross-Tool-Korrelation',           webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'CVSS v3.1 Scoring',               webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: '§30 BSIG Compliance-Mapping',      webcheck: false, perimeter: false, compliance: true,  supplychain: false, insurance: false },
+  { name: 'ISO 27001 Mapping',                webcheck: false, perimeter: false, compliance: false, supplychain: true,  insurance: false },
+  { name: 'Versicherungs-Fragebogen',         webcheck: false, perimeter: false, compliance: false, supplychain: false, insurance: true },
+  { name: 'Max. Hosts',                       webcheck: '3',   perimeter: '15',  compliance: '15',  supplychain: '15',  insurance: '15' },
 ];
 
 interface PackageInfo {
@@ -38,29 +44,47 @@ interface PackageInfo {
 
 const PACKAGES: PackageInfo[] = [
   {
-    key: 'basic',
-    title: 'Basic',
-    description: 'Schneller Überblick über die wichtigsten Sicherheitsaspekte.',
-    duration: '~10 Min',
+    key: 'webcheck',
+    title: 'WebCheck',
+    description: 'Website- und Mail-Sicherheit für kleine Unternehmen.',
+    duration: '~15–20 Min',
     accentColor: '#38BDF8',
   },
   {
-    key: 'professional',
-    title: 'Professional',
-    description: 'Vollständige Sicherheitsbewertung mit allen Scan-Tools.',
-    duration: '~45 Min',
+    key: 'perimeter',
+    title: 'PerimeterScan',
+    description: 'Vollständige Angriffsflächen-Analyse mit allen Tools.',
+    duration: '~60–90 Min',
     badge: 'Empfohlen',
     badgeColor: '#38BDF8',
     accentColor: '#38BDF8',
   },
   {
-    key: 'nis2',
-    title: 'NIS2 Compliance',
-    description: 'Pro-Scan mit §30 BSIG-Mapping und Audit-Trail.',
-    duration: '~45 Min',
-    badge: 'NIS2-konform',
+    key: 'compliance',
+    title: 'ComplianceScan',
+    description: 'Perimeter-Scan mit §30 BSIG-Mapping für NIS2.',
+    duration: '~65–95 Min',
+    badge: 'NIS2',
     badgeColor: '#EAB308',
     accentColor: '#EAB308',
+  },
+  {
+    key: 'supplychain',
+    title: 'SupplyChain',
+    description: 'Sicherheitsnachweis für NIS2-pflichtige Auftraggeber.',
+    duration: '~65–95 Min',
+    badge: 'ISO 27001',
+    badgeColor: '#A78BFA',
+    accentColor: '#A78BFA',
+  },
+  {
+    key: 'insurance',
+    title: 'InsuranceReport',
+    description: 'Nachweis für Cyberversicherung mit Fragebogen-Format.',
+    duration: '~65–95 Min',
+    badge: 'Versicherung',
+    badgeColor: '#34D399',
+    accentColor: '#34D399',
   },
 ];
 
@@ -81,7 +105,7 @@ function FeatureIcon({ value }: { value: boolean | string }) {
 
 export default function PackageSelector({ selected, onSelect }: Props) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4" data-testid="package-selector">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" data-testid="package-selector">
       {PACKAGES.map((pkg) => {
         const isSelected = selected === pkg.key;
         const borderColor = isSelected ? pkg.accentColor : '#334155';

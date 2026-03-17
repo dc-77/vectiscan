@@ -272,7 +272,9 @@ def get_system_prompt(package: str) -> str:
     """Return the system prompt for a given scan package.
 
     Args:
-        package: One of 'basic', 'professional', 'nis2'.
+        package: One of 'webcheck', 'perimeter', 'compliance', 'supplychain',
+                 'insurance'. Legacy names 'basic', 'professional', 'nis2'
+                 are also accepted.
 
     Returns:
         The system prompt string for the given package.
@@ -280,13 +282,22 @@ def get_system_prompt(package: str) -> str:
     Raises:
         ValueError: If the package name is not recognized.
     """
+    # v2 package names + legacy aliases
     prompts = {
+        # v2 names
+        "webcheck": SYSTEM_PROMPT_BASIC,
+        "perimeter": SYSTEM_PROMPT_PROFESSIONAL,
+        "compliance": SYSTEM_PROMPT_NIS2,
+        "supplychain": SYSTEM_PROMPT_PROFESSIONAL,   # TODO Phase V: SYSTEM_PROMPT_SUPPLYCHAIN
+        "insurance": SYSTEM_PROMPT_PROFESSIONAL,      # TODO Phase V: SYSTEM_PROMPT_INSURANCE
+        # Legacy aliases
         "basic": SYSTEM_PROMPT_BASIC,
         "professional": SYSTEM_PROMPT_PROFESSIONAL,
         "nis2": SYSTEM_PROMPT_NIS2,
     }
     if package not in prompts:
         raise ValueError(
-            f"Unknown package: {package}. Must be basic, professional, or nis2."
+            f"Unknown package: {package}. "
+            f"Must be one of: webcheck, perimeter, compliance, supplychain, insurance."
         )
     return prompts[package]

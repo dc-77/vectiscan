@@ -105,7 +105,7 @@ function mockOrderRow(pkg: string) {
 
 const emptyResult = { rows: [], command: 'SELECT' as const, rowCount: 0, oid: 0, fields: [] };
 
-describe('Package selection', () => {
+describe('Package selection (v2: 5 packages)', () => {
   let server: FastifyInstance;
 
   beforeEach(async () => {
@@ -120,48 +120,76 @@ describe('Package selection', () => {
   });
 
   describe('POST /api/orders with package', () => {
-    it('should accept package=basic', async () => {
-      mockQuery.mockResolvedValueOnce(mockInsertResult('basic'));
+    it('should accept package=webcheck', async () => {
+      mockQuery.mockResolvedValueOnce(mockInsertResult('webcheck'));
 
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'basic' },
+        payload: { domain: 'example.com', package: 'webcheck' },
       });
 
       expect(res.statusCode).toBe(201);
       const body = res.json();
       expect(body.success).toBe(true);
-      expect(body.data.package).toBe('basic');
+      expect(body.data.package).toBe('webcheck');
     });
 
-    it('should accept package=professional', async () => {
-      mockQuery.mockResolvedValueOnce(mockInsertResult('professional'));
+    it('should accept package=perimeter', async () => {
+      mockQuery.mockResolvedValueOnce(mockInsertResult('perimeter'));
 
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'professional' },
+        payload: { domain: 'example.com', package: 'perimeter' },
       });
 
       expect(res.statusCode).toBe(201);
-      expect(res.json().data.package).toBe('professional');
+      expect(res.json().data.package).toBe('perimeter');
     });
 
-    it('should accept package=nis2', async () => {
-      mockQuery.mockResolvedValueOnce(mockInsertResult('nis2'));
+    it('should accept package=compliance', async () => {
+      mockQuery.mockResolvedValueOnce(mockInsertResult('compliance'));
 
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'nis2' },
+        payload: { domain: 'example.com', package: 'compliance' },
       });
 
       expect(res.statusCode).toBe(201);
-      expect(res.json().data.package).toBe('nis2');
+      expect(res.json().data.package).toBe('compliance');
+    });
+
+    it('should accept package=supplychain', async () => {
+      mockQuery.mockResolvedValueOnce(mockInsertResult('supplychain'));
+
+      const res = await server.inject({
+        method: 'POST',
+        url: '/api/orders',
+        headers: AUTH_HEADER,
+        payload: { domain: 'example.com', package: 'supplychain' },
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(res.json().data.package).toBe('supplychain');
+    });
+
+    it('should accept package=insurance', async () => {
+      mockQuery.mockResolvedValueOnce(mockInsertResult('insurance'));
+
+      const res = await server.inject({
+        method: 'POST',
+        url: '/api/orders',
+        headers: AUTH_HEADER,
+        payload: { domain: 'example.com', package: 'insurance' },
+      });
+
+      expect(res.statusCode).toBe(201);
+      expect(res.json().data.package).toBe('insurance');
     });
 
     it('should reject invalid package', async () => {
@@ -175,11 +203,23 @@ describe('Package selection', () => {
       expect(res.statusCode).toBe(400);
       const body = res.json();
       expect(body.success).toBe(false);
-      expect(body.error).toBe('Invalid package. Must be basic, professional, or nis2.');
+      expect(body.error).toContain('Invalid package');
     });
 
-    it('should default to professional when no package specified', async () => {
-      mockQuery.mockResolvedValueOnce(mockInsertResult('professional'));
+    it('should reject legacy package names (basic, professional, nis2)', async () => {
+      for (const legacyPkg of ['basic', 'professional', 'nis2']) {
+        const res = await server.inject({
+          method: 'POST',
+          url: '/api/orders',
+          headers: AUTH_HEADER,
+          payload: { domain: 'example.com', package: legacyPkg },
+        });
+        expect(res.statusCode).toBe(400);
+      }
+    });
+
+    it('should default to perimeter when no package specified', async () => {
+      mockQuery.mockResolvedValueOnce(mockInsertResult('perimeter'));
 
       const res = await server.inject({
         method: 'POST',
@@ -189,17 +229,17 @@ describe('Package selection', () => {
       });
 
       expect(res.statusCode).toBe(201);
-      expect(res.json().data.package).toBe('professional');
+      expect(res.json().data.package).toBe('perimeter');
     });
 
     it('should not queue scan job (verification required first)', async () => {
-      mockQuery.mockResolvedValueOnce(mockInsertResult('nis2'));
+      mockQuery.mockResolvedValueOnce(mockInsertResult('compliance'));
 
       await server.inject({
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'nis2' },
+        payload: { domain: 'example.com', package: 'compliance' },
       });
 
       expect(mockScanQueueAdd).not.toHaveBeenCalled();
@@ -207,38 +247,38 @@ describe('Package selection', () => {
   });
 
   describe('GET /api/orders/:id with package', () => {
-    it('should return package and estimatedDuration for basic', async () => {
+    it('should return package and estimatedDuration for webcheck', async () => {
       mockQuery
-        .mockResolvedValueOnce(mockOrderRow('basic'))
+        .mockResolvedValueOnce(mockOrderRow('webcheck'))
         .mockResolvedValueOnce(emptyResult);
 
       const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
       expect(res.statusCode).toBe(200);
       const body = res.json();
-      expect(body.data.package).toBe('basic');
-      expect(body.data.estimatedDuration).toBe('~10 Minuten');
+      expect(body.data.package).toBe('webcheck');
+      expect(body.data.estimatedDuration).toBe('~15–20 Minuten');
     });
 
-    it('should return package and estimatedDuration for professional', async () => {
+    it('should return package and estimatedDuration for perimeter', async () => {
       mockQuery
-        .mockResolvedValueOnce(mockOrderRow('professional'))
+        .mockResolvedValueOnce(mockOrderRow('perimeter'))
         .mockResolvedValueOnce(emptyResult);
 
       const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
       const body = res.json();
-      expect(body.data.package).toBe('professional');
-      expect(body.data.estimatedDuration).toBe('~45 Minuten');
+      expect(body.data.package).toBe('perimeter');
+      expect(body.data.estimatedDuration).toBe('~60–90 Minuten');
     });
 
-    it('should return package and estimatedDuration for nis2', async () => {
+    it('should return package and estimatedDuration for compliance', async () => {
       mockQuery
-        .mockResolvedValueOnce(mockOrderRow('nis2'))
+        .mockResolvedValueOnce(mockOrderRow('compliance'))
         .mockResolvedValueOnce(emptyResult);
 
       const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
       const body = res.json();
-      expect(body.data.package).toBe('nis2');
-      expect(body.data.estimatedDuration).toBe('~45 Minuten');
+      expect(body.data.package).toBe('compliance');
+      expect(body.data.estimatedDuration).toBe('~65–95 Minuten');
     });
   });
 });

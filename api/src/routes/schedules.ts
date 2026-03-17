@@ -8,7 +8,7 @@ import { requireAuth } from '../middleware/requireAuth.js';
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 const SCHEDULE_TYPES = ['weekly', 'monthly', 'quarterly', 'once'] as const;
-const PACKAGES = ['basic', 'professional', 'nis2'] as const;
+const PACKAGES = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'] as const;
 
 const SCHEDULE_LABELS: Record<string, string> = {
   weekly: 'Wöchentlich',
@@ -80,7 +80,7 @@ export async function scheduleRoutes(server: FastifyInstance): Promise<void> {
 
     const domain = ((body.domain as string) || '').trim().toLowerCase()
       .replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '').replace(/\.$/, '');
-    const pkg = (body.package as string) || 'professional';
+    const pkg = (body.package as string) || 'perimeter';
     const scheduleType = (body.scheduleType as string) || 'monthly';
     const scheduledAt = body.scheduledAt as string | undefined;
 

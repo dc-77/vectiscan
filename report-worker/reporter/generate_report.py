@@ -233,7 +233,7 @@ class PackageBadge(Flowable):
     """Narrow badge bar showing the package type on the cover page."""
     def __init__(self, package_name):
         Flowable.__init__(self)
-        badge = PACKAGE_BADGES.get(package_name, PACKAGE_BADGES["professional"])
+        badge = PACKAGE_BADGES.get(package_name, PACKAGE_BADGES["perimeter"])
         self.bg_color = badge["color"]
         self.text_color = badge["text_color"]
         self.label = badge["label"]

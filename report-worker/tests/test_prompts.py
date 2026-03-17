@@ -100,13 +100,31 @@ class TestSystemPromptNis2:
 
 
 class TestGetSystemPrompt:
-    def test_basic(self):
+    def test_webcheck(self):
+        assert get_system_prompt("webcheck") is SYSTEM_PROMPT_BASIC
+
+    def test_perimeter(self):
+        assert get_system_prompt("perimeter") is SYSTEM_PROMPT_PROFESSIONAL
+
+    def test_compliance(self):
+        assert get_system_prompt("compliance") is SYSTEM_PROMPT_NIS2
+
+    def test_supplychain(self):
+        # TODO Phase V: should return SYSTEM_PROMPT_SUPPLYCHAIN
+        assert get_system_prompt("supplychain") is SYSTEM_PROMPT_PROFESSIONAL
+
+    def test_insurance(self):
+        # TODO Phase V: should return SYSTEM_PROMPT_INSURANCE
+        assert get_system_prompt("insurance") is SYSTEM_PROMPT_PROFESSIONAL
+
+    # Legacy aliases still work
+    def test_legacy_basic(self):
         assert get_system_prompt("basic") is SYSTEM_PROMPT_BASIC
 
-    def test_professional(self):
+    def test_legacy_professional(self):
         assert get_system_prompt("professional") is SYSTEM_PROMPT_PROFESSIONAL
 
-    def test_nis2(self):
+    def test_legacy_nis2(self):
         assert get_system_prompt("nis2") is SYSTEM_PROMPT_NIS2
 
     def test_invalid_raises(self):
@@ -114,5 +132,5 @@ class TestGetSystemPrompt:
             get_system_prompt("invalid")
 
     def test_invalid_error_message(self):
-        with pytest.raises(ValueError, match="Must be basic, professional, or nis2"):
+        with pytest.raises(ValueError, match="webcheck"):
             get_system_prompt("enterprise")

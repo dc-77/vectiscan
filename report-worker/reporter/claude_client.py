@@ -127,6 +127,13 @@ Antworte ausschließlich in JSON nach folgendem Schema:
 """
 
 MAX_TOKENS_BY_PACKAGE: dict[str, int] = {
+    # v2 package names
+    "webcheck": 2048,
+    "perimeter": 4096,
+    "compliance": 6144,
+    "supplychain": 5120,
+    "insurance": 5120,
+    # Legacy aliases
     "basic": 2048,
     "professional": 4096,
     "nis2": 6144,

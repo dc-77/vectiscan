@@ -49,7 +49,7 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const [ready, setReady] = useState(false);
   const [domain, setDomain] = useState('');
-  const [selectedPackage, setSelectedPackage] = useState<ScanPackage>('professional');
+  const [selectedPackage, setSelectedPackage] = useState<ScanPackage>('perimeter');
   const [orderId, setOrderId] = useState<string | null>(null);
   const [order, setOrder] = useState<OrderStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -255,7 +255,7 @@ function HomeContent() {
 
   const handleRetry = () => {
     stopPolling(); closeWs(); resetTerminal();
-    setShowReport(false); setDomain(''); setSelectedPackage('professional');
+    setShowReport(false); setDomain(''); setSelectedPackage('perimeter');
     setOrderId(null); setOrder(null); setError(null); setCancelling(false);
     setAiStrategy(null); setAiConfigs({}); setToolOutputs([]); setIntelligenceHosts([]);
   };

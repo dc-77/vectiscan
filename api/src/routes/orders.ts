@@ -27,13 +27,15 @@ async function streamReport(reply: FastifyReply, report: Record<string, unknown>
     .send(stream);
 }
 
-const VALID_PACKAGES = ['basic', 'professional', 'nis2'] as const;
+const VALID_PACKAGES = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'] as const;
 type ScanPackage = typeof VALID_PACKAGES[number];
 
 const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
-  basic: '~10 Minuten',
-  professional: '~45 Minuten',
-  nis2: '~45 Minuten',
+  webcheck: '~15–20 Minuten',
+  perimeter: '~60–90 Minuten',
+  compliance: '~65–95 Minuten',
+  supplychain: '~65–95 Minuten',
+  insurance: '~65–95 Minuten',
 };
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -52,7 +54,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
   server.post<{ Body: CreateOrderBody }>('/api/orders', { preHandler: [requireAuth] }, async (request, reply) => {
     const user = request.user!;
     const { domain } = request.body || {};
-    const pkg = (request.body?.package || 'professional') as string;
+    const pkg = (request.body?.package || 'perimeter') as string;
 
     if (!isValidDomain(domain)) {
       return reply.status(400).send({
@@ -64,7 +66,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     if (!VALID_PACKAGES.includes(pkg as ScanPackage)) {
       return reply.status(400).send({
         success: false,
-        error: 'Invalid package. Must be basic, professional, or nis2.',
+        error: 'Invalid package. Must be webcheck, perimeter, compliance, supplychain, or insurance.',
       });
     }
 
@@ -194,7 +196,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const reportResult = await query('SELECT id FROM reports WHERE order_id = $1', [id]);
     const hasReport = reportResult.rows.length > 0;
 
-    const orderPackage = (order.package || 'professional') as ScanPackage;
+    const orderPackage = (order.package || 'perimeter') as ScanPackage;
 
     // Read tool output summary from Redis (fast, non-blocking)
     const redisProgress = await getProgressFromRedis(id);

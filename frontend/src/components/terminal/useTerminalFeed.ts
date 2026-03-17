@@ -112,7 +112,7 @@ export function useTerminalFeed() {
 
   const processStatus = useCallback((scan: ScanStatus) => {
     const { status, progress, domain } = scan;
-    const pkg = scan.package || 'professional';
+    const pkg = scan.package || 'perimeter';
     const newLines: TerminalLine[] = [];
     const now = ts();
 

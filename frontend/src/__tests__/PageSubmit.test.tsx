@@ -31,10 +31,10 @@ describe('Page submit with package', () => {
     jest.clearAllMocks();
   });
 
-  it('should submit with default professional package', async () => {
+  it('should submit with default perimeter package', async () => {
     mockCreateOrder.mockResolvedValueOnce({
       success: true,
-      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'professional', createdAt: new Date().toISOString() },
+      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'perimeter', createdAt: new Date().toISOString() },
     });
 
     render(<Home />);
@@ -46,21 +46,21 @@ describe('Page submit with package', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'professional');
+      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'perimeter');
     });
   });
 
-  it('should submit with selected basic package', async () => {
+  it('should submit with selected webcheck package', async () => {
     mockCreateOrder.mockResolvedValueOnce({
       success: true,
-      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'basic', createdAt: new Date().toISOString() },
+      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'webcheck', createdAt: new Date().toISOString() },
     });
 
     render(<Home />);
 
-    // Select basic package
-    const basicCard = screen.getByTestId('package-basic');
-    fireEvent.click(basicCard);
+    // Select webcheck package
+    const webcheckCard = screen.getByTestId('package-webcheck');
+    fireEvent.click(webcheckCard);
 
     const input = screen.getByPlaceholderText('beispiel.de');
     fireEvent.change(input, { target: { value: 'example.com' } });
@@ -69,21 +69,21 @@ describe('Page submit with package', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'basic');
+      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'webcheck');
     });
   });
 
-  it('should submit with selected nis2 package', async () => {
+  it('should submit with selected compliance package', async () => {
     mockCreateOrder.mockResolvedValueOnce({
       success: true,
-      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'nis2', createdAt: new Date().toISOString() },
+      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'compliance', createdAt: new Date().toISOString() },
     });
 
     render(<Home />);
 
-    // Select NIS2 package
-    const nis2Card = screen.getByTestId('package-nis2');
-    fireEvent.click(nis2Card);
+    // Select compliance package
+    const compCard = screen.getByTestId('package-compliance');
+    fireEvent.click(compCard);
 
     const input = screen.getByPlaceholderText('beispiel.de');
     fireEvent.change(input, { target: { value: 'example.com' } });
@@ -92,15 +92,17 @@ describe('Page submit with package', () => {
     fireEvent.submit(form);
 
     await waitFor(() => {
-      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'nis2');
+      expect(mockCreateOrder).toHaveBeenCalledWith('example.com', 'compliance');
     });
   });
 
-  it('should show package selector with 3 cards', () => {
+  it('should show package selector with 5 cards', () => {
     render(<Home />);
     expect(screen.getByTestId('package-selector')).toBeInTheDocument();
-    expect(screen.getByTestId('package-basic')).toBeInTheDocument();
-    expect(screen.getByTestId('package-professional')).toBeInTheDocument();
-    expect(screen.getByTestId('package-nis2')).toBeInTheDocument();
+    expect(screen.getByTestId('package-webcheck')).toBeInTheDocument();
+    expect(screen.getByTestId('package-perimeter')).toBeInTheDocument();
+    expect(screen.getByTestId('package-compliance')).toBeInTheDocument();
+    expect(screen.getByTestId('package-supplychain')).toBeInTheDocument();
+    expect(screen.getByTestId('package-insurance')).toBeInTheDocument();
   });
 });

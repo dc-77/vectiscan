@@ -1,71 +1,143 @@
-"""Tests for scanner.packages — package configuration validation."""
+"""Tests for scanner.packages — package configuration validation (v2: 5 packages)."""
 
 import pytest
-from scanner.packages import get_config, PACKAGE_CONFIG
+from scanner.packages import get_config, PACKAGE_CONFIG, resolve_package
 
 
-class TestGetConfig:
-    def test_basic_phase2_tools_excludes_nikto(self):
-        config = get_config("basic")
+class TestWebcheck:
+    def test_phase2_tools_excludes_nikto(self):
+        config = get_config("webcheck")
         assert "nikto" not in config["phase2_tools"]
 
-    def test_basic_phase2_tools_excludes_nuclei(self):
-        config = get_config("basic")
-        assert "nuclei" not in config["phase2_tools"]
+    def test_phase2_tools_includes_nuclei(self):
+        config = get_config("webcheck")
+        assert "nuclei" in config["phase2_tools"]
 
-    def test_basic_phase2_tools_excludes_gobuster_dir(self):
-        config = get_config("basic")
-        assert "gobuster_dir" not in config["phase2_tools"]
+    def test_max_hosts(self):
+        config = get_config("webcheck")
+        assert config["max_hosts"] == 3
 
-    def test_basic_max_hosts(self):
-        config = get_config("basic")
-        assert config["max_hosts"] == 5
-
-    def test_basic_nmap_ports(self):
-        config = get_config("basic")
+    def test_nmap_ports(self):
+        config = get_config("webcheck")
         assert config["nmap_ports"] == "--top-ports 100"
 
-    def test_basic_phase0_tools_limited(self):
-        config = get_config("basic")
-        assert config["phase0_tools"] == ["crtsh", "subfinder", "dnsx"]
+    def test_phase0b_tools_limited(self):
+        config = get_config("webcheck")
+        assert "amass" not in config["phase0b_tools"]
+        assert "gobuster_dns" not in config["phase0b_tools"]
 
-    def test_basic_total_timeout(self):
-        config = get_config("basic")
-        assert config["total_timeout"] == 900  # 15 minutes
+    def test_phase0a_only_whois(self):
+        config = get_config("webcheck")
+        assert config["phase0a_tools"] == ["whois"]
 
-    def test_professional_phase2_has_all_tools(self):
-        config = get_config("professional")
-        expected = ["testssl", "nikto", "nuclei", "gobuster_dir", "gowitness", "headers", "httpx", "katana", "wpscan"]
+    def test_total_timeout(self):
+        config = get_config("webcheck")
+        assert config["total_timeout"] == 1200  # 20 minutes
+
+    def test_nuclei_severity_high_crit_only(self):
+        config = get_config("webcheck")
+        assert config["nuclei_severity"] == "high,critical"
+
+
+class TestPerimeter:
+    def test_phase2_has_all_tools(self):
+        config = get_config("perimeter")
+        expected = ["testssl", "nikto", "nuclei", "gobuster_dir", "ffuf",
+                    "feroxbuster", "katana", "dalfox", "gowitness", "headers",
+                    "httpx", "wpscan"]
         for tool in expected:
             assert tool in config["phase2_tools"]
-        assert len(config["phase2_tools"]) == 9
 
-    def test_professional_max_hosts(self):
-        config = get_config("professional")
-        assert config["max_hosts"] == 10
+    def test_max_hosts(self):
+        config = get_config("perimeter")
+        assert config["max_hosts"] == 15
 
-    def test_professional_nmap_ports(self):
-        config = get_config("professional")
+    def test_nmap_ports(self):
+        config = get_config("perimeter")
         assert config["nmap_ports"] == "--top-ports 1000"
 
-    def test_professional_phase0_all_tools(self):
+    def test_phase0a_all_apis(self):
+        config = get_config("perimeter")
+        assert "shodan" in config["phase0a_tools"]
+        assert "abuseipdb" in config["phase0a_tools"]
+        assert "securitytrails" in config["phase0a_tools"]
+        assert "whois" in config["phase0a_tools"]
+
+    def test_phase0b_full_dns(self):
+        config = get_config("perimeter")
+        assert "amass" in config["phase0b_tools"]
+        assert "gobuster_dns" in config["phase0b_tools"]
+        assert "dane_tlsa" in config["phase0b_tools"]
+
+    def test_phase3_enrichment(self):
+        config = get_config("perimeter")
+        assert "nvd" in config["phase3_tools"]
+        assert "epss" in config["phase3_tools"]
+        assert "cisa_kev" in config["phase3_tools"]
+        assert "exploitdb" in config["phase3_tools"]
+
+    def test_nuclei_all_severities(self):
+        config = get_config("perimeter")
+        assert "info" in config["nuclei_severity"]
+
+
+class TestComplianceSupplychainInsurance:
+    """Compliance, SupplyChain and Insurance share the perimeter scan config."""
+
+    def test_compliance_identical_to_perimeter(self):
+        peri = get_config("perimeter")
+        comp = get_config("compliance")
+        for key in ("phase0a_tools", "phase0b_tools", "phase1_tools",
+                     "phase2_tools", "phase3_tools", "max_hosts",
+                     "nmap_ports", "total_timeout"):
+            assert peri[key] == comp[key], f"Mismatch on {key}"
+
+    def test_supplychain_identical_to_perimeter(self):
+        peri = get_config("perimeter")
+        sc = get_config("supplychain")
+        assert peri["phase2_tools"] == sc["phase2_tools"]
+        assert peri["max_hosts"] == sc["max_hosts"]
+
+    def test_insurance_identical_to_perimeter(self):
+        peri = get_config("perimeter")
+        ins = get_config("insurance")
+        assert peri["phase2_tools"] == ins["phase2_tools"]
+        assert peri["max_hosts"] == ins["max_hosts"]
+
+
+class TestLegacyAliases:
+    """v1 package names still resolve via backwards-compat aliases."""
+
+    def test_basic_resolves_to_webcheck(self):
+        config = get_config("basic")
+        assert config["max_hosts"] == 3
+
+    def test_professional_resolves_to_perimeter(self):
         config = get_config("professional")
-        assert len(config["phase0_tools"]) == 6
+        assert config["max_hosts"] == 15
 
-    def test_nis2_identical_to_professional(self):
-        pro = get_config("professional")
-        nis2 = get_config("nis2")
-        assert pro["phase0_tools"] == nis2["phase0_tools"]
-        assert pro["phase1_tools"] == nis2["phase1_tools"]
-        assert pro["phase2_tools"] == nis2["phase2_tools"]
-        assert pro["max_hosts"] == nis2["max_hosts"]
-        assert pro["nmap_ports"] == nis2["nmap_ports"]
-        assert pro["total_timeout"] == nis2["total_timeout"]
+    def test_nis2_resolves_to_compliance(self):
+        config = get_config("nis2")
+        assert config["max_hosts"] == 15
 
-    def test_invalid_package_raises_value_error(self):
+    def test_resolve_package_basic(self):
+        assert resolve_package("basic") == "webcheck"
+
+    def test_resolve_package_professional(self):
+        assert resolve_package("professional") == "perimeter"
+
+    def test_resolve_package_nis2(self):
+        assert resolve_package("nis2") == "compliance"
+
+    def test_resolve_package_passthrough(self):
+        assert resolve_package("perimeter") == "perimeter"
+
+
+class TestInvalidPackage:
+    def test_raises_value_error(self):
         with pytest.raises(ValueError, match="Unknown package"):
             get_config("invalid")
 
-    def test_invalid_package_error_message(self):
-        with pytest.raises(ValueError, match="Must be basic, professional, or nis2"):
+    def test_error_message_lists_valid_packages(self):
+        with pytest.raises(ValueError, match="webcheck"):
             get_config("enterprise")

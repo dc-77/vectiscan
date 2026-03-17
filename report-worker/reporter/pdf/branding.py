@@ -110,19 +110,46 @@ SEVERITY_COLORS = {
 # ============================================================================
 
 PACKAGE_BADGES = {
-    "basic": {
-        "label": "BASIC",
+    # v2 package names
+    "webcheck": {
+        "label": "WEBCHECK",
         "color": COLORS["accent"],           # Cyan
-        "text_color": COLORS["primary"],      # Dunkler Text auf Cyan
+        "text_color": COLORS["primary"],
+    },
+    "perimeter": {
+        "label": "PERIMETERSCAN",
+        "color": COLORS["accent"],           # Cyan
+        "text_color": COLORS["primary"],
+    },
+    "compliance": {
+        "label": "NIS2 COMPLIANCE",
+        "color": COLORS["highlight"],        # Gold
+        "text_color": COLORS["primary"],
+    },
+    "supplychain": {
+        "label": "SUPPLY CHAIN",
+        "color": COLORS["accent"],           # Cyan
+        "text_color": COLORS["primary"],
+    },
+    "insurance": {
+        "label": "INSURANCE REPORT",
+        "color": COLORS["accent"],           # Cyan
+        "text_color": COLORS["primary"],
+    },
+    # Legacy aliases
+    "basic": {
+        "label": "WEBCHECK",
+        "color": COLORS["accent"],
+        "text_color": COLORS["primary"],
     },
     "professional": {
-        "label": "PROFESSIONAL",
-        "color": COLORS["accent"],            # Cyan
+        "label": "PERIMETERSCAN",
+        "color": COLORS["accent"],
         "text_color": COLORS["primary"],
     },
     "nis2": {
         "label": "NIS2 COMPLIANCE",
-        "color": COLORS["highlight"],         # Gold
+        "color": COLORS["highlight"],
         "text_color": COLORS["primary"],
     },
 }

@@ -91,25 +91,29 @@ class TestWorkerPackageFlow:
     @patch("scanner.worker.run_phase1", return_value={"ip": "1.2.3.4", "has_ssl": True})
     @patch("scanner.worker.run_phase0")
     @patch("scanner.worker.get_config")
-    def test_default_package_is_professional(
+    def test_default_package_is_perimeter(
         self, mock_get_config, mock_phase0, mock_phase1, mock_phase2,
         mock_started, mock_hosts, mock_progress, mock_enqueue,
         mock_pack, mock_upload, mock_complete, tmp_path
     ):
-        """Verify that when no package is specified, professional is used."""
+        """Verify that when no package is specified, perimeter is used."""
         mock_get_config.return_value = {
-            "phase0_tools": ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"],
-            "phase0_timeout": 600,
-            "max_hosts": 10,
+            "phase0b_tools": ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"],
+            "phase0b_timeout": 900,
+            "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois"],
+            "phase0a_timeout": 120,
+            "max_hosts": 15,
             "nmap_ports": "--top-ports 1000",
-            "phase1_tools": ["nmap", "webtech", "wafw00f"],
+            "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
             "phase2_tools": ["testssl", "nikto", "nuclei", "gobuster_dir", "gowitness", "headers"],
+            "phase3_tools": ["nvd", "epss", "cisa_kev", "exploitdb", "correlator", "fp_filter", "business_impact"],
+            "phase3_timeout": 300,
             "total_timeout": 7200,
         }
         mock_phase0.return_value = {"hosts": [], "domain": "example.com"}
 
         from scanner.worker import _process_job
-        # Call without explicit package — should default to "professional"
+        # Call without explicit package — should default to "perimeter"
         _process_job("scan-789", "example.com")
 
-        mock_get_config.assert_called_once_with("professional")
+        mock_get_config.assert_called_once_with("perimeter")

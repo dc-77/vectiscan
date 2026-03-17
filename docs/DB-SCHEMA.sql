@@ -40,7 +40,7 @@ CREATE TABLE orders (
     customer_id             UUID NOT NULL REFERENCES customers(id),
     target_url              VARCHAR(2048) NOT NULL,
     target_ip               INET,
-    package                 VARCHAR(20) NOT NULL DEFAULT 'professional',
+    package                 VARCHAR(20) NOT NULL DEFAULT 'perimeter',
     status                  VARCHAR(30) NOT NULL DEFAULT 'created',
 
     -- Verifizierung
@@ -70,7 +70,7 @@ CREATE TABLE orders (
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CONSTRAINT chk_orders_package
-        CHECK (package IN ('basic', 'professional', 'nis2')),
+        CHECK (package IN ('webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance')),
     CONSTRAINT chk_orders_verification_method
         CHECK (verification_method IS NULL
             OR verification_method IN ('dns_txt', 'file', 'meta_tag', 'manual'))
@@ -152,7 +152,7 @@ CREATE TABLE scan_schedules (
     CONSTRAINT chk_schedule_type
         CHECK (schedule_type IN ('weekly', 'monthly', 'quarterly', 'once')),
     CONSTRAINT chk_schedule_package
-        CHECK (package IN ('basic', 'professional', 'nis2'))
+        CHECK (package IN ('webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'))
 );
 
 CREATE INDEX idx_scan_schedules_next ON scan_schedules (next_scan_at) WHERE enabled = true;

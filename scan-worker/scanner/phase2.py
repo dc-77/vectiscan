@@ -587,9 +587,9 @@ def run_phase2(
     # nuclei
     if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip:
         # Basic: 10 min, high/critical only. Pro/NIS2: 25 min, all severities.
-        is_basic = config.get("package") == "basic"
-        nuclei_timeout = 600 if is_basic else 1500
-        nuclei_severity = "high,critical" if is_basic else "low,medium,high,critical"
+        is_webcheck = config.get("package") in ("basic", "webcheck")
+        nuclei_timeout = 600 if is_webcheck else 1500
+        nuclei_severity = config.get("nuclei_severity", "high,critical" if is_webcheck else "low,medium,high,critical")
         nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
                                    adaptive_config=adaptive_config,
                                    timeout=nuclei_timeout,

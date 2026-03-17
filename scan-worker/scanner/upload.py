@@ -64,7 +64,7 @@ def enqueue_report_job(
     minio_path: str,
     host_inventory: dict,
     tech_profiles: list[dict],
-    package: str = "professional",
+    package: str = "perimeter",
 ) -> None:
     """Push a job to the report-pending queue in Redis."""
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")

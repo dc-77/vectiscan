@@ -94,7 +94,7 @@ export async function register(email: string, password: string): Promise<ApiResp
 
 // --- Orders ---
 
-export async function createOrder(domain: string, pkg: string = 'professional'): Promise<ApiResponse<OrderData>> {
+export async function createOrder(domain: string, pkg: string = 'perimeter'): Promise<ApiResponse<OrderData>> {
   const res = await fetch(`${API_URL}/api/orders`, {
     method: 'POST',
     headers: authHeaders(),

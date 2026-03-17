@@ -14,9 +14,11 @@ const SCHEDULE_TYPES = [
 ];
 
 const PACKAGES = [
-  { value: 'basic', label: 'BASIC' },
-  { value: 'professional', label: 'PRO' },
-  { value: 'nis2', label: 'NIS2' },
+  { value: 'webcheck', label: 'WebCheck' },
+  { value: 'perimeter', label: 'PerimeterScan' },
+  { value: 'compliance', label: 'ComplianceScan' },
+  { value: 'supplychain', label: 'SupplyChain' },
+  { value: 'insurance', label: 'InsuranceReport' },
 ];
 
 function formatDate(iso: string): string {
@@ -36,7 +38,7 @@ export default function SchedulesPage() {
 
   // Create form state
   const [domain, setDomain] = useState('');
-  const [pkg, setPkg] = useState('professional');
+  const [pkg, setPkg] = useState('perimeter');
   const [scheduleType, setScheduleType] = useState('monthly');
   const [scheduledAt, setScheduledAt] = useState('');
   const [creating, setCreating] = useState(false);
@@ -191,7 +193,7 @@ export default function SchedulesPage() {
                   <div className="flex items-center gap-3 min-w-0">
                     <span className={`w-2 h-2 rounded-full shrink-0 ${s.enabled ? 'bg-blue-500' : 'bg-slate-600'}`} />
                     <span className="font-mono text-blue-400 text-sm truncate">{s.domain}</span>
-                    <span className="text-xs font-mono uppercase text-slate-500">{s.package === 'professional' ? 'PRO' : s.package.toUpperCase()}</span>
+                    <span className="text-xs font-mono uppercase text-slate-500">{s.package.toUpperCase()}</span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className={`text-xs px-2 py-0.5 rounded ${s.enabled ? 'bg-blue-500/15 text-blue-400' : 'bg-slate-700 text-slate-500'}`}>

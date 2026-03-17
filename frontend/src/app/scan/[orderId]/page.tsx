@@ -220,7 +220,12 @@ export default function ScanDetailPage() {
 
   const isDone = order.status === 'report_complete';
   const isFailed = order.status === 'failed' || order.status === 'cancelled';
-  const pkg = order.package === 'professional' ? 'PRO' : order.package.toUpperCase();
+  const PKG_LABELS: Record<string, string> = {
+    webcheck: 'WEBCHECK', perimeter: 'PERIMETER', compliance: 'COMPLIANCE',
+    supplychain: 'SUPPLYCHAIN', insurance: 'INSURANCE',
+    basic: 'WEBCHECK', professional: 'PERIMETER', nis2: 'COMPLIANCE',
+  };
+  const pkg = PKG_LABELS[order.package] || order.package.toUpperCase();
   const statusLabel = PHASE_LABELS[order.status] || order.status;
 
   // Build IP → FQDNs lookup from discovered hosts
