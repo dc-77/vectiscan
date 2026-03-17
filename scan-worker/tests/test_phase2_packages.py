@@ -40,9 +40,9 @@ class TestPhase2Packages:
         )
 
         mock_testssl.assert_called_once()
-        mock_nikto.assert_not_called()
-        mock_nuclei.assert_not_called()
-        mock_gobuster.assert_not_called()
+        mock_nikto.assert_not_called()      # nikto not in webcheck
+        mock_nuclei.assert_called_once()    # nuclei IS in webcheck (high/crit only)
+        mock_gobuster.assert_not_called()   # gobuster not in webcheck
         mock_gowitness.assert_called_once()
         mock_headers.assert_called_once()
 
@@ -96,7 +96,7 @@ class TestPhase2Packages:
             scan_dir, "test-id", callback, config
         )
 
-        # Basic should only have testssl, gowitness, header_check in tools_run
+        # WebCheck (basic) should have testssl, nuclei, gowitness, header_check, httpx
         assert "nikto" not in result["tools_run"]
-        assert "nuclei" not in result["tools_run"]
+        assert "nuclei" in result["tools_run"]  # nuclei IS in webcheck (high/crit only)
         assert "gobuster_dir" not in result["tools_run"]

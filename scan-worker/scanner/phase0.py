@@ -668,9 +668,16 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     Overall timeout: 10 minutes.
     """
     # Use config if provided, otherwise default to professional
-    phase0_timeout = config["phase0_timeout"] if config else PHASE0_TIMEOUT
-    max_hosts = config["max_hosts"] if config else MAX_HOSTS
-    phase0_tools = config["phase0_tools"] if config else ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]
+    # v2 uses phase0b_tools/phase0b_timeout; fall back to v1 keys for compat
+    if config:
+        phase0_timeout = config.get("phase0b_timeout", config.get("phase0_timeout", PHASE0_TIMEOUT))
+        max_hosts = config["max_hosts"]
+        phase0_tools = config.get("phase0b_tools", config.get("phase0_tools",
+                                  ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]))
+    else:
+        phase0_timeout = PHASE0_TIMEOUT
+        max_hosts = MAX_HOSTS
+        phase0_tools = ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]
 
     phase0_start = time.monotonic()
     phase0_dir = os.path.join(scan_dir, "phase0")

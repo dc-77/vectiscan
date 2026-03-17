@@ -18,12 +18,12 @@ class TestPhase0Packages:
     @patch("scanner.phase0.run_amass", return_value=["sub2.example.com"])
     @patch("scanner.phase0.run_subfinder", return_value=["sub1.example.com"])
     @patch("scanner.phase0.run_crtsh", return_value=["www.example.com"])
-    def test_basic_only_runs_crtsh_and_subfinder(
+    def test_webcheck_only_runs_crtsh_and_subfinder(
         self, mock_crtsh, mock_subfinder, mock_amass, mock_gobuster,
         mock_zone, mock_dns, mock_dnsx, tmp_path
     ):
         from scanner.phase0 import run_phase0
-        config = get_config("basic")
+        config = get_config("webcheck")
         scan_dir = str(tmp_path / "scan")
         os.makedirs(scan_dir, exist_ok=True)
 
@@ -34,7 +34,7 @@ class TestPhase0Packages:
         mock_amass.assert_not_called()
         mock_gobuster.assert_not_called()
         mock_zone.assert_not_called()
-        # dnsx is required for IP resolution, even in basic
+        # dnsx is in webcheck phase0b_tools
         mock_dnsx.assert_called_once()
         # DNS records should always be collected
         mock_dns.assert_called_once()
@@ -46,12 +46,12 @@ class TestPhase0Packages:
     @patch("scanner.phase0.run_amass", return_value=["sub2.example.com"])
     @patch("scanner.phase0.run_subfinder", return_value=["sub1.example.com"])
     @patch("scanner.phase0.run_crtsh", return_value=["www.example.com"])
-    def test_professional_runs_all_tools(
+    def test_perimeter_runs_all_tools(
         self, mock_crtsh, mock_subfinder, mock_amass, mock_gobuster,
         mock_zone, mock_dns, mock_dnsx, tmp_path
     ):
         from scanner.phase0 import run_phase0
-        config = get_config("professional")
+        config = get_config("perimeter")
         scan_dir = str(tmp_path / "scan")
         os.makedirs(scan_dir, exist_ok=True)
 
@@ -72,23 +72,21 @@ class TestPhase0Packages:
     @patch("scanner.phase0.run_amass", return_value=[])
     @patch("scanner.phase0.run_subfinder", return_value=[])
     @patch("scanner.phase0.run_crtsh", return_value=[])
-    def test_basic_max_hosts_limits_to_5(
+    def test_webcheck_max_hosts_limits_to_3(
         self, mock_crtsh, mock_subfinder, mock_amass, mock_gobuster,
         mock_zone, mock_dns, mock_dnsx, tmp_path
     ):
-        """When 8 hosts are discovered, basic config should limit to 5."""
+        """When 8 hosts are discovered, webcheck config should limit to 3."""
         # Make dnsx return 8 validated hosts with different IPs
         mock_dnsx.return_value = [
             {"host": f"h{i}.example.com", "a": [f"1.2.3.{i}"]}
             for i in range(8)
         ]
         from scanner.phase0 import run_phase0
-        config = get_config("basic")
+        config = get_config("webcheck")
         scan_dir = str(tmp_path / "scan")
         os.makedirs(scan_dir, exist_ok=True)
 
-        # Need to include dnsx in tools for this test
-        config_with_dnsx = {**config, "phase0_tools": [*config["phase0_tools"], "dnsx"]}
-        inventory = run_phase0("example.com", scan_dir, "test-id", config_with_dnsx)
+        inventory = run_phase0("example.com", scan_dir, "test-id", config)
 
-        assert len(inventory["hosts"]) <= 5
+        assert len(inventory["hosts"]) <= 3
