@@ -40,6 +40,10 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[di
         "--quiet",
         "--ip", "one",
         "--warnings", "off",
+        "--sneaky",              # less traces in target logs
+        "--hints",               # additional remediation hints for report
+        "--severity", "LOW",     # filter out pure INFO noise from JSON
+        "--nodns", "min",        # minimal DNS (we already have it from Phase 0)
         f"https://{fqdn}",
     ]
 
