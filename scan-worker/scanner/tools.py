@@ -90,7 +90,9 @@ def run_tool(
         # Determine raw output: prefer stdout, fall back to output file
         # Append stderr on failure so error details are visible in scan results
         raw = stdout
-        if stderr and exit_code not in (0, 1):
+        if stderr and exit_code != 0:
+            # Always include stderr when tool exits non-zero (even exit 1)
+            # Some tools use exit 1 for errors (nikto), others for "findings found" (nuclei)
             raw = f"{raw}\n--- STDERR ---\n{stderr}" if raw else stderr
         if not raw and output_path:
             try:

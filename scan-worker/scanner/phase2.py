@@ -520,9 +520,11 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     if mode == "dir":
         # Directory/file discovery with extensions
-        extensions = ".php,.html,.js,.bak,.old,.conf"
+        extensions = ".php,.html,.js,.bak"
         if adaptive_config and adaptive_config.get("ffuf_extensions"):
-            extensions = adaptive_config["ffuf_extensions"]
+            # Cap at 4 extensions to keep runtime within timeout
+            ext_list = adaptive_config["ffuf_extensions"].split(",")[:4]
+            extensions = ",".join(ext_list)
 
         wordlist = FFUF_WORDLISTS.get("dir", WORDLIST_MAP["common"])
         if not os.path.isfile(wordlist):
@@ -729,17 +731,31 @@ def run_dalfox(fqdn: str, ip: str, host_dir: str, order_id: str,
         log.info("dalfox_skipped", ip=ip, reason="no_katana_urls")
         return None
 
-    # Filter only URLs with parameters
-    param_urls = [u for u in katana_urls if "?" in u]
+    # Filter only URLs with meaningful parameters (skip asset versioning)
+    NOISE_PARAMS = {"ver", "v", "format", "type", "css", "js"}
+    param_urls: list[str] = []
+    for u in katana_urls:
+        if "?" not in u:
+            continue
+        # Skip URLs where the only params are noise (e.g. ?ver=6.4.2)
+        from urllib.parse import urlparse, parse_qs
+        qs = parse_qs(urlparse(u).query)
+        meaningful = [k for k in qs if k.lower() not in NOISE_PARAMS]
+        if meaningful:
+            param_urls.append(u)
+
     if not param_urls:
-        log.info("dalfox_skipped", ip=ip, reason="no_urls_with_params")
+        log.info("dalfox_skipped", ip=ip, reason="no_urls_with_meaningful_params",
+                 total_param_urls=sum(1 for u in katana_urls if "?" in u))
         return None
 
     # Write URLs to a temp file for piping into dalfox
     urls_file = f"{phase2_dir}/dalfox_input.txt"
     with open(urls_file, "w") as f:
-        for url in param_urls[:100]:  # Cap at 100 URLs
+        for url in param_urls[:30]:  # Cap at 30 URLs (was 100, caused timeouts)
             f.write(url + "\n")
+    log.info("dalfox_input", ip=ip, meaningful_urls=len(param_urls),
+             capped_to=min(len(param_urls), 30))
 
     output_path = f"{phase2_dir}/dalfox.json"
 
