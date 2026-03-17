@@ -12,24 +12,20 @@ interface Feature {
 }
 
 const FEATURES: Feature[] = [
-  { name: 'Port-Scan',                        webcheck: 'Top 100', perimeter: 'Top 1000', compliance: 'Top 1000', supplychain: 'Top 1000', insurance: 'Top 1000' },
-  { name: 'SSL/TLS-Analyse',                  webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Security-Header-Check',            webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'CMS-Fingerprinting',               webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Screenshot',                       webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Passive Intelligence (Shodan)',     webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'DNS-Reconnaissance (vollständig)', webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Vulnerability-Scan (Nuclei)',      webcheck: 'High/Crit', perimeter: 'Alle', compliance: 'Alle', supplychain: 'Alle', insurance: 'Alle' },
-  { name: 'Web-Vulnerability-Scan (Nikto)',   webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Directory-/Fuzzing (ffuf)',        webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'XSS-Scanner (dalfox)',             webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Threat-Intelligence (EPSS/KEV)',   webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'Cross-Tool-Korrelation',           webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: 'CVSS v3.1 Scoring',               webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
-  { name: '§30 BSIG Compliance-Mapping',      webcheck: false, perimeter: false, compliance: true,  supplychain: false, insurance: false },
-  { name: 'ISO 27001 Mapping',                webcheck: false, perimeter: false, compliance: false, supplychain: true,  insurance: false },
-  { name: 'Versicherungs-Fragebogen',         webcheck: false, perimeter: false, compliance: false, supplychain: false, insurance: true },
-  { name: 'Max. Hosts',                       webcheck: '3',   perimeter: '15',  compliance: '15',  supplychain: '15',  insurance: '15' },
+  { name: 'Port-Scan',            webcheck: 'Top 100', perimeter: 'Top 1000', compliance: 'Top 1000', supplychain: 'Top 1000', insurance: 'Top 1000' },
+  { name: 'SSL/TLS',              webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Security-Header',      webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'CMS-Erkennung',        webcheck: true,  perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Passive Intel',        webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Vuln-Scan',            webcheck: 'High/Crit', perimeter: 'Alle', compliance: 'Alle', supplychain: 'Alle', insurance: 'Alle' },
+  { name: 'Nikto / ffuf',         webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'XSS-Scanner',          webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Threat-Intel',         webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: 'Korrelation',          webcheck: false, perimeter: true,  compliance: true,  supplychain: true,  insurance: true },
+  { name: '§30 BSIG',             webcheck: false, perimeter: false, compliance: true,  supplychain: false, insurance: false },
+  { name: 'ISO 27001',            webcheck: false, perimeter: false, compliance: false, supplychain: true,  insurance: false },
+  { name: 'Vers.-Fragebogen',     webcheck: false, perimeter: false, compliance: false, supplychain: false, insurance: true },
+  { name: 'Max. Hosts',           webcheck: '3',   perimeter: '15',  compliance: '15',  supplychain: '15',  insurance: '15' },
 ];
 
 interface PackageInfo {
@@ -46,14 +42,14 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'webcheck',
     title: 'WebCheck',
-    description: 'Website-Sicherheit, SSL/TLS, E-Mail-Schutz (SPF/DMARC/DKIM) und CMS-Check. Kompakter Report mit Ampelbewertung.',
+    description: 'Website, SSL/TLS, E-Mail-Schutz und CMS-Check.',
     duration: '~15–20 Min',
     accentColor: '#38BDF8',
   },
   {
     key: 'perimeter',
     title: 'PerimeterScan',
-    description: 'Vollständige Angriffsflächen-Analyse: Passive Intelligence, Deep Vulnerability Scan, Directory-Fuzzing und Threat-Intelligence-Enrichment.',
+    description: 'Volle Angriffsfläche: Passive Intel, Deep Scan, Fuzzing, Threat-Intel.',
     duration: '~60–90 Min',
     badge: 'Empfohlen',
     badgeColor: '#38BDF8',
@@ -62,7 +58,7 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'compliance',
     title: 'ComplianceScan',
-    description: 'Perimeter-Scan mit §30 BSIG-Mapping, BSI-Grundschutz-Referenzen und NIS2-Compliance-Summary. Inkl. Audit-Trail.',
+    description: 'Perimeter + §30 BSIG, BSI-Grundschutz, Audit-Trail.',
     duration: '~65–95 Min',
     badge: 'NIS2',
     badgeColor: '#EAB308',
@@ -71,7 +67,7 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'supplychain',
     title: 'SupplyChain',
-    description: 'Perimeter-Scan mit ISO 27001 Annex A Mapping und Sicherheitsnachweis-Kapitel für NIS2-pflichtige Auftraggeber.',
+    description: 'Perimeter + ISO 27001 Mapping, Auftraggeber-Nachweis.',
     duration: '~65–95 Min',
     badge: 'ISO 27001',
     badgeColor: '#A78BFA',
@@ -80,7 +76,7 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'insurance',
     title: 'InsuranceReport',
-    description: 'Perimeter-Scan mit Versicherungs-Fragebogen (10 Prüfpunkte), Risk-Score und Ransomware-Indikator. Zeigt prämienrelevante Maßnahmen.',
+    description: 'Perimeter + Fragebogen, Risk-Score, Ransomware-Indikator.',
     duration: '~65–95 Min',
     badge: 'Versicherung',
     badgeColor: '#34D399',
@@ -105,7 +101,7 @@ function FeatureIcon({ value }: { value: boolean | string }) {
 
 export default function PackageSelector({ selected, onSelect }: Props) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" data-testid="package-selector">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4" data-testid="package-selector">
       {PACKAGES.map((pkg) => {
         const isSelected = selected === pkg.key;
         const borderColor = isSelected ? pkg.accentColor : '#334155';
