@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { FastifyInstance } from 'fastify';
+import { createClient } from 'redis';
 import { query } from '../lib/db.js';
 import { hashPassword, verifyPasswordHash, generateJwt, JwtPayload } from '../lib/auth.js';
 import { requireAuth } from '../middleware/requireAuth.js';
@@ -360,5 +361,42 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
         orders: { total: orders.total, today: recent.today, byStatus: statusBreakdown },
       },
     };
+  });
+
+  // POST /api/admin/diagnose — trigger scan-worker tool diagnostics
+  server.post<{ Body: { probe?: string } }>('/api/admin/diagnose', { preHandler: [requireAuth, requireAdmin] }, async (request, reply) => {
+    const probe = request.body?.probe || undefined;
+    const requestId = crypto.randomUUID();
+
+    // Push diagnose job to Redis queue
+    const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+    const redis = createClient({ url: redisUrl });
+    await redis.connect();
+
+    await redis.rPush('diagnose-pending', JSON.stringify({
+      requestId,
+      probe: probe || null,
+    }));
+
+    // Poll for result (max 30s)
+    const maxWait = probe ? 60000 : 30000;
+    const pollInterval = 500;
+    const start = Date.now();
+
+    while (Date.now() - start < maxWait) {
+      const raw = await redis.get(`diagnose:result:${requestId}`);
+      if (raw) {
+        await redis.disconnect();
+        const result = JSON.parse(raw);
+        return { success: true, data: result };
+      }
+      await new Promise(r => setTimeout(r, pollInterval));
+    }
+
+    await redis.disconnect();
+    return reply.status(504).send({
+      success: false,
+      error: 'Diagnose timeout — scan-worker did not respond within 30s. Is it running?',
+    });
   });
 }

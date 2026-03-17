@@ -504,17 +504,61 @@ def _finalize(
     log.info("scan_complete", order_id=order_id)
 
 
+def _handle_diagnose(redis_client: redis.Redis, job: dict) -> None:
+    """Run diagnostics and publish result to Redis."""
+    request_id = job.get("requestId", "unknown")
+    probe_domain = job.get("probe")
+
+    log.info("diagnose_start", request_id=request_id, probe=probe_domain)
+
+    from scanner.diagnose import diagnose_tools, check_environment, probe_domain as run_probe
+
+    env = check_environment()
+    tools = diagnose_tools()
+
+    probe_results = []
+    if probe_domain:
+        probe_results = run_probe(probe_domain)
+
+    result = {
+        "requestId": request_id,
+        "environment": env,
+        "tools": tools,
+        "probe": probe_results,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+    # Write result to Redis (API will poll for it)
+    redis_client.set(
+        f"diagnose:result:{request_id}",
+        json.dumps(result, default=str),
+        ex=300,  # 5 min TTL
+    )
+    log.info("diagnose_complete", request_id=request_id,
+             ok=sum(1 for t in tools if t["ok"]),
+             fail=sum(1 for t in tools if not t["ok"]))
+
+
 def wait_for_jobs(redis_client: redis.Redis) -> None:
-    """Block and wait for scan jobs on the Redis queue."""
-    log.info("waiting_for_jobs", queue="scan-pending")
+    """Block and wait for scan jobs and diagnose requests on Redis queues."""
+    log.info("waiting_for_jobs", queues=["scan-pending", "diagnose-pending"])
     while True:
         try:
-            result = redis_client.blpop("scan-pending", timeout=5)
+            result = redis_client.blpop(["scan-pending", "diagnose-pending"], timeout=5)
             if result is None:
                 continue
 
-            _, job_data = result
-            job = json.loads(job_data.decode())
+            queue_name, job_data = result
+            queue = queue_name.decode() if isinstance(queue_name, bytes) else queue_name
+            job = json.loads(job_data.decode() if isinstance(job_data, bytes) else job_data)
+
+            if queue == "diagnose-pending":
+                try:
+                    _handle_diagnose(redis_client, job)
+                except Exception as e:
+                    log.error("diagnose_failed", error=str(e))
+                continue
+
             order_id = job["orderId"]
             domain = job["targetDomain"]
             package = job.get("package", "perimeter")
