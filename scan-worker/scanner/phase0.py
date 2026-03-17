@@ -629,13 +629,37 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str) 
                     data = json.loads(line)
                     status = data.get("status_code") or data.get("status-code") or 0
                     if status and 200 <= int(status) < 500:
+                        title = (data.get("title") or "")[:100]
+                        final_url = data.get("final_url") or data.get("url", "")
+
+                        # Detect parking/hosting panel pages — not real web content
+                        _PARKING_PATTERNS = [
+                            "domain not configured", "nicht konfiguriert",
+                            "froxlor", "plesk", "cpanel", "ispconfig",
+                            "this domain is parked", "domain parking",
+                            "coming soon", "under construction",
+                            "default web page", "apache2 debian default",
+                            "welcome to nginx", "test page for",
+                        ]
+                        title_lower = title.lower()
+                        is_parking = any(p in title_lower for p in _PARKING_PATTERNS)
+
+                        if is_parking:
+                            probe["has_web"] = False
+                            probe["status"] = int(status)
+                            probe["title"] = title
+                            probe["parking"] = True
+                            log.info("web_probe_parking_detected", ip=host["ip"],
+                                     fqdn=fqdn, title=title[:50])
+                            break
+
                         probe["has_web"] = True
                         probe["status"] = int(status)
-                        probe["final_url"] = data.get("final_url") or data.get("url", "")
-                        probe["title"] = (data.get("title") or "")[:100]
+                        probe["final_url"] = final_url
+                        probe["title"] = title
                         probe["web_fqdn"] = fqdn
                         log.info("web_probe_found", ip=host["ip"], fqdn=fqdn,
-                                 status=status, title=probe["title"][:50])
+                                 status=status, title=title[:50])
                         break
             except (subprocess.TimeoutExpired, json.JSONDecodeError, Exception) as e:
                 log.debug("web_probe_error", ip=host["ip"], fqdn=fqdn, error=str(e))

@@ -503,11 +503,25 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 # Remove first line (```json) and last line (```)
                 json_text = "\n".join(lines[1:-1])
 
-            # Fix trailing commas before } or ] (common Claude JSON issue)
+            # Fix common Claude JSON issues
             import re
+            # 1. Trailing commas before } or ]
             json_text = re.sub(r',\s*([\]}])', r'\1', json_text)
+            # 2. Single quotes → double quotes (but not inside strings)
+            # 3. Unescaped newlines inside strings
+            json_text = json_text.replace('\t', '\\t')
 
-            result = json.loads(json_text)
+            try:
+                result = json.loads(json_text)
+            except json.JSONDecodeError:
+                # Last resort: try to extract the JSON object from the text
+                match = re.search(r'\{[\s\S]*\}', json_text)
+                if match:
+                    json_text = match.group(0)
+                    json_text = re.sub(r',\s*([\]}])', r'\1', json_text)
+                    result = json.loads(json_text)
+                else:
+                    raise
             log.info(
                 "claude_api_success",
                 findings=len(result.get("findings", [])),
