@@ -122,9 +122,29 @@ export default function FindingsViewer({ data }: FindingsViewerProps) {
                       {finding.cvss_score}
                     </span>
                   )}
+                  {finding.in_cisa_kev && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30" title="CISA Known Exploited Vulnerability">
+                      KEV
+                    </span>
+                  )}
+                  {finding.epss != null && finding.epss > 0.3 && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-orange-500/15 text-orange-400" title={`EPSS: ${(finding.epss * 100).toFixed(0)}% Exploit-Wahrscheinlichkeit`}>
+                      EPSS {(finding.epss * 100).toFixed(0)}%
+                    </span>
+                  )}
+                  {finding.confidence != null && finding.confidence < 0.5 && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-700 text-slate-500" title={`Confidence: ${(finding.confidence * 100).toFixed(0)}%`}>
+                      {(finding.confidence * 100).toFixed(0)}%
+                    </span>
+                  )}
                   {finding.nis2_ref && (
                     <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-slate-700 text-slate-400">
                       {finding.nis2_ref}
+                    </span>
+                  )}
+                  {finding.iso27001_ref && (
+                    <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-violet-500/15 text-violet-400">
+                      {finding.iso27001_ref}
                     </span>
                   )}
                   <span className="text-slate-700 text-xs">{isOpen ? '\u25B2' : '\u25BC'}</span>

@@ -16,6 +16,7 @@ const PHASE_LABELS: Record<string, string> = {
   dns_recon: 'DNS-Recon',
   scan_phase1: 'Phase 1',
   scan_phase2: 'Phase 2',
+  scan_phase3: 'Phase 3',
   scan_complete: 'Scan fertig',
   report_generating: 'Report...',
   report_complete: 'Fertig',
@@ -33,6 +34,7 @@ const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   dns_recon:           { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scan_phase1:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scan_phase2:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  scan_phase3:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scan_complete:       { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   report_generating:   { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   report_complete:     { bg: 'bg-slate-700',   text: 'text-slate-300' },
@@ -42,9 +44,16 @@ const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 const PACKAGE_STYLES: Record<string, { label: string }> = {
-  basic:        { label: 'BASIC' },
-  professional: { label: 'PRO' },
-  nis2:         { label: 'NIS2' },
+  // v2 package names
+  webcheck:     { label: 'WEBCHECK' },
+  perimeter:    { label: 'PERIMETER' },
+  compliance:   { label: 'COMPLIANCE' },
+  supplychain:  { label: 'SUPPLY' },
+  insurance:    { label: 'INSURANCE' },
+  // Legacy aliases
+  basic:        { label: 'WEBCHECK' },
+  professional: { label: 'PERIMETER' },
+  nis2:         { label: 'COMPLIANCE' },
 };
 
 const RISK_BADGE: Record<string, { bg: string; text: string; border: string }> = {
@@ -57,7 +66,7 @@ const RISK_BADGE: Record<string, { bg: string; text: string; border: string }> =
 type StatusFilter = 'all' | 'active' | 'done' | 'failed';
 // Detail tabs moved to /scan/[orderId] page
 
-const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'passive_intel', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_complete', 'report_generating'];
+const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'passive_intel', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_phase3', 'scan_complete', 'report_generating'];
 const DONE_STATUSES = ['report_complete'];
 const FAILED_STATUSES = ['failed', 'cancelled'];
 
@@ -236,6 +245,11 @@ export default function Dashboard() {
                         {riskBadge && isDone && (
                           <span className={`${riskBadge.bg} ${riskBadge.text} ${riskBadge.border} text-xs font-bold px-2 py-0.5 rounded uppercase`}>
                             {order.overallRisk}
+                          </span>
+                        )}
+                        {isDone && order.businessImpactScore != null && order.businessImpactScore > 0 && (
+                          <span className="text-[10px] font-mono text-slate-500" title="Business Impact Score">
+                            BIS {order.businessImpactScore.toFixed(1)}
                           </span>
                         )}
                         <span className={`${statusStyle.bg} ${statusStyle.text} text-xs font-medium px-2.5 py-1 rounded inline-flex items-center gap-1.5`}>

@@ -38,6 +38,9 @@ export interface OrderStatus {
   finishedAt: string | null;
   error: string | null;
   hasReport: boolean;
+  passiveIntelSummary?: Record<string, unknown> | null;
+  correlationData?: unknown[] | null;
+  businessImpactScore?: number | null;
 }
 
 export interface ReportData {
@@ -195,6 +198,7 @@ export interface OrderListItem {
   createdAt: string;
   overallRisk: string | null;
   severityCounts: Record<string, number> | null;
+  businessImpactScore: number | null;
 }
 
 // --- Findings ---
@@ -212,6 +216,13 @@ export interface Finding {
   impact: string;
   recommendation: string;
   nis2_ref?: string;
+  iso27001_ref?: string;
+  confidence?: number;
+  epss?: number;
+  epss_percentile?: number;
+  in_cisa_kev?: boolean;
+  exploit_available?: boolean;
+  business_impact?: number;
 }
 
 export interface PositiveFinding {

@@ -118,6 +118,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const baseSelect = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
                     o.scan_started_at, o.scan_finished_at, o.created_at,
                     o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
+                    o.business_impact_score,
                     c.email,
                     EXISTS(SELECT 1 FROM reports r2 WHERE r2.order_id = o.id) AS has_report,
                     r.findings_data->>'overall_risk' AS overall_risk,
@@ -153,6 +154,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       createdAt: (row.created_at as Date).toISOString(),
       overallRisk: (row.overall_risk as string) || null,
       severityCounts: row.severity_counts || null,
+      businessImpactScore: row.business_impact_score != null ? Number(row.business_impact_score) : null,
     }));
 
     return { success: true, data: { orders } };
@@ -176,7 +178,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       `SELECT o.id, o.target_url, o.status, o.package, o.customer_id,
               o.discovered_hosts, o.hosts_total, o.hosts_completed,
               o.current_phase, o.current_tool, o.current_host,
-              o.scan_started_at, o.scan_finished_at, o.error_message, o.created_at
+              o.scan_started_at, o.scan_finished_at, o.error_message, o.created_at,
+              o.passive_intel_summary, o.correlation_data, o.business_impact_score
        FROM orders o WHERE o.id = $1`,
       [id],
     );
@@ -226,6 +229,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         finishedAt: order.scan_finished_at ? (order.scan_finished_at as Date).toISOString() : null,
         error: order.error_message || null,
         hasReport,
+        passiveIntelSummary: order.passive_intel_summary || null,
+        correlationData: order.correlation_data || null,
+        businessImpactScore: order.business_impact_score != null ? Number(order.business_impact_score) : null,
       },
     };
   });

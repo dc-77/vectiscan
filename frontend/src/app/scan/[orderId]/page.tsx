@@ -25,6 +25,7 @@ const PHASE_COLORS: Record<number, string> = {
   0: '#3b82f6', // blue-500
   1: '#60a5fa', // blue-400
   2: '#93c5fd', // blue-300
+  3: '#a78bfa', // violet-400 (Correlation & Enrichment)
 };
 
 function ScanTimeline({ results, startedAt, finishedAt }: {
@@ -75,7 +76,7 @@ function ScanTimeline({ results, startedAt, finishedAt }: {
           {Object.entries(phaseDurations).sort(([a], [b]) => Number(a) - Number(b)).map(([phase, ms]) => {
             const pct = totalMs > 0 ? Math.round((ms / totalMs) * 100) : 0;
             const phaseNum = Number(phase);
-            const label = phaseNum === 0 ? 'Phase 0 — DNS' : phaseNum === 1 ? 'Phase 1 — Tech' : 'Phase 2 — Deep Scan';
+            const label = phaseNum === 0 ? 'Phase 0 — DNS' : phaseNum === 1 ? 'Phase 1 — Tech' : phaseNum === 2 ? 'Phase 2 — Deep Scan' : 'Phase 3 — Korrelation';
             return (
               <div key={phase}>
                 <div className="flex justify-between text-[10px] mb-0.5">
@@ -129,7 +130,7 @@ function ScanTimeline({ results, startedAt, finishedAt }: {
 
 const PHASE_LABELS: Record<string, string> = {
   passive_intel: 'Passive Intel', dns_recon: 'DNS-Recon', scan_phase1: 'Phase 1', scan_phase2: 'Phase 2',
-  scan_complete: 'Scan fertig', report_generating: 'Report...', report_complete: 'Fertig',
+  scan_phase3: 'Phase 3 — Korrelation', scan_complete: 'Scan fertig', report_generating: 'Report...', report_complete: 'Fertig',
   failed: 'Fehlgeschlagen', cancelled: 'Abgebrochen',
 };
 
@@ -152,6 +153,7 @@ export default function ScanDetailPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [aiData, setAiData] = useState<Record<string, any> | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('findings');
+  const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
@@ -203,6 +205,13 @@ export default function ScanDetailPage() {
     if (ready) loadData();
   }, [ready, loadData]);
 
+  // Auto-switch to debug tab when scan failed and user is admin
+  useEffect(() => {
+    if (order && (order.status === 'failed' || order.status === 'cancelled') && admin) {
+      setActiveTab('debug');
+    }
+  }, [order?.status, admin]);
+
   if (!ready) return null;
 
   if (loading) {
@@ -220,6 +229,7 @@ export default function ScanDetailPage() {
 
   const isDone = order.status === 'report_complete';
   const isFailed = order.status === 'failed' || order.status === 'cancelled';
+  const showDebugDefault = isFailed && admin;
   const PKG_LABELS: Record<string, string> = {
     webcheck: 'WEBCHECK', perimeter: 'PERIMETER', compliance: 'COMPLIANCE',
     supplychain: 'SUPPLYCHAIN', insurance: 'INSURANCE',
@@ -307,11 +317,11 @@ export default function ScanDetailPage() {
                 }`}>Empfehlungen</button>
             </>
           )}
-          {admin && (
+          {(admin || isFailed) && (
             <button onClick={() => setActiveTab('debug')}
               className={`px-4 py-2.5 text-xs font-medium transition-colors ${
                 activeTab === 'debug' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-500 hover:text-slate-300'
-              }`}>Debug</button>
+              }`}>{isFailed ? 'Fehleranalyse' : 'Debug'}</button>
           )}
         </div>
 
@@ -335,8 +345,8 @@ export default function ScanDetailPage() {
             <div className="text-center py-12 text-slate-600 text-sm">Keine Empfehlungen verfügbar.</div>
           )}
 
-          {/* Debug Tab (Admin only) */}
-          {activeTab === 'debug' && admin && (
+          {/* Debug Tab (Admin or Failed scans) */}
+          {activeTab === 'debug' && (admin || isFailed) && (
             <div className="space-y-6">
               {/* Timeline */}
               {scanResults && (
@@ -369,6 +379,86 @@ export default function ScanDetailPage() {
                       </pre>
                     </details>
                   )}
+                </div>
+              )}
+
+              {/* Copy All Debug Data Button */}
+              {scanResults && scanResults.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const debugData = {
+                        orderId,
+                        domain: order.domain,
+                        status: order.status,
+                        package: order.package,
+                        error: order.error,
+                        startedAt: order.startedAt,
+                        finishedAt: order.finishedAt,
+                        progress: order.progress,
+                        aiStrategy: aiData?.aiStrategy || null,
+                        aiConfigs: aiData?.aiConfigs || null,
+                        passiveIntel: order.passiveIntelSummary || null,
+                        correlationData: order.correlationData || null,
+                        businessImpactScore: order.businessImpactScore || null,
+                        toolResults: scanResults.map(r => ({
+                          tool: r.toolName,
+                          phase: r.phase,
+                          host: r.hostIp,
+                          exitCode: r.exitCode,
+                          durationMs: r.durationMs,
+                          output: r.rawOutput,
+                        })),
+                      };
+                      navigator.clipboard.writeText(JSON.stringify(debugData, null, 2)).then(() => {
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      });
+                    }}
+                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-colors ${
+                      copied
+                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600 border border-slate-600'
+                    }`}
+                  >
+                    {copied ? 'Kopiert!' : 'Debug-JSON kopieren'}
+                  </button>
+                  <span className="text-[10px] text-slate-600">{scanResults.length} Tool-Outputs</span>
+                </div>
+              )}
+
+              {/* Passive Intelligence (Phase 0a) */}
+              {order.passiveIntelSummary && Object.keys(order.passiveIntelSummary).length > 0 && (
+                <div>
+                  <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Passive Intelligence</h3>
+                  <details className="bg-[#1e293b] rounded-lg border border-gray-800">
+                    <summary className="px-4 py-2.5 text-sm font-mono text-violet-400 cursor-pointer hover:bg-[#253347]">
+                      Phase 0a — Shodan, AbuseIPDB, WHOIS, DNS-Security
+                    </summary>
+                    <pre className="px-4 pb-3 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
+                      {JSON.stringify(order.passiveIntelSummary, null, 2)}
+                    </pre>
+                  </details>
+                </div>
+              )}
+
+              {/* Phase 3 Correlation Data */}
+              {order.correlationData && (order.correlationData as unknown[]).length > 0 && (
+                <div>
+                  <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Korrelation &amp; Enrichment (Phase 3)</h3>
+                  <details className="bg-[#1e293b] rounded-lg border border-gray-800 mb-2">
+                    <summary className="px-4 py-2.5 text-sm font-mono text-violet-400 cursor-pointer hover:bg-[#253347]">
+                      Korrelierte Findings ({(order.correlationData as unknown[]).length})
+                      {order.businessImpactScore != null && (
+                        <span className="ml-3 text-xs text-slate-500">Business-Impact: {order.businessImpactScore.toFixed(1)}/10</span>
+                      )}
+                    </summary>
+                    <pre className="px-4 pb-3 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
+                      {JSON.stringify(order.correlationData, null, 2)}
+                    </pre>
+                  </details>
                 </div>
               )}
 

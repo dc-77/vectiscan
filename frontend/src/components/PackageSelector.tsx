@@ -46,14 +46,14 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'webcheck',
     title: 'WebCheck',
-    description: 'Website- und Mail-Sicherheit für kleine Unternehmen.',
+    description: 'Website-Sicherheit, SSL/TLS, E-Mail-Schutz (SPF/DMARC/DKIM) und CMS-Check. Kompakter Report mit Ampelbewertung.',
     duration: '~15–20 Min',
     accentColor: '#38BDF8',
   },
   {
     key: 'perimeter',
     title: 'PerimeterScan',
-    description: 'Vollständige Angriffsflächen-Analyse mit allen Tools.',
+    description: 'Vollständige Angriffsflächen-Analyse: Passive Intelligence, Deep Vulnerability Scan, Directory-Fuzzing und Threat-Intelligence-Enrichment.',
     duration: '~60–90 Min',
     badge: 'Empfohlen',
     badgeColor: '#38BDF8',
@@ -62,7 +62,7 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'compliance',
     title: 'ComplianceScan',
-    description: 'Perimeter-Scan mit §30 BSIG-Mapping für NIS2.',
+    description: 'Perimeter-Scan mit §30 BSIG-Mapping, BSI-Grundschutz-Referenzen und NIS2-Compliance-Summary. Inkl. Audit-Trail.',
     duration: '~65–95 Min',
     badge: 'NIS2',
     badgeColor: '#EAB308',
@@ -71,7 +71,7 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'supplychain',
     title: 'SupplyChain',
-    description: 'Sicherheitsnachweis für NIS2-pflichtige Auftraggeber.',
+    description: 'Perimeter-Scan mit ISO 27001 Annex A Mapping und Sicherheitsnachweis-Kapitel für NIS2-pflichtige Auftraggeber.',
     duration: '~65–95 Min',
     badge: 'ISO 27001',
     badgeColor: '#A78BFA',
@@ -80,7 +80,7 @@ const PACKAGES: PackageInfo[] = [
   {
     key: 'insurance',
     title: 'InsuranceReport',
-    description: 'Nachweis für Cyberversicherung mit Fragebogen-Format.',
+    description: 'Perimeter-Scan mit Versicherungs-Fragebogen (10 Prüfpunkte), Risk-Score und Ransomware-Indikator. Zeigt prämienrelevante Maßnahmen.',
     duration: '~65–95 Min',
     badge: 'Versicherung',
     badgeColor: '#34D399',

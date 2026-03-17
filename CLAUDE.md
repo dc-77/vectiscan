@@ -1,7 +1,7 @@
-# VectiScan — Prototyp
+# VectiScan v2
 
 ## Was ist VectiScan?
-Automatisierte Security-Scan-Plattform mit drei Paketen (Basic, Professional, NIS2).
+Automatisierte Security-Scan-Plattform mit fünf Paketen (WebCheck, Perimeter, Compliance, SupplyChain, Insurance).
 Internes Tool hinter Traefik (internal-only). Benutzer registrieren sich, erstellen
 Scan-Orders, verifizieren ihre Domain, und erhalten einen PDF-Report.
 
@@ -117,27 +117,38 @@ Siehe docs/DB-SCHEMA.sql für das vollständige Schema.
 Sieben Tabellen: customers, users, orders, scan_results, reports, audit_log, scan_schedules.
 
 ## Scan-Worker
-Phase-First-Architektur mit AI-Orchestrierung:
-1. Phase 0: DNS-Reconnaissance + Web-Probe (httpx)
-2. AI Host Strategy: Haiku entscheidet scan/skip pro Host
-3. Phase 1: Tech-Detection alle Hosts sequenziell (nmap, webtech, wafw00f)
-4. AI Phase 2 Config: Haiku konfiguriert Tools pro Host
-5. Phase 2: Deep-Scan alle Hosts sequenziell (testssl, nikto, nuclei, gobuster, etc.)
+6-Phasen-Architektur mit 4 AI-Entscheidungspunkten:
+1. Phase 0a: Passive Intelligence (Shodan, AbuseIPDB, SecurityTrails, WHOIS)
+2. Phase 0b: DNS-Reconnaissance + Web-Probe (httpx)
+3. AI Host Strategy (Haiku): scan/skip pro Host, Priorität, scan_hints
+4. Phase 1: Tech-Detection (nmap, webtech, wafw00f, CMS-Fingerprinting-Engine)
+5. AI Phase-2-Config (Haiku): nuclei-Tags, Wordlists, ffuf-Modus, feroxbuster-Tiefe, dalfox
+6. Phase 2: Deep-Scan (testssl, nikto, nuclei, gobuster, ffuf, feroxbuster, katana, dalfox, gowitness, headers, httpx, wpscan)
+7. AI Phase-3-Priorisierung (Sonnet): Cross-Tool-Korrelation, FP-Erkennung
+8. Phase 3: Correlation & Enrichment (NVD, EPSS, CISA KEV, ExploitDB, Cross-Tool-Korrelation, FP-Filter, Business-Impact-Scoring)
 
 Tool-Konfiguration und Timeouts: siehe docs/SCAN-TOOLS.md
-Max Hosts: Basic 5, Pro/NIS2 10. Gesamt-Timeout: Basic 15 Min, Pro/NIS2 120 Min.
+Max Hosts: WebCheck 3, Perimeter+ 15. Gesamt-Timeout: WebCheck 20 Min, Perimeter+ 120 Min.
 
 ## Report-Worker
 1. Rohdaten aus MinIO laden (scan-rawdata/<orderId>.tar.gz)
 2. Tool-Outputs parsen und strukturieren (parser.py)
-3. Claude API aufrufen (claude_client.py, Sonnet, JSON-Output, deutscher Text)
-   - Drei Prompt-Varianten: Basic, Professional, NIS2 (prompts.py)
-4. CWE-Validierung + CVSS-Score-Capping (cwe_reference.py)
-5. Claude-Output auf report_data-Struktur mappen (report_mapper.py)
-6. PDF generieren via generate_report() aus dem Skill (generate_report.py)
-7. PDF nach MinIO hochladen (scan-reports/<orderId>.pdf)
-8. Findings-Daten in reports.findings_data speichern (Dashboard)
-9. Order-Status auf report_complete setzen
+3. Claude API aufrufen (claude_client.py, Sonnet 4.6, JSON-Output, deutscher Text)
+   - Fünf Prompt-Varianten: WebCheck, Perimeter, Compliance, SupplyChain, Insurance (prompts.py)
+4. Report-QA: Programmatische Checks (CVSS, CWE, Severity, Duplikate) + Haiku-Plausibilität (qa_check.py)
+5. CWE-Validierung + CVSS-Score-Capping (cwe_reference.py, claude_client.py)
+6. Claude-Output auf report_data-Struktur mappen (report_mapper.py, 5 Mapper)
+7. PDF generieren via generate_report() aus dem Skill (generate_report.py)
+8. PDF nach MinIO hochladen (scan-reports/<orderId>.pdf)
+9. Findings-Daten in reports.findings_data speichern (Dashboard)
+10. Order-Status auf report_complete setzen
+
+Compliance-Module (report-worker/reporter/compliance/):
+- nis2_bsig.py — §30 BSIG Mapping
+- iso27001.py — ISO 27001 Annex A
+- bsi_grundschutz.py — BSI IT-Grundschutz
+- nist_csf.py — NIST CSF 2.0
+- insurance.py — Versicherungs-Fragebogen-Generator
 
 ## Frontend-Seiten
 - `/` — Landing, Order erstellen mit Package-Selector
@@ -167,18 +178,29 @@ Deploy-Sleep: 15 Sekunden (7 Container brauchen Zeit für Healthchecks).
 - docs/SCAN-TOOLS.md — Alle Scan-Tools mit Argumenten, Paketen und Output-Format
 - docs/architecture.md — Architektur inkl. AI-Orchestrierung und Event-System
 - docs/STRUCTURE.md — Verzeichnisstruktur
+- docs/SCAN-PIPELINE-v2.md — v2 Pipeline-Spezifikation (6 Phasen, 5 Pakete, 4 AI-Punkte)
+- docs/PIPELINE-PLAN-v2.md — Umsetzungsplan v2 (Phasen I–VI)
 - references/report_structure.md — PDF-Layout-Referenz (Farbschema, Sektionen, Finding-Template)
 
-## Drei Pakete (Basic, Professional, NIS2)
-Die drei Pakete sind implementiert:
-- Basic: Schnellscan (~10 Min), weniger Tools, kompakter Report, max 5 Hosts
-- Professional: Vollscan (~45 Min), alle Tools, max 10 Hosts
-- NIS2 Compliance: Gleicher Scan wie Pro, Report mit §30 BSIG-Mapping, Audit-Trail, Lieferketten-1-Seiter
+## Fünf Pakete (WebCheck, Perimeter, Compliance, SupplyChain, Insurance)
+- WebCheck: Schnellscan (~15–20 Min), Website + Mail-Security, max 3 Hosts, einfache Sprache
+- Perimeter: Vollscan (~60–90 Min), alle Tools, max 15 Hosts, PTES-konform
+- Compliance: = Perimeter-Scan + §30 BSIG-Mapping, BSI-Grundschutz-Refs, Audit-Trail
+- SupplyChain: = Perimeter-Scan + ISO 27001 Annex A Mapping, Auftraggeber-Nachweis
+- Insurance: = Perimeter-Scan + Versicherungs-Fragebogen, Risk-Score, Ransomware-Indikator
+
+Legacy-Aliase: basic→webcheck, professional→perimeter, nis2→compliance
 
 Das Paket wird bei POST /api/orders mitgegeben und steuert:
-- Scan-Worker: Welche Tools laufen (scanner/packages.py)
-- Claude-Prompt: Drei Varianten (reporter/prompts.py)
-- Report-Mapper: Drei Mapper-Funktionen (reporter/report_mapper.py)
-- PDF-Engine: NIS2-Sections + Branding (reporter/pdf/generate_report.py)
+- Scan-Worker: Welche Tools laufen, Timeouts, Max-Hosts (scanner/packages.py)
+- Phase 3: Enrichment-Tiefe (WebCheck: nur KEV+NVD, Perimeter+: vollständig)
+- Claude-Prompt: Fünf Varianten (reporter/prompts.py)
+- Report-Mapper: Fünf Mapper-Funktionen (reporter/report_mapper.py)
+- Compliance-Module: Paketspezifische Mappings (reporter/compliance/)
+- PDF-Engine: Paketspezifische Sektionen + Branding (reporter/pdf/generate_report.py)
 
 Branding: Alle Farben kommen aus reporter/pdf/branding.py (VectiScan CI). NICHT hardcoden.
+
+## AI-Modelle
+- Haiku 4.5 (`claude-haiku-4-5-20251001`): Host Strategy, Phase-2-Config, Report-QA
+- Sonnet 4.6 (`claude-sonnet-4-6`): Phase-3-Priorisierung, Report-Generierung
