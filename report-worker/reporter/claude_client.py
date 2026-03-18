@@ -3,6 +3,7 @@
 import json
 import math
 import os
+import re
 import time
 from typing import Any
 
@@ -418,6 +419,33 @@ def validate_cvss_scores(result: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
+def _repair_json(text: str) -> str:
+    """Repair common JSON issues in Claude API responses.
+
+    Handles: markdown fences, JS comments, trailing commas, control chars.
+    """
+    text = text.strip()
+
+    # 1. Remove markdown code fences (```json ... ```)
+    if text.startswith("```"):
+        lines = text.split("\n")
+        text = "\n".join(lines[1:-1])
+
+    # 2. Remove JavaScript-style comments (only outside of JSON strings)
+    #    Line comments: // ... (but not inside URLs like https://)
+    text = re.sub(r'(?<![:"\\])//[^\n]*', '', text)
+    #    Block comments: /* ... */
+    text = re.sub(r'/\*.*?\*/', '', text, flags=re.DOTALL)
+
+    # 3. Trailing commas before } or ]
+    text = re.sub(r',\s*([\]}])', r'\1', text)
+
+    # 4. Fix control characters (literal tabs)
+    text = text.replace('\t', '\\t')
+
+    return text
+
+
 def call_claude(
     domain: str,
     host_inventory: dict[str, Any],
@@ -494,31 +522,16 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
             # Extract text from response
             response_text = response.content[0].text
 
-            # Parse JSON from response
-            # Claude may wrap JSON in markdown code blocks
-            json_text = response_text.strip()
-            if json_text.startswith("```"):
-                # Remove markdown code block
-                lines = json_text.split("\n")
-                # Remove first line (```json) and last line (```)
-                json_text = "\n".join(lines[1:-1])
-
-            # Fix common Claude JSON issues
-            import re
-            # 1. Trailing commas before } or ]
-            json_text = re.sub(r',\s*([\]}])', r'\1', json_text)
-            # 2. Single quotes → double quotes (but not inside strings)
-            # 3. Unescaped newlines inside strings
-            json_text = json_text.replace('\t', '\\t')
+            # Parse JSON from response — repair common Claude issues
+            json_text = _repair_json(response_text)
 
             try:
                 result = json.loads(json_text)
             except json.JSONDecodeError:
-                # Last resort: try to extract the JSON object from the text
+                # Last resort: extract the outermost JSON object
                 match = re.search(r'\{[\s\S]*\}', json_text)
                 if match:
-                    json_text = match.group(0)
-                    json_text = re.sub(r',\s*([\]}])', r'\1', json_text)
+                    json_text = _repair_json(match.group(0))
                     result = json.loads(json_text)
                 else:
                     raise
@@ -556,11 +569,22 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 )
 
         except json.JSONDecodeError as e:
+            # Log context around the parse error position for debugging
+            err_ctx = ""
+            if 'json_text' in dir() and json_text and e.pos is not None:
+                ctx_start = max(0, e.pos - 120)
+                ctx_end = min(len(json_text), e.pos + 120)
+                err_ctx = json_text[ctx_start:ctx_end]
+            elif 'json_text' in dir() and json_text:
+                err_ctx = json_text[:300]
             if attempt < max_retries - 1:
                 log.warning("claude_json_parse_error", attempt=attempt + 1, error=str(e),
-                            raw_snippet=json_text[:200] if 'json_text' in dir() else "")
+                            error_context=err_ctx)
                 time.sleep(3)
             else:
+                log.error("claude_json_parse_final_failure", error=str(e),
+                          error_context=err_ctx,
+                          response_length=len(json_text) if 'json_text' in dir() and json_text else 0)
                 raise RuntimeError(f"Failed to parse Claude response as JSON: {e}")
 
         except Exception as e:

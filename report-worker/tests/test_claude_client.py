@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from reporter.claude_client import (
+    _repair_json,
     call_claude,
     compute_cvss_score,
     validate_cvss_scores,
@@ -321,3 +322,52 @@ class TestValidateCvssScores:
         """Result without findings key should not error."""
         result = validate_cvss_scores({"overall_risk": "LOW"})
         assert result == {"overall_risk": "LOW"}
+
+
+class TestRepairJson:
+    """Test _repair_json() handles common Claude output issues."""
+
+    def test_clean_json_unchanged(self) -> None:
+        raw = '{"key": "value", "num": 42}'
+        assert json.loads(_repair_json(raw)) == {"key": "value", "num": 42}
+
+    def test_markdown_fence_removed(self) -> None:
+        raw = '```json\n{"key": "value"}\n```'
+        assert json.loads(_repair_json(raw)) == {"key": "value"}
+
+    def test_trailing_comma_object(self) -> None:
+        raw = '{"a": 1, "b": 2,}'
+        assert json.loads(_repair_json(raw)) == {"a": 1, "b": 2}
+
+    def test_trailing_comma_array(self) -> None:
+        raw = '{"items": [1, 2, 3,]}'
+        assert json.loads(_repair_json(raw)) == {"items": [1, 2, 3]}
+
+    def test_trailing_comma_nested(self) -> None:
+        raw = '{"a": {"b": 1,}, "c": [1,],}'
+        assert json.loads(_repair_json(raw)) == {"a": {"b": 1}, "c": [1]}
+
+    def test_line_comment_removed(self) -> None:
+        raw = '{\n  "a": 1, // this is a comment\n  "b": 2\n}'
+        assert json.loads(_repair_json(raw)) == {"a": 1, "b": 2}
+
+    def test_block_comment_removed(self) -> None:
+        raw = '{\n  "a": 1, /* block\ncomment */ "b": 2\n}'
+        assert json.loads(_repair_json(raw)) == {"a": 1, "b": 2}
+
+    def test_url_in_value_preserved(self) -> None:
+        """URLs with // inside string values must NOT be treated as comments."""
+        raw = '{"url": "https://example.com/path"}'
+        assert json.loads(_repair_json(raw)) == {"url": "https://example.com/path"}
+
+    def test_combined_issues(self) -> None:
+        """Markdown fence + trailing commas + comments all at once."""
+        raw = '```json\n{\n  "a": 1, // note\n  "b": [2, 3,],\n}\n```'
+        assert json.loads(_repair_json(raw)) == {"a": 1, "b": [2, 3]}
+
+    def test_tabs_escaped(self) -> None:
+        raw = '{"text": "col1\tcol2"}'
+        result = _repair_json(raw)
+        assert "\\t" in result
+        parsed = json.loads(result)
+        assert parsed["text"] == "col1\tcol2"
