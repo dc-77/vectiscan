@@ -27,14 +27,10 @@ def _make_mock_anthropic(response_data: dict):
 
 
 class TestMaxTokensByPackage:
-    def test_basic_max_tokens(self):
-        assert MAX_TOKENS_BY_PACKAGE["basic"] == 2048
-
-    def test_professional_max_tokens(self):
-        assert MAX_TOKENS_BY_PACKAGE["professional"] == 4096
-
-    def test_nis2_max_tokens(self):
-        assert MAX_TOKENS_BY_PACKAGE["nis2"] == 6144
+    def test_all_packages_use_max_tokens(self):
+        """All packages should use the Sonnet maximum (16384) — no artificial limits."""
+        for pkg, tokens in MAX_TOKENS_BY_PACKAGE.items():
+            assert tokens == 16384, f"{pkg} should be 16384, got {tokens}"
 
 
 class TestCallClaudePackages:
@@ -134,7 +130,7 @@ class TestCallClaudePackages:
             call_claude("example.com", {}, [], "", package="basic")
 
         call_args = mock_client.messages.create.call_args
-        assert call_args.kwargs["max_tokens"] == 2048
+        assert call_args.kwargs["max_tokens"] == 16384
 
     def test_professional_uses_4096_tokens(self, professional_response):
         mock_mod, mock_client = _make_mock_anthropic(professional_response)
@@ -143,7 +139,7 @@ class TestCallClaudePackages:
             call_claude("example.com", {}, [], "", package="professional")
 
         call_args = mock_client.messages.create.call_args
-        assert call_args.kwargs["max_tokens"] == 4096
+        assert call_args.kwargs["max_tokens"] == 16384
 
     def test_nis2_uses_6144_tokens(self, nis2_response):
         mock_mod, mock_client = _make_mock_anthropic(nis2_response)
@@ -152,7 +148,7 @@ class TestCallClaudePackages:
             call_claude("example.com", {}, [], "", package="nis2")
 
         call_args = mock_client.messages.create.call_args
-        assert call_args.kwargs["max_tokens"] == 6144
+        assert call_args.kwargs["max_tokens"] == 16384
 
     def test_nis2_response_has_compliance_summary(self, nis2_response):
         mock_mod, _ = _make_mock_anthropic(nis2_response)
@@ -180,7 +176,7 @@ class TestCallClaudePackages:
             call_claude("example.com", {}, [], "")
 
         call_args = mock_client.messages.create.call_args
-        assert call_args.kwargs["max_tokens"] == 4096
+        assert call_args.kwargs["max_tokens"] == 16384
 
     def test_basic_uses_basic_prompt(self, basic_response):
         """Verify that basic package uses the basic system prompt (no CVSS vectors)."""
