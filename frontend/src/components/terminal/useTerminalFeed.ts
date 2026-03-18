@@ -31,20 +31,26 @@ export interface TerminalLine {
   id: string;
   timestamp: string;
   text: string;
-  status?: 'done' | 'running' | 'error';
+  status?: 'done' | 'running' | 'error' | 'command' | 'warning' | 'system';
   detail?: string;
   isHeader?: boolean;
   isHost?: boolean;
   indent?: number;
 }
 
-type ScanPhase = 'idle' | 'starting' | 'queued' | 'dns_recon' | 'scan_phase1' | 'scan_phase2'
+type ScanPhase = 'idle' | 'starting' | 'queued' | 'dns_recon' | 'passive_intel'
+  | 'scan_phase1' | 'scan_phase2' | 'scan_phase3'
   | 'scan_complete' | 'report_generating' | 'report_complete' | 'failed';
 
 const PACKAGE_LABELS: Record<string, string> = {
-  basic: 'Basic Scan',
-  professional: 'Professional Scan',
-  nis2: 'NIS2 Compliance Scan',
+  basic: 'WebCheck',
+  webcheck: 'WebCheck',
+  professional: 'Perimeter Scan',
+  perimeter: 'Perimeter Scan',
+  nis2: 'Compliance Scan',
+  compliance: 'Compliance Scan',
+  supplychain: 'SupplyChain Scan',
+  insurance: 'Insurance Scan',
 };
 
 // Tools expected per phase (for generating terminal lines)
@@ -52,14 +58,39 @@ const PHASE0_TOOLS_BASIC = ['crt.sh', 'subfinder'];
 const PHASE0_TOOLS_PRO = ['crt.sh', 'subfinder', 'amass', 'gobuster DNS', 'Zone-Transfer', 'dnsx Validierung'];
 const PHASE1_TOOLS = ['nmap', 'webtech', 'wafw00f'];
 const PHASE2_TOOLS_BASIC = ['testssl.sh', 'headers', 'gowitness', 'httpx'];
-const PHASE2_TOOLS_PRO = ['testssl.sh', 'nikto', 'nuclei', 'gobuster dir', 'gowitness', 'headers', 'httpx', 'katana', 'wpscan'];
+const PHASE2_TOOLS_PRO = ['testssl.sh', 'nikto', 'nuclei', 'gobuster dir', 'ffuf', 'feroxbuster', 'gowitness', 'headers', 'httpx', 'katana', 'dalfox', 'wpscan'];
+
+// Map tool names from backend to display labels for command-style lines
+const TOOL_COMMANDS: Record<string, string> = {
+  testssl: 'testssl.sh --jsonfile /phase2/testssl.json',
+  nikto: 'nikto -h TARGET -Format json',
+  nuclei: 'nuclei -u TARGET -severity all -jsonl',
+  gobuster_dir: 'gobuster dir -u TARGET -w common.txt',
+  ffuf: 'ffuf -u TARGET/FUZZ -w seclists',
+  ffuf_dir: 'ffuf -u TARGET/FUZZ -e .php,.html,.js,.bak',
+  ffuf_vhost: 'ffuf -H "Host: FUZZ.TARGET" -w vhosts',
+  ffuf_param: 'ffuf -u TARGET?FUZZ=test -w params',
+  feroxbuster: 'feroxbuster -u TARGET -d 2 --json',
+  katana: 'katana -u TARGET -depth 3 -jsluice',
+  dalfox: 'dalfox file urls.txt --format json',
+  gowitness: 'gowitness scan single -u TARGET',
+  header_check: 'curl -sI TARGET | analyze-headers',
+  httpx: 'httpx -u TARGET -json -tech-detect',
+  wpscan: 'wpscan --url TARGET --enumerate vp,vt',
+  nmap: 'nmap -sV -sC TARGET',
+  webtech: 'webtech -u TARGET',
+  wafw00f: 'wafw00f TARGET',
+};
 
 function ts(): string {
-  return new Date().toLocaleTimeString('de-DE', {
+  const d = new Date();
+  const hms = d.toLocaleTimeString('de-DE', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
   });
+  const ms = String(d.getMilliseconds()).padStart(3, '0');
+  return `${hms}.${ms}`;
 }
 
 let lineCounter = 0;
@@ -67,26 +98,94 @@ function lineId(): string {
   return `line-${++lineCounter}`;
 }
 
-export function useTerminalFeed() {
-  const [lines, setLines] = useState<TerminalLine[]>([]);
-  const lastStatusRef = useRef<string>('');
-  const lastToolRef = useRef<string>('');
-  const lastHostRef = useRef<string>('');
-  const lastHostsCompletedRef = useRef<number>(0);
-  const hostsShownRef = useRef(false);
-  const initializedRef = useRef(false);
-  const phase0DoneRef = useRef(false);
-  const phase1DoneRef = useRef(false);
-  const lastToolOutputRef = useRef<string>('');
+/** SessionStorage key for terminal state. */
+function storageKey(orderId: string): string {
+  return `vectiscan-terminal-${orderId}`;
+}
+
+interface TerminalState {
+  lines: TerminalLine[];
+  lastStatus: string;
+  lastTool: string;
+  lastHost: string;
+  hostsCompleted: number;
+  hostsShown: boolean;
+  initialized: boolean;
+  phase0Done: boolean;
+  phase1Done: boolean;
+  lastToolOutput: string;
+}
+
+function saveTerminalState(orderId: string | null, state: TerminalState): void {
+  if (!orderId) return;
+  try {
+    sessionStorage.setItem(storageKey(orderId), JSON.stringify(state));
+  } catch { /* quota exceeded — ignore */ }
+}
+
+function loadTerminalState(orderId: string | null): TerminalState | null {
+  if (!orderId) return null;
+  try {
+    const raw = sessionStorage.getItem(storageKey(orderId));
+    if (raw) return JSON.parse(raw) as TerminalState;
+  } catch { /* corrupt data — ignore */ }
+  return null;
+}
+
+export function useTerminalFeed(orderId?: string | null) {
+  // Restore from sessionStorage on mount
+  const restored = useRef(false);
+  const initialState = useRef<TerminalState | null>(null);
+  if (!restored.current && orderId) {
+    initialState.current = loadTerminalState(orderId);
+    restored.current = true;
+  }
+  const cached = initialState.current;
+
+  const [lines, setLines] = useState<TerminalLine[]>(cached?.lines || []);
+  const lastStatusRef = useRef<string>(cached?.lastStatus || '');
+  const lastToolRef = useRef<string>(cached?.lastTool || '');
+  const lastHostRef = useRef<string>(cached?.lastHost || '');
+  const lastHostsCompletedRef = useRef<number>(cached?.hostsCompleted || 0);
+  const hostsShownRef = useRef(cached?.hostsShown || false);
+  const initializedRef = useRef(cached?.initialized || false);
+  const phase0DoneRef = useRef(cached?.phase0Done || false);
+  const phase1DoneRef = useRef(cached?.phase1Done || false);
+  const lastToolOutputRef = useRef<string>(cached?.lastToolOutput || '');
+
+  // Restore lineCounter to avoid ID collisions
+  if (cached?.lines.length) {
+    const maxId = Math.max(...cached.lines.map(l => {
+      const m = l.id.match(/^line-(\d+)$/);
+      return m ? parseInt(m[1], 10) : 0;
+    }));
+    if (maxId > lineCounter) lineCounter = maxId;
+  }
+
+  const orderIdRef = useRef(orderId);
+  orderIdRef.current = orderId;
 
   const addLines = useCallback((newLines: TerminalLine[]) => {
     setLines(prev => {
       const updated = [...prev, ...newLines];
       // Keep max 200 lines in DOM
-      if (updated.length > 200) {
-        return updated.slice(updated.length - 200);
-      }
-      return updated;
+      const trimmed = updated.length > 200 ? updated.slice(updated.length - 200) : updated;
+
+      // Persist to sessionStorage
+      saveTerminalState(orderIdRef.current || null, {
+        lines: trimmed,
+        lastStatus: lastStatusRef.current,
+        lastTool: lastToolRef.current,
+        lastHost: lastHostRef.current,
+        hostsCompleted: lastHostsCompletedRef.current,
+        hostsShown: hostsShownRef.current,
+        initialized: initializedRef.current,
+        phase0Done: phase0DoneRef.current,
+        phase1Done: phase1DoneRef.current,
+        lastToolOutput: lastToolOutputRef.current,
+      });
+
+      return trimmed;
     });
   }, []);
 
@@ -104,7 +203,7 @@ export function useTerminalFeed() {
     const now = ts();
     const label = PACKAGE_LABELS[pkg] || 'Scan';
     addLines([
-      { id: lineId(), timestamp: now, text: `VectiScan v1.0 — ${label}`, isHeader: true },
+      { id: lineId(), timestamp: now, text: `VectiScan v2.0 — ${label}`, isHeader: true },
       { id: lineId(), timestamp: now, text: `Target: ${domain}`, isHeader: false },
       { id: lineId(), timestamp: now, text: '─'.repeat(50), isHeader: false },
     ]);
@@ -141,11 +240,18 @@ export function useTerminalFeed() {
           });
           break;
 
+        case 'passive_intel':
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '▸ Phase 0a: Passive Intelligence', isHeader: true,
+          });
+          break;
+
         case 'dns_recon':
           if (!phase0DoneRef.current) {
             newLines.push({
               id: lineId(), timestamp: now,
-              text: '▸ Phase 0: DNS-Reconnaissance', isHeader: true,
+              text: '▸ Phase 0b: DNS-Reconnaissance', isHeader: true,
             });
           }
           break;
@@ -207,6 +313,14 @@ export function useTerminalFeed() {
           });
           break;
         }
+
+        case 'scan_phase3':
+          newLines.push({ id: lineId(), timestamp: now, text: '' });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '▸ Phase 3: Correlation & Enrichment', isHeader: true,
+          });
+          break;
 
         case 'scan_complete':
           newLines.push({ id: lineId(), timestamp: now, text: '' });
@@ -270,9 +384,9 @@ export function useTerminalFeed() {
 
     // Tool changes within a phase
     const currentTool = progress.currentTool || '';
-    if (currentTool && currentTool !== 'starting' && currentTool !== lastToolRef.current) {
-      // Mark previous tool as done
-      if (lastToolRef.current) {
+    if (currentTool && currentTool !== lastToolRef.current) {
+      // Mark previous tool as done (unless it was a "starting" marker)
+      if (lastToolRef.current && lastToolRef.current !== 'starting') {
         const host = progress.currentHost || '';
         const toolLabel = lastToolRef.current;
         newLines.push({
@@ -290,6 +404,7 @@ export function useTerminalFeed() {
           lastToolOutputRef.current = progress.toolOutput;
         }
       }
+
       lastToolRef.current = currentTool;
     } else if (progress.toolOutput && progress.toolOutput !== lastToolOutputRef.current) {
       // Tool output arrived but tool hasn't changed yet — show it
@@ -328,7 +443,21 @@ export function useTerminalFeed() {
     phase1DoneRef.current = false;
     lastToolOutputRef.current = '';
     lineCounter = 0;
+    // Clear sessionStorage
+    if (orderIdRef.current) {
+      try { sessionStorage.removeItem(storageKey(orderIdRef.current)); } catch { /* ignore */ }
+    }
   }, []);
 
-  return { lines, processStatus, initTerminal, reset };
+  const addToolCommand = useCallback((tool: string, host: string) => {
+    const now = ts();
+    const cmdTemplate = TOOL_COMMANDS[tool] || tool;
+    const cmd = cmdTemplate.replace(/TARGET/g, host || 'target');
+    addLines([{
+      id: lineId(), timestamp: now,
+      text: cmd, status: 'command' as const, indent: 1,
+    }]);
+  }, [addLines]);
+
+  return { lines, processStatus, initTerminal, reset, addToolCommand };
 }

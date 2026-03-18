@@ -40,13 +40,13 @@ export default function ScanTerminal({
     return (
       <div
         ref={scrollRef}
-        className="p-3 overflow-y-auto font-mono text-xs leading-relaxed"
+        className="p-3 overflow-y-auto font-mono text-xs leading-relaxed animate-crt-flicker"
         style={{
           fontFamily: "'Fira Mono', 'Consolas', 'Liberation Mono', monospace",
           height: '100%',
           minHeight: 0,
           backgroundColor: 'rgba(12, 18, 34, 0.95)',
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(56,189,248,0.015) 22px, rgba(56,189,248,0.015) 24px)',
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(56,189,248,0.03) 22px, rgba(56,189,248,0.03) 24px)',
           scrollbarWidth: 'thin',
           scrollbarColor: '#1E3A5F #0C1222',
         }}
@@ -83,8 +83,11 @@ export default function ScanTerminal({
 
   return (
     <div
-      className={`relative w-full max-w-4xl mx-auto rounded-lg border ${borderClass} transition-all duration-500`}
-      style={{ backgroundColor: 'rgba(12, 18, 34, 0.95)' }}
+      className={`relative w-full max-w-4xl mx-auto rounded-lg border ${borderClass} transition-all duration-500 animate-crt-flicker overflow-hidden`}
+      style={{
+        backgroundColor: 'rgba(12, 18, 34, 0.95)',
+        borderRadius: '12px',
+      }}
     >
       {/* Title bar — terminal dots */}
       <div className="flex items-center gap-2 px-4 py-2 border-b border-[#1E3A5F]">
@@ -104,6 +107,7 @@ export default function ScanTerminal({
           fontFamily: "'Fira Mono', 'Consolas', 'Liberation Mono', monospace",
           maxHeight: '500px',
           minHeight: '300px',
+          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 22px, rgba(56,189,248,0.03) 22px, rgba(56,189,248,0.03) 24px)',
           scrollbarWidth: 'thin',
           scrollbarColor: '#1E3A5F #0C1222',
         }}

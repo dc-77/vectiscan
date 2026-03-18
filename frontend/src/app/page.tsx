@@ -65,7 +65,7 @@ function HomeContent() {
   const [toolOutputs, setToolOutputs] = useState<ToolOutputEntry[]>([]);
   const [intelligenceHosts, setIntelligenceHosts] = useState<HostNode[]>([]);
 
-  const { lines, processStatus, initTerminal, reset: resetTerminal } = useTerminalFeed();
+  const { lines, processStatus, initTerminal, reset: resetTerminal, addToolCommand } = useTerminalFeed(orderId);
 
   // Build HostNode list from discovered hosts + AI strategy
   const updateIntelligenceHosts = useCallback((
@@ -100,6 +100,10 @@ function HomeContent() {
     }
     if (msg.type === 'ai_config' && msg.ip && msg.config) {
       setAiConfigs(prev => ({ ...prev, [msg.ip!]: msg.config! }));
+      return;
+    }
+    if (msg.type === 'tool_starting' && msg.tool) {
+      addToolCommand(msg.tool, msg.host || '');
       return;
     }
     if (msg.type === 'tool_output' && msg.tool && msg.summary) {
@@ -140,7 +144,7 @@ function HomeContent() {
       processStatus(updated);
       return updated;
     });
-  }, [processStatus]);
+  }, [processStatus, addToolCommand]);
 
   useEffect(() => {
     if (order?.progress.discoveredHosts) {

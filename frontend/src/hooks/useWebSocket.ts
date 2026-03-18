@@ -36,7 +36,7 @@ export interface AiConfig {
 }
 
 export interface WsMessage {
-  type: 'connected' | 'progress' | 'status' | 'hosts_discovered' | 'error' | 'tool_output' | 'ai_strategy' | 'ai_config';
+  type: 'connected' | 'progress' | 'status' | 'hosts_discovered' | 'error' | 'tool_output' | 'tool_starting' | 'ai_strategy' | 'ai_config';
   orderId?: string;
   status?: string;
   currentPhase?: string;

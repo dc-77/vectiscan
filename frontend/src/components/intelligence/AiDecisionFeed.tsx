@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { COLORS, hostDisplayName } from './constants';
 import type { HostNode } from './constants';
 import type { AiStrategy, AiConfig } from '@/hooks/useWebSocket';
@@ -10,7 +10,7 @@ import type { AiStrategy, AiConfig } from '@/hooks/useWebSocket';
 interface FeedEntry {
   id: string;
   ts: number;
-  type: 'strategy' | 'config' | 'skip' | 'threat' | 'info';
+  type: 'strategy' | 'config' | 'skip' | 'threat' | 'info' | 'correlation' | 'enrichment' | 'fp_filter';
   text: string;
 }
 
@@ -20,6 +20,9 @@ const TYPE_STYLES: Record<string, { border: string; icon: string; color: string 
   skip: { border: COLORS.gray, icon: '\u2298', color: COLORS.gray },
   threat: { border: COLORS.red, icon: '\u26A0', color: COLORS.red },
   info: { border: COLORS.cyanDim, icon: '\u25B8', color: COLORS.cyanDim },
+  correlation: { border: '#A78BFA', icon: '\u2194', color: '#A78BFA' },   // purple — cross-tool link
+  enrichment: { border: '#34D399', icon: '\u2B06', color: '#34D399' },    // green — NVD/EPSS/KEV
+  fp_filter: { border: '#F59E0B', icon: '\u2718', color: '#F59E0B' },     // amber — false-positive removed
 };
 
 function formatTime(ts: number): string {
@@ -46,6 +49,14 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
     return h ? hostDisplayName(h) : ip;
   };
 
+  // Dedup helper — merge entries, skip existing IDs
+  const mergeFeed = useCallback((prev: FeedEntry[], entries: FeedEntry[]): FeedEntry[] => {
+    const existingIds = new Set(prev.map(e => e.id));
+    const unique = entries.filter(e => !existingIds.has(e.id));
+    if (unique.length === 0) return prev;
+    return [...prev, ...unique].slice(-50);
+  }, []);
+
   // Process aiStrategy changes
   useEffect(() => {
     if (!aiStrategy || aiStrategy === prevStrategyRef.current) return;
@@ -54,19 +65,19 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
     const entries: FeedEntry[] = [];
 
     if (aiStrategy.strategy_notes) {
-      entries.push({ id: `strat-notes-${now}`, ts: now, type: 'info', text: aiStrategy.strategy_notes });
+      entries.push({ id: 'strat-notes', ts: now, type: 'info', text: aiStrategy.strategy_notes });
     }
 
     aiStrategy.hosts.forEach(h => {
       const label = labelForIp(h.ip);
       if (h.action === 'skip') {
-        entries.push({ id: `skip-${h.ip}-${now}`, ts: now, type: 'skip', text: `${label} \u2014 Skipped: ${h.reasoning}` });
+        entries.push({ id: `skip-${h.ip}`, ts: now, type: 'skip', text: `${label} \u2014 Skipped: ${h.reasoning}` });
       } else {
-        entries.push({ id: `scan-${h.ip}-${now}`, ts: now, type: 'strategy', text: `Targeting ${label}${h.priority ? ` [P${h.priority}]` : ''} \u2014 ${h.reasoning}` });
+        entries.push({ id: `scan-${h.ip}`, ts: now, type: 'strategy', text: `Targeting ${label}${h.priority ? ` [P${h.priority}]` : ''} \u2014 ${h.reasoning}` });
       }
     });
 
-    setFeed(prev => [...prev, ...entries].slice(-50));
+    setFeed(prev => mergeFeed(prev, entries));
   }, [aiStrategy]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Process aiConfigs changes
@@ -85,10 +96,10 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
       if (cfg.gobuster_wordlist && cfg.gobuster_wordlist !== 'common') parts.push(`wordlist:${cfg.gobuster_wordlist}`);
       if (cfg.skip_tools?.length) parts.push(`skip:[${cfg.skip_tools.join(',')}]`);
       const detail = parts.length > 0 ? parts.join(' ') : 'default config';
-      return { id: `cfg-${ip}-${now}`, ts: now, type: 'config' as const, text: `${label} \u2014 ${detail}${cfg.reasoning ? ` \u2014 ${cfg.reasoning}` : ''}` };
+      return { id: `cfg-${ip}`, ts: now, type: 'config' as const, text: `${label} \u2014 ${detail}${cfg.reasoning ? ` \u2014 ${cfg.reasoning}` : ''}` };
     });
 
-    setFeed(prev => [...prev, ...entries].slice(-50));
+    setFeed(prev => mergeFeed(prev, entries));
   }, [aiConfigs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Process threat-related tool outputs
@@ -124,7 +135,7 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
             const isNew = i >= feed.length - 3;
             return (
               <div key={entry.id}
-                className={`flex gap-2 py-1.5 px-2 border-l-[3px] ${isNew ? 'animate-feedSlideIn' : ''}`}
+                className={`flex gap-2 py-1.5 px-2 border-l-[3px] ${isNew ? 'animate-feedSlideIn' : ''} ${entry.type === 'threat' ? 'animate-threat-pulse animate-glitch' : ''}`}
                 style={{ borderColor: style.border }}>
                 <span className="text-[10px] font-mono shrink-0 mt-0.5" style={{ color: COLORS.grayDim }}>
                   {formatTime(entry.ts)}

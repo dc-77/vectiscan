@@ -6,9 +6,9 @@ const SCRAMBLE_CHARS = '█▓▒░╔╗╚╝║═0123456789abcdef';
 
 export interface TerminalLineData {
   id: string;
-  timestamp: string;         // HH:MM:SS
+  timestamp: string;         // HH:MM:SS.mmm
   text: string;              // Main text content
-  status?: 'done' | 'running' | 'error';  // Tool completion status
+  status?: 'done' | 'running' | 'error' | 'command' | 'warning' | 'system';
   detail?: string;           // Additional detail (e.g. "12 Subdomains")
   isHeader?: boolean;        // Phase headers get special styling
   isHost?: boolean;          // Host discovery lines
@@ -56,23 +56,46 @@ export default function TerminalLine({ line, animate = true }: TerminalLineProps
   }, [animate, line.text]);
 
   const indent = '  '.repeat(line.indent || 0);
-  const statusIcon = line.status === 'done' ? '✓' : line.status === 'error' ? '✗' : '';
+  const statusIcon = line.status === 'done' ? '✓'
+    : line.status === 'error' ? '✗'
+    : line.status === 'warning' ? '⚠'
+    : '';
   const statusColor = line.status === 'done'
     ? 'text-green-500'
     : line.status === 'error'
     ? 'text-red-500'
+    : line.status === 'warning'
+    ? 'text-orange-400'
     : '';
 
+  // Status-based text color
+  const textColor = line.status === 'command'
+    ? 'text-green-400'
+    : line.status === 'warning'
+    ? 'text-orange-400'
+    : line.status === 'system'
+    ? 'text-slate-500'
+    : line.status === 'error'
+    ? 'text-red-400'
+    : line.isHeader
+    ? 'text-[#38BDF8] font-bold'
+    : line.isHost
+    ? 'text-[#7DD3FC]'
+    : 'text-[#38BDF8]';
+
+  // Command prefix for command-style lines
+  const prefix = line.status === 'command' ? '$ ' : '';
+
   return (
-    <div className={`flex items-start gap-0 ${line.isHeader ? 'mt-3 mb-1' : ''}`}>
+    <div className={`flex items-start gap-0 ${line.isHeader ? 'mt-3 mb-1' : ''} ${line.status === 'error' ? 'animate-glitch' : ''}`}>
       {/* Timestamp */}
       <span className="text-[#4B7399] shrink-0 select-none">
         [{line.timestamp}]
       </span>
 
       {/* Content */}
-      <span className={`ml-1 ${line.isHeader ? 'text-[#38BDF8] font-bold' : line.isHost ? 'text-[#7DD3FC]' : 'text-[#38BDF8]'}`}>
-        {indent}{display}
+      <span className={`ml-1 ${textColor}`}>
+        {indent}{prefix}{display}
       </span>
 
       {/* Detail text */}

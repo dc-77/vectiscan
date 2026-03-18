@@ -36,6 +36,55 @@ body {
   animation: scanlineScroll 6s linear infinite;
 }
 
+/* Glitch effect — horizontal shift + color split */
+@keyframes glitch {
+  0%, 100% { transform: translateX(0); filter: none; }
+  10% { transform: translateX(-2px); filter: hue-rotate(90deg); }
+  20% { transform: translateX(2px); filter: hue-rotate(-90deg); }
+  30% { transform: translateX(-1px); filter: none; }
+  40% { transform: translateX(1px); filter: hue-rotate(45deg); }
+  50% { transform: translateX(0); filter: none; }
+}
+
+.animate-glitch {
+  animation: glitch 0.4s ease-in-out;
+}
+
+/* CRT flicker — subtle brightness fluctuation */
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  4% { opacity: 0.97; }
+  8% { opacity: 1; }
+  42% { opacity: 0.96; }
+  44% { opacity: 1; }
+  78% { opacity: 0.98; }
+  80% { opacity: 1; }
+}
+
+.animate-crt-flicker {
+  animation: crt-flicker 8s linear infinite;
+}
+
+/* Threat pulse — red glow pulse */
+@keyframes threat-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  50% { box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.4); }
+}
+
+.animate-threat-pulse {
+  animation: threat-pulse 1.5s ease-in-out infinite;
+}
+
+/* Active tool glow pulse */
+@keyframes tool-glow {
+  0%, 100% { text-shadow: 0 0 4px rgba(56, 189, 248, 0.3); }
+  50% { text-shadow: 0 0 12px rgba(56, 189, 248, 0.7); }
+}
+
+.animate-tool-glow {
+  animation: tool-glow 2s ease-in-out infinite;
+}
+
 /* Custom scrollbar for dark panels */
 .scrollbar-thin {
   scrollbar-width: thin;

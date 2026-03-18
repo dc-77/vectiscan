@@ -8,7 +8,7 @@ from typing import Any, Callable, Optional
 
 import structlog
 
-from scanner.progress import publish_tool_output
+from scanner.progress import publish_event, publish_tool_output
 from scanner.tools import run_tool
 
 log = structlog.get_logger()
@@ -901,6 +901,7 @@ def run_phase2(
 
     # testssl (only if SSL present and in package)
     if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
+        publish_event(order_id, {"type": "tool_starting", "tool": "testssl", "host": ip})
         testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id)
         results["testssl"] = testssl_result
         results["tools_run"].append("testssl")
@@ -919,6 +920,7 @@ def run_phase2(
 
     # nikto (web-only: skip if no web content detected)
     if (phase2_tools is None or "nikto" in phase2_tools) and "nikto" not in ai_skip and has_web:
+        publish_event(order_id, {"type": "tool_starting", "tool": "nikto", "host": ip})
         nikto_result = run_nikto(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
         results["nikto"] = nikto_result
         results["tools_run"].append("nikto")
@@ -935,6 +937,7 @@ def run_phase2(
 
     # nuclei (web-only: skip if no web content detected)
     if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web:
+        publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
         # Basic: 10 min, high/critical only. Pro/NIS2: 25 min, all severities.
         is_webcheck = config.get("package") in ("basic", "webcheck")
         nuclei_timeout = 600 if is_webcheck else 1500
@@ -963,6 +966,7 @@ def run_phase2(
     # gobuster dir (web-only)
     gobuster_output_path: Optional[str] = None
     if (phase2_tools is None or "gobuster_dir" in phase2_tools) and "gobuster_dir" not in ai_skip and has_web:
+        publish_event(order_id, {"type": "tool_starting", "tool": "gobuster_dir", "host": ip})
         gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
         results["gobuster_dir"] = gobuster_result
         gobuster_output_path = gobuster_result
@@ -983,6 +987,8 @@ def run_phase2(
     # ffuf — web fuzzer (Perimeter+ only, web-only)
     ffuf_result: Optional[list[dict[str, Any]]] = None
     if (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip and has_web:
+        ffuf_mode = adaptive_config.get("ffuf_mode", "dir") if adaptive_config else "dir"
+        publish_event(order_id, {"type": "tool_starting", "tool": f"ffuf_{ffuf_mode}", "host": ip})
         ffuf_result = run_ffuf(
             primary_fqdn, ip, host_dir, order_id,
             adaptive_config=adaptive_config,
@@ -1008,6 +1014,7 @@ def run_phase2(
             log.info("feroxbuster_skipped", ip=ip, reason="ai_disabled")
 
         if ferox_enabled:
+            publish_event(order_id, {"type": "tool_starting", "tool": "feroxbuster", "host": ip})
             # Collect known paths from gobuster + ffuf for dedup
             known_paths: set[str] = set()
             if gobuster_output_path:
@@ -1034,6 +1041,7 @@ def run_phase2(
     # katana — web crawler (web-only, before dalfox which depends on katana URLs)
     katana_result: list[str] = []
     if (phase2_tools is None or "katana" in phase2_tools) and "katana" not in ai_skip and has_web:
+        publish_event(order_id, {"type": "tool_starting", "tool": "katana", "host": ip})
         katana_result = run_katana(primary_fqdn, ip, host_dir, order_id)
         results["katana"] = katana_result
         results["tools_run"].append("katana")
@@ -1054,6 +1062,7 @@ def run_phase2(
             log.info("dalfox_skipped", ip=ip, reason="ai_disabled")
 
         if dalfox_enabled:
+            publish_event(order_id, {"type": "tool_starting", "tool": "dalfox", "host": ip})
             dalfox_result = run_dalfox(
                 primary_fqdn, ip, host_dir, order_id,
                 katana_urls=katana_result if katana_result else None,
@@ -1070,6 +1079,7 @@ def run_phase2(
 
     # gowitness
     if (phase2_tools is None or "gowitness" in phase2_tools) and "gowitness" not in ai_skip:
+        publish_event(order_id, {"type": "tool_starting", "tool": "gowitness", "host": ip})
         gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, order_id)
         results["gowitness"] = gowitness_result
         results["tools_run"].append("gowitness")
@@ -1083,6 +1093,7 @@ def run_phase2(
 
     # header check
     if phase2_tools is None or "headers" in phase2_tools:
+        publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
         header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)
         results["headers"] = header_result
         results["tools_run"].append("header_check")
@@ -1097,6 +1108,7 @@ def run_phase2(
 
     # httpx — HTTP probing
     if phase2_tools is None or "httpx" in phase2_tools:
+        publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
         httpx_result = run_httpx(primary_fqdn, ip, host_dir, order_id)
         results["httpx"] = httpx_result
         results["tools_run"].append("httpx")
@@ -1115,6 +1127,7 @@ def run_phase2(
     # wpscan — CMS-adaptive: only if WordPress detected
     cms = tech_profile.get("cms", "")
     if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
+        publish_event(order_id, {"type": "tool_starting", "tool": "wpscan", "host": ip})
         wpscan_result = run_wpscan(primary_fqdn, ip, host_dir, order_id)
         results["wpscan"] = wpscan_result
         results["tools_run"].append("wpscan")

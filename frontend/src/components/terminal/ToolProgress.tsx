@@ -93,7 +93,7 @@ export default function ToolProgress({ tool, host }: ToolProgressProps) {
         <span className="ml-1">
           <span className="text-[#EAB308]">{spinner}</span>
           {' '}
-          <span className="text-[#38BDF8] font-bold">{targetLabel}</span>
+          <span className="text-[#38BDF8] font-bold animate-tool-glow">{targetLabel}</span>
           {elapsedStr && (
             <span className="text-[#1E3A5F] ml-2">{elapsedStr}</span>
           )}
