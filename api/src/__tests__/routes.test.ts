@@ -132,7 +132,15 @@ describe('API Routes', () => {
 
     it('should create order for valid domain with auth', async () => {
       const now = new Date();
-      // First call: order insert (no more customer upsert — customerId comes from JWT)
+      // First call: verified_domains check (no existing verification)
+      mockQuery.mockResolvedValueOnce({
+        rows: [],
+        command: 'SELECT',
+        rowCount: 0,
+        oid: 0,
+        fields: [],
+      });
+      // Second call: order insert
       mockQuery.mockResolvedValueOnce({
         rows: [{ id: '550e8400-e29b-41d4-a716-446655440000', target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'vectiscan-verify-mock12345678', created_at: now }],
         command: 'INSERT',

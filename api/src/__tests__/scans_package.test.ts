@@ -77,6 +77,9 @@ function mockInsertResult(pkg: string) {
   };
 }
 
+/** Mock for verified_domains check (no existing verification). */
+const noVerificationResult = { rows: [], command: 'SELECT' as const, rowCount: 0, oid: 0, fields: [] };
+
 function mockOrderRow(pkg: string) {
   return {
     rows: [{
@@ -121,6 +124,7 @@ describe('Package selection (v2: 5 packages)', () => {
 
   describe('POST /api/orders with package', () => {
     it('should accept package=webcheck', async () => {
+      mockQuery.mockResolvedValueOnce(noVerificationResult);
       mockQuery.mockResolvedValueOnce(mockInsertResult('webcheck'));
 
       const res = await server.inject({
@@ -137,6 +141,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should accept package=perimeter', async () => {
+      mockQuery.mockResolvedValueOnce(noVerificationResult);
       mockQuery.mockResolvedValueOnce(mockInsertResult('perimeter'));
 
       const res = await server.inject({
@@ -151,6 +156,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should accept package=compliance', async () => {
+      mockQuery.mockResolvedValueOnce(noVerificationResult);
       mockQuery.mockResolvedValueOnce(mockInsertResult('compliance'));
 
       const res = await server.inject({
@@ -165,6 +171,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should accept package=supplychain', async () => {
+      mockQuery.mockResolvedValueOnce(noVerificationResult);
       mockQuery.mockResolvedValueOnce(mockInsertResult('supplychain'));
 
       const res = await server.inject({
@@ -179,6 +186,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should accept package=insurance', async () => {
+      mockQuery.mockResolvedValueOnce(noVerificationResult);
       mockQuery.mockResolvedValueOnce(mockInsertResult('insurance'));
 
       const res = await server.inject({
@@ -219,6 +227,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should default to perimeter when no package specified', async () => {
+      mockQuery.mockResolvedValueOnce(noVerificationResult);
       mockQuery.mockResolvedValueOnce(mockInsertResult('perimeter'));
 
       const res = await server.inject({
@@ -233,6 +242,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should not queue scan job (verification required first)', async () => {
+      mockQuery.mockResolvedValueOnce(noVerificationResult);
       mockQuery.mockResolvedValueOnce(mockInsertResult('compliance'));
 
       await server.inject({

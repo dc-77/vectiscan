@@ -272,12 +272,21 @@ describe('Verification API', () => {
     });
 
     it('should verify and update order on success', async () => {
+      // 1. SELECT order
       mockQuery.mockResolvedValueOnce({
         rows: [{ id: orderId, target_url: 'example.com', verification_token: 'tok', status: 'verification_pending', package: 'professional', verified_at: null, verification_method: null }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
       mockVerifyAll.mockResolvedValueOnce({ verified: true, method: 'file' });
+      // 2. UPDATE orders SET status = 'queued'
       mockQuery.mockResolvedValueOnce({ rows: [], command: 'UPDATE', rowCount: 1, oid: 0, fields: [] });
+      // 3. SELECT customer_id FROM orders (for verified_domains persistence)
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ customer_id: 'cust-1' }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      // 4. INSERT INTO verified_domains
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'INSERT', rowCount: 1, oid: 0, fields: [] });
 
       const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { orderId } });
       expect(res.json()).toEqual({ success: true, data: { verified: true, method: 'file' } });
@@ -344,6 +353,9 @@ describe('Verification API', () => {
     const AUTH_HEADER = { authorization: 'Bearer mock-jwt-token' };
 
     it('should return verificationToken and instructions', async () => {
+      // verified_domains check (no existing verification)
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
+      // order insert
       mockQuery.mockResolvedValueOnce({
         rows: [{ id: orderId, target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'vectiscan-verify-mock12345678', created_at: new Date() }],
         command: 'INSERT', rowCount: 1, oid: 0, fields: [],
@@ -361,6 +373,9 @@ describe('Verification API', () => {
     });
 
     it('should NOT queue a scan job', async () => {
+      // verified_domains check
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
+      // order insert
       mockQuery.mockResolvedValueOnce({
         rows: [{ id: orderId, target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'tok', created_at: new Date() }],
         command: 'INSERT', rowCount: 1, oid: 0, fields: [],
