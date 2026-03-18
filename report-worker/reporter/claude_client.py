@@ -138,7 +138,7 @@ MAX_TOKENS_BY_PACKAGE: dict[str, int] = {
     # Legacy aliases
     "basic": 16384,
     "professional": 16384,
-    "nis2": 6144,
+    "nis2": 16384,
 }
 
 
