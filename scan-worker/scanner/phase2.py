@@ -99,7 +99,7 @@ def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=600,
+        timeout=180,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -676,7 +676,7 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=300,
+        timeout=120,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -940,7 +940,7 @@ def run_phase2(
         publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
         # Basic: 10 min, high/critical only. Pro/NIS2: 25 min, all severities.
         is_webcheck = config.get("package") in ("basic", "webcheck")
-        nuclei_timeout = 600 if is_webcheck else 1500
+        nuclei_timeout = 600 if is_webcheck else 600
         nuclei_severity = config.get("nuclei_severity", "high,critical" if is_webcheck else "low,medium,high,critical")
         nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
                                    adaptive_config=adaptive_config,

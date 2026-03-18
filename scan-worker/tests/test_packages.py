@@ -43,11 +43,14 @@ class TestWebcheck:
 class TestPerimeter:
     def test_phase2_has_all_tools(self):
         config = get_config("perimeter")
-        expected = ["testssl", "nikto", "nuclei", "gobuster_dir", "ffuf",
-                    "feroxbuster", "katana", "dalfox", "gowitness", "headers",
+        expected = ["testssl", "nikto", "nuclei", "gobuster_dir",
+                    "feroxbuster", "katana", "gowitness", "headers",
                     "httpx", "wpscan"]
         for tool in expected:
             assert tool in config["phase2_tools"]
+        # ffuf and dalfox removed — zero useful output in all test runs
+        assert "ffuf" not in config["phase2_tools"]
+        assert "dalfox" not in config["phase2_tools"]
 
     def test_max_hosts(self):
         config = get_config("perimeter")
@@ -77,11 +80,12 @@ class TestPerimeter:
         assert "cisa_kev" in config["phase3_tools"]
         assert "exploitdb" in config["phase3_tools"]
 
-    def test_nuclei_severities_no_info(self):
+    def test_nuclei_severities_no_low_or_info(self):
         config = get_config("perimeter")
-        assert "low" in config["nuclei_severity"]
+        assert "medium" in config["nuclei_severity"]
         assert "high" in config["nuclei_severity"]
         assert "critical" in config["nuclei_severity"]
+        assert "low" not in config["nuclei_severity"]
         assert "info" not in config["nuclei_severity"]
 
 

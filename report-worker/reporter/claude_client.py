@@ -10,6 +10,7 @@ from typing import Any
 import anthropic
 import structlog
 
+from reporter.cwe_reference import correct_cwe_mappings
 from reporter.prompts import get_system_prompt
 
 log = structlog.get_logger()
@@ -620,8 +621,10 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
             result = cap_implausible_scores(result)
             # 2. Validate/correct CVSS scores vs vectors
             result = validate_cvss_scores(result)
-            # 3. Validate CWE mappings
+            # 3. Validate CWE mappings (check if CWE exists)
             result = validate_cwe_mappings(result)
+            # 4. Correct CWE assignments (pattern-based, deterministic)
+            result = correct_cwe_mappings(result)
             return result
 
         except anthropic.RateLimitError as e:

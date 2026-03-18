@@ -258,6 +258,32 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
 
     _check_timeout()
 
+    # ── Redirect dedup: skip hosts whose web_probe redirects to another host ──
+    from urllib.parse import urlparse
+    fqdn_to_ip: dict[str, str] = {}
+    for h in hosts:
+        for fqdn in h.get("fqdns", []):
+            fqdn_to_ip[fqdn.lower()] = h["ip"]
+
+    for h in hosts:
+        wp = h.get("web_probe") or {}
+        final_url = wp.get("final_url", "")
+        if not final_url:
+            continue
+        final_fqdn = (urlparse(final_url).hostname or "").lower()
+        if not final_fqdn or final_fqdn in [f.lower() for f in h.get("fqdns", [])]:
+            continue  # redirects to itself — normal
+        target_ip = fqdn_to_ip.get(final_fqdn)
+        if target_ip and target_ip != h["ip"]:
+            h["status"] = "skipped"
+            h["_reasoning"] = f"Redirects to {final_fqdn} (host {target_ip})"
+            log.info("host_redirect_dedup", ip=h["ip"],
+                     fqdns=h.get("fqdns"), redirect_to=final_fqdn, target_ip=target_ip)
+
+    # Update host inventory after dedup
+    host_inventory["hosts"] = hosts
+    set_discovered_hosts(order_id, host_inventory)
+
     # ── AI Host Strategy: prioritize and filter hosts ─────
     # Enrich host inventory with passive intel for better AI decisions
     enriched_inventory = {**host_inventory}

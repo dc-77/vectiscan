@@ -19,14 +19,14 @@ _PERIMETER_BASE: dict[str, Any] = {
     "max_hosts": 15,
     "nmap_ports": "--top-ports 1000",
     "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
-    "phase2_tools": ["testssl", "nikto", "nuclei", "gobuster_dir", "ffuf",
-                     "feroxbuster", "katana", "dalfox", "gowitness", "headers",
+    "phase2_tools": ["testssl", "nikto", "nuclei", "gobuster_dir",
+                     "feroxbuster", "katana", "gowitness", "headers",
                      "httpx", "wpscan"],
     "phase3_tools": ["nvd", "epss", "cisa_kev", "exploitdb", "correlator",
                      "fp_filter", "business_impact"],
     "phase3_timeout": 300,        # 5 Minuten
     "total_timeout": 7200,        # 120 Minuten
-    "nuclei_severity": "low,medium,high,critical",
+    "nuclei_severity": "medium,high,critical",
 }
 
 
