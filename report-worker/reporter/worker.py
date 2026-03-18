@@ -42,6 +42,7 @@ MINIO_SECURE = os.environ.get("MINIO_SECURE", "false").lower() == "true"
 QUEUE_NAME = "report-pending"
 RAWDATA_BUCKET = "scan-rawdata"
 REPORTS_BUCKET = "scan-reports"
+DEBUG_BUCKET = "scan-debug"
 BLPOP_TIMEOUT = 5  # seconds
 
 
@@ -113,22 +114,30 @@ def _update_order_status(
     status: str,
     error_message: str | None = None,
 ) -> None:
-    """Update the order status (and optionally the error_message)."""
+    """Update the order status (and optionally the error_message).
+
+    Sets scan_finished_at for terminal statuses (report_complete, failed).
+    """
+    is_terminal = status in ("report_complete", "failed")
     with conn.cursor() as cur:
         if error_message is not None:
             cur.execute(
-                """
+                f"""
                 UPDATE orders
-                   SET status = %s, error_message = %s, updated_at = NOW()
+                   SET status = %s, error_message = %s,
+                       {'scan_finished_at = NOW(),' if is_terminal else ''}
+                       updated_at = NOW()
                  WHERE id = %s
                 """,
                 (status, error_message, order_id),
             )
         else:
             cur.execute(
-                """
+                f"""
                 UPDATE orders
-                   SET status = %s, updated_at = NOW()
+                   SET status = %s,
+                       {'scan_finished_at = NOW(),' if is_terminal else ''}
+                       updated_at = NOW()
                  WHERE id = %s
                 """,
                 (status, order_id),
@@ -175,6 +184,24 @@ def _download_rawdata(minio_client: Minio, raw_data_path: str, dest: Path) -> Pa
 
 
 
+def _upload_claude_debug(minio_client: Minio, order_id: str, debug_data: dict, work_dir: Path) -> None:
+    """Upload Claude prompt+response debug data to MinIO (best-effort)."""
+    try:
+        if not minio_client.bucket_exists(DEBUG_BUCKET):
+            minio_client.make_bucket(DEBUG_BUCKET)
+        debug_path = work_dir / "claude-debug.json"
+        debug_path.write_text(json.dumps(debug_data, indent=2, default=str, ensure_ascii=False), encoding="utf-8")
+        minio_client.fput_object(
+            DEBUG_BUCKET,
+            f"{order_id}-claude.json",
+            str(debug_path),
+            content_type="application/json",
+        )
+        log.info("claude_debug_uploaded", order_id=order_id, bucket=DEBUG_BUCKET)
+    except Exception as e:
+        log.warning("claude_debug_upload_failed", order_id=order_id, error=str(e))
+
+
 def _upload_report(minio_client: Minio, local_path: Path, minio_path: str) -> int:
     """Upload the PDF to MinIO and return file size in bytes."""
     # Ensure the bucket exists
@@ -215,6 +242,7 @@ def process_job(job_data: dict) -> None:
     log.info("job_started", order_id=order_id, package=package, work_dir=str(work_dir))
 
     conn: psycopg2.extensions.connection | None = None
+    claude_debug: dict = {}
 
     try:
         # -- Clients ----------------------------------------------------------
@@ -251,6 +279,7 @@ def process_job(job_data: dict) -> None:
             tech_profiles=effective_profiles,
             consolidated_findings=consolidated_findings,
             package=package,
+            debug_info=claude_debug,
         )
         log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
 
@@ -311,6 +340,14 @@ def process_job(job_data: dict) -> None:
         except Exception:
             log.exception("failed_to_update_order_status", order_id=order_id)
     finally:
+        # -- Upload Claude debug data (both success and failure) ---------------
+        if claude_debug:
+            try:
+                mc = _get_minio_client()
+                _upload_claude_debug(mc, order_id, claude_debug, work_dir)
+            except Exception:
+                log.warning("claude_debug_upload_skipped", order_id=order_id)
+
         # -- 10. Clean up /tmp ------------------------------------------------
         try:
             shutil.rmtree(work_dir, ignore_errors=True)

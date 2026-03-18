@@ -447,6 +447,21 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       ts: new Date(row.created_at as string).toISOString(),
     }));
 
+    // Fetch Claude report debug data from MinIO (best-effort, admin only)
+    let claudeDebug = null;
+    if (user.role === 'admin') {
+      try {
+        const stream = await minioClient.getObject('scan-debug', `${id}-claude.json`);
+        const chunks: Buffer[] = [];
+        for await (const chunk of stream) {
+          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        }
+        claudeDebug = JSON.parse(Buffer.concat(chunks).toString('utf-8'));
+      } catch {
+        // File doesn't exist or MinIO unavailable — not critical
+      }
+    }
+
     return {
       success: true,
       data: {
@@ -455,6 +470,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         toolOutputs,
         discoveredHosts: order.discovered_hosts || [],
         error: order.error_message || null,
+        claudeDebug,
       },
     };
   });

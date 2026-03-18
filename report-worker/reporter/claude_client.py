@@ -446,12 +446,59 @@ def _repair_json(text: str) -> str:
     return text
 
 
+def _try_escape_inner_quote(text: str, error_pos: int) -> str:
+    """Try to fix an unescaped double quote inside a JSON string value.
+
+    Scans backward from *error_pos* looking for a ``"`` that is likely an
+    inner quote (not a JSON structural delimiter) and escapes it.
+    Returns the modified text, or the original text unchanged if no fix found.
+    """
+    # JSON structural chars that legitimately precede a closing "
+    STRUCT_BEFORE_CLOSE = set(':,[{')
+
+    search_start = max(0, error_pos - 80)
+    for i in range(error_pos - 1, search_start, -1):
+        ch = text[i]
+        if ch != '"' or (i > 0 and text[i - 1] == '\\'):
+            continue
+        # Found an unescaped " — check if it looks like an inner quote
+        # (i.e. the previous non-whitespace char is NOT a JSON delimiter)
+        j = i - 1
+        while j >= 0 and text[j] in ' \t\n\r':
+            j -= 1
+        if j >= 0 and text[j] not in STRUCT_BEFORE_CLOSE:
+            # This " is likely an inner quote — escape it
+            return text[:i] + '\\"' + text[i + 1:]
+    return text  # no fix found
+
+
+def _iterative_json_parse(text: str, max_fixes: int = 15) -> dict[str, Any]:
+    """Parse JSON with iterative repair for unescaped inner quotes.
+
+    On each ``JSONDecodeError``, attempts to escape the offending quote
+    and retries.  Handles up to *max_fixes* broken quotes per response.
+    """
+    for _ in range(max_fixes):
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError as e:
+            if e.pos is None:
+                raise
+            fixed = _try_escape_inner_quote(text, e.pos)
+            if fixed == text:
+                raise  # couldn't fix — re-raise original error
+            log.debug("json_inner_quote_fixed", pos=e.pos, error=e.msg)
+            text = fixed
+    raise json.JSONDecodeError("Max JSON fixes exceeded", text, 0)
+
+
 def call_claude(
     domain: str,
     host_inventory: dict[str, Any],
     tech_profiles: list[dict[str, Any]],
     consolidated_findings: str,
     package: str = "professional",
+    debug_info: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Call Claude API to analyze scan data and generate findings.
 
@@ -505,7 +552,16 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
     system_prompt = get_system_prompt(package)
     max_tokens = MAX_TOKENS_BY_PACKAGE.get(package, 4096)
 
+    # Populate debug info (prompts are constant across retries)
+    if debug_info is not None:
+        debug_info["system_prompt"] = system_prompt
+        debug_info["user_prompt"] = user_prompt
+        debug_info["package"] = package
+        debug_info["domain"] = domain
+
     # Retry logic: 3 attempts with backoff for rate limits
+    response_text: str | None = None
+    json_text: str | None = None
     max_retries = 3
     for attempt in range(max_retries):
         try:
@@ -522,17 +578,22 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
             # Extract text from response
             response_text = response.content[0].text
 
+            # Save raw response for debug
+            if debug_info is not None:
+                debug_info["raw_response"] = response_text
+                debug_info["attempt"] = attempt + 1
+
             # Parse JSON from response — repair common Claude issues
             json_text = _repair_json(response_text)
 
             try:
-                result = json.loads(json_text)
+                result = _iterative_json_parse(json_text)
             except json.JSONDecodeError:
                 # Last resort: extract the outermost JSON object
                 match = re.search(r'\{[\s\S]*\}', json_text)
                 if match:
                     json_text = _repair_json(match.group(0))
-                    result = json.loads(json_text)
+                    result = _iterative_json_parse(json_text)
                 else:
                     raise
             log.info(
@@ -571,12 +632,16 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
         except json.JSONDecodeError as e:
             # Log context around the parse error position for debugging
             err_ctx = ""
-            if 'json_text' in dir() and json_text and e.pos is not None:
+            if json_text and e.pos is not None:
                 ctx_start = max(0, e.pos - 120)
                 ctx_end = min(len(json_text), e.pos + 120)
                 err_ctx = json_text[ctx_start:ctx_end]
-            elif 'json_text' in dir() and json_text:
+            elif json_text:
                 err_ctx = json_text[:300]
+            # Save error in debug info
+            if debug_info is not None:
+                debug_info["error"] = str(e)
+                debug_info["error_context"] = err_ctx
             if attempt < max_retries - 1:
                 log.warning("claude_json_parse_error", attempt=attempt + 1, error=str(e),
                             error_context=err_ctx)
@@ -584,10 +649,12 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
             else:
                 log.error("claude_json_parse_final_failure", error=str(e),
                           error_context=err_ctx,
-                          response_length=len(json_text) if 'json_text' in dir() and json_text else 0)
+                          response_length=len(json_text) if json_text else 0)
                 raise RuntimeError(f"Failed to parse Claude response as JSON: {e}")
 
         except Exception as e:
+            if debug_info is not None:
+                debug_info["error"] = str(e)
             raise RuntimeError(f"Claude API error: {e}")
 
     raise RuntimeError("Claude API call failed after all retries")

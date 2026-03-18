@@ -44,7 +44,7 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
         "max_hosts": 3,
         "nmap_ports": "--top-ports 100",
         "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
-        "phase2_tools": ["testssl", "nuclei", "gowitness", "headers",
+        "phase2_tools": ["testssl", "gowitness", "headers",
                          "httpx", "wpscan"],
         "phase3_tools": ["nvd", "cisa_kev", "correlator", "fp_filter"],
         "phase3_timeout": 120,        # 2 Minuten

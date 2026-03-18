@@ -279,14 +279,14 @@ export default function Dashboard() {
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate-600">
                         <span className="font-mono uppercase tracking-wider text-slate-500">{pkg.label}</span>
-                        {isDone && order.hostsTotal > 0 && (
+                        {order.hostsTotal > 0 && (
                           <><span className="text-slate-700">&middot;</span><span>{order.hostsTotal} Hosts</span></>
                         )}
                         {duration && (
                           <><span className="text-slate-700">&middot;</span><span>{duration}</span></>
                         )}
                         <span className="text-slate-700">&middot;</span>
-                        <span>{formatDate(order.createdAt)}</span>
+                        <span>{order.startedAt ? formatDate(order.startedAt) : formatDate(order.createdAt)}</span>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {hasDetails && (

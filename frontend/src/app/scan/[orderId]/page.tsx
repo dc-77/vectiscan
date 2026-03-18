@@ -462,6 +462,45 @@ export default function ScanDetailPage() {
                 </div>
               )}
 
+              {/* Claude Report Debug (admin only) */}
+              {aiData?.claudeDebug && (
+                <div>
+                  <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Claude Report Debug</h3>
+                  <details className="bg-[#1e293b] rounded-lg border border-gray-800 mb-2">
+                    <summary className="px-4 py-2.5 text-sm font-mono text-amber-400 cursor-pointer hover:bg-[#253347]">
+                      System Prompt ({aiData.claudeDebug.package})
+                    </summary>
+                    <pre className="px-4 pb-3 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
+                      {aiData.claudeDebug.system_prompt}
+                    </pre>
+                  </details>
+                  <details className="bg-[#1e293b] rounded-lg border border-gray-800 mb-2">
+                    <summary className="px-4 py-2.5 text-sm font-mono text-amber-400 cursor-pointer hover:bg-[#253347]">
+                      User Prompt
+                    </summary>
+                    <pre className="px-4 pb-3 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
+                      {aiData.claudeDebug.user_prompt}
+                    </pre>
+                  </details>
+                  <details className="bg-[#1e293b] rounded-lg border border-gray-800 mb-2">
+                    <summary className="px-4 py-2.5 text-sm font-mono text-amber-400 cursor-pointer hover:bg-[#253347]">
+                      Claude Raw Response {aiData.claudeDebug.error && <span className="text-red-400 ml-2">(Parse Error)</span>}
+                    </summary>
+                    <pre className="px-4 pb-3 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto"
+                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
+                      {aiData.claudeDebug.raw_response}
+                    </pre>
+                  </details>
+                  {aiData.claudeDebug.error && (
+                    <div className="bg-red-900/20 border border-red-800/50 rounded-lg px-4 py-2 text-xs font-mono text-red-300 mb-2">
+                      {aiData.claudeDebug.error}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Tool Results */}
               {scanResults && scanResults.length > 0 && (
                 <div>

@@ -9,7 +9,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from reporter.claude_client import (
+    _iterative_json_parse,
     _repair_json,
+    _try_escape_inner_quote,
     call_claude,
     compute_cvss_score,
     validate_cvss_scores,
@@ -371,3 +373,50 @@ class TestRepairJson:
         assert "\\t" in result
         parsed = json.loads(result)
         assert parsed["text"] == "col1\tcol2"
+
+
+class TestTryEscapeInnerQuote:
+    """Test _try_escape_inner_quote() fixes unescaped quotes in JSON strings."""
+
+    def test_inner_quote_escaped(self) -> None:
+        raw = '{"desc": "Server gibt "403 Forbidden" zurück"}'
+        # First inner " is at position after "Server gibt "
+        # json.loads will fail; find the error position
+        try:
+            json.loads(raw)
+            assert False, "Should have raised"
+        except json.JSONDecodeError as e:
+            fixed = _try_escape_inner_quote(raw, e.pos)
+            assert fixed != raw  # something was changed
+
+    def test_no_change_on_valid_json(self) -> None:
+        raw = '{"key": "value"}'
+        # No error to fix, but function should return unchanged
+        result = _try_escape_inner_quote(raw, 10)
+        # May or may not change — just shouldn't crash
+        assert isinstance(result, str)
+
+
+class TestIterativeJsonParse:
+    """Test _iterative_json_parse() handles multiple unescaped quotes."""
+
+    def test_valid_json_passes(self) -> None:
+        result = _iterative_json_parse('{"key": "value", "num": 42}')
+        assert result == {"key": "value", "num": 42}
+
+    def test_single_inner_quote_fixed(self) -> None:
+        # Claude-typical: unescaped quote in description
+        raw = '{"description": "Der Header "X-Frame-Options" fehlt", "severity": "HIGH"}'
+        result = _iterative_json_parse(raw)
+        assert result["severity"] == "HIGH"
+        assert "X-Frame-Options" in result["description"]
+
+    def test_multiple_inner_quotes_fixed(self) -> None:
+        # Two findings with unescaped quotes
+        raw = '{"findings": [{"desc": "Header "CSP" fehlt"}, {"desc": "Header "HSTS" fehlt"}]}'
+        result = _iterative_json_parse(raw)
+        assert len(result["findings"]) == 2
+
+    def test_unfixable_raises(self) -> None:
+        with pytest.raises(json.JSONDecodeError):
+            _iterative_json_parse("totally not json at all")

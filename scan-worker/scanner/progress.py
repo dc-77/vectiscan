@@ -118,7 +118,7 @@ def set_scan_complete(order_id: str) -> None:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE orders SET status = 'scan_complete', finished_at = NOW(), updated_at = NOW() WHERE id = %s""",
+                """UPDATE orders SET status = 'scan_complete', scan_finished_at = NOW(), updated_at = NOW() WHERE id = %s""",
                 (order_id,),
             )
         conn.commit()
@@ -151,7 +151,7 @@ def set_scan_failed(order_id: str, error_message: str) -> None:
         conn = _get_db()
         with conn.cursor() as cur:
             cur.execute(
-                """UPDATE orders SET status = 'failed', error_message = %s, finished_at = NOW(), updated_at = NOW() WHERE id = %s""",
+                """UPDATE orders SET status = 'failed', error_message = %s, scan_finished_at = NOW(), updated_at = NOW() WHERE id = %s""",
                 (error_message, order_id),
             )
         conn.commit()
