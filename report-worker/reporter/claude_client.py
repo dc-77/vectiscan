@@ -128,15 +128,16 @@ Antworte ausschließlich in JSON nach folgendem Schema:
 """
 
 MAX_TOKENS_BY_PACKAGE: dict[str, int] = {
-    # v2 package names
-    "webcheck": 4096,
-    "perimeter": 8192,
-    "compliance": 8192,
-    "supplychain": 8192,
-    "insurance": 8192,
+    # No artificial limits — Claude charges by actual usage, not by cap.
+    # Sonnet 4.6 supports up to 16384 output tokens.
+    "webcheck": 16384,
+    "perimeter": 16384,
+    "compliance": 16384,
+    "supplychain": 16384,
+    "insurance": 16384,
     # Legacy aliases
-    "basic": 4096,
-    "professional": 8192,
+    "basic": 16384,
+    "professional": 16384,
     "nis2": 6144,
 }
 
