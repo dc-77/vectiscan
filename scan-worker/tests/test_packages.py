@@ -9,9 +9,10 @@ class TestWebcheck:
         config = get_config("webcheck")
         assert "nikto" not in config["phase2_tools"]
 
-    def test_phase2_tools_includes_nuclei(self):
+    def test_phase2_tools_excludes_nuclei(self):
+        """nuclei removed from webcheck — too slow for quick scan."""
         config = get_config("webcheck")
-        assert "nuclei" in config["phase2_tools"]
+        assert "nuclei" not in config["phase2_tools"]
 
     def test_max_hosts(self):
         config = get_config("webcheck")
