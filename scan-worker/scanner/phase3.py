@@ -251,10 +251,46 @@ def run_phase3(
 
     # Build summary
     non_fp = [cf for cf in correlated if not cf.is_false_positive]
+    fp_list = [cf for cf in correlated if cf.is_false_positive]
     severity_counts: dict[str, int] = {}
     for cf in non_fp:
         sev = cf.primary.severity
         severity_counts[sev] = severity_counts.get(sev, 0) + 1
+
+    # Detailed FP report: which findings were filtered and why
+    fp_details: list[dict[str, str]] = []
+    for cf in fp_list:
+        fp_details.append({
+            "tool": cf.primary.tool,
+            "title": cf.primary.title[:100],
+            "severity": cf.primary.severity,
+            "reason": cf.fp_reason,
+            "host": cf.primary.host_ip,
+            "cve": cf.primary.cve_id or "",
+        })
+
+    # Group FP reasons for summary
+    fp_by_reason: dict[str, int] = {}
+    for fp in fp_details:
+        # Extract the rule category from the reason
+        reason = fp["reason"]
+        if reason.startswith("AI:"):
+            category = "AI-Priorisierung"
+        elif "WAF" in reason:
+            category = "WAF-Filter"
+        elif "Version mismatch" in reason:
+            category = "Version-Mismatch"
+        elif "CMS mismatch" in reason:
+            category = "CMS-Mismatch"
+        elif "SSL dedup" in reason:
+            category = "SSL-Dedup"
+        elif "Header dedup" in reason:
+            category = "Header-Dedup"
+        elif "Info noise" in reason:
+            category = "Info-Noise"
+        else:
+            category = "Sonstige"
+        fp_by_reason[category] = fp_by_reason.get(category, 0) + 1
 
     phase3_result = {
         "correlated_findings": findings_data,
@@ -263,12 +299,14 @@ def run_phase3(
         "business_impact_score": order_impact_score,
         "phase3_summary": {
             "total_findings": len(correlated),
-            "false_positives": sum(1 for cf in correlated if cf.is_false_positive),
+            "false_positives": len(fp_list),
             "valid_findings": len(non_fp),
             "severity_counts": severity_counts,
             "cves_enriched": len(enrichment_data),
             "cisa_kev_matches": sum(1 for d in enrichment_data.values()
                                     if "cisa_kev" in d),
+            "fp_details": fp_details,
+            "fp_by_reason": fp_by_reason,
         },
     }
 
