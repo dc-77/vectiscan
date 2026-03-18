@@ -480,7 +480,7 @@ def _iterative_json_parse(text: str, max_fixes: int = 15) -> dict[str, Any]:
     """
     for _ in range(max_fixes):
         try:
-            return json.loads(text)
+            return json.loads(text, strict=False)
         except json.JSONDecodeError as e:
             if e.pos is None:
                 raise
