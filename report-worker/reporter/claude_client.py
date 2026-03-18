@@ -129,14 +129,14 @@ Antworte ausschließlich in JSON nach folgendem Schema:
 
 MAX_TOKENS_BY_PACKAGE: dict[str, int] = {
     # v2 package names
-    "webcheck": 2048,
-    "perimeter": 4096,
-    "compliance": 6144,
-    "supplychain": 5120,
-    "insurance": 5120,
+    "webcheck": 4096,
+    "perimeter": 8192,
+    "compliance": 8192,
+    "supplychain": 8192,
+    "insurance": 8192,
     # Legacy aliases
-    "basic": 2048,
-    "professional": 4096,
+    "basic": 4096,
+    "professional": 8192,
     "nis2": 6144,
 }
 
@@ -577,11 +577,24 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
 
             # Extract text from response
             response_text = response.content[0].text
+            stop_reason = response.stop_reason  # "end_turn" or "max_tokens"
 
             # Save raw response for debug
             if debug_info is not None:
                 debug_info["raw_response"] = response_text
                 debug_info["attempt"] = attempt + 1
+                debug_info["stop_reason"] = stop_reason
+
+            # Detect truncated response — retry is useless, need more tokens
+            if stop_reason == "max_tokens":
+                log.warning("claude_response_truncated",
+                            attempt=attempt + 1,
+                            max_tokens=max_tokens,
+                            response_chars=len(response_text))
+                raise json.JSONDecodeError(
+                    f"Response truncated (max_tokens={max_tokens}, got {len(response_text)} chars)",
+                    response_text, len(response_text) - 1,
+                )
 
             # Parse JSON from response — repair common Claude issues
             json_text = _repair_json(response_text)
