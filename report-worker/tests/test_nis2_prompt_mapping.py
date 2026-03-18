@@ -26,7 +26,7 @@ class TestNIS2PromptMappingRules:
     def test_missing_headers_map_to_nr5(self):
         """Missing headers should map to Nr. 5."""
         lines = SYSTEM_PROMPT_NIS2.split("\n")
-        header_lines = [l for l in lines if "Security-Header" in l and "Fehlende" in l]
+        header_lines = [l for l in lines if "Security-Header" in l and "Fehlende" in l and "Nr." in l]
         assert len(header_lines) >= 1
         assert "Nr. 5" in header_lines[0]
 
