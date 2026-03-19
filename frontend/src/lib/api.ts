@@ -145,9 +145,10 @@ export async function getOrderEvents(id: string): Promise<ApiResponse<OrderEvent
   return handleResponse(res);
 }
 
-export function getReportDownloadUrl(id: string): string {
+export function getReportDownloadUrl(id: string, version?: number): string {
   const token = getToken();
-  return `${API_URL}/api/orders/${id}/report${token ? `?token=${token}` : ''}`;
+  const url = `${API_URL}/api/orders/${id}/report${token ? `?token=${token}` : ''}`;
+  return version ? `${url}&version=${version}` : url;
 }
 
 export async function getOrderReport(id: string): Promise<ApiResponse<ReportData>> {
@@ -470,6 +471,29 @@ export async function unexcludeFinding(orderId: string, findingId: string): Prom
 export async function regenerateReport(orderId: string): Promise<ApiResponse<{ message: string }>> {
   const res = await fetch(`${API_URL}/api/orders/${orderId}/regenerate-report`, {
     method: 'POST',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// --- Report Versions ---
+
+export interface ReportVersion {
+  version: number;
+  createdAt: string;
+  findingsCount: number;
+  excludedCount: number;
+  excludedFindings: string[];
+  fileSizeBytes: number;
+  isCurrent: boolean;
+}
+
+export interface ReportVersionsData {
+  versions: ReportVersion[];
+}
+
+export async function getReportVersions(orderId: string): Promise<ApiResponse<ReportVersionsData>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/report-versions`, {
     headers: authHeaders(),
   });
   return handleResponse(res);

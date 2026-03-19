@@ -36,9 +36,10 @@ interface FindingsViewerProps {
   onExclude?: (findingId: string, reason: string) => void;
   onUnexclude?: (findingId: string) => void;
   onRegenerateReport?: () => void;
+  lastReportExcludedFindings?: string[];
 }
 
-export default function FindingsViewer({ data, excludedIds = [], onExclude, onUnexclude, onRegenerateReport }: FindingsViewerProps) {
+export default function FindingsViewer({ data, excludedIds = [], onExclude, onUnexclude, onRegenerateReport, lastReportExcludedFindings = [] }: FindingsViewerProps) {
   const [filter, setFilter] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -57,6 +58,13 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
     }
   }
   const hasExclusions = excludedIds.length > 0;
+
+  // Determine if exclusions have changed since last report
+  const lastReportExclusions = new Set(lastReportExcludedFindings);
+  const currentExclusions = new Set(excludedIds);
+  const hasExclusionChanges = currentExclusions.size !== lastReportExclusions.size ||
+    [...currentExclusions].some(id => !lastReportExclusions.has(id));
+  const exclusionDiff = currentExclusions.size - lastReportExclusions.size;
 
   const riskStyle = RISK_STYLE[data.overall_risk?.toUpperCase()] || 'bg-slate-700 text-slate-400';
 
@@ -77,12 +85,16 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
         </div>
         <div className="flex items-center gap-3 flex-1">
           <SeverityCounts counts={hasExclusions ? adjustedCounts : data.severity_counts} />
-          {hasExclusions && onRegenerateReport && (
+          {hasExclusionChanges && onRegenerateReport && (
             <button
               onClick={onRegenerateReport}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors ml-auto shrink-0"
             >
-              Report neu generieren ({excludedIds.length} ausgeschlossen)
+              {exclusionDiff > 0
+                ? `Report neu generieren (${exclusionDiff} weitere FP)`
+                : exclusionDiff < 0
+                  ? `Report neu generieren (${Math.abs(exclusionDiff)} FP wiederhergestellt)`
+                  : `Report neu generieren (FP ge\u00e4ndert)`}
             </button>
           )}
         </div>

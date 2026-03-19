@@ -5,8 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
 import { getOrderStatus, getFindings, getScanResults, getReportDownloadUrl, getOrderEvents,
-         excludeFinding, unexcludeFinding, regenerateReport,
-         OrderStatus, OrderEvents, FindingsData, ScanResult } from '@/lib/api';
+         excludeFinding, unexcludeFinding, regenerateReport, getReportVersions,
+         OrderStatus, OrderEvents, FindingsData, ScanResult, ReportVersion } from '@/lib/api';
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
 
@@ -159,6 +159,7 @@ export default function ScanDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
+  const [reportVersions, setReportVersions] = useState<ReportVersion[]>([]);
 
   useEffect(() => {
     if (!isLoggedIn()) { router.replace('/login'); return; }
@@ -182,6 +183,14 @@ export default function ScanDetailPage() {
         const findingsRes = await getFindings(orderId);
         if (findingsRes.success && findingsRes.data) {
           setFindings(findingsRes.data);
+        }
+      }
+
+      // Load report versions when scan is done
+      if (orderRes.data.status === 'report_complete' && orderRes.data.hasReport) {
+        const versionsRes = await getReportVersions(orderId);
+        if (versionsRes.success && versionsRes.data) {
+          setReportVersions(versionsRes.data.versions);
         }
       }
 
@@ -231,6 +240,9 @@ export default function ScanDetailPage() {
       // Refresh order status to pick up new report status
       const orderRes = await getOrderStatus(orderId);
       if (orderRes.success && orderRes.data) setOrder(orderRes.data);
+      // Reload report versions
+      const versionsRes = await getReportVersions(orderId);
+      if (versionsRes.success && versionsRes.data) setReportVersions(versionsRes.data.versions);
     }
     setRegenerating(false);
   }, [orderId]);
@@ -319,6 +331,47 @@ export default function ScanDetailPage() {
           </div>
         </div>
 
+        {/* Report Versions */}
+        {isDone && order.hasReport && reportVersions.length > 0 && (
+          <div className="bg-[#1e293b] rounded-xl p-5 border border-slate-700">
+            <h3 className="text-sm font-semibold text-slate-300 mb-3">
+              Reports ({reportVersions.length} {reportVersions.length === 1 ? 'Version' : 'Versionen'})
+            </h3>
+            <div className="space-y-2">
+              {reportVersions.map((rv) => (
+                <div key={rv.version} className={`flex items-center justify-between p-3 rounded-lg border ${
+                  rv.isCurrent ? 'border-blue-500/30 bg-blue-900/10' : 'border-slate-700 bg-slate-800/50 opacity-70'
+                }`}>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-slate-200">v{rv.version}</span>
+                      {rv.isCurrent && (
+                        <span className="px-1.5 py-0.5 bg-blue-600/30 text-blue-300 text-xs rounded">Aktuell</span>
+                      )}
+                      {rv.excludedCount > 0 && (
+                        <span className="px-1.5 py-0.5 bg-yellow-600/20 text-yellow-300 text-xs rounded">
+                          {rv.excludedCount} FP ausgeschlossen
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-0.5">
+                      {new Date(rv.createdAt).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      {' \u2014 '}{rv.findingsCount} Befunde
+                      {rv.fileSizeBytes > 0 && ` \u2014 ${(rv.fileSizeBytes / 1024).toFixed(0)} KB`}
+                    </div>
+                  </div>
+                  <a
+                    href={getReportDownloadUrl(orderId, rv.version)}
+                    className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs rounded-lg whitespace-nowrap"
+                  >
+                    PDF herunterladen
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Meta info */}
         <div className="flex items-center gap-3 text-xs text-slate-600 flex-wrap">
           {order.startedAt && <span>Gestartet: {formatDate(order.startedAt)}</span>}
@@ -371,6 +424,7 @@ export default function ScanDetailPage() {
                 onExclude={admin ? handleExclude : undefined}
                 onUnexclude={admin ? handleUnexclude : undefined}
                 onRegenerateReport={admin ? handleRegenerate : undefined}
+                lastReportExcludedFindings={reportVersions.length > 0 ? reportVersions[0].excludedFindings : []}
               />
             </div>
           )}

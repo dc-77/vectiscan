@@ -339,11 +339,32 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     let result;
-    {
+    const requestedVersion = (request.query as Record<string, string>).version
+      ? parseInt((request.query as Record<string, string>).version, 10)
+      : null;
+
+    if (requestedVersion) {
+      try {
+        result = await query(
+          `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url
+           FROM reports r JOIN orders o ON r.order_id = o.id
+           WHERE r.order_id = $1 AND r.version = $2`,
+          [id, requestedVersion],
+        );
+      } catch {
+        // version column doesn't exist yet — fallback
+        result = await query(
+          `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, o.target_url
+           FROM reports r JOIN orders o ON r.order_id = o.id
+           WHERE r.order_id = $1 LIMIT 1`,
+          [id],
+        );
+      }
+    } else {
       result = await query(
-        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, o.target_url
+        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url
          FROM reports r JOIN orders o ON r.order_id = o.id
-         WHERE r.order_id = $1 LIMIT 1`,
+         WHERE r.order_id = $1 ORDER BY r.created_at DESC LIMIT 1`,
         [id],
       );
     }
@@ -582,6 +603,65 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
           finding_id: r.finding_id,
           reason: r.reason,
           created_at: r.created_at ? (r.created_at as Date).toISOString() : null,
+        })),
+      },
+    };
+  });
+
+  // GET /api/orders/:id/report-versions — list all report versions
+  server.get<{ Params: OrderParams }>('/api/orders/:id/report-versions', { preHandler: [requireAuth] }, async (request, reply) => {
+    const { id } = request.params;
+    const user = request.user!;
+
+    if (!UUID_REGEX.test(id)) {
+      return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+    }
+
+    // Ownership check
+    const orderCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [id]);
+    if (orderCheck.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'Order not found' });
+    }
+    if (user.role !== 'admin' && (orderCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
+
+    // Try query with version column first; fallback if migration 011 hasn't run
+    let versions: Array<Record<string, unknown>>;
+    try {
+      const result = await query(
+        `SELECT version, created_at, file_size_bytes, excluded_findings, findings_data->'severity_counts' AS severity_counts
+         FROM reports WHERE order_id = $1
+         ORDER BY version DESC`,
+        [id],
+      );
+      versions = result.rows as Array<Record<string, unknown>>;
+    } catch {
+      // version column doesn't exist yet — fallback
+      const result = await query(
+        `SELECT created_at, file_size_bytes, findings_data->'severity_counts' AS severity_counts
+         FROM reports WHERE order_id = $1`,
+        [id],
+      );
+      versions = result.rows as Array<Record<string, unknown>>;
+    }
+
+    const sumSeverityCounts = (counts: unknown): number => {
+      if (!counts || typeof counts !== 'object') return 0;
+      return Object.values(counts as Record<string, number>).reduce((sum, v) => sum + (typeof v === 'number' ? v : 0), 0);
+    };
+
+    return {
+      success: true,
+      data: {
+        versions: versions.map((row, idx) => ({
+          version: row.version ?? 1,
+          createdAt: row.created_at ? (row.created_at as Date).toISOString() : null,
+          findingsCount: sumSeverityCounts(row.severity_counts),
+          excludedCount: (row.excluded_findings as string[] || []).length,
+          excludedFindings: row.excluded_findings || [],
+          fileSizeBytes: row.file_size_bytes || 0,
+          isCurrent: idx === 0,
         })),
       },
     };
