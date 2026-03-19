@@ -1220,65 +1220,9 @@ def run_phase2(
                 log.error("phase2_group_failed", group=group_name, ip=ip, error=str(e))
 
     # ── Legacy tools (kept for rollback, not in phase2_tools) ──
-
-    # nikto (legacy — skipped when not in phase2_tools)
-    if (phase2_tools is None or "nikto" in phase2_tools) and "nikto" not in ai_skip and has_web:
-        publish_event(order_id, {"type": "tool_starting", "tool": "nikto", "host": ip})
-        nikto_result = run_nikto(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
-        results["nikto"] = nikto_result
-        results["tools_run"].append("nikto")
-        progress_callback(order_id, "nikto", "complete")
-        if nikto_result:
-            items = nikto_result.get("vulnerabilities", []) if isinstance(nikto_result, dict) else []
-            publish_tool_output(order_id, "nikto", ip, f"{len(items)} items found")
-        else:
-            publish_tool_output(order_id, "nikto", ip, "No findings")
-    elif not has_web:
-        log.info("nikto_skipped", ip=ip, reason="no_web_content")
-    else:
-        log.info("nikto_skipped", ip=ip, reason="not_in_package")
-
-    # nuclei (web-only: skip if no web content detected)
-    # ZAP handles misconfig/exposure — nuclei focuses on CVE + default-login + tech-specific
-    if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web:
-        publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
-        # Ensure "cve" and "default-login" tags are always included
-        nuclei_config = dict(adaptive_config) if adaptive_config else {}
-        tags = list(nuclei_config.get("nuclei_tags", []))
-        for auto_tag in ("cve", "default-login"):
-            if auto_tag not in tags:
-                tags.append(auto_tag)
-        nuclei_config["nuclei_tags"] = tags
-        # Ensure misconfig/exposure are excluded (ZAP covers these)
-        exclude = list(nuclei_config.get("nuclei_exclude_tags", []))
-        for excl_tag in ("misconfig", "exposure"):
-            if excl_tag not in exclude:
-                exclude.append(excl_tag)
-        nuclei_config["nuclei_exclude_tags"] = exclude
-        # Basic: 10 min, high/critical only. Pro/NIS2: 25 min, all severities.
-        is_webcheck = config.get("package") in ("basic", "webcheck")
-        nuclei_timeout = 600 if is_webcheck else 600
-        nuclei_severity = config.get("nuclei_severity", "high,critical" if is_webcheck else "low,medium,high,critical")
-        nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
-                                   adaptive_config=nuclei_config,
-                                   timeout=nuclei_timeout,
-                                   severity=nuclei_severity)
-        results["nuclei"] = nuclei_result
-        results["tools_run"].append("nuclei")
-        progress_callback(order_id, "nuclei", "complete")
-        if nuclei_result:
-            severities = {}
-            for f in nuclei_result:
-                sev = f.get("info", {}).get("severity", "unknown")
-                severities[sev] = severities.get(sev, 0) + 1
-            parts = [f"{v} {k}" for k, v in sorted(severities.items())]
-            publish_tool_output(order_id, "nuclei", ip, f"{len(nuclei_result)} findings ({', '.join(parts)})")
-        else:
-            publish_tool_output(order_id, "nuclei", ip, "No vulnerabilities found")
-    elif not has_web:
-        log.info("nuclei_skipped", ip=ip, reason="no_web_content")
-    else:
-        log.info("nuclei_skipped", ip=ip, reason="not_in_package")
+    # nikto, nuclei, testssl, gowitness, headers, httpx, wpscan now run
+    # in parallel tool groups above. Only gobuster/ffuf/feroxbuster/katana/dalfox
+    # remain here as dead legacy code (not in phase2_tools since ZAP integration).
 
     # gobuster dir (web-only)
     gobuster_output_path: Optional[str] = None
