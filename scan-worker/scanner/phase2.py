@@ -1060,43 +1060,168 @@ def run_phase2(
         "tools_run": [],
     }
 
-    # testssl (only if SSL present and in package)
-    if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
-        publish_event(order_id, {"type": "tool_starting", "tool": "testssl", "host": ip})
-        testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id)
-        results["testssl"] = testssl_result
-        results["tools_run"].append("testssl")
-        progress_callback(order_id, "testssl", "complete")
-        # Publish tool output summary
-        if testssl_result:
-            count = len(testssl_result) if isinstance(testssl_result, list) else 1
-            publish_tool_output(order_id, "testssl", ip, f"{count} SSL/TLS checks completed")
-        else:
-            publish_tool_output(order_id, "testssl", ip, "No SSL findings")
-    else:
-        if not has_ssl:
-            log.info("testssl_skipped", ip=ip, reason="no_ssl")
-        else:
-            log.info("testssl_skipped", ip=ip, reason="not_in_package")
+    # ── Parallel Tool Groups ─────────────────────────────────
+    # Since ZAP integration, all active phase2 tools are independent.
+    # Run testssl, ZAP, nuclei, and quick tools (gowitness/headers/httpx/wpscan)
+    # in parallel to reduce per-host scan time.
+    from concurrent.futures import ThreadPoolExecutor, as_completed
 
-    # ZAP scan (replaces nikto, katana, gobuster for web vulnerability scanning)
-    if has_web and (phase2_tools is None or any(
-        t in (phase2_tools or []) for t in ("zap_spider", "zap_passive", "zap_active")
-    )):
-        zap_result = run_zap_scan(
-            primary_fqdn, ip, host_dir, order_id,
-            adaptive_config=adaptive_config,
-            config=config,
-            progress_callback=progress_callback,
-        )
-        results["zap_alerts"] = zap_result.get("alerts", [])
-        results["zap_findings"] = zap_result.get("findings", [])
-        results["zap_spider_urls"] = zap_result.get("spider_urls", [])
-        results["tools_run"].extend(zap_result.get("tools_run", []))
-    else:
-        log.info("zap_skipped", ip=ip, reason="no_web_or_not_in_package")
+    def _run_testssl_group() -> dict[str, Any]:
+        """Run testssl (SSL/TLS audit)."""
+        r: dict[str, Any] = {}
+        if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
+            publish_event(order_id, {"type": "tool_starting", "tool": "testssl", "host": ip})
+            testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id)
+            r["testssl"] = testssl_result
+            r["_tools"] = ["testssl"]
+            progress_callback(order_id, "testssl", "complete")
+            if testssl_result:
+                count = len(testssl_result) if isinstance(testssl_result, list) else 1
+                publish_tool_output(order_id, "testssl", ip, f"{count} SSL/TLS checks completed")
+            else:
+                publish_tool_output(order_id, "testssl", ip, "No SSL findings")
+        return r
 
-    # nikto (legacy — kept for rollback, skipped when not in phase2_tools)
+    def _run_zap_group() -> dict[str, Any]:
+        """Run ZAP scan (spider + ajax + active)."""
+        r: dict[str, Any] = {}
+        if has_web and (phase2_tools is None or any(
+            t in (phase2_tools or []) for t in ("zap_spider", "zap_passive", "zap_active")
+        )):
+            zap_result = run_zap_scan(
+                primary_fqdn, ip, host_dir, order_id,
+                adaptive_config=adaptive_config,
+                config=config,
+                progress_callback=progress_callback,
+            )
+            r["zap_alerts"] = zap_result.get("alerts", [])
+            r["zap_findings"] = zap_result.get("findings", [])
+            r["zap_spider_urls"] = zap_result.get("spider_urls", [])
+            r["_tools"] = zap_result.get("tools_run", [])
+        return r
+
+    def _run_nuclei_group() -> dict[str, Any]:
+        """Run nuclei (CVE + default-login scanning)."""
+        r: dict[str, Any] = {}
+        if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web:
+            publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
+            nuclei_config = dict(adaptive_config) if adaptive_config else {}
+            tags = list(nuclei_config.get("nuclei_tags", []))
+            for auto_tag in ("cve", "default-login"):
+                if auto_tag not in tags:
+                    tags.append(auto_tag)
+            nuclei_config["nuclei_tags"] = tags
+            exclude = list(nuclei_config.get("nuclei_exclude_tags", []))
+            for excl_tag in ("misconfig", "exposure"):
+                if excl_tag not in exclude:
+                    exclude.append(excl_tag)
+            nuclei_config["nuclei_exclude_tags"] = exclude
+            is_wc = config.get("package") in ("basic", "webcheck")
+            nuclei_timeout = 600 if is_wc else 600
+            nuclei_severity = config.get("nuclei_severity", "high,critical" if is_wc else "low,medium,high,critical")
+            nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
+                                       adaptive_config=nuclei_config,
+                                       timeout=nuclei_timeout,
+                                       severity=nuclei_severity)
+            r["nuclei"] = nuclei_result
+            r["_tools"] = ["nuclei"]
+            progress_callback(order_id, "nuclei", "complete")
+            if nuclei_result:
+                severities: dict[str, int] = {}
+                for f in nuclei_result:
+                    sev = f.get("info", {}).get("severity", "unknown")
+                    severities[sev] = severities.get(sev, 0) + 1
+                parts = [f"{v} {k}" for k, v in sorted(severities.items())]
+                publish_tool_output(order_id, "nuclei", ip, f"{len(nuclei_result)} findings ({', '.join(parts)})")
+            else:
+                publish_tool_output(order_id, "nuclei", ip, "No vulnerabilities found")
+        return r
+
+    def _run_quick_tools() -> dict[str, Any]:
+        """Run fast tools: gowitness, header_check, httpx, wpscan."""
+        r: dict[str, Any] = {"_tools": []}
+
+        # gowitness
+        if (phase2_tools is None or "gowitness" in phase2_tools) and "gowitness" not in ai_skip:
+            publish_event(order_id, {"type": "tool_starting", "tool": "gowitness", "host": ip})
+            gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, order_id)
+            r["gowitness"] = gowitness_result
+            r["_tools"].append("gowitness")
+            progress_callback(order_id, "gowitness", "complete")
+            if gowitness_result:
+                publish_tool_output(order_id, "gowitness", ip, "Screenshot captured")
+            else:
+                publish_tool_output(order_id, "gowitness", ip, "Screenshot failed")
+
+        # header_check
+        if phase2_tools is None or "headers" in phase2_tools:
+            publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
+            header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)
+            r["headers"] = header_result
+            r["_tools"].append("header_check")
+            progress_callback(order_id, "header_check", "complete")
+            if header_result:
+                score = header_result.get("score", "?/?")
+                publish_tool_output(order_id, "header_check", ip, f"Security headers: {score}")
+            else:
+                publish_tool_output(order_id, "header_check", ip, "Header check failed")
+
+        # httpx
+        if phase2_tools is None or "httpx" in phase2_tools:
+            publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
+            httpx_result = run_httpx(primary_fqdn, ip, host_dir, order_id)
+            r["httpx"] = httpx_result
+            r["_tools"].append("httpx")
+            progress_callback(order_id, "httpx", "complete")
+            if httpx_result:
+                status_code = httpx_result.get("status_code", "?")
+                title = (httpx_result.get("title", "") or "")[:40]
+                techs = httpx_result.get("tech", [])
+                tech_str = f", {len(techs)} technologies" if techs else ""
+                publish_tool_output(order_id, "httpx", ip, f"HTTP {status_code} {title}{tech_str}")
+            else:
+                publish_tool_output(order_id, "httpx", ip, "HTTP probe failed")
+
+        # wpscan (conditional on WordPress)
+        cms = tech_profile.get("cms", "")
+        if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
+            publish_event(order_id, {"type": "tool_starting", "tool": "wpscan", "host": ip})
+            wpscan_result = run_wpscan(primary_fqdn, ip, host_dir, order_id)
+            r["wpscan"] = wpscan_result
+            r["_tools"].append("wpscan")
+            progress_callback(order_id, "wpscan", "complete")
+            if wpscan_result:
+                vulns = len(wpscan_result.get("interesting_findings", []))
+                plugins = len(wpscan_result.get("plugins", {}))
+                publish_tool_output(order_id, "wpscan", ip, f"{vulns} findings, {plugins} plugins")
+            else:
+                publish_tool_output(order_id, "wpscan", ip, "WPScan failed")
+
+        return r
+
+    # Launch all 4 groups in parallel
+    with ThreadPoolExecutor(max_workers=4, thread_name_prefix="phase2t") as pool:
+        group_futures = {
+            pool.submit(_run_testssl_group): "testssl",
+            pool.submit(_run_zap_group): "zap",
+            pool.submit(_run_nuclei_group): "nuclei",
+            pool.submit(_run_quick_tools): "quick",
+        }
+
+        for future in as_completed(group_futures):
+            group_name = group_futures[future]
+            try:
+                group_result = future.result()
+                # Merge results (except _tools key)
+                tools = group_result.pop("_tools", [])
+                results.update(group_result)
+                results["tools_run"].extend(tools)
+            except Exception as e:
+                log.error("phase2_group_failed", group=group_name, ip=ip, error=str(e))
+
+    # ── Legacy tools (kept for rollback, not in phase2_tools) ──
+
+    # nikto (legacy — skipped when not in phase2_tools)
     if (phase2_tools is None or "nikto" in phase2_tools) and "nikto" not in ai_skip and has_web:
         publish_event(order_id, {"type": "tool_starting", "tool": "nikto", "host": ip})
         nikto_result = run_nikto(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
@@ -1269,71 +1394,7 @@ def run_phase2(
     else:
         log.info("dalfox_skipped", ip=ip, reason="not_in_package")
 
-    # gowitness
-    if (phase2_tools is None or "gowitness" in phase2_tools) and "gowitness" not in ai_skip:
-        publish_event(order_id, {"type": "tool_starting", "tool": "gowitness", "host": ip})
-        gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, order_id)
-        results["gowitness"] = gowitness_result
-        results["tools_run"].append("gowitness")
-        progress_callback(order_id, "gowitness", "complete")
-        if gowitness_result:
-            publish_tool_output(order_id, "gowitness", ip, "Screenshot captured")
-        else:
-            publish_tool_output(order_id, "gowitness", ip, "Screenshot failed")
-    else:
-        log.info("gowitness_skipped", ip=ip, reason="not_in_package")
-
-    # header check
-    if phase2_tools is None or "headers" in phase2_tools:
-        publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
-        header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)
-        results["headers"] = header_result
-        results["tools_run"].append("header_check")
-        progress_callback(order_id, "header_check", "complete")
-        if header_result:
-            score = header_result.get("score", "?/?")
-            publish_tool_output(order_id, "header_check", ip, f"Security headers: {score}")
-        else:
-            publish_tool_output(order_id, "header_check", ip, "Header check failed")
-    else:
-        log.info("headers_skipped", ip=ip, reason="not_in_package")
-
-    # httpx — HTTP probing
-    if phase2_tools is None or "httpx" in phase2_tools:
-        publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
-        httpx_result = run_httpx(primary_fqdn, ip, host_dir, order_id)
-        results["httpx"] = httpx_result
-        results["tools_run"].append("httpx")
-        progress_callback(order_id, "httpx", "complete")
-        if httpx_result:
-            status_code = httpx_result.get("status_code", "?")
-            title = (httpx_result.get("title", "") or "")[:40]
-            techs = httpx_result.get("tech", [])
-            tech_str = f", {len(techs)} technologies" if techs else ""
-            publish_tool_output(order_id, "httpx", ip, f"HTTP {status_code} {title}{tech_str}")
-        else:
-            publish_tool_output(order_id, "httpx", ip, "HTTP probe failed")
-    else:
-        log.info("httpx_skipped", ip=ip, reason="not_in_package")
-
-    # wpscan — CMS-adaptive: only if WordPress detected
-    cms = tech_profile.get("cms", "")
-    if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
-        publish_event(order_id, {"type": "tool_starting", "tool": "wpscan", "host": ip})
-        wpscan_result = run_wpscan(primary_fqdn, ip, host_dir, order_id)
-        results["wpscan"] = wpscan_result
-        results["tools_run"].append("wpscan")
-        progress_callback(order_id, "wpscan", "complete")
-        if wpscan_result:
-            vulns = len(wpscan_result.get("interesting_findings", []))
-            plugins = len(wpscan_result.get("plugins", {}))
-            publish_tool_output(order_id, "wpscan", ip, f"{vulns} findings, {plugins} plugins")
-        else:
-            publish_tool_output(order_id, "wpscan", ip, "WPScan failed")
-    elif cms and cms.lower() != "wordpress":
-        log.info("wpscan_skipped", ip=ip, reason=f"cms_is_{cms}")
-    else:
-        log.info("wpscan_skipped", ip=ip, reason="no_cms_or_not_in_package")
+    # gowitness, headers, httpx, wpscan — now in _run_quick_tools() above
 
     log.info("phase2_complete", ip=ip, order_id=order_id, tools_run=len(results["tools_run"]))
     return results

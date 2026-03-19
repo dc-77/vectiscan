@@ -54,94 +54,100 @@ def run_phase0a(
     os.makedirs(phase0a_dir, exist_ok=True)
 
     results: dict[str, Any] = {}
-
-    # --- WHOIS (all packages) ---
-    if "whois" in phase0a_tools:
-        if progress_callback:
-            progress_callback(order_id, "whois", "running")
-        whois = WhoisClient()
-        whois_data = whois.lookup(domain)
-        if whois_data:
-            results["whois"] = whois_data
-            _save_json(phase0a_dir, "whois.json", whois_data)
-        if progress_callback:
-            progress_callback(order_id, "whois", "complete")
-
-    # --- Shodan (Perimeter+ only) ---
-    if "shodan" in phase0a_tools:
-        if progress_callback:
-            progress_callback(order_id, "shodan", "running")
-        shodan = ShodanClient()
-        if shodan.available:
-            # Domain lookup
-            domain_data = shodan.lookup_domain(domain)
-            if domain_data:
-                results["shodan_domain"] = domain_data
-                _save_json(phase0a_dir, "shodan_domain.json", domain_data)
-
-            # Host lookups for known IPs
-            shodan_hosts: dict[str, Any] = {}
-            for ip in ips[:15]:  # Cap at max_hosts
-                host_data = shodan.lookup_host(ip)
-                if host_data:
-                    shodan_hosts[ip] = host_data
-            if shodan_hosts:
-                results["shodan_hosts"] = shodan_hosts
-                _save_json(phase0a_dir, "shodan_hosts.json", shodan_hosts)
-        else:
-            log.info("shodan_skipped", reason="no_api_key")
-        if progress_callback:
-            progress_callback(order_id, "shodan", "complete")
-
-    # --- AbuseIPDB (Perimeter+ only) ---
-    if "abuseipdb" in phase0a_tools:
-        if progress_callback:
-            progress_callback(order_id, "abuseipdb", "running")
-        abuseipdb = AbuseIPDBClient()
-        if abuseipdb.available:
-            abuse_results: dict[str, Any] = {}
-            for ip in ips[:15]:
-                abuse_data = abuseipdb.check_ip(ip)
-                if abuse_data:
-                    abuse_results[ip] = abuse_data
-            if abuse_results:
-                results["abuseipdb"] = abuse_results
-                _save_json(phase0a_dir, "abuseipdb.json", abuse_results)
-        else:
-            log.info("abuseipdb_skipped", reason="no_api_key")
-        if progress_callback:
-            progress_callback(order_id, "abuseipdb", "complete")
-
-    # --- SecurityTrails (Perimeter+ only) ---
-    if "securitytrails" in phase0a_tools:
-        if progress_callback:
-            progress_callback(order_id, "securitytrails", "running")
-        st = SecurityTrailsClient()
-        if st.available:
-            st_domain = st.lookup_domain(domain)
-            st_subs = st.get_subdomains(domain)
-            st_history = st.get_dns_history(domain)
-            st_data = {
-                "domain": st_domain,
-                "subdomains": st_subs,
-                "dns_history": st_history,
-            }
-            results["securitytrails"] = st_data
-            _save_json(phase0a_dir, "securitytrails.json", st_data)
-        else:
-            log.info("securitytrails_skipped", reason="no_api_key")
-        if progress_callback:
-            progress_callback(order_id, "securitytrails", "complete")
-
-    # --- DNS Security (all packages, detail varies) ---
     package = config.get("package", "perimeter")
-    if progress_callback:
-        progress_callback(order_id, "dns_security", "running")
-    dns_sec = run_all_dns_security(domain, package)
-    results["dns_security"] = dns_sec
-    _save_json(phase0a_dir, "dns_security.json", dns_sec)
-    if progress_callback:
-        progress_callback(order_id, "dns_security", "complete")
+
+    # --- Helper functions for parallel execution ---
+
+    def _run_whois() -> tuple[str, dict[str, Any] | None]:
+        whois = WhoisClient()
+        data = whois.lookup(domain)
+        if data:
+            _save_json(phase0a_dir, "whois.json", data)
+        return "whois", data
+
+    def _run_shodan() -> tuple[str, dict[str, Any] | None]:
+        shodan = ShodanClient()
+        if not shodan.available:
+            log.info("shodan_skipped", reason="no_api_key")
+            return "shodan", None
+        result: dict[str, Any] = {}
+        domain_data = shodan.lookup_domain(domain)
+        if domain_data:
+            result["shodan_domain"] = domain_data
+            _save_json(phase0a_dir, "shodan_domain.json", domain_data)
+        shodan_hosts: dict[str, Any] = {}
+        for ip in ips[:15]:
+            host_data = shodan.lookup_host(ip)
+            if host_data:
+                shodan_hosts[ip] = host_data
+        if shodan_hosts:
+            result["shodan_hosts"] = shodan_hosts
+            _save_json(phase0a_dir, "shodan_hosts.json", shodan_hosts)
+        return "shodan", result
+
+    def _run_abuseipdb() -> tuple[str, dict[str, Any] | None]:
+        client = AbuseIPDBClient()
+        if not client.available:
+            log.info("abuseipdb_skipped", reason="no_api_key")
+            return "abuseipdb", None
+        abuse_results: dict[str, Any] = {}
+        for ip in ips[:15]:
+            abuse_data = client.check_ip(ip)
+            if abuse_data:
+                abuse_results[ip] = abuse_data
+        if abuse_results:
+            _save_json(phase0a_dir, "abuseipdb.json", abuse_results)
+        return "abuseipdb", abuse_results or None
+
+    def _run_securitytrails() -> tuple[str, dict[str, Any] | None]:
+        st = SecurityTrailsClient()
+        if not st.available:
+            log.info("securitytrails_skipped", reason="no_api_key")
+            return "securitytrails", None
+        st_data = {
+            "domain": st.lookup_domain(domain),
+            "subdomains": st.get_subdomains(domain),
+            "dns_history": st.get_dns_history(domain),
+        }
+        _save_json(phase0a_dir, "securitytrails.json", st_data)
+        return "securitytrails", st_data
+
+    def _run_dns_security() -> tuple[str, dict[str, Any] | None]:
+        dns_sec = run_all_dns_security(domain, package)
+        _save_json(phase0a_dir, "dns_security.json", dns_sec)
+        return "dns_security", dns_sec
+
+    # --- Run all tools in parallel ---
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    phase0a_timeout = config.get("phase0a_timeout", 120)
+    futures: dict[Any, str] = {}
+
+    with ThreadPoolExecutor(max_workers=5, thread_name_prefix="phase0a") as pool:
+        if "whois" in phase0a_tools:
+            futures[pool.submit(_run_whois)] = "whois"
+        if "shodan" in phase0a_tools:
+            futures[pool.submit(_run_shodan)] = "shodan"
+        if "abuseipdb" in phase0a_tools:
+            futures[pool.submit(_run_abuseipdb)] = "abuseipdb"
+        if "securitytrails" in phase0a_tools:
+            futures[pool.submit(_run_securitytrails)] = "securitytrails"
+        futures[pool.submit(_run_dns_security)] = "dns_security"
+
+        for future in as_completed(futures, timeout=phase0a_timeout):
+            tool_name = futures[future]
+            try:
+                key, data = future.result()
+                if data:
+                    if key == "shodan" and isinstance(data, dict):
+                        # Shodan returns a composite dict
+                        results.update(data)
+                    else:
+                        results[key] = data
+            except Exception as e:
+                log.error("phase0a_tool_failed", tool=tool_name, error=str(e))
+            if progress_callback:
+                progress_callback(order_id, tool_name, "complete")
 
     duration_ms = int((time.monotonic() - start) * 1000)
     log.info("phase0a_complete", order_id=order_id, duration_ms=duration_ms,

@@ -124,7 +124,7 @@ services:
       resources:
         limits:
           cpus: "1.5"
-          memory: 1024M
+          memory: 1536M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/JSON/core/view/version/"]
       interval: 30s

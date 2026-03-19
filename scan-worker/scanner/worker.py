@@ -349,45 +349,62 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
         all_hosts_with_status.append(entry)
     set_discovered_hosts(order_id, {**host_inventory, "hosts": all_hosts_with_status})
 
-    # ── Phase 1: Tech Detection (all hosts) ─────────────────
-    tech_profiles: list[dict[str, Any]] = []
+    # ── Phase 1: Tech Detection (parallel, max 3 hosts) ─────
+    from concurrent.futures import ThreadPoolExecutor, as_completed
 
-    for idx, host in enumerate(scan_hosts):
+    tech_profiles: list[dict[str, Any] | None] = [None] * len(scan_hosts)
+
+    def _run_phase1_host(idx: int, host: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         ip = host["ip"]
-        fqdns = host["fqdns"]
+        fqdns = list(host["fqdns"])
 
         # If web_probe found a working FQDN, put it first for Phase 1/2
         web_fqdn = host.get("web_probe", {}).get("web_fqdn")
         if web_fqdn and web_fqdn in fqdns and fqdns[0] != web_fqdn:
             fqdns = [web_fqdn] + [f for f in fqdns if f != web_fqdn]
-            log.info("web_fqdn_prioritized", ip=ip, web_fqdn=web_fqdn)
 
         _check_timeout()
 
-        # Quick reachability check — skip unreachable hosts
         if not _is_host_reachable(ip):
             log.warning("host_unreachable", ip=ip, fqdns=fqdns, order_id=order_id)
-            update_progress(order_id, "scan_phase1", "skipped", host=ip,
-                            hosts_completed=idx + 1, hosts_total=hosts_total)
-            tech_profiles.append({"ip": ip, "fqdns": fqdns, "skipped": True, "reason": "unreachable"})
-            continue
+            return idx, {"ip": ip, "fqdns": fqdns, "skipped": True, "reason": "unreachable"}
 
-        update_progress(order_id, "scan_phase1", "starting", host=ip,
-                        hosts_completed=idx, hosts_total=hosts_total)
-
-        def p1_callback(oid: str, tool: str, status: str, _ip: str = ip, _idx: int = idx) -> None:
+        def p1_callback(oid: str, tool: str, status: str, _ip: str = ip) -> None:
             update_progress(oid, "scan_phase1", tool, host=_ip,
-                            hosts_completed=_idx, hosts_total=hosts_total)
+                            hosts_completed=0, hosts_total=hosts_total)
             _check_timeout()
 
         tech_profile = run_phase1(ip, fqdns, scan_dir, order_id, p1_callback, config)
 
-        # Carry web_probe data from Phase 0 into tech_profile for Phase 2 decisions
+        # Carry web_probe data from Phase 0 into tech_profile
         web_probe = host.get("web_probe", {})
-        tech_profile["has_web"] = web_probe.get("has_web", True)  # default True for safety
+        tech_profile["has_web"] = web_probe.get("has_web", True)
         tech_profile["web_fqdn"] = web_probe.get("web_fqdn")
 
-        tech_profiles.append(tech_profile)
+        return idx, tech_profile
+
+    max_parallel = min(3, len(scan_hosts))
+    with ThreadPoolExecutor(max_workers=max_parallel, thread_name_prefix="phase1") as pool:
+        futures = {
+            pool.submit(_run_phase1_host, idx, host): idx
+            for idx, host in enumerate(scan_hosts)
+        }
+        completed_count = 0
+        for future in as_completed(futures):
+            try:
+                idx, profile = future.result()
+                tech_profiles[idx] = profile
+            except Exception as e:
+                idx = futures[future]
+                tech_profiles[idx] = {"ip": scan_hosts[idx]["ip"], "skipped": True, "reason": str(e)}
+                log.error("phase1_host_failed", ip=scan_hosts[idx]["ip"], error=str(e))
+            completed_count += 1
+            update_progress(order_id, "scan_phase1", "host_done",
+                            hosts_completed=completed_count, hosts_total=hosts_total)
+
+    # Replace None entries with skip markers (shouldn't happen, but defensive)
+    tech_profiles = [p if p is not None else {"skipped": True, "reason": "unknown"}
+                     for p in tech_profiles]
 
     log.info("phase1_complete", order_id=order_id, profiles=len(tech_profiles))
 
@@ -412,30 +429,49 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
 
     log.info("ai_phase2_configs_complete", order_id=order_id, configs=len(adaptive_configs))
 
-    # ── Phase 2: Deep Scan (all hosts) ────────────────────
+    # ── Phase 2: Deep Scan (parallel, max 3 hosts) ────────
     scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]
     scannable_total = len(scannable)
 
-    phase2_results: list[dict[str, Any]] = []
-    for idx, (host, tech_profile) in enumerate(scannable):
+    def _run_phase2_host(idx: int, host: dict[str, Any], tech_profile: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         ip = host["ip"]
         fqdns = host["fqdns"]
 
         _check_timeout()
 
-        update_progress(order_id, "scan_phase2", "starting", host=ip,
-                        hosts_completed=idx, hosts_total=scannable_total)
-
-        def p2_callback(oid: str, tool: str, status: str, _ip: str = ip, _idx: int = idx) -> None:
+        def p2_callback(oid: str, tool: str, status: str, _ip: str = ip) -> None:
             update_progress(oid, "scan_phase2", tool, host=_ip,
-                            hosts_completed=_idx, hosts_total=scannable_total)
+                            hosts_completed=0, hosts_total=scannable_total)
             _check_timeout()
 
         result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
                             adaptive_config=adaptive_configs.get(ip, {}))
-        phase2_results.append(result)
+        return idx, result
 
-        log.info("host_phase2_complete", order_id=order_id, ip=ip, idx=idx + 1, total=scannable_total)
+    phase2_results: list[dict[str, Any] | None] = [None] * len(scannable)
+    max_parallel_p2 = min(3, scannable_total)
+    with ThreadPoolExecutor(max_workers=max_parallel_p2, thread_name_prefix="phase2") as pool:
+        futures = {
+            pool.submit(_run_phase2_host, idx, host, tp): idx
+            for idx, (host, tp) in enumerate(scannable)
+        }
+        p2_completed = 0
+        for future in as_completed(futures):
+            try:
+                idx, result = future.result()
+                phase2_results[idx] = result
+            except Exception as e:
+                idx = futures[future]
+                ip = scannable[idx][0]["ip"]
+                phase2_results[idx] = {"ip": ip, "fqdn": ip, "tools_run": [], "error": str(e)}
+                log.error("phase2_host_failed", ip=ip, error=str(e))
+            p2_completed += 1
+            update_progress(order_id, "scan_phase2", "host_done",
+                            hosts_completed=p2_completed, hosts_total=scannable_total)
+            log.info("host_phase2_complete", order_id=order_id, idx=p2_completed, total=scannable_total)
+
+    # Filter out None entries
+    phase2_results = [r for r in phase2_results if r is not None]
 
     # ── Phase 3: Correlation & Enrichment ──────────────────
     phase3_result: dict[str, Any] = {}

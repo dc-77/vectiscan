@@ -159,44 +159,79 @@ def run_phase3(
         )
         correlated = fp_filter.filter(correlated)
 
-    # ── Step 6: Threat-Intel Enrichment ──────────────────────
+    # ── Step 6: Threat-Intel Enrichment (parallel) ──────────
     cve_ids = _collect_cve_ids(correlated)
     enrichment_data: dict[str, dict[str, Any]] = {}
 
-    # NVD enrichment
-    if "nvd" in phase3_tools and cve_ids:
-        progress_callback(order_id, "correlation", "nvd_enrichment")
-        nvd = NVDClient()
-        # WebCheck: max 5 lookups (only CRITICAL). Perimeter+: all CVEs.
+    if cve_ids:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        progress_callback(order_id, "correlation", "enrichment")
         max_lookups = 5 if package == "webcheck" else 50
-        nvd_data = nvd.lookup_batch(cve_ids, max_lookups=max_lookups)
-        for cve_id, data in nvd_data.items():
-            enrichment_data.setdefault(cve_id, {})["nvd"] = data
 
-    # EPSS enrichment
-    if "epss" in phase3_tools and cve_ids:
-        progress_callback(order_id, "correlation", "epss_enrichment")
-        epss = EPSSClient()
-        epss_data = epss.lookup_batch(cve_ids)
-        for cve_id, data in epss_data.items():
-            enrichment_data.setdefault(cve_id, {})["epss"] = data
+        def _enrich_nvd() -> dict[str, Any]:
+            if "nvd" not in phase3_tools:
+                return {}
+            return NVDClient().lookup_batch(cve_ids, max_lookups=max_lookups)
 
-    # CISA KEV
-    if "cisa_kev" in phase3_tools and cve_ids:
-        progress_callback(order_id, "correlation", "cisa_kev_check")
-        kev = CISAKEVLoader()
-        kev_data = kev.check_batch(cve_ids)
-        for cve_id, data in kev_data.items():
-            enrichment_data.setdefault(cve_id, {})["cisa_kev"] = data
+        def _enrich_epss() -> dict[str, Any]:
+            if "epss" not in phase3_tools:
+                return {}
+            return EPSSClient().lookup_batch(cve_ids)
 
-    # ExploitDB
-    if "exploitdb" in phase3_tools and cve_ids:
-        progress_callback(order_id, "correlation", "exploitdb_check")
-        edb = ExploitDBClient()
-        if edb.available:
-            edb_data = edb.search_batch(cve_ids)
-            for cve_id, data in edb_data.items():
-                enrichment_data.setdefault(cve_id, {})["exploitdb"] = data
+        def _enrich_kev() -> dict[str, Any]:
+            if "cisa_kev" not in phase3_tools:
+                return {}
+            return CISAKEVLoader().check_batch(cve_ids)
+
+        def _enrich_exploitdb() -> dict[str, Any]:
+            if "exploitdb" not in phase3_tools:
+                return {}
+            edb = ExploitDBClient()
+            return edb.search_batch(cve_ids) if edb.available else {}
+
+        with ThreadPoolExecutor(max_workers=4, thread_name_prefix="enrich") as pool:
+            nvd_future = pool.submit(_enrich_nvd)
+            epss_future = pool.submit(_enrich_epss)
+            kev_future = pool.submit(_enrich_kev)
+            edb_future = pool.submit(_enrich_exploitdb)
+
+            # Collect results with individual error handling
+            nvd_data: dict[str, Any] = {}
+            epss_data: dict[str, Any] = {}
+            kev_data: dict[str, Any] = {}
+            edb_data: dict[str, Any] = {}
+
+            try:
+                nvd_data = nvd_future.result(timeout=120)
+            except Exception as e:
+                log.error("nvd_enrichment_failed", error=str(e))
+            try:
+                epss_data = epss_future.result(timeout=30)
+            except Exception as e:
+                log.error("epss_enrichment_failed", error=str(e))
+            try:
+                kev_data = kev_future.result(timeout=30)
+            except Exception as e:
+                log.error("kev_enrichment_failed", error=str(e))
+            try:
+                edb_data = edb_future.result(timeout=60)
+            except Exception as e:
+                log.error("exploitdb_enrichment_failed", error=str(e))
+
+        # Merge all enrichment data
+        for cve_id in cve_ids:
+            entry: dict[str, Any] = {}
+            if cve_id in nvd_data:
+                entry["nvd"] = nvd_data[cve_id]
+            if cve_id in epss_data:
+                entry["epss"] = epss_data[cve_id]
+            if cve_id in kev_data:
+                entry["cisa_kev"] = kev_data[cve_id]
+            if cve_id in edb_data:
+                entry["exploitdb"] = edb_data[cve_id]
+            if entry:
+                enrichment_data[cve_id] = entry
 
     # Apply enrichment to correlated findings
     for cf in correlated:

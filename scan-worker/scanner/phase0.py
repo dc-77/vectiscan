@@ -715,59 +715,43 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         elapsed = time.monotonic() - phase0_start
         return max(0, phase0_timeout - elapsed)
 
-    # --- crt.sh ---
-    if _time_remaining() > 0 and "crtsh" in phase0_tools:
-        try:
-            subs = run_crtsh(domain, scan_dir, order_id)
-            all_subdomains.extend(subs)
-            log.info("phase0_crtsh_done", found=len(subs))
-        except Exception as e:
-            log.error("phase0_crtsh_error", error=str(e))
+    # --- Stufe 1: Subdomain Discovery + DNS Records (parallel) ---
+    from concurrent.futures import ThreadPoolExecutor, as_completed
 
-    # --- subfinder ---
-    if _time_remaining() > 0 and "subfinder" in phase0_tools:
-        try:
-            subs = run_subfinder(domain, scan_dir, order_id)
-            all_subdomains.extend(subs)
-            log.info("phase0_subfinder_done", found=len(subs))
-        except Exception as e:
-            log.error("phase0_subfinder_error", error=str(e))
-
-    # --- amass ---
-    if _time_remaining() > 0 and "amass" in phase0_tools:
-        try:
-            subs = run_amass(domain, scan_dir, order_id)
-            all_subdomains.extend(subs)
-            log.info("phase0_amass_done", found=len(subs))
-        except Exception as e:
-            log.error("phase0_amass_error", error=str(e))
-
-    # --- gobuster dns ---
-    if _time_remaining() > 0 and "gobuster_dns" in phase0_tools:
-        try:
-            subs = run_gobuster_dns(domain, scan_dir, order_id)
-            all_subdomains.extend(subs)
-            log.info("phase0_gobuster_done", found=len(subs))
-        except Exception as e:
-            log.error("phase0_gobuster_error", error=str(e))
-
-    # --- zone transfer ---
     zone_transfer: dict[str, Any] = {"success": False, "data": {}}
-    if _time_remaining() > 0 and "axfr" in phase0_tools:
-        try:
-            zone_transfer = run_zone_transfer(domain, scan_dir, order_id)
-            log.info("phase0_zone_transfer_done", success=zone_transfer["success"])
-        except Exception as e:
-            log.error("phase0_zone_transfer_error", error=str(e))
-
-    # --- DNS records (SPF, DMARC, DKIM, MX, NS) ---
     dns_records: dict[str, Any] = {"spf": None, "dmarc": None, "dkim": False, "mx": [], "ns": []}
-    if _time_remaining() > 0:
-        try:
-            dns_records = collect_dns_records(domain, scan_dir, order_id)
-            log.info("phase0_dns_records_done")
-        except Exception as e:
-            log.error("phase0_dns_records_error", error=str(e))
+
+    discovery_futures: dict[Any, str] = {}
+    with ThreadPoolExecutor(max_workers=6, thread_name_prefix="phase0b") as pool:
+        if "crtsh" in phase0_tools:
+            discovery_futures[pool.submit(run_crtsh, domain, scan_dir, order_id)] = "crtsh"
+        if "subfinder" in phase0_tools:
+            discovery_futures[pool.submit(run_subfinder, domain, scan_dir, order_id)] = "subfinder"
+        if "amass" in phase0_tools:
+            discovery_futures[pool.submit(run_amass, domain, scan_dir, order_id)] = "amass"
+        if "gobuster_dns" in phase0_tools:
+            discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
+        if "axfr" in phase0_tools:
+            discovery_futures[pool.submit(run_zone_transfer, domain, scan_dir, order_id)] = "axfr"
+        discovery_futures[pool.submit(collect_dns_records, domain, scan_dir, order_id)] = "dns_records"
+
+        for future in as_completed(discovery_futures, timeout=_time_remaining()):
+            tool_name = discovery_futures[future]
+            try:
+                result = future.result()
+                if tool_name == "axfr":
+                    zone_transfer = result
+                    log.info("phase0_zone_transfer_done", success=zone_transfer["success"])
+                elif tool_name == "dns_records":
+                    dns_records = result
+                    log.info("phase0_dns_records_done")
+                else:
+                    # Subdomain enumeration tools return list[str]
+                    subs = result if isinstance(result, list) else []
+                    all_subdomains.extend(subs)
+                    log.info(f"phase0_{tool_name}_done", found=len(subs))
+            except Exception as e:
+                log.error(f"phase0_{tool_name}_error", error=str(e))
 
     # Always include the base domain
     all_subdomains.append(domain)
