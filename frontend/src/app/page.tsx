@@ -364,10 +364,21 @@ function HomeContent() {
       <main className={`grid gap-2 px-3 py-2 overflow-hidden ${phaseFlash ? 'animate-phase-transition' : ''}`}
         style={{
           height: 'calc(100vh - 40px)',
-          gridTemplateAreas: '"progress progress progress" "active active active" "terminal sidebar ailog" "terminal hosts ailog"',
-          gridTemplateRows: 'auto auto 1fr auto',
-          gridTemplateColumns: '1fr 280px 1fr',
+          gridTemplateAreas: 'var(--scan-grid-areas)',
+          gridTemplateRows: 'var(--scan-grid-rows)',
+          gridTemplateColumns: 'var(--scan-grid-cols)',
         }}>
+        {/* CSS custom properties for responsive grid — mobile: stacked, desktop: 3-col */}
+        <style>{`
+          main { --scan-grid-areas: "progress" "sidebar" "hosts" "active" "terminal" "ailog";
+                 --scan-grid-rows: auto auto auto auto 1fr auto;
+                 --scan-grid-cols: 1fr; }
+          @media (min-width: 768px) {
+            main { --scan-grid-areas: "progress progress progress" "active active active" "terminal sidebar ailog" "terminal hosts ailog";
+                   --scan-grid-rows: auto auto 1fr auto;
+                   --scan-grid-cols: 1fr 280px 1fr; }
+          }
+        `}</style>
 
         {/* Threat flash overlay */}
         {threatFlash && (

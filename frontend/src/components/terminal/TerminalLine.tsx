@@ -88,32 +88,37 @@ export default function TerminalLine({ line, animate = true, dimmed = false }: T
 
   return (
     <div
-      className={`flex items-start gap-0 ${line.isHeader ? 'mt-3 mb-1' : ''} ${line.status === 'error' ? 'animate-glitch' : ''} ${line.isHeader ? 'animate-headerFlash' : ''}`}
+      className={`${line.isHeader ? 'mt-3 mb-1' : ''} ${line.status === 'error' ? 'animate-glitch' : ''} ${line.isHeader ? 'animate-headerFlash' : ''}`}
       style={{
         borderLeft: line.hostColor ? `3px solid ${line.hostColor}` : undefined,
         paddingLeft: line.hostColor ? '6px' : undefined,
         opacity: dimmed ? 0.82 : 1,
       }}
     >
-      {/* Timestamp */}
-      <span className="text-[#4B7399] shrink-0 select-none">
+      {/* Timestamp — above content on mobile, inline on desktop */}
+      <span className="text-[#4B7399] shrink-0 select-none block md:hidden text-[9px]">
         [{line.timestamp}]
       </span>
+      <div className="flex items-start gap-0">
+        <span className="text-[#4B7399] shrink-0 select-none hidden md:inline">
+          [{line.timestamp}]
+        </span>
 
-      {/* Content */}
-      <span className={`ml-1 ${textColor}`}>
-        {indent}{display}
-      </span>
+        {/* Content */}
+        <span className={`md:ml-1 ${textColor}`}>
+          {indent}{display}
+        </span>
 
-      {/* Detail text */}
-      {line.detail && resolved && (
-        <span className="ml-1 text-[#4B7399]">{line.detail}</span>
-      )}
+        {/* Detail text */}
+        {line.detail && resolved && (
+          <span className="ml-1 text-[#4B7399]">{line.detail}</span>
+        )}
 
-      {/* Status icon */}
-      {statusIcon && resolved && (
-        <span className={`ml-2 ${statusColor} shrink-0`}>{statusIcon}</span>
-      )}
+        {/* Status icon */}
+        {statusIcon && resolved && (
+          <span className={`ml-2 ${statusColor} shrink-0`}>{statusIcon}</span>
+        )}
+      </div>
     </div>
   );
 }
