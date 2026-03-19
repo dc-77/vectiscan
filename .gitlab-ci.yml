@@ -164,6 +164,9 @@ test-report-worker:
     - sleep 30
     - docker compose ps
     - docker compose ps --format json | python3 -c "import sys,json; containers=[json.loads(line) for line in sys.stdin if line.strip()]; unhealthy=[c['Name'] for c in containers if c.get('Health','') not in ('','healthy') or c.get('State')!='running']; print('Unhealthy:',unhealthy) if unhealthy else print('All healthy'); exit(1 if unhealthy else 0)"
+  after_script:
+    - docker image prune -a -f --filter "until=1h"
+    - docker builder prune -a -f
   environment:
     name: production
     url: https://scan.vectigal.tech

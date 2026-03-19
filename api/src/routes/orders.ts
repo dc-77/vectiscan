@@ -166,9 +166,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
                     r.findings_data->'severity_counts' AS severity_counts
              FROM orders o
              JOIN customers c ON o.customer_id = c.id
-             LEFT JOIN LATERAL (
-               SELECT findings_data FROM reports WHERE order_id = o.id ORDER BY version DESC LIMIT 1
-             ) r ON true`;
+             LEFT JOIN reports r ON r.order_id = o.id`;
 
     if (user.role === 'admin') {
       sql = `${baseSelect} ORDER BY o.created_at DESC`;
@@ -294,7 +292,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         `SELECT r.id, r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, o.target_url
          FROM reports r JOIN orders o ON r.order_id = o.id
          WHERE r.order_id = $1 AND r.download_token = $2
-         ORDER BY r.version DESC LIMIT 1`,
+         LIMIT 1`,
         [id, downloadToken],
       );
 
@@ -340,22 +338,12 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    // Support ?version=N for specific report versions, otherwise latest
-    const requestedVersion = queryParams.version ? parseInt(queryParams.version, 10) : null;
-
     let result;
-    if (requestedVersion) {
+    {
       result = await query(
-        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url
+        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, o.target_url
          FROM reports r JOIN orders o ON r.order_id = o.id
-         WHERE r.order_id = $1 AND r.version = $2`,
-        [id, requestedVersion],
-      );
-    } else {
-      result = await query(
-        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url
-         FROM reports r JOIN orders o ON r.order_id = o.id
-         WHERE r.order_id = $1 ORDER BY r.version DESC LIMIT 1`,
+         WHERE r.order_id = $1 LIMIT 1`,
         [id],
       );
     }
@@ -563,19 +551,26 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const result = await query(
-      'SELECT findings_data FROM reports WHERE order_id = $1 ORDER BY version DESC LIMIT 1',
+      'SELECT findings_data FROM reports WHERE order_id = $1 LIMIT 1',
       [id],
     );
     if (result.rows.length === 0 || !(result.rows[0] as Record<string, unknown>).findings_data) {
       return reply.status(404).send({ success: false, error: 'Keine Befunddaten verfügbar' });
     }
 
-    // Load excluded findings
-    const exclusions = await query(
-      'SELECT finding_id, reason, created_at FROM finding_exclusions WHERE order_id = $1',
-      [id],
-    );
-    const excludedIds = exclusions.rows.map((r: Record<string, unknown>) => r.finding_id as string);
+    // Load excluded findings (table may not exist yet — graceful fallback)
+    let excludedIds: string[] = [];
+    let exclusionRows: Array<Record<string, unknown>> = [];
+    try {
+      const exclusions = await query(
+        'SELECT finding_id, reason, created_at FROM finding_exclusions WHERE order_id = $1',
+        [id],
+      );
+      excludedIds = exclusions.rows.map((r: Record<string, unknown>) => r.finding_id as string);
+      exclusionRows = exclusions.rows as Array<Record<string, unknown>>;
+    } catch {
+      // finding_exclusions table doesn't exist yet — skip
+    }
 
     const findingsData = (result.rows[0] as Record<string, unknown>).findings_data as Record<string, unknown>;
     return {
@@ -583,10 +578,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       data: {
         ...findingsData,
         excluded_finding_ids: excludedIds,
-        exclusions: exclusions.rows.map((r: Record<string, unknown>) => ({
+        exclusions: exclusionRows.map((r) => ({
           finding_id: r.finding_id,
           reason: r.reason,
-          created_at: (r.created_at as Date).toISOString(),
+          created_at: r.created_at ? (r.created_at as Date).toISOString() : null,
         })),
       },
     };
