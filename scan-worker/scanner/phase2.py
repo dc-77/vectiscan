@@ -898,6 +898,7 @@ def run_zap_scan(
 
         # 3. Traditional Spider
         publish_event(order_id, {"type": "tool_starting", "tool": "zap_spider", "host": ip})
+        spider_start = int(_time.monotonic() * 1000)
         spider_depth = ac.get("zap_spider_max_depth", 5)
         spider_id = zap.start_spider(target_url, context_name=context_name, max_depth=spider_depth)
         zap.poll_until_complete(
@@ -906,9 +907,14 @@ def run_zap_scan(
             order_id=order_id, tool_name="zap_spider",
         )
         spider_urls = zap.spider_results(spider_id)
+        spider_duration = int(_time.monotonic() * 1000) - spider_start
         result["spider_urls"] = spider_urls
         result["tools_run"].append("zap_spider")
         publish_tool_output(order_id, "zap_spider", ip, f"{len(spider_urls)} URLs discovered")
+        _save_result(order_id, ip, 2, "zap_spider",
+                     json.dumps({"urls_found": len(spider_urls), "depth": spider_depth,
+                                 "urls": spider_urls[:50]}, indent=2),
+                     0, spider_duration)
         if progress_callback:
             progress_callback(order_id, "zap_spider", "complete")
 
@@ -916,6 +922,7 @@ def run_zap_scan(
         ajax_enabled = ac.get("zap_ajax_spider_enabled", False)
         if ajax_enabled and "zap_ajax_spider" not in ai_skip:
             publish_event(order_id, {"type": "tool_starting", "tool": "zap_ajax_spider", "host": ip})
+            ajax_start = int(_time.monotonic() * 1000)
             zap.start_ajax_spider(target_url, context_name=context_name)
             completed = zap.poll_until_complete(
                 lambda: 100 if zap.ajax_spider_status() == "stopped" else 50,
@@ -924,8 +931,13 @@ def run_zap_scan(
             )
             if not completed:
                 zap.stop_ajax_spider()
+            ajax_duration = int(_time.monotonic() * 1000) - ajax_start
             result["tools_run"].append("zap_ajax_spider")
             publish_tool_output(order_id, "zap_ajax_spider", ip, "AJAX crawl complete")
+            _save_result(order_id, ip, 2, "zap_ajax_spider",
+                         json.dumps({"status": "complete" if completed else "timeout",
+                                     "duration_ms": ajax_duration}),
+                         0, ajax_duration)
             if progress_callback:
                 progress_callback(order_id, "zap_ajax_spider", "complete")
 
@@ -937,6 +949,7 @@ def run_zap_scan(
                       and "zap_active" in phase2_tools)
         if run_active:
             publish_event(order_id, {"type": "tool_starting", "tool": "zap_active", "host": ip})
+            active_start = int(_time.monotonic() * 1000)
             categories = ac.get("zap_active_categories", ["sqli", "xss", "lfi", "ssrf", "cmdi"])
             zap.create_scan_policy(policy_name, categories, scan_policy)
 
@@ -948,8 +961,15 @@ def run_zap_scan(
             )
             if not completed:
                 zap.stop_active_scan(scan_id)
+            active_duration = int(_time.monotonic() * 1000) - active_start
             result["tools_run"].append("zap_active")
             publish_tool_output(order_id, "zap_active", ip, "Active scan complete")
+            # Save active scan results to DB (alerts collected later)
+            _save_result(order_id, ip, 2, "zap_active",
+                         json.dumps({"status": "complete" if completed else "timeout",
+                                     "policy": scan_policy, "categories": categories,
+                                     "duration_ms": active_duration}),
+                         0, active_duration)
             if progress_callback:
                 progress_callback(order_id, "zap_active", "complete")
 

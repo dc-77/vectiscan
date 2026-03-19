@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
-import { scanQueue, publishEvent, getProgressFromRedis } from '../lib/queue.js';
+import { scanQueue, reportQueue, publishEvent, getProgressFromRedis } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
@@ -47,6 +47,15 @@ interface CreateOrderBody {
 
 interface OrderParams {
   id: string;
+}
+
+interface FindingParams {
+  id: string;
+  findingId: string;
+}
+
+interface ExcludeBody {
+  reason?: string;
 }
 
 export async function orderRoutes(server: FastifyInstance): Promise<void> {
@@ -157,7 +166,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
                     r.findings_data->'severity_counts' AS severity_counts
              FROM orders o
              JOIN customers c ON o.customer_id = c.id
-             LEFT JOIN reports r ON r.order_id = o.id`;
+             LEFT JOIN LATERAL (
+               SELECT findings_data FROM reports WHERE order_id = o.id ORDER BY version DESC LIMIT 1
+             ) r ON true`;
 
     if (user.role === 'admin') {
       sql = `${baseSelect} ORDER BY o.created_at DESC`;
@@ -280,9 +291,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const downloadToken = queryParams.download_token;
     if (downloadToken) {
       const tokenCheck = await query(
-        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, o.target_url
+        `SELECT r.id, r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, o.target_url
          FROM reports r JOIN orders o ON r.order_id = o.id
-         WHERE r.order_id = $1 AND r.download_token = $2`,
+         WHERE r.order_id = $1 AND r.download_token = $2
+         ORDER BY r.version DESC LIMIT 1`,
         [id, downloadToken],
       );
 
@@ -297,7 +309,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       }
 
       // Increment download count
-      await query('UPDATE reports SET download_count = download_count + 1 WHERE order_id = $1', [id]);
+      await query('UPDATE reports SET download_count = download_count + 1 WHERE id = $1', [report.id]);
 
       audit({ orderId: id, action: 'report.downloaded', details: { via: 'download_token' }, ip: request.ip });
 
@@ -328,18 +340,32 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    const result = await query(
-      `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, o.target_url
-       FROM reports r JOIN orders o ON r.order_id = o.id
-       WHERE r.order_id = $1`,
-      [id],
-    );
+    // Support ?version=N for specific report versions, otherwise latest
+    const requestedVersion = queryParams.version ? parseInt(queryParams.version, 10) : null;
+
+    let result;
+    if (requestedVersion) {
+      result = await query(
+        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url
+         FROM reports r JOIN orders o ON r.order_id = o.id
+         WHERE r.order_id = $1 AND r.version = $2`,
+        [id, requestedVersion],
+      );
+    } else {
+      result = await query(
+        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url
+         FROM reports r JOIN orders o ON r.order_id = o.id
+         WHERE r.order_id = $1 ORDER BY r.version DESC LIMIT 1`,
+        [id],
+      );
+    }
 
     if (result.rows.length === 0) {
       return reply.status(404).send({ success: false, error: 'Report not yet available' });
     }
 
-    audit({ orderId: id, action: 'report.downloaded', details: { via: 'jwt', userId: user.sub }, ip: request.ip });
+    const reportVersion = (result.rows[0] as Record<string, unknown>).version;
+    audit({ orderId: id, action: 'report.downloaded', details: { via: 'jwt', userId: user.sub, version: reportVersion }, ip: request.ip });
 
     return streamReport(reply, result.rows[0] as Record<string, unknown>);
   });
@@ -447,6 +473,47 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       ts: new Date(row.created_at as string).toISOString(),
     }));
 
+    // Load AI debug prompts/responses
+    const aiDebugRows = await query(
+      `SELECT tool_name, host_ip, raw_output FROM scan_results
+       WHERE order_id = $1 AND tool_name LIKE '%_debug' ORDER BY created_at`,
+      [id],
+    );
+
+    const aiDebug: Record<string, unknown> = {};
+    for (const row of aiDebugRows.rows as Array<Record<string, unknown>>) {
+      try {
+        const data = JSON.parse(row.raw_output as string);
+        const key = (row.tool_name as string).replace('_debug', '');
+        if (row.host_ip) {
+          // Per-host debug (phase2_config)
+          if (!aiDebug[key]) aiDebug[key] = {};
+          (aiDebug[key] as Record<string, unknown>)[row.host_ip as string] = data;
+        } else {
+          aiDebug[key] = data;
+        }
+      } catch { /* skip unparseable */ }
+    }
+
+    // Load false positive details from phase3 correlation
+    const fpRow = await query(
+      `SELECT raw_output FROM scan_results
+       WHERE order_id = $1 AND tool_name = 'phase3_correlation' LIMIT 1`,
+      [id],
+    );
+
+    let falsePositives = null;
+    if (fpRow.rows.length > 0) {
+      try {
+        const phase3Data = JSON.parse((fpRow.rows[0] as Record<string, unknown>).raw_output as string);
+        falsePositives = {
+          count: phase3Data.false_positives_count || 0,
+          by_reason: phase3Data.fp_by_reason || {},
+          details: phase3Data.fp_details || [],
+        };
+      } catch { /* skip unparseable */ }
+    }
+
     // Fetch Claude report debug data from MinIO (best-effort, admin only)
     let claudeDebug = null;
     if (user.role === 'admin') {
@@ -467,9 +534,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       data: {
         aiStrategy,
         aiConfigs,
+        aiDebug,
         toolOutputs,
         discoveredHosts: order.discovered_hosts || [],
         error: order.error_message || null,
+        falsePositives,
         claudeDebug,
       },
     };
@@ -493,13 +562,182 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    const result = await query('SELECT findings_data FROM reports WHERE order_id = $1', [id]);
+    const result = await query(
+      'SELECT findings_data FROM reports WHERE order_id = $1 ORDER BY version DESC LIMIT 1',
+      [id],
+    );
     if (result.rows.length === 0 || !(result.rows[0] as Record<string, unknown>).findings_data) {
       return reply.status(404).send({ success: false, error: 'Keine Befunddaten verfügbar' });
     }
 
-    return { success: true, data: (result.rows[0] as Record<string, unknown>).findings_data };
+    // Load excluded findings
+    const exclusions = await query(
+      'SELECT finding_id, reason, created_at FROM finding_exclusions WHERE order_id = $1',
+      [id],
+    );
+    const excludedIds = exclusions.rows.map((r: Record<string, unknown>) => r.finding_id as string);
+
+    const findingsData = (result.rows[0] as Record<string, unknown>).findings_data as Record<string, unknown>;
+    return {
+      success: true,
+      data: {
+        ...findingsData,
+        excluded_finding_ids: excludedIds,
+        exclusions: exclusions.rows.map((r: Record<string, unknown>) => ({
+          finding_id: r.finding_id,
+          reason: r.reason,
+          created_at: (r.created_at as Date).toISOString(),
+        })),
+      },
+    };
   });
+
+  // POST /api/orders/:id/findings/:findingId/exclude — exclude a finding
+  server.post<{ Params: FindingParams; Body: ExcludeBody }>(
+    '/api/orders/:id/findings/:findingId/exclude',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id, findingId } = request.params;
+      const user = request.user!;
+      const { reason } = request.body || {};
+
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
+
+      // Ownership check
+      const orderCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [id]);
+      if (orderCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+      if (user.role !== 'admin' && (orderCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId) {
+        return reply.status(403).send({ success: false, error: 'Access denied' });
+      }
+
+      await query(
+        `INSERT INTO finding_exclusions (order_id, finding_id, excluded_by, reason)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (order_id, finding_id) DO UPDATE SET reason = EXCLUDED.reason`,
+        [id, findingId, user.sub, reason || null],
+      );
+
+      audit({ orderId: id, action: 'finding.excluded', details: { findingId, reason, userId: user.sub }, ip: request.ip });
+
+      return { success: true, data: null };
+    },
+  );
+
+  // DELETE /api/orders/:id/findings/:findingId/exclude — unexclude a finding
+  server.delete<{ Params: FindingParams }>(
+    '/api/orders/:id/findings/:findingId/exclude',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id, findingId } = request.params;
+      const user = request.user!;
+
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
+
+      // Ownership check
+      const orderCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [id]);
+      if (orderCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+      if (user.role !== 'admin' && (orderCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId) {
+        return reply.status(403).send({ success: false, error: 'Access denied' });
+      }
+
+      await query(
+        'DELETE FROM finding_exclusions WHERE order_id = $1 AND finding_id = $2',
+        [id, findingId],
+      );
+
+      audit({ orderId: id, action: 'finding.unexcluded', details: { findingId, userId: user.sub }, ip: request.ip });
+
+      return { success: true, data: null };
+    },
+  );
+
+  // POST /api/orders/:id/regenerate-report — regenerate report with excluded findings
+  server.post<{ Params: OrderParams }>(
+    '/api/orders/:id/regenerate-report',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const user = request.user!;
+
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
+
+      // Ownership check + get order details
+      const orderCheck = await query(
+        'SELECT customer_id, target_url, package, status FROM orders WHERE id = $1',
+        [id],
+      );
+      if (orderCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+      const order = orderCheck.rows[0] as Record<string, unknown>;
+      if (user.role !== 'admin' && order.customer_id !== user.customerId) {
+        return reply.status(403).send({ success: false, error: 'Access denied' });
+      }
+
+      // Only allow regeneration for completed orders
+      const status = order.status as string;
+      if (status !== 'report_complete' && status !== 'completed') {
+        return reply.status(409).send({
+          success: false,
+          error: `Report kann nur bei abgeschlossenen Orders neu generiert werden (aktuell: ${status})`,
+        });
+      }
+
+      // Load excluded findings
+      const exclusions = await query(
+        'SELECT finding_id, reason FROM finding_exclusions WHERE order_id = $1',
+        [id],
+      );
+      const excludedFindings = exclusions.rows.map((r: Record<string, unknown>) => ({
+        finding_id: r.finding_id,
+        reason: r.reason,
+      }));
+
+      // Update order status
+      await query(
+        "UPDATE orders SET status = 'report_generating', updated_at = NOW() WHERE id = $1",
+        [id],
+      );
+
+      // Enqueue report job with excluded findings
+      await reportQueue.add('report', {
+        orderId: id,
+        rawDataPath: `${id}.tar.gz`,
+        package: order.package as string,
+        excludedFindings,
+        regenerate: true,
+      });
+
+      audit({
+        orderId: id,
+        action: 'report.regenerate',
+        details: { userId: user.sub, excludedCount: excludedFindings.length },
+        ip: request.ip,
+      });
+
+      // Notify WebSocket clients
+      await publishEvent(id, {
+        type: 'status',
+        orderId: id,
+        status: 'report_generating',
+      });
+
+      return {
+        success: true,
+        data: { message: 'Report wird neu generiert' },
+      };
+    },
+  );
 
   // DELETE /api/orders/:id — soft cancel or admin hard delete
   server.delete<{ Params: OrderParams }>('/api/orders/:id', { preHandler: [requireAuth] }, async (request, reply) => {

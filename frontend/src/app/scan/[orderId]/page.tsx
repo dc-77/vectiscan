@@ -5,7 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
 import { getOrderStatus, getFindings, getScanResults, getReportDownloadUrl, getOrderEvents,
-         OrderStatus, FindingsData, ScanResult } from '@/lib/api';
+         excludeFinding, unexcludeFinding, regenerateReport,
+         OrderStatus, OrderEvents, FindingsData, ScanResult } from '@/lib/api';
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
 
@@ -151,12 +152,13 @@ export default function ScanDetailPage() {
   const [findings, setFindings] = useState<FindingsData | null>(null);
   const [scanResults, setScanResults] = useState<ScanResult[] | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [aiData, setAiData] = useState<Record<string, any> | null>(null);
+  const [aiData, setAiData] = useState<(OrderEvents & Record<string, any>) | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('findings');
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn()) { router.replace('/login'); return; }
@@ -204,6 +206,34 @@ export default function ScanDetailPage() {
   useEffect(() => {
     if (ready) loadData();
   }, [ready, loadData]);
+
+  // --- Finding exclusion handlers ---
+  const handleExclude = useCallback(async (findingId: string, reason: string) => {
+    const res = await excludeFinding(orderId, findingId, reason);
+    if (res.success) {
+      const findingsRes = await getFindings(orderId);
+      if (findingsRes.success && findingsRes.data) setFindings(findingsRes.data);
+    }
+  }, [orderId]);
+
+  const handleUnexclude = useCallback(async (findingId: string) => {
+    const res = await unexcludeFinding(orderId, findingId);
+    if (res.success) {
+      const findingsRes = await getFindings(orderId);
+      if (findingsRes.success && findingsRes.data) setFindings(findingsRes.data);
+    }
+  }, [orderId]);
+
+  const handleRegenerate = useCallback(async () => {
+    setRegenerating(true);
+    const res = await regenerateReport(orderId);
+    if (res.success) {
+      // Refresh order status to pick up new report status
+      const orderRes = await getOrderStatus(orderId);
+      if (orderRes.success && orderRes.data) setOrder(orderRes.data);
+    }
+    setRegenerating(false);
+  }, [orderId]);
 
   // Auto-switch to debug tab when scan failed and user is admin
   useEffect(() => {
@@ -329,7 +359,20 @@ export default function ScanDetailPage() {
         <div className="min-h-[300px]">
           {/* Findings Tab */}
           {activeTab === 'findings' && findings && (
-            <FindingsViewer data={findings} />
+            <div className="space-y-4">
+              {regenerating && (
+                <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg px-4 py-3 text-sm text-blue-300">
+                  Report wird neu generiert...
+                </div>
+              )}
+              <FindingsViewer
+                data={findings}
+                excludedIds={findings.excluded_finding_ids || []}
+                onExclude={admin ? handleExclude : undefined}
+                onUnexclude={admin ? handleUnexclude : undefined}
+                onRegenerateReport={admin ? handleRegenerate : undefined}
+              />
+            </div>
           )}
           {activeTab === 'findings' && !findings && (
             <div className="text-center py-12 text-slate-600 text-sm">
@@ -498,6 +541,124 @@ export default function ScanDetailPage() {
                       {aiData.claudeDebug.error}
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* AI Communication Debug */}
+              {aiData?.aiDebug && Object.keys(aiData.aiDebug).length > 0 && (
+                <div>
+                  <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">AI-Kommunikation</h3>
+                  <details className="bg-[#1e293b] rounded-lg border border-gray-800">
+                    <summary className="px-4 py-2.5 text-sm font-mono text-cyan-400 cursor-pointer hover:bg-[#253347]">
+                      AI-Kommunikation ({Object.keys(aiData.aiDebug).length} Aufrufe)
+                    </summary>
+                    <div className="px-4 pb-3 space-y-3 border-t border-gray-800">
+                      {Object.entries(aiData.aiDebug).map(([key, data]: [string, any]) => {
+                        // Per-host configs (ai_phase2_config has IPs as keys)
+                        const isPerHost = key === 'ai_phase2_config' && typeof data === 'object' && !data.system_prompt;
+
+                        if (isPerHost) {
+                          return Object.entries(data).map(([ip, hostData]: [string, any]) => (
+                            <details key={`${key}-${ip}`} className="border border-gray-700 rounded-lg">
+                              <summary className="px-3 py-2 cursor-pointer text-xs font-mono text-slate-400 hover:text-slate-200">
+                                {key} — {ip}
+                              </summary>
+                              <div className="px-3 pb-2 space-y-2 text-xs">
+                                <div><span className="text-slate-500">System Prompt:</span>
+                                  <pre className="mt-1 p-2 bg-[#0c1222] border border-gray-800 rounded text-slate-300 whitespace-pre-wrap max-h-40 overflow-y-auto"
+                                    style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>{hostData.system_prompt}</pre>
+                                </div>
+                                <div><span className="text-slate-500">User Prompt:</span>
+                                  <pre className="mt-1 p-2 bg-[#0c1222] border border-gray-800 rounded text-slate-300 whitespace-pre-wrap max-h-40 overflow-y-auto"
+                                    style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>{hostData.user_prompt}</pre>
+                                </div>
+                                <div><span className="text-slate-500">Raw Response:</span>
+                                  <pre className="mt-1 p-2 bg-[#0c1222] border border-gray-800 rounded text-green-400 whitespace-pre-wrap max-h-40 overflow-y-auto"
+                                    style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>{hostData.raw_response}</pre>
+                                </div>
+                              </div>
+                            </details>
+                          ));
+                        }
+
+                        return (
+                          <details key={key} className="border border-gray-700 rounded-lg">
+                            <summary className="px-3 py-2 cursor-pointer text-xs font-mono text-slate-400 hover:text-slate-200">
+                              {key.replace(/_/g, ' ').replace(/ai /i, 'AI ')}
+                            </summary>
+                            <div className="px-3 pb-2 space-y-2 text-xs">
+                              <div><span className="text-slate-500">System Prompt:</span>
+                                <pre className="mt-1 p-2 bg-[#0c1222] border border-gray-800 rounded text-slate-300 whitespace-pre-wrap max-h-40 overflow-y-auto"
+                                  style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>{data.system_prompt}</pre>
+                              </div>
+                              <div><span className="text-slate-500">User Prompt:</span>
+                                <pre className="mt-1 p-2 bg-[#0c1222] border border-gray-800 rounded text-slate-300 whitespace-pre-wrap max-h-40 overflow-y-auto"
+                                  style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>{data.user_prompt}</pre>
+                              </div>
+                              <div><span className="text-slate-500">Raw Response:</span>
+                                <pre className="mt-1 p-2 bg-[#0c1222] border border-gray-800 rounded text-green-400 whitespace-pre-wrap max-h-40 overflow-y-auto"
+                                  style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>{data.raw_response}</pre>
+                              </div>
+                            </div>
+                          </details>
+                        );
+                      })}
+                    </div>
+                  </details>
+                </div>
+              )}
+
+              {/* False Positives */}
+              {aiData?.falsePositives && aiData.falsePositives.count > 0 && (
+                <div>
+                  <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Aussortierte False Positives</h3>
+                  <details className="bg-[#1e293b] rounded-lg border border-gray-800">
+                    <summary className="px-4 py-2.5 text-sm font-mono text-yellow-400 cursor-pointer hover:bg-[#253347]">
+                      False Positives ({aiData.falsePositives.count})
+                    </summary>
+                    <div className="px-4 pb-3 space-y-3 border-t border-gray-800">
+                      {/* Summary by reason */}
+                      <div className="flex flex-wrap gap-2 pt-3">
+                        {Object.entries(aiData.falsePositives.by_reason).map(([reason, count]) => (
+                          <span key={reason} className="px-2 py-1 bg-slate-700 rounded text-xs text-slate-300">
+                            {reason}: {count as number}
+                          </span>
+                        ))}
+                      </div>
+                      {/* Detail table */}
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left">
+                          <thead className="text-slate-500 border-b border-slate-700">
+                            <tr>
+                              <th className="py-2 pr-3">Tool</th>
+                              <th className="py-2 pr-3">Titel</th>
+                              <th className="py-2 pr-3">Severity</th>
+                              <th className="py-2 pr-3">Host</th>
+                              <th className="py-2">Grund</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-slate-300">
+                            {aiData.falsePositives.details.map((fp: any, i: number) => (
+                              <tr key={i} className="border-b border-slate-800">
+                                <td className="py-2 pr-3 text-slate-400">{fp.tool}</td>
+                                <td className="py-2 pr-3">{fp.title}</td>
+                                <td className="py-2 pr-3">
+                                  <span className={`px-1.5 py-0.5 rounded text-xs ${
+                                    fp.severity === 'high' || fp.severity === 'HIGH' ? 'bg-red-900/50 text-red-300' :
+                                    fp.severity === 'medium' || fp.severity === 'MEDIUM' ? 'bg-yellow-900/50 text-yellow-300' :
+                                    fp.severity === 'critical' || fp.severity === 'CRITICAL' ? 'bg-red-900/70 text-red-200' :
+                                    'bg-slate-700 text-slate-300'
+                                  }`}>{fp.severity}</span>
+                                </td>
+                                <td className="py-2 pr-3 font-mono text-slate-400">{fp.host}</td>
+                                <td className="py-2 text-slate-500">{fp.reason}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </details>
                 </div>
               )}
 

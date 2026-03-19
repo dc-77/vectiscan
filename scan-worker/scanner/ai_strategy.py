@@ -20,6 +20,35 @@ log = structlog.get_logger()
 HAIKU_MODEL = "claude-haiku-4-5-20251001"
 SONNET_MODEL = "claude-sonnet-4-6"
 
+
+def _save_ai_debug(
+    order_id: str,
+    host_ip: str | None,
+    phase: int,
+    tool_name: str,
+    system_prompt: str,
+    user_prompt: str,
+    raw_response: str,
+    parsed: dict[str, Any],
+) -> None:
+    """Save full Claude prompt+response for debug transparency.
+
+    Stored as a separate scan_result with tool_name '{tool_name}_debug'.
+    """
+    from scanner.tools import _save_result
+    debug = {
+        "system_prompt": system_prompt,
+        "user_prompt": user_prompt[:10000],  # Cap user prompt (can be very long)
+        "raw_response": raw_response,
+    }
+    _save_result(
+        order_id=order_id, host_ip=host_ip, phase=phase,
+        tool_name=f"{tool_name}_debug",
+        raw_output=json.dumps(debug, indent=2, ensure_ascii=False)[:50000],
+        exit_code=0, duration_ms=0,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Haiku client
 # ---------------------------------------------------------------------------
@@ -60,14 +89,16 @@ def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
             text = text.rsplit("```", 1)[0]
         text = text.strip()
 
-        return json.loads(text)
+        parsed = json.loads(text)
+        parsed["_raw"] = raw  # Preserve raw response for debug transparency
+        return parsed
 
     except json.JSONDecodeError as e:
         log.error("haiku_json_parse_error", error=str(e), raw=raw[:500])
-        return {"_error": f"JSON-Parse-Fehler: {e}"}
+        return {"_error": f"JSON-Parse-Fehler: {e}", "_raw": raw}
     except Exception as e:
         log.error("haiku_call_error", error=str(e))
-        return {"_error": f"API-Fehler: {e}"}
+        return {"_error": f"API-Fehler: {e}", "_raw": raw}
 
 
 # ---------------------------------------------------------------------------
@@ -140,6 +171,7 @@ def plan_host_strategy(
     host_inventory: dict[str, Any],
     domain: str,
     package: str,
+    order_id: str = "",
 ) -> dict[str, Any]:
     """Use Haiku to decide which hosts to scan and in what order."""
     hosts = host_inventory.get("hosts", [])
@@ -163,6 +195,12 @@ Antwort im Format:
 
     result = _call_haiku(HOST_STRATEGY_SYSTEM, user_prompt)
 
+    # Save full AI debug (system prompt + user prompt + raw response)
+    if order_id:
+        _save_ai_debug(order_id, None, 0, "ai_host_strategy",
+                        HOST_STRATEGY_SYSTEM, user_prompt,
+                        result.get("_raw", ""), result)
+
     error_detail = result.get("_error", "")
     if not result or "hosts" not in result:
         # Fallback: scan all hosts in original order
@@ -181,6 +219,7 @@ Antwort im Format:
              scan=sum(1 for h in result["hosts"] if h.get("action") == "scan"),
              skip=sum(1 for h in result["hosts"] if h.get("action") == "skip"))
 
+    result.pop("_raw", None)
     return result
 
 
@@ -289,6 +328,7 @@ def plan_phase2_config(
     tech_profile: dict[str, Any],
     host_inventory: dict[str, Any],
     package: str,
+    order_id: str = "",
 ) -> dict[str, Any]:
     """Use Haiku to configure Phase 2 tools based on discovered tech stack."""
 
@@ -323,6 +363,12 @@ Antwort im Format:
 
     result = _call_haiku(PHASE2_CONFIG_SYSTEM, user_prompt)
 
+    # Save full AI debug
+    if order_id:
+        _save_ai_debug(order_id, ip, 1, "ai_phase2_config",
+                        PHASE2_CONFIG_SYSTEM, user_prompt,
+                        result.get("_raw", ""), result)
+
     error_detail = result.get("_error", "")
     if not result or "nuclei_tags" not in result:
         # Fallback: default config (all tools, all templates)
@@ -350,6 +396,7 @@ Antwort im Format:
              zap_ajax=result.get("zap_ajax_spider_enabled"),
              zap_categories=result.get("zap_active_categories"))
 
+    result.pop("_raw", None)
     return result
 
 
@@ -394,14 +441,16 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 4096) -
             text = text.rsplit("```", 1)[0]
         text = text.strip()
 
-        return json.loads(text)
+        parsed = json.loads(text)
+        parsed["_raw"] = raw
+        return parsed
 
     except json.JSONDecodeError as e:
         log.error("sonnet_json_parse_error", error=str(e), raw=raw[:500])
-        return {"_error": f"JSON-Parse-Fehler: {e}"}
+        return {"_error": f"JSON-Parse-Fehler: {e}", "_raw": raw}
     except Exception as e:
         log.error("sonnet_call_error", error=str(e))
-        return {"_error": f"API-Fehler: {e}"}
+        return {"_error": f"API-Fehler: {e}", "_raw": raw}
 
 
 # ---------------------------------------------------------------------------
@@ -461,6 +510,7 @@ def plan_phase3_prioritization(
     finding_summary: list[dict[str, Any]],
     tech_profiles: list[dict[str, Any]],
     has_waf: bool = False,
+    order_id: str = "",
 ) -> dict[str, Any]:
     """Use Sonnet to prioritize and correlate Phase 2 findings.
 
@@ -490,6 +540,12 @@ Antwort im Format:
 
     result = _call_sonnet(PHASE3_SYSTEM, user_prompt)
 
+    # Save full AI debug
+    if order_id:
+        _save_ai_debug(order_id, None, 3, "ai_phase3_prioritization",
+                        PHASE3_SYSTEM, user_prompt,
+                        result.get("_raw", ""), result)
+
     error_detail = result.get("_error", "")
     if not result or "high_confidence_findings" not in result:
         reason = error_detail or "Ungültige KI-Antwort"
@@ -506,4 +562,5 @@ Antwort im Format:
     fp = len(result.get("potential_false_positives", []))
     log.info("ai_phase3_complete", high=high, low=low, fp=fp)
 
+    result.pop("_raw", None)
     return result

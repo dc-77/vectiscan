@@ -136,7 +136,7 @@ def run_phase3(
         progress_callback(order_id, "correlation", "ai_prioritization")
         finding_summary = _build_finding_summary(correlated)
         ai_prioritization = plan_phase3_prioritization(
-            finding_summary, tech_profiles, has_waf,
+            finding_summary, tech_profiles, has_waf, order_id=order_id,
         )
 
         # Apply AI FP suggestions to correlated findings

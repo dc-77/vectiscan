@@ -122,6 +122,20 @@ export interface OrderEvents {
   toolOutputs: Array<{ tool: string; host: string; summary: string; ts: string }>;
   discoveredHosts: HostInfo[];
   error: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  aiDebug?: Record<string, any>;
+  falsePositives?: {
+    count: number;
+    by_reason: Record<string, number>;
+    details: Array<{
+      tool: string;
+      title: string;
+      severity: string;
+      reason: string;
+      host: string;
+      cve?: string;
+    }>;
+  } | null;
 }
 
 export async function getOrderEvents(id: string): Promise<ApiResponse<OrderEvents>> {
@@ -247,6 +261,12 @@ export interface FindingsData {
   recommendations: Recommendation[];
   package: string;
   nis2_compliance_summary?: Record<string, string> | null;
+  excluded_finding_ids?: string[];
+  exclusions?: Array<{
+    finding_id: string;
+    reason: string;
+    created_at: string;
+  }>;
 }
 
 export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[] }>> {
@@ -423,6 +443,33 @@ export interface ScanResult {
 
 export async function getScanResults(orderId: string): Promise<ApiResponse<{ results: ScanResult[] }>> {
   const res = await fetch(`${API_URL}/api/orders/${orderId}/results`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// --- Finding Exclusions ---
+
+export async function excludeFinding(orderId: string, findingId: string, reason: string): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/findings/${findingId}/exclude`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ reason }),
+  });
+  return handleResponse(res);
+}
+
+export async function unexcludeFinding(orderId: string, findingId: string): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/findings/${findingId}/exclude`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function regenerateReport(orderId: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/regenerate-report`, {
+    method: 'POST',
     headers: authHeaders(),
   });
   return handleResponse(res);

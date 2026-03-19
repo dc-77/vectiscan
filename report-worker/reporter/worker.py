@@ -89,6 +89,8 @@ def _create_report_record(
     minio_path: str,
     file_size_bytes: int,
     findings_data: dict | None = None,
+    version: int = 1,
+    excluded_findings: list[str] | None = None,
 ) -> tuple[str, str]:
     """Insert a row into the reports table and return (report_id, download_token)."""
     download_token = str(uuid.uuid4())
@@ -96,12 +98,14 @@ def _create_report_record(
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO reports (order_id, minio_bucket, minio_path, file_size_bytes, download_token, expires_at, findings_data)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO reports (order_id, minio_bucket, minio_path, file_size_bytes,
+                                 download_token, expires_at, findings_data, version, excluded_findings)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
             (order_id, REPORTS_BUCKET, minio_path, file_size_bytes, download_token, expires_at,
-             json.dumps(findings_data) if findings_data else None),
+             json.dumps(findings_data) if findings_data else None,
+             version, json.dumps(excluded_findings) if excluded_findings else None),
         )
         report_id = cur.fetchone()[0]
     conn.commit()
@@ -237,6 +241,7 @@ def process_job(job_data: dict) -> None:
     host_inventory: dict = job_data["hostInventory"]
     tech_profiles: list[dict] = job_data["techProfiles"]
     package: str = job_data.get("package", "perimeter")
+    excluded: list[str] = job_data.get("excluded_findings", [])
 
     work_dir = Path(tempfile.mkdtemp(prefix=f"report-{order_id}-"))
     log.info("job_started", order_id=order_id, package=package, work_dir=str(work_dir))
@@ -310,19 +315,68 @@ def process_job(job_data: dict) -> None:
         )
         log.info("report_data_mapped")
 
+        # -- 5b. Filter excluded findings -------------------------------------
+        if excluded:
+            log.info("filtering_excluded_findings", count=len(excluded), ids=excluded)
+            report_data["findings"] = [f for f in report_data.get("findings", [])
+                                        if f.get("id") not in excluded]
+            # Also filter claude_output so _build_findings_data reflects exclusions
+            claude_output["findings"] = [f for f in claude_output.get("findings", [])
+                                          if f.get("id") not in excluded]
+            # Recalculate severity counts
+            severity_counts = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "INFO": 0}
+            for f in report_data["findings"]:
+                sev = f.get("severity", "INFO").upper()
+                if sev in severity_counts:
+                    severity_counts[sev] += 1
+            report_data["severity_counts"] = severity_counts
+
+        # -- 5c. Determine PDF version number ---------------------------------
+        version = 1
+        if excluded:
+            # This is a regeneration — find current max version
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT COALESCE(MAX(version), 0) FROM reports WHERE order_id = %s", (order_id,))
+                    current_max = cur.fetchone()[0]
+                    version = current_max + 1
+            except Exception:
+                version = 2  # Fallback if query fails
+                log.warning("version_query_failed", order_id=order_id, fallback_version=version)
+
+        minio_pdf_path = f"{order_id}_v{version}.pdf" if version > 1 else f"{order_id}.pdf"
+
         # -- 6. Generate PDF --------------------------------------------------
         pdf_path = work_dir / f"{order_id}.pdf"
         generate_report(report_data, str(pdf_path))
         log.info("pdf_generated", path=str(pdf_path), size=pdf_path.stat().st_size)
 
         # -- 7. Upload PDF to MinIO -------------------------------------------
-        minio_pdf_path = f"{order_id}.pdf"
         file_size = _upload_report(minio_client, pdf_path, minio_pdf_path)
 
         # -- 8. Build findings_data and create report record in DB ---------------
         findings_data = _build_findings_data(claude_output, package, report_data)
-        report_id, download_token = _create_report_record(conn, order_id, minio_pdf_path, file_size, findings_data)
-        log.info("report_record_created", report_id=report_id, download_token=download_token)
+        report_id, download_token = _create_report_record(
+            conn, order_id, minio_pdf_path, file_size, findings_data,
+            version=version, excluded_findings=excluded if excluded else None,
+        )
+        log.info("report_record_created", report_id=report_id, download_token=download_token, version=version)
+
+        # -- 8b. Mark previous version as superseded --------------------------
+        if version > 1:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        UPDATE reports SET superseded_by = %s
+                        WHERE order_id = %s AND version = %s
+                        """,
+                        (report_id, order_id, version - 1),
+                    )
+                conn.commit()
+                log.info("previous_version_superseded", order_id=order_id, old_version=version - 1)
+            except Exception as e:
+                log.warning("supersede_failed", error=str(e))
 
         # -- 9. Update order status to report_complete -------------------------
         _update_order_status(conn, order_id, "report_complete")

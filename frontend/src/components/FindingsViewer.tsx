@@ -32,15 +32,31 @@ function sortFindings(findings: Finding[]): Finding[] {
 
 interface FindingsViewerProps {
   data: FindingsData;
+  excludedIds?: string[];
+  onExclude?: (findingId: string, reason: string) => void;
+  onUnexclude?: (findingId: string) => void;
+  onRegenerateReport?: () => void;
 }
 
-export default function FindingsViewer({ data }: FindingsViewerProps) {
+export default function FindingsViewer({ data, excludedIds = [], onExclude, onUnexclude, onRegenerateReport }: FindingsViewerProps) {
   const [filter, setFilter] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const sorted = sortFindings(data.findings);
   const filtered = filter ? sorted.filter(f => f.severity?.toUpperCase() === filter) : sorted;
   const isBasic = data.package === 'basic' || data.package === 'webcheck';
+
+  // Compute adjusted severity counts (excluding manually excluded findings)
+  const adjustedCounts: Record<string, number> = { ...data.severity_counts };
+  if (excludedIds.length > 0) {
+    for (const f of data.findings) {
+      if (excludedIds.includes(f.id)) {
+        const sev = f.severity?.toUpperCase() || 'INFO';
+        if (adjustedCounts[sev]) adjustedCounts[sev]--;
+      }
+    }
+  }
+  const hasExclusions = excludedIds.length > 0;
 
   const riskStyle = RISK_STYLE[data.overall_risk?.toUpperCase()] || 'bg-slate-700 text-slate-400';
 
@@ -52,10 +68,23 @@ export default function FindingsViewer({ data }: FindingsViewerProps) {
           <span className={`${riskStyle} text-xs font-bold px-3 py-1.5 rounded uppercase tracking-wider`}>
             {data.overall_risk || 'N/A'}
           </span>
-          <span className="text-sm text-slate-500">{data.findings.length} Befunde</span>
+          <span className="text-sm text-slate-500">
+            {data.findings.length} Befunde
+            {hasExclusions && (
+              <span className="text-slate-600 ml-1">({excludedIds.length} ausgeschlossen)</span>
+            )}
+          </span>
         </div>
-        <div className="flex-1">
-          <SeverityCounts counts={data.severity_counts} />
+        <div className="flex items-center gap-3 flex-1">
+          <SeverityCounts counts={hasExclusions ? adjustedCounts : data.severity_counts} />
+          {hasExclusions && onRegenerateReport && (
+            <button
+              onClick={onRegenerateReport}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors ml-auto shrink-0"
+            >
+              Report neu generieren ({excludedIds.length} ausgeschlossen)
+            </button>
+          )}
         </div>
       </div>
 
@@ -96,9 +125,10 @@ export default function FindingsViewer({ data }: FindingsViewerProps) {
           const sev = finding.severity?.toUpperCase() || 'INFO';
           const borderClass = SEVERITY_BORDER[sev] || SEVERITY_BORDER.INFO;
           const isOpen = expandedId === finding.id;
+          const isExcluded = excludedIds.includes(finding.id);
 
           return (
-            <div key={finding.id} className={`rounded-lg overflow-hidden border border-gray-800/50 ${borderClass}`}>
+            <div key={finding.id} className={`rounded-lg overflow-hidden border border-gray-800/50 ${borderClass} ${isExcluded ? 'opacity-50' : ''}`}>
               {/* Collapsed Header */}
               <button
                 onClick={() => setExpandedId(isOpen ? null : finding.id)}
@@ -117,6 +147,11 @@ export default function FindingsViewer({ data }: FindingsViewerProps) {
                   )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
+                  {isExcluded && (
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                      FALSE POSITIVE
+                    </span>
+                  )}
                   {!isBasic && finding.cvss_score && (
                     <span className="text-xs font-mono font-bold text-slate-300 bg-slate-700/50 px-2 py-0.5 rounded">
                       {finding.cvss_score}
@@ -199,6 +234,31 @@ export default function FindingsViewer({ data }: FindingsViewerProps) {
                         className="text-sm text-slate-300 leading-relaxed [&>b]:font-semibold [&>b]:text-white"
                         dangerouslySetInnerHTML={{ __html: finding.recommendation.replace(/\n/g, '<br/>') }}
                       />
+                    </div>
+                  )}
+
+                  {/* Exclude/Unexclude button */}
+                  {(onExclude || onUnexclude) && (
+                    <div className="pt-2 border-t border-gray-800/50">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (isExcluded && onUnexclude) {
+                            onUnexclude(finding.id);
+                          } else if (!isExcluded && onExclude) {
+                            const reason = prompt('Begründung für False Positive:');
+                            if (reason !== null && reason.trim() !== '') onExclude(finding.id, reason);
+                          }
+                        }}
+                        className={`text-xs px-2 py-1 rounded transition-colors ${
+                          isExcluded
+                            ? 'bg-green-900/30 text-green-400 hover:bg-green-900/50'
+                            : 'bg-red-900/30 text-red-400 hover:bg-red-900/50'
+                        }`}
+                        title={isExcluded ? 'False Positive aufheben' : 'Als False Positive markieren'}
+                      >
+                        {isExcluded ? 'Wiederherstellen' : 'False Positive'}
+                      </button>
                     </div>
                   )}
                 </div>

@@ -297,7 +297,7 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
         enriched_inventory["dns_security"] = phase0a_results.get("dns_security", {})
         enriched_inventory["whois"] = phase0a_results.get("whois", {})
 
-    strategy = plan_host_strategy(enriched_inventory, domain, package)
+    strategy = plan_host_strategy(enriched_inventory, domain, package, order_id=order_id)
 
     # Save strategy to scan results and disk
     strategy_json = json.dumps(strategy, indent=2, ensure_ascii=False)
@@ -418,7 +418,7 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
 
         _check_timeout()
 
-        adaptive_config = plan_phase2_config(profile, host_inventory, package)
+        adaptive_config = plan_phase2_config(profile, host_inventory, package, order_id=order_id)
         adaptive_configs[ip] = adaptive_config
 
         adaptive_json = json.dumps(adaptive_config, indent=2, ensure_ascii=False)

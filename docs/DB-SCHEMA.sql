@@ -1,6 +1,6 @@
 -- VectiScan — Vollständiges Datenbankschema
--- Stand: 2026-03-17
--- Quelle: Migrationen 003–008
+-- Stand: 2026-03-19
+-- Quelle: Migrationen 003–009
 
 -- ============================================================
 -- Kunden
@@ -102,7 +102,7 @@ CREATE INDEX idx_scan_results_order ON scan_results(order_id);
 -- ============================================================
 CREATE TABLE reports (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    order_id        UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE UNIQUE,
+    order_id        UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     minio_bucket    VARCHAR(50) DEFAULT 'scan-reports',
     minio_path      VARCHAR(500) NOT NULL,
     file_size_bytes INTEGER,
@@ -110,8 +110,26 @@ CREATE TABLE reports (
     download_count  INTEGER NOT NULL DEFAULT 0,
     expires_at      TIMESTAMPTZ,
     findings_data   JSONB,                  -- Strukturierte Claude-Befunde für Dashboard
+    version         INTEGER DEFAULT 1,
+    superseded_by   UUID REFERENCES reports(id),
+    excluded_findings JSONB DEFAULT '[]'::jsonb,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+CREATE INDEX idx_reports_order_version ON reports(order_id, version DESC);
+
+-- ============================================================
+-- Finding-Ausschlüsse (für Report-Regenerierung)
+-- ============================================================
+CREATE TABLE finding_exclusions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    finding_id VARCHAR(20) NOT NULL,
+    excluded_by UUID NOT NULL REFERENCES users(id),
+    reason TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE UNIQUE INDEX idx_exclusions_order_finding ON finding_exclusions(order_id, finding_id);
 
 -- ============================================================
 -- Audit-Log
