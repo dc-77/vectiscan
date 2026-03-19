@@ -651,7 +651,7 @@ def map_professional_report(
             "cover_meta": [
                 ["Ziel:", f"{domain} ({hosts_count} Hosts)"],
                 ["Datum:", scan_date],
-                ["Paket:", "Professional"],
+                ["Paket:", "PerimeterScan"],
                 ["Methodik:", "PTES (automatisiert)"],
                 ["Scoring:", "CVSS v3.1"],
                 ["Klassifizierung:", "Vertraulich"],
@@ -739,7 +739,7 @@ def map_basic_report(
             "cover_meta": [
                 ["Ziel:", f"{domain} ({hosts_count} Hosts)"],
                 ["Datum:", scan_date],
-                ["Paket:", "Basic"],
+                ["Paket:", "WebCheck"],
                 ["Methodik:", "Automatisierter Schnellscan"],
                 ["Klassifizierung:", "Vertraulich"],
                 ["Befunde:", finding_summary],
@@ -859,7 +859,7 @@ def map_nis2_report(
     cover_meta = report_data["cover"]["cover_meta"]
     for i, row in enumerate(cover_meta):
         if row[0] == "Paket:":
-            cover_meta[i] = ["Paket:", "NIS2 Compliance"]
+            cover_meta[i] = ["Paket:", "ComplianceScan"]
             break
     # Insert Regulatorik row after Paket
     for i, row in enumerate(cover_meta):
