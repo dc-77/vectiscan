@@ -16,6 +16,7 @@ from scanner.passive.abuseipdb_client import AbuseIPDBClient
 from scanner.passive.securitytrails_client import SecurityTrailsClient
 from scanner.passive.whois_client import WhoisClient
 from scanner.passive.dns_security import run_all_dns_security
+from scanner.progress import publish_event
 
 log = structlog.get_logger()
 
@@ -59,6 +60,7 @@ def run_phase0a(
     # --- Helper functions for parallel execution ---
 
     def _run_whois() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "whois", "host": domain})
         whois = WhoisClient()
         data = whois.lookup(domain)
         if data:
@@ -66,6 +68,7 @@ def run_phase0a(
         return "whois", data
 
     def _run_shodan() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "shodan", "host": domain})
         shodan = ShodanClient()
         if not shodan.available:
             log.info("shodan_skipped", reason="no_api_key")
@@ -86,6 +89,7 @@ def run_phase0a(
         return "shodan", result
 
     def _run_abuseipdb() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "abuseipdb", "host": domain})
         client = AbuseIPDBClient()
         if not client.available:
             log.info("abuseipdb_skipped", reason="no_api_key")
@@ -100,6 +104,7 @@ def run_phase0a(
         return "abuseipdb", abuse_results or None
 
     def _run_securitytrails() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "securitytrails", "host": domain})
         st = SecurityTrailsClient()
         if not st.available:
             log.info("securitytrails_skipped", reason="no_api_key")
@@ -113,6 +118,7 @@ def run_phase0a(
         return "securitytrails", st_data
 
     def _run_dns_security() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "dns_security", "host": domain})
         dns_sec = run_all_dns_security(domain, package)
         _save_json(phase0a_dir, "dns_security.json", dns_sec)
         return "dns_security", dns_sec

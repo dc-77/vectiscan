@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useMemo } from 'react';
+import { getToolLabel } from '@/lib/toolLabels';
 
 interface ToolProgressProps {
   tool: string;
@@ -78,9 +79,9 @@ export default function ToolProgress({ tool, host }: ToolProgressProps) {
     return chars;
   }, [frame, burst]);
 
-  // Display "scanning" instead of "starting"
-  const displayTool = tool === 'starting' ? 'scanning' : tool;
-  const targetLabel = host ? `${displayTool} → ${host}` : displayTool;
+  // Display cinematic label instead of raw tool name
+  const displayTool = tool === 'starting' ? 'INITIALIZING' : getToolLabel(tool);
+  const targetLabel = host ? `${displayTool} ── ${host}` : displayTool;
   const elapsedStr = elapsed > 0 ? `${elapsed}s` : '';
 
   return (

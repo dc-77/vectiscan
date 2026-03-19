@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useState } from 'react';
+import { getToolLabel, getHostColor } from '@/lib/toolLabels';
 
 // Must match the ScanStatus from lib/api.ts
 interface ScanProgress {
@@ -36,6 +37,19 @@ export interface TerminalLine {
   isHeader?: boolean;
   isHost?: boolean;
   indent?: number;
+  hostColor?: string;
+  hostLabel?: string;
+}
+
+export interface HostStream {
+  ip: string;
+  fqdns: string[];
+  currentTool: string | null;
+  toolLabel: string | null;
+  toolStartedAt: number;
+  status: 'idle' | 'scanning' | 'done' | 'error';
+  color: string;
+  toolsCompleted: number;
 }
 
 type ScanPhase = 'idle' | 'starting' | 'queued' | 'dns_recon' | 'passive_intel'
@@ -45,36 +59,19 @@ type ScanPhase = 'idle' | 'starting' | 'queued' | 'dns_recon' | 'passive_intel'
 const PACKAGE_LABELS: Record<string, string> = {
   basic: 'WebCheck',
   webcheck: 'WebCheck',
-  professional: 'Perimeter Scan',
-  perimeter: 'Perimeter Scan',
-  nis2: 'Compliance Scan',
-  compliance: 'Compliance Scan',
-  supplychain: 'SupplyChain Scan',
-  insurance: 'Insurance Scan',
+  professional: 'PerimeterScan',
+  perimeter: 'PerimeterScan',
+  nis2: 'ComplianceScan',
+  compliance: 'ComplianceScan',
+  supplychain: 'SupplyChainScan',
+  insurance: 'InsuranceScan',
 };
 
-// Tools expected per phase (for generating terminal lines)
-const PHASE0_TOOLS_BASIC = ['crt.sh', 'subfinder'];
-const PHASE0_TOOLS_PRO = ['crt.sh', 'subfinder', 'amass', 'gobuster DNS', 'Zone-Transfer', 'dnsx Validierung'];
-const PHASE1_TOOLS = ['nmap', 'webtech', 'wafw00f'];
-const PHASE2_TOOLS_BASIC = ['testssl.sh', 'ZAP Spider', 'headers', 'gowitness', 'httpx'];
-const PHASE2_TOOLS_PRO = ['testssl.sh', 'ZAP Spider', 'ZAP Active Scan', 'nuclei', 'gowitness', 'headers', 'httpx', 'wpscan'];
-
-// Map tool names from backend to display labels for command-style lines
-const TOOL_COMMANDS: Record<string, string> = {
-  testssl: 'testssl.sh --jsonfile /phase2/testssl.json',
-  zap_spider: 'zap-cli spider --url TARGET --depth 5',
-  zap_ajax_spider: 'zap-cli ajax-spider --url TARGET --browser chromium',
-  zap_active: 'zap-cli active-scan --url TARGET --policy adaptive',
-  zap_passive: 'zap-cli passive-scan --analyze',
-  nuclei: 'nuclei -u TARGET -severity all -jsonl',
-  gowitness: 'gowitness scan single -u TARGET',
-  header_check: 'curl -sI TARGET | analyze-headers',
-  httpx: 'httpx -u TARGET -json -tech-detect',
-  wpscan: 'wpscan --url TARGET --enumerate vp,vt',
-  nmap: 'nmap -sV -sC TARGET',
-  webtech: 'webtech -u TARGET',
-  wafw00f: 'wafw00f TARGET',
+const PACKAGE_MAX_HOSTS: Record<string, number> = {
+  basic: 3, webcheck: 3,
+  professional: 15, perimeter: 15,
+  nis2: 15, compliance: 15,
+  supplychain: 15, insurance: 15,
 };
 
 function ts(): string {
@@ -93,7 +90,6 @@ function lineId(): string {
   return `line-${++lineCounter}`;
 }
 
-/** SessionStorage key for terminal state. */
 function storageKey(orderId: string): string {
   return `vectiscan-terminal-${orderId}`;
 }
@@ -109,6 +105,8 @@ interface TerminalState {
   phase0Done: boolean;
   phase1Done: boolean;
   lastToolOutput: string;
+  hostStreams: Record<string, HostStream>;
+  hostColorIndex: number;
 }
 
 function saveTerminalState(orderId: string | null, state: TerminalState): void {
@@ -127,8 +125,15 @@ function loadTerminalState(orderId: string | null): TerminalState | null {
   return null;
 }
 
+/** Get the primary FQDN for display (shortest non-IP). */
+function hostDisplayName(ip: string, fqdns?: string[]): string {
+  if (fqdns && fqdns.length > 0) {
+    return fqdns[0];
+  }
+  return ip;
+}
+
 export function useTerminalFeed(orderId?: string | null) {
-  // Restore from sessionStorage on mount
   const restored = useRef(false);
   const initialState = useRef<TerminalState | null>(null);
   if (!restored.current && orderId) {
@@ -148,7 +153,14 @@ export function useTerminalFeed(orderId?: string | null) {
   const phase1DoneRef = useRef(cached?.phase1Done || false);
   const lastToolOutputRef = useRef<string>(cached?.lastToolOutput || '');
 
-  // Restore lineCounter to avoid ID collisions
+  // Per-host parallel tracking
+  const hostStreamsRef = useRef<Map<string, HostStream>>(
+    new Map(Object.entries(cached?.hostStreams || {}))
+  );
+  const hostColorIndexRef = useRef<number>(cached?.hostColorIndex || 0);
+  const [hostStreams, setHostStreams] = useState<Map<string, HostStream>>(hostStreamsRef.current);
+
+  // Restore lineCounter
   if (cached?.lines.length) {
     const maxId = Math.max(...cached.lines.map(l => {
       const m = l.id.match(/^line-(\d+)$/);
@@ -160,28 +172,55 @@ export function useTerminalFeed(orderId?: string | null) {
   const orderIdRef = useRef(orderId);
   orderIdRef.current = orderId;
 
+  const persistState = useCallback((updatedLines: TerminalLine[]) => {
+    saveTerminalState(orderIdRef.current || null, {
+      lines: updatedLines,
+      lastStatus: lastStatusRef.current,
+      lastTool: lastToolRef.current,
+      lastHost: lastHostRef.current,
+      hostsCompleted: lastHostsCompletedRef.current,
+      hostsShown: hostsShownRef.current,
+      initialized: initializedRef.current,
+      phase0Done: phase0DoneRef.current,
+      phase1Done: phase1DoneRef.current,
+      lastToolOutput: lastToolOutputRef.current,
+      hostStreams: Object.fromEntries(hostStreamsRef.current),
+      hostColorIndex: hostColorIndexRef.current,
+    });
+  }, []);
+
   const addLines = useCallback((newLines: TerminalLine[]) => {
     setLines(prev => {
       const updated = [...prev, ...newLines];
-      // Keep max 200 lines in DOM
       const trimmed = updated.length > 200 ? updated.slice(updated.length - 200) : updated;
-
-      // Persist to sessionStorage
-      saveTerminalState(orderIdRef.current || null, {
-        lines: trimmed,
-        lastStatus: lastStatusRef.current,
-        lastTool: lastToolRef.current,
-        lastHost: lastHostRef.current,
-        hostsCompleted: lastHostsCompletedRef.current,
-        hostsShown: hostsShownRef.current,
-        initialized: initializedRef.current,
-        phase0Done: phase0DoneRef.current,
-        phase1Done: phase1DoneRef.current,
-        lastToolOutput: lastToolOutputRef.current,
-      });
-
+      persistState(trimmed);
       return trimmed;
     });
+  }, [persistState]);
+
+  /** Get or create a host stream with assigned color. */
+  const getOrCreateStream = useCallback((ip: string, fqdns?: string[]): HostStream => {
+    const existing = hostStreamsRef.current.get(ip);
+    if (existing) {
+      if (fqdns && fqdns.length > 0 && existing.fqdns.length === 0) {
+        existing.fqdns = fqdns;
+      }
+      return existing;
+    }
+    const stream: HostStream = {
+      ip,
+      fqdns: fqdns || [],
+      currentTool: null,
+      toolLabel: null,
+      toolStartedAt: Date.now(),
+      status: 'idle',
+      color: getHostColor(hostColorIndexRef.current),
+      toolsCompleted: 0,
+    };
+    hostColorIndexRef.current++;
+    hostStreamsRef.current.set(ip, stream);
+    setHostStreams(new Map(hostStreamsRef.current));
+    return stream;
   }, []);
 
   const initTerminal = useCallback((domain: string, pkg: string) => {
@@ -197,11 +236,115 @@ export function useTerminalFeed(orderId?: string | null) {
 
     const now = ts();
     const label = PACKAGE_LABELS[pkg] || 'Scan';
-    addLines([
-      { id: lineId(), timestamp: now, text: `VectiScan v2.0 — ${label}`, isHeader: true },
-      { id: lineId(), timestamp: now, text: `Target: ${domain}`, isHeader: false },
-      { id: lineId(), timestamp: now, text: '─'.repeat(50), isHeader: false },
-    ]);
+    const maxHosts = PACKAGE_MAX_HOSTS[pkg] || 15;
+
+    // Boot sequence lines — staggered via addLines batches
+    const bootLines: TerminalLine[] = [
+      { id: lineId(), timestamp: now, text: 'VectiScan v2.0 — Security Assessment System', isHeader: true },
+      { id: lineId(), timestamp: now, text: '━'.repeat(50) },
+      { id: lineId(), timestamp: now, text: '[SYS] Initializing scan modules...', status: 'system' },
+      { id: lineId(), timestamp: now, text: '  ✓ Network stack online', indent: 1, status: 'done' },
+      { id: lineId(), timestamp: now, text: '  ✓ DNS resolver online', indent: 1, status: 'done' },
+      { id: lineId(), timestamp: now, text: '  ✓ Vulnerability database synced', indent: 1, status: 'done' },
+      { id: lineId(), timestamp: now, text: '  ✓ AI orchestration ready', indent: 1, status: 'done' },
+      { id: lineId(), timestamp: now, text: `[SYS] Package: ${label} // Max ${maxHosts} hosts`, status: 'system' },
+      { id: lineId(), timestamp: now, text: `[SYS] Target: ${domain}`, status: 'system' },
+      { id: lineId(), timestamp: now, text: '━'.repeat(50) },
+    ];
+    addLines(bootLines);
+  }, [addLines]);
+
+  /** Handle a tool_starting WebSocket event — emit cinematic label line. */
+  const handleToolStarting = useCallback((tool: string, host: string) => {
+    const now = ts();
+    const label = getToolLabel(tool);
+    const newLines: TerminalLine[] = [];
+
+    // Determine host color for parallel visualization
+    let hostColor: string | undefined;
+    let hostName: string | undefined;
+
+    if (host) {
+      const stream = getOrCreateStream(host);
+
+      // Mark previous tool as done for this host
+      if (stream.currentTool && stream.status === 'scanning') {
+        const prevLabel = stream.toolLabel || getToolLabel(stream.currentTool);
+        newLines.push({
+          id: lineId(), timestamp: now,
+          text: `  ${prevLabel} ${'·'.repeat(Math.max(2, 42 - prevLabel.length))} DONE`,
+          indent: 1, status: 'done',
+          hostColor: stream.color,
+          hostLabel: hostDisplayName(stream.ip, stream.fqdns),
+        });
+        stream.toolsCompleted++;
+      }
+
+      // Update stream state
+      stream.currentTool = tool;
+      stream.toolLabel = label;
+      stream.toolStartedAt = Date.now();
+      stream.status = 'scanning';
+      hostStreamsRef.current.set(host, stream);
+      setHostStreams(new Map(hostStreamsRef.current));
+
+      hostColor = stream.color;
+      hostName = hostDisplayName(stream.ip, stream.fqdns);
+    }
+
+    // Emit the cinematic label line
+    const hostSuffix = hostName ? ` ── ${hostName}` : '';
+    newLines.push({
+      id: lineId(), timestamp: now,
+      text: `  ${label}${hostSuffix}`,
+      indent: 1,
+      hostColor,
+      hostLabel: hostName,
+    });
+
+    if (newLines.length > 0) {
+      addLines(newLines);
+    }
+  }, [addLines, getOrCreateStream]);
+
+  /** Handle a tool_output WebSocket event — mark tool completion. */
+  const handleToolOutput = useCallback((tool: string, host: string, summary: string) => {
+    const now = ts();
+    const newLines: TerminalLine[] = [];
+
+    if (host) {
+      const stream = hostStreamsRef.current.get(host);
+      if (stream && stream.currentTool === tool) {
+        const label = stream.toolLabel || getToolLabel(tool);
+        newLines.push({
+          id: lineId(), timestamp: now,
+          text: `  ${label} ${'·'.repeat(Math.max(2, 42 - label.length))} DONE`,
+          indent: 1, status: 'done',
+          hostColor: stream.color,
+          hostLabel: hostDisplayName(stream.ip, stream.fqdns),
+        });
+        stream.toolsCompleted++;
+        stream.currentTool = null;
+        stream.toolLabel = null;
+        hostStreamsRef.current.set(host, stream);
+        setHostStreams(new Map(hostStreamsRef.current));
+      }
+    }
+
+    // Show summary
+    if (summary) {
+      const stream = host ? hostStreamsRef.current.get(host) : undefined;
+      newLines.push({
+        id: lineId(), timestamp: now,
+        text: `    └ ${summary}`,
+        indent: 2,
+        hostColor: stream?.color,
+      });
+    }
+
+    if (newLines.length > 0) {
+      addLines(newLines);
+    }
   }, [addLines]);
 
   const processStatus = useCallback((scan: ScanStatus) => {
@@ -210,19 +353,17 @@ export function useTerminalFeed(orderId?: string | null) {
     const newLines: TerminalLine[] = [];
     const now = ts();
 
-    // Initialize if not done
     if (!initializedRef.current) {
       initTerminal(domain, pkg);
     }
 
-    // Phase/host transitions — emit when phase OR host changes
+    // Phase/host transitions
     const currentHost = progress.currentHost || '';
     const phaseHostKey = `${status}:${currentHost}`;
     const lastPhaseHostKey = `${lastStatusRef.current}:${lastHostRef.current}`;
     const phaseOrHostChanged = phaseHostKey !== lastPhaseHostKey;
 
     if (phaseOrHostChanged) {
-      const prevStatus = lastStatusRef.current;
       lastStatusRef.current = status;
       lastHostRef.current = currentHost;
 
@@ -230,7 +371,7 @@ export function useTerminalFeed(orderId?: string | null) {
         case 'queued':
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '⏳ Scan in Warteschlange — wird gestartet, sobald ein Worker frei ist',
+            text: 'QUEUED — AWAITING AVAILABLE WORKER',
             status: 'running',
           });
           break;
@@ -238,7 +379,7 @@ export function useTerminalFeed(orderId?: string | null) {
         case 'passive_intel':
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '▸ Phase 0a: Passive Intelligence', isHeader: true,
+            text: 'PHASE 0a /// PASSIVE INTELLIGENCE', isHeader: true,
           });
           break;
 
@@ -246,7 +387,7 @@ export function useTerminalFeed(orderId?: string | null) {
           if (!phase0DoneRef.current) {
             newLines.push({
               id: lineId(), timestamp: now,
-              text: '▸ Phase 0b: DNS-Reconnaissance', isHeader: true,
+              text: 'PHASE 0b /// ACTIVE DISCOVERY', isHeader: true,
             });
           }
           break;
@@ -254,13 +395,17 @@ export function useTerminalFeed(orderId?: string | null) {
         case 'scan_phase1':
           if (!phase0DoneRef.current) {
             phase0DoneRef.current = true;
-            // Show discovered hosts + selected hosts
+            // Show discovered hosts
             if (!hostsShownRef.current && progress.discoveredHosts.length > 0) {
               hostsShownRef.current = true;
               newLines.push({ id: lineId(), timestamp: now, text: '' });
               newLines.push({
                 id: lineId(), timestamp: now,
-                text: '▸ Hosts entdeckt:', isHeader: true,
+                text: 'DISCOVERED HOSTS', isHeader: true,
+              });
+              newLines.push({
+                id: lineId(), timestamp: now,
+                text: '─'.repeat(50),
               });
               for (const host of progress.discoveredHosts) {
                 const fqdns = host.fqdns.join(', ');
@@ -269,51 +414,46 @@ export function useTerminalFeed(orderId?: string | null) {
                   id: lineId(), timestamp: now,
                   text: `  ${host.ip}  ${fqdns}${skip}`, isHost: true, indent: 1,
                 });
+                // Initialize host streams with color assignment
+                if (host.status !== 'skipped') {
+                  getOrCreateStream(host.ip, host.fqdns);
+                }
               }
-              // Show selected hosts (non-skipped)
+              // Show selected count
               const selected = progress.discoveredHosts.filter(h => h.status !== 'skipped');
               if (selected.length < progress.discoveredHosts.length) {
                 newLines.push({ id: lineId(), timestamp: now, text: '' });
                 newLines.push({
                   id: lineId(), timestamp: now,
-                  text: `▸ Hosts ausgewählt: ${selected.length} von ${progress.discoveredHosts.length}`, isHeader: true,
+                  text: `TARGETS SELECTED: ${selected.length} OF ${progress.discoveredHosts.length} HOSTS`,
+                  isHeader: true,
                 });
-                for (const host of selected) {
-                  const fqdns = host.fqdns.join(', ');
-                  newLines.push({
-                    id: lineId(), timestamp: now,
-                    text: `  ${host.ip}  ${fqdns}`, isHost: true, indent: 1,
-                  });
-                }
               }
               newLines.push({ id: lineId(), timestamp: now, text: '' });
             }
           }
-          // Phase 1 header with host info
+          // Phase 1 header — no host suffix (parallel)
           newLines.push({
             id: lineId(), timestamp: now,
-            text: `▸ Phase 1: Technologie-Erkennung${currentHost ? ` [${currentHost}]` : ''}`,
+            text: 'PHASE 1 /// TECHNOLOGY FINGERPRINTING',
             isHeader: true,
           });
           break;
 
-        case 'scan_phase2': {
-          const hostLabel = progress.hostsTotal > 0
-            ? ` [Host ${progress.hostsCompleted + 1}/${progress.hostsTotal}]`
-            : '';
+        case 'scan_phase2':
+          newLines.push({ id: lineId(), timestamp: now, text: '' });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: `▸ Phase 2: Deep Scan${currentHost ? ` [${currentHost}]` : ''}${hostLabel}`,
+            text: 'PHASE 2 /// DEEP SCAN',
             isHeader: true,
           });
           break;
-        }
 
         case 'scan_phase3':
           newLines.push({ id: lineId(), timestamp: now, text: '' });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '▸ Phase 3: Correlation & Enrichment', isHeader: true,
+            text: 'PHASE 3 /// CORRELATION & ENRICHMENT', isHeader: true,
           });
           break;
 
@@ -321,8 +461,20 @@ export function useTerminalFeed(orderId?: string | null) {
           newLines.push({ id: lineId(), timestamp: now, text: '' });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: `▸ Scan abgeschlossen. ${progress.hostsTotal} Hosts gescannt.`,
-            isHeader: true,
+            text: '══════════════════════════════════════════',
+          });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: 'SCAN COMPLETE', isHeader: true,
+          });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '══════════════════════════════════════════',
+          });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: `  Hosts scanned ${'·'.repeat(10)} ${progress.hostsTotal}`,
+            indent: 1,
           });
           break;
 
@@ -330,39 +482,47 @@ export function useTerminalFeed(orderId?: string | null) {
           newLines.push({ id: lineId(), timestamp: now, text: '' });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '▸ Report-Generierung...', isHeader: true,
+            text: 'GENERATING REPORT', isHeader: true,
           });
-          newLines.push({
-            id: lineId(), timestamp: now,
-            text: '  Rohdaten konsolidieren', indent: 1, status: 'done',
-          });
-          newLines.push({
-            id: lineId(), timestamp: now,
-            text: '  KI-Analyse (Claude)', indent: 1, status: 'done',
-          });
-          newLines.push({
-            id: lineId(), timestamp: now,
-            text: '  PDF generieren', indent: 1, status: 'running',
-          });
-          break;
-
-        case 'report_complete':
-          newLines.push({
-            id: lineId(), timestamp: now,
-            text: '  ✓ PDF generieren', indent: 1, status: 'done',
-          });
-          newLines.push({ id: lineId(), timestamp: now, text: '' });
           newLines.push({
             id: lineId(), timestamp: now,
             text: '─'.repeat(50),
           });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '  ▸ ASSESSMENT COMPLETE', isHeader: true, indent: 1,
+            text: '  Consolidating raw data', indent: 1, status: 'done',
           });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: '  Report bereit zum Download', indent: 1,
+            text: '  AI analysis in progress', indent: 1, status: 'running',
+          });
+          break;
+
+        case 'report_complete':
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '  AI analysis complete', indent: 1, status: 'done',
+          });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '  PDF generation complete', indent: 1, status: 'done',
+          });
+          newLines.push({ id: lineId(), timestamp: now, text: '' });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '══════════════════════════════════════════',
+          });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: 'ASSESSMENT COMPLETE', isHeader: true,
+          });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '══════════════════════════════════════════',
+          });
+          newLines.push({
+            id: lineId(), timestamp: now,
+            text: '  Report ready for download', indent: 1,
           });
           break;
 
@@ -370,39 +530,21 @@ export function useTerminalFeed(orderId?: string | null) {
           newLines.push({ id: lineId(), timestamp: now, text: '' });
           newLines.push({
             id: lineId(), timestamp: now,
-            text: `[ERROR] ${scan.error || 'Scan fehlgeschlagen'}`,
+            text: `[ERROR] ${scan.error || 'Scan failed'}`,
             status: 'error',
           });
           break;
       }
     }
 
-    // Tool changes within a phase
+    // Tool changes via progress events (fallback for phases without tool_starting)
     const currentTool = progress.currentTool || '';
     if (currentTool && currentTool !== lastToolRef.current) {
-      // Mark previous tool as done (unless it was a "starting" marker)
-      if (lastToolRef.current && lastToolRef.current !== 'starting') {
-        const host = progress.currentHost || '';
-        const toolLabel = lastToolRef.current;
-        newLines.push({
-          id: lineId(), timestamp: now,
-          text: `  ✓ ${toolLabel}${host ? ' → ' + host : ''}`,
-          indent: 1, status: 'done',
-        });
-        // Show tool output summary if available
-        if (progress.toolOutput && progress.toolOutput !== lastToolOutputRef.current) {
-          newLines.push({
-            id: lineId(), timestamp: now,
-            text: `    └ ${progress.toolOutput}`,
-            indent: 2,
-          });
-          lastToolOutputRef.current = progress.toolOutput;
-        }
-      }
-
       lastToolRef.current = currentTool;
-    } else if (progress.toolOutput && progress.toolOutput !== lastToolOutputRef.current) {
-      // Tool output arrived but tool hasn't changed yet — show it
+    }
+
+    // Tool output via progress (not via tool_output WS event)
+    if (progress.toolOutput && progress.toolOutput !== lastToolOutputRef.current) {
       newLines.push({
         id: lineId(), timestamp: now,
         text: `    └ ${progress.toolOutput}`,
@@ -411,20 +553,15 @@ export function useTerminalFeed(orderId?: string | null) {
       lastToolOutputRef.current = progress.toolOutput;
     }
 
-    // Host completion changes
+    // Host completion tracking
     if (progress.hostsCompleted > lastHostsCompletedRef.current) {
       lastHostsCompletedRef.current = progress.hostsCompleted;
-    }
-
-    // Discovered hosts (show when first discovered, during dns_recon)
-    if (status === 'dns_recon' && !hostsShownRef.current && progress.discoveredHosts.length > 0) {
-      // Don't show yet — wait for phase transition to show them together
     }
 
     if (newLines.length > 0) {
       addLines(newLines);
     }
-  }, [addLines, initTerminal]);
+  }, [addLines, initTerminal, getOrCreateStream]);
 
   const reset = useCallback(() => {
     setLines([]);
@@ -437,22 +574,22 @@ export function useTerminalFeed(orderId?: string | null) {
     phase0DoneRef.current = false;
     phase1DoneRef.current = false;
     lastToolOutputRef.current = '';
+    hostStreamsRef.current.clear();
+    hostColorIndexRef.current = 0;
+    setHostStreams(new Map());
     lineCounter = 0;
-    // Clear sessionStorage
     if (orderIdRef.current) {
       try { sessionStorage.removeItem(storageKey(orderIdRef.current)); } catch { /* ignore */ }
     }
   }, []);
 
-  const addToolCommand = useCallback((tool: string, host: string) => {
-    const now = ts();
-    const cmdTemplate = TOOL_COMMANDS[tool] || tool;
-    const cmd = cmdTemplate.replace(/TARGET/g, host || 'target');
-    addLines([{
-      id: lineId(), timestamp: now,
-      text: cmd, status: 'command' as const, indent: 1,
-    }]);
-  }, [addLines]);
-
-  return { lines, processStatus, initTerminal, reset, addToolCommand };
+  return {
+    lines,
+    hostStreams,
+    processStatus,
+    initTerminal,
+    reset,
+    handleToolStarting,
+    handleToolOutput,
+  };
 }

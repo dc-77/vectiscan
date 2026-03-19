@@ -90,3 +90,116 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #1E3A5F #0C1222;
 }
+
+/* ═══════════════════════════════════════════════════════
+   CINEMATIC TERMINAL EFFECTS
+   ═══════════════════════════════════════════════════════ */
+
+/* Phase transition — full-screen brightness burst */
+@keyframes phaseTransition {
+  0%   { filter: brightness(1); }
+  10%  { filter: brightness(2.2) saturate(0.3); }
+  30%  { filter: brightness(0.8); }
+  100% { filter: brightness(1); }
+}
+
+.animate-phase-transition {
+  animation: phaseTransition 0.5s ease-out;
+}
+
+/* Phase header flash — cyan background wipe */
+@keyframes headerFlash {
+  0%   { background: rgba(56, 189, 248, 0.2); }
+  100% { background: transparent; }
+}
+
+.animate-headerFlash {
+  animation: headerFlash 0.5s ease-out forwards;
+}
+
+/* Threat discovery — red edge flash (full-screen overlay) */
+@keyframes threatScreenFlash {
+  0%   { box-shadow: inset 0 0 60px rgba(239, 68, 68, 0.4); }
+  30%  { box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.2); }
+  100% { box-shadow: inset 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.animate-threatScreenFlash {
+  animation: threatScreenFlash 0.8s ease-out forwards;
+}
+
+/* AI decision glow — amber border pulse */
+@keyframes aiDecisionGlow {
+  0%   { border-color: #F59E0B; box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+  100% { border-color: rgba(30, 58, 95, 0.3); box-shadow: none; }
+}
+
+.animate-aiDecisionGlow {
+  animation: aiDecisionGlow 0.8s ease-out;
+}
+
+/* Completion ceremony — green border flash */
+@keyframes completionFlash {
+  0%   { border-color: rgba(30, 58, 95, 0.3); }
+  30%  { border-color: rgba(34, 197, 94, 0.8); box-shadow: 0 0 30px rgba(34, 197, 94, 0.2); }
+  100% { border-color: rgba(34, 197, 94, 0.4); box-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
+}
+
+.animate-completionFlash {
+  animation: completionFlash 1s ease-out forwards;
+}
+
+/* Panel border breathing — subtle ambient oscillation */
+@keyframes panelBreathe {
+  0%, 100% { border-color: rgba(30, 58, 95, 0.3); }
+  50%      { border-color: rgba(30, 58, 95, 0.5); }
+}
+
+.animate-panelBreathe {
+  animation: panelBreathe 6s ease-in-out infinite;
+}
+
+/* Active operations lane entry */
+@keyframes laneEntry {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-laneEntry {
+  animation: laneEntry 0.3s ease-out;
+}
+
+/* Enhanced cursor blink with glow */
+@keyframes cursorBlink {
+  0%, 49%  { opacity: 1; text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); }
+  50%, 100% { opacity: 0; text-shadow: none; }
+}
+
+.animate-cursorBlink {
+  animation: cursorBlink 1s step-end infinite;
+  color: #38BDF8;
+}
+
+/* Terminal data rain background (CSS-only ambient) */
+.terminal-data-rain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 18px,
+      rgba(56, 189, 248, 0.15) 18px,
+      rgba(56, 189, 248, 0.15) 20px
+    );
+  animation: dataRain 30s linear infinite;
+  z-index: 0;
+}
+
+@keyframes dataRain {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 1000px; }
+}

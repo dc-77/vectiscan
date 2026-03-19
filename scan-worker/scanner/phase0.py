@@ -13,6 +13,7 @@ from typing import Any, Optional
 import structlog
 
 from scanner.tools import run_tool
+from scanner.progress import publish_event
 
 log = structlog.get_logger()
 
@@ -22,6 +23,7 @@ MAX_HOSTS = 10
 
 def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Query crt.sh for certificate transparency subdomains. Timeout 30s."""
+    publish_event(order_id, {"type": "tool_starting", "tool": "crtsh", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", "crtsh_raw.json")
     subdomains: list[str] = []
 
@@ -70,6 +72,7 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
 def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Run subfinder for passive subdomain enumeration. Timeout 120s."""
+    publish_event(order_id, {"type": "tool_starting", "tool": "subfinder", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", "subfinder.json")
     subdomains: list[str] = []
 
@@ -115,6 +118,7 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
 def run_amass(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Run amass passive enumeration. Timeout 300s (5 Min)."""
+    publish_event(order_id, {"type": "tool_starting", "tool": "amass", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", "amass.json")
     subdomains: list[str] = []
 
@@ -159,6 +163,7 @@ def run_amass(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
 def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Run gobuster DNS brute-force. Timeout 180s (3 Min)."""
+    publish_event(order_id, {"type": "tool_starting", "tool": "gobuster_dns", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", "gobuster_dns.txt")
     subdomains: list[str] = []
 
@@ -205,6 +210,7 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
 def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, Any]:
     """Attempt DNS zone transfer via AXFR. Timeout 30s per NS."""
+    publish_event(order_id, {"type": "tool_starting", "tool": "axfr", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", "zone_transfer.txt")
     result_data: dict[str, Any] = {"success": False, "data": {}}
     all_output: list[str] = []
@@ -277,6 +283,7 @@ def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, An
 
 def run_dnsx(subdomains: list[str], scan_dir: str, order_id: str) -> list[dict[str, Any]]:
     """Validate subdomains with dnsx and resolve IPs. Timeout 60s."""
+    publish_event(order_id, {"type": "tool_starting", "tool": "dnsx", "host": ""})
     output_path = os.path.join(scan_dir, "phase0", "dnsx_validation.json")
     validated: list[dict[str, Any]] = []
 

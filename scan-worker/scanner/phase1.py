@@ -11,6 +11,7 @@ import structlog
 
 from scanner.cms_fingerprinter import CMSFingerprinter, CMSResult
 from scanner.tools import run_tool
+from scanner.progress import publish_event
 
 log = structlog.get_logger()
 
@@ -344,6 +345,7 @@ def run_phase1(
     log.info("phase1_start", ip=ip, fqdns=fqdns, order_id=order_id)
 
     # Run nmap
+    publish_event(order_id, {"type": "tool_starting", "tool": "nmap", "host": ip})
     nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports)
     progress_callback(order_id, "nmap", "complete")
 
@@ -358,6 +360,7 @@ def run_phase1(
         probe_fqdns = [primary_fqdn]
 
     # Run webtech on all relevant FQDNs — merge results
+    publish_event(order_id, {"type": "tool_starting", "tool": "webtech", "host": ip})
     webtech_result: list[dict] | dict | None = None
     for fqdn in probe_fqdns:
         result = run_webtech(fqdn, host_dir, order_id)
@@ -383,6 +386,7 @@ def run_phase1(
                  duration_ms=0)
 
     # Run wafw00f on primary FQDN
+    publish_event(order_id, {"type": "tool_starting", "tool": "wafw00f", "host": ip})
     wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, order_id)
     progress_callback(order_id, "wafw00f", "complete")
 

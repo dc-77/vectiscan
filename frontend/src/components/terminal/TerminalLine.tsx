@@ -13,14 +13,17 @@ export interface TerminalLineData {
   isHeader?: boolean;        // Phase headers get special styling
   isHost?: boolean;          // Host discovery lines
   indent?: number;           // Indentation level (0, 1, 2)
+  hostColor?: string;        // Colored left border for parallel host tracking
+  hostLabel?: string;        // Short host name for context
 }
 
 interface TerminalLineProps {
   line: TerminalLineData;
   animate?: boolean;         // Whether to animate entry
+  dimmed?: boolean;          // Phosphor decay — older lines get slightly dimmer
 }
 
-export default function TerminalLine({ line, animate = true }: TerminalLineProps) {
+export default function TerminalLine({ line, animate = true, dimmed = false }: TerminalLineProps) {
   const [display, setDisplay] = useState(animate ? '' : line.text);
   const [resolved, setResolved] = useState(!animate);
 
@@ -83,11 +86,15 @@ export default function TerminalLine({ line, animate = true }: TerminalLineProps
     ? 'text-[#7DD3FC]'
     : 'text-[#38BDF8]';
 
-  // Command prefix for command-style lines
-  const prefix = line.status === 'command' ? '$ ' : '';
-
   return (
-    <div className={`flex items-start gap-0 ${line.isHeader ? 'mt-3 mb-1' : ''} ${line.status === 'error' ? 'animate-glitch' : ''}`}>
+    <div
+      className={`flex items-start gap-0 ${line.isHeader ? 'mt-3 mb-1' : ''} ${line.status === 'error' ? 'animate-glitch' : ''} ${line.isHeader ? 'animate-headerFlash' : ''}`}
+      style={{
+        borderLeft: line.hostColor ? `3px solid ${line.hostColor}` : undefined,
+        paddingLeft: line.hostColor ? '6px' : undefined,
+        opacity: dimmed ? 0.82 : 1,
+      }}
+    >
       {/* Timestamp */}
       <span className="text-[#4B7399] shrink-0 select-none">
         [{line.timestamp}]
@@ -95,7 +102,7 @@ export default function TerminalLine({ line, animate = true }: TerminalLineProps
 
       {/* Content */}
       <span className={`ml-1 ${textColor}`}>
-        {indent}{prefix}{display}
+        {indent}{display}
       </span>
 
       {/* Detail text */}

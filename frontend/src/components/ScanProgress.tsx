@@ -3,17 +3,18 @@
 import { OrderStatus } from '@/lib/api';
 
 const PHASE_LABELS: Record<string, string> = {
-  created: 'Erstellt',
-  queued: 'Warteschlange',
+  created: 'Created',
+  queued: 'Queued',
   passive_intel: 'Passive Intel',
-  dns_recon: 'DNS-Recon',
-  scan_phase1: 'Phase 1 — Tech-Erkennung',
+  dns_recon: 'DNS Recon',
+  scan_phase1: 'Phase 1 — Fingerprinting',
   scan_phase2: 'Phase 2 — Deep Scan',
-  scan_complete: 'Scan fertig',
-  report_generating: 'Report...',
-  report_complete: 'Fertig',
-  failed: 'Fehlgeschlagen',
-  cancelled: 'Abgebrochen',
+  scan_phase3: 'Phase 3 — Correlation',
+  scan_complete: 'Scan Complete',
+  report_generating: 'Generating Report',
+  report_complete: 'Complete',
+  failed: 'Failed',
+  cancelled: 'Cancelled',
 };
 
 const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
@@ -23,6 +24,7 @@ const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   dns_recon:          { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scan_phase1:        { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scan_phase2:        { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  scan_phase3:        { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   scan_complete:      { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   report_generating:  { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   report_complete:    { bg: 'bg-slate-700',   text: 'text-slate-300' },
@@ -31,9 +33,14 @@ const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
 };
 
 const PACKAGE_LABELS: Record<string, string> = {
-  basic: 'BASIC',
-  professional: 'PRO',
-  nis2: 'NIS2',
+  basic: 'WEBCHECK',
+  webcheck: 'WEBCHECK',
+  professional: 'PERIMETER',
+  perimeter: 'PERIMETER',
+  nis2: 'COMPLIANCE',
+  compliance: 'COMPLIANCE',
+  supplychain: 'SUPPLYCHAIN',
+  insurance: 'INSURANCE',
 };
 
 function formatDuration(seconds: number): string {
@@ -55,7 +62,7 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
   const { status, progress, domain, startedAt } = scan;
   const label = PHASE_LABELS[status] || status;
   const phaseStyle = PHASE_COLORS[status] || { bg: 'bg-slate-700', text: 'text-slate-400' };
-  const pkgLabel = PACKAGE_LABELS[scan.package] || scan.package;
+  const pkgLabel = PACKAGE_LABELS[scan.package] || scan.package.toUpperCase();
   const isActive = !['report_complete', 'failed', 'cancelled'].includes(status);
 
   const percent = progress.hostsTotal > 0
@@ -90,19 +97,16 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-slate-500">
             <span className="font-mono">
-              {progress.currentHost && progress.currentTool && progress.currentTool !== 'starting'
-                ? `${progress.currentTool} → ${progress.currentHost}`
-                : progress.currentHost || ''}
+              {progress.hostsCompleted}/{progress.hostsTotal} hosts complete
             </span>
-            <span>{progress.hostsCompleted}/{progress.hostsTotal} Hosts</span>
+            {estimatedRemaining && (
+              <span>ETA: {estimatedRemaining}</span>
+            )}
           </div>
           <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
             <div className="h-full bg-blue-500 rounded-full transition-all duration-1000"
                  style={{ width: `${percent}%` }} />
           </div>
-          {estimatedRemaining && (
-            <div className="text-[10px] text-slate-600 text-right">Restzeit: {estimatedRemaining}</div>
-          )}
         </div>
       )}
 
@@ -110,7 +114,7 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
       {onCancel && (
         <button onClick={onCancel} disabled={cancelling}
           className="text-red-400 hover:text-red-300 hover:bg-red-400/10 disabled:text-slate-600 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-900/50 transition-colors">
-          {cancelling ? 'Abbrechen...' : 'Scan abbrechen'}
+          {cancelling ? 'Cancelling...' : 'Cancel scan'}
         </button>
       )}
     </div>

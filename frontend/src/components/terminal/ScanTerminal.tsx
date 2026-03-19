@@ -2,14 +2,11 @@
 
 import { useEffect, useRef } from 'react';
 import TerminalLine from './TerminalLine';
-import ToolProgress from './ToolProgress';
 
 import type { TerminalLine as TerminalLineData } from './useTerminalFeed';
 
 interface ScanTerminalProps {
   lines: TerminalLineData[];
-  currentTool: string | null;
-  currentHost: string | null;
   isScanning: boolean;
   isComplete: boolean;
   isError: boolean;
@@ -19,8 +16,6 @@ interface ScanTerminalProps {
 
 export default function ScanTerminal({
   lines,
-  currentTool,
-  currentHost,
   isScanning,
   isComplete,
   isError,
@@ -40,7 +35,7 @@ export default function ScanTerminal({
     return (
       <div
         ref={scrollRef}
-        className="p-3 overflow-y-auto font-mono text-xs leading-relaxed animate-crt-flicker"
+        className="relative p-3 overflow-y-auto font-mono text-xs leading-relaxed animate-crt-flicker terminal-data-rain"
         style={{
           fontFamily: "'Fira Mono', 'Consolas', 'Liberation Mono', monospace",
           height: '100%',
@@ -56,16 +51,13 @@ export default function ScanTerminal({
             key={line.id}
             line={line}
             animate={i >= lines.length - 5}
+            dimmed={i < lines.length - 10}
           />
         ))}
 
-        {isScanning && currentTool && (
-          <ToolProgress tool={currentTool} host={currentHost || undefined} />
-        )}
-
         {isScanning && (
           <div className="mt-1">
-            <span className="text-[#38BDF8] animate-pulse">▌</span>
+            <span className="animate-cursorBlink">▌</span>
           </div>
         )}
       </div>
@@ -102,7 +94,7 @@ export default function ScanTerminal({
       {/* Terminal content */}
       <div
         ref={scrollRef}
-        className="p-4 overflow-y-auto font-mono text-sm leading-relaxed"
+        className="relative p-4 overflow-y-auto font-mono text-sm leading-relaxed terminal-data-rain"
         style={{
           fontFamily: "'Fira Mono', 'Consolas', 'Liberation Mono', monospace",
           maxHeight: '500px',
@@ -117,16 +109,13 @@ export default function ScanTerminal({
             key={line.id}
             line={line}
             animate={i >= lines.length - 5}
+            dimmed={i < lines.length - 10}
           />
         ))}
 
-        {isScanning && currentTool && (
-          <ToolProgress tool={currentTool} host={currentHost || undefined} />
-        )}
-
         {isScanning && (
           <div className="mt-1">
-            <span className="text-[#38BDF8] animate-pulse">▌</span>
+            <span className="animate-cursorBlink">▌</span>
           </div>
         )}
       </div>

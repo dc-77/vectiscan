@@ -26,6 +26,7 @@ from scanner.correlation.threat_intel import (
     ExploitDBClient,
     NVDClient,
 )
+from scanner.progress import publish_event
 
 log = structlog.get_logger()
 
@@ -119,6 +120,7 @@ def run_phase3(
                 shodan_services[ip] = host_data.get("services", {})
 
     # ── Step 3: Cross-Tool Correlation ───────────────────────
+    publish_event(order_id, {"type": "tool_starting", "tool": "correlator", "host": ""})
     progress_callback(order_id, "correlation", "correlating")
 
     correlator = CrossToolCorrelator(
@@ -151,6 +153,7 @@ def run_phase3(
 
     # ── Step 5: False-Positive Filter ────────────────────────
     if "fp_filter" in phase3_tools:
+        publish_event(order_id, {"type": "tool_starting", "tool": "fp_filter", "host": ""})
         progress_callback(order_id, "correlation", "fp_filter")
         fp_filter = FalsePositiveFilter(
             tech_profiles=tech_profiles,
@@ -166,6 +169,7 @@ def run_phase3(
     if cve_ids:
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
+        publish_event(order_id, {"type": "tool_starting", "tool": "nvd", "host": ""})
         progress_callback(order_id, "correlation", "enrichment")
         max_lookups = 5 if package == "webcheck" else 50
 
@@ -258,6 +262,7 @@ def run_phase3(
     # ── Step 7: Business-Impact Scoring ──────────────────────
     order_impact_score = 0.0
     if "business_impact" in phase3_tools:
+        publish_event(order_id, {"type": "tool_starting", "tool": "business_impact", "host": ""})
         progress_callback(order_id, "correlation", "business_impact")
         for cf in correlated:
             if not cf.is_false_positive:

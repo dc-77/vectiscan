@@ -9,6 +9,7 @@ import ReportDownload from '@/components/ReportDownload';
 import ScanError from '@/components/ScanError';
 import PackageSelector, { ScanPackage } from '@/components/PackageSelector';
 import ScanTerminal from '@/components/terminal/ScanTerminal';
+import ActiveOperations from '@/components/terminal/ActiveOperations';
 import { useTerminalFeed } from '@/components/terminal/useTerminalFeed';
 import { useWebSocket, WsMessage, AiStrategy, AiConfig } from '@/hooks/useWebSocket';
 import { HostNode, ToolOutputEntry } from '@/components/intelligence/constants';
@@ -65,7 +66,13 @@ function HomeContent() {
   const [toolOutputs, setToolOutputs] = useState<ToolOutputEntry[]>([]);
   const [intelligenceHosts, setIntelligenceHosts] = useState<HostNode[]>([]);
 
-  const { lines, processStatus, initTerminal, reset: resetTerminal, addToolCommand } = useTerminalFeed(orderId);
+  const { lines, hostStreams, processStatus, initTerminal, reset: resetTerminal, handleToolStarting, handleToolOutput } = useTerminalFeed(orderId);
+
+  // Effect states for cinematic flashes
+  const [phaseFlash, setPhaseFlash] = useState(false);
+  const [threatFlash, setThreatFlash] = useState(false);
+  const [aiGlow, setAiGlow] = useState(false);
+  const lastPhaseRef = useRef<string>('');
 
   // Build HostNode list from discovered hosts + AI strategy
   const updateIntelligenceHosts = useCallback((
@@ -96,20 +103,31 @@ function HomeContent() {
 
     if (msg.type === 'ai_strategy' && msg.strategy) {
       setAiStrategy(msg.strategy);
+      // AI decision glow effect
+      setAiGlow(true);
+      setTimeout(() => setAiGlow(false), 800);
       return;
     }
     if (msg.type === 'ai_config' && msg.ip && msg.config) {
       setAiConfigs(prev => ({ ...prev, [msg.ip!]: msg.config! }));
+      setAiGlow(true);
+      setTimeout(() => setAiGlow(false), 800);
       return;
     }
     if (msg.type === 'tool_starting' && msg.tool) {
-      addToolCommand(msg.tool, msg.host || '');
+      handleToolStarting(msg.tool, msg.host || '');
       return;
     }
     if (msg.type === 'tool_output' && msg.tool && msg.summary) {
+      handleToolOutput(msg.tool, msg.host || '', msg.summary);
       setToolOutputs(prev => [...prev.slice(-50), {
         tool: msg.tool!, host: msg.host || '', summary: msg.summary!, ts: Date.now(),
       }]);
+      // Threat flash on critical findings
+      if (/critical|CVE-|HIGH/i.test(msg.summary)) {
+        setThreatFlash(true);
+        setTimeout(() => setThreatFlash(false), 800);
+      }
       return;
     }
 
@@ -128,6 +146,14 @@ function HomeContent() {
           hostsTotal: msg.hostsTotal ?? prev.progress.hostsTotal,
           discoveredHosts: prev.progress.discoveredHosts,
         };
+
+        // Phase transition flash
+        const phase = msg.currentPhase || msg.status || '';
+        if (phase && phase !== lastPhaseRef.current) {
+          lastPhaseRef.current = phase;
+          setPhaseFlash(true);
+          setTimeout(() => setPhaseFlash(false), 500);
+        }
       } else if (msg.type === 'hosts_discovered' && msg.hosts) {
         updated.progress = {
           ...prev.progress,
@@ -144,7 +170,7 @@ function HomeContent() {
       processStatus(updated);
       return updated;
     });
-  }, [processStatus, addToolCommand]);
+  }, [processStatus, handleToolStarting, handleToolOutput]);
 
   useEffect(() => {
     if (order?.progress.discoveredHosts) {
@@ -335,21 +361,31 @@ function HomeContent() {
     const panelBg = 'rgba(12,18,34,0.6)';
 
     return (
-      <main className="grid gap-2 px-3 py-2 overflow-hidden"
+      <main className={`grid gap-2 px-3 py-2 overflow-hidden ${phaseFlash ? 'animate-phase-transition' : ''}`}
         style={{
           height: 'calc(100vh - 40px)',
-          gridTemplateAreas: '"progress progress progress" "terminal ailog sidebar" "terminal ailog hosts"',
-          gridTemplateRows: 'auto 1fr auto',
+          gridTemplateAreas: '"progress progress progress" "active active active" "terminal ailog sidebar" "terminal ailog hosts"',
+          gridTemplateRows: 'auto auto 1fr auto',
           gridTemplateColumns: '1fr 1fr 260px',
         }}>
+
+        {/* Threat flash overlay */}
+        {threatFlash && (
+          <div className="fixed inset-0 pointer-events-none z-[9998] animate-threatScreenFlash" />
+        )}
 
         {/* ─── Row 1: ScanProgress ──────────────────── */}
         <div style={{ gridArea: 'progress' }}>
           <ScanProgress scan={order} onCancel={handleCancel} cancelling={cancelling} />
         </div>
 
-        {/* ─── Row 2 Left: Terminal Log ─────────────── */}
-        <div className="rounded-lg border overflow-hidden flex flex-col"
+        {/* ─── Row 2: Active Operations ─────────────── */}
+        <div style={{ gridArea: 'active' }}>
+          <ActiveOperations hostStreams={hostStreams} />
+        </div>
+
+        {/* ─── Row 3 Left: Terminal Log ─────────────── */}
+        <div className="rounded-lg border overflow-hidden flex flex-col animate-panelBreathe"
           style={{ gridArea: 'terminal', borderColor: panelBorder, background: panelBg }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
@@ -358,15 +394,15 @@ function HomeContent() {
             <span className="ml-auto text-[9px] font-mono text-slate-700">{lines.length} lines</span>
           </div>
           <div className="flex-1 min-h-0">
-            <ScanTerminal lines={lines} currentTool={order.progress.currentTool || null}
-              currentHost={order.progress.currentHost || null} isScanning={!!isScanning}
+            <ScanTerminal lines={lines}
+              isScanning={!!isScanning}
               isComplete={order.status === 'report_complete'} isError={order.status === 'failed'} compact />
           </div>
         </div>
 
         {/* ─── Right: Radar + Metrics ───────────────── */}
-        <div className="hidden lg:flex rounded-lg border overflow-hidden flex-col"
-          style={{ gridArea: 'sidebar', borderColor: panelBorder, background: panelBg }}>
+        <div className="hidden lg:flex rounded-lg border overflow-hidden flex-col animate-panelBreathe"
+          style={{ gridArea: 'sidebar', borderColor: panelBorder, background: panelBg, animationDelay: '4s' }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2" />
@@ -391,9 +427,9 @@ function HomeContent() {
           </div>
         </div>
 
-        {/* ─── Row 2 Right: AI Decision Log ─────────── */}
-        <div className="rounded-lg border overflow-hidden flex flex-col"
-          style={{ gridArea: 'ailog', borderColor: panelBorder, background: panelBg }}>
+        {/* ─── Row 3 Center: AI Decision Log ──────────── */}
+        <div className={`rounded-lg border overflow-hidden flex flex-col ${aiGlow ? 'animate-aiDecisionGlow' : 'animate-panelBreathe'}`}
+          style={{ gridArea: 'ailog', borderColor: panelBorder, background: panelBg, animationDelay: '2s' }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
             <span className={`w-1.5 h-1.5 rounded-full mr-2 ${aiStrategy ? 'bg-blue-500 animate-pulse' : 'bg-slate-600'}`} />

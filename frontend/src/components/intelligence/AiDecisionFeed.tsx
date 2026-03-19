@@ -110,7 +110,7 @@ export default function AiDecisionFeed({ aiStrategy, aiConfigs, hosts, toolOutpu
     prevThreatCountRef.current = threats.length;
     const entries: FeedEntry[] = newThreats.map(t => ({
       id: `threat-${t.ts}-${t.tool}`, ts: t.ts, type: 'threat' as const,
-      text: `${t.tool} @ ${labelForIp(t.host)}: ${t.summary}`,
+      text: `${labelForIp(t.host)}: ${t.summary}`,
     }));
     setFeed(prev => [...prev, ...entries].slice(-50));
   }, [toolOutputs]); // eslint-disable-line react-hooks/exhaustive-deps
