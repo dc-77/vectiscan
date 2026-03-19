@@ -276,7 +276,7 @@ def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=30,
+        timeout=45,
         output_path=None,
         order_id=order_id,
         host_ip=ip,
@@ -973,8 +973,18 @@ def run_zap_scan(
             if progress_callback:
                 progress_callback(order_id, "zap_active", "complete")
 
-        # 7. Collect all alerts
+        # 7. Collect all alerts — first unfiltered to debug, then filtered
+        all_alerts_unfiltered = zap.get_alerts()
         all_alerts = zap.get_alerts(base_url=target_url)
+        log.info("zap_alerts_collected", ip=ip, fqdn=fqdn,
+                 unfiltered=len(all_alerts_unfiltered), filtered=len(all_alerts),
+                 target_url=target_url)
+        if len(all_alerts_unfiltered) > 0 and len(all_alerts) == 0:
+            log.warning("zap_alerts_lost_by_filter", ip=ip,
+                        unfiltered_sample=[a.get("url", "")[:80] for a in all_alerts_unfiltered[:5]],
+                        target_url=target_url)
+            # Use unfiltered alerts if filter drops everything
+            all_alerts = all_alerts_unfiltered
         result["alerts"] = all_alerts
 
         # 8. Map to Finding dicts
@@ -1132,9 +1142,7 @@ def run_phase2(
                     tags.append(auto_tag)
             nuclei_config["nuclei_tags"] = tags
             exclude = list(nuclei_config.get("nuclei_exclude_tags", []))
-            for excl_tag in ("misconfig", "exposure"):
-                if excl_tag not in exclude:
-                    exclude.append(excl_tag)
+            # Keep misconfig+exposure in nuclei until ZAP active scanner is verified working
             nuclei_config["nuclei_exclude_tags"] = exclude
             is_wc = config.get("package") in ("basic", "webcheck")
             nuclei_timeout = 600 if is_wc else 600

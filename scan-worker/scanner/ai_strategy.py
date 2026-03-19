@@ -310,7 +310,7 @@ Antworte NUR mit validem JSON, kein anderer Text."""
 
 PHASE2_CONFIG_SCHEMA = """{
   "nuclei_tags": ["tag1", "tag2"],
-  "nuclei_exclude_tags": ["dos", "fuzz", "misconfig", "exposure"],
+  "nuclei_exclude_tags": ["dos", "fuzz"],
   "zap_scan_policy": "standard",
   "zap_spider_max_depth": 5,
   "zap_ajax_spider_enabled": true,
@@ -376,7 +376,7 @@ Antwort im Format:
         log.warning("ai_phase2_config_fallback", ip=tech_profile.get("ip"), reason=reason)
         return {
             "nuclei_tags": [],
-            "nuclei_exclude_tags": ["dos", "fuzz", "misconfig", "exposure"],
+            "nuclei_exclude_tags": ["dos", "fuzz"],
             "zap_scan_policy": "standard",
             "zap_spider_max_depth": 5,
             "zap_ajax_spider_enabled": False,

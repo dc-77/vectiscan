@@ -265,7 +265,20 @@ def process_job(job_data: dict) -> None:
         log.info("rawdata_extracted", dest=str(extract_dir))
 
         # -- 3. Parse scan data -----------------------------------------------
-        parsed = parse_scan_data(str(extract_dir))
+        # tar.gz has {orderId}/ as root, so extracted structure is:
+        # extract_dir/{orderId}/meta.json, hosts/, phase0/, etc.
+        # Resolve to the actual scan data directory inside the extraction.
+        scan_data_dir = extract_dir
+        subdirs = [d for d in extract_dir.iterdir() if d.is_dir()]
+        if len(subdirs) == 1 and (subdirs[0] / "hosts").is_dir():
+            scan_data_dir = subdirs[0]
+            log.info("scan_data_resolved", subdir=subdirs[0].name)
+        elif (extract_dir / "hosts").is_dir():
+            scan_data_dir = extract_dir  # Flat extraction (no nesting)
+        else:
+            log.warning("scan_data_dir_ambiguous", subdirs=[d.name for d in subdirs])
+
+        parsed = parse_scan_data(str(scan_data_dir))
         parsed_inventory = parsed["host_inventory"]
         parsed_profiles = parsed["tech_profiles"]
         consolidated_findings = parsed["consolidated_findings"]
