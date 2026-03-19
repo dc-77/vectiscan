@@ -8,9 +8,11 @@ interface HostDiscoveryMatrixProps {
   hosts: HostNode[];
   currentHost: string | null;
   aiStrategy: AiStrategy | null;
+  /** Map of host IP to assigned lane color from parallel scanning. */
+  hostColorMap?: Record<string, string>;
 }
 
-export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy }: HostDiscoveryMatrixProps) {
+export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy, hostColorMap }: HostDiscoveryMatrixProps) {
   if (hosts.length === 0) return null;
 
   const actionMap = new Map<string, string>();
@@ -31,14 +33,16 @@ export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy }: 
         {/* Host rows */}
         {hosts.map(h => {
           const isActive = h.ip === currentHost;
-          const color = STATUS_COLORS[h.status] || COLORS.cyan;
+          const laneColor = hostColorMap?.[h.ip];
+          const color = laneColor || STATUS_COLORS[h.status] || COLORS.cyan;
           const action = actionMap.get(h.ip);
+          const borderColor = laneColor || (isActive ? COLORS.amber : 'transparent');
 
           return (
             <div key={h.ip}
               className="flex items-center gap-2 px-2 py-[3px] transition-colors"
               style={{
-                borderLeft: isActive ? `2px solid ${COLORS.amber}` : '2px solid transparent',
+                borderLeft: `2px solid ${borderColor}`,
                 background: isActive ? 'rgba(234,179,8,0.04)' : undefined,
                 boxShadow: isActive ? `inset 0 0 20px ${COLORS.amberGlow}` : undefined,
               }}>
@@ -64,8 +68,7 @@ export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy }: 
               <span className="flex-1 min-w-0 text-[9px] font-mono truncate"
                 style={{
                   color: h.status === 'skipped' ? COLORS.gray
-                    : isActive ? COLORS.amber
-                    : COLORS.cyanDim,
+                    : laneColor || (isActive ? COLORS.amber : COLORS.cyanDim),
                   opacity: h.status === 'skipped' ? 0.6 : 1,
                 }}>
                 {truncate(hostDisplayName(h), 28)}

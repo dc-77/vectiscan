@@ -364,9 +364,9 @@ function HomeContent() {
       <main className={`grid gap-2 px-3 py-2 overflow-hidden ${phaseFlash ? 'animate-phase-transition' : ''}`}
         style={{
           height: 'calc(100vh - 40px)',
-          gridTemplateAreas: '"progress progress progress" "active active active" "terminal ailog sidebar" "terminal ailog hosts"',
+          gridTemplateAreas: '"progress progress progress" "active active active" "terminal sidebar ailog" "terminal hosts ailog"',
           gridTemplateRows: 'auto auto 1fr auto',
-          gridTemplateColumns: '1fr 1fr 260px',
+          gridTemplateColumns: '1fr 280px 1fr',
         }}>
 
         {/* Threat flash overlay */}
@@ -400,8 +400,8 @@ function HomeContent() {
           </div>
         </div>
 
-        {/* ─── Right: Radar + Metrics ───────────────── */}
-        <div className="hidden lg:flex rounded-lg border overflow-hidden flex-col animate-panelBreathe"
+        {/* ─── Center: Tactical Map + Metrics ─────────── */}
+        <div className="rounded-lg border overflow-hidden flex flex-col animate-panelBreathe"
           style={{ gridArea: 'sidebar', borderColor: panelBorder, background: panelBg, animationDelay: '4s' }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
@@ -414,6 +414,9 @@ function HomeContent() {
               hosts={intelligenceHosts}
               currentHost={order.progress.currentHost}
               toolOutputs={toolOutputs}
+              hostColorMap={Object.fromEntries(
+                Array.from(hostStreams.entries()).map(([ip, s]) => [ip, s.color])
+              )}
             />
           </div>
           <HexDivider />
@@ -448,8 +451,8 @@ function HomeContent() {
           </div>
         </div>
 
-        {/* ─── Right Bottom: Discovered Hosts ─────────── */}
-        <div className="hidden lg:flex rounded-lg border overflow-hidden flex-col"
+        {/* ─── Center Bottom: Discovered Hosts ──────────── */}
+        <div className="rounded-lg border overflow-hidden flex flex-col"
           style={{ gridArea: 'hosts', borderColor: panelBorder, background: panelBg }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
@@ -462,6 +465,9 @@ function HomeContent() {
               hosts={intelligenceHosts}
               currentHost={order.progress.currentHost}
               aiStrategy={aiStrategy}
+              hostColorMap={Object.fromEntries(
+                Array.from(hostStreams.entries()).map(([ip, s]) => [ip, s.color])
+              )}
             />
           </div>
         </div>

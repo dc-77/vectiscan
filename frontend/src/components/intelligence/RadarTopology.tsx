@@ -12,9 +12,11 @@ interface RadarTopologyProps {
   hosts: HostNode[];
   currentHost: string | null;
   toolOutputs: ToolOutputEntry[];
+  /** Map of host IP to assigned lane color from parallel scanning. */
+  hostColorMap?: Record<string, string>;
 }
 
-export default function RadarTopology({ domain, hosts, currentHost, toolOutputs }: RadarTopologyProps) {
+export default function RadarTopology({ domain, hosts, currentHost, toolOutputs, hostColorMap }: RadarTopologyProps) {
   const size = 210;
   const cx = size / 2;
   const cy = size / 2;
@@ -105,9 +107,10 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
         {hostPositions.map(h => {
           const isSkipped = h.status === 'skipped';
           const isActive = h.ip === currentHost;
+          const laneColor = hostColorMap?.[h.ip];
           const lineColor = isSkipped ? COLORS.grayDim
-            : isActive ? COLORS.amber
-            : COLORS.border;
+            : laneColor || (isActive ? COLORS.amber : COLORS.border);
+          const particleColor = laneColor || (isActive ? COLORS.amber : COLORS.cyan);
 
           return (
             <g key={`conn-${h.ip}`}>
@@ -115,17 +118,17 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
               <line x1={cx} y1={cy} x2={h.x} y2={h.y}
                 stroke={lineColor} strokeWidth={isActive ? 1.5 : 1}
                 strokeDasharray={isSkipped ? '4,4' : undefined}
-                opacity={isSkipped ? 0.3 : 0.5} />
+                opacity={isSkipped ? 0.3 : 0.6} />
 
               {/* Data particles traveling along line — only for non-skipped */}
               {!isSkipped && (
                 <>
-                  <circle r="1.5" fill={isActive ? COLORS.amber : COLORS.cyan} opacity="0.8" filter="url(#glow)">
+                  <circle r="1.5" fill={particleColor} opacity="0.8" filter="url(#glow)">
                     <animateMotion dur={isActive ? '1.5s' : '2.5s'} repeatCount="indefinite"
                       path={`M${cx},${cy} L${h.x},${h.y}`} />
                   </circle>
                   {isActive && (
-                    <circle r="1" fill={COLORS.amber} opacity="0.5">
+                    <circle r="1" fill={particleColor} opacity="0.5">
                       <animateMotion dur="1.5s" repeatCount="indefinite" begin="0.7s"
                         path={`M${cx},${cy} L${h.x},${h.y}`} />
                     </circle>
@@ -149,7 +152,12 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
         {hostPositions.map(h => {
           const isActive = h.ip === currentHost;
           const hasThreat = threatHosts.has(h.ip);
-          const color = STATUS_COLORS[h.status] || COLORS.cyan;
+          const laneColor = hostColorMap?.[h.ip];
+          // Use lane color if assigned, otherwise fall back to status color
+          const dotColor = h.status === 'skipped' ? COLORS.gray
+            : h.status === 'scanned' ? COLORS.green
+            : laneColor || STATUS_COLORS[h.status] || COLORS.cyan;
+          const haloColor = laneColor || COLORS.amber;
 
           return (
             <g key={`node-${h.ip}`}>
@@ -162,17 +170,17 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
                 </circle>
               )}
 
-              {/* Active host halo */}
+              {/* Active host halo — uses lane color */}
               {isActive && (
                 <circle cx={h.x} cy={h.y} r={12} fill="none"
-                  stroke={COLORS.amber} strokeWidth="1" opacity="0.3">
+                  stroke={haloColor} strokeWidth="1" opacity="0.3">
                   <animate attributeName="r" values="9;18;9" dur="1.5s" repeatCount="indefinite" />
                   <animate attributeName="opacity" values="0.4;0;0.4" dur="1.5s" repeatCount="indefinite" />
                 </circle>
               )}
 
-              {/* Host dot */}
-              <circle cx={h.x} cy={h.y} r={5} fill={color}
+              {/* Host dot — uses lane color */}
+              <circle cx={h.x} cy={h.y} r={5} fill={dotColor}
                 opacity={h.status === 'skipped' ? 0.35 : 0.85}
                 filter={isActive ? 'url(#glowStrong)' : undefined}>
                 {isActive && (
@@ -195,9 +203,9 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs 
       {hostPositions.map(h => {
         const name = truncate(hostDisplayName(h), 18);
         const isActive = h.ip === currentHost;
+        const laneColor = hostColorMap?.[h.ip];
         const color = h.status === 'skipped' ? COLORS.gray
-          : isActive ? COLORS.amber
-          : COLORS.cyanDim;
+          : laneColor || (isActive ? COLORS.amber : COLORS.cyanDim);
 
         return (
           <div key={`label-${h.ip}`} className="absolute font-mono whitespace-nowrap group"
