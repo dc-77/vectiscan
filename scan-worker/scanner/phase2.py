@@ -973,18 +973,13 @@ def run_zap_scan(
             if progress_callback:
                 progress_callback(order_id, "zap_active", "complete")
 
-        # 7. Collect all alerts — first unfiltered to debug, then filtered
-        all_alerts_unfiltered = zap.get_alerts()
-        all_alerts = zap.get_alerts(base_url=target_url)
-        log.info("zap_alerts_collected", ip=ip, fqdn=fqdn,
-                 unfiltered=len(all_alerts_unfiltered), filtered=len(all_alerts),
-                 target_url=target_url)
-        if len(all_alerts_unfiltered) > 0 and len(all_alerts) == 0:
-            log.warning("zap_alerts_lost_by_filter", ip=ip,
-                        unfiltered_sample=[a.get("url", "")[:80] for a in all_alerts_unfiltered[:5]],
-                        target_url=target_url)
-            # Use unfiltered alerts if filter drops everything
-            all_alerts = all_alerts_unfiltered
+        # 6b. Wait for passive scanner to finish processing queued items
+        log.info("zap_waiting_for_passive", ip=ip)
+        zap.wait_for_passive_scan(timeout=30)
+
+        # 7. Collect all alerts (no baseurl filter — context isolation is sufficient)
+        all_alerts = zap.get_alerts()
+        log.info("zap_alerts_collected", ip=ip, fqdn=fqdn, count=len(all_alerts))
         result["alerts"] = all_alerts
 
         # 8. Map to Finding dicts
@@ -1137,9 +1132,10 @@ def run_phase2(
             publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
             nuclei_config = dict(adaptive_config) if adaptive_config else {}
             tags = list(nuclei_config.get("nuclei_tags", []))
-            for auto_tag in ("cve", "default-login"):
-                if auto_tag not in tags:
-                    tags.append(auto_tag)
+            # Only auto-add "default-login". "cve" tag removed — matches 3000+ templates
+            # causing timeouts. Tech-specific tags (wordpress, nginx, etc.) already cover CVEs.
+            if "default-login" not in tags:
+                tags.append("default-login")
             nuclei_config["nuclei_tags"] = tags
             exclude = list(nuclei_config.get("nuclei_exclude_tags", []))
             # Keep misconfig+exposure in nuclei until ZAP active scanner is verified working

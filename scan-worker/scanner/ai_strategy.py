@@ -224,14 +224,113 @@ Antwort im Format:
 
 
 # ---------------------------------------------------------------------------
+# Tech Analysis (after Phase 1, correct CMS detection)
+# ---------------------------------------------------------------------------
+
+TECH_ANALYSIS_SYSTEM = """Du bist ein Web-Technologie-Analyst. Du bestimmst die korrekte Technologie für jeden Host basierend auf Redirect-Verhalten, HTTP-Headern und Scan-Ergebnissen.
+
+REGELN:
+- Wenn eine FQDN auf eine ANDERE Domain redirected → die FQDN nutzt NICHT das CMS dieser anderen Domain
+- Wenn /wp-login.php existiert aber Body "nicht gefunden", "not found" oder "404" enthält → KEIN WordPress
+- Wenn /wp-login.php auf eine andere Domain redirected → KEIN WordPress auf DIESER Domain
+- Page Title "Outlook Web App" oder "OWA" → Microsoft Exchange, KEIN WordPress/CMS
+- Page Title mit "TYPO3" oder "Neos" → TYPO3
+- meta generator Tag hat Vorrang vor Pfad-Probes
+- IIS Server + .aspx/.asmx Pfade → Microsoft-Stack, KEIN PHP-CMS
+- Wenn CMS-Fingerprinter WordPress mit hoher Konfidenz (>0.8) meldet UND /wp-login.php tatsächlich WordPress-Login zeigt → WordPress bestätigt
+- Wenn CMS-Fingerprinter WordPress meldet ABER /wp-login.php zeigt Fehlerseite → WordPress NICHT bestätigt, CMS auf null setzen
+
+WICHTIG:
+- Nur CMS melden wenn du sicher bist. Im Zweifel: cms=null
+- technology_stack ist eine Liste aller erkannten Technologien (Server, Sprache, Framework)
+- is_spa=true nur wenn React, Vue, Angular, Next.js, Nuxt oder Shopware 6 erkannt
+
+Antworte NUR mit validem JSON, kein anderer Text."""
+
+TECH_ANALYSIS_SCHEMA = """{
+  "hosts": {
+    "<ip>": {
+      "cms": "WordPress|TYPO3|Shopware|Joomla|Drupal|Exchange|null",
+      "cms_version": "6.8|null",
+      "cms_confidence": 0.95,
+      "technology_stack": ["nginx", "PHP 8.2", "WordPress"],
+      "is_spa": false,
+      "reasoning": "Kurze Begründung"
+    }
+  }
+}"""
+
+
+def plan_tech_analysis(
+    tech_profiles: list[dict[str, Any]],
+    redirect_data: dict[str, Any],
+    order_id: str = "",
+) -> dict[str, Any]:
+    """Use Haiku to correct CMS detection using Playwright redirect data.
+
+    Args:
+        tech_profiles: Phase 1 tech profiles (with potentially wrong CMS)
+        redirect_data: Playwright redirect probe results per FQDN
+        order_id: For debug logging
+
+    Returns:
+        Dict with corrected CMS per host IP.
+    """
+    if not tech_profiles:
+        return {}
+
+    # Build condensed summary of tech profiles
+    tech_profiles_summary = []
+    for tp in tech_profiles:
+        tech_profiles_summary.append({
+            "ip": tp.get("ip", ""),
+            "fqdns": tp.get("fqdns", []),
+            "cms": tp.get("cms"),
+            "cms_confidence": tp.get("cms_confidence"),
+            "server": tp.get("server"),
+            "open_ports": tp.get("open_ports", []),
+        })
+
+    user_prompt = f"""Phase-1 Tech-Profiles (CMS-Fingerprinter-Vorschlag, kann falsch sein):
+{json.dumps(tech_profiles_summary, indent=2, ensure_ascii=False)}
+
+Playwright Redirect-Analyse:
+{json.dumps(redirect_data, indent=2, ensure_ascii=False)}
+
+Korrigiere die CMS-Erkennung für jeden Host.
+Antwort im Format:
+{TECH_ANALYSIS_SCHEMA}"""
+
+    result = _call_haiku(TECH_ANALYSIS_SYSTEM, user_prompt)
+
+    # Save full AI debug
+    if order_id:
+        _save_ai_debug(order_id, None, 1, "ai_tech_analysis",
+                        TECH_ANALYSIS_SYSTEM, user_prompt,
+                        result.get("_raw", ""), result)
+
+    error_detail = result.get("_error", "")
+    if not result or "hosts" not in result:
+        reason = error_detail or "Ungültige KI-Antwort"
+        log.warning("ai_tech_analysis_fallback", reason=reason)
+        return {}
+
+    log.info("ai_tech_analysis_complete",
+             hosts=len(result.get("hosts", {})))
+
+    result.pop("_raw", None)
+    return result
+
+
+# ---------------------------------------------------------------------------
 # Phase 2 Config (after Phase 1, per host)
 # ---------------------------------------------------------------------------
 
 PHASE2_CONFIG_SYSTEM = """Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts.
 
 NUCLEI-KONFIGURATION:
-Die Tags "cve" und "default-login" werden automatisch hinzugefügt — du gibst nur die tech-spezifischen Tags an.
-Misconfig und Exposure werden von OWASP ZAP abgedeckt — nur bei Bedarf als nuclei-Tag.
+Der Tag "default-login" wird automatisch hinzugefügt. Verwende tech-spezifische Tags für CVE-Erkennung (z.B. "wordpress", "nginx", "apache").
+WICHTIG: Verwende NICHT den Tag "cve" — er matcht 3000+ Templates und verursacht Timeouts.
 
 VERFÜGBARE NUCLEI-TAGS (wichtigste):
 wordpress, apache, nginx, iis, php, java, python, nodejs, rails, laravel, django, spring, tomcat, jboss, weblogic, coldfusion, drupal, joomla, magento, shopify, shopware, prestashop, struts, network, ssl, dns, tech, token, sqli, xss, lfi, rfi, ssrf, redirect, upload
@@ -302,7 +401,7 @@ WICHTIG FÜR NUCLEI-TAGS (Performance):
 - Verwende NIEMALS den Tag "cve" allein — das matcht 3000+ Templates und dauert zu lange
 - Stattdessen: technologie-spezifische Tags wie "apache", "nginx", "wordpress", "shopware"
 - Kombiniere maximal 5-7 Tags für optimale Laufzeit
-- Die Tags "cve" und "default-login" werden automatisch ergänzt
+- Der Tag "default-login" wird automatisch ergänzt
 - Gute Kombination: ["tech-spezifisch", "ssl", "token"]
 - Schlechte Kombination: ["cve", "network", "dns"] — viel zu breit, Timeout garantiert
 

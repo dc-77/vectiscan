@@ -394,6 +394,27 @@ class CMSFingerprinter:
                     status, headers, body, cookies = _fetch(url, method="GET", read_body=True)
 
                     if status in (200, 301, 302, 303, 307, 308):
+                        # Negative pattern check: if body shows error page, skip this hit
+                        _NEGATIVE_BODY = re.compile(
+                            r"nicht.gefunden|not.found|page.not.found|error.404|seite.nicht|"
+                            r"page.doesn.t.exist|pagina.no.encontrada|404",
+                            re.IGNORECASE,
+                        )
+                        if status == 200 and body and _NEGATIVE_BODY.search(body):
+                            log.debug("cms_probe_negative_body", path=path, fqdn=fqdn)
+                            break  # Skip this probe — error page, not CMS
+
+                        # Cross-domain redirect check
+                        if status in (301, 302, 307, 308):
+                            location = headers.get("location", "")
+                            if location:
+                                from urllib.parse import urlparse as _urlparse
+                                orig_host = fqdn.lower()
+                                redir_host = (_urlparse(location).hostname or "").lower()
+                                if redir_host and redir_host != orig_host and not redir_host.endswith(f".{orig_host}"):
+                                    log.debug("cms_probe_cross_domain", path=path, fqdn=fqdn, redir=redir_host)
+                                    break  # Cross-domain redirect — not this host's CMS
+
                         hits.append(f"{path} → {status}")
 
                         # Check body patterns

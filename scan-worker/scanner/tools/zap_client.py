@@ -157,6 +157,23 @@ class ZapClient:
         log.info("zap_ajax_spider_stopped")
 
     # ------------------------------------------------------------------
+    # Passive Scanner
+    # ------------------------------------------------------------------
+
+    def wait_for_passive_scan(self, timeout: int = 30) -> bool:
+        """Wait for ZAP passive scanner queue to drain.
+
+        The passive scanner runs automatically on all traffic (spider, active scan).
+        After spider/active scan completes, there may still be items queued.
+        Call this before collecting alerts to ensure passive findings are included.
+        """
+        return self.poll_until_complete(
+            lambda: int(self._get("/JSON/pscan/view/recordsToScan/").get("recordsToScan", "0")),
+            timeout=timeout, interval=3, stop_value=0,
+            tool_name="zap_passive_wait",
+        )
+
+    # ------------------------------------------------------------------
     # Active Scan
     # ------------------------------------------------------------------
 

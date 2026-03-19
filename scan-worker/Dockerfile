@@ -17,6 +17,7 @@ RUN apt-get update && \
 # gowitness/katana need Chrome — set path
 ENV CHROME_PATH="/usr/bin/chromium"
 ENV CHROMIUM_PATH="/usr/bin/chromium"
+ENV PLAYWRIGHT_BROWSERS_PATH="/opt/pw-browsers"
 
 # ── 2. Go binaries — pinned versions ────────────────────────────────
 
@@ -149,7 +150,9 @@ WORKDIR /opt/scanner
 
 COPY requirements.txt .
 RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt && \
-    pip3 install --no-cache-dir --break-system-packages webtech
+    pip3 install --no-cache-dir --break-system-packages webtech && \
+    pip3 install --no-cache-dir --break-system-packages playwright && \
+    PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers playwright install chromium --with-deps
 
 # httpx v1.6.10 — MUST come after pip install because anthropic pulls Python
 # httpx which installs an entry-point script that shadows the Go binary

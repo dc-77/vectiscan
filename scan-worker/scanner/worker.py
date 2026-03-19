@@ -31,7 +31,7 @@ from scanner.progress import (
     update_progress,
 )
 from scanner.upload import enqueue_report_job, pack_results, upload_to_minio
-from scanner.ai_strategy import plan_host_strategy, plan_phase2_config
+from scanner.ai_strategy import plan_host_strategy, plan_phase2_config, plan_tech_analysis
 
 log = structlog.get_logger()
 
@@ -407,6 +407,51 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
                      for p in tech_profiles]
 
     log.info("phase1_complete", order_id=order_id, profiles=len(tech_profiles))
+
+    # ── Playwright Redirect Probe + AI Tech Analysis ──────
+    _check_timeout()
+    try:
+        from scanner.tools.redirect_probe import probe_redirects, probe_cms_paths, _is_playwright_available
+        if _is_playwright_available():
+            update_progress(order_id, "scan_phase1", "redirect_probe")
+            # Collect all FQDNs from non-skipped hosts
+            all_fqdns = []
+            for host, profile in zip(scan_hosts, tech_profiles):
+                if not profile.get("skipped"):
+                    all_fqdns.extend(host.get("fqdns", [])[:3])
+            all_fqdns = list(set(all_fqdns))
+
+            redirect_data = probe_redirects(all_fqdns, order_id=order_id)
+            cms_probe_data = probe_cms_paths(all_fqdns)
+
+            combined_redirect = {"redirects": redirect_data, "cms_probes": cms_probe_data}
+            publish_event(order_id, {"type": "tool_output", "tool": "redirect_probe",
+                                     "summary": f"{len(redirect_data)} FQDNs probed"})
+
+            # AI Tech Analysis — correct CMS detection
+            update_progress(order_id, "scan_phase1", "ai_tech_analysis")
+            tech_corrections = plan_tech_analysis(tech_profiles, combined_redirect, order_id=order_id)
+
+            # Apply corrections to tech_profiles
+            if tech_corrections.get("hosts"):
+                for profile in tech_profiles:
+                    ip = profile.get("ip", "")
+                    correction = tech_corrections["hosts"].get(ip)
+                    if correction:
+                        old_cms = profile.get("cms")
+                        new_cms = correction.get("cms")
+                        if new_cms != old_cms:
+                            log.info("cms_corrected", ip=ip, old=old_cms, new=new_cms,
+                                     reason=correction.get("reasoning", ""))
+                        profile["cms"] = correction.get("cms")
+                        profile["cms_version"] = correction.get("cms_version")
+                        profile["cms_confidence"] = correction.get("cms_confidence", 0)
+                        if correction.get("is_spa") is not None:
+                            profile["is_spa"] = correction["is_spa"]
+        else:
+            log.info("playwright_not_available", msg="Skipping redirect probe")
+    except Exception as e:
+        log.warning("redirect_probe_failed", error=str(e))
 
     # ── AI Phase 2 Config (all hosts, after all Phase 1) ──
     adaptive_configs: dict[str, dict[str, Any]] = {}
