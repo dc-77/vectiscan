@@ -218,12 +218,6 @@ ZAP-KONFIGURATION (OWASP ZAP Daemon):
   - "aggressive": Alle Scan-Rules, hohe Intensität — nur bei verdächtigen Hosts
 - zap_spider_max_depth: 3–7 (Default: 5). SPAs/JS-Heavy Apps: 6-7. Statische Seiten: 3.
 - zap_ajax_spider_enabled: true für SPA-Frameworks (React, Vue, Angular, Next.js, Nuxt, Shopware 6), false sonst
-- zap_forced_browse_enabled: true (Default). false bei WAF (wird geblockt).
-- zap_forced_browse_wordlist: "common"|"wordpress"|"api-rest"|"java-spring" (Default: "common")
-  - "wordpress": wp-admin, plugins, uploads
-  - "api-rest": swagger, graphql, /api/v1, actuator
-  - "java-spring": actuator, /api/v1, /manage
-  - "common": generische Pfade
 - zap_active_categories: Aktivierte Active-Scan-Kategorien:
   - "sqli" — SQL Injection
   - "xss" — Cross-Site Scripting (reflected + stored)
@@ -244,12 +238,12 @@ ZAP-KONFIGURATION (OWASP ZAP Daemon):
 
 WAF-SIGNAL → ZAP-DEFAULTS:
 WAF erkannt (Cloudflare, Akamai, Sucuri, Imperva, F5 etc.):
-→ zap_scan_policy: "waf-safe", zap_rate_req_per_sec: 15, zap_threads: 2, zap_spider_delay_ms: 800, zap_forced_browse_enabled: false
+→ zap_scan_policy: "waf-safe", zap_rate_req_per_sec: 15, zap_threads: 2, zap_spider_delay_ms: 800
 Keine WAF:
-→ zap_scan_policy: "standard" oder "aggressive", zap_rate_req_per_sec: 80, zap_threads: 5, zap_spider_delay_ms: 0, zap_forced_browse_enabled: true
+→ zap_scan_policy: "standard" oder "aggressive", zap_rate_req_per_sec: 80, zap_threads: 5, zap_spider_delay_ms: 0
 
 TOOLS DIE ÜBERSPRUNGEN WERDEN KÖNNEN:
-gowitness, zap_ajax_spider, zap_forced_browse
+gowitness, zap_ajax_spider
 
 WICHTIG FÜR skip_tools:
 - Für die Basisdomain und www-Subdomain: skip_tools MUSS IMMER leer sein []
@@ -259,9 +253,9 @@ WICHTIG FÜR skip_tools:
 
 REGELN:
 - Nuclei-Tags sollten zur erkannten Technologie passen
-- Bei WordPress: "wordpress" Tag + wordpress Wordlist für ZAP Forced Browse
+- Bei WordPress: "wordpress" Tag
 - Bei Shopware: "shopware" Tag
-- Bei API-Hosts: api-rest Wordlist für ZAP Forced Browse, token Tags für nuclei
+- Bei API-Hosts: token Tags für nuclei
 - Bei WAF vorhanden: "dos" und "fuzz" für nuclei ausschließen, ZAP auf waf-safe setzen
 - zap_ajax_spider_enabled=true nur wenn SPA/JS-Framework erkannt
 
@@ -281,8 +275,6 @@ PHASE2_CONFIG_SCHEMA = """{
   "zap_scan_policy": "standard",
   "zap_spider_max_depth": 5,
   "zap_ajax_spider_enabled": true,
-  "zap_forced_browse_enabled": true,
-  "zap_forced_browse_wordlist": "common",
   "zap_active_categories": ["sqli", "xss", "lfi", "ssrf"],
   "zap_rate_req_per_sec": 80,
   "zap_threads": 5,
@@ -342,8 +334,6 @@ Antwort im Format:
             "zap_scan_policy": "standard",
             "zap_spider_max_depth": 5,
             "zap_ajax_spider_enabled": False,
-            "zap_forced_browse_enabled": True,
-            "zap_forced_browse_wordlist": "common",
             "zap_active_categories": ["sqli", "xss", "lfi", "ssrf", "cmdi"],
             "zap_rate_req_per_sec": 80,
             "zap_threads": 5,

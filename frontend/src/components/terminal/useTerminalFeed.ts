@@ -65,7 +65,6 @@ const TOOL_COMMANDS: Record<string, string> = {
   testssl: 'testssl.sh --jsonfile /phase2/testssl.json',
   zap_spider: 'zap-cli spider --url TARGET --depth 5',
   zap_ajax_spider: 'zap-cli ajax-spider --url TARGET --browser chromium',
-  zap_forced_browse: 'zap-cli forced-browse --url TARGET --wordlist common',
   zap_active: 'zap-cli active-scan --url TARGET --policy adaptive',
   zap_passive: 'zap-cli passive-scan --analyze',
   nuclei: 'nuclei -u TARGET -severity all -jsonl',

@@ -929,22 +929,7 @@ def run_zap_scan(
             if progress_callback:
                 progress_callback(order_id, "zap_ajax_spider", "complete")
 
-        # 5. Forced Browse (conditional on no WAF)
-        forced_browse_enabled = ac.get("zap_forced_browse_enabled", True)
-        if forced_browse_enabled and "zap_forced_browse" not in ai_skip:
-            publish_event(order_id, {"type": "tool_starting", "tool": "zap_forced_browse", "host": ip})
-            zap.start_forced_browse(target_url)
-            zap.poll_until_complete(
-                lambda: zap.forced_browse_status(),
-                timeout=180, interval=5, stop_value=100,
-                order_id=order_id, tool_name="zap_forced_browse",
-            )
-            result["tools_run"].append("zap_forced_browse")
-            publish_tool_output(order_id, "zap_forced_browse", ip, "Forced browse complete")
-            if progress_callback:
-                progress_callback(order_id, "zap_forced_browse", "complete")
-
-        # 6. Active Scan (package-dependent: not for webcheck/passive-only)
+        # 5. Active Scan (package-dependent: not for webcheck/passive-only)
         scan_policy = ac.get("zap_scan_policy", "standard")
         is_webcheck = (config or {}).get("package") in ("basic", "webcheck")
         phase2_tools = (config or {}).get("phase2_tools", [])

@@ -157,31 +157,6 @@ class ZapClient:
         log.info("zap_ajax_spider_stopped")
 
     # ------------------------------------------------------------------
-    # Forced Browse
-    # ------------------------------------------------------------------
-
-    def add_forced_browse_file(self, file_path: str) -> None:
-        """Add a custom wordlist file for forced browsing."""
-        self._get("/JSON/forcedBrowse/action/addForcedBrowseCustomFile/", {
-            "filename": file_path,
-        })
-
-    def start_forced_browse(self, url: str) -> None:
-        """Start forced browse scan on a URL (site node)."""
-        self._get("/JSON/forcedBrowse/action/forcedBrowseSiteAndChildren/", {
-            "url": url,
-        })
-        log.info("zap_forced_browse_started", url=url)
-
-    def forced_browse_status(self) -> int:
-        """Get forced browse progress. Returns 100 when done, <100 when running.
-        Note: ZAP forced browse API is limited — we check if it's still running."""
-        data = self._get("/JSON/forcedBrowse/view/forcedBrowseRunning/")
-        # Returns {"forcedBrowseRunning": "true"/"false"}
-        running = data.get("forcedBrowseRunning", "false")
-        return 0 if running == "true" else 100
-
-    # ------------------------------------------------------------------
     # Active Scan
     # ------------------------------------------------------------------
 
