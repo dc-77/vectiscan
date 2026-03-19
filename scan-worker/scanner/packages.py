@@ -20,6 +20,7 @@ _PERIMETER_BASE: dict[str, Any] = {
     "nmap_ports": "--top-ports 1000",
     "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
     "phase2_tools": ["testssl", "zap_spider", "zap_active", "nuclei",
+                     "dalfox", "ffuf", "feroxbuster",
                      "gowitness", "headers", "httpx", "wpscan"],
     "phase3_tools": ["nvd", "epss", "cisa_kev", "exploitdb", "correlator",
                      "fp_filter", "business_impact"],

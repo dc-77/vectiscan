@@ -781,6 +781,24 @@ def consolidate_findings(
                 if item.get("cweid"):
                     lines.append(f"    CWE: {item['cweid']}")
 
+        # --- Discovered Endpoints (ZAP Spider) ---
+        spider_urls = data.get("zap_spider_urls", [])
+        if spider_urls:
+            lines.append("")
+            lines.append(f"--- DISCOVERED ENDPOINTS ({len(spider_urls)} URLs) ---")
+            api_urls = [u for u in spider_urls if any(p in u for p in ("/api/", "/graphql", "/rest/", "/v1/", "/v2/"))]
+            admin_urls = [u for u in spider_urls if any(p in u for p in ("/admin", "/login", "/auth", "/wp-admin"))]
+            if api_urls:
+                lines.append(f"  API-Endpoints ({len(api_urls)}):")
+                for u in api_urls[:10]:
+                    lines.append(f"    {u}")
+                if len(api_urls) > 10:
+                    lines.append(f"    ... und {len(api_urls) - 10} weitere")
+            if admin_urls:
+                lines.append(f"  Admin/Login ({len(admin_urls)}):")
+                for u in admin_urls[:5]:
+                    lines.append(f"    {u}")
+
         # --- Security headers ---
         headers = data.get("headers", {})
         if headers.get("missing") or headers.get("present"):
@@ -1024,6 +1042,14 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
         zap_path = os.path.join(str(phase2), "zap_alerts.json")
         if os.path.isfile(zap_path):
             host_data["zap"] = parse_zap_alerts_json(zap_path)
+
+        # ZAP Spider URLs (for endpoint discovery section in Claude prompt)
+        spider_path = os.path.join(str(phase2), "zap_spider_urls.json")
+        if os.path.isfile(spider_path):
+            try:
+                host_data["zap_spider_urls"] = json.loads(Path(spider_path).read_text())
+            except Exception:
+                pass
 
         host_results[ip] = host_data
 

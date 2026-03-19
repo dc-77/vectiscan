@@ -1085,14 +1085,106 @@ def run_phase2(
         "tools_run": [],
     }
 
-    # ── Parallel Tool Groups ─────────────────────────────────
-    # Since ZAP integration, all active phase2 tools are independent.
-    # Run testssl, ZAP, nuclei, and quick tools (gowitness/headers/httpx/wpscan)
-    # in parallel to reduce per-host scan time.
+    # ══════════════════════════════════════════════════════════
+    # 3-STAGE PIPELINE: Discovery → Deep Scan → Collect
+    # Stage 1 runs ZAP Spider + independent tools in parallel.
+    # Stage 2 uses Spider URLs to feed nuclei, dalfox, ffuf, feroxbuster.
+    # Stage 3 collects ZAP passive alerts after all scanning completes.
+    # ══════════════════════════════════════════════════════════
     from concurrent.futures import ThreadPoolExecutor, as_completed
+    from urllib.parse import urlparse as _urlparse
+
+    zap_in_tools = phase2_tools is None or any(
+        t in (phase2_tools or []) for t in ("zap_spider", "zap_passive", "zap_active")
+    )
+    cms = tech_profile.get("cms", "")
+
+    # ── Stage 1: Discovery (parallel) ─────────────────────────
+    # ZAP Spider discovers URLs, testssl/headers/httpx/gowitness run independently.
+
+    def _run_zap_discovery() -> dict[str, Any]:
+        """ZAP Spider on ALL FQDNs (not just primary). No active scan yet."""
+        import re as _re
+        import time as _time
+        from scanner.tools.zap_client import ZapClient, ZapError
+        r: dict[str, Any] = {"zap_spider_urls": [], "_tools": []}
+        if not (has_web and zap_in_tools):
+            return r
+
+        zap = ZapClient()
+        if not zap.health_check():
+            log.warning("zap_daemon_unavailable", ip=ip)
+            return r
+
+        ac = adaptive_config or {}
+        all_spider_urls: list[str] = []
+        context_name = f"ctx-{order_id[:8]}-{ip.replace('.', '_')}"
+
+        try:
+            context_id = zap.create_context(context_name)
+            # Include ALL FQDNs in context scope
+            for fqdn_item in fqdns[:5]:
+                zap.include_in_context(context_name, f".*{_re.escape(fqdn_item)}.*")
+
+            zap.configure_rate_limit(
+                req_per_sec=ac.get("zap_rate_req_per_sec", 80),
+                threads=ac.get("zap_threads", 5),
+                delay_ms=ac.get("zap_spider_delay_ms", 0),
+            )
+
+            # Spider each FQDN
+            spider_depth = ac.get("zap_spider_max_depth", 5)
+            for fqdn_item in fqdns[:5]:
+                publish_event(order_id, {"type": "tool_starting", "tool": "zap_spider", "host": ip})
+                spider_start = int(_time.monotonic() * 1000)
+                spider_id = zap.start_spider(f"https://{fqdn_item}", context_name=context_name,
+                                             max_depth=spider_depth)
+                zap.poll_until_complete(
+                    lambda: zap.spider_status(spider_id),
+                    timeout=120, interval=5, stop_value=100,
+                    order_id=order_id, tool_name="zap_spider",
+                )
+                urls = zap.spider_results(spider_id)
+                spider_duration = int(_time.monotonic() * 1000) - spider_start
+                all_spider_urls.extend(urls)
+                log.info("zap_spider_fqdn_complete", fqdn=fqdn_item, urls=len(urls),
+                         duration_ms=spider_duration)
+
+            # AJAX Spider (conditional on SPA)
+            if ac.get("zap_ajax_spider_enabled") and "zap_ajax_spider" not in set(ac.get("skip_tools", [])):
+                publish_event(order_id, {"type": "tool_starting", "tool": "zap_ajax_spider", "host": ip})
+                zap.start_ajax_spider(f"https://{primary_fqdn}", context_name=context_name)
+                completed = zap.poll_until_complete(
+                    lambda: 100 if zap.ajax_spider_status() == "stopped" else 50,
+                    timeout=240, interval=10, stop_value=100,
+                    order_id=order_id, tool_name="zap_ajax_spider",
+                )
+                if not completed:
+                    zap.stop_ajax_spider()
+                r["_tools"].append("zap_ajax_spider")
+
+            unique_urls = sorted(set(all_spider_urls))
+            r["zap_spider_urls"] = unique_urls
+            r["_tools"].append("zap_spider")
+            r["_zap_context"] = context_name
+            r["_zap_context_id"] = context_id
+
+            # Save spider results to DB
+            _save_result(order_id, ip, 2, "zap_spider",
+                         json.dumps({"urls_found": len(unique_urls), "fqdns_spidered": len(fqdns[:5]),
+                                     "urls": unique_urls[:50]}, indent=2),
+                         0, 0)
+            publish_tool_output(order_id, "zap_spider", ip,
+                                f"{len(unique_urls)} URLs from {len(fqdns[:5])} FQDNs")
+            progress_callback(order_id, "zap_spider", "complete")
+
+        except ZapError as e:
+            log.error("zap_discovery_failed", ip=ip, error=str(e))
+        # Note: DON'T clean up context here — Stage 2 needs it for active scan
+
+        return r
 
     def _run_testssl_group() -> dict[str, Any]:
-        """Run testssl (SSL/TLS audit)."""
         r: dict[str, Any] = {}
         if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
             publish_event(order_id, {"type": "tool_starting", "tool": "testssl", "host": ip})
@@ -1107,90 +1199,25 @@ def run_phase2(
                 publish_tool_output(order_id, "testssl", ip, "No SSL findings")
         return r
 
-    def _run_zap_group() -> dict[str, Any]:
-        """Run ZAP scan (spider + ajax + active)."""
-        r: dict[str, Any] = {}
-        if has_web and (phase2_tools is None or any(
-            t in (phase2_tools or []) for t in ("zap_spider", "zap_passive", "zap_active")
-        )):
-            zap_result = run_zap_scan(
-                primary_fqdn, ip, host_dir, order_id,
-                adaptive_config=adaptive_config,
-                config=config,
-                progress_callback=progress_callback,
-            )
-            r["zap_alerts"] = zap_result.get("alerts", [])
-            r["zap_findings"] = zap_result.get("findings", [])
-            r["zap_spider_urls"] = zap_result.get("spider_urls", [])
-            r["_tools"] = zap_result.get("tools_run", [])
-        return r
-
-    def _run_nuclei_group() -> dict[str, Any]:
-        """Run nuclei (CVE + default-login scanning)."""
-        r: dict[str, Any] = {}
-        if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web:
-            publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
-            nuclei_config = dict(adaptive_config) if adaptive_config else {}
-            tags = list(nuclei_config.get("nuclei_tags", []))
-            # Only auto-add "default-login". "cve" tag removed — matches 3000+ templates
-            # causing timeouts. Tech-specific tags (wordpress, nginx, etc.) already cover CVEs.
-            if "default-login" not in tags:
-                tags.append("default-login")
-            nuclei_config["nuclei_tags"] = tags
-            exclude = list(nuclei_config.get("nuclei_exclude_tags", []))
-            # Keep misconfig+exposure in nuclei until ZAP active scanner is verified working
-            nuclei_config["nuclei_exclude_tags"] = exclude
-            is_wc = config.get("package") in ("basic", "webcheck")
-            nuclei_timeout = 600 if is_wc else 600
-            nuclei_severity = config.get("nuclei_severity", "high,critical" if is_wc else "low,medium,high,critical")
-            nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
-                                       adaptive_config=nuclei_config,
-                                       timeout=nuclei_timeout,
-                                       severity=nuclei_severity)
-            r["nuclei"] = nuclei_result
-            r["_tools"] = ["nuclei"]
-            progress_callback(order_id, "nuclei", "complete")
-            if nuclei_result:
-                severities: dict[str, int] = {}
-                for f in nuclei_result:
-                    sev = f.get("info", {}).get("severity", "unknown")
-                    severities[sev] = severities.get(sev, 0) + 1
-                parts = [f"{v} {k}" for k, v in sorted(severities.items())]
-                publish_tool_output(order_id, "nuclei", ip, f"{len(nuclei_result)} findings ({', '.join(parts)})")
-            else:
-                publish_tool_output(order_id, "nuclei", ip, "No vulnerabilities found")
-        return r
-
-    def _run_quick_tools() -> dict[str, Any]:
-        """Run fast tools: gowitness, header_check, httpx, wpscan."""
+    def _run_quick_tools_stage1() -> dict[str, Any]:
+        """Fast independent tools: gowitness, header_check, httpx."""
         r: dict[str, Any] = {"_tools": []}
-
-        # gowitness
         if (phase2_tools is None or "gowitness" in phase2_tools) and "gowitness" not in ai_skip:
             publish_event(order_id, {"type": "tool_starting", "tool": "gowitness", "host": ip})
             gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, order_id)
             r["gowitness"] = gowitness_result
             r["_tools"].append("gowitness")
             progress_callback(order_id, "gowitness", "complete")
-            if gowitness_result:
-                publish_tool_output(order_id, "gowitness", ip, "Screenshot captured")
-            else:
-                publish_tool_output(order_id, "gowitness", ip, "Screenshot failed")
-
-        # header_check
+            publish_tool_output(order_id, "gowitness", ip,
+                                "Screenshot captured" if gowitness_result else "Screenshot failed")
         if phase2_tools is None or "headers" in phase2_tools:
             publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
             header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)
             r["headers"] = header_result
             r["_tools"].append("header_check")
             progress_callback(order_id, "header_check", "complete")
-            if header_result:
-                score = header_result.get("score", "?/?")
-                publish_tool_output(order_id, "header_check", ip, f"Security headers: {score}")
-            else:
-                publish_tool_output(order_id, "header_check", ip, "Header check failed")
-
-        # httpx
+            score = header_result.get("score", "?/?") if header_result else "failed"
+            publish_tool_output(order_id, "header_check", ip, f"Security headers: {score}")
         if phase2_tools is None or "httpx" in phase2_tools:
             publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
             httpx_result = run_httpx(primary_fqdn, ip, host_dir, order_id)
@@ -1198,16 +1225,245 @@ def run_phase2(
             r["_tools"].append("httpx")
             progress_callback(order_id, "httpx", "complete")
             if httpx_result:
-                status_code = httpx_result.get("status_code", "?")
-                title = (httpx_result.get("title", "") or "")[:40]
-                techs = httpx_result.get("tech", [])
-                tech_str = f", {len(techs)} technologies" if techs else ""
-                publish_tool_output(order_id, "httpx", ip, f"HTTP {status_code} {title}{tech_str}")
+                publish_tool_output(order_id, "httpx", ip,
+                                    f"HTTP {httpx_result.get('status_code', '?')}")
             else:
                 publish_tool_output(order_id, "httpx", ip, "HTTP probe failed")
+        return r
+
+    log.info("phase2_stage1_start", ip=ip, tools="testssl+zap_spider+quick")
+    with ThreadPoolExecutor(max_workers=3, thread_name_prefix="p2s1") as pool:
+        s1_futures = {
+            pool.submit(_run_testssl_group): "testssl",
+            pool.submit(_run_zap_discovery): "zap_discovery",
+            pool.submit(_run_quick_tools_stage1): "quick",
+        }
+        for future in as_completed(s1_futures):
+            group_name = s1_futures[future]
+            try:
+                group_result = future.result()
+                tools = group_result.pop("_tools", [])
+                # Keep internal keys (_zap_context etc.) but don't add to tools_run
+                for k, v in group_result.items():
+                    if not k.startswith("_"):
+                        results[k] = v
+                    else:
+                        results[k] = v  # Keep internal state for Stage 2
+                results["tools_run"].extend(tools)
+            except Exception as e:
+                log.error("phase2_stage1_failed", group=group_name, ip=ip, error=str(e))
+
+    # Extract Spider URLs for Stage 2
+    spider_urls = results.get("zap_spider_urls", [])
+    zap_context = results.pop("_zap_context", None)
+    zap_context_id = results.pop("_zap_context_id", None)
+    log.info("phase2_stage1_complete", ip=ip, spider_urls=len(spider_urls))
+
+    # ── Stage 2: Deep Scan (parallel, Spider URLs as input) ───
+    # nuclei, ZAP Active, dalfox, ffuf, feroxbuster, wpscan — all receive spider URLs
+
+    def _run_zap_active_stage2() -> dict[str, Any]:
+        """ZAP Active Scan using the context from Stage 1."""
+        import time as _time
+        from scanner.tools.zap_client import ZapClient, ZapError
+        from scanner.tools.zap_mapper import ZapAlertMapper
+        r: dict[str, Any] = {"_tools": []}
+
+        ac = adaptive_config or {}
+        scan_policy = ac.get("zap_scan_policy", "standard")
+        is_webcheck = (config or {}).get("package") in ("basic", "webcheck")
+        run_active = (not is_webcheck and scan_policy != "passive-only"
+                      and (phase2_tools is None or "zap_active" in (phase2_tools or [])))
+
+        if not run_active or not zap_context:
+            return r
+
+        zap = ZapClient()
+        policy_name = f"policy-{order_id[:8]}-{ip.replace('.', '_')}"
+
+        try:
+            publish_event(order_id, {"type": "tool_starting", "tool": "zap_active", "host": ip})
+            active_start = int(_time.monotonic() * 1000)
+            categories = ac.get("zap_active_categories", ["sqli", "xss", "lfi", "ssrf", "cmdi"])
+            zap.create_scan_policy(policy_name, categories, scan_policy)
+
+            target_url = f"https://{primary_fqdn}"
+            scan_id = zap.start_active_scan(target_url, context_id=zap_context_id,
+                                            scan_policy=policy_name)
+            completed = zap.poll_until_complete(
+                lambda: zap.active_scan_status(scan_id),
+                timeout=600, interval=10, stop_value=100,
+                order_id=order_id, tool_name="zap_active",
+            )
+            if not completed:
+                zap.stop_active_scan(scan_id)
+
+            active_duration = int(_time.monotonic() * 1000) - active_start
+            r["_tools"].append("zap_active")
+            _save_result(order_id, ip, 2, "zap_active",
+                         json.dumps({"status": "complete" if completed else "timeout",
+                                     "policy": scan_policy, "categories": categories,
+                                     "duration_ms": active_duration}),
+                         0, active_duration)
+            publish_tool_output(order_id, "zap_active", ip, "Active scan complete")
+            progress_callback(order_id, "zap_active", "complete")
+        except ZapError as e:
+            log.error("zap_active_failed", ip=ip, error=str(e))
+        finally:
+            try:
+                zap.remove_scan_policy(policy_name)
+            except Exception:
+                pass
+        return r
+
+    def _run_nuclei_with_urls() -> dict[str, Any]:
+        """Run nuclei against Spider-discovered URLs (not just root FQDN)."""
+        r: dict[str, Any] = {}
+        if not ((phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web):
+            return r
+
+        publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
+        nuclei_config = dict(adaptive_config) if adaptive_config else {}
+        tags = list(nuclei_config.get("nuclei_tags", []))
+        if "default-login" not in tags:
+            tags.append("default-login")
+        nuclei_config["nuclei_tags"] = tags
+        nuclei_config["nuclei_exclude_tags"] = list(nuclei_config.get("nuclei_exclude_tags", []))
+
+        is_wc = (config or {}).get("package") in ("basic", "webcheck")
+        nuclei_timeout = 600
+        nuclei_severity = (config or {}).get("nuclei_severity",
+                                             "high,critical" if is_wc else "low,medium,high,critical")
+
+        # Build URL target list from spider URLs
+        unique_urls = set()
+        unique_urls.add(f"https://{primary_fqdn}")
+        base_domain = ".".join(primary_fqdn.split(".")[-2:])
+        for url in spider_urls:
+            parsed = _urlparse(url)
+            if parsed.hostname and base_domain in parsed.hostname:
+                clean = f"{parsed.scheme}://{parsed.hostname}{parsed.path}"
+                unique_urls.add(clean)
+        url_list = sorted(unique_urls)[:100]  # Cap at 100
+
+        if len(url_list) > 1:
+            # Write URL list file and use -list flag
+            urls_file = f"{host_dir}/phase2/nuclei_targets.txt"
+            os.makedirs(os.path.dirname(urls_file), exist_ok=True)
+            with open(urls_file, "w") as f:
+                f.write("\n".join(url_list))
+            log.info("nuclei_target_list", ip=ip, urls=len(url_list))
+
+            # Build command with -list instead of -u
+            output_path = f"{host_dir}/phase2/nuclei.json"
+            cmd = [
+                "nuclei", "-list", urls_file,
+                "-severity", nuclei_severity,
+                "-jsonl", "-o", output_path,
+                "-timeout", "5", "-retries", "1",
+                "-no-interactsh", "-c", "25", "-rl", "150",
+            ]
+            if nuclei_config.get("nuclei_tags"):
+                cmd.extend(["-tags", ",".join(nuclei_config["nuclei_tags"])])
+            if nuclei_config.get("nuclei_exclude_tags"):
+                cmd.extend(["-exclude-tags", ",".join(nuclei_config["nuclei_exclude_tags"])])
+
+            exit_code, duration_ms = run_tool(
+                cmd=cmd, timeout=nuclei_timeout, output_path=output_path,
+                order_id=order_id, host_ip=ip, phase=2, tool_name="nuclei",
+            )
+
+            # Parse JSONL output
+            nuclei_result = []
+            if os.path.isfile(output_path):
+                with open(output_path, "r") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            try:
+                                nuclei_result.append(json.loads(line))
+                            except json.JSONDecodeError:
+                                continue
+            r["nuclei"] = nuclei_result
+        else:
+            # Fallback: single URL mode
+            nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
+                                       adaptive_config=nuclei_config,
+                                       timeout=nuclei_timeout,
+                                       severity=nuclei_severity)
+            r["nuclei"] = nuclei_result
+
+        r["_tools"] = ["nuclei"]
+        progress_callback(order_id, "nuclei", "complete")
+        if r.get("nuclei"):
+            severities: dict[str, int] = {}
+            for finding in r["nuclei"]:
+                sev = finding.get("info", {}).get("severity", "unknown")
+                severities[sev] = severities.get(sev, 0) + 1
+            parts = [f"{v} {k}" for k, v in sorted(severities.items())]
+            publish_tool_output(order_id, "nuclei", ip,
+                                f"{len(r['nuclei'])} findings ({', '.join(parts)})")
+        else:
+            publish_tool_output(order_id, "nuclei", ip, "No vulnerabilities found")
+        return r
+
+    def _run_deep_scan_extras() -> dict[str, Any]:
+        """Run dalfox, ffuf param, feroxbuster, wpscan with Spider URLs."""
+        r: dict[str, Any] = {"_tools": []}
+
+        # dalfox: XSS on parameter URLs from spider
+        param_urls = [u for u in spider_urls if "?" in u]
+        if param_urls and (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip and has_web:
+            publish_event(order_id, {"type": "tool_starting", "tool": "dalfox", "host": ip})
+            dalfox_result = run_dalfox(primary_fqdn, ip, host_dir, order_id,
+                                       katana_urls=param_urls[:30])
+            r["dalfox"] = dalfox_result
+            r["_tools"].append("dalfox")
+            progress_callback(order_id, "dalfox", "complete")
+            if dalfox_result:
+                publish_tool_output(order_id, "dalfox", ip, f"{len(dalfox_result)} XSS findings")
+            else:
+                publish_tool_output(order_id, "dalfox", ip, "No XSS vulnerabilities")
+
+        # ffuf param: parameter discovery on API-like URLs
+        api_urls = [u for u in spider_urls if "?" not in u and
+                    any(p in u for p in ("/api/", "/graphql", "/rest/", "/v1/", "/v2/"))]
+        if api_urls and (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip and has_web:
+            publish_event(order_id, {"type": "tool_starting", "tool": "ffuf", "host": ip})
+            ffuf_config = dict(adaptive_config) if adaptive_config else {}
+            ffuf_config["ffuf_mode"] = "param"
+            ffuf_result = run_ffuf(primary_fqdn, ip, host_dir, order_id,
+                                    adaptive_config=ffuf_config,
+                                    katana_urls=api_urls[:20])
+            r["ffuf"] = ffuf_result
+            r["_tools"].append("ffuf")
+            progress_callback(order_id, "ffuf", "complete")
+            if ffuf_result:
+                publish_tool_output(order_id, "ffuf", ip, f"{len(ffuf_result)} params discovered")
+            else:
+                publish_tool_output(order_id, "ffuf", ip, "No parameters found")
+
+        # feroxbuster: recursive directory scan, spider URLs as dedup
+        if (phase2_tools is not None and "feroxbuster" in phase2_tools) and "feroxbuster" not in ai_skip and has_web:
+            ferox_enabled = True
+            if adaptive_config and adaptive_config.get("feroxbuster_enabled") is False:
+                ferox_enabled = False
+            if ferox_enabled:
+                publish_event(order_id, {"type": "tool_starting", "tool": "feroxbuster", "host": ip})
+                spider_paths = {_urlparse(u).path for u in spider_urls if u}
+                ferox_result = run_feroxbuster(primary_fqdn, ip, host_dir, order_id,
+                                               adaptive_config=adaptive_config,
+                                               known_paths=spider_paths if spider_paths else None)
+                r["feroxbuster"] = ferox_result
+                r["_tools"].append("feroxbuster")
+                progress_callback(order_id, "feroxbuster", "complete")
+                if ferox_result:
+                    publish_tool_output(order_id, "feroxbuster", ip,
+                                        f"{len(ferox_result)} paths (recursive, dedup applied)")
+                else:
+                    publish_tool_output(order_id, "feroxbuster", ip, "No new paths")
 
         # wpscan (conditional on WordPress)
-        cms = tech_profile.get("cms", "")
         if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
             publish_event(order_id, {"type": "tool_starting", "tool": "wpscan", "host": ip})
             wpscan_result = run_wpscan(primary_fqdn, ip, host_dir, order_id)
@@ -1223,146 +1479,67 @@ def run_phase2(
 
         return r
 
-    # Launch all 4 groups in parallel
-    with ThreadPoolExecutor(max_workers=4, thread_name_prefix="phase2t") as pool:
-        group_futures = {
-            pool.submit(_run_testssl_group): "testssl",
-            pool.submit(_run_zap_group): "zap",
-            pool.submit(_run_nuclei_group): "nuclei",
-            pool.submit(_run_quick_tools): "quick",
+    log.info("phase2_stage2_start", ip=ip, spider_urls=len(spider_urls))
+    with ThreadPoolExecutor(max_workers=4, thread_name_prefix="p2s2") as pool:
+        s2_futures = {
+            pool.submit(_run_zap_active_stage2): "zap_active",
+            pool.submit(_run_nuclei_with_urls): "nuclei",
+            pool.submit(_run_deep_scan_extras): "extras",
         }
-
-        for future in as_completed(group_futures):
-            group_name = group_futures[future]
+        for future in as_completed(s2_futures):
+            group_name = s2_futures[future]
             try:
                 group_result = future.result()
-                # Merge results (except _tools key)
                 tools = group_result.pop("_tools", [])
                 results.update(group_result)
                 results["tools_run"].extend(tools)
             except Exception as e:
-                log.error("phase2_group_failed", group=group_name, ip=ip, error=str(e))
+                log.error("phase2_stage2_failed", group=group_name, ip=ip, error=str(e))
 
-    # ── Legacy tools (kept for rollback, not in phase2_tools) ──
-    # nikto, nuclei, testssl, gowitness, headers, httpx, wpscan now run
-    # in parallel tool groups above. Only gobuster/ffuf/feroxbuster/katana/dalfox
-    # remain here as dead legacy code (not in phase2_tools since ZAP integration).
+    # ── Stage 3: Collect ZAP alerts (passive + active) ────────
+    if zap_context:
+        from scanner.tools.zap_client import ZapClient, ZapError
+        from scanner.tools.zap_mapper import ZapAlertMapper
+        try:
+            zap = ZapClient()
+            log.info("zap_waiting_for_passive", ip=ip)
+            zap.wait_for_passive_scan(timeout=30)
 
-    # gobuster dir (web-only)
-    gobuster_output_path: Optional[str] = None
-    if (phase2_tools is None or "gobuster_dir" in phase2_tools) and "gobuster_dir" not in ai_skip and has_web:
-        publish_event(order_id, {"type": "tool_starting", "tool": "gobuster_dir", "host": ip})
-        gobuster_result = run_gobuster_dir(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
-        results["gobuster_dir"] = gobuster_result
-        gobuster_output_path = gobuster_result
-        results["tools_run"].append("gobuster_dir")
-        progress_callback(order_id, "gobuster_dir", "complete")
-        if gobuster_result:
+            all_alerts = zap.get_alerts()
+            log.info("zap_alerts_collected", ip=ip, count=len(all_alerts))
+            results["zap_alerts"] = all_alerts
+
+            mapper = ZapAlertMapper()
+            findings = mapper.map_alerts(all_alerts, ip, primary_fqdn)
+            results["zap_findings"] = findings
+
+            # Save to disk
+            alerts_path = f"{phase2_dir}/zap_alerts.json"
+            with open(alerts_path, "w") as f:
+                json.dump(all_alerts, f, indent=2)
+
+            passive_count = sum(1 for fd in findings if fd.get("tool") == "zap_passive")
+            active_count = len(findings) - passive_count
+            publish_tool_output(order_id, "zap", ip,
+                                f"{len(all_alerts)} alerts ({passive_count} passive, {active_count} active)")
+
+            _save_result(order_id, ip, 2, "zap",
+                         json.dumps(all_alerts[:50], indent=2)[:50000] if all_alerts else "[]",
+                         0, 0)
+        except ZapError as e:
+            log.error("zap_alert_collection_failed", ip=ip, error=str(e))
+        finally:
             try:
-                with open(gobuster_result, "r") as _f:
-                    line_count = sum(1 for _ in _f)
-                publish_tool_output(order_id, "gobuster_dir", ip, f"{line_count} paths discovered")
+                zap = ZapClient()
+                zap.remove_context(zap_context)
             except Exception:
-                publish_tool_output(order_id, "gobuster_dir", ip, "Directory scan complete")
-        else:
-            publish_tool_output(order_id, "gobuster_dir", ip, "No paths found")
-    else:
-        log.info("gobuster_dir_skipped", ip=ip, reason="not_in_package")
+                pass
 
-    # ffuf — web fuzzer (Perimeter+ only, web-only)
-    ffuf_result: Optional[list[dict[str, Any]]] = None
-    if (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip and has_web:
-        ffuf_mode = adaptive_config.get("ffuf_mode", "dir") if adaptive_config else "dir"
-        publish_event(order_id, {"type": "tool_starting", "tool": f"ffuf_{ffuf_mode}", "host": ip})
-        ffuf_result = run_ffuf(
-            primary_fqdn, ip, host_dir, order_id,
-            adaptive_config=adaptive_config,
-            domain=domain,
-        )
-        results["ffuf"] = ffuf_result
-        results["tools_run"].append("ffuf")
-        progress_callback(order_id, "ffuf", "complete")
-        if ffuf_result:
-            mode = adaptive_config.get("ffuf_mode", "dir") if adaptive_config else "dir"
-            publish_tool_output(order_id, "ffuf", ip, f"{len(ffuf_result)} results ({mode} mode)")
-        else:
-            publish_tool_output(order_id, "ffuf", ip, "No results")
-    else:
-        log.info("ffuf_skipped", ip=ip, reason="not_in_package_or_ai_skip")
-
-    # feroxbuster — recursive directory brute-force (Perimeter+ only, web-only)
-    # Dependency: runs after gobuster/ffuf, deduplicates known paths
-    if (phase2_tools is not None and "feroxbuster" in phase2_tools) and "feroxbuster" not in ai_skip and has_web:
-        ferox_enabled = True
-        if adaptive_config and adaptive_config.get("feroxbuster_enabled") is False:
-            ferox_enabled = False
-            log.info("feroxbuster_skipped", ip=ip, reason="ai_disabled")
-
-        if ferox_enabled:
-            publish_event(order_id, {"type": "tool_starting", "tool": "feroxbuster", "host": ip})
-            # Collect known paths from gobuster + ffuf for dedup
-            known_paths: set[str] = set()
-            if gobuster_output_path:
-                known_paths.update(_extract_paths_from_gobuster(gobuster_output_path))
-            if ffuf_result:
-                known_paths.update(_extract_paths_from_ffuf(ffuf_result))
-
-            ferox_result = run_feroxbuster(
-                primary_fqdn, ip, host_dir, order_id,
-                adaptive_config=adaptive_config,
-                known_paths=known_paths if known_paths else None,
-            )
-            results["feroxbuster"] = ferox_result
-            results["tools_run"].append("feroxbuster")
-            progress_callback(order_id, "feroxbuster", "complete")
-            if ferox_result:
-                publish_tool_output(order_id, "feroxbuster", ip,
-                                    f"{len(ferox_result)} paths (recursive, dedup applied)")
-            else:
-                publish_tool_output(order_id, "feroxbuster", ip, "No new paths found")
-    else:
-        log.info("feroxbuster_skipped", ip=ip, reason="not_in_package")
-
-    # katana — web crawler (web-only, before dalfox which depends on katana URLs)
-    katana_result: list[str] = []
-    if (phase2_tools is None or "katana" in phase2_tools) and "katana" not in ai_skip and has_web:
-        publish_event(order_id, {"type": "tool_starting", "tool": "katana", "host": ip})
-        katana_result = run_katana(primary_fqdn, ip, host_dir, order_id)
-        results["katana"] = katana_result
-        results["tools_run"].append("katana")
-        progress_callback(order_id, "katana", "complete")
-        if katana_result:
-            publish_tool_output(order_id, "katana", ip, f"{len(katana_result)} URLs crawled")
-        else:
-            publish_tool_output(order_id, "katana", ip, "No URLs discovered")
-    else:
-        log.info("katana_skipped", ip=ip, reason="not_in_package")
-
-    # dalfox — XSS scanner (Perimeter+ only, web-only)
-    # Dependency: needs katana URLs with parameters
-    if (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip and has_web:
-        dalfox_enabled = True
-        if adaptive_config and adaptive_config.get("dalfox_enabled") is False:
-            dalfox_enabled = False
-            log.info("dalfox_skipped", ip=ip, reason="ai_disabled")
-
-        if dalfox_enabled:
-            publish_event(order_id, {"type": "tool_starting", "tool": "dalfox", "host": ip})
-            dalfox_result = run_dalfox(
-                primary_fqdn, ip, host_dir, order_id,
-                katana_urls=katana_result if katana_result else None,
-            )
-            results["dalfox"] = dalfox_result
-            results["tools_run"].append("dalfox")
-            progress_callback(order_id, "dalfox", "complete")
-            if dalfox_result:
-                publish_tool_output(order_id, "dalfox", ip, f"{len(dalfox_result)} XSS findings")
-            else:
-                publish_tool_output(order_id, "dalfox", ip, "No XSS vulnerabilities found")
-    else:
-        log.info("dalfox_skipped", ip=ip, reason="not_in_package")
-
-    # gowitness, headers, httpx, wpscan — now in _run_quick_tools() above
+    # Save spider URLs to disk for report-worker
+    if spider_urls:
+        spider_path = f"{phase2_dir}/zap_spider_urls.json"
+        with open(spider_path, "w") as f:
+            json.dump(spider_urls, f, indent=2)
 
     log.info("phase2_complete", ip=ip, order_id=order_id, tools_run=len(results["tools_run"]))
     return results

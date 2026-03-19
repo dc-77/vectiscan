@@ -67,10 +67,13 @@ class TestPerimeter:
             assert tool in config["phase2_tools"]
 
     def test_phase2_excludes_legacy_tools(self):
-        """nikto, gobuster, katana, feroxbuster replaced by ZAP."""
+        """nikto, gobuster_dir, katana removed. dalfox, ffuf, feroxbuster reactivated."""
         config = get_config("perimeter")
-        for tool in ("nikto", "gobuster_dir", "katana", "feroxbuster", "ffuf", "dalfox"):
+        for tool in ("nikto", "gobuster_dir", "katana"):
             assert tool not in config["phase2_tools"]
+        # Reactivated with Spider-URL input
+        for tool in ("dalfox", "ffuf", "feroxbuster"):
+            assert tool in config["phase2_tools"]
 
     def test_max_hosts(self):
         config = get_config("perimeter")
