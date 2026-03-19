@@ -108,7 +108,7 @@ services:
       - vectiscan-internal
 
   zap:
-    image: zaproxy/zaproxy:stable
+    image: zaproxy/zap-stable
     restart: unless-stopped
     command: >
       zap.sh -daemon
