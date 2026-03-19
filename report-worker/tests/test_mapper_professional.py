@@ -50,4 +50,4 @@ def test_professional_cover_meta_has_paket(pro_output, scan_meta, host_inventory
     cover_meta = result["cover"]["cover_meta"]
     paket_rows = [row for row in cover_meta if row[0] == "Paket:"]
     assert len(paket_rows) == 1
-    assert paket_rows[0][1] == "Professional"
+    assert paket_rows[0][1] == "PerimeterScan"

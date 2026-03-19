@@ -24,7 +24,7 @@ def test_default_is_professional(pro_output, scan_meta, host_inventory):
     result = map_to_report_data(pro_output, scan_meta, host_inventory)
     cover_meta = result["cover"]["cover_meta"]
     paket_rows = [row for row in cover_meta if row[0] == "Paket:"]
-    assert paket_rows[0][1] == "Professional"
+    assert paket_rows[0][1] == "PerimeterScan"
 
 def test_basic_dispatch(scan_meta, host_inventory):
     """package='basic' should use basic mapper."""
@@ -48,4 +48,4 @@ def test_unknown_package_defaults_to_professional(pro_output, scan_meta, host_in
     result = map_to_report_data(pro_output, scan_meta, host_inventory, package="enterprise")
     cover_meta = result["cover"]["cover_meta"]
     paket_rows = [row for row in cover_meta if row[0] == "Paket:"]
-    assert paket_rows[0][1] == "Professional"
+    assert paket_rows[0][1] == "PerimeterScan"

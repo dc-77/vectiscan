@@ -50,7 +50,7 @@ def test_basic_cover_meta_has_paket(basic_output, scan_meta, host_inventory):
     cover_meta = result["cover"]["cover_meta"]
     paket_rows = [row for row in cover_meta if row[0] == "Paket:"]
     assert len(paket_rows) == 1
-    assert paket_rows[0][1] == "Basic"
+    assert paket_rows[0][1] == "WebCheck"
 
 def test_basic_evidence_optional(basic_output, scan_meta, host_inventory):
     """Basic findings may or may not have evidence."""
