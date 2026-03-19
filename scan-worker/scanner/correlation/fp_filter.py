@@ -69,7 +69,7 @@ class FalsePositiveFilter:
 
     def _filter_waf(self, findings: list[CorrelatedFinding],
                     stats: dict[str, int]) -> list[CorrelatedFinding]:
-        """Rule 1: WAF-Filter — nikto-only findings behind WAF are likely FP."""
+        """Rule 1: WAF-Filter — single-tool findings behind WAF are likely FP."""
         if not self.has_waf:
             return findings
 
@@ -80,6 +80,11 @@ class FalsePositiveFilter:
             if f.primary.tool == "nikto" and not f.corroborating and f.confidence < 0.5:
                 f.is_false_positive = True
                 f.fp_reason = "WAF detected, nikto-only finding with low confidence"
+                stats["waf"] += 1
+            # zap_active-only findings behind WAF with low confidence
+            elif f.primary.tool == "zap_active" and not f.corroborating and f.confidence < 0.5:
+                f.is_false_positive = True
+                f.fp_reason = "WAF detected, ZAP active-only finding with low confidence"
                 stats["waf"] += 1
 
         return findings

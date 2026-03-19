@@ -1,4 +1,4 @@
-"""Tests for Phase 2 package-aware tool selection."""
+"""Tests for Phase 2 package-aware tool selection (ZAP integration)."""
 
 from unittest.mock import patch, MagicMock
 import os
@@ -15,19 +15,22 @@ class TestPhase2Packages:
             "ip": "1.2.3.4",
             "fqdns": ["example.com"],
             "has_ssl": has_ssl,
+            "has_web": True,
             "open_ports": [80, 443],
         }
 
     @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
+    @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
     @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
-    @patch("scanner.phase2.run_gobuster_dir", return_value="/tmp/gobuster.txt")
-    @patch("scanner.phase2.run_nuclei", return_value=[])
-    @patch("scanner.phase2.run_nikto", return_value={})
+    @patch("scanner.phase2.run_zap_scan", return_value={
+        "alerts": [], "findings": [], "spider_urls": [],
+        "tools_run": ["zap_spider"], "duration_ms": 1000,
+    })
     @patch("scanner.phase2.run_testssl", return_value={})
-    def test_basic_only_runs_testssl_headers_gowitness(
-        self, mock_testssl, mock_nikto, mock_nuclei,
-        mock_gobuster, mock_gowitness, mock_headers, mock_publish, tmp_path
+    def test_webcheck_runs_zap_spider_not_active(
+        self, mock_testssl, mock_zap, mock_gowitness, mock_httpx,
+        mock_headers, mock_publish, tmp_path
     ):
         from scanner.phase2 import run_phase2
         config = get_config("basic")
@@ -40,22 +43,31 @@ class TestPhase2Packages:
         )
 
         mock_testssl.assert_called_once()
-        mock_nikto.assert_not_called()      # nikto not in webcheck
-        mock_nuclei.assert_not_called()     # nuclei removed from webcheck (too slow)
-        mock_gobuster.assert_not_called()   # gobuster not in webcheck
+        mock_zap.assert_called_once()
         mock_gowitness.assert_called_once()
         mock_headers.assert_called_once()
+        # ZAP spider should be in tools_run
+        assert "zap_spider" in result["tools_run"]
+        # nikto, gobuster, katana should NOT be in tools_run
+        for legacy in ("nikto", "gobuster_dir", "katana", "nuclei"):
+            assert legacy not in result["tools_run"]
 
     @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
+    @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
     @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
-    @patch("scanner.phase2.run_gobuster_dir", return_value="/tmp/gobuster.txt")
     @patch("scanner.phase2.run_nuclei", return_value=[])
-    @patch("scanner.phase2.run_nikto", return_value={})
+    @patch("scanner.phase2.run_zap_scan", return_value={
+        "alerts": [{"alert": "XSS", "risk": "High"}],
+        "findings": [{"tool": "zap_active", "title": "XSS"}],
+        "spider_urls": ["https://example.com/"],
+        "tools_run": ["zap_spider", "zap_active"],
+        "duration_ms": 5000,
+    })
     @patch("scanner.phase2.run_testssl", return_value={})
-    def test_professional_runs_all_tools(
-        self, mock_testssl, mock_nikto, mock_nuclei,
-        mock_gobuster, mock_gowitness, mock_headers, mock_publish, tmp_path
+    def test_perimeter_runs_zap_and_nuclei(
+        self, mock_testssl, mock_zap, mock_nuclei,
+        mock_gowitness, mock_httpx, mock_headers, mock_publish, tmp_path
     ):
         from scanner.phase2 import run_phase2
         config = get_config("professional")
@@ -68,24 +80,31 @@ class TestPhase2Packages:
         )
 
         mock_testssl.assert_called_once()
-        mock_nikto.assert_called_once()
+        mock_zap.assert_called_once()
         mock_nuclei.assert_called_once()
-        mock_gobuster.assert_called_once()
         mock_gowitness.assert_called_once()
         mock_headers.assert_called_once()
+        # ZAP tools in tools_run
+        assert "zap_spider" in result["tools_run"]
+        assert "zap_active" in result["tools_run"]
+        assert "nuclei" in result["tools_run"]
+        # ZAP findings stored
+        assert len(result["zap_findings"]) == 1
 
     @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
+    @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
     @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
-    @patch("scanner.phase2.run_gobuster_dir", return_value="/tmp/gobuster.txt")
-    @patch("scanner.phase2.run_nuclei", return_value=[])
-    @patch("scanner.phase2.run_nikto", return_value={})
+    @patch("scanner.phase2.run_zap_scan", return_value={
+        "alerts": [], "findings": [], "spider_urls": [],
+        "tools_run": ["zap_spider"], "duration_ms": 1000,
+    })
     @patch("scanner.phase2.run_testssl", return_value={})
-    def test_basic_tools_run_list(
-        self, mock_testssl, mock_nikto, mock_nuclei,
-        mock_gobuster, mock_gowitness, mock_headers, mock_publish, tmp_path
+    def test_webcheck_tools_run_excludes_legacy(
+        self, mock_testssl, mock_zap, mock_gowitness, mock_httpx,
+        mock_headers, mock_publish, tmp_path
     ):
-        """Verify tools_run list only contains actually executed tools."""
+        """Verify tools_run list does not contain legacy tools."""
         from scanner.phase2 import run_phase2
         config = get_config("basic")
         scan_dir = str(tmp_path / "scan")
@@ -96,7 +115,6 @@ class TestPhase2Packages:
             scan_dir, "test-id", callback, config
         )
 
-        # WebCheck (basic) should have testssl, gowitness, header_check, httpx
-        assert "nikto" not in result["tools_run"]
-        assert "nuclei" not in result["tools_run"]  # nuclei removed from webcheck
-        assert "gobuster_dir" not in result["tools_run"]
+        # Legacy tools should not appear
+        for legacy in ("nikto", "gobuster_dir", "katana", "feroxbuster", "ffuf", "dalfox"):
+            assert legacy not in result["tools_run"]

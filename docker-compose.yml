@@ -90,6 +90,7 @@ services:
       SECURITYTRAILS_API_KEY: ${SECURITYTRAILS_API_KEY:-}
       NVD_API_KEY: ${NVD_API_KEY:-}
       WPSCAN_API_TOKEN: ${WPSCAN_API_TOKEN:-}
+      ZAP_BASE_URL: http://zap:8090
     deploy:
       replicas: 3
       resources:
@@ -101,6 +102,35 @@ services:
         condition: service_started
       minio:
         condition: service_started
+      zap:
+        condition: service_healthy
+    networks:
+      - vectiscan-internal
+
+  zap:
+    image: zaproxy/zaproxy:stable
+    restart: unless-stopped
+    command: >
+      zap.sh -daemon
+      -port 8090
+      -host 0.0.0.0
+      -config api.disablekey=true
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config scanner.maxScanDurationInMins=12
+      -config ajaxSpider.maxDuration=4
+      -config connection.timeoutInSecs=20
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1024M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/JSON/core/view/version/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     networks:
       - vectiscan-internal
 

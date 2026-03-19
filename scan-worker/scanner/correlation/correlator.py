@@ -31,6 +31,8 @@ TOOL_BASE_CONFIDENCE: dict[str, float] = {
     "dalfox": 0.75,
     "httpx": 0.70,
     "katana": 0.50,
+    "zap_passive": 0.85,
+    "zap_active": 0.75,
 }
 
 
@@ -219,6 +221,23 @@ def extract_findings(phase2_results: list[dict[str, Any]]) -> list[Finding]:
                 description=df.get("message", ""),
                 evidence=df.get("proof_of_concept", df.get("url", "")),
                 raw=df,
+            ))
+
+        # ZAP findings (pre-mapped to Finding dicts by zap_mapper in phase2)
+        for zf in host_result.get("zap_findings", []) or []:
+            findings.append(Finding(
+                tool=zf.get("tool", "zap_active"),
+                host_ip=ip,
+                fqdn=fqdn,
+                cve_id=zf.get("cve_id"),
+                title=zf.get("title", ""),
+                severity=zf.get("severity", "info"),
+                description=zf.get("description", ""),
+                evidence=zf.get("evidence", ""),
+                port=zf.get("port"),
+                service=zf.get("service", ""),
+                technology=zf.get("technology", ""),
+                raw=zf.get("raw", {}),
             ))
 
     log.info("findings_extracted", total=len(findings),
@@ -410,3 +429,15 @@ class CrossToolCorrelator:
             # Discovery cluster (gobuster, ffuf, feroxbuster)
             elif cf.primary.tool in ("gobuster_dir", "ffuf", "feroxbuster"):
                 cf.cluster_id = f"discovery_{cf.primary.host_ip}"
+
+            # ZAP web vulnerability clusters
+            elif cf.primary.tool in ("zap_active", "zap_passive"):
+                title_lower = cf.primary.title.lower()
+                if "xss" in title_lower or "cross site scripting" in title_lower:
+                    cf.cluster_id = f"xss_{cf.primary.host_ip}"
+                elif "sql" in title_lower:
+                    cf.cluster_id = f"sqli_{cf.primary.host_ip}"
+                elif "header" in title_lower or "csp" in title_lower or "hsts" in title_lower:
+                    cf.cluster_id = f"security_headers_{cf.primary.host_ip}"
+                else:
+                    cf.cluster_id = f"web_vulns_{cf.primary.host_ip}"

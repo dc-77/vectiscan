@@ -57,22 +57,18 @@ const PACKAGE_LABELS: Record<string, string> = {
 const PHASE0_TOOLS_BASIC = ['crt.sh', 'subfinder'];
 const PHASE0_TOOLS_PRO = ['crt.sh', 'subfinder', 'amass', 'gobuster DNS', 'Zone-Transfer', 'dnsx Validierung'];
 const PHASE1_TOOLS = ['nmap', 'webtech', 'wafw00f'];
-const PHASE2_TOOLS_BASIC = ['testssl.sh', 'headers', 'gowitness', 'httpx'];
-const PHASE2_TOOLS_PRO = ['testssl.sh', 'nikto', 'nuclei', 'gobuster dir', 'ffuf', 'feroxbuster', 'gowitness', 'headers', 'httpx', 'katana', 'dalfox', 'wpscan'];
+const PHASE2_TOOLS_BASIC = ['testssl.sh', 'ZAP Spider', 'headers', 'gowitness', 'httpx'];
+const PHASE2_TOOLS_PRO = ['testssl.sh', 'ZAP Spider', 'ZAP Active Scan', 'nuclei', 'gowitness', 'headers', 'httpx', 'wpscan'];
 
 // Map tool names from backend to display labels for command-style lines
 const TOOL_COMMANDS: Record<string, string> = {
   testssl: 'testssl.sh --jsonfile /phase2/testssl.json',
-  nikto: 'nikto -h TARGET -Format json',
+  zap_spider: 'zap-cli spider --url TARGET --depth 5',
+  zap_ajax_spider: 'zap-cli ajax-spider --url TARGET --browser chromium',
+  zap_forced_browse: 'zap-cli forced-browse --url TARGET --wordlist common',
+  zap_active: 'zap-cli active-scan --url TARGET --policy adaptive',
+  zap_passive: 'zap-cli passive-scan --analyze',
   nuclei: 'nuclei -u TARGET -severity all -jsonl',
-  gobuster_dir: 'gobuster dir -u TARGET -w common.txt',
-  ffuf: 'ffuf -u TARGET/FUZZ -w seclists',
-  ffuf_dir: 'ffuf -u TARGET/FUZZ -e .php,.html,.js,.bak',
-  ffuf_vhost: 'ffuf -H "Host: FUZZ.TARGET" -w vhosts',
-  ffuf_param: 'ffuf -u TARGET?FUZZ=test -w params',
-  feroxbuster: 'feroxbuster -u TARGET -d 2 --json',
-  katana: 'katana -u TARGET -depth 3 -jsluice',
-  dalfox: 'dalfox file urls.txt --format json',
   gowitness: 'gowitness scan single -u TARGET',
   header_check: 'curl -sI TARGET | analyze-headers',
   httpx: 'httpx -u TARGET -json -tech-detect',

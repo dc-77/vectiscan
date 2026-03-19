@@ -289,6 +289,40 @@ def parse_nikto_json(path: str) -> list[dict[str, Any]]:
     return vulns
 
 
+def parse_zap_alerts_json(path: str) -> list[dict[str, Any]]:
+    """Parse OWASP ZAP alerts JSON output.
+
+    Returns list of alert dicts sorted by severity.
+    """
+    _SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2, "info": 3}
+    _RISK_MAP = {"High": "high", "Medium": "medium", "Low": "low", "Informational": "info"}
+
+    data = _read_json(path)
+    if data is None:
+        return []
+
+    alerts_raw = data if isinstance(data, list) else data.get("alerts", [])
+    alerts: list[dict[str, Any]] = []
+    for a in alerts_raw:
+        severity = _RISK_MAP.get(a.get("risk", "Informational"), "info")
+        alerts.append({
+            "name": a.get("name", a.get("alert", "")),
+            "severity": severity,
+            "description": a.get("description", "")[:300],
+            "url": a.get("url", ""),
+            "cweid": a.get("cweid", ""),
+            "solution": a.get("solution", "")[:300],
+            "evidence": a.get("evidence", ""),
+            "confidence": a.get("confidence", ""),
+            "method": a.get("method", ""),
+            "param": a.get("param", ""),
+        })
+
+    alerts.sort(key=lambda x: _SEVERITY_ORDER.get(x.get("severity", "info"), 3))
+    log.info("zap_parsed", path=path, alerts=len(alerts))
+    return alerts
+
+
 def parse_headers_json(path: str) -> dict[str, Any]:
     """Parse security headers analysis JSON.
 
@@ -732,6 +766,21 @@ def consolidate_findings(
                 )
                 lines.append(f"    {item.get('msg', '')}")
 
+        # --- ZAP Web Application Scan ---
+        zap = data.get("zap", [])
+        if zap:
+            lines.append("")
+            lines.append("--- WEB APPLICATION SCAN (OWASP ZAP) ---")
+            for item in zap:
+                sev = item.get("severity", "info").upper()
+                lines.append(f"  [{sev}] {item.get('name', '')}")
+                if item.get("url"):
+                    lines.append(f"    URL: {item['url']}")
+                if item.get("description"):
+                    lines.append(f"    {item['description'][:200]}")
+                if item.get("cweid"):
+                    lines.append(f"    CWE: {item['cweid']}")
+
         # --- Security headers ---
         headers = data.get("headers", {})
         if headers.get("missing") or headers.get("present"):
@@ -970,6 +1019,11 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
                     host_data["wpscan"] = parse_wpscan(json.load(f))
             except Exception:
                 pass
+
+        # ZAP alerts
+        zap_path = os.path.join(str(phase2), "zap_alerts.json")
+        if os.path.isfile(zap_path):
+            host_data["zap"] = parse_zap_alerts_json(zap_path)
 
         host_results[ip] = host_data
 

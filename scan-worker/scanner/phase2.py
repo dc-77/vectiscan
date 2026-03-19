@@ -9,7 +9,7 @@ from typing import Any, Callable, Optional
 import structlog
 
 from scanner.progress import publish_event, publish_tool_output
-from scanner.tools import run_tool
+from scanner.tools import run_tool, _save_result
 
 log = structlog.get_logger()
 
@@ -838,6 +838,182 @@ def _extract_paths_from_ffuf(results: list[dict[str, Any]] | None) -> set[str]:
     return paths
 
 
+def run_zap_scan(
+    fqdn: str,
+    ip: str,
+    host_dir: str,
+    order_id: str,
+    adaptive_config: dict[str, Any] | None = None,
+    config: dict[str, Any] | None = None,
+    progress_callback: Callable[[str, str, str], None] | None = None,
+) -> dict[str, Any]:
+    """Run OWASP ZAP scan sequence for a single host.
+
+    Sequence: Spider → [AJAX Spider] → [Forced Browse] → [Active Scan].
+    Passive Scanner runs automatically on all traffic.
+
+    Returns dict with: alerts, findings, spider_urls, tools_run, duration_ms.
+    """
+    import re
+    import time as _time
+
+    from scanner.tools.zap_client import ZapClient, ZapError
+    from scanner.tools.zap_mapper import ZapAlertMapper
+
+    zap = ZapClient()
+    result: dict[str, Any] = {
+        "alerts": [],
+        "findings": [],
+        "spider_urls": [],
+        "tools_run": [],
+        "duration_ms": 0,
+    }
+    start_ms = int(_time.monotonic() * 1000)
+
+    # Health check
+    if not zap.health_check():
+        log.warning("zap_daemon_unavailable", ip=ip, fqdn=fqdn)
+        publish_tool_output(order_id, "zap", ip, "ZAP daemon unavailable, skipping")
+        return result
+
+    ac = adaptive_config or {}
+    phase2_dir = f"{host_dir}/phase2"
+    context_name = f"ctx-{order_id[:8]}-{ip.replace('.', '_')}"
+    policy_name = f"policy-{order_id[:8]}-{ip.replace('.', '_')}"
+    target_url = f"https://{fqdn}"
+    context_id: int | None = None
+    ai_skip = set(ac.get("skip_tools", []))
+
+    try:
+        # 1. Create isolated context
+        context_id = zap.create_context(context_name)
+        zap.include_in_context(context_name, f".*{re.escape(fqdn)}.*")
+
+        # 2. Configure rate limiting (WAF-adaptive)
+        zap.configure_rate_limit(
+            req_per_sec=ac.get("zap_rate_req_per_sec", 80),
+            threads=ac.get("zap_threads", 5),
+            delay_ms=ac.get("zap_spider_delay_ms", 0),
+        )
+
+        # 3. Traditional Spider
+        publish_event(order_id, {"type": "tool_starting", "tool": "zap_spider", "host": ip})
+        spider_depth = ac.get("zap_spider_max_depth", 5)
+        spider_id = zap.start_spider(target_url, context_name=context_name, max_depth=spider_depth)
+        zap.poll_until_complete(
+            lambda: zap.spider_status(spider_id),
+            timeout=180, interval=5, stop_value=100,
+            order_id=order_id, tool_name="zap_spider",
+        )
+        spider_urls = zap.spider_results(spider_id)
+        result["spider_urls"] = spider_urls
+        result["tools_run"].append("zap_spider")
+        publish_tool_output(order_id, "zap_spider", ip, f"{len(spider_urls)} URLs discovered")
+        if progress_callback:
+            progress_callback(order_id, "zap_spider", "complete")
+
+        # 4. AJAX Spider (conditional on SPA detection)
+        ajax_enabled = ac.get("zap_ajax_spider_enabled", False)
+        if ajax_enabled and "zap_ajax_spider" not in ai_skip:
+            publish_event(order_id, {"type": "tool_starting", "tool": "zap_ajax_spider", "host": ip})
+            zap.start_ajax_spider(target_url, context_name=context_name)
+            completed = zap.poll_until_complete(
+                lambda: 100 if zap.ajax_spider_status() == "stopped" else 50,
+                timeout=240, interval=10, stop_value=100,
+                order_id=order_id, tool_name="zap_ajax_spider",
+            )
+            if not completed:
+                zap.stop_ajax_spider()
+            result["tools_run"].append("zap_ajax_spider")
+            publish_tool_output(order_id, "zap_ajax_spider", ip, "AJAX crawl complete")
+            if progress_callback:
+                progress_callback(order_id, "zap_ajax_spider", "complete")
+
+        # 5. Forced Browse (conditional on no WAF)
+        forced_browse_enabled = ac.get("zap_forced_browse_enabled", True)
+        if forced_browse_enabled and "zap_forced_browse" not in ai_skip:
+            publish_event(order_id, {"type": "tool_starting", "tool": "zap_forced_browse", "host": ip})
+            zap.start_forced_browse(target_url)
+            zap.poll_until_complete(
+                lambda: zap.forced_browse_status(),
+                timeout=180, interval=5, stop_value=100,
+                order_id=order_id, tool_name="zap_forced_browse",
+            )
+            result["tools_run"].append("zap_forced_browse")
+            publish_tool_output(order_id, "zap_forced_browse", ip, "Forced browse complete")
+            if progress_callback:
+                progress_callback(order_id, "zap_forced_browse", "complete")
+
+        # 6. Active Scan (package-dependent: not for webcheck/passive-only)
+        scan_policy = ac.get("zap_scan_policy", "standard")
+        is_webcheck = (config or {}).get("package") in ("basic", "webcheck")
+        phase2_tools = (config or {}).get("phase2_tools", [])
+        run_active = (not is_webcheck and scan_policy != "passive-only"
+                      and "zap_active" in phase2_tools)
+        if run_active:
+            publish_event(order_id, {"type": "tool_starting", "tool": "zap_active", "host": ip})
+            categories = ac.get("zap_active_categories", ["sqli", "xss", "lfi", "ssrf", "cmdi"])
+            zap.create_scan_policy(policy_name, categories, scan_policy)
+
+            scan_id = zap.start_active_scan(target_url, context_id=context_id, scan_policy=policy_name)
+            completed = zap.poll_until_complete(
+                lambda: zap.active_scan_status(scan_id),
+                timeout=600, interval=10, stop_value=100,
+                order_id=order_id, tool_name="zap_active",
+            )
+            if not completed:
+                zap.stop_active_scan(scan_id)
+            result["tools_run"].append("zap_active")
+            publish_tool_output(order_id, "zap_active", ip, "Active scan complete")
+            if progress_callback:
+                progress_callback(order_id, "zap_active", "complete")
+
+        # 7. Collect all alerts
+        all_alerts = zap.get_alerts(base_url=target_url)
+        result["alerts"] = all_alerts
+
+        # 8. Map to Finding dicts
+        mapper = ZapAlertMapper()
+        findings = mapper.map_alerts(all_alerts, ip, fqdn)
+        result["findings"] = findings
+
+        # Save alerts to disk
+        alerts_path = f"{phase2_dir}/zap_alerts.json"
+        with open(alerts_path, "w") as f:
+            json.dump(all_alerts, f, indent=2)
+
+        passive_count = sum(1 for fd in findings if fd.get("tool") == "zap_passive")
+        active_count = len(findings) - passive_count
+        publish_tool_output(order_id, "zap", ip,
+                            f"{len(all_alerts)} alerts ({passive_count} passive, {active_count} active)")
+
+    except ZapError as e:
+        log.error("zap_scan_failed", fqdn=fqdn, ip=ip, error=str(e))
+        publish_tool_output(order_id, "zap", ip, f"ZAP error: {e}")
+    finally:
+        # Always clean up context and policy
+        try:
+            zap.remove_context(context_name)
+        except Exception:
+            pass
+        try:
+            zap.remove_scan_policy(policy_name)
+        except Exception:
+            pass
+
+    result["duration_ms"] = int(_time.monotonic() * 1000) - start_ms
+
+    # Save to DB
+    raw_summary = json.dumps(result["alerts"][:50], indent=2)[:50000] if result["alerts"] else "[]"
+    _save_result(
+        order_id=order_id, host_ip=ip, phase=2,
+        tool_name="zap", raw_output=raw_summary,
+        exit_code=0, duration_ms=result["duration_ms"],
+    )
+
+    return result
+
+
 def run_phase2(
     ip: str,
     fqdns: list[str],
@@ -918,7 +1094,24 @@ def run_phase2(
         else:
             log.info("testssl_skipped", ip=ip, reason="not_in_package")
 
-    # nikto (web-only: skip if no web content detected)
+    # ZAP scan (replaces nikto, katana, gobuster for web vulnerability scanning)
+    if has_web and (phase2_tools is None or any(
+        t in (phase2_tools or []) for t in ("zap_spider", "zap_passive", "zap_active")
+    )):
+        zap_result = run_zap_scan(
+            primary_fqdn, ip, host_dir, order_id,
+            adaptive_config=adaptive_config,
+            config=config,
+            progress_callback=progress_callback,
+        )
+        results["zap_alerts"] = zap_result.get("alerts", [])
+        results["zap_findings"] = zap_result.get("findings", [])
+        results["zap_spider_urls"] = zap_result.get("spider_urls", [])
+        results["tools_run"].extend(zap_result.get("tools_run", []))
+    else:
+        log.info("zap_skipped", ip=ip, reason="no_web_or_not_in_package")
+
+    # nikto (legacy — kept for rollback, skipped when not in phase2_tools)
     if (phase2_tools is None or "nikto" in phase2_tools) and "nikto" not in ai_skip and has_web:
         publish_event(order_id, {"type": "tool_starting", "tool": "nikto", "host": ip})
         nikto_result = run_nikto(primary_fqdn, ip, host_dir, order_id, adaptive_config=adaptive_config)
@@ -936,14 +1129,28 @@ def run_phase2(
         log.info("nikto_skipped", ip=ip, reason="not_in_package")
 
     # nuclei (web-only: skip if no web content detected)
+    # ZAP handles misconfig/exposure — nuclei focuses on CVE + default-login + tech-specific
     if (phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web:
         publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
+        # Ensure "cve" and "default-login" tags are always included
+        nuclei_config = dict(adaptive_config) if adaptive_config else {}
+        tags = list(nuclei_config.get("nuclei_tags", []))
+        for auto_tag in ("cve", "default-login"):
+            if auto_tag not in tags:
+                tags.append(auto_tag)
+        nuclei_config["nuclei_tags"] = tags
+        # Ensure misconfig/exposure are excluded (ZAP covers these)
+        exclude = list(nuclei_config.get("nuclei_exclude_tags", []))
+        for excl_tag in ("misconfig", "exposure"):
+            if excl_tag not in exclude:
+                exclude.append(excl_tag)
+        nuclei_config["nuclei_exclude_tags"] = exclude
         # Basic: 10 min, high/critical only. Pro/NIS2: 25 min, all severities.
         is_webcheck = config.get("package") in ("basic", "webcheck")
         nuclei_timeout = 600 if is_webcheck else 600
         nuclei_severity = config.get("nuclei_severity", "high,critical" if is_webcheck else "low,medium,high,critical")
         nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
-                                   adaptive_config=adaptive_config,
+                                   adaptive_config=nuclei_config,
                                    timeout=nuclei_timeout,
                                    severity=nuclei_severity)
         results["nuclei"] = nuclei_result

@@ -14,6 +14,24 @@ class TestWebcheck:
         config = get_config("webcheck")
         assert "nuclei" not in config["phase2_tools"]
 
+    def test_phase2_has_zap_spider(self):
+        config = get_config("webcheck")
+        assert "zap_spider" in config["phase2_tools"]
+
+    def test_phase2_has_zap_passive(self):
+        config = get_config("webcheck")
+        assert "zap_passive" in config["phase2_tools"]
+
+    def test_phase2_excludes_zap_active(self):
+        """WebCheck is passive-only — no active scan."""
+        config = get_config("webcheck")
+        assert "zap_active" not in config["phase2_tools"]
+
+    def test_phase2_excludes_legacy_tools(self):
+        config = get_config("webcheck")
+        for tool in ("gobuster_dir", "katana", "feroxbuster", "ffuf", "dalfox"):
+            assert tool not in config["phase2_tools"]
+
     def test_max_hosts(self):
         config = get_config("webcheck")
         assert config["max_hosts"] == 3
@@ -43,14 +61,16 @@ class TestWebcheck:
 class TestPerimeter:
     def test_phase2_has_all_tools(self):
         config = get_config("perimeter")
-        expected = ["testssl", "nikto", "nuclei", "gobuster_dir",
-                    "feroxbuster", "katana", "gowitness", "headers",
-                    "httpx", "wpscan"]
+        expected = ["testssl", "zap_spider", "zap_active", "nuclei",
+                    "gowitness", "headers", "httpx", "wpscan"]
         for tool in expected:
             assert tool in config["phase2_tools"]
-        # ffuf and dalfox removed — zero useful output in all test runs
-        assert "ffuf" not in config["phase2_tools"]
-        assert "dalfox" not in config["phase2_tools"]
+
+    def test_phase2_excludes_legacy_tools(self):
+        """nikto, gobuster, katana, feroxbuster replaced by ZAP."""
+        config = get_config("perimeter")
+        for tool in ("nikto", "gobuster_dir", "katana", "feroxbuster", "ffuf", "dalfox"):
+            assert tool not in config["phase2_tools"]
 
     def test_max_hosts(self):
         config = get_config("perimeter")

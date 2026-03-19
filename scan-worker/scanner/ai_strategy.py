@@ -190,54 +190,66 @@ Antwort im Format:
 
 PHASE2_CONFIG_SYSTEM = """Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts.
 
+NUCLEI-KONFIGURATION:
+Die Tags "cve" und "default-login" werden automatisch hinzugefügt — du gibst nur die tech-spezifischen Tags an.
+Misconfig und Exposure werden von OWASP ZAP abgedeckt — nur bei Bedarf als nuclei-Tag.
+
 VERFÜGBARE NUCLEI-TAGS (wichtigste):
-wordpress, apache, nginx, iis, php, java, python, nodejs, rails, laravel, django, spring, tomcat, jboss, weblogic, coldfusion, drupal, joomla, magento, shopify, shopware, prestashop, struts, exposure, network, ssl, dns, cve, default-login, misconfig, tech, token, sqli, xss, lfi, rfi, ssrf, redirect, upload
+wordpress, apache, nginx, iis, php, java, python, nodejs, rails, laravel, django, spring, tomcat, jboss, weblogic, coldfusion, drupal, joomla, magento, shopify, shopware, prestashop, struts, network, ssl, dns, tech, token, sqli, xss, lfi, rfi, ssrf, redirect, upload
 
 CMS-SPEZIFISCHE NUCLEI-TAG-EMPFEHLUNGEN:
 - WordPress     → nuclei_tags: ["wordpress", "wp-plugin", "wp-theme"]
-- Shopware 5/6  → nuclei_tags: ["shopware", "php", "exposure", "misconfig"]
-- TYPO3         → nuclei_tags: ["typo3", "php", "exposure", "misconfig"]
-- Joomla        → nuclei_tags: ["joomla", "php", "exposure"]
-- Drupal        → nuclei_tags: ["drupal", "php", "exposure"]
-- Contao        → nuclei_tags: ["php", "exposure", "misconfig"]
-- Magento       → nuclei_tags: ["magento", "php", "exposure", "token"]
-- Strapi        → nuclei_tags: ["nodejs", "exposure", "misconfig", "api"]
-- Ghost         → nuclei_tags: ["nodejs", "exposure", "misconfig"]
+- Shopware 5/6  → nuclei_tags: ["shopware", "php"]
+- TYPO3         → nuclei_tags: ["typo3", "php"]
+- Joomla        → nuclei_tags: ["joomla", "php"]
+- Drupal        → nuclei_tags: ["drupal", "php"]
+- Contao        → nuclei_tags: ["php"]
+- Magento       → nuclei_tags: ["magento", "php", "token"]
+- Strapi        → nuclei_tags: ["nodejs", "api"]
+- Ghost         → nuclei_tags: ["nodejs"]
 Wenn kein CMS erkannt: → Standard-Tags basierend auf Tech-Stack (Apache/nginx/PHP/Node)
 Wenn WordPress erkannt: → wpscan wird automatisch aktiviert
 
-NIKTO-TUNING-KATEGORIEN:
-1=Interesting File, 2=Misconfiguration, 3=Information Disclosure, 4=Injection (XSS/Script), 5=Remote File Retrieval, 6=Denial of Service, 7=Remote File Retrieval (Server Wide), 8=Command Execution, 9=SQL Injection, 0=File Upload
+ZAP-KONFIGURATION (OWASP ZAP Daemon):
+- zap_scan_policy: "passive-only"|"waf-safe"|"standard"|"aggressive" (Default: "standard")
+  - "passive-only": Kein Active Scan (WebCheck-Default, wird automatisch gesetzt)
+  - "waf-safe": Reduzierte Intensität, langsamer — für Hosts hinter WAF
+  - "standard": Gute Balance zwischen Coverage und Laufzeit (Default)
+  - "aggressive": Alle Scan-Rules, hohe Intensität — nur bei verdächtigen Hosts
+- zap_spider_max_depth: 3–7 (Default: 5). SPAs/JS-Heavy Apps: 6-7. Statische Seiten: 3.
+- zap_ajax_spider_enabled: true für SPA-Frameworks (React, Vue, Angular, Next.js, Nuxt, Shopware 6), false sonst
+- zap_forced_browse_enabled: true (Default). false bei WAF (wird geblockt).
+- zap_forced_browse_wordlist: "common"|"wordpress"|"api-rest"|"java-spring" (Default: "common")
+  - "wordpress": wp-admin, plugins, uploads
+  - "api-rest": swagger, graphql, /api/v1, actuator
+  - "java-spring": actuator, /api/v1, /manage
+  - "common": generische Pfade
+- zap_active_categories: Aktivierte Active-Scan-Kategorien:
+  - "sqli" — SQL Injection
+  - "xss" — Cross-Site Scripting (reflected + stored)
+  - "lfi" — Local File Inclusion / Path Traversal
+  - "rfi" — Remote File Inclusion
+  - "ssrf" — Server-Side Request Forgery
+  - "cmdi" — Command Injection
+  - "xxe" — XML External Entity
+  - "crlf" — CRLF Injection
+  Bei PHP-Servern: sqli, xss, lfi, rfi, cmdi
+  Bei Java/Spring/Tomcat: sqli, xss, lfi, xxe, cmdi
+  Bei Node.js/Express: xss, ssrf, cmdi, crlf
+  Bei statischen Seiten: nur xss
+- zap_rate_req_per_sec: 15–80 (Default: 80). Bei WAF: 15. Ohne WAF: 80.
+- zap_threads: 2–5 (Default: 5). Bei WAF: 2. Ohne WAF: 5.
+- zap_spider_delay_ms: 0–800 (Default: 0). Bei WAF: 800. Ohne WAF: 0.
+- zap_extra_urls: [] — Zusätzliche URLs für offene Non-Standard-Ports (z.B. 8080, 8443, 9090)
 
-GOBUSTER-WORDLISTS:
-- "common" — Generische Pfade (Standard)
-- "wordpress" — WordPress-spezifische Pfade (wp-admin, plugins, uploads)
-- "api" — API-Endpunkte (swagger, graphql, /api/v1, actuator)
-- "cms" — CMS-Admin-Panels und typische CMS-Pfade
-
-FFUF-KONFIGURATION:
-- ffuf_mode: "dir" (Default, Extension-Fuzzing), "vhost" (Virtual-Host-Discovery), "param" (Parameter-Discovery)
-- ffuf_extensions: Dateiendungen zum Fuzzen (z.B. ".php,.html,.js,.bak,.old,.conf")
-- Bei PHP-Servern: ".php,.phtml,.inc,.bak,.old,.conf"
-- Bei Node.js: ".js,.json,.env,.bak"
-- Bei statischen Seiten: ".html,.htm,.txt,.xml,.json"
-- Modus "vhost": Nur bei Hosts mit IP-basiertem Zugriff sinnvoll (suche versteckte VHosts)
-- Modus "param": Nur wenn katana-Ergebnisse vorliegen
-
-FEROXBUSTER-KONFIGURATION:
-- feroxbuster_depth: Rekursionstiefe 1–4 (Default: 2)
-  - Tiefe 1: Flach, schnell — für einfache Webseiten
-  - Tiefe 2: Standard — findet versteckte Admin-Bereiche
-  - Tiefe 3: Tief — für komplexe Apps mit verschachtelten Pfaden
-  - Tiefe 4: Maximal — nur bei verdächtigen Hosts mit vielen Verzeichnissen
-- feroxbuster_enabled: false → nur bei reinen API-Hosts ohne Directory-Struktur
-
-DALFOX-KONFIGURATION:
-- dalfox_enabled: true (Default) — XSS-Scanner auf katana-URLs mit Parametern
-- dalfox_enabled: false → bei statischen Seiten ohne dynamische Parameter
+WAF-SIGNAL → ZAP-DEFAULTS:
+WAF erkannt (Cloudflare, Akamai, Sucuri, Imperva, F5 etc.):
+→ zap_scan_policy: "waf-safe", zap_rate_req_per_sec: 15, zap_threads: 2, zap_spider_delay_ms: 800, zap_forced_browse_enabled: false
+Keine WAF:
+→ zap_scan_policy: "standard" oder "aggressive", zap_rate_req_per_sec: 80, zap_threads: 5, zap_spider_delay_ms: 0, zap_forced_browse_enabled: true
 
 TOOLS DIE ÜBERSPRUNGEN WERDEN KÖNNEN:
-katana, gowitness, ffuf, feroxbuster, dalfox
+gowitness, zap_ajax_spider, zap_forced_browse
 
 WICHTIG FÜR skip_tools:
 - Für die Basisdomain und www-Subdomain: skip_tools MUSS IMMER leer sein []
@@ -247,36 +259,35 @@ WICHTIG FÜR skip_tools:
 
 REGELN:
 - Nuclei-Tags sollten zur erkannten Technologie passen
-- Immer "exposure" und "misconfig" als Tags einschließen
-- Bei WordPress: "wordpress" Tag UND wordpress Wordlist
-- Bei Shopware: "shopware" Tag UND cms Wordlist
-- Bei API-Hosts: "api" Wordlist, exposure + token Tags
-- Bei WAF vorhanden: "dos" und "fuzz" ausschließen (werden geblockt)
-- nikto_tuning auf relevante Kategorien beschränken
-- ffuf_extensions passend zur Server-Technologie wählen
-- feroxbuster_depth erhöhen bei Hosts mit vielen Verzeichnissen
-- dalfox_enabled=false bei statischen Sites
+- Bei WordPress: "wordpress" Tag + wordpress Wordlist für ZAP Forced Browse
+- Bei Shopware: "shopware" Tag
+- Bei API-Hosts: api-rest Wordlist für ZAP Forced Browse, token Tags für nuclei
+- Bei WAF vorhanden: "dos" und "fuzz" für nuclei ausschließen, ZAP auf waf-safe setzen
+- zap_ajax_spider_enabled=true nur wenn SPA/JS-Framework erkannt
 
 WICHTIG FÜR NUCLEI-TAGS (Performance):
 - Verwende NIEMALS den Tag "cve" allein — das matcht 3000+ Templates und dauert zu lange
 - Stattdessen: technologie-spezifische Tags wie "apache", "nginx", "wordpress", "shopware"
 - Kombiniere maximal 5-7 Tags für optimale Laufzeit
-- Die Tags "exposure" und "misconfig" sind effizient (wenige Templates, hoher Ertrag)
-- Gute Kombination: ["exposure", "misconfig", "tech-spezifisch", "ssl", "default-login"]
+- Die Tags "cve" und "default-login" werden automatisch ergänzt
+- Gute Kombination: ["tech-spezifisch", "ssl", "token"]
 - Schlechte Kombination: ["cve", "network", "dns"] — viel zu breit, Timeout garantiert
 
 Antworte NUR mit validem JSON, kein anderer Text."""
 
 PHASE2_CONFIG_SCHEMA = """{
   "nuclei_tags": ["tag1", "tag2"],
-  "nuclei_exclude_tags": ["dos", "fuzz"],
-  "nikto_tuning": "1,2,3,4",
-  "gobuster_wordlist": "common|wordpress|api|cms",
-  "ffuf_mode": "dir|vhost|param",
-  "ffuf_extensions": ".php,.html,.js,.bak,.old,.conf",
-  "feroxbuster_depth": 2,
-  "feroxbuster_enabled": true,
-  "dalfox_enabled": true,
+  "nuclei_exclude_tags": ["dos", "fuzz", "misconfig", "exposure"],
+  "zap_scan_policy": "standard",
+  "zap_spider_max_depth": 5,
+  "zap_ajax_spider_enabled": true,
+  "zap_forced_browse_enabled": true,
+  "zap_forced_browse_wordlist": "common",
+  "zap_active_categories": ["sqli", "xss", "lfi", "ssrf"],
+  "zap_rate_req_per_sec": 80,
+  "zap_threads": 5,
+  "zap_spider_delay_ms": 0,
+  "zap_extra_urls": [],
   "skip_tools": [],
   "reasoning": "Kurze Begründung der Konfiguration"
 }"""
@@ -327,24 +338,27 @@ Antwort im Format:
         log.warning("ai_phase2_config_fallback", ip=tech_profile.get("ip"), reason=reason)
         return {
             "nuclei_tags": [],
-            "nuclei_exclude_tags": [],
-            "nikto_tuning": "1234567890",
-            "gobuster_wordlist": "common",
-            "ffuf_mode": "dir",
-            "ffuf_extensions": ".php,.html,.js,.bak,.old,.conf",
-            "feroxbuster_depth": 2,
-            "feroxbuster_enabled": True,
-            "dalfox_enabled": True,
+            "nuclei_exclude_tags": ["dos", "fuzz", "misconfig", "exposure"],
+            "zap_scan_policy": "standard",
+            "zap_spider_max_depth": 5,
+            "zap_ajax_spider_enabled": False,
+            "zap_forced_browse_enabled": True,
+            "zap_forced_browse_wordlist": "common",
+            "zap_active_categories": ["sqli", "xss", "lfi", "ssrf", "cmdi"],
+            "zap_rate_req_per_sec": 80,
+            "zap_threads": 5,
+            "zap_spider_delay_ms": 0,
+            "zap_extra_urls": [],
             "skip_tools": [],
-            "reasoning": f"Fallback — {reason}"
+            "reasoning": f"Fallback — {reason}",
         }
 
     log.info("ai_phase2_config_complete",
              ip=tech_profile.get("ip"),
              nuclei_tags=result.get("nuclei_tags"),
-             wordlist=result.get("gobuster_wordlist"),
-             ffuf_mode=result.get("ffuf_mode"),
-             ferox_depth=result.get("feroxbuster_depth"))
+             zap_policy=result.get("zap_scan_policy"),
+             zap_ajax=result.get("zap_ajax_spider_enabled"),
+             zap_categories=result.get("zap_active_categories"))
 
     return result
 

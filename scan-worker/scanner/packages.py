@@ -19,9 +19,8 @@ _PERIMETER_BASE: dict[str, Any] = {
     "max_hosts": 15,
     "nmap_ports": "--top-ports 1000",
     "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
-    "phase2_tools": ["testssl", "nikto", "nuclei", "gobuster_dir",
-                     "feroxbuster", "katana", "gowitness", "headers",
-                     "httpx", "wpscan"],
+    "phase2_tools": ["testssl", "zap_spider", "zap_active", "nuclei",
+                     "gowitness", "headers", "httpx", "wpscan"],
     "phase3_tools": ["nvd", "epss", "cisa_kev", "exploitdb", "correlator",
                      "fp_filter", "business_impact"],
     "phase3_timeout": 300,        # 5 Minuten
@@ -44,8 +43,8 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
         "max_hosts": 3,
         "nmap_ports": "--top-ports 100",
         "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
-        "phase2_tools": ["testssl", "gowitness", "headers",
-                         "httpx", "wpscan"],
+        "phase2_tools": ["testssl", "zap_spider", "zap_passive",
+                         "gowitness", "headers", "httpx", "wpscan"],
         "phase3_tools": ["nvd", "cisa_kev", "correlator", "fp_filter"],
         "phase3_timeout": 120,        # 2 Minuten
         "total_timeout": 1200,        # 20 Minuten
