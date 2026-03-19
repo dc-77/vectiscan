@@ -17,6 +17,7 @@ const MIGRATION_007_PATH = path.join(__dirname, '..', 'migrations', '007_report_
 const MIGRATION_008_PATH = path.join(__dirname, '..', 'migrations', '008_scan_schedules.sql');
 const MIGRATION_009_PATH = path.join(__dirname, '..', 'migrations', '009_v2_packages.sql');
 const MIGRATION_010_PATH = path.join(__dirname, '..', 'migrations', '010_verified_domains.sql');
+const MIGRATION_011_PATH = path.join(__dirname, '..', 'migrations', '011_finding_exclusions_report_versioning.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -119,6 +120,18 @@ export async function initDb(): Promise<void> {
 
   if (!verifiedDomainsCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_010_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 011: finding_exclusions + report versioning
+  const exclusionsCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables WHERE table_name = 'finding_exclusions'
+    ) AS exists
+  `);
+
+  if (!exclusionsCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_011_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 
