@@ -76,7 +76,7 @@ PROBE_MATRIX: list[dict[str, Any]] = [
     {
         "cms": "Shopware",
         "version_hint": "6",
-        "probes": ["/admin", "/api/_info/config"],
+        "probes": ["/api/_info/config", "/store-api/context"],
         "body_patterns": [r"(?i)shopware"],
         "confidence": 0.90,
     },
@@ -439,10 +439,20 @@ class CMSFingerprinter:
 
             if hits:
                 version_hint = probe_def.get("version_hint")
+                confidence = probe_def["confidence"]
+                has_body_match = any("body match" in h for h in hits)
+                has_body_patterns = bool(probe_def.get("body_patterns"))
+                # If body_patterns are defined but none matched, this is a weak
+                # signal (generic path like /admin responded 200 but body doesn't
+                # confirm the CMS).  Reduce confidence significantly.
+                if has_body_patterns and not has_body_match:
+                    confidence = min(confidence, 0.3)
+                    log.debug("cms_probe_no_body_match",
+                              cms=cms_name, fqdn=fqdn, hits=hits)
                 candidates.append(CMSCandidate(
                     cms=cms_name,
                     version=version_hint,
-                    confidence=probe_def["confidence"],
+                    confidence=confidence,
                     method="probe_matrix",
                     details={"probe_hits": hits},
                 ))
