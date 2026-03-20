@@ -593,12 +593,15 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
         try:
             log.info("claude_api_call", attempt=attempt + 1, domain=domain)
 
+            # Opus needs more time for complex reports (32K tokens output)
+            api_timeout = 600.0 if "opus" in model else 120.0
+
             response = client.messages.create(
                 model=model,
                 max_tokens=max_tokens,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
-                timeout=120.0,
+                timeout=api_timeout,
             )
 
             # Extract text from response
