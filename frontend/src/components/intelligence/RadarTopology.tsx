@@ -14,9 +14,13 @@ interface RadarTopologyProps {
   toolOutputs: ToolOutputEntry[];
   /** Map of host IP to assigned lane color from parallel scanning. */
   hostColorMap?: Record<string, string>;
+  /** IP of host where a threat was just found — triggers expanding red rings. */
+  threatHost?: string;
+  /** When true, pulse the center domain node (AI decision event). */
+  aiPulse?: boolean;
 }
 
-export default function RadarTopology({ domain, hosts, currentHost, toolOutputs, hostColorMap }: RadarTopologyProps) {
+export default function RadarTopology({ domain, hosts, currentHost, toolOutputs, hostColorMap, threatHost, aiPulse }: RadarTopologyProps) {
   const size = 210;
   const cx = size / 2;
   const cy = size / 2;
@@ -139,14 +143,21 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs,
           );
         })}
 
-        {/* Center domain node */}
-        <circle cx={cx} cy={cy} r={9} fill={COLORS.cyan} opacity="0.9" filter="url(#glow)">
-          <animate attributeName="r" values="8;10;8" dur="2s" repeatCount="indefinite" />
+        {/* Center domain node — with AI pulse */}
+        <circle cx={cx} cy={cy} r={aiPulse ? 14 : 9} fill={COLORS.cyan} opacity="0.9" filter="url(#glow)"
+          style={{ transition: 'r 0.3s ease-out' }}>
+          <animate attributeName="r" values={aiPulse ? '12;14;12' : '8;10;8'} dur="2s" repeatCount="indefinite" />
         </circle>
         <circle cx={cx} cy={cy} r={16} fill="none" stroke={COLORS.cyan} strokeWidth="0.5" opacity="0.3">
           <animate attributeName="r" values="14;20;14" dur="3s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.3;0.08;0.3" dur="3s" repeatCount="indefinite" />
         </circle>
+        {aiPulse && (
+          <circle cx={cx} cy={cy} r={14} fill="none" stroke="#A78BFA" strokeWidth="1" opacity="0">
+            <animate attributeName="r" values="14;30;40" dur="1s" fill="freeze" />
+            <animate attributeName="opacity" values="0.6;0.3;0" dur="1s" fill="freeze" />
+          </circle>
+        )}
 
         {/* Host nodes */}
         {hostPositions.map(h => {
@@ -187,6 +198,28 @@ export default function RadarTopology({ domain, hosts, currentHost, toolOutputs,
                   <animate attributeName="r" values="4;7;4" dur="1s" repeatCount="indefinite" />
                 )}
               </circle>
+
+              {/* Lock-on reticle for active host */}
+              {h.ip === currentHost && (
+                <g>
+                  <rect x={h.x-12} y={h.y-12} width={24} height={24}
+                        fill="none" stroke={dotColor} strokeWidth="0.5" opacity="0.7"
+                        style={{ transformOrigin: `${h.x}px ${h.y}px`, animation: 'lockOnSpin 0.8s ease-out forwards' }} />
+                  <rect x={h.x-8} y={h.y-8} width={16} height={16}
+                        fill="none" stroke={dotColor} strokeWidth="0.3" opacity="0.5"
+                        style={{ transformOrigin: `${h.x}px ${h.y}px`, animation: 'lockOnSpin 0.8s 0.1s ease-out forwards' }} />
+                </g>
+              )}
+
+              {/* Vulnerability strike rings */}
+              {threatHost && h.ip === threatHost && (
+                <g>
+                  {[0, 0.2, 0.4].map((delay, i) => (
+                    <circle key={i} cx={h.x} cy={h.y} r={5} fill="none" stroke="#EF4444" strokeWidth="1.5"
+                            opacity="0" style={{ animation: `vulnRing 1.5s ${delay}s ease-out forwards` }} />
+                  ))}
+                </g>
+              )}
             </g>
           );
         })}

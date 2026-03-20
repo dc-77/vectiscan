@@ -104,8 +104,21 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
             )}
           </div>
           <div className="h-1 bg-gray-700 rounded-full overflow-hidden">
-            <div className="h-full bg-blue-500 rounded-full transition-all duration-1000"
-                 style={{ width: `${percent}%` }} />
+            <div className="h-full rounded-full animate-energyFlow relative"
+                 style={{ width: `${percent}%`, transition: 'width 1s ease-out' }}>
+              {percent > 0 && percent < 100 && (
+                <div
+                  className="absolute top-0 h-full"
+                  style={{
+                    right: 0,
+                    width: 4,
+                    background: 'radial-gradient(circle, rgba(255,255,255,0.9), rgba(56,189,248,0.6))',
+                    boxShadow: '0 0 8px rgba(56,189,248,0.8), 0 0 16px rgba(56,189,248,0.4)',
+                    animation: 'sparkPulse 1s ease-in-out infinite',
+                  }}
+                />
+              )}
+            </div>
           </div>
         </div>
       )}

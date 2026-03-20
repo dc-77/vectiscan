@@ -40,7 +40,7 @@ export default function HostDiscoveryMatrix({ hosts, currentHost, aiStrategy, ho
 
           return (
             <div key={h.ip}
-              className="flex items-center gap-2 px-2 py-[3px] transition-colors"
+              className={`flex items-center gap-2 px-2 py-[3px] transition-colors ${h.ip === currentHost ? 'animate-rowHighlight' : ''}`}
               style={{
                 borderLeft: `2px solid ${borderColor}`,
                 background: isActive ? 'rgba(234,179,8,0.04)' : undefined,

@@ -17,6 +17,8 @@ import RadarTopology from '@/components/intelligence/RadarTopology';
 import MetricsGrid from '@/components/intelligence/MetricsGrid';
 import HostDiscoveryMatrix from '@/components/intelligence/HostDiscoveryMatrix';
 import AiDecisionFeed from '@/components/intelligence/AiDecisionFeed';
+import ToolWatermark from '@/components/terminal/ToolWatermark';
+import PacketStream from '@/components/intelligence/PacketStream';
 
 // Hex divider between sections
 function HexDivider() {
@@ -74,6 +76,13 @@ function HomeContent() {
   const [aiGlow, setAiGlow] = useState(false);
   const lastPhaseRef = useRef<string>('');
 
+  // New visual effects state
+  const [threatHost, setThreatHost] = useState<string>('');
+  const [aiPulse, setAiPulse] = useState(false);
+  const [phaseName, setPhaseName] = useState('');
+  const [packetBurst, setPacketBurst] = useState(false);
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+
   // Build HostNode list from discovered hosts + AI strategy
   const updateIntelligenceHosts = useCallback((
     discoveredHosts: Array<{ ip: string; fqdns: string[]; status?: string }>,
@@ -106,16 +115,25 @@ function HomeContent() {
       // AI decision glow effect
       setAiGlow(true);
       setTimeout(() => setAiGlow(false), 800);
+      // AI neural pulse on radar
+      setAiPulse(true);
+      setTimeout(() => setAiPulse(false), 1200);
       return;
     }
     if (msg.type === 'ai_config' && msg.ip && msg.config) {
       setAiConfigs(prev => ({ ...prev, [msg.ip!]: msg.config! }));
       setAiGlow(true);
       setTimeout(() => setAiGlow(false), 800);
+      // AI neural pulse on radar
+      setAiPulse(true);
+      setTimeout(() => setAiPulse(false), 1200);
       return;
     }
     if (msg.type === 'tool_starting' && msg.tool) {
       handleToolStarting(msg.tool, msg.host || '');
+      // Packet burst on tool start
+      setPacketBurst(true);
+      setTimeout(() => setPacketBurst(false), 1000);
       return;
     }
     if (msg.type === 'tool_output' && msg.tool && msg.summary) {
@@ -127,6 +145,11 @@ function HomeContent() {
       if (/critical|CVE-|HIGH/i.test(msg.summary)) {
         setThreatFlash(true);
         setTimeout(() => setThreatFlash(false), 800);
+        // Vulnerability strike rings on radar
+        if (msg.host) {
+          setThreatHost(msg.host);
+          setTimeout(() => setThreatHost(''), 2000);
+        }
       }
       return;
     }
@@ -153,6 +176,19 @@ function HomeContent() {
           lastPhaseRef.current = phase;
           setPhaseFlash(true);
           setTimeout(() => setPhaseFlash(false), 500);
+          // Phase warp overlay
+          const phaseNames: Record<string, string> = {
+            passive_intel: 'PHASE 0a \u2014 PASSIVE INTELLIGENCE',
+            dns_recon: 'PHASE 0b \u2014 ACTIVE DISCOVERY',
+            scan_phase1: 'PHASE 1 \u2014 TECHNOLOGY FINGERPRINTING',
+            scan_phase2: 'PHASE 2 \u2014 DEEP SCAN',
+            scan_phase3: 'PHASE 3 \u2014 CORRELATION',
+          };
+          const name = phaseNames[phase];
+          if (name) {
+            setPhaseName(name);
+            setTimeout(() => setPhaseName(''), 1500);
+          }
         }
       } else if (msg.type === 'hosts_discovered' && msg.hosts) {
         updated.progress = {
@@ -180,6 +216,19 @@ function HomeContent() {
 
   const handleWsConnectionChange = useCallback((connected: boolean) => {
     setWsConnected(connected);
+  }, []);
+
+  // Panel parallax on desktop only
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches) {
+      const handler = (e: MouseEvent) => {
+        const x = ((e.clientX / window.innerWidth) - 0.5) * 2;
+        const y = ((e.clientY / window.innerHeight) - 0.5) * 2;
+        setMouseOffset({ x, y });
+      };
+      window.addEventListener('mousemove', handler, { passive: true });
+      return () => window.removeEventListener('mousemove', handler);
+    }
   }, []);
 
   const { close: closeWs } = useWebSocket(orderId, {
@@ -295,6 +344,7 @@ function HomeContent() {
     setShowReport(false); setDomain(''); setSelectedPackage('perimeter');
     setOrderId(null); setOrder(null); setError(null); setCancelling(false);
     setAiStrategy(null); setAiConfigs({}); setToolOutputs([]); setIntelligenceHosts([]);
+    setThreatHost(''); setAiPulse(false); setPhaseName(''); setPacketBurst(false);
   };
 
   const handleCancel = async () => {
@@ -385,6 +435,20 @@ function HomeContent() {
           <div className="fixed inset-0 pointer-events-none z-[9998] animate-threatScreenFlash" />
         )}
 
+        {/* Phase warp overlay */}
+        {phaseName && (
+          <div className="fixed inset-0 pointer-events-none z-[9997] flex items-center justify-center">
+            {/* Wipe line */}
+            <div className="absolute inset-y-0 left-0 w-[3px] animate-phaseWipe"
+                 style={{ background: 'linear-gradient(to bottom, transparent, #38BDF8, transparent)' }} />
+            {/* Phase name */}
+            <div className="text-2xl font-mono font-bold text-[#38BDF8] animate-phaseName"
+                 style={{ textShadow: '0 0 20px rgba(56,189,248,0.5), 0 0 40px rgba(56,189,248,0.2)' }}>
+              {phaseName}
+            </div>
+          </div>
+        )}
+
         {/* ─── Row 1: ScanProgress ──────────────────── */}
         <div style={{ gridArea: 'progress' }}>
           <ScanProgress scan={order} onCancel={handleCancel} cancelling={cancelling} />
@@ -397,23 +461,39 @@ function HomeContent() {
 
         {/* ─── Row 3 Left: Terminal Log ─────────────── */}
         <div className="rounded-lg border overflow-hidden flex flex-col animate-panelBreathe"
-          style={{ gridArea: 'terminal', borderColor: panelBorder, background: panelBg }}>
+          style={{
+            gridArea: 'terminal',
+            borderColor: panelBorder,
+            background: panelBg,
+            contain: 'layout style',
+            transform: `translate3d(${mouseOffset.x * -1}px, ${mouseOffset.y * -0.5}px, 0)`,
+            transition: 'transform 0.3s ease-out',
+          }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
             <span className={`w-1.5 h-1.5 rounded-full mr-2 ${isScanning ? 'bg-blue-500 animate-pulse' : 'bg-slate-600'}`} />
             <span className="text-[10px] font-mono uppercase tracking-wider text-blue-500">Terminal Log</span>
             <span className="ml-auto text-[9px] font-mono text-slate-700">{lines.length} lines</span>
           </div>
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 relative">
             <ScanTerminal lines={lines}
               isScanning={!!isScanning}
               isComplete={order.status === 'report_complete'} isError={order.status === 'failed'} compact />
+            <ToolWatermark currentTool={order.progress.currentTool || ''} />
           </div>
         </div>
 
         {/* ─── Center: Tactical Map + Metrics ─────────── */}
         <div className="rounded-lg border overflow-hidden flex flex-col animate-panelBreathe"
-          style={{ gridArea: 'sidebar', borderColor: panelBorder, background: panelBg, animationDelay: '4s' }}>
+          style={{
+            gridArea: 'sidebar',
+            borderColor: panelBorder,
+            background: panelBg,
+            animationDelay: '4s',
+            contain: 'layout style',
+            transform: `translate3d(${mouseOffset.x * 0.5}px, ${mouseOffset.y * -0.3}px, 0)`,
+            transition: 'transform 0.3s ease-out',
+          }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-2" />
@@ -428,6 +508,8 @@ function HomeContent() {
               hostColorMap={Object.fromEntries(
                 Array.from(hostStreams.entries()).map(([ip, s]) => [ip, s.color])
               )}
+              threatHost={threatHost}
+              aiPulse={aiPulse}
             />
           </div>
           <HexDivider />
@@ -443,7 +525,15 @@ function HomeContent() {
 
         {/* ─── Row 3 Center: AI Decision Log ──────────── */}
         <div className={`rounded-lg border overflow-hidden flex flex-col ${aiGlow ? 'animate-aiDecisionGlow' : 'animate-panelBreathe'}`}
-          style={{ gridArea: 'ailog', borderColor: panelBorder, background: panelBg, animationDelay: '2s' }}>
+          style={{
+            gridArea: 'ailog',
+            borderColor: panelBorder,
+            background: panelBg,
+            animationDelay: '2s',
+            contain: 'layout style',
+            transform: `translate3d(${mouseOffset.x * 1}px, ${mouseOffset.y * -0.5}px, 0)`,
+            transition: 'transform 0.3s ease-out',
+          }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
             <span className={`w-1.5 h-1.5 rounded-full mr-2 ${aiStrategy ? 'bg-blue-500 animate-pulse' : 'bg-slate-600'}`} />
@@ -464,7 +554,7 @@ function HomeContent() {
 
         {/* ─── Center Bottom: Discovered Hosts ──────────── */}
         <div className="rounded-lg border overflow-hidden flex flex-col"
-          style={{ gridArea: 'hosts', borderColor: panelBorder, background: panelBg }}>
+          style={{ gridArea: 'hosts', borderColor: panelBorder, background: panelBg, contain: 'layout style' }}>
           <div className="flex items-center px-3 shrink-0 border-b"
             style={{ height: 28, borderColor: panelBorder, background: '#0C1222' }}>
             <span className={`w-1.5 h-1.5 rounded-full mr-2 ${intelligenceHosts.length > 0 ? 'bg-blue-500' : 'bg-slate-600'}`} />
@@ -482,6 +572,17 @@ function HomeContent() {
             />
           </div>
         </div>
+
+        {/* Data packet stream — fixed bottom bar */}
+        {isScanning && (
+          <div className="fixed bottom-0 left-0 right-0 z-50">
+            <PacketStream
+              isActive={true}
+              hostColors={Array.from(hostStreams.values()).map(s => s.color)}
+              burst={packetBurst}
+            />
+          </div>
+        )}
       </main>
     );
   }
