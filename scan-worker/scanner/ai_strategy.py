@@ -81,7 +81,7 @@ def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
         start = time.monotonic()
         response = client.messages.create(
             model=HAIKU_MODEL,
-            max_tokens=4096,
+            max_tokens=8192,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
         )
@@ -533,7 +533,7 @@ Antwort im Format:
 # Sonnet client (for Phase 3 cross-tool reasoning)
 # ---------------------------------------------------------------------------
 
-def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 4096) -> dict[str, Any]:
+def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384) -> dict[str, Any]:
     """Call Claude Sonnet for complex reasoning tasks.
 
     Used for Phase 3 cross-tool correlation where Haiku's reasoning
