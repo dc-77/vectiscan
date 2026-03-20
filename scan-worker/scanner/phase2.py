@@ -1200,16 +1200,12 @@ def run_phase2(
         return r
 
     def _run_quick_tools_stage1() -> dict[str, Any]:
-        """Fast independent tools: gowitness, header_check, httpx."""
+        """Fast independent tools: header_check, httpx.
+
+        Note: gowitness removed — screenshots are now taken in Phase 1 via Playwright.
+        run_gowitness() kept as dead code for rollback.
+        """
         r: dict[str, Any] = {"_tools": []}
-        if (phase2_tools is None or "gowitness" in phase2_tools) and "gowitness" not in ai_skip:
-            publish_event(order_id, {"type": "tool_starting", "tool": "gowitness", "host": ip})
-            gowitness_result = run_gowitness(primary_fqdn, ip, host_dir, order_id)
-            r["gowitness"] = gowitness_result
-            r["_tools"].append("gowitness")
-            progress_callback(order_id, "gowitness", "complete")
-            publish_tool_output(order_id, "gowitness", ip,
-                                "Screenshot captured" if gowitness_result else "Screenshot failed")
         if phase2_tools is None or "headers" in phase2_tools:
             publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
             header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)

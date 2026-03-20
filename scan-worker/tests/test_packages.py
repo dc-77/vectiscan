@@ -62,7 +62,7 @@ class TestPerimeter:
     def test_phase2_has_all_tools(self):
         config = get_config("perimeter")
         expected = ["testssl", "zap_spider", "zap_active", "nuclei",
-                    "gowitness", "headers", "httpx", "wpscan"]
+                    "headers", "httpx", "wpscan"]
         for tool in expected:
             assert tool in config["phase2_tools"]
 

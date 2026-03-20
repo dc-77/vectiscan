@@ -359,29 +359,45 @@ def run_phase1(
     if not probe_fqdns:
         probe_fqdns = [primary_fqdn]
 
-    # Run webtech on all relevant FQDNs — merge results
+    # Use Playwright tech detection instead of webtech (which fails on all domains)
+    from scanner.tools.redirect_probe import probe_redirects, _is_playwright_available
     publish_event(order_id, {"type": "tool_starting", "tool": "webtech", "host": ip})
     webtech_result: list[dict] | dict | None = None
-    for fqdn in probe_fqdns:
-        result = run_webtech(fqdn, host_dir, order_id)
-        if result:
-            if webtech_result is None:
-                webtech_result = result
-            elif isinstance(webtech_result, list) and isinstance(result, list):
-                webtech_result.extend(result)
-            elif isinstance(webtech_result, dict) and isinstance(result, dict):
-                # Merge tech lists
-                existing = webtech_result.get("tech", [])
-                new_techs = result.get("tech", [])
-                webtech_result["tech"] = existing + new_techs
+    if _is_playwright_available():
+        try:
+            pw_fqdns = [f for f in fqdns[:3] if f]  # max 3 FQDNs
+            redirect_data = probe_redirects(
+                pw_fqdns, order_id=order_id,
+                scan_dir=scan_dir, ip=ip,
+            )
+            # Convert Playwright tech_info to webtech-compatible format
+            tech_list = []
+            for fqdn_key, probe in redirect_data.items():
+                tech_info = probe.get("tech_info", {})
+                if tech_info.get("generator"):
+                    tech_list.append({"name": tech_info["generator"], "version": ""})
+                headers = probe.get("response_headers", {})
+                server = headers.get("server", "")
+                if server:
+                    parts = server.split("/", 1)
+                    tech_list.append({"name": parts[0], "version": parts[1] if len(parts) > 1 else ""})
+                powered = headers.get("x-powered-by", "") or tech_info.get("powered_by", "")
+                if powered:
+                    tech_list.append({"name": powered, "version": ""})
+            if tech_list:
+                webtech_result = {"tech": tech_list}
+        except Exception as e:
+            log.warning("playwright_tech_failed", error=str(e))
+    else:
+        log.info("playwright_not_available", msg="Falling back to no webtech data")
     progress_callback(order_id, "webtech", "complete")
 
-    # Save webtech result to scan_results (was previously only in archive)
+    # Save webtech result to scan_results
     from scanner.tools import _save_result
     _save_result(order_id=order_id, host_ip=ip, phase=1,
                  tool_name="webtech",
                  raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False) if webtech_result
-                     else f"webtech failed for all FQDNs: {', '.join(probe_fqdns)} (tried HTTPS + HTTP)",
+                     else f"Playwright tech detection: no data for {', '.join(probe_fqdns)}",
                  exit_code=0 if webtech_result else 1,
                  duration_ms=0)
 
@@ -401,6 +417,13 @@ def run_phase1(
         wafw00f_result=wafw00f_result,
         host_dir=host_dir,
     )
+
+    # Save redirect data for later use (AI Tech Analysis, CMS fingerprinter)
+    if _is_playwright_available():
+        try:
+            tech_profile["redirect_data"] = redirect_data  # type: ignore[possibly-undefined]
+        except NameError:
+            pass  # redirect_data not set if Playwright failed
 
     log.info("phase1_complete", ip=ip, order_id=order_id)
     return tech_profile

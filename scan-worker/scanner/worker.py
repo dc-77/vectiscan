@@ -408,25 +408,33 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
 
     log.info("phase1_complete", order_id=order_id, profiles=len(tech_profiles))
 
-    # ── Playwright Redirect Probe + AI Tech Analysis ──────
+    # ── Redirect Data + AI Tech Analysis ────────────────────
+    # Extract redirect data from Phase 1 tech profiles (already collected via Playwright)
     _check_timeout()
     try:
-        from scanner.tools.redirect_probe import probe_redirects, probe_cms_paths, _is_playwright_available
-        if _is_playwright_available():
+        from scanner.tools.redirect_probe import probe_cms_paths, _is_playwright_available
+        combined_redirect: dict[str, Any] = {"redirects": {}, "cms_probes": {}}
+
+        # Reuse redirect data already gathered during Phase 1 (no second Playwright run)
+        for profile in tech_profiles:
+            if profile.get("redirect_data"):
+                combined_redirect["redirects"].update(profile["redirect_data"])
+
+        redirect_count = len(combined_redirect["redirects"])
+        if redirect_count > 0:
             update_progress(order_id, "scan_phase1", "redirect_probe")
-            # Collect all FQDNs from non-skipped hosts
-            all_fqdns = []
-            for host, profile in zip(scan_hosts, tech_profiles):
-                if not profile.get("skipped"):
-                    all_fqdns.extend(host.get("fqdns", [])[:3])
-            all_fqdns = list(set(all_fqdns))
-
-            redirect_data = probe_redirects(all_fqdns, order_id=order_id)
-            cms_probe_data = probe_cms_paths(all_fqdns)
-
-            combined_redirect = {"redirects": redirect_data, "cms_probes": cms_probe_data}
             publish_event(order_id, {"type": "tool_output", "tool": "redirect_probe",
-                                     "summary": f"{len(redirect_data)} FQDNs probed"})
+                                     "summary": f"{redirect_count} FQDNs probed (from Phase 1)"})
+
+            # Run CMS path probes separately (lightweight HTTP checks)
+            if _is_playwright_available():
+                all_fqdns = []
+                for host, prof in zip(scan_hosts, tech_profiles):
+                    if not prof.get("skipped"):
+                        all_fqdns.extend(host.get("fqdns", [])[:3])
+                all_fqdns = list(set(all_fqdns))
+                cms_probe_data = probe_cms_paths(all_fqdns)
+                combined_redirect["cms_probes"] = cms_probe_data
 
             # AI Tech Analysis — correct CMS detection
             update_progress(order_id, "scan_phase1", "ai_tech_analysis")
@@ -449,7 +457,7 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
                         if correction.get("is_spa") is not None:
                             profile["is_spa"] = correction["is_spa"]
         else:
-            log.info("playwright_not_available", msg="Skipping redirect probe")
+            log.info("no_redirect_data_from_phase1", msg="Skipping AI tech analysis")
     except Exception as e:
         log.warning("redirect_probe_failed", error=str(e))
 
