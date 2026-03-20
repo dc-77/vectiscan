@@ -6,6 +6,7 @@ import { isValidDomain } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
 import { verifyJwt } from '../lib/auth.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
 
 async function streamReport(reply: FastifyReply, report: Record<string, unknown>) {
@@ -926,6 +927,97 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
     return { success: true, data: null };
   });
+
+  // --- Admin: Re-queue report generation ---
+  server.post<{ Params: OrderParams }>(
+    '/api/orders/:id/requeue-report',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params;
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID' });
+      }
+
+      // Fetch order
+      const orderResult = await query(
+        'SELECT id, domain, package, status FROM orders WHERE id = $1',
+        [id],
+      );
+      if (orderResult.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+      const order = orderResult.rows[0] as Record<string, unknown>;
+
+      // Fetch host inventory from scan_results (ai_host_strategy stores it)
+      const invResult = await query(
+        `SELECT raw_output FROM scan_results
+         WHERE order_id = $1 AND tool_name = 'ai_host_strategy' LIMIT 1`,
+        [id],
+      );
+      let hostInventory = { hosts: [], domain: order.domain };
+      if (invResult.rows.length > 0) {
+        try {
+          const parsed = JSON.parse((invResult.rows[0] as Record<string, unknown>).raw_output as string);
+          if (parsed.hosts) hostInventory = parsed;
+        } catch { /* use default */ }
+      }
+
+      // Fetch tech profiles from scan_results
+      const techResult = await query(
+        `SELECT raw_output FROM scan_results
+         WHERE order_id = $1 AND tool_name = 'ai_tech_analysis_debug' LIMIT 1`,
+        [id],
+      );
+      let techProfiles: unknown[] = [];
+      if (techResult.rows.length > 0) {
+        try {
+          techProfiles = JSON.parse((techResult.rows[0] as Record<string, unknown>).raw_output as string);
+        } catch { /* use default */ }
+      }
+
+      // Fetch phase3 correlation data
+      const p3Result = await query(
+        `SELECT raw_output FROM scan_results
+         WHERE order_id = $1 AND tool_name = 'phase3_correlation' LIMIT 1`,
+        [id],
+      );
+      let phase3Data: Record<string, unknown> | null = null;
+      if (p3Result.rows.length > 0) {
+        try {
+          phase3Data = JSON.parse((p3Result.rows[0] as Record<string, unknown>).raw_output as string);
+        } catch { /* skip */ }
+      }
+
+      // Reset status to scan_complete so the report worker picks it up
+      await query(
+        `UPDATE orders SET status = 'scan_complete', error = NULL WHERE id = $1`,
+        [id],
+      );
+
+      // Build and enqueue report job
+      const jobPayload: Record<string, unknown> = {
+        orderId: id,
+        rawDataPath: `scan-rawdata/${id}.tar.gz`,
+        hostInventory,
+        techProfiles,
+        package: order.package || 'perimeter',
+      };
+
+      if (phase3Data) {
+        jobPayload.enrichment = phase3Data.enrichment || {};
+        jobPayload.correlatedFindings = phase3Data.correlated_findings || [];
+        jobPayload.businessImpactScore = phase3Data.business_impact_score || 0.0;
+        jobPayload.phase3Summary = phase3Data.phase3_summary || {};
+      }
+
+      await reportQueue.add('report', jobPayload);
+
+      await audit({ orderId: id, action: 'report.regenerate', ip: request.ip });
+      server.log.info({ orderId: id }, 'Report job re-queued by admin');
+
+      return { success: true, data: { message: 'Report job re-queued', orderId: id } };
+    },
+  );
 
   // Backwards-compat redirects for old scan endpoints
   server.get<{ Params: OrderParams }>('/api/scans/:id', async (request, reply) => {
