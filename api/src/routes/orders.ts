@@ -991,7 +991,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
       // Reset status to scan_complete so the report worker picks it up
       await query(
-        `UPDATE orders SET status = 'scan_complete', error = NULL WHERE id = $1`,
+        `UPDATE orders SET status = 'scan_complete', error_message = NULL WHERE id = $1`,
         [id],
       );
 
