@@ -63,7 +63,23 @@ export const TOOL_LABELS: Record<string, string> = {
 };
 
 /** Host lane colors for parallel scanning visualization. */
-export const HOST_COLORS = ['#38BDF8', '#A78BFA', '#34D399'] as const;
+export const HOST_COLORS = [
+  '#38BDF8', // Sky Blue
+  '#A78BFA', // Violet
+  '#34D399', // Emerald
+  '#F472B6', // Pink
+  '#FBBF24', // Amber
+  '#2DD4BF', // Teal
+  '#818CF8', // Indigo
+  '#FB923C', // Orange
+  '#A3E635', // Lime
+  '#22D3EE', // Cyan
+  '#E879F9', // Fuchsia
+  '#4ADE80', // Green
+  '#F9A8D4', // Rose
+  '#93C5FD', // Light Blue
+  '#FCA5A5', // Light Red
+] as const;
 
 /** Get cinematic label for a tool. Falls back to uppercased tool name. */
 export function getToolLabel(tool: string): string {
