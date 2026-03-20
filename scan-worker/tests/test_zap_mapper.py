@@ -53,10 +53,11 @@ class TestSeverityMapping:
         findings = mapper.map_alerts(alerts, "192.168.1.1", "example.com")
         assert findings[0]["severity"] == "low"
 
-    def test_informational(self, mapper):
+    def test_informational_filtered(self, mapper):
+        """Informational alerts are filtered out to reduce noise."""
         alerts = [_make_alert(risk="Informational")]
         findings = mapper.map_alerts(alerts, "192.168.1.1", "example.com")
-        assert findings[0]["severity"] == "info"
+        assert len(findings) == 0
 
 
 # ---------------------------------------------------------------------------
@@ -133,16 +134,25 @@ class TestSpecificAlerts:
         assert f["raw"]["cweid"] == 79
         assert f["title"] == "Cross Site Scripting (Reflected)"
 
-    def test_missing_csp(self, mapper):
+    def test_missing_csp_informational_filtered(self, mapper):
+        """CSP missing is Informational in ZAP — filtered out (headers tool covers this)."""
         alerts = [_make_alert(
             pluginId="10038", name="Content-Security-Policy (CSP) Header Not Set",
             risk="Informational", cweid="693", confidence="High",
         )]
         findings = mapper.map_alerts(alerts, "10.0.0.1", "victim.com")
-        f = findings[0]
-        assert f["severity"] == "info"
-        assert f["tool"] == "zap_passive"
-        assert f["raw"]["cweid"] == 693
+        assert len(findings) == 0  # Informational filtered
+
+    def test_missing_csp_as_low(self, mapper):
+        """If ZAP reports CSP as Low risk, it passes the filter."""
+        alerts = [_make_alert(
+            pluginId="10038", name="Content-Security-Policy (CSP) Header Not Set",
+            risk="Low", cweid="693", confidence="High",
+        )]
+        findings = mapper.map_alerts(alerts, "10.0.0.1", "victim.com")
+        assert len(findings) == 1
+        assert findings[0]["severity"] == "low"
+        assert findings[0]["raw"]["cweid"] == 693
 
     def test_sqli(self, mapper):
         alerts = [_make_alert(

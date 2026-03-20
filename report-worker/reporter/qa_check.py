@@ -168,6 +168,85 @@ def _check_required_fields(findings: list[dict[str, Any]]) -> list[dict[str, Any
     return issues
 
 
+def _check_severity_evidence(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Check 8: HIGH/CRITICAL findings without CVE or strong evidence → cap to MEDIUM.
+
+    Prevents alarmist reports where AI speculates severity without proof.
+    A finding is only HIGH/CRITICAL if it has:
+    - A CVE reference, OR
+    - A CVSS vector with AV:N + C:H or I:H, OR
+    - Evidence of active exploitation or direct data access
+
+    Common false-HIGH patterns that get capped:
+    - "Öffentlich erreichbar" without exploit → MEDIUM
+    - "Unvollständige Zertifikatskette" → MEDIUM (browsers handle gracefully)
+    - "Veraltete Software" without CVE → MEDIUM
+    """
+    import re
+
+    issues: list[dict[str, Any]] = []
+
+    # Patterns that are typically overrated as HIGH
+    _MAX_MEDIUM_PATTERNS = re.compile(
+        r"zertifikatskette|certificate.chain|chain.of.trust|"
+        r"öffentlich.erreichbar|publicly.accessible|publicly.exposed|"
+        r"exponiert.im.internet|internet.exponiert|direkt.erreichbar|"
+        r"veraltete?.software|outdated.software|eol|end.of.life|"
+        r"server.banner|version.disclosure|versionsinformation|"
+        r"fehlende?.security.header|missing.header|"
+        r"weak.cipher|schwache?.cipher|cbc.cipher|"
+        r"session.id.in.url|url.rewriting",
+        re.IGNORECASE,
+    )
+
+    for f in findings:
+        severity = f.get("severity", "").upper()
+        if severity not in ("HIGH", "CRITICAL"):
+            continue
+
+        title = f.get("title", "")
+        description = f.get("description", "")
+        cvss_score = f.get("cvss_score", "")
+        cve = f.get("cve", "") or ""
+        evidence = f.get("evidence", "")
+
+        # Has strong evidence?
+        has_cve = bool(re.search(r"CVE-\d{4}-\d+", cve + " " + title + " " + description))
+        has_cvss_high = False
+        try:
+            score = float(cvss_score)
+            has_cvss_high = score >= 7.0
+        except (ValueError, TypeError):
+            pass
+
+        combined = f"{title} {description}"
+
+        # Pattern-based cap: known overrated findings → MEDIUM
+        if _MAX_MEDIUM_PATTERNS.search(combined) and not has_cve:
+            issues.append({
+                "finding_id": f.get("id", "?"),
+                "check": "severity_evidence",
+                "issue": f"{severity} → MEDIUM (pattern match, no CVE: {title[:60]})",
+                "auto_fix": True,
+                "corrected_severity": "MEDIUM",
+                "corrected_score": "5.3",
+            })
+            continue
+
+        # Generic check: HIGH/CRITICAL without CVE and without high CVSS → MEDIUM
+        if not has_cve and not has_cvss_high:
+            issues.append({
+                "finding_id": f.get("id", "?"),
+                "check": "severity_evidence",
+                "issue": f"{severity} finding without CVE or CVSS ≥7.0: {title[:60]}",
+                "auto_fix": True,
+                "corrected_severity": "MEDIUM",
+                "corrected_score": "5.3",
+            })
+
+    return issues
+
+
 def _check_epss_reference(
     findings: list[dict[str, Any]],
     enrichment: dict[str, Any] | None = None,
@@ -260,6 +339,14 @@ def _apply_auto_fixes(
             fixes_applied += 1
         elif check == "severity_consistency" and "corrected_severity" in issue:
             finding["severity"] = issue["corrected_severity"]
+            fixes_applied += 1
+        elif check == "severity_evidence" and "corrected_severity" in issue:
+            log.info("severity_capped", finding_id=fid,
+                     old=finding.get("severity"), new=issue["corrected_severity"],
+                     reason=issue.get("issue", ""))
+            finding["severity"] = issue["corrected_severity"]
+            if "corrected_score" in issue:
+                finding["cvss_score"] = str(issue["corrected_score"])
             fixes_applied += 1
         elif check == "cwe_format" and "corrected_value" in issue:
             finding["cwe"] = issue["corrected_value"]
@@ -364,6 +451,7 @@ def run_qa_checks(
     all_issues.extend(_check_cwe_format(findings))
     all_issues.extend(_check_duplicates(findings))
     all_issues.extend(_check_required_fields(findings))
+    all_issues.extend(_check_severity_evidence(findings))
     all_issues.extend(_check_epss_reference(findings, enrichment))
     all_issues.extend(_check_nis2_mapping(findings, package))
 

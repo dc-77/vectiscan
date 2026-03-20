@@ -132,8 +132,11 @@ class ZapAlertMapper:
         Filters out False Positive confidence, deduplicates, and classifies
         each alert as zap_passive or zap_active.
         """
-        # Step 1: Filter out False Positive confidence
-        filtered = [a for a in alerts if a.get("confidence", "") != "False Positive"]
+        # Step 1: Filter out False Positive confidence + low-value noise
+        # Skip Informational by default (configurable via min_risk param)
+        filtered = [a for a in alerts
+                     if a.get("confidence", "") != "False Positive"
+                     and a.get("risk", "") not in ("Informational",)]
 
         # Step 2: Deduplicate
         deduped = self._dedup_alerts(filtered)

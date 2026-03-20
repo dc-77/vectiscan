@@ -27,6 +27,8 @@ _PERIMETER_BASE: dict[str, Any] = {
     "phase3_timeout": 300,        # 5 Minuten
     "total_timeout": 7200,        # 120 Minuten
     "nuclei_severity": "medium,high,critical",
+    "testssl_severity": "MEDIUM",     # MEDIUM+ in output (LOW = cipher noise)
+    "zap_min_risk": "Low",            # Low+ alerts (skip Informational)
 }
 
 
@@ -50,6 +52,8 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
         "phase3_timeout": 120,        # 2 Minuten
         "total_timeout": 1200,        # 20 Minuten
         "nuclei_severity": "high,critical",
+        "testssl_severity": "MEDIUM",     # Same as perimeter
+        "zap_min_risk": "Low",            # Same as perimeter
     },
 
     # ------------------------------------------------------------------

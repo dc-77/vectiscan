@@ -519,11 +519,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     for (const row of costRows.rows as Array<Record<string, unknown>>) {
       try {
         const data = JSON.parse(row.raw_output as string);
-        const cost = data.cost || null;
+        // _debug entries have cost nested: {cost: {...}}
+        // report_cost entries ARE the cost object directly: {model: ..., total_cost_usd: ...}
+        const cost = data.cost || (data.total_cost_usd ? data : null);
         if (cost && typeof cost === 'object' && cost.total_cost_usd) {
           totalCostUsd += cost.total_cost_usd;
+          const toolName = row.tool_name as string;
           costBreakdown.push({
-            step: (row.tool_name as string).replace('_debug', ''),
+            step: toolName === 'report_cost' ? 'report_generation' : toolName.replace('_debug', ''),
             model: cost.model || 'unknown',
             tokens: (cost.input_tokens || 0) + (cost.output_tokens || 0),
             cost_usd: cost.total_cost_usd,

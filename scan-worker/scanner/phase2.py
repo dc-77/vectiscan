@@ -24,26 +24,19 @@ SECURITY_HEADERS = [
 ]
 
 
-def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
-    """Run testssl.sh to check TLS/SSL configuration.
-
-    Only called when has_ssl=true. Returns parsed results or None on failure.
-    """
-    phase2_dir = f"{host_dir}/phase2"
-    os.makedirs(phase2_dir, exist_ok=True)
-
-    output_path = f"{phase2_dir}/testssl.json"
-
+def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
+                      severity: str = "MEDIUM", tool_name: str = "testssl") -> Optional[list]:
+    """Run a single testssl pass. Returns parsed JSON list or None."""
     cmd = [
         "bash", "/opt/testssl.sh/testssl.sh",
         "--jsonfile", output_path,
         "--quiet",
         "--ip", "one",
         "--warnings", "off",
-        "--sneaky",              # less traces in target logs
-        "--hints",               # additional remediation hints for report
-        "--severity", "LOW",     # filter out pure INFO noise from JSON
-        "--nodns", "min",        # minimal DNS (we already have it from Phase 0)
+        "--sneaky",
+        "--hints",
+        "--severity", severity,
+        "--nodns", "min",
         f"https://{fqdn}",
     ]
 
@@ -54,22 +47,83 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[di
         order_id=order_id,
         host_ip=ip,
         phase=2,
-        tool_name="testssl",
+        tool_name=tool_name,
     )
 
     if exit_code not in (0, 1):
-        # testssl returns 1 for findings, which is normal
-        log.warning("testssl_failed", fqdn=fqdn, exit_code=exit_code)
         return None
 
     try:
         with open(output_path, "r") as f:
-            data = json.load(f)
-        log.info("testssl_complete", fqdn=fqdn, findings=len(data) if isinstance(data, list) else 1)
-        return data
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        log.warning("testssl_parse_error", fqdn=fqdn, error=str(e))
+            return json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
         return None
+
+
+def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str,
+                severity: str = "MEDIUM") -> Optional[list]:
+    """Run testssl.sh with double-verification for MEDIUM+ findings.
+
+    First run: full scan. If MEDIUM+ findings found, runs a second pass
+    and only keeps findings that appear in BOTH runs (eliminates transient
+    false positives from network glitches, OCSP timeouts, etc.).
+    """
+    phase2_dir = f"{host_dir}/phase2"
+    os.makedirs(phase2_dir, exist_ok=True)
+
+    output_path = f"{phase2_dir}/testssl.json"
+
+    # Run 1
+    run1 = _run_testssl_once(fqdn, ip, output_path, order_id,
+                              severity=severity, tool_name="testssl")
+    if not run1 or not isinstance(run1, list):
+        return run1
+
+    # Check if there are MEDIUM+ findings worth verifying
+    medium_plus = [f for f in run1
+                   if f.get("severity", "").upper() in ("MEDIUM", "HIGH", "CRITICAL", "WARN")]
+
+    if not medium_plus:
+        log.info("testssl_no_medium_findings", fqdn=fqdn, total=len(run1))
+        return run1  # No need for verification
+
+    # Run 2: verify MEDIUM+ findings
+    log.info("testssl_verification_run", fqdn=fqdn, findings_to_verify=len(medium_plus))
+    output_path_v2 = f"{phase2_dir}/testssl_verify.json"
+    run2 = _run_testssl_once(fqdn, ip, output_path_v2, order_id,
+                              severity=severity, tool_name="testssl_verify")
+
+    if not run2 or not isinstance(run2, list):
+        log.warning("testssl_verify_failed", fqdn=fqdn)
+        return run1  # Verification failed — keep original findings
+
+    # Build set of finding IDs from run 2
+    run2_ids = {f.get("id", "") for f in run2 if f.get("id")}
+
+    # Only keep MEDIUM+ findings that appear in BOTH runs
+    verified = []
+    dropped = 0
+    for f in run1:
+        sev = f.get("severity", "").upper()
+        if sev in ("MEDIUM", "HIGH", "CRITICAL", "WARN"):
+            if f.get("id", "") in run2_ids:
+                verified.append(f)  # Confirmed in both runs
+            else:
+                dropped += 1
+                log.info("testssl_finding_dropped", fqdn=fqdn, id=f.get("id"),
+                         finding=f.get("finding", "")[:80],
+                         reason="not confirmed in verification run")
+        else:
+            verified.append(f)  # LOW/INFO pass through without verification
+
+    log.info("testssl_verification_complete", fqdn=fqdn,
+             original=len(run1), verified=len(verified), dropped=dropped)
+
+    # Save verified results as the final output
+    with open(output_path, "w") as fout:
+        json.dump(verified, fout, indent=2)
+
+    return verified
 
 
 def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str,
@@ -776,7 +830,7 @@ def run_dalfox(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=180,
+        timeout=120,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -1191,7 +1245,9 @@ def run_phase2(
         r: dict[str, Any] = {}
         if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
             publish_event(order_id, {"type": "tool_starting", "tool": "testssl", "host": ip})
-            testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id)
+            testssl_sev = (config or {}).get("testssl_severity", "MEDIUM")
+            testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id,
+                                         severity=testssl_sev)
             r["testssl"] = testssl_result
             r["_tools"] = ["testssl"]
             progress_callback(order_id, "testssl", "complete")
@@ -1324,8 +1380,10 @@ def run_phase2(
         publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
         nuclei_config = dict(adaptive_config) if adaptive_config else {}
         tags = list(nuclei_config.get("nuclei_tags", []))
-        if "default-login" not in tags:
-            tags.append("default-login")
+        # Auto-add high-value tags that reliably find issues
+        for auto_tag in ("default-login", "exposure", "misconfig"):
+            if auto_tag not in tags:
+                tags.append(auto_tag)
         nuclei_config["nuclei_tags"] = tags
         nuclei_config["nuclei_exclude_tags"] = list(nuclei_config.get("nuclei_exclude_tags", []))
 
@@ -1415,7 +1473,7 @@ def run_phase2(
         if param_urls and (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip and has_web:
             publish_event(order_id, {"type": "tool_starting", "tool": "dalfox", "host": ip})
             dalfox_result = run_dalfox(primary_fqdn, ip, host_dir, order_id,
-                                       katana_urls=param_urls[:30])
+                                       katana_urls=param_urls[:15])
             r["dalfox"] = dalfox_result
             r["_tools"].append("dalfox")
             progress_callback(order_id, "dalfox", "complete")
@@ -1546,8 +1604,17 @@ def run_phase2(
             publish_tool_output(order_id, "zap", ip,
                                 f"{len(all_alerts)} alerts ({passive_count} passive, {active_count} active)")
 
+            # Save alert summary (not full JSON — too large for 50K DB column)
+            alert_summary = {
+                "total_alerts": len(all_alerts),
+                "passive": passive_count,
+                "active": active_count,
+                "unique_types": len(set(a.get("name", a.get("alert", "")) for a in all_alerts)),
+                "top_alerts": [{"name": a.get("name",""), "risk": a.get("risk",""), "url": a.get("url","")[:80]}
+                               for a in all_alerts[:20]],
+            }
             _save_result(order_id, ip, 2, "zap",
-                         json.dumps(all_alerts[:50], indent=2)[:50000] if all_alerts else "[]",
+                         json.dumps(alert_summary, indent=2),
                          0, 0)
         except ZapError as e:
             log.error("zap_alert_collection_failed", ip=ip, error=str(e))

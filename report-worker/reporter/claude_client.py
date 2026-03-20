@@ -324,6 +324,7 @@ def cap_implausible_scores(result: dict[str, Any]) -> dict[str, Any]:
         "server banner": 2.5,
         "server-version": 2.5,
         "version im banner": 2.5,
+        "versionsinformation": 2.5,
         "information disclosure": 4.0,
         "security header": 5.5,
         "security-header": 5.5,
@@ -335,6 +336,18 @@ def cap_implausible_scores(result: dict[str, Any]) -> dict[str, Any]:
         "directory listing": 5.5,
         "verzeichnislisting": 5.5,
         "banner": 2.5,
+        # Common false-HIGH patterns
+        "zertifikatskette": 5.5,
+        "certificate chain": 5.5,
+        "chain of trust": 5.5,
+        "öffentlich erreichbar": 5.5,
+        "publicly accessible": 5.5,
+        "publicly exposed": 5.5,
+        "exponiert im internet": 5.5,
+        "cbc cipher": 5.5,
+        "weak cipher": 5.5,
+        "session id in url": 5.5,
+        "url rewriting": 5.5,
         "connection refused": 0.0,
     }
 
