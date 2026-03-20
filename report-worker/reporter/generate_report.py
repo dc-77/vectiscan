@@ -345,26 +345,70 @@ def build_finding(story, styles, f):
     affected = f.get("affected", "\u2014")
     has_cvss_meta = cvss_vector not in _dash_values or cwe not in _dash_values
 
-    if has_cvss_meta:
-        # Full metadata row with CVSS Vector, CWE, and Affected Systems
-        meta_data = [
-            [Paragraph("<b>CVSS Vector</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
-             Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
-             Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"]))],
-            [Paragraph(cvss_vector, ParagraphStyle("x", fontName=FONT_MONO, fontSize=7.5, textColor=COLORS["text"])),
-             Paragraph(cwe, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
-             Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"]))],
-        ]
-        meta_table = Table(meta_data, colWidths=[85 * mm, 25 * mm, 60 * mm])
-    else:
-        # Simplified metadata row — only Affected Systems (for Basic package)
-        meta_data = [
-            [Paragraph("<b>Betroffene Systeme</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"]))],
-            [Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"]))],
-        ]
-        meta_table = Table(meta_data, colWidths=[170 * mm])
+    # Build optional thumbnail image for the affected host
+    thumb_cell = None
+    thumbnail_path = f.get("thumbnail")
+    if thumbnail_path and os.path.isfile(thumbnail_path):
+        try:
+            thumb_img = Image(thumbnail_path)
+            tw, th = thumb_img.drawWidth, thumb_img.drawHeight
+            if tw > 0 and th > 0:
+                _THUMB_W = 30 * mm
+                scale = _THUMB_W / tw
+                thumb_img.drawWidth = _THUMB_W
+                thumb_img.drawHeight = th * scale
+                if thumb_img.drawHeight > 22 * mm:
+                    scale2 = 22 * mm / thumb_img.drawHeight
+                    thumb_img.drawWidth *= scale2
+                    thumb_img.drawHeight = 22 * mm
+            thumb_cell = thumb_img
+        except Exception:
+            thumb_cell = None
 
-    meta_table.setStyle(TableStyle([
+    if has_cvss_meta:
+        if thumb_cell:
+            # Full metadata row with thumbnail
+            meta_data = [
+                [Paragraph("<b>CVSS Vector</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
+                 Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
+                 Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
+                 ""],
+                [Paragraph(cvss_vector, ParagraphStyle("x", fontName=FONT_MONO, fontSize=7.5, textColor=COLORS["text"])),
+                 Paragraph(cwe, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
+                 Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
+                 thumb_cell],
+            ]
+            meta_table = Table(meta_data, colWidths=[75 * mm, 22 * mm, 38 * mm, 35 * mm])
+        else:
+            # Full metadata row without thumbnail
+            meta_data = [
+                [Paragraph("<b>CVSS Vector</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
+                 Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
+                 Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"]))],
+                [Paragraph(cvss_vector, ParagraphStyle("x", fontName=FONT_MONO, fontSize=7.5, textColor=COLORS["text"])),
+                 Paragraph(cwe, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
+                 Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"]))],
+            ]
+            meta_table = Table(meta_data, colWidths=[85 * mm, 25 * mm, 60 * mm])
+    else:
+        if thumb_cell:
+            # Simplified metadata row with thumbnail
+            meta_data = [
+                [Paragraph("<b>Betroffene Systeme</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
+                 ""],
+                [Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
+                 thumb_cell],
+            ]
+            meta_table = Table(meta_data, colWidths=[135 * mm, 35 * mm])
+        else:
+            # Simplified metadata row without thumbnail
+            meta_data = [
+                [Paragraph("<b>Betroffene Systeme</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"]))],
+                [Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"]))],
+            ]
+            meta_table = Table(meta_data, colWidths=[170 * mm])
+
+    meta_style_cmds = [
         ("BACKGROUND", (0, 0), (-1, -1), COLORS["bg_light"]),
         ("TOPPADDING", (0, 0), (-1, 0), 4),
         ("BOTTOMPADDING", (0, 0), (-1, 0), 1),
@@ -372,7 +416,16 @@ def build_finding(story, styles, f):
         ("BOTTOMPADDING", (0, 1), (-1, 1), 5),
         ("LEFTPADDING", (0, 0), (-1, -1), 6),
         ("ROUNDEDCORNERS", [2, 2, 2, 2]),
-    ]))
+    ]
+    if thumb_cell:
+        # Span thumbnail cell across both rows, align center/middle
+        last_col = len(meta_data[0]) - 1
+        meta_style_cmds += [
+            ("SPAN", (last_col, 0), (last_col, 1)),
+            ("ALIGN", (last_col, 0), (last_col, 1), "CENTER"),
+            ("VALIGN", (last_col, 0), (last_col, 1), "MIDDLE"),
+        ]
+    meta_table.setStyle(TableStyle(meta_style_cmds))
     header_group.append(meta_table)
     header_group.append(Spacer(1, SPACING_PARAGRAPH))
 
@@ -423,7 +476,7 @@ def build_screenshots_section(story, styles, screenshots):
 
     story.append(Paragraph("2.3&nbsp;&nbsp;&nbsp;Web-Oberfl\u00e4chen", styles["SubsectionTitle"]))
     story.append(Paragraph(
-        "Die folgenden Screenshots wurden automatisch mit gowitness aufgenommen "
+        "Die folgenden Screenshots wurden automatisch aufgenommen "
         "und dokumentieren die Web-Oberfl\u00e4chen der identifizierten Hosts.",
         styles["BodyText2"],
     ))

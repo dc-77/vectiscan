@@ -37,6 +37,25 @@ def _count_by_severity(findings: list[dict[str, Any]]) -> dict[str, int]:
 # ---------------------------------------------------------------------------
 
 
+def _attach_thumbnails(
+    findings: list[dict[str, Any]],
+    host_screenshots: dict[str, list[str]] | None,
+) -> None:
+    """Attach the first matching screenshot path to each finding (in-place).
+
+    Matches by checking if any host IP appears in the finding's 'affected' text.
+    Sets finding["thumbnail"] to the first screenshot path found, or None.
+    """
+    if not host_screenshots:
+        return
+    for f in findings:
+        affected = f.get("affected", "")
+        for ip, paths in host_screenshots.items():
+            if ip in affected and paths:
+                f["thumbnail"] = paths[0]
+                break
+
+
 def _map_finding(f: dict[str, Any]) -> dict[str, Any]:
     """Map a Claude finding to the Skill finding format with German labels."""
     return {
@@ -624,9 +643,10 @@ def map_professional_report(
         f"{count} {sev}" for sev, count in severity_counts.items() if count > 0
     )
 
-    # Map findings to report format
+    # Map findings to report format and attach thumbnails
     mapped_findings = [_map_finding(f) for f in findings]
     mapped_findings += [_map_positive_finding(f) for f in positive_findings]
+    _attach_thumbnails(mapped_findings, host_screenshots)
 
     log.info(
         "report_mapper.professional",
@@ -715,6 +735,7 @@ def map_basic_report(
     # Map findings to basic report format (no CVSS, CWE, evidence)
     mapped_findings = [_map_basic_finding(f) for f in findings]
     mapped_findings += [_map_positive_finding(f) for f in positive_findings]
+    _attach_thumbnails(mapped_findings, host_screenshots)
 
     log.info(
         "report_mapper.basic",

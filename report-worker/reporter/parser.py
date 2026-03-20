@@ -405,13 +405,14 @@ def parse_headers_json(path: str) -> dict[str, Any]:
 
 
 def find_gowitness_screenshots(phase2_dir: str) -> list[str]:
-    """Find gowitness screenshot files (PNG/JPEG) in a phase2 directory.
+    """Find screenshot files (PNG/JPEG) in a phase2 directory.
 
-    Looks for image files produced by gowitness.  Common locations:
+    Looks for image files produced by Playwright (or legacy gowitness).
+    Common locations:
     - ``<phase2>/gowitness/screenshots/*.png``
     - ``<phase2>/gowitness/*.png``
     - ``<phase2>/screenshots/*.png``
-    - ``<phase2>/*.png`` (fallback)
+    - ``<phase2>/screenshot_*.png`` (Playwright output, fallback)
 
     Returns:
         Sorted list of absolute file paths to screenshot images.
@@ -435,21 +436,15 @@ def find_gowitness_screenshots(phase2_dir: str) -> list[str]:
             if screenshots:
                 break  # Stop at the first directory that has screenshots
 
-    # Fallback: look for screenshot.png directly in phase2 (gowitness single output)
+    # Fallback: look for screenshot*.png directly in phase2 (Playwright output)
     if not screenshots:
-        # Check for the standard gowitness output filename first
-        standard_name = phase2_path / "screenshot.png"
-        if standard_name.is_file():
-            screenshots.append(str(standard_name))
-        else:
-            # Also check for any image file in phase2 that could be a screenshot
-            for f in sorted(phase2_path.iterdir()):
-                if (
-                    f.is_file()
-                    and f.suffix.lower() in image_extensions
-                    and f.stem.lower() in ("screenshot", "gowitness")
-                ):
-                    screenshots.append(str(f))
+        for f in sorted(phase2_path.iterdir()):
+            if (
+                f.is_file()
+                and f.suffix.lower() in image_extensions
+                and f.stem.lower().startswith("screenshot")
+            ):
+                screenshots.append(str(f))
 
     if screenshots:
         log.info(
