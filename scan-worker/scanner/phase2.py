@@ -977,9 +977,12 @@ def run_zap_scan(
         log.info("zap_waiting_for_passive", ip=ip)
         zap.wait_for_passive_scan(timeout=30)
 
-        # 7. Collect all alerts (no baseurl filter — context isolation is sufficient)
-        all_alerts = zap.get_alerts()
-        log.info("zap_alerts_collected", ip=ip, fqdn=fqdn, count=len(all_alerts))
+        # 7. Collect alerts + domain filter (defense in depth)
+        all_alerts_raw = zap.get_alerts()
+        all_alerts = [a for a in all_alerts_raw
+                      if fqdn.lower() in (a.get("url", "") or "").lower()]
+        log.info("zap_alerts_collected", ip=ip, fqdn=fqdn,
+                 raw=len(all_alerts_raw), filtered=len(all_alerts))
         result["alerts"] = all_alerts
 
         # 8. Map to Finding dicts
@@ -1501,8 +1504,32 @@ def run_phase2(
             log.info("zap_waiting_for_passive", ip=ip)
             zap.wait_for_passive_scan(timeout=30)
 
-            all_alerts = zap.get_alerts()
-            log.info("zap_alerts_collected", ip=ip, count=len(all_alerts))
+            all_alerts_raw = zap.get_alerts()
+
+            # Domain filter — defense in depth against cross-contamination
+            # Even with dedicated ZAP per worker, filter to only our FQDNs
+            allowed_domains = set()
+            for _fqdn in fqdns:
+                allowed_domains.add(_fqdn.lower())
+                if _fqdn.lower().startswith("www."):
+                    allowed_domains.add(_fqdn.lower()[4:])
+                else:
+                    allowed_domains.add(f"www.{_fqdn.lower()}")
+
+            def _alert_belongs(alert: dict) -> bool:
+                url = alert.get("url", "") or alert.get("nodeName", "")
+                if not url:
+                    return True  # Keep alerts without URL (rare)
+                try:
+                    hostname = _urlparse(url).hostname or ""
+                    return hostname.lower() in allowed_domains
+                except Exception:
+                    return True
+
+            all_alerts = [a for a in all_alerts_raw if _alert_belongs(a)]
+            log.info("zap_alerts_collected", ip=ip,
+                     raw=len(all_alerts_raw), filtered=len(all_alerts),
+                     domains=list(allowed_domains)[:5])
             results["zap_alerts"] = all_alerts
 
             mapper = ZapAlertMapper()
