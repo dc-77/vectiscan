@@ -998,7 +998,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       // Build and enqueue report job
       const jobPayload: Record<string, unknown> = {
         orderId: id,
-        rawDataPath: `scan-rawdata/${id}.tar.gz`,
+        rawDataPath: `${id}.tar.gz`,
         hostInventory,
         techProfiles,
         package: order.package || 'perimeter',
