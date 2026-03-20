@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from typing import Any
+from xml.sax.saxutils import escape as xml_escape
 
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph
@@ -12,6 +13,25 @@ from reporter.pdf.branding import CLASSIFICATION_LABEL_DE
 import structlog
 
 log = structlog.get_logger()
+
+
+def _safe(text: str | None) -> str:
+    """Escape XML-special characters so ReportLab Paragraph doesn't crash.
+
+    Converts <, >, & to &lt;, &gt;, &amp; — but preserves known safe
+    markup tags like <b>, <i>, <br/> that ReportLab supports.
+    """
+    if not text:
+        return "—"
+    # First escape everything
+    escaped = xml_escape(str(text))
+    # Restore common ReportLab-safe tags that Claude sometimes uses
+    import re
+    for tag in ("b", "i", "u", "br"):
+        escaped = re.sub(rf"&lt;({tag})&gt;", rf"<\1>", escaped)
+        escaped = re.sub(rf"&lt;/({tag})&gt;", rf"</\1>", escaped)
+    escaped = re.sub(r"&lt;(br\s*/?)&gt;", r"<\1>", escaped)
+    return escaped
 
 # Severity order for sorting findings
 _SEVERITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
@@ -59,17 +79,17 @@ def _attach_thumbnails(
 def _map_finding(f: dict[str, Any]) -> dict[str, Any]:
     """Map a Claude finding to the Skill finding format with German labels."""
     return {
-        "id": f["id"],
-        "title": f["title"],
+        "id": _safe(f["id"]),
+        "title": _safe(f["title"]),
         "severity": f["severity"],
         "cvss_score": f["cvss_score"],
-        "cvss_vector": f["cvss_vector"],
-        "cwe": f["cwe"],
-        "affected": f["affected"],
-        "description": f["description"],
-        "evidence": f["evidence"],
-        "impact": f["impact"],
-        "recommendation": f["recommendation"],
+        "cvss_vector": _safe(f["cvss_vector"]),
+        "cwe": _safe(f["cwe"]),
+        "affected": _safe(f["affected"]),
+        "description": _safe(f["description"]),
+        "evidence": _safe(f["evidence"]),
+        "impact": _safe(f["impact"]),
+        "recommendation": _safe(f["recommendation"]),
         # Deutsche Labels
         "label_description": "Beschreibung",
         "label_evidence": "Nachweis",
@@ -81,17 +101,17 @@ def _map_finding(f: dict[str, Any]) -> dict[str, Any]:
 def _map_basic_finding(f: dict[str, Any]) -> dict[str, Any]:
     """Map a basic-package Claude finding."""
     return {
-        "id": f["id"],
-        "title": f["title"],
+        "id": _safe(f["id"]),
+        "title": _safe(f["title"]),
         "severity": f["severity"],
         "cvss_score": f.get("cvss_score", "—"),
-        "cvss_vector": f.get("cvss_vector", "—"),
-        "cwe": f.get("cwe", "—"),
-        "affected": f["affected"],
-        "description": f["description"],
-        "evidence": f.get("evidence", "—"),
-        "impact": f.get("impact", "—"),
-        "recommendation": f["recommendation"],
+        "cvss_vector": _safe(f.get("cvss_vector", "—")),
+        "cwe": _safe(f.get("cwe", "—")),
+        "affected": _safe(f["affected"]),
+        "description": _safe(f["description"]),
+        "evidence": _safe(f.get("evidence", "—")),
+        "impact": _safe(f.get("impact", "—")),
+        "recommendation": _safe(f["recommendation"]),
         # Deutsche Labels
         "label_description": "Beschreibung",
         "label_evidence": "Nachweis",
@@ -104,14 +124,14 @@ def _map_positive_finding(f: dict[str, Any]) -> dict[str, Any]:
     """Map a positive finding (INFO severity) with German labels."""
     return {
         "id": f.get("id", "VS-2026-POS"),
-        "title": f["title"],
+        "title": _safe(f["title"]),
         "severity": "INFO",
         "cvss_score": "—",
         "cvss_vector": "—",
         "cwe": "—",
-        "affected": f.get("affected", "Gesamte Infrastruktur"),
-        "description": f["description"],
-        "evidence": f.get("evidence", "—"),
+        "affected": _safe(f.get("affected", "Gesamte Infrastruktur")),
+        "description": _safe(f["description"]),
+        "evidence": _safe(f.get("evidence", "—")),
         "impact": "Positiver Befund — korrekte Konfiguration.",
         "recommendation": "Aktuelle Konfiguration beibehalten.",
         "label_description": "Beschreibung",
@@ -182,10 +202,10 @@ def _build_executive_summary(
 ) -> dict[str, Any]:
     """Build the executive summary section."""
     overall_risk = claude_output.get("overall_risk", "MEDIUM")
-    overall_desc = claude_output.get(
+    overall_desc = _safe(claude_output.get(
         "overall_description",
         f"Die Sicherheitsbewertung von {domain} ergab mehrere Befunde.",
-    )
+    ))
 
     total_findings = sum(severity_counts.values())
 
@@ -373,10 +393,10 @@ def _build_recommendations(
     """Build the recommendations section with a Paragraph-based table."""
     table_rows = []
     for rec in recommendations:
-        timeframe = rec.get("timeframe", "—")
-        action = rec.get("action", "—")
-        refs = ", ".join(rec.get("finding_refs", []))
-        effort = rec.get("effort", "—")
+        timeframe = _safe(rec.get("timeframe", "—"))
+        action = _safe(rec.get("action", "—"))
+        refs = _safe(", ".join(rec.get("finding_refs", [])))
+        effort = _safe(rec.get("effort", "—"))
 
         table_rows.append(
             [
@@ -415,8 +435,8 @@ def _build_basic_recommendations(
     """Build simplified recommendations for basic package (2 columns only)."""
     table_rows = []
     for rec in top_recommendations[:3]:
-        action = rec.get("action", "—")
-        timeframe = rec.get("timeframe", "—")
+        action = _safe(rec.get("action", "—"))
+        timeframe = _safe(rec.get("timeframe", "—"))
 
         table_rows.append(
             [

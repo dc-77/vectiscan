@@ -437,7 +437,7 @@ def find_gowitness_screenshots(phase2_dir: str) -> list[str]:
                 break  # Stop at the first directory that has screenshots
 
     # Fallback: look for screenshot*.png directly in phase2 (Playwright output)
-    if not screenshots:
+    if not screenshots and phase2_path.is_dir():
         for f in sorted(phase2_path.iterdir()):
             if (
                 f.is_file()
