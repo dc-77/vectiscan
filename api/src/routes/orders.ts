@@ -940,13 +940,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
       // Fetch order
       const orderResult = await query(
-        'SELECT id, domain, package, status FROM orders WHERE id = $1',
+        'SELECT id, target_url, package, status FROM orders WHERE id = $1',
         [id],
       );
       if (orderResult.rows.length === 0) {
         return reply.status(404).send({ success: false, error: 'Order not found' });
       }
       const order = orderResult.rows[0] as Record<string, unknown>;
+      const domain = order.target_url as string;
 
       // Fetch host inventory from scan_results (ai_host_strategy stores it)
       const invResult = await query(
@@ -954,7 +955,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
          WHERE order_id = $1 AND tool_name = 'ai_host_strategy' LIMIT 1`,
         [id],
       );
-      let hostInventory = { hosts: [], domain: order.domain };
+      let hostInventory: Record<string, unknown> = { hosts: [], domain };
       if (invResult.rows.length > 0) {
         try {
           const parsed = JSON.parse((invResult.rows[0] as Record<string, unknown>).raw_output as string);
