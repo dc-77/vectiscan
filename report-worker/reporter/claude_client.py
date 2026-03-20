@@ -294,11 +294,12 @@ def validate_cvss_vector(vector: str) -> str | None:
 
 
 def validate_cwe_mappings(result: dict[str, Any]) -> dict[str, Any]:
-    """Validate CWE identifiers in findings — remove invalid ones, warn on unknown."""
+    """Validate CWE identifiers — remove invalid, verify unknown via MITRE API."""
     import re
     from reporter.cwe_reference import KNOWN_CWES
 
     valid_pattern = re.compile(r'^CWE-\d{1,4}$')
+    unknown_cwes: list[str] = []
 
     for finding in result.get("findings", []):
         cwe = finding.get("cwe", "")
@@ -310,8 +311,27 @@ def validate_cwe_mappings(result: dict[str, Any]) -> dict[str, Any]:
             finding["cwe"] = ""
             continue
         if cwe not in KNOWN_CWES:
-            log.warning("cwe_unknown", cwe=cwe, finding_id=finding.get("id"))
-            # Keep it — it might be valid just uncommon
+            unknown_cwes.append(cwe)
+
+    # Live-validate unknown CWEs via MITRE API (graceful degradation)
+    if unknown_cwes:
+        try:
+            from reporter.cwe_api_client import CWEAPIClient
+            client = CWEAPIClient()
+            api_results = client.lookup_batch(list(set(unknown_cwes)))
+            for finding in result.get("findings", []):
+                cwe = finding.get("cwe", "")
+                if cwe in api_results:
+                    if not api_results[cwe].get("exists", False):
+                        log.warning("cwe_nonexistent", cwe=cwe,
+                                    finding_id=finding.get("id"))
+                        finding["cwe"] = ""
+                    else:
+                        log.info("cwe_verified_via_api", cwe=cwe,
+                                 name=api_results[cwe].get("name", ""))
+        except Exception as e:
+            log.warning("cwe_api_fallback_to_static", error=str(e))
+            # Keep unknown CWEs as-is (previous behavior)
 
     return result
 

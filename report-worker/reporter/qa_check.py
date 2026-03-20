@@ -11,6 +11,7 @@ Programmatic checks:
 5. Required field check (HIGH/CRITICAL findings need recommendations)
 6. EPSS reference check (if enrichment data present)
 7. NIS2 mapping check (compliance package only)
+8. CWE semantic validation (MITRE API existence check)
 
 Haiku check:
 - Only for findings where programmatic checks found anomalies
@@ -309,6 +310,48 @@ def _check_nis2_mapping(
     return issues
 
 
+def _check_cwe_semantic(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Check 8: CWE existence validation via MITRE CWE API.
+
+    Verifies that assigned CWE-IDs actually exist in the MITRE database.
+    Uses Redis cache (populated by validate_cwe_mappings in claude_client).
+    Falls back silently if API is unreachable.
+    """
+    valid_pattern = re.compile(r"^CWE-\d{1,4}$")
+    cwe_ids: list[str] = []
+    for f in findings:
+        cwe = f.get("cwe", "")
+        if cwe and valid_pattern.match(cwe):
+            cwe_ids.append(cwe)
+
+    if not cwe_ids:
+        return []
+
+    try:
+        from reporter.cwe_api_client import CWEAPIClient
+        client = CWEAPIClient()
+        api_results = client.lookup_batch(list(set(cwe_ids)))
+    except Exception as e:
+        log.warning("qa_cwe_semantic_skipped", error=str(e))
+        return []
+
+    issues: list[dict[str, Any]] = []
+    for f in findings:
+        cwe = f.get("cwe", "")
+        if cwe not in api_results:
+            continue
+        if not api_results[cwe].get("exists", False):
+            issues.append({
+                "finding_id": f.get("id", "?"),
+                "check": "cwe_nonexistent",
+                "issue": f"CWE {cwe} does not exist in MITRE database",
+                "auto_fix": True,
+                "corrected_value": "",
+            })
+
+    return issues
+
+
 # ---------------------------------------------------------------------------
 # Apply auto-fixes
 # ---------------------------------------------------------------------------
@@ -349,6 +392,9 @@ def _apply_auto_fixes(
                 finding["cvss_score"] = str(issue["corrected_score"])
             fixes_applied += 1
         elif check == "cwe_format" and "corrected_value" in issue:
+            finding["cwe"] = issue["corrected_value"]
+            fixes_applied += 1
+        elif check == "cwe_nonexistent" and "corrected_value" in issue:
             finding["cwe"] = issue["corrected_value"]
             fixes_applied += 1
 
@@ -454,6 +500,7 @@ def run_qa_checks(
     all_issues.extend(_check_severity_evidence(findings))
     all_issues.extend(_check_epss_reference(findings, enrichment))
     all_issues.extend(_check_nis2_mapping(findings, package))
+    all_issues.extend(_check_cwe_semantic(findings))
 
     # Apply auto-fixes
     auto_fixes = _apply_auto_fixes(claude_result, all_issues)
@@ -486,6 +533,7 @@ def run_qa_checks(
             "required_fields",
             "epss_reference",
             "nis2_mapping",
+            "cwe_semantic",
         ],
     }
 
