@@ -651,7 +651,7 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
     # AI-controlled recursion depth (default: 2)
     depth = 2
     if adaptive_config and adaptive_config.get("feroxbuster_depth"):
-        depth = min(int(adaptive_config["feroxbuster_depth"]), 4)
+        depth = min(int(adaptive_config["feroxbuster_depth"]), 2)
 
     wordlist = WORDLIST_MAP["common"]
     if not os.path.isfile(wordlist):
@@ -676,7 +676,7 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=120,
+        timeout=90,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -770,13 +770,13 @@ def run_dalfox(fqdn: str, ip: str, host_dir: str, order_id: str,
         "--format", "json",
         "-o", output_path,
         "--timeout", "5",
-        "--delay", "100",
+        "--worker", "5",
         "--skip-bav",  # Skip Blind XSS (too invasive for automated scanner)
     ]
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=300,
+        timeout=180,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -1330,7 +1330,7 @@ def run_phase2(
         nuclei_config["nuclei_exclude_tags"] = list(nuclei_config.get("nuclei_exclude_tags", []))
 
         is_wc = (config or {}).get("package") in ("basic", "webcheck")
-        nuclei_timeout = 600
+        nuclei_timeout = 300
         nuclei_severity = (config or {}).get("nuclei_severity",
                                              "high,critical" if is_wc else "low,medium,high,critical")
 
@@ -1343,7 +1343,7 @@ def run_phase2(
             if parsed.hostname and base_domain in parsed.hostname:
                 clean = f"{parsed.scheme}://{parsed.hostname}{parsed.path}"
                 unique_urls.add(clean)
-        url_list = sorted(unique_urls)[:100]  # Cap at 100
+        url_list = sorted(unique_urls)[:20]  # was [:100] — 20 URLs is enough for template-based scanning
 
         if len(url_list) > 1:
             # Write URL list file and use -list flag
@@ -1360,7 +1360,7 @@ def run_phase2(
                 "-severity", nuclei_severity,
                 "-jsonl", "-o", output_path,
                 "-timeout", "5", "-retries", "1",
-                "-no-interactsh", "-c", "25", "-rl", "150",
+                "-no-interactsh", "-c", "25", "-rl", "100",
             ]
             if nuclei_config.get("nuclei_tags"):
                 cmd.extend(["-tags", ",".join(nuclei_config["nuclei_tags"])])

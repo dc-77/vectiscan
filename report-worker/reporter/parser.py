@@ -700,7 +700,13 @@ def consolidate_findings(
             "=" * 72,
         ]
 
-        # --- Nmap ---
+        # === Section order: most important first, most verbose last ===
+        # 1. nmap (ports), 2. nuclei (CVEs), 3. testssl (SSL/TLS),
+        # 4. wpscan (WordPress vulns), 5. nikto (legacy),
+        # 6. headers (security headers), 7. httpx, 8. katana,
+        # 9. gobuster, 10. ZAP (most verbose — LAST), 11. Endpoints (also verbose)
+
+        # --- 1. Nmap ---
         nmap = data.get("nmap", {})
         if nmap.get("open_ports") or nmap.get("summary"):
             lines.append("")
@@ -717,7 +723,7 @@ def consolidate_findings(
                     f"{p['service']}{product_str}{version_str}"
                 )
 
-        # --- Nuclei (sorted by severity) ---
+        # --- 2. Nuclei (sorted by severity) ---
         nuclei = data.get("nuclei", [])
         if nuclei:
             nuclei_sorted = sorted(
@@ -739,123 +745,28 @@ def consolidate_findings(
                     if isinstance(refs, list):
                         lines.append(f"    Refs: {', '.join(refs[:3])}")
 
-        # --- testssl ---
+        # --- 3. testssl ---
         testssl = data.get("testssl", [])
         if testssl:
-            testssl_sorted = sorted(
-                testssl,
-                key=lambda f: _severity_key(f.get("severity", "unknown")),
-            )
             lines.append("")
             lines.append("--- SSL/TLS ANALYSIS (testssl.sh) ---")
-            for item in testssl_sorted:
+            # Only show MEDIUM+ findings in detail, summarize LOW/INFO
+            important = [t for t in testssl if t.get("severity", "").lower() in ("high", "critical", "medium", "warn")]
+            low_count = sum(1 for t in testssl if t.get("severity", "").lower() in ("low",))
+            info_count = sum(1 for t in testssl if t.get("severity", "").lower() in ("ok", "info", ""))
+
+            for item in sorted(important, key=lambda f: _severity_key(f.get("severity", "unknown"))):
                 sev = item.get("severity", "").upper()
                 lines.append(
                     f"  [{sev}] {item.get('id', '')}: "
                     f"{item.get('finding', '')}"
                 )
+            if low_count > 0:
+                lines.append(f"  [{low_count} LOW findings omitted — cipher/protocol details]")
+            if info_count > 0:
+                lines.append(f"  [{info_count} INFO/OK checks passed]")
 
-        # --- Nikto ---
-        nikto = data.get("nikto", [])
-        if nikto:
-            lines.append("")
-            lines.append("--- WEB VULNERABILITY SCAN (nikto) ---")
-            for item in nikto:
-                lines.append(
-                    f"  [{item.get('method', 'GET')}] {item.get('url', '')}"
-                )
-                lines.append(f"    {item.get('msg', '')}")
-
-        # --- ZAP Web Application Scan ---
-        zap = data.get("zap", [])
-        if zap:
-            lines.append("")
-            lines.append("--- WEB APPLICATION SCAN (OWASP ZAP) ---")
-            for item in zap:
-                sev = item.get("severity", "info").upper()
-                lines.append(f"  [{sev}] {item.get('name', '')}")
-                if item.get("url"):
-                    lines.append(f"    URL: {item['url']}")
-                if item.get("description"):
-                    lines.append(f"    {item['description'][:200]}")
-                if item.get("cweid"):
-                    lines.append(f"    CWE: {item['cweid']}")
-
-        # --- Discovered Endpoints (ZAP Spider) ---
-        spider_urls = data.get("zap_spider_urls", [])
-        if spider_urls:
-            lines.append("")
-            lines.append(f"--- DISCOVERED ENDPOINTS ({len(spider_urls)} URLs) ---")
-            api_urls = [u for u in spider_urls if any(p in u for p in ("/api/", "/graphql", "/rest/", "/v1/", "/v2/"))]
-            admin_urls = [u for u in spider_urls if any(p in u for p in ("/admin", "/login", "/auth", "/wp-admin"))]
-            if api_urls:
-                lines.append(f"  API-Endpoints ({len(api_urls)}):")
-                for u in api_urls[:10]:
-                    lines.append(f"    {u}")
-                if len(api_urls) > 10:
-                    lines.append(f"    ... und {len(api_urls) - 10} weitere")
-            if admin_urls:
-                lines.append(f"  Admin/Login ({len(admin_urls)}):")
-                for u in admin_urls[:5]:
-                    lines.append(f"    {u}")
-
-        # --- Security headers ---
-        headers = data.get("headers", {})
-        if headers.get("missing") or headers.get("present"):
-            lines.append("")
-            lines.append("--- SECURITY HEADERS ---")
-            if headers.get("url"):
-                lines.append(f"  URL: {headers['url']}")
-            lines.append(f"  Score: {headers.get('score', 'N/A')}")
-            if headers.get("present"):
-                lines.append(f"  Present: {', '.join(headers['present'])}")
-            if headers.get("missing"):
-                lines.append(f"  Missing: {', '.join(headers['missing'])}")
-
-        # --- Gobuster directories ---
-        gobuster = data.get("gobuster_dir", [])
-        if gobuster:
-            lines.append("")
-            lines.append("--- DISCOVERED DIRECTORIES (gobuster) ---")
-            for p in gobuster[:50]:
-                lines.append(f"  {p}")
-            if len(gobuster) > 50:
-                lines.append(f"  ... and {len(gobuster) - 50} more")
-
-        # --- httpx ---
-        httpx = data.get("httpx", {})
-        if httpx:
-            lines.append("")
-            lines.append("--- HTTP PROBE (httpx) ---")
-            if httpx.get("status_code"):
-                lines.append(f"  Status: {httpx['status_code']}")
-            if httpx.get("title"):
-                lines.append(f"  Title: {httpx['title']}")
-            if httpx.get("server"):
-                lines.append(f"  Server: {httpx['server']}")
-            if httpx.get("final_url"):
-                lines.append(f"  Final URL: {httpx['final_url']}")
-            if httpx.get("technologies"):
-                lines.append(f"  Technologies: {', '.join(httpx['technologies'])}")
-
-        # --- katana ---
-        katana = data.get("katana", {})
-        if katana:
-            lines.append("")
-            lines.append("--- WEB CRAWLER (katana) ---")
-            lines.append(f"  Total URLs discovered: {katana.get('total_urls', 0)}")
-            if katana.get("interesting_paths"):
-                lines.append("  Interesting paths:")
-                for p in katana["interesting_paths"][:10]:
-                    lines.append(f"    {p}")
-            if katana.get("api_endpoints"):
-                lines.append("  API endpoints:")
-                for p in katana["api_endpoints"][:10]:
-                    lines.append(f"    {p}")
-            if katana.get("parameterized_urls"):
-                lines.append(f"  Parameterized URLs: {len(katana['parameterized_urls'])}")
-
-        # --- wpscan ---
+        # --- 4. wpscan (before nikto — WordPress vulns are high-value) ---
         wpscan = data.get("wpscan", {})
         if wpscan:
             lines.append("")
@@ -876,6 +787,115 @@ def consolidate_findings(
                     lines.append(f"    - {v.get('title', '')}")
             if wpscan.get("users_found"):
                 lines.append(f"  Users enumerated: {', '.join(wpscan['users_found'])}")
+
+        # --- 5. Nikto ---
+        nikto = data.get("nikto", [])
+        if nikto:
+            lines.append("")
+            lines.append("--- WEB VULNERABILITY SCAN (nikto) ---")
+            for item in nikto:
+                lines.append(
+                    f"  [{item.get('method', 'GET')}] {item.get('url', '')}"
+                )
+                lines.append(f"    {item.get('msg', '')}")
+
+        # --- 6. Security headers ---
+        headers = data.get("headers", {})
+        if headers.get("missing") or headers.get("present"):
+            lines.append("")
+            lines.append("--- SECURITY HEADERS ---")
+            if headers.get("url"):
+                lines.append(f"  URL: {headers['url']}")
+            lines.append(f"  Score: {headers.get('score', 'N/A')}")
+            if headers.get("present"):
+                lines.append(f"  Present: {', '.join(headers['present'])}")
+            if headers.get("missing"):
+                lines.append(f"  Missing: {', '.join(headers['missing'])}")
+
+        # --- 7. httpx ---
+        httpx = data.get("httpx", {})
+        if httpx:
+            lines.append("")
+            lines.append("--- HTTP PROBE (httpx) ---")
+            if httpx.get("status_code"):
+                lines.append(f"  Status: {httpx['status_code']}")
+            if httpx.get("title"):
+                lines.append(f"  Title: {httpx['title']}")
+            if httpx.get("server"):
+                lines.append(f"  Server: {httpx['server']}")
+            if httpx.get("final_url"):
+                lines.append(f"  Final URL: {httpx['final_url']}")
+            if httpx.get("technologies"):
+                lines.append(f"  Technologies: {', '.join(httpx['technologies'])}")
+
+        # --- 8. katana ---
+        katana = data.get("katana", {})
+        if katana:
+            lines.append("")
+            lines.append("--- WEB CRAWLER (katana) ---")
+            lines.append(f"  Total URLs discovered: {katana.get('total_urls', 0)}")
+            if katana.get("interesting_paths"):
+                lines.append("  Interesting paths:")
+                for p in katana["interesting_paths"][:10]:
+                    lines.append(f"    {p}")
+            if katana.get("api_endpoints"):
+                lines.append("  API endpoints:")
+                for p in katana["api_endpoints"][:10]:
+                    lines.append(f"    {p}")
+            if katana.get("parameterized_urls"):
+                lines.append(f"  Parameterized URLs: {len(katana['parameterized_urls'])}")
+
+        # --- 9. Gobuster directories ---
+        gobuster = data.get("gobuster_dir", [])
+        if gobuster:
+            lines.append("")
+            lines.append("--- DISCOVERED DIRECTORIES (gobuster) ---")
+            for p in gobuster[:50]:
+                lines.append(f"  {p}")
+            if len(gobuster) > 50:
+                lines.append(f"  ... and {len(gobuster) - 50} more")
+
+        # --- 10. ZAP Web Application Scan (most verbose — put LAST so truncation hits it first) ---
+        zap = data.get("zap", [])
+        if zap:
+            lines.append("")
+            lines.append("--- WEB APPLICATION SCAN (OWASP ZAP) ---")
+            # Group by alert name to avoid duplicates
+            alert_groups: dict[str, list] = {}
+            for item in zap:
+                name = item.get("name", item.get("alert", "unknown"))
+                alert_groups.setdefault(name, []).append(item)
+
+            lines.append(f"  {len(zap)} total alerts, {len(alert_groups)} unique types:")
+            # Show each unique alert type once, with count
+            for name, items in sorted(alert_groups.items(),
+                                       key=lambda x: {"high":0,"medium":1,"low":2,"info":3}.get(x[1][0].get("severity","info"), 3)):
+                sev = items[0].get("severity", "info").upper()
+                count = len(items)
+                urls = list(set(i.get("url","")[:60] for i in items[:3]))
+                lines.append(f"  [{sev}] {name} ({count}x)")
+                if items[0].get("cweid"):
+                    lines.append(f"    CWE: {items[0]['cweid']}")
+                for u in urls[:2]:
+                    lines.append(f"    URL: {u}")
+
+        # --- 11. Discovered Endpoints (ZAP Spider — also verbose) ---
+        spider_urls = data.get("zap_spider_urls", [])
+        if spider_urls:
+            lines.append("")
+            lines.append(f"--- DISCOVERED ENDPOINTS ({len(spider_urls)} URLs) ---")
+            api_urls = [u for u in spider_urls if any(p in u for p in ("/api/", "/graphql", "/rest/", "/v1/", "/v2/"))]
+            admin_urls = [u for u in spider_urls if any(p in u for p in ("/admin", "/login", "/auth", "/wp-admin"))]
+            if api_urls:
+                lines.append(f"  API-Endpoints ({len(api_urls)}):")
+                for u in api_urls[:10]:
+                    lines.append(f"    {u}")
+                if len(api_urls) > 10:
+                    lines.append(f"    ... und {len(api_urls) - 10} weitere")
+            if admin_urls:
+                lines.append(f"  Admin/Login ({len(admin_urls)}):")
+                for u in admin_urls[:5]:
+                    lines.append(f"    {u}")
 
         sections.append("\n".join(lines))
 

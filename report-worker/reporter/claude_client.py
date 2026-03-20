@@ -545,18 +545,31 @@ def call_claude(
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    # Safety-net: cap consolidated_findings to avoid Claude API timeout on large scans
-    MAX_FINDINGS_CHARS = 30000
+    # Smart truncation — preserve complete host sections, prioritize variety
+    MAX_FINDINGS_CHARS = 120000  # ~30K tokens, well within Opus 200K context
+
     if len(consolidated_findings) > MAX_FINDINGS_CHARS:
         log.warning("consolidated_findings_truncated",
                     original_len=len(consolidated_findings),
                     truncated_to=MAX_FINDINGS_CHARS,
                     domain=domain)
-        consolidated_findings = (
-            consolidated_findings[:MAX_FINDINGS_CHARS]
-            + f"\n\n--- GEKÜRZT: {len(consolidated_findings) - MAX_FINDINGS_CHARS} Zeichen entfernt "
-            "(vollständige Rohdaten im MinIO-Archiv) ---"
-        )
+        # Split by host sections (marked by "HOST:" headers)
+        host_sections = re.split(r'(={50,}[\s\S]*?HOST:)', consolidated_findings)
+
+        # Reconstruct with per-host caps
+        truncated = ""
+        per_host_cap = MAX_FINDINGS_CHARS // max(len(host_sections) // 2, 1)
+
+        for i, section in enumerate(host_sections):
+            if len(truncated) + len(section) > MAX_FINDINGS_CHARS:
+                remaining = MAX_FINDINGS_CHARS - len(truncated)
+                if remaining > 500:
+                    truncated += section[:remaining]
+                truncated += f"\n\n--- GEKUERZT: weitere Daten im MinIO-Archiv ---"
+                break
+            truncated += section
+
+        consolidated_findings = truncated
 
     # Build user prompt (from architecture.md)
     user_prompt = f"""
