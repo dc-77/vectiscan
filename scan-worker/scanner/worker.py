@@ -502,7 +502,9 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
         return idx, result
 
     phase2_results: list[dict[str, Any] | None] = [None] * len(scannable)
-    max_parallel_p2 = min(3, scannable_total)
+    # Sequential host processing — each worker has ONE ZAP daemon,
+    # parallel hosts would cause ZAP context conflicts and alert mixing.
+    max_parallel_p2 = 1
     with ThreadPoolExecutor(max_workers=max_parallel_p2, thread_name_prefix="phase2") as pool:
         futures = {
             pool.submit(_run_phase2_host, idx, host, tp): idx
