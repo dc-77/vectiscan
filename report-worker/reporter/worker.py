@@ -301,6 +301,24 @@ def process_job(job_data: dict) -> None:
         )
         log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
 
+        # Extract cost info
+        claude_cost = claude_output.pop("_cost", None)
+        if claude_cost:
+            claude_debug["cost"] = claude_cost
+            # Save cost as separate scan_result for aggregation
+            try:
+                cost_conn = _get_db_connection()
+                with cost_conn.cursor() as cur:
+                    cur.execute(
+                        """INSERT INTO scan_results (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms)
+                           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                        (order_id, None, 4, "report_cost", json.dumps(claude_cost), 0, 0),
+                    )
+                cost_conn.commit()
+                cost_conn.close()
+            except Exception as e:
+                log.warning("report_cost_save_failed", error=str(e))
+
         # -- 4b. Report QA — programmatic checks + Haiku plausibility ---------
         enrichment = job_data.get("enrichment")
         qa_report = run_qa_checks(claude_output, package=package, enrichment=enrichment)

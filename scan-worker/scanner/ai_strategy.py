@@ -20,6 +20,12 @@ log = structlog.get_logger()
 HAIKU_MODEL = "claude-haiku-4-5-20251001"
 SONNET_MODEL = "claude-sonnet-4-6"
 
+AI_PRICING: dict[str, dict[str, float]] = {
+    "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},
+    "claude-sonnet-4-6": {"input": 3.0, "output": 15.0},
+    "claude-opus-4-6": {"input": 15.0, "output": 75.0},
+}
+
 
 def _save_ai_debug(
     order_id: str,
@@ -30,6 +36,7 @@ def _save_ai_debug(
     user_prompt: str,
     raw_response: str,
     parsed: dict[str, Any],
+    cost: dict[str, Any] | None = None,
 ) -> None:
     """Save full Claude prompt+response for debug transparency.
 
@@ -41,6 +48,8 @@ def _save_ai_debug(
         "user_prompt": user_prompt[:10000],  # Cap user prompt (can be very long)
         "raw_response": raw_response,
     }
+    if cost:
+        debug["cost"] = cost
     _save_result(
         order_id=order_id, host_ip=host_ip, phase=phase,
         tool_name=f"{tool_name}_debug",
@@ -81,6 +90,12 @@ def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
         raw = response.content[0].text
         log.info("haiku_response", duration_ms=duration_ms, tokens=response.usage.output_tokens)
 
+        # Cost tracking
+        prices = AI_PRICING.get(HAIKU_MODEL, {"input": 1.0, "output": 5.0})
+        input_tokens = response.usage.input_tokens
+        output_tokens = response.usage.output_tokens
+        cost = round((input_tokens / 1_000_000) * prices["input"] + (output_tokens / 1_000_000) * prices["output"], 4)
+
         # Strip markdown code fences if present
         text = raw.strip()
         if text.startswith("```"):
@@ -91,6 +106,12 @@ def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
 
         parsed = json.loads(text)
         parsed["_raw"] = raw  # Preserve raw response for debug transparency
+        parsed["_cost"] = {
+            "model": HAIKU_MODEL,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_cost_usd": cost,
+        }
         return parsed
 
     except json.JSONDecodeError as e:
@@ -196,10 +217,11 @@ Antwort im Format:
     result = _call_haiku(HOST_STRATEGY_SYSTEM, user_prompt)
 
     # Save full AI debug (system prompt + user prompt + raw response)
+    cost = result.get("_cost")
     if order_id:
         _save_ai_debug(order_id, None, 0, "ai_host_strategy",
                         HOST_STRATEGY_SYSTEM, user_prompt,
-                        result.get("_raw", ""), result)
+                        result.get("_raw", ""), result, cost=cost)
 
     error_detail = result.get("_error", "")
     if not result or "hosts" not in result:
@@ -219,7 +241,9 @@ Antwort im Format:
              scan=sum(1 for h in result["hosts"] if h.get("action") == "scan"),
              skip=sum(1 for h in result["hosts"] if h.get("action") == "skip"))
 
+    # Strip internal keys before return
     result.pop("_raw", None)
+    result.pop("_cost", None)
     return result
 
 
@@ -304,10 +328,11 @@ Antwort im Format:
     result = _call_haiku(TECH_ANALYSIS_SYSTEM, user_prompt)
 
     # Save full AI debug
+    cost = result.get("_cost")
     if order_id:
         _save_ai_debug(order_id, None, 1, "ai_tech_analysis",
                         TECH_ANALYSIS_SYSTEM, user_prompt,
-                        result.get("_raw", ""), result)
+                        result.get("_raw", ""), result, cost=cost)
 
     error_detail = result.get("_error", "")
     if not result or "hosts" not in result:
@@ -318,7 +343,9 @@ Antwort im Format:
     log.info("ai_tech_analysis_complete",
              hosts=len(result.get("hosts", {})))
 
+    # Strip internal keys before return
     result.pop("_raw", None)
+    result.pop("_cost", None)
     return result
 
 
@@ -463,10 +490,11 @@ Antwort im Format:
     result = _call_haiku(PHASE2_CONFIG_SYSTEM, user_prompt)
 
     # Save full AI debug
+    cost = result.get("_cost")
     if order_id:
         _save_ai_debug(order_id, ip, 1, "ai_phase2_config",
                         PHASE2_CONFIG_SYSTEM, user_prompt,
-                        result.get("_raw", ""), result)
+                        result.get("_raw", ""), result, cost=cost)
 
     error_detail = result.get("_error", "")
     if not result or "nuclei_tags" not in result:
@@ -495,7 +523,9 @@ Antwort im Format:
              zap_ajax=result.get("zap_ajax_spider_enabled"),
              zap_categories=result.get("zap_active_categories"))
 
+    # Strip internal keys before return
     result.pop("_raw", None)
+    result.pop("_cost", None)
     return result
 
 
@@ -532,6 +562,12 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 4096) -
         log.info("sonnet_response", duration_ms=duration_ms,
                  tokens=response.usage.output_tokens)
 
+        # Cost tracking
+        prices = AI_PRICING.get(SONNET_MODEL, {"input": 3.0, "output": 15.0})
+        input_tokens = response.usage.input_tokens
+        output_tokens = response.usage.output_tokens
+        cost = round((input_tokens / 1_000_000) * prices["input"] + (output_tokens / 1_000_000) * prices["output"], 4)
+
         # Strip markdown code fences if present
         text = raw.strip()
         if text.startswith("```"):
@@ -542,6 +578,12 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 4096) -
 
         parsed = json.loads(text)
         parsed["_raw"] = raw
+        parsed["_cost"] = {
+            "model": SONNET_MODEL,
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_cost_usd": cost,
+        }
         return parsed
 
     except json.JSONDecodeError as e:
@@ -640,10 +682,11 @@ Antwort im Format:
     result = _call_sonnet(PHASE3_SYSTEM, user_prompt)
 
     # Save full AI debug
+    cost = result.get("_cost")
     if order_id:
         _save_ai_debug(order_id, None, 3, "ai_phase3_prioritization",
                         PHASE3_SYSTEM, user_prompt,
-                        result.get("_raw", ""), result)
+                        result.get("_raw", ""), result, cost=cost)
 
     error_detail = result.get("_error", "")
     if not result or "high_confidence_findings" not in result:
@@ -661,5 +704,7 @@ Antwort im Format:
     fp = len(result.get("potential_false_positives", []))
     log.info("ai_phase3_complete", high=high, low=low, fp=fp)
 
+    # Strip internal keys before return
     result.pop("_raw", None)
+    result.pop("_cost", None)
     return result

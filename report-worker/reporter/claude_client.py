@@ -15,6 +15,29 @@ from reporter.prompts import get_system_prompt
 
 log = structlog.get_logger()
 
+# Model selection by package — Opus for complex reports, Sonnet for simple ones
+REPORT_MODELS: dict[str, str] = {
+    "webcheck": "claude-sonnet-4-6",
+    "basic": "claude-sonnet-4-6",
+    "perimeter": "claude-opus-4-6",
+    "professional": "claude-opus-4-6",
+    "compliance": "claude-opus-4-6",
+    "nis2": "claude-opus-4-6",
+    "supplychain": "claude-opus-4-6",
+    "insurance": "claude-opus-4-6",
+}
+
+MAX_TOKENS_BY_MODEL: dict[str, int] = {
+    "claude-sonnet-4-6": 16384,
+    "claude-opus-4-6": 32000,
+}
+
+AI_PRICING: dict[str, dict[str, float]] = {
+    "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},
+    "claude-sonnet-4-6": {"input": 3.0, "output": 15.0},
+    "claude-opus-4-6": {"input": 15.0, "output": 75.0},
+}
+
 # System prompt from docs/architecture.md — copy VERBATIM
 SYSTEM_PROMPT = """
 Du bist ein erfahrener Penetration Tester, der Scan-Rohdaten in professionelle
@@ -552,7 +575,8 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
 """
 
     system_prompt = get_system_prompt(package)
-    max_tokens = MAX_TOKENS_BY_PACKAGE.get(package, 4096)
+    model = REPORT_MODELS.get(package, "claude-sonnet-4-6")
+    max_tokens = MAX_TOKENS_BY_MODEL.get(model, 16384)
 
     # Populate debug info (prompts are constant across retries)
     if debug_info is not None:
@@ -570,7 +594,7 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
             log.info("claude_api_call", attempt=attempt + 1, domain=domain)
 
             response = client.messages.create(
-                model="claude-sonnet-4-6",
+                model=model,
                 max_tokens=max_tokens,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
@@ -580,6 +604,23 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
             # Extract text from response
             response_text = response.content[0].text
             stop_reason = response.stop_reason  # "end_turn" or "max_tokens"
+
+            # Token cost tracking
+            input_tokens = response.usage.input_tokens
+            output_tokens = response.usage.output_tokens
+            prices = AI_PRICING.get(model, {"input": 3.0, "output": 15.0})
+            cost_info = {
+                "model": model,
+                "input_tokens": input_tokens,
+                "output_tokens": output_tokens,
+                "input_cost_usd": round((input_tokens / 1_000_000) * prices["input"], 4),
+                "output_cost_usd": round((output_tokens / 1_000_000) * prices["output"], 4),
+                "total_cost_usd": round((input_tokens / 1_000_000) * prices["input"] + (output_tokens / 1_000_000) * prices["output"], 4),
+            }
+            log.info("claude_cost", **cost_info)
+
+            if debug_info is not None:
+                debug_info["cost"] = cost_info
 
             # Save raw response for debug
             if debug_info is not None:
@@ -625,6 +666,7 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
             result = validate_cwe_mappings(result)
             # 4. Correct CWE assignments (pattern-based, deterministic)
             result = correct_cwe_mappings(result)
+            result["_cost"] = cost_info
             return result
 
         except anthropic.RateLimitError as e:

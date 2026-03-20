@@ -136,6 +136,15 @@ export interface OrderEvents {
       cve?: string;
     }>;
   } | null;
+  costs?: {
+    total_usd: number;
+    breakdown: Array<{
+      step: string;
+      model: string;
+      tokens: number;
+      cost_usd: number;
+    }>;
+  } | null;
 }
 
 export async function getOrderEvents(id: string): Promise<ApiResponse<OrderEvents>> {
@@ -417,6 +426,20 @@ export interface AdminStats {
 
 export async function getAdminStats(): Promise<ApiResponse<AdminStats>> {
   const res = await fetch(`${API_URL}/api/admin/stats`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export interface AiCostsData {
+  total_cost_usd: number;
+  cost_by_model: Record<string, {count: number; total_usd: number}>;
+  cost_by_package: Record<string, {count: number; total_usd: number}>;
+  recent_reports: Array<{orderId: string; domain: string; package: string; cost_usd: number; model: string; createdAt: string}>;
+}
+
+export async function getAiCosts(): Promise<ApiResponse<AiCostsData>> {
+  const res = await fetch(`${API_URL}/api/admin/ai-costs`, {
     headers: authHeaders(),
   });
   return handleResponse(res);

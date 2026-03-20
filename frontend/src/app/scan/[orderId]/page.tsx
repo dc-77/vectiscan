@@ -450,6 +450,41 @@ export default function ScanDetailPage() {
                 <ScanTimeline results={scanResults} startedAt={order.startedAt} finishedAt={order.finishedAt} />
               )}
 
+              {/* AI Costs (admin only) */}
+              {admin && aiData?.costs && aiData.costs.total_usd > 0 && (
+                <details className="border border-slate-700 rounded-lg">
+                  <summary className="p-4 cursor-pointer text-sm font-semibold text-slate-300 hover:text-white">
+                    AI-Kosten: ${aiData.costs.total_usd.toFixed(4)} USD
+                  </summary>
+                  <div className="p-4 border-t border-slate-700">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="text-slate-500 border-b border-slate-700">
+                          <th className="text-left py-2">Schritt</th>
+                          <th className="text-left py-2">Modell</th>
+                          <th className="text-right py-2">Tokens</th>
+                          <th className="text-right py-2">Kosten</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-slate-300">
+                        {aiData.costs.breakdown.map((c: { step: string; model: string; tokens: number; cost_usd: number }, i: number) => (
+                          <tr key={i} className="border-t border-slate-800">
+                            <td className="py-1.5">{c.step.replace(/_/g, ' ')}</td>
+                            <td className="py-1.5 text-slate-400 font-mono text-[10px]">{c.model.split('-').slice(-2).join('-')}</td>
+                            <td className="py-1.5 text-right font-mono">{c.tokens.toLocaleString()}</td>
+                            <td className="py-1.5 text-right font-mono">${c.cost_usd.toFixed(4)}</td>
+                          </tr>
+                        ))}
+                        <tr className="border-t border-slate-600 font-semibold">
+                          <td className="py-2" colSpan={3}>Gesamt</td>
+                          <td className="py-2 text-right font-mono">${aiData.costs.total_usd.toFixed(4)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </details>
+              )}
+
               {/* AI Decisions */}
               {aiData && (
                 <div>

@@ -363,6 +363,70 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
     };
   });
 
+  // GET /api/admin/ai-costs — AI cost analytics
+  server.get('/api/admin/ai-costs', { preHandler: [requireAuth, requireAdmin] }, async () => {
+    // Get all cost data from scan_results
+    const costResult = await query(
+      `SELECT sr.order_id, sr.tool_name, sr.raw_output, sr.created_at, o.target_url, o.package
+       FROM scan_results sr
+       JOIN orders o ON sr.order_id = o.id
+       WHERE sr.tool_name = 'report_cost'
+       ORDER BY sr.created_at DESC
+       LIMIT 100`,
+    );
+
+    let totalCost = 0;
+    const byModel: Record<string, {count: number; total_usd: number}> = {};
+    const byPackage: Record<string, {count: number; total_usd: number}> = {};
+    const recentReports: Array<{orderId: string; domain: string; package: string; cost_usd: number; model: string; createdAt: string}> = [];
+
+    for (const row of costResult.rows as Array<Record<string, unknown>>) {
+      try {
+        const cost = JSON.parse(row.raw_output as string);
+        if (!cost.total_cost_usd) continue;
+
+        totalCost += cost.total_cost_usd;
+        const model = cost.model || 'unknown';
+        const pkg = (row.package as string) || 'unknown';
+
+        if (!byModel[model]) byModel[model] = {count: 0, total_usd: 0};
+        byModel[model].count++;
+        byModel[model].total_usd += cost.total_cost_usd;
+
+        if (!byPackage[pkg]) byPackage[pkg] = {count: 0, total_usd: 0};
+        byPackage[pkg].count++;
+        byPackage[pkg].total_usd += cost.total_cost_usd;
+
+        if (recentReports.length < 20) {
+          recentReports.push({
+            orderId: (row.order_id as string) || '',
+            domain: (row.target_url as string) || '',
+            package: pkg,
+            cost_usd: Math.round(cost.total_cost_usd * 10000) / 10000,
+            model,
+            createdAt: row.created_at ? (row.created_at as Date).toISOString() : '',
+          });
+        }
+      } catch { /* skip unparseable */ }
+    }
+
+    // Round aggregates
+    for (const m of Object.values(byModel)) m.total_usd = Math.round(m.total_usd * 100) / 100;
+    for (const p of Object.values(byPackage)) {
+      p.total_usd = Math.round(p.total_usd * 100) / 100;
+    }
+
+    return {
+      success: true,
+      data: {
+        total_cost_usd: Math.round(totalCost * 100) / 100,
+        cost_by_model: byModel,
+        cost_by_package: byPackage,
+        recent_reports: recentReports,
+      },
+    };
+  });
+
   // POST /api/admin/diagnose — trigger scan-worker tool diagnostics
   server.post<{ Body: { probe?: string } }>('/api/admin/diagnose', { preHandler: [requireAuth, requireAdmin] }, async (request, reply) => {
     const probe = request.body?.probe || undefined;

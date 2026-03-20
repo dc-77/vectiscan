@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { listUsers, changeUserRole, deleteUser, getAdminStats, AdminUser, AdminStats } from '@/lib/api';
+import { listUsers, changeUserRole, deleteUser, getAdminStats, getAiCosts, AdminUser, AdminStats, AiCostsData } from '@/lib/api';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
 
 
@@ -19,6 +19,7 @@ export default function AdminPage() {
   const [ready, setReady] = useState(false);
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
+  const [aiCosts, setAiCosts] = useState<AiCostsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,9 +33,10 @@ export default function AdminPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [usersRes, statsRes] = await Promise.all([listUsers(), getAdminStats()]);
+      const [usersRes, statsRes, costsRes] = await Promise.all([listUsers(), getAdminStats(), getAiCosts()]);
       if (usersRes.success && usersRes.data) setUsers(usersRes.data.users);
       if (statsRes.success && statsRes.data) setStats(statsRes.data);
+      if (costsRes.success && costsRes.data) setAiCosts(costsRes.data);
       setError(null);
     } catch {
       setError('Daten konnten nicht geladen werden.');
@@ -103,6 +105,92 @@ export default function AdminPage() {
               <p className="text-xs text-gray-500 uppercase tracking-wider">Fertig</p>
               <p className="text-2xl font-bold text-green-400 mt-1">{stats.orders.byStatus?.report_complete ?? 0}</p>
             </div>
+          </div>
+        )}
+
+        {/* AI Costs */}
+        {aiCosts && aiCosts.total_cost_usd > 0 && (
+          <div className="bg-[#1e293b] rounded-lg border border-gray-800 p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-medium text-gray-400">AI-Kosten</h2>
+              <span className="text-lg font-bold text-white">${aiCosts.total_cost_usd.toFixed(2)} USD</span>
+            </div>
+
+            {/* Cost by Model */}
+            {Object.keys(aiCosts.cost_by_model).length > 0 && (
+              <div>
+                <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">Nach Modell</h3>
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-gray-500 border-b border-gray-700">
+                      <th className="text-left py-1.5">Modell</th>
+                      <th className="text-right py-1.5">Aufrufe</th>
+                      <th className="text-right py-1.5">Gesamt</th>
+                      <th className="text-right py-1.5">Durchschnitt</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-300">
+                    {Object.entries(aiCosts.cost_by_model).map(([model, data]) => (
+                      <tr key={model} className="border-t border-gray-800">
+                        <td className="py-1.5 font-mono text-[10px]">{model}</td>
+                        <td className="py-1.5 text-right">{data.count}</td>
+                        <td className="py-1.5 text-right font-mono">${data.total_usd.toFixed(2)}</td>
+                        <td className="py-1.5 text-right font-mono text-gray-500">${(data.total_usd / data.count).toFixed(4)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Cost by Package */}
+            {Object.keys(aiCosts.cost_by_package).length > 0 && (
+              <div>
+                <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">Nach Paket</h3>
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-gray-500 border-b border-gray-700">
+                      <th className="text-left py-1.5">Paket</th>
+                      <th className="text-right py-1.5">Aufrufe</th>
+                      <th className="text-right py-1.5">Gesamt</th>
+                      <th className="text-right py-1.5">Durchschnitt</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-300">
+                    {Object.entries(aiCosts.cost_by_package).map(([pkg, data]) => (
+                      <tr key={pkg} className="border-t border-gray-800">
+                        <td className="py-1.5 uppercase">{pkg}</td>
+                        <td className="py-1.5 text-right">{data.count}</td>
+                        <td className="py-1.5 text-right font-mono">${data.total_usd.toFixed(2)}</td>
+                        <td className="py-1.5 text-right font-mono text-gray-500">${(data.total_usd / data.count).toFixed(4)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Recent Reports */}
+            {aiCosts.recent_reports.length > 0 && (
+              <div>
+                <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">Letzte Reports</h3>
+                <div className="space-y-1.5 max-h-64 overflow-y-auto" style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
+                  {aiCosts.recent_reports.map((r, i) => (
+                    <div key={i} className="flex items-center justify-between text-xs py-1.5 border-t border-gray-800">
+                      <div className="min-w-0">
+                        <span className="text-gray-300 font-mono truncate">{r.domain}</span>
+                        <span className="ml-2 text-gray-600 uppercase text-[10px]">{r.package}</span>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-gray-500 text-[10px] font-mono">{r.model.split('-').slice(-2).join('-')}</span>
+                        <span className="text-gray-300 font-mono">${r.cost_usd.toFixed(4)}</span>
+                        <span className="text-gray-600 text-[10px]">{r.createdAt ? formatDate(r.createdAt) : ''}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

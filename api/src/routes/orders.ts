@@ -504,6 +504,34 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       } catch { /* skip unparseable */ }
     }
 
+    // Aggregate AI costs for this scan
+    let totalCostUsd = 0;
+    const costBreakdown: Array<{step: string; model: string; tokens: number; cost_usd: number}> = [];
+
+    // Cost data is in _debug entries and report_cost
+    const costRows = await query(
+      `SELECT tool_name, raw_output FROM scan_results
+       WHERE order_id = $1 AND (tool_name LIKE '%_debug' OR tool_name = 'report_cost')
+       ORDER BY created_at`,
+      [id],
+    );
+
+    for (const row of costRows.rows as Array<Record<string, unknown>>) {
+      try {
+        const data = JSON.parse(row.raw_output as string);
+        const cost = data.cost || null;
+        if (cost && typeof cost === 'object' && cost.total_cost_usd) {
+          totalCostUsd += cost.total_cost_usd;
+          costBreakdown.push({
+            step: (row.tool_name as string).replace('_debug', ''),
+            model: cost.model || 'unknown',
+            tokens: (cost.input_tokens || 0) + (cost.output_tokens || 0),
+            cost_usd: cost.total_cost_usd,
+          });
+        }
+      } catch { /* skip unparseable */ }
+    }
+
     // Load false positive details from phase3 correlation
     const fpRow = await query(
       `SELECT raw_output FROM scan_results
@@ -549,6 +577,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         error: order.error_message || null,
         falsePositives,
         claudeDebug,
+        costs: totalCostUsd > 0 ? { total_usd: Math.round(totalCostUsd * 10000) / 10000, breakdown: costBreakdown } : null,
       },
     };
   });
