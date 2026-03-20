@@ -40,10 +40,9 @@ class TestPhase2Packages:
     @patch("scanner.phase2._save_result")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
-    @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
     @patch("scanner.phase2.run_testssl", return_value={})
     def test_webcheck_runs_zap_spider_not_active(
-        self, mock_testssl, mock_gowitness, mock_httpx,
+        self, mock_testssl, mock_httpx,
         mock_headers, mock_save, mock_event, mock_publish, tmp_path
     ):
         from scanner.phase2 import run_phase2
@@ -60,12 +59,13 @@ class TestPhase2Packages:
             )
 
         mock_testssl.assert_called_once()
-        mock_gowitness.assert_called_once()
         mock_headers.assert_called_once()
         assert "zap_spider" in result["tools_run"]
         assert "testssl" in result["tools_run"]
         # WebCheck: no active scan, no nuclei
         assert "zap_active" not in result["tools_run"]
+        # gowitness removed — screenshots now via Playwright in Phase 1
+        assert "gowitness" not in result["tools_run"]
         for legacy in ("nikto", "gobuster_dir", "katana"):
             assert legacy not in result["tools_run"]
 
@@ -74,11 +74,9 @@ class TestPhase2Packages:
     @patch("scanner.phase2._save_result")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
-    @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
-    @patch("scanner.phase2.run_nuclei", return_value=[])
     @patch("scanner.phase2.run_testssl", return_value={})
     def test_perimeter_runs_zap_and_nuclei(
-        self, mock_testssl, mock_nuclei, mock_gowitness, mock_httpx,
+        self, mock_testssl, mock_httpx,
         mock_headers, mock_save, mock_event, mock_publish, tmp_path
     ):
         from scanner.phase2 import run_phase2
@@ -95,7 +93,6 @@ class TestPhase2Packages:
             )
 
         mock_testssl.assert_called_once()
-        mock_gowitness.assert_called_once()
         mock_headers.assert_called_once()
         assert "zap_spider" in result["tools_run"]
         assert "nuclei" in result["tools_run"]
@@ -105,10 +102,9 @@ class TestPhase2Packages:
     @patch("scanner.phase2._save_result")
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
-    @patch("scanner.phase2.run_gowitness", return_value="/tmp/screenshots")
     @patch("scanner.phase2.run_testssl", return_value={})
     def test_webcheck_tools_run_excludes_legacy(
-        self, mock_testssl, mock_gowitness, mock_httpx,
+        self, mock_testssl, mock_httpx,
         mock_headers, mock_save, mock_event, mock_publish, tmp_path
     ):
         """Verify tools_run list does not contain removed legacy tools."""
@@ -125,5 +121,5 @@ class TestPhase2Packages:
                 scan_dir, "test-id", callback, config
             )
 
-        for legacy in ("nikto", "gobuster_dir", "katana"):
+        for legacy in ("nikto", "gobuster_dir", "katana", "gowitness"):
             assert legacy not in result["tools_run"]
