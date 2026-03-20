@@ -126,14 +126,16 @@ class TestCallClaudePackages:
             },
         }
 
-    def test_basic_uses_2048_tokens(self, basic_response):
+    def test_basic_uses_sonnet_tokens(self, basic_response):
+        """basic/webcheck uses Sonnet → 16384 tokens."""
         mock_mod, mock_client = _make_mock_anthropic(basic_response)
         with patch("reporter.claude_client.anthropic", mock_mod), \
              patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}):
             call_claude("example.com", {}, [], "", package="basic")
 
         call_args = mock_client.messages.create.call_args
-        assert call_args.kwargs["max_tokens"] == 32000
+        assert call_args.kwargs["max_tokens"] == 16384
+        assert call_args.kwargs["model"] == "claude-sonnet-4-6"
 
     def test_professional_uses_4096_tokens(self, professional_response):
         mock_mod, mock_client = _make_mock_anthropic(professional_response)
