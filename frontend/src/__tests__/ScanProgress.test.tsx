@@ -28,10 +28,16 @@ describe('ScanProgress', () => {
   it('should show domain and phase badge', () => {
     render(<ScanProgress scan={baseScan} />);
     expect(screen.getByText('example.com')).toBeInTheDocument();
-    expect(screen.getByText('DNS-Reconnaissance')).toBeInTheDocument();
+    expect(screen.getByText('DNS Recon')).toBeInTheDocument();
   });
 
-  it('should show current tool when scanning', () => {
+  it('should show progress bar during active phases even without hosts', () => {
+    render(<ScanProgress scan={baseScan} />);
+    // dns_recon for perimeter: midpoint of [8, 15] = 12%
+    expect(screen.getByText(/12%/)).toBeInTheDocument();
+  });
+
+  it('should interpolate host progress in scan_phase2', () => {
     const scan: OrderStatus = {
       ...baseScan,
       status: 'scan_phase2',
@@ -44,21 +50,23 @@ describe('ScanProgress', () => {
       },
     };
     render(<ScanProgress scan={scan} />);
-    expect(screen.getByText('nikto')).toBeInTheDocument();
-    expect(screen.getByText('1.2.3.4')).toBeInTheDocument();
-    expect(screen.getByText('1 / 3')).toBeInTheDocument();
+    // scan_phase2 perimeter: [30, 75], 1/3 hosts = 30 + (75-30) * 0.333 = 45%
+    expect(screen.getByText(/1\/3 hosts/)).toBeInTheDocument();
+    expect(screen.getByText(/45%/)).toBeInTheDocument();
   });
 
-  it('should show report generating status', () => {
+  it('should show report generating status with progress', () => {
     const scan: OrderStatus = {
       ...baseScan,
       status: 'report_generating',
     };
     render(<ScanProgress scan={scan} />);
-    expect(screen.getByText('Report wird generiert')).toBeInTheDocument();
+    expect(screen.getByText('Generating Report')).toBeInTheDocument();
+    // Midpoint of [90, 95] = 93%
+    expect(screen.getByText(/93%/)).toBeInTheDocument();
   });
 
-  it('should show estimated remaining time when hosts are being scanned', () => {
+  it('should show ETA only during host-based phases', () => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     const scan: OrderStatus = {
       ...baseScan,
@@ -72,12 +80,15 @@ describe('ScanProgress', () => {
       },
     };
     render(<ScanProgress scan={scan} />);
-    const estimate = screen.getByTestId('time-estimate');
-    expect(estimate).toBeInTheDocument();
-    expect(estimate.textContent).toContain('Geschätzte Restzeit');
+    expect(screen.getByText(/ETA:/)).toBeInTheDocument();
   });
 
-  it('should not show estimated time when no hosts completed', () => {
+  it('should not show ETA during non-host phases', () => {
+    render(<ScanProgress scan={baseScan} />);
+    expect(screen.queryByText(/ETA:/)).not.toBeInTheDocument();
+  });
+
+  it('should not show ETA when no hosts completed', () => {
     const scan: OrderStatus = {
       ...baseScan,
       status: 'scan_phase1',
@@ -88,13 +99,13 @@ describe('ScanProgress', () => {
       },
     };
     render(<ScanProgress scan={scan} />);
-    expect(screen.queryByTestId('time-estimate')).not.toBeInTheDocument();
+    expect(screen.queryByText(/ETA:/)).not.toBeInTheDocument();
   });
 
   it('should show cancel button when onCancel is provided', () => {
     const onCancel = jest.fn();
     render(<ScanProgress scan={baseScan} onCancel={onCancel} />);
-    const btn = screen.getByText('Scan abbrechen');
+    const btn = screen.getByText('Cancel scan');
     expect(btn).toBeInTheDocument();
     fireEvent.click(btn);
     expect(onCancel).toHaveBeenCalledTimes(1);
@@ -102,12 +113,37 @@ describe('ScanProgress', () => {
 
   it('should show cancelling state', () => {
     render(<ScanProgress scan={baseScan} onCancel={() => {}} cancelling={true} />);
-    expect(screen.getByText('Wird abgebrochen...')).toBeInTheDocument();
+    expect(screen.getByText('Cancelling...')).toBeInTheDocument();
   });
 
   it('should not show cancel button when onCancel is not provided', () => {
     render(<ScanProgress scan={baseScan} />);
-    expect(screen.queryByText('Scan abbrechen')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cancel scan')).not.toBeInTheDocument();
+  });
+
+  it('should use different progress ranges for webcheck vs perimeter', () => {
+    const webcheckScan: OrderStatus = {
+      ...baseScan,
+      package: 'webcheck',
+      status: 'dns_recon',
+    };
+    const { unmount } = render(<ScanProgress scan={webcheckScan} />);
+    // dns_recon for webcheck: midpoint of [0, 10] = 5%
+    expect(screen.getByText(/5%/)).toBeInTheDocument();
+    unmount();
+
+    // Perimeter dns_recon: midpoint of [8, 15] = 12%
+    render(<ScanProgress scan={baseScan} />);
+    expect(screen.getByText(/12%/)).toBeInTheDocument();
+  });
+
+  it('should not show progress bar for completed scans', () => {
+    const scan: OrderStatus = {
+      ...baseScan,
+      status: 'report_complete',
+    };
+    const { container } = render(<ScanProgress scan={scan} />);
+    expect(container.querySelector('.bg-gray-700')).not.toBeInTheDocument();
   });
 
   it('should use smooth transition on progress bar', () => {
@@ -121,8 +157,8 @@ describe('ScanProgress', () => {
       },
     };
     const { container } = render(<ScanProgress scan={scan} />);
-    const bar = container.querySelector('.bg-blue-500.rounded-full');
-    expect(bar?.className).toContain('duration-1000');
-    expect(bar?.className).toContain('ease-in-out');
+    const bar = container.querySelector('.animate-energyFlow');
+    expect(bar).toBeInTheDocument();
+    expect(bar?.getAttribute('style')).toContain('transition: width 1s ease-out');
   });
 });

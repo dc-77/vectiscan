@@ -52,6 +52,46 @@ function formatDuration(seconds: number): string {
   return `~${h}h ${rm}m`;
 }
 
+function calcProgress(status: string, hostsCompleted: number, hostsTotal: number, pkg: string): number {
+  const isWebCheck = ['basic', 'webcheck'].includes(pkg);
+
+  const PHASE_RANGES: Record<string, [number, number]> = isWebCheck
+    ? {
+        created: [0, 0], queued: [0, 0],
+        dns_recon: [0, 10],
+        scan_phase1: [10, 30],
+        scan_phase2: [30, 75],
+        scan_phase3: [75, 85],
+        scan_complete: [85, 85],
+        report_generating: [90, 95],
+        report_complete: [100, 100],
+      }
+    : {
+        created: [0, 0], queued: [0, 0],
+        passive_intel: [0, 8],
+        dns_recon: [8, 15],
+        scan_phase1: [15, 30],
+        scan_phase2: [30, 75],
+        scan_phase3: [75, 85],
+        scan_complete: [85, 85],
+        report_generating: [90, 95],
+        report_complete: [100, 100],
+      };
+
+  const range = PHASE_RANGES[status];
+  if (!range) return 0;
+  const [min, max] = range;
+
+  // Host-Interpolation in Phase 1 und 2
+  if ((status === 'scan_phase1' || status === 'scan_phase2') && hostsTotal > 0) {
+    const hostFraction = hostsCompleted / hostsTotal;
+    return Math.round(min + (max - min) * hostFraction);
+  }
+
+  // Alle anderen Phasen: Mitte des Ranges
+  return Math.round((min + max) / 2);
+}
+
 interface Props {
   scan: OrderStatus;
   onCancel?: () => void;
@@ -65,12 +105,11 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
   const pkgLabel = PACKAGE_LABELS[scan.package] || scan.package.toUpperCase();
   const isActive = !['report_complete', 'failed', 'cancelled'].includes(status);
 
-  const percent = progress.hostsTotal > 0
-    ? Math.round((progress.hostsCompleted / progress.hostsTotal) * 100)
-    : 0;
+  const percent = calcProgress(status, progress.hostsCompleted, progress.hostsTotal, scan.package);
+  const hostPhase = status === 'scan_phase1' || status === 'scan_phase2';
 
   let estimatedRemaining: string | null = null;
-  if (startedAt && progress.hostsTotal > 0 && progress.hostsCompleted > 0) {
+  if (hostPhase && startedAt && progress.hostsTotal > 0 && progress.hostsCompleted > 0) {
     const elapsedSec = (Date.now() - new Date(startedAt).getTime()) / 1000;
     const perHost = elapsedSec / progress.hostsCompleted;
     const remaining = perHost * (progress.hostsTotal - progress.hostsCompleted);
@@ -93,11 +132,14 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
       </div>
 
       {/* Progress bar */}
-      {progress.hostsTotal > 0 && (
+      {isActive && (
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-slate-500">
             <span className="font-mono">
-              {progress.hostsCompleted}/{progress.hostsTotal} hosts complete
+              {hostPhase && progress.hostsTotal > 0
+                ? `${progress.hostsCompleted}/${progress.hostsTotal} hosts`
+                : label}
+              {' · '}{percent}%
             </span>
             {estimatedRemaining && (
               <span>ETA: {estimatedRemaining}</span>
