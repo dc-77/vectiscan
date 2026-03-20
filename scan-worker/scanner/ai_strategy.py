@@ -81,7 +81,7 @@ def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
         start = time.monotonic()
         response = client.messages.create(
             model=HAIKU_MODEL,
-            max_tokens=2048,
+            max_tokens=4096,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
         )
