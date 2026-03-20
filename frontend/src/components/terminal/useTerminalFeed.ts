@@ -359,15 +359,16 @@ export function useTerminalFeed(orderId?: string | null) {
 
     // Phase/host transitions
     const currentHost = progress.currentHost || '';
-    const phaseHostKey = `${status}:${currentHost}`;
-    const lastPhaseHostKey = `${lastStatusRef.current}:${lastHostRef.current}`;
-    const phaseOrHostChanged = phaseHostKey !== lastPhaseHostKey;
+    const phaseChanged = status !== lastStatusRef.current;
+    const hostChanged = currentHost !== lastHostRef.current;
+    const phaseOrHostChanged = phaseChanged || hostChanged;
 
     if (phaseOrHostChanged) {
       lastStatusRef.current = status;
       lastHostRef.current = currentHost;
 
-      switch (status) {
+      // Phase headers only on actual PHASE change (not on host change within same phase)
+      if (phaseChanged) switch (status) {
         case 'queued':
           newLines.push({
             id: lineId(), timestamp: now,

@@ -24,11 +24,13 @@ interface TerminalLineProps {
 }
 
 export default function TerminalLine({ line, animate = true, dimmed = false }: TerminalLineProps) {
-  const [display, setDisplay] = useState(animate ? '' : line.text);
-  const [resolved, setResolved] = useState(!animate);
+  // Phase headers skip scramble animation — they're navigation landmarks
+  const skipScramble = !animate || line.isHeader;
+  const [display, setDisplay] = useState(skipScramble ? line.text : '');
+  const [resolved, setResolved] = useState(skipScramble);
 
   useEffect(() => {
-    if (!animate) return;
+    if (skipScramble) return;
 
     // Scramble resolve effect
     const target = line.text;
@@ -56,7 +58,7 @@ export default function TerminalLine({ line, animate = true, dimmed = false }: T
     }, 25);
 
     return () => clearInterval(interval);
-  }, [animate, line.text]);
+  }, [skipScramble, line.text]);
 
   const indent = '  '.repeat(line.indent || 0);
   const statusIcon = line.status === 'done' ? '✓'
