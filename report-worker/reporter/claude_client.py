@@ -152,17 +152,17 @@ Antworte ausschließlich in JSON nach folgendem Schema:
 """
 
 MAX_TOKENS_BY_PACKAGE: dict[str, int] = {
-    # No artificial limits — Claude charges by actual usage, not by cap.
-    # Sonnet 4.6 supports up to 16384 output tokens.
+    # Derived from REPORT_MODELS + MAX_TOKENS_BY_MODEL:
+    # Sonnet packages → 16384, Opus packages → 32000
     "webcheck": 16384,
-    "perimeter": 16384,
-    "compliance": 16384,
-    "supplychain": 16384,
-    "insurance": 16384,
+    "perimeter": 32000,
+    "compliance": 32000,
+    "supplychain": 32000,
+    "insurance": 32000,
     # Legacy aliases
     "basic": 16384,
-    "professional": 16384,
-    "nis2": 16384,
+    "professional": 32000,
+    "nis2": 32000,
 }
 
 
