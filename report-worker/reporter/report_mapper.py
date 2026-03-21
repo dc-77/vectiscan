@@ -67,13 +67,22 @@ def _attach_thumbnails(
     Sets finding["thumbnail"] to the first screenshot path found, or None.
     """
     if not host_screenshots:
+        log.debug("attach_thumbnails.no_screenshots")
         return
+    log.info("attach_thumbnails.start",
+             screenshot_ips=list(host_screenshots.keys()),
+             finding_count=len(findings))
+    matched = 0
     for f in findings:
         affected = f.get("affected", "")
         for ip, paths in host_screenshots.items():
             if ip in affected and paths:
                 f["thumbnail"] = paths[0]
+                matched += 1
+                log.debug("attach_thumbnails.match",
+                          finding=f.get("id"), ip=ip, path=paths[0])
                 break
+    log.info("attach_thumbnails.done", matched=matched, total=len(findings))
 
 
 def _map_finding(f: dict[str, Any]) -> dict[str, Any]:
@@ -618,7 +627,9 @@ def _build_screenshot_data(
             continue
         fqdns = fqdn_lookup.get(ip, [])
         label = f"{ip} ({', '.join(fqdns)})" if fqdns else ip
-        entries.append({"label": label, "paths": paths})
+        # Show only the first screenshot per host to avoid duplicates
+        # (multiple FQDNs on the same IP often show the same page)
+        entries.append({"label": label, "paths": [paths[0]]})
 
     return entries
 
@@ -668,11 +679,14 @@ def map_professional_report(
     mapped_findings += [_map_positive_finding(f) for f in positive_findings]
     _attach_thumbnails(mapped_findings, host_screenshots)
 
+    thumb_count = sum(1 for f in mapped_findings if f.get("thumbnail"))
     log.info(
         "report_mapper.professional",
         domain=domain,
         findings=len(mapped_findings),
         severities=severity_counts,
+        thumbnails_attached=thumb_count,
+        screenshot_hosts=list((host_screenshots or {}).keys()),
     )
 
     return {

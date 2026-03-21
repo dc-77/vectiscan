@@ -348,6 +348,8 @@ def build_finding(story, styles, f):
     # Build optional thumbnail image for the affected host
     thumb_cell = None
     thumbnail_path = f.get("thumbnail")
+    if thumbnail_path:
+        print(f"[THUMB] Finding {f.get('id')}: path={thumbnail_path}, exists={os.path.isfile(thumbnail_path)}")
     if thumbnail_path and os.path.isfile(thumbnail_path):
         try:
             thumb_img = Image(thumbnail_path)
