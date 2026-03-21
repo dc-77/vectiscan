@@ -224,6 +224,72 @@ def _upload_report(minio_client: Minio, local_path: Path, minio_path: str) -> in
 
 
 # ---------------------------------------------------------------------------
+# Post-QA risk recalculation
+# ---------------------------------------------------------------------------
+
+_SEVERITY_RANK = {"CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1, "INFO": 0}
+_RANK_TO_RISK = {4: "CRITICAL", 3: "HIGH", 2: "MEDIUM", 1: "LOW", 0: "LOW"}
+
+
+def _recalculate_overall_risk(claude_output: dict) -> None:
+    """Recalculate overall_risk from actual finding severities after QA.
+
+    If QA downgrades findings (e.g. HIGH→MEDIUM), the overall_risk must
+    reflect the actual maximum severity, not Claude's original assessment.
+    Modifies claude_output in-place.
+    """
+    findings = claude_output.get("findings", [])
+    if not findings:
+        return
+
+    original_risk = claude_output.get("overall_risk", "MEDIUM")
+    original_rank = _SEVERITY_RANK.get(original_risk.upper(), 2)
+
+    # Find the actual maximum severity across all findings
+    max_rank = 0
+    for f in findings:
+        sev = f.get("severity", "INFO").upper()
+        rank = _SEVERITY_RANK.get(sev, 0)
+        if rank > max_rank:
+            max_rank = rank
+
+    actual_risk = _RANK_TO_RISK[max_rank]
+
+    if max_rank < original_rank:
+        log.info(
+            "overall_risk_recalculated",
+            original=original_risk,
+            actual=actual_risk,
+            reason="QA corrections lowered max severity",
+        )
+        claude_output["overall_risk"] = actual_risk
+
+        # Adjust overall_description to reflect the corrected risk level
+        old_desc = claude_output.get("overall_description", "")
+        if old_desc:
+            # Replace risk level keywords in the description text
+            import re
+            risk_replacements = {
+                "kritisch": {"HIGH": "erhöht", "MEDIUM": "moderat", "LOW": "gering"},
+                "hohes Risiko": {"MEDIUM": "moderates Risiko", "LOW": "geringes Risiko"},
+                "hohem Risiko": {"MEDIUM": "moderatem Risiko", "LOW": "geringem Risiko"},
+                "erheblich": {"LOW": "begrenzt"},
+                "signifikant": {"MEDIUM": "moderat", "LOW": "begrenzt"},
+            }
+            new_desc = old_desc
+            for keyword, replacements in risk_replacements.items():
+                if actual_risk in replacements and keyword.lower() in new_desc.lower():
+                    new_desc = re.sub(
+                        re.escape(keyword), replacements[actual_risk],
+                        new_desc, count=1, flags=re.IGNORECASE,
+                    )
+            if new_desc != old_desc:
+                claude_output["overall_description"] = new_desc
+                log.info("overall_description_adjusted",
+                         original_risk=original_risk, new_risk=actual_risk)
+
+
+# ---------------------------------------------------------------------------
 # Job processing
 # ---------------------------------------------------------------------------
 
@@ -326,6 +392,9 @@ def process_job(job_data: dict) -> None:
                  quality_score=qa_report.get("quality_score"),
                  auto_fixes=qa_report.get("auto_fixes_applied", 0),
                  manual_review=qa_report.get("manual_review_needed", False))
+
+        # -- 4c. Recalculate overall_risk after QA corrections -----------------
+        _recalculate_overall_risk(claude_output)
 
         # -- 5. Map Claude output to report_data ------------------------------
         parsed_meta = parsed.get("meta", {})
