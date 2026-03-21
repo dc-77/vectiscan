@@ -760,6 +760,19 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                           response_length=len(json_text) if json_text else 0)
                 raise RuntimeError(f"Failed to parse Claude response as JSON: {e}")
 
+        except anthropic.APIStatusError as e:
+            # Retryable server errors: 429, 500, 502, 503, 529 (overloaded)
+            if e.status_code in (429, 500, 502, 503, 529) and attempt < max_retries - 1:
+                wait_time = (attempt + 1) * 15  # 15s, 30s, 45s
+                log.warning("claude_api_retryable_error",
+                            attempt=attempt + 1, status=e.status_code,
+                            wait=wait_time, error=str(e)[:200])
+                time.sleep(wait_time)
+            else:
+                if debug_info is not None:
+                    debug_info["error"] = str(e)
+                raise RuntimeError(f"Claude API error (HTTP {e.status_code}): {e}")
+
         except Exception as e:
             if debug_info is not None:
                 debug_info["error"] = str(e)
