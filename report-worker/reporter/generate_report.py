@@ -55,20 +55,42 @@ class HorizontalLine(Flowable):
 
 class FindingHeader(Flowable):
     """Colored header bar for a finding with ID, title, and CVSS badge."""
-    def __init__(self, finding_id, title, severity, cvss_score, color):
+    def __init__(self, finding_id, title, severity, cvss_score, color,
+                 compact=False, show_badge=True):
         Flowable.__init__(self)
         self.finding_id = finding_id
         self.title = title
         self.severity = severity
         self.cvss_score = cvss_score
         self.color = color
+        self.compact = compact          # smaller bar for positive findings
+        self.show_badge = show_badge    # hide CVSS badge for positive findings
         self.width = 170 * mm
-        self.height = 18 * mm
+        # Determine if title needs two lines (break at ~60 chars on word boundary)
+        self._line1, self._line2 = self._split_title(title)
+        self._needs_two_lines = bool(self._line2)
+        if compact:
+            self.height = 12 * mm
+        elif self._needs_two_lines:
+            self.height = 22 * mm
+        else:
+            self.height = 18 * mm
+
+    @staticmethod
+    def _split_title(title, max_chars=60):
+        """Split a long title into two lines, breaking at the last space before max_chars."""
+        if len(title) <= max_chars:
+            return title, ""
+        # Find last space within the first max_chars characters
+        break_pos = title.rfind(" ", 0, max_chars)
+        if break_pos == -1:
+            break_pos = max_chars
+        return title[:break_pos].rstrip(), title[break_pos:].lstrip()
 
     def _is_unrated(self):
         """Check if this finding has no CVSS score (Basic package or positive finding)."""
         score = str(self.cvss_score)
-        return score in ("—", "", "N/A", "None")
+        return score in ("\u2014", "", "N/A", "None")
 
     def draw(self):
         self.canv.setFillColor(self.color)
@@ -76,27 +98,50 @@ class FindingHeader(Flowable):
         self.canv.setFillColor(COLORS["white"])
         self.canv.setFont(FONT_HEADING, 9)
         self.canv.drawString(4 * mm, self.height - 5.5 * mm, self.finding_id)
-        self.canv.setFont(FONT_HEADING, 11)
-        # Truncate title if too long
-        title = self.title
-        if len(title) > 65:
-            title = title[:62] + "..."
-        self.canv.drawString(4 * mm, self.height - 12 * mm, title)
 
-        badge_x = self.width - 30 * mm
-        self.canv.setFillColor(HexColor("#00000033"))
-        self.canv.roundRect(badge_x, 3 * mm, 26 * mm, 12 * mm, 2 * mm, fill=1, stroke=0)
-        self.canv.setFillColor(COLORS["white"])
-
-        if self._is_unrated():
-            # Show prominent severity-only badge (no CVSS)
+        if self._needs_two_lines:
+            # Two-line title: use slightly smaller font
             self.canv.setFont(FONT_HEADING, 10)
-            self.canv.drawCentredString(badge_x + 13 * mm, 7 * mm, self.severity.upper())
+            self.canv.drawString(4 * mm, self.height - 12 * mm, self._line1)
+            self.canv.drawString(4 * mm, self.height - 16 * mm, self._line2)
+        elif self.compact:
+            self.canv.setFont(FONT_HEADING, 10)
+            self.canv.drawString(4 * mm, self.height - 10 * mm, self._line1)
         else:
-            self.canv.setFont(FONT_HEADING, 8)
-            self.canv.drawCentredString(badge_x + 13 * mm, 11 * mm, "CVSS v3.1")
-            self.canv.setFont(FONT_HEADING, 10)
-            self.canv.drawCentredString(badge_x + 13 * mm, 4.5 * mm, str(self.cvss_score))
+            self.canv.setFont(FONT_HEADING, 11)
+            self.canv.drawString(4 * mm, self.height - 12 * mm, self._line1)
+
+        if self.show_badge:
+            badge_x = self.width - 30 * mm
+            self.canv.setFillColor(HexColor("#00000033"))
+            self.canv.roundRect(badge_x, 3 * mm, 26 * mm, 12 * mm, 2 * mm, fill=1, stroke=0)
+            self.canv.setFillColor(COLORS["white"])
+
+            if self._is_unrated():
+                # Show prominent severity-only badge (no CVSS)
+                self.canv.setFont(FONT_HEADING, 10)
+                self.canv.drawCentredString(badge_x + 13 * mm, 7 * mm, self.severity.upper())
+            else:
+                self.canv.setFont(FONT_HEADING, 8)
+                self.canv.drawCentredString(badge_x + 13 * mm, 11 * mm, "CVSS v3.1")
+                self.canv.setFont(FONT_HEADING, 10)
+                self.canv.drawCentredString(badge_x + 13 * mm, 4.5 * mm, str(self.cvss_score))
+
+
+def severity_badge_text(severity_name):
+    """Return severity name with a colored dot prefix for use in Paragraph HTML.
+
+    Uses Unicode circle character colored via ReportLab's <font> tag.
+    """
+    sev_upper = severity_name.strip().upper()
+    color_obj = SEVERITY_COLORS.get(sev_upper, COLORS["info"])
+    # Convert HexColor to hex string for <font> tag
+    hex_str = "#{:02x}{:02x}{:02x}".format(
+        int(color_obj.red * 255),
+        int(color_obj.green * 255),
+        int(color_obj.blue * 255),
+    )
+    return f'<font color="{hex_str}">\u25cf</font>&nbsp;{severity_name}'
 
 
 # ============================================================================
@@ -320,23 +365,81 @@ def build_toc(story, styles, toc_entries):
     story.append(PageBreak())
 
 
-def build_finding(story, styles, f):
+def _is_positive_finding(f):
+    """Check if a finding is a positive/INFO finding."""
+    return f.get("severity", "").upper() == "INFO"
+
+
+def build_finding(story, styles, f, compact=False):
     """
     Build a single finding section using KeepTogether for intelligent page breaks.
     f is a dict with keys: id, title, severity, cvss_score, cvss_vector, cwe,
                            affected, description, evidence, impact, recommendation
+    compact: if True, use smaller header, no CVSS badge, simplified metadata (positive findings)
     """
     color = SEVERITY_COLORS.get(f["severity"].upper(), COLORS["info"])
 
     # Build the finding header + metadata as a group that stays together
     header_group = []
-    header_group.append(FindingHeader(f["id"], f["title"], f["severity"], f["cvss_score"], color))
+    header_group.append(FindingHeader(
+        f["id"], f["title"], f["severity"], f["cvss_score"], color,
+        compact=compact, show_badge=(not compact),
+    ))
     header_group.append(Spacer(1, 4 * mm))
 
     # NIS2 reference badge (if present)
     if f.get("nis2_ref"):
         header_group.append(NIS2RefBadge(f["nis2_ref"]))
         header_group.append(Spacer(1, 3 * mm))
+
+    # For compact (positive) findings, show only "Betroffene Systeme" inline
+    if compact:
+        affected = f.get("affected", "\u2014")
+        meta_data = [
+            [Paragraph("<b>Betroffene Systeme</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"]))],
+            [Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"]))],
+        ]
+        meta_table = Table(meta_data, colWidths=[170 * mm])
+        meta_style_cmds = [
+            ("BACKGROUND", (0, 0), (-1, -1), COLORS["bg_light"]),
+            ("TOPPADDING", (0, 0), (-1, 0), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, 0), 1),
+            ("TOPPADDING", (0, 1), (-1, 1), 1),
+            ("BOTTOMPADDING", (0, 1), (-1, 1), 5),
+            ("LEFTPADDING", (0, 0), (-1, -1), 6),
+            ("ROUNDEDCORNERS", [2, 2, 2, 2]),
+        ]
+        meta_table.setStyle(TableStyle(meta_style_cmds))
+        header_group.append(meta_table)
+        header_group.append(Spacer(1, SPACING_PARAGRAPH))
+
+        # Description — keep with header
+        desc_label = f.get("label_description", "Description")
+        header_group.append(Paragraph(desc_label, styles["FindingLabel"]))
+        header_group.append(Paragraph(f["description"], styles["FindingBody"]))
+
+        # Use KeepTogether so the header + meta + description stays on one page
+        story.append(KeepTogether(header_group))
+
+        # Evidence (separate block, can flow to next page) — hide if empty
+        evidence_text = f.get("evidence", "\u2014")
+        if evidence_text not in ("\u2014", "", "N/A", None):
+            story.append(Spacer(1, 2 * mm))
+            ev_label = f.get("label_evidence", "Evidence")
+            story.append(Paragraph(ev_label, styles["FindingLabel"]))
+            story.append(Paragraph(evidence_text, styles["Evidence"]))
+
+        # Recommendation
+        story.append(Spacer(1, 2 * mm))
+        rec_label = f.get("label_recommendation", "Recommendation")
+        story.append(Paragraph(rec_label, styles["FindingLabel"]))
+        story.append(Paragraph(f["recommendation"], styles["FindingBody"]))
+
+        # Spacing after finding
+        story.append(Spacer(1, SPACING_FINDING))
+        return
+
+    # --- Full (non-compact) finding rendering below ---
 
     # Metadata row — only show CVSS/CWE columns when they have real values
     _dash_values = ("\u2014", "", "N/A", "None", None)
@@ -375,7 +478,7 @@ def build_finding(story, styles, f):
                  Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
                  Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
                  ""],
-                [Paragraph(cvss_vector, ParagraphStyle("x", fontName=FONT_MONO, fontSize=7.5, textColor=COLORS["text"])),
+                [Paragraph(cvss_vector, ParagraphStyle("x", fontName=FONT_MONO, fontSize=8.5, textColor=COLORS["text"])),
                  Paragraph(cwe, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
                  Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
                  thumb_cell],
@@ -387,7 +490,7 @@ def build_finding(story, styles, f):
                 [Paragraph("<b>CVSS Vector</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
                  Paragraph("<b>CWE</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"])),
                  Paragraph("<b>Affected Systems</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=7.5, textColor=COLORS["muted"]))],
-                [Paragraph(cvss_vector, ParagraphStyle("x", fontName=FONT_MONO, fontSize=7.5, textColor=COLORS["text"])),
+                [Paragraph(cvss_vector, ParagraphStyle("x", fontName=FONT_MONO, fontSize=8.5, textColor=COLORS["text"])),
                  Paragraph(cwe, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"])),
                  Paragraph(affected, ParagraphStyle("x", fontName=FONT_BODY, fontSize=8, textColor=COLORS["text"]))],
             ]
@@ -504,6 +607,17 @@ def build_screenshots_section(story, styles, screenshots):
                     scale = min(_MAX_IMAGE_WIDTH / iw, 1.0)
                     img.drawWidth = iw * scale
                     img.drawHeight = ih * scale
+                    # Enforce minimum height of 60mm for small screenshots
+                    min_img_height = 60 * mm
+                    if img.drawHeight < min_img_height:
+                        scale_up = min_img_height / img.drawHeight
+                        img.drawWidth *= scale_up
+                        img.drawHeight = min_img_height
+                        # Re-check max width after scaling up
+                        if img.drawWidth > _MAX_IMAGE_WIDTH:
+                            scale_down = _MAX_IMAGE_WIDTH / img.drawWidth
+                            img.drawWidth = _MAX_IMAGE_WIDTH
+                            img.drawHeight *= scale_down
                     # Also cap height to avoid full-page images
                     max_img_height = 120 * mm
                     if img.drawHeight > max_img_height:
@@ -541,23 +655,36 @@ def build_risk_box(story, label, level, description):
     """Overall risk assessment colored box."""
     level_upper = level.upper()
     level_color = SEVERITY_COLORS.get(level_upper, COLORS["high"])
-    data = [
-        [Paragraph(f"<b>{label}</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=10, textColor=COLORS["white"], alignment=TA_CENTER)),
-         Paragraph(f"<b>{level}</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=10, textColor=COLORS["white"], alignment=TA_CENTER))],
-        [Paragraph(description, ParagraphStyle("x", fontName=FONT_BODY, fontSize=9, textColor=COLORS["white"], leading=13, alignment=TA_JUSTIFY)), ""],
+
+    header_row = [
+        Paragraph(f"<b>{label}</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=10, textColor=COLORS["white"], alignment=TA_CENTER)),
+        Paragraph(f"<b>{level}</b>", ParagraphStyle("x", fontName=FONT_HEADING, fontSize=10, textColor=COLORS["white"], alignment=TA_CENTER)),
     ]
-    table = Table(data, colWidths=[130 * mm, 40 * mm])
-    table.setStyle(TableStyle([
+
+    style_cmds = [
         ("BACKGROUND", (0, 0), (0, 0), level_color),
         ("BACKGROUND", (1, 0), (1, 0), COLORS["critical"]),
-        ("BACKGROUND", (0, 1), (-1, 1), HexColor("#2d3748")),
-        ("SPAN", (0, 1), (1, 1)),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ("TOPPADDING", (0, 0), (-1, -1), 6),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
         ("LEFTPADDING", (0, 0), (-1, -1), 8),
         ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-    ]))
+    ]
+
+    if description:
+        data = [
+            header_row,
+            [Paragraph(description, ParagraphStyle("x", fontName=FONT_BODY, fontSize=9, textColor=COLORS["white"], leading=13, alignment=TA_JUSTIFY)), ""],
+        ]
+        style_cmds += [
+            ("BACKGROUND", (0, 1), (-1, 1), HexColor("#2d3748")),
+            ("SPAN", (0, 1), (1, 1)),
+        ]
+    else:
+        data = [header_row]
+
+    table = Table(data, colWidths=[130 * mm, 40 * mm])
+    table.setStyle(TableStyle(style_cmds))
     story.append(table)
 
 
@@ -872,7 +999,12 @@ def generate_report(report_data, output_path):
                 story.append(Paragraph(p, styles["BodyText2"]))
             if sub.get("risk_box"):
                 rb = sub["risk_box"]
-                build_risk_box(story, rb["label"], rb["level"], rb["description"])
+                # If this subsection already has paragraphs, skip the risk_box
+                # description to avoid duplicate text — show label+level only
+                rb_desc = rb.get("description", "")
+                if sub.get("paragraphs"):
+                    rb_desc = ""
+                build_risk_box(story, rb["label"], rb["level"], rb_desc)
                 story.append(Spacer(1, SPACING_SUBSECTION))
             if sub.get("table"):
                 t = sub["table"]
@@ -915,14 +1047,26 @@ def generate_report(report_data, output_path):
     # --- Findings ---
     findings = report_data.get("findings", [])
     if findings:
+        # Split into negative (non-INFO) and positive (INFO) findings
+        negative_findings = [f for f in findings if not _is_positive_finding(f)]
+        positive_findings = [f for f in findings if _is_positive_finding(f)]
+
         # Section heading kept with first finding via keepWithNext on the style
         sec_label = report_data.get("findings_section_label", "3&nbsp;&nbsp;&nbsp;Findings")
         story.append(Paragraph(sec_label, styles["SectionTitle"]))
         story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
         story.append(Spacer(1, SPACING_SUBSECTION))
 
-        for f in findings:
-            build_finding(story, styles, f)
+        for f in negative_findings:
+            build_finding(story, styles, f, compact=False)
+
+        # Positive findings subsection
+        if positive_findings:
+            story.append(Spacer(1, SPACING_SECTION))
+            story.append(Paragraph("Positive Befunde", styles["SubsectionTitle"]))
+            story.append(Spacer(1, SPACING_PARAGRAPH))
+            for f in positive_findings:
+                build_finding(story, styles, f, compact=True)
 
     story.append(PageBreak())
 
@@ -968,7 +1112,55 @@ def generate_report(report_data, output_path):
     disclaimer = report_data.get("disclaimer")
     if disclaimer:
         story.append(Spacer(1, SPACING_SUBSECTION))
-        build_info_box(story, disclaimer, COLORS["bg_light"])
+        # Build comprehensive disclaimer section with bold subsection titles
+        story.append(Paragraph("Haftungsausschluss", styles["SectionTitle"]))
+        story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+        story.append(Spacer(1, SPACING_PARAGRAPH))
+
+        _disclaimer_paragraphs = [
+            (
+                "Geltungsbereich",
+                "Dieser Bericht dokumentiert den Sicherheitsstatus der gepr\u00fcften Systeme "
+                "ausschlie\u00dflich zum Zeitpunkt der Durchf\u00fchrung. Sicherheitsbewertungen sind "
+                "Momentaufnahmen und verlieren mit der Zeit an Aussagekraft, da neue Schwachstellen "
+                "entdeckt, Software aktualisiert oder Konfigurationen ver\u00e4ndert werden k\u00f6nnen."
+            ),
+            (
+                "Keine Vollst\u00e4ndigkeitsgarantie",
+                "Die Pr\u00fcfung wurde ausschlie\u00dflich von extern ohne Zugang zu internen Systemen, "
+                "Quellcode oder Dokumentation durchgef\u00fchrt. Es besteht keine Garantie, dass "
+                "s\u00e4mtliche vorhandenen Schwachstellen identifiziert wurden. Insbesondere k\u00f6nnen "
+                "Schwachstellen existieren, die nur durch interne Pr\u00fcfungen, manuelle Code-Reviews "
+                "oder Social-Engineering-Tests aufgedeckt werden k\u00f6nnen."
+            ),
+            (
+                "Haftungsbegrenzung",
+                "BS Consulting \u00fcbernimmt keine Haftung f\u00fcr Sch\u00e4den, die aus der Umsetzung "
+                "oder Nicht-Umsetzung der in diesem Bericht enthaltenen Empfehlungen entstehen. "
+                "Die Empfehlungen stellen keine rechtsverbindliche Beratung dar. F\u00fcr die Umsetzung "
+                "von Ma\u00dfnahmen ist der Auftraggeber verantwortlich."
+            ),
+            (
+                "Vertraulichkeit",
+                "Dieser Bericht ist ausschlie\u00dflich f\u00fcr den Auftraggeber bestimmt und darf ohne "
+                "schriftliche Genehmigung nicht an Dritte weitergegeben werden. Bei der Weitergabe an "
+                "autorisierte Dritte (z.B. IT-Dienstleister, Versicherer) liegt die Verantwortung "
+                "f\u00fcr die Wahrung der Vertraulichkeit beim Auftraggeber."
+            ),
+            (
+                "Wiederholungspr\u00fcfung",
+                "Es wird empfohlen, Sicherheitspr\u00fcfungen in regelm\u00e4\u00dfigen Abst\u00e4nden "
+                "(mindestens alle 12 Monate) sowie nach wesentlichen \u00c4nderungen an der Infrastruktur "
+                "zu wiederholen."
+            ),
+        ]
+
+        for sub_title, sub_text in _disclaimer_paragraphs:
+            story.append(Paragraph(
+                f"<b>{sub_title}:</b> {sub_text}",
+                styles["BodyText2"],
+            ))
+            story.append(Spacer(1, SPACING_PARAGRAPH))
 
     doc.build(story)
     print(f"Report generated: {output_path}")

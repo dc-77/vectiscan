@@ -4,10 +4,12 @@ from datetime import datetime
 from typing import Any
 from xml.sax.saxutils import escape as xml_escape
 
+_CURRENT_YEAR = datetime.now().year
+
 from reportlab.lib.units import mm
 from reportlab.platypus import Paragraph
 
-from reporter.generate_report import create_styles
+from reporter.generate_report import create_styles, severity_badge_text
 from reporter.pdf.branding import CLASSIFICATION_LABEL_DE
 
 import structlog
@@ -35,6 +37,31 @@ def _safe(text: str | None) -> str:
 
 # Severity order for sorting findings
 _SEVERITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
+
+# Comprehensive list of all scan tools used in the VectiScan pipeline
+SCAN_TOOLS = [
+    {"tool": "subfinder", "description": "Passive Subdomain-Enumeration", "phase": "Phase 0"},
+    {"tool": "amass", "description": "OWASP Subdomain-Enumeration", "phase": "Phase 0"},
+    {"tool": "gobuster", "description": "DNS-Bruteforce / Directory-Enumeration", "phase": "Phase 0/2"},
+    {"tool": "dnsx", "description": "DNS-Validierung und -Auflösung", "phase": "Phase 0"},
+    {"tool": "httpx", "description": "HTTP-Probe und Service-Erkennung", "phase": "Phase 0"},
+    {"tool": "nmap", "description": "Port-Scanning und Service-Erkennung", "phase": "Phase 1"},
+    {"tool": "webtech", "description": "Web-Technologie-Identifikation", "phase": "Phase 1"},
+    {"tool": "wafw00f", "description": "WAF-Erkennung", "phase": "Phase 1"},
+    {"tool": "testssl.sh", "description": "SSL/TLS-Konfigurationsanalyse", "phase": "Phase 2"},
+    {"tool": "nikto", "description": "Web-Schwachstellen-Scanner", "phase": "Phase 2"},
+    {"tool": "nuclei", "description": "Template-basierter Schwachstellen-Scanner", "phase": "Phase 2"},
+    {"tool": "ZAP Spider", "description": "Web-Crawling und Sitemap-Erstellung", "phase": "Phase 2"},
+    {"tool": "ZAP Ajax Spider", "description": "JavaScript-basiertes Web-Crawling", "phase": "Phase 2"},
+    {"tool": "ZAP Active Scan", "description": "Automatisierte Schwachstellenprüfung", "phase": "Phase 2"},
+    {"tool": "ffuf", "description": "Web-Fuzzing und Parameter-Discovery", "phase": "Phase 2"},
+    {"tool": "feroxbuster", "description": "Rekursive Directory-Enumeration", "phase": "Phase 2"},
+    {"tool": "dalfox", "description": "XSS-Scanner und Parameter-Analyse", "phase": "Phase 2"},
+    {"tool": "katana", "description": "Web-Crawler für Endpoint-Discovery", "phase": "Phase 2"},
+    {"tool": "wpscan", "description": "WordPress-Schwachstellen-Scanner", "phase": "Phase 2"},
+    {"tool": "gowitness", "description": "Web-Screenshot-Tool", "phase": "Phase 2"},
+    {"tool": "NVD/EPSS/KEV", "description": "Threat-Intelligence-Enrichment (NIST, FIRST, CISA)", "phase": "Phase 3"},
+]
 
 
 # ---------------------------------------------------------------------------
@@ -132,7 +159,7 @@ def _map_basic_finding(f: dict[str, Any]) -> dict[str, Any]:
 def _map_positive_finding(f: dict[str, Any]) -> dict[str, Any]:
     """Map a positive finding (INFO severity) with German labels."""
     return {
-        "id": f.get("id", "VS-2026-POS"),
+        "id": f.get("id", f"VS-{_CURRENT_YEAR}-POS"),
         "title": _safe(f["title"]),
         "severity": "INFO",
         "cvss_score": "—",
@@ -172,14 +199,14 @@ def _build_toc(
 
     idx = 1
     for f in findings:
-        finding_id = f.get("id", f"VS-2026-{idx:03d}")
+        finding_id = f.get("id", f"VS-{_CURRENT_YEAR}-{idx:03d}")
         title = f.get("title", "Befund")
         toc.append((f"3.{idx}", f"{finding_id} — {title}", True))
         idx += 1
 
     for f in positive_findings:
         title = f.get("title", "Positiver Befund")
-        toc.append((f"3.{idx}", f"VS-2026-POS — {title}", True))
+        toc.append((f"3.{idx}", f"VS-{_CURRENT_YEAR}-POS — {title}", True))
         idx += 1
 
     toc.append(("4", "Maßnahmenplan", False))
@@ -218,12 +245,12 @@ def _build_executive_summary(
 
     total_findings = sum(severity_counts.values())
 
-    # Build severity overview table rows using Paragraph for proper formatting
+    # Build severity overview table rows using Paragraph with colored badges
     severity_rows = []
     for sev, count in severity_counts.items():
         severity_rows.append(
             [
-                Paragraph(sev, styles["TableCellCenter"]),
+                Paragraph(severity_badge_text(sev), styles["TableCellCenter"]),
                 Paragraph(str(count), styles["TableCellCenter"]),
             ]
         )
@@ -310,16 +337,20 @@ def _build_scope(
             "paragraphs": [
                 "Die Prüfung wurde als automatisierter Security-Scan nach dem "
                 "PTES-Standard (Penetration Testing Execution Standard) durchgeführt. "
-                "Der Scan umfasste drei Phasen:",
-                "<b>Phase 0 — DNS-Reconnaissance:</b> Subdomain-Enumeration mittels "
-                "Certificate Transparency Logs, passiver Enumeration (subfinder), "
-                "DNS-Bruteforce (gobuster) und Validierung (dnsx).",
+                "Der Scan umfasste vier Phasen:",
+                "<b>Phase 0 — Reconnaissance:</b> Passive Intelligence (Shodan, AbuseIPDB, WHOIS), "
+                "DNS-Enumeration (subfinder, amass, gobuster, dnsx) und Web-Probe (httpx). "
+                "KI-gestützte Host-Strategie bestimmt Scan-Prioritäten.",
                 "<b>Phase 1 — Technologie-Erkennung:</b> Port-Scanning (nmap), "
-                "Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) "
-                "pro Host.",
+                "Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) "
+                "pro Host. KI-gestützte Tool-Konfiguration passt Phase-2-Parameter adaptiv an.",
                 "<b>Phase 2 — Tiefer Scan:</b> SSL/TLS-Analyse (testssl.sh), "
-                "Schwachstellen-Scan (nikto, nuclei), Directory-Enumeration "
-                "(gobuster) und Screenshots (gowitness) pro Host.",
+                "Schwachstellen-Scan (nikto, nuclei, ZAP), Directory-Enumeration "
+                "(gobuster, ffuf, feroxbuster), XSS-Analyse (dalfox), Web-Crawling (katana) "
+                "und Screenshots (gowitness) pro Host.",
+                "<b>Phase 3 — Korrelation &amp; Enrichment:</b> Cross-Tool-Korrelation, "
+                "False-Positive-Filterung, Threat-Intelligence-Anreicherung (NVD, EPSS, CISA KEV) "
+                "und KI-gestützte Priorisierung.",
                 f"Die Prüfung wurde am <b>{scan_date}</b> durchgeführt. "
                 "Die Bewertung erfolgt nach CVSS v3.1.",
             ],
@@ -395,6 +426,23 @@ def _build_basic_scope(
 # ---------------------------------------------------------------------------
 
 
+def _normalize_finding_ref(ref: str) -> str:
+    """Ensure finding reference uses the full VS-YYYY-NNN format.
+
+    If the ref is just a number (e.g. "001"), prefix it with VS-{year}-.
+    If it already has the full format, return as-is.
+    """
+    ref = ref.strip()
+    if ref.upper().startswith("VS-"):
+        return ref
+    # Bare number like "001" or "1" — expand to full ID
+    try:
+        num = int(ref)
+        return f"VS-{_CURRENT_YEAR}-{num:03d}"
+    except ValueError:
+        return ref
+
+
 def _build_recommendations(
     recommendations: list[dict[str, Any]],
     styles: Any,
@@ -404,7 +452,8 @@ def _build_recommendations(
     for rec in recommendations:
         timeframe = _safe(rec.get("timeframe", "—"))
         action = _safe(rec.get("action", "—"))
-        refs = _safe(", ".join(rec.get("finding_refs", [])))
+        raw_refs = rec.get("finding_refs", [])
+        refs = _safe(", ".join(_normalize_finding_ref(r) for r in raw_refs))
         effort = _safe(rec.get("effort", "—"))
 
         table_rows.append(
@@ -432,7 +481,7 @@ def _build_recommendations(
         "table": {
             "header": header,
             "rows": table_rows,
-            "widths": [28 * mm, 95 * mm, 22 * mm, 25 * mm],
+            "widths": [28 * mm, 80 * mm, 37 * mm, 25 * mm],
         },
     }
 
@@ -516,63 +565,14 @@ def _build_appendices(
             }
         )
 
-    # Appendix B: Tool list
+    # Appendix B: Tool list (from SCAN_TOOLS constant)
     tool_rows = [
         [
-            Paragraph("subfinder", styles["TableCell"]),
-            Paragraph("Passive Subdomain-Enumeration", styles["TableCell"]),
-            Paragraph("Phase 0", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("amass", styles["TableCell"]),
-            Paragraph("OWASP Subdomain-Enumeration", styles["TableCell"]),
-            Paragraph("Phase 0", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("gobuster", styles["TableCell"]),
-            Paragraph("DNS-Bruteforce / Directory-Enumeration", styles["TableCell"]),
-            Paragraph("Phase 0/2", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("dnsx", styles["TableCell"]),
-            Paragraph("DNS-Validierung und -Auflösung", styles["TableCell"]),
-            Paragraph("Phase 0", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("nmap", styles["TableCell"]),
-            Paragraph("Port-Scanning und Service-Erkennung", styles["TableCell"]),
-            Paragraph("Phase 1", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("webtech", styles["TableCell"]),
-            Paragraph("Web-Technologie-Identifikation", styles["TableCell"]),
-            Paragraph("Phase 1", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("wafw00f", styles["TableCell"]),
-            Paragraph("WAF-Erkennung", styles["TableCell"]),
-            Paragraph("Phase 1", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("testssl.sh", styles["TableCell"]),
-            Paragraph("SSL/TLS-Konfigurationsanalyse", styles["TableCell"]),
-            Paragraph("Phase 2", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("nikto", styles["TableCell"]),
-            Paragraph("Web-Schwachstellen-Scanner", styles["TableCell"]),
-            Paragraph("Phase 2", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("nuclei", styles["TableCell"]),
-            Paragraph("Template-basierter Schwachstellen-Scanner", styles["TableCell"]),
-            Paragraph("Phase 2", styles["TableCellCenter"]),
-        ],
-        [
-            Paragraph("gowitness", styles["TableCell"]),
-            Paragraph("Web-Screenshot-Tool", styles["TableCell"]),
-            Paragraph("Phase 2", styles["TableCellCenter"]),
-        ],
+            Paragraph(t["tool"], styles["TableCell"]),
+            Paragraph(t["description"], styles["TableCell"]),
+            Paragraph(t["phase"], styles["TableCellCenter"]),
+        ]
+        for t in SCAN_TOOLS
     ]
 
     appendices.append(
