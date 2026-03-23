@@ -530,7 +530,6 @@ def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dic
         "--enumerate", "vp,vt,u1-5",  # vulnerable plugins, themes, users
         "--random-user-agent",
         "--no-banner",
-        "--ignore-main-redirect",      # follow redirects (e.g. www → non-www)
         "--disable-tls-checks",        # handle self-signed certs
     ]
     if api_token:
@@ -1374,6 +1373,13 @@ def run_phase2(
     def _run_nuclei_with_urls() -> dict[str, Any]:
         """Run nuclei against Spider-discovered URLs (not just root FQDN)."""
         r: dict[str, Any] = {}
+        # DISABLED: nuclei consistently times out (300s) on all hosts and produces
+        # 0 findings across 12+ runs. ZAP covers vulnerability scanning.
+        # Re-enable once nuclei template set is tuned or timeout issue is resolved.
+        log.info("nuclei_disabled", ip=ip, reason="consistent_timeouts_zero_findings")
+        progress_callback(order_id, "nuclei", "skipped")
+        publish_tool_output(order_id, "nuclei", ip, "Disabled (timeout optimization)")
+        return r
         if not ((phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web):
             return r
 
@@ -1469,8 +1475,11 @@ def run_phase2(
         r: dict[str, Any] = {"_tools": []}
 
         # dalfox: XSS on parameter URLs from spider
+        # DISABLED: dalfox times out (120s) on 75% of hosts and produces 0 findings
+        # across 12+ runs. ZAP active scan already covers XSS detection.
+        # Re-enable once input URL filtering or timeout is improved.
         param_urls = [u for u in spider_urls if "?" in u]
-        if param_urls and (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip and has_web:
+        if False and param_urls and (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip and has_web:
             publish_event(order_id, {"type": "tool_starting", "tool": "dalfox", "host": ip})
             dalfox_result = run_dalfox(primary_fqdn, ip, host_dir, order_id,
                                        katana_urls=param_urls[:15])
@@ -1520,10 +1529,17 @@ def run_phase2(
                 else:
                     publish_tool_output(order_id, "feroxbuster", ip, "No new paths")
 
-        # wpscan (conditional on WordPress)
+        # wpscan (conditional on WordPress) — use final URL after redirects
         if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
             publish_event(order_id, {"type": "tool_starting", "tool": "wpscan", "host": ip})
-            wpscan_result = run_wpscan(primary_fqdn, ip, host_dir, order_id)
+            # Prefer final_url from web probe (follows redirects, e.g. securess.de → www.securess.de)
+            wp_final = tech_profile.get("final_url", "")
+            if wp_final:
+                from urllib.parse import urlparse as _up
+                wp_fqdn = _up(wp_final).hostname or primary_fqdn
+            else:
+                wp_fqdn = primary_fqdn
+            wpscan_result = run_wpscan(wp_fqdn, ip, host_dir, order_id)
             r["wpscan"] = wpscan_result
             r["_tools"].append("wpscan")
             progress_callback(order_id, "wpscan", "complete")
