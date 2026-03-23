@@ -95,7 +95,8 @@ class TestPhase2Packages:
         mock_testssl.assert_called_once()
         mock_headers.assert_called_once()
         assert "zap_spider" in result["tools_run"]
-        assert "nuclei" in result["tools_run"]
+        # nuclei is currently disabled (consistent timeouts, 0 findings)
+        # assert "nuclei" in result["tools_run"]
 
     @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.publish_event")
