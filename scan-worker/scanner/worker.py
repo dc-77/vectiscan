@@ -113,21 +113,16 @@ def _is_host_reachable(ip: str, timeout: int = 5) -> bool:
 # Tool version commands — each returns (tool_name, version_string)
 _VERSION_COMMANDS: list[tuple[str, list[str]]] = [
     ("nmap", ["nmap", "--version"]),
-    ("nuclei", ["nuclei", "-version"]),
     ("subfinder", ["subfinder", "-version"]),
     ("amass", ["amass", "-version"]),
     ("gobuster", ["gobuster", "version"]),
     ("dnsx", ["dnsx", "-version"]),
-    ("gowitness", ["gowitness", "version"]),
     ("testssl.sh", ["/opt/testssl.sh/testssl.sh", "--version"]),
-    ("nikto", ["perl", "/opt/nikto/program/nikto.pl", "-Version"]),
     ("wafw00f", ["wafw00f", "--version"]),
     ("httpx", ["httpx", "-version"]),
-    ("katana", ["katana", "-version"]),
     ("wpscan", ["wpscan", "--version"]),
     ("ffuf", ["ffuf", "-V"]),
     ("feroxbuster", ["feroxbuster", "--version"]),
-    ("dalfox", ["dalfox", "version"]),
     ("searchsploit", ["searchsploit", "--help"]),
 ]
 
@@ -135,7 +130,7 @@ _VERSION_COMMANDS: list[tuple[str, list[str]]] = [
 def _collect_tool_versions() -> list[str]:
     """Collect installed tool versions at scan start.
 
-    Returns a list of strings like ["nmap 7.94", "nuclei 3.7.1", ...].
+    Returns a list of strings like ["nmap 7.94", "subfinder 2.6.7", ...].
     """
     versions: list[str] = []
     for tool_name, cmd in _VERSION_COMMANDS:

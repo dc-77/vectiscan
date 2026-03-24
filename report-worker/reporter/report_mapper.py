@@ -49,17 +49,12 @@ SCAN_TOOLS = [
     {"tool": "webtech", "description": "Web-Technologie-Identifikation", "phase": "Phase 1"},
     {"tool": "wafw00f", "description": "WAF-Erkennung", "phase": "Phase 1"},
     {"tool": "testssl.sh", "description": "SSL/TLS-Konfigurationsanalyse", "phase": "Phase 2"},
-    {"tool": "nikto", "description": "Web-Schwachstellen-Scanner", "phase": "Phase 2"},
-    {"tool": "nuclei", "description": "Template-basierter Schwachstellen-Scanner", "phase": "Phase 2"},
     {"tool": "ZAP Spider", "description": "Web-Crawling und Sitemap-Erstellung", "phase": "Phase 2"},
     {"tool": "ZAP Ajax Spider", "description": "JavaScript-basiertes Web-Crawling", "phase": "Phase 2"},
     {"tool": "ZAP Active Scan", "description": "Automatisierte Schwachstellenprüfung", "phase": "Phase 2"},
     {"tool": "ffuf", "description": "Web-Fuzzing und Parameter-Discovery", "phase": "Phase 2"},
     {"tool": "feroxbuster", "description": "Rekursive Directory-Enumeration", "phase": "Phase 2"},
-    {"tool": "dalfox", "description": "XSS-Scanner und Parameter-Analyse", "phase": "Phase 2"},
-    {"tool": "katana", "description": "Web-Crawler für Endpoint-Discovery", "phase": "Phase 2"},
     {"tool": "wpscan", "description": "WordPress-Schwachstellen-Scanner", "phase": "Phase 2"},
-    {"tool": "gowitness", "description": "Web-Screenshot-Tool", "phase": "Phase 2"},
     {"tool": "NVD/EPSS/KEV", "description": "Threat-Intelligence-Enrichment (NIST, FIRST, CISA)", "phase": "Phase 3"},
 ]
 
@@ -345,9 +340,9 @@ def _build_scope(
                 "Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) "
                 "pro Host. KI-gestützte Tool-Konfiguration passt Phase-2-Parameter adaptiv an.",
                 "<b>Phase 2 — Tiefer Scan:</b> SSL/TLS-Analyse (testssl.sh), "
-                "Schwachstellen-Scan (nikto, nuclei, ZAP), Directory-Enumeration "
-                "(gobuster, ffuf, feroxbuster), XSS-Analyse (dalfox), Web-Crawling (katana) "
-                "und Screenshots (gowitness) pro Host.",
+                "Schwachstellen-Scan (ZAP Active Scan), Directory-Enumeration "
+                "(ffuf, feroxbuster), HTTP-Header-Prüfung "
+                "und WordPress-Scan (wpscan) pro Host.",
                 "<b>Phase 3 — Korrelation &amp; Enrichment:</b> Cross-Tool-Korrelation, "
                 "False-Positive-Filterung, Threat-Intelligence-Anreicherung (NVD, EPSS, CISA KEV) "
                 "und KI-gestützte Priorisierung.",
@@ -409,7 +404,7 @@ def _build_basic_scope(
                 "<b>Port-Scan:</b> Identifikation offener Ports und Dienste (nmap).",
                 "<b>Header-Analyse:</b> Prüfung der HTTP-Sicherheitsheader.",
                 "<b>SSL-Check:</b> Bewertung der SSL/TLS-Konfiguration (testssl.sh).",
-                "<b>Screenshot:</b> Visuelle Dokumentation der Web-Oberflächen (gowitness).",
+                "<b>Web-Scan:</b> Schwachstellenprüfung (ZAP Spider + Passive Scan).",
                 f"Die Prüfung wurde am <b>{scan_date}</b> durchgeführt.",
             ],
         },

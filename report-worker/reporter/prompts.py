@@ -36,7 +36,7 @@ HÄUFIG FALSCH BEWERTET:
 - HTTP ohne HTTPS ohne Login-Formular: LOW 3.7
 
 METHODIK:
-Der Scan wurde als automatisierter Schnellscan durchgeführt. Port-Scanning (nmap), Web-Technologie-Identifikation (webtech), SSL/TLS-Analyse (testssl.sh), HTTP-Header-Prüfung und Screenshots (gowitness).
+Der Scan wurde als automatisierter Schnellscan durchgeführt. Port-Scanning (nmap), Web-Technologie-Identifikation (webtech), SSL/TLS-Analyse (testssl.sh), HTTP-Header-Prüfung und Web-Schwachstellen-Scan (ZAP).
 
 Positive Befunde: Variiere den Text der Bewertung und Empfehlung. Vermeide es, bei jedem positiven Befund identisch "Positiver Befund — korrekte Konfiguration." und "Aktuelle Konfiguration beibehalten." zu schreiben. Beschreibe stattdessen konkret, was gut gemacht wurde und warum es wichtig ist.
 
@@ -164,7 +164,7 @@ Phase 0 — Reconnaissance: Passive Intelligence (Shodan, AbuseIPDB, WHOIS), DNS
 
 Phase 1 — Technologie-Erkennung: Port-Scanning (nmap), Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) pro Host. KI-gestützte Tool-Konfiguration passt Phase-2-Parameter adaptiv an.
 
-Phase 2 — Tiefer Scan: SSL/TLS-Analyse (testssl.sh), Schwachstellen-Scan (nikto, nuclei, ZAP), Directory-Enumeration (gobuster, ffuf, feroxbuster), XSS-Analyse (dalfox), Web-Crawling (katana) und Screenshots (gowitness) pro Host.
+Phase 2 — Tiefer Scan: SSL/TLS-Analyse (testssl.sh), Schwachstellen-Scan (ZAP Active Scan), Directory-Enumeration (ffuf, feroxbuster), HTTP-Header-Prüfung und WordPress-Scan (wpscan) pro Host.
 
 Phase 3 — Korrelation & Enrichment: Cross-Tool-Korrelation, False-Positive-Filterung, Threat-Intelligence-Anreicherung (NVD, EPSS, CISA KEV) und KI-gestützte Priorisierung.
 

@@ -569,7 +569,7 @@ def build_finding(story, styles, f, compact=False):
 
 
 def build_screenshots_section(story, styles, screenshots):
-    """Build a 'Web-Oberflaechen' subsection with gowitness screenshots.
+    """Build a 'Web-Oberflaechen' subsection with screenshots.
 
     Args:
         story: The story list to append to.
@@ -941,7 +941,7 @@ def generate_report(report_data, output_path):
                              distribution_table, recommendations_table
         - scope: dict with scope_table, methodology_paragraphs, limitations_paragraphs,
                  compliance_note (optional)
-        - screenshots: list of dicts with label, paths (for gowitness screenshots)
+        - screenshots: list of dicts with label, paths
         - findings: list of finding dicts
         - recommendations: dict with intro_paragraph, roadmap_table
         - appendix_cvss: list of rows for CVSS table

@@ -95,7 +95,7 @@ def run_tool(
         raw = stdout
         if stderr and exit_code != 0:
             # Always include stderr when tool exits non-zero (even exit 1)
-            # Some tools use exit 1 for errors (nikto), others for "findings found" (nuclei)
+            # Some tools use exit 1 for "findings found" or warnings
             raw = f"{raw}\n--- STDERR ---\n{stderr}" if raw else stderr
         if not raw and output_path:
             try:
@@ -132,7 +132,7 @@ def run_tool(
             except (subprocess.TimeoutExpired, Exception):
                 proc.kill()
 
-        # On timeout, try to read partial output from file (tools like nuclei write incrementally)
+        # On timeout, try to read partial output from file (some tools write incrementally)
         raw = f"TIMEOUT after {timeout}s"
         if output_path:
             try:

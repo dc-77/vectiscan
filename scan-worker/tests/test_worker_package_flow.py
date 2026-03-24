@@ -105,7 +105,7 @@ class TestWorkerPackageFlow:
             "max_hosts": 15,
             "nmap_ports": "--top-ports 1000",
             "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
-            "phase2_tools": ["testssl", "nikto", "nuclei", "gobuster_dir", "gowitness", "headers"],
+            "phase2_tools": ["testssl", "zap_spider", "zap_active", "ffuf", "feroxbuster", "headers", "httpx", "wpscan"],
             "phase3_tools": ["nvd", "epss", "cisa_kev", "exploitdb", "correlator", "fp_filter", "business_impact"],
             "phase3_timeout": 300,
             "total_timeout": 7200,

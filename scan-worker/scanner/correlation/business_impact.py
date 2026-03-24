@@ -55,7 +55,7 @@ def _get_cvss_from_finding(finding: CorrelatedFinding) -> float:
     if nvd and nvd.get("cvss_score"):
         return float(nvd["cvss_score"])
 
-    # Try nuclei CVSS
+    # Try tool-provided CVSS (e.g. from ZAP or raw data)
     if finding.primary.raw:
         cvss = finding.primary.raw.get("info", {}).get("classification", {}).get("cvss-score")
         if cvss:

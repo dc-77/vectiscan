@@ -38,8 +38,8 @@ class TestAuditTrail:
                 "duration": "45 Minuten",
                 "hosts_scanned": 3,
                 "tools": [
-                    "nmap 7.94", "testssl.sh 3.2", "nikto 2.5.0",
-                    "nuclei 3.7.1", "gobuster 3.8.2",
+                    "nmap 7.94", "testssl.sh 3.2", "gobuster 3.8.2",
+                    "ffuf 2.1.0", "feroxbuster 2.11.0",
                 ],
             },
         }

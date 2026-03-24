@@ -126,126 +126,6 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str,
     return verified
 
 
-def run_nikto(fqdn: str, ip: str, host_dir: str, order_id: str,
-              adaptive_config: dict[str, Any] | None = None) -> Optional[dict[str, Any]]:
-    """Run nikto web server scanner.
-
-    Returns parsed results or None on failure.
-    """
-    phase2_dir = f"{host_dir}/phase2"
-    os.makedirs(phase2_dir, exist_ok=True)
-
-    output_path = f"{phase2_dir}/nikto.json"
-
-    # AI-adaptive tuning
-    tuning = "1234567890"
-    if adaptive_config and adaptive_config.get("nikto_tuning"):
-        tuning = adaptive_config["nikto_tuning"]
-        log.info("nikto_adaptive_tuning", ip=ip, tuning=tuning)
-
-    cmd = [
-        "perl", "/opt/nikto/program/nikto.pl",
-        "-h", fqdn,
-        "-Format", "json",
-        "-output", output_path,
-        "-Tuning", tuning,
-    ]
-
-    exit_code, duration_ms = run_tool(
-        cmd=cmd,
-        timeout=180,
-        output_path=output_path,
-        order_id=order_id,
-        host_ip=ip,
-        phase=2,
-        tool_name="nikto",
-    )
-
-    if exit_code != 0 and exit_code != 1:
-        log.warning("nikto_failed", fqdn=fqdn, exit_code=exit_code)
-        return None
-
-    try:
-        with open(output_path, "r") as f:
-            data = json.load(f)
-        log.info("nikto_complete", fqdn=fqdn)
-        return data
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        log.warning("nikto_parse_error", fqdn=fqdn, error=str(e))
-        return None
-
-
-def run_nuclei(fqdn: str, ip: str, host_dir: str, order_id: str,
-               adaptive_config: dict[str, Any] | None = None,
-               timeout: int = 1500,
-               severity: str = "low,medium,high,critical") -> list[dict[str, Any]]:
-    """Run nuclei vulnerability scanner.
-
-    Returns list of findings or empty list on failure.
-    Nuclei writes JSONL incrementally — partial results are preserved on timeout.
-    """
-    phase2_dir = f"{host_dir}/phase2"
-    os.makedirs(phase2_dir, exist_ok=True)
-
-    output_path = f"{phase2_dir}/nuclei.json"
-
-    cmd = [
-        "nuclei",
-        "-u", fqdn,
-        "-severity", severity,
-        "-jsonl",
-        "-o", output_path,
-        "-timeout", "5",           # Per-request timeout: 5s (default: 10)
-        "-retries", "1",           # 1 retry (default: 1)
-        "-no-interactsh",          # Skip out-of-band interaction checks (saves time)
-        "-c", "25",                # Concurrency: 25 templates parallel
-        "-rl", "150",              # Rate limit: 150 req/s
-    ]
-
-    # AI-adaptive: filter templates by technology tags
-    if adaptive_config:
-        tags = adaptive_config.get("nuclei_tags")
-        if tags:
-            cmd.extend(["-tags", ",".join(tags)])
-            log.info("nuclei_adaptive_tags", ip=ip, tags=tags)
-        exclude_tags = adaptive_config.get("nuclei_exclude_tags")
-        if exclude_tags:
-            cmd.extend(["-exclude-tags", ",".join(exclude_tags)])
-            log.info("nuclei_adaptive_exclude", ip=ip, exclude=exclude_tags)
-
-    exit_code, duration_ms = run_tool(
-        cmd=cmd,
-        timeout=timeout,
-        output_path=output_path,
-        order_id=order_id,
-        host_ip=ip,
-        phase=2,
-        tool_name="nuclei",
-    )
-
-    # exit 0/1 = success, -1 = timeout (partial results in output file)
-    if exit_code not in (0, 1, -1):
-        log.warning("nuclei_failed", fqdn=fqdn, exit_code=exit_code)
-        return []
-
-    if exit_code == -1:
-        log.info("nuclei_timeout_partial", fqdn=fqdn, timeout=timeout,
-                 msg="Reading partial results from output file")
-
-    findings: list[dict[str, Any]] = []
-    try:
-        with open(output_path, "r") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    findings.append(json.loads(line))
-        log.info("nuclei_complete", fqdn=fqdn, findings=len(findings))
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        log.warning("nuclei_parse_error", fqdn=fqdn, error=str(e))
-
-    return findings
-
-
 WORDLIST_MAP = {
     "common": "/usr/share/wordlists/common.txt",
     "wordpress": "/usr/share/wordlists/wordpress.txt",
@@ -308,42 +188,6 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     log.info("gobuster_dir_complete", fqdn=fqdn)
     return output_path
-
-
-def run_gowitness(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[str]:
-    """Run gowitness to take a screenshot.
-
-    Returns path to screenshot directory or None on failure.
-    """
-    phase2_dir = f"{host_dir}/phase2"
-    os.makedirs(phase2_dir, exist_ok=True)
-
-    chrome_path = os.environ.get("CHROME_PATH", "/usr/bin/chromium")
-    # gowitness 3.x: chrome flags via environment, not --chrome-arg
-    os.environ["CHROMIUM_FLAGS"] = "--no-sandbox --disable-gpu --disable-dev-shm-usage"
-    cmd = [
-        "gowitness", "scan", "single",
-        "-u", f"https://{fqdn}",
-        "--screenshot-path", f"{phase2_dir}/",
-        "--chrome-path", chrome_path,
-    ]
-
-    exit_code, duration_ms = run_tool(
-        cmd=cmd,
-        timeout=45,
-        output_path=None,
-        order_id=order_id,
-        host_ip=ip,
-        phase=2,
-        tool_name="gowitness",
-    )
-
-    if exit_code != 0:
-        log.warning("gowitness_failed", fqdn=fqdn, exit_code=exit_code)
-        return None
-
-    log.info("gowitness_complete", fqdn=fqdn)
-    return phase2_dir
 
 
 def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[str, Any]:
@@ -477,40 +321,6 @@ def run_httpx(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict
         return None
 
 
-def run_katana(fqdn: str, ip: str, host_dir: str, order_id: str) -> list[str]:
-    """Run katana web crawler to discover endpoints."""
-    phase2_dir = f"{host_dir}/phase2"
-    os.makedirs(phase2_dir, exist_ok=True)
-    output_path = f"{phase2_dir}/katana.txt"
-
-    cmd = [
-        "katana",
-        "-u", f"https://{fqdn}",
-        "-o", output_path,
-        "-depth", "3",
-        "-jsluice",
-        "-known-files", "all",
-        "-silent",
-    ]
-
-    exit_code, duration_ms = run_tool(
-        cmd=cmd, timeout=300, output_path=output_path,
-        order_id=order_id, host_ip=ip, phase=2, tool_name="katana",
-    )
-
-    if exit_code != 0:
-        log.warning("katana_failed", fqdn=fqdn, exit_code=exit_code)
-        return []
-
-    try:
-        with open(output_path, "r") as f:
-            urls = [line.strip() for line in f if line.strip()]
-        log.info("katana_complete", fqdn=fqdn, urls_found=len(urls))
-        return urls
-    except FileNotFoundError:
-        return []
-
-
 def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
     """Run WPScan WordPress vulnerability scanner.
 
@@ -625,7 +435,7 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
         ]
 
     elif mode == "param":
-        # Parameter discovery on katana endpoints
+        # Parameter discovery on spider-discovered endpoints
         if not katana_urls:
             log.info("ffuf_param_skipped", ip=ip, reason="no_katana_urls")
             return None
@@ -729,7 +539,7 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=90,
+        timeout=150,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -769,93 +579,6 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
                  dedup_removed=dedup_count, depth=depth)
     except FileNotFoundError:
         log.warning("feroxbuster_no_output", fqdn=fqdn)
-        return None
-
-    return findings if findings else None
-
-
-def run_dalfox(fqdn: str, ip: str, host_dir: str, order_id: str,
-               katana_urls: list[str] | None = None) -> Optional[list[dict[str, Any]]]:
-    """Run dalfox XSS scanner on URLs with parameters discovered by katana.
-
-    Only runs if katana found URLs with query parameters.
-    Returns list of XSS findings or None.
-    """
-    phase2_dir = f"{host_dir}/phase2"
-    os.makedirs(phase2_dir, exist_ok=True)
-
-    if not katana_urls:
-        log.info("dalfox_skipped", ip=ip, reason="no_katana_urls")
-        return None
-
-    # Filter only URLs with meaningful parameters (skip asset versioning)
-    NOISE_PARAMS = {"ver", "v", "format", "type", "css", "js"}
-    param_urls: list[str] = []
-    for u in katana_urls:
-        if "?" not in u:
-            continue
-        # Skip URLs where the only params are noise (e.g. ?ver=6.4.2)
-        from urllib.parse import urlparse, parse_qs
-        qs = parse_qs(urlparse(u).query)
-        meaningful = [k for k in qs if k.lower() not in NOISE_PARAMS]
-        if meaningful:
-            param_urls.append(u)
-
-    if not param_urls:
-        log.info("dalfox_skipped", ip=ip, reason="no_urls_with_meaningful_params",
-                 total_param_urls=sum(1 for u in katana_urls if "?" in u))
-        return None
-
-    # Write URLs to a temp file for piping into dalfox
-    urls_file = f"{phase2_dir}/dalfox_input.txt"
-    with open(urls_file, "w") as f:
-        for url in param_urls[:30]:  # Cap at 30 URLs (was 100, caused timeouts)
-            f.write(url + "\n")
-    log.info("dalfox_input", ip=ip, meaningful_urls=len(param_urls),
-             capped_to=min(len(param_urls), 30))
-
-    output_path = f"{phase2_dir}/dalfox.json"
-
-    cmd = [
-        "dalfox", "file", urls_file,
-        "--silence",
-        "--no-color",
-        "--format", "json",
-        "-o", output_path,
-        "--timeout", "5",
-        "--worker", "5",
-        "--skip-bav",  # Skip Blind XSS (too invasive for automated scanner)
-    ]
-
-    exit_code, duration_ms = run_tool(
-        cmd=cmd,
-        timeout=120,
-        output_path=output_path,
-        order_id=order_id,
-        host_ip=ip,
-        phase=2,
-        tool_name="dalfox",
-    )
-
-    if exit_code not in (0, 1, -1):
-        log.warning("dalfox_failed", fqdn=fqdn, exit_code=exit_code)
-        return None
-
-    # Parse JSONL output
-    findings: list[dict[str, Any]] = []
-    try:
-        with open(output_path, "r") as f:
-            for line in f:
-                line = line.strip()
-                if line:
-                    try:
-                        findings.append(json.loads(line))
-                    except json.JSONDecodeError:
-                        continue
-        log.info("dalfox_complete", fqdn=fqdn, findings=len(findings),
-                 input_urls=len(param_urls))
-    except FileNotFoundError:
-        log.warning("dalfox_no_output", fqdn=fqdn)
         return None
 
     return findings if findings else None
@@ -1144,7 +867,7 @@ def run_phase2(
     # ══════════════════════════════════════════════════════════
     # 3-STAGE PIPELINE: Discovery → Deep Scan → Collect
     # Stage 1 runs ZAP Spider + independent tools in parallel.
-    # Stage 2 uses Spider URLs to feed nuclei, dalfox, ffuf, feroxbuster.
+    # Stage 2 uses Spider URLs to feed ffuf, feroxbuster, wpscan.
     # Stage 3 collects ZAP passive alerts after all scanning completes.
     # ══════════════════════════════════════════════════════════
     from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -1156,7 +879,7 @@ def run_phase2(
     cms = tech_profile.get("cms", "")
 
     # ── Stage 1: Discovery (parallel) ─────────────────────────
-    # ZAP Spider discovers URLs, testssl/headers/httpx/gowitness run independently.
+    # ZAP Spider discovers URLs, testssl/headers/httpx run independently.
 
     def _run_zap_discovery() -> dict[str, Any]:
         """ZAP Spider on ALL FQDNs (not just primary). No active scan yet."""
@@ -1258,11 +981,7 @@ def run_phase2(
         return r
 
     def _run_quick_tools_stage1() -> dict[str, Any]:
-        """Fast independent tools: header_check, httpx.
-
-        Note: gowitness removed — screenshots are now taken in Phase 1 via Playwright.
-        run_gowitness() kept as dead code for rollback.
-        """
+        """Fast independent tools: header_check, httpx."""
         r: dict[str, Any] = {"_tools": []}
         if phase2_tools is None or "headers" in phase2_tools:
             publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
@@ -1314,7 +1033,7 @@ def run_phase2(
     log.info("phase2_stage1_complete", ip=ip, spider_urls=len(spider_urls))
 
     # ── Stage 2: Deep Scan (parallel, Spider URLs as input) ───
-    # nuclei, ZAP Active, dalfox, ffuf, feroxbuster, wpscan — all receive spider URLs
+    # ZAP Active, ffuf, feroxbuster, wpscan — all receive spider URLs
 
     def _run_zap_active_stage2() -> dict[str, Any]:
         """ZAP Active Scan using the context from Stage 1."""
@@ -1370,126 +1089,9 @@ def run_phase2(
                 pass
         return r
 
-    def _run_nuclei_with_urls() -> dict[str, Any]:
-        """Run nuclei against Spider-discovered URLs (not just root FQDN)."""
-        r: dict[str, Any] = {}
-        # DISABLED: nuclei consistently times out (300s) on all hosts and produces
-        # 0 findings across 12+ runs. ZAP covers vulnerability scanning.
-        # Re-enable once nuclei template set is tuned or timeout issue is resolved.
-        log.info("nuclei_disabled", ip=ip, reason="consistent_timeouts_zero_findings")
-        progress_callback(order_id, "nuclei", "skipped")
-        publish_tool_output(order_id, "nuclei", ip, "Disabled (timeout optimization)")
-        return r
-        if not ((phase2_tools is None or "nuclei" in phase2_tools) and "nuclei" not in ai_skip and has_web):
-            return r
-
-        publish_event(order_id, {"type": "tool_starting", "tool": "nuclei", "host": ip})
-        nuclei_config = dict(adaptive_config) if adaptive_config else {}
-        tags = list(nuclei_config.get("nuclei_tags", []))
-        # Auto-add high-value tags that reliably find issues
-        for auto_tag in ("default-login", "exposure", "misconfig"):
-            if auto_tag not in tags:
-                tags.append(auto_tag)
-        nuclei_config["nuclei_tags"] = tags
-        nuclei_config["nuclei_exclude_tags"] = list(nuclei_config.get("nuclei_exclude_tags", []))
-
-        is_wc = (config or {}).get("package") in ("basic", "webcheck")
-        nuclei_timeout = 300
-        nuclei_severity = (config or {}).get("nuclei_severity",
-                                             "high,critical" if is_wc else "low,medium,high,critical")
-
-        # Build URL target list from spider URLs
-        unique_urls = set()
-        unique_urls.add(f"https://{primary_fqdn}")
-        base_domain = ".".join(primary_fqdn.split(".")[-2:])
-        for url in spider_urls:
-            parsed = _urlparse(url)
-            if parsed.hostname and base_domain in parsed.hostname:
-                clean = f"{parsed.scheme}://{parsed.hostname}{parsed.path}"
-                unique_urls.add(clean)
-        url_list = sorted(unique_urls)[:20]  # was [:100] — 20 URLs is enough for template-based scanning
-
-        if len(url_list) > 1:
-            # Write URL list file and use -list flag
-            urls_file = f"{host_dir}/phase2/nuclei_targets.txt"
-            os.makedirs(os.path.dirname(urls_file), exist_ok=True)
-            with open(urls_file, "w") as f:
-                f.write("\n".join(url_list))
-            log.info("nuclei_target_list", ip=ip, urls=len(url_list))
-
-            # Build command with -list instead of -u
-            output_path = f"{host_dir}/phase2/nuclei.json"
-            cmd = [
-                "nuclei", "-list", urls_file,
-                "-severity", nuclei_severity,
-                "-jsonl", "-o", output_path,
-                "-timeout", "5", "-retries", "1",
-                "-no-interactsh", "-c", "25", "-rl", "100",
-            ]
-            if nuclei_config.get("nuclei_tags"):
-                cmd.extend(["-tags", ",".join(nuclei_config["nuclei_tags"])])
-            if nuclei_config.get("nuclei_exclude_tags"):
-                cmd.extend(["-exclude-tags", ",".join(nuclei_config["nuclei_exclude_tags"])])
-
-            exit_code, duration_ms = run_tool(
-                cmd=cmd, timeout=nuclei_timeout, output_path=output_path,
-                order_id=order_id, host_ip=ip, phase=2, tool_name="nuclei",
-            )
-
-            # Parse JSONL output
-            nuclei_result = []
-            if os.path.isfile(output_path):
-                with open(output_path, "r") as f:
-                    for line in f:
-                        line = line.strip()
-                        if line:
-                            try:
-                                nuclei_result.append(json.loads(line))
-                            except json.JSONDecodeError:
-                                continue
-            r["nuclei"] = nuclei_result
-        else:
-            # Fallback: single URL mode
-            nuclei_result = run_nuclei(primary_fqdn, ip, host_dir, order_id,
-                                       adaptive_config=nuclei_config,
-                                       timeout=nuclei_timeout,
-                                       severity=nuclei_severity)
-            r["nuclei"] = nuclei_result
-
-        r["_tools"] = ["nuclei"]
-        progress_callback(order_id, "nuclei", "complete")
-        if r.get("nuclei"):
-            severities: dict[str, int] = {}
-            for finding in r["nuclei"]:
-                sev = finding.get("info", {}).get("severity", "unknown")
-                severities[sev] = severities.get(sev, 0) + 1
-            parts = [f"{v} {k}" for k, v in sorted(severities.items())]
-            publish_tool_output(order_id, "nuclei", ip,
-                                f"{len(r['nuclei'])} findings ({', '.join(parts)})")
-        else:
-            publish_tool_output(order_id, "nuclei", ip, "No vulnerabilities found")
-        return r
-
     def _run_deep_scan_extras() -> dict[str, Any]:
-        """Run dalfox, ffuf param, feroxbuster, wpscan with Spider URLs."""
+        """Run ffuf param, feroxbuster, wpscan with Spider URLs."""
         r: dict[str, Any] = {"_tools": []}
-
-        # dalfox: XSS on parameter URLs from spider
-        # DISABLED: dalfox times out (120s) on 75% of hosts and produces 0 findings
-        # across 12+ runs. ZAP active scan already covers XSS detection.
-        # Re-enable once input URL filtering or timeout is improved.
-        param_urls = [u for u in spider_urls if "?" in u]
-        if False and param_urls and (phase2_tools is not None and "dalfox" in phase2_tools) and "dalfox" not in ai_skip and has_web:
-            publish_event(order_id, {"type": "tool_starting", "tool": "dalfox", "host": ip})
-            dalfox_result = run_dalfox(primary_fqdn, ip, host_dir, order_id,
-                                       katana_urls=param_urls[:15])
-            r["dalfox"] = dalfox_result
-            r["_tools"].append("dalfox")
-            progress_callback(order_id, "dalfox", "complete")
-            if dalfox_result:
-                publish_tool_output(order_id, "dalfox", ip, f"{len(dalfox_result)} XSS findings")
-            else:
-                publish_tool_output(order_id, "dalfox", ip, "No XSS vulnerabilities")
 
         # ffuf param: parameter discovery on API-like URLs
         api_urls = [u for u in spider_urls if "?" not in u and
@@ -1556,7 +1158,6 @@ def run_phase2(
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix="p2s2") as pool:
         s2_futures = {
             pool.submit(_run_zap_active_stage2): "zap_active",
-            pool.submit(_run_nuclei_with_urls): "nuclei",
             pool.submit(_run_deep_scan_extras): "extras",
         }
         for future in as_completed(s2_futures):

@@ -355,26 +355,6 @@ Antwort im Format:
 
 PHASE2_CONFIG_SYSTEM = """Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts.
 
-NUCLEI-KONFIGURATION:
-Der Tag "default-login" wird automatisch hinzugefügt. Verwende tech-spezifische Tags für CVE-Erkennung (z.B. "wordpress", "nginx", "apache").
-WICHTIG: Verwende NICHT den Tag "cve" — er matcht 3000+ Templates und verursacht Timeouts.
-
-VERFÜGBARE NUCLEI-TAGS (wichtigste):
-wordpress, apache, nginx, iis, php, java, python, nodejs, rails, laravel, django, spring, tomcat, jboss, weblogic, coldfusion, drupal, joomla, magento, shopify, shopware, prestashop, struts, network, ssl, dns, tech, token, sqli, xss, lfi, rfi, ssrf, redirect, upload
-
-CMS-SPEZIFISCHE NUCLEI-TAG-EMPFEHLUNGEN:
-- WordPress     → nuclei_tags: ["wordpress", "wp-plugin", "wp-theme"]
-- Shopware 5/6  → nuclei_tags: ["shopware", "php"]
-- TYPO3         → nuclei_tags: ["typo3", "php"]
-- Joomla        → nuclei_tags: ["joomla", "php"]
-- Drupal        → nuclei_tags: ["drupal", "php"]
-- Contao        → nuclei_tags: ["php"]
-- Magento       → nuclei_tags: ["magento", "php", "token"]
-- Strapi        → nuclei_tags: ["nodejs", "api"]
-- Ghost         → nuclei_tags: ["nodejs"]
-Wenn kein CMS erkannt: → Standard-Tags basierend auf Tech-Stack (Apache/nginx/PHP/Node)
-Wenn WordPress erkannt: → wpscan wird automatisch aktiviert
-
 ZAP-KONFIGURATION (OWASP ZAP Daemon):
 - zap_scan_policy: "passive-only"|"waf-safe"|"standard"|"aggressive" (Default: "standard")
   - "passive-only": Kein Active Scan (WebCheck-Default, wird automatisch gesetzt)
@@ -408,35 +388,27 @@ Keine WAF:
 → zap_scan_policy: "standard" oder "aggressive", zap_rate_req_per_sec: 80, zap_threads: 5, zap_spider_delay_ms: 0
 
 TOOLS DIE ÜBERSPRUNGEN WERDEN KÖNNEN:
-gowitness, zap_ajax_spider
+feroxbuster, zap_ajax_spider
+
+WANN feroxbuster ÜBERSPRINGEN:
+- Große Webshops/CMS mit vielen Produktseiten (Shopware, Magento, WooCommerce mit >1000 Seiten) — ZAP Spider findet bereits umfangreiche URLs
+- Hosts hinter aggressiver WAF (Cloudflare etc.) — feroxbuster erzeugt viele 403er ohne Mehrwert
+- Reine API-Hosts ohne Web-Frontend
 
 WICHTIG FÜR skip_tools:
 - Für die Basisdomain und www-Subdomain: skip_tools MUSS IMMER leer sein []
-- Für Hosts mit Web-Content (has_web=true): skip_tools MUSS leer sein []
-- skip_tools nur für reine API-Hosts (kein HTML), reine Mailserver, oder minimale Services
+- Für Hosts mit Web-Content (has_web=true) und kleinen/mittleren Seiten: skip_tools leer lassen
+- skip_tools nur für reine API-Hosts, reine Mailserver, minimale Services, oder große Webshops (nur feroxbuster)
 - Im Zweifel: skip_tools leer lassen — lieber ein Tool zu viel als wichtige Findings verpassen
 
 REGELN:
-- Nuclei-Tags sollten zur erkannten Technologie passen
-- Bei WordPress: "wordpress" Tag
-- Bei Shopware: "shopware" Tag
-- Bei API-Hosts: token Tags für nuclei
-- Bei WAF vorhanden: "dos" und "fuzz" für nuclei ausschließen, ZAP auf waf-safe setzen
+- Bei WAF vorhanden: ZAP auf waf-safe setzen
 - zap_ajax_spider_enabled=true nur wenn SPA/JS-Framework erkannt
-
-WICHTIG FÜR NUCLEI-TAGS (Performance):
-- Verwende NIEMALS den Tag "cve" allein — das matcht 3000+ Templates und dauert zu lange
-- Stattdessen: technologie-spezifische Tags wie "apache", "nginx", "wordpress", "shopware"
-- Kombiniere maximal 5-7 Tags für optimale Laufzeit
-- Der Tag "default-login" wird automatisch ergänzt
-- Gute Kombination: ["tech-spezifisch", "ssl", "token"]
-- Schlechte Kombination: ["cve", "network", "dns"] — viel zu breit, Timeout garantiert
+- Bei WordPress: wpscan wird automatisch aktiviert
 
 Antworte NUR mit validem JSON, kein anderer Text."""
 
 PHASE2_CONFIG_SCHEMA = """{
-  "nuclei_tags": ["tag1", "tag2"],
-  "nuclei_exclude_tags": ["dos", "fuzz"],
   "zap_scan_policy": "standard",
   "zap_spider_max_depth": 5,
   "zap_ajax_spider_enabled": true,
@@ -497,13 +469,11 @@ Antwort im Format:
                         result.get("_raw", ""), result, cost=cost)
 
     error_detail = result.get("_error", "")
-    if not result or "nuclei_tags" not in result:
-        # Fallback: default config (all tools, all templates)
+    if not result or "zap_scan_policy" not in result:
+        # Fallback: default config
         reason = error_detail or "Ungültige KI-Antwort"
         log.warning("ai_phase2_config_fallback", ip=tech_profile.get("ip"), reason=reason)
         return {
-            "nuclei_tags": [],
-            "nuclei_exclude_tags": ["dos", "fuzz"],
             "zap_scan_policy": "standard",
             "zap_spider_max_depth": 5,
             "zap_ajax_spider_enabled": False,
@@ -518,10 +488,10 @@ Antwort im Format:
 
     log.info("ai_phase2_config_complete",
              ip=tech_profile.get("ip"),
-             nuclei_tags=result.get("nuclei_tags"),
              zap_policy=result.get("zap_scan_policy"),
              zap_ajax=result.get("zap_ajax_spider_enabled"),
-             zap_categories=result.get("zap_active_categories"))
+             zap_categories=result.get("zap_active_categories"),
+             skip_tools=result.get("skip_tools"))
 
     # Strip internal keys before return
     result.pop("_raw", None)
@@ -608,10 +578,10 @@ Analysiere die aggregierten Findings und entscheide:
 
 KONFIDENZ-REGELN:
 - Gleiche CVE aus mehreren Tools → hohe Konfidenz
-- nuclei-Finding + passende Service-Version aus nmap → hohe Konfidenz
-- nikto-only Finding hinter WAF → niedrige Konfidenz
-- nuclei-Finding für falsche Technologie (z.B. WordPress-Template auf Shopware-Site) → False Positive
-- testssl-Finding + nuclei-SSL-Finding → merge zu einem Finding
+- ZAP-Finding + passende Service-Version aus nmap → hohe Konfidenz
+- ZAP-Finding für falsche Technologie (z.B. WordPress-spezifisch auf Shopware-Site) → False Positive
+- testssl-Finding + ZAP-SSL-Finding → merge zu einem Finding
+- wpscan-Finding + ZAP-Finding für gleiche Schwachstelle → hohe Konfidenz
 
 PRIORISIERUNG:
 - Findings mit CVSS ≥ 9.0 → immer "high" Priorität

@@ -19,18 +19,14 @@ log = structlog.get_logger()
 # ---------------------------------------------------------------------------
 
 TOOL_BASE_CONFIDENCE: dict[str, float] = {
-    "nuclei": 0.85,
     "nmap": 0.80,
     "testssl": 0.90,
-    "nikto": 0.40,
     "wpscan": 0.85,
     "ffuf": 0.60,
     "feroxbuster": 0.60,
     "gobuster_dir": 0.60,
     "header_check": 0.95,
-    "dalfox": 0.75,
     "httpx": 0.70,
-    "katana": 0.50,
     "zap_passive": 0.85,
     "zap_active": 0.75,
 }
@@ -106,43 +102,6 @@ def extract_findings(phase2_results: list[dict[str, Any]]) -> list[Finding]:
         ip = host_result.get("ip", "")
         fqdn = host_result.get("fqdn", "")
 
-        # nuclei findings
-        for nf in host_result.get("nuclei", []) or []:
-            cve_id = None
-            # Extract CVE from nuclei classification
-            classification = nf.get("info", {}).get("classification", {})
-            cve_ids = classification.get("cve-id") or []
-            if cve_ids:
-                cve_id = cve_ids[0] if isinstance(cve_ids, list) else str(cve_ids)
-
-            findings.append(Finding(
-                tool="nuclei",
-                host_ip=ip,
-                fqdn=fqdn,
-                cve_id=cve_id,
-                title=nf.get("info", {}).get("name", ""),
-                severity=nf.get("info", {}).get("severity", "info"),
-                description=nf.get("info", {}).get("description", ""),
-                evidence=nf.get("matched-at", ""),
-                technology=", ".join(nf.get("info", {}).get("tags", [])[:5]),
-                raw=nf,
-            ))
-
-        # nikto findings
-        nikto = host_result.get("nikto")
-        if isinstance(nikto, dict):
-            for vuln in nikto.get("vulnerabilities", []):
-                osvdb = vuln.get("OSVDB", "")
-                findings.append(Finding(
-                    tool="nikto",
-                    host_ip=ip,
-                    fqdn=fqdn,
-                    title=vuln.get("msg", ""),
-                    severity="medium" if osvdb else "info",
-                    evidence=vuln.get("url", ""),
-                    raw=vuln,
-                ))
-
         # testssl findings
         testssl = host_result.get("testssl")
         if isinstance(testssl, list):
@@ -210,19 +169,6 @@ def extract_findings(phase2_results: list[dict[str, Any]]) -> list[Finding]:
                     raw=finding_entry,
                 ))
 
-        # dalfox findings
-        for df in host_result.get("dalfox", []) or []:
-            findings.append(Finding(
-                tool="dalfox",
-                host_ip=ip,
-                fqdn=fqdn,
-                title=f"XSS: {df.get('type', 'reflected')}",
-                severity="high",
-                description=df.get("message", ""),
-                evidence=df.get("proof_of_concept", df.get("url", "")),
-                raw=df,
-            ))
-
         # ZAP findings (pre-mapped to Finding dicts by zap_mapper in phase2)
         for zf in host_result.get("zap_findings", []) or []:
             findings.append(Finding(
@@ -255,10 +201,10 @@ class CrossToolCorrelator:
 
     Correlation rules:
     1. CVE-Match: Same CVE-ID from different tools → merge, confidence++
-    2. Port-Service-Match: nmap finds service X, nuclei finds CVE for X → correlated
-    3. Tech-Version-Match: webtech detects nginx 1.18, nuclei finds nginx CVE → correlated
+    2. Port-Service-Match: nmap finds service X, ZAP finds CVE for X → correlated
+    3. Tech-Version-Match: webtech detects nginx 1.18, ZAP finds nginx vuln → correlated
     4. Header-Correlation: missing HSTS + weak TLS → group as "Transport Security" cluster
-    5. CMS-Correlation: wpscan + nuclei find same plugin vulnerability → merge
+    5. CMS-Correlation: wpscan + ZAP find same plugin vulnerability → merge
     """
 
     def __init__(self, tech_profiles: list[dict[str, Any]] | None = None,
@@ -394,9 +340,6 @@ class CrossToolCorrelator:
     def _apply_waf_degrade(self, correlated: list[CorrelatedFinding]) -> None:
         """Degrade confidence for findings behind WAF when single-tool only."""
         for cf in correlated:
-            if not cf.corroborating and cf.primary.tool in ("nikto",):
-                cf.confidence -= 0.10
-
             # General WAF penalty for all single-tool findings
             if not cf.corroborating:
                 cf.confidence -= 0.10
@@ -416,8 +359,7 @@ class CrossToolCorrelator:
                 cf.cluster_id = f"security_headers_{cf.primary.host_ip}"
 
             # XSS cluster
-            elif cf.primary.tool == "dalfox" or \
-                 "xss" in cf.primary.title.lower():
+            elif "xss" in cf.primary.title.lower():
                 cf.cluster_id = f"xss_{cf.primary.host_ip}"
 
             # CMS cluster

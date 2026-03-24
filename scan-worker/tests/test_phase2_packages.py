@@ -62,7 +62,7 @@ class TestPhase2Packages:
         mock_headers.assert_called_once()
         assert "zap_spider" in result["tools_run"]
         assert "testssl" in result["tools_run"]
-        # WebCheck: no active scan, no nuclei
+        # WebCheck: no active scan
         assert "zap_active" not in result["tools_run"]
         # gowitness removed — screenshots now via Playwright in Phase 1
         assert "gowitness" not in result["tools_run"]
@@ -75,7 +75,7 @@ class TestPhase2Packages:
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
     @patch("scanner.phase2.run_testssl", return_value={})
-    def test_perimeter_runs_zap_and_nuclei(
+    def test_perimeter_runs_zap_and_deep_scan(
         self, mock_testssl, mock_httpx,
         mock_headers, mock_save, mock_event, mock_publish, tmp_path
     ):
@@ -95,8 +95,6 @@ class TestPhase2Packages:
         mock_testssl.assert_called_once()
         mock_headers.assert_called_once()
         assert "zap_spider" in result["tools_run"]
-        # nuclei is currently disabled (consistent timeouts, 0 findings)
-        # assert "nuclei" in result["tools_run"]
 
     @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.publish_event")

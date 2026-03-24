@@ -76,13 +76,8 @@ class FalsePositiveFilter:
         for f in findings:
             if f.is_false_positive:
                 continue
-            # nikto-only findings behind WAF with low confidence
-            if f.primary.tool == "nikto" and not f.corroborating and f.confidence < 0.5:
-                f.is_false_positive = True
-                f.fp_reason = "WAF detected, nikto-only finding with low confidence"
-                stats["waf"] += 1
-            # zap_active-only findings behind WAF with low confidence
-            elif f.primary.tool == "zap_active" and not f.corroborating and f.confidence < 0.5:
+            # Single-tool findings behind WAF with low confidence
+            if f.primary.tool == "zap_active" and not f.corroborating and f.confidence < 0.5:
                 f.is_false_positive = True
                 f.fp_reason = "WAF detected, ZAP active-only finding with low confidence"
                 stats["waf"] += 1
@@ -145,21 +140,19 @@ class FalsePositiveFilter:
         for f in findings:
             if f.is_false_positive:
                 continue
-            if f.primary.tool != "nuclei":
-                continue
 
-            tags = set(f.primary.raw.get("info", {}).get("tags", []))
+            # Check ZAP findings for CMS-specific template mismatches
+            tags_raw = f.primary.raw.get("info", {}).get("tags", [])
+            tags = set(tags_raw) if isinstance(tags_raw, list) else set()
             if not tags:
                 continue
 
-            # Check if nuclei used CMS-specific templates for wrong CMS
             for cms_name, cms_tags in cms_tag_map.items():
                 if cms_name == self.detected_cms:
                     continue  # This is the correct CMS
                 if tags & cms_tags:
-                    # nuclei found a match for a CMS we didn't detect
                     f.is_false_positive = True
-                    f.fp_reason = (f"CMS mismatch: nuclei used {cms_name} templates, "
+                    f.fp_reason = (f"CMS mismatch: {cms_name} templates, "
                                    f"but detected CMS is {self.detected_cms}")
                     stats["cms"] += 1
                     break
@@ -168,7 +161,7 @@ class FalsePositiveFilter:
 
     def _dedup_ssl(self, findings: list[CorrelatedFinding],
                    stats: dict[str, int]) -> list[CorrelatedFinding]:
-        """Rule 4: SSL-Dedup — testssl and nuclei both report SSL issues."""
+        """Rule 4: SSL-Dedup — testssl and ZAP both report SSL issues."""
         ssl_findings: dict[str, list[CorrelatedFinding]] = {}
 
         for f in findings:
@@ -203,7 +196,7 @@ class FalsePositiveFilter:
 
     def _dedup_headers(self, findings: list[CorrelatedFinding],
                        stats: dict[str, int]) -> list[CorrelatedFinding]:
-        """Rule 5: Header-Dedup — nikto, header_check, nuclei report same missing header."""
+        """Rule 5: Header-Dedup — header_check, ZAP report same missing header."""
         header_findings: dict[str, list[CorrelatedFinding]] = {}
 
         for f in findings:

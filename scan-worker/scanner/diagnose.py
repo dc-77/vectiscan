@@ -7,7 +7,7 @@ Usage (inside scan-worker container):
     docker compose exec scan-worker python3 -m scanner.diagnose
 
     # Test a specific tool:
-    docker compose exec scan-worker python3 -m scanner.diagnose --tool nikto
+    docker compose exec scan-worker python3 -m scanner.diagnose --tool testssl
 
     # Test against a specific domain (quick probe):
     docker compose exec scan-worker python3 -m scanner.diagnose --probe example.com
@@ -51,17 +51,6 @@ TOOLS: list[dict[str, Any]] = [
         "category": "phase2",
     },
     {
-        "name": "nikto",
-        "version_cmd": ["perl", "/opt/nikto/program/nikto.pl", "-Version"],
-        "test_cmd": lambda domain: ["perl", "/opt/nikto/program/nikto.pl", "-h", domain, "-Tuning", "1", "-maxtime", "10s"],
-        "category": "phase2",
-    },
-    {
-        "name": "nuclei",
-        "version_cmd": ["nuclei", "-version"],
-        "category": "phase2",
-    },
-    {
         "name": "gobuster",
         "version_cmd": ["gobuster", "--help"],
         "category": "phase2",
@@ -74,21 +63,6 @@ TOOLS: list[dict[str, Any]] = [
     {
         "name": "feroxbuster",
         "version_cmd": ["feroxbuster", "--version"],
-        "category": "phase2",
-    },
-    {
-        "name": "dalfox",
-        "version_cmd": ["dalfox", "version"],
-        "category": "phase2",
-    },
-    {
-        "name": "katana",
-        "version_cmd": ["katana", "-version"],
-        "category": "phase2",
-    },
-    {
-        "name": "gowitness",
-        "version_cmd": ["gowitness", "version"],
         "category": "phase2",
     },
     {

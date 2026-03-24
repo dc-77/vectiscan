@@ -696,10 +696,10 @@ def consolidate_findings(
         ]
 
         # === Section order: most important first, most verbose last ===
-        # 1. nmap (ports), 2. nuclei (CVEs), 3. testssl (SSL/TLS),
-        # 4. wpscan (WordPress vulns), 5. nikto (legacy),
-        # 6. headers (security headers), 7. httpx, 8. katana,
-        # 9. gobuster, 10. ZAP (most verbose — LAST), 11. Endpoints (also verbose)
+        # 1. nmap (ports), 2. testssl (SSL/TLS), 3. wpscan (WordPress vulns),
+        # 4. headers (security headers), 5. httpx,
+        # 6. gobuster, 7. ZAP (most verbose — LAST), 8. Endpoints (also verbose)
+        # Legacy parsers (nuclei, nikto, katana) kept for old scan data compatibility
 
         # --- 1. Nmap ---
         nmap = data.get("nmap", {})

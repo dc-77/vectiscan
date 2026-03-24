@@ -9,11 +9,6 @@ class TestWebcheck:
         config = get_config("webcheck")
         assert "nikto" not in config["phase2_tools"]
 
-    def test_phase2_tools_excludes_nuclei(self):
-        """nuclei removed from webcheck — too slow for quick scan."""
-        config = get_config("webcheck")
-        assert "nuclei" not in config["phase2_tools"]
-
     def test_phase2_has_zap_spider(self):
         config = get_config("webcheck")
         assert "zap_spider" in config["phase2_tools"]
@@ -29,7 +24,7 @@ class TestWebcheck:
 
     def test_phase2_excludes_legacy_tools(self):
         config = get_config("webcheck")
-        for tool in ("gobuster_dir", "katana", "feroxbuster", "ffuf", "dalfox"):
+        for tool in ("gobuster_dir", "katana", "feroxbuster", "ffuf", "nuclei", "dalfox"):
             assert tool not in config["phase2_tools"]
 
     def test_max_hosts(self):
@@ -53,27 +48,19 @@ class TestWebcheck:
         config = get_config("webcheck")
         assert config["total_timeout"] == 1200  # 20 minutes
 
-    def test_nuclei_severity_high_crit_only(self):
-        config = get_config("webcheck")
-        assert config["nuclei_severity"] == "high,critical"
-
-
 class TestPerimeter:
     def test_phase2_has_all_tools(self):
         config = get_config("perimeter")
-        expected = ["testssl", "zap_spider", "zap_active", "nuclei",
-                    "headers", "httpx", "wpscan"]
+        expected = ["testssl", "zap_spider", "zap_active",
+                    "ffuf", "feroxbuster", "headers", "httpx", "wpscan"]
         for tool in expected:
             assert tool in config["phase2_tools"]
 
-    def test_phase2_excludes_legacy_tools(self):
-        """nikto, gobuster_dir, katana removed. dalfox, ffuf, feroxbuster reactivated."""
+    def test_phase2_excludes_disabled_tools(self):
+        """nuclei, dalfox, nikto, gobuster_dir, katana removed."""
         config = get_config("perimeter")
-        for tool in ("nikto", "gobuster_dir", "katana"):
+        for tool in ("nuclei", "dalfox", "nikto", "gobuster_dir", "katana"):
             assert tool not in config["phase2_tools"]
-        # Reactivated with Spider-URL input
-        for tool in ("dalfox", "ffuf", "feroxbuster"):
-            assert tool in config["phase2_tools"]
 
     def test_max_hosts(self):
         config = get_config("perimeter")
@@ -102,15 +89,6 @@ class TestPerimeter:
         assert "epss" in config["phase3_tools"]
         assert "cisa_kev" in config["phase3_tools"]
         assert "exploitdb" in config["phase3_tools"]
-
-    def test_nuclei_severities_no_low_or_info(self):
-        config = get_config("perimeter")
-        assert "medium" in config["nuclei_severity"]
-        assert "high" in config["nuclei_severity"]
-        assert "critical" in config["nuclei_severity"]
-        assert "low" not in config["nuclei_severity"]
-        assert "info" not in config["nuclei_severity"]
-
 
 class TestComplianceSupplychainInsurance:
     """Compliance, SupplyChain and Insurance share the perimeter scan config."""
