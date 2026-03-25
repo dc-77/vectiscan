@@ -22,17 +22,37 @@ def _safe(text: str | None) -> str:
 
     Converts <, >, & to &lt;, &gt;, &amp; — but preserves known safe
     markup tags like <b>, <i>, <br/> that ReportLab supports.
+
+    Strips unsupported HTML tags (code, ul, li, ol, p, div, span, pre, h1-h6,
+    a, table, tr, td, th) while keeping their text content.
     """
     if not text:
         return "—"
-    # First escape everything
-    escaped = xml_escape(str(text))
-    # Restore common ReportLab-safe tags that Claude sometimes uses
     import re
-    for tag in ("b", "i", "u", "br"):
+    s = str(text)
+
+    # 1. Convert unsupported tags to text equivalents BEFORE escaping
+    # <code>...</code> → bold
+    s = re.sub(r"<code>(.*?)</code>", r"<b>\1</b>", s, flags=re.DOTALL)
+    # <li> → bullet point
+    s = re.sub(r"<li>\s*", "• ", s)
+    s = re.sub(r"</li>", "<br/>", s)
+    # Strip remaining unsupported tags (keep content)
+    for tag in ("ul", "ol", "p", "div", "span", "pre", "h1", "h2", "h3",
+                "h4", "h5", "h6", "a", "table", "tr", "td", "th", "code",
+                "strong", "em", "dl", "dt", "dd", "blockquote"):
+        s = re.sub(rf"</?{tag}[^>]*>", "", s, flags=re.IGNORECASE)
+
+    # 2. Escape everything for XML safety
+    escaped = xml_escape(s)
+
+    # 3. Restore ReportLab-safe tags
+    for tag in ("b", "i", "u"):
         escaped = re.sub(rf"&lt;({tag})&gt;", rf"<\1>", escaped)
         escaped = re.sub(rf"&lt;/({tag})&gt;", rf"</\1>", escaped)
-    escaped = re.sub(r"&lt;(br\s*/?)&gt;", r"<\1>", escaped)
+    # <br/> and <br> → <br/>
+    escaped = re.sub(r"&lt;(br\s*/?)&gt;", "<br/>", escaped)
+
     return escaped
 
 # Severity order for sorting findings
