@@ -50,6 +50,7 @@ const PACKAGE_STYLES: Record<string, { label: string }> = {
   compliance:   { label: 'COMPLIANCE' },
   supplychain:  { label: 'SUPPLY' },
   insurance:    { label: 'INSURANCE' },
+  tlscompliance: { label: 'TLS-AUDIT' },
   // Legacy aliases
   basic:        { label: 'WEBCHECK' },
   professional: { label: 'PERIMETER' },

@@ -25,7 +25,7 @@ REPORT_MODELS: dict[str, str] = {
     "nis2": "claude-opus-4-6",
     "supplychain": "claude-opus-4-6",
     "insurance": "claude-opus-4-6",
-    "tlscompliance": "claude-haiku-4-5-20251001",
+    "tlscompliance": "claude-sonnet-4-6",
 }
 
 MAX_TOKENS_BY_MODEL: dict[str, int] = {

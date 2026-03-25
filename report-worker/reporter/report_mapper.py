@@ -1255,8 +1255,8 @@ def map_tlscompliance_report(
 ) -> dict[str, Any]:
     """Map TR-03116-4 checker results to report_data for TLS Compliance package.
 
-    claude_output contains only overall_risk + executive_summary from Haiku.
-    The main content comes from the TR-03116-4 checker (added by dispatcher).
+    claude_output contains overall_risk, executive_summary, findings, and
+    recommendations from Sonnet based on the TR-03116-4 check results.
     """
     domain = scan_meta.get("domain", "unknown")
     scan_date = scan_meta.get("startedAt", "")[:10]
@@ -1264,6 +1264,30 @@ def map_tlscompliance_report(
 
     executive_summary = claude_output.get("executive_summary", "")
     overall_risk = claude_output.get("overall_risk", "MEDIUM")
+
+    # Map findings from Claude output
+    mapped_findings = [_map_finding(f) for f in claude_output.get("findings", [])]
+    positive_findings = [_map_positive_finding(f) for f in claude_output.get("positive_findings", [])]
+    severity_counts = _count_by_severity(mapped_findings)
+
+    # Build recommendations table from Claude output
+    recommendations = claude_output.get("recommendations", [])
+    styles = {}  # Not needed for data-only mapping
+    recs_data = {}
+    if recommendations:
+        recs_data = {
+            "section_label": "5&nbsp;&nbsp;&nbsp;Maßnahmenplan",
+            "paragraphs": ["Die folgenden Maßnahmen sind nach Priorität sortiert:"],
+            "table": {
+                "header": ["Zeitrahmen", "Maßnahme", "Referenz", "Aufwand"],
+                "rows": [
+                    [r.get("timeframe", ""), r.get("action", ""),
+                     ", ".join(r.get("finding_refs", [])), r.get("effort", "")]
+                    for r in recommendations
+                ],
+                "widths": [55, 240, 70, 40],
+            },
+        }
 
     return {
         "meta": {
@@ -1290,9 +1314,11 @@ def map_tlscompliance_report(
         "toc": [
             ("1", "Zusammenfassung", False),
             ("2", "Umfang &amp; Methodik", False),
-            ("3", "BSI TR-03116-4 Compliance-Prüfung", False),
-            ("4", "Manuelle Checkliste", False),
-            ("5", "Compliance-Bescheinigung", False),
+            ("3", "Befunde", False),
+            ("4", "BSI TR-03116-4 Compliance-Prüfung", False),
+            ("5", "Maßnahmenplan", False),
+            ("6", "Manuelle Checkliste", False),
+            ("7", "Compliance-Bescheinigung", False),
         ],
         "executive_summary": {
             "section_label": "1&nbsp;&nbsp;&nbsp;Zusammenfassung",
@@ -1336,9 +1362,9 @@ def map_tlscompliance_report(
                 },
             ],
         },
-        "findings_section_label": "3&nbsp;&nbsp;&nbsp;BSI TR-03116-4 Compliance-Prüfung",
-        "findings": [],
-        "recommendations": {},
+        "findings_section_label": "3&nbsp;&nbsp;&nbsp;Befunde",
+        "findings": mapped_findings + positive_findings,
+        "recommendations": recs_data,
         "appendices": [],
         "manual_checklist": TR_MANUAL_CHECKLIST,
         "disclaimer": (

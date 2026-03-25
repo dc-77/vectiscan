@@ -274,7 +274,7 @@ export default function ScanDetailPage() {
   const showDebugDefault = isFailed && admin;
   const PKG_LABELS: Record<string, string> = {
     webcheck: 'WEBCHECK', perimeter: 'PERIMETER', compliance: 'COMPLIANCE',
-    supplychain: 'SUPPLYCHAIN', insurance: 'INSURANCE',
+    supplychain: 'SUPPLYCHAIN', insurance: 'INSURANCE', tlscompliance: 'TLS-AUDIT',
     basic: 'WEBCHECK', professional: 'PERIMETER', nis2: 'COMPLIANCE',
   };
   const pkg = PKG_LABELS[order.package] || order.package.toUpperCase();
