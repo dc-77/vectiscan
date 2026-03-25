@@ -1,6 +1,6 @@
 'use client';
 
-export type ScanPackage = 'webcheck' | 'perimeter' | 'compliance' | 'supplychain' | 'insurance';
+export type ScanPackage = 'webcheck' | 'perimeter' | 'compliance' | 'supplychain' | 'insurance' | 'tlscompliance';
 
 interface PackageInfo {
   key: ScanPackage;
@@ -25,6 +25,18 @@ const PACKAGES: PackageInfo[] = [
     hosts: '3',
     tier: 'quick',
     accentColor: '#38BDF8',
+  },
+  {
+    key: 'tlscompliance',
+    title: 'TLS-Compliance',
+    subtitle: 'BSI TR-03116-4 Prüfung mit Compliance-Bescheinigung und Checklisten.',
+    reportFocus: ['TLS-Versionen & Cipher', 'Zertifikats-Prüfung', 'Checkliste für interne Punkte'],
+    duration: '~5–10 Min',
+    hosts: '15',
+    tier: 'quick',
+    badge: 'BSI',
+    badgeColor: '#16A34A',
+    accentColor: '#16A34A',
   },
   {
     key: 'perimeter',

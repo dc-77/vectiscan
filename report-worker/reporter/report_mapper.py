@@ -1154,6 +1154,203 @@ def map_insurance_report(
 
 
 # ===========================================================================
+# TLS Compliance Mapper
+# ===========================================================================
+
+
+# Checkliste: nicht extern prüfbare TR-03116-4-Punkte
+TR_MANUAL_CHECKLIST = [
+    {
+        "check_id": "2.5.3",
+        "title": "truncated_hmac Extension deaktiviert",
+        "section": "2.5 Extensions",
+        "instruction": (
+            "Serverkonfiguration prüfen (Apache: SSLOptions, Nginx: ssl_protocols). "
+            "Die truncated_hmac Extension ist standardmäßig deaktiviert. "
+            "Stellen Sie sicher, dass sie nicht manuell aktiviert wurde."
+        ),
+        "expected": "Extension ist nicht aktiv (Standard-Verhalten).",
+    },
+    {
+        "check_id": "2.6.4",
+        "title": "Encrypt-then-MAC Extension aktiv",
+        "section": "2.6 Empfehlungen",
+        "instruction": (
+            "OpenSSL-Konfiguration prüfen:\n"
+            "openssl s_client -connect <host>:443 -tlsextdebug 2>&1 | grep encrypt-then-mac\n"
+            "Alternativ: In der Serverkonfiguration nach 'encrypt_then_mac' suchen."
+        ),
+        "expected": "'encrypt-then-mac' erscheint in der Extension-Liste.",
+    },
+    {
+        "check_id": "2.6.5",
+        "title": "Session-Ticket-Schlüssel werden regelmäßig rotiert",
+        "section": "2.6 Empfehlungen",
+        "instruction": (
+            "Key-Rotation-Policy prüfen.\n"
+            "Apache: SSLSessionTicketKeyFile mit Rotation via Cron.\n"
+            "Nginx: ssl_session_ticket_key mit 2+ Keys (aktueller + vorheriger).\n"
+            "Alternative: Session Tickets deaktivieren (ssl_session_tickets off)."
+        ),
+        "expected": "Rotation alle 24h oder kürzer, oder Session Tickets deaktiviert.",
+    },
+    {
+        "check_id": "2.3.8",
+        "title": "CRL Distribution Points im Zertifikat",
+        "section": "2.3 Serverzertifikat",
+        "instruction": (
+            "Zertifikat prüfen:\n"
+            "openssl x509 -in cert.pem -text -noout | grep -A2 'CRL Distribution'\n"
+            "Let's-Encrypt-Zertifikate enthalten keine CRL-URLs (nur OCSP)."
+        ),
+        "expected": "CRL-URL vorhanden, oder OCSP als Alternative konfiguriert.",
+    },
+    {
+        "check_id": "3.1",
+        "title": "S/MIME-Konfiguration (falls E-Mail-Dienste betrieben werden)",
+        "section": "3 S/MIME",
+        "instruction": (
+            "E-Mail-Gateway-Konfiguration prüfen. S/MIME-Zertifikate müssen "
+            "TR-03116-4 Abschnitt 3 entsprechen:\n"
+            "- Signatur: SHA-256 oder stärker\n"
+            "- Schlüssel: RSA ≥ 2048 Bit oder ECDSA ≥ 256 Bit\n"
+            "Falls keine E-Mail-Dienste betrieben werden: nicht anwendbar."
+        ),
+        "expected": "S/MIME mit SHA-256+ Signatur, RSA ≥ 2048 Bit / ECDSA ≥ 256 Bit.",
+    },
+    {
+        "check_id": "4.1",
+        "title": "SAML Token-Sicherheit (falls SAML-basierte Authentifizierung)",
+        "section": "4 SAML",
+        "instruction": (
+            "SAML IdP/SP-Konfiguration prüfen:\n"
+            "- Token-Transport über TLS 1.2+\n"
+            "- XML-Signaturen mit SHA-256 oder stärker\n"
+            "- Assertion-Verschlüsselung mit AES-128/256-GCM\n"
+            "Falls kein SAML eingesetzt wird: nicht anwendbar."
+        ),
+        "expected": "XML-Signaturen mit SHA-256+, Transport über TLS 1.2+.",
+    },
+    {
+        "check_id": "5.1",
+        "title": "OpenPGP-Konfiguration (falls PGP-verschlüsselte Kommunikation)",
+        "section": "5 OpenPGP",
+        "instruction": (
+            "PGP-Schlüssel und Algorithmen prüfen:\n"
+            "- Schlüssel: RSA ≥ 2048 Bit oder ECC ≥ 256 Bit\n"
+            "- Hash: SHA-256 oder stärker\n"
+            "- Symmetrisch: AES-128/256\n"
+            "Falls kein OpenPGP eingesetzt wird: nicht anwendbar."
+        ),
+        "expected": "RSA ≥ 2048 Bit oder ECC ≥ 256 Bit, SHA-256+.",
+    },
+]
+
+
+def map_tlscompliance_report(
+    claude_output: dict[str, Any],
+    scan_meta: dict[str, Any],
+    host_inventory: dict[str, Any],
+    host_screenshots: dict[str, list[str]] | None = None,
+) -> dict[str, Any]:
+    """Map TR-03116-4 checker results to report_data for TLS Compliance package.
+
+    claude_output contains only overall_risk + executive_summary from Haiku.
+    The main content comes from the TR-03116-4 checker (added by dispatcher).
+    """
+    domain = scan_meta.get("domain", "unknown")
+    scan_date = scan_meta.get("startedAt", "")[:10]
+    hosts_count = len(host_inventory.get("hosts", []))
+
+    executive_summary = claude_output.get("executive_summary", "")
+    overall_risk = claude_output.get("overall_risk", "MEDIUM")
+
+    return {
+        "meta": {
+            "title": f"BSI TR-03116-4 TLS-Compliance — {domain}",
+            "author": "VectiScan Automated TLS Compliance Audit",
+            "header_left": "VECTISCAN — TLS-COMPLIANCE",
+            "header_right": domain,
+            "footer_left": f"Vertraulich  |  {scan_date}",
+            "classification_label": CLASSIFICATION_LABEL_DE,
+        },
+        "cover": {
+            "cover_subtitle": "BSI TR-03116-4 TLS-COMPLIANCE-PRÜFUNG",
+            "cover_title": f"TLS-Compliance-Bericht<br/>{domain}",
+            "package": "tlscompliance",
+            "cover_meta": [
+                ["Ziel:", f"{domain} ({hosts_count} Hosts)"],
+                ["Datum:", scan_date],
+                ["Paket:", "TLS-Compliance"],
+                ["Prüfgrundlage:", "BSI TR-03116-4"],
+                ["Methodik:", "testssl.sh + Header-Analyse"],
+                ["Klassifizierung:", "Vertraulich"],
+            ],
+        },
+        "toc": [
+            ("1", "Zusammenfassung", False),
+            ("2", "Umfang &amp; Methodik", False),
+            ("3", "BSI TR-03116-4 Compliance-Prüfung", False),
+            ("4", "Manuelle Checkliste", False),
+            ("5", "Compliance-Bescheinigung", False),
+        ],
+        "executive_summary": {
+            "section_label": "1&nbsp;&nbsp;&nbsp;Zusammenfassung",
+            "subsections": [
+                {
+                    "title": "Gesamtbewertung",
+                    "paragraphs": [executive_summary] if executive_summary else [
+                        f"Die TLS-Compliance-Prüfung der Domain {domain} wurde "
+                        f"am {scan_date} durchgeführt. {hosts_count} Hosts wurden "
+                        "gegen die BSI TR-03116-4 TLS-Checkliste geprüft."
+                    ],
+                    "risk_box": {
+                        "label": "Gesamtrisiko",
+                        "level": overall_risk,
+                        "description": "",
+                    },
+                },
+            ],
+        },
+        "scope": {
+            "section_label": "2&nbsp;&nbsp;&nbsp;Umfang &amp; Methodik",
+            "subsections": [
+                {
+                    "title": "Prüfungsumfang",
+                    "paragraphs": [
+                        f"<b>Ziel-Domain:</b> {domain}",
+                        f"<b>Geprüfte Hosts:</b> {hosts_count}",
+                        "<b>Prüfgrundlage:</b> BSI TR-03116-4 — Kryptographische Vorgaben "
+                        "für TLS-Implementierungen (Diensteanbieter)",
+                    ],
+                },
+                {
+                    "title": "Methodik",
+                    "paragraphs": [
+                        "Die automatisierte Prüfung erfolgt mittels testssl.sh gegen alle "
+                        "TLS-fähigen Ports. Jeder Host wird gegen die 34 Prüfpunkte der "
+                        "BSI TLS-Checkliste (Abschnitte 2.1–2.6) geprüft.",
+                        "Nicht extern prüfbare Punkte (Abschnitte 2.5 teilweise, 3–5) "
+                        "werden als manuelle Checkliste im Report dokumentiert.",
+                    ],
+                },
+            ],
+        },
+        "findings_section_label": "3&nbsp;&nbsp;&nbsp;BSI TR-03116-4 Compliance-Prüfung",
+        "findings": [],
+        "recommendations": {},
+        "appendices": [],
+        "manual_checklist": TR_MANUAL_CHECKLIST,
+        "disclaimer": (
+            "<b>Haftungsausschluss:</b> Diese Prüfung bescheinigt den TLS-Compliance-Status "
+            "zum Zeitpunkt der Analyse. Die Bescheinigung bezieht sich auf den extern prüfbaren "
+            "Teil (Abschnitte 2.1–2.6). Intern zu prüfende Punkte sind in der Checkliste "
+            "dokumentiert. Regelmäßige Wiederholungsprüfungen werden empfohlen."
+        ),
+    }
+
+
+# ===========================================================================
 # Dispatcher
 # ===========================================================================
 
@@ -1189,6 +1386,7 @@ def map_to_report_data(
         "compliance": map_nis2_report,
         "supplychain": map_supplychain_report,
         "insurance": map_insurance_report,
+        "tlscompliance": map_tlscompliance_report,
         # Legacy aliases
         "basic": map_basic_report,
         "professional": map_professional_report,
@@ -1197,8 +1395,8 @@ def map_to_report_data(
     mapper = mappers.get(package, map_professional_report)
     report_data = mapper(claude_output, scan_meta, host_inventory, host_screenshots)
 
-    # TR-03116-4 compliance: only for perimeter, compliance, supplychain
-    if package in ("perimeter", "compliance", "supplychain", "professional", "nis2") and testssl_raw_by_host:
+    # TR-03116-4 compliance: for perimeter, compliance, supplychain, tlscompliance
+    if package in ("perimeter", "compliance", "supplychain", "tlscompliance", "professional", "nis2") and testssl_raw_by_host:
         from reporter.tr03116_checker import check_tr03116_compliance
 
         hosts = host_inventory.get("hosts", [])

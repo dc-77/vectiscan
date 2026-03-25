@@ -1159,6 +1159,182 @@ def build_tr03116_section(story, styles, tr03116_data):
 
 
 # ============================================================================
+# MANUAL CHECKLIST SECTION (TLS Compliance)
+# ============================================================================
+
+def build_checklist_section(story, styles, checklist_items):
+    """Build the manual checklist section for non-externally-testable TR points."""
+    if not checklist_items:
+        return
+
+    story.append(Paragraph(
+        "Manuelle Checkliste — Intern zu prüfende Punkte",
+        styles["SectionTitle"],
+    ))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, 2 * mm))
+    story.append(Paragraph(
+        "Die folgenden Prüfpunkte der BSI TR-03116-4 können nicht durch externen "
+        "Scan ermittelt werden und müssen intern geprüft werden.",
+        ParagraphStyle("ChecklistIntro", parent=styles["BodyText2"],
+                       fontSize=9, textColor=COLORS["muted"], spaceAfter=4 * mm),
+    ))
+
+    check_title_style = ParagraphStyle(
+        "CheckTitle", parent=styles["BodyText2"],
+        fontSize=9, fontName=FONT_HEADING, textColor=COLORS["text"],
+    )
+    instruction_style = ParagraphStyle(
+        "CheckInstruction", parent=styles["BodyText2"],
+        fontSize=8, textColor=COLORS["text"], leftIndent=8 * mm,
+        backColor=COLORS["bg_light"], borderPadding=4,
+        spaceBefore=2 * mm, spaceAfter=1 * mm,
+    )
+    expected_style = ParagraphStyle(
+        "CheckExpected", parent=styles["BodyText2"],
+        fontSize=8, textColor=COLORS["muted"], leftIndent=8 * mm,
+        spaceAfter=4 * mm,
+    )
+
+    for item in checklist_items:
+        cid = item.get("check_id", "")
+        title = item.get("title", "")
+        section = item.get("section", "")
+        instruction = item.get("instruction", "").replace("\n", "<br/>")
+        expected = item.get("expected", "")
+
+        # Checkbox + title
+        story.append(Paragraph(
+            f"\u2610&nbsp;&nbsp;<b>{cid}</b>&nbsp;&nbsp;{title}"
+            f"&nbsp;&nbsp;<font color='#94A3B8' size='7'>({section})</font>",
+            check_title_style,
+        ))
+        # Instruction box
+        story.append(Paragraph(
+            f"<b>Prüfanweisung:</b> {instruction}",
+            instruction_style,
+        ))
+        # Expected result
+        story.append(Paragraph(
+            f"<b>Erwartetes Ergebnis:</b> {expected}",
+            expected_style,
+        ))
+
+    story.append(Spacer(1, SPACING_SECTION))
+
+
+# ============================================================================
+# COMPLIANCE ATTESTATION (TLS Compliance)
+# ============================================================================
+
+class ComplianceAttestation(Flowable):
+    """Formal compliance attestation box with border and result."""
+
+    def __init__(self, overall_status, score, domain, scan_date, hosts_count):
+        Flowable.__init__(self)
+        self.overall_status = overall_status
+        self.score = score
+        self.domain = domain
+        self.scan_date = scan_date
+        self.hosts_count = hosts_count
+        self.width = 170 * mm
+        self.height = 55 * mm
+
+    def draw(self):
+        c = self.canv
+
+        # Border
+        border_color = {
+            "PASS": _TR_BADGE_PASS,
+            "PARTIAL": _TR_BADGE_PARTIAL,
+            "FAIL": _TR_BADGE_FAIL,
+        }.get(self.overall_status, _TR_BADGE_FAIL)
+
+        c.setStrokeColor(border_color)
+        c.setLineWidth(2)
+        c.setFillColor(HexColor("#FFFFFF"))
+        c.roundRect(0, 0, self.width, self.height, 3 * mm, fill=1, stroke=1)
+
+        # Left accent bar
+        c.setFillColor(border_color)
+        c.rect(0, 0, 3 * mm, self.height, fill=1, stroke=0)
+
+        # Title
+        c.setFillColor(COLORS["primary"])
+        c.setFont(FONT_HEADING, 12)
+        c.drawString(8 * mm, self.height - 10 * mm, "Compliance-Bescheinigung")
+
+        # Subtitle
+        c.setFont(FONT_BODY, 8)
+        c.setFillColor(COLORS["muted"])
+        c.drawString(8 * mm, self.height - 16 * mm,
+                     "gemäß BSI TR-03116-4 — TLS-Checkliste für Diensteanbieter")
+
+        # Result badge
+        labels = {"PASS": "KONFORM", "PARTIAL": "TEILWEISE KONFORM", "FAIL": "NICHT KONFORM"}
+        label = labels.get(self.overall_status, "UNBEKANNT")
+        badge_w = 50 * mm
+        badge_x = self.width - badge_w - 8 * mm
+        badge_y = self.height - 16 * mm
+        c.setFillColor(border_color)
+        c.roundRect(badge_x, badge_y, badge_w, 10 * mm, 2 * mm, fill=1, stroke=0)
+        c.setFillColor(HexColor("#FFFFFF"))
+        c.setFont(FONT_HEADING, 10)
+        c.drawCentredString(badge_x + badge_w / 2, badge_y + 3 * mm, label)
+
+        # Details
+        c.setFillColor(COLORS["text"])
+        c.setFont(FONT_BODY, 9)
+        y = self.height - 26 * mm
+        details = [
+            f"Domain: {self.domain}",
+            f"Geprüfte Hosts: {self.hosts_count}",
+            f"Prüfdatum: {self.scan_date}",
+            f"Ergebnis: {self.score} Prüfpunkte bestanden",
+        ]
+        for line in details:
+            c.drawString(8 * mm, y, line)
+            y -= 5 * mm
+
+        # Disclaimer
+        c.setFont(FONT_BODY, 7)
+        c.setFillColor(COLORS["muted"])
+        c.drawString(8 * mm, 4 * mm,
+                     "Bezieht sich auf den extern prüfbaren Teil (Abschn. 2.1–2.6). "
+                     "Interne Punkte: siehe Checkliste.")
+
+
+def build_compliance_attestation(story, styles, tr03116_data, domain, scan_date, hosts_count):
+    """Build the formal compliance attestation section."""
+    story.append(Paragraph(
+        "Compliance-Bescheinigung",
+        styles["SectionTitle"],
+    ))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, 4 * mm))
+
+    # Determine overall status across all hosts
+    if tr03116_data:
+        statuses = [h.get("overall_status", "FAIL") for h in tr03116_data]
+        if "FAIL" in statuses:
+            overall = "FAIL"
+        elif "PARTIAL" in statuses:
+            overall = "PARTIAL"
+        else:
+            overall = "PASS"
+        # Aggregate score
+        total_passed = sum(int(h["score"].split("/")[0]) for h in tr03116_data)
+        total_checks = sum(int(h["score"].split("/")[1]) for h in tr03116_data)
+        score = f"{total_passed}/{total_checks}"
+    else:
+        overall = "FAIL"
+        score = "0/0"
+
+    story.append(ComplianceAttestation(overall, score, domain, scan_date, hosts_count))
+    story.append(Spacer(1, SPACING_SECTION))
+
+
+# ============================================================================
 # MAIN REPORT BUILDER
 # ============================================================================
 
@@ -1346,6 +1522,32 @@ def generate_report(report_data, output_path):
     # --- NIS2 Supply Chain Page (before Disclaimer) ---
     if nis2 and nis2.get("supply_chain"):
         build_supply_chain_page(story, styles, nis2["supply_chain"], report_data.get("scan_meta", {}))
+
+    # --- Manual Checklist (TLS Compliance) ---
+    checklist = report_data.get("manual_checklist")
+    if checklist:
+        story.append(PageBreak())
+        build_checklist_section(story, styles, checklist)
+
+    # --- Compliance Attestation (TLS Compliance) ---
+    tr03116 = report_data.get("tr03116_compliance")
+    if tr03116 and report_data.get("cover", {}).get("package") == "tlscompliance":
+        story.append(PageBreak())
+        scan_meta = report_data.get("scan_meta", report_data.get("cover", {}).get("cover_meta", {}))
+        domain = report_data.get("meta", {}).get("header_right", "")
+        scan_date = ""
+        hosts_count = 0
+        cover_meta = report_data.get("cover", {}).get("cover_meta", [])
+        for row in cover_meta:
+            if row[0] == "Datum:":
+                scan_date = row[1]
+            if row[0].startswith("Ziel:"):
+                # Extract host count from "domain (X Hosts)"
+                import re
+                m = re.search(r"(\d+)\s+Hosts", row[1])
+                if m:
+                    hosts_count = int(m.group(1))
+        build_compliance_attestation(story, styles, tr03116, domain, scan_date, hosts_count)
 
     # --- Disclaimer ---
     disclaimer = report_data.get("disclaimer")

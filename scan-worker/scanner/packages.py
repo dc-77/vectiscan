@@ -1,8 +1,9 @@
 """Package configuration — defines tool sets and limits per scan package.
 
-VectiScan v2: 5 packages (webcheck, perimeter, compliance, supplychain, insurance).
+VectiScan v2: 6 packages (webcheck, perimeter, compliance, supplychain, insurance, tlscompliance).
 Compliance, SupplyChain and Insurance share the perimeter scan config —
 they differ only in report generation (prompts, mapper, PDF sections).
+TLSCompliance is a dedicated TLS-only audit against BSI TR-03116-4.
 """
 
 from typing import Any
@@ -77,6 +78,26 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
     # = Perimeter-Scan, Report mit Versicherungs-Fragebogen
     # ------------------------------------------------------------------
     "insurance": {**_PERIMETER_BASE},
+
+    # ------------------------------------------------------------------
+    # TLSCompliance — "BSI TR-03116-4 Compliance-Prüfung"
+    # Nur testssl + Headers, kein Deep-Scan, schnell (~5–10 Min)
+    # ------------------------------------------------------------------
+    "tlscompliance": {
+        "phase0a_tools": ["whois"],
+        "phase0a_timeout": 30,
+        "phase0b_tools": ["crtsh", "dnsx"],
+        "phase0b_timeout": 180,          # 3 Minuten
+        "max_hosts": 15,
+        "nmap_ports": "443,8443,993,995,465,587,636,989,990,5061",
+        "phase1_tools": ["nmap"],
+        "phase2_tools": ["testssl", "headers"],
+        "phase3_tools": [],              # Kein Enrichment
+        "phase3_timeout": 0,
+        "total_timeout": 600,            # 10 Minuten
+        "testssl_severity": "LOW",       # Alle Findings für TR-Vollständigkeit
+        "zap_min_risk": "Low",
+    },
 }
 
 # Backwards-compat aliases (v1 package names → v2)

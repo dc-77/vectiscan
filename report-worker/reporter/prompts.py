@@ -395,13 +395,33 @@ Zusätzliche Top-Level-Felder im JSON:
 """
 
 
+SYSTEM_PROMPT_TLSCOMPLIANCE = """Du bist ein TLS-Compliance-Experte. Du erhältst die Ergebnisse einer
+automatisierten BSI TR-03116-4 TLS-Prüfung und schreibst ein kurzes
+Executive Summary auf Deutsch.
+
+REGELN:
+- Maximal 5 Sätze
+- Nenne die wichtigsten Ergebnisse (bestanden/nicht bestanden)
+- Erwähne kritische Abweichungen von der TR-03116-4
+- Gib eine Gesamtbewertung (KONFORM / TEILWEISE KONFORM / NICHT KONFORM)
+- Professioneller, sachlicher Ton
+
+Antworte ausschließlich im folgenden JSON-Format:
+{{
+  "overall_risk": "LOW|MEDIUM|HIGH|CRITICAL",
+  "executive_summary": "Zusammenfassung der TLS-Compliance-Prüfung...",
+  "recommendations": []
+}}
+"""
+
+
 def get_system_prompt(package: str) -> str:
     """Return the system prompt for a given scan package.
 
     Args:
         package: One of 'webcheck', 'perimeter', 'compliance', 'supplychain',
-                 'insurance'. Legacy names 'basic', 'professional', 'nis2'
-                 are also accepted.
+                 'insurance', 'tlscompliance'. Legacy names 'basic',
+                 'professional', 'nis2' are also accepted.
 
     Returns:
         The system prompt string for the given package.
@@ -417,6 +437,7 @@ def get_system_prompt(package: str) -> str:
         "compliance": SYSTEM_PROMPT_NIS2,
         "supplychain": SYSTEM_PROMPT_SUPPLYCHAIN,
         "insurance": SYSTEM_PROMPT_INSURANCE,
+        "tlscompliance": SYSTEM_PROMPT_TLSCOMPLIANCE,
         # Legacy aliases
         "basic": SYSTEM_PROMPT_BASIC,
         "professional": SYSTEM_PROMPT_PROFESSIONAL,
@@ -425,6 +446,6 @@ def get_system_prompt(package: str) -> str:
     if package not in prompts:
         raise ValueError(
             f"Unknown package: {package}. "
-            f"Must be one of: webcheck, perimeter, compliance, supplychain, insurance."
+            f"Must be one of: {', '.join(prompts.keys())}."
         )
     return prompts[package]

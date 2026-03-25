@@ -25,11 +25,13 @@ REPORT_MODELS: dict[str, str] = {
     "nis2": "claude-opus-4-6",
     "supplychain": "claude-opus-4-6",
     "insurance": "claude-opus-4-6",
+    "tlscompliance": "claude-haiku-4-5-20251001",
 }
 
 MAX_TOKENS_BY_MODEL: dict[str, int] = {
     "claude-sonnet-4-6": 16384,
     "claude-opus-4-6": 32000,
+    "claude-haiku-4-5-20251001": 4096,
 }
 
 AI_PRICING: dict[str, dict[str, float]] = {

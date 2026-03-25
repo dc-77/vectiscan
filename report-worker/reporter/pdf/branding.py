@@ -136,6 +136,11 @@ PACKAGE_BADGES = {
         "color": COLORS["accent"],           # Cyan
         "text_color": COLORS["primary"],
     },
+    "tlscompliance": {
+        "label": "TLS COMPLIANCE",
+        "color": COLORS["low"],              # Grün
+        "text_color": COLORS["white"],
+    },
     # Legacy aliases
     "basic": {
         "label": "WEBCHECK",

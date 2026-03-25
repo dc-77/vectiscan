@@ -28,7 +28,7 @@ async function streamReport(reply: FastifyReply, report: Record<string, unknown>
     .send(stream);
 }
 
-const VALID_PACKAGES = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'] as const;
+const VALID_PACKAGES = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance', 'tlscompliance'] as const;
 type ScanPackage = typeof VALID_PACKAGES[number];
 
 const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
@@ -37,6 +37,7 @@ const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
   compliance: '~65–95 Minuten',
   supplychain: '~65–95 Minuten',
   insurance: '~65–95 Minuten',
+  tlscompliance: '~5–10 Minuten',
 };
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -76,7 +77,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     if (!VALID_PACKAGES.includes(pkg as ScanPackage)) {
       return reply.status(400).send({
         success: false,
-        error: 'Invalid package. Must be webcheck, perimeter, compliance, supplychain, or insurance.',
+        error: 'Invalid package. Must be webcheck, perimeter, compliance, supplychain, insurance, or tlscompliance.',
       });
     }
 

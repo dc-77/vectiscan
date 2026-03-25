@@ -357,44 +357,71 @@ def process_job(job_data: dict) -> None:
         domain = effective_inventory.get("domain", "unknown")
 
         # -- 4. Call Claude API for analysis ----------------------------------
-        claude_output = call_claude(
-            domain=domain,
-            host_inventory=effective_inventory,
-            tech_profiles=effective_profiles,
-            consolidated_findings=consolidated_findings,
-            package=package,
-            debug_info=claude_debug,
-        )
-        log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
+        if package == "tlscompliance":
+            # TLS-Compliance: build TR summary as findings text for Haiku
+            from reporter.tr03116_checker import check_tr03116_compliance
+            testssl_raw = parsed.get("testssl_raw_by_host", {})
+            headers_raw = parsed.get("headers_by_host", {})
+            tr_summary_lines = ["BSI TR-03116-4 TLS-Compliance-Prüfung\n"]
+            for ip, raw in testssl_raw.items():
+                header_data = headers_raw.get(ip)
+                result = check_tr03116_compliance(raw, header_data, ip)
+                tr_summary_lines.append(f"Host: {result['host']} — {result['overall_status']} ({result['score']})")
+                for sec_id, sec in result.get("sections", {}).items():
+                    for c in sec.get("checks", []):
+                        if c["status"] in ("FAIL", "WARN"):
+                            tr_summary_lines.append(f"  [{c['status']}] {c['check_id']} {c['title']}: {c['detail']}")
+            consolidated_findings = "\n".join(tr_summary_lines) if len(tr_summary_lines) > 1 else "Keine TLS-Daten vorhanden."
 
-        # Extract cost info
-        claude_cost = claude_output.pop("_cost", None)
-        if claude_cost:
-            claude_debug["cost"] = claude_cost
-            # Save cost as separate scan_result for aggregation
-            try:
-                cost_conn = _get_db_connection()
-                with cost_conn.cursor() as cur:
-                    cur.execute(
-                        """INSERT INTO scan_results (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms)
-                           VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                        (order_id, None, 4, "report_cost", json.dumps(claude_cost), 0, 0),
-                    )
-                cost_conn.commit()
-                cost_conn.close()
-            except Exception as e:
-                log.warning("report_cost_save_failed", error=str(e))
+            claude_output = call_claude(
+                domain=domain,
+                host_inventory=effective_inventory,
+                tech_profiles=effective_profiles,
+                consolidated_findings=consolidated_findings,
+                package=package,
+                debug_info=claude_debug,
+            )
+            log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
+            # No QA needed for tlscompliance (no CVSS findings)
+        else:
+            claude_output = call_claude(
+                domain=domain,
+                host_inventory=effective_inventory,
+                tech_profiles=effective_profiles,
+                consolidated_findings=consolidated_findings,
+                package=package,
+                debug_info=claude_debug,
+            )
+            log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
 
-        # -- 4b. Report QA — programmatic checks + Haiku plausibility ---------
-        enrichment = job_data.get("enrichment")
-        qa_report = run_qa_checks(claude_output, package=package, enrichment=enrichment)
-        log.info("qa_complete",
-                 quality_score=qa_report.get("quality_score"),
-                 auto_fixes=qa_report.get("auto_fixes_applied", 0),
-                 manual_review=qa_report.get("manual_review_needed", False))
+            # Extract cost info
+            claude_cost = claude_output.pop("_cost", None)
+            if claude_cost:
+                claude_debug["cost"] = claude_cost
+                # Save cost as separate scan_result for aggregation
+                try:
+                    cost_conn = _get_db_connection()
+                    with cost_conn.cursor() as cur:
+                        cur.execute(
+                            """INSERT INTO scan_results (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms)
+                               VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                            (order_id, None, 4, "report_cost", json.dumps(claude_cost), 0, 0),
+                        )
+                    cost_conn.commit()
+                    cost_conn.close()
+                except Exception as e:
+                    log.warning("report_cost_save_failed", error=str(e))
 
-        # -- 4c. Recalculate overall_risk after QA corrections -----------------
-        _recalculate_overall_risk(claude_output)
+            # -- 4b. Report QA — programmatic checks + Haiku plausibility ---------
+            enrichment = job_data.get("enrichment")
+            qa_report = run_qa_checks(claude_output, package=package, enrichment=enrichment)
+            log.info("qa_complete",
+                     quality_score=qa_report.get("quality_score"),
+                     auto_fixes=qa_report.get("auto_fixes_applied", 0),
+                     manual_review=qa_report.get("manual_review_needed", False))
+
+            # -- 4c. Recalculate overall_risk after QA corrections -----------------
+            _recalculate_overall_risk(claude_output)
 
         # -- 5. Map Claude output to report_data ------------------------------
         parsed_meta = parsed.get("meta", {})
