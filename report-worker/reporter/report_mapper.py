@@ -1164,6 +1164,8 @@ def map_to_report_data(
     host_inventory: dict[str, Any],
     package: str = "professional",
     host_screenshots: dict[str, list[str]] | None = None,
+    testssl_raw_by_host: dict[str, list[dict[str, Any]]] | None = None,
+    headers_by_host: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Dispatch to the correct package-specific mapper.
 
@@ -1173,6 +1175,8 @@ def map_to_report_data(
         host_inventory: Host inventory JSON from phase 0
         package: One of 'basic', 'professional', 'nis2'
         host_screenshots: Dict mapping host IP to list of screenshot file paths
+        testssl_raw_by_host: Raw testssl findings per host IP (for TR-03116-4)
+        headers_by_host: Parsed security headers per host IP (for TR-03116-4)
 
     Returns:
         report_data dict ready for generate_report()
@@ -1191,4 +1195,45 @@ def map_to_report_data(
         "nis2": map_nis2_report,
     }
     mapper = mappers.get(package, map_professional_report)
-    return mapper(claude_output, scan_meta, host_inventory, host_screenshots)
+    report_data = mapper(claude_output, scan_meta, host_inventory, host_screenshots)
+
+    # TR-03116-4 compliance: only for perimeter, compliance, supplychain
+    if package in ("perimeter", "compliance", "supplychain", "professional", "nis2") and testssl_raw_by_host:
+        from reporter.tr03116_checker import check_tr03116_compliance
+
+        hosts = host_inventory.get("hosts", [])
+        ip_to_fqdn: dict[str, str] = {}
+        for h in hosts:
+            ip = h.get("ip", "")
+            fqdns = h.get("fqdns", [])
+            ip_to_fqdn[ip] = fqdns[0] if fqdns else ip
+
+        tr03116_results = []
+        for ip, raw_findings in testssl_raw_by_host.items():
+            header_data = (headers_by_host or {}).get(ip)
+            host_label = ip_to_fqdn.get(ip, ip)
+            result = check_tr03116_compliance(raw_findings, header_data, host_label)
+            tr03116_results.append(result)
+
+        report_data["tr03116_compliance"] = tr03116_results
+
+        # Insert TOC entry before Maßnahmenplan / appendices
+        toc = report_data.get("toc", [])
+        insert_idx = len(toc)
+        for i, (num, _title, _sub) in enumerate(toc):
+            if num in ("4", "5", "A", "B"):
+                insert_idx = i
+                break
+        sec_num = str(insert_idx)  # dynamic number based on position
+        # Use the number that comes after the last finding section
+        for i, (num, _title, _sub) in enumerate(toc):
+            if num.startswith("4") or num.startswith("A"):
+                sec_num = num
+                break
+        toc.insert(insert_idx, (sec_num, "BSI TR-03116-4 TLS-Compliance", False))
+        # Renumber subsequent entries if needed
+        report_data["toc"] = toc
+
+        log.info("tr03116_compliance_added", hosts=len(tr03116_results))
+
+    return report_data

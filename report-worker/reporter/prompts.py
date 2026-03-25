@@ -217,6 +217,16 @@ Antworte ausschließlich in JSON nach folgendem Schema:
     }}
   ]
 }}
+
+BSI TR-03116-4 COMPLIANCE:
+Der Report enthält eine automatisch generierte Sektion
+"BSI TR-03116-4 TLS-Compliance" die NICHT von dir erstellt wird.
+Diese wird programmatisch aus den testssl.sh-Rohdaten erzeugt.
+Du musst diese Sektion NICHT in deinem Output referenzieren oder
+duplizieren. Wenn du allerdings TLS-bezogene Findings erstellst
+(z.B. veraltete Protokollversionen, schwache Cipher), verweise
+in der Empfehlung auf die TR-03116-4 Sektion des Reports:
+"Siehe auch: BSI TR-03116-4 Compliance-Prüfung in diesem Bericht."
 """
 
 

@@ -926,6 +926,239 @@ def build_supply_chain_page(story, styles, supply_chain_data, scan_meta):
 
 
 # ============================================================================
+# BSI TR-03116-4 TLS COMPLIANCE SECTION
+# ============================================================================
+
+# Row background colors for TR-03116-4 compliance table
+_TR_ROW_FAIL = HexColor("#FEF2F2")   # Very light red
+_TR_ROW_WARN = HexColor("#FFFBEB")   # Very light yellow
+_TR_BADGE_PASS = HexColor("#22C55E")  # Green
+_TR_BADGE_PARTIAL = HexColor("#EAB308")  # Yellow
+_TR_BADGE_FAIL = HexColor("#EF4444")  # Red
+
+_TR_STATUS_SYMBOLS = {
+    "PASS": "\u2713",   # ✓
+    "FAIL": "\u2717",   # ✗
+    "WARN": "\u26A0",   # ⚠
+    "N/A":  "\u2014",   # —
+}
+
+_TR_STATUS_COLORS = {
+    "PASS": HexColor("#22C55E"),
+    "FAIL": HexColor("#EF4444"),
+    "WARN": HexColor("#EAB308"),
+    "N/A":  HexColor("#94A3B8"),
+}
+
+
+class TRComplianceBadge(Flowable):
+    """Badge showing TR-03116-4 compliance status for a host."""
+
+    def __init__(self, status, host, score):
+        Flowable.__init__(self)
+        self.status = status
+        self.host = host
+        self.score = score
+        self.width = 170 * mm
+        self.height = 9 * mm
+
+    def draw(self):
+        badge_colors = {
+            "PASS": (_TR_BADGE_PASS, "TR-KONFORM"),
+            "PARTIAL": (_TR_BADGE_PARTIAL, "TEILWEISE KONFORM"),
+            "FAIL": (_TR_BADGE_FAIL, "NICHT KONFORM"),
+        }
+        color, label = badge_colors.get(self.status, (_TR_BADGE_FAIL, "UNBEKANNT"))
+
+        # Host name
+        self.canv.setFillColor(COLORS["text"])
+        self.canv.setFont(FONT_HEADING, 11)
+        self.canv.drawString(0, 2 * mm, self.host)
+
+        # Badge
+        badge_x = 90 * mm
+        badge_w = 38 * mm
+        self.canv.setFillColor(color)
+        self.canv.roundRect(badge_x, 0.5 * mm, badge_w, 7 * mm, 2 * mm, fill=1, stroke=0)
+        self.canv.setFillColor(HexColor("#FFFFFF"))
+        self.canv.setFont(FONT_HEADING, 8)
+        self.canv.drawCentredString(badge_x + badge_w / 2, 2.5 * mm, label)
+
+        # Score
+        self.canv.setFillColor(COLORS["muted"])
+        self.canv.setFont(FONT_BODY, 9)
+        self.canv.drawString(132 * mm, 2.5 * mm, f"{self.score} Prüfpunkte bestanden")
+
+
+def build_tr03116_section(story, styles, tr03116_data):
+    """Build the BSI TR-03116-4 TLS compliance section in the PDF."""
+    if not tr03116_data:
+        return
+
+    # Section header
+    story.append(Paragraph(
+        "BSI TR-03116-4 TLS-Compliance-Prüfung",
+        styles["SectionTitle"],
+    ))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, 2 * mm))
+    story.append(Paragraph(
+        "Prüfung gemäß BSI TLS-Checkliste für Diensteanbieter (Stand 2023)",
+        ParagraphStyle(
+            "TRSubtitle",
+            parent=styles["BodyText2"],
+            fontSize=9,
+            textColor=COLORS["muted"],
+            spaceAfter=4 * mm,
+        ),
+    ))
+
+    for host_result in tr03116_data:
+        host = host_result.get("host", "")
+        overall = host_result.get("overall_status", "FAIL")
+        score = host_result.get("score", "0/0")
+
+        # Host badge
+        story.append(TRComplianceBadge(overall, host, score))
+        story.append(Spacer(1, 3 * mm))
+
+        sections = host_result.get("sections", {})
+        for sec_id in ("2.1", "2.2", "2.3", "2.4", "2.5", "2.6"):
+            section = sections.get(sec_id)
+            if not section:
+                continue
+
+            sec_title = section.get("title", "")
+            required = section.get("required", True)
+            optional_hint = "" if required else " (Empfehlungen — optional)"
+
+            # Section sub-header row style
+            sub_style = ParagraphStyle(
+                f"TRSec{sec_id}",
+                parent=styles["BodyText2"],
+                fontSize=8,
+                fontName=FONT_HEADING,
+                textColor=COLORS["text"],
+            )
+            check_style = ParagraphStyle(
+                "TRCheck",
+                parent=styles["BodyText2"],
+                fontSize=8,
+                textColor=COLORS["text"],
+            )
+            detail_style = ParagraphStyle(
+                "TRDetail",
+                parent=styles["BodyText2"],
+                fontSize=7.5,
+                textColor=COLORS["muted"],
+            )
+            status_style_pass = ParagraphStyle("TRPass", parent=check_style,
+                                               textColor=_TR_STATUS_COLORS["PASS"])
+            status_style_fail = ParagraphStyle("TRFail", parent=check_style,
+                                               textColor=_TR_STATUS_COLORS["FAIL"])
+            status_style_warn = ParagraphStyle("TRWarn", parent=check_style,
+                                               textColor=_TR_STATUS_COLORS["WARN"])
+            status_style_na = ParagraphStyle("TRNA", parent=check_style,
+                                             textColor=_TR_STATUS_COLORS["N/A"])
+            status_styles = {
+                "PASS": status_style_pass,
+                "FAIL": status_style_fail,
+                "WARN": status_style_warn,
+                "N/A": status_style_na,
+            }
+
+            # Build header row
+            hdr_style = ParagraphStyle(
+                "TRHdr",
+                parent=styles["BodyText2"],
+                fontSize=8,
+                fontName=FONT_HEADING,
+                textColor=HexColor("#FFFFFF"),
+            )
+            header_row = [
+                Paragraph("#", hdr_style),
+                Paragraph("Prüfpunkt", hdr_style),
+                Paragraph("Status", hdr_style),
+                Paragraph("Detail", hdr_style),
+            ]
+
+            # Build data rows
+            data_rows = []
+            # Section header row
+            data_rows.append([
+                Paragraph(sec_id, sub_style),
+                Paragraph(f"<b>{sec_title}{optional_hint}</b>", sub_style),
+                Paragraph("", sub_style),
+                Paragraph("", sub_style),
+            ])
+
+            checks = section.get("checks", [])
+            for c in checks:
+                status = c.get("status", "N/A")
+                symbol = _TR_STATUS_SYMBOLS.get(status, "—")
+                s_style = status_styles.get(status, status_style_na)
+
+                data_rows.append([
+                    Paragraph(c.get("check_id", ""), check_style),
+                    Paragraph(c.get("title", ""), check_style),
+                    Paragraph(f"<b>{symbol}</b>", s_style),
+                    Paragraph(c.get("detail", "")[:120], detail_style),
+                ])
+
+            col_widths = [14 * mm, 55 * mm, 12 * mm, 89 * mm]
+            all_rows = [header_row] + data_rows
+            table = Table(all_rows, colWidths=col_widths)
+
+            # Build table style commands
+            style_cmds = [
+                # Header row
+                ("BACKGROUND", (0, 0), (-1, 0), COLORS["primary"]),
+                ("GRID", (0, 0), (-1, -1), 0.3, COLORS["light_accent"]),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ("LEFTPADDING", (0, 0), (-1, -1), 3),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+                # Section header row (row 1)
+                ("BACKGROUND", (0, 1), (-1, 1), COLORS["bg_light"]),
+                ("SPAN", (1, 1), (3, 1)),
+            ]
+
+            # Color rows based on check status
+            for row_idx, c in enumerate(checks, start=2):
+                status = c.get("status", "N/A")
+                if status == "FAIL":
+                    style_cmds.append(("BACKGROUND", (0, row_idx), (-1, row_idx), _TR_ROW_FAIL))
+                elif status == "WARN":
+                    style_cmds.append(("BACKGROUND", (0, row_idx), (-1, row_idx), _TR_ROW_WARN))
+
+            table.setStyle(TableStyle(style_cmds))
+            story.append(table)
+            story.append(Spacer(1, 2 * mm))
+
+        story.append(Spacer(1, 3 * mm))
+
+    # Footnote
+    footnote_style = ParagraphStyle(
+        "TRFootnote",
+        parent=styles["BodyText2"],
+        fontSize=7,
+        fontName=FONT_BODY,
+        textColor=COLORS["muted"],
+        italic=True,
+        spaceAfter=SPACING_SECTION,
+    )
+    story.append(Paragraph(
+        "<i>Diese Prüfung erfolgt automatisiert auf Basis externer TLS-Analyse "
+        "(testssl.sh) und bildet die Abschnitte 2.1–2.6 der BSI TLS-Checkliste "
+        "ab. Abschnitte 3 (S/MIME), 4 (SAML) und 5 (OpenPGP) der TR-03116-4 "
+        "erfordern interne Konfigurationsprüfung und sind nicht Bestandteil "
+        "dieser externen Analyse.</i>",
+        footnote_style,
+    ))
+
+
+# ============================================================================
 # MAIN REPORT BUILDER
 # ============================================================================
 
@@ -1069,6 +1302,12 @@ def generate_report(report_data, output_path):
                 build_finding(story, styles, f, compact=True)
 
     story.append(PageBreak())
+
+    # --- BSI TR-03116-4 TLS Compliance (after Findings, before Recommendations) ---
+    tr03116 = report_data.get("tr03116_compliance")
+    if tr03116:
+        build_tr03116_section(story, styles, tr03116)
+        story.append(PageBreak())
 
     # --- Recommendations ---
     recs = report_data.get("recommendations", {})

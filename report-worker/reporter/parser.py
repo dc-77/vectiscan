@@ -251,6 +251,48 @@ def parse_testssl_json(path: str) -> list[dict[str, Any]]:
     return findings
 
 
+def parse_testssl_raw(path: str) -> list[dict[str, Any]]:
+    """Parse testssl.sh JSON output — ALL entries including OK/INFO.
+
+    Used by the TR-03116-4 compliance checker which needs the full dataset
+    (e.g. ``TLS1_2: offered`` has severity ``OK``).
+
+    Returns list of::
+
+        {"id": "...", "finding": "...", "severity": "...", "cve": "...", "port": "..."}
+    """
+    data = _read_json(path)
+    if data is None:
+        return []
+
+    items: list[Any]
+    if isinstance(data, list):
+        items = data
+    elif isinstance(data, dict):
+        items = []
+        for val in data.values():
+            if isinstance(val, list):
+                items.extend(entry for entry in val if isinstance(entry, dict))
+    else:
+        log.warning("testssl_raw_unexpected_format", path=path)
+        return []
+
+    raw: list[dict[str, Any]] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        raw.append({
+            "id": item.get("id", ""),
+            "finding": item.get("finding", ""),
+            "severity": item.get("severity", ""),
+            "cve": item.get("cve", ""),
+            "port": item.get("port", ""),
+        })
+
+    log.info("testssl_raw_parsed", path=path, entries=len(raw))
+    return raw
+
+
 def parse_nikto_json(path: str) -> list[dict[str, Any]]:
     """Parse nikto JSON output.
 
@@ -1010,6 +1052,9 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
         host_data["testssl"] = parse_testssl_json(
             str(phase2 / "testssl.json")
         )
+        host_data["testssl_raw"] = parse_testssl_raw(
+            str(phase2 / "testssl.json")
+        )
 
         host_data["nikto"] = parse_nikto_json(str(phase2 / "nikto.json"))
 
@@ -1095,6 +1140,9 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             host_data["testssl"] = parse_testssl_json(
                 str(phase2 / "testssl.json")
             )
+            host_data["testssl_raw"] = parse_testssl_raw(
+                str(phase2 / "testssl.json")
+            )
             host_data["nikto"] = parse_nikto_json(str(phase2 / "nikto.json"))
             host_data["headers"] = parse_headers_json(
                 str(phase2 / "headers.json")
@@ -1161,10 +1209,23 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             total_screenshots=sum(len(v) for v in host_screenshots.values()),
         )
 
+    # 7. Collect testssl raw findings and headers per host (for TR-03116-4)
+    testssl_raw_by_host: dict[str, list[dict[str, Any]]] = {}
+    headers_by_host: dict[str, dict[str, Any]] = {}
+    for ip, data in host_results.items():
+        raw = data.get("testssl_raw", [])
+        if raw:
+            testssl_raw_by_host[ip] = raw
+        hdrs = data.get("headers")
+        if hdrs:
+            headers_by_host[ip] = hdrs
+
     return {
         "host_inventory": host_inventory,
         "tech_profiles": tech_profiles,
         "consolidated_findings": consolidated,
         "host_screenshots": host_screenshots,
+        "testssl_raw_by_host": testssl_raw_by_host,
+        "headers_by_host": headers_by_host,
         "meta": meta,
     }

@@ -412,6 +412,8 @@ def process_job(job_data: dict) -> None:
             host_inventory=effective_inventory,
             package=package,
             host_screenshots=host_screenshots,
+            testssl_raw_by_host=parsed.get("testssl_raw_by_host"),
+            headers_by_host=parsed.get("headers_by_host"),
         )
         log.info("report_data_mapped")
 
