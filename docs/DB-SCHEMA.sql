@@ -70,7 +70,7 @@ CREATE TABLE orders (
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CONSTRAINT chk_orders_package
-        CHECK (package IN ('webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance')),
+        CHECK (package IN ('webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance', 'tlscompliance')),
     CONSTRAINT chk_orders_verification_method
         CHECK (verification_method IS NULL
             OR verification_method IN ('dns_txt', 'file', 'meta_tag', 'manual'))
@@ -170,7 +170,7 @@ CREATE TABLE scan_schedules (
     CONSTRAINT chk_schedule_type
         CHECK (schedule_type IN ('weekly', 'monthly', 'quarterly', 'once')),
     CONSTRAINT chk_schedule_package
-        CHECK (package IN ('webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'))
+        CHECK (package IN ('webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance', 'tlscompliance'))
 );
 
 CREATE INDEX idx_scan_schedules_next ON scan_schedules (next_scan_at) WHERE enabled = true;
