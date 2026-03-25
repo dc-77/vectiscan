@@ -112,44 +112,58 @@ function CheckCircle({ color }: { color: string }) {
 }
 
 export default function PackageSelector({ selected, onSelect }: Props) {
-  const webcheck = PACKAGES.find(p => p.key === 'webcheck')!;
+  const quickPkgs = PACKAGES.filter(p => p.tier === 'quick');
   const perimeterPkgs = PACKAGES.filter(p => p.tier === 'perimeter');
-
-  const isWcSelected = selected === 'webcheck';
-  const wcBorder = isWcSelected ? webcheck.accentColor : '#334155';
 
   return (
     <div className="space-y-5" data-testid="package-selector">
-      {/* ── Tier 1: WebCheck ────────────────────────────────── */}
-      <div
-        data-testid="package-webcheck"
-        onClick={() => onSelect('webcheck')}
-        className="relative w-full rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
-        style={{
-          borderWidth: '2px',
-          borderStyle: 'solid',
-          borderColor: wcBorder,
-          boxShadow: isWcSelected ? `0 0 20px ${webcheck.accentColor}20` : 'none',
-        }}
-      >
-        {isWcSelected && <CheckCircle color={webcheck.accentColor} />}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="text-2xl shrink-0">&#9889;</span>
-            <div className="min-w-0">
-              <h3 className="text-white font-semibold text-base">WebCheck</h3>
-              <p className="text-[#94A3B8] text-sm mt-0.5">{webcheck.subtitle}</p>
+      {/* ── Tier 1: Quick Scans ────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {quickPkgs.map((pkg) => {
+          const isSelected = selected === pkg.key;
+          const borderColor = isSelected ? pkg.accentColor : '#334155';
+          return (
+            <div
+              key={pkg.key}
+              data-testid={`package-${pkg.key}`}
+              onClick={() => onSelect(pkg.key)}
+              className="relative w-full rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
+              style={{
+                borderWidth: '2px',
+                borderStyle: 'solid',
+                borderColor,
+                boxShadow: isSelected ? `0 0 20px ${pkg.accentColor}20` : 'none',
+              }}
+            >
+              {isSelected && <CheckCircle color={pkg.accentColor} />}
+              {pkg.badge && (
+                <span
+                  className="absolute -top-2.5 left-4 text-xs font-bold px-3 py-0.5 rounded-full"
+                  style={{ backgroundColor: pkg.badgeColor || pkg.accentColor, color: '#0F172A' }}
+                >
+                  {pkg.badge}
+                </span>
+              )}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-2xl shrink-0">&#9889;</span>
+                  <div className="min-w-0">
+                    <h3 className="text-white font-semibold text-base">{pkg.title}</h3>
+                    <p className="text-[#94A3B8] text-sm mt-0.5">{pkg.subtitle}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 sm:ml-auto shrink-0">
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8]">
+                    {pkg.duration}
+                  </span>
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8]">
+                    max {pkg.hosts} Hosts
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2 sm:ml-auto shrink-0">
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8]">
-              {webcheck.duration}
-            </span>
-            <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8]">
-              max {webcheck.hosts} Hosts
-            </span>
-          </div>
-        </div>
+          );
+        })}
       </div>
 
       {/* ── Divider ─────────────────────────────────────────── */}
