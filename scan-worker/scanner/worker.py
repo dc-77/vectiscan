@@ -280,51 +280,58 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
     set_discovered_hosts(order_id, host_inventory)
 
     # ── AI Host Strategy: prioritize and filter hosts ─────
-    # Enrich host inventory with passive intel for better AI decisions
-    enriched_inventory = {**host_inventory}
-    if phase0a_results:
-        enriched_hosts = []
-        for h in hosts:
-            enriched = {**h}
-            enriched["passive_intel"] = build_passive_intel_for_ai(phase0a_results, h["ip"])
-            enriched_hosts.append(enriched)
-        enriched_inventory["hosts"] = enriched_hosts
-        enriched_inventory["dns_security"] = phase0a_results.get("dns_security", {})
-        enriched_inventory["whois"] = phase0a_results.get("whois", {})
-
-    strategy = plan_host_strategy(enriched_inventory, domain, package, order_id=order_id)
-
-    # Save strategy to scan results and disk
-    strategy_json = json.dumps(strategy, indent=2, ensure_ascii=False)
-    strategy_path = os.path.join(scan_dir, "phase0", "host_strategy.json")
-    try:
-        with open(strategy_path, "w") as f:
-            f.write(strategy_json)
-    except Exception:
-        pass
-
+    skip_ai = config.get("skip_ai_decisions", False)
     from scanner.tools import _save_result
-    _save_result(order_id=order_id, host_ip=None, phase=0,
-                 tool_name="ai_host_strategy", raw_output=strategy_json,
-                 exit_code=0, duration_ms=0)
 
-    # Build scan list from strategy
-    ip_to_host = {h["ip"]: h for h in hosts}
-    scan_hosts: list[dict[str, Any]] = []
-    for sh in sorted(strategy.get("hosts", []), key=lambda h: h.get("priority") or 999):
-        if sh.get("action") == "scan" and sh["ip"] in ip_to_host:
-            entry = ip_to_host[sh["ip"]]
-            entry["_reasoning"] = sh.get("reasoning", "")
-            scan_hosts.append(entry)
-        elif sh.get("action") == "skip":
-            _save_result(order_id=order_id, host_ip=sh["ip"], phase=0,
-                         tool_name="ai_host_skip", raw_output=f"SKIP: {sh.get('reasoning', 'Kein Grund angegeben')}",
-                         exit_code=0, duration_ms=0)
-            log.info("host_skipped_by_ai", ip=sh["ip"], reasoning=sh.get("reasoning"))
+    if skip_ai:
+        # TLS-Compliance: scan ALL hosts, no AI filtering
+        scan_hosts = list(hosts)
+        log.info("ai_strategy_skipped", reason="skip_ai_decisions=True", hosts=len(scan_hosts))
+    else:
+        # Enrich host inventory with passive intel for better AI decisions
+        enriched_inventory = {**host_inventory}
+        if phase0a_results:
+            enriched_hosts = []
+            for h in hosts:
+                enriched = {**h}
+                enriched["passive_intel"] = build_passive_intel_for_ai(phase0a_results, h["ip"])
+                enriched_hosts.append(enriched)
+            enriched_inventory["hosts"] = enriched_hosts
+            enriched_inventory["dns_security"] = phase0a_results.get("dns_security", {})
+            enriched_inventory["whois"] = phase0a_results.get("whois", {})
 
-    # Fallback if strategy returned nothing scannable
-    if not scan_hosts:
-        scan_hosts = hosts
+        strategy = plan_host_strategy(enriched_inventory, domain, package, order_id=order_id)
+
+        # Save strategy to scan results and disk
+        strategy_json = json.dumps(strategy, indent=2, ensure_ascii=False)
+        strategy_path = os.path.join(scan_dir, "phase0", "host_strategy.json")
+        try:
+            with open(strategy_path, "w") as f:
+                f.write(strategy_json)
+        except Exception:
+            pass
+
+        _save_result(order_id=order_id, host_ip=None, phase=0,
+                     tool_name="ai_host_strategy", raw_output=strategy_json,
+                     exit_code=0, duration_ms=0)
+
+        # Build scan list from strategy
+        ip_to_host = {h["ip"]: h for h in hosts}
+        scan_hosts = []
+        for sh in sorted(strategy.get("hosts", []), key=lambda h: h.get("priority") or 999):
+            if sh.get("action") == "scan" and sh["ip"] in ip_to_host:
+                entry = ip_to_host[sh["ip"]]
+                entry["_reasoning"] = sh.get("reasoning", "")
+                scan_hosts.append(entry)
+            elif sh.get("action") == "skip":
+                _save_result(order_id=order_id, host_ip=sh["ip"], phase=0,
+                             tool_name="ai_host_skip", raw_output=f"SKIP: {sh.get('reasoning', 'Kein Grund angegeben')}",
+                             exit_code=0, duration_ms=0)
+                log.info("host_skipped_by_ai", ip=sh["ip"], reasoning=sh.get("reasoning"))
+
+        # Fallback if strategy returned nothing scannable
+        if not scan_hosts:
+            scan_hosts = hosts
 
     hosts_total = len(scan_hosts)
     log.info("ai_strategy_applied", scan=hosts_total,
@@ -406,76 +413,80 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
     # ── Redirect Data + AI Tech Analysis ────────────────────
     # Extract redirect data from Phase 1 tech profiles (already collected via Playwright)
     _check_timeout()
-    try:
-        from scanner.tools.redirect_probe import probe_cms_paths, _is_playwright_available
-        combined_redirect: dict[str, Any] = {"redirects": {}, "cms_probes": {}}
-
-        # Reuse redirect data already gathered during Phase 1 (no second Playwright run)
-        for profile in tech_profiles:
-            if profile.get("redirect_data"):
-                combined_redirect["redirects"].update(profile["redirect_data"])
-
-        redirect_count = len(combined_redirect["redirects"])
-        if redirect_count > 0:
-            update_progress(order_id, "scan_phase1", "redirect_probe")
-            publish_event(order_id, {"type": "tool_output", "tool": "redirect_probe",
-                                     "summary": f"{redirect_count} FQDNs probed (from Phase 1)"})
-
-            # Run CMS path probes separately (lightweight HTTP checks)
-            if _is_playwright_available():
-                all_fqdns = []
-                for host, prof in zip(scan_hosts, tech_profiles):
-                    if not prof.get("skipped"):
-                        all_fqdns.extend(host.get("fqdns", [])[:3])
-                all_fqdns = list(set(all_fqdns))
-                cms_probe_data = probe_cms_paths(all_fqdns)
-                combined_redirect["cms_probes"] = cms_probe_data
-
-            # AI Tech Analysis — correct CMS detection
-            update_progress(order_id, "scan_phase1", "ai_tech_analysis")
-            tech_corrections = plan_tech_analysis(tech_profiles, combined_redirect, order_id=order_id)
-
-            # Apply corrections to tech_profiles
-            if tech_corrections.get("hosts"):
-                for profile in tech_profiles:
-                    ip = profile.get("ip", "")
-                    correction = tech_corrections["hosts"].get(ip)
-                    if correction:
-                        old_cms = profile.get("cms")
-                        new_cms = correction.get("cms")
-                        if new_cms != old_cms:
-                            log.info("cms_corrected", ip=ip, old=old_cms, new=new_cms,
-                                     reason=correction.get("reasoning", ""))
-                        profile["cms"] = correction.get("cms")
-                        profile["cms_version"] = correction.get("cms_version")
-                        profile["cms_confidence"] = correction.get("cms_confidence", 0)
-                        if correction.get("is_spa") is not None:
-                            profile["is_spa"] = correction["is_spa"]
-        else:
-            log.info("no_redirect_data_from_phase1", msg="Skipping AI tech analysis")
-    except Exception as e:
-        log.warning("redirect_probe_failed", error=str(e))
-
-    # ── AI Phase 2 Config (all hosts, after all Phase 1) ──
     adaptive_configs: dict[str, dict[str, Any]] = {}
 
-    for host, profile in zip(scan_hosts, tech_profiles):
-        ip = host["ip"]
-        if profile.get("skipped"):
-            continue
+    if skip_ai:
+        log.info("ai_tech_analysis_skipped", reason="skip_ai_decisions=True")
+        log.info("ai_phase2_configs_skipped", reason="skip_ai_decisions=True")
+    else:
+        try:
+            from scanner.tools.redirect_probe import probe_cms_paths, _is_playwright_available
+            combined_redirect: dict[str, Any] = {"redirects": {}, "cms_probes": {}}
 
-        _check_timeout()
+            # Reuse redirect data already gathered during Phase 1 (no second Playwright run)
+            for profile in tech_profiles:
+                if profile.get("redirect_data"):
+                    combined_redirect["redirects"].update(profile["redirect_data"])
 
-        adaptive_config = plan_phase2_config(profile, host_inventory, package, order_id=order_id)
-        adaptive_configs[ip] = adaptive_config
+            redirect_count = len(combined_redirect["redirects"])
+            if redirect_count > 0:
+                update_progress(order_id, "scan_phase1", "redirect_probe")
+                publish_event(order_id, {"type": "tool_output", "tool": "redirect_probe",
+                                         "summary": f"{redirect_count} FQDNs probed (from Phase 1)"})
 
-        adaptive_json = json.dumps(adaptive_config, indent=2, ensure_ascii=False)
-        _save_result(order_id=order_id, host_ip=ip, phase=1,
-                     tool_name="ai_phase2_config", raw_output=adaptive_json,
-                     exit_code=0, duration_ms=0)
-        publish_event(order_id, {"type": "ai_config", "ip": ip, "config": adaptive_config})
+                # Run CMS path probes separately (lightweight HTTP checks)
+                if _is_playwright_available():
+                    all_fqdns = []
+                    for host, prof in zip(scan_hosts, tech_profiles):
+                        if not prof.get("skipped"):
+                            all_fqdns.extend(host.get("fqdns", [])[:3])
+                    all_fqdns = list(set(all_fqdns))
+                    cms_probe_data = probe_cms_paths(all_fqdns)
+                    combined_redirect["cms_probes"] = cms_probe_data
 
-    log.info("ai_phase2_configs_complete", order_id=order_id, configs=len(adaptive_configs))
+                # AI Tech Analysis — correct CMS detection
+                update_progress(order_id, "scan_phase1", "ai_tech_analysis")
+                tech_corrections = plan_tech_analysis(tech_profiles, combined_redirect, order_id=order_id)
+
+                # Apply corrections to tech_profiles
+                if tech_corrections.get("hosts"):
+                    for profile in tech_profiles:
+                        ip = profile.get("ip", "")
+                        correction = tech_corrections["hosts"].get(ip)
+                        if correction:
+                            old_cms = profile.get("cms")
+                            new_cms = correction.get("cms")
+                            if new_cms != old_cms:
+                                log.info("cms_corrected", ip=ip, old=old_cms, new=new_cms,
+                                         reason=correction.get("reasoning", ""))
+                            profile["cms"] = correction.get("cms")
+                            profile["cms_version"] = correction.get("cms_version")
+                            profile["cms_confidence"] = correction.get("cms_confidence", 0)
+                            if correction.get("is_spa") is not None:
+                                profile["is_spa"] = correction["is_spa"]
+            else:
+                log.info("no_redirect_data_from_phase1", msg="Skipping AI tech analysis")
+        except Exception as e:
+            log.warning("redirect_probe_failed", error=str(e))
+
+        # ── AI Phase 2 Config (all hosts, after all Phase 1) ──
+        for host, profile in zip(scan_hosts, tech_profiles):
+            ip = host["ip"]
+            if profile.get("skipped"):
+                continue
+
+            _check_timeout()
+
+            adaptive_config = plan_phase2_config(profile, host_inventory, package, order_id=order_id)
+            adaptive_configs[ip] = adaptive_config
+
+            adaptive_json = json.dumps(adaptive_config, indent=2, ensure_ascii=False)
+            _save_result(order_id=order_id, host_ip=ip, phase=1,
+                         tool_name="ai_phase2_config", raw_output=adaptive_json,
+                         exit_code=0, duration_ms=0)
+            publish_event(order_id, {"type": "ai_config", "ip": ip, "config": adaptive_config})
+
+        log.info("ai_phase2_configs_complete", order_id=order_id, configs=len(adaptive_configs))
 
     # ── Phase 2: Deep Scan (parallel, max 3 hosts) ────────
     scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]

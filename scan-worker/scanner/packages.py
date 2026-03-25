@@ -84,19 +84,20 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
     # Nur testssl + Headers, kein Deep-Scan, schnell (~5–10 Min)
     # ------------------------------------------------------------------
     "tlscompliance": {
-        "phase0a_tools": ["whois"],
-        "phase0a_timeout": 30,
-        "phase0b_tools": ["crtsh", "dnsx"],
-        "phase0b_timeout": 180,          # 3 Minuten
+        "phase0a_tools": [],             # Kein whois — irrelevant für TLS
+        "phase0a_timeout": 5,
+        "phase0b_tools": ["dnsx"],       # Nur DNS-Auflösung, kein crtsh
+        "phase0b_timeout": 120,          # 2 Minuten
         "max_hosts": 15,
         "nmap_ports": "443,8443,993,995,465,587,636,989,990,5061",
-        "phase1_tools": ["nmap"],
+        "phase1_tools": ["nmap"],        # Nur Port-Scan (webtech/wafw00f über Config gesteuert)
         "phase2_tools": ["testssl", "headers"],
         "phase3_tools": [],              # Kein Enrichment
         "phase3_timeout": 0,
         "total_timeout": 600,            # 10 Minuten
-        "testssl_severity": "LOW",       # Alle Findings für TR-Vollständigkeit
+        "testssl_severity": "",          # Leer = kein --severity Filter → ALLE Einträge inkl. OK/INFO
         "zap_min_risk": "Low",
+        "skip_ai_decisions": True,       # Kein AI Host Strategy / Tech Analysis / Phase-2 Config
     },
 }
 

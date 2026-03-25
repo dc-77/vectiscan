@@ -344,6 +344,8 @@ def run_phase1(
 
     log.info("phase1_start", ip=ip, fqdns=fqdns, order_id=order_id)
 
+    phase1_tools = (config or {}).get("phase1_tools", ["nmap", "webtech", "wafw00f", "cms_fingerprint"])
+
     # Run nmap
     publish_event(order_id, {"type": "tool_starting", "tool": "nmap", "host": ip})
     nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports)
@@ -361,50 +363,53 @@ def run_phase1(
 
     # Use Playwright tech detection instead of webtech (which fails on all domains)
     from scanner.tools.redirect_probe import probe_redirects, _is_playwright_available
-    publish_event(order_id, {"type": "tool_starting", "tool": "webtech", "host": ip})
     webtech_result: list[dict] | dict | None = None
-    if _is_playwright_available():
-        try:
-            pw_fqdns = [f for f in fqdns[:3] if f]  # max 3 FQDNs
-            redirect_data = probe_redirects(
-                pw_fqdns, order_id=order_id,
-                scan_dir=scan_dir, ip=ip,
-            )
-            # Convert Playwright tech_info to webtech-compatible format
-            tech_list = []
-            for fqdn_key, probe in redirect_data.items():
-                tech_info = probe.get("tech_info", {})
-                if tech_info.get("generator"):
-                    tech_list.append({"name": tech_info["generator"], "version": ""})
-                headers = probe.get("response_headers", {})
-                server = headers.get("server", "")
-                if server:
-                    parts = server.split("/", 1)
-                    tech_list.append({"name": parts[0], "version": parts[1] if len(parts) > 1 else ""})
-                powered = headers.get("x-powered-by", "") or tech_info.get("powered_by", "")
-                if powered:
-                    tech_list.append({"name": powered, "version": ""})
-            if tech_list:
-                webtech_result = {"tech": tech_list}
-        except Exception as e:
-            log.warning("playwright_tech_failed", error=str(e))
-    else:
-        log.info("playwright_not_available", msg="Falling back to no webtech data")
-    progress_callback(order_id, "webtech", "complete")
+    if "webtech" in phase1_tools:
+        publish_event(order_id, {"type": "tool_starting", "tool": "webtech", "host": ip})
+        if _is_playwright_available():
+            try:
+                pw_fqdns = [f for f in fqdns[:3] if f]  # max 3 FQDNs
+                redirect_data = probe_redirects(
+                    pw_fqdns, order_id=order_id,
+                    scan_dir=scan_dir, ip=ip,
+                )
+                # Convert Playwright tech_info to webtech-compatible format
+                tech_list = []
+                for fqdn_key, probe in redirect_data.items():
+                    tech_info = probe.get("tech_info", {})
+                    if tech_info.get("generator"):
+                        tech_list.append({"name": tech_info["generator"], "version": ""})
+                    headers = probe.get("response_headers", {})
+                    server = headers.get("server", "")
+                    if server:
+                        parts = server.split("/", 1)
+                        tech_list.append({"name": parts[0], "version": parts[1] if len(parts) > 1 else ""})
+                    powered = headers.get("x-powered-by", "") or tech_info.get("powered_by", "")
+                    if powered:
+                        tech_list.append({"name": powered, "version": ""})
+                if tech_list:
+                    webtech_result = {"tech": tech_list}
+            except Exception as e:
+                log.warning("playwright_tech_failed", error=str(e))
+        else:
+            log.info("playwright_not_available", msg="Falling back to no webtech data")
+        progress_callback(order_id, "webtech", "complete")
 
-    # Save webtech result to scan_results
-    from scanner.tools import _save_result
-    _save_result(order_id=order_id, host_ip=ip, phase=1,
-                 tool_name="webtech",
-                 raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False) if webtech_result
-                     else f"Playwright tech detection: no data for {', '.join(probe_fqdns)}",
-                 exit_code=0 if webtech_result else 1,
-                 duration_ms=0)
+        # Save webtech result to scan_results
+        from scanner.tools import _save_result
+        _save_result(order_id=order_id, host_ip=ip, phase=1,
+                     tool_name="webtech",
+                     raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False) if webtech_result
+                         else f"Playwright tech detection: no data for {', '.join(probe_fqdns)}",
+                     exit_code=0 if webtech_result else 1,
+                     duration_ms=0)
 
     # Run wafw00f on primary FQDN
-    publish_event(order_id, {"type": "tool_starting", "tool": "wafw00f", "host": ip})
-    wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, order_id)
-    progress_callback(order_id, "wafw00f", "complete")
+    wafw00f_result = None
+    if "wafw00f" in phase1_tools:
+        publish_event(order_id, {"type": "tool_starting", "tool": "wafw00f", "host": ip})
+        wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, order_id)
+        progress_callback(order_id, "wafw00f", "complete")
 
     # wafw00f already saved to scan_results by run_tool() inside run_wafw00f()
 

@@ -35,10 +35,14 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
         "--warnings", "off",
         "--sneaky",
         "--hints",
-        "--severity", severity,
+    ]
+    # Omit --severity to get ALL entries (incl. OK/INFO) for TR-03116-4
+    if severity:
+        cmd.extend(["--severity", severity])
+    cmd.extend([
         "--nodns", "min",
         f"https://{fqdn}",
-    ]
+    ])
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
