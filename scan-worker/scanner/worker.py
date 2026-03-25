@@ -286,6 +286,7 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
     if skip_ai:
         # TLS-Compliance: scan ALL hosts, no AI filtering
         scan_hosts = list(hosts)
+        strategy = {"hosts": [{"ip": h["ip"], "action": "scan"} for h in hosts]}
         log.info("ai_strategy_skipped", reason="skip_ai_decisions=True", hosts=len(scan_hosts))
     else:
         # Enrich host inventory with passive intel for better AI decisions
