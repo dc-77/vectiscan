@@ -15,9 +15,12 @@ async function streamReport(reply: FastifyReply, report: Record<string, unknown>
   const domain = report.target_url as string;
   const fileSize = report.file_size_bytes as number;
   const createdAt = report.created_at as Date;
+  const pkg = (report.package as string) || 'perimeter';
+  const version = (report.version as number) || 1;
 
-  const dateStr = createdAt.toISOString().split('T')[0];
-  const fileName = `vectiscan-${domain}-${dateStr}.pdf`;
+  const dateStr = createdAt.toISOString().slice(0, 10);
+  const timeStr = createdAt.toISOString().slice(11, 16).replace(':', '');
+  const fileName = `vectiscan-${domain}-${pkg}-${dateStr}-${timeStr}-v${version}.pdf`;
 
   const stream = await minioClient.getObject(bucket, objectPath);
 
@@ -291,7 +294,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const downloadToken = queryParams.download_token;
     if (downloadToken) {
       const tokenCheck = await query(
-        `SELECT r.id, r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, o.target_url
+        `SELECT r.id, r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.expires_at, r.version, o.target_url, o.package
          FROM reports r JOIN orders o ON r.order_id = o.id
          WHERE r.order_id = $1 AND r.download_token = $2
          LIMIT 1`,
@@ -348,7 +351,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     if (requestedVersion) {
       try {
         result = await query(
-          `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url
+          `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url, o.package
            FROM reports r JOIN orders o ON r.order_id = o.id
            WHERE r.order_id = $1 AND r.version = $2`,
           [id, requestedVersion],
@@ -356,7 +359,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       } catch {
         // version column doesn't exist yet — fallback
         result = await query(
-          `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, o.target_url
+          `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, o.target_url, o.package
            FROM reports r JOIN orders o ON r.order_id = o.id
            WHERE r.order_id = $1 LIMIT 1`,
           [id],
@@ -364,7 +367,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       }
     } else {
       result = await query(
-        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url
+        `SELECT r.minio_bucket, r.minio_path, r.file_size_bytes, r.created_at, r.version, o.target_url, o.package
          FROM reports r JOIN orders o ON r.order_id = o.id
          WHERE r.order_id = $1 ORDER BY r.created_at DESC LIMIT 1`,
         [id],
