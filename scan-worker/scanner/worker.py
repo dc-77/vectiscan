@@ -509,9 +509,11 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
         return idx, result
 
     phase2_results: list[dict[str, Any] | None] = [None] * len(scannable)
-    # Sequential host processing — each worker has ONE ZAP daemon,
-    # parallel hosts would cause ZAP context conflicts and alert mixing.
-    max_parallel_p2 = 1
+    # ZAP has ONE daemon — parallel hosts cause context conflicts.
+    # Packages without ZAP (e.g. tlscompliance) can safely parallelize.
+    has_zap = any(t in (config.get("phase2_tools") or [])
+                  for t in ("zap_spider", "zap_active", "zap_passive"))
+    max_parallel_p2 = min(5, len(scannable)) if not has_zap else 1
     with ThreadPoolExecutor(max_workers=max_parallel_p2, thread_name_prefix="phase2") as pool:
         futures = {
             pool.submit(_run_phase2_host, idx, host, tp): idx
