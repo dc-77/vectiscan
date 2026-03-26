@@ -425,11 +425,21 @@ def _check_key_exchange(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
     checks: list[dict[str, Any]] = []
 
     # 2.4.1: ECDHE supported
+    # testssl FS finding just says "offered" — ECDHE evidence comes from
+    # FS_ECDHE_curves or cipher_order entries containing "ECDHE"
     pfs_entry = _find(findings, "FS") or _find(findings, "PFS")
+    ecdhe_curves_entry = _find(findings, "FS_ECDHE_curves") or _find(findings, "PFS_ECDHE_curves")
     cipher_entries = _find_all(findings, "cipher_order")
     has_ecdhe = False
-    if pfs_entry:
-        has_ecdhe = "ecdhe" in pfs_entry.get("finding", "").lower()
+    # FS_ECDHE_curves present → ECDHE is definitely supported
+    if ecdhe_curves_entry and ecdhe_curves_entry.get("finding", "").strip():
+        has_ecdhe = True
+    # FS "offered" with OK severity → Forward Secrecy available (ECDHE or DHE)
+    if not has_ecdhe and pfs_entry:
+        finding_text = pfs_entry.get("finding", "").lower()
+        sev = pfs_entry.get("severity", "").upper()
+        has_ecdhe = ("offered" in finding_text and "not offered" not in finding_text) or sev == "OK"
+    # Fallback: check cipher_order for ECDHE ciphers
     if not has_ecdhe:
         for ce in cipher_entries:
             if "ecdhe" in ce.get("finding", "").lower():
