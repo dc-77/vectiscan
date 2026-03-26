@@ -24,15 +24,15 @@ def _compliant_base() -> list[dict]:
         _entry("SSLv3", "not offered"),
         _entry("TLS1", "not offered"),
         _entry("TLS1_1", "not offered"),
-        # 2.2 Cipher Suites
+        # 2.2 Cipher Suites (testssl uses cipherlist_ prefix + FS for PFS)
         _entry("RC4", "not offered"),
-        _entry("3DES_IDEA", "not offered"),
-        _entry("NULL", "not offered"),
-        _entry("EXPORT", "not offered"),
-        _entry("aNULL", "not offered"),
-        _entry("PFS", "offered, server supports ECDHE"),
-        _entry("cipherorder_tls13_1", "TLS_AES_256_GCM_SHA384"),
-        _entry("cipherorder_tls12_1", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"),
+        _entry("cipherlist_3DES_IDEA", "not offered"),
+        _entry("cipherlist_NULL", "not offered"),
+        _entry("cipherlist_EXPORT", "not offered"),
+        _entry("cipherlist_aNULL", "not offered"),
+        _entry("FS", "offered, server supports ECDHE"),
+        _entry("cipher_order_TLSv1_3", "TLS_AES_256_GCM_SHA384"),
+        _entry("cipher_order_TLSv1_2", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"),
         # 2.3 Certificate
         _entry("cert_keySize", "RSA 4096 bits"),
         _entry("cert_signatureAlgorithm", "SHA256withRSA"),
@@ -42,8 +42,8 @@ def _compliant_base() -> list[dict]:
         _entry("cert_subjectAltName", "example.com, www.example.com"),
         _entry("cert_trust", "certificate trusted"),
         _entry("cert_ocspURL", "http://ocsp.letsencrypt.org"),
-        # 2.4 Key Exchange
-        _entry("PFS_ECDHE_curves", "secp256r1 secp384r1 x25519"),
+        # 2.4 Key Exchange (testssl uses FS_ prefix)
+        _entry("FS_ECDHE_curves", "secp256r1 secp384r1 x25519"),
         _entry("DH_groups", "RFC 7919/ffdhe4096"),
         _entry("LOGJAM", "not vulnerable"),
         _entry("secure_renego", "supported"),
@@ -155,7 +155,7 @@ class TestNoPFS:
     def test_no_pfs_fails(self):
         findings = _compliant_base()
         for f in findings:
-            if f["id"] == "PFS":
+            if f["id"] == "FS":
                 f["finding"] = "not offered"
                 f["severity"] = "MEDIUM"
         result = check_tr03116_compliance(findings)
@@ -245,7 +245,7 @@ class TestBrainpoolCurves:
     def test_brainpool_mentioned(self):
         findings = _compliant_base()
         for f in findings:
-            if f["id"] == "PFS_ECDHE_curves":
+            if f["id"] == "FS_ECDHE_curves":
                 f["finding"] = "brainpoolP256r1 secp256r1 x25519"
         result = check_tr03116_compliance(findings)
         check = result["sections"]["2.4"]["checks"][1]  # 2.4.2

@@ -74,10 +74,21 @@ _CURVE_ALIASES: dict[str, str] = {
 # ---------------------------------------------------------------------------
 
 def _find(findings: list[dict[str, Any]], target_id: str) -> dict[str, Any] | None:
-    """Find a testssl entry by id (case-insensitive)."""
+    """Find a testssl entry by id (case-insensitive).
+
+    Handles testssl.sh's multi-cert suffix format where IDs like
+    ``cert_notAfter`` become ``cert_notAfter <hostCert#1>``.
+    First tries exact match, then prefix match (id starts with target).
+    """
     target_lower = target_id.lower()
+    # Exact match first
     for f in findings:
         if f.get("id", "").lower() == target_lower:
+            return f
+    # Prefix match (handles " <hostCert#N>" suffixes)
+    for f in findings:
+        fid = f.get("id", "").lower()
+        if fid.startswith(target_lower) and (len(fid) == len(target_lower) or fid[len(target_lower)] in (" ", "_")):
             return f
     return None
 
@@ -179,12 +190,15 @@ def _check_cipher_suites(findings: list[dict[str, Any]]) -> list[dict[str, Any]]
     checks: list[dict[str, Any]] = []
 
     # 2.2.1-2.2.5: Weak ciphers must NOT be offered
+    # testssl.sh uses "cipherlist_" prefix for cipher group tests:
+    # cipherlist_NULL, cipherlist_aNULL, cipherlist_EXPORT, cipherlist_3DES_IDEA
+    # RC4 is a standalone vulnerability check (no prefix)
     weak_checks = [
         ("2.2.1", "RC4", "Keine RC4-Cipher"),
-        ("2.2.2", "3DES_IDEA", "Keine 3DES/IDEA-Cipher"),
-        ("2.2.3", "NULL", "Keine NULL-Cipher"),
-        ("2.2.4", "EXPORT", "Keine EXPORT-Cipher"),
-        ("2.2.5", "aNULL", "Keine anonymen Cipher"),
+        ("2.2.2", "cipherlist_3DES_IDEA", "Keine 3DES/IDEA-Cipher"),
+        ("2.2.3", "cipherlist_NULL", "Keine NULL-Cipher"),
+        ("2.2.4", "cipherlist_EXPORT", "Keine EXPORT-Cipher"),
+        ("2.2.5", "cipherlist_aNULL", "Keine anonymen Cipher"),
     ]
     for cid, tid, title in weak_checks:
         entry = _find(findings, tid)
@@ -203,8 +217,8 @@ def _check_cipher_suites(findings: list[dict[str, Any]]) -> list[dict[str, Any]]
             checks.append(_check(cid, title, "N/A",
                                  f"Keine testssl-Daten für {tid} vorhanden"))
 
-    # 2.2.6: PFS offered
-    entry = _find(findings, "PFS")
+    # 2.2.6: PFS offered (testssl uses "FS" as jsonID)
+    entry = _find(findings, "FS") or _find(findings, "PFS")
     if entry:
         finding_text = entry.get("finding", "").lower()
         not_offered = "not offered" in finding_text
@@ -220,7 +234,7 @@ def _check_cipher_suites(findings: list[dict[str, Any]]) -> list[dict[str, Any]]
                              "Keine testssl-Daten für PFS vorhanden"))
 
     # 2.2.7: AES-GCM preferred (first cipher in order)
-    cipher_order_entries = _find_all(findings, "cipherorder_")
+    cipher_order_entries = _find_all(findings, "cipher_order")
     if cipher_order_entries:
         first_cipher = cipher_order_entries[0].get("finding", "")
         gcm_preferred = "GCM" in first_cipher.upper()
@@ -238,7 +252,7 @@ def _check_cipher_suites(findings: list[dict[str, Any]]) -> list[dict[str, Any]]
     # 2.2.8: All ciphers TR-02102-2 compliant
     cipher_entries = [f for f in findings
                       if f.get("id", "").startswith("cipher_")
-                      or f.get("id", "").startswith("cipherorder_")]
+                      or f.get("id", "").startswith("cipher_order")]
     if cipher_entries:
         allowed_set = set(TR_02102_2_ALLOWED_CIPHERS)
         non_compliant = []
@@ -411,8 +425,8 @@ def _check_key_exchange(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
     checks: list[dict[str, Any]] = []
 
     # 2.4.1: ECDHE supported
-    pfs_entry = _find(findings, "PFS")
-    cipher_entries = _find_all(findings, "cipherorder_")
+    pfs_entry = _find(findings, "FS") or _find(findings, "PFS")
+    cipher_entries = _find_all(findings, "cipher_order")
     has_ecdhe = False
     if pfs_entry:
         has_ecdhe = "ecdhe" in pfs_entry.get("finding", "").lower()
@@ -434,7 +448,7 @@ def _check_key_exchange(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
                              "Keine Daten zum Schlüsselaustausch vorhanden"))
 
     # 2.4.2: Elliptic curves compliant
-    entry = _find(findings, "PFS_ECDHE_curves")
+    entry = _find(findings, "FS_ECDHE_curves") or _find(findings, "PFS_ECDHE_curves")
     if entry:
         curves_str = entry.get("finding", "")
         curves = [c.strip() for c in curves_str.replace(",", " ").split() if c.strip()]
@@ -589,7 +603,7 @@ def _check_recommendations(
     checks: list[dict[str, Any]] = []
 
     # 2.6.1: Only PFS cipher suites
-    cipher_entries = _find_all(findings, "cipherorder_")
+    cipher_entries = _find_all(findings, "cipher_order")
     if cipher_entries:
         non_pfs = []
         for ce in cipher_entries:
