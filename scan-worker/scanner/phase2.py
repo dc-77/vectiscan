@@ -66,68 +66,17 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
 
 def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str,
                 severity: str = "MEDIUM") -> Optional[list]:
-    """Run testssl.sh with double-verification for MEDIUM+ findings.
+    """Run testssl.sh and return parsed JSON findings.
 
-    First run: full scan. If MEDIUM+ findings found, runs a second pass
-    and only keeps findings that appear in BOTH runs (eliminates transient
-    false positives from network glitches, OCSP timeouts, etc.).
+    Single-pass execution — the previous double-verification strategy was
+    removed because results were consistently identical in production.
     """
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
 
     output_path = f"{phase2_dir}/testssl.json"
-
-    # Run 1
-    run1 = _run_testssl_once(fqdn, ip, output_path, order_id,
+    return _run_testssl_once(fqdn, ip, output_path, order_id,
                               severity=severity, tool_name="testssl")
-    if not run1 or not isinstance(run1, list):
-        return run1
-
-    # Check if there are MEDIUM+ findings worth verifying
-    medium_plus = [f for f in run1
-                   if f.get("severity", "").upper() in ("MEDIUM", "HIGH", "CRITICAL", "WARN")]
-
-    if not medium_plus:
-        log.info("testssl_no_medium_findings", fqdn=fqdn, total=len(run1))
-        return run1  # No need for verification
-
-    # Run 2: verify MEDIUM+ findings
-    log.info("testssl_verification_run", fqdn=fqdn, findings_to_verify=len(medium_plus))
-    output_path_v2 = f"{phase2_dir}/testssl_verify.json"
-    run2 = _run_testssl_once(fqdn, ip, output_path_v2, order_id,
-                              severity=severity, tool_name="testssl_verify")
-
-    if not run2 or not isinstance(run2, list):
-        log.warning("testssl_verify_failed", fqdn=fqdn)
-        return run1  # Verification failed — keep original findings
-
-    # Build set of finding IDs from run 2
-    run2_ids = {f.get("id", "") for f in run2 if f.get("id")}
-
-    # Only keep MEDIUM+ findings that appear in BOTH runs
-    verified = []
-    dropped = 0
-    for f in run1:
-        sev = f.get("severity", "").upper()
-        if sev in ("MEDIUM", "HIGH", "CRITICAL", "WARN"):
-            if f.get("id", "") in run2_ids:
-                verified.append(f)  # Confirmed in both runs
-            else:
-                dropped += 1
-                log.info("testssl_finding_dropped", fqdn=fqdn, id=f.get("id"),
-                         finding=f.get("finding", "")[:80],
-                         reason="not confirmed in verification run")
-        else:
-            verified.append(f)  # LOW/INFO pass through without verification
-
-    log.info("testssl_verification_complete", fqdn=fqdn,
-             original=len(run1), verified=len(verified), dropped=dropped)
-
-    # Save verified results as the final output
-    with open(output_path, "w") as fout:
-        json.dump(verified, fout, indent=2)
-
-    return verified
 
 
 WORDLIST_MAP = {

@@ -1301,8 +1301,8 @@ def map_tlscompliance_report(
             "table": {
                 "header": ["Zeitrahmen", "Maßnahme", "Referenz", "Aufwand"],
                 "rows": [
-                    [r.get("timeframe", ""), r.get("action", ""),
-                     ", ".join(r.get("finding_refs", [])), r.get("effort", "")]
+                    [_safe(r.get("timeframe", "")), _safe(r.get("action", "")),
+                     _safe(", ".join(r.get("finding_refs", []))), _safe(r.get("effort", ""))]
                     for r in recommendations
                 ],
                 "widths": [55, 240, 70, 40],

@@ -27,7 +27,7 @@ _PERIMETER_BASE: dict[str, Any] = {
                      "fp_filter", "business_impact"],
     "phase3_timeout": 300,        # 5 Minuten
     "total_timeout": 7200,        # 120 Minuten
-    "testssl_severity": "MEDIUM",     # MEDIUM+ in output (LOW = cipher noise)
+    "testssl_severity": "",             # Kein Filter → ALLE Einträge in JSON, Parser filtert für Findings
     "zap_min_risk": "Low",            # Low+ alerts (skip Informational)
 }
 
@@ -51,7 +51,7 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
         "phase3_tools": ["nvd", "cisa_kev", "correlator", "fp_filter"],
         "phase3_timeout": 120,        # 2 Minuten
         "total_timeout": 1200,        # 20 Minuten
-        "testssl_severity": "MEDIUM",     # Same as perimeter
+        "testssl_severity": "",             # Kein Filter → Parser filtert für Findings
         "zap_min_risk": "Low",            # Same as perimeter
     },
 
@@ -84,10 +84,10 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
     # Nur testssl + Headers, kein Deep-Scan, schnell (~5–10 Min)
     # ------------------------------------------------------------------
     "tlscompliance": {
-        "phase0a_tools": [],             # Kein whois — irrelevant für TLS
-        "phase0a_timeout": 5,
-        "phase0b_tools": ["dnsx"],       # Nur DNS-Auflösung, kein crtsh
-        "phase0b_timeout": 120,          # 2 Minuten
+        "phase0a_tools": ["whois"],
+        "phase0a_timeout": 30,
+        "phase0b_tools": ["crtsh", "subfinder", "dnsx", "dnssec", "caa", "mta_sts"],
+        "phase0b_timeout": 300,          # 5 Minuten — vollständige Recon wie WebCheck
         "max_hosts": 15,
         "nmap_ports": "443,8443,993,995,465,587,636,989,990,5061",
         "phase1_tools": ["nmap"],        # Nur Port-Scan (webtech/wafw00f über Config gesteuert)

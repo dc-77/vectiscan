@@ -413,13 +413,13 @@ def build_finding(story, styles, f, compact=False):
         header_group.append(meta_table)
         header_group.append(Spacer(1, SPACING_PARAGRAPH))
 
-        # Description — keep with header
-        desc_label = f.get("label_description", "Description")
-        header_group.append(Paragraph(desc_label, styles["FindingLabel"]))
-        header_group.append(Paragraph(f["description"], styles["FindingBody"]))
-
-        # Use KeepTogether so the header + meta + description stays on one page
+        # Use KeepTogether only for header + meta (not description — it may span pages)
         story.append(KeepTogether(header_group))
+
+        # Description — separate so it can flow across page boundaries
+        desc_label = f.get("label_description", "Description")
+        story.append(Paragraph(desc_label, styles["FindingLabel"]))
+        story.append(Paragraph(f["description"], styles["FindingBody"]))
 
         # Evidence (separate block, can flow to next page) — hide if empty
         evidence_text = f.get("evidence", "\u2014")
@@ -1497,7 +1497,18 @@ def generate_report(report_data, output_path):
         story.append(Spacer(1, SPACING_PARAGRAPH))
         if recs.get("table"):
             t = recs["table"]
-            story.append(styled_table(t["header"], t["rows"], t["widths"], styles))
+            # Wrap table cells as Paragraphs for proper text wrapping + HTML support
+            cell_style = ParagraphStyle("RecCell", parent=styles["BodyText2"],
+                                        fontSize=8, leading=10)
+            hdr_style = ParagraphStyle("RecHdr", parent=styles["BodyText2"],
+                                       fontSize=8, fontName=FONT_HEADING,
+                                       textColor=HexColor("#FFFFFF"))
+            wrapped_header = [Paragraph(str(h), hdr_style) for h in t["header"]]
+            wrapped_rows = [
+                [Paragraph(str(cell), cell_style) for cell in row]
+                for row in t["rows"]
+            ]
+            story.append(styled_table(wrapped_header, wrapped_rows, t["widths"], styles))
         story.append(PageBreak())
 
     # --- NIS2 Audit Trail (after Recommendations, before Appendices) ---

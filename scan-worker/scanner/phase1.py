@@ -368,7 +368,7 @@ def run_phase1(
         publish_event(order_id, {"type": "tool_starting", "tool": "webtech", "host": ip})
         if _is_playwright_available():
             try:
-                pw_fqdns = [f for f in fqdns[:3] if f]  # max 3 FQDNs
+                pw_fqdns = [f for f in fqdns[:8] if f]  # Screenshot + tech probe per FQDN
                 redirect_data = probe_redirects(
                     pw_fqdns, order_id=order_id,
                     scan_dir=scan_dir, ip=ip,
