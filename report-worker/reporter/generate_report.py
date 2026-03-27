@@ -1497,18 +1497,8 @@ def generate_report(report_data, output_path):
         story.append(Spacer(1, SPACING_PARAGRAPH))
         if recs.get("table"):
             t = recs["table"]
-            # Wrap table cells as Paragraphs for proper text wrapping + HTML support
-            cell_style = ParagraphStyle("RecCell", parent=styles["BodyText2"],
-                                        fontSize=8, leading=10)
-            hdr_style = ParagraphStyle("RecHdr", parent=styles["BodyText2"],
-                                       fontSize=8, fontName=FONT_HEADING,
-                                       textColor=HexColor("#FFFFFF"))
-            wrapped_header = [Paragraph(str(h), hdr_style) for h in t["header"]]
-            wrapped_rows = [
-                [Paragraph(str(cell), cell_style) for cell in row]
-                for row in t["rows"]
-            ]
-            story.append(styled_table(wrapped_header, wrapped_rows, t["widths"], styles))
+            # header and rows already contain Paragraph objects from _build_recommendations()
+            story.append(styled_table(t["header"], t["rows"], t["widths"], styles))
         story.append(PageBreak())
 
     # --- NIS2 Audit Trail (after Recommendations, before Appendices) ---

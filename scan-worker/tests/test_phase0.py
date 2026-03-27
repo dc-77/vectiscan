@@ -174,7 +174,8 @@ def test_phase0_tools_called_with_correct_timeouts(tmp_path: Path) -> None:
 
 
 def test_merge_and_group_dangling_cnames(tmp_path: Path) -> None:
-    """merge_and_group detects dangling CNAMEs (CNAME without A record)."""
+    """merge_and_group detects truly dangling CNAMEs (CNAME target unresolvable)."""
+    import socket as _socket
     from scanner.phase0 import merge_and_group
 
     scan_dir = str(tmp_path)
@@ -185,7 +186,8 @@ def test_merge_and_group_dangling_cnames(tmp_path: Path) -> None:
         {"host": "dangling.example.com", "cname": ["old.cdn.example.com"], "a": []},
     ]
 
-    with patch("scanner.phase0.socket.gethostbyaddr", side_effect=OSError):
+    with patch("scanner.phase0.socket.gethostbyaddr", side_effect=OSError), \
+         patch("scanner.phase0.socket.getaddrinfo", side_effect=_socket.gaierror):
         inventory = merge_and_group(
             domain="example.com",
             all_subdomains=["ok.example.com", "dangling.example.com"],
@@ -196,6 +198,83 @@ def test_merge_and_group_dangling_cnames(tmp_path: Path) -> None:
         )
 
     assert "dangling.example.com" in inventory["dns_findings"]["dangling_cnames"]
+
+
+def test_merge_and_group_dangling_cname_resolved_via_socket(tmp_path: Path) -> None:
+    """merge_and_group resolves dangling CNAMEs via socket fallback."""
+    import socket as _socket
+    from scanner.phase0 import merge_and_group
+
+    scan_dir = str(tmp_path)
+    (tmp_path / "phase0").mkdir()
+
+    dnsx_results = [
+        {"host": "ok.example.com", "a": ["1.2.3.4"]},
+        # CNAME without A record — dnsx didn't follow the chain
+        {"host": "app.example.com", "cname": ["app.azurewebsites.net"], "a": []},
+    ]
+
+    def fake_getaddrinfo(host, *args, **kwargs):
+        if host == "app.example.com":
+            # Simulate successful resolution to same IP as ok.example.com
+            return [(_socket.AF_INET, _socket.SOCK_STREAM, 6, "", ("1.2.3.4", 0))]
+        raise _socket.gaierror("not found")
+
+    with patch("scanner.phase0.socket.gethostbyaddr", side_effect=OSError), \
+         patch("scanner.phase0.socket.getaddrinfo", side_effect=fake_getaddrinfo):
+        inventory = merge_and_group(
+            domain="example.com",
+            all_subdomains=["ok.example.com", "app.example.com"],
+            dnsx_results=dnsx_results,
+            dns_records={},
+            zone_transfer={"success": False},
+            scan_dir=scan_dir,
+        )
+
+    # app.example.com should be assigned to host 1.2.3.4, not dangling
+    assert "app.example.com" not in inventory["dns_findings"]["dangling_cnames"]
+    host_1234 = next(h for h in inventory["hosts"] if h["ip"] == "1.2.3.4")
+    assert "app.example.com" in host_1234["fqdns"]
+    assert "ok.example.com" in host_1234["fqdns"]
+
+
+def test_merge_and_group_missed_subdomains_resolved(tmp_path: Path) -> None:
+    """merge_and_group resolves subdomains that dnsx missed entirely."""
+    import socket as _socket
+    from scanner.phase0 import merge_and_group
+
+    scan_dir = str(tmp_path)
+    (tmp_path / "phase0").mkdir()
+
+    # dnsx only returned 1 of 3 subdomains
+    dnsx_results = [
+        {"host": "www.example.com", "a": ["1.2.3.4"]},
+    ]
+
+    def fake_getaddrinfo(host, *args, **kwargs):
+        if host == "api.example.com":
+            return [(_socket.AF_INET, _socket.SOCK_STREAM, 6, "", ("1.2.3.4", 0))]
+        if host == "example.com":
+            return [(_socket.AF_INET, _socket.SOCK_STREAM, 6, "", ("1.2.3.4", 0))]
+        raise _socket.gaierror("not found")
+
+    with patch("scanner.phase0.socket.gethostbyaddr", side_effect=OSError), \
+         patch("scanner.phase0.socket.getaddrinfo", side_effect=fake_getaddrinfo):
+        inventory = merge_and_group(
+            domain="example.com",
+            # api.example.com was found by crtsh but dnsx didn't validate it
+            all_subdomains=["www.example.com", "api.example.com", "stale.example.com"],
+            dnsx_results=dnsx_results,
+            dns_records={},
+            zone_transfer={"success": False},
+            scan_dir=scan_dir,
+        )
+
+    # api.example.com should be assigned via socket fallback
+    host_1234 = next(h for h in inventory["hosts"] if h["ip"] == "1.2.3.4")
+    assert "api.example.com" in host_1234["fqdns"]
+    assert "www.example.com" in host_1234["fqdns"]
+    assert "example.com" in host_1234["fqdns"]  # Base domain also resolved via fallback
 
 
 def test_merge_and_group_saves_inventory_file(tmp_path: Path) -> None:

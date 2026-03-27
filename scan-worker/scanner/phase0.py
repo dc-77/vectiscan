@@ -488,12 +488,14 @@ def merge_and_group(
 
     # Group by IP from dnsx results
     ip_to_fqdns: dict[str, set[str]] = defaultdict(set)
+    dnsx_resolved: set[str] = set()  # Track which FQDNs dnsx handled
     dangling_cnames: list[str] = []
 
     for entry in dnsx_results:
         host = entry.get("host", "").lower().rstrip(".")
         if not host:
             continue
+        dnsx_resolved.add(host)
 
         # Collect A record IPs
         a_records = entry.get("a", [])
@@ -506,10 +508,57 @@ def merge_and_group(
             for ip in ips:
                 ip_to_fqdns[ip].add(host)
         elif cname and not ips:
-            # CNAME exists but no A/AAAA -> dangling CNAME
+            # CNAME exists but dnsx didn't return the final A record —
+            # resolve via socket fallback instead of discarding the FQDN
             dangling_cnames.append(host)
 
-    # Ensure base domain is present — fallback via socket if dnsx missed it
+    # --- Socket fallback for dangling CNAMEs ---
+    # dnsx sometimes returns CNAME without following it to the A record.
+    # Resolve these via socket so FQDNs are correctly assigned to hosts.
+    resolved_danglings = 0
+    true_danglings: list[str] = []
+    for fqdn in dangling_cnames:
+        old_timeout = socket.getdefaulttimeout()
+        try:
+            socket.setdefaulttimeout(5)
+            infos = socket.getaddrinfo(fqdn, None, proto=socket.IPPROTO_TCP)
+            resolved_ips = sorted({info[4][0] for info in infos})
+            for ip in resolved_ips:
+                ip_to_fqdns[ip].add(fqdn)
+            resolved_danglings += 1
+        except (socket.gaierror, socket.timeout, OSError):
+            true_danglings.append(fqdn)  # Truly unresolvable
+        finally:
+            socket.setdefaulttimeout(old_timeout)
+    dangling_cnames = true_danglings
+    if resolved_danglings:
+        log.info("dangling_cname_resolved", count=resolved_danglings,
+                 still_dangling=len(true_danglings))
+
+    # --- Socket fallback for subdomains dnsx missed entirely ---
+    # dnsx may skip subdomains due to timeout or rate-limiting.
+    # Resolve any enumerated subdomains that aren't in dnsx output.
+    missed_subs = [s for s in unique_subs if s not in dnsx_resolved]
+    resolved_missed = 0
+    if missed_subs:
+        for fqdn in missed_subs:
+            old_timeout = socket.getdefaulttimeout()
+            try:
+                socket.setdefaulttimeout(5)
+                infos = socket.getaddrinfo(fqdn, None, proto=socket.IPPROTO_TCP)
+                resolved_ips = sorted({info[4][0] for info in infos})
+                for ip in resolved_ips:
+                    ip_to_fqdns[ip].add(fqdn)
+                resolved_missed += 1
+            except (socket.gaierror, socket.timeout, OSError):
+                pass  # Subdomain doesn't resolve — expected for stale entries
+            finally:
+                socket.setdefaulttimeout(old_timeout)
+        if resolved_missed:
+            log.info("missed_subs_resolved", total_missed=len(missed_subs),
+                     resolved=resolved_missed)
+
+    # Ensure base domain is present — fallback via socket if still missing
     domain_in_results = any(
         domain.lower() in (h.lower().rstrip(".") for h in fqdns)
         for fqdns in ip_to_fqdns.values()
