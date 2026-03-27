@@ -482,8 +482,12 @@ def merge_and_group(
     """Deduplicate subdomains, group by IP, create host_inventory.json."""
     output_path = os.path.join(scan_dir, "phase0", "host_inventory.json")
 
-    # Deduplicate subdomains
+    # Deduplicate subdomains and filter invalid DNS labels (>63 chars per label)
     unique_subs = sorted(set(s.lower().rstrip(".") for s in all_subdomains if s))
+    invalid = [s for s in unique_subs if any(len(label) > 63 for label in s.split("."))]
+    if invalid:
+        log.warning("invalid_dns_labels_filtered", count=len(invalid), examples=invalid[:3])
+        unique_subs = [s for s in unique_subs if not any(len(label) > 63 for label in s.split("."))]
     log.info("merge_dedup", total_raw=len(all_subdomains), unique=len(unique_subs))
 
     # Group by IP from dnsx results
@@ -518,6 +522,11 @@ def merge_and_group(
     resolved_danglings = 0
     true_danglings: list[str] = []
     for fqdn in dangling_cnames:
+        # Skip FQDNs with invalid DNS labels (>63 chars) — getaddrinfo
+        # uses IDNA encoding which raises UnicodeError for these
+        if any(len(label) > 63 for label in fqdn.split(".")):
+            true_danglings.append(fqdn)
+            continue
         old_timeout = socket.getdefaulttimeout()
         try:
             socket.setdefaulttimeout(5)
@@ -526,7 +535,7 @@ def merge_and_group(
             for ip in resolved_ips:
                 ip_to_fqdns[ip].add(fqdn)
             resolved_danglings += 1
-        except (socket.gaierror, socket.timeout, OSError):
+        except (socket.gaierror, socket.timeout, OSError, UnicodeError):
             true_danglings.append(fqdn)  # Truly unresolvable
         finally:
             socket.setdefaulttimeout(old_timeout)
@@ -542,6 +551,8 @@ def merge_and_group(
     resolved_missed = 0
     if missed_subs:
         for fqdn in missed_subs:
+            if any(len(label) > 63 for label in fqdn.split(".")):
+                continue
             old_timeout = socket.getdefaulttimeout()
             try:
                 socket.setdefaulttimeout(5)
@@ -550,7 +561,7 @@ def merge_and_group(
                 for ip in resolved_ips:
                     ip_to_fqdns[ip].add(fqdn)
                 resolved_missed += 1
-            except (socket.gaierror, socket.timeout, OSError):
+            except (socket.gaierror, socket.timeout, OSError, UnicodeError):
                 pass  # Subdomain doesn't resolve — expected for stale entries
             finally:
                 socket.setdefaulttimeout(old_timeout)
@@ -572,7 +583,7 @@ def merge_and_group(
             for fb_ip in fallback_ips:
                 ip_to_fqdns[fb_ip].add(domain.lower())
             log.info("base_domain_fallback", domain=domain, ips=fallback_ips)
-        except (socket.gaierror, socket.timeout, OSError) as e:
+        except (socket.gaierror, socket.timeout, OSError, UnicodeError) as e:
             log.warning("base_domain_resolve_failed", domain=domain, error=str(e))
         finally:
             socket.setdefaulttimeout(old_timeout)
