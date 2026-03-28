@@ -322,6 +322,7 @@ def run_phase1(
     order_id: str,
     progress_callback: Callable[[str, str, str], None],
     config: dict[str, Any] | None = None,
+    web_probe: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Orchestrate Phase 1 (technology detection) for a single host.
 
@@ -332,6 +333,7 @@ def run_phase1(
         order_id: Order UUID.
         progress_callback: Called after each tool with (order_id, tool_name, status).
         config: Package configuration dict (optional).
+        web_probe: Phase 0 web_probe data with final_url for redirect-aware probing.
 
     Returns:
         Tech profile dict for this host.
@@ -369,9 +371,17 @@ def run_phase1(
         if _is_playwright_available():
             try:
                 pw_fqdns = [f for f in fqdns[:8] if f]  # Screenshot + tech probe per FQDN
+                # Build web_probe URL map: use Phase 0 final_url if it redirected
+                wp_urls: dict[str, str] = {}
+                if web_probe and web_probe.get("final_url"):
+                    wp_fqdn = web_probe.get("web_fqdn", "")
+                    wp_final = web_probe["final_url"]
+                    if wp_fqdn and wp_final:
+                        wp_urls[wp_fqdn] = wp_final
                 redirect_data = probe_redirects(
                     pw_fqdns, order_id=order_id,
                     scan_dir=scan_dir, ip=ip,
+                    web_probe_urls=wp_urls if wp_urls else None,
                 )
                 # Convert Playwright tech_info to webtech-compatible format
                 tech_list = []

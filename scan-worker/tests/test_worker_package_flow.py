@@ -32,7 +32,7 @@ class TestWorkerPackageFlow:
             "max_hosts": 5,
             "nmap_ports": "--top-ports 100",
             "phase1_tools": ["nmap", "webtech", "wafw00f"],
-            "phase2_tools": ["testssl", "headers", "gowitness"],
+            "phase2_tools": ["headers"],
             "total_timeout": 600,
         }
         mock_phase0.return_value = {"hosts": [], "domain": "example.com"}
@@ -65,7 +65,7 @@ class TestWorkerPackageFlow:
             "max_hosts": 5,
             "nmap_ports": "--top-ports 100",
             "phase1_tools": ["nmap"],
-            "phase2_tools": ["testssl"],
+            "phase2_tools": ["headers"],
             "total_timeout": 600,
         }
         mock_phase0.return_value = {"hosts": [], "domain": "example.com"}
@@ -105,7 +105,7 @@ class TestWorkerPackageFlow:
             "max_hosts": 15,
             "nmap_ports": "--top-ports 1000",
             "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
-            "phase2_tools": ["testssl", "zap_spider", "zap_active", "ffuf", "feroxbuster", "headers", "httpx", "wpscan"],
+            "phase2_tools": ["zap_spider", "zap_active", "ffuf", "feroxbuster", "headers", "httpx", "wpscan"],
             "phase3_tools": ["nvd", "epss", "cisa_kev", "exploitdb", "correlator", "fp_filter", "business_impact"],
             "phase3_timeout": 300,
             "total_timeout": 7200,

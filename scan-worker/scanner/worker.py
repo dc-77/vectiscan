@@ -377,10 +377,11 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
                             hosts_completed=0, hosts_total=hosts_total)
             _check_timeout()
 
-        tech_profile = run_phase1(ip, fqdns, scan_dir, order_id, p1_callback, config)
+        web_probe = host.get("web_probe", {})
+        tech_profile = run_phase1(ip, fqdns, scan_dir, order_id, p1_callback, config,
+                                  web_probe=web_probe)
 
         # Carry web_probe data from Phase 0 into tech_profile
-        web_probe = host.get("web_probe", {})
         tech_profile["has_web"] = web_probe.get("has_web", True)
         tech_profile["web_fqdn"] = web_probe.get("web_fqdn")
 

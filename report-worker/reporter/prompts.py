@@ -36,9 +36,15 @@ HÄUFIG FALSCH BEWERTET:
 - HTTP ohne HTTPS ohne Login-Formular: LOW 3.7
 
 METHODIK:
-Der Scan wurde als automatisierter Schnellscan durchgeführt. Port-Scanning (nmap), Web-Technologie-Identifikation (webtech), SSL/TLS-Analyse (testssl.sh), HTTP-Header-Prüfung und Web-Schwachstellen-Scan (ZAP).
+Der Scan wurde als automatisierter Schnellscan durchgeführt. Port-Scanning (nmap), Web-Technologie-Identifikation (webtech), HTTP-Header-Prüfung und Web-Schwachstellen-Scan (ZAP).
 
 Positive Befunde: Variiere den Text der Bewertung und Empfehlung. Vermeide es, bei jedem positiven Befund identisch "Positiver Befund — korrekte Konfiguration." und "Aktuelle Konfiguration beibehalten." zu schreiben. Beschreibe stattdessen konkret, was gut gemacht wurde und warum es wichtig ist.
+
+KONSISTENZ-CHECK FÜR POSITIVE BEFUNDE:
+- Bevor du einen positiven Befund erstellst, prüfe ob ein negativer Befund dem widerspricht.
+- Beispiel: Behaupte NICHT "perfekte Security-Header (7/7)" wenn ein Finding CSP-Schwächen meldet.
+- Behaupte NICHT "vorbildliche TLS-Konfiguration" wenn ein Finding ablaufende Zertifikate oder schwache Cipher meldet.
+- Ein positiver Befund darf nur Bereiche loben, in denen KEIN negativer Befund existiert.
 
 REGELN FÜR TONALITÄT:
 - Professionell und sachlich, nicht alarmistisch
@@ -164,11 +170,17 @@ Phase 0 — Reconnaissance: Passive Intelligence (Shodan, AbuseIPDB, WHOIS), DNS
 
 Phase 1 — Technologie-Erkennung: Port-Scanning (nmap), Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) pro Host. KI-gestützte Tool-Konfiguration passt Phase-2-Parameter adaptiv an.
 
-Phase 2 — Tiefer Scan: SSL/TLS-Analyse (testssl.sh), Schwachstellen-Scan (ZAP Active Scan), Directory-Enumeration (ffuf, feroxbuster), HTTP-Header-Prüfung und WordPress-Scan (wpscan) pro Host.
+Phase 2 — Tiefer Scan: Schwachstellen-Scan (ZAP Active Scan), Directory-Enumeration (ffuf, feroxbuster), HTTP-Header-Prüfung und WordPress-Scan (wpscan) pro Host.
 
 Phase 3 — Korrelation & Enrichment: Cross-Tool-Korrelation, False-Positive-Filterung, Threat-Intelligence-Anreicherung (NVD, EPSS, CISA KEV) und KI-gestützte Priorisierung.
 
 Positive Befunde: Variiere den Text der Bewertung und Empfehlung. Vermeide es, bei jedem positiven Befund identisch "Positiver Befund — korrekte Konfiguration." und "Aktuelle Konfiguration beibehalten." zu schreiben. Beschreibe stattdessen konkret, was gut gemacht wurde und warum es wichtig ist.
+
+KONSISTENZ-CHECK FÜR POSITIVE BEFUNDE:
+- Bevor du einen positiven Befund erstellst, prüfe ob ein negativer Befund dem widerspricht.
+- Beispiel: Behaupte NICHT "perfekte Security-Header (7/7)" wenn ein Finding CSP-Schwächen meldet.
+- Behaupte NICHT "vorbildliche TLS-Konfiguration" wenn ein Finding ablaufende Zertifikate oder schwache Cipher meldet.
+- Ein positiver Befund darf nur Bereiche loben, in denen KEIN negativer Befund existiert.
 
 REGELN FÜR TONALITÄT:
 - Professionell und sachlich, nicht alarmistisch

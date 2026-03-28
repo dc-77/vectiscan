@@ -353,6 +353,95 @@ def _check_cwe_semantic(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 # ---------------------------------------------------------------------------
+# Check 9: Positive finding contradictions
+# ---------------------------------------------------------------------------
+
+_CONTRADICTION_PATTERNS: list[dict[str, list[str]]] = [
+    {
+        "positive": ["header", "security-header", "7/7", "6/7", "score"],
+        "negative": ["csp", "unsafe-inline", "unsafe-eval", "fehlende.*header",
+                      "missing.*header", "x-frame", "hsts.*fehlt", "no.*hsts"],
+    },
+    {
+        "positive": ["tls", "ssl", "verschlüsselung", "kryptografie", "zertifikat"],
+        "negative": ["tls.*1\\.0", "tls.*1\\.1", "sslv3", "beast", "weak.*cipher",
+                      "schwache.*cipher", "ablauf", "expir", "zertifikat.*läuft"],
+    },
+    {
+        "positive": ["https.*durchgehend", "https.*aktiv", "https.*konsistent"],
+        "negative": ["kein.*redirect", "kein.*hsts", "http.*ohne.*tls",
+                      "mixed.*content", "unverschlüsselt"],
+    },
+    {
+        "positive": ["e-mail.*security", "e-mail.*sicher", "mail.*schutz"],
+        "negative": ["kein.*dkim", "kein.*dmarc", "kein.*spf", "spf.*softfail",
+                      "dmarc.*none", "dmarc.*quarantine"],
+    },
+]
+
+
+def _check_positive_contradictions(
+    findings: list[dict[str, Any]],
+    positive_findings: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Check 9: Detect contradictions between positive and negative findings.
+
+    If a positive finding claims something that a negative finding directly
+    contradicts, mark it for removal. Example: "perfect headers 7/7" vs
+    "CSP unsafe-inline" → remove the positive finding.
+    """
+    if not positive_findings or not findings:
+        return []
+
+    issues: list[dict[str, Any]] = []
+
+    # Build a searchable text for each negative finding
+    neg_texts = []
+    for f in findings:
+        title = (f.get("title") or "").lower()
+        desc = (f.get("description") or "").lower()
+        neg_texts.append(f"{title} {desc}")
+
+    for pf in positive_findings:
+        pf_title = (pf.get("title") or "").lower()
+        pf_desc = (pf.get("description") or "").lower()
+        pf_text = f"{pf_title} {pf_desc}"
+
+        for pattern in _CONTRADICTION_PATTERNS:
+            # Check if positive finding matches any positive keyword
+            pos_match = any(
+                re.search(kw, pf_text) for kw in pattern["positive"]
+            )
+            if not pos_match:
+                continue
+
+            # Check if any negative finding matches a contradicting keyword
+            for neg_idx, neg_text in enumerate(neg_texts):
+                neg_match = any(
+                    re.search(kw, neg_text) for kw in pattern["negative"]
+                )
+                if neg_match:
+                    neg_finding = findings[neg_idx]
+                    issues.append({
+                        "finding_id": pf.get("title", "?"),
+                        "check": "positive_contradiction",
+                        "issue": (
+                            f"Positiver Befund \"{pf.get('title', '?')}\" "
+                            f"widerspricht negativem Finding "
+                            f"\"{neg_finding.get('id', '?')}: {neg_finding.get('title', '?')}\""
+                        ),
+                        "auto_fix": True,
+                        "positive_title": pf.get("title", ""),
+                    })
+                    break  # One contradiction is enough to flag this positive
+            # Stop checking more patterns once flagged
+            if issues and issues[-1].get("positive_title") == pf.get("title", ""):
+                break
+
+    return issues
+
+
+# ---------------------------------------------------------------------------
 # Apply auto-fixes
 # ---------------------------------------------------------------------------
 
@@ -397,6 +486,24 @@ def _apply_auto_fixes(
         elif check == "cwe_nonexistent" and "corrected_value" in issue:
             finding["cwe"] = issue["corrected_value"]
             fixes_applied += 1
+
+    # Remove contradicted positive findings
+    positive_findings = result.get("positive_findings", [])
+    contradicted_titles = {
+        i["positive_title"] for i in issues
+        if i.get("auto_fix") and i.get("check") == "positive_contradiction"
+    }
+    if contradicted_titles and positive_findings:
+        before = len(positive_findings)
+        result["positive_findings"] = [
+            pf for pf in positive_findings
+            if pf.get("title", "") not in contradicted_titles
+        ]
+        removed = before - len(result["positive_findings"])
+        if removed:
+            log.info("positive_contradictions_removed", count=removed,
+                     titles=list(contradicted_titles))
+            fixes_applied += removed
 
     return fixes_applied
 
@@ -501,6 +608,8 @@ def run_qa_checks(
     all_issues.extend(_check_epss_reference(findings, enrichment))
     all_issues.extend(_check_nis2_mapping(findings, package))
     all_issues.extend(_check_cwe_semantic(findings))
+    all_issues.extend(_check_positive_contradictions(
+        findings, claude_result.get("positive_findings", [])))
 
     # Apply auto-fixes
     auto_fixes = _apply_auto_fixes(claude_result, all_issues)
@@ -534,6 +643,7 @@ def run_qa_checks(
             "epss_reference",
             "nis2_mapping",
             "cwe_semantic",
+            "positive_contradictions",
         ],
     }
 

@@ -20,14 +20,13 @@ _PERIMETER_BASE: dict[str, Any] = {
     "max_hosts": 15,
     "nmap_ports": "--top-ports 1000",
     "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
-    "phase2_tools": ["testssl", "zap_spider", "zap_active",
+    "phase2_tools": ["zap_spider", "zap_active",
                      "ffuf", "feroxbuster",
                      "headers", "httpx", "wpscan"],
     "phase3_tools": ["nvd", "epss", "cisa_kev", "exploitdb", "correlator",
                      "fp_filter", "business_impact"],
     "phase3_timeout": 300,        # 5 Minuten
     "total_timeout": 7200,        # 120 Minuten
-    "testssl_severity": "",             # Kein Filter → ALLE Einträge in JSON, Parser filtert für Findings
     "zap_min_risk": "Low",            # Low+ alerts (skip Informational)
 }
 
@@ -46,12 +45,11 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
         "max_hosts": 3,
         "nmap_ports": "--top-ports 100",
         "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
-        "phase2_tools": ["testssl", "zap_spider", "zap_passive",
+        "phase2_tools": ["zap_spider", "zap_passive",
                          "headers", "httpx", "wpscan"],
         "phase3_tools": ["nvd", "cisa_kev", "correlator", "fp_filter"],
         "phase3_timeout": 120,        # 2 Minuten
         "total_timeout": 1200,        # 20 Minuten
-        "testssl_severity": "",             # Kein Filter → Parser filtert für Findings
         "zap_min_risk": "Low",            # Same as perimeter
     },
 

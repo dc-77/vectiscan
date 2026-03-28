@@ -91,7 +91,7 @@ def _take_screenshot(
         page.screenshot(path=screenshot_path, full_page=False)
         return screenshot_path
     except Exception as exc:
-        log.debug("screenshot_failed", fqdn=fqdn, error=str(exc))
+        log.warning("screenshot_failed", fqdn=fqdn, error=str(exc))
         return None
 
 
@@ -101,8 +101,18 @@ def probe_redirects(
     timeout_per_page: int = 10,
     scan_dir: str = "",
     ip: str = "",
+    web_probe_urls: dict[str, str] | None = None,
 ) -> dict[str, dict[str, Any]]:
     """Visit each FQDN with Playwright headless Chromium.
+
+    Args:
+        fqdns: List of FQDNs to probe.
+        order_id: For logging.
+        timeout_per_page: Seconds per page load.
+        scan_dir: Base scan directory for screenshots.
+        ip: Host IP for screenshot path.
+        web_probe_urls: Optional dict mapping FQDN → final_url from Phase 0 web_probe.
+            If provided, uses the known-good URL instead of guessing https://{fqdn}/.
 
     Returns dict keyed by FQDN with:
     {
@@ -124,6 +134,7 @@ def probe_redirects(
 
     from playwright.sync_api import sync_playwright
 
+    web_probe_urls = web_probe_urls or {}
     results: dict[str, dict[str, Any]] = {}
     browser = None
     pw = None
@@ -136,9 +147,12 @@ def probe_redirects(
         )
 
         for fqdn in fqdns:
+            # Build URL candidates: prefer web_probe final_url, then HTTPS, then HTTP
+            start_url = web_probe_urls.get(fqdn)
             result = _probe_single_fqdn(
                 browser, fqdn, timeout_per_page,
                 scan_dir=scan_dir, ip=ip,
+                start_url=start_url,
             )
             results[fqdn] = result
             log.info(
@@ -153,7 +167,8 @@ def probe_redirects(
             )
 
     except Exception as exc:
-        log.error("redirect_probe_fatal", error=str(exc), order_id=order_id)
+        log.error("redirect_probe_fatal", error=str(exc), order_id=order_id,
+                  fqdns_remaining=[f for f in fqdns if f not in results])
     finally:
         if browser is not None:
             try:
@@ -175,83 +190,101 @@ def _probe_single_fqdn(
     timeout_per_page: int,
     scan_dir: str = "",
     ip: str = "",
+    start_url: str | None = None,
 ) -> dict[str, Any]:
-    """Probe a single FQDN and return its redirect result."""
-    url = f"https://{fqdn}/"
-    redirect_chain: list[str] = []
-    final_status_code: int = 0
-    response_headers: dict[str, str] = {}
-    page = None
+    """Probe a single FQDN and return its redirect result.
 
-    try:
-        context = browser.new_context(ignore_https_errors=True)
-        page = context.new_page()
+    Tries URLs in order: start_url (from web_probe), https://{fqdn}/, http://{fqdn}/
+    Returns the first successful result.
+    """
+    # Build URL candidates
+    urls_to_try = []
+    if start_url:
+        urls_to_try.append(start_url)
+    urls_to_try.append(f"https://{fqdn}/")
+    urls_to_try.append(f"http://{fqdn}/")
+    # Deduplicate while preserving order
+    seen: set[str] = set()
+    urls_to_try = [u for u in urls_to_try if not (u in seen or seen.add(u))]  # type: ignore[func-returns-value]
 
-        # Collect redirect chain and response headers from response events
-        def on_response(response: Any) -> None:
-            nonlocal final_status_code, response_headers
-            redirect_chain.append(response.url)
-            final_status_code = response.status
-            # Capture headers from the first response matching our FQDN
-            if not response_headers and response.url.startswith(f"https://{fqdn}"):
+    last_error = ""
+    for url in urls_to_try:
+        redirect_chain: list[str] = []
+        final_status_code: int = 0
+        response_headers: dict[str, str] = {}
+        page = None
+
+        try:
+            context = browser.new_context(ignore_https_errors=True)
+            page = context.new_page()
+
+            def on_response(response: Any) -> None:
+                nonlocal final_status_code, response_headers
+                redirect_chain.append(response.url)
+                final_status_code = response.status
+                if not response_headers:
+                    try:
+                        response_headers = dict(response.headers) if hasattr(response, "headers") else {}
+                    except Exception:
+                        pass
+
+            page.on("response", on_response)
+
+            page.goto(url, wait_until="networkidle", timeout=timeout_per_page * 1000)
+
+            final_url = page.url
+            final_domain = _extract_domain(final_url)
+            is_cross_domain = final_domain.lower() != fqdn.lower()
+
+            try:
+                page_title = page.title() or ""
+            except Exception:
+                page_title = ""
+
+            # Tech detection via JS evaluation
+            tech_info = _collect_tech_info(page, fqdn)
+
+            # Take screenshot (best effort)
+            screenshot_path = _take_screenshot(page, fqdn, scan_dir, ip)
+
+            return {
+                "final_url": final_url,
+                "final_domain": final_domain,
+                "redirect_chain": redirect_chain,
+                "is_cross_domain": is_cross_domain,
+                "page_title": page_title,
+                "status_code": final_status_code,
+                "error": None,
+                "response_headers": response_headers,
+                "tech_info": tech_info,
+                "screenshot_path": screenshot_path,
+            }
+
+        except Exception as exc:
+            last_error = str(exc)
+            log.warning("redirect_probe_url_failed", fqdn=fqdn, url=url, error=last_error)
+        finally:
+            if page is not None:
                 try:
-                    response_headers = dict(response.headers) if hasattr(response, "headers") else {}
+                    page.close()
                 except Exception:
                     pass
 
-        page.on("response", on_response)
-
-        page.goto(url, wait_until="networkidle", timeout=timeout_per_page * 1000)
-
-        final_url = page.url
-        final_domain = _extract_domain(final_url)
-        is_cross_domain = final_domain.lower() != fqdn.lower()
-
-        try:
-            page_title = page.title() or ""
-        except Exception:
-            page_title = ""
-
-        # Tech detection via JS evaluation
-        tech_info = _collect_tech_info(page, fqdn)
-
-        # Take screenshot (best effort)
-        screenshot_path = _take_screenshot(page, fqdn, scan_dir, ip)
-
-        return {
-            "final_url": final_url,
-            "final_domain": final_domain,
-            "redirect_chain": redirect_chain,
-            "is_cross_domain": is_cross_domain,
-            "page_title": page_title,
-            "status_code": final_status_code,
-            "error": None,
-            "response_headers": response_headers,
-            "tech_info": tech_info,
-            "screenshot_path": screenshot_path,
-        }
-
-    except Exception as exc:
-        error_msg = str(exc)
-        log.warning("redirect_probe_error", fqdn=fqdn, error=error_msg)
-        return {
-            "final_url": url,
-            "final_domain": fqdn,
-            "redirect_chain": redirect_chain,
-            "is_cross_domain": False,
-            "page_title": "",
-            "status_code": final_status_code,
-            "error": error_msg,
-            "response_headers": response_headers,
-            "tech_info": {},
-            "screenshot_path": None,
-        }
-    finally:
-        if page is not None:
-            try:
-                page.close()
-            except Exception:
-                pass
+    # All URLs failed
+    log.warning("redirect_probe_all_failed", fqdn=fqdn,
+                urls_tried=urls_to_try, last_error=last_error)
+    return {
+        "final_url": f"https://{fqdn}/",
+        "final_domain": fqdn,
+        "redirect_chain": [],
+        "is_cross_domain": False,
+        "page_title": "",
+        "status_code": 0,
+        "error": last_error,
+        "response_headers": {},
+        "tech_info": {},
+        "screenshot_path": None,
+    }
 
 
 def probe_cms_paths(
