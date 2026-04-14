@@ -696,9 +696,32 @@ def merge_and_group(
         finally:
             socket.setdefaulttimeout(old_timeout)
 
+    # ── Deduplicate IPs sharing the same FQDN set ─────────────
+    # Multiple IPs (especially IPv6 variants) often serve the same FQDNs.
+    # Group by FQDN set, keep one representative IP per group (prefer IPv4).
+    fqdn_groups: dict[frozenset[str], list[str]] = defaultdict(list)
+    for ip, fqdns in ip_to_fqdns.items():
+        fqdn_groups[frozenset(fqdns)].append(ip)
+
+    deduped_ip_to_fqdns: dict[str, set[str]] = {}
+    deduped_count = 0
+    for fqdn_set, ips in fqdn_groups.items():
+        if len(ips) == 1:
+            deduped_ip_to_fqdns[ips[0]] = set(fqdn_set)
+        else:
+            # Prefer IPv4 over IPv6, then shortest IP string
+            ipv4 = [ip for ip in ips if ":" not in ip]
+            representative = ipv4[0] if ipv4 else sorted(ips, key=len)[0]
+            deduped_ip_to_fqdns[representative] = set(fqdn_set)
+            deduped_count += len(ips) - 1
+
+    if deduped_count:
+        log.info("hosts_deduped", removed=deduped_count,
+                 before=len(ip_to_fqdns), after=len(deduped_ip_to_fqdns))
+
     # Build hosts list
     hosts: list[dict[str, Any]] = []
-    for ip, fqdns in sorted(ip_to_fqdns.items()):
+    for ip, fqdns in sorted(deduped_ip_to_fqdns.items()):
         # Attempt reverse DNS (with 5s timeout to prevent hangs)
         rdns = ""
         old_timeout = socket.getdefaulttimeout()
@@ -716,22 +739,35 @@ def merge_and_group(
             "rdns": rdns,
         })
 
-    # Prioritize hosts: base domain first, then web hosts, then others
-    # Mail/autodiscover hosts are deprioritized so web assets get scanned
-    def _host_priority(host: dict[str, Any]) -> tuple[int, str]:
+    # Prioritize hosts: base domain first, unique services high, cloud noise low
+    _CLOUD_ONLY_PREFIXES = (
+        "autodiscover.", "enterpriseregistration.", "enterpriseenrollment.",
+        "lyncdiscover.", "sip.", "msoid.", "selector1._domainkey.",
+        "selector2._domainkey.", "_dmarc.",
+    )
+
+    def _host_priority(host: dict[str, Any]) -> tuple[int, int, str]:
         fqdns_lower = [f.lower() for f in host["fqdns"]]
+        num_fqdns = len(fqdns_lower)
+
         # Priority 0: host that serves the base domain itself
         if domain.lower() in fqdns_lower:
-            return (0, host["ip"])
+            return (0, -num_fqdns, host["ip"])
         # Priority 1: www subdomain
         if f"www.{domain.lower()}" in fqdns_lower:
-            return (1, host["ip"])
+            return (1, -num_fqdns, host["ip"])
+
+        # Priority 4: pure cloud/MDM service hosts (all FQDNs are cloud prefixes)
+        if all(any(f.startswith(p) for p in _CLOUD_ONLY_PREFIXES) for f in fqdns_lower):
+            return (4, -num_fqdns, host["ip"])
+
         # Priority 3: mail/autodiscover/mx — deprioritize
         mail_keywords = ("mail.", "mx.", "smtp.", "imap.", "pop.", "autodiscover.", "exchange.")
-        if any(f.startswith(kw) for f in fqdns_lower for kw in mail_keywords):
-            return (3, host["ip"])
-        # Priority 2: everything else (web hosts, portals, apps)
-        return (2, host["ip"])
+        if all(any(f.startswith(kw) for kw in mail_keywords) for f in fqdns_lower):
+            return (3, -num_fqdns, host["ip"])
+
+        # Priority 2: business hosts — more FQDNs = more important (negative for ascending sort)
+        return (2, -num_fqdns, host["ip"])
 
     hosts.sort(key=_host_priority)
 
