@@ -101,7 +101,17 @@ def run_phase3(
             "correlated_findings": [],
             "enrichment": {},
             "business_impact_score": 0.0,
-            "phase3_summary": "No findings to correlate.",
+            "phase3_summary": {
+                "total_findings": 0,
+                "false_positives": 0,
+                "valid_findings": 0,
+                "severity_counts": {},
+                "cves_enriched": 0,
+                "cisa_kev_matches": 0,
+                "fp_details": [],
+                "fp_by_reason": {},
+                "message": "No findings to correlate.",
+            },
         }
 
     # ── Step 2: Determine WAF and CMS context ───────────────
@@ -256,7 +266,7 @@ def run_phase3(
 
             # NVD CVSS overrides tool CVSS
             nvd_info = cf.enrichment.get("nvd", {})
-            if nvd_info and nvd_info.get("cvss_score"):
+            if isinstance(nvd_info, dict) and nvd_info.get("cvss_score"):
                 cf.enrichment["authoritative_cvss"] = nvd_info["cvss_score"]
 
     # ── Step 7: Business-Impact Scoring ──────────────────────

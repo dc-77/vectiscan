@@ -934,27 +934,39 @@ def run_phase2(
         return r
 
     def _run_quick_tools_stage1() -> dict[str, Any]:
-        """Fast independent tools: header_check, httpx."""
+        """Fast independent tools: header_check, httpx.
+
+        Each tool is isolated so a failure in one doesn't lose results from the other.
+        """
         r: dict[str, Any] = {"_tools": []}
         if phase2_tools is None or "headers" in phase2_tools:
-            publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
-            header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)
-            r["headers"] = header_result
-            r["_tools"].append("header_check")
-            progress_callback(order_id, "header_check", "complete")
-            score = header_result.get("score", "?/?") if header_result else "failed"
-            publish_tool_output(order_id, "header_check", ip, f"Security headers: {score}")
+            try:
+                publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
+                header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)
+                r["headers"] = header_result
+                r["_tools"].append("header_check")
+                progress_callback(order_id, "header_check", "complete")
+                score = header_result.get("score", "?/?") if header_result else "failed"
+                publish_tool_output(order_id, "header_check", ip, f"Security headers: {score}")
+                _save_result(order_id, ip, 2, "header_check",
+                             json.dumps(header_result, indent=2, ensure_ascii=False),
+                             0, 0)
+            except Exception as e:
+                log.error("header_check_failed", fqdn=primary_fqdn, ip=ip, error=str(e))
         if phase2_tools is None or "httpx" in phase2_tools:
-            publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
-            httpx_result = run_httpx(primary_fqdn, ip, host_dir, order_id)
-            r["httpx"] = httpx_result
-            r["_tools"].append("httpx")
-            progress_callback(order_id, "httpx", "complete")
-            if httpx_result:
-                publish_tool_output(order_id, "httpx", ip,
-                                    f"HTTP {httpx_result.get('status_code', '?')}")
-            else:
-                publish_tool_output(order_id, "httpx", ip, "HTTP probe failed")
+            try:
+                publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
+                httpx_result = run_httpx(primary_fqdn, ip, host_dir, order_id)
+                r["httpx"] = httpx_result
+                r["_tools"].append("httpx")
+                progress_callback(order_id, "httpx", "complete")
+                if httpx_result:
+                    publish_tool_output(order_id, "httpx", ip,
+                                        f"HTTP {httpx_result.get('status_code', '?')}")
+                else:
+                    publish_tool_output(order_id, "httpx", ip, "HTTP probe failed")
+            except Exception as e:
+                log.error("httpx_failed", fqdn=primary_fqdn, ip=ip, error=str(e))
         return r
 
     log.info("phase2_stage1_start", ip=ip, tools="testssl+zap_spider+quick")

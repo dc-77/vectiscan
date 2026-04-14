@@ -52,7 +52,7 @@ def _get_cvss_from_finding(finding: CorrelatedFinding) -> float:
     """Extract or approximate CVSS score from a finding."""
     # Try NVD enrichment first (authoritative)
     nvd = finding.enrichment.get("nvd", {})
-    if nvd and nvd.get("cvss_score"):
+    if isinstance(nvd, dict) and nvd.get("cvss_score"):
         return float(nvd["cvss_score"])
 
     # Try tool-provided CVSS (e.g. from ZAP or raw data)

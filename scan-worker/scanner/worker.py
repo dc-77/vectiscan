@@ -576,8 +576,9 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
             "summary": phase3_result.get("phase3_summary", {}),
         })
 
-        log.info("phase3_integrated", order_id=order_id,
-                 findings=phase3_result.get("phase3_summary", {}).get("valid_findings", 0))
+        summary = phase3_result.get("phase3_summary", {})
+        valid = summary.get("valid_findings", 0) if isinstance(summary, dict) else 0
+        log.info("phase3_integrated", order_id=order_id, findings=valid)
 
     # ── Finalize ────────────────────────────────────────────
     _finalize(order_id, scan_dir, host_inventory, tech_profiles, package,
