@@ -20,6 +20,100 @@ log = structlog.get_logger()
 PHASE0_TIMEOUT = 600  # 10 Minuten Gesamt-Timeout
 MAX_HOSTS = 10
 
+# ---------------------------------------------------------------------------
+# Dangling CNAME risk classification
+# ---------------------------------------------------------------------------
+# Services where subdomain takeover IS possible (attacker can claim the name)
+_TAKEOVER_POSSIBLE: list[tuple[str, str]] = [
+    # Azure
+    (".azurewebsites.net", "Azure App Service"),
+    (".cloudapp.azure.com", "Azure Cloud App"),
+    (".cloudapp.net", "Azure Cloud App"),
+    (".azureedge.net", "Azure CDN"),
+    (".trafficmanager.net", "Azure Traffic Manager"),
+    (".blob.core.windows.net", "Azure Blob Storage"),
+    (".azure-api.net", "Azure API Management"),
+    (".azurefd.net", "Azure Front Door"),
+    (".azurestaticapps.net", "Azure Static Web Apps"),
+    # AWS
+    (".s3.amazonaws.com", "AWS S3"),
+    (".s3-website", "AWS S3 Website"),
+    (".elasticbeanstalk.com", "AWS Elastic Beanstalk"),
+    (".cloudfront.net", "AWS CloudFront"),
+    # GitHub
+    (".github.io", "GitHub Pages"),
+    (".githubusercontent.com", "GitHub"),
+    # Heroku
+    (".herokuapp.com", "Heroku"),
+    (".herokudns.com", "Heroku DNS"),
+    (".herokussl.com", "Heroku SSL"),
+    # Diverse
+    (".shopify.com", "Shopify"),
+    (".myshopify.com", "Shopify"),
+    (".pantheonsite.io", "Pantheon"),
+    (".netlify.app", "Netlify"),
+    (".netlify.com", "Netlify"),
+    (".vercel.app", "Vercel"),
+    (".fly.dev", "Fly.io"),
+    (".surge.sh", "Surge"),
+    (".bitbucket.io", "Bitbucket"),
+    (".ghost.io", "Ghost"),
+    (".helpjuice.com", "Helpjuice"),
+    (".helpscoutdocs.com", "HelpScout"),
+    (".zendesk.com", "Zendesk"),
+    (".teamwork.com", "Teamwork"),
+    (".freshdesk.com", "Freshdesk"),
+    (".unbounce.com", "Unbounce"),
+    (".tictail.com", "Tictail"),
+    (".cargocollective.com", "Cargo"),
+    (".tumblr.com", "Tumblr"),
+    (".wordpress.com", "WordPress.com"),
+    (".readthedocs.io", "ReadTheDocs"),
+]
+
+# Services where takeover is NOT possible (provider-controlled infrastructure)
+_TAKEOVER_NOT_POSSIBLE: list[tuple[str, str]] = [
+    # Microsoft 365 / Lync / Skype for Business
+    (".online.lync.com", "Microsoft Lync/SfB (abgeschaltet)"),
+    (".lync.com", "Microsoft Lync"),
+    (".outlook.com", "Microsoft 365"),
+    (".microsoftonline.com", "Microsoft Entra ID"),
+    (".sharepoint.com", "SharePoint Online"),
+    (".office.com", "Microsoft 365"),
+    (".onmicrosoft.com", "Microsoft 365 Tenant"),
+    (".msappproxy.net", "Azure AD App Proxy"),
+    # Google
+    (".google.com", "Google Workspace"),
+    (".googlemail.com", "Google Mail"),
+    (".ghs.googlehosted.com", "Google Hosted"),
+    # Andere kontrollierte Infrastruktur
+    (".microsoft.com", "Microsoft"),
+    (".windows.net", "Microsoft Azure (intern)"),
+    (".office365.com", "Microsoft 365"),
+]
+
+
+def _classify_dangling_cname(cname_target: str) -> tuple[str, str]:
+    """Classify a dangling CNAME target by subdomain takeover risk.
+
+    Returns:
+        (risk_level, reason) where risk_level is "high", "low", or "info".
+    """
+    target = cname_target.lower()
+
+    for suffix, service in _TAKEOVER_POSSIBLE:
+        if target.endswith(suffix):
+            return "high", f"Subdomain-Takeover möglich ({service})"
+
+    for suffix, service in _TAKEOVER_NOT_POSSIBLE:
+        if target.endswith(suffix):
+            return "info", f"Verwaister DNS-Eintrag, kein Takeover-Risiko ({service})"
+
+    # Unknown target — conservative medium/low classification
+    if not target:
+        return "low", "CNAME-Ziel unbekannt"
+    return "low", f"Verwaister DNS-Eintrag (Ziel: {cname_target})"
+
 
 def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     """Query crt.sh for certificate transparency subdomains. Timeout 30s."""
@@ -493,7 +587,7 @@ def merge_and_group(
     # Group by IP from dnsx results
     ip_to_fqdns: dict[str, set[str]] = defaultdict(set)
     dnsx_resolved: set[str] = set()  # Track which FQDNs dnsx handled
-    dangling_cnames: list[str] = []
+    dangling_candidates: list[dict[str, Any]] = []  # {fqdn, cname_target}
 
     for entry in dnsx_results:
         host = entry.get("host", "").lower().rstrip(".")
@@ -514,18 +608,20 @@ def merge_and_group(
         elif cname and not ips:
             # CNAME exists but dnsx didn't return the final A record —
             # resolve via socket fallback instead of discarding the FQDN
-            dangling_cnames.append(host)
+            target = cname[0].lower().rstrip(".") if cname else ""
+            dangling_candidates.append({"fqdn": host, "cname_target": target})
 
     # --- Socket fallback for dangling CNAMEs ---
     # dnsx sometimes returns CNAME without following it to the A record.
     # Resolve these via socket so FQDNs are correctly assigned to hosts.
     resolved_danglings = 0
-    true_danglings: list[str] = []
-    for fqdn in dangling_cnames:
+    true_danglings: list[dict[str, Any]] = []
+    for entry in dangling_candidates:
+        fqdn = entry["fqdn"]
         # Skip FQDNs with invalid DNS labels (>63 chars) — getaddrinfo
         # uses IDNA encoding which raises UnicodeError for these
         if any(len(label) > 63 for label in fqdn.split(".")):
-            true_danglings.append(fqdn)
+            true_danglings.append(entry)
             continue
         old_timeout = socket.getdefaulttimeout()
         try:
@@ -536,13 +632,25 @@ def merge_and_group(
                 ip_to_fqdns[ip].add(fqdn)
             resolved_danglings += 1
         except (socket.gaierror, socket.timeout, OSError, UnicodeError):
-            true_danglings.append(fqdn)  # Truly unresolvable
+            true_danglings.append(entry)  # Truly unresolvable
         finally:
             socket.setdefaulttimeout(old_timeout)
-    dangling_cnames = true_danglings
+
+    # Classify dangling CNAMEs by takeover risk
+    dangling_cnames: list[dict[str, Any]] = []
+    for entry in true_danglings:
+        target = entry["cname_target"]
+        risk, reason = _classify_dangling_cname(target)
+        dangling_cnames.append({
+            "fqdn": entry["fqdn"],
+            "cname_target": target,
+            "takeover_risk": risk,
+            "reason": reason,
+        })
+
     if resolved_danglings:
         log.info("dangling_cname_resolved", count=resolved_danglings,
-                 still_dangling=len(true_danglings))
+                 still_dangling=len(dangling_cnames))
 
     # --- Socket fallback for subdomains dnsx missed entirely ---
     # dnsx may skip subdomains due to timeout or rate-limiting.

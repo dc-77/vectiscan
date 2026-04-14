@@ -962,7 +962,20 @@ def consolidate_findings(
 
         dangles = dns_records.get("dangling_cnames", [])
         if dangles:
-            dns_lines.append(f"  Dangling CNAMEs: {', '.join(dangles)}")
+            # Support both old format (list[str]) and new format (list[dict])
+            if dangles and isinstance(dangles[0], str):
+                dns_lines.append(f"  Dangling CNAMEs: {', '.join(dangles)}")
+            else:
+                for d in dangles:
+                    risk = d.get("takeover_risk", "low")
+                    fqdn = d.get("fqdn", "?")
+                    target = d.get("cname_target", "?")
+                    reason = d.get("reason", "")
+                    risk_label = {"high": "TAKEOVER MÖGLICH", "low": "Verwaist",
+                                  "info": "Kein Risiko"}.get(risk, risk)
+                    dns_lines.append(
+                        f"  Dangling CNAME: {fqdn} → {target} [{risk_label}] {reason}"
+                    )
 
         sections.append("\n".join(dns_lines))
 

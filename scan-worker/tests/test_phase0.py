@@ -197,7 +197,14 @@ def test_merge_and_group_dangling_cnames(tmp_path: Path) -> None:
             scan_dir=scan_dir,
         )
 
-    assert "dangling.example.com" in inventory["dns_findings"]["dangling_cnames"]
+    dangles = inventory["dns_findings"]["dangling_cnames"]
+    dangling_fqdns = [d["fqdn"] for d in dangles]
+    assert "dangling.example.com" in dangling_fqdns
+    # Should have classification metadata
+    entry = next(d for d in dangles if d["fqdn"] == "dangling.example.com")
+    assert "takeover_risk" in entry
+    assert "cname_target" in entry
+    assert entry["cname_target"] == "old.cdn.example.com"
 
 
 def test_merge_and_group_dangling_cname_resolved_via_socket(tmp_path: Path) -> None:
@@ -232,7 +239,8 @@ def test_merge_and_group_dangling_cname_resolved_via_socket(tmp_path: Path) -> N
         )
 
     # app.example.com should be assigned to host 1.2.3.4, not dangling
-    assert "app.example.com" not in inventory["dns_findings"]["dangling_cnames"]
+    dangling_fqdns = [d["fqdn"] for d in inventory["dns_findings"]["dangling_cnames"]]
+    assert "app.example.com" not in dangling_fqdns
     host_1234 = next(h for h in inventory["hosts"] if h["ip"] == "1.2.3.4")
     assert "app.example.com" in host_1234["fqdns"]
     assert "ok.example.com" in host_1234["fqdns"]

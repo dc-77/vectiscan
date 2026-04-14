@@ -79,8 +79,10 @@ CVSS-REFERENZWERTE FÜR DNS-FINDINGS:
 - Zone Transfer (AXFR) möglich:
   → HIGH 7.5, CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N
   → Vollständige DNS-Zone kann abgerufen werden
-- Dangling CNAME (Subdomain Takeover möglich):
-  → HIGH 8.2, CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L
+- Dangling CNAME — Bewertung nach Risiko:
+  Wenn "[TAKEOVER MÖGLICH]": → HIGH 8.2, CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:L
+  Wenn "[Verwaist]": → LOW 2.0, CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N (aufräumen empfohlen)
+  Wenn "[Kein Risiko]": → INFO, CVSS 0.0 (z.B. Microsoft Lync, veralteter Dienst, kein Takeover möglich)
 
 WICHTIG: Jeder Finding MUSS einen cvss_score und cvss_vector haben.
 Nur bei INFO-Severity (Score 0.0) darf der Vektor "N/A" sein.
@@ -633,10 +635,10 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
         debug_info["package"] = package
         debug_info["domain"] = domain
 
-    # Retry logic: 3 attempts with backoff for rate limits
+    # Retry logic: 5 attempts with exponential backoff for transient errors
     response_text: str | None = None
     json_text: str | None = None
-    max_retries = 3
+    max_retries = 5
     for attempt in range(max_retries):
         try:
             log.info("claude_api_call", attempt=attempt + 1, domain=domain)
@@ -722,7 +724,7 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
 
         except anthropic.RateLimitError as e:
             if attempt < max_retries - 1:
-                wait_time = (attempt + 1) * 10  # 10s, 20s, 30s
+                wait_time = min(120, 10 * (2 ** attempt))  # 10s, 20s, 40s, 80s
                 log.warning("claude_rate_limit", attempt=attempt + 1, wait=wait_time)
                 time.sleep(wait_time)
             else:
@@ -765,7 +767,7 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
         except anthropic.APIStatusError as e:
             # Retryable server errors: 429, 500, 502, 503, 529 (overloaded)
             if e.status_code in (429, 500, 502, 503, 529) and attempt < max_retries - 1:
-                wait_time = (attempt + 1) * 15  # 15s, 30s, 45s
+                wait_time = min(120, 15 * (2 ** attempt))  # 15s, 30s, 60s, 120s
                 log.warning("claude_api_retryable_error",
                             attempt=attempt + 1, status=e.status_code,
                             wait=wait_time, error=str(e)[:200])
