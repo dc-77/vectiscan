@@ -1290,24 +1290,13 @@ def map_tlscompliance_report(
     positive_findings = [_map_positive_finding(f) for f in claude_output.get("positive_findings", [])]
     severity_counts = _count_by_severity(mapped_findings)
 
-    # Build recommendations table from Claude output
+    # Build recommendations table from Claude output (reuse shared builder)
     recommendations = claude_output.get("recommendations", [])
-    styles = {}  # Not needed for data-only mapping
+    styles = create_styles()
     recs_data = {}
     if recommendations:
-        recs_data = {
-            "section_label": "5&nbsp;&nbsp;&nbsp;Maßnahmenplan",
-            "paragraphs": ["Die folgenden Maßnahmen sind nach Priorität sortiert:"],
-            "table": {
-                "header": ["Zeitrahmen", "Maßnahme", "Referenz", "Aufwand"],
-                "rows": [
-                    [_safe(r.get("timeframe", "")), _safe(r.get("action", "")),
-                     _safe(", ".join(r.get("finding_refs", []))), _safe(r.get("effort", ""))]
-                    for r in recommendations
-                ],
-                "widths": [55, 240, 70, 40],
-            },
-        }
+        recs_data = _build_recommendations(recommendations, styles)
+        recs_data["section_label"] = "5&nbsp;&nbsp;&nbsp;Maßnahmenplan"
 
     return {
         "meta": {
