@@ -319,11 +319,11 @@ def process_job(job_data: dict) -> None:
       - techProfiles      (list[dict], per-host technology profiles)
     """
     order_id: str = job_data.get("orderId", job_data.get("scanId", ""))
-    raw_data_path: str = job_data["rawDataPath"]
-    host_inventory: dict = job_data["hostInventory"]
-    tech_profiles: list[dict] = job_data["techProfiles"]
+    raw_data_path: str = job_data.get("rawDataPath", f"{order_id}.tar.gz")
+    host_inventory: dict = job_data.get("hostInventory", {})
+    tech_profiles: list[dict] = job_data.get("techProfiles", [])
     package: str = job_data.get("package", "perimeter")
-    excluded: list[str] = job_data.get("excluded_findings", [])
+    excluded: list[str] = job_data.get("excludedFindings", job_data.get("excluded_findings", []))
 
     work_dir = Path(tempfile.mkdtemp(prefix=f"report-{order_id}-"))
     log.info("job_started", order_id=order_id, package=package, work_dir=str(work_dir))
