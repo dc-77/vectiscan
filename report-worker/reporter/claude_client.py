@@ -358,35 +358,40 @@ def cap_implausible_scores(result: dict[str, Any]) -> dict[str, Any]:
     """Cap CVSS scores that are implausibly high for certain finding types."""
     # keyword in title/description → maximum plausible CVSS score
     score_limits = {
+        # Info-Disclosure-Findings — niemals HIGH
         "robots.txt": 3.5,
         "server banner": 2.5,
         "server-version": 2.5,
         "version im banner": 2.5,
         "versionsinformation": 2.5,
         "information disclosure": 4.0,
+        "banner": 2.5,
+        # Security-Header — maximal MEDIUM
         "security header": 5.5,
         "security-header": 5.5,
         "x-frame-options": 5.5,
         "content-security-policy": 5.5,
+        # DNS-/Mail-Config — maximal MEDIUM
         "spf": 5.5,
         "dmarc": 5.5,
         "dkim": 4.5,
+        # Directory Listing — maximal MEDIUM
         "directory listing": 5.5,
         "verzeichnislisting": 5.5,
-        "banner": 2.5,
-        # Common false-HIGH patterns
+        # TLS-Konfiguration — maximal MEDIUM
         "zertifikatskette": 5.5,
         "certificate chain": 5.5,
         "chain of trust": 5.5,
-        "öffentlich erreichbar": 5.5,
-        "publicly accessible": 5.5,
-        "publicly exposed": 5.5,
-        "exponiert im internet": 5.5,
         "cbc cipher": 5.5,
         "weak cipher": 5.5,
+        # Sonstige
         "session id in url": 5.5,
         "url rewriting": 5.5,
         "connection refused": 0.0,
+        # ENTFERNT: "öffentlich erreichbar", "publicly accessible",
+        # "publicly exposed", "exponiert im internet" — zu breit,
+        # matchen auch DB-Ports ohne Auth, EOL-Server, Admin-Panels.
+        # Claude wird per Prompt-Regeln (CVSS-Referenzwerte) gesteuert.
     }
 
     capped = 0
