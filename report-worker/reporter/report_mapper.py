@@ -335,15 +335,20 @@ def _build_scope(
     hosts = host_inventory.get("hosts", [])
     scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
 
-    # Build host table rows
+    # Build host table rows (cap FQDNs to prevent page overflow)
+    MAX_FQDNS_DISPLAY = 8
     host_rows = []
     for h in hosts:
         ip = h.get("ip", "N/A")
-        fqdns = ", ".join(h.get("fqdns", []))
+        all_fqdns = h.get("fqdns", [])
+        if len(all_fqdns) > MAX_FQDNS_DISPLAY:
+            fqdns_text = ", ".join(all_fqdns[:MAX_FQDNS_DISPLAY]) + f" ... (+{len(all_fqdns) - MAX_FQDNS_DISPLAY} weitere)"
+        else:
+            fqdns_text = ", ".join(all_fqdns)
         host_rows.append(
             [
                 Paragraph(ip, styles["TableCell"]),
-                Paragraph(fqdns, styles["TableCell"]),
+                Paragraph(fqdns_text, styles["TableCell"]),
             ]
         )
 
@@ -405,15 +410,20 @@ def _build_basic_scope(
     hosts = host_inventory.get("hosts", [])
     scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
 
-    # Build host table rows
+    # Build host table rows (cap FQDNs to prevent page overflow)
+    MAX_FQDNS_DISPLAY = 8
     host_rows = []
     for h in hosts:
         ip = h.get("ip", "N/A")
-        fqdns = ", ".join(h.get("fqdns", []))
+        all_fqdns = h.get("fqdns", [])
+        if len(all_fqdns) > MAX_FQDNS_DISPLAY:
+            fqdns_text = ", ".join(all_fqdns[:MAX_FQDNS_DISPLAY]) + f" ... (+{len(all_fqdns) - MAX_FQDNS_DISPLAY} weitere)"
+        else:
+            fqdns_text = ", ".join(all_fqdns)
         host_rows.append(
             [
                 Paragraph(ip, styles["TableCell"]),
-                Paragraph(fqdns, styles["TableCell"]),
+                Paragraph(fqdns_text, styles["TableCell"]),
             ]
         )
 
