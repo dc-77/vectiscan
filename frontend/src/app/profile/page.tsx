@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { changePassword } from '@/lib/api';
+import { changePassword, getVerifiedDomains, VerifiedDomain } from '@/lib/api';
 import { isLoggedIn, getUser, clearToken } from '@/lib/auth';
 
 
@@ -19,6 +19,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [verifiedDomains, setVerifiedDomains] = useState<VerifiedDomain[]>([]);
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -31,6 +32,12 @@ export default function ProfilePage() {
       setRole(user.role);
     }
     setReady(true);
+
+    getVerifiedDomains().then((res) => {
+      if (res.success && res.data) {
+        setVerifiedDomains(res.data.domains);
+      }
+    }).catch(() => {});
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,6 +105,45 @@ export default function ProfilePage() {
               {role}
             </span>
           </div>
+        </div>
+
+        {/* Verified Domains */}
+        <div className="bg-[#1e293b] rounded-lg border border-gray-800 p-5 space-y-3">
+          <h2 className="text-sm font-medium text-gray-400">Verifizierte Domains</h2>
+          {verifiedDomains.length === 0 ? (
+            <p className="text-sm text-gray-500">Keine verifizierten Domains vorhanden.</p>
+          ) : (
+            <div className="space-y-2">
+              {verifiedDomains.map((d) => {
+                const methodLabels: Record<string, string> = {
+                  dns_txt: 'DNS-TXT',
+                  file: 'Datei',
+                  meta_tag: 'Meta-Tag',
+                  manual: 'Manuell',
+                };
+                const expiresDate = new Date(d.expires_at);
+                const daysLeft = Math.ceil((expiresDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                const isExpiringSoon = daysLeft <= 14;
+
+                return (
+                  <div key={d.domain} className="flex items-center justify-between py-2 border-b border-gray-700/50 last:border-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                      <span className="text-sm text-white truncate">{d.domain}</span>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0 ml-3">
+                      <span className="text-xs px-2 py-0.5 rounded bg-blue-500/20 text-blue-400">
+                        {methodLabels[d.verification_method] || d.verification_method}
+                      </span>
+                      <span className={`text-xs ${isExpiringSoon ? 'text-amber-400' : 'text-gray-500'}`}>
+                        {daysLeft > 0 ? `${daysLeft} Tage` : 'Abgelaufen'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Password Change */}

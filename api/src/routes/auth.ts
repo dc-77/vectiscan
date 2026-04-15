@@ -264,6 +264,30 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
     return { success: true, data: { message: 'Passwort geändert.' } };
   });
 
+  // GET /api/auth/verified-domains — list verified domains for current user
+  server.get('/api/auth/verified-domains', { preHandler: [requireAuth] }, async (request) => {
+    const user = request.user!;
+    const customerId = user.customerId;
+    if (!customerId) {
+      return { success: true, data: { domains: [] } };
+    }
+
+    const result = await query<{
+      domain: string;
+      verification_method: string;
+      verified_at: string;
+      expires_at: string;
+    }>(
+      `SELECT domain, verification_method, verified_at, expires_at
+       FROM verified_domains
+       WHERE customer_id = $1 AND expires_at > NOW()
+       ORDER BY domain ASC`,
+      [customerId],
+    );
+
+    return { success: true, data: { domains: result.rows } };
+  });
+
   // ── Admin endpoints ──
 
   // GET /api/admin/users — list all users

@@ -335,6 +335,22 @@ export async function changePassword(currentPassword: string, newPassword: strin
   return handleResponse(res);
 }
 
+// --- Verified Domains ---
+
+export interface VerifiedDomain {
+  domain: string;
+  verification_method: string;
+  verified_at: string;
+  expires_at: string;
+}
+
+export async function getVerifiedDomains(): Promise<ApiResponse<{ domains: VerifiedDomain[] }>> {
+  const res = await fetch(`${API_URL}/api/auth/verified-domains`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
 // --- Admin: Users ---
 
 export interface AdminUser {
