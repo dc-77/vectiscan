@@ -267,9 +267,18 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
   // GET /api/auth/verified-domains — list verified domains for current user
   server.get('/api/auth/verified-domains', { preHandler: [requireAuth] }, async (request) => {
     const user = request.user!;
-    const customerId = user.customerId;
+
+    // Resolve customer_id: JWT may have null for admins, look up via email
+    let customerId = user.customerId;
     if (!customerId) {
-      return { success: true, data: { domains: [] } };
+      const custResult = await query<{ id: string }>(
+        'SELECT id FROM customers WHERE email = $1',
+        [user.email],
+      );
+      if (custResult.rows.length === 0) {
+        return { success: true, data: { domains: [] } };
+      }
+      customerId = custResult.rows[0].id;
     }
 
     const result = await query<{
