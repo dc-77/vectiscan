@@ -796,12 +796,13 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         return reply.status(403).send({ success: false, error: 'Access denied' });
       }
 
-      // Only allow regeneration for completed orders
+      // Allow regeneration for completed orders and failed reports (scan data still exists)
       const status = order.status as string;
-      if (status !== 'report_complete' && status !== 'completed') {
+      const allowedStatuses = ['report_complete', 'completed', 'failed', 'report_generating'];
+      if (!allowedStatuses.includes(status)) {
         return reply.status(409).send({
           success: false,
-          error: `Report kann nur bei abgeschlossenen Orders neu generiert werden (aktuell: ${status})`,
+          error: `Report kann nur bei abgeschlossenen oder fehlgeschlagenen Orders neu generiert werden (aktuell: ${status})`,
         });
       }
 
