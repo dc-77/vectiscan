@@ -59,17 +59,27 @@ def _build_findings_data(claude_output: dict, package: str, report_data: dict | 
     """Build a JSON-serializable findings_data dict from Claude output."""
     findings = claude_output.get("findings", [])
     severity_order = ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+    severity_rank = {s: i for i, s in enumerate(severity_order)}
     counts: dict[str, int] = {s: 0 for s in severity_order}
     for f in findings:
         sev = (f.get("severity") or "INFO").upper()
         if sev in counts:
             counts[sev] += 1
 
+    # Sort findings by severity (CRITICAL first), then by CVSS score descending
+    sorted_findings = sorted(
+        findings,
+        key=lambda f: (
+            severity_rank.get((f.get("severity") or "INFO").upper(), 5),
+            -(f.get("cvss_score") or 0),
+        ),
+    )
+
     data: dict = {
         "overall_risk": claude_output.get("overall_risk"),
         "overall_description": claude_output.get("overall_description"),
         "severity_counts": counts,
-        "findings": findings,
+        "findings": sorted_findings,
         "positive_findings": claude_output.get("positive_findings", []),
         "recommendations": claude_output.get("recommendations") or claude_output.get("top_recommendations", []),
         "package": package,

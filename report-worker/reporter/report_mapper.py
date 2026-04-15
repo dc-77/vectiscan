@@ -58,6 +58,17 @@ def _safe(text: str | None) -> str:
 # Severity order for sorting findings
 _SEVERITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
 
+
+def _sort_findings_by_severity(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Sort findings by severity (CRITICAL first), then by CVSS score descending."""
+    return sorted(
+        findings,
+        key=lambda f: (
+            _SEVERITY_ORDER.get(f.get("severity", "INFO").upper(), 5),
+            -(f.get("cvss_score") or 0),
+        ),
+    )
+
 # Comprehensive list of all scan tools used in the VectiScan pipeline
 SCAN_TOOLS = [
     {"tool": "subfinder", "description": "Passive Subdomain-Enumeration", "phase": "Phase 0"},
@@ -689,8 +700,8 @@ def map_professional_report(
         f"{count} {sev}" for sev, count in severity_counts.items() if count > 0
     )
 
-    # Map findings to report format and attach thumbnails
-    mapped_findings = [_map_finding(f) for f in findings]
+    # Map findings to report format, sort by severity, attach thumbnails
+    mapped_findings = _sort_findings_by_severity([_map_finding(f) for f in findings])
     mapped_findings += [_map_positive_finding(f) for f in positive_findings]
     _attach_thumbnails(mapped_findings, host_screenshots)
 
@@ -781,8 +792,8 @@ def map_basic_report(
         f"{count} {sev}" for sev, count in severity_counts.items() if count > 0
     )
 
-    # Map findings to basic report format (no CVSS, CWE, evidence)
-    mapped_findings = [_map_basic_finding(f) for f in findings]
+    # Map findings to basic report format, sort by severity
+    mapped_findings = _sort_findings_by_severity([_map_basic_finding(f) for f in findings])
     mapped_findings += [_map_positive_finding(f) for f in positive_findings]
     _attach_thumbnails(mapped_findings, host_screenshots)
 
@@ -1285,8 +1296,10 @@ def map_tlscompliance_report(
     executive_summary = claude_output.get("executive_summary", "")
     overall_risk = claude_output.get("overall_risk", "MEDIUM")
 
-    # Map findings from Claude output
-    mapped_findings = [_map_finding(f) for f in claude_output.get("findings", [])]
+    # Map findings from Claude output, sort by severity
+    mapped_findings = _sort_findings_by_severity(
+        [_map_finding(f) for f in claude_output.get("findings", [])]
+    )
     positive_findings = [_map_positive_finding(f) for f in claude_output.get("positive_findings", [])]
     severity_counts = _count_by_severity(mapped_findings)
 
