@@ -428,6 +428,17 @@ REGELN FÜR FINDINGS:
 - description: Erkläre was das Problem ist und warum es TR-03116-4-relevant ist
 - recommendation: Konkrete Schritte zur Behebung (Konfigurationsbeispiele)
 
+AUSNAHME — CNAME-basierte Cloud-Dienste (Hostname-Mismatch):
+Wenn "certificate does not match" auf einem Host gemeldet wird, der per CNAME auf
+einen Microsoft/Cloud-Dienst zeigt (erkennbar am CNAME-Ziel wie manage.microsoft.com,
+outlook.com, online.lync.com, windows.net), dann ist das KEIN echtes Compliance-Problem:
+- Der Cloud-Provider präsentiert sein eigenes Zertifikat → erwartetes Verhalten
+- Der Kunde kann das Zertifikat nicht ändern (Infrastruktur nicht unter seiner Kontrolle)
+- MDM/Enrollment-Clients (Intune) validieren korrekt gegen das CNAME-Ziel
+→ Severity: INFO (nicht HIGH/CRITICAL)
+→ Empfehlung: "DNS-Eintrag entfernen falls Dienst nicht mehr genutzt wird"
+→ NICHT mit CVSS 7+ bewerten, KEINE Zertifikats-Deployment-Empfehlung geben
+
 REGELN FÜR RECOMMENDATIONS:
 - Priorisiere nach Severity
 - Gib konkrete Konfigurationshinweise (Apache, Nginx, IIS)

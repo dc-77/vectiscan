@@ -87,6 +87,20 @@ CVSS-REFERENZWERTE FÜR DNS-FINDINGS:
 WICHTIG: Jeder Finding MUSS einen cvss_score und cvss_vector haben.
 Nur bei INFO-Severity (Score 0.0) darf der Vektor "N/A" sein.
 
+CNAME-BASIERTE CLOUD-DIENSTE — TLS-Zertifikat-Mismatch:
+Wenn ein Hostname per CNAME auf einen Cloud-Dienst zeigt (z.B. enterpriseenrollment.heuel.com
+→ enterpriseenrollment.manage.microsoft.com), präsentiert der Cloud-Provider sein EIGENES
+Zertifikat (z.B. *.manage.microsoft.com). Das ist KEIN Sicherheitsproblem, sondern erwartetes
+Verhalten. Bekannte Muster:
+- enterpriseenrollment.*.com → manage.microsoft.com (Microsoft Intune MDM)
+- enterpriseregistration.*.com → enterpriseregistration.windows.net (Microsoft Entra ID)
+- autodiscover.*.com → autodiscover.outlook.com (Microsoft 365)
+- lyncdiscover.*.com → webdir.online.lync.com (Skype for Business, abgeschaltet)
+- sip.*.com → sipdir.online.lync.com (Skype for Business, abgeschaltet)
+→ Bewertung: INFO, CVSS 0.0 — "Erwartetes Verhalten bei CNAME-basiertem Cloud-Dienst"
+→ Empfehlung: "DNS-Eintrag aufräumen falls Dienst nicht mehr genutzt wird"
+→ NICHT als HIGH/CRITICAL bewerten, KEINE Zertifikatsempfehlung geben (nicht vom Kunden kontrollierbar)
+
 HÄUFIG FALSCH BEWERTETE FINDINGS — Korrekte Scores:
 - SSH Port 22 offen, Key-Auth konfiguriert, Passwort-Auth deaktiviert:
   → INFO, CVSS 0.0, kein Vektor nötig — das ist Standard-Konfiguration
