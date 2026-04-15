@@ -379,10 +379,26 @@ export default function ScanDetailPage() {
           {order.progress.hostsTotal > 0 && <span>{order.progress.hostsTotal} Hosts</span>}
         </div>
 
-        {/* Error message */}
+        {/* Error message + retry button */}
         {order.error && (
           <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
-            {order.error}
+            <div className="flex items-start justify-between gap-4">
+              <span className="break-words whitespace-pre-wrap flex-1">{order.error}</span>
+              {admin && isFailed && (
+                <button
+                  onClick={handleRegenerate}
+                  disabled={regenerating}
+                  className="flex-shrink-0 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 text-white text-xs font-medium px-3 py-1.5 rounded transition-colors"
+                >
+                  {regenerating ? 'Wird generiert...' : 'Report erneut generieren'}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+        {order.status === 'report_generating' && (
+          <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg px-4 py-3 text-sm text-blue-300">
+            Report wird generiert...
           </div>
         )}
 
