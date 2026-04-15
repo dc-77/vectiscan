@@ -798,7 +798,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
       // Allow regeneration for completed orders and failed reports (scan data still exists)
       const status = order.status as string;
-      const allowedStatuses = ['report_complete', 'completed', 'failed', 'report_generating'];
+      const allowedStatuses = ['report_complete', 'completed', 'failed', 'report_generating', 'cancelled'];
       if (!allowedStatuses.includes(status)) {
         return reply.status(409).send({
           success: false,
