@@ -54,8 +54,14 @@ REGELN FÜR CVSS-SCORING:
 - Der numerische cvss_score MUSS exakt zum CVSS-Vektor passen
 
 CVSS-REFERENZWERTE (häufige Findings):
-- DB-Port exponiert, Auth funktioniert: HIGH (7.0-8.5)
-- DB-Port exponiert, keine Auth: CRITICAL (9.8-10.0)
+- DB-Port exponiert, KEINE Auth (anonym/root ohne Passwort): CRITICAL (9.8)
+- DB-Port exponiert, Auth aktiv aber Default-Credentials nachgewiesen: HIGH (7.5-8.0)
+- DB-Port exponiert, Auth aktiv (Credentials unbekannt/nicht getestet): MEDIUM (5.3-6.5)
+  → Empfehlung: Firewall-Regel oder SSH-Tunnel, nicht pauschal CRITICAL
+  → 3,6 Mio MySQL-Server sind öffentlich erreichbar — bei vielen Hostern Standardconfig
+- Admin-Panel/Webmin exponiert ohne MFA: HIGH (7.0-7.5)
+- Admin-Panel exponiert mit Auth: MEDIUM (5.0-6.0)
+- Stark veraltete Software (EOL, keine Patches): HIGH (7.0-8.0)
 - Mail-Services auf Prod-Server: MEDIUM (5.0-6.5)
 - FTP exponiert mit SSL: MEDIUM (4.0-5.5)
 - SSH ohne fail2ban: LOW (3.0-4.0)
