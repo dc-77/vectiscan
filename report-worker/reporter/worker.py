@@ -67,11 +67,17 @@ def _build_findings_data(claude_output: dict, package: str, report_data: dict | 
             counts[sev] += 1
 
     # Sort findings by severity (CRITICAL first), then by CVSS score descending
+    def _cvss(f: dict) -> float:
+        try:
+            return float(f.get("cvss_score") or 0)
+        except (ValueError, TypeError):
+            return 0.0
+
     sorted_findings = sorted(
         findings,
         key=lambda f: (
             severity_rank.get((f.get("severity") or "INFO").upper(), 5),
-            -(f.get("cvss_score") or 0),
+            -_cvss(f),
         ),
     )
 

@@ -61,11 +61,17 @@ _SEVERITY_ORDER = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
 
 def _sort_findings_by_severity(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Sort findings by severity (CRITICAL first), then by CVSS score descending."""
+    def _cvss(f: dict[str, Any]) -> float:
+        try:
+            return float(f.get("cvss_score") or 0)
+        except (ValueError, TypeError):
+            return 0.0
+
     return sorted(
         findings,
         key=lambda f: (
             _SEVERITY_ORDER.get(f.get("severity", "INFO").upper(), 5),
-            -(f.get("cvss_score") or 0),
+            -_cvss(f),
         ),
     )
 
