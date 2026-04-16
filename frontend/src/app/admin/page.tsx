@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { listUsers, changeUserRole, deleteUser, getAdminStats, getAiCosts, getPendingReviews, approveOrder, rejectOrder, AdminUser, AdminStats, AiCostsData, PendingReview } from '@/lib/api';
+import { listUsers, changeUserRole, deleteUser, getAdminStats, getAiCosts, getPendingReviews, approveOrder, rejectOrder, getPendingDomains, approveDomain, rejectDomain, AdminUser, AdminStats, AiCostsData, PendingReview, PendingDomain } from '@/lib/api';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
 
 
@@ -21,6 +21,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [aiCosts, setAiCosts] = useState<AiCostsData | null>(null);
   const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([]);
+  const [pendingDomains, setPendingDomains] = useState<PendingDomain[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,13 +35,14 @@ export default function AdminPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [usersRes, statsRes, costsRes, reviewsRes] = await Promise.all([
-        listUsers(), getAdminStats(), getAiCosts(), getPendingReviews(),
+      const [usersRes, statsRes, costsRes, reviewsRes, domainsRes] = await Promise.all([
+        listUsers(), getAdminStats(), getAiCosts(), getPendingReviews(), getPendingDomains(),
       ]);
       if (usersRes.success && usersRes.data) setUsers(usersRes.data.users);
       if (statsRes.success && statsRes.data) setStats(statsRes.data);
       if (costsRes.success && costsRes.data) setAiCosts(costsRes.data);
       if (reviewsRes.success && reviewsRes.data) setPendingReviews(reviewsRes.data.reviews);
+      if (domainsRes.success && domainsRes.data) setPendingDomains(domainsRes.data.domains);
       setError(null);
     } catch {
       setError('Daten konnten nicht geladen werden.');
@@ -89,6 +91,34 @@ export default function AdminPage() {
       const res = await rejectOrder(review.id, reason);
       if (res.success) {
         setPendingReviews((prev) => prev.filter((r) => r.id !== review.id));
+      } else {
+        setError(res.error || 'Fehler beim Ablehnen');
+      }
+    } catch {
+      setError('Fehler beim Ablehnen');
+    }
+  };
+
+  const handleApproveDomain = async (d: PendingDomain) => {
+    if (!confirm(`Domain ${d.domain} für Abo genehmigen?`)) return;
+    try {
+      const res = await approveDomain(d.id);
+      if (res.success) {
+        setPendingDomains((prev) => prev.filter((x) => x.id !== d.id));
+      } else {
+        setError(res.error || 'Fehler beim Genehmigen');
+      }
+    } catch {
+      setError('Fehler beim Genehmigen');
+    }
+  };
+
+  const handleRejectDomain = async (d: PendingDomain) => {
+    if (!confirm(`Domain ${d.domain} ablehnen?`)) return;
+    try {
+      const res = await rejectDomain(d.id);
+      if (res.success) {
+        setPendingDomains((prev) => prev.filter((x) => x.id !== d.id));
       } else {
         setError(res.error || 'Fehler beim Ablehnen');
       }
@@ -194,6 +224,38 @@ export default function AdminPage() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Pending Domain Approvals */}
+        {pendingDomains.length > 0 && (
+          <div className="bg-[#1e293b] rounded-lg border border-cyan-800/50 p-4 space-y-3">
+            <h2 className="text-sm font-medium text-cyan-400">
+              Domain-Genehmigungen ({pendingDomains.length})
+            </h2>
+            <div className="space-y-2">
+              {pendingDomains.map((d) => (
+                <div key={d.id} className="bg-[#0f172a] rounded-lg border border-gray-800 p-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-white font-medium">{d.domain}</span>
+                      <span className="text-[10px] text-gray-500 uppercase bg-gray-800 px-1.5 py-0.5 rounded">{d.package}</span>
+                    </div>
+                    <span className="text-xs text-gray-500">{d.customerEmail}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button onClick={() => handleApproveDomain(d)}
+                      className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors">
+                      Genehmigen
+                    </button>
+                    <button onClick={() => handleRejectDomain(d)}
+                      className="text-xs text-red-400 hover:text-red-300 font-medium px-3 py-1.5 bg-red-400/10 rounded-lg transition-colors">
+                      Ablehnen
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

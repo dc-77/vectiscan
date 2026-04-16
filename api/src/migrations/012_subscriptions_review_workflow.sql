@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     max_rescans             INTEGER NOT NULL DEFAULT 3,
     rescans_used            INTEGER NOT NULL DEFAULT 0,
     report_emails           TEXT[] NOT NULL DEFAULT '{}',
+    last_scan_at            TIMESTAMPTZ,
     created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 

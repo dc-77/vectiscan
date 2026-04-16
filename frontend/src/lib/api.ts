@@ -335,6 +335,101 @@ export async function changePassword(currentPassword: string, newPassword: strin
   return handleResponse(res);
 }
 
+// --- Subscriptions ---
+
+export interface SubscriptionDomain {
+  id: string;
+  domain: string;
+  status: string;
+  verifiedAt: string | null;
+  enabled: boolean;
+}
+
+export interface Subscription {
+  id: string;
+  customerEmail: string;
+  package: string;
+  status: string;
+  scanInterval: string;
+  maxDomains: number;
+  maxRescans: number;
+  rescansUsed: number;
+  reportEmails: string[];
+  startedAt: string;
+  expiresAt: string;
+  lastScanAt: string | null;
+  createdAt: string;
+  domains: SubscriptionDomain[];
+}
+
+export async function createSubscription(data: {
+  package: string; domains: string[]; scanInterval: string; reportEmails: string[];
+}): Promise<ApiResponse<{ id: string; message: string }>> {
+  const res = await fetch(`${API_URL}/api/subscriptions`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleResponse(res);
+}
+
+export async function listSubscriptions(): Promise<ApiResponse<{ subscriptions: Subscription[] }>> {
+  const res = await fetch(`${API_URL}/api/subscriptions`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function addSubscriptionDomain(subscriptionId: string, domain: string): Promise<ApiResponse<{ domain: string; status: string }>> {
+  const res = await fetch(`${API_URL}/api/subscriptions/${subscriptionId}/domains`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ domain }),
+  });
+  return handleResponse(res);
+}
+
+export async function requestRescan(subscriptionId: string, domain: string): Promise<ApiResponse<{ orderId: string; message: string }>> {
+  const res = await fetch(`${API_URL}/api/subscriptions/${subscriptionId}/rescan`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ domain }),
+  });
+  return handleResponse(res);
+}
+
+export interface PendingDomain {
+  id: string;
+  domain: string;
+  subscriptionId: string;
+  package: string;
+  customerEmail: string;
+  createdAt: string;
+}
+
+export async function getPendingDomains(): Promise<ApiResponse<{ domains: PendingDomain[] }>> {
+  const res = await fetch(`${API_URL}/api/admin/pending-domains`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function approveDomain(domainId: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/subscription-domains/${domainId}/approve`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function rejectDomain(domainId: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/subscription-domains/${domainId}/reject`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
 // --- Verified Domains ---
 
 export interface VerifiedDomain {
