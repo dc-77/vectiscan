@@ -54,12 +54,14 @@ export async function initWsManager(log: FastifyBaseLogger): Promise<void> {
 
 async function handleReportComplete(orderId: string): Promise<void> {
   try {
-    // Load customer email and download token
+    // Load customer email, subscription report_emails, and download token
     const result = await query(
-      `SELECT c.email, o.target_url AS domain, r.download_token
+      `SELECT c.email, o.target_url AS domain, o.subscription_id,
+              r.download_token, s.report_emails
        FROM orders o
        JOIN customers c ON o.customer_id = c.id
-       LEFT JOIN reports r ON r.order_id = o.id
+       LEFT JOIN reports r ON r.order_id = o.id AND r.superseded_by IS NULL
+       LEFT JOIN subscriptions s ON s.id = o.subscription_id
        WHERE o.id = $1`,
       [orderId],
     );
@@ -70,16 +72,37 @@ async function handleReportComplete(orderId: string): Promise<void> {
     }
 
     const row = result.rows[0] as Record<string, unknown>;
-    const email = row.email as string;
+    const customerEmail = row.email as string;
     const domain = row.domain as string;
     const downloadToken = row.download_token as string | null;
+    const reportEmails = (row.report_emails as string[] | null) || [];
 
-    if (!email || !downloadToken) {
-      logger?.warn({ orderId, email, downloadToken }, 'Missing email or download token — skipping notification');
+    if (!downloadToken) {
+      logger?.warn({ orderId, downloadToken }, 'Missing download token — skipping notification');
       return;
     }
 
-    await sendScanCompleteEmail(email, domain, orderId, downloadToken);
+    // Collect all unique email recipients: subscription report_emails + customer email
+    const recipients = new Set<string>();
+    for (const e of reportEmails) {
+      if (e) recipients.add(e.toLowerCase());
+    }
+    if (customerEmail) recipients.add(customerEmail.toLowerCase());
+
+    // Send email to each recipient
+    for (const email of recipients) {
+      try {
+        await sendScanCompleteEmail(email, domain, orderId, downloadToken);
+      } catch (err) {
+        logger?.error({ err, orderId, email }, 'Failed to send report email to recipient');
+      }
+    }
+
+    // Mark order as delivered
+    await query(
+      "UPDATE orders SET status = 'delivered', updated_at = NOW() WHERE id = $1 AND status = 'report_complete'",
+      [orderId],
+    );
   } catch (err) {
     logger?.error({ err, orderId }, 'Failed to send report-complete notification');
   }

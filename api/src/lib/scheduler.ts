@@ -30,8 +30,20 @@ function calculateNextScanAt(interval: string, from: Date): Date | null {
   }
 }
 
+async function expireSubscriptions(): Promise<void> {
+  // Mark expired subscriptions as 'expired'
+  const result = await query(
+    `UPDATE subscriptions SET status = 'expired', updated_at = NOW()
+     WHERE status = 'active' AND expires_at IS NOT NULL AND expires_at < NOW()
+     RETURNING id`,
+  );
+  if (result.rows.length > 0) {
+    console.log(`[scheduler] Expired ${result.rows.length} subscription(s)`);
+  }
+}
+
 async function tickSubscriptions(): Promise<void> {
-  // Find all active subscriptions where a scan is due
+  // Find all active (non-expired) subscriptions where a scan is due
   // A scan is due when: last_scan_at + interval < NOW(), or last_scan_at IS NULL (first scan)
   const result = await query(
     `SELECT s.id AS subscription_id, s.customer_id, s.package, s.scan_interval,
@@ -153,6 +165,7 @@ async function tickLegacySchedules(): Promise<void> {
 
 async function tick(): Promise<void> {
   try {
+    await expireSubscriptions();
     await tickSubscriptions();
     await tickLegacySchedules();
   } catch (err) {

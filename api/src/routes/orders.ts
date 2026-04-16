@@ -240,6 +240,12 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
+    // Visibility check: customers cannot access internal-status orders
+    const customerVisibleStatuses = ['report_complete', 'delivered', 'report_generating'];
+    if (user.role !== 'admin' && !customerVisibleStatuses.includes(order.status as string)) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
+
     // Check if report exists
     const reportResult = await query('SELECT id FROM reports WHERE order_id = $1', [id]);
     const hasReport = reportResult.rows.length > 0;
