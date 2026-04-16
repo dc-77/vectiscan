@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, getReportDownloadUrl, deleteOrderPermanent, OrderListItem } from '@/lib/api';
+import { listOrders, getReportDownloadUrl, deleteOrderPermanent, listSubscriptions, requestRescan, OrderListItem, Subscription } from '@/lib/api';
 import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
 
@@ -103,6 +103,7 @@ export default function Dashboard() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const [orders, setOrders] = useState<OrderListItem[]>([]);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>('all');
@@ -122,13 +123,16 @@ export default function Dashboard() {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await listOrders();
-      if (res.success && res.data) {
-        setOrders(res.data.orders);
+      const [ordersRes, subsRes] = await Promise.all([listOrders(), listSubscriptions()]);
+      if (ordersRes.success && ordersRes.data) {
+        setOrders(ordersRes.data.orders);
         setLastUpdate(new Date());
         setError(null);
       } else {
-        setError(res.error || 'Fehler beim Laden');
+        setError(ordersRes.error || 'Fehler beim Laden');
+      }
+      if (subsRes.success && subsRes.data) {
+        setSubscriptions(subsRes.data.subscriptions);
       }
     } catch {
       setError('API nicht erreichbar');
@@ -179,6 +183,87 @@ export default function Dashboard() {
         {/* Title */}
         <h1 className="text-lg font-semibold text-white">Dashboard</h1>
 
+        {/* Subscriptions */}
+        {subscriptions.length > 0 && (
+          <div className="space-y-3">
+            {subscriptions.filter(s => s.status === 'active').map((sub) => {
+              const pkgLabel = PACKAGE_STYLES[sub.package]?.label || sub.package.toUpperCase();
+              const intervalLabel = { weekly: 'Wochentlich', monthly: 'Monatlich', quarterly: 'Quartalsweise' }[sub.scanInterval] || sub.scanInterval;
+              const verifiedDomains = sub.domains.filter(d => d.status === 'verified');
+              const pendingDomains = sub.domains.filter(d => d.status === 'pending_approval');
+              const rescansLeft = sub.maxRescans - sub.rescansUsed;
+
+              return (
+                <div key={sub.id} className="bg-[#1e293b] rounded-lg border border-gray-800 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold tracking-wider text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">{pkgLabel}</span>
+                      <span className="text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded">Aktiv</span>
+                      <span className="text-xs text-gray-500">{intervalLabel}</span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {sub.expiresAt && <>Lauft bis {new Date(sub.expiresAt).toLocaleDateString('de-DE')}</>}
+                    </div>
+                  </div>
+
+                  {/* Domains */}
+                  <div className="space-y-1.5">
+                    {sub.domains.map((d) => {
+                      const statusMap: Record<string, { dot: string; label: string }> = {
+                        verified: { dot: 'bg-green-500', label: 'Aktiv' },
+                        pending_approval: { dot: 'bg-amber-500', label: 'Wartet auf Freigabe' },
+                        rejected: { dot: 'bg-red-500', label: 'Abgelehnt' },
+                      };
+                      const s = statusMap[d.status] || { dot: 'bg-gray-500', label: d.status };
+                      return (
+                        <div key={d.id} className="flex items-center justify-between py-1 border-b border-gray-700/50 last:border-0">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+                            <span className="text-sm text-white font-mono">{d.domain}</span>
+                            <span className="text-[10px] text-gray-500">{s.label}</span>
+                          </div>
+                          {d.status === 'verified' && rescansLeft > 0 && (
+                            <button
+                              onClick={async () => {
+                                if (!confirm(`Re-Scan fur ${d.domain} starten? (${rescansLeft} Re-Scans verbleibend)`)) return;
+                                const res = await requestRescan(sub.id, d.domain);
+                                if (res.success) {
+                                  fetchOrders();
+                                } else {
+                                  setError(res.error || 'Re-Scan fehlgeschlagen');
+                                }
+                              }}
+                              className="text-[10px] text-blue-400 hover:text-blue-300 font-medium px-2 py-1 bg-blue-400/10 rounded transition-colors"
+                            >
+                              Re-Scan
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Meta */}
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <span>{verifiedDomains.length} aktive Domain{verifiedDomains.length !== 1 ? 's' : ''}</span>
+                    {pendingDomains.length > 0 && <span className="text-amber-400">{pendingDomains.length} ausstehend</span>}
+                    <span>{rescansLeft}/{sub.maxRescans} Re-Scans</span>
+                    {sub.lastScanAt && <span>Letzter Scan: {formatDate(sub.lastScanAt)}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Upsell banner if no subscriptions */}
+        {!loading && subscriptions.length === 0 && orders.length > 0 && (
+          <Link href="/subscribe"
+            className="block bg-[#1e293b] border border-blue-800/30 rounded-lg p-3 text-sm text-blue-400 hover:text-blue-300 hover:bg-[#253347] transition-colors">
+            Automatisieren Sie Ihre Scans mit einem Abo &rarr;
+          </Link>
+        )}
+
         {/* Filter pills */}
         <div className="flex items-center gap-2 flex-wrap">
           {([
@@ -205,7 +290,10 @@ export default function Dashboard() {
         {!loading && orders.length === 0 && (
           <div className="text-center py-16 space-y-4">
             <p className="text-gray-500 text-lg">Noch keine Aufträge</p>
-            <Link href="/" className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors">Ersten Scan starten</Link>
+            <div className="flex items-center justify-center gap-3">
+              <Link href="/" className="bg-[#1e293b] hover:bg-[#253347] text-gray-300 font-medium px-5 py-2.5 rounded-lg transition-colors text-sm border border-gray-700">Einzelnen Scan starten</Link>
+              <Link href="/subscribe" className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm">Abo erstellen</Link>
+            </div>
           </div>
         )}
 
