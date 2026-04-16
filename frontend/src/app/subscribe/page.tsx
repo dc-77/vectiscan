@@ -8,6 +8,24 @@ import { createSubscription } from '@/lib/api';
 import { isLoggedIn, getUser } from '@/lib/auth';
 
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+const IPV4_REGEX = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+
+function isValidTarget(input: string): boolean {
+  const s = input.trim();
+  if (!s) return false;
+  if (DOMAIN_REGEX.test(s)) return true;
+  // IPv4 with optional CIDR or dotted mask
+  if (s.includes('/')) {
+    const [ip, mask] = s.split('/', 2);
+    if (!IPV4_REGEX.test(ip)) return false;
+    if (/^\d{1,2}$/.test(mask)) { const n = parseInt(mask); return n >= 8 && n <= 32; }
+    return IPV4_REGEX.test(mask); // dotted-decimal mask
+  }
+  if (IPV4_REGEX.test(s)) {
+    return s.split('.').every(o => { const n = parseInt(o); return n >= 0 && n <= 255; });
+  }
+  return false;
+}
 
 const PACKAGES = [
   {
@@ -78,7 +96,7 @@ export default function SubscribePage() {
     setReady(true);
   }, [router]);
 
-  const validDomains = domains.map(cleanDomain).filter(d => d && DOMAIN_REGEX.test(d));
+  const validDomains = domains.map(cleanDomain).filter(d => d && isValidTarget(d));
   const validEmails = reportEmails.filter(e => e.includes('@'));
 
   const canAdvance = () => {
@@ -207,7 +225,7 @@ export default function SubscribePage() {
         {/* Step 2: Domain Input */}
         {step === 2 && (
           <div className="space-y-3">
-            <p className="text-sm text-gray-400">Welche Domains sollen regelmaessig gescannt werden? (max. 5)</p>
+            <p className="text-sm text-gray-400">Welche Ziele sollen regelmaessig gescannt werden? (max. 5)</p>
             <div className="space-y-2">
               {domains.map((d, i) => (
                 <div key={i} className="flex gap-2">
@@ -219,7 +237,7 @@ export default function SubscribePage() {
                       next[i] = e.target.value;
                       setDomains(next);
                     }}
-                    placeholder="beispiel.de"
+                    placeholder="beispiel.de oder 85.22.47.0/24"
                     className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm font-mono"
                   />
                   {domains.length > 1 && (
@@ -235,7 +253,7 @@ export default function SubscribePage() {
                 + Domain hinzufugen
               </button>
             )}
-            <p className="text-xs text-gray-600">Domains werden nach der Bestellung von einem Administrator gepruft und freigegeben.</p>
+            <p className="text-xs text-gray-600">FQDN (beispiel.de), IPv4 (1.2.3.4), CIDR (1.2.3.0/24) oder Subnetzmaske (1.2.3.4/255.255.255.224). Ziele werden nach der Bestellung von einem Administrator geprueft.</p>
           </div>
         )}
 

@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
 import { scanQueue, reportQueue, publishEvent, getProgressFromRedis } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
-import { isValidDomain } from '../lib/validate.js';
+import { isValidDomain, isValidTarget } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
 import { verifyJwt } from '../lib/auth.js';
 import { requireAuth } from '../middleware/requireAuth.js';
@@ -70,10 +70,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const { domain } = request.body || {};
     const pkg = (request.body?.package || 'perimeter') as string;
 
-    if (!isValidDomain(domain)) {
+    const normalizedTarget = isValidTarget(domain);
+    if (!normalizedTarget) {
       return reply.status(400).send({
         success: false,
-        error: 'Invalid domain. Provide a valid FQDN without protocol, path, or port.',
+        error: 'Ungueltige Eingabe. Erlaubt: FQDN (example.com), IPv4 (1.2.3.4), CIDR (1.2.3.0/24) oder Subnetzmaske (1.2.3.4/255.255.255.0).',
       });
     }
 
