@@ -42,6 +42,8 @@ class TestWorkerPackageFlow:
 
         mock_get_config.assert_called_once_with("basic")
 
+    @patch("scanner.worker.psycopg2")
+    @patch("scanner.worker.publish_event")
     @patch("scanner.worker.set_scan_complete")
     @patch("scanner.worker.upload_to_minio", return_value="test.tar.gz")
     @patch("scanner.worker.pack_results", return_value="/tmp/test.tar.gz")
@@ -53,12 +55,12 @@ class TestWorkerPackageFlow:
     @patch("scanner.worker.run_phase1", return_value={"ip": "1.2.3.4", "has_ssl": True})
     @patch("scanner.worker.run_phase0")
     @patch("scanner.worker.get_config")
-    def test_package_forwarded_to_report_queue(
+    def test_scan_sets_pending_review(
         self, mock_get_config, mock_phase0, mock_phase1, mock_phase2,
         mock_started, mock_hosts, mock_progress, mock_enqueue,
-        mock_pack, mock_upload, mock_complete, tmp_path
+        mock_pack, mock_upload, mock_complete, mock_publish, mock_psycopg2,
     ):
-        """Verify that package is included in the report queue payload."""
+        """Verify that scan finishes with pending_review (no report enqueued)."""
         mock_get_config.return_value = {
             "phase0_tools": ["crtsh"],
             "phase0_timeout": 300,
@@ -73,12 +75,10 @@ class TestWorkerPackageFlow:
         from scanner.worker import _process_job
         _process_job("scan-456", "example.com", "nis2")
 
-        # Check enqueue_report_job was called with package="nis2"
-        mock_enqueue.assert_called_once()
-        args = mock_enqueue.call_args
-        # package should be the last positional arg or a kwarg
-        # The call should be: enqueue_report_job(scan_id, minio_path, host_inventory, tech_profiles, package)
-        assert args[0][-1] == "nis2" or args[1].get("package") == "nis2"
+        # Report should NOT be enqueued (admin review required first)
+        mock_enqueue.assert_not_called()
+        # Upload to MinIO should still happen
+        mock_upload.assert_called_once()
 
     @patch("scanner.worker.set_scan_complete")
     @patch("scanner.worker.upload_to_minio", return_value="test.tar.gz")
