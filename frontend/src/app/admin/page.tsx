@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { listUsers, changeUserRole, deleteUser, getAdminStats, getAiCosts, AdminUser, AdminStats, AiCostsData } from '@/lib/api';
+import { listUsers, changeUserRole, deleteUser, getAdminStats, getAiCosts, getPendingReviews, approveOrder, rejectOrder, AdminUser, AdminStats, AiCostsData, PendingReview } from '@/lib/api';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
 
 
@@ -20,6 +20,7 @@ export default function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [aiCosts, setAiCosts] = useState<AiCostsData | null>(null);
+  const [pendingReviews, setPendingReviews] = useState<PendingReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,10 +34,13 @@ export default function AdminPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      const [usersRes, statsRes, costsRes] = await Promise.all([listUsers(), getAdminStats(), getAiCosts()]);
+      const [usersRes, statsRes, costsRes, reviewsRes] = await Promise.all([
+        listUsers(), getAdminStats(), getAiCosts(), getPendingReviews(),
+      ]);
       if (usersRes.success && usersRes.data) setUsers(usersRes.data.users);
       if (statsRes.success && statsRes.data) setStats(statsRes.data);
       if (costsRes.success && costsRes.data) setAiCosts(costsRes.data);
+      if (reviewsRes.success && reviewsRes.data) setPendingReviews(reviewsRes.data.reviews);
       setError(null);
     } catch {
       setError('Daten konnten nicht geladen werden.');
@@ -61,6 +65,35 @@ export default function AdminPage() {
       }
     } catch {
       setError('Fehler beim Ändern der Rolle');
+    }
+  };
+
+  const handleApprove = async (review: PendingReview) => {
+    if (!confirm(`Scan für ${review.domain} freigeben und Report generieren?`)) return;
+    try {
+      const res = await approveOrder(review.id);
+      if (res.success) {
+        setPendingReviews((prev) => prev.filter((r) => r.id !== review.id));
+      } else {
+        setError(res.error || 'Fehler beim Freigeben');
+      }
+    } catch {
+      setError('Fehler beim Freigeben');
+    }
+  };
+
+  const handleReject = async (review: PendingReview) => {
+    const reason = prompt(`Begründung für die Ablehnung von ${review.domain}:`);
+    if (reason === null) return;
+    try {
+      const res = await rejectOrder(review.id, reason);
+      if (res.success) {
+        setPendingReviews((prev) => prev.filter((r) => r.id !== review.id));
+      } else {
+        setError(res.error || 'Fehler beim Ablehnen');
+      }
+    } catch {
+      setError('Fehler beim Ablehnen');
     }
   };
 
@@ -104,6 +137,63 @@ export default function AdminPage() {
             <div className="bg-[#1e293b] rounded-lg border border-gray-800 p-4">
               <p className="text-xs text-gray-500 uppercase tracking-wider">Fertig</p>
               <p className="text-2xl font-bold text-green-400 mt-1">{stats.orders.byStatus?.report_complete ?? 0}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Pending Reviews */}
+        {pendingReviews.length > 0 && (
+          <div className="bg-[#1e293b] rounded-lg border border-amber-800/50 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-medium text-amber-400">
+                Ausstehende Reviews ({pendingReviews.length})
+              </h2>
+              <span className="text-xs text-amber-400/60 bg-amber-400/10 px-2 py-0.5 rounded">Aktion erforderlich</span>
+            </div>
+            <div className="space-y-2">
+              {pendingReviews.map((review) => {
+                const sevCounts = review.severityCounts;
+                return (
+                  <div key={review.id} className="bg-[#0f172a] rounded-lg border border-gray-800 p-3 flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <a href={`/scan/${review.id}`} className="text-sm text-white font-medium hover:text-blue-400 transition-colors truncate">
+                          {review.domain}
+                        </a>
+                        <span className="text-[10px] text-gray-500 uppercase bg-gray-800 px-1.5 py-0.5 rounded">{review.package}</span>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-gray-500">{review.customerEmail}</span>
+                        {review.scanFinishedAt && (
+                          <span className="text-xs text-gray-600">{formatDate(review.scanFinishedAt)}</span>
+                        )}
+                        {sevCounts && (
+                          <div className="flex items-center gap-1.5">
+                            {(sevCounts.CRITICAL || 0) > 0 && <span className="text-[10px] font-medium text-red-400 bg-red-400/10 px-1.5 py-0.5 rounded">{sevCounts.CRITICAL} CRIT</span>}
+                            {(sevCounts.HIGH || 0) > 0 && <span className="text-[10px] font-medium text-orange-400 bg-orange-400/10 px-1.5 py-0.5 rounded">{sevCounts.HIGH} HIGH</span>}
+                            {(sevCounts.MEDIUM || 0) > 0 && <span className="text-[10px] font-medium text-yellow-400 bg-yellow-400/10 px-1.5 py-0.5 rounded">{sevCounts.MEDIUM} MED</span>}
+                            {(sevCounts.LOW || 0) > 0 && <span className="text-[10px] font-medium text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded">{sevCounts.LOW} LOW</span>}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <a href={`/scan/${review.id}`}
+                        className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-blue-400/10 rounded-lg transition-colors">
+                        Prüfen
+                      </a>
+                      <button onClick={() => handleApprove(review)}
+                        className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors">
+                        Freigeben
+                      </button>
+                      <button onClick={() => handleReject(review)}
+                        className="text-xs text-red-400 hover:text-red-300 font-medium px-3 py-1.5 bg-red-400/10 rounded-lg transition-colors">
+                        Ablehnen
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

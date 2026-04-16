@@ -461,6 +461,44 @@ export async function getAiCosts(): Promise<ApiResponse<AiCostsData>> {
   return handleResponse(res);
 }
 
+// --- Admin: Review Workflow ---
+
+export interface PendingReview {
+  id: string;
+  domain: string;
+  package: string;
+  status: string;
+  customerEmail: string;
+  createdAt: string;
+  scanFinishedAt: string;
+  businessImpactScore: number | null;
+  severityCounts: Record<string, number> | null;
+}
+
+export async function getPendingReviews(): Promise<ApiResponse<{ reviews: PendingReview[] }>> {
+  const res = await fetch(`${API_URL}/api/admin/pending-reviews`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function approveOrder(orderId: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/orders/${orderId}/approve`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function rejectOrder(orderId: string, reason: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/orders/${orderId}/reject`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ reason }),
+  });
+  return handleResponse(res);
+}
+
 export async function manualVerify(orderId: string): Promise<ApiResponse<VerificationCheckResult>> {
   const res = await fetch(`${API_URL}/api/verify/manual`, {
     method: 'POST',

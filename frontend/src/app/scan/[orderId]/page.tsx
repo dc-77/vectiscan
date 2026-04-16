@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
 import { getOrderStatus, getFindings, getScanResults, getReportDownloadUrl, getOrderEvents,
-         excludeFinding, unexcludeFinding, regenerateReport, getReportVersions,
+         excludeFinding, unexcludeFinding, regenerateReport, getReportVersions, approveOrder, rejectOrder,
          OrderStatus, OrderEvents, FindingsData, ScanResult, ReportVersion } from '@/lib/api';
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
@@ -131,7 +131,9 @@ function ScanTimeline({ results, startedAt, finishedAt }: {
 
 const PHASE_LABELS: Record<string, string> = {
   passive_intel: 'Passive Intel', dns_recon: 'DNS-Recon', scan_phase1: 'Phase 1', scan_phase2: 'Phase 2',
-  scan_phase3: 'Phase 3 — Korrelation', scan_complete: 'Scan fertig', report_generating: 'Report...', report_complete: 'Fertig',
+  scan_phase3: 'Phase 3 — Korrelation', scan_complete: 'Scan fertig',
+  pending_review: 'Wartet auf Review', approved: 'Genehmigt', rejected: 'Abgelehnt',
+  report_generating: 'Report...', report_complete: 'Fertig', delivered: 'Zugestellt',
   failed: 'Fehlgeschlagen', cancelled: 'Abgebrochen',
 };
 
@@ -269,8 +271,9 @@ export default function ScanDetailPage() {
     );
   }
 
-  const isDone = order.status === 'report_complete';
-  const isFailed = order.status === 'failed' || order.status === 'cancelled';
+  const isDone = order.status === 'report_complete' || order.status === 'delivered';
+  const isFailed = order.status === 'failed' || order.status === 'cancelled' || order.status === 'rejected';
+  const isPendingReview = order.status === 'pending_review';
   const showDebugDefault = isFailed && admin;
   const PKG_LABELS: Record<string, string> = {
     webcheck: 'WEBCHECK', perimeter: 'PERIMETER', compliance: 'COMPLIANCE',
@@ -401,10 +404,46 @@ export default function ScanDetailPage() {
             Report wird generiert...
           </div>
         )}
+        {isPendingReview && admin && (
+          <div className="bg-amber-900/20 border border-amber-800/50 rounded-lg px-4 py-3 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-amber-300">Dieser Scan wartet auf deine Freigabe. Prüfe die Befunde und markiere ggf. False Positives, bevor du freigibst.</span>
+              <div className="flex items-center gap-2 ml-4 shrink-0">
+                <button
+                  onClick={async () => {
+                    if (!confirm('Scan freigeben und Report generieren?')) return;
+                    const res = await approveOrder(orderId);
+                    if (res.success) {
+                      const orderRes = await getOrderStatus(orderId);
+                      if (orderRes.success && orderRes.data) setOrder(orderRes.data);
+                    }
+                  }}
+                  className="text-xs text-green-400 hover:text-green-300 font-medium px-3 py-1.5 bg-green-400/10 rounded-lg transition-colors"
+                >
+                  Freigeben
+                </button>
+                <button
+                  onClick={async () => {
+                    const reason = prompt('Begründung für die Ablehnung:');
+                    if (reason === null) return;
+                    const res = await rejectOrder(orderId, reason);
+                    if (res.success) {
+                      const orderRes = await getOrderStatus(orderId);
+                      if (orderRes.success && orderRes.data) setOrder(orderRes.data);
+                    }
+                  }}
+                  className="text-xs text-red-400 hover:text-red-300 font-medium px-3 py-1.5 bg-red-400/10 rounded-lg transition-colors"
+                >
+                  Ablehnen
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex border-b border-gray-800">
-          {(isDone || findings) && (
+          {(isDone || isPendingReview || findings) && (
             <>
               <button onClick={() => setActiveTab('findings')}
                 className={`px-4 py-2.5 text-xs font-medium transition-colors ${
