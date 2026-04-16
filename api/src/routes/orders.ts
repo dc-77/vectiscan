@@ -67,14 +67,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
   // POST /api/orders — requireAuth, customer_id from JWT
   server.post<{ Body: CreateOrderBody }>('/api/orders', { preHandler: [requireAuth] }, async (request, reply) => {
     const user = request.user!;
-    const { domain } = request.body || {};
-    const pkg = (request.body?.package || 'perimeter') as string;
+    const { domain: rawDomain, package: rawPkg } = request.body || {} as CreateOrderBody;
+    const pkg = (rawPkg || 'perimeter') as string;
 
-    const normalizedTarget = isValidTarget(domain);
-    if (!normalizedTarget) {
+    const domain = isValidTarget(rawDomain);
+    if (!domain) {
       return reply.status(400).send({
         success: false,
-        error: 'Ungueltige Eingabe. Erlaubt: FQDN (example.com), IPv4 (1.2.3.4), CIDR (1.2.3.0/24) oder Subnetzmaske (1.2.3.4/255.255.255.0).',
+        error: 'Invalid domain. Provide a valid FQDN, IPv4, CIDR (/24), or subnet mask (255.255.255.0).',
       });
     }
 

@@ -28,6 +28,13 @@ jest.mock('../lib/minio', () => {
 
 jest.mock('../lib/validate', () => ({
   isValidDomain: jest.fn((d: string) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)),
+  isValidTarget: jest.fn((d: unknown) => {
+    if (typeof d !== 'string') return null;
+    if (/^[a-z]+:\/\//i.test(d)) return null;
+    if (/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(d)) return d.toLowerCase();
+    if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(d)) return d;
+    return null;
+  }),
 }));
 
 jest.mock('../services/VerificationService', () => ({

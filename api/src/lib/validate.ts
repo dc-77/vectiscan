@@ -37,6 +37,9 @@ export function isValidTarget(input: unknown): string | null {
   const trimmed = input.trim();
   if (!trimmed || trimmed.length > 255) return null;
 
+  // Reject inputs with protocol — user should provide clean targets
+  if (/^[a-z]+:\/\//i.test(trimmed)) return null;
+
   // FQDN
   if (DOMAIN_REGEX.test(trimmed)) {
     return trimmed.toLowerCase();

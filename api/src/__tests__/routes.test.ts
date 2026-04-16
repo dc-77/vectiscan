@@ -29,8 +29,17 @@ jest.mock('../lib/minio', () => {
   };
 });
 
+// Use a stable implementation that survives jest.resetAllMocks()
+const _isValidTarget = (d: unknown) => {
+  if (typeof d !== 'string') return null;
+  if (/^[a-z]+:\/\//i.test(d)) return null;
+  if (/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(d)) return d.toLowerCase();
+  if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(\/\d+)?$/.test(d)) return d;
+  return null;
+};
 jest.mock('../lib/validate', () => ({
   isValidDomain: jest.fn((d: string) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)),
+  isValidTarget: jest.fn((d: unknown) => _isValidTarget(d)),
 }));
 
 jest.mock('../services/VerificationService', () => ({
@@ -80,7 +89,7 @@ describe('API Routes', () => {
   let server: FastifyInstance;
 
   beforeEach(async () => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
     // Re-set default mocks after resetAllMocks
     mockVerifyJwt.mockReturnValue({
       sub: 'user-uuid-1234',
