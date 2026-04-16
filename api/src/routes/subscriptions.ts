@@ -293,11 +293,9 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
       );
 
       // Enqueue scan
-      const { scanQueue: sq } = await import('./queue.js');
+      const { scanQueue: sq, publishEvent: pub } = await import('../lib/queue.js');
       await sq.add('scan', { orderId, targetDomain: domain, package: subRow.package });
-      await (await import('./queue.js')).publishEvent(orderId, {
-        type: 'status', orderId, status: 'queued',
-      });
+      await pub(orderId, { type: 'status', orderId, status: 'queued' });
 
       audit({
         action: 'subscription.rescan',

@@ -25,7 +25,14 @@ export type AuditAction =
   | 'user.password_reset'
   | 'user.role_changed'
   | 'user.disabled'
-  | 'user.deleted';
+  | 'user.deleted'
+  | 'order.approved'
+  | 'order.rejected'
+  | 'subscription.created'
+  | 'subscription.domain_requested'
+  | 'subscription.domain_approved'
+  | 'subscription.domain_rejected'
+  | 'subscription.rescan';
 
 interface AuditEntry {
   orderId?: string | null;
