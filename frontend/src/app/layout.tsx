@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import AppHeader from '@/components/AppHeader';
 
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
+
 export const metadata: Metadata = {
-  title: 'VectiScan',
-  description: 'Automated Security Scan Platform',
+  title: 'VectiScan — Automatisierte Security-Analyse',
+  description: 'Automatisierte Perimeter-Analyse fur Ihre IT-Infrastruktur. Regelmaessige Scans, professionelle Reports, Compliance-Nachweise. Made in Germany.',
 };
 
 export default function RootLayout({
@@ -14,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="de" className="dark">
-      <body className="min-h-screen bg-[#0C1222] text-gray-200 antialiased flex flex-col">
+      <body className={`${inter.className} min-h-screen bg-[#0C1222] text-gray-200 antialiased flex flex-col`}>
         <AppHeader />
         <div className="flex-1 flex flex-col">
           {children}

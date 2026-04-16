@@ -1,7 +1,17 @@
 @import "tailwindcss";
 
+:root {
+  --brand-slate: #0F172A;
+  --brand-slate-light: #1E293B;
+  --brand-teal: #2DD4BF;
+  --brand-teal-dark: #14B8A6;
+  --brand-off-white: #F8FAFC;
+  --brand-muted: #94A3B8;
+  --brand-bg: #0C1222;
+}
+
 body {
-  background-color: #0C1222;
+  background-color: var(--brand-bg);
   color: #e2e8f0;
 }
 
