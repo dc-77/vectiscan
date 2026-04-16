@@ -593,7 +593,10 @@ def _finalize(
     package: str = "perimeter",
     phase3_result: dict[str, Any] | None = None,
 ) -> None:
-    """Pack results, upload to MinIO, enqueue report job."""
+    """Pack results, upload to MinIO, set status to pending_review.
+
+    Report generation is NOT triggered here — it happens after admin approval.
+    """
     hosts_total = len(host_inventory.get("hosts", []))
 
     update_progress(order_id, "scan_complete", "uploading",
@@ -613,14 +616,27 @@ def _finalize(
 
     # Pack and upload
     archive_path = pack_results(scan_dir, order_id)
-    minio_path = upload_to_minio(archive_path, order_id)
+    upload_to_minio(archive_path, order_id)
 
-    # Enqueue report generation (with Phase 3 enrichment data if available)
-    enqueue_report_job(order_id, minio_path, host_inventory, tech_profiles, package,
-                       phase3_result=phase3_result)
-
-    # Mark scan as complete
+    # Mark scan as pending_review (admin must approve before report generation)
     set_scan_complete(order_id)
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE orders SET status = 'pending_review', updated_at = NOW() WHERE id = %s",
+                (order_id,),
+            )
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        log.error("pending_review_update_failed", order_id=order_id, error=str(e))
+
+    publish_event(order_id, {
+        "type": "status",
+        "orderId": order_id,
+        "status": "pending_review",
+    })
 
     # Cleanup scan directory
     try:
@@ -629,7 +645,7 @@ def _finalize(
     except Exception as e:
         log.warning("scan_dir_cleanup_failed", error=str(e))
 
-    log.info("scan_complete", order_id=order_id)
+    log.info("scan_pending_review", order_id=order_id)
 
 
 def _handle_diagnose(redis_client: redis.Redis, job: dict) -> None:

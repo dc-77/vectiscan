@@ -18,6 +18,7 @@ const MIGRATION_008_PATH = path.join(__dirname, '..', 'migrations', '008_scan_sc
 const MIGRATION_009_PATH = path.join(__dirname, '..', 'migrations', '009_v2_packages.sql');
 const MIGRATION_010_PATH = path.join(__dirname, '..', 'migrations', '010_verified_domains.sql');
 const MIGRATION_011_PATH = path.join(__dirname, '..', 'migrations', '011_finding_exclusions_report_versioning.sql');
+const MIGRATION_012_PATH = path.join(__dirname, '..', 'migrations', '012_subscriptions_review_workflow.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -132,6 +133,18 @@ export async function initDb(): Promise<void> {
 
   if (!exclusionsCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_011_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 012: subscriptions + review workflow
+  const subscriptionsCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables WHERE table_name = 'subscriptions'
+    ) AS exists
+  `);
+
+  if (!subscriptionsCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_012_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

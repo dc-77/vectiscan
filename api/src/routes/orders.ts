@@ -177,7 +177,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       sql = `${baseSelect} ORDER BY o.created_at DESC`;
       params = [];
     } else {
-      sql = `${baseSelect} WHERE o.customer_id = $1 ORDER BY o.created_at DESC`;
+      sql = `${baseSelect} WHERE o.customer_id = $1 AND o.status IN ('report_complete', 'delivered', 'report_generating') ORDER BY o.created_at DESC`;
       params = [user.customerId];
     }
 
@@ -849,6 +849,158 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         success: true,
         data: { message: 'Report wird neu generiert' },
       };
+    },
+  );
+
+  // ── Admin Review Workflow ──────────────────────────────────
+
+  // GET /api/admin/pending-reviews — list all orders pending admin review
+  server.get('/api/admin/pending-reviews', { preHandler: [requireAuth, requireAdmin] }, async () => {
+    const result = await query(
+      `SELECT o.id, o.target_url AS domain, o.package, o.status, o.created_at, o.scan_finished_at,
+              o.correlation_data, o.business_impact_score,
+              c.email AS customer_email,
+              r.findings_data
+       FROM orders o
+       LEFT JOIN customers c ON c.id = o.customer_id
+       LEFT JOIN reports r ON r.order_id = o.id AND r.superseded_by IS NULL
+       WHERE o.status = 'pending_review'
+       ORDER BY o.scan_finished_at ASC`,
+    );
+
+    const reviews = result.rows.map((row: Record<string, unknown>) => {
+      const findingsData = row.findings_data as Record<string, unknown> | null;
+      return {
+        id: row.id,
+        domain: row.domain,
+        package: row.package,
+        status: row.status,
+        customerEmail: row.customer_email,
+        createdAt: row.created_at,
+        scanFinishedAt: row.scan_finished_at,
+        businessImpactScore: row.business_impact_score,
+        severityCounts: findingsData?.severity_counts || null,
+      };
+    });
+
+    return { success: true, data: { reviews } };
+  });
+
+  // POST /api/admin/orders/:id/approve — approve a pending review, trigger report generation
+  server.post<{ Params: OrderParams }>(
+    '/api/admin/orders/:id/approve',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const user = request.user!;
+
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
+
+      const orderCheck = await query(
+        'SELECT status, target_url, package, customer_id FROM orders WHERE id = $1',
+        [id],
+      );
+      if (orderCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+
+      const order = orderCheck.rows[0] as Record<string, unknown>;
+      if (order.status !== 'pending_review') {
+        return reply.status(409).send({
+          success: false,
+          error: `Order ist nicht im Review-Status (aktuell: ${order.status})`,
+        });
+      }
+
+      // Load excluded findings (admin may have marked FPs before approving)
+      const exclusions = await query(
+        'SELECT finding_id, reason FROM finding_exclusions WHERE order_id = $1',
+        [id],
+      );
+      const excludedFindings = exclusions.rows.map((r: Record<string, unknown>) => ({
+        finding_id: r.finding_id,
+        reason: r.reason,
+      }));
+
+      // Mark as approved
+      await query(
+        `UPDATE orders SET status = 'approved', reviewed_by = $1, reviewed_at = NOW(),
+         updated_at = NOW() WHERE id = $2`,
+        [user.sub, id],
+      );
+
+      // Enqueue report generation
+      await reportQueue.add('report', {
+        orderId: id,
+        rawDataPath: `${id}.tar.gz`,
+        package: order.package as string,
+        excludedFindings,
+      });
+
+      // Update status to report_generating
+      await query(
+        "UPDATE orders SET status = 'report_generating', updated_at = NOW() WHERE id = $1",
+        [id],
+      );
+
+      await publishEvent(id, { type: 'status', orderId: id, status: 'report_generating' });
+
+      audit({
+        orderId: id,
+        action: 'order.approved',
+        details: { userId: user.sub, excludedCount: excludedFindings.length },
+        ip: request.ip,
+      });
+
+      return { success: true, data: { message: 'Review genehmigt, Report wird generiert.' } };
+    },
+  );
+
+  // POST /api/admin/orders/:id/reject — reject a pending review
+  server.post<{ Params: OrderParams }>(
+    '/api/admin/orders/:id/reject',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const user = request.user!;
+      const body = request.body as Record<string, unknown> | null;
+      const reason = (body?.reason as string) || '';
+
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
+
+      const orderCheck = await query('SELECT status FROM orders WHERE id = $1', [id]);
+      if (orderCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+
+      const order = orderCheck.rows[0] as Record<string, unknown>;
+      if (order.status !== 'pending_review') {
+        return reply.status(409).send({
+          success: false,
+          error: `Order ist nicht im Review-Status (aktuell: ${order.status})`,
+        });
+      }
+
+      await query(
+        `UPDATE orders SET status = 'rejected', reviewed_by = $1, reviewed_at = NOW(),
+         review_notes = $2, updated_at = NOW() WHERE id = $3`,
+        [user.sub, reason, id],
+      );
+
+      await publishEvent(id, { type: 'status', orderId: id, status: 'rejected' });
+
+      audit({
+        orderId: id,
+        action: 'order.rejected',
+        details: { userId: user.sub, reason },
+        ip: request.ip,
+      });
+
+      return { success: true, data: { message: 'Review abgelehnt.' } };
     },
   );
 
