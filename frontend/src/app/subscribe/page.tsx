@@ -225,7 +225,7 @@ export default function SubscribePage() {
         {/* Step 2: Domain Input */}
         {step === 2 && (
           <div className="space-y-3">
-            <p className="text-sm text-gray-400">Welche Ziele sollen regelmaessig gescannt werden? (max. 5)</p>
+            <p className="text-sm text-gray-400">Welche Ziele sollen regelmäßig gescannt werden? (max. 30)</p>
             <div className="space-y-2">
               {domains.map((d, i) => (
                 <div key={i} className="flex gap-2">
@@ -247,7 +247,7 @@ export default function SubscribePage() {
                 </div>
               ))}
             </div>
-            {domains.length < 5 && (
+            {domains.length < 30 && (
               <button onClick={() => setDomains([...domains, ''])}
                 className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors">
                 + Domain hinzufugen

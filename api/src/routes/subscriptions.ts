@@ -37,8 +37,8 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
     if (domains.length === 0) {
       return reply.status(400).send({ success: false, error: 'Mindestens eine Domain erforderlich.' });
     }
-    if (domains.length > 5) {
-      return reply.status(400).send({ success: false, error: 'Maximal 5 Domains pro Abo.' });
+    if (domains.length > 30) {
+      return reply.status(400).send({ success: false, error: 'Maximal 30 Domains pro Abo.' });
     }
 
     const reportEmails = (body?.reportEmails as string[]) || [user.email];

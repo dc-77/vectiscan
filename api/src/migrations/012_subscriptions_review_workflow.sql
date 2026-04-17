@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     started_at              TIMESTAMPTZ,
     expires_at              TIMESTAMPTZ,
     scan_interval           VARCHAR(20) NOT NULL DEFAULT 'monthly',
-    max_domains             INTEGER NOT NULL DEFAULT 5,
+    max_domains             INTEGER NOT NULL DEFAULT 30,
     max_rescans             INTEGER NOT NULL DEFAULT 3,
     rescans_used            INTEGER NOT NULL DEFAULT 0,
     report_emails           TEXT[] NOT NULL DEFAULT '{}',

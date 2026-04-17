@@ -18,7 +18,7 @@ const FEATURES = [
   { name: 'Web-Schwachstellen-Scan (OWASP ZAP)', perimeter: true, insurance: true },
   { name: 'SSL/TLS-Konfigurationsanalyse', perimeter: true, insurance: true },
   { name: 'E-Mail-Security (SPF, DKIM, DMARC)', perimeter: true, insurance: true },
-  { name: 'HTTP-Security-Header-Pruefung', perimeter: true, insurance: true },
+  { name: 'HTTP-Security-Header-Prüfung', perimeter: true, insurance: true },
   { name: 'KI-gestutzte Korrelation & FP-Filter', perimeter: true, insurance: true },
   { name: 'Executive Summary + Massnahmenplan', perimeter: true, insurance: true },
   { name: 'NIS2 / BSI-Compliance-Mapping', perimeter: true, insurance: true },
@@ -45,8 +45,8 @@ export default function PricingPage() {
             Pakete &amp; Preise
           </h1>
           <p className="text-base max-w-2xl mx-auto" style={{ color: C.muted }}>
-            Waehlen Sie das passende Paket fuer Ihre Anforderungen.
-            Bis zu 5 Domains pro Abo, automatische Scans, gepruefte Reports.
+            Wählen Sie das passende Paket für Ihre Anforderungen.
+            Bis zu 30 Domains pro Abo, automatische Scans, geprüfte Reports.
           </p>
         </div>
       </section>
@@ -62,11 +62,11 @@ export default function PricingPage() {
               style={{ backgroundColor: `${C.teal}20`, color: C.teal }}>Empfohlen</span>
             <h2 className="text-xl font-semibold mt-2 mb-1" style={{ color: C.offWhite }}>Perimeter-Scan</h2>
             <p className="text-sm mb-6" style={{ color: C.muted }}>
-              Vollstaendige Sicherheitsanalyse Ihrer externen IT-Infrastruktur
+              Vollständige Sicherheitsanalyse Ihrer externen IT-Infrastruktur
             </p>
             <ul className="space-y-2.5 mb-8 flex-1">
-              {['Bis zu 5 Domains / IPs / Subnetze', 'Woechentliche, monatliche oder quartalsweise Scans',
-                '3 Re-Scans pro Jahr inklusive', 'Manuelle Qualitaetspruefung jedes Reports',
+              {['Bis zu 30 Domains / IPs / Subnetze', 'Wöchentliche, monatliche oder quartalsweise Scans',
+                '3 Re-Scans pro Jahr inklusive', 'Manuelle Qualitätsprüfung jedes Reports',
                 'PDF-Report per E-Mail an Ihr Team', 'NIS2 & BSI-Compliance-Mapping',
               ].map(f => (
                 <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.mutedLight }}>
@@ -89,12 +89,12 @@ export default function PricingPage() {
             style={{ backgroundColor: C.slateLight, border: `1px solid ${C.borderSubtle}` }}>
             <h2 className="text-xl font-semibold mt-2 mb-1" style={{ color: C.offWhite }}>Cyberversicherung</h2>
             <p className="text-sm mb-6" style={{ color: C.muted }}>
-              Nachweis-Report fuer Ihren Versicherungsantrag
+              Nachweis-Report für Ihren Versicherungsantrag
             </p>
             <ul className="space-y-2.5 mb-8 flex-1">
               {['Alles aus dem Perimeter-Scan', '10-Punkte Versicherungs-Fragebogen',
                 'Risk-Score & Ransomware-Indikator', 'Versicherungskonformer Nachweis',
-                'Direkt einreichbar beim Versicherer', 'Regelmaessige Aktualisierung fuer Verlaengerung',
+                'Direkt einreichbar beim Versicherer', 'Regelmäßige Aktualisierung für Verlängerung',
               ].map(f => (
                 <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.mutedLight }}>
                   <span className="mt-0.5" style={{ color: C.teal }}>&#x2713;</span> {f}
@@ -150,10 +150,10 @@ export default function PricingPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[
-              { title: 'Bis zu 5 Scan-Ziele', text: 'Domains, IP-Adressen, CIDR-Subnetze oder einzelne Hosts — flexibel kombinierbar.' },
-              { title: 'Flexible Intervalle', text: 'Woechentlich, monatlich oder quartalsweise — Sie bestimmen den Rhythmus.' },
-              { title: '3 Re-Scans / Jahr', text: 'Nach der Behebung von Schwachstellen koennen Sie Nachscans beauftragen.' },
-              { title: 'Manuelle Pruefung', text: 'Jeder Report wird vor Zustellung von einem Security-Analysten geprueft.' },
+              { title: 'Bis zu 30 Scan-Ziele', text: 'Domains, IP-Adressen, CIDR-Subnetze oder einzelne Hosts — flexibel kombinierbar.' },
+              { title: 'Flexible Intervalle', text: 'Wöchentlich, monatlich oder quartalsweise — Sie bestimmen den Rhythmus.' },
+              { title: '3 Re-Scans / Jahr', text: 'Nach der Behebung von Schwachstellen können Sie Nachscans beauftragen.' },
+              { title: 'Manuelle Prüfung', text: 'Jeder Report wird vor Zustellung von einem Security-Analysten geprüft.' },
               { title: 'PDF per E-Mail', text: 'Reports werden automatisch an alle definierten Empfaenger versandt.' },
               { title: '12 Monate Laufzeit', text: 'Jahresabo mit automatischer Verlaengerung. Kuendigung jederzeit zum Laufzeitende.' },
             ].map(item => (
@@ -174,7 +174,7 @@ export default function PricingPage() {
           </h2>
           <p className="text-sm mb-8" style={{ color: C.muted }}>
             Schreiben Sie uns mit Ihren Domains und Anforderungen — wir erstellen
-            Ihnen ein massgeschneidertes Angebot innerhalb von 24 Stunden.
+            Ihnen ein maßgeschneidertes Angebot innerhalb von 24 Stunden.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="mailto:kontakt@vectigal.gmbh?subject=VectiScan%20Angebot&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20VectiScan.%0A%0AFirma%3A%20%0ADomains%3A%20%0AGew%C3%BCnschtes%20Paket%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"

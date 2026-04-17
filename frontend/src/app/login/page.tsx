@@ -70,7 +70,7 @@ export default function LoginPage() {
             onClick={() => { setTab('login'); setError(null); }}
             className={`flex-1 py-2 text-sm font-medium transition-colors ${
               tab === 'login'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[#2DD4BF] text-[#0F172A]'
                 : 'bg-[#1e293b] text-gray-400 hover:text-white'
             }`}
           >
@@ -80,7 +80,7 @@ export default function LoginPage() {
             onClick={() => { setTab('register'); setError(null); }}
             className={`flex-1 py-2 text-sm font-medium transition-colors ${
               tab === 'register'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-[#2DD4BF] text-[#0F172A]'
                 : 'bg-[#1e293b] text-gray-400 hover:text-white'
             }`}
           >
@@ -96,7 +96,7 @@ export default function LoginPage() {
             placeholder="E-Mail-Adresse"
             autoFocus
             disabled={loading}
-            className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] disabled:opacity-50"
           />
           <input
             type="password"
@@ -104,7 +104,7 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Passwort"
             disabled={loading}
-            className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] disabled:opacity-50"
           />
           {tab === 'register' && (
             <input
@@ -113,13 +113,13 @@ export default function LoginPage() {
               onChange={(e) => setPasswordConfirm(e.target.value)}
               placeholder="Passwort wiederholen"
               disabled={loading}
-              className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] disabled:opacity-50"
             />
           )}
           <button
             type="submit"
             disabled={loading || !email.trim() || !password.trim()}
-            className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
+            className="w-full bg-[#2DD4BF] hover:bg-[#14B8A6] disabled:bg-gray-700 disabled:cursor-not-allowed text-[#0F172A] font-medium px-6 py-3 rounded-lg transition-colors"
           >
             {loading
               ? 'Bitte warten...'
