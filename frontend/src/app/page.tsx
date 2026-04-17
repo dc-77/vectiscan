@@ -33,93 +33,7 @@ function useReveal() {
   return { ref, visible };
 }
 
-/* ── Animated Grid Background (follows cursor) ─────────── */
-function CursorGrid() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const mouseRef = useRef({ x: -1000, y: -1000 });
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animId: number;
-    const spacing = 40;
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    const handleMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
-    };
-    window.addEventListener('mousemove', handleMove);
-
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
-      const radius = 180;
-
-      for (let x = spacing / 2; x < canvas.width; x += spacing) {
-        for (let y = spacing / 2; y < canvas.height; y += spacing) {
-          const dx = x - mx;
-          const dy = y - my;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < radius) {
-            const intensity = 1 - dist / radius;
-            const size = 1 + intensity * 2.5;
-            const alpha = intensity * 0.5;
-            ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(45, 212, 191, ${alpha})`;
-            ctx.fill();
-
-            // Connection lines to nearby dots
-            if (intensity > 0.3) {
-              const lineAlpha = (intensity - 0.3) * 0.4;
-              ctx.beginPath();
-              ctx.moveTo(x, y);
-              ctx.lineTo(x + spacing, y);
-              ctx.strokeStyle = `rgba(45, 212, 191, ${lineAlpha})`;
-              ctx.lineWidth = 0.5;
-              ctx.stroke();
-              ctx.beginPath();
-              ctx.moveTo(x, y);
-              ctx.lineTo(x, y + spacing);
-              ctx.strokeStyle = `rgba(45, 212, 191, ${lineAlpha * 0.6})`;
-              ctx.stroke();
-            }
-          } else if (dist < radius * 2) {
-            ctx.beginPath();
-            ctx.arc(x, y, 0.5, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(45, 212, 191, 0.06)';
-            ctx.fill();
-          }
-        }
-      }
-      animId = requestAnimationFrame(draw);
-    };
-    draw();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener('resize', resize);
-      window.removeEventListener('mousemove', handleMove);
-    };
-  }, []);
-
-  return (
-    <canvas ref={canvasRef}
-      className="fixed inset-0 z-0 pointer-events-none"
-      style={{ opacity: 0.7 }} />
-  );
-}
+/* ── Cursor Grid entfernt — wird später durch besseren Effekt ersetzt ── */
 
 /* ── Shield SVG (Hero visual, animated) ───────────────── */
 function ShieldGraphic({ offsetX, offsetY }: { offsetX: number; offsetY: number }) {
@@ -184,20 +98,77 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   );
 }
 
-/* ── Animated Arrow (for "So funktioniert's") ─────────── */
-function FlowArrow() {
+/* ── Sequential Steps (So funktioniert's) ─────────────── */
+function StepSequence() {
+  const { ref, visible } = useReveal();
+  const [activeStep, setActiveStep] = useState(0);
+
+  useEffect(() => {
+    if (!visible) return;
+    const iv = setInterval(() => {
+      setActiveStep(prev => (prev + 1) % 4);
+    }, 2500);
+    return () => clearInterval(iv);
+  }, [visible]);
+
+  const steps = [
+    { num: 1, title: 'Ziele definieren', text: 'Domains, IPs oder Subnetze — bis zu 30 Ziele pro Abo' },
+    { num: 2, title: 'Automatisch scannen', text: 'Regelmäßige Scans im gewählten Intervall' },
+    { num: 3, title: 'Report erhalten', text: 'Geprüfter PDF-Report per E-Mail' },
+    { num: 4, title: 'Maßnahmen umsetzen', text: 'Priorisierter Plan mit konkreten Schritten' },
+  ];
+
   return (
-    <div className="hidden md:flex items-center justify-center flex-shrink-0 w-8">
-      <svg width="32" height="20" viewBox="0 0 32 20" fill="none">
-        <line x1="2" y1="10" x2="24" y2="10" stroke={C.teal} strokeWidth="1" opacity="0.4" strokeDasharray="3 3">
-          <animate attributeName="stroke-dashoffset" values="6;0" dur="1.5s" repeatCount="indefinite" />
-        </line>
-        <path d="M22 5L28 10L22 15" stroke={C.teal} strokeWidth="1.5" fill="none" opacity="0.5" strokeLinecap="round" strokeLinejoin="round" />
-        {/* Flowing dot */}
-        <circle r="2" fill={C.teal} opacity="0.7">
-          <animateMotion dur="2s" repeatCount="indefinite" path="M2,10 L26,10" />
-        </circle>
-      </svg>
+    <div ref={ref} className="grid grid-cols-1 md:grid-cols-4 gap-0">
+      {steps.map((step, i) => {
+        const isActive = i === activeStep;
+        const isPast = i < activeStep;
+        return (
+          <div key={step.num} className="relative">
+            {/* Connector line */}
+            {i < 3 && (
+              <div className="hidden md:block absolute top-6 right-0 w-1/2 h-px"
+                style={{ backgroundColor: isPast || isActive ? `${C.teal}40` : `${C.borderSubtle}` }}>
+                {(isPast || isActive) && (
+                  <div className="h-full transition-all duration-700"
+                    style={{ backgroundColor: C.teal, opacity: 0.5, width: isActive ? '100%' : isPast ? '100%' : '0%' }} />
+                )}
+              </div>
+            )}
+            {i > 0 && (
+              <div className="hidden md:block absolute top-6 left-0 w-1/2 h-px"
+                style={{ backgroundColor: isPast ? `${C.teal}40` : `${C.borderSubtle}` }}>
+                {isPast && (
+                  <div className="h-full w-full" style={{ backgroundColor: C.teal, opacity: 0.5 }} />
+                )}
+              </div>
+            )}
+
+            <div className={`text-center p-5 transition-all duration-500 ${
+              isActive ? 'scale-105' : 'scale-100'
+            }`}>
+              <div className={`w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-base font-bold transition-all duration-500 relative z-10 ${
+                isActive ? 'shadow-[0_0_20px_#2DD4BF40]' : ''
+              }`}
+                style={{
+                  backgroundColor: isActive ? `${C.teal}25` : isPast ? `${C.teal}15` : `${C.slateLight}`,
+                  color: isActive || isPast ? C.teal : C.muted,
+                  border: `2px solid ${isActive ? `${C.teal}60` : isPast ? `${C.teal}30` : C.borderSubtle}`,
+                }}>
+                {isPast ? '\u2713' : step.num}
+              </div>
+              <h4 className="text-sm font-bold mb-1.5 transition-colors duration-500"
+                style={{ color: isActive ? C.offWhite : isPast ? C.mutedLight : C.muted }}>
+                {step.title}
+              </h4>
+              <p className="text-xs leading-relaxed transition-colors duration-500"
+                style={{ color: isActive ? C.muted : `${C.muted}80` }}>
+                {step.text}
+              </p>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -279,25 +250,6 @@ const FeatureIcons = {
   ),
 };
 
-/* ── Step Card (for "So funktioniert's") ─────────────── */
-function StepCard({ num, title, text, delay }: { num: number; title: string; text: string; delay: number }) {
-  return (
-    <Reveal delay={delay}>
-      <div className="text-center p-4 flex-1">
-        <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-base font-bold relative"
-          style={{ backgroundColor: `${C.teal}15`, color: C.teal, border: `2px solid ${C.teal}40` }}>
-          {num}
-          {/* Pulse ring */}
-          <div className="absolute inset-0 rounded-full animate-[ping_4s_ease-out_infinite]"
-            style={{ border: `1px solid ${C.teal}20`, animationDelay: `${num * 0.8}s` }} />
-        </div>
-        <h4 className="text-sm font-bold mb-1.5" style={{ color: C.offWhite }}>{title}</h4>
-        <p className="text-xs leading-relaxed" style={{ color: C.muted }}>{text}</p>
-      </div>
-    </Reveal>
-  );
-}
-
 /* ── Flickering Badge ────────────────────────────────── */
 function FlickerBadge({ text }: { text: string }) {
   const [dim, setDim] = useState(false);
@@ -336,8 +288,7 @@ export default function LandingPage() {
 
   return (
     <main className="flex-1 relative">
-      {/* Interactive grid background */}
-      <CursorGrid />
+      {/* Mauseffekt: wird später durch besseren Effekt ersetzt */}
 
       {/* ── Hero ──────────────────────────────────────── */}
       <section ref={heroRef} className="relative overflow-hidden z-10" onMouseMove={handleMouseMove}>
@@ -495,15 +446,7 @@ export default function LandingPage() {
               So funktioniert&apos;s
             </h2>
           </Reveal>
-          <div className="flex flex-col md:flex-row items-stretch justify-center gap-0">
-            <StepCard delay={0} num={1} title="Ziele definieren" text="Domains, IPs oder Subnetze — bis zu 30 Ziele pro Abo" />
-            <FlowArrow />
-            <StepCard delay={200} num={2} title="Automatisch scannen" text="Regelmäßige Scans im gewählten Intervall" />
-            <FlowArrow />
-            <StepCard delay={400} num={3} title="Report erhalten" text="Geprüfter PDF-Report per E-Mail" />
-            <FlowArrow />
-            <StepCard delay={600} num={4} title="Maßnahmen umsetzen" text="Priorisierter Plan mit konkreten Schritten" />
-          </div>
+          <StepSequence />
         </div>
       </section>
 
