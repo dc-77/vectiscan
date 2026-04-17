@@ -75,8 +75,8 @@ class TestWorkerPackageFlow:
         from scanner.worker import _process_job
         _process_job("scan-456", "example.com", "nis2")
 
-        # Report should NOT be enqueued (admin review required first)
-        mock_enqueue.assert_not_called()
+        # Report IS enqueued (for Claude analysis + findings, needed for admin review)
+        mock_enqueue.assert_called_once()
         # Upload to MinIO should still happen
         mock_upload.assert_called_once()
 

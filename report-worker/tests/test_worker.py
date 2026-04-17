@@ -91,7 +91,8 @@ class TestProcessJob:
         mock_gen_report.assert_called_once()
         mock_upload.assert_called_once()
         mock_create_record.assert_called_once()
-        mock_update_status.assert_called_with(mock_conn, "scan-123", "report_complete"
+        # First run (no excluded findings) → pending_review for admin approval
+        mock_update_status.assert_called_with(mock_conn, "scan-123", "pending_review"
         )
 
     @patch("reporter.worker._get_db_connection")
