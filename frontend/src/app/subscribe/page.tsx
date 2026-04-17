@@ -9,22 +9,50 @@ import { isLoggedIn, getUser } from '@/lib/auth';
 
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 const IPV4_REGEX = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+const MAX_HOSTS = 30;
+
+// Valid dotted-decimal masks → CIDR prefix
+const DOTTED_TO_CIDR: Record<string, number> = {
+  '255.255.255.255': 32, '255.255.255.254': 31, '255.255.255.252': 30,
+  '255.255.255.248': 29, '255.255.255.240': 28, '255.255.255.224': 27,
+  '255.255.255.192': 26, '255.255.255.128': 25, '255.255.255.0': 24,
+  '255.255.254.0': 23, '255.255.252.0': 22, '255.255.248.0': 21,
+  '255.255.240.0': 20, '255.255.224.0': 19, '255.255.192.0': 18,
+  '255.255.128.0': 17, '255.255.0.0': 16,
+};
 
 function isValidTarget(input: string): boolean {
   const s = input.trim();
   if (!s) return false;
   if (DOMAIN_REGEX.test(s)) return true;
-  // IPv4 with optional CIDR or dotted mask
   if (s.includes('/')) {
     const [ip, mask] = s.split('/', 2);
     if (!IPV4_REGEX.test(ip)) return false;
     if (/^\d{1,2}$/.test(mask)) { const n = parseInt(mask); return n >= 8 && n <= 32; }
-    return IPV4_REGEX.test(mask); // dotted-decimal mask
+    return IPV4_REGEX.test(mask) && mask in DOTTED_TO_CIDR;
   }
   if (IPV4_REGEX.test(s)) {
     return s.split('.').every(o => { const n = parseInt(o); return n >= 0 && n <= 255; });
   }
   return false;
+}
+
+/** Calculate number of hosts a target represents */
+function countHosts(input: string): number {
+  const s = input.trim();
+  if (!s || !isValidTarget(s)) return 0;
+  if (DOMAIN_REGEX.test(s)) return 1;
+  if (s.includes('/')) {
+    const [, mask] = s.split('/', 2);
+    let prefix: number;
+    if (/^\d{1,2}$/.test(mask)) {
+      prefix = parseInt(mask);
+    } else {
+      prefix = DOTTED_TO_CIDR[mask] ?? 32;
+    }
+    return Math.pow(2, 32 - prefix);
+  }
+  return 1; // single IP
 }
 
 const PACKAGES = [
@@ -96,13 +124,16 @@ export default function SubscribePage() {
     setReady(true);
   }, [router]);
 
-  const validDomains = domains.map(cleanDomain).filter(d => d && isValidTarget(d));
+  const cleanedDomains = domains.map(cleanDomain).filter(d => d);
+  const validDomains = cleanedDomains.filter(d => isValidTarget(d));
+  const totalHosts = cleanedDomains.reduce((sum, d) => sum + countHosts(d), 0);
+  const overLimit = totalHosts > MAX_HOSTS;
   const validEmails = reportEmails.filter(e => e.includes('@'));
 
   const canAdvance = () => {
     switch (step) {
       case 1: return !!selectedPackage;
-      case 2: return validDomains.length > 0;
+      case 2: return validDomains.length > 0 && !overLimit;
       case 3: return validEmails.length > 0;
       case 4: return !!scanInterval;
       default: return true;
@@ -146,7 +177,7 @@ export default function SubscribePage() {
             Nach der Freigabe startet der erste Scan automatisch.
           </p>
           <Link href="/dashboard"
-            className="inline-block bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm">
+            className="inline-block bg-[#2DD4BF] hover:bg-[#14B8A6] text-[#0F172A] text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm">
             Zum Dashboard
           </Link>
         </div>
@@ -167,9 +198,9 @@ export default function SubscribePage() {
             const isDone = stepNum < step;
             return (
               <div key={label} className="flex items-center gap-1 flex-1">
-                <div className={`flex items-center gap-1.5 ${isActive ? 'text-blue-400' : isDone ? 'text-green-400' : 'text-slate-600'}`}>
+                <div className={`flex items-center gap-1.5 ${isActive ? 'text-[#2DD4BF]' : isDone ? 'text-green-400' : 'text-slate-600'}`}>
                   <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium border ${
-                    isActive ? 'border-blue-400 bg-blue-400/10' : isDone ? 'border-green-400 bg-green-400/10' : 'border-slate-700'
+                    isActive ? 'border-[#2DD4BF] bg-[#2DD4BF]/10' : isDone ? 'border-green-400 bg-green-400/10' : 'border-slate-700'
                   }`}>
                     {isDone ? '\u2713' : stepNum}
                   </span>
@@ -197,13 +228,13 @@ export default function SubscribePage() {
                   <button key={pkg.id} onClick={() => setSelectedPackage(pkg.id)}
                     className={`text-left p-5 rounded-lg border-2 transition-all ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-500/5'
+                        ? 'border-[#2DD4BF] bg-[#2DD4BF]/5'
                         : 'border-gray-800 bg-[#1e293b] hover:bg-[#253347] hover:border-gray-700'
                     }`}>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-sm font-semibold text-white">{pkg.name}</span>
                       {pkg.recommended && (
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400">Empfohlen</span>
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/20 text-[#2DD4BF]">Empfohlen</span>
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mb-3">{pkg.subtitle}</p>
@@ -225,35 +256,69 @@ export default function SubscribePage() {
         {/* Step 2: Domain Input */}
         {step === 2 && (
           <div className="space-y-3">
-            <p className="text-sm text-gray-400">Welche Ziele sollen regelmäßig gescannt werden? (max. 30)</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-400">Welche Ziele sollen regelmäßig gescannt werden?</p>
+              <span className={`text-xs font-mono px-2 py-0.5 rounded ${
+                overLimit ? 'bg-red-500/20 text-red-400' : totalHosts > 0 ? 'bg-[#2DD4BF]/10 text-[#2DD4BF]' : 'text-gray-600'
+              }`}>
+                {totalHosts} / {MAX_HOSTS} Hosts
+              </span>
+            </div>
             <div className="space-y-2">
-              {domains.map((d, i) => (
-                <div key={i} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={d}
-                    onChange={(e) => {
-                      const next = [...domains];
-                      next[i] = e.target.value;
-                      setDomains(next);
-                    }}
-                    placeholder="beispiel.de oder 85.22.47.0/24"
-                    className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm font-mono"
-                  />
-                  {domains.length > 1 && (
-                    <button onClick={() => setDomains(domains.filter((_, j) => j !== i))}
-                      className="text-red-400 hover:text-red-300 px-2 transition-colors">x</button>
-                  )}
-                </div>
-              ))}
+              {domains.map((d, i) => {
+                const cleaned = cleanDomain(d);
+                const hosts = countHosts(cleaned);
+                return (
+                  <div key={i} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      value={d}
+                      onChange={(e) => {
+                        const next = [...domains];
+                        next[i] = e.target.value;
+                        setDomains(next);
+                      }}
+                      placeholder="beispiel.de oder 85.22.47.0/24"
+                      className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] text-sm font-mono"
+                    />
+                    {hosts > 1 && (
+                      <span className="text-[10px] text-gray-500 font-mono w-16 text-right flex-shrink-0">{hosts} Hosts</span>
+                    )}
+                    {domains.length > 1 && (
+                      <button onClick={() => setDomains(domains.filter((_, j) => j !== i))}
+                        className="text-red-400 hover:text-red-300 px-1 transition-colors flex-shrink-0">x</button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             {domains.length < 30 && (
               <button onClick={() => setDomains([...domains, ''])}
-                className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors">
-                + Domain hinzufugen
+                className="text-xs text-[#2DD4BF] hover:text-[#5EEAD4] font-medium transition-colors">
+                + Ziel hinzufügen
               </button>
             )}
-            <p className="text-xs text-gray-600">FQDN (beispiel.de), IPv4 (1.2.3.4), CIDR (1.2.3.0/24) oder Subnetzmaske (1.2.3.4/255.255.255.224). Ziele werden nach der Bestellung von einem Administrator geprueft.</p>
+
+            {/* Over-limit warning */}
+            {overLimit && (
+              <div className="bg-amber-900/20 border border-amber-800/50 rounded-lg p-4 space-y-3">
+                <p className="text-sm text-amber-300">
+                  Sie haben {totalHosts} Hosts konfiguriert — das übersteigt das Standard-Limit von {MAX_HOSTS}.
+                </p>
+                <p className="text-xs text-amber-300/70">
+                  Für größere Infrastrukturen erstellen wir Ihnen ein maßgeschneidertes Angebot.
+                </p>
+                <a href="mailto:kontakt@vectigal.gmbh?subject=Maßgeschneidertes%20Angebot%20(über%2030%20Hosts)&body=Guten%20Tag%2C%0A%0Awir%20benötigen%20ein%20Angebot%20für%20mehr%20als%2030%20Hosts.%0A%0AAnzahl%20Hosts%3A%20%0ADomains%2FSubnetze%3A%20%0A%0AMit%20freundlichen%20Grüßen"
+                  className="inline-block px-4 py-2 rounded-lg text-xs font-medium bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors">
+                  Individuelles Angebot anfordern
+                </a>
+              </div>
+            )}
+
+            <p className="text-xs text-gray-600">
+              FQDN (beispiel.de), IPv4 (1.2.3.4), CIDR (1.2.3.0/24) oder Subnetzmaske (1.2.3.4/255.255.255.224).
+              Ziele werden nach der Bestellung von einem Administrator geprüft.
+            </p>
           </div>
         )}
 
@@ -273,7 +338,7 @@ export default function SubscribePage() {
                       setReportEmails(next);
                     }}
                     placeholder="it-leitung@firma.de"
-                    className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm"
+                    className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] text-sm"
                   />
                   {reportEmails.length > 1 && (
                     <button onClick={() => setReportEmails(reportEmails.filter((_, j) => j !== i))}
@@ -284,7 +349,7 @@ export default function SubscribePage() {
             </div>
             {reportEmails.length < 10 && (
               <button onClick={() => setReportEmails([...reportEmails, ''])}
-                className="text-xs text-blue-400 hover:text-blue-300 font-medium transition-colors">
+                className="text-xs text-[#2DD4BF] hover:text-[#5EEAD4] font-medium transition-colors">
                 + Empfanger hinzufugen
               </button>
             )}
@@ -302,7 +367,7 @@ export default function SubscribePage() {
                   <button key={iv.id} onClick={() => setScanInterval(iv.id)}
                     className={`text-center p-4 rounded-lg border-2 transition-all ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-500/10'
+                        ? 'border-[#2DD4BF] bg-[#2DD4BF]/10'
                         : 'border-gray-800 bg-[#1e293b] hover:bg-[#253347]'
                     }`}>
                     <p className="text-sm font-medium text-white">{iv.label}</p>
@@ -324,11 +389,11 @@ export default function SubscribePage() {
                 <span className="text-white font-medium">{PACKAGES.find(p => p.id === selectedPackage)?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Domains ({validDomains.length})</span>
-                <span className="text-white font-mono text-xs">{validDomains.join(', ')}</span>
+                <span className="text-gray-500">Ziele ({validDomains.length} Einträge, {totalHosts} Hosts)</span>
+                <span className="text-white font-mono text-xs max-w-[200px] text-right truncate">{validDomains.join(', ')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Report-Empfanger</span>
+                <span className="text-gray-500">Report-Empfänger</span>
                 <span className="text-white text-xs">{validEmails.join(', ')}</span>
               </div>
               <div className="flex justify-between">
@@ -365,12 +430,12 @@ export default function SubscribePage() {
           {step < 5 ? (
             <button onClick={() => { if (canAdvance()) setStep(step + 1); }}
               disabled={!canAdvance()}
-              className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm">
+              className="bg-[#2DD4BF] hover:bg-[#14B8A6] text-[#0F172A] disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm">
               Weiter
             </button>
           ) : (
             <button onClick={handleSubmit} disabled={submitting}
-              className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm">
+              className="bg-[#2DD4BF] hover:bg-[#14B8A6] text-[#0F172A] disabled:bg-gray-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm">
               {submitting ? 'Wird erstellt...' : 'Abo starten'}
             </button>
           )}

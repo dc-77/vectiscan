@@ -217,19 +217,67 @@ function PainCard({ icon, title, text, delay }: { icon: string; title: string; t
 }
 
 /* ── Feature Card ────────────────────────────────────── */
-function FeatureCard({ title, text, delay }: { title: string; text: string; delay: number }) {
+function FeatureCard({ icon, title, text, delay }: { icon: React.ReactNode; title: string; text: string; delay: number }) {
   return (
     <Reveal delay={delay}>
       <div className="p-5 rounded-lg h-full group hover:border-[#2DD4BF25] transition-all duration-300 hover:shadow-[0_0_30px_#2DD4BF08]"
         style={{ backgroundColor: C.slateLight, border: `1px solid ${C.borderSubtle}` }}>
-        <div className="w-1.5 h-1.5 rounded-full mb-3 group-hover:shadow-[0_0_10px_#2DD4BF80] transition-shadow duration-500"
-          style={{ backgroundColor: C.teal }} />
+        <div className="mb-3 text-[#2DD4BF] opacity-80 group-hover:opacity-100 transition-opacity duration-300">
+          {icon}
+        </div>
         <h4 className="text-sm font-semibold mb-1.5" style={{ color: C.offWhite }}>{title}</h4>
         <p className="text-xs leading-relaxed" style={{ color: C.muted }}>{text}</p>
       </div>
     </Reveal>
   );
 }
+
+/* ── Feature Icons (Teal SVGs) ────────────────────────── */
+const FeatureIcons = {
+  perimeter: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
+      <line x1="12" y1="2" x2="12" y2="4" /><line x1="12" y1="20" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="4" y2="12" /><line x1="20" y1="12" x2="22" y2="12" />
+    </svg>
+  ),
+  ai: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" />
+      <path d="M6 10v1a6 6 0 0 0 12 0v-1" />
+      <line x1="12" y1="17" x2="12" y2="21" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <circle cx="9" cy="7" r="0.5" fill="currentColor" /><circle cx="15" cy="7" r="0.5" fill="currentColor" />
+    </svg>
+  ),
+  report: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="8" y1="13" x2="16" y2="13" /><line x1="8" y1="17" x2="13" y2="17" />
+      <path d="M10 9l2 2 4-4" />
+    </svg>
+  ),
+  repeat: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
+      <polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+    </svg>
+  ),
+  compliance: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="M9 12l2 2 4-4" />
+    </svg>
+  ),
+  quality: (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 9V5a3 3 0 0 0-6 0v4" /><rect x="6" y="9" width="12" height="12" rx="2" />
+      <circle cx="12" cy="15" r="1.5" />
+      <line x1="12" y1="16.5" x2="12" y2="18" />
+    </svg>
+  ),
+};
 
 /* ── Step Card (for "So funktioniert's") ─────────────── */
 function StepCard({ num, title, text, delay }: { num: number; title: string; text: string; delay: number }) {
@@ -371,17 +419,17 @@ export default function LandingPage() {
             </p>
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <FeatureCard delay={0} title="Perimeter-Analyse"
+            <FeatureCard delay={0} icon={FeatureIcons.perimeter} title="Perimeter-Analyse"
               text="Port-Scanning, DNS-Enumeration, Web-Schwachstellen, SSL/TLS-Prüfung — über 15 spezialisierte Scanner analysieren Ihre gesamte Angriffsoberfläche." />
-            <FeatureCard delay={80} title="KI-gestützte Bewertung"
+            <FeatureCard delay={80} icon={FeatureIcons.ai} title="KI-gestützte Bewertung"
               text="Intelligente Korrelation über Tool-Grenzen hinweg. False-Positive-Filterung und kontextbezogene Risikobewertung nach CVSS v3.1." />
-            <FeatureCard delay={160} title="Professionelle Reports"
+            <FeatureCard delay={160} icon={FeatureIcons.report} title="Professionelle Reports"
               text="Executive Summary für die Geschäftsleitung, technische Details für Ihr IT-Team, priorisierter Maßnahmenplan mit konkreten Handlungsempfehlungen." />
-            <FeatureCard delay={240} title="Automatische Wiederholung"
+            <FeatureCard delay={240} icon={FeatureIcons.repeat} title="Automatische Wiederholung"
               text="Wöchentliche, monatliche oder quartalsweise Scans — Sie definieren den Rhythmus, wir liefern zuverlässig aktuelle Ergebnisse." />
-            <FeatureCard delay={320} title="Compliance-Nachweise"
+            <FeatureCard delay={320} icon={FeatureIcons.compliance} title="Compliance-Nachweise"
               text="Mappings auf NIS2 (§30 BSIG), BSI-Grundschutz, ISO 27001 und Cyberversicherungs-Anforderungen — direkt im Report." />
-            <FeatureCard delay={400} title="Qualitätsgesichert"
+            <FeatureCard delay={400} icon={FeatureIcons.quality} title="Qualitätsgesichert"
               text="Jeder Report wird vor der Zustellung manuell geprüft. False Positives werden markiert, Befunde validiert — keine automatisierten Fehlalarme." />
           </div>
         </div>
