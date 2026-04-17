@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -285,20 +285,21 @@ function FlickerBadge({ text }: { text: string }) {
   );
 }
 
-/* ── Main Landing Page ─────────────────────────────────── */
-export default function LandingPage() {
+/* ── Redirect wrapper (needs Suspense for useSearchParams) ── */
+function OrderIdRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  // Redirect legacy /?orderId=... URLs to /scan?orderId=...
   useEffect(() => {
     const orderId = searchParams.get('orderId');
-    if (orderId) {
-      router.replace(`/scan?orderId=${orderId}`);
-    }
+    if (orderId) { router.replace(`/scan?orderId=${orderId}`); }
   }, [searchParams, router]);
+  return null;
+}
+
+/* ── Main Landing Page ─────────────────────────────────── */
+export default function LandingPage() {
+  const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+  const heroRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!heroRef.current) return;
@@ -313,7 +314,8 @@ export default function LandingPage() {
 
   return (
     <main className="flex-1 relative">
-      {/* Mauseffekt: wird später durch besseren Effekt ersetzt */}
+      {/* Legacy orderId redirect */}
+      <Suspense><OrderIdRedirect /></Suspense>
 
       {/* ── Hero ──────────────────────────────────────── */}
       <section ref={heroRef} className="relative overflow-hidden z-10" onMouseMove={handleMouseMove}>
