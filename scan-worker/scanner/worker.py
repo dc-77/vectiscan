@@ -616,21 +616,16 @@ def _finalize(
 
     # Pack and upload
     archive_path = pack_results(scan_dir, order_id)
-    upload_to_minio(archive_path, order_id)
+    minio_path = upload_to_minio(archive_path, order_id)
 
-    # Mark scan as pending_review (admin must approve before report generation)
+    # Enqueue report generation for Claude analysis + findings (needed for admin review).
+    # The report-worker will generate findings_data but set status to pending_review,
+    # NOT report_complete. The PDF + email only happen after admin approval.
+    enqueue_report_job(order_id, minio_path, host_inventory, tech_profiles, package,
+                       phase3_result=phase3_result)
+
+    # Mark scan as complete (report-worker will set pending_review after Claude analysis)
     set_scan_complete(order_id)
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-        with conn.cursor() as cur:
-            cur.execute(
-                "UPDATE orders SET status = 'pending_review', updated_at = NOW() WHERE id = %s",
-                (order_id,),
-            )
-        conn.commit()
-        conn.close()
-    except Exception as e:
-        log.error("pending_review_update_failed", order_id=order_id, error=str(e))
 
     publish_event(order_id, {
         "type": "status",

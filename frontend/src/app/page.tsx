@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 /* ── Brand Colors ────────────────────────────────────────── */
@@ -286,8 +287,18 @@ function FlickerBadge({ text }: { text: string }) {
 
 /* ── Main Landing Page ─────────────────────────────────── */
 export default function LandingPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
+
+  // Redirect legacy /?orderId=... URLs to /scan?orderId=...
+  useEffect(() => {
+    const orderId = searchParams.get('orderId');
+    if (orderId) {
+      router.replace(`/scan?orderId=${orderId}`);
+    }
+  }, [searchParams, router]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (!heroRef.current) return;

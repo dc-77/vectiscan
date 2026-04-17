@@ -523,9 +523,13 @@ def process_job(job_data: dict) -> None:
             except Exception as e:
                 log.warning("supersede_failed", error=str(e))
 
-        # -- 9. Update order status to report_complete -------------------------
-        _update_order_status(conn, order_id, "report_complete")
-        log.info("job_completed", order_id=order_id, package=package)
+        # -- 9. Update order status -----------------------------------------------
+        # If this is a regeneration (admin approved), set report_complete.
+        # Otherwise (first run after scan), set pending_review for admin to approve.
+        is_regeneration = bool(excluded)
+        final_status = "report_complete" if is_regeneration else "pending_review"
+        _update_order_status(conn, order_id, final_status)
+        log.info("job_completed", order_id=order_id, package=package, status=final_status)
 
     except Exception:
         log.exception("job_failed", order_id=order_id)
