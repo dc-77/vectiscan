@@ -68,7 +68,7 @@ function ResetPasswordForm() {
           placeholder="Neues Passwort"
           autoFocus
           disabled={loading || !token}
-          className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+          className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] disabled:opacity-50"
         />
         <input
           type="password"
@@ -76,12 +76,12 @@ function ResetPasswordForm() {
           onChange={(e) => setPasswordConfirm(e.target.value)}
           placeholder="Passwort wiederholen"
           disabled={loading || !token}
-          className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+          className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] disabled:opacity-50"
         />
         <button
           type="submit"
           disabled={loading || !token || !password.trim() || !passwordConfirm.trim()}
-          className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
+          className="w-full bg-[#2DD4BF] hover:bg-[#14B8A6] text-[#0F172A] disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
         >
           {loading ? 'Bitte warten...' : 'Passwort speichern'}
         </button>
