@@ -101,64 +101,78 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 /* ── Sequential Steps (So funktioniert's) ─────────────── */
 function StepSequence() {
   const { ref, visible } = useReveal();
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(-1);
 
   useEffect(() => {
     if (!visible) return;
+    // Initial delay, then cycle
+    const start = setTimeout(() => setActiveStep(0), 400);
     const iv = setInterval(() => {
       setActiveStep(prev => (prev + 1) % 4);
-    }, 2500);
-    return () => clearInterval(iv);
+    }, 3000);
+    return () => { clearTimeout(start); clearInterval(iv); };
   }, [visible]);
 
   const steps = [
-    { num: 1, title: 'Ziele definieren', text: 'Domains, IPs oder Subnetze — bis zu 30 Ziele pro Abo' },
-    { num: 2, title: 'Automatisch scannen', text: 'Regelmäßige Scans im gewählten Intervall' },
-    { num: 3, title: 'Report erhalten', text: 'Geprüfter PDF-Report per E-Mail' },
-    { num: 4, title: 'Maßnahmen umsetzen', text: 'Priorisierter Plan mit konkreten Schritten' },
+    { title: 'Ziele definieren', text: 'Domains, IPs oder Subnetze — bis zu 30 Ziele pro Abo' },
+    { title: 'Automatisch scannen', text: 'Regelmäßige Scans im gewählten Intervall' },
+    { title: 'Report erhalten', text: 'Geprüfter PDF-Report per E-Mail' },
+    { title: 'Maßnahmen umsetzen', text: 'Priorisierter Plan mit konkreten Schritten' },
   ];
 
   return (
-    <div ref={ref} className="grid grid-cols-1 md:grid-cols-4 gap-0">
-      {steps.map((step, i) => {
-        const isActive = i === activeStep;
-        const isPast = i < activeStep;
-        return (
-          <div key={step.num} className="relative">
-            {/* Connector line */}
-            {i < 3 && (
-              <div className="hidden md:block absolute top-6 right-0 w-1/2 h-px"
-                style={{ backgroundColor: isPast || isActive ? `${C.teal}40` : `${C.borderSubtle}` }}>
-                {(isPast || isActive) && (
-                  <div className="h-full transition-all duration-700"
-                    style={{ backgroundColor: C.teal, opacity: 0.5, width: isActive ? '100%' : isPast ? '100%' : '0%' }} />
-                )}
-              </div>
-            )}
-            {i > 0 && (
-              <div className="hidden md:block absolute top-6 left-0 w-1/2 h-px"
-                style={{ backgroundColor: isPast ? `${C.teal}40` : `${C.borderSubtle}` }}>
-                {isPast && (
-                  <div className="h-full w-full" style={{ backgroundColor: C.teal, opacity: 0.5 }} />
-                )}
-              </div>
-            )}
+    <div ref={ref} className="max-w-3xl mx-auto">
+      {/* Progress bar */}
+      <div className="hidden md:flex items-center justify-between mb-10 px-8 relative">
+        {/* Background track */}
+        <div className="absolute left-8 right-8 top-1/2 h-0.5 -translate-y-1/2" style={{ backgroundColor: C.borderSubtle }} />
+        {/* Filled track */}
+        <div className="absolute left-8 top-1/2 h-0.5 -translate-y-1/2 transition-all duration-700 ease-out"
+          style={{
+            backgroundColor: C.teal,
+            opacity: 0.6,
+            width: activeStep < 0 ? '0%' : `${(activeStep / 3) * 100}%`,
+            maxWidth: 'calc(100% - 4rem)',
+          }} />
+        {/* Step dots on the track */}
+        {steps.map((_, i) => {
+          const done = i <= activeStep;
+          return (
+            <div key={i} className="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-500"
+              style={{
+                backgroundColor: done ? C.teal : C.slateLight,
+                color: done ? C.slate : C.muted,
+                border: `2px solid ${done ? C.teal : C.borderSubtle}`,
+                boxShadow: i === activeStep ? `0 0 16px ${C.teal}50` : 'none',
+              }}>
+              {i < activeStep ? '\u2713' : i + 1}
+            </div>
+          );
+        })}
+      </div>
 
-            <div className={`text-center p-5 transition-all duration-500 ${
-              isActive ? 'scale-105' : 'scale-100'
-            }`}>
-              <div className={`w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-base font-bold transition-all duration-500 relative z-10 ${
-                isActive ? 'shadow-[0_0_20px_#2DD4BF40]' : ''
-              }`}
+      {/* Step cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {steps.map((step, i) => {
+          const isActive = i === activeStep;
+          const isDone = i < activeStep;
+          return (
+            <div key={i} className="text-center p-4 rounded-lg transition-all duration-500"
+              style={{
+                backgroundColor: isActive ? `${C.teal}08` : 'transparent',
+                border: `1px solid ${isActive ? `${C.teal}20` : 'transparent'}`,
+              }}>
+              {/* Mobile number (hidden on desktop where progress bar shows) */}
+              <div className="md:hidden w-8 h-8 rounded-full mx-auto mb-3 flex items-center justify-center text-xs font-bold"
                 style={{
-                  backgroundColor: isActive ? `${C.teal}25` : isPast ? `${C.teal}15` : `${C.slateLight}`,
-                  color: isActive || isPast ? C.teal : C.muted,
-                  border: `2px solid ${isActive ? `${C.teal}60` : isPast ? `${C.teal}30` : C.borderSubtle}`,
+                  backgroundColor: isActive || isDone ? C.teal : C.slateLight,
+                  color: isActive || isDone ? C.slate : C.muted,
+                  border: `2px solid ${isActive || isDone ? C.teal : C.borderSubtle}`,
                 }}>
-                {isPast ? '\u2713' : step.num}
+                {isDone ? '\u2713' : i + 1}
               </div>
               <h4 className="text-sm font-bold mb-1.5 transition-colors duration-500"
-                style={{ color: isActive ? C.offWhite : isPast ? C.mutedLight : C.muted }}>
+                style={{ color: isActive ? C.offWhite : isDone ? C.mutedLight : C.muted }}>
                 {step.title}
               </h4>
               <p className="text-xs leading-relaxed transition-colors duration-500"
@@ -166,9 +180,9 @@ function StepSequence() {
                 {step.text}
               </p>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
