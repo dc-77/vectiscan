@@ -50,11 +50,11 @@ export default function AppHeader() {
 
   return (
     <>
-      <header className="h-12 shrink-0 flex items-center justify-between px-5 sticky top-0 z-50"
+      <header className="h-14 shrink-0 flex items-center justify-between px-5 sm:px-6 sticky top-0 z-50"
         style={{ backgroundColor: 'rgba(15,23,42,0.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(45,212,191,0.08)' }}>
         <Link href="/" className="flex items-center gap-2.5 hover:opacity-90 transition-opacity">
-          <VectiScanShield size={24} variant="teal" />
-          <span className="text-sm font-bold tracking-tight" style={{ letterSpacing: '-0.5px' }}>
+          <VectiScanShield size={30} variant="teal" />
+          <span className="text-base font-bold tracking-tight" style={{ letterSpacing: '-0.5px' }}>
             <span style={{ color: '#F8FAFC' }}>vecti</span><span style={{ color: '#2DD4BF' }}>scan</span>
           </span>
         </Link>
@@ -64,18 +64,18 @@ export default function AppHeader() {
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map(item => (
               <Link key={item.href} href={item.href}
-                className="text-xs font-medium px-3 py-1.5 rounded-md transition-colors hover:text-white"
+                className="text-[13px] font-medium px-3 py-1.5 rounded-md transition-colors hover:text-white"
                 style={linkStyle(item.href, item.highlight)}>
                 {item.label}
               </Link>
             ))}
             {admin && (
-              <Link href="/admin" className="text-xs font-medium px-3 py-1.5 rounded-md transition-colors hover:text-white"
+              <Link href="/admin" className="text-[13px] font-medium px-3 py-1.5 rounded-md transition-colors hover:text-white"
                 style={linkStyle('/admin')}>Admin</Link>
             )}
             {authed && (
               <button onClick={handleLogout}
-                className="text-xs font-medium px-3 py-1.5 rounded-md transition-colors hover:text-red-400"
+                className="text-[13px] font-medium px-3 py-1.5 rounded-md transition-colors hover:text-red-400"
                 style={{ color: '#64748B' }}>Abmelden</button>
             )}
           </nav>
@@ -100,7 +100,7 @@ export default function AppHeader() {
       {!isAuthPage && (
         <div className="md:hidden fixed inset-0 z-40 transition-all duration-300 ease-out"
           style={{
-            top: 48, pointerEvents: menuOpen ? 'auto' : 'none', opacity: menuOpen ? 1 : 0,
+            top: 56, pointerEvents: menuOpen ? 'auto' : 'none', opacity: menuOpen ? 1 : 0,
             backgroundColor: 'rgba(15,23,42,0.95)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
           }}>
           <nav className="flex flex-col items-center gap-2 pt-16 px-6">

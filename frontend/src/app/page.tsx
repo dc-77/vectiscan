@@ -212,17 +212,17 @@ export default function LandingPage() {
       <section ref={heroRef} className="relative overflow-hidden min-h-[90vh] flex items-center justify-center">
         <HeroShield containerRef={heroRef} />
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-6 sm:mb-8 font-medium" style={{ color: C.teal }}>
+          <p className="text-xs sm:text-sm uppercase tracking-[0.25em] mb-4 sm:mb-6 font-medium" style={{ color: C.teal }}>
             Automatisierte Perimeter-Analyse
           </p>
-          <h1 className="text-[1.75rem] sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight mb-5 sm:mb-6" style={{ color: C.offWhite }}>
+          <h1 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight mb-4 sm:mb-5" style={{ color: C.offWhite }}>
             Kennen Sie Ihre<br />
             <span style={{ color: C.teal, textShadow: glitching ? '2px 0 #EF4444, -2px 0 #3B82F6' : 'none' }}>Angriffsoberfläche</span>?
           </h1>
-          <p className="text-base sm:text-xl md:text-2xl font-normal mb-3" style={{ color: C.teal }}>
+          <p className="text-lg sm:text-xl md:text-2xl font-normal mb-3" style={{ color: C.teal }}>
             Finden, bevor es andere tun.
           </p>
-          <p className="text-sm sm:text-base max-w-xl mx-auto mb-8 sm:mb-10 leading-relaxed font-light" style={{ color: C.muted }}>
+          <p className="text-[15px] sm:text-base max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed font-light" style={{ color: C.muted }}>
             VectiScan analysiert Ihre exponierte IT-Infrastruktur automatisiert auf Schwachstellen — regelmäßig, zuverlässig, nach anerkannten Standards. Damit Sie Gewissheit haben.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -243,10 +243,10 @@ export default function LandingPage() {
       </div>
 
       {/* ── PAIN SECTION ──────────────────────────── */}
-      <section className="py-16 md:py-24 relative z-10">
+      <section className="py-12 md:py-20 relative z-10">
         <div className="max-w-5xl mx-auto px-6">
           <Reveal>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-center mb-4" style={{ color: C.offWhite }}>Wissen Sie, wie angreifbar Ihr Unternehmen ist?</h2>
+            <h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-4" style={{ color: C.offWhite }}>Wissen Sie, wie angreifbar Ihr Unternehmen ist?</h2>
             <p className="text-sm text-center max-w-2xl mx-auto mb-12" style={{ color: C.muted }}>Die meisten Unternehmen kennen nur einen Bruchteil ihrer exponierten Systeme. Angreifer kennen sie alle.</p>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -266,10 +266,10 @@ export default function LandingPage() {
       </section>
 
       {/* ── FEATURES ──────────────────────────────── */}
-      <section className="py-16 md:py-24 relative z-10" style={{ backgroundColor: `${C.slateLight}30` }}>
+      <section className="py-12 md:py-20 relative z-10" style={{ backgroundColor: `${C.slateLight}30` }}>
         <div className="max-w-5xl mx-auto px-6">
           <Reveal>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-center mb-4" style={{ color: C.offWhite }}>Automatisierte Perimeter-Analyse.<br className="hidden sm:block" />Regelmäßig. Zuverlässig.</h2>
+            <h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-4" style={{ color: C.offWhite }}>Automatisierte Perimeter-Analyse.<br className="hidden sm:block" />Regelmäßig. Zuverlässig.</h2>
             <p className="text-sm text-center max-w-2xl mx-auto mb-12" style={{ color: C.muted }}>VectiScan kombiniert etablierte Open-Source-Scanner mit KI-gestützter Analyse zu einem vollautomatisierten Perimeter-Assessment.</p>
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -293,18 +293,18 @@ export default function LandingPage() {
       </section>
 
       {/* ── INTERSTITIAL ──────────────────────────── */}
-      <section className="py-20 md:py-32 relative z-10">
+      <section className="py-16 md:py-28 relative z-10">
         <div className="absolute left-1/2 -translate-x-1/2 top-8 w-16 h-px" style={{ backgroundColor: `${C.teal}18` }} />
-        <Reveal><p className="text-lg sm:text-2xl md:text-3xl font-semibold text-center leading-snug px-6" style={{ color: C.offWhite }}>
+        <Reveal><p className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center leading-snug px-6" style={{ color: C.offWhite }}>
           Sicherheit ist kein Gefühl.<br /><span style={{ color: C.teal }}>Sondern ein Ergebnis.</span>
         </p></Reveal>
         <div className="absolute left-1/2 -translate-x-1/2 bottom-8 w-16 h-px" style={{ backgroundColor: `${C.teal}18` }} />
       </section>
 
       {/* ── PACKAGES ──────────────────────────────── */}
-      <section className="py-16 md:py-24 relative z-10">
+      <section className="py-12 md:py-20 relative z-10">
         <div className="max-w-4xl mx-auto px-6">
-          <Reveal><h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-center mb-12" style={{ color: C.offWhite }}>Zwei Pakete. Ein Ziel: Ihre Sicherheit.</h2></Reveal>
+          <Reveal><h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-12" style={{ color: C.offWhite }}>Zwei Pakete. Ein Ziel: Ihre Sicherheit.</h2></Reveal>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {[
               { name: 'Perimeter-Scan', sub: 'Vollständige Sicherheitsanalyse Ihrer externen Angriffsoberfläche', rec: true,
@@ -326,9 +326,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── STEPS ─────────────────────────────────── */}
-      <section className="py-16 md:py-28 relative z-10" style={{ backgroundColor: `${C.slateLight}30` }}>
+      <section className="py-12 md:py-24 relative z-10" style={{ backgroundColor: `${C.slateLight}30` }}>
         <div className="max-w-5xl mx-auto px-6">
-          <Reveal><h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-center mb-12 md:mb-16" style={{ color: C.offWhite }}>So funktioniert&apos;s</h2></Reveal>
+          <Reveal><h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-12 md:mb-16" style={{ color: C.offWhite }}>So funktioniert&apos;s</h2></Reveal>
           <StepSequence />
         </div>
       </section>
@@ -346,9 +346,9 @@ export default function LandingPage() {
       </section>
 
       {/* ── FINAL CTA ─────────────────────────────── */}
-      <section className="py-16 md:py-28 relative z-10">
+      <section className="py-12 md:py-24 relative z-10">
         <Reveal><div className="max-w-2xl mx-auto px-6 text-center">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-4" style={{ color: C.offWhite }}>Bereit für Ihren ersten Security-Scan?</h2>
+          <h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold mb-4" style={{ color: C.offWhite }}>Bereit für Ihren ersten Security-Scan?</h2>
           <p className="text-sm mb-8 font-light" style={{ color: C.muted }}>Lassen Sie sich ein individuelles Angebot erstellen — oder starten Sie direkt.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/pricing" className="w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-semibold transition-all duration-300 cta-glow text-center"
@@ -363,7 +363,7 @@ export default function LandingPage() {
       <footer className="border-t py-8 sm:py-10 px-6 relative z-10" style={{ borderColor: 'rgba(45,212,191,0.08)' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
           <div className="flex items-center gap-2.5">
-            <VectiScanShield size={28} variant="teal" />
+            <VectiScanShield size={32} variant="teal" />
             <span className="text-sm font-bold tracking-tight" style={{ letterSpacing: '-0.5px' }}>
               <span style={{ color: C.offWhite }}>vecti</span><span style={{ color: C.teal }}>scan</span>
             </span>
