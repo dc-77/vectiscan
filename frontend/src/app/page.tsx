@@ -91,9 +91,12 @@ function HeroShield({ containerRef }: { containerRef: React.RefObject<HTMLElemen
 
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ perspective: '1000px' }}>
+      {/* Teal glow behind shield */}
+      <div className="absolute w-[300px] h-[300px] sm:w-[450px] sm:h-[450px] rounded-full"
+        style={{ background: `radial-gradient(circle, ${C.teal}0A 0%, transparent 70%)`, filter: 'blur(40px)' }} />
       <div style={{ transform: isTouch ? 'none' : `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`, willChange: 'transform' }}>
         <svg viewBox="0 0 200 210" fill="none" aria-hidden="true"
-          className="w-[280px] h-[294px] sm:w-[400px] sm:h-[420px] md:w-[500px] md:h-[525px] opacity-[0.06]">
+          className="w-[280px] h-[294px] sm:w-[400px] sm:h-[420px] md:w-[500px] md:h-[525px] opacity-[0.12]">
           <path d="M100 8 L178 48 L178 116 C178 156 144 186 100 200 C56 186 22 156 22 116 L22 48 Z"
             fill="none" stroke={C.teal} strokeWidth="3" className="shield-pulse" />
           <path d="M100 22 L166 56 L166 110 C166 146 138 174 100 186 C62 174 34 146 34 110 L34 56 Z"
@@ -191,6 +194,19 @@ export default function LandingPage() {
     <main className="flex-1 relative">
       <CursorGlow />
       <Suspense><OrderIdRedirect /></Suspense>
+
+      {/* ── Background gradients (subtle, decorative) ── */}
+      <div className="fixed inset-0 pointer-events-none z-0" aria-hidden="true">
+        {/* Top-right teal wash */}
+        <div className="absolute -top-32 -right-32 w-[600px] h-[600px] rounded-full"
+          style={{ background: `radial-gradient(circle, ${C.teal}06 0%, transparent 60%)`, filter: 'blur(80px)' }} />
+        {/* Bottom-left accent */}
+        <div className="absolute -bottom-48 -left-48 w-[500px] h-[500px] rounded-full"
+          style={{ background: `radial-gradient(circle, ${C.teal}04 0%, transparent 60%)`, filter: 'blur(100px)' }} />
+        {/* Mid-page subtle highlight */}
+        <div className="absolute top-[60%] right-[10%] w-[400px] h-[400px] rounded-full"
+          style={{ background: `radial-gradient(circle, ${C.tealDark}03 0%, transparent 60%)`, filter: 'blur(120px)' }} />
+      </div>
 
       {/* ── HERO ──────────────────────────────────── */}
       <section ref={heroRef} className="relative overflow-hidden min-h-[90vh] flex items-center justify-center">
