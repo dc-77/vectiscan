@@ -172,7 +172,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
                     r.findings_data->'severity_counts' AS severity_counts
              FROM orders o
              JOIN customers c ON o.customer_id = c.id
-             LEFT JOIN reports r ON r.order_id = o.id`;
+             LEFT JOIN reports r ON r.order_id = o.id AND r.superseded_by IS NULL
+                AND r.id = (SELECT r3.id FROM reports r3 WHERE r3.order_id = o.id ORDER BY r3.version DESC LIMIT 1)`;
 
     if (user.role === 'admin') {
       sql = `${baseSelect} ORDER BY o.created_at DESC`;
@@ -938,12 +939,13 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         [user.sub, id],
       );
 
-      // Enqueue report generation
+      // Enqueue report generation (approved flag tells worker to set report_complete)
       await reportQueue.add('report', {
         orderId: id,
         rawDataPath: `${id}.tar.gz`,
         package: order.package as string,
         excludedFindings,
+        approved: true,
       });
 
       // Update status to report_generating
