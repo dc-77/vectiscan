@@ -168,12 +168,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
                     o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
                     c.email,
                     EXISTS(SELECT 1 FROM reports r2 WHERE r2.order_id = o.id) AS has_report,
-                    r.findings_data->>'overall_risk' AS overall_risk,
-                    r.findings_data->'severity_counts' AS severity_counts
+                    (SELECT rr.findings_data->>'overall_risk' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS overall_risk,
+                    (SELECT rr.findings_data->'severity_counts' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS severity_counts
              FROM orders o
-             JOIN customers c ON o.customer_id = c.id
-             LEFT JOIN reports r ON r.order_id = o.id AND r.superseded_by IS NULL
-                AND r.id = (SELECT r3.id FROM reports r3 WHERE r3.order_id = o.id ORDER BY r3.version DESC LIMIT 1)`;
+             JOIN customers c ON o.customer_id = c.id`;
 
     if (user.role === 'admin') {
       sql = `${baseSelect} ORDER BY o.created_at DESC`;
