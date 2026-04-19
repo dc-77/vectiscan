@@ -180,8 +180,8 @@ export default function ScanDetailPage() {
       }
       setOrder(orderRes.data);
 
-      // Load findings if report is complete
-      if (['report_complete', 'scan_complete', 'report_generating'].includes(orderRes.data.status)) {
+      // Load findings if report exists (including pending_review for admin review)
+      if (['report_complete', 'delivered', 'scan_complete', 'report_generating', 'pending_review', 'approved'].includes(orderRes.data.status)) {
         const findingsRes = await getFindings(orderId);
         if (findingsRes.success && findingsRes.data) {
           setFindings(findingsRes.data);
