@@ -246,9 +246,15 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    // Check if report exists
-    const reportResult = await query('SELECT id FROM reports WHERE order_id = $1', [id]);
+    // Check if report exists + get severity data from latest report
+    const reportResult = await query(
+      `SELECT id, findings_data->>'overall_risk' AS overall_risk,
+              findings_data->'severity_counts' AS severity_counts
+       FROM reports WHERE order_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [id],
+    );
     const hasReport = reportResult.rows.length > 0;
+    const latestReport = reportResult.rows[0] as Record<string, unknown> | undefined;
 
     const orderPackage = (order.package || 'perimeter') as ScanPackage;
 
@@ -280,6 +286,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         finishedAt: order.scan_finished_at ? (order.scan_finished_at as Date).toISOString() : null,
         error: order.error_message || null,
         hasReport,
+        overallRisk: latestReport?.overall_risk || null,
+        severityCounts: latestReport?.severity_counts || null,
         passiveIntelSummary: order.passive_intel_summary || null,
         correlationData: order.correlation_data || null,
         businessImpactScore: order.business_impact_score != null ? Number(order.business_impact_score) : null,
