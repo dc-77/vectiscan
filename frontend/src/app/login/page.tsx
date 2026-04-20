@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +31,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = tab === 'login' ? await login(email, password) : await register(email, password);
+      const res = tab === 'login' ? await login(email, password) : await register(email, password, companyName || undefined);
       if (res.success && res.data) { setToken(res.data.token); router.push('/dashboard'); }
       else { setError(res.error || 'Unbekannter Fehler'); }
     } catch { setError('API nicht erreichbar.'); }
@@ -67,7 +68,8 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {tab === 'register' && (
-              <input type="text" placeholder="Firmenname (optional)" disabled={loading}
+              <input type="text" value={companyName} onChange={e => setCompanyName(e.target.value)}
+                placeholder="Firmenname (optional)" disabled={loading}
                 className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
             )}
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}

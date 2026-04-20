@@ -87,11 +87,11 @@ export async function login(email: string, password: string): Promise<ApiRespons
   return res.json();
 }
 
-export async function register(email: string, password: string): Promise<ApiResponse<AuthResponse>> {
+export async function register(email: string, password: string, companyName?: string): Promise<ApiResponse<AuthResponse>> {
   const res = await fetch(`${API_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, companyName: companyName || undefined }),
   });
   return res.json();
 }
@@ -300,6 +300,24 @@ export interface DashboardSummary {
 
 export async function getDashboardSummary(): Promise<ApiResponse<DashboardSummary>> {
   const res = await fetch(`${API_URL}/api/orders/dashboard-summary`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// --- Scan Diff ---
+
+export interface ScanDiff {
+  current: { orderId: string; domain: string; date: string; findingsCount: number };
+  previous: { orderId: string; domain: string; date: string; findingsCount: number };
+  newFindings: Array<{ title: string; severity: string; cvss_score: string }>;
+  resolvedFindings: Array<{ title: string; severity: string; cvss_score: string }>;
+  unchangedCount: number;
+  summary: string;
+}
+
+export async function getScanDiff(orderId: string, compareId: string): Promise<ApiResponse<ScanDiff>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/diff?compare=${compareId}`, {
     headers: authHeaders(),
   });
   return handleResponse(res);

@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
 import { getOrderStatus, getFindings, getScanResults, getReportDownloadUrl, getOrderEvents,
          excludeFinding, unexcludeFinding, regenerateReport, getReportVersions, approveOrder, rejectOrder,
-         OrderStatus, OrderEvents, FindingsData, ScanResult, ReportVersion } from '@/lib/api';
+         getScanDiff, listOrders,
+         OrderStatus, OrderEvents, FindingsData, ScanResult, ReportVersion, ScanDiff } from '@/lib/api';
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
 
-type Tab = 'findings' | 'recommendations' | 'debug';
+type Tab = 'findings' | 'recommendations' | 'diff' | 'debug';
 
 // ─── Scan Timeline Component ─────────────────────────────
 
@@ -153,6 +154,8 @@ export default function ScanDetailPage() {
   const [activeTab, setActiveTab] = useState<Tab>('findings');
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [diff, setDiff] = useState<ScanDiff | null>(null);
+  const [diffLoading, setDiffLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
@@ -321,10 +324,27 @@ export default function ScanDetailPage() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {isDone && order.hasReport && (
-              <a href={getReportDownloadUrl(orderId)}
-                className="text-sm text-blue-400 hover:text-blue-300 bg-blue-500/10 hover:bg-blue-500/20 px-4 py-2 rounded-lg transition-colors">
-                PDF herunterladen
-              </a>
+              <>
+                <a href={getReportDownloadUrl(orderId)}
+                  className="text-sm hover:text-white px-4 py-2 rounded-lg transition-colors"
+                  style={{ color: '#2DD4BF', backgroundColor: 'rgba(45,212,191,0.1)' }}>
+                  PDF herunterladen
+                </a>
+                <button onClick={() => {
+                  const email = prompt('E-Mail-Adresse des Empfängers:');
+                  if (!email) return;
+                  const url = getReportDownloadUrl(orderId);
+                  const subject = encodeURIComponent(`Sicherheitsreport: ${order.domain}`);
+                  const body = encodeURIComponent(
+                    `Guten Tag,\n\nanbei der aktuelle Sicherheitsreport für ${order.domain}.\n\nReport herunterladen:\n${window.location.origin}${url}\n\nBitte bearbeiten Sie die priorisierten Maßnahmen gemäß dem Maßnahmenplan im Report.\n\nMit freundlichen Grüßen`
+                  );
+                  window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+                }}
+                  className="text-sm px-4 py-2 rounded-lg transition-colors"
+                  style={{ color: '#94A3B8', backgroundColor: 'rgba(148,163,184,0.1)' }}>
+                  An IT-Team senden
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -491,6 +511,29 @@ export default function ScanDetailPage() {
                 className={`px-4 py-2.5 text-xs font-medium transition-colors ${
                   activeTab === 'recommendations' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-500 hover:text-slate-300'
                 }`}>Empfehlungen</button>
+              {isDone && (
+                <button onClick={async () => {
+                  setActiveTab('diff');
+                  if (!diff && !diffLoading) {
+                    setDiffLoading(true);
+                    // Find previous scan for same domain
+                    const ordersRes = await listOrders();
+                    if (ordersRes.success && ordersRes.data) {
+                      const sameD = ordersRes.data.orders
+                        .filter(o => o.domain === order.domain && o.id !== orderId && ['report_complete', 'delivered'].includes(o.status))
+                        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                      if (sameD.length > 0) {
+                        const diffRes = await getScanDiff(orderId, sameD[0].id);
+                        if (diffRes.success && diffRes.data) setDiff(diffRes.data);
+                      }
+                    }
+                    setDiffLoading(false);
+                  }
+                }}
+                  className={`px-4 py-2.5 text-xs font-medium transition-colors ${
+                    activeTab === 'diff' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-500 hover:text-slate-300'
+                  }`}>Vergleich</button>
+              )}
             </>
           )}
           {admin && (
@@ -533,6 +576,51 @@ export default function ScanDetailPage() {
           )}
           {activeTab === 'recommendations' && !findings && (
             <div className="text-center py-12 text-slate-600 text-sm">Keine Empfehlungen verfügbar.</div>
+          )}
+
+          {/* Diff Tab */}
+          {activeTab === 'diff' && (
+            <div className="px-5 py-5 space-y-4">
+              {diffLoading && <p className="text-center py-8 text-sm" style={{ color: '#64748B' }}>Vergleich wird geladen...</p>}
+              {!diffLoading && !diff && (
+                <p className="text-center py-8 text-sm" style={{ color: '#64748B' }}>Kein vorheriger Scan für diese Domain gefunden.</p>
+              )}
+              {diff && (
+                <>
+                  <div className="rounded-xl p-4" style={{ backgroundColor: '#1E293B' }}>
+                    <p className="text-sm" style={{ color: '#F8FAFC' }}>{diff.summary}</p>
+                    <p className="text-xs mt-1" style={{ color: '#64748B' }}>
+                      Vergleich: {diff.current.date ? new Date(diff.current.date).toLocaleDateString('de-DE') : '?'} vs. {diff.previous.date ? new Date(diff.previous.date).toLocaleDateString('de-DE') : '?'}
+                    </p>
+                  </div>
+                  {diff.newFindings.length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#EF4444' }}>Neue Befunde ({diff.newFindings.length})</h4>
+                      {diff.newFindings.map((f, i) => (
+                        <div key={i} className="flex items-center gap-3 py-2 border-b" style={{ borderColor: 'rgba(30,58,95,0.2)' }}>
+                          <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ backgroundColor: '#EF444420', color: '#EF4444' }}>{f.severity}</span>
+                          <span className="text-sm" style={{ color: '#F8FAFC' }}>{f.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {diff.resolvedFindings.length > 0 && (
+                    <div>
+                      <h4 className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: '#22C55E' }}>Behobene Befunde ({diff.resolvedFindings.length})</h4>
+                      {diff.resolvedFindings.map((f, i) => (
+                        <div key={i} className="flex items-center gap-3 py-2 border-b" style={{ borderColor: 'rgba(30,58,95,0.2)' }}>
+                          <span className="text-xs font-bold px-2 py-0.5 rounded" style={{ backgroundColor: '#22C55E20', color: '#22C55E' }}>✓</span>
+                          <span className="text-sm line-through" style={{ color: '#64748B' }}>{f.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {diff.unchangedCount > 0 && (
+                    <p className="text-xs" style={{ color: '#64748B' }}>{diff.unchangedCount} Befunde unverändert</p>
+                  )}
+                </>
+              )}
+            </div>
           )}
 
           {/* Debug Tab (Admin or Failed scans) */}

@@ -14,6 +14,7 @@ const MIN_PASSWORD_LENGTH = 8;
 interface RegisterBody {
   email: string;
   password: string;
+  companyName?: string;
 }
 
 interface LoginBody {
@@ -33,7 +34,7 @@ interface ResetPasswordBody {
 export async function authRoutes(server: FastifyInstance): Promise<void> {
   // POST /api/auth/register
   server.post<{ Body: RegisterBody }>('/api/auth/register', async (request, reply) => {
-    const { email, password } = request.body || {};
+    const { email, password, companyName } = request.body || {};
 
     if (!email || !EMAIL_REGEX.test(email)) {
       return reply.status(400).send({ success: false, error: 'Ungültige E-Mail-Adresse.' });
@@ -52,10 +53,12 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(409).send({ success: false, error: 'Ein Konto mit dieser E-Mail existiert bereits.' });
     }
 
-    // Find or create customer record
+    // Find or create customer record (with optional company name)
     const customerResult = await query<{ id: string }>(
-      'INSERT INTO customers (email) VALUES ($1) ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING id',
-      [email.toLowerCase()],
+      `INSERT INTO customers (email, company_name) VALUES ($1, $2)
+       ON CONFLICT (email) DO UPDATE SET company_name = COALESCE(EXCLUDED.company_name, customers.company_name)
+       RETURNING id`,
+      [email.toLowerCase(), companyName?.trim() || null],
     );
     const customerId = customerResult.rows[0].id;
 

@@ -747,6 +747,63 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     };
   });
 
+  // GET /api/orders/:id/diff?compare=<otherId> — compare findings between two scans
+  server.get<{ Params: OrderParams }>('/api/orders/:id/diff', { preHandler: [requireAuth] }, async (request, reply) => {
+    const { id } = request.params;
+    const user = request.user!;
+    const queryParams = request.query as Record<string, string>;
+    const compareId = queryParams.compare;
+
+    if (!UUID_REGEX.test(id) || !compareId || !UUID_REGEX.test(compareId)) {
+      return reply.status(400).send({ success: false, error: 'Zwei gültige Order-IDs erforderlich (?compare=<id>)' });
+    }
+
+    // Load findings from both orders (latest report each)
+    const loadFindings = async (orderId: string) => {
+      const res = await query(
+        `SELECT r.findings_data->'findings' AS findings, o.target_url, o.scan_finished_at, o.customer_id
+         FROM orders o
+         LEFT JOIN LATERAL (SELECT findings_data FROM reports WHERE order_id = o.id ORDER BY created_at DESC LIMIT 1) r ON true
+         WHERE o.id = $1`,
+        [orderId],
+      );
+      return res.rows[0] as Record<string, unknown> | undefined;
+    };
+
+    const [currentData, previousData] = await Promise.all([loadFindings(id), loadFindings(compareId)]);
+    if (!currentData || !previousData) {
+      return reply.status(404).send({ success: false, error: 'Order nicht gefunden' });
+    }
+
+    // Ownership check
+    if (user.role !== 'admin' && (currentData.customer_id !== user.customerId || previousData.customer_id !== user.customerId)) {
+      return reply.status(403).send({ success: false, error: 'Zugriff verweigert' });
+    }
+
+    const currentFindings = (currentData.findings as Array<Record<string, unknown>>) || [];
+    const previousFindings = (previousData.findings as Array<Record<string, unknown>>) || [];
+
+    // Build title-based lookup for comparison
+    const prevTitles = new Set(previousFindings.map(f => (f.title as string || '').toLowerCase()));
+    const currTitles = new Set(currentFindings.map(f => (f.title as string || '').toLowerCase()));
+
+    const newFindings = currentFindings.filter(f => !prevTitles.has((f.title as string || '').toLowerCase()));
+    const resolvedFindings = previousFindings.filter(f => !currTitles.has((f.title as string || '').toLowerCase()));
+    const unchangedFindings = currentFindings.filter(f => prevTitles.has((f.title as string || '').toLowerCase()));
+
+    return {
+      success: true,
+      data: {
+        current: { orderId: id, domain: currentData.target_url, date: currentData.scan_finished_at, findingsCount: currentFindings.length },
+        previous: { orderId: compareId, domain: previousData.target_url, date: previousData.scan_finished_at, findingsCount: previousFindings.length },
+        newFindings: newFindings.map(f => ({ title: f.title, severity: f.severity, cvss_score: f.cvss_score })),
+        resolvedFindings: resolvedFindings.map(f => ({ title: f.title, severity: f.severity, cvss_score: f.cvss_score })),
+        unchangedCount: unchangedFindings.length,
+        summary: `${newFindings.length} neue, ${resolvedFindings.length} behobene, ${unchangedFindings.length} unveränderte Befunde`,
+      },
+    };
+  });
+
   // GET /api/orders/:id/report-versions — list all report versions
   server.get<{ Params: OrderParams }>('/api/orders/:id/report-versions', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
