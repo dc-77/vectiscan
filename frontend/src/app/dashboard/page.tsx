@@ -107,7 +107,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const PAGE_SIZE = 20;
 
   // Detail panel removed — dedicated /scan/[orderId] page handles details
 
@@ -167,7 +170,10 @@ export default function Dashboard() {
     }
   };
 
-  const filtered = filterOrders(orders, filter);
+  const filtered = filterOrders(orders, filter)
+    .filter(o => !searchQuery || o.domain.toLowerCase().includes(searchQuery.toLowerCase()));
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const counts = {
     all: orders.length,
     active: orders.filter(o => isActive(o.status)).length,
@@ -283,6 +289,15 @@ export default function Dashboard() {
           )}
         </div>
 
+        {/* Search */}
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => { setSearchQuery(e.target.value); setPage(1); }}
+          placeholder="Domain suchen..."
+          className="w-full sm:max-w-xs bg-[#1e293b] border border-gray-800 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF]"
+        />
+
         {error && (
           <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">{error}</div>
         )}
@@ -300,7 +315,7 @@ export default function Dashboard() {
         {/* Orders list */}
         {!loading && filtered.length > 0 && (
           <div className="space-y-4">
-            {filtered.map((order) => {
+            {paginated.map((order) => {
               const pkg = PACKAGE_STYLES[order.package] || PACKAGE_STYLES.professional;
               const statusLabel = PHASE_LABELS[order.status] || order.status;
               const statusStyle = PHASE_COLORS[order.status] || { bg: 'bg-slate-700', text: 'text-slate-400' };
@@ -325,7 +340,7 @@ export default function Dashboard() {
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <span className="font-mono text-blue-400 text-sm truncate">{order.domain}</span>
-                        {admin && <span className="text-xs text-slate-600 truncate hidden sm:inline">{order.email}</span>}
+                        {admin && order.email !== userEmail && <span className="text-xs text-slate-600 truncate hidden sm:inline">{order.email}</span>}
                         {isDone && order.severityCounts && (
                           <SeverityCounts counts={order.severityCounts} />
                         )}
@@ -416,6 +431,19 @@ export default function Dashboard() {
                 </div>
               );
             })}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 pt-4">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}
+                  className="text-xs px-3 py-1.5 rounded-md disabled:opacity-30 transition-colors"
+                  style={{ color: '#94A3B8', border: '1px solid rgba(45,212,191,0.15)' }}>Zurück</button>
+                <span className="text-xs" style={{ color: '#64748B' }}>Seite {page} von {totalPages}</span>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}
+                  className="text-xs px-3 py-1.5 rounded-md disabled:opacity-30 transition-colors"
+                  style={{ color: '#94A3B8', border: '1px solid rgba(45,212,191,0.15)' }}>Weiter</button>
+              </div>
+            )}
           </div>
         )}
 

@@ -455,7 +455,7 @@ export default function ScanDetailPage() {
                 }`}>Empfehlungen</button>
             </>
           )}
-          {(admin || isFailed) && (
+          {admin && (
             <button onClick={() => setActiveTab('debug')}
               className={`px-4 py-2.5 text-xs font-medium transition-colors ${
                 activeTab === 'debug' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-slate-500 hover:text-slate-300'
@@ -498,7 +498,7 @@ export default function ScanDetailPage() {
           )}
 
           {/* Debug Tab (Admin or Failed scans) */}
-          {activeTab === 'debug' && (admin || isFailed) && (
+          {activeTab === 'debug' && admin && (
             <div className="space-y-6">
               {/* Timeline */}
               {scanResults && (
