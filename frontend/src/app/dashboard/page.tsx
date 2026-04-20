@@ -398,7 +398,7 @@ export default function Dashboard() {
               In wenigen Minuten wissen Sie, wie sicher Ihre IT-Infrastruktur ist. Starten Sie Ihren ersten Scan oder erstellen Sie ein Abo für regelmäßige Überwachung.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Link href="/scan" className="px-6 py-3 rounded-lg text-sm font-semibold transition-all cta-glow"
+              <Link href="/welcome" className="px-6 py-3 rounded-lg text-sm font-semibold transition-all cta-glow"
                 style={{ backgroundColor: '#2DD4BF', color: '#0F172A' }}>Ersten Scan starten</Link>
               <Link href="/subscribe" className="px-6 py-3 rounded-lg text-sm font-medium transition-colors"
                 style={{ color: '#F8FAFC', border: '1px solid rgba(45,212,191,0.25)' }}>Abo erstellen</Link>

@@ -51,6 +51,23 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* WebCheck Teaser */}
+      <section className="pb-12">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="rounded-2xl p-6 sm:p-8 text-center" style={{ backgroundColor: C.slateLight, border: `1px solid ${C.border}` }}>
+            <p className="text-xs uppercase tracking-wider mb-3 font-medium" style={{ color: C.teal }}>Kostenlos testen</p>
+            <h2 className="text-xl font-semibold mb-2" style={{ color: C.offWhite }}>WebCheck — Ihr erster Sicherheits-Scan</h2>
+            <p className="text-sm mb-6 max-w-lg mx-auto" style={{ color: C.muted }}>
+              Schnell-Scan Ihrer Domain in ~15 Minuten. DNS, E-Mail-Security und grundlegende Schwachstellen — kostenlos und unverbindlich.
+            </p>
+            <Link href="/welcome" className="inline-block px-7 py-3 rounded-lg text-sm font-semibold transition-all"
+              style={{ backgroundColor: C.teal, color: C.slate }}>
+              Kostenlosen WebCheck starten
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Package Cards */}
       <section id="pakete" className="pb-16">
         <div className="max-w-4xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -75,7 +92,7 @@ export default function PricingPage() {
               ))}
             </ul>
             <div className="border-t pt-5" style={{ borderColor: C.borderSubtle }}>
-              <p className="text-xs mb-4" style={{ color: C.muted }}>Jahresabo — Preis auf Anfrage</p>
+              <p className="text-xs mb-4" style={{ color: C.muted }}>Jahresabo — individuelle Preisgestaltung</p>
               <Link href="mailto:kontakt@vectigal.gmbh?subject=Angebot%20Perimeter-Scan&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20VectiScan%20Perimeter-Scan.%0A%0AFirma%3A%20%0ADomains%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
                 className="block w-full text-center px-5 py-3 rounded-lg text-sm font-medium transition-all"
                 style={{ backgroundColor: C.teal, color: C.slate }}>
@@ -102,7 +119,7 @@ export default function PricingPage() {
               ))}
             </ul>
             <div className="border-t pt-5" style={{ borderColor: C.borderSubtle }}>
-              <p className="text-xs mb-4" style={{ color: C.muted }}>Jahresabo — Preis auf Anfrage</p>
+              <p className="text-xs mb-4" style={{ color: C.muted }}>Jahresabo — individuelle Preisgestaltung</p>
               <Link href="mailto:kontakt@vectigal.gmbh?subject=Angebot%20Cyberversicherung&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20VectiScan%20Cyberversicherungs-Report.%0A%0AFirma%3A%20%0ADomains%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
                 className="block w-full text-center px-5 py-3 rounded-lg text-sm font-medium transition-colors"
                 style={{ color: C.teal, border: `1px solid ${C.teal}40` }}>

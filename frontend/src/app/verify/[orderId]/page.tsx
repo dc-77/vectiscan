@@ -197,7 +197,7 @@ export default function VerifyPage() {
                     </button>
                   </div>
                   <p className="text-gray-500 text-sm mt-3">
-                    DNS-Anderungen konnen bis zu 5 Minuten dauern.
+                    DNS-Änderungen können bis zu 5 Minuten dauern.
                   </p>
                 </div>
               )}
@@ -232,7 +232,7 @@ export default function VerifyPage() {
               {activeTab === 'meta_tag' && (
                 <div data-testid="tab-content-meta_tag">
                   <p className="text-gray-300 mb-3">
-                    Fuge diesen Meta-Tag in den &lt;head&gt; deiner Startseite ein:
+                    Fügen Sie diesen Meta-Tag in den &lt;head&gt;-Bereich Ihrer Startseite ein:
                   </p>
                   <div className="relative">
                     <pre className="bg-[#0f172a] rounded-lg p-4 text-cyan-300 font-mono text-sm overflow-x-auto">
