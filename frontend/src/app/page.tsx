@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { VectiScanShield } from '@/components/VectiScanLogo';
+import { isLoggedIn } from '@/lib/auth';
 
 const C = {
   slate: '#0F172A', slateLight: '#1E293B', teal: '#2DD4BF', tealDark: '#14B8A6',
@@ -41,7 +42,12 @@ function useGlitch() {
 
 function OrderIdRedirect() {
   const router = useRouter(); const sp = useSearchParams();
-  useEffect(() => { const id = sp.get('orderId'); if (id) router.replace(`/scan?orderId=${id}`); }, [sp, router]);
+  useEffect(() => {
+    const id = sp.get('orderId');
+    if (id) { router.replace(`/scan?orderId=${id}`); return; }
+    // Eingeloggte User → Dashboard statt Landing Page
+    if (isLoggedIn()) { router.replace('/dashboard'); }
+  }, [sp, router]);
   return null;
 }
 

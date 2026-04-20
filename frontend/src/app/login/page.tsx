@@ -31,7 +31,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = tab === 'login' ? await login(email, password) : await register(email, password);
-      if (res.success && res.data) { setToken(res.data.token); router.push('/'); }
+      if (res.success && res.data) { setToken(res.data.token); router.push('/dashboard'); }
       else { setError(res.error || 'Unbekannter Fehler'); }
     } catch { setError('API nicht erreichbar.'); }
     finally { setLoading(false); }

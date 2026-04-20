@@ -59,11 +59,11 @@ const PACKAGES = [
   {
     id: 'perimeter',
     name: 'Perimeter-Scan',
-    subtitle: 'Vollstandige Sicherheitsanalyse Ihrer Angriffsoberflache',
+    subtitle: 'Vollständige Sicherheitsanalyse Ihrer Angriffsoberfläche',
     recommended: true,
     color: '#38BDF8',
     features: [
-      'Vollstandige Angriffsoberflachen-Analyse',
+      'Vollständige Angriffsoberflächen-Analyse',
       'Port-Scanning, Web-Schwachstellen, DNS, E-Mail-Security',
       'PTES-konformer Report mit Executive Summary',
       'Priorisierter Massnahmenplan mit Zeitrahmen',
@@ -85,7 +85,7 @@ const PACKAGES = [
 ] as const;
 
 const INTERVALS = [
-  { id: 'weekly', label: 'Wochentlich', desc: 'Scan jede Woche' },
+  { id: 'weekly', label: 'Wöchentlich', desc: 'Scan jede Woche' },
   { id: 'monthly', label: 'Monatlich', desc: 'Scan jeden Monat' },
   { id: 'quarterly', label: 'Quartalsweise', desc: 'Scan alle 3 Monate' },
 ] as const;
@@ -173,7 +173,7 @@ export default function SubscribePage() {
           </div>
           <h1 className="text-xl font-semibold text-white">Abo erfolgreich erstellt</h1>
           <p className="text-sm text-gray-400">
-            Ihre Domains werden jetzt von einem Administrator gepruft und freigegeben.
+            Ihre Domains werden jetzt von einem Administrator geprüft und freigegeben.
             Nach der Freigabe startet der erste Scan automatisch.
           </p>
           <Link href="/dashboard"
@@ -220,7 +220,7 @@ export default function SubscribePage() {
         {/* Step 1: Package Selection */}
         {step === 1 && (
           <div className="space-y-3">
-            <p className="text-sm text-gray-400">Wahlen Sie Ihr Scan-Paket:</p>
+            <p className="text-sm text-gray-400">Wählen Sie Ihr Scan-Paket:</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {PACKAGES.map((pkg) => {
                 const isSelected = selectedPackage === pkg.id;
@@ -350,7 +350,7 @@ export default function SubscribePage() {
             {reportEmails.length < 10 && (
               <button onClick={() => setReportEmails([...reportEmails, ''])}
                 className="text-xs text-[#2DD4BF] hover:text-[#5EEAD4] font-medium transition-colors">
-                + Empfanger hinzufugen
+                + Empfänger hinzufügen
               </button>
             )}
           </div>
@@ -411,7 +411,7 @@ export default function SubscribePage() {
             </div>
             <div className="border-t border-gray-700 pt-3">
               <p className="text-xs text-gray-500">
-                Nach der Bestellung werden Ihre Domains von einem Administrator gepruft.
+                Nach der Bestellung werden Ihre Domains von einem Administrator geprüft.
                 Nach Freigabe startet der erste Scan automatisch.
               </p>
             </div>
@@ -423,7 +423,7 @@ export default function SubscribePage() {
           {step > 1 ? (
             <button onClick={() => { setStep(step - 1); setError(null); }}
               className="text-sm text-gray-400 hover:text-gray-300 transition-colors">
-              Zuruck
+              Zurück
             </button>
           ) : <div />}
 

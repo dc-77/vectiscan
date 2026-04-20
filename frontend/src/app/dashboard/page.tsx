@@ -188,7 +188,7 @@ export default function Dashboard() {
           <div className="space-y-3">
             {subscriptions.filter(s => s.status === 'active').map((sub) => {
               const pkgLabel = PACKAGE_STYLES[sub.package]?.label || sub.package.toUpperCase();
-              const intervalLabel = { weekly: 'Wochentlich', monthly: 'Monatlich', quarterly: 'Quartalsweise' }[sub.scanInterval] || sub.scanInterval;
+              const intervalLabel = { weekly: 'Wöchentlich', monthly: 'Monatlich', quarterly: 'Quartalsweise' }[sub.scanInterval] || sub.scanInterval;
               const verifiedDomains = sub.domains.filter(d => d.status === 'verified');
               const pendingDomains = sub.domains.filter(d => d.status === 'pending_approval');
               const rescansLeft = sub.maxRescans - sub.rescansUsed;
@@ -202,7 +202,7 @@ export default function Dashboard() {
                       <span className="text-xs text-gray-500">{intervalLabel}</span>
                     </div>
                     <div className="text-xs text-gray-500">
-                      {sub.expiresAt && <>Lauft bis {new Date(sub.expiresAt).toLocaleDateString('de-DE')}</>}
+                      {sub.expiresAt && <>Läuft bis {new Date(sub.expiresAt).toLocaleDateString('de-DE')}</>}
                     </div>
                   </div>
 
