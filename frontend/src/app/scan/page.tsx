@@ -364,14 +364,23 @@ function HomeContent() {
       <main className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-4xl space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex gap-3">
-              <input type="text" value={domain} onChange={(e) => setDomain(e.target.value)}
-                placeholder="beispiel.de" disabled={submitting}
-                className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono disabled:opacity-50" />
-              <button type="submit" disabled={submitting || !domain.trim()}
-                className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors">
-                {submitting ? 'Startet...' : 'Scan starten'}
-              </button>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#F8FAFC' }}>
+                Welche Domain möchten Sie scannen?
+              </label>
+              <div className="flex gap-3">
+                <input type="text" value={domain} onChange={(e) => setDomain(e.target.value)}
+                  placeholder="meinefirma.de" disabled={submitting}
+                  className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] font-mono disabled:opacity-50" />
+                <button type="submit" disabled={submitting || !domain.trim()}
+                  className="disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-3 rounded-lg transition-colors"
+                  style={{ backgroundColor: '#2DD4BF', color: '#0F172A' }}>
+                  {submitting ? 'Startet...' : 'Scan starten'}
+                </button>
+              </div>
+              <p className="text-xs mt-2" style={{ color: '#64748B' }}>
+                Nach dem Start dauert der Scan je nach Paket ca. 15–90 Minuten. Sie erhalten den Report per E-Mail.
+              </p>
             </div>
             <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />
           </form>

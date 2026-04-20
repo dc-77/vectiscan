@@ -55,19 +55,24 @@ export default function ForgotPasswordPage() {
         ) : (
           <>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="E-Mail-Adresse"
-                autoFocus
-                disabled={loading}
-                className="w-full bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] disabled:opacity-50"
-              />
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#94A3B8' }}>E-Mail-Adresse</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="ihre@email.de"
+                  autoFocus
+                  disabled={loading}
+                  className="w-full bg-transparent border rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] disabled:opacity-50"
+                  style={{ borderColor: 'rgba(148,163,184,0.2)' }}
+                />
+              </div>
               <button
                 type="submit"
                 disabled={loading || !email.trim()}
-                className="w-full bg-[#2DD4BF] hover:bg-[#14B8A6] text-[#0F172A] disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors"
+                className="w-full disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-3 rounded-lg transition-colors"
+                style={{ backgroundColor: '#2DD4BF', color: '#0F172A' }}
               >
                 {loading ? 'Bitte warten...' : 'Reset-Link senden'}
               </button>

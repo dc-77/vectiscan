@@ -408,10 +408,14 @@ export default function SubscribePage() {
                 <span className="text-gray-500">Re-Scans inklusive</span>
                 <span className="text-white">3 pro Jahr</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Preis</span>
+                <span className="text-white">Wird nach Prüfung mitgeteilt</span>
+              </div>
             </div>
             <div className="border-t border-gray-700 pt-3">
               <p className="text-xs text-gray-500">
-                Nach der Bestellung werden Ihre Domains von einem Administrator geprüft.
+                Nach der Bestellung werden Ihre Domains von einem Administrator geprüft. Der Preis wird Ihnen individuell mitgeteilt.
                 Nach Freigabe startet der erste Scan automatisch.
               </p>
             </div>

@@ -89,8 +89,8 @@ const PACKAGES: PackageInfo[] = [
 ];
 
 const SHARED_CAPABILITIES = [
-  'Nmap Top-1000', 'Passive Intel', 'Nuclei', 'Nikto', 'ffuf',
-  'XSS-Scanner', 'Threat-Intel', 'Korrelation', '15 Hosts',
+  'Port-Analyse', 'Passive Aufklärung', 'Schwachstellen-Scan', 'Webserver-Analyse', 'Verzeichnis-Scan',
+  'Skript-Injection-Test', 'Bedrohungsanalyse', 'KI-Korrelation', '15 Hosts',
 ];
 
 interface Props {

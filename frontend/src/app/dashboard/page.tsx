@@ -371,7 +371,7 @@ export default function Dashboard() {
             >{label} ({count})</button>
           ))}
           {lastUpdate && (
-            <span className="ml-auto text-xs text-gray-600 font-mono">Aktualisiert: {lastUpdate.toLocaleTimeString('de-DE')}</span>
+            <span className="ml-auto text-xs text-gray-600">Zuletzt aktualisiert: {lastUpdate.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })} Uhr</span>
           )}
         </div>
 

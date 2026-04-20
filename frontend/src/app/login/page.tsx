@@ -75,9 +75,22 @@ export default function LoginPage() {
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="E-Mail-Adresse" autoFocus disabled={loading}
               className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-              placeholder="Passwort (min. 8 Zeichen)" disabled={loading}
-              className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
+            <div>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+                placeholder="Passwort (min. 8 Zeichen)" disabled={loading}
+                className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
+              {tab === 'register' && password.length > 0 && (
+                <div className="flex gap-1 mt-2">
+                  {[1,2,3,4].map(i => {
+                    const strength = password.length >= 12 && /[A-Z]/.test(password) && /[0-9]/.test(password) && /[^a-zA-Z0-9]/.test(password) ? 4
+                      : password.length >= 10 && /[A-Z]/.test(password) && /[0-9]/.test(password) ? 3
+                      : password.length >= 8 ? 2 : 1;
+                    const colors = ['#EF4444', '#F59E0B', '#3B82F6', '#22C55E'];
+                    return <div key={i} className="flex-1 h-1 rounded-full" style={{ backgroundColor: i <= strength ? colors[strength-1] : '#1E293B' }} />;
+                  })}
+                </div>
+              )}
+            </div>
             {tab === 'register' && (
               <>
                 <input type="password" value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)}
