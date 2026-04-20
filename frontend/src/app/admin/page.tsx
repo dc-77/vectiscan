@@ -264,8 +264,8 @@ export default function AdminPage() {
         {aiCosts && aiCosts.total_cost_usd > 0 && (
           <div className="bg-[#1e293b] rounded-lg border border-gray-800 p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-medium text-gray-400">AI-Kosten</h2>
-              <span className="text-lg font-bold text-white">${aiCosts.total_cost_usd.toFixed(2)} USD</span>
+              <h2 className="text-sm font-medium text-gray-400">AI-Kosten <span className="text-[10px] text-gray-600 font-normal">(Anthropic API, in USD)</span></h2>
+              <span className="text-lg font-bold text-white">${aiCosts.total_cost_usd.toFixed(2)}</span>
             </div>
 
             {/* Cost by Model */}

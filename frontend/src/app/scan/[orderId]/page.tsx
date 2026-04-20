@@ -129,13 +129,8 @@ function ScanTimeline({ results, startedAt, finishedAt }: {
   );
 }
 
-const PHASE_LABELS: Record<string, string> = {
-  passive_intel: 'Passive Intel', dns_recon: 'DNS-Recon', scan_phase1: 'Phase 1', scan_phase2: 'Phase 2',
-  scan_phase3: 'Phase 3 — Korrelation', scan_complete: 'Scan fertig',
-  pending_review: 'Wartet auf Review', approved: 'Genehmigt', rejected: 'Abgelehnt',
-  report_generating: 'Report...', report_complete: 'Fertig', delivered: 'Zugestellt',
-  failed: 'Fehlgeschlagen', cancelled: 'Abgebrochen',
-};
+import { STATUS_LABELS, cvssLabel } from '@/lib/utils';
+const PHASE_LABELS = STATUS_LABELS;
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString('de-DE', {

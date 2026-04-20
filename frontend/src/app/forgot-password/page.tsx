@@ -36,9 +36,9 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm space-y-6">
-        <p className="text-center text-gray-400">Passwort zurücksetzen</p>
+    <main className="flex-1 flex flex-col items-center justify-center px-4 py-12" style={{ backgroundColor: '#0F172A' }}>
+      <div className="w-full max-w-sm rounded-2xl p-8 space-y-6" style={{ backgroundColor: '#1E293B' }}>
+        <p className="text-center font-semibold" style={{ color: '#F8FAFC' }}>Passwort zurücksetzen</p>
 
         {sent ? (
           <div className="space-y-4">

@@ -7,23 +7,9 @@ import { listOrders, getReportDownloadUrl, deleteOrderPermanent, listSubscriptio
 import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
 
-const PHASE_LABELS: Record<string, string> = {
-  verification_pending: 'Verifizierung',
-  created: 'Erstellt',
-  queued: 'In Warteschlange',
-  scanning: 'Startet...',
-  passive_intel: 'Passive Intel',
-  dns_recon: 'DNS-Recon',
-  scan_phase1: 'Phase 1',
-  scan_phase2: 'Phase 2',
-  scan_phase3: 'Phase 3',
-  scan_complete: 'Scan fertig',
-  report_generating: 'Report...',
-  report_complete: 'Fertig',
-  failed: 'Fehlgeschlagen',
-  cancelled: 'Abgebrochen',
-  verified: 'Verifiziert',
-};
+import { STATUS_LABELS, formatDuration as fmtDur } from '@/lib/utils';
+
+const PHASE_LABELS = STATUS_LABELS;
 
 const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   verification_pending: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
@@ -92,8 +78,7 @@ function formatDuration(startedAt: string | null, finishedAt: string | null): st
   if (!startedAt || !finishedAt) return null;
   const ms = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
   const min = Math.round(ms / 60000);
-  if (min < 1) return '< 1 Min';
-  return `${min} Min`;
+  return fmtDur(min);
 }
 
 export default function Dashboard() {
@@ -269,6 +254,41 @@ export default function Dashboard() {
             Automatisieren Sie Ihre Scans mit einem Abo &rarr;
           </Link>
         )}
+
+        {/* KPI Summary Cards */}
+        {!loading && orders.length > 0 && (() => {
+          const done = orders.filter(o => ['report_complete', 'delivered'].includes(o.status));
+          const activeScans = orders.filter(o => ['scanning', 'queued', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_phase3', 'report_generating'].includes(o.status));
+          const domains = new Set(orders.map(o => o.domain));
+          const highestRisk = done.reduce((max, o) => {
+            const r = o.overallRisk?.toUpperCase();
+            if (r === 'CRITICAL') return 'CRITICAL';
+            if (r === 'HIGH' && max !== 'CRITICAL') return 'HIGH';
+            if (r === 'MEDIUM' && !['CRITICAL', 'HIGH'].includes(max)) return 'MEDIUM';
+            return max;
+          }, 'LOW');
+          const riskColor = { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6', LOW: '#22C55E' }[highestRisk] || '#22C55E';
+          return (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="rounded-xl p-4" style={{ backgroundColor: '#1E293B' }}>
+                <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#64748B' }}>Domains</p>
+                <p className="text-2xl font-bold" style={{ color: '#F8FAFC' }}>{domains.size}</p>
+              </div>
+              <div className="rounded-xl p-4" style={{ backgroundColor: '#1E293B' }}>
+                <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#64748B' }}>Scans gesamt</p>
+                <p className="text-2xl font-bold" style={{ color: '#F8FAFC' }}>{orders.length}</p>
+              </div>
+              <div className="rounded-xl p-4" style={{ backgroundColor: '#1E293B' }}>
+                <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#64748B' }}>Aktive Scans</p>
+                <p className="text-2xl font-bold" style={{ color: '#2DD4BF' }}>{activeScans.length}</p>
+              </div>
+              <div className="rounded-xl p-4" style={{ backgroundColor: '#1E293B' }}>
+                <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: '#64748B' }}>Gesamtrisiko</p>
+                <p className="text-2xl font-bold" style={{ color: riskColor }}>{highestRisk}</p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Filter pills */}
         <div className="flex items-center gap-2 flex-wrap">

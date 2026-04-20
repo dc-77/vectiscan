@@ -81,9 +81,35 @@ export const HOST_COLORS = [
   '#FCA5A5', // Light Red
 ] as const;
 
-/** Get cinematic label for a tool. Falls back to uppercased tool name. */
+/** CEO-friendly German tool labels (for customer-facing UI). */
+export const TOOL_LABELS_DE: Record<string, string> = {
+  nmap: 'Port-Analyse', webtech: 'Technologie-Erkennung', wafw00f: 'Firewall-Erkennung',
+  cms_fingerprint: 'CMS-Erkennung', testssl: 'Verschlüsselungs-Prüfung',
+  zap_spider: 'Web-Crawling', zap_ajax_spider: 'JavaScript-Analyse',
+  zap_active: 'Schwachstellen-Prüfung', zap_passive: 'Passive Analyse',
+  nuclei: 'Schwachstellen-Scan', header_check: 'Security-Header-Prüfung',
+  headers: 'Security-Header-Prüfung', httpx: 'HTTP-Analyse',
+  wpscan: 'WordPress-Prüfung', nikto: 'Webserver-Analyse',
+  gobuster_dir: 'Verzeichnis-Scan', ffuf: 'Parameter-Analyse',
+  feroxbuster: 'Verzeichnis-Analyse', katana: 'Endpunkt-Erkennung',
+  dalfox: 'Skript-Injection-Test', correlator: 'KI-Korrelation',
+  fp_filter: 'Falsch-Positiv-Filter', business_impact: 'Risiko-Bewertung',
+  nvd: 'Schwachstellen-Datenbank', epss: 'Exploit-Wahrscheinlichkeit',
+  cisa_kev: 'Bekannte Schwachstellen', exploitdb: 'Exploit-Recherche',
+  subfinder: 'Subdomain-Suche', amass: 'Subdomain-Analyse',
+  gobuster_dns: 'DNS-Analyse', dnsx: 'DNS-Validierung',
+  crtsh: 'Zertifikats-Suche', shodan: 'Netzwerk-Aufklärung',
+  gowitness: 'Screenshot-Erfassung',
+};
+
+/** Get cinematic label for a tool (for terminal/admin view). Falls back to uppercased tool name. */
 export function getToolLabel(tool: string): string {
   return TOOL_LABELS[tool] || tool.toUpperCase().replace(/_/g, ' ');
+}
+
+/** Get CEO-friendly German label (for customer view). */
+export function getToolLabelDE(tool: string): string {
+  return TOOL_LABELS_DE[tool] || tool.replace(/_/g, ' ');
 }
 
 /** Assign a lane color to a host based on its index. */

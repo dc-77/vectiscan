@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { FindingsData, Finding } from '@/lib/api';
 import SeverityCounts from './SeverityCounts';
+import { cvssLabel } from '@/lib/utils';
 
 const SEVERITY_ORDER = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
 
@@ -164,11 +165,16 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
                       FALSE POSITIVE
                     </span>
                   )}
-                  {!isBasic && finding.cvss_score && (
-                    <span className="text-xs font-mono font-bold text-slate-300 bg-slate-700/50 px-2 py-0.5 rounded">
-                      {finding.cvss_score}
-                    </span>
-                  )}
+                  {!isBasic && finding.cvss_score && (() => {
+                    const score = parseFloat(finding.cvss_score);
+                    const label = cvssLabel(score);
+                    return (
+                      <span className="text-xs font-mono font-bold text-slate-300 bg-slate-700/50 px-2 py-0.5 rounded" title={label.urgency ? `${label.text} — ${label.urgency}` : label.text}>
+                        {finding.cvss_score}
+                        <span className="font-sans font-normal text-slate-500 ml-1.5">{label.urgency || label.text}</span>
+                      </span>
+                    );
+                  })()}
                   {finding.in_cisa_kev && (
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30" title="CISA Known Exploited Vulnerability">
                       KEV
