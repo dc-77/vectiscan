@@ -379,7 +379,7 @@ function HomeContent() {
                 </button>
               </div>
               <p className="text-xs mt-2" style={{ color: '#64748B' }}>
-                Nach dem Start dauert der Scan je nach Paket ca. 15–90 Minuten. Sie erhalten den Report per E-Mail.
+                Nach dem Start dauert der Scan je nach Paket ca. 15–90 Minuten. Sie erhalten den Report per E-Mail. Neue Domains müssen einmalig verifiziert werden.
               </p>
             </div>
             <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />

@@ -220,7 +220,7 @@ export default function Dashboard() {
                           {d.status === 'verified' && rescansLeft > 0 && (
                             <button
                               onClick={async () => {
-                                if (!confirm(`Re-Scan fur ${d.domain} starten? (${rescansLeft} Re-Scans verbleibend)`)) return;
+                                if (!confirm(`Re-Scan für ${d.domain} starten? (${rescansLeft} Re-Scans verbleibend)`)) return;
                                 const res = await requestRescan(sub.id, d.domain);
                                 if (res.success) {
                                   fetchOrders();
@@ -242,7 +242,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-4 text-xs text-gray-500">
                     <span>{verifiedDomains.length} aktive Domain{verifiedDomains.length !== 1 ? 's' : ''}</span>
                     {pendingDomains.length > 0 && <span className="text-amber-400">{pendingDomains.length} ausstehend</span>}
-                    <span>{rescansLeft}/{sub.maxRescans} Re-Scans</span>
+                    <span title="Nach Behebung von Schwachstellen können Sie erneut scannen lassen, um die Korrektur zu bestätigen.">{rescansLeft}/{sub.maxRescans} Re-Scans</span>
                     {sub.lastScanAt && <span>Letzter Scan: {formatDate(sub.lastScanAt)}</span>}
                   </div>
                 </div>

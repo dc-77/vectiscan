@@ -15,10 +15,11 @@ const SCHEDULE_TYPES = [
 
 const PACKAGES = [
   { value: 'webcheck', label: 'WebCheck' },
-  { value: 'perimeter', label: 'PerimeterScan' },
-  { value: 'compliance', label: 'ComplianceScan' },
+  { value: 'perimeter', label: 'Perimeter-Scan' },
+  { value: 'compliance', label: 'Compliance-Scan' },
   { value: 'supplychain', label: 'SupplyChain' },
-  { value: 'insurance', label: 'InsuranceReport' },
+  { value: 'insurance', label: 'Cyberversicherung' },
+  { value: 'tlscompliance', label: 'TLS-Compliance' },
 ];
 
 function formatDate(iso: string): string {
@@ -125,7 +126,11 @@ export default function SchedulesPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold text-white">Geplante Scans</h1>
           <button onClick={() => setShowCreate(!showCreate)}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
+            className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            style={showCreate
+              ? { color: '#94A3B8', border: '1px solid rgba(148,163,184,0.2)' }
+              : { backgroundColor: '#2DD4BF', color: '#0F172A' }
+            }>
             {showCreate ? 'Abbrechen' : '+ Neuer Zeitplan'}
           </button>
         </div>
@@ -142,20 +147,20 @@ export default function SchedulesPage() {
                 <label className="block text-xs text-slate-500 mb-1">Domain</label>
                 <input type="text" value={domain} onChange={e => setDomain(e.target.value)}
                   placeholder="beispiel.de" disabled={creating}
-                  className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-blue-500 disabled:opacity-50" />
+                  className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white font-mono placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] disabled:opacity-50" />
                 <p className="text-[10px] text-slate-600 mt-1">Domain muss vorher einmal verifiziert worden sein.</p>
               </div>
               <div>
                 <label className="block text-xs text-slate-500 mb-1">Paket</label>
                 <select value={pkg} onChange={e => setPkg(e.target.value)} disabled={creating}
-                  className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 disabled:opacity-50">
+                  className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#2DD4BF] disabled:opacity-50">
                   {PACKAGES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs text-slate-500 mb-1">Intervall</label>
                 <select value={scheduleType} onChange={e => setScheduleType(e.target.value)} disabled={creating}
-                  className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 disabled:opacity-50">
+                  className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#2DD4BF] disabled:opacity-50">
                   {SCHEDULE_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
@@ -164,12 +169,12 @@ export default function SchedulesPage() {
                   <label className="block text-xs text-slate-500 mb-1">Zeitpunkt</label>
                   <input type="datetime-local" value={scheduledAt} onChange={e => setScheduledAt(e.target.value)}
                     disabled={creating}
-                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500 disabled:opacity-50" />
+                    className="w-full bg-[#0f172a] border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#2DD4BF] disabled:opacity-50" />
                 </div>
               )}
             </div>
             <button type="submit" disabled={creating || !domain.trim()}
-              className="bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors">
+              className="bg-[#2DD4BF] hover:bg-[#14B8A6] text-[#0F172A] disabled:bg-gray-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors">
               {creating ? 'Erstellen...' : 'Zeitplan erstellen'}
             </button>
           </form>
@@ -180,8 +185,18 @@ export default function SchedulesPage() {
 
         {!loading && schedules.length === 0 && !showCreate && (
           <div className="text-center py-16 space-y-4">
-            <p className="text-slate-500 text-lg">Noch keine geplanten Scans</p>
-            <p className="text-slate-600 text-sm">Erstellen Sie einen Zeitplan, um Domains automatisch regelmäßig zu scannen.</p>
+            <div className="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center" style={{ backgroundColor: '#2DD4BF12', border: '2px solid #2DD4BF30' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" strokeWidth="1.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <p className="font-semibold" style={{ color: '#F8FAFC' }}>Noch keine geplanten Scans</p>
+            <p className="text-sm max-w-sm mx-auto" style={{ color: '#94A3B8' }}>
+              Mit Zeitplänen scannen Sie Ihre Domains automatisch in regelmäßigen Abständen — wöchentlich, monatlich oder quartalsweise.
+            </p>
+            <button onClick={() => setShowCreate(true)}
+              className="px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+              style={{ backgroundColor: '#2DD4BF', color: '#0F172A' }}>
+              Ersten Zeitplan erstellen
+            </button>
           </div>
         )}
 

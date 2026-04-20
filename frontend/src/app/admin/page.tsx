@@ -383,7 +383,7 @@ export default function AdminPage() {
                       onClick={() => handleRoleToggle(user)}
                       className="text-xs text-yellow-400 hover:text-yellow-300 font-medium px-3 py-1.5 bg-yellow-400/10 rounded-lg transition-colors"
                     >
-                      {user.role === 'admin' ? 'Zu Customer' : 'Zu Admin'}
+                      Rolle → {user.role === 'admin' ? 'Kunde' : 'Admin'}
                     </button>
                     <button
                       onClick={() => handleDeleteUser(user)}

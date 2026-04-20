@@ -294,7 +294,8 @@ export default function SubscribePage() {
             </div>
             {domains.length < 30 && (
               <button onClick={() => setDomains([...domains, ''])}
-                className="text-xs text-[#2DD4BF] hover:text-[#5EEAD4] font-medium transition-colors">
+                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+                style={{ color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.25)' }}>
                 + Ziel hinzufügen
               </button>
             )}
@@ -432,11 +433,16 @@ export default function SubscribePage() {
           ) : <div />}
 
           {step < 5 ? (
-            <button onClick={() => { if (canAdvance()) setStep(step + 1); }}
-              disabled={!canAdvance()}
-              className="bg-[#2DD4BF] hover:bg-[#14B8A6] text-[#0F172A] disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm">
-              Weiter
-            </button>
+            <div className="flex items-center gap-3">
+              {!canAdvance() && step === 2 && <span className="text-xs" style={{ color: '#F59E0B' }}>Mindestens ein gültiges Ziel eingeben</span>}
+              {!canAdvance() && step === 3 && <span className="text-xs" style={{ color: '#F59E0B' }}>Mindestens eine E-Mail-Adresse eingeben</span>}
+              <button onClick={() => { if (canAdvance()) setStep(step + 1); }}
+                disabled={!canAdvance()}
+                className="disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-2.5 rounded-lg transition-colors text-sm"
+                style={{ backgroundColor: canAdvance() ? '#2DD4BF' : undefined, color: canAdvance() ? '#0F172A' : undefined }}>
+                Weiter
+              </button>
+            </div>
           ) : (
             <button onClick={handleSubmit} disabled={submitting}
               className="bg-[#2DD4BF] hover:bg-[#14B8A6] text-[#0F172A] disabled:bg-gray-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm">
