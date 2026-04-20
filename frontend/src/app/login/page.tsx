@@ -66,16 +66,26 @@ export default function LoginPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {tab === 'register' && (
+              <input type="text" placeholder="Firmenname (optional)" disabled={loading}
+                className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
+            )}
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="E-Mail-Adresse" autoFocus disabled={loading}
               className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
             <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-              placeholder="Passwort" disabled={loading}
+              placeholder="Passwort (min. 8 Zeichen)" disabled={loading}
               className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
             {tab === 'register' && (
-              <input type="password" value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)}
-                placeholder="Passwort wiederholen" disabled={loading}
-                className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
+              <>
+                <input type="password" value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)}
+                  placeholder="Passwort wiederholen" disabled={loading}
+                  className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
+                <label className="flex items-start gap-2 text-xs" style={{ color: '#64748B' }}>
+                  <input type="checkbox" required className="mt-0.5 accent-[#2DD4BF]" />
+                  <span>Ich akzeptiere die <a href="/datenschutz" className="underline" style={{ color: '#2DD4BF' }}>Datenschutzerklärung</a> und stimme der Verarbeitung meiner Daten zu.</span>
+                </label>
+              </>
             )}
             <button type="submit" disabled={loading || !email.trim() || !password.trim()}
               className="w-full py-3 rounded-lg text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-[0_0_16px_#2DD4BF30]"

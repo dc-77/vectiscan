@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import AppHeader from '@/components/AppHeader';
+import { ToastProvider } from '@/components/Toast';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="de" className="dark">
       <body className={`${inter.className} min-h-screen bg-[#0C1222] text-gray-200 antialiased flex flex-col`}>
+        <ToastProvider>
         <AppHeader />
         <div className="flex-1 flex flex-col">
           {children}
@@ -26,6 +28,7 @@ export default function RootLayout({
         <div className="text-center py-3 text-[10px] tracking-wide" style={{ color: '#475569', borderTop: '1px solid rgba(45,212,191,0.05)' }}>
           🔒 AES-256 verschlüsselt · Hosting in Deutschland · DSGVO-konform
         </div>
+        </ToastProvider>
         {/* Global scanline overlay */}
         <div className="scanline-overlay" />
       </body>
