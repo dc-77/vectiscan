@@ -286,6 +286,25 @@ export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[
   return handleResponse(res);
 }
 
+// --- Dashboard Summary ---
+
+export interface DashboardSummary {
+  domains: number;
+  totalScans: number;
+  totalFindings: number;
+  criticalCount: number;
+  highCount: number;
+  overallRisk: string;
+  topFindings: Array<{ domain: string; title: string; severity: string; cvss: number; orderId: string }>;
+}
+
+export async function getDashboardSummary(): Promise<ApiResponse<DashboardSummary>> {
+  const res = await fetch(`${API_URL}/api/orders/dashboard-summary`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
 // --- Password Reset ---
 
 export async function forgotPassword(email: string): Promise<ApiResponse<{ message: string }>> {

@@ -377,6 +377,49 @@ export default function ScanDetailPage() {
           {order.progress.hostsTotal > 0 && <span>{order.progress.hostsTotal} Hosts</span>}
         </div>
 
+        {/* Live scan progress bar */}
+        {!isDone && !isFailed && !isPendingReview && order.status !== 'verification_pending' && (() => {
+          const phases = [
+            { key: 'passive_intel', label: 'Aufklärung' },
+            { key: 'dns_recon', label: 'DNS-Analyse' },
+            { key: 'scan_phase1', label: 'Port-Analyse' },
+            { key: 'scan_phase2', label: 'Schwachstellen' },
+            { key: 'scan_phase3', label: 'KI-Korrelation' },
+            { key: 'scan_complete', label: 'Abschluss' },
+          ];
+          const currentPhase = order.progress.phase || order.status;
+          const currentIdx = phases.findIndex(p => p.key === currentPhase);
+          return (
+            <div className="rounded-xl p-4 space-y-3" style={{ backgroundColor: '#1E293B' }}>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium" style={{ color: '#94A3B8' }}>Scan-Fortschritt</span>
+                <span className="text-xs" style={{ color: '#2DD4BF' }}>{order.progress.currentTool ? PHASE_LABELS[order.progress.currentTool] || order.progress.currentTool : ''}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                {phases.map((p, i) => (
+                  <div key={p.key} className="flex-1 flex items-center gap-1">
+                    <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#0F172A' }}>
+                      <div className="h-full rounded-full transition-all duration-700"
+                        style={{
+                          width: i < currentIdx ? '100%' : i === currentIdx ? '60%' : '0%',
+                          backgroundColor: i <= currentIdx ? '#2DD4BF' : '#1E293B',
+                        }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between">
+                {phases.map((p, i) => (
+                  <span key={p.key} className="text-[9px] flex-1 text-center"
+                    style={{ color: i <= currentIdx ? '#2DD4BF' : '#475569' }}>
+                    {p.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Error message + retry button */}
         {order.error && (
           <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">
@@ -486,7 +529,7 @@ export default function ScanDetailPage() {
 
           {/* Recommendations Tab */}
           {activeTab === 'recommendations' && findings && (
-            <RecommendationsViewer recommendations={findings.recommendations} />
+            <RecommendationsViewer recommendations={findings.recommendations} orderId={orderId} />
           )}
           {activeTab === 'recommendations' && !findings && (
             <div className="text-center py-12 text-slate-600 text-sm">Keine Empfehlungen verfügbar.</div>

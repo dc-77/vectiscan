@@ -211,6 +211,94 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     return reply.redirect('/api/orders', 307);
   });
 
+  // GET /api/orders/dashboard-summary — aggregated security cockpit data
+  server.get('/api/orders/dashboard-summary', { preHandler: [requireAuth] }, async (request) => {
+    const user = request.user!;
+
+    // Resolve customer_id
+    let customerId = user.customerId;
+    if (!customerId && user.role !== 'admin') {
+      const custResult = await query<{ id: string }>('SELECT id FROM customers WHERE email = $1', [user.email]);
+      if (custResult.rows.length > 0) customerId = custResult.rows[0].id;
+    }
+
+    // Get all findings from latest reports for the user's completed orders
+    const whereClause = user.role === 'admin' ? '' : 'AND o.customer_id = $1';
+    const params = user.role === 'admin' ? [] : [customerId];
+
+    const result = await query(
+      `SELECT o.id, o.target_url AS domain, o.status, o.scan_finished_at,
+              r.findings_data->>'overall_risk' AS overall_risk,
+              r.findings_data->'severity_counts' AS severity_counts,
+              r.findings_data->'findings' AS findings
+       FROM orders o
+       LEFT JOIN LATERAL (
+         SELECT findings_data FROM reports WHERE order_id = o.id ORDER BY created_at DESC LIMIT 1
+       ) r ON true
+       WHERE o.status IN ('report_complete', 'delivered', 'pending_review')
+       ${whereClause}
+       ORDER BY o.scan_finished_at DESC`,
+      params,
+    );
+
+    // Aggregate
+    const domains = new Set<string>();
+    let totalFindings = 0;
+    let criticalCount = 0;
+    let highCount = 0;
+    const topFindings: Array<{ domain: string; title: string; severity: string; cvss: number; orderId: string }> = [];
+
+    for (const row of result.rows as Array<Record<string, unknown>>) {
+      domains.add(row.domain as string);
+      const sev = row.severity_counts as Record<string, number> | null;
+      if (sev) {
+        totalFindings += (sev.CRITICAL || 0) + (sev.HIGH || 0) + (sev.MEDIUM || 0) + (sev.LOW || 0);
+        criticalCount += sev.CRITICAL || 0;
+        highCount += sev.HIGH || 0;
+      }
+      // Collect top findings from latest scans (max 5)
+      const findings = row.findings as Array<Record<string, unknown>> | null;
+      if (findings && topFindings.length < 5) {
+        for (const f of findings) {
+          if (topFindings.length >= 5) break;
+          const fsev = ((f.severity as string) || 'INFO').toUpperCase();
+          if (['CRITICAL', 'HIGH', 'MEDIUM'].includes(fsev)) {
+            topFindings.push({
+              domain: row.domain as string,
+              title: (f.title as string) || '',
+              severity: fsev,
+              cvss: parseFloat((f.cvss_score as string) || '0'),
+              orderId: row.id as string,
+            });
+          }
+        }
+      }
+    }
+
+    // Sort top findings by severity then CVSS
+    const sevOrder: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2 };
+    topFindings.sort((a, b) => (sevOrder[a.severity] ?? 3) - (sevOrder[b.severity] ?? 3) || b.cvss - a.cvss);
+
+    // Overall risk
+    let overallRisk = 'LOW';
+    if (criticalCount > 0) overallRisk = 'CRITICAL';
+    else if (highCount > 0) overallRisk = 'HIGH';
+    else if (totalFindings > 0) overallRisk = 'MEDIUM';
+
+    return {
+      success: true,
+      data: {
+        domains: domains.size,
+        totalScans: result.rows.length,
+        totalFindings,
+        criticalCount,
+        highCount,
+        overallRisk,
+        topFindings: topFindings.slice(0, 3),
+      },
+    };
+  });
+
   // GET /api/orders/:id — requireAuth, ownership check
   server.get<{ Params: OrderParams }>('/api/orders/:id', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, getReportDownloadUrl, deleteOrderPermanent, listSubscriptions, requestRescan, OrderListItem, Subscription } from '@/lib/api';
+import { listOrders, getReportDownloadUrl, deleteOrderPermanent, listSubscriptions, requestRescan, getDashboardSummary, OrderListItem, Subscription, DashboardSummary } from '@/lib/api';
 import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
 
@@ -89,6 +89,7 @@ export default function Dashboard() {
 
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>('all');
@@ -111,7 +112,7 @@ export default function Dashboard() {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const [ordersRes, subsRes] = await Promise.all([listOrders(), listSubscriptions()]);
+      const [ordersRes, subsRes, summaryRes] = await Promise.all([listOrders(), listSubscriptions(), getDashboardSummary()]);
       if (ordersRes.success && ordersRes.data) {
         setOrders(ordersRes.data.orders);
         setLastUpdate(new Date());
@@ -121,6 +122,9 @@ export default function Dashboard() {
       }
       if (subsRes.success && subsRes.data) {
         setSubscriptions(subsRes.data.subscriptions);
+      }
+      if (summaryRes.success && summaryRes.data) {
+        setSummary(summaryRes.data);
       }
     } catch {
       setError('API nicht erreichbar');
@@ -255,6 +259,68 @@ export default function Dashboard() {
           </Link>
         )}
 
+        {/* Security Cockpit — Risk Gauge + Top Findings */}
+        {summary && summary.totalScans > 0 && (
+          <div className="space-y-4">
+            {/* Risk Gauge */}
+            <div className="rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6" style={{ backgroundColor: '#1E293B' }}>
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold border-4"
+                  style={{
+                    borderColor: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6', LOW: '#22C55E' }[summary.overallRisk] || '#22C55E',
+                    color: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6', LOW: '#22C55E' }[summary.overallRisk] || '#22C55E',
+                  }}>
+                  {summary.overallRisk === 'CRITICAL' ? '!' : summary.overallRisk === 'HIGH' ? '!!' : summary.overallRisk === 'MEDIUM' ? '~' : '✓'}
+                </div>
+                <div>
+                  <p className="text-lg font-semibold" style={{ color: '#F8FAFC' }}>
+                    Gesamtrisiko: <span style={{ color: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6', LOW: '#22C55E' }[summary.overallRisk] || '#22C55E' }}>
+                      {{ CRITICAL: 'Kritisch', HIGH: 'Hoch', MEDIUM: 'Mittel', LOW: 'Niedrig' }[summary.overallRisk] || summary.overallRisk}
+                    </span>
+                  </p>
+                  <p className="text-xs" style={{ color: '#94A3B8' }}>
+                    {summary.domains} Domain{summary.domains !== 1 ? 's' : ''} · {summary.totalFindings} offene Befunde
+                    {summary.criticalCount > 0 && <span style={{ color: '#EF4444' }}> · {summary.criticalCount} kritisch</span>}
+                    {summary.highCount > 0 && <span style={{ color: '#F59E0B' }}> · {summary.highCount} hoch</span>}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Top Findings */}
+            {summary.topFindings.length > 0 && (
+              <div className="rounded-2xl p-5 space-y-3" style={{ backgroundColor: '#1E293B' }}>
+                <h3 className="text-xs font-medium uppercase tracking-wider" style={{ color: '#64748B' }}>Dringendster Handlungsbedarf</h3>
+                {summary.topFindings.map((f, i) => (
+                  <Link key={i} href={`/scan/${f.orderId}`}
+                    className="flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-[#253347]">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded"
+                        style={{
+                          backgroundColor: { CRITICAL: '#EF444420', HIGH: '#F59E0B20', MEDIUM: '#3B82F620' }[f.severity] || '#3B82F620',
+                          color: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6' }[f.severity] || '#3B82F6',
+                        }}>
+                        {f.cvss.toFixed(1)}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-sm truncate" style={{ color: '#F8FAFC' }}>{f.title}</p>
+                        <p className="text-[11px]" style={{ color: '#64748B' }}>{f.domain}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs flex-shrink-0" style={{ color: '#2DD4BF' }}>Details →</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {summary.topFindings.length === 0 && (
+              <div className="rounded-2xl p-6 text-center" style={{ backgroundColor: '#1E293B' }}>
+                <p className="text-sm" style={{ color: '#22C55E' }}>Keine kritischen Befunde — gut gemacht!</p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* KPI Summary Cards */}
         {!loading && orders.length > 0 && (() => {
           const done = orders.filter(o => ['report_complete', 'delivered'].includes(o.status));
@@ -324,10 +390,18 @@ export default function Dashboard() {
         {loading && <div className="text-center py-12 text-gray-500">Lade Aufträge...</div>}
         {!loading && orders.length === 0 && (
           <div className="text-center py-16 space-y-4">
-            <p className="text-gray-500 text-lg">Noch keine Aufträge</p>
-            <div className="flex items-center justify-center gap-3">
-              <Link href="/" className="bg-[#1e293b] hover:bg-[#253347] text-gray-300 font-medium px-5 py-2.5 rounded-lg transition-colors text-sm border border-gray-700">Einzelnen Scan starten</Link>
-              <Link href="/subscribe" className="bg-blue-600 hover:bg-blue-500 text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm">Abo erstellen</Link>
+            <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#2DD4BF12', border: '2px solid #2DD4BF30' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" strokeWidth="1.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h2 className="text-lg font-semibold" style={{ color: '#F8FAFC' }}>Willkommen bei VectiScan</h2>
+            <p className="text-sm max-w-sm mx-auto" style={{ color: '#94A3B8' }}>
+              In wenigen Minuten wissen Sie, wie sicher Ihre IT-Infrastruktur ist. Starten Sie Ihren ersten Scan oder erstellen Sie ein Abo für regelmäßige Überwachung.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <Link href="/scan" className="px-6 py-3 rounded-lg text-sm font-semibold transition-all cta-glow"
+                style={{ backgroundColor: '#2DD4BF', color: '#0F172A' }}>Ersten Scan starten</Link>
+              <Link href="/subscribe" className="px-6 py-3 rounded-lg text-sm font-medium transition-colors"
+                style={{ color: '#F8FAFC', border: '1px solid rgba(45,212,191,0.25)' }}>Abo erstellen</Link>
             </div>
           </div>
         )}
