@@ -224,6 +224,8 @@ export interface OrderListItem {
   overallRisk: string | null;
   severityCounts: Record<string, number> | null;
   businessImpactScore: number | null;
+  subscriptionId: string | null;
+  isRescan: boolean;
 }
 
 // --- Findings ---

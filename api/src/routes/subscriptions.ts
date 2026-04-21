@@ -7,6 +7,7 @@
  */
 import { FastifyInstance } from 'fastify';
 import { query } from '../lib/db.js';
+import { scanQueue, publishEvent } from '../lib/queue.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
@@ -253,7 +254,10 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
         return reply.status(409).send({ success: false, error: 'Abo ist nicht aktiv.' });
       }
 
-      if ((subRow.rescans_used as number) >= (subRow.max_rescans as number)) {
+      const isAdminTrigger = user.role === 'admin';
+
+      // Admins bypass quota — useful for support/debug re-scans
+      if (!isAdminTrigger && (subRow.rescans_used as number) >= (subRow.max_rescans as number)) {
         return reply.status(409).send({
           success: false,
           error: `Re-Scan-Kontingent erschöpft (${subRow.rescans_used}/${subRow.max_rescans}).`,
@@ -286,24 +290,33 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
       );
       const orderId = orderResult.rows[0].id;
 
-      // Increment rescan counter
-      await query(
-        'UPDATE subscriptions SET rescans_used = rescans_used + 1, updated_at = NOW() WHERE id = $1',
-        [id],
-      );
+      // Increment rescan counter only for customer-triggered re-scans
+      if (!isAdminTrigger) {
+        await query(
+          'UPDATE subscriptions SET rescans_used = rescans_used + 1, updated_at = NOW() WHERE id = $1',
+          [id],
+        );
+      }
 
       // Enqueue scan
-      const { scanQueue: sq, publishEvent: pub } = await import('../lib/queue.js');
-      await sq.add('scan', { orderId, targetDomain: domain, package: subRow.package });
-      await pub(orderId, { type: 'status', orderId, status: 'queued' });
+      await scanQueue.add('scan', { orderId, targetDomain: domain, package: subRow.package });
+      await publishEvent(orderId, { type: 'status', orderId, status: 'queued' });
 
       audit({
         action: 'subscription.rescan',
-        details: { subscriptionId: id, domain, orderId, userId: user.sub },
+        details: { subscriptionId: id, domain, orderId, userId: user.sub, triggeredBy: isAdminTrigger ? 'admin' : 'customer' },
         ip: request.ip,
       });
 
-      return { success: true, data: { orderId, message: 'Re-Scan gestartet.' } };
+      return {
+        success: true,
+        data: {
+          orderId,
+          message: isAdminTrigger
+            ? 'Admin-Re-Scan gestartet (Kontingent unverändert).'
+            : 'Re-Scan gestartet.',
+        },
+      };
     },
   );
 

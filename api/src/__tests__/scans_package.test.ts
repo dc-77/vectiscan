@@ -125,14 +125,24 @@ describe('Package selection (v2: 5 packages)', () => {
     await server.ready();
   });
 
+  /** Order of queries in POST /api/orders:
+   *  1) verified_domains lookup
+   *  2) subscription auto-link lookup  ← added in 2026-04
+   *  3) INSERT INTO orders RETURNING ...
+   */
+  function chainOrderInsert(pkg: string) {
+    mockQuery.mockResolvedValueOnce(noVerificationResult);
+    mockQuery.mockResolvedValueOnce(noVerificationResult); // subscription auto-link: no match
+    mockQuery.mockResolvedValueOnce(mockInsertResult(pkg));
+  }
+
   afterEach(async () => {
     await server.close();
   });
 
   describe('POST /api/orders with package', () => {
     it('should accept package=webcheck', async () => {
-      mockQuery.mockResolvedValueOnce(noVerificationResult);
-      mockQuery.mockResolvedValueOnce(mockInsertResult('webcheck'));
+      chainOrderInsert('webcheck');
 
       const res = await server.inject({
         method: 'POST',
@@ -148,8 +158,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should accept package=perimeter', async () => {
-      mockQuery.mockResolvedValueOnce(noVerificationResult);
-      mockQuery.mockResolvedValueOnce(mockInsertResult('perimeter'));
+      chainOrderInsert('perimeter');
 
       const res = await server.inject({
         method: 'POST',
@@ -163,8 +172,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should accept package=compliance', async () => {
-      mockQuery.mockResolvedValueOnce(noVerificationResult);
-      mockQuery.mockResolvedValueOnce(mockInsertResult('compliance'));
+      chainOrderInsert('compliance');
 
       const res = await server.inject({
         method: 'POST',
@@ -178,8 +186,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should accept package=supplychain', async () => {
-      mockQuery.mockResolvedValueOnce(noVerificationResult);
-      mockQuery.mockResolvedValueOnce(mockInsertResult('supplychain'));
+      chainOrderInsert('supplychain');
 
       const res = await server.inject({
         method: 'POST',
@@ -193,8 +200,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should accept package=insurance', async () => {
-      mockQuery.mockResolvedValueOnce(noVerificationResult);
-      mockQuery.mockResolvedValueOnce(mockInsertResult('insurance'));
+      chainOrderInsert('insurance');
 
       const res = await server.inject({
         method: 'POST',
@@ -234,8 +240,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should default to perimeter when no package specified', async () => {
-      mockQuery.mockResolvedValueOnce(noVerificationResult);
-      mockQuery.mockResolvedValueOnce(mockInsertResult('perimeter'));
+      chainOrderInsert('perimeter');
 
       const res = await server.inject({
         method: 'POST',
@@ -249,8 +254,7 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should not queue scan job (verification required first)', async () => {
-      mockQuery.mockResolvedValueOnce(noVerificationResult);
-      mockQuery.mockResolvedValueOnce(mockInsertResult('compliance'));
+      chainOrderInsert('compliance');
 
       await server.inject({
         method: 'POST',

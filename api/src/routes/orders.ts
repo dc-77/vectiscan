@@ -103,21 +103,54 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     );
     const alreadyVerified = existingVerification.rows.length > 0;
 
+    // Auto-link to active subscription that covers this domain (verified + enabled)
+    const subscriptionMatch = await query<{ id: string }>(
+      `SELECT s.id
+       FROM subscriptions s
+       JOIN subscription_domains sd ON sd.subscription_id = s.id
+       WHERE s.customer_id = $1
+         AND s.status = 'active'
+         AND sd.domain = $2
+         AND sd.status = 'verified'
+         AND sd.enabled = true
+       ORDER BY s.created_at DESC
+       LIMIT 1`,
+      [customerId, domain],
+    );
+    const subscriptionId = subscriptionMatch.rows[0]?.id ?? null;
+
     // Insert order — skip verification if domain already verified for this customer
     const initialStatus = alreadyVerified ? 'queued' : 'verification_pending';
     const verificationToken = alreadyVerified ? '' : generateToken();
-    const result = await query<{ id: string; target_url: string; status: string; package: string; verification_token: string; created_at: Date }>(
-      `INSERT INTO orders (customer_id, target_url, package, verification_token, status${alreadyVerified ? ', verified_at, verification_method' : ''})
-       VALUES ($1, $2, $3, $4, $5${alreadyVerified ? ', NOW(), $6' : ''})
-       RETURNING id, target_url, status, package, verification_token, created_at`,
-      alreadyVerified
-        ? [customerId, domain, pkg, verificationToken, initialStatus, existingVerification.rows[0].verification_method]
-        : [customerId, domain, pkg, verificationToken, initialStatus],
+
+    const params: unknown[] = [customerId, domain, pkg, verificationToken, initialStatus];
+    const cols = ['customer_id', 'target_url', 'package', 'verification_token', 'status'];
+    const valExprs = ['$1', '$2', '$3', '$4', '$5'];
+    if (alreadyVerified) {
+      cols.push('verified_at', 'verification_method');
+      valExprs.push('NOW()', `$${params.length + 1}`);
+      params.push(existingVerification.rows[0].verification_method);
+    }
+    if (subscriptionId) {
+      cols.push('subscription_id');
+      valExprs.push(`$${params.length + 1}`);
+      params.push(subscriptionId);
+    }
+    const result = await query<{ id: string; target_url: string; status: string; package: string; verification_token: string; created_at: Date; subscription_id: string | null }>(
+      `INSERT INTO orders (${cols.join(', ')})
+       VALUES (${valExprs.join(', ')})
+       RETURNING id, target_url, status, package, verification_token, created_at, subscription_id`,
+      params,
     );
 
     const order = result.rows[0];
 
-    audit({ orderId: order.id, action: 'order.created', details: { domain, package: pkg, reusedVerification: alreadyVerified }, ip: request.ip });
+    audit({
+      orderId: order.id,
+      action: 'order.created',
+      details: { domain, package: pkg, reusedVerification: alreadyVerified, linkedToSubscription: !!subscriptionId, subscriptionId },
+      ip: request.ip,
+    });
 
     // If domain already verified for this customer → start scan immediately
     if (alreadyVerified) {
@@ -166,6 +199,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const baseSelect = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
                     o.scan_started_at, o.scan_finished_at, o.created_at,
                     o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
+                    o.subscription_id, o.is_rescan,
                     c.email,
                     EXISTS(SELECT 1 FROM reports r2 WHERE r2.order_id = o.id) AS has_report,
                     (SELECT rr.findings_data->>'overall_risk' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS overall_risk,
@@ -201,6 +235,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       overallRisk: (row.overall_risk as string) || null,
       severityCounts: row.severity_counts || null,
       businessImpactScore: row.business_impact_score != null ? Number(row.business_impact_score) : null,
+      subscriptionId: (row.subscription_id as string) || null,
+      isRescan: row.is_rescan === true || row.is_rescan === 't',
     }));
 
     return { success: true, data: { orders } };
@@ -312,7 +348,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       `SELECT o.id, o.target_url, o.status, o.package, o.customer_id,
               o.discovered_hosts, o.hosts_total, o.hosts_completed,
               o.current_phase, o.current_tool, o.current_host,
-              o.scan_started_at, o.scan_finished_at, o.error_message, o.created_at
+              o.scan_started_at, o.scan_finished_at, o.error_message, o.created_at,
+              o.subscription_id, o.is_rescan,
+              o.passive_intel_summary, o.correlation_data, o.business_impact_score
        FROM orders o WHERE o.id = $1`,
       [id],
     );
@@ -379,6 +417,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         passiveIntelSummary: order.passive_intel_summary || null,
         correlationData: order.correlation_data || null,
         businessImpactScore: order.business_impact_score != null ? Number(order.business_impact_score) : null,
+        subscriptionId: (order.subscription_id as string) || null,
+        isRescan: order.is_rescan === true || order.is_rescan === 't',
       },
     };
   });

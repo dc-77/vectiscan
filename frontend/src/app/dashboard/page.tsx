@@ -3,11 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, getReportDownloadUrl, deleteOrderPermanent, listSubscriptions, requestRescan, getDashboardSummary, OrderListItem, Subscription, DashboardSummary } from '@/lib/api';
-import { isLoggedIn, isAdmin, getUser, clearToken } from '@/lib/auth';
+import { listOrders, deleteOrderPermanent, listSubscriptions, getDashboardSummary, OrderListItem, Subscription, DashboardSummary } from '@/lib/api';
+import { isLoggedIn, isAdmin, clearToken } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
+import { groupOrders, OrderGroup } from '@/lib/grouping';
 
-import { STATUS_LABELS, formatDuration as fmtDur } from '@/lib/utils';
+import { STATUS_LABELS } from '@/lib/utils';
 
 const PHASE_LABELS = STATUS_LABELS;
 
@@ -51,20 +52,21 @@ const RISK_BADGE: Record<string, { bg: string; text: string; border: string }> =
 };
 
 type StatusFilter = 'all' | 'active' | 'done' | 'failed';
-// Detail tabs moved to /scan/[orderId] page
 
-const ACTIVE_STATUSES = ['verification_pending', 'verified', 'created', 'queued', 'scanning', 'passive_intel', 'dns_recon', 'scan_phase1', 'scan_phase2', 'scan_phase3', 'scan_complete', 'report_generating'];
-const DONE_STATUSES = ['report_complete'];
-const FAILED_STATUSES = ['failed', 'cancelled'];
+function groupMatchesFilter(group: OrderGroup, filter: StatusFilter): boolean {
+  if (filter === 'all') return true;
+  if (group.orders.length === 0) return false;
+  if (filter === 'active') return group.aggregates.activeScans > 0;
+  if (filter === 'done') return group.aggregates.doneScans > 0;
+  if (filter === 'failed') return group.aggregates.failedScans > 0;
+  return true;
+}
 
-function isActive(status: string) { return ACTIVE_STATUSES.includes(status); }
-
-function filterOrders(orders: OrderListItem[], filter: StatusFilter): OrderListItem[] {
-  if (filter === 'all') return orders;
-  if (filter === 'active') return orders.filter(o => isActive(o.status));
-  if (filter === 'done') return orders.filter(o => DONE_STATUSES.includes(o.status));
-  if (filter === 'failed') return orders.filter(o => FAILED_STATUSES.includes(o.status));
-  return orders;
+function groupMatchesSearch(group: OrderGroup, search: string): boolean {
+  if (!search) return true;
+  const q = search.toLowerCase();
+  if (group.title.toLowerCase().includes(q)) return true;
+  return group.domains.some(d => d.toLowerCase().includes(q));
 }
 
 function formatDate(iso: string): string {
@@ -74,18 +76,10 @@ function formatDate(iso: string): string {
   });
 }
 
-function formatDuration(startedAt: string | null, finishedAt: string | null): string | null {
-  if (!startedAt || !finishedAt) return null;
-  const ms = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
-  const min = Math.round(ms / 60000);
-  return fmtDur(min);
-}
-
 export default function Dashboard() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
   const [admin, setAdmin] = useState(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -106,7 +100,6 @@ export default function Dashboard() {
       return;
     }
     setAdmin(isAdmin());
-    setUserEmail(getUser()?.email || null);
     setReady(true);
   }, [router]);
 
@@ -159,15 +152,17 @@ export default function Dashboard() {
     }
   };
 
-  const filtered = filterOrders(orders, filter)
-    .filter(o => !searchQuery || o.domain.toLowerCase().includes(searchQuery.toLowerCase()));
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const groups = groupOrders(orders, subscriptions);
+  const filteredGroups = groups
+    .filter(g => groupMatchesFilter(g, filter))
+    .filter(g => groupMatchesSearch(g, searchQuery));
+  const totalPages = Math.max(1, Math.ceil(filteredGroups.length / PAGE_SIZE));
+  const paginatedGroups = filteredGroups.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const counts = {
-    all: orders.length,
-    active: orders.filter(o => isActive(o.status)).length,
-    done: orders.filter(o => DONE_STATUSES.includes(o.status)).length,
-    failed: orders.filter(o => FAILED_STATUSES.includes(o.status)).length,
+    all: groups.length,
+    active: groups.filter(g => g.aggregates.activeScans > 0).length,
+    done: groups.filter(g => g.aggregates.doneScans > 0).length,
+    failed: groups.filter(g => g.aggregates.failedScans > 0).length,
   };
 
   if (!ready) return null;
@@ -177,79 +172,6 @@ export default function Dashboard() {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Title */}
         <h1 className="text-lg font-semibold text-white">Dashboard</h1>
-
-        {/* Subscriptions */}
-        {subscriptions.length > 0 && (
-          <div className="space-y-3">
-            {subscriptions.filter(s => s.status === 'active').map((sub) => {
-              const pkgLabel = PACKAGE_STYLES[sub.package]?.label || sub.package.toUpperCase();
-              const intervalLabel = { weekly: 'Wöchentlich', monthly: 'Monatlich', quarterly: 'Quartalsweise' }[sub.scanInterval] || sub.scanInterval;
-              const verifiedDomains = sub.domains.filter(d => d.status === 'verified');
-              const pendingDomains = sub.domains.filter(d => d.status === 'pending_approval');
-              const rescansLeft = sub.maxRescans - sub.rescansUsed;
-
-              return (
-                <div key={sub.id} className="bg-[#1e293b] rounded-lg border border-gray-800 p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold tracking-wider text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">{pkgLabel}</span>
-                      <span className="text-xs text-green-400 bg-green-400/10 px-2 py-0.5 rounded">Aktiv</span>
-                      <span className="text-xs text-gray-500">{intervalLabel}</span>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {sub.expiresAt && <>Läuft bis {new Date(sub.expiresAt).toLocaleDateString('de-DE')}</>}
-                    </div>
-                  </div>
-
-                  {/* Domains */}
-                  <div className="space-y-1.5">
-                    {sub.domains.map((d) => {
-                      const statusMap: Record<string, { dot: string; label: string }> = {
-                        verified: { dot: 'bg-green-500', label: 'Aktiv' },
-                        pending_approval: { dot: 'bg-amber-500', label: 'Wartet auf Freigabe' },
-                        rejected: { dot: 'bg-red-500', label: 'Abgelehnt' },
-                      };
-                      const s = statusMap[d.status] || { dot: 'bg-gray-500', label: d.status };
-                      return (
-                        <div key={d.id} className="flex items-center justify-between py-1 border-b border-gray-700/50 last:border-0">
-                          <div className="flex items-center gap-2">
-                            <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-                            <span className="text-sm text-white font-mono">{d.domain}</span>
-                            <span className="text-[10px] text-gray-500">{s.label}</span>
-                          </div>
-                          {d.status === 'verified' && rescansLeft > 0 && (
-                            <button
-                              onClick={async () => {
-                                if (!confirm(`Re-Scan für ${d.domain} starten? (${rescansLeft} Re-Scans verbleibend)`)) return;
-                                const res = await requestRescan(sub.id, d.domain);
-                                if (res.success) {
-                                  fetchOrders();
-                                } else {
-                                  setError(res.error || 'Re-Scan fehlgeschlagen');
-                                }
-                              }}
-                              className="text-[10px] text-blue-400 hover:text-blue-300 font-medium px-2 py-1 bg-blue-400/10 rounded transition-colors"
-                            >
-                              Re-Scan
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Meta */}
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
-                    <span>{verifiedDomains.length} aktive Domain{verifiedDomains.length !== 1 ? 's' : ''}</span>
-                    {pendingDomains.length > 0 && <span className="text-amber-400">{pendingDomains.length} ausstehend</span>}
-                    <span title="Nach Behebung von Schwachstellen können Sie erneut scannen lassen, um die Korrektur zu bestätigen.">{rescansLeft}/{sub.maxRescans} Re-Scans</span>
-                    {sub.lastScanAt && <span>Letzter Scan: {formatDate(sub.lastScanAt)}</span>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
 
         {/* Upsell banner if no subscriptions */}
         {!loading && subscriptions.length === 0 && orders.length > 0 && (
@@ -406,125 +328,12 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Orders list */}
-        {!loading && filtered.length > 0 && (
+        {/* Group cards */}
+        {!loading && filteredGroups.length > 0 && (
           <div className="space-y-4">
-            {paginated.map((order) => {
-              const pkg = PACKAGE_STYLES[order.package] || PACKAGE_STYLES.professional;
-              const statusLabel = PHASE_LABELS[order.status] || order.status;
-              const statusStyle = PHASE_COLORS[order.status] || { bg: 'bg-slate-700', text: 'text-slate-400' };
-              const active = isActive(order.status);
-              const needsVerify = order.status === 'verification_pending' || order.status === 'verified';
-              const isRunning = active && !needsVerify;
-              const isDone = order.status === 'report_complete';
-              const hasDetails = !['created', 'queued', 'verification_pending', 'verified'].includes(order.status);
-              // Detail expansion removed — uses /scan/[orderId]
-              const duration = formatDuration(order.startedAt, order.finishedAt);
-              const riskBadge = order.overallRisk ? RISK_BADGE[order.overallRisk.toUpperCase()] : null;
-
-              const rowHref = needsVerify ? `/verify/${order.id}` : isRunning ? `/?orderId=${order.id}` : undefined;
-
-              return (
-                <div key={order.id} className="space-y-0">
-                  <div
-                    className={`bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-5 transition-colors ${rowHref ? 'cursor-pointer' : ''}`}
-                    onClick={rowHref ? () => router.push(rowHref) : undefined}
-                  >
-                    {/* Row 1: Domain + Severity Counts + Risk + Status */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="font-mono text-blue-400 text-sm truncate">{order.domain}</span>
-                        {admin && order.email !== userEmail && <span className="text-xs text-slate-600 truncate hidden sm:inline">{order.email}</span>}
-                        {isDone && order.severityCounts && (
-                          <SeverityCounts counts={order.severityCounts} />
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {riskBadge && isDone && (
-                          <span className={`${riskBadge.bg} ${riskBadge.text} ${riskBadge.border} text-xs font-bold px-2 py-0.5 rounded uppercase`}>
-                            {order.overallRisk}
-                          </span>
-                        )}
-                        {isDone && order.businessImpactScore != null && order.businessImpactScore > 0 && (
-                          <span className="text-[10px] font-mono text-slate-500" title="Business Impact Score">
-                            BIS {order.businessImpactScore.toFixed(1)}
-                          </span>
-                        )}
-                        <span className={`${statusStyle.bg} ${statusStyle.text} text-xs font-medium px-2.5 py-1 rounded inline-flex items-center gap-1.5`}>
-                          {active && <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" />}
-                          {statusLabel}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Progress bar for running scans */}
-                    {isRunning && order.hostsTotal > 0 && (
-                      <div className="mb-2">
-                        <div className="flex justify-between text-xs text-gray-500 mb-1">
-                          <span className="font-mono truncate">
-                            {order.currentTool && <>{order.currentTool}{order.currentHost ? ` \u2192 ${order.currentHost}` : ''}</>}
-                          </span>
-                          <span className="shrink-0 ml-2">{order.hostsCompleted}/{order.hostsTotal} Hosts</span>
-                        </div>
-                        <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                          <div className="h-full bg-blue-500 rounded-full transition-all duration-1000"
-                               style={{ width: `${Math.round((order.hostsCompleted / order.hostsTotal) * 100)}%` }} />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Row 2: Package + Meta + Actions */}
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate-600">
-                        <span className="font-mono uppercase tracking-wider text-slate-500">{pkg.label}</span>
-                        {order.hostsTotal > 0 && (
-                          <><span className="text-slate-700">&middot;</span><span>{order.hostsTotal} Hosts</span></>
-                        )}
-                        {duration && (
-                          <><span className="text-slate-700">&middot;</span><span>{duration}</span></>
-                        )}
-                        <span className="text-slate-700">&middot;</span>
-                        <span>{order.startedAt ? formatDate(order.startedAt) : formatDate(order.createdAt)}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {hasDetails && (
-                          <Link href={`/scan/${order.id}`} onClick={(e) => e.stopPropagation()}
-                            className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors text-slate-400 hover:text-blue-400 bg-slate-800/50 hover:bg-slate-700/50">
-                            Details
-                          </Link>
-                        )}
-                        {needsVerify && (
-                          <button onClick={(e) => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
-                            className="text-xs text-slate-400 hover:text-blue-400 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors">
-                            Verifizieren
-                          </button>
-                        )}
-                        {isRunning && (
-                          <button onClick={(e) => { e.stopPropagation(); router.push(`/?orderId=${order.id}`); }}
-                            className="text-xs text-blue-400 hover:text-blue-300 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors">
-                            Live View
-                          </button>
-                        )}
-                        {isDone && order.hasReport && (
-                          <a href={getReportDownloadUrl(order.id)} onClick={(e) => e.stopPropagation()}
-                            className="text-xs text-slate-400 hover:text-blue-400 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors inline-block">
-                            PDF
-                          </a>
-                        )}
-                        {admin && (
-                          <button onClick={(e) => { e.stopPropagation(); handleDelete(order); }}
-                            className="text-xs text-slate-400 hover:text-red-400 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors">
-                            Löschen
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Detail panel removed — use /scan/[orderId] page */}
-                </div>
-              );
-            })}
+            {paginatedGroups.map((group) => (
+              <GroupCard key={group.key} group={group} admin={admin} />
+            ))}
 
             {/* Pagination */}
             {totalPages > 1 && (
@@ -541,12 +350,130 @@ export default function Dashboard() {
           </div>
         )}
 
-        {!loading && orders.length > 0 && filtered.length === 0 && (
-          <div className="text-center py-12 text-gray-500">Keine Aufträge mit diesem Filter.</div>
+        {!loading && groups.length > 0 && filteredGroups.length === 0 && (
+          <div className="text-center py-12 text-gray-500">Keine Pakete mit diesem Filter.</div>
+        )}
+
+        {/* Admin: Delete legacy individual orders inline */}
+        {admin && groups.some(g => g.kind === 'domain') && (
+          <details className="text-xs text-slate-500">
+            <summary className="cursor-pointer hover:text-slate-300">Admin: Einzelne Scans verwalten</summary>
+            <div className="mt-2 space-y-1 max-h-64 overflow-auto pr-2">
+              {orders.filter(o => !o.subscriptionId).map(o => (
+                <div key={o.id} className="flex items-center justify-between gap-2 py-1 border-b border-gray-800">
+                  <span className="font-mono text-slate-400 truncate">{o.domain} &middot; {o.id.slice(0, 8)}</span>
+                  <button onClick={() => handleDelete(o)} className="text-red-400 hover:text-red-300">Löschen</button>
+                </div>
+              ))}
+            </div>
+          </details>
         )}
       </div>
     </main>
   );
 }
 
-// RawResultsPanel moved to /scan/[orderId] detail page
+// ────────────────────────────────────────────────────────────
+// Group card — replaces both subscription cards and flat scan rows
+// ────────────────────────────────────────────────────────────
+function GroupCard({ group, admin }: { group: OrderGroup; admin: boolean }) {
+  const router = useRouter();
+  const sub = group.subscription;
+  const agg = group.aggregates;
+  const intervalLabel = sub
+    ? ({ weekly: 'Wöchentlich', monthly: 'Monatlich', quarterly: 'Quartalsweise' } as Record<string, string>)[sub.scanInterval] || sub.scanInterval
+    : null;
+  const pkgLabel = sub
+    ? PACKAGE_STYLES[sub.package]?.label || sub.package.toUpperCase()
+    : null;
+  const riskBadge = agg.latestRisk ? RISK_BADGE[agg.latestRisk] : null;
+  const statusLabel = agg.latestStatus ? (PHASE_LABELS[agg.latestStatus] || agg.latestStatus) : null;
+  const statusStyle = agg.latestStatus ? (PHASE_COLORS[agg.latestStatus] || { bg: 'bg-slate-700', text: 'text-slate-400' }) : null;
+  const isActiveGroup = agg.activeScans > 0;
+  const totalSeverity = agg.severityCounts.CRITICAL + agg.severityCounts.HIGH + agg.severityCounts.MEDIUM + agg.severityCounts.LOW;
+  const groupHref = `/scans/${group.key}`;
+
+  return (
+    <div
+      className="bg-[#1e293b] hover:bg-[#253347] rounded-lg border border-gray-800 p-5 transition-colors cursor-pointer"
+      onClick={() => router.push(groupHref)}
+    >
+      {/* Header row */}
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-3 min-w-0 flex-wrap">
+          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
+            group.kind === 'subscription'
+              ? 'bg-teal-500/15 text-teal-400'
+              : 'bg-slate-700 text-slate-400'
+          }`}>
+            {group.kind === 'subscription' ? 'Abo' : 'Einzelscans'}
+          </span>
+          <span className="font-semibold text-white text-sm truncate">{group.title}</span>
+          <span className="text-xs text-slate-500 truncate">{group.subtitle}</span>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {riskBadge && (
+            <span className={`${riskBadge.bg} ${riskBadge.text} ${riskBadge.border} text-xs font-bold px-2 py-0.5 rounded uppercase`}>
+              {agg.latestRisk}
+            </span>
+          )}
+          {statusLabel && statusStyle && (
+            <span className={`${statusStyle.bg} ${statusStyle.text} text-xs font-medium px-2.5 py-1 rounded inline-flex items-center gap-1.5`}>
+              {isActiveGroup && <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" />}
+              {statusLabel}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Aggregated severity */}
+      {totalSeverity > 0 && (
+        <div className="mb-3">
+          <SeverityCounts counts={agg.severityCounts} />
+        </div>
+      )}
+
+      {/* Meta row */}
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate-600">
+          {pkgLabel && (
+            <>
+              <span className="font-mono uppercase tracking-wider text-slate-500">{pkgLabel}</span>
+              <span className="text-slate-700">&middot;</span>
+            </>
+          )}
+          {intervalLabel && (
+            <><span>{intervalLabel}</span><span className="text-slate-700">&middot;</span></>
+          )}
+          <span>{agg.totalScans} Scan{agg.totalScans !== 1 ? 's' : ''}</span>
+          {agg.activeScans > 0 && (
+            <><span className="text-slate-700">&middot;</span><span className="text-blue-400">{agg.activeScans} aktiv</span></>
+          )}
+          {agg.failedScans > 0 && (
+            <><span className="text-slate-700">&middot;</span><span className="text-red-400">{agg.failedScans} fehlgeschlagen</span></>
+          )}
+          {sub && (
+            <>
+              <span className="text-slate-700">&middot;</span>
+              <span title="Verbleibende Re-Scans aus dem Abo-Kontingent">{sub.maxRescans - sub.rescansUsed}/{sub.maxRescans} Re-Scans</span>
+            </>
+          )}
+          {agg.lastScanAt && (
+            <><span className="text-slate-700">&middot;</span><span>Zuletzt {formatDate(agg.lastScanAt)}</span></>
+          )}
+          {!agg.lastScanAt && sub && (
+            <span className="text-slate-500">Noch keine Scans</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {admin && group.orders[0]?.email && <span className="text-[10px] text-slate-600 hidden sm:inline">{group.orders[0].email}</span>}
+          <Link href={groupHref} onClick={(e) => e.stopPropagation()}
+            className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors text-slate-400 hover:text-blue-400 bg-slate-800/50 hover:bg-slate-700/50">
+            Öffnen →
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+

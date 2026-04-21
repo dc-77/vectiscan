@@ -369,9 +369,11 @@ describe('Verification API', () => {
     it('should return verificationToken and instructions', async () => {
       // verified_domains check (no existing verification)
       mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
+      // subscription auto-link (no match)
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
       // order insert
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'vectiscan-verify-mock12345678', created_at: new Date() }],
+        rows: [{ id: orderId, target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'vectiscan-verify-mock12345678', created_at: new Date(), subscription_id: null }],
         command: 'INSERT', rowCount: 1, oid: 0, fields: [],
       });
 
@@ -389,9 +391,11 @@ describe('Verification API', () => {
     it('should NOT queue a scan job', async () => {
       // verified_domains check
       mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
+      // subscription auto-link
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
       // order insert
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'tok', created_at: new Date() }],
+        rows: [{ id: orderId, target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'tok', created_at: new Date(), subscription_id: null }],
         command: 'INSERT', rowCount: 1, oid: 0, fields: [],
       });
 
