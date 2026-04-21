@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, deleteOrderPermanent, listSubscriptions, getDashboardSummary, OrderListItem, Subscription, DashboardSummary } from '@/lib/api';
+import { listOrders, deleteOrderPermanent, listSubscriptions, OrderListItem, Subscription } from '@/lib/api';
 import { isLoggedIn, isAdmin, clearToken } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
 import { groupOrders, OrderGroup } from '@/lib/grouping';
@@ -51,10 +51,12 @@ const RISK_BADGE: Record<string, { bg: string; text: string; border: string }> =
   LOW:      { bg: 'bg-slate-800',     text: 'text-slate-500',  border: 'border border-slate-700' },
 };
 
-type StatusFilter = 'all' | 'active' | 'done' | 'failed';
+type StatusFilter = 'all' | 'subscription' | 'domain' | 'active' | 'done' | 'failed';
 
 function groupMatchesFilter(group: OrderGroup, filter: StatusFilter): boolean {
   if (filter === 'all') return true;
+  if (filter === 'subscription') return group.kind === 'subscription';
+  if (filter === 'domain') return group.kind === 'domain';
   if (group.orders.length === 0) return false;
   if (filter === 'active') return group.aggregates.activeScans > 0;
   if (filter === 'done') return group.aggregates.doneScans > 0;
@@ -83,7 +85,6 @@ export default function Dashboard() {
 
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>('all');
@@ -105,7 +106,7 @@ export default function Dashboard() {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const [ordersRes, subsRes, summaryRes] = await Promise.all([listOrders(), listSubscriptions(), getDashboardSummary()]);
+      const [ordersRes, subsRes] = await Promise.all([listOrders(), listSubscriptions()]);
       if (ordersRes.success && ordersRes.data) {
         setOrders(ordersRes.data.orders);
         setLastUpdate(new Date());
@@ -115,9 +116,6 @@ export default function Dashboard() {
       }
       if (subsRes.success && subsRes.data) {
         setSubscriptions(subsRes.data.subscriptions);
-      }
-      if (summaryRes.success && summaryRes.data) {
-        setSummary(summaryRes.data);
       }
     } catch {
       setError('API nicht erreichbar');
@@ -160,6 +158,8 @@ export default function Dashboard() {
   const paginatedGroups = filteredGroups.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const counts = {
     all: groups.length,
+    subscription: groups.filter(g => g.kind === 'subscription').length,
+    domain: groups.filter(g => g.kind === 'domain').length,
     active: groups.filter(g => g.aggregates.activeScans > 0).length,
     done: groups.filter(g => g.aggregates.doneScans > 0).length,
     failed: groups.filter(g => g.aggregates.failedScans > 0).length,
@@ -179,68 +179,6 @@ export default function Dashboard() {
             className="block bg-[#1e293b] border border-blue-800/30 rounded-lg p-3 text-sm text-blue-400 hover:text-blue-300 hover:bg-[#253347] transition-colors">
             Automatisieren Sie Ihre Scans mit einem Abo &rarr;
           </Link>
-        )}
-
-        {/* Security Cockpit — Risk Gauge + Top Findings */}
-        {summary && summary.totalScans > 0 && (
-          <div className="space-y-4">
-            {/* Risk Gauge */}
-            <div className="rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6" style={{ backgroundColor: '#1E293B' }}>
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold border-4"
-                  style={{
-                    borderColor: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6', LOW: '#22C55E' }[summary.overallRisk] || '#22C55E',
-                    color: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6', LOW: '#22C55E' }[summary.overallRisk] || '#22C55E',
-                  }}>
-                  {summary.overallRisk === 'CRITICAL' ? '!' : summary.overallRisk === 'HIGH' ? '!!' : summary.overallRisk === 'MEDIUM' ? '~' : '✓'}
-                </div>
-                <div>
-                  <p className="text-lg font-semibold" style={{ color: '#F8FAFC' }}>
-                    Gesamtrisiko: <span style={{ color: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6', LOW: '#22C55E' }[summary.overallRisk] || '#22C55E' }}>
-                      {{ CRITICAL: 'Kritisch', HIGH: 'Hoch', MEDIUM: 'Mittel', LOW: 'Niedrig' }[summary.overallRisk] || summary.overallRisk}
-                    </span>
-                  </p>
-                  <p className="text-xs" style={{ color: '#94A3B8' }}>
-                    {summary.domains} Domain{summary.domains !== 1 ? 's' : ''} · {summary.totalFindings} offene Befunde
-                    {summary.criticalCount > 0 && <span style={{ color: '#EF4444' }}> · {summary.criticalCount} kritisch</span>}
-                    {summary.highCount > 0 && <span style={{ color: '#F59E0B' }}> · {summary.highCount} hoch</span>}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Top Findings */}
-            {summary.topFindings.length > 0 && (
-              <div className="rounded-2xl p-5 space-y-3" style={{ backgroundColor: '#1E293B' }}>
-                <h3 className="text-xs font-medium uppercase tracking-wider" style={{ color: '#64748B' }}>Dringendster Handlungsbedarf</h3>
-                {summary.topFindings.map((f, i) => (
-                  <Link key={i} href={`/scan/${f.orderId}`}
-                    className="flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-[#253347]">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-xs font-bold px-2 py-0.5 rounded"
-                        style={{
-                          backgroundColor: { CRITICAL: '#EF444420', HIGH: '#F59E0B20', MEDIUM: '#3B82F620' }[f.severity] || '#3B82F620',
-                          color: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6' }[f.severity] || '#3B82F6',
-                        }}>
-                        {f.cvss.toFixed(1)}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-sm truncate" style={{ color: '#F8FAFC' }}>{f.title}</p>
-                        <p className="text-[11px]" style={{ color: '#64748B' }}>{f.domain}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs flex-shrink-0" style={{ color: '#2DD4BF' }}>Details →</span>
-                  </Link>
-                ))}
-              </div>
-            )}
-
-            {summary.topFindings.length === 0 && (
-              <div className="rounded-2xl p-6 text-center" style={{ backgroundColor: '#1E293B' }}>
-                <p className="text-sm" style={{ color: '#22C55E' }}>Keine kritischen Befunde — gut gemacht!</p>
-              </div>
-            )}
-          </div>
         )}
 
         {/* KPI Summary Cards */}
@@ -282,6 +220,8 @@ export default function Dashboard() {
         <div className="flex items-center gap-2 flex-wrap">
           {([
             ['all', 'Alle', counts.all],
+            ['subscription', 'Abo', counts.subscription],
+            ['domain', 'Einzelscan', counts.domain],
             ['active', 'Aktiv', counts.active],
             ['done', 'Fertig', counts.done],
             ['failed', 'Fehlgeschlagen', counts.failed],

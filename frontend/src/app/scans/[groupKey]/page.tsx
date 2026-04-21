@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   listOrders, listSubscriptions, getReportDownloadUrl, requestRescan,
-  deleteOrderPermanent,
-  OrderListItem, Subscription,
+  deleteOrderPermanent, getDashboardSummary,
+  OrderListItem, Subscription, DashboardSummary,
 } from '@/lib/api';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
@@ -85,6 +85,7 @@ export default function GroupDetailPage({ params }: PageProps) {
   const [admin, setAdmin] = useState(false);
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rescanBusy, setRescanBusy] = useState<string | null>(null);
@@ -95,18 +96,32 @@ export default function GroupDetailPage({ params }: PageProps) {
     setReady(true);
   }, [router]);
 
+  // Parse the route key to drive the per-group dashboard-summary filter
+  const summaryFilter = (() => {
+    if (groupKey.startsWith('sub:')) return { subscriptionId: groupKey.slice(4) };
+    if (groupKey.startsWith('dom:')) return { domain: groupKey.slice(4) };
+    return undefined;
+  })();
+
   const fetchData = useCallback(async () => {
     try {
-      const [ordersRes, subsRes] = await Promise.all([listOrders(), listSubscriptions()]);
+      const [ordersRes, subsRes, summaryRes] = await Promise.all([
+        listOrders(),
+        listSubscriptions(),
+        getDashboardSummary(summaryFilter),
+      ]);
       if (ordersRes.success && ordersRes.data) setOrders(ordersRes.data.orders);
       if (subsRes.success && subsRes.data) setSubscriptions(subsRes.data.subscriptions);
+      if (summaryRes.success && summaryRes.data) setSummary(summaryRes.data);
       setError(null);
     } catch {
       setError('API nicht erreichbar');
     } finally {
       setLoading(false);
     }
-  }, []);
+    // summaryFilter is derived from groupKey which only changes on route change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupKey]);
 
   useEffect(() => {
     if (!ready) return;
@@ -239,6 +254,39 @@ export default function GroupDetailPage({ params }: PageProps) {
             rescanBusy={rescanBusy}
             onRescan={handleRescan}
           />
+        )}
+
+        {/* Top findings (per group) */}
+        {summary && summary.topFindings.length > 0 && (
+          <div className="rounded-2xl p-5 space-y-3" style={{ backgroundColor: '#1E293B' }}>
+            <h3 className="text-xs font-medium uppercase tracking-wider" style={{ color: '#64748B' }}>
+              Dringendster Handlungsbedarf
+            </h3>
+            {summary.topFindings.map((f, i) => (
+              <Link key={i} href={`/scan/${f.orderId}`}
+                className="flex items-center justify-between p-3 rounded-xl transition-colors hover:bg-[#253347]">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded"
+                    style={{
+                      backgroundColor: { CRITICAL: '#EF444420', HIGH: '#F59E0B20', MEDIUM: '#3B82F620' }[f.severity] || '#3B82F620',
+                      color: { CRITICAL: '#EF4444', HIGH: '#F59E0B', MEDIUM: '#3B82F6' }[f.severity] || '#3B82F6',
+                    }}>
+                    {f.cvss.toFixed(1)}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm truncate" style={{ color: '#F8FAFC' }}>{f.title}</p>
+                    <p className="text-[11px]" style={{ color: '#64748B' }}>{f.domain}</p>
+                  </div>
+                </div>
+                <span className="text-xs flex-shrink-0" style={{ color: '#2DD4BF' }}>Details →</span>
+              </Link>
+            ))}
+          </div>
+        )}
+        {summary && summary.topFindings.length === 0 && summary.totalScans > 0 && (
+          <div className="rounded-2xl p-6 text-center" style={{ backgroundColor: '#1E293B' }}>
+            <p className="text-sm" style={{ color: '#22C55E' }}>Keine kritischen Befunde — gut gemacht!</p>
+          </div>
         )}
 
         {/* Scan list */}

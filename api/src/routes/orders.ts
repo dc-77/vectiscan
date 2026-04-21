@@ -248,8 +248,12 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
   });
 
   // GET /api/orders/dashboard-summary — aggregated security cockpit data
+  // Optional filters: ?subscriptionId=<uuid> or ?domain=<fqdn>
   server.get('/api/orders/dashboard-summary', { preHandler: [requireAuth] }, async (request) => {
     const user = request.user!;
+    const qp = request.query as Record<string, string | undefined>;
+    const subscriptionIdFilter = qp.subscriptionId && UUID_REGEX.test(qp.subscriptionId) ? qp.subscriptionId : null;
+    const domainFilter = qp.domain ? qp.domain.toLowerCase().slice(0, 255) : null;
 
     // Resolve customer_id
     let customerId = user.customerId;
@@ -258,9 +262,22 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       if (custResult.rows.length > 0) customerId = custResult.rows[0].id;
     }
 
-    // Get all findings from latest reports for the user's completed orders
-    const whereClause = user.role === 'admin' ? '' : 'AND o.customer_id = $1';
-    const params = user.role === 'admin' ? [] : [customerId];
+    // Build WHERE dynamically — ownership first, then optional scope filters
+    const where: string[] = [`o.status IN ('report_complete', 'delivered', 'pending_review')`];
+    const params: unknown[] = [];
+    if (user.role !== 'admin') {
+      params.push(customerId);
+      where.push(`o.customer_id = $${params.length}`);
+    }
+    if (subscriptionIdFilter) {
+      params.push(subscriptionIdFilter);
+      where.push(`o.subscription_id = $${params.length}`);
+    }
+    if (domainFilter) {
+      params.push(domainFilter);
+      // Only plain single-domain groups (no subscription) — see /scans/dom:<domain>
+      where.push(`o.target_url = $${params.length} AND o.subscription_id IS NULL`);
+    }
 
     const result = await query(
       `SELECT o.id, o.target_url AS domain, o.status, o.scan_finished_at,
@@ -271,8 +288,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
        LEFT JOIN LATERAL (
          SELECT findings_data FROM reports WHERE order_id = o.id ORDER BY created_at DESC LIMIT 1
        ) r ON true
-       WHERE o.status IN ('report_complete', 'delivered', 'pending_review')
-       ${whereClause}
+       WHERE ${where.join(' AND ')}
        ORDER BY o.scan_finished_at DESC`,
       params,
     );

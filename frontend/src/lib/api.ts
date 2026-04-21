@@ -300,8 +300,14 @@ export interface DashboardSummary {
   topFindings: Array<{ domain: string; title: string; severity: string; cvss: number; orderId: string }>;
 }
 
-export async function getDashboardSummary(): Promise<ApiResponse<DashboardSummary>> {
-  const res = await fetch(`${API_URL}/api/orders/dashboard-summary`, {
+export async function getDashboardSummary(
+  filter?: { subscriptionId?: string; domain?: string },
+): Promise<ApiResponse<DashboardSummary>> {
+  const qs = new URLSearchParams();
+  if (filter?.subscriptionId) qs.set('subscriptionId', filter.subscriptionId);
+  if (filter?.domain) qs.set('domain', filter.domain);
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  const res = await fetch(`${API_URL}/api/orders/dashboard-summary${suffix}`, {
     headers: authHeaders(),
   });
   return handleResponse(res);
