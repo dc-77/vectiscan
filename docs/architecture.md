@@ -1,200 +1,279 @@
-# VectiScan — Architektur-Referenz
+# VectiScan — Architektur-Referenz (Stand: 2026-04-21)
 
-## Scan-Architektur: Phase-First Model
-
-Der Scan-Worker verwendet eine Phase-First-Architektur: Alle Hosts durchlaufen
-Phase 1, bevor Phase 2 beginnt. Zwischen den Phasen trifft Haiku KI-Entscheidungen.
-
-```
-Phase 0: DNS-Reconnaissance (alle Tools)
-    │
-    ├── crt.sh, subfinder, [amass, gobuster dns, AXFR]*
-    ├── DNS Records (SPF, DMARC, DKIM, MX, NS)
-    ├── dnsx Validierung + IP-Gruppierung
-    └── Web Probe (httpx: HTTP-Check pro Host)
-    │
-    ▼
-AI Host Strategy (Haiku)
-    │ Entscheidet: scan/skip pro Host, Priorität, Begründung
-    │ Persistiert in: scan_results (ai_host_strategy)
-    │ Gepusht via: WebSocket (ai_strategy Event)
-    │
-    ▼
-Phase 1: Tech Detection — ALLE Hosts sequenziell
-    │
-    ├── nmap (Port-Scan, Service Detection)
-    ├── webtech (Technologie-Erkennung, HTTPS first)
-    ├── wafw00f (WAF-Erkennung)
-    └── CMS-Fallback (wp-login.php Probe wenn webtech nichts findet)
-    │
-    ▼
-AI Phase 2 Config (Haiku, pro Host)
-    │ Konfiguriert: nuclei_tags, nikto_tuning, gobuster_wordlist, skip_tools
-    │ Persistiert in: scan_results (ai_phase2_config)
-    │ Gepusht via: WebSocket (ai_config Event)
-    │
-    ▼
-Phase 2: Deep Scan — ALLE Hosts sequenziell
-    │
-    ├── testssl.sh (nur bei has_ssl=true)
-    ├── nikto (AI-adaptive Tuning)
-    ├── nuclei (AI-adaptive Tags, Performance-Flags)
-    ├── gobuster dir (AI-adaptive Wordlist)
-    ├── gowitness (Screenshot)
-    ├── HTTP Headers (Security-Header-Analyse)
-    ├── httpx (HTTP-Probing, Tech-Detection)
-    ├── katana (Web-Crawler)
-    └── wpscan (nur bei CMS=WordPress)
-    │
-    ▼
-Finalize: Pack tar.gz → MinIO Upload → Report-Job enqueuen
-
-* Tools je nach Paket — Basic hat nur crtsh, subfinder, dnsx
-```
+Hochlevel-Architektur. Detaillierte Pipeline-Doku in `SCAN-PIPELINE-DETAIL.md`.
 
 ---
 
-## Web Probe in Phase 0
+## Systemtopologie
 
-Nach der DNS-Validierung und Host-Gruppierung wird ein schneller HTTP-Check
-pro Host durchgeführt (httpx, ~1-5s pro FQDN):
+```
+                       ┌─────────────────────────┐
+   internes Netz ──→   │ Traefik v3.6 (DMZ host) │
+                       └────────┬────────────────┘
+                                │ scan.vectigal.tech
+                                │ scan-api.vectigal.tech
+                                ▼
+              ┌─────────────────────────────────────────────────┐
+              │              Docker-Compose Stack               │
+              │                                                 │
+              │  ┌──────────┐   ┌──────────┐                   │
+              │  │ frontend │──▶│   api    │──▶ postgres ◀──┐  │
+              │  │ Next.js  │   │ Fastify  │──▶ redis    ◀──┤  │
+              │  └──────────┘   └────┬─────┘──▶ minio    ◀──┤  │
+              │                      │                       │  │
+              │             ┌────────┴─────────┐             │  │
+              │             ▼                  ▼             │  │
+              │     ┌───────────────┐  ┌───────────────┐    │  │
+              │     │ scan-worker-1 │  │ scan-worker-2 │────┤  │
+              │     │   + zap-1     │  │   + zap-2     │    │  │
+              │     └───────┬───────┘  └───────┬───────┘    │  │
+              │             └──────┬───────────┘             │  │
+              │                    ▼                         │  │
+              │             ┌─────────────┐                  │  │
+              │             │report-worker│──────────────────┘  │
+              │             └─────────────┘                     │
+              └──────────────────────────────────────────────────┘
+```
 
-- `has_web=true`: HTTP-Content vorhanden, Status 2xx-4xx -> voller Web-Scan
-- `has_web=false`: Kein HTTP-Content -> nur Port-Scan + SSL
-
-Die Web-Probe-Daten werden im Host-Inventar gespeichert und der AI Host Strategy
-als Input mitgegeben. Wenn eine funktionierende FQDN gefunden wird, wird sie
-in Phase 1/2 als primäre FQDN verwendet.
+Frontend und API hängen in `proxy-net` (Traefik) und `vectiscan-internal`.
+Alle anderen Services nur in `vectiscan-internal`. Scan-Worker brauchen
+Internet-Outbound (NAT über `ens192`, Docker `iptables=false`).
 
 ---
 
-## FQDN-Priorisierung
+## Scan-Pipeline (6 Phasen, 4 KI-Punkte)
 
-Innerhalb jedes Hosts werden FQDNs nach Scan-Relevanz sortiert:
+```
+Redis Queue: scan-pending
+    │
+    ▼
+worker.py::_process_job(order_id, domain, package)
+    │
+    ├── Phase 0a: Passive Intelligence
+    │     WHOIS, Shodan, AbuseIPDB, SecurityTrails,
+    │     DNSSEC/CAA/MTA-STS/DANE  (parallel)
+    │
+    ├── Phase 0b: DNS-Reconnaissance
+    │     crt.sh, subfinder, amass, gobuster_dns, AXFR, dnsx
+    │     + Web-Probe (httpx pro FQDN)              (parallel, 6 Worker)
+    │
+    ├── KI #1: Host Strategy (Haiku)
+    │     scan/skip pro Host, Priorität, scan_hints
+    │
+    ├── Phase 1: Tech Detection                     (parallel, max 3 Hosts)
+    │     nmap, Playwright-webtech, wafw00f, CMSFingerprinter
+    │
+    ├── KI #2: Tech Analysis (Haiku)
+    │     CMS-Korrektur basierend auf Redirect-Daten
+    │
+    ├── KI #3: Phase-2-Config (Haiku, pro Host)
+    │     ZAP-Policy/Spider-Tiefe/Active-Kategorien/ffuf-Modus/skip_tools
+    │
+    ├── Phase 2: Deep Scan       (parallel max 3 Hosts; max 1 wenn ZAP läuft)
+    │     ├── Stage 1 Discovery: ZAP Spider, testssl, Headers, httpx
+    │     ├── Stage 2 Deep:      ZAP Active, ffuf, feroxbuster, wpscan
+    │     └── Stage 3 Alerts:    ZAP-Pscan-Queue leeren, Alerts mappen
+    │
+    ├── KI #4: Phase-3-Priorisierung (Sonnet, nur bei >5 Findings)
+    │     Konfidenz-Scoring, Cross-Tool-Korrelation, FP-Erkennung
+    │
+    ├── Phase 3: Correlation & Enrichment
+    │     ├── Cross-Tool-Korrelation (CrossToolCorrelator)
+    │     ├── FP-Filter (6 Regeln: WAF, Version, CMS, SSL/Header-Dedup, Noise)
+    │     ├── Threat-Intel: NVD, EPSS, CISA KEV, ExploitDB (parallel, 4 Worker)
+    │     └── Business-Impact-Score (CVSS × EPSS × KEV × Asset × Paket)
+    │
+    └── Finalize
+          ├── tar.gz packen → MinIO scan-rawdata/<orderId>.tar.gz
+          ├── Report-Job in Redis-Queue (report-pending)
+          └── Status → pending_review (Admin-Review-Workflow)
+```
+
+TLSCompliance-Paket (`skip_ai_decisions=True`) überspringt KI #1, #2 und #3
+sowie Phase 3 — es nutzt nur DNS-Recon, nmap auf TLS-Ports, testssl und
+Headers, und einen dedizierten TR-03116-4-Pfad im Report-Worker.
+
+---
+
+## KI-Modelle und Einsatz
+
+| Punkt | Modell | Einsatz | Token-Budget |
+|---|---|---|---|
+| Host Strategy | `claude-haiku-4-5-20251001` | Pattern-Matching: scan/skip | 8.192 |
+| Tech Analysis | `claude-haiku-4-5-20251001` | CMS-Korrektur per Redirect-Daten | 8.192 |
+| Phase-2-Config | `claude-haiku-4-5-20251001` | ZAP-Policy + ffuf-Modus pro Host | 8.192 |
+| Phase-3-Priorisierung | `claude-sonnet-4-6` | Cross-Tool-Reasoning, FP-Erkennung | 16.384 |
+| Report-Generierung | `claude-sonnet-4-6` | Komplexe Analyse, Prosa, Compliance | paketabhängig |
+| Report-QA | `claude-haiku-4-5-20251001` | Plausibilität nur bei Anomalien | klein |
+
+Alle KI-Calls werden über `_save_ai_debug()` in `scan_results` gespeichert:
+System-Prompt vollständig, User-Prompt bis 10 KB, Raw-Response, Cost-Dict.
+Cap auf 50 KB pro Eintrag.
+
+---
+
+## Order-Status-Flow
+
+```
+verification_pending
+        │
+        ▼ POST /api/verify/check (verified) oder /api/verify/manual
+       queued
+        │
+        ▼ scan-worker pickup
+      scanning ─→ passive_intel ─→ dns_recon
+        │           │                │
+        │           ▼                ▼
+        │      scan_phase1 ─→ scan_phase2 ─→ scan_phase3
+        │                              │
+        │                              ▼
+        └────────────────────────→ scan_complete
+                                       │
+                                       ▼ report-worker (Claude-Analyse)
+                                 pending_review  ←── Admin-Review
+                                       │
+                          ┌────────────┼─────────────┐
+                          ▼ approve    ▼ reject      ▼ regenerate
+                  report_generating  rejected   report_generating
+                          │                          │
+                          ▼                          ▼
+                  report_complete             report_complete (v+1)
+
+   cancelled (von jedem aktiven Status)
+   failed    (von jedem Status, bei Worker-Fehler)
+   delivered (Folge-Status nach Versand, nicht aktiv im Pipeline-Code)
+```
+
+Customer sieht nur `report_complete`, `delivered`, `report_generating` und
+`pending_review` über `GET /api/orders/:id`. Alle anderen Status sind
+admin-only.
+
+---
+
+## Web-Probe in Phase 0b
+
+Pro FQDN (max 3 pro Host) wird `httpx -u <fqdn> -json -silent
+-follow-redirects -status-code -title -timeout 5` ausgeführt.
+
+- `has_web=true`: HTTP-Content vorhanden → voller Web-Scan
+- `has_web=false`: kein HTTP-Content → nur Port-Scan + SSL
+- Parking-Page-Patterns werden erkannt (Froxlor, Plesk, cPanel, "domain not
+  configured", "default web page" etc.) und als skipping-Signal an die KI
+  übergeben
+
+Die Web-Probe-Daten landen im Host-Inventar und werden der KI Host
+Strategy als Input mitgegeben. Wenn eine antwortende FQDN gefunden wird,
+wird sie zur primären FQDN für Phase 1/2.
+
+---
+
+## FQDN- und Host-Priorisierung
 
 | Priorität | FQDN-Typ | Beispiel |
 |---|---|---|
 | 0 | Basisdomain | `example.com` |
 | 1 | www-Subdomain | `www.example.com` |
-| 5 | Sonstige Subdomains | `shop.example.com`, `dev.example.com` |
-| 9 | Mail-FQDNs | `mail.example.com`, `mx.example.com` |
+| 5 | Sonstige Subdomains | `shop.example.com` |
+| 9 | Mail-FQDNs | `mail.*`, `mx.*`, `smtp.*`, `imap.*`, `autodiscover.*` |
 
-Die erste FQDN in der Liste wird als `primary_fqdn` für Phase 1/2 Tools verwendet.
-
-Hosts werden ebenfalls priorisiert:
-- Basisdomain-Host zuerst
-- www-Subdomain-Host
-- Sonstige Web-Hosts
-- Mail/Autodiscover-Hosts zuletzt
+Hosts werden in derselben Logik priorisiert. **Override:** Auf Basisdomain
+und `www.<domain>` ist `skip_tools` der KI immer leer (Basisdomain wird
+immer vollständig gescannt).
 
 ---
 
-## AI-Orchestrierung
+## Admin-Review-Workflow
 
-### Host Strategy (nach Phase 0)
+1. Scan-Worker beendet Phase 3 → Status `scan_complete`, Job in
+   `report-pending`-Queue
+2. Report-Worker führt Claude-Analyse + QA durch, schreibt `findings_data`
+   in `reports`, setzt Status auf `pending_review` (kein PDF!)
+3. Admin sieht Pending-Review-Queue (`GET /api/admin/pending-reviews`),
+   prüft die Findings und kann FPs ausschließen (`POST
+   /api/orders/:id/findings/:findingId/exclude`)
+4. Admin **approved** (`POST /api/admin/orders/:id/approve`):
+   Status → `report_generating`, Report-Worker erstellt PDF inkl.
+   Excluded-Filter, Status → `report_complete`
+5. Admin **rejected** (`POST /api/admin/orders/:id/reject`):
+   Status → `rejected` mit `review_notes`
 
-**Modell:** `claude-haiku-4-5-20251001`
+Kunden können nach Approve den Report über die Detail-Seite herunterladen
+oder per Deep-Link teilen.
 
-Haiku erhält das Host-Inventar mit Web-Probe-Daten und entscheidet:
-- `scan`: Host wird in Phase 1+2 gescannt
-- `skip`: Host wird übersprungen (z.B. Parking-Pages, CDN-Nodes, Autodiscover)
+---
 
-**Fallback:** Bei API-Fehler werden alle Hosts gescannt.
+## Subscription-Workflow
 
-### Phase 2 Config (nach Phase 1, pro Host)
+- Kunde erstellt Abo (`POST /api/subscriptions`) — Stripe gemockt, Status
+  geht direkt auf `active`
+- Domains landen mit Status `pending_approval`
+- Admin sieht Queue (`GET /api/admin/pending-domains`), gibt jede Domain
+  manuell frei (`POST /api/admin/subscription-domains/:id/approve`) oder
+  lehnt sie ab
+- Freigegebene Domains landen automatisch im persistierten
+  `verified_domains`-Bestand des Kunden (90 Tage Gültigkeit), sodass
+  Folge-Orders die Verifikation überspringen
+- Customer kann pro Abo Re-Scans anstoßen (`POST
+  /api/subscriptions/:id/rescan`), bis das Kontingent (`max_rescans`)
+  erschöpft ist. **Admin-Re-Scans** über denselben Endpoint überspringen
+  Quota-Check und -Inkrement; Audit-Log markiert `triggeredBy: 'admin'`.
 
-Haiku erhält das Tech-Profile eines Hosts und konfiguriert:
-- **nuclei_tags**: Technologie-spezifische Template-Tags (max 5-7)
-- **nuclei_exclude_tags**: Tags die ausgeschlossen werden (z.B. `dos`, `fuzz` bei WAF)
-- **nikto_tuning**: Relevante Scan-Kategorien (1-9, 0)
-- **gobuster_wordlist**: Passende Wordlist (`common`, `wordpress`, `api`, `cms`)
-- **skip_tools**: Tools die übersprungen werden können (nur für API-Hosts/Mailserver)
-
-**Override:** Auf der Basisdomain und www-Subdomain ist `skip_tools` immer leer.
+### Order-zu-Abo-Linking
+- `POST /api/orders` (`api/src/routes/orders.ts`) prüft bei jeder neuen
+  Order: existiert für den Customer ein aktives Abo, dessen
+  `subscription_domains` die Ziel-Domain mit Status `verified` und
+  `enabled=true` enthält? → `subscription_id` wird automatisch gesetzt.
+- Der Subscription-Scheduler (`api/src/lib/scheduler.ts`) setzt
+  `subscription_id` ohnehin direkt beim INSERT.
+- Der Re-Scan-Endpoint (`POST /api/subscriptions/:id/rescan`) setzt
+  zusätzlich `is_rescan = true`.
+- Folge: Das Dashboard kann Orders zuverlässig nach Abo gruppieren —
+  auch dann, wenn der Customer den Re-Scan manuell über `/api/orders`
+  statt über den Subscription-Endpoint anstößt. Alt-Orders ohne
+  `subscription_id` bleiben unverknüpft und erscheinen als
+  Einzelscan-Domain-Gruppen.
 
 ---
 
 ## WebSocket Event Replay
 
-Clients, die sich spät verbinden, erhalten automatisch alle bisherigen Events:
+Verbindungs-Endpoint: `GET /ws?orderId=<uuid>` (auch `?scanId=` für
+Backward-Compat).
 
-1. **hosts_discovered**: Entdeckte Hosts aus dem Host-Inventar
-2. **ai_strategy**: Die AI-Host-Strategie (scan/skip Entscheidungen)
-3. **ai_config**: AI Phase-2-Konfigurationen pro Host
-4. **tool_output**: Zusammenfassungen aller bisherigen Tool-Ergebnisse (max 50)
+Bei Connect sendet der Server `connected` und replayt aus zwei Quellen:
 
-Die Events werden aus zwei Quellen rekonstruiert:
-- `orders.discovered_hosts` (JSONB) für Host-Discovery
-- `scan_results` Tabelle für AI-Entscheidungen und Tool-Outputs
+- `orders.discovered_hosts` (JSONB) → `hosts_discovered`-Event
+- `scan_results` Tabelle:
+  - `tool_name=ai_host_strategy` → `ai_strategy`-Event
+  - `tool_name=ai_phase2_config` (pro Host) → `ai_config`-Events
+  - Alle übrigen Tools (max 50) → `tool_output`-Events
 
----
+Live-Events (vom Scan-Worker via Redis-Pub/Sub):
 
-## Event-Persistenz
+```
+{ "type": "status",          "orderId": "uuid", "status": "..." }
+{ "type": "progress",        "orderId": "uuid", "phase": "...", "tool": "...", "host": "..." }
+{ "type": "hosts_discovered","orderId": "uuid", "hosts": [...], "hostsTotal": 3 }
+{ "type": "ai_strategy",     "orderId": "uuid", "strategy": {...} }
+{ "type": "ai_config",       "orderId": "uuid", "ip": "...", "config": {...} }
+{ "type": "tool_output",     "orderId": "uuid", "tool": "nuclei", "host": "...", "summary": "..." }
+{ "type": "phase3_complete", "summary": {...} }
+```
 
-AI-Entscheidungen werden in der `scan_results` Tabelle gespeichert:
-
-| tool_name | phase | Inhalt |
-|---|---|---|
-| `ai_host_strategy` | 0 | JSON mit hosts[], strategy_notes |
-| `ai_host_skip` | 0 | Skip-Begründung pro Host |
-| `ai_phase2_config` | 1 | JSON mit nuclei_tags, wordlist, etc. |
-| `web_probe` | 0 | JSON mit has_web, status, title pro Host |
-
-Dies ermöglicht:
-- Event-Replay für WebSocket Late-Joining
-- Scan-Detail-Seite (`/scan/[orderId]`) mit Debug-Mode
-- `/api/orders/:id/events` Endpoint
-
----
-
-## CWE-Validierung + CVSS-Score-Capping
-
-Der Report-Worker hat eine Post-Processing-Pipeline:
-
-1. **CWE-Validierung**: `cwe_reference.py` enthält eine Referenztabelle gültiger CWE-IDs.
-   Ungültige CWE-Zuordnungen von Claude werden korrigiert.
-2. **CVSS-Score-Capping**: Strenge Obergrenzen verhindern überhöhte Scores:
-   - Information Disclosure: max LOW (3.5)
-   - Fehlende Security Headers: max MEDIUM (5.5)
-   - SSH mit Key-Auth: INFO (0.0)
-   - DNS-Records: max MEDIUM (5.5)
-3. **Score-Vektor-Konsistenz**: Der numerische CVSS-Score muss zum Vektor passen.
-
-Die Regeln sind in den drei Prompt-Varianten (`prompts.py`) kodiert.
-
----
-
-## Scheduled Scans Architecture
-
-### Scheduler Tick Loop
-
-Der API-Server startet beim Boot einen Scheduler (`lib/scheduler.ts`), der alle 60 Sekunden:
-
-1. `scan_schedules` abfragt: `WHERE enabled = true AND next_scan_at <= NOW()`
-2. Row-Level-Lock (`FOR UPDATE SKIP LOCKED`) gegen Doppelverarbeitung
-3. Für jede fällige Schedule:
-   - Order direkt im Status `queued` erstellen (Verifikation überspringen)
-   - Scan-Job in Redis-Queue enqueuen
-   - `next_scan_at` berechnen (weekly: +7d, monthly: +1M, quarterly: +3M)
-   - `once`-Schedules werden deaktiviert (`enabled = false`)
-
-### Voraussetzung
-
-Eine Schedule kann nur für Domains erstellt werden, die der Kunde zuvor
-verifiziert hat (mind. eine Order mit `verified_at IS NOT NULL`).
+Pub/Sub-Kanal: `scan:events:<orderId>`.
 
 ---
 
 ## Queue-System (Redis + BullMQ)
 
-**Zwei Queues:**
-
-| Queue | Produzent | Konsument | Payload |
+| Queue | Producer | Consumer | Payload |
 |---|---|---|---|
-| `scan-pending` | Backend-API / Scheduler | Scan-Worker | `{ orderId, targetDomain, package }` |
-| `report-pending` | Scan-Worker | Report-Worker | `{ orderId, rawDataPath, hostInventory, techProfiles[], package }` |
+| `scan-pending` | API / Scheduler / Subscriptions | Scan-Worker | `{orderId, targetDomain, package}` |
+| `report-pending` | Scan-Worker (auto), API (regenerate/requeue/approve) | Report-Worker | `{orderId, rawDataPath, hostInventory, techProfiles, package, enrichment?, correlatedFindings?, businessImpactScore?, excludedFindings?, approved?, regenerate?}` |
+| `diagnose-pending` | API (`POST /api/admin/diagnose`) | Scan-Worker | `{requestId, probe?}` |
 
-**Redis Pub/Sub:** Kanal `scan:{orderId}` für WebSocket-Events.
+Alle drei Queues werden via `BLPOP` konsumiert. Diagnose-Result wird unter
+`diagnose:result:<requestId>` (TTL 5 Min) abgelegt und vom API gepollt.
 
 ---
 
@@ -202,61 +281,53 @@ verifiziert hat (mind. eine Order mit `verified_at IS NOT NULL`).
 
 | Bucket | Inhalt | Retention |
 |---|---|---|
-| `scan-rawdata` | Rohdaten der Scans (tar.gz) | 90 Tage |
-| `scan-reports` | Fertige PDF-Berichte | 365 Tage |
-| `scan-logs` | Scan-Execution-Logs | 30 Tage |
+| `scan-rawdata` | tar.gz aller Scans | 90 Tage |
+| `scan-reports` | PDF-Reports (versioniert) | 365 Tage |
+| `scan-debug` | Claude-Prompts/Responses pro Order (JSON) | 30 Tage |
+
+Versionierte Reports liegen unter `<orderId>.pdf` (v1) bzw.
+`<orderId>_v<n>.pdf`. Die Datenbank-Spalte `reports.version` und
+`reports.superseded_by` halten die Reihenfolge.
 
 ---
 
-## Report-Pipeline
+## CWE/CVSS-Validierung
 
-### Drei Prompt-Varianten
+Pipeline im Report-Worker:
 
-| Paket | Prompt | Besonderheiten |
-|---|---|---|
-| Basic | `SYSTEM_PROMPT_BASIC` | Max 5-8 Findings, Management-tauglich, kein Fachjargon |
-| Professional | `SYSTEM_PROMPT_PROFESSIONAL` | PTES-Standard, vollständige CVSS-Vektoren, Evidence-Blöcke |
-| NIS2 | `SYSTEM_PROMPT_NIS2` | = Professional + §30 BSIG-Mapping, Compliance-Summary, Lieferketten-Zusammenfassung |
+1. **`validate_cwe_mappings()`** — `cwe_reference.py` enthält die lokale
+   Whitelist gültiger CWE-IDs; ungültige Zuordnungen werden geloggt
+   (optional korrigiert via MITRE-CWE-API-Client `cwe_api_client.py`)
+2. **`validate_cvss_scores()`** — Berechnet CVSS-3.1-Score aus dem Vektor
+   (8 Pflichtmetriken), korrigiert Divergenzen >0.1
+3. **`cap_implausible_scores()`** — Strenge Obergrenzen aus den Prompts:
+   - Information Disclosure: max LOW (3.5)
+   - Banner: max INFO (2.5)
+   - Fehlende Security-Headers: max MEDIUM (5.5)
+   - DNS-Records: max MEDIUM (5.5)
+   - SSH mit Key-Auth: INFO (0.0)
+4. **`run_qa_checks()`** — Programmatische Konsistenz-Checks (Severity ↔
+   Score, doppelte IDs, fehlende Felder); Haiku-Plausibilität nur bei
+   Anomalien
 
-Alle Prompts enthalten:
-- Strenge CVSS-Obergrenzen
-- CWE-Referenztabelle (inline)
-- Häufig falsch bewertete Findings mit korrekten Scores
-- Deutsche Ausgabe
-
-### Report-Worker Dateien
-
-```
-report-worker/reporter/
-├── worker.py              ← BullMQ Consumer, Orchestrierung
-├── parser.py              ← Tool-Output-Parser (JSON/XML → Findings)
-├── claude_client.py       ← Claude API Aufruf + JSON-Parsing
-├── prompts.py             ← Drei Prompt-Varianten (Basic, Pro, NIS2)
-├── report_mapper.py       ← Claude-Output → report_data Dict (drei Mapper)
-├── cwe_reference.py       ← CWE-Validierung + CVSS-Capping
-└── generate_report.py     ← PDF-Engine (pentest-report-generator Skill)
-```
-
-### Claude-Output → report_data Mapping
-
-Der Claude-API-Aufruf liefert JSON mit `findings[]`, `positive_findings[]` und
-`recommendations[]`. Die Finding-Felder (id, title, severity, cvss_score,
-cvss_vector, cwe, affected, description, evidence, impact, recommendation)
-mappen 1:1 auf die report_data-Struktur des PDF-Skills.
-
-NIS2-Findings haben zusätzlich ein `nis2_ref`-Feld (`§30 Abs. 2 Nr. X BSIG`).
-Der NIS2-Report enthält außerdem `nis2_compliance_summary` und `supply_chain_summary`.
+Trailing-Commas in Claude-Antworten werden per Regex bereinigt;
+JSON-Parse-Fehler werden bis zu 3× retried (mit 3 s Pause).
 
 ---
 
 ## Sicherheit des Scan-Workers
 
 - Container läuft als Non-Root-User (`scanner`)
-- Persistent-Worker, der nach jedem Job /tmp aufräumt
-- Minimales Base-Image (Debian-Slim)
-- Kein Volume-Mount auf Host-Dateisystem
-- Resource-Limits (CPU, RAM)
+- Persistent-Worker, der nach jedem Job `/tmp/scan-<orderId>` aufräumt
+- Minimales Base-Image (`debian:bookworm-slim`)
+- Kein Volume-Mount auf das Host-Dateisystem
+- Resource-Limits (2 CPU, 2 GB RAM pro Worker)
 - **Keine aktive Exploitation** — nur Scanning und Enumeration
-- Alle Tool-Aufrufe werden in `scan_results` geloggt
-- Cancellation-Check: Worker prüft regelmäßig DB-Status, bricht bei `cancelled` ab
-- Tool-Versionen werden bei Scan-Start erfasst und in `meta.json` geschrieben
+- Cancellation-Check: Worker prüft regelmäßig `orders.status` → bei
+  `cancelled` wird der Scan beendet (`ScanCancelled`)
+- Tool-Versionen werden bei Scan-Start erfasst und in `meta.json` und
+  vom Report-Worker in den Audit-Trail (Compliance/SupplyChain) übernommen
+- ZAP läuft pro Worker als separater Daemon (zap-1, zap-2) auf
+  `vectiscan-internal`, kein externer Port
+- Subprocess-Cleanup: `start_new_session=True` + SIGKILL der gesamten
+  Prozessgruppe bei Timeout
