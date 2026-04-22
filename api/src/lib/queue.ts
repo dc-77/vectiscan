@@ -25,6 +25,15 @@ export const reportQueue = {
   },
 };
 
+export type PrecheckJob =
+  | { orderId: string; targetIds: string[] }
+  | { subscriptionId: string; targetIds: string[] };
+
+export async function enqueuePrecheck(job: PrecheckJob): Promise<void> {
+  const client = await getRedisClient();
+  await client.rPush('precheck-pending', JSON.stringify(job));
+}
+
 export async function publishEvent(orderId: string, event: Record<string, unknown>): Promise<void> {
   const client = await getRedisClient();
   // Channel name kept as scan:events:{id} for backward compat with workers

@@ -194,6 +194,48 @@ services:
     networks:
       - vectiscan-internal
 
+  # Precheck-Worker: validiert Multi-Target-Eingaben vor Admin-Review.
+  # Nutzt scan-worker-Image mit alternativem Entrypoint. Keine ZAP-Dependency.
+  precheck-worker-1:
+    image: ghcr.io/dc-77/vectiscan/scan-worker:${TAG:-latest}
+    restart: unless-stopped
+    entrypoint: ["python", "-m", "scanner.precheck_worker"]
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks:
+      - vectiscan-internal
+
+  precheck-worker-2:
+    image: ghcr.io/dc-77/vectiscan/scan-worker:${TAG:-latest}
+    restart: unless-stopped
+    entrypoint: ["python", "-m", "scanner.precheck_worker"]
+    environment:
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks:
+      - vectiscan-internal
+
   report-worker:
     image: ghcr.io/dc-77/vectiscan/report-worker:${TAG:-latest}
     restart: unless-stopped
