@@ -1,4 +1,14 @@
-# VectiScan — API Specification (Stand: 2026-04-21)
+# VectiScan — API Specification (Stand: 2026-04-22, Multi-Target-Umbau)
+
+> **Hinweis Multi-Target (seit 2026-04-22):** `POST /api/orders` akzeptiert
+> jetzt `{package, targets: [{raw_input, exclusions?}, ...]}` statt
+> `{domain, package}`. Limits: 10 Zeilen, 1 CIDR, /24 min. Alle Order- und
+> Abo-Anlagen laufen über Pre-Check → Admin-Review (siehe
+> `docs/MULTI-TARGET-PLAN.md` §6–9). Neue Admin-Endpoints unter
+> `/api/admin/review/*`, `/api/admin/targets/*`, `/api/admin/orders/:id/release`,
+> `/api/admin/orders/:id/authorizations`. `POST /api/verify/manual` wurde
+> entfernt; `POST /api/verify/check` arbeitet jetzt auf `scan_target_id` und
+> nur auf FQDN-Typen.
 
 Base URL: `https://scan-api.vectigal.tech` (internal-only via Traefik)
 

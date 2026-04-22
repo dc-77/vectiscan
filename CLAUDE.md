@@ -80,8 +80,11 @@ Kein certresolver-Label nötig — das ist der Traefik-Default.
 ## API-Endpoints
 Siehe docs/API-SPEC.md für vollständige Spezifikation.
 
-### Orders
-- POST /api/orders           → Neue Order anlegen (Body: { domain, package? })
+### Orders (Multi-Target)
+- POST /api/orders           → Neue Order anlegen
+  (Body: `{ package, targets: [{raw_input, exclusions?}, ...] }`, max 10 Zeilen,
+   max 1 CIDR, /24 minimaler Prefix)
+- POST /api/orders/validate-targets → Live-Validierung pro Zeile
 - GET  /api/orders           → Order-Liste (Admin: alle, Kunde: eigene)
 - GET  /api/orders/:id       → Status + Live-Fortschritt
 - DELETE /api/orders/:id     → Soft-Cancel oder Hard-Delete (?permanent=true)
@@ -98,13 +101,31 @@ Siehe docs/API-SPEC.md für vollständige Spezifikation.
 ### Admin
 - GET /api/admin/users, PUT /api/admin/users/:id/role, DELETE /api/admin/users/:id
 - GET /api/admin/stats
+- GET /api/admin/review/queue → Orders/Subscriptions mit `pending_target_review`
+- GET /api/admin/review/:type/:id → Detail inkl. Pre-Check-Hosts + Authorizations
+- PUT /api/admin/targets/:targetId → Policy/Exclusions editieren
+- POST /api/admin/targets/:targetId/approve|reject|restart-precheck
+- POST /api/admin/orders/:id/release → Scan nach Freigabe aller Targets starten
+- POST /api/admin/orders/:id/authorizations → Multipart-Upload (PDF/JPG/PNG)
+- POST /api/admin/subscriptions/:id/authorizations
+- DELETE /api/admin/authorizations/:id
+
+### Subscriptions
+- POST /api/subscriptions → Abo anlegen mit `targets[]`
+- GET /api/subscriptions → Liste (Kunde: eigene, Admin: alle) inkl. Target-Stati
+- POST /api/subscriptions/:id/targets → Target nachtraeglich anhaengen
+- DELETE /api/subscriptions/:id/targets/:targetId → Target entfernen
+- POST /api/subscriptions/:id/rescan → Ad-hoc Re-Scan (optional nur ein Target)
 
 ### Schedules
 - GET /api/schedules, POST /api/schedules, GET /api/schedules/:id
 - PUT /api/schedules/:id, DELETE /api/schedules/:id
 
-### Verification
-- POST /api/verify/check, POST /api/verify/manual, GET /api/verify/status/:orderId
+### Verification (optional im Multi-Target-Flow)
+- POST /api/verify/check → verifiziert ein scan_target (nur FQDN-Typen),
+  beschleunigt Admin-Entscheidung, Ergebnis im 90-Tage-Cache `verified_domains`
+- GET /api/verify/status/:orderId → Verify-Status pro FQDN-Target der Order
+- (`POST /api/verify/manual` entfernt — ersetzt durch Admin-Approve-Flow)
 
 ### WebSocket
 - GET /ws?orderId=<uuid> → Real-Time Progress mit Event-Replay
@@ -114,12 +135,37 @@ Siehe docs/API-SPEC.md für vollständige Spezifikation.
 
 ## Datenbank
 Siehe docs/DB-SCHEMA.sql für das vollständige Schema.
-Sieben Tabellen: customers, users, orders, scan_results, reports, audit_log, scan_schedules.
+Basis-Tabellen: customers, users, orders, scan_results, reports, audit_log, scan_schedules.
+Multi-Target-Tabellen (Migration 014): scan_targets, scan_target_hosts,
+scan_run_targets, scan_authorizations. Die alte subscription_domains ist gedropt.
+
+## Multi-Target-Flow
+1. POST /api/orders mit `targets[]` legt Order mit Status `precheck_running` an
+   und befüllt `scan_targets`. Job wird in Redis-Queue `precheck-pending` gelegt.
+2. precheck-worker-1/-2 (separate Container, gleiches Image, anderer Entrypoint
+   `scanner.precheck_worker`) validiert pro Target: DNS, httpx, nmap-Top-10,
+   Cloud-Provider-Heuristik. Schreibt `scan_target_hosts`.
+3. Nach Abschluss: Order-Status → `pending_target_review`. Admin sieht Review
+   unter `/admin/review/[orderId]`, kann pro Target approve/reject/update und
+   Scan-Authorizations (PDF) hochladen.
+4. `POST /api/admin/orders/:id/release` setzt Status `queued` und enqueued
+   `scan-pending` mit `{orderId, package}`. `scan_run_targets` wird als
+   Snapshot angelegt.
+5. Scan-Worker liest Targets aus DB, führt Phase 0b pro Policy (enumerate/
+   scoped/ip_only) aus, merget Inventar, wendet Scope-Enforcement an
+   (`scanner/scope.py`), läuft dann wie bisher Phase 1-3 durch.
+
+Four Target-Typen: `fqdn_root`, `fqdn_specific`, `ipv4`, `cidr`.
+Drei Discovery-Policies: `enumerate`, `scoped`, `ip_only`.
+Limits: 10 Eingabezeilen pro Auftrag, 1 CIDR, /24 kleinster Prefix, 50 lebende
+Hosts maximal (`subscriptions.max_hosts`, Default 50).
 
 ## Scan-Worker
 6-Phasen-Architektur mit 4 AI-Entscheidungspunkten:
 1. Phase 0a: Passive Intelligence (Shodan, AbuseIPDB, SecurityTrails, WHOIS)
-2. Phase 0b: DNS-Reconnaissance + Web-Probe (httpx)
+2. Phase 0b: DNS-Reconnaissance + Web-Probe (httpx), pro Target policy-aware;
+   danach `scope.enforce_scope()` verwirft out-of-scope Hosts und wendet
+   Exclusions an.
 3. AI Host Strategy (Haiku): scan/skip pro Host, Priorität, scan_hints
 4. Phase 1: Tech-Detection (nmap, webtech, wafw00f, CMS-Fingerprinting-Engine)
 5. AI Phase-2-Config (Haiku): nuclei-Tags, Wordlists, ffuf-Modus, feroxbuster-Tiefe, dalfox
@@ -152,14 +198,18 @@ Compliance-Module (report-worker/reporter/compliance/):
 
 ## Frontend-Seiten
 - `/` — Landing, Order erstellen mit Package-Selector
+- `/scan` — Multi-Target Order-Form (Package + TargetInput-Komponente)
 - `/login` — Login
 - `/forgot-password`, `/reset-password` — Passwort-Reset-Flow
 - `/dashboard` — Order-Liste, Findings-Viewer, Severity-Bars
 - `/scan/[orderId]` — Scan-Detail mit Live-Progress, AI Intelligence Panel, Debug-Mode
-- `/verify/[orderId]` — Domain-Verifizierung (DNS-TXT, File, Meta-Tag)
+- `/verify/[orderId]` — Domain-Verifizierung (DNS-TXT, File, Meta-Tag) — optional
 - `/schedules` — Zeitplan-Verwaltung (CRUD)
 - `/profile` — Passwort ändern
 - `/admin` — Benutzerverwaltung, System-Statistiken
+- `/admin/review` — Liste Orders/Subscriptions mit pending Target-Review
+- `/admin/review/[orderId]` — Target-Review mit Policy-Editor + Auth-Upload
+- `/admin/review/subscription/[subId]` — analoge Review-Seite für Subscriptions
 
 ## CI/CD
 Multi-Image-Build nach dem Muster aus dem Betriebshandbuch (Beispiel C: Gutachten-KI).

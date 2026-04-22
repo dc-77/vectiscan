@@ -186,3 +186,45 @@ und Compliance-Modulen. Migration 009 ist eingespielt.
       `paid_at`/`amount_cents`/`stripe_*`-Felder vorbereitet, geht aber
       direkt auf `active`. Sobald Stripe live geht, Checkout-Session +
       Webhook + Payment-Status-Handling nachziehen.
+
+## G. Multi-Target Follow-ups (Stand: 2026-04-22)
+
+Umgesetzt: Migration 014, Precheck-Worker, validate-targets-Endpoint,
+POST /api/orders + /api/subscriptions auf `targets[]`, Admin-Review-API +
+Scan-Authorizations, Scope-Enforcement im Scan-Worker. Siehe
+`docs/MULTI-TARGET-PLAN.md` und Commits `194c921`..`7b620ab`.
+
+Offene Follow-ups:
+
+- [ ] **KI #1 Tier-Prompt**: `plan_host_strategy` gibt aktuell weiterhin
+      `action: scan|skip` zurueck. Der geplante Umbau auf
+      `tier: 1|2|3|null` inkl. harter Regeln ("fqdn_specific/ipv4 → min
+      Tier 2") und Tier-Overflow-Override steht noch aus. Ohne Tier-Split
+      laufen alle Scan-Hosts im bestehenden max_parallel-Modus — das ist
+      funktional, aber bei 50 Hosts ineffizient.
+- [ ] **`packages.py` Tier-Konfiguration**: `tier1_tools`, `tier2_tools`,
+      `tier3_tools` + Max-Host-Budgets pro Tier noch nicht eingefuehrt.
+- [ ] **Report-Worker Unreachable-vs-Fixed-Diff** (MULTI-TARGET-PLAN §10.3):
+      Kompletter Neubau der Diff-Logik im Report-Worker. Datenbasis
+      (`scan_target_hosts`, `scan_run_targets`) ist durch Migration 014 /
+      Scope-Enforcement bereits befuellt.
+- [ ] **Cloud-Provider-Range-Refresh**: `precheck/saas_heuristic.py`
+      nutzt statische Haupt-Ranges. Wochentlicher Cron-Refresh aus Azure
+      ServiceTags / AWS ip-ranges.json / Cloudflare ips-v4 / Hetzner ASN
+      fehlt (Plan §14).
+- [ ] **Phase 0b voll policy-aware im Scan-Worker**: `run_phase0()` laeuft
+      aktuell mit `primary_domain` (erster enumerate-FQDN). Scoped /
+      ip_only-Targets werden in `scope.build_partial_inventory_for_non_enumerate`
+      separat erzeugt und gemerged — funktional korrekt, aber der geplante
+      Umbau auf `run(targets: list[TargetWithPolicy])` als native Signatur
+      steht aus.
+- [ ] **`frontend/src/lib/api.ts` Tests und Subscription-UI**: neue Order-
+      Seite und Admin-Review existieren; Subscription-Target-Editor fuer
+      bestehende Abos (Hinzufuegen/Entfernen von Targets ausserhalb des
+      Initial-Wizards) fehlt.
+- [ ] **Legacy-Test-Sammlung**: `api/src/__tests__/routes.test.ts`,
+      `subscription_rescan_admin.test.ts` und `verification.test.ts` gehen
+      noch von der Single-Domain-API aus und muessen aktualisiert werden.
+- [ ] **Frontend tsc / integrationstests**: Frontend wurde im gleichen
+      Durchlauf von Agents umgebaut — `cd frontend && npx tsc --noEmit`
+      und die Playwright-Flows einmal komplett durchlaufen lassen.
