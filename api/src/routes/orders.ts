@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
 import { scanQueue, reportQueue, publishEvent, getProgressFromRedis } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
-import { isValidDomain, isValidTarget } from '../lib/validate.js';
+import { isValidDomain, isValidTarget, validateTargetBatch } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
 import { verifyJwt } from '../lib/auth.js';
 import { requireAuth } from '../middleware/requireAuth.js';
@@ -1390,6 +1390,17 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       server.log.info({ orderId: id }, 'Report job re-queued by admin');
 
       return { success: true, data: { message: 'Report job re-queued', orderId: id } };
+    },
+  );
+
+  // POST /api/orders/validate-targets — pro Zeile eine TargetValidation zurueck
+  server.post<{ Body: { targets?: Array<{ raw_input?: unknown; exclusions?: unknown }> } }>(
+    '/api/orders/validate-targets',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const body = request.body || {};
+      const result = validateTargetBatch(body.targets || []);
+      return reply.send({ success: true, data: result });
     },
   );
 

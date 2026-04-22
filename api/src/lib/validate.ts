@@ -78,3 +78,154 @@ export function isValidTarget(input: unknown): string | null {
 
   return null;
 }
+
+// ---------------------------------------------------------------------------
+// Multi-Target-Validierung
+// ---------------------------------------------------------------------------
+
+export type TargetType = 'fqdn_root' | 'fqdn_specific' | 'ipv4' | 'cidr';
+export type DiscoveryPolicy = 'enumerate' | 'scoped' | 'ip_only';
+
+export interface TargetValidation {
+  raw_input: string;
+  valid: boolean;
+  canonical?: string;
+  target_type?: TargetType;
+  policy_default?: DiscoveryPolicy;
+  expanded_count_estimate?: number;
+  warnings: string[];
+  error?: string;
+}
+
+// Haeufige Multi-Label-TLDs. Keine vollstaendige Public-Suffix-List — deckt
+// die wichtigsten Faelle ab, ohne eine neue Dependency einzufuehren.
+const MULTI_LABEL_TLDS = new Set<string>([
+  'co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'ltd.uk', 'plc.uk',
+  'com.au', 'net.au', 'org.au', 'gov.au', 'edu.au',
+  'co.jp', 'ne.jp', 'or.jp', 'ac.jp', 'go.jp',
+  'com.br', 'net.br', 'org.br',
+  'co.in', 'net.in', 'org.in',
+  'com.cn', 'net.cn', 'org.cn', 'gov.cn',
+  'co.nz', 'net.nz', 'org.nz',
+  'co.za', 'net.za', 'org.za',
+  'com.mx', 'com.ar', 'com.co', 'com.tr', 'com.sg', 'com.hk',
+]);
+
+function classifyFqdn(fqdn: string): 'fqdn_root' | 'fqdn_specific' {
+  const labels = fqdn.split('.');
+  if (labels.length <= 2) return 'fqdn_root';
+  const lastTwo = labels.slice(-2).join('.');
+  if (MULTI_LABEL_TLDS.has(lastTwo) && labels.length === 3) {
+    return 'fqdn_root';
+  }
+  return 'fqdn_specific';
+}
+
+function cidrPrefix(canonical: string): number | null {
+  const m = /^\d{1,3}(?:\.\d{1,3}){3}\/(\d{1,2})$/.exec(canonical);
+  if (!m) return null;
+  const p = parseInt(m[1], 10);
+  return p >= 0 && p <= 32 ? p : null;
+}
+
+export function validateTarget(rawInput: unknown): TargetValidation {
+  if (typeof rawInput !== 'string' || rawInput.trim() === '') {
+    return { raw_input: String(rawInput ?? ''), valid: false, warnings: [], error: 'empty_input' };
+  }
+  const raw = rawInput.trim();
+  const canonical = isValidTarget(raw);
+  if (!canonical) {
+    return { raw_input: raw, valid: false, warnings: [], error: 'parse_failed' };
+  }
+
+  const warnings: string[] = [];
+
+  // CIDR / dotted-mask erkennt man am "/"
+  if (canonical.includes('/')) {
+    const prefix = cidrPrefix(canonical);
+    if (prefix === null) {
+      return { raw_input: raw, valid: false, warnings, error: 'parse_failed' };
+    }
+    // Haertelimit: /24 oder kleiner ist ok, groesser (kleinere Zahl) verwerfen
+    if (prefix < 24) {
+      return {
+        raw_input: raw, valid: false, warnings,
+        canonical, target_type: 'cidr', policy_default: 'ip_only',
+        expanded_count_estimate: 2 ** (32 - prefix) - 2,
+        error: 'cidr_too_large',
+      };
+    }
+    const count = prefix === 32 ? 1 : (prefix === 31 ? 2 : 2 ** (32 - prefix) - 2);
+    if (prefix === 32) {
+      // /32 ist eine einzelne IP — auf ipv4 zurueckstufen
+      return {
+        raw_input: raw, valid: true, warnings,
+        canonical: canonical.split('/')[0],
+        target_type: 'ipv4', policy_default: 'ip_only',
+        expanded_count_estimate: 1,
+      };
+    }
+    return {
+      raw_input: raw, valid: true, warnings,
+      canonical, target_type: 'cidr', policy_default: 'ip_only',
+      expanded_count_estimate: count,
+    };
+  }
+
+  // Plain IPv4
+  if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(canonical)) {
+    return {
+      raw_input: raw, valid: true, warnings,
+      canonical, target_type: 'ipv4', policy_default: 'ip_only',
+      expanded_count_estimate: 1,
+    };
+  }
+
+  // FQDN
+  const targetType = classifyFqdn(canonical);
+  const policyDefault: DiscoveryPolicy = targetType === 'fqdn_root' ? 'enumerate' : 'scoped';
+  return {
+    raw_input: raw, valid: true, warnings,
+    canonical, target_type: targetType, policy_default: policyDefault,
+  };
+}
+
+export interface TargetBatchValidation {
+  targets: TargetValidation[];
+  errors: string[];
+}
+
+export const MAX_TARGETS_PER_ORDER = 10;
+export const MAX_CIDR_PER_ORDER = 1;
+export const MIN_CIDR_PREFIX = 24;
+
+export function validateTargetBatch(inputs: Array<{ raw_input?: unknown }>): TargetBatchValidation {
+  const errors: string[] = [];
+  if (!Array.isArray(inputs) || inputs.length === 0) {
+    return { targets: [], errors: ['no_targets'] };
+  }
+  if (inputs.length > MAX_TARGETS_PER_ORDER) {
+    errors.push('too_many_targets');
+  }
+
+  const targets = inputs.map(i => validateTarget(i?.raw_input));
+
+  const cidrCount = targets.filter(t => t.valid && t.target_type === 'cidr').length;
+  if (cidrCount > MAX_CIDR_PER_ORDER) {
+    errors.push('too_many_cidrs');
+  }
+
+  // Dubletten markieren
+  const seen = new Map<string, number>();
+  targets.forEach((t, idx) => {
+    if (!t.valid || !t.canonical) return;
+    const prev = seen.get(t.canonical);
+    if (prev !== undefined) {
+      t.warnings.push(`duplicate_of_row_${prev + 1}`);
+    } else {
+      seen.set(t.canonical, idx);
+    }
+  });
+
+  return { targets, errors };
+}
