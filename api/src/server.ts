@@ -11,6 +11,7 @@ import { verifyRoutes } from './routes/verify.js';
 import { wsRoutes } from './routes/ws.js';
 import { scheduleRoutes } from './routes/schedules.js';
 import { subscriptionRoutes } from './routes/subscriptions.js';
+import { adminReviewRoutes } from './routes/admin-review.js';
 import { startScheduler } from './lib/scheduler.js';
 
 export function buildServer() {
@@ -45,6 +46,7 @@ export function buildServer() {
   server.register(wsRoutes);
   server.register(scheduleRoutes);
   server.register(subscriptionRoutes);
+  server.register(adminReviewRoutes);
 
   return server;
 }

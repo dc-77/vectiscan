@@ -1,13 +1,20 @@
+/**
+ * Domain-Verifikation (optional im Multi-Target-Flow).
+ *
+ * Der Admin-Review-Flow ersetzt den alten Manual-Bypass. Die Verifikation
+ * beschleunigt lediglich die Admin-Entscheidung bei FQDN-Targets und
+ * speichert das Ergebnis im 90-Tage-Cache `verified_domains`.
+ */
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
-import { scanQueue, publishEvent } from '../lib/queue.js';
 import { verifyAll } from '../services/VerificationService.js';
 import { audit } from '../lib/audit.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const FQDN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
 interface CheckBody {
-  orderId: string;
+  targetId: string;
 }
 
 interface StatusParams {
@@ -15,186 +22,112 @@ interface StatusParams {
 }
 
 export async function verifyRoutes(server: FastifyInstance): Promise<void> {
-  // POST /api/verify/check
-  server.post<{ Body: CheckBody }>('/api/verify/check', async (request: FastifyRequest<{ Body: CheckBody }>, reply: FastifyReply) => {
-    const { orderId } = request.body || {};
-
-    if (!orderId || !UUID_REGEX.test(orderId)) {
-      return reply.status(400).send({ success: false, error: 'Invalid or missing orderId' });
-    }
-
-    const result = await query<{
-      id: string;
-      target_url: string;
-      verification_token: string;
-      status: string;
-      package: string;
-      verified_at: Date | null;
-      verification_method: string | null;
-    }>(
-      'SELECT id, target_url, verification_token, status, package, verified_at, verification_method FROM orders WHERE id = $1',
-      [orderId],
-    );
-
-    if (result.rows.length === 0) {
-      return reply.status(404).send({ success: false, error: 'Order nicht gefunden' });
-    }
-
-    const order = result.rows[0];
-
-    // Idempotent: already verified
-    if (order.verified_at) {
-      return reply.send({
-        success: true,
-        data: { verified: true, method: order.verification_method },
-      });
-    }
-
-    const domain = order.target_url;
-    const token = order.verification_token;
-
-    const verification = await verifyAll(domain, token);
-
-    if (verification.verified) {
-      await query(
-        "UPDATE orders SET status = 'queued', verified_at = NOW(), verification_method = $1 WHERE id = $2",
-        [verification.method, orderId],
-      );
-
-      // Persist domain verification for this customer (reusable for 90 days)
-      const orderOwner = await query<{ customer_id: string }>(
-        'SELECT customer_id FROM orders WHERE id = $1',
-        [orderId],
-      );
-      if (orderOwner.rows.length > 0 && orderOwner.rows[0].customer_id) {
-        await query(
-          `INSERT INTO verified_domains (customer_id, domain, verification_method)
-           VALUES ($1, $2, $3)
-           ON CONFLICT (customer_id, domain) DO UPDATE
-           SET verification_method = $3, verified_at = NOW(), expires_at = NOW() + INTERVAL '90 days'`,
-          [orderOwner.rows[0].customer_id, domain, verification.method],
-        );
+  // POST /api/verify/check — verifiziert EIN scan_target (nur FQDN-Typen)
+  server.post<{ Body: CheckBody }>(
+    '/api/verify/check',
+    async (request: FastifyRequest<{ Body: CheckBody }>, reply: FastifyReply) => {
+      const { targetId } = request.body || ({} as CheckBody);
+      if (!targetId || !UUID_REGEX.test(targetId)) {
+        return reply.status(400).send({ success: false, error: 'Invalid or missing targetId' });
       }
 
-      audit({ orderId, action: 'order.verified', details: { method: verification.method, domain }, ip: request.ip });
+      const result = await query<{
+        id: string;
+        canonical: string;
+        target_type: string;
+        order_id: string | null;
+        subscription_id: string | null;
+      }>(
+        `SELECT id, canonical, target_type, order_id, subscription_id
+         FROM scan_targets WHERE id = $1`,
+        [targetId],
+      );
+      if (result.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Target nicht gefunden' });
+      }
 
-      // Prototyp: Scan direkt starten (kein Zahlungsflow)
-      await scanQueue.add('scan', {
-        orderId,
-        targetDomain: order.target_url,
-        package: order.package,
-      });
+      const target = result.rows[0];
+      if (target.target_type !== 'fqdn_root' && target.target_type !== 'fqdn_specific') {
+        return reply.status(400).send({
+          success: false,
+          error: 'verification_not_applicable_for_ip_targets',
+        });
+      }
+      if (!FQDN_REGEX.test(target.canonical)) {
+        return reply.status(400).send({ success: false, error: 'invalid_fqdn' });
+      }
 
-      await publishEvent(orderId, { type: 'status', orderId, status: 'queued' });
+      // Token wird ad-hoc generiert (nicht persistiert — Verifikation ist optional)
+      const token = `vectiscan-${target.id}`;
+      const verification = await verifyAll(target.canonical, token);
+
+      if (verification.verified) {
+        const customerRes = await query<{ customer_id: string }>(
+          `SELECT COALESCE(o.customer_id, s.customer_id) AS customer_id
+           FROM scan_targets t
+           LEFT JOIN orders o ON o.id = t.order_id
+           LEFT JOIN subscriptions s ON s.id = t.subscription_id
+           WHERE t.id = $1`,
+          [targetId],
+        );
+        const customerId = customerRes.rows[0]?.customer_id;
+        if (customerId) {
+          await query(
+            `INSERT INTO verified_domains (customer_id, domain, verification_method)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (customer_id, domain) DO UPDATE
+             SET verification_method = EXCLUDED.verification_method,
+                 verified_at = NOW(),
+                 expires_at = NOW() + INTERVAL '90 days'`,
+            [customerId, target.canonical, verification.method],
+          );
+        }
+
+        audit({
+          orderId: target.order_id,
+          action: 'order.verified',
+          details: { method: verification.method, targetId, fqdn: target.canonical },
+          ip: request.ip,
+        });
+      }
 
       return reply.send({
         success: true,
-        data: { verified: true, method: verification.method },
+        data: { verified: verification.verified, method: verification.method || null },
       });
-    }
+    },
+  );
 
-    return reply.send({
-      success: true,
-      data: { verified: false },
-    });
-  });
+  // GET /api/verify/status/:orderId — List der FQDN-Targets der Order + Verify-Status
+  server.get<{ Params: StatusParams }>(
+    '/api/verify/status/:orderId',
+    async (request: FastifyRequest<{ Params: StatusParams }>, reply: FastifyReply) => {
+      const { orderId } = request.params;
+      if (!UUID_REGEX.test(orderId)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
 
-  // POST /api/verify/manual — Skip verification (prototype only)
-  server.post<{ Body: CheckBody }>('/api/verify/manual', async (request: FastifyRequest<{ Body: CheckBody }>, reply: FastifyReply) => {
-    const { orderId } = request.body || {};
-
-    if (!orderId || !UUID_REGEX.test(orderId)) {
-      return reply.status(400).send({ success: false, error: 'Invalid or missing orderId' });
-    }
-
-    const result = await query<{
-      id: string;
-      target_url: string;
-      status: string;
-      package: string;
-      verified_at: Date | null;
-    }>(
-      'SELECT id, target_url, status, package, verified_at FROM orders WHERE id = $1',
-      [orderId],
-    );
-
-    if (result.rows.length === 0) {
-      return reply.status(404).send({ success: false, error: 'Order nicht gefunden' });
-    }
-
-    const order = result.rows[0];
-
-    if (order.verified_at) {
-      return reply.send({ success: true, data: { verified: true, method: 'manual' } });
-    }
-
-    await query(
-      "UPDATE orders SET status = 'queued', verified_at = NOW(), verification_method = 'manual' WHERE id = $1",
-      [orderId],
-    );
-
-    // Persist domain verification for this customer (reusable for 90 days)
-    {
-      const ownerResult = await query<{ customer_id: string }>(
-        'SELECT customer_id FROM orders WHERE id = $1',
+      const result = await query<{
+        id: string; canonical: string; target_type: string;
+        verified: boolean | null; method: string | null;
+      }>(
+        `SELECT t.id, t.canonical, t.target_type,
+                (vd.id IS NOT NULL) AS verified, vd.verification_method AS method
+         FROM scan_targets t
+         LEFT JOIN orders o ON o.id = t.order_id
+         LEFT JOIN verified_domains vd
+                ON vd.customer_id = o.customer_id
+               AND vd.domain = t.canonical
+               AND vd.expires_at > NOW()
+         WHERE t.order_id = $1
+           AND t.target_type IN ('fqdn_root', 'fqdn_specific')`,
         [orderId],
       );
-      if (ownerResult.rows.length > 0 && ownerResult.rows[0].customer_id) {
-        await query(
-          `INSERT INTO verified_domains (customer_id, domain, verification_method)
-           VALUES ($1, $2, 'manual')
-           ON CONFLICT (customer_id, domain) DO UPDATE
-           SET verification_method = 'manual', verified_at = NOW(), expires_at = NOW() + INTERVAL '90 days'`,
-          [ownerResult.rows[0].customer_id, order.target_url],
-        );
-      }
-    }
 
-    audit({ orderId, action: 'order.verified', details: { method: 'manual', domain: order.target_url }, ip: request.ip });
-
-    await scanQueue.add('scan', {
-      orderId,
-      targetDomain: order.target_url,
-      package: order.package,
-    });
-
-    await publishEvent(orderId, { type: 'status', orderId, status: 'queued' });
-
-    return reply.send({ success: true, data: { verified: true, method: 'manual' } });
-  });
-
-  // GET /api/verify/status/:orderId
-  server.get<{ Params: StatusParams }>('/api/verify/status/:orderId', async (request: FastifyRequest<{ Params: StatusParams }>, reply: FastifyReply) => {
-    const { orderId } = request.params;
-
-    if (!UUID_REGEX.test(orderId)) {
-      return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
-    }
-
-    const result = await query<{
-      target_url: string;
-      verification_token: string;
-      verification_method: string | null;
-      verified_at: Date | null;
-    }>(
-      'SELECT target_url, verification_token, verification_method, verified_at FROM orders WHERE id = $1',
-      [orderId],
-    );
-
-    if (result.rows.length === 0) {
-      return reply.status(404).send({ success: false, error: 'Order nicht gefunden' });
-    }
-
-    const order = result.rows[0];
-
-    return reply.send({
-      success: true,
-      data: {
-        verified: !!order.verified_at,
-        method: order.verification_method,
-        token: order.verification_token,
-        domain: order.target_url,
-      },
-    });
-  });
+      return reply.send({
+        success: true,
+        data: { targets: result.rows },
+      });
+    },
+  );
 }
