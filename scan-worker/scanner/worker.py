@@ -32,6 +32,7 @@ from scanner.progress import (
 )
 from scanner.upload import enqueue_report_job, pack_results, upload_to_minio
 from scanner.ai_strategy import plan_host_strategy, plan_phase2_config, plan_tech_analysis
+from scanner import scope as scope_module
 
 log = structlog.get_logger()
 
@@ -154,7 +155,22 @@ def _collect_tool_versions() -> list[str]:
     return versions
 
 
-def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None:
+def _process_job_multi_target(order_id: str, package: str = "perimeter") -> None:
+    """Multi-Target-Variante: Targets aus scan_targets WHERE status='approved'."""
+    targets = scope_module.load_approved_targets(order_id)
+    if not targets:
+        log.error("multi_target_no_approved", order_id=order_id)
+        set_scan_failed(order_id, "Keine freigegebenen Targets.")
+        return
+    primary = scope_module.derive_primary_domain(targets)
+    scope_module.snapshot_run_targets(order_id, targets)
+    log.info("multi_target_dispatch", order_id=order_id, primary=primary,
+             targets=len(targets))
+    _process_job(order_id, primary, package, multi_target_context={"targets": targets})
+
+
+def _process_job(order_id: str, domain: str, package: str = "perimeter",
+                 multi_target_context: dict[str, Any] | None = None) -> None:
     """Run the full three-phase scan pipeline for a single job."""
     scan_dir = f"/tmp/scan-{order_id}"
     os.makedirs(scan_dir, exist_ok=True)
@@ -229,6 +245,25 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter") -> None
     # ── Phase 0b: DNS Reconnaissance (active discovery) ────
     update_progress(order_id, "dns_recon", "starting")
     host_inventory = run_phase0(domain, scan_dir, order_id, config)
+
+    # ── Multi-Target: non-enumerate Targets dazumergen + Scope-Enforcement ──
+    if multi_target_context:
+        mt_targets = multi_target_context["targets"]
+        extra_hosts = scope_module.build_partial_inventory_for_non_enumerate(mt_targets)
+        if extra_hosts:
+            host_inventory = scope_module.merge_inventories(host_inventory, extra_hosts)
+            log.info("multi_target_merged_partial", order_id=order_id,
+                     extra_hosts=len(extra_hosts))
+        host_inventory, out_of_scope = scope_module.enforce_scope(host_inventory, mt_targets)
+        if out_of_scope:
+            log.info("multi_target_out_of_scope", order_id=order_id,
+                     removed=len(out_of_scope))
+        live_count = sum(
+            1 for h in host_inventory.get("hosts", [])
+            if (h.get("web_probe") or {}).get("has_web") or h.get("ports")
+        )
+        scope_module.update_live_hosts_count(order_id, live_count)
+
     set_discovered_hosts(order_id, host_inventory)
 
     hosts = host_inventory.get("hosts", [])
@@ -699,13 +734,16 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
                 continue
 
             order_id = job["orderId"]
-            domain = job["targetDomain"]
+            domain = job.get("targetDomain")  # Optional — Multi-Target-Jobs haben keinen einzelnen
             package = job.get("package", "perimeter")
 
-            log.info("job_received", order_id=order_id, domain=domain)
+            log.info("job_received", order_id=order_id, domain=domain, multi_target=domain is None)
 
             try:
-                _process_job(order_id, domain, package)
+                if domain:
+                    _process_job(order_id, domain, package)
+                else:
+                    _process_job_multi_target(order_id, package)
             except ScanCancelled:
                 log.info("scan_cancelled", order_id=order_id)
                 scan_dir = f"/tmp/scan-{order_id}"
