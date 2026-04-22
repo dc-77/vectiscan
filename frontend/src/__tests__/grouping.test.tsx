@@ -37,9 +37,9 @@ const baseSub: Subscription = {
   expiresAt: '2027-01-01T00:00:00Z',
   lastScanAt: '2026-04-01T11:00:00Z',
   createdAt: '2026-01-01T00:00:00Z',
-  domains: [
-    { id: 'sd-1', domain: 'example.com', status: 'verified', verifiedAt: '2026-01-02T00:00:00Z', enabled: true },
-    { id: 'sd-2', domain: 'shop.example.com', status: 'verified', verifiedAt: '2026-01-02T00:00:00Z', enabled: true },
+  targets: [
+    { id: 'sd-1', raw_input: 'example.com', canonical: 'example.com', target_type: 'fqdn_root', discovery_policy: 'enumerate', exclusions: [], status: 'approved' },
+    { id: 'sd-2', raw_input: 'shop.example.com', canonical: 'shop.example.com', target_type: 'fqdn_specific', discovery_policy: 'scoped', exclusions: [], status: 'approved' },
   ],
 };
 

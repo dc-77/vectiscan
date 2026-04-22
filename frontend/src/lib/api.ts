@@ -98,11 +98,61 @@ export async function register(email: string, password: string, companyName?: st
 
 // --- Orders ---
 
-export async function createOrder(domain: string, pkg: string = 'perimeter'): Promise<ApiResponse<OrderData>> {
+export type TargetType = 'fqdn_root' | 'fqdn_specific' | 'ipv4' | 'cidr';
+export type DiscoveryPolicy = 'enumerate' | 'scoped' | 'ip_only';
+
+export interface TargetEntry {
+  raw_input: string;
+  exclusions: string[];
+}
+
+export interface TargetValidation {
+  raw_input: string;
+  valid: boolean;
+  canonical?: string;
+  target_type?: TargetType;
+  policy_default?: DiscoveryPolicy;
+  expanded_count_estimate?: number;
+  warnings: string[];
+  error?: string;
+}
+
+export interface TargetBatchValidation {
+  targets: TargetValidation[];
+  errors: string[];
+}
+
+export interface OrderTargetStub {
+  id: string;
+  raw_input: string;
+  canonical: string;
+  target_type: TargetType;
+  discovery_policy: DiscoveryPolicy;
+  status: string;
+}
+
+export interface OrderWithTargets {
+  id: string;
+  status: string;
+  package: string;
+  targetCount: number;
+  targets: OrderTargetStub[];
+}
+
+export async function validateTargets(targets: TargetEntry[]): Promise<ApiResponse<TargetBatchValidation>> {
+  const res = await fetch(`${API_URL}/api/orders/validate-targets`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ targets }),
+  });
+  return handleResponse(res);
+}
+
+export async function createOrder(targets: TargetEntry[], pkg: string = 'perimeter'): Promise<ApiResponse<OrderWithTargets>> {
   const res = await fetch(`${API_URL}/api/orders`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify({ domain, package: pkg }),
+    body: JSON.stringify({ package: pkg, targets }),
   });
   return handleResponse(res);
 }
@@ -382,12 +432,14 @@ export async function changePassword(currentPassword: string, newPassword: strin
 
 // --- Subscriptions ---
 
-export interface SubscriptionDomain {
+export interface SubscriptionTarget {
   id: string;
-  domain: string;
+  raw_input: string;
+  canonical: string;
+  target_type: TargetType;
+  discovery_policy: DiscoveryPolicy;
+  exclusions: string[];
   status: string;
-  verifiedAt: string | null;
-  enabled: boolean;
 }
 
 export interface Subscription {
@@ -397,6 +449,8 @@ export interface Subscription {
   status: string;
   scanInterval: string;
   maxDomains: number;
+  maxHosts?: number;
+  maxCidrPrefix?: number;
   maxRescans: number;
   rescansUsed: number;
   reportEmails: string[];
@@ -404,11 +458,11 @@ export interface Subscription {
   expiresAt: string;
   lastScanAt: string | null;
   createdAt: string;
-  domains: SubscriptionDomain[];
+  targets: SubscriptionTarget[];
 }
 
 export async function createSubscription(data: {
-  package: string; domains: string[]; scanInterval: string; reportEmails: string[];
+  package: string; targets: TargetEntry[]; scanInterval: string; reportEmails: string[];
 }): Promise<ApiResponse<{ id: string; message: string }>> {
   const res = await fetch(`${API_URL}/api/subscriptions`, {
     method: 'POST',
@@ -425,20 +479,28 @@ export async function listSubscriptions(): Promise<ApiResponse<{ subscriptions: 
   return handleResponse(res);
 }
 
-export async function addSubscriptionDomain(subscriptionId: string, domain: string): Promise<ApiResponse<{ domain: string; status: string }>> {
-  const res = await fetch(`${API_URL}/api/subscriptions/${subscriptionId}/domains`, {
+export async function addSubscriptionTarget(subscriptionId: string, entry: TargetEntry): Promise<ApiResponse<SubscriptionTarget>> {
+  const res = await fetch(`${API_URL}/api/subscriptions/${subscriptionId}/targets`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify({ domain }),
+    body: JSON.stringify(entry),
   });
   return handleResponse(res);
 }
 
-export async function requestRescan(subscriptionId: string, domain: string): Promise<ApiResponse<{ orderId: string; message: string }>> {
+export async function removeSubscriptionTarget(subscriptionId: string, targetId: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/subscriptions/${subscriptionId}/targets/${targetId}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function requestRescan(subscriptionId: string, targetId?: string): Promise<ApiResponse<{ orderId: string; message: string }>> {
   const res = await fetch(`${API_URL}/api/subscriptions/${subscriptionId}/rescan`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify({ domain }),
+    body: JSON.stringify(targetId ? { targetId } : {}),
   });
   return handleResponse(res);
 }
@@ -711,6 +773,214 @@ export interface ReportVersionsData {
 
 export async function getReportVersions(orderId: string): Promise<ApiResponse<ReportVersionsData>> {
   const res = await fetch(`${API_URL}/api/orders/${orderId}/report-versions`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+// --- Admin: Multi-Target Review ---
+
+export type TargetDiscoveryPolicy = 'enumerate' | 'scoped' | 'ip_only';
+
+export interface ReviewCustomer {
+  email: string;
+  companyName: string | null;
+}
+
+export interface ReviewQueueOrder {
+  type: 'order';
+  id: string;
+  displayName: string;
+  package: string;
+  targetCount: number | null;
+  liveHostsCount: number | null;
+  pendingTargets: number;
+  customer: ReviewCustomer;
+  createdAt: string;
+}
+
+export interface ReviewQueueSubscription {
+  type: 'subscription';
+  id: string;
+  package: string;
+  scanInterval: string;
+  pendingTargets: number;
+  customer: ReviewCustomer;
+  createdAt: string;
+}
+
+export interface ReviewQueue {
+  orders: ReviewQueueOrder[];
+  subscriptions: ReviewQueueSubscription[];
+}
+
+export async function getReviewQueue(): Promise<ApiResponse<ReviewQueue>> {
+  const res = await fetch(`${API_URL}/api/admin/review/queue`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export interface ScanTargetHost {
+  scan_target_id: string;
+  ip: string;
+  fqdns: string[] | null;
+  is_live: boolean;
+  ports_hint: number[] | null;
+  http_status: number | null;
+  http_title: string | null;
+  http_final_url: string | null;
+  reverse_dns: string | null;
+  cloud_provider: string | null;
+  parking_page: boolean | null;
+  source: string;
+}
+
+export interface ScanTargetDetail {
+  id: string;
+  raw_input: string;
+  canonical: string | null;
+  target_type: string;
+  discovery_policy: TargetDiscoveryPolicy | string;
+  exclusions: string[] | null;
+  status: string;
+  review_notes: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  hosts: ScanTargetHost[];
+}
+
+export interface ScanAuthorization {
+  id: string;
+  document_type: string;
+  minio_path: string;
+  original_filename: string;
+  file_size_bytes: number;
+  uploaded_by: string | null;
+  notes: string | null;
+  valid_until: string | null;
+  created_at: string;
+}
+
+export interface ReviewDetail {
+  type: 'order' | 'subscription';
+  id: string;
+  targets: ScanTargetDetail[];
+  authorizations: ScanAuthorization[];
+}
+
+export async function getReviewDetail(
+  type: 'order' | 'subscription',
+  id: string,
+): Promise<ApiResponse<ReviewDetail>> {
+  const res = await fetch(`${API_URL}/api/admin/review/${type}/${id}`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export interface TargetUpdatePayload {
+  discoveryPolicy?: TargetDiscoveryPolicy;
+  exclusions?: string[];
+}
+
+export async function updateTarget(
+  targetId: string,
+  payload: TargetUpdatePayload,
+): Promise<ApiResponse<{ id: string; discovery_policy: string; exclusions: string[] }>> {
+  const res = await fetch(`${API_URL}/api/admin/targets/${targetId}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(res);
+}
+
+export interface TargetApprovePayload extends TargetUpdatePayload {
+  notes?: string;
+}
+
+export async function approveTarget(
+  targetId: string,
+  payload: TargetApprovePayload,
+): Promise<ApiResponse<{ id: string; status: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/targets/${targetId}/approve`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(payload || {}),
+  });
+  return handleResponse(res);
+}
+
+export async function rejectTarget(
+  targetId: string,
+  reason: string,
+): Promise<ApiResponse<{ id: string; status: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/targets/${targetId}/reject`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify({ reason }),
+  });
+  return handleResponse(res);
+}
+
+export async function restartPrecheck(
+  targetId: string,
+): Promise<ApiResponse<{ targetId: string; status: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/targets/${targetId}/restart-precheck`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function releaseOrder(
+  orderId: string,
+): Promise<ApiResponse<{ orderId: string; approvedCount: number }>> {
+  const res = await fetch(`${API_URL}/api/admin/orders/${orderId}/release`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export interface AuthorizationUploadOptions {
+  documentType: string;
+  notes?: string;
+  validUntil?: string;
+}
+
+export async function uploadAuthorization(
+  type: 'order' | 'subscription',
+  id: string,
+  file: File,
+  options: AuthorizationUploadOptions,
+): Promise<ApiResponse<{ id: string; minio_path: string; filename: string }>> {
+  const token = getToken();
+  const form = new FormData();
+  form.append('document_type', options.documentType);
+  if (options.notes) form.append('notes', options.notes);
+  if (options.validUntil) form.append('valid_until', options.validUntil);
+  form.append('file', file, file.name);
+
+  const path = type === 'order'
+    ? `/api/admin/orders/${id}/authorizations`
+    : `/api/admin/subscriptions/${id}/authorizations`;
+
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(`${API_URL}${path}`, {
+    method: 'POST',
+    headers,
+    body: form,
+  });
+  return handleResponse(res);
+}
+
+export async function deleteAuthorization(authId: string): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(`${API_URL}/api/admin/authorizations/${authId}`, {
+    method: 'DELETE',
     headers: authHeaders(),
   });
   return handleResponse(res);

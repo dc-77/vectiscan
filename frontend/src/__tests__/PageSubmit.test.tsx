@@ -34,7 +34,7 @@ describe('Page submit with package', () => {
   it('should submit with default perimeter package', async () => {
     mockCreateOrder.mockResolvedValueOnce({
       success: true,
-      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'perimeter', createdAt: new Date().toISOString() },
+      data: { id: 'test-id', status: 'precheck_running', package: 'perimeter', targetCount: 1, targets: [] },
     });
 
     render(<Home />);
@@ -53,7 +53,7 @@ describe('Page submit with package', () => {
   it('should submit with selected webcheck package', async () => {
     mockCreateOrder.mockResolvedValueOnce({
       success: true,
-      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'webcheck', createdAt: new Date().toISOString() },
+      data: { id: 'test-id', status: 'precheck_running', package: 'webcheck', targetCount: 1, targets: [] },
     });
 
     render(<Home />);
@@ -76,7 +76,7 @@ describe('Page submit with package', () => {
   it('should submit with selected compliance package', async () => {
     mockCreateOrder.mockResolvedValueOnce({
       success: true,
-      data: { id: 'test-id', domain: 'example.com', status: 'created', package: 'compliance', createdAt: new Date().toISOString() },
+      data: { id: 'test-id', status: 'precheck_running', package: 'compliance', targetCount: 1, targets: [] },
     });
 
     render(<Home />);

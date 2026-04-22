@@ -23,14 +23,9 @@ export default function WelcomePage() {
     setError(null);
     setSubmitting(true);
     try {
-      const res = await createOrder(domain.trim(), 'webcheck');
+      const res = await createOrder([{ raw_input: domain.trim(), exclusions: [] }], 'webcheck');
       if (res.success && res.data) {
-        // Redirect to scan detail or verify
-        if (res.data.status === 'verification_pending') {
-          router.push(`/verify/${res.data.id}`);
-        } else {
-          router.push(`/scan/${res.data.id}`);
-        }
+        router.push(`/scan/${res.data.id}`);
       } else {
         setError(res.error || 'Fehler beim Starten');
       }

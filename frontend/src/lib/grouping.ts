@@ -139,15 +139,15 @@ export function groupOrders(
   // Subscription groups (incl. empty ones so the user sees their abo on the dashboard)
   for (const sub of subscriptions) {
     const orderList = subOrders.get(sub.id) ?? [];
-    const subDomains = sub.domains.map(d => d.domain);
-    const allDomains = Array.from(new Set([...subDomains, ...orderList.map(o => o.domain)])).sort();
+    const subTargets = (sub.targets ?? []).map(t => t.canonical || t.raw_input);
+    const allDomains = Array.from(new Set([...subTargets, ...orderList.map(o => o.domain)])).sort();
     groups.push({
       kind: 'subscription',
       key: `sub:${sub.id}`,
       title: `${packageLabel(sub.package)}-Abo`,
-      subtitle: subDomains.length === 1
-        ? subDomains[0]
-        : `${subDomains.length} Domains`,
+      subtitle: subTargets.length === 1
+        ? subTargets[0]
+        : `${subTargets.length} Ziele`,
       subscription: sub,
       domains: allDomains,
       orders: orderList,

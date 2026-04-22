@@ -4,56 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-import { createSubscription } from '@/lib/api';
+import { createSubscription, TargetEntry } from '@/lib/api';
 import { isLoggedIn, getUser } from '@/lib/auth';
+import TargetInput from '@/components/TargetInput';
 
-const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
-const IPV4_REGEX = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
-const MAX_HOSTS = 30;
-
-// Valid dotted-decimal masks → CIDR prefix
-const DOTTED_TO_CIDR: Record<string, number> = {
-  '255.255.255.255': 32, '255.255.255.254': 31, '255.255.255.252': 30,
-  '255.255.255.248': 29, '255.255.255.240': 28, '255.255.255.224': 27,
-  '255.255.255.192': 26, '255.255.255.128': 25, '255.255.255.0': 24,
-  '255.255.254.0': 23, '255.255.252.0': 22, '255.255.248.0': 21,
-  '255.255.240.0': 20, '255.255.224.0': 19, '255.255.192.0': 18,
-  '255.255.128.0': 17, '255.255.0.0': 16,
-};
-
-function isValidTarget(input: string): boolean {
-  const s = input.trim();
-  if (!s) return false;
-  if (DOMAIN_REGEX.test(s)) return true;
-  if (s.includes('/')) {
-    const [ip, mask] = s.split('/', 2);
-    if (!IPV4_REGEX.test(ip)) return false;
-    if (/^\d{1,2}$/.test(mask)) { const n = parseInt(mask); return n >= 8 && n <= 32; }
-    return IPV4_REGEX.test(mask) && mask in DOTTED_TO_CIDR;
-  }
-  if (IPV4_REGEX.test(s)) {
-    return s.split('.').every(o => { const n = parseInt(o); return n >= 0 && n <= 255; });
-  }
-  return false;
-}
-
-/** Calculate number of hosts a target represents */
-function countHosts(input: string): number {
-  const s = input.trim();
-  if (!s || !isValidTarget(s)) return 0;
-  if (DOMAIN_REGEX.test(s)) return 1;
-  if (s.includes('/')) {
-    const [, mask] = s.split('/', 2);
-    let prefix: number;
-    if (/^\d{1,2}$/.test(mask)) {
-      prefix = parseInt(mask);
-    } else {
-      prefix = DOTTED_TO_CIDR[mask] ?? 32;
-    }
-    return Math.pow(2, 32 - prefix);
-  }
-  return 1; // single IP
-}
+const MAX_TARGETS = 10;
 
 const PACKAGES = [
   {
@@ -90,16 +45,7 @@ const INTERVALS = [
   { id: 'quarterly', label: 'Quartalsweise', desc: 'Scan alle 3 Monate' },
 ] as const;
 
-const STEPS = ['Paket', 'Domains', 'E-Mail', 'Intervall', 'Zusammenfassung'];
-
-function cleanDomain(input: string): string {
-  let d = input.trim().toLowerCase();
-  d = d.replace(/^https?:\/\//, '');
-  d = d.replace(/\/.*$/, '');
-  d = d.replace(/:\d+$/, '');
-  d = d.replace(/\.$/, '');
-  return d;
-}
+const STEPS = ['Paket', 'Ziele', 'E-Mail', 'Intervall', 'Zusammenfassung'];
 
 export default function SubscribePage() {
   const router = useRouter();
@@ -108,7 +54,7 @@ export default function SubscribePage() {
 
   const [step, setStep] = useState(1);
   const [selectedPackage, setSelectedPackage] = useState<string>('perimeter');
-  const [domains, setDomains] = useState<string[]>(['']);
+  const [targets, setTargets] = useState<TargetEntry[]>([{ raw_input: '', exclusions: [] }]);
   const [reportEmails, setReportEmails] = useState<string[]>(['']);
   const [scanInterval, setScanInterval] = useState<string>('monthly');
   const [submitting, setSubmitting] = useState(false);
@@ -124,16 +70,15 @@ export default function SubscribePage() {
     setReady(true);
   }, [router]);
 
-  const cleanedDomains = domains.map(cleanDomain).filter(d => d);
-  const validDomains = cleanedDomains.filter(d => isValidTarget(d));
-  const totalHosts = cleanedDomains.reduce((sum, d) => sum + countHosts(d), 0);
-  const overLimit = totalHosts > MAX_HOSTS;
+  const cleanedTargets: TargetEntry[] = targets
+    .map(t => ({ raw_input: t.raw_input.trim(), exclusions: t.exclusions }))
+    .filter(t => t.raw_input !== '');
   const validEmails = reportEmails.filter(e => e.includes('@'));
 
   const canAdvance = () => {
     switch (step) {
       case 1: return !!selectedPackage;
-      case 2: return validDomains.length > 0 && !overLimit;
+      case 2: return cleanedTargets.length > 0 && cleanedTargets.length <= MAX_TARGETS;
       case 3: return validEmails.length > 0;
       case 4: return !!scanInterval;
       default: return true;
@@ -146,7 +91,7 @@ export default function SubscribePage() {
     try {
       const res = await createSubscription({
         package: selectedPackage,
-        domains: validDomains,
+        targets: cleanedTargets,
         scanInterval,
         reportEmails: validEmails,
       });
@@ -253,71 +198,15 @@ export default function SubscribePage() {
           </div>
         )}
 
-        {/* Step 2: Domain Input */}
+        {/* Step 2: Target Input */}
         {step === 2 && (
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-400">Welche Ziele sollen regelmäßig gescannt werden?</p>
-              <span className={`text-xs font-mono px-2 py-0.5 rounded ${
-                overLimit ? 'bg-red-500/20 text-red-400' : totalHosts > 0 ? 'bg-[#2DD4BF]/10 text-[#2DD4BF]' : 'text-gray-600'
-              }`}>
-                {totalHosts} / {MAX_HOSTS} Hosts
-              </span>
-            </div>
-            <div className="space-y-2">
-              {domains.map((d, i) => {
-                const cleaned = cleanDomain(d);
-                const hosts = countHosts(cleaned);
-                return (
-                  <div key={i} className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      value={d}
-                      onChange={(e) => {
-                        const next = [...domains];
-                        next[i] = e.target.value;
-                        setDomains(next);
-                      }}
-                      placeholder="beispiel.de oder 85.22.47.0/24"
-                      className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] text-sm font-mono"
-                    />
-                    {hosts > 1 && (
-                      <span className="text-[10px] text-gray-500 font-mono w-16 text-right flex-shrink-0">{hosts} Hosts</span>
-                    )}
-                    {domains.length > 1 && (
-                      <button onClick={() => setDomains(domains.filter((_, j) => j !== i))}
-                        className="text-red-400 hover:text-red-300 px-1 transition-colors flex-shrink-0">x</button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            {domains.length < 30 && (
-              <button onClick={() => setDomains([...domains, ''])}
-                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-                style={{ color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.25)' }}>
-                + Ziel hinzufügen
-              </button>
-            )}
-
-            {/* Over-limit warning */}
-            {overLimit && (
-              <div className="bg-amber-900/20 border border-amber-800/50 rounded-lg p-4 space-y-3">
-                <p className="text-sm text-amber-300">
-                  Sie haben {totalHosts} Hosts konfiguriert — das übersteigt das Standard-Limit von {MAX_HOSTS}.
-                </p>
-                <p className="text-xs text-amber-300/70">
-                  Für größere Infrastrukturen erstellen wir Ihnen ein maßgeschneidertes Angebot.
-                </p>
-                <a href="mailto:kontakt@vectigal.gmbh?subject=Maßgeschneidertes%20Angebot%20(über%2030%20Hosts)&body=Guten%20Tag%2C%0A%0Awir%20benötigen%20ein%20Angebot%20für%20mehr%20als%2030%20Hosts.%0A%0AAnzahl%20Hosts%3A%20%0ADomains%2FSubnetze%3A%20%0A%0AMit%20freundlichen%20Grüßen"
-                  className="inline-block px-4 py-2 rounded-lg text-xs font-medium bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors">
-                  Individuelles Angebot anfordern
-                </a>
-              </div>
-            )}
-
+            <TargetInput
+              value={targets}
+              onChange={setTargets}
+              disabled={submitting}
+            />
             <p className="text-xs text-gray-600">
-              FQDN (beispiel.de), IPv4 (1.2.3.4), CIDR (1.2.3.0/24) oder Subnetzmaske (1.2.3.4/255.255.255.224).
               Ziele werden nach der Bestellung von einem Administrator geprüft.
             </p>
           </div>
@@ -390,8 +279,10 @@ export default function SubscribePage() {
                 <span className="text-white font-medium">{PACKAGES.find(p => p.id === selectedPackage)?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Ziele ({validDomains.length} Einträge, {totalHosts} Hosts)</span>
-                <span className="text-white font-mono text-xs max-w-[200px] text-right truncate">{validDomains.join(', ')}</span>
+                <span className="text-gray-500">Ziele ({cleanedTargets.length} Einträge)</span>
+                <span className="text-white font-mono text-xs max-w-[200px] text-right truncate">
+                  {cleanedTargets.map(t => t.raw_input).join(', ')}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Report-Empfänger</span>

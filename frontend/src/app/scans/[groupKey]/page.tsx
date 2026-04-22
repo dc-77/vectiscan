@@ -160,16 +160,16 @@ export default function GroupDetailPage({ params }: PageProps) {
     return bTs - aTs;
   });
 
-  const handleRescan = async (domain: string) => {
+  const handleRescan = async (targetId: string, label: string) => {
     if (!sub) return;
     const isAdminTrigger = admin;
     const confirmMsg = isAdminTrigger
-      ? `Admin-Re-Scan für ${domain} starten? Das Kontingent wird dabei NICHT belastet.`
-      : `Re-Scan für ${domain} starten? (${sub.maxRescans - sub.rescansUsed} Re-Scans verbleibend)`;
+      ? `Admin-Re-Scan für ${label} starten? Das Kontingent wird dabei NICHT belastet.`
+      : `Re-Scan für ${label} starten? (${sub.maxRescans - sub.rescansUsed} Re-Scans verbleibend)`;
     if (!confirm(confirmMsg)) return;
-    setRescanBusy(domain);
+    setRescanBusy(targetId);
     try {
-      const res = await requestRescan(sub.id, domain);
+      const res = await requestRescan(sub.id, targetId);
       if (res.success) {
         await fetchData();
       } else {
@@ -316,10 +316,11 @@ function SubscriptionPanel({
   sub: Subscription;
   admin: boolean;
   rescanBusy: string | null;
-  onRescan: (domain: string) => void;
+  onRescan: (targetId: string, label: string) => void;
 }) {
   const intervalLabel = ({ weekly: 'Wöchentlich', monthly: 'Monatlich', quarterly: 'Quartalsweise' } as Record<string, string>)[sub.scanInterval] || sub.scanInterval;
   const rescansLeft = sub.maxRescans - sub.rescansUsed;
+  const targets = sub.targets ?? [];
   return (
     <div className="rounded-xl p-5 space-y-4" style={{ backgroundColor: '#1E293B' }}>
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -339,28 +340,33 @@ function SubscriptionPanel({
       </div>
 
       <div className="space-y-1.5">
-        {sub.domains.map(d => {
+        {targets.map(t => {
           const statusMap: Record<string, { dot: string; label: string }> = {
-            verified: { dot: 'bg-green-500', label: 'Aktiv' },
-            pending_approval: { dot: 'bg-amber-500', label: 'Wartet auf Freigabe' },
+            approved: { dot: 'bg-green-500', label: 'Aktiv' },
+            pending_precheck: { dot: 'bg-slate-400', label: 'Pre-Check läuft' },
+            precheck_running: { dot: 'bg-slate-400', label: 'Pre-Check läuft' },
+            precheck_complete: { dot: 'bg-amber-500', label: 'Wartet auf Freigabe' },
+            pending_review: { dot: 'bg-amber-500', label: 'Wartet auf Freigabe' },
             rejected: { dot: 'bg-red-500', label: 'Abgelehnt' },
+            removed: { dot: 'bg-gray-600', label: 'Entfernt' },
           };
-          const s = statusMap[d.status] || { dot: 'bg-gray-500', label: d.status };
-          const canRescan = d.status === 'verified' && (admin || rescansLeft > 0);
+          const s = statusMap[t.status] || { dot: 'bg-gray-500', label: t.status };
+          const label = t.canonical || t.raw_input;
+          const canRescan = t.status === 'approved' && (admin || rescansLeft > 0);
           return (
-            <div key={d.id} className="flex items-center justify-between py-1 border-b border-gray-700/50 last:border-0">
+            <div key={t.id} className="flex items-center justify-between py-1 border-b border-gray-700/50 last:border-0">
               <div className="flex items-center gap-2 min-w-0">
                 <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-                <span className="text-sm text-white font-mono truncate">{d.domain}</span>
+                <span className="text-sm text-white font-mono truncate">{label}</span>
                 <span className="text-[10px] text-gray-500">{s.label}</span>
               </div>
               {canRescan && (
                 <button
-                  onClick={() => onRescan(d.domain)}
-                  disabled={rescanBusy === d.domain}
+                  onClick={() => onRescan(t.id, label)}
+                  disabled={rescanBusy === t.id}
                   className="text-[10px] text-teal-400 hover:text-teal-300 disabled:opacity-50 font-medium px-2 py-1 bg-teal-400/10 rounded transition-colors"
                 >
-                  {rescanBusy === d.domain ? 'Startet…' : (admin ? 'Admin-Re-Scan' : 'Re-Scan')}
+                  {rescanBusy === t.id ? 'Startet…' : (admin ? 'Admin-Re-Scan' : 'Re-Scan')}
                 </button>
               )}
             </div>

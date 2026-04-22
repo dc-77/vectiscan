@@ -8,6 +8,7 @@ import ScanProgress from '@/components/ScanProgress';
 import ReportDownload from '@/components/ReportDownload';
 import ScanError from '@/components/ScanError';
 import PackageSelector, { ScanPackage } from '@/components/PackageSelector';
+import TargetInput, { TargetEntry } from '@/components/TargetInput';
 import ScanTerminal from '@/components/terminal/ScanTerminal';
 import ActiveOperations from '@/components/terminal/ActiveOperations';
 import { useTerminalFeed } from '@/components/terminal/useTerminalFeed';
@@ -37,8 +38,6 @@ function HexDivider() {
   );
 }
 
-const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
-
 export default function Home() {
   return (
     <Suspense>
@@ -51,7 +50,7 @@ function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [ready, setReady] = useState(false);
-  const [domain, setDomain] = useState('');
+  const [targets, setTargets] = useState<TargetEntry[]>([{ raw_input: '', exclusions: [] }]);
   const [selectedPackage, setSelectedPackage] = useState<ScanPackage>('perimeter');
   const [orderId, setOrderId] = useState<string | null>(null);
   const [order, setOrder] = useState<OrderStatus | null>(null);
@@ -320,28 +319,30 @@ function HomeContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null); setOrder(null); setOrderId(null);
-    let trimmed = domain.trim().toLowerCase()
-      .replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '').replace(/\.$/, '');
-    if (!DOMAIN_REGEX.test(trimmed)) { setError('Ungültige Domain. Beispiel: beispiel.de'); return; }
+    const cleaned: TargetEntry[] = targets
+      .map(t => ({ raw_input: t.raw_input.trim(), exclusions: t.exclusions }))
+      .filter(t => t.raw_input !== '');
+    if (cleaned.length === 0) {
+      setError('Bitte mindestens ein Ziel eingeben.');
+      return;
+    }
     setSubmitting(true);
     try {
-      const res = await createOrder(trimmed, selectedPackage);
+      const res = await createOrder(cleaned, selectedPackage);
       if (res.success && res.data) {
-        if (res.data.alreadyVerified || res.data.status === 'queued') {
-          // Domain already verified — skip verification, go to scan view
-          router.push(`/?orderId=${res.data.id}`);
-        } else {
-          router.push(`/verify/${res.data.id}`);
-        }
+        router.push(`/scan/${res.data.id}`);
+      } else {
+        setError(res.error || 'Unbekannter Fehler');
       }
-      else { setError(res.error || 'Unbekannter Fehler'); }
     } catch { setError('API nicht erreichbar. Läuft der Backend-Server?'); }
     finally { setSubmitting(false); }
   };
 
   const handleRetry = () => {
     stopPolling(); closeWs(); resetTerminal();
-    setShowReport(false); setDomain(''); setSelectedPackage('perimeter');
+    setShowReport(false);
+    setTargets([{ raw_input: '', exclusions: [] }]);
+    setSelectedPackage('perimeter');
     setOrderId(null); setOrder(null); setError(null); setCancelling(false);
     setAiStrategy(null); setAiConfigs({}); setToolOutputs([]); setIntelligenceHosts([]);
     setThreatHost(''); setAiPulse(false); setPhaseName(''); setPacketBurst(false);
@@ -358,31 +359,38 @@ function HomeContent() {
 
   if (!ready) return null;
 
+  const hasValidTarget = targets.some(t => t.raw_input.trim() !== '');
+
   // ─── Scan Form (not scanning) ──────────────────────────
   if (!orderId && !showReport) {
     return (
-      <main className="flex-1 flex flex-col items-center justify-center px-4">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-4xl space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#F8FAFC' }}>
-                Welche Domain möchten Sie scannen?
-              </label>
-              <div className="flex gap-3">
-                <input type="text" value={domain} onChange={(e) => setDomain(e.target.value)}
-                  placeholder="meinefirma.de" disabled={submitting}
-                  className="flex-1 bg-[#1e293b] border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] font-mono disabled:opacity-50" />
-                <button type="submit" disabled={submitting || !domain.trim()}
-                  className="disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-3 rounded-lg transition-colors"
-                  style={{ backgroundColor: '#2DD4BF', color: '#0F172A' }}>
-                  {submitting ? 'Startet...' : 'Scan starten'}
-                </button>
-              </div>
-              <p className="text-xs mt-2" style={{ color: '#64748B' }}>
-                Nach dem Start dauert der Scan je nach Paket ca. 15–90 Minuten. Sie erhalten den Report per E-Mail. Neue Domains müssen einmalig verifiziert werden.
-              </p>
-            </div>
             <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />
+
+            <div className="bg-[#0F172A] border border-gray-800 rounded-lg p-5">
+              <TargetInput
+                value={targets}
+                onChange={setTargets}
+                disabled={submitting}
+              />
+            </div>
+
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-xs" style={{ color: '#64748B' }}>
+                Nach dem Start läuft ein Pre-Check, anschließend gibt der Administrator den Auftrag frei.
+                Der Scan dauert je nach Paket ca. 15–90 Minuten.
+              </p>
+              <button
+                type="submit"
+                disabled={submitting || !hasValidTarget}
+                className="disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-3 rounded-lg transition-colors text-sm"
+                style={{ backgroundColor: submitting || !hasValidTarget ? undefined : '#2DD4BF', color: submitting || !hasValidTarget ? undefined : '#0F172A' }}
+              >
+                {submitting ? 'Startet...' : 'Scan starten'}
+              </button>
+            </div>
           </form>
           {error && (
             <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">{error}</div>

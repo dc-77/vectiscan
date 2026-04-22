@@ -272,6 +272,8 @@ export default function ScanDetailPage() {
   const isDone = order.status === 'report_complete' || order.status === 'delivered';
   const isFailed = order.status === 'failed' || order.status === 'cancelled' || order.status === 'rejected';
   const isPendingReview = order.status === 'pending_review';
+  const isPrecheckRunning = order.status === 'precheck_running';
+  const isPendingTargetReview = order.status === 'pending_target_review';
   const showDebugDefault = isFailed && admin;
   const PKG_LABELS: Record<string, string> = {
     webcheck: 'WEBCHECK', perimeter: 'PERIMETER', compliance: 'COMPLIANCE',
@@ -397,8 +399,41 @@ export default function ScanDetailPage() {
           {order.progress.hostsTotal > 0 && <span>{order.progress.hostsTotal} Hosts</span>}
         </div>
 
+        {/* Pre-Check Status Blocks */}
+        {isPrecheckRunning && (
+          <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg px-4 py-3 text-sm space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+              <span className="text-blue-300 font-medium">Pre-Check läuft...</span>
+            </div>
+            <p className="text-xs text-slate-400">
+              Targets werden validiert, DNS aufgelöst und Live-Hosts ermittelt. Danach wartet der Auftrag auf Admin-Freigabe.
+            </p>
+          </div>
+        )}
+        {isPendingTargetReview && (
+          <div className="bg-amber-900/20 border border-amber-800/50 rounded-lg px-4 py-3 text-sm">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-amber-300 font-medium">Wartet auf Admin-Freigabe</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Der Pre-Check ist abgeschlossen. Ein Admin muss die Targets freigeben, bevor der Scan startet.
+                </p>
+              </div>
+              {admin && (
+                <Link
+                  href={`/admin/review/${orderId}`}
+                  className="text-xs text-amber-400 hover:text-amber-300 font-medium px-3 py-1.5 bg-amber-400/10 rounded-lg transition-colors whitespace-nowrap"
+                >
+                  Review öffnen
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Live scan progress bar */}
-        {!isDone && !isFailed && !isPendingReview && order.status !== 'verification_pending' && (() => {
+        {!isDone && !isFailed && !isPendingReview && !isPrecheckRunning && !isPendingTargetReview && order.status !== 'verification_pending' && (() => {
           const phases = [
             { key: 'passive_intel', label: 'Aufklärung' },
             { key: 'dns_recon', label: 'DNS-Analyse' },
