@@ -20,6 +20,7 @@ const MIGRATION_010_PATH = path.join(__dirname, '..', 'migrations', '010_verifie
 const MIGRATION_011_PATH = path.join(__dirname, '..', 'migrations', '011_finding_exclusions_report_versioning.sql');
 const MIGRATION_012_PATH = path.join(__dirname, '..', 'migrations', '012_subscriptions_review_workflow.sql');
 const MIGRATION_013_PATH = path.join(__dirname, '..', 'migrations', '013_company_name.sql');
+const MIGRATION_014_PATH = path.join(__dirname, '..', 'migrations', '014_multi_target.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -159,6 +160,18 @@ export async function initDb(): Promise<void> {
 
   if (!companyColCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_013_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 014: Multi-Target scan orchestration
+  const multiTargetCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables WHERE table_name = 'scan_targets'
+    ) AS exists
+  `);
+
+  if (!multiTargetCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_014_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

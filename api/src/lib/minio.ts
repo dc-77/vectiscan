@@ -8,7 +8,7 @@ export const minioClient = new Client({
   secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
 });
 
-const BUCKETS = ['scan-rawdata', 'scan-reports'];
+const BUCKETS = ['scan-rawdata', 'scan-reports', 'scan-authorizations'];
 
 export async function initBuckets(): Promise<void> {
   for (const bucket of BUCKETS) {
