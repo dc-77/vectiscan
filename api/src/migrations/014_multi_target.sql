@@ -12,7 +12,7 @@
 -- ============================================================
 -- 1. scan_targets: Rohe Target-Eingaben pro Order oder Subscription
 -- ============================================================
-CREATE TABLE scan_targets (
+CREATE TABLE IF NOT EXISTS scan_targets (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id            UUID REFERENCES orders(id) ON DELETE CASCADE,
     subscription_id     UUID REFERENCES subscriptions(id) ON DELETE CASCADE,
@@ -41,17 +41,17 @@ CREATE TABLE scan_targets (
                (order_id IS NULL AND subscription_id IS NOT NULL))
 );
 
-CREATE INDEX idx_scan_targets_order        ON scan_targets(order_id);
-CREATE INDEX idx_scan_targets_subscription ON scan_targets(subscription_id);
-CREATE INDEX idx_scan_targets_status       ON scan_targets(status);
-CREATE INDEX idx_scan_targets_pending
+CREATE INDEX IF NOT EXISTS idx_scan_targets_order        ON scan_targets(order_id);
+CREATE INDEX IF NOT EXISTS idx_scan_targets_subscription ON scan_targets(subscription_id);
+CREATE INDEX IF NOT EXISTS idx_scan_targets_status       ON scan_targets(status);
+CREATE INDEX IF NOT EXISTS idx_scan_targets_pending
     ON scan_targets(status)
     WHERE status IN ('pending_precheck', 'precheck_running', 'pending_review');
 
 -- ============================================================
 -- 2. scan_target_hosts: Pre-Check expandierte Hosts pro Target
 -- ============================================================
-CREATE TABLE scan_target_hosts (
+CREATE TABLE IF NOT EXISTS scan_target_hosts (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     scan_target_id      UUID NOT NULL REFERENCES scan_targets(id) ON DELETE CASCADE,
     ip                  INET,
@@ -77,16 +77,16 @@ CREATE TABLE scan_target_hosts (
                                   'cloudflare', 'hetzner_cloud', 'other'))
 );
 
-CREATE INDEX idx_target_hosts_target ON scan_target_hosts(scan_target_id);
-CREATE INDEX idx_target_hosts_live
+CREATE INDEX IF NOT EXISTS idx_target_hosts_target ON scan_target_hosts(scan_target_id);
+CREATE INDEX IF NOT EXISTS idx_target_hosts_live
     ON scan_target_hosts(scan_target_id)
     WHERE is_live = true;
-CREATE INDEX idx_target_hosts_ip ON scan_target_hosts(ip);
+CREATE INDEX IF NOT EXISTS idx_target_hosts_ip ON scan_target_hosts(ip);
 
 -- ============================================================
 -- 3. scan_run_targets: Historischer Snapshot pro Scan-Lauf
 -- ============================================================
-CREATE TABLE scan_run_targets (
+CREATE TABLE IF NOT EXISTS scan_run_targets (
     order_id                    UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     scan_target_id              UUID NOT NULL REFERENCES scan_targets(id) ON DELETE CASCADE,
     in_scope                    BOOLEAN NOT NULL DEFAULT true,
@@ -104,12 +104,12 @@ CREATE TABLE scan_run_targets (
                                        'rejected_by_admin'))
 );
 
-CREATE INDEX idx_scan_run_targets_order ON scan_run_targets(order_id);
+CREATE INDEX IF NOT EXISTS idx_scan_run_targets_order ON scan_run_targets(order_id);
 
 -- ============================================================
 -- 4. scan_authorizations: Out-of-Band Autorisierungsnachweise
 -- ============================================================
-CREATE TABLE scan_authorizations (
+CREATE TABLE IF NOT EXISTS scan_authorizations (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     subscription_id     UUID REFERENCES subscriptions(id) ON DELETE CASCADE,
     order_id            UUID REFERENCES orders(id) ON DELETE CASCADE,
@@ -132,23 +132,26 @@ CREATE TABLE scan_authorizations (
                scan_target_id IS NOT NULL)
 );
 
-CREATE INDEX idx_scan_auth_subscription ON scan_authorizations(subscription_id);
-CREATE INDEX idx_scan_auth_order        ON scan_authorizations(order_id);
-CREATE INDEX idx_scan_auth_target       ON scan_authorizations(scan_target_id);
+CREATE INDEX IF NOT EXISTS idx_scan_auth_subscription ON scan_authorizations(subscription_id);
+CREATE INDEX IF NOT EXISTS idx_scan_auth_order        ON scan_authorizations(order_id);
+CREATE INDEX IF NOT EXISTS idx_scan_auth_target       ON scan_authorizations(scan_target_id);
 
 -- ============================================================
 -- 5. Erweiterungen an bestehenden Tabellen
 -- ============================================================
 
 -- orders: Multi-Target-Fähigkeit
+-- Bei Multi-Target-Orders ist target_url nur ein Display-Name
+-- ("multi-target (N)" oder erster Target-Canonical). Darf daher nullable
+-- werden, auch wenn der aktuelle Code immer einen Wert setzt.
 ALTER TABLE orders
-    ALTER COLUMN domain DROP NOT NULL;
+    ALTER COLUMN target_url DROP NOT NULL;
 
 ALTER TABLE orders
-    ADD COLUMN target_count INTEGER NOT NULL DEFAULT 1;
+    ADD COLUMN IF NOT EXISTS target_count INTEGER NOT NULL DEFAULT 1;
 
 ALTER TABLE orders
-    ADD COLUMN live_hosts_count INTEGER;
+    ADD COLUMN IF NOT EXISTS live_hosts_count INTEGER;
 
 -- orders: Erweiterte Status-Liste (keine CHECK-Constraint auf status
 -- existiert in v1, bleibt so). Neue Werte:
@@ -161,10 +164,10 @@ ALTER TABLE orders
 
 -- subscriptions: neue Felder
 ALTER TABLE subscriptions
-    ADD COLUMN max_hosts INTEGER NOT NULL DEFAULT 50;
+    ADD COLUMN IF NOT EXISTS max_hosts INTEGER NOT NULL DEFAULT 50;
 
 ALTER TABLE subscriptions
-    ADD COLUMN max_cidr_prefix INTEGER NOT NULL DEFAULT 24;
+    ADD COLUMN IF NOT EXISTS max_cidr_prefix INTEGER NOT NULL DEFAULT 24;
 
 -- max_domains wird semantisch zu "max Eingabe-Zeilen" umgedeutet.
 -- Default von 30 auf 10 reduzieren (bestehende Abos behalten ihren Wert).
@@ -190,6 +193,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_scan_targets_updated ON scan_targets;
 CREATE TRIGGER trg_scan_targets_updated
     BEFORE UPDATE ON scan_targets
     FOR EACH ROW
@@ -223,6 +227,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_orders_target_count ON scan_targets;
 CREATE TRIGGER trg_orders_target_count
     AFTER INSERT OR UPDATE OR DELETE ON scan_targets
     FOR EACH ROW
