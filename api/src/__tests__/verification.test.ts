@@ -21,6 +21,7 @@ jest.mock('../lib/queue', () => ({
   reportQueue: { add: jest.fn() },
   publishEvent: jest.fn(),
   getProgressFromRedis: jest.fn().mockResolvedValue(null),
+  enqueuePrecheck: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('../lib/minio', () => ({
@@ -38,6 +39,17 @@ jest.mock('../lib/validate', () => ({
     if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(d)) return d;
     return null;
   }),
+  validateTargetBatch: jest.fn((inputs: Array<{ raw_input?: unknown }>) => ({
+    targets: inputs.map(i => ({
+      raw_input: String(i?.raw_input ?? ''),
+      valid: true,
+      canonical: String(i?.raw_input ?? '').toLowerCase(),
+      target_type: 'fqdn_root',
+      policy_default: 'enumerate',
+      warnings: [],
+    })),
+    errors: [],
+  })),
 }));
 
 jest.mock('../services/VerificationService', () => {
@@ -246,7 +258,7 @@ describe('Verification API', () => {
       customerId: 'cust-1',
       email: 'admin@test.com',
     });
-    const { isValidDomain, isValidTarget } = require('../lib/validate');
+    const { isValidDomain, isValidTarget, validateTargetBatch } = require('../lib/validate');
     (isValidDomain as jest.Mock).mockImplementation((d: string) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d));
     (isValidTarget as jest.Mock).mockImplementation((d: unknown) => {
       if (typeof d !== 'string') return null;
@@ -255,6 +267,17 @@ describe('Verification API', () => {
       if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(\/\d+)?$/.test(d)) return d;
       return null;
     });
+    (validateTargetBatch as jest.Mock).mockImplementation((inputs: Array<{ raw_input?: unknown }>) => ({
+      targets: inputs.map(i => ({
+        raw_input: String(i?.raw_input ?? ''),
+        valid: true,
+        canonical: String(i?.raw_input ?? '').toLowerCase(),
+        target_type: 'fqdn_root',
+        policy_default: 'enumerate',
+        warnings: [],
+      })),
+      errors: [],
+    }));
     const { generateToken } = require('../services/VerificationService');
     (generateToken as jest.Mock).mockReturnValue('vectiscan-verify-mock12345678');
     server = Fastify({ logger: false });
@@ -267,139 +290,123 @@ describe('Verification API', () => {
     await server.close();
   });
 
+  const targetId = '650e8400-e29b-41d4-a716-446655440000';
+
   describe('POST /api/verify/check', () => {
-    it('should return 404 for non-existent order', async () => {
-      mockQuery.mockResolvedValueOnce(EMPTY_RESULT);
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { orderId } });
-      expect(res.statusCode).toBe(404);
-      expect(res.json().error).toBe('Order nicht gefunden');
+    it('should return 400 for missing targetId', async () => {
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: {} });
+      expect(res.statusCode).toBe(400);
     });
 
-    it('should return verified:true idempotently for already-verified order', async () => {
+    it('should return 404 for non-existent target', async () => {
+      mockQuery.mockResolvedValueOnce(EMPTY_RESULT);
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
+      expect(res.statusCode).toBe(404);
+      expect(res.json().error).toBe('Target nicht gefunden');
+    });
+
+    it('should return 400 for IP/CIDR target', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', verification_token: 'tok', status: 'verified', verified_at: new Date(), verification_method: 'dns_txt' }],
+        rows: [{ id: targetId, canonical: '85.22.47.32/27', target_type: 'cidr', order_id: orderId, subscription_id: null }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { orderId } });
-      expect(res.json()).toEqual({ success: true, data: { verified: true, method: 'dns_txt' } });
-      expect(mockVerifyAll).not.toHaveBeenCalled();
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
+      expect(res.statusCode).toBe(400);
+      expect(res.json().error).toBe('verification_not_applicable_for_ip_targets');
     });
 
-    it('should verify and update order on success', async () => {
-      // 1. SELECT order
+    it('should verify fqdn target and persist to verified_domains', async () => {
+      // 1. SELECT scan_target
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', verification_token: 'tok', status: 'verification_pending', package: 'professional', verified_at: null, verification_method: null }],
+        rows: [{ id: targetId, canonical: 'example.com', target_type: 'fqdn_root', order_id: orderId, subscription_id: null }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
       mockVerifyAll.mockResolvedValueOnce({ verified: true, method: 'file' });
-      // 2. UPDATE orders SET status = 'queued'
-      mockQuery.mockResolvedValueOnce({ rows: [], command: 'UPDATE', rowCount: 1, oid: 0, fields: [] });
-      // 3. SELECT customer_id FROM orders (for verified_domains persistence)
+      // 2. SELECT customer_id (owner lookup)
       mockQuery.mockResolvedValueOnce({
         rows: [{ customer_id: 'cust-1' }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
-      // 4. INSERT INTO verified_domains
+      // 3. INSERT INTO verified_domains
       mockQuery.mockResolvedValueOnce({ rows: [], command: 'INSERT', rowCount: 1, oid: 0, fields: [] });
 
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { orderId } });
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
       expect(res.json()).toEqual({ success: true, data: { verified: true, method: 'file' } });
-
-      // Verify UPDATE was called with queued status
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining("status = 'queued'"),
-        ['file', orderId],
-      );
-      // Verify scan was enqueued
-      expect(mockScanQueueAdd).toHaveBeenCalledWith('scan', {
-        orderId,
-        targetDomain: 'example.com',
-        package: 'professional',
-      });
+      // Der Scan wird durch Admin-Review gestartet, nicht durch die Verifikation.
+      expect(mockScanQueueAdd).not.toHaveBeenCalled();
     });
 
-    it('should return verified:false without DB update on failure', async () => {
+    it('should return verified:false without persistence on failure', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', verification_token: 'tok', status: 'verification_pending', package: 'professional', verified_at: null, verification_method: null }],
+        rows: [{ id: targetId, canonical: 'example.com', target_type: 'fqdn_root', order_id: orderId, subscription_id: null }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
       mockVerifyAll.mockResolvedValueOnce({ verified: false, method: null });
 
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { orderId } });
-      expect(res.json()).toEqual({ success: true, data: { verified: false } });
-      expect(mockQuery).toHaveBeenCalledTimes(1); // Only SELECT, no UPDATE
-    });
-
-    it('should return 400 for missing orderId', async () => {
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: {} });
-      expect(res.statusCode).toBe(400);
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
+      expect(res.json()).toEqual({ success: true, data: { verified: false, method: null } });
+      // Nur der SELECT wurde durchgefuehrt, keine verified_domains-Persistenz.
+      expect(mockQuery).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('GET /api/verify/status/:orderId', () => {
-    it('should return 404 for non-existent order', async () => {
+    it('should return 400 for invalid order ID', async () => {
+      const res = await server.inject({ method: 'GET', url: '/api/verify/status/not-a-uuid' });
+      expect(res.statusCode).toBe(400);
+    });
+
+    it('should return empty list when order has no FQDN targets', async () => {
       mockQuery.mockResolvedValueOnce(EMPTY_RESULT);
       const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}` });
-      expect(res.statusCode).toBe(404);
+      expect(res.statusCode).toBe(200);
+      expect(res.json().data).toEqual({ targets: [] });
     });
 
-    it('should return unverified status with token', async () => {
+    it('should list FQDN targets with cached verification status', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{ target_url: 'example.com', verification_token: 'vectiscan-verify-abc123', verification_method: null, verified_at: null }],
-        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+        rows: [
+          { id: targetId, canonical: 'example.com', target_type: 'fqdn_root', verified: true, method: 'dns_txt' },
+          { id: 'other-target', canonical: 'sub.example.com', target_type: 'fqdn_specific', verified: false, method: null },
+        ],
+        command: 'SELECT', rowCount: 2, oid: 0, fields: [],
       });
       const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}` });
-      expect(res.json().data).toEqual({ verified: false, method: null, token: 'vectiscan-verify-abc123', domain: 'example.com' });
-    });
-
-    it('should return verified status with method', async () => {
-      mockQuery.mockResolvedValueOnce({
-        rows: [{ target_url: 'example.com', verification_token: 'tok', verification_method: 'dns_txt', verified_at: new Date() }],
-        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
-      });
-      const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}` });
-      expect(res.json().data.verified).toBe(true);
-      expect(res.json().data.method).toBe('dns_txt');
+      expect(res.json().data.targets).toHaveLength(2);
+      expect(res.json().data.targets[0].verified).toBe(true);
+      expect(res.json().data.targets[1].verified).toBe(false);
     });
   });
 
-  describe('POST /api/orders (verification flow)', () => {
+  describe('POST /api/orders (multi-target flow)', () => {
     const AUTH_HEADER = { authorization: 'Bearer mock-jwt-token' };
 
-    it('should return verificationToken and instructions', async () => {
-      // verified_domains check (no existing verification)
-      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
-      // subscription auto-link (no match)
-      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
-      // order insert
+    it('should create order in precheck_running and return target stubs', async () => {
+      // Order insert
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'vectiscan-verify-mock12345678', created_at: new Date(), subscription_id: null }],
+        rows: [{ id: orderId, status: 'precheck_running', package: 'perimeter', created_at: new Date() }],
+        command: 'INSERT', rowCount: 1, oid: 0, fields: [],
+      });
+      // scan_targets insert
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: targetId }],
         command: 'INSERT', rowCount: 1, oid: 0, fields: [],
       });
 
-      const res = await server.inject({ method: 'POST', url: '/api/orders', headers: AUTH_HEADER, payload: { domain: 'example.com' } });
+      const res = await server.inject({
+        method: 'POST',
+        url: '/api/orders',
+        headers: AUTH_HEADER,
+        payload: { package: 'perimeter', targets: [{ raw_input: 'example.com' }] },
+      });
       const body = res.json();
 
       expect(res.statusCode).toBe(201);
-      expect(body.data.status).toBe('verification_pending');
-      expect(body.data.verificationToken).toBe('vectiscan-verify-mock12345678');
-      expect(body.data.verificationInstructions.dns_txt).toContain('_vectiscan-verify.example.com');
-      expect(body.data.verificationInstructions.file).toContain('.well-known/vectiscan-verify.txt');
-      expect(body.data.verificationInstructions.meta_tag).toContain('vectiscan-verify');
-    });
-
-    it('should NOT queue a scan job', async () => {
-      // verified_domains check
-      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
-      // subscription auto-link
-      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
-      // order insert
-      mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'tok', created_at: new Date(), subscription_id: null }],
-        command: 'INSERT', rowCount: 1, oid: 0, fields: [],
-      });
-
-      await server.inject({ method: 'POST', url: '/api/orders', headers: AUTH_HEADER, payload: { domain: 'example.com' } });
+      expect(body.data.status).toBe('precheck_running');
+      expect(body.data.targetCount).toBe(1);
+      expect(body.data.targets[0].id).toBe(targetId);
+      expect(body.data.targets[0].canonical).toBe('example.com');
+      // Multi-Target-Orders queuen den Scan nicht direkt — der laeuft ueber Admin-Release.
       expect(mockScanQueueAdd).not.toHaveBeenCalled();
     });
   });

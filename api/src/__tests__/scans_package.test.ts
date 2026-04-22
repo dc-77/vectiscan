@@ -1,7 +1,6 @@
 import Fastify, { FastifyInstance } from 'fastify';
 import { orderRoutes } from '../routes/orders';
 
-// Mock the lib modules
 jest.mock('../lib/db', () => ({
   query: jest.fn(),
   initDb: jest.fn(),
@@ -13,6 +12,7 @@ jest.mock('../lib/queue', () => ({
   reportQueue: { add: jest.fn() },
   publishEvent: jest.fn(),
   getProgressFromRedis: jest.fn().mockResolvedValue(null),
+  enqueuePrecheck: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('../lib/minio', () => {
@@ -35,6 +35,17 @@ jest.mock('../lib/validate', () => ({
     if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(d)) return d;
     return null;
   }),
+  validateTargetBatch: jest.fn((inputs: Array<{ raw_input?: unknown }>) => ({
+    targets: inputs.map(i => ({
+      raw_input: String(i?.raw_input ?? ''),
+      valid: true,
+      canonical: String(i?.raw_input ?? '').toLowerCase(),
+      target_type: 'fqdn_root',
+      policy_default: 'enumerate',
+      warnings: [],
+    })),
+    errors: [],
+  })),
 }));
 
 jest.mock('../services/VerificationService', () => ({
@@ -54,47 +65,26 @@ jest.mock('../lib/auth', () => ({
   }),
 }));
 
+jest.mock('../lib/audit', () => ({ audit: jest.fn().mockResolvedValue(undefined) }));
+
 import { query } from '../lib/db';
 import { scanQueue } from '../lib/queue';
 
 const mockQuery = query as jest.MockedFunction<typeof query>;
 const mockScanQueueAdd = scanQueue.add as jest.MockedFunction<typeof scanQueue.add>;
 
-const TEST_UUID = '550e8400-e29b-41d4-a716-446655440000';
-const CUST_UUID = 'cust-0000-0000-0000-000000000001';
+const ORDER_UUID = '550e8400-e29b-41d4-a716-446655440000';
+const TARGET_UUID = '650e8400-e29b-41d4-a716-446655440000';
 const AUTH_HEADER = { authorization: 'Bearer mock-jwt-token' };
-
-function mockCustomerResult() {
-  return {
-    rows: [{ id: CUST_UUID }],
-    command: 'INSERT' as const,
-    rowCount: 1,
-    oid: 0,
-    fields: [],
-  };
-}
-
-function mockInsertResult(pkg: string) {
-  return {
-    rows: [{ id: TEST_UUID, target_url: 'example.com', status: 'verification_pending', package: pkg, verification_token: 'vectiscan-verify-mock12345678', created_at: new Date() }],
-    command: 'INSERT' as const,
-    rowCount: 1,
-    oid: 0,
-    fields: [],
-  };
-}
-
-/** Mock for verified_domains check (no existing verification). */
-const noVerificationResult = { rows: [], command: 'SELECT' as const, rowCount: 0, oid: 0, fields: [] };
 
 function mockOrderRow(pkg: string) {
   return {
     rows: [{
-      id: TEST_UUID,
+      id: ORDER_UUID,
       target_url: 'example.com',
-      status: 'created',
+      status: 'precheck_running',
       package: pkg,
-      customer_id: CUST_UUID,
+      customer_id: 'cust-0000-0000-0000-000000000001',
       discovered_hosts: null,
       hosts_total: 0,
       hosts_completed: 0,
@@ -106,16 +96,13 @@ function mockOrderRow(pkg: string) {
       error_message: null,
       created_at: new Date(),
     }],
-    command: 'SELECT' as const,
-    rowCount: 1,
-    oid: 0,
-    fields: [],
+    command: 'SELECT' as const, rowCount: 1, oid: 0, fields: [],
   };
 }
 
 const emptyResult = { rows: [], command: 'SELECT' as const, rowCount: 0, oid: 0, fields: [] };
 
-describe('Package selection (v2: 5 packages)', () => {
+describe('Package selection (v2: 6 packages, Multi-Target)', () => {
   let server: FastifyInstance;
 
   beforeEach(async () => {
@@ -125,115 +112,97 @@ describe('Package selection (v2: 5 packages)', () => {
     await server.ready();
   });
 
-  /** Order of queries in POST /api/orders:
-   *  1) verified_domains lookup
-   *  2) subscription auto-link lookup  ← added in 2026-04
-   *  3) INSERT INTO orders RETURNING ...
-   */
-  function chainOrderInsert(pkg: string) {
-    mockQuery.mockResolvedValueOnce(noVerificationResult);
-    mockQuery.mockResolvedValueOnce(noVerificationResult); // subscription auto-link: no match
-    mockQuery.mockResolvedValueOnce(mockInsertResult(pkg));
-  }
-
   afterEach(async () => {
     await server.close();
   });
 
+  // POST /api/orders Multi-Target-Flow: INSERT orders → INSERT scan_targets
+  function chainOrderInsert(pkg: string) {
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ id: ORDER_UUID, status: 'precheck_running', package: pkg, created_at: new Date() }],
+      command: 'INSERT' as const, rowCount: 1, oid: 0, fields: [],
+    });
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ id: TARGET_UUID }],
+      command: 'INSERT' as const, rowCount: 1, oid: 0, fields: [],
+    });
+  }
+
   describe('POST /api/orders with package', () => {
     it('should accept package=webcheck', async () => {
       chainOrderInsert('webcheck');
-
       const res = await server.inject({
-        method: 'POST',
-        url: '/api/orders',
-        headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'webcheck' },
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'webcheck', targets: [{ raw_input: 'example.com' }] },
       });
-
       expect(res.statusCode).toBe(201);
-      const body = res.json();
-      expect(body.success).toBe(true);
-      expect(body.data.package).toBe('webcheck');
+      expect(res.json().data.package).toBe('webcheck');
     });
 
     it('should accept package=perimeter', async () => {
       chainOrderInsert('perimeter');
-
       const res = await server.inject({
-        method: 'POST',
-        url: '/api/orders',
-        headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'perimeter' },
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'perimeter', targets: [{ raw_input: 'example.com' }] },
       });
-
       expect(res.statusCode).toBe(201);
       expect(res.json().data.package).toBe('perimeter');
     });
 
     it('should accept package=compliance', async () => {
       chainOrderInsert('compliance');
-
       const res = await server.inject({
-        method: 'POST',
-        url: '/api/orders',
-        headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'compliance' },
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'compliance', targets: [{ raw_input: 'example.com' }] },
       });
-
       expect(res.statusCode).toBe(201);
       expect(res.json().data.package).toBe('compliance');
     });
 
     it('should accept package=supplychain', async () => {
       chainOrderInsert('supplychain');
-
       const res = await server.inject({
-        method: 'POST',
-        url: '/api/orders',
-        headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'supplychain' },
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'supplychain', targets: [{ raw_input: 'example.com' }] },
       });
-
       expect(res.statusCode).toBe(201);
       expect(res.json().data.package).toBe('supplychain');
     });
 
     it('should accept package=insurance', async () => {
       chainOrderInsert('insurance');
-
       const res = await server.inject({
-        method: 'POST',
-        url: '/api/orders',
-        headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'insurance' },
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'insurance', targets: [{ raw_input: 'example.com' }] },
       });
-
       expect(res.statusCode).toBe(201);
       expect(res.json().data.package).toBe('insurance');
     });
 
+    it('should accept package=tlscompliance', async () => {
+      chainOrderInsert('tlscompliance');
+      const res = await server.inject({
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'tlscompliance', targets: [{ raw_input: 'example.com' }] },
+      });
+      expect(res.statusCode).toBe(201);
+      expect(res.json().data.package).toBe('tlscompliance');
+    });
+
     it('should reject invalid package', async () => {
       const res = await server.inject({
-        method: 'POST',
-        url: '/api/orders',
-        headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'invalid' },
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'invalid', targets: [{ raw_input: 'example.com' }] },
       });
-
       expect(res.statusCode).toBe(400);
-      const body = res.json();
-      expect(body.success).toBe(false);
-      expect(body.error).toContain('Invalid package');
+      expect(res.json().error).toContain('Invalid package');
     });
 
     it('should reject legacy package names (basic, professional, nis2)', async () => {
       for (const legacyPkg of ['basic', 'professional', 'nis2']) {
         const res = await server.inject({
-          method: 'POST',
-          url: '/api/orders',
-          headers: AUTH_HEADER,
-          payload: { domain: 'example.com', package: legacyPkg },
+          method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+          payload: { package: legacyPkg, targets: [{ raw_input: 'example.com' }] },
         });
         expect(res.statusCode).toBe(400);
       }
@@ -241,39 +210,28 @@ describe('Package selection (v2: 5 packages)', () => {
 
     it('should default to perimeter when no package specified', async () => {
       chainOrderInsert('perimeter');
-
       const res = await server.inject({
-        method: 'POST',
-        url: '/api/orders',
-        headers: AUTH_HEADER,
-        payload: { domain: 'example.com' },
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { targets: [{ raw_input: 'example.com' }] },
       });
-
       expect(res.statusCode).toBe(201);
       expect(res.json().data.package).toBe('perimeter');
     });
 
-    it('should not queue scan job (verification required first)', async () => {
+    it('should not queue scan job (admin review required first)', async () => {
       chainOrderInsert('compliance');
-
       await server.inject({
-        method: 'POST',
-        url: '/api/orders',
-        headers: AUTH_HEADER,
-        payload: { domain: 'example.com', package: 'compliance' },
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'compliance', targets: [{ raw_input: 'example.com' }] },
       });
-
       expect(mockScanQueueAdd).not.toHaveBeenCalled();
     });
   });
 
   describe('GET /api/orders/:id with package', () => {
     it('should return package and estimatedDuration for webcheck', async () => {
-      mockQuery
-        .mockResolvedValueOnce(mockOrderRow('webcheck'))
-        .mockResolvedValueOnce(emptyResult);
-
-      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
+      mockQuery.mockResolvedValueOnce(mockOrderRow('webcheck')).mockResolvedValueOnce(emptyResult);
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${ORDER_UUID}`, headers: AUTH_HEADER });
       expect(res.statusCode).toBe(200);
       const body = res.json();
       expect(body.data.package).toBe('webcheck');
@@ -281,25 +239,17 @@ describe('Package selection (v2: 5 packages)', () => {
     });
 
     it('should return package and estimatedDuration for perimeter', async () => {
-      mockQuery
-        .mockResolvedValueOnce(mockOrderRow('perimeter'))
-        .mockResolvedValueOnce(emptyResult);
-
-      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
-      const body = res.json();
-      expect(body.data.package).toBe('perimeter');
-      expect(body.data.estimatedDuration).toBe('~60–90 Minuten');
+      mockQuery.mockResolvedValueOnce(mockOrderRow('perimeter')).mockResolvedValueOnce(emptyResult);
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${ORDER_UUID}`, headers: AUTH_HEADER });
+      expect(res.json().data.package).toBe('perimeter');
+      expect(res.json().data.estimatedDuration).toBe('~60–90 Minuten');
     });
 
     it('should return package and estimatedDuration for compliance', async () => {
-      mockQuery
-        .mockResolvedValueOnce(mockOrderRow('compliance'))
-        .mockResolvedValueOnce(emptyResult);
-
-      const res = await server.inject({ method: 'GET', url: `/api/orders/${TEST_UUID}`, headers: AUTH_HEADER });
-      const body = res.json();
-      expect(body.data.package).toBe('compliance');
-      expect(body.data.estimatedDuration).toBe('~65–95 Minuten');
+      mockQuery.mockResolvedValueOnce(mockOrderRow('compliance')).mockResolvedValueOnce(emptyResult);
+      const res = await server.inject({ method: 'GET', url: `/api/orders/${ORDER_UUID}`, headers: AUTH_HEADER });
+      expect(res.json().data.package).toBe('compliance');
+      expect(res.json().data.estimatedDuration).toBe('~65–95 Minuten');
     });
   });
 });

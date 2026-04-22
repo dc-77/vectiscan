@@ -10,9 +10,11 @@ jest.mock('next/navigation', () => ({
 // Mock API
 const mockGetVerificationStatus = jest.fn();
 const mockCheckVerification = jest.fn();
+const mockManualVerify = jest.fn();
 jest.mock('@/lib/api', () => ({
   getVerificationStatus: (...args: unknown[]) => mockGetVerificationStatus(...args),
   checkVerification: (...args: unknown[]) => mockCheckVerification(...args),
+  manualVerify: (...args: unknown[]) => mockManualVerify(...args),
 }));
 
 import VerifyPage from '@/app/verify/[orderId]/page';
@@ -33,6 +35,7 @@ describe('VerifyPage', () => {
     jest.useFakeTimers();
     mockGetVerificationStatus.mockResolvedValue(MOCK_STATUS);
     mockCheckVerification.mockResolvedValue({ success: true, data: { verified: false } });
+    mockManualVerify.mockResolvedValue({ success: true, data: { verified: true, method: 'manual' } });
     Object.assign(navigator, {
       clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
     });
@@ -60,7 +63,8 @@ describe('VerifyPage', () => {
     });
 
     expect(screen.getByTestId('tab-content-dns_txt')).toBeInTheDocument();
-    expect(screen.getByText(/TXT-Record/)).toBeInTheDocument();
+    // Inhalt enthaelt den zu erstellenden TXT-Record
+    expect(screen.getByTestId('tab-content-dns_txt').textContent).toMatch(/TXT-Record/);
   });
 
   it('should switch between tabs', async () => {

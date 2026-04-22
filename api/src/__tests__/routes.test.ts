@@ -15,6 +15,7 @@ jest.mock('../lib/queue', () => ({
   reportQueue: { add: jest.fn() },
   publishEvent: jest.fn(),
   getProgressFromRedis: jest.fn().mockResolvedValue(null),
+  enqueuePrecheck: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('../lib/minio', () => {
@@ -40,7 +41,24 @@ const _isValidTarget = (d: unknown) => {
 jest.mock('../lib/validate', () => ({
   isValidDomain: jest.fn((d: string) => /^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)),
   isValidTarget: jest.fn((d: unknown) => _isValidTarget(d)),
+  validateTargetBatch: jest.fn((inputs: Array<{ raw_input?: unknown }>) => {
+    const targets = inputs.map(i => {
+      const raw = String(i?.raw_input ?? '');
+      const canonical = _isValidTarget(raw);
+      if (!canonical) {
+        return { raw_input: raw, valid: false, warnings: [], error: 'parse_failed' };
+      }
+      return {
+        raw_input: raw, valid: true, warnings: [],
+        canonical,
+        target_type: canonical.includes('/') ? 'cidr' : /^\d/.test(canonical) ? 'ipv4' : 'fqdn_root',
+        policy_default: canonical.includes('/') || /^\d/.test(canonical) ? 'ip_only' : 'enumerate',
+      };
+    });
+    return { targets, errors: [] };
+  }),
 }));
+
 
 jest.mock('../services/VerificationService', () => ({
   generateToken: jest.fn().mockReturnValue('vectiscan-verify-mock12345678'),
@@ -134,56 +152,57 @@ describe('API Routes', () => {
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
-        payload: { domain: 'example.com' },
+        payload: { package: 'perimeter', targets: [{ raw_input: 'example.com' }] },
       });
       expect(res.statusCode).toBe(401);
     });
 
-    it('should create order for valid domain with auth', async () => {
-      const now = new Date();
-      // 1: verified_domains check (no existing verification)
-      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
-      // 2: subscription auto-link lookup (no matching active subscription)
-      mockQuery.mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
-      // 3: order insert
+    it('should create order for valid target with auth', async () => {
+      const orderId = '550e8400-e29b-41d4-a716-446655440000';
+      const targetId = '550e8400-e29b-41d4-a716-446655440001';
+      // Order insert
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: '550e8400-e29b-41d4-a716-446655440000', target_url: 'example.com', status: 'verification_pending', package: 'professional', verification_token: 'vectiscan-verify-mock12345678', created_at: now, subscription_id: null }],
-        command: 'INSERT',
-        rowCount: 1,
-        oid: 0,
-        fields: [],
+        rows: [{ id: orderId, status: 'precheck_running', package: 'perimeter', created_at: new Date() }],
+        command: 'INSERT', rowCount: 1, oid: 0, fields: [],
+      });
+      // scan_targets insert
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: targetId }],
+        command: 'INSERT', rowCount: 1, oid: 0, fields: [],
       });
 
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { domain: 'example.com' },
+        payload: { package: 'perimeter', targets: [{ raw_input: 'example.com' }] },
       });
 
       expect(res.statusCode).toBe(201);
       const body = res.json();
       expect(body.success).toBe(true);
-      expect(body.data.id).toBe('550e8400-e29b-41d4-a716-446655440000');
-      expect(body.data.domain).toBe('example.com');
-      expect(body.data.status).toBe('verification_pending');
-      expect(body.data.package).toBe('professional');
-      expect(body.data.verificationToken).toBe('vectiscan-verify-mock12345678');
+      expect(body.data.id).toBe(orderId);
+      expect(body.data.status).toBe('precheck_running');
+      expect(body.data.package).toBe('perimeter');
+      expect(body.data.targetCount).toBe(1);
+      expect(body.data.targets).toHaveLength(1);
+      expect(body.data.targets[0].canonical).toBe('example.com');
+      // Scan-Queue wird nicht direkt gefuellt — erst nach Admin-Release
       expect(mockScanQueueAdd).not.toHaveBeenCalled();
     });
 
-    it('should reject invalid domain', async () => {
+    it('should reject invalid target', async () => {
       const res = await server.inject({
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { domain: 'http://example.com' },
+        payload: { package: 'perimeter', targets: [{ raw_input: 'http://example.com' }] },
       });
 
       expect(res.statusCode).toBe(400);
       const body = res.json();
       expect(body.success).toBe(false);
-      expect(body.error).toContain('Invalid domain');
+      expect(body.error).toBe('target_validation_failed');
     });
   });
 

@@ -4,13 +4,14 @@ import VectiScanLogo from '@/components/VectiScanLogo';
 describe('VectiScanLogo', () => {
   it('should render the logo text', () => {
     render(<VectiScanLogo />);
-    expect(screen.getByText('Vecti')).toBeInTheDocument();
-    expect(screen.getByText('Scan')).toBeInTheDocument();
+    expect(screen.getByText('vecti')).toBeInTheDocument();
+    expect(screen.getByText('scan')).toBeInTheDocument();
   });
 
-  it('should render the subtitle', () => {
-    render(<VectiScanLogo />);
-    expect(screen.getByText('Security Scanner')).toBeInTheDocument();
+  it('should render shield with aria-hidden', () => {
+    const { container } = render(<VectiScanLogo />);
+    const svg = container.querySelector('svg');
+    expect(svg?.getAttribute('aria-hidden')).toBe('true');
   });
 
   it('should contain an SVG element', () => {

@@ -49,7 +49,8 @@ describe('PackageSelector', () => {
   it('should show non-selected border on unselected cards', () => {
     render(<PackageSelector selected="webcheck" onSelect={jest.fn()} />);
     const periCard = screen.getByTestId('package-perimeter');
-    expect(periCard.style.borderColor).toBe('#334155');
+    // Unselected cards use a dim version of their accent (color + 30% alpha suffix).
+    expect(periCard.style.borderColor.toLowerCase()).toMatch(/^#[0-9a-f]{6}30$/);
   });
 
   it('should show "Empfohlen" badge on perimeter card', () => {
