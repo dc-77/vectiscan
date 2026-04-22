@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
-import { scanQueue, reportQueue, publishEvent, getProgressFromRedis } from '../lib/queue.js';
+import { scanQueue, reportQueue, publishEvent, getProgressFromRedis, enqueuePrecheck } from '../lib/queue.js';
 import { minioClient } from '../lib/minio.js';
 import { isValidDomain, isValidTarget, validateTargetBatch } from '../lib/validate.js';
 import { generateToken } from '../services/VerificationService.js';
@@ -46,8 +46,8 @@ const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface CreateOrderBody {
-  domain: string;
   package?: string;
+  targets?: Array<{ raw_input?: unknown; exclusions?: unknown }>;
 }
 
 interface OrderParams {
@@ -64,19 +64,13 @@ interface ExcludeBody {
 }
 
 export async function orderRoutes(server: FastifyInstance): Promise<void> {
-  // POST /api/orders — requireAuth, customer_id from JWT
+  // POST /api/orders — requireAuth, multi-target
+  // Body: { package, targets: [{raw_input, exclusions?}, ...] }
   server.post<{ Body: CreateOrderBody }>('/api/orders', { preHandler: [requireAuth] }, async (request, reply) => {
     const user = request.user!;
-    const { domain: rawDomain, package: rawPkg } = request.body || {} as CreateOrderBody;
-    const pkg = (rawPkg || 'perimeter') as string;
-
-    const domain = isValidTarget(rawDomain);
-    if (!domain) {
-      return reply.status(400).send({
-        success: false,
-        error: 'Invalid domain. Provide a valid FQDN, IPv4, CIDR (/24), or subnet mask (255.255.255.0).',
-      });
-    }
+    const body = request.body || {} as CreateOrderBody;
+    const pkg = (body.package || 'perimeter').toLowerCase();
+    const rawTargets = body.targets || [];
 
     if (!VALID_PACKAGES.includes(pkg as ScanPackage)) {
       return reply.status(400).send({
@@ -85,7 +79,16 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       });
     }
 
-    // Resolve customer_id: admins without customer_id get one created
+    const batch = validateTargetBatch(rawTargets);
+    if (batch.errors.length > 0 || batch.targets.some(t => !t.valid)) {
+      return reply.status(400).send({
+        success: false,
+        error: 'target_validation_failed',
+        data: batch,
+      });
+    }
+
+    // Resolve customer_id
     let customerId = user.customerId;
     if (!customerId) {
       const customerResult = await query<{ id: string }>(
@@ -95,96 +98,65 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       customerId = customerResult.rows[0].id;
     }
 
-    // Check if this customer already has a valid domain verification
-    const existingVerification = await query<{ id: string; verification_method: string; expires_at: Date }>(
-      `SELECT id, verification_method, expires_at FROM verified_domains
-       WHERE customer_id = $1 AND domain = $2 AND expires_at > NOW()`,
-      [customerId, domain],
+    const validTargets = batch.targets;
+    const displayName = validTargets.length === 1
+      ? validTargets[0].canonical!
+      : `multi-target (${validTargets.length})`;
+
+    // Insert order with precheck_running
+    const orderResult = await query<{ id: string; status: string; package: string; created_at: Date }>(
+      `INSERT INTO orders (customer_id, target_url, package, status, target_count)
+       VALUES ($1, $2, $3, 'precheck_running', $4)
+       RETURNING id, status, package, created_at`,
+      [customerId, displayName, pkg, validTargets.length],
     );
-    const alreadyVerified = existingVerification.rows.length > 0;
+    const order = orderResult.rows[0];
 
-    // Auto-link to active subscription that covers this domain (verified + enabled)
-    const subscriptionMatch = await query<{ id: string }>(
-      `SELECT s.id
-       FROM subscriptions s
-       JOIN subscription_domains sd ON sd.subscription_id = s.id
-       WHERE s.customer_id = $1
-         AND s.status = 'active'
-         AND sd.domain = $2
-         AND sd.status = 'verified'
-         AND sd.enabled = true
-       ORDER BY s.created_at DESC
-       LIMIT 1`,
-      [customerId, domain],
-    );
-    const subscriptionId = subscriptionMatch.rows[0]?.id ?? null;
-
-    // Insert order — skip verification if domain already verified for this customer
-    const initialStatus = alreadyVerified ? 'queued' : 'verification_pending';
-    const verificationToken = alreadyVerified ? '' : generateToken();
-
-    const params: unknown[] = [customerId, domain, pkg, verificationToken, initialStatus];
-    const cols = ['customer_id', 'target_url', 'package', 'verification_token', 'status'];
-    const valExprs = ['$1', '$2', '$3', '$4', '$5'];
-    if (alreadyVerified) {
-      cols.push('verified_at', 'verification_method');
-      valExprs.push('NOW()', `$${params.length + 1}`);
-      params.push(existingVerification.rows[0].verification_method);
+    // Insert scan_targets
+    const targetIds: string[] = [];
+    const targetStubs: Array<{ id: string; raw_input: string; canonical: string; target_type: string; discovery_policy: string; status: string }> = [];
+    for (let i = 0; i < validTargets.length; i++) {
+      const t = validTargets[i];
+      const exclusions = Array.isArray(rawTargets[i]?.exclusions)
+        ? (rawTargets[i].exclusions as unknown[]).filter(e => typeof e === 'string') as string[]
+        : [];
+      const insertRes = await query<{ id: string }>(
+        `INSERT INTO scan_targets
+           (order_id, raw_input, canonical, target_type, discovery_policy, exclusions, status)
+         VALUES ($1, $2, $3, $4, $5, $6, 'pending_precheck')
+         RETURNING id`,
+        [order.id, t.raw_input, t.canonical, t.target_type, t.policy_default, exclusions],
+      );
+      const tid = insertRes.rows[0].id;
+      targetIds.push(tid);
+      targetStubs.push({
+        id: tid,
+        raw_input: t.raw_input,
+        canonical: t.canonical!,
+        target_type: t.target_type!,
+        discovery_policy: t.policy_default!,
+        status: 'pending_precheck',
+      });
     }
-    if (subscriptionId) {
-      cols.push('subscription_id');
-      valExprs.push(`$${params.length + 1}`);
-      params.push(subscriptionId);
-    }
-    const result = await query<{ id: string; target_url: string; status: string; package: string; verification_token: string; created_at: Date; subscription_id: string | null }>(
-      `INSERT INTO orders (${cols.join(', ')})
-       VALUES (${valExprs.join(', ')})
-       RETURNING id, target_url, status, package, verification_token, created_at, subscription_id`,
-      params,
-    );
-
-    const order = result.rows[0];
 
     audit({
       orderId: order.id,
       action: 'order.created',
-      details: { domain, package: pkg, reusedVerification: alreadyVerified, linkedToSubscription: !!subscriptionId, subscriptionId },
+      details: { package: pkg, targetCount: validTargets.length, targets: targetStubs.map(s => s.canonical) },
       ip: request.ip,
     });
 
-    // If domain already verified for this customer → start scan immediately
-    if (alreadyVerified) {
-      await scanQueue.add('scan', {
-        orderId: order.id,
-        targetDomain: domain,
-        package: pkg,
-      });
-
-      return reply.status(201).send({
-        success: true,
-        data: {
-          id: order.id,
-          domain: order.target_url,
-          status: 'queued',
-          package: order.package,
-          alreadyVerified: true,
-        },
-      });
-    }
+    // Enqueue pre-check
+    await enqueuePrecheck({ orderId: order.id, targetIds });
 
     return reply.status(201).send({
       success: true,
       data: {
         id: order.id,
-        domain: order.target_url,
-        status: order.status,
+        status: 'precheck_running',
         package: order.package,
-        verificationToken: order.verification_token,
-        verificationInstructions: {
-          dns_txt: `Create a TXT record at _vectiscan-verify.${domain} with value: ${order.verification_token}`,
-          file: `Place a file at https://${domain}/.well-known/vectiscan-verify.txt containing: ${order.verification_token}`,
-          meta_tag: `Add <meta name="vectiscan-verify" content="${order.verification_token}"> to your homepage`,
-        },
+        targetCount: validTargets.length,
+        targets: targetStubs,
       },
     });
   });

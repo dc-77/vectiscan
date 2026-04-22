@@ -32,7 +32,17 @@ export type AuditAction =
   | 'subscription.domain_requested'
   | 'subscription.domain_approved'
   | 'subscription.domain_rejected'
-  | 'subscription.rescan';
+  | 'subscription.target_requested'
+  | 'subscription.target_removed'
+  | 'subscription.target_approved'
+  | 'subscription.target_rejected'
+  | 'subscription.rescan'
+  | 'target.approved'
+  | 'target.rejected'
+  | 'target.updated'
+  | 'authorization.uploaded'
+  | 'authorization.deleted'
+  | 'order.released';
 
 interface AuditEntry {
   orderId?: string | null;

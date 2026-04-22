@@ -43,17 +43,15 @@ async function expireSubscriptions(): Promise<void> {
 }
 
 async function tickSubscriptions(): Promise<void> {
-  // Find all active (non-expired) subscriptions where a scan is due
-  // A scan is due when: last_scan_at + interval < NOW(), or last_scan_at IS NULL (first scan)
+  // Find due active subscriptions with at least one approved target.
   const result = await query(
-    `SELECT s.id AS subscription_id, s.customer_id, s.package, s.scan_interval,
-            s.last_scan_at, s.report_emails,
-            sd.id AS domain_id, sd.domain
+    `SELECT s.id AS subscription_id, s.customer_id, s.package, s.scan_interval
      FROM subscriptions s
-     JOIN subscription_domains sd ON sd.subscription_id = s.id
      WHERE s.status = 'active'
-       AND sd.enabled = true
-       AND sd.status = 'verified'
+       AND EXISTS (
+         SELECT 1 FROM scan_targets t
+         WHERE t.subscription_id = s.id AND t.status = 'approved'
+       )
        AND (
          s.last_scan_at IS NULL
          OR (s.scan_interval = 'weekly' AND s.last_scan_at < NOW() - INTERVAL '7 days')
@@ -63,50 +61,54 @@ async function tickSubscriptions(): Promise<void> {
      FOR UPDATE OF s SKIP LOCKED`,
   );
 
-  // Group by subscription to avoid scanning same subscription twice in one tick
-  const processed = new Set<string>();
-
   for (const row of result.rows as Array<Record<string, unknown>>) {
     const subId = row.subscription_id as string;
-    const domain = row.domain as string;
-    const domainKey = `${subId}:${domain}`;
-
-    if (processed.has(domainKey)) continue;
-    processed.add(domainKey);
 
     try {
-      // Create order linked to subscription
+      const targetsRes = await query(
+        `SELECT id, canonical, discovery_policy, exclusions
+         FROM scan_targets
+         WHERE subscription_id = $1 AND status = 'approved'`,
+        [subId],
+      );
+      const targets = targetsRes.rows as Array<Record<string, unknown>>;
+      if (targets.length === 0) continue;
+
+      const displayName = targets.length === 1
+        ? (targets[0].canonical as string)
+        : `multi-target (${targets.length})`;
+
       const orderResult = await query(
-        `INSERT INTO orders (customer_id, target_url, package, status, verified_at, subscription_id)
-         VALUES ($1, $2, $3, 'queued', NOW(), $4)
+        `INSERT INTO orders (customer_id, target_url, package, status, verified_at, subscription_id, target_count, is_rescan)
+         VALUES ($1, $2, $3, 'queued', NOW(), $4, $5, true)
          RETURNING id`,
-        [row.customer_id, domain, row.package, subId],
+        [row.customer_id, displayName, row.package, subId, targets.length],
       );
       const orderId = (orderResult.rows[0] as Record<string, unknown>).id as string;
 
-      // Enqueue scan job
-      await scanQueue.add('scan', {
-        orderId,
-        targetDomain: domain,
-        package: row.package,
-      });
+      for (const t of targets) {
+        await query(
+          `INSERT INTO scan_run_targets
+             (order_id, scan_target_id, in_scope, snapshot_discovery_policy, snapshot_exclusions)
+           VALUES ($1, $2, true, $3, $4)`,
+          [orderId, t.id, t.discovery_policy, t.exclusions],
+        );
+      }
 
+      await scanQueue.add('scan', { orderId, package: row.package });
       await publishEvent(orderId, {
-        type: 'status',
-        orderId,
-        status: 'queued',
+        type: 'status', orderId, status: 'queued',
         updatedAt: new Date().toISOString(),
       });
 
-      // Update subscription last_scan_at
       await query(
         `UPDATE subscriptions SET last_scan_at = NOW(), updated_at = NOW() WHERE id = $1`,
         [subId],
       );
 
-      console.log(`[scheduler] Subscription scan enqueued: ${domain} (sub ${subId}, order ${orderId})`);
+      console.log(`[scheduler] Subscription scan enqueued: sub ${subId}, order ${orderId}, targets ${targets.length}`);
     } catch (err) {
-      console.error(`[scheduler] Failed to process subscription domain ${domain}:`, err);
+      console.error(`[scheduler] Failed to process subscription ${subId}:`, err);
     }
   }
 }
