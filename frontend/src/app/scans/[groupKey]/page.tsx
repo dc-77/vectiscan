@@ -180,6 +180,30 @@ export default function GroupDetailPage({ params }: PageProps) {
     }
   };
 
+  const handleRescanAll = async () => {
+    if (!sub) return;
+    const approvedCount = (sub.targets ?? []).filter(t => t.status === 'approved').length;
+    if (approvedCount === 0) {
+      setError('Keine freigegebenen Targets im Abo.');
+      return;
+    }
+    const confirmMsg = admin
+      ? `Admin-Re-Scan für alle ${approvedCount} Targets starten? Das Kontingent wird NICHT belastet.`
+      : `Re-Scan für alle ${approvedCount} Targets starten? (${sub.maxRescans - sub.rescansUsed} Re-Scans verbleibend — wird als EIN Re-Scan gezählt.)`;
+    if (!confirm(confirmMsg)) return;
+    setRescanBusy('__all__');
+    try {
+      const res = await requestRescan(sub.id);
+      if (res.success) {
+        await fetchData();
+      } else {
+        setError(res.error || 'Re-Scan fehlgeschlagen');
+      }
+    } finally {
+      setRescanBusy(null);
+    }
+  };
+
   const handleDelete = async (order: OrderListItem) => {
     if (!confirm(`Order für ${order.domain} endgültig löschen?`)) return;
     const res = await deleteOrderPermanent(order.id);
@@ -253,6 +277,7 @@ export default function GroupDetailPage({ params }: PageProps) {
             admin={admin}
             rescanBusy={rescanBusy}
             onRescan={handleRescan}
+            onRescanAll={handleRescanAll}
           />
         )}
 
@@ -311,16 +336,19 @@ export default function GroupDetailPage({ params }: PageProps) {
 // Subscription panel
 // ────────────────────────────────────────────────────────────
 function SubscriptionPanel({
-  sub, admin, rescanBusy, onRescan,
+  sub, admin, rescanBusy, onRescan, onRescanAll,
 }: {
   sub: Subscription;
   admin: boolean;
   rescanBusy: string | null;
   onRescan: (targetId: string, label: string) => void;
+  onRescanAll: () => void;
 }) {
   const intervalLabel = ({ weekly: 'Wöchentlich', monthly: 'Monatlich', quarterly: 'Quartalsweise' } as Record<string, string>)[sub.scanInterval] || sub.scanInterval;
   const rescansLeft = sub.maxRescans - sub.rescansUsed;
   const targets = sub.targets ?? [];
+  const approvedCount = targets.filter(t => t.status === 'approved').length;
+  const canRescanAll = approvedCount > 0 && (admin || rescansLeft > 0);
   return (
     <div className="rounded-xl p-5 space-y-4" style={{ backgroundColor: '#1E293B' }}>
       <div className="flex items-center justify-between flex-wrap gap-2">
@@ -334,9 +362,21 @@ function SubscriptionPanel({
           {admin && <span className="text-slate-700">·</span>}
           {admin && <span className="text-amber-400/80">Admin-Re-Scan ohne Kontingent</span>}
         </div>
-        {sub.expiresAt && (
-          <span className="text-xs text-slate-500">Läuft bis {new Date(sub.expiresAt).toLocaleDateString('de-DE')}</span>
-        )}
+        <div className="flex items-center gap-2 flex-wrap">
+          {canRescanAll && (
+            <button
+              onClick={onRescanAll}
+              disabled={rescanBusy === '__all__'}
+              className="text-xs text-teal-300 hover:text-teal-200 disabled:opacity-50 font-semibold px-3 py-1.5 bg-teal-400/15 hover:bg-teal-400/25 rounded transition-colors"
+              title={admin ? 'Alle Targets in einem Lauf scannen (kein Kontingent)' : `Alle ${approvedCount} Targets in einem Lauf scannen (zaehlt als 1 Re-Scan)`}
+            >
+              {rescanBusy === '__all__' ? 'Startet…' : (admin ? `Admin-Re-Scan (alle ${approvedCount})` : `Re-Scan (alle ${approvedCount})`)}
+            </button>
+          )}
+          {sub.expiresAt && (
+            <span className="text-xs text-slate-500">Läuft bis {new Date(sub.expiresAt).toLocaleDateString('de-DE')}</span>
+          )}
+        </div>
       </div>
 
       <div className="space-y-1.5">
