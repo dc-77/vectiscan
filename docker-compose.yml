@@ -74,7 +74,8 @@ services:
       - proxy-net
       - vectiscan-internal
 
-  # Worker 1 + dedicated ZAP (no shared ZAP — prevents cross-contamination)
+  # Worker 1 — legacy ZAP_BASE_URL fallback; pool mode activated via
+  # ZAP_POOL_ENABLED=true once all four daemons are healthy (see §11.3).
   scan-worker-1:
     image: ghcr.io/dc-77/vectiscan/scan-worker:${TAG:-latest}
     restart: unless-stopped
@@ -92,11 +93,17 @@ services:
       NVD_API_KEY: ${NVD_API_KEY:-}
       WPSCAN_API_TOKEN: ${WPSCAN_API_TOKEN:-}
       ZAP_BASE_URL: http://zap-1:8090
+      WORKER_ID: scan-worker-1
+      ZAP_POOL: ${ZAP_POOL:-zap-1,zap-2,zap-3,zap-4}
+      ZAP_POOL_ENABLED: ${ZAP_POOL_ENABLED:-false}
+      ZAP_MAX_PARALLEL_PER_ORDER: ${ZAP_MAX_PARALLEL_PER_ORDER:-3}
+      PHASE1_MAX_WORKERS: ${PHASE1_MAX_WORKERS:-3}
+      PHASE2_STAGE2_WAF_SAFE: ${PHASE2_STAGE2_WAF_SAFE:-true}
     deploy:
       resources:
         limits:
           cpus: "2"
-          memory: 2G
+          memory: 3G
     depends_on:
       redis:
         condition: service_started
@@ -123,7 +130,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.5"
+          cpus: "1.0"
           memory: 1536M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/JSON/core/view/version/"]
@@ -134,7 +141,7 @@ services:
     networks:
       - vectiscan-internal
 
-  # Worker 2 + dedicated ZAP
+  # Worker 2 — see scan-worker-1 comment.
   scan-worker-2:
     image: ghcr.io/dc-77/vectiscan/scan-worker:${TAG:-latest}
     restart: unless-stopped
@@ -152,17 +159,63 @@ services:
       NVD_API_KEY: ${NVD_API_KEY:-}
       WPSCAN_API_TOKEN: ${WPSCAN_API_TOKEN:-}
       ZAP_BASE_URL: http://zap-2:8090
+      WORKER_ID: scan-worker-2
+      ZAP_POOL: ${ZAP_POOL:-zap-1,zap-2,zap-3,zap-4}
+      ZAP_POOL_ENABLED: ${ZAP_POOL_ENABLED:-false}
+      ZAP_MAX_PARALLEL_PER_ORDER: ${ZAP_MAX_PARALLEL_PER_ORDER:-3}
+      PHASE1_MAX_WORKERS: ${PHASE1_MAX_WORKERS:-3}
+      PHASE2_STAGE2_WAF_SAFE: ${PHASE2_STAGE2_WAF_SAFE:-true}
     deploy:
       resources:
         limits:
           cpus: "2"
-          memory: 2G
+          memory: 3G
     depends_on:
       redis:
         condition: service_started
       minio:
         condition: service_started
       zap-2:
+        condition: service_healthy
+    networks:
+      - vectiscan-internal
+
+  # Worker 3 — pool-only (no dedicated legacy ZAP). Depends on zap-3 for
+  # readiness gating but uses the shared pool once ZAP_POOL_ENABLED=true.
+  scan-worker-3:
+    image: ghcr.io/dc-77/vectiscan/scan-worker:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: "9000"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      SHODAN_API_KEY: ${SHODAN_API_KEY:-}
+      ABUSEIPDB_API_KEY: ${ABUSEIPDB_API_KEY:-}
+      SECURITYTRAILS_API_KEY: ${SECURITYTRAILS_API_KEY:-}
+      NVD_API_KEY: ${NVD_API_KEY:-}
+      WPSCAN_API_TOKEN: ${WPSCAN_API_TOKEN:-}
+      ZAP_BASE_URL: http://zap-3:8090
+      WORKER_ID: scan-worker-3
+      ZAP_POOL: ${ZAP_POOL:-zap-1,zap-2,zap-3,zap-4}
+      ZAP_POOL_ENABLED: ${ZAP_POOL_ENABLED:-false}
+      ZAP_MAX_PARALLEL_PER_ORDER: ${ZAP_MAX_PARALLEL_PER_ORDER:-3}
+      PHASE1_MAX_WORKERS: ${PHASE1_MAX_WORKERS:-3}
+      PHASE2_STAGE2_WAF_SAFE: ${PHASE2_STAGE2_WAF_SAFE:-true}
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 3G
+    depends_on:
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+      zap-3:
         condition: service_healthy
     networks:
       - vectiscan-internal
@@ -183,7 +236,63 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.5"
+          cpus: "1.0"
+          memory: 1536M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/JSON/core/view/version/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - vectiscan-internal
+
+  # Pool-Expansion: zap-3 + zap-4 treten dem ZAP-Pool bei. Erst nach
+  # ZAP_POOL_ENABLED=true auf den Workern werden sie genutzt.
+  zap-3:
+    image: zaproxy/zap-stable
+    restart: unless-stopped
+    command: >
+      zap.sh -daemon
+      -port 8090
+      -host 0.0.0.0
+      -config api.disablekey=true
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config scanner.maxScanDurationInMins=12
+      -config ajaxSpider.maxDuration=4
+      -config connection.timeoutInSecs=20
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1536M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/JSON/core/view/version/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - vectiscan-internal
+
+  zap-4:
+    image: zaproxy/zap-stable
+    restart: unless-stopped
+    command: >
+      zap.sh -daemon
+      -port 8090
+      -host 0.0.0.0
+      -config api.disablekey=true
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config scanner.maxScanDurationInMins=12
+      -config ajaxSpider.maxDuration=4
+      -config connection.timeoutInSecs=20
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
           memory: 1536M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/JSON/core/view/version/"]

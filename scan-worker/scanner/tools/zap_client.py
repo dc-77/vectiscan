@@ -8,6 +8,7 @@ multiple scan-worker replicas can share one ZAP instance without interference.
 from __future__ import annotations
 
 import os
+import threading
 import time
 from typing import Any, Callable, Optional
 
@@ -19,6 +20,21 @@ log = structlog.get_logger()
 ZAP_BASE_URL = os.environ.get("ZAP_BASE_URL", "http://zap:8090")
 CONNECT_TIMEOUT = 5
 READ_TIMEOUT = 30
+
+# Thread-local pool assignment: worker.py leases a zap_id for the duration
+# of a host scan and stores it here. ZapClient() (no args) reads it as
+# fallback so every existing call site picks up the right daemon without
+# signature changes.
+_thread_local = threading.local()
+
+
+def set_thread_zap_id(zap_id: str | None) -> None:
+    """Set the ZAP daemon for the current thread. ``None`` clears it."""
+    _thread_local.zap_id = zap_id
+
+
+def get_thread_zap_id() -> str | None:
+    return getattr(_thread_local, "zap_id", None)
 
 
 class ZapError(Exception):
@@ -35,17 +51,19 @@ class ZapClient:
     ):
         """Connect to a ZAP daemon.
 
-        Precedence: explicit ``base_url`` > ``zap_id`` (pool mode) > env
-        ``ZAP_BASE_URL`` (legacy single-daemon mode).
+        Precedence: explicit ``base_url`` > explicit ``zap_id`` > thread-local
+        ``zap_id`` (set by the pool-leased worker task) > env ``ZAP_BASE_URL``
+        (legacy single-daemon fallback).
         """
+        effective_zap_id = zap_id or get_thread_zap_id()
         if base_url:
             resolved = base_url
-        elif zap_id:
-            resolved = f"http://{zap_id}:8090"
+        elif effective_zap_id:
+            resolved = f"http://{effective_zap_id}:8090"
         else:
             resolved = ZAP_BASE_URL
         self.base_url = resolved.rstrip("/")
-        self.zap_id = zap_id
+        self.zap_id = effective_zap_id
         self.session = requests.Session()
         self.session.headers["Accept"] = "application/json"
 

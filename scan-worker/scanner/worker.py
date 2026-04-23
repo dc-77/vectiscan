@@ -6,6 +6,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
 import time
 from datetime import datetime, timezone
 from typing import Any
@@ -33,6 +34,8 @@ from scanner.progress import (
 from scanner.upload import enqueue_report_job, pack_results, upload_to_minio
 from scanner.ai_strategy import plan_host_strategy, plan_phase2_config, plan_tech_analysis
 from scanner import scope as scope_module
+from scanner import zap_pool
+from scanner.tools.zap_client import set_thread_zap_id as _set_thread_zap_id
 
 log = structlog.get_logger()
 
@@ -422,7 +425,12 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
         return idx, tech_profile
 
-    max_parallel = min(3, len(scan_hosts))
+    try:
+        phase1_cap = int(os.getenv("PHASE1_MAX_WORKERS", "3"))
+    except ValueError:
+        phase1_cap = 3
+    phase1_cap = max(1, phase1_cap)
+    max_parallel = min(phase1_cap, len(scan_hosts))
     with ThreadPoolExecutor(max_workers=max_parallel, thread_name_prefix="phase1") as pool:
         futures = {
             pool.submit(_run_phase1_host, idx, host): idx
@@ -529,6 +537,22 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]
     scannable_total = len(scannable)
 
+    has_zap = any(t in (config.get("phase2_tools") or [])
+                  for t in ("zap_spider", "zap_active", "zap_passive"))
+    pool_enabled = has_zap and os.environ.get("ZAP_POOL_ENABLED", "false").lower() == "true"
+    worker_id = os.environ.get("WORKER_ID", _socket.gethostname())
+
+    redis_client_pool = None
+    if pool_enabled:
+        redis_url_pool = os.environ.get("REDIS_URL", "redis://localhost:6379")
+        try:
+            redis_client_pool = redis.from_url(redis_url_pool)
+            zap_pool.init_zap_pool(redis_client_pool)
+        except Exception as pool_err:
+            log.warning("zap_pool_init_failed, falling back to singleton", error=str(pool_err))
+            pool_enabled = False
+            redis_client_pool = None
+
     def _run_phase2_host(idx: int, host: dict[str, Any], tech_profile: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         ip = host["ip"]
         fqdns = host["fqdns"]
@@ -540,16 +564,65 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
                             hosts_completed=0, hosts_total=scannable_total)
             _check_timeout()
 
-        result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
-                            adaptive_config=adaptive_configs.get(ip, {}))
-        return idx, result
+        if not pool_enabled:
+            result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
+                                adaptive_config=adaptive_configs.get(ip, {}))
+            return idx, result
+
+        # Pool-Mode: lease a ZAP, run, release — even on error.
+        lease = zap_pool.acquire_zap(redis_client_pool, order_id, ip, worker_id)
+        if lease is None:
+            log.error("zap_lease_timeout", order_id=order_id, ip=ip)
+            return idx, {"ip": ip, "fqdn": ip, "tools_run": [], "error": "zap_lease_timeout"}
+
+        zap_id, lease_value = lease
+        log.info("zap_lease_acquired", zap_id=zap_id, order_id=order_id, host_ip=ip,
+                 worker_id=worker_id)
+
+        hb_stop = threading.Event()
+
+        def _heartbeat_loop() -> None:
+            while not hb_stop.wait(zap_pool.HEARTBEAT_INTERVAL_SEC):
+                if not zap_pool.heartbeat_zap(redis_client_pool, zap_id, lease_value):
+                    log.warning("zap_heartbeat_lost", zap_id=zap_id, order_id=order_id, ip=ip)
+                    return
+
+        hb_thread = threading.Thread(target=_heartbeat_loop, daemon=True,
+                                     name=f"zap-hb-{zap_id}")
+        hb_thread.start()
+        lease_start = time.monotonic()
+
+        try:
+            _set_thread_zap_id(zap_id)
+            # Clean up any stale contexts left by a crashed prior lease.
+            try:
+                from scanner.tools.zap_client import ZapClient
+                _cleanup_client = ZapClient(zap_id=zap_id)
+                active_ctx_names = zap_pool.get_all_active_context_names(redis_client_pool)
+                # Exclude our own soon-to-be-created context from the deletion set —
+                # it's not listed yet so this is informational only.
+                _cleanup_client.cleanup_stale_contexts(active_ctx_names)
+            except Exception as cleanup_err:
+                log.warning("zap_cleanup_skipped", zap_id=zap_id, error=str(cleanup_err))
+
+            result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
+                                adaptive_config=adaptive_configs.get(ip, {}))
+            return idx, result
+        finally:
+            hb_stop.set()
+            _set_thread_zap_id(None)
+            duration_ms = int((time.monotonic() - lease_start) * 1000)
+            zap_pool.release_zap(redis_client_pool, zap_id, lease_value)
+            log.info("zap_lease_released", zap_id=zap_id, order_id=order_id, host_ip=ip,
+                     duration_ms=duration_ms)
 
     phase2_results: list[dict[str, Any] | None] = [None] * len(scannable)
-    # ZAP has ONE daemon — parallel hosts cause context conflicts.
-    # Packages without ZAP (e.g. tlscompliance) can safely parallelize.
-    has_zap = any(t in (config.get("phase2_tools") or [])
-                  for t in ("zap_spider", "zap_active", "zap_passive"))
-    max_parallel_p2 = min(5, len(scannable)) if not has_zap else 1
+    if pool_enabled:
+        max_parallel_p2 = min(zap_pool.get_max_parallel_per_order(), len(scannable))
+    else:
+        # Legacy Mode: ZAP Singleton — parallel hosts cause context conflicts.
+        # Packages without ZAP (e.g. tlscompliance) can safely parallelize.
+        max_parallel_p2 = min(5, len(scannable)) if not has_zap else 1
     with ThreadPoolExecutor(max_workers=max_parallel_p2, thread_name_prefix="phase2") as pool:
         futures = {
             pool.submit(_run_phase2_host, idx, host, tp): idx
@@ -773,6 +846,14 @@ def main() -> None:
 
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
     redis_client = redis.from_url(redis_url)
+
+    # Register this container's ZAP pool membership at boot so newly added
+    # daemons (e.g. scaling from 2 to 4 ZAPs) are picked up on the next restart.
+    if os.environ.get("ZAP_POOL_ENABLED", "false").lower() == "true":
+        try:
+            zap_pool.init_zap_pool(redis_client)
+        except Exception as e:
+            log.warning("zap_pool_init_failed_at_startup", error=str(e))
 
     def shutdown(signum: int, frame: object) -> None:
         log.info("scan_worker_shutdown", signal=signum)

@@ -24,6 +24,44 @@ SECURITY_HEADERS = [
 ]
 
 
+def _waf_detected(tech_profile: dict[str, Any] | None) -> bool:
+    """True wenn Phase 1 einen WAF erkannt hat.
+
+    wafw00f schreibt den Treffer in tech_profile["waf"] (Liste oder str).
+    Spaetere Layer koennen ``waf_detected`` setzen — wir pruefen beides.
+    """
+    if not tech_profile:
+        return False
+    if tech_profile.get("waf_detected"):
+        return True
+    waf = tech_profile.get("waf")
+    if isinstance(waf, str):
+        return bool(waf.strip())
+    if isinstance(waf, list):
+        return any(w for w in waf if w)
+    return bool(waf)
+
+
+def should_parallelize_stage2(
+    adaptive_config: dict[str, Any] | None,
+    tech_profile: dict[str, Any] | None,
+) -> bool:
+    """Entscheidet, ob Stage 2 (ZAP Active + ffuf/ferox/wpscan) parallel laeuft.
+
+    Sequenziell bei WAF, bei AI-Policy ``waf-safe`` oder wenn der
+    PHASE2_STAGE2_WAF_SAFE-Kill-Switch deaktiviert ist (dann immer parallel).
+    Default der Env-Variable: ``true`` (defensiv).
+    """
+    flag = os.getenv("PHASE2_STAGE2_WAF_SAFE", "true").lower() == "true"
+    if not flag:
+        return True
+    if adaptive_config and adaptive_config.get("zap_scan_policy") == "waf-safe":
+        return False
+    if _waf_detected(tech_profile):
+        return False
+    return True
+
+
 def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
                       severity: str = "MEDIUM", tool_name: str = "testssl") -> Optional[list]:
     """Run a single testssl pass. Returns parsed JSON list or None."""
@@ -1119,8 +1157,11 @@ def run_phase2(
 
         return r
 
-    log.info("phase2_stage2_start", ip=ip, spider_urls=len(spider_urls))
-    with ThreadPoolExecutor(max_workers=4, thread_name_prefix="p2s2") as pool:
+    stage2_parallel = should_parallelize_stage2(adaptive_config, tech_profile)
+    stage2_workers = 4 if stage2_parallel else 1
+    log.info("phase2_stage2_start", ip=ip, spider_urls=len(spider_urls),
+             parallel=stage2_parallel, reason="waf_safe" if not stage2_parallel else "default")
+    with ThreadPoolExecutor(max_workers=stage2_workers, thread_name_prefix="p2s2") as pool:
         s2_futures = {
             pool.submit(_run_zap_active_stage2): "zap_active",
             pool.submit(_run_deep_scan_extras): "extras",
