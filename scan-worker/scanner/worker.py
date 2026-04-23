@@ -222,6 +222,15 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     log.info("scan_start", order_id=order_id, domain=domain)
     set_scan_started(order_id)
 
+    # Performance-Tracking: Dauer pro Phase in Millisekunden.
+    phase_durations_ms: dict[str, int] = {}
+    _phase_cursor = {"t": time.monotonic()}
+
+    def _phase_checkpoint(name: str) -> None:
+        now = time.monotonic()
+        phase_durations_ms[name] = int((now - _phase_cursor["t"]) * 1000)
+        _phase_cursor["t"] = now
+
     # ── Phase 0a: Passive Intelligence (no contact to target) ──
     from scanner.phase0a import run_phase0a, build_passive_intel_for_ai
 
@@ -244,6 +253,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         _save_passive_intel_summary(order_id, phase0a_results)
 
         _check_timeout()
+
+    _phase_checkpoint("phase0a")
 
     # ── Phase 0b: DNS Reconnaissance (active discovery) ────
     update_progress(order_id, "dns_recon", "starting")
@@ -390,6 +401,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         all_hosts_with_status.append(entry)
     set_discovered_hosts(order_id, {**host_inventory, "hosts": all_hosts_with_status})
 
+    _phase_checkpoint("phase0b")
+
     # ── Phase 1: Tech Detection (parallel, max 3 hosts) ─────
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -533,6 +546,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
         log.info("ai_phase2_configs_complete", order_id=order_id, configs=len(adaptive_configs))
 
+    _phase_checkpoint("phase1")
+
     # ── Phase 2: Deep Scan (parallel, max 3 hosts) ────────
     scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]
     scannable_total = len(scannable)
@@ -646,6 +661,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     # Filter out None entries
     phase2_results = [r for r in phase2_results if r is not None]
 
+    _phase_checkpoint("phase2")
+
     # ── Phase 3: Correlation & Enrichment ──────────────────
     phase3_result: dict[str, Any] = {}
     phase3_tools = config.get("phase3_tools", [])
@@ -688,9 +705,73 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         valid = summary.get("valid_findings", 0) if isinstance(summary, dict) else 0
         log.info("phase3_integrated", order_id=order_id, findings=valid)
 
+    _phase_checkpoint("phase3")
+
+    # Performance-Metriken fuer orders.performance_metrics (Migration 015).
+    performance_metrics = _build_performance_metrics(phase_durations_ms=phase_durations_ms)
+
     # ── Finalize ────────────────────────────────────────────
     _finalize(order_id, scan_dir, host_inventory, tech_profiles, package,
-              phase3_result=phase3_result)
+              phase3_result=phase3_result,
+              performance_metrics=performance_metrics)
+
+
+def _build_performance_metrics(phase_durations_ms: dict[str, int]) -> dict[str, Any]:
+    """Sammelt Scan-Performance-Metriken fuer orders.performance_metrics.
+
+    Quelle sind die lokalen Phasen-Timer sowie die Pool-Stats aus Redis
+    (falls ZAP_POOL_ENABLED aktiv war). Fehler beim Redis-Zugriff werden
+    leise verschluckt — fehlende Pool-Felder sind fuer die Migration 015
+    erlaubt (JSONB, kein NOT NULL).
+    """
+    pool_enabled = os.getenv("ZAP_POOL_ENABLED", "false").lower() == "true"
+    pool_members = zap_pool.get_pool_members() if pool_enabled else []
+    max_parallel_configured = zap_pool.get_max_parallel_per_order() if pool_enabled else 1
+
+    metrics: dict[str, Any] = {
+        "phase_durations_ms": phase_durations_ms,
+        "zap_pool_size": len(pool_members),
+        "zap_pool_enabled": pool_enabled,
+        "zap_max_parallel_per_order": max_parallel_configured,
+        "parallelism_effective": {
+            "phase1_max_workers": max(1, int(os.getenv("PHASE1_MAX_WORKERS", "3") or "3")),
+            "phase2_stage2_waf_safe_enabled":
+                os.getenv("PHASE2_STAGE2_WAF_SAFE", "true").lower() == "true",
+            "zap_pool_enabled": pool_enabled,
+        },
+    }
+
+    if pool_enabled:
+        try:
+            redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
+            rc = redis.from_url(redis_url)
+            samples = zap_pool.get_lease_wait_ms_samples(rc)
+            metrics["zap_leases_total"] = zap_pool.get_leases_total(rc)
+            if samples:
+                metrics["zap_avg_lease_wait_ms"] = int(sum(samples) / len(samples))
+                metrics["zap_max_lease_wait_ms"] = max(samples)
+            else:
+                metrics["zap_avg_lease_wait_ms"] = 0
+                metrics["zap_max_lease_wait_ms"] = 0
+        except Exception as e:
+            log.warning("performance_metrics_pool_read_failed", error=str(e))
+
+    return metrics
+
+
+def _persist_performance_metrics(order_id: str, metrics: dict[str, Any]) -> None:
+    """Schreibt orders.performance_metrics. Fehler loggen, nicht werfen."""
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE orders SET performance_metrics = %s::jsonb WHERE id = %s",
+                (json.dumps(metrics), order_id),
+            )
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        log.warning("performance_metrics_write_failed", order_id=order_id, error=str(e))
 
 
 def _finalize(
@@ -700,11 +781,14 @@ def _finalize(
     tech_profiles: list[dict[str, Any]],
     package: str = "perimeter",
     phase3_result: dict[str, Any] | None = None,
+    performance_metrics: dict[str, Any] | None = None,
 ) -> None:
     """Pack results, upload to MinIO, set status to pending_review.
 
     Report generation is NOT triggered here — it happens after admin approval.
     """
+    if performance_metrics is not None:
+        _persist_performance_metrics(order_id, performance_metrics)
     hosts_total = len(host_inventory.get("hosts", []))
 
     update_progress(order_id, "scan_complete", "uploading",
