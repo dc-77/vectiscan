@@ -28,8 +28,24 @@ class ZapError(Exception):
 class ZapClient:
     """ZAP daemon REST API client with context-based session isolation."""
 
-    def __init__(self, base_url: str | None = None):
-        self.base_url = (base_url or ZAP_BASE_URL).rstrip("/")
+    def __init__(
+        self,
+        base_url: str | None = None,
+        zap_id: str | None = None,
+    ):
+        """Connect to a ZAP daemon.
+
+        Precedence: explicit ``base_url`` > ``zap_id`` (pool mode) > env
+        ``ZAP_BASE_URL`` (legacy single-daemon mode).
+        """
+        if base_url:
+            resolved = base_url
+        elif zap_id:
+            resolved = f"http://{zap_id}:8090"
+        else:
+            resolved = ZAP_BASE_URL
+        self.base_url = resolved.rstrip("/")
+        self.zap_id = zap_id
         self.session = requests.Session()
         self.session.headers["Accept"] = "application/json"
 
@@ -101,6 +117,47 @@ class ZapClient:
             log.info("zap_context_removed", name=context_name)
         except ZapError as e:
             log.warning("zap_context_remove_failed", name=context_name, error=str(e))
+
+    def get_context_list(self) -> list[str]:
+        """List all context names that currently exist on the ZAP daemon."""
+        data = self._get("/JSON/context/view/contextList/")
+        raw = data.get("contextList", [])
+        # ZAP historically returns the list as a JSON-encoded string with brackets;
+        # modern builds return a proper list. Normalize both shapes.
+        if isinstance(raw, str):
+            stripped = raw.strip().lstrip("[").rstrip("]")
+            if not stripped:
+                return []
+            return [p.strip().strip('"').strip("'") for p in stripped.split(",") if p.strip()]
+        return [str(entry) for entry in raw]
+
+    def delete_context(self, context_name: str) -> None:
+        """Alias for ``remove_context`` used by the pool-cleanup path."""
+        self.remove_context(context_name)
+
+    def cleanup_stale_contexts(self, active_context_names: set[str]) -> int:
+        """Remove all ``ctx-*`` contexts that are not in ``active_context_names``.
+
+        Called at the start of every pool lease so a worker never inherits
+        contexts from a previous (crashed) lease on the same ZAP daemon.
+        Non-``ctx-`` contexts (default, manually created) are left alone.
+        """
+        deleted = 0
+        try:
+            contexts = self.get_context_list()
+        except ZapError as e:
+            log.warning("zap_context_list_failed", error=str(e))
+            return 0
+        for ctx_name in contexts:
+            if not ctx_name.startswith("ctx-"):
+                continue
+            if ctx_name in active_context_names:
+                continue
+            self.delete_context(ctx_name)
+            deleted += 1
+        if deleted:
+            log.info("zap_cleanup_performed", zap_id=self.zap_id, stale_contexts_deleted=deleted)
+        return deleted
 
     # ------------------------------------------------------------------
     # Traditional Spider

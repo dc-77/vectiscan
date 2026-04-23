@@ -261,3 +261,82 @@ class TestConcurrentContexts:
             ctx2 = zap.create_context("ctx-order2-10_0_0_1")
             assert ctx1 == 1
             assert ctx2 == 2
+
+
+# ---------------------------------------------------------------------------
+# Pool-mode constructor (zap_id resolves base URL)
+# ---------------------------------------------------------------------------
+
+class TestPoolConstructor:
+    def test_zap_id_builds_internal_url(self):
+        client = ZapClient(zap_id="zap-3")
+        assert client.base_url == "http://zap-3:8090"
+        assert client.zap_id == "zap-3"
+
+    def test_explicit_base_url_wins_over_zap_id(self):
+        client = ZapClient(base_url="http://custom:9090", zap_id="zap-3")
+        assert client.base_url == "http://custom:9090"
+
+
+# ---------------------------------------------------------------------------
+# cleanup_stale_contexts
+# ---------------------------------------------------------------------------
+
+class TestCleanupStaleContexts:
+    def test_removes_stale_ctx_contexts_only(self, zap):
+        listed = ["Default Context", "ctx-abcd1234-10_0_0_1", "ctx-ffeedd11-10_0_0_2"]
+        deleted: list[str] = []
+
+        def mock_get(path, params=None):
+            if "contextList" in path:
+                return {"contextList": listed}
+            if "removeContext" in path:
+                deleted.append(params["contextName"])
+                return {}
+            return {}
+
+        with patch.object(zap, "_get", side_effect=mock_get):
+            count = zap.cleanup_stale_contexts(active_context_names=set())
+        assert count == 2
+        assert "Default Context" not in deleted
+        assert set(deleted) == {"ctx-abcd1234-10_0_0_1", "ctx-ffeedd11-10_0_0_2"}
+
+    def test_keeps_active_contexts(self, zap):
+        listed = ["ctx-abcd1234-10_0_0_1", "ctx-ffeedd11-10_0_0_2"]
+        deleted: list[str] = []
+
+        def mock_get(path, params=None):
+            if "contextList" in path:
+                return {"contextList": listed}
+            if "removeContext" in path:
+                deleted.append(params["contextName"])
+                return {}
+            return {}
+
+        with patch.object(zap, "_get", side_effect=mock_get):
+            count = zap.cleanup_stale_contexts(
+                active_context_names={"ctx-abcd1234-10_0_0_1"}
+            )
+        assert count == 1
+        assert deleted == ["ctx-ffeedd11-10_0_0_2"]
+
+    def test_returns_zero_on_list_error(self, zap):
+        with patch.object(zap, "_get", side_effect=ZapError("unreachable")):
+            assert zap.cleanup_stale_contexts(active_context_names=set()) == 0
+
+    def test_parses_string_contextlist_shape(self, zap):
+        """Some ZAP builds return contextList as a JSON-encoded string."""
+        deleted: list[str] = []
+
+        def mock_get(path, params=None):
+            if "contextList" in path:
+                return {"contextList": '["ctx-aaaa-1_1_1_1", "Default Context"]'}
+            if "removeContext" in path:
+                deleted.append(params["contextName"])
+                return {}
+            return {}
+
+        with patch.object(zap, "_get", side_effect=mock_get):
+            count = zap.cleanup_stale_contexts(active_context_names=set())
+        assert count == 1
+        assert deleted == ["ctx-aaaa-1_1_1_1"]

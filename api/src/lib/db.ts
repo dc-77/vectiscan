@@ -21,6 +21,7 @@ const MIGRATION_011_PATH = path.join(__dirname, '..', 'migrations', '011_finding
 const MIGRATION_012_PATH = path.join(__dirname, '..', 'migrations', '012_subscriptions_review_workflow.sql');
 const MIGRATION_013_PATH = path.join(__dirname, '..', 'migrations', '013_company_name.sql');
 const MIGRATION_014_PATH = path.join(__dirname, '..', 'migrations', '014_multi_target.sql');
+const MIGRATION_015_PATH = path.join(__dirname, '..', 'migrations', '015_performance_metrics.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -172,6 +173,19 @@ export async function initDb(): Promise<void> {
 
   if (!multiTargetCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_014_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 015: performance_metrics JSONB on orders
+  const perfMetricsColCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.columns
+      WHERE table_name = 'orders' AND column_name = 'performance_metrics'
+    ) AS exists
+  `);
+
+  if (!perfMetricsColCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_015_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 
