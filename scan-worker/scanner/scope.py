@@ -43,16 +43,35 @@ def _conn():
 
 
 def load_approved_targets(order_id: str) -> list[ScanTarget]:
-    """Liefert alle approved scan_targets einer Order, in Eingabe-Reihenfolge."""
+    """Liefert alle fuer diesen Scan-Lauf in-scope Targets.
+
+    Bevorzugt `scan_run_targets` (Snapshot pro Scan-Lauf, funktioniert fuer
+    Single-Scan-Orders UND Abo-Rescans). Faellt auf direktes
+    `scan_targets.order_id` zurueck, falls kein Snapshot existiert (z.B.
+    aelterer Daten-Stand).
+    """
     with _conn() as conn, conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
         cur.execute(
-            """SELECT id, raw_input, canonical, target_type,
-                      discovery_policy, exclusions
-               FROM scan_targets
-               WHERE order_id = %s AND status = 'approved'
-               ORDER BY created_at""",
+            """SELECT t.id, t.raw_input, t.canonical, t.target_type,
+                      COALESCE(r.snapshot_discovery_policy, t.discovery_policy) AS discovery_policy,
+                      COALESCE(r.snapshot_exclusions, t.exclusions) AS exclusions
+               FROM scan_run_targets r
+               JOIN scan_targets t ON t.id = r.scan_target_id
+               WHERE r.order_id = %s AND r.in_scope = true
+               ORDER BY t.created_at""",
             (order_id,),
         )
+        rows = cur.fetchall()
+        if not rows:
+            cur.execute(
+                """SELECT id, raw_input, canonical, target_type,
+                          discovery_policy, exclusions
+                   FROM scan_targets
+                   WHERE order_id = %s AND status = 'approved'
+                   ORDER BY created_at""",
+                (order_id,),
+            )
+            rows = cur.fetchall()
         return [
             ScanTarget(
                 id=str(row["id"]),
@@ -62,7 +81,7 @@ def load_approved_targets(order_id: str) -> list[ScanTarget]:
                 discovery_policy=row["discovery_policy"],
                 exclusions=list(row["exclusions"] or []),
             )
-            for row in cur.fetchall()
+            for row in rows
         ]
 
 
