@@ -1,0 +1,4 @@
+# Test-Only Dependencies (nicht im Production-Image).
+# CI installiert via: pip install -r requirements.txt -r requirements-dev.txt
+pytest>=8.0.0
+fakeredis>=2.20.0
