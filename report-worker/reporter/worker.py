@@ -21,6 +21,7 @@ import structlog
 from minio import Minio
 
 from reporter.claude_client import call_claude
+from reporter.deterministic_pipeline import apply_deterministic_pipeline
 from reporter.generate_report import generate_report
 from reporter.parser import parse_scan_data
 from reporter.qa_check import run_qa_checks
@@ -107,21 +108,37 @@ def _create_report_record(
     findings_data: dict | None = None,
     version: int = 1,
     excluded_findings: list[str] | None = None,
+    policy_version: str | None = None,
+    policy_id_distinct: list[str] | None = None,
 ) -> tuple[str, str]:
-    """Insert a row into the reports table and return (report_id, download_token)."""
+    """Insert a row into the reports table and return (report_id, download_token).
+
+    policy_version + policy_id_distinct werden in den Audit-Spalten der
+    Migration 016 abgelegt. severity_counts wird automatisch via
+    BEFORE-INSERT-Trigger aus findings_data abgeleitet.
+    """
     download_token = str(uuid.uuid4())
     expires_at = datetime.now(timezone.utc) + timedelta(days=30)
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO reports (order_id, minio_bucket, minio_path, file_size_bytes,
-                                 download_token, expires_at, findings_data, version, excluded_findings)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO reports (
+                order_id, minio_bucket, minio_path, file_size_bytes,
+                download_token, expires_at, findings_data, version,
+                excluded_findings, policy_version, policy_id_distinct
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
-            (order_id, REPORTS_BUCKET, minio_path, file_size_bytes, download_token, expires_at,
-             json.dumps(findings_data) if findings_data else None,
-             version, json.dumps(excluded_findings) if excluded_findings else None),
+            (
+                order_id, REPORTS_BUCKET, minio_path, file_size_bytes,
+                download_token, expires_at,
+                json.dumps(findings_data) if findings_data else None,
+                version,
+                json.dumps(excluded_findings) if excluded_findings else None,
+                policy_version,
+                policy_id_distinct,  # psycopg2 maps Python list → TEXT[]
+            ),
         )
         report_id = cur.fetchone()[0]
     conn.commit()
@@ -437,7 +454,23 @@ def process_job(job_data: dict) -> None:
                      auto_fixes=qa_report.get("auto_fixes_applied", 0),
                      manual_review=qa_report.get("manual_review_needed", False))
 
-            # -- 4c. Recalculate overall_risk after QA corrections -----------------
+            # -- 4c. Deterministische Pipeline (Q2/2026 Determinismus) ---------
+            # Severity-Policy + Top-N-Selection ueberschreiben die Claude-
+            # Vorschlaege deterministisch. Spec: docs/deterministic/.
+            scan_context = {
+                "dns_records": effective_inventory.get("dns_findings") or {},
+                "tech_profiles": effective_profiles,
+                "enrichment": enrichment or {},
+                "host_inventory": effective_inventory,
+            }
+            apply_deterministic_pipeline(
+                claude_output,
+                package=package,
+                domain=domain,
+                scan_context=scan_context,
+            )
+
+            # -- 4d. Recalculate overall_risk after QA + Policy corrections ---
             _recalculate_overall_risk(claude_output)
 
         # -- 5. Map Claude output to report_data ------------------------------
@@ -502,11 +535,20 @@ def process_job(job_data: dict) -> None:
 
         # -- 8. Build findings_data and create report record in DB ---------------
         findings_data = _build_findings_data(claude_output, package, report_data)
+        # Audit-Felder aus deterministischer Pipeline
+        policy_version = claude_output.get("policy_version")
+        policy_ids_raw = claude_output.get("policy_id_distinct") or []
+        policy_id_distinct = [pid for pid in policy_ids_raw if pid] or None
         report_id, download_token = _create_report_record(
             conn, order_id, minio_pdf_path, file_size, findings_data,
             version=version, excluded_findings=excluded if excluded else None,
+            policy_version=policy_version,
+            policy_id_distinct=policy_id_distinct,
         )
-        log.info("report_record_created", report_id=report_id, download_token=download_token, version=version)
+        log.info("report_record_created", report_id=report_id,
+                 download_token=download_token, version=version,
+                 policy_version=policy_version,
+                 policy_id_count=len(policy_id_distinct or []))
 
         # -- 8b. Mark previous version as superseded --------------------------
         if version > 1:
