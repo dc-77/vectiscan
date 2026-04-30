@@ -69,6 +69,75 @@ from reporter.finding_type_mapper import annotate_finding_types, map_finding_typ
     # EOL
     ({"title": "End-of-life software detected"}, "software_eol"),
     ({"description": "PHP 5.6 is unsupported version"}, "software_eol"),
+
+    # ── Deutsche Claude-Output-Strings (Bug #2 Regression-Tests) ──
+    # WordPress Plugin/Theme
+    ({"title": "Slider Revolution — Authentifiziertes Arbitrary File Read"},
+     "wordpress_plugin_vulnerability"),
+    ({"title": "Unauthentifizierte Offenlegung privater Inhalte über Complianz-Plugin"},
+     "wordpress_plugin_vulnerability"),
+    ({"title": "Betheme — Mehrere Stored XSS und PHP Object Injection"},
+     "wordpress_plugin_vulnerability"),
+    ({"title": "Burst Statistics — Cross-Site Request Forgery"},
+     "wordpress_plugin_vulnerability"),
+    ({"title": "Yoast SEO authentifizierter SSRF"}, "wordpress_plugin_vulnerability"),
+    ({"description": "WooCommerce Plugin XSS Schwachstelle in Cart"},
+     "wordpress_plugin_vulnerability"),
+
+    # WordPress User-Enumeration / Login
+    ({"title": "WordPress-Login und Benutzerenumeration öffentlich zugänglich"},
+     "wordpress_user_enumeration"),
+    ({"title": "Generic User Enumeration via WP-JSON"}, "user_enumeration"),
+
+    # Server-Banner mit Version
+    ({"title": "Apache-Versionsinformation im Server-Header"},
+     "server_banner_with_version"),
+    ({"title": "PHP-Versionsinformation preisgegeben"}, "server_banner_with_version"),
+    ({"title": "OpenSSH-Version verraet System"}, "server_banner_with_version"),
+    ({"description": "Server-Header zeigt Version"}, "server_banner_with_version"),
+
+    # Cookie-Sicherheitsattribute (deutsch)
+    ({"title": "Cookie-Sicherheitsattribute fehlen auf Login-Seite"},
+     "cookie_no_secure"),
+    ({"title": "Secure-Flag fehlt auf Session-Cookie"}, "cookie_no_secure"),
+    ({"title": "HttpOnly-Attribut nicht gesetzt"}, "cookie_no_httponly"),
+    ({"title": "SameSite-Flag fehlt"}, "cookie_no_samesite"),
+
+    # Header (deutsch)
+    ({"title": "Fehlende Security-Header auf der Hauptdomain"}, "xfo_missing"),
+    ({"title": "X-Frame-Options nicht gesetzt"}, "xfo_missing"),
+    ({"title": "Clickjacking-Schutz fehlt"}, "xfo_missing"),
+    ({"title": "Content-Security-Policy nicht gesetzt"}, "csp_missing"),
+
+    # DMARC quarantine (war Lücke!)
+    ({"title": "DMARC-Policy auf 'quarantine' statt 'reject'"}, "dmarc_p_quarantine"),
+    ({"description": "DMARC p=quarantine konfiguriert"}, "dmarc_p_quarantine"),
+    ({"title": "DMARC-Policy auf 'none' — kein E-Mail-Spoofing-Schutz"},
+     "dmarc_p_none"),
+
+    # SPF (deutsch)
+    ({"title": "SPF mit Softfail (~all) statt Hardfail (-all)"}, "spf_softfail"),
+    ({"title": "Kein SPF-Record konfiguriert"}, "spf_missing"),
+
+    # DKIM (deutsch)
+    ({"title": "Fehlende DKIM-Konfiguration für E-Mail-Authentifizierung"},
+     "dkim_missing"),
+    ({"title": "Kein DKIM für E-Mail-Authentifizierung konfiguriert"},
+     "dkim_missing"),
+
+    # SSH
+    ({"title": "SSH auf nicht-standardmäßigem Port ohne erkennbaren Brute-Force-Schutz"},
+     "ssh_no_brute_force_protection"),
+
+    # TLS (deutsch)
+    ({"title": "TLS-Zertifikat abgelaufen"}, "tls_certificate_expired"),
+    ({"title": "Schwache Cipher-Suiten verfügbar"}, "tls_weak_cipher_suites"),
+
+    # Disclosure (deutsch)
+    ({"title": "Verzeichnis-Listing aktiv auf /uploads"},
+     "directory_listing_enabled"),
+    ({"description": "Stack-Trace in Fehlermeldung sichtbar"},
+     "error_message_with_stack"),
 ])
 def test_map_finding_type(finding, expected):
     assert map_finding_type(finding) == expected

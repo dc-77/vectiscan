@@ -534,6 +534,16 @@ SEVERITY_POLICIES: list[SeverityPolicy] = [
         references=["CWE-290"],
     ),
     SeverityPolicy(
+        policy_id="SP-DNS-010",
+        finding_type="dmarc_p_quarantine",
+        final_severity=Severity.LOW,
+        cvss_vector="AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+        cvss_score=3.7,
+        rationale="DMARC mit p=quarantine - Mail wird nur in Spam verschoben, "
+                  "nicht abgewiesen; teilweise Durchsetzung, aber nicht vollstaendig",
+        references=["CWE-290"],
+    ),
+    SeverityPolicy(
         policy_id="SP-DNS-008",
         finding_type="dkim_missing",
         matches_when={"mx_present": True},
@@ -621,6 +631,67 @@ SEVERITY_POLICIES: list[SeverityPolicy] = [
         cvss_score=7.5,
         rationale="WordPress mehrere Major-Versionen hinter Aktuell - bekannte RCE-Pfade",
         references=["CWE-1104"],
+    ),
+
+    # ----------------------------------------------------------------
+    # WORDPRESS PLUGIN- / THEME-VULNERABILITIES (SP-WP-*)
+    # Sammeltyp fuer alle bekannten WP-Plugin/Theme-Schwachstellen.
+    # CVSS bleibt offen (Original aus Tool-Output) — wir uebernehmen
+    # den vom Reporter bereits gesetzten Score, nur die Severity wird
+    # auf MEDIUM gecappt (typisch fuer Plugin-Findings ohne CVE-Kontext).
+    # KEV-/EPSS-Boost laufen separat ueber SP-CVE-001..003 wenn CVE-IDs
+    # vorliegen.
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-WP-001",
+        finding_type="wordpress_plugin_vulnerability",
+        final_severity=Severity.MEDIUM,
+        cvss_score=5.4,
+        rationale="WordPress-Plugin/Theme-Schwachstelle - typischerweise XSS, "
+                  "Object Injection oder Auth-Bypass. Schweregrad haengt von "
+                  "Plugin-Aktivitaet, Auth-Voraussetzungen und Patch-Stand ab; "
+                  "Default MEDIUM, Boost via KEV/EPSS bei zugeordnetem CVE.",
+        references=["CWE-1395", "OWASP2025-A06"],
+    ),
+    SeverityPolicy(
+        policy_id="SP-WP-002",
+        finding_type="wordpress_user_enumeration",
+        final_severity=Severity.LOW,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+        cvss_score=3.7,
+        rationale="WordPress-Login + User-Enumeration oeffentlich erreichbar - "
+                  "erleichtert Brute-Force gegen bekannte Username-Listen, aber "
+                  "kein direkter Zugriff",
+        references=["CWE-200", "CWE-203"],
+    ),
+
+    # ----------------------------------------------------------------
+    # GENERIC USER ENUMERATION (SP-ENUM-*)
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-ENUM-001",
+        finding_type="user_enumeration",
+        final_severity=Severity.LOW,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+        cvss_score=3.7,
+        rationale="Benutzer-Enumeration moeglich - Username-Listen ableitbar, "
+                  "Vorbereitung fuer Credential-Stuffing/Brute-Force",
+        references=["CWE-203", "CWE-200"],
+    ),
+
+    # ----------------------------------------------------------------
+    # SSH HARDENING (SP-SSH-*)
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-SSH-001",
+        finding_type="ssh_no_brute_force_protection",
+        final_severity=Severity.LOW,
+        cvss_vector="AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N",
+        cvss_score=3.9,
+        rationale="SSH ohne erkennbaren Brute-Force-Schutz (fail2ban / Rate-Limit) - "
+                  "Brute-Force-Angriffe moeglich, aber nur LOW weil "
+                  "Authentifizierung weiterhin erforderlich",
+        references=["CWE-307"],
     ),
 ]
 
