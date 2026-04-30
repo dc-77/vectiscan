@@ -10,8 +10,19 @@ from typing import Any
 import anthropic
 import structlog
 
+from reporter.ai_cache import (
+    cache_key as build_cache_key,
+    delete_cached,
+    get_cached_response,
+    set_cached_response,
+    stats_from_cache_entry,
+)
 from reporter.cwe_reference import correct_cwe_mappings
 from reporter.prompts import get_system_prompt
+
+# Cache-TTL fuer Reporter-Calls (Spec 03-ai-determinism.md §5: 1 Tag).
+REPORTER_CACHE_TTL_SECONDS = 24 * 3600
+REPORTER_CACHE_NAMESPACE = "reporter_v1"
 
 log = structlog.get_logger()
 
@@ -652,6 +663,17 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
     system_prompt = get_system_prompt(package)
     model = REPORT_MODELS.get(package, "claude-sonnet-4-6")
     max_tokens = MAX_TOKENS_BY_MODEL.get(model, 16384)
+    messages_payload = [{"role": "user", "content": user_prompt}]
+
+    # Cache-Key inkl. POLICY_VERSION → bei Policy-Bump automatische Invalidierung.
+    cache_k = build_cache_key(
+        model=model,
+        system=system_prompt,
+        messages=messages_payload,
+        temperature=0.0,
+        max_tokens=max_tokens,
+        namespace=REPORTER_CACHE_NAMESPACE,
+    )
 
     # Populate debug info (prompts are constant across retries)
     if debug_info is not None:
@@ -659,42 +681,76 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
         debug_info["user_prompt"] = user_prompt
         debug_info["package"] = package
         debug_info["domain"] = domain
+        debug_info["cache_key"] = cache_k[:24]
 
     # Retry logic: 5 attempts with exponential backoff for transient errors
     response_text: str | None = None
     json_text: str | None = None
     max_retries = 5
+    cache_hit_consumed = False  # markiert dass aktueller Versuch ein Cache-Hit ist
     for attempt in range(max_retries):
         try:
-            log.info("claude_api_call", attempt=attempt + 1, domain=domain)
-
-            # Opus needs more time for complex reports (32K tokens output)
-            api_timeout = 600.0 if "opus" in model else 120.0
-
-            response = client.messages.create(
-                model=model,
-                max_tokens=max_tokens,
-                system=system_prompt,
-                messages=[{"role": "user", "content": user_prompt}],
-                timeout=api_timeout,
+            # Cache-Lookup nur beim ERSTEN Versuch — bei JSON-Parse-Fehler
+            # invalidieren wir und greifen ab da live durch.
+            cache_entry = (
+                get_cached_response(cache_k)
+                if attempt == 0 and not cache_hit_consumed
+                else None
             )
 
-            # Extract text from response
-            response_text = response.content[0].text
-            stop_reason = response.stop_reason  # "end_turn" or "max_tokens"
+            if cache_entry is not None:
+                cache_hit_consumed = True
+                response_text = cache_entry.get("response_text", "")
+                stop_reason = "end_turn"  # gecachte Antworten waren komplett
+                input_tokens = int(cache_entry.get("input_tokens", 0) or 0)
+                output_tokens = int(cache_entry.get("output_tokens", 0) or 0)
+                stats = stats_from_cache_entry(cache_entry, model)
+                prices = AI_PRICING.get(model, {"input": 3.0, "output": 15.0})
+                cost_info = {
+                    "model": model,
+                    "input_tokens": input_tokens,
+                    "output_tokens": output_tokens,
+                    "input_cost_usd": round((input_tokens / 1_000_000) * prices["input"], 4),
+                    "output_cost_usd": round((output_tokens / 1_000_000) * prices["output"], 4),
+                    "total_cost_usd": round(stats.cost_estimated_usd, 4),
+                    "cache_hit": True,
+                    "cache_age_seconds": stats.age_seconds,
+                }
+                log.info("claude_cache_hit", domain=domain, model=model,
+                         age_s=round(stats.age_seconds or 0, 1))
+            else:
+                log.info("claude_api_call", attempt=attempt + 1, domain=domain,
+                         cache_hit=False)
 
-            # Token cost tracking
-            input_tokens = response.usage.input_tokens
-            output_tokens = response.usage.output_tokens
-            prices = AI_PRICING.get(model, {"input": 3.0, "output": 15.0})
-            cost_info = {
-                "model": model,
-                "input_tokens": input_tokens,
-                "output_tokens": output_tokens,
-                "input_cost_usd": round((input_tokens / 1_000_000) * prices["input"], 4),
-                "output_cost_usd": round((output_tokens / 1_000_000) * prices["output"], 4),
-                "total_cost_usd": round((input_tokens / 1_000_000) * prices["input"] + (output_tokens / 1_000_000) * prices["output"], 4),
-            }
+                # Opus needs more time for complex reports (32K tokens output)
+                api_timeout = 600.0 if "opus" in model else 120.0
+
+                response = client.messages.create(
+                    model=model,
+                    max_tokens=max_tokens,
+                    system=system_prompt,
+                    messages=messages_payload,
+                    temperature=0.0,
+                    timeout=api_timeout,
+                )
+
+                # Extract text from response
+                response_text = response.content[0].text
+                stop_reason = response.stop_reason  # "end_turn" or "max_tokens"
+
+                # Token cost tracking
+                input_tokens = response.usage.input_tokens
+                output_tokens = response.usage.output_tokens
+                prices = AI_PRICING.get(model, {"input": 3.0, "output": 15.0})
+                cost_info = {
+                    "model": model,
+                    "input_tokens": input_tokens,
+                    "output_tokens": output_tokens,
+                    "input_cost_usd": round((input_tokens / 1_000_000) * prices["input"], 4),
+                    "output_cost_usd": round((output_tokens / 1_000_000) * prices["output"], 4),
+                    "total_cost_usd": round((input_tokens / 1_000_000) * prices["input"] + (output_tokens / 1_000_000) * prices["output"], 4),
+                    "cache_hit": False,
+                }
             log.info("claude_cost", **cost_info)
 
             if debug_info is not None:
@@ -735,6 +791,17 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 findings=len(result.get("findings", [])),
                 positive=len(result.get("positive_findings", [])),
             )
+            # Cache-Write nur bei Live-Call und erfolgreichem Parse.
+            if not cost_info.get("cache_hit") and response_text:
+                set_cached_response(
+                    cache_k,
+                    response_text=response_text,
+                    model=model,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    cache_ttl_seconds=REPORTER_CACHE_TTL_SECONDS,
+                )
+
             # Post-process validation pipeline:
             # 1. Cap implausible scores (e.g. robots.txt with CVSS 7.0)
             result = cap_implausible_scores(result)
@@ -767,6 +834,13 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 )
 
         except json.JSONDecodeError as e:
+            # Wenn der aktuelle Versuch ein Cache-Hit war, ist die gecachte
+            # Antwort defekt — invalidieren und im naechsten Versuch live gehen.
+            if cache_hit_consumed:
+                log.warning("claude_cache_invalidate_corrupt",
+                            attempt=attempt + 1, error=str(e))
+                delete_cached(cache_k)
+                cache_hit_consumed = False  # zwingt naechsten Versuch zu live
             # Log context around the parse error position for debugging
             err_ctx = ""
             if json_text and e.pos is not None:

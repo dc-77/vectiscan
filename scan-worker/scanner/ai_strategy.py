@@ -15,16 +15,23 @@ from typing import Any
 
 import structlog
 
+from scanner.ai_cache import (
+    AI_PRICING,
+    CacheStats,
+    cached_call,
+    extract_text,
+)
+
 log = structlog.get_logger()
 
 HAIKU_MODEL = "claude-haiku-4-5-20251001"
 SONNET_MODEL = "claude-sonnet-4-6"
 
-AI_PRICING: dict[str, dict[str, float]] = {
-    "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},
-    "claude-sonnet-4-6": {"input": 3.0, "output": 15.0},
-    "claude-opus-4-6": {"input": 15.0, "output": 75.0},
-}
+# Cache-TTLs pro Namespace (Spec 03-ai-determinism.md §5)
+CACHE_TTL_HOST_STRATEGY = 7 * 24 * 3600     # 7 Tage
+CACHE_TTL_TECH_ANALYSIS = 30 * 24 * 3600    # 30 Tage (CMS-Detection ist stabil)
+CACHE_TTL_PHASE2_CONFIG = 7 * 24 * 3600     # 7 Tage
+CACHE_TTL_PHASE3 = 24 * 3600                # 1 Tag (Findings-Liste aendert sich oft)
 
 
 def _save_ai_debug(
@@ -62,64 +69,73 @@ def _save_ai_debug(
 # Haiku client
 # ---------------------------------------------------------------------------
 
-def _call_haiku(system_prompt: str, user_prompt: str) -> dict[str, Any]:
-    """Call Claude Haiku and return parsed JSON response.
+def _strip_markdown_fences(text: str) -> str:
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+    if text.endswith("```"):
+        text = text.rsplit("```", 1)[0]
+    return text.strip()
+
+
+def _build_cost_dict(model: str, stats: CacheStats) -> dict[str, Any]:
+    return {
+        "model": model,
+        "input_tokens": stats.input_tokens,
+        "output_tokens": stats.output_tokens,
+        "total_cost_usd": round(stats.cost_estimated_usd, 4),
+        "cache_hit": stats.hit,
+        "cache_age_seconds": stats.age_seconds,
+        "cache_key": stats.cache_key_short,
+    }
+
+
+def _call_haiku(system_prompt: str, user_prompt: str,
+                cache_namespace: str = "haiku_default",
+                cache_ttl_seconds: int = 24 * 3600) -> dict[str, Any]:
+    """Cached Haiku-Call mit temperature=0.
 
     On failure, returns {"_error": "reason"} so callers can include the
     specific error in fallback reasoning shown to the user.
+
+    Caller-Vertrag (unveraendert):
+      - parsed["_raw"]  : roher Antwort-Text (auch bei JSON-Parse-Fehler)
+      - parsed["_cost"] : {model, input_tokens, output_tokens, total_cost_usd, cache_hit, ...}
     """
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        log.warning("ai_strategy_no_api_key", msg="ANTHROPIC_API_KEY not set, skipping AI strategy")
-        return {"_error": "ANTHROPIC_API_KEY nicht gesetzt"}
-
     raw = ""
+    start = time.monotonic()
+    response_dict, stats = cached_call(
+        model=HAIKU_MODEL,
+        system=system_prompt,
+        messages=[{"role": "user", "content": user_prompt}],
+        temperature=0.0,
+        max_tokens=8192,
+        cache_ttl_seconds=cache_ttl_seconds,
+        cache_namespace=cache_namespace,
+    )
+    duration_ms = int((time.monotonic() - start) * 1000)
+
+    if "_error" in response_dict:
+        return {"_error": response_dict["_error"], "_raw": ""}
+
+    raw = extract_text(response_dict)
+    log.info("haiku_response",
+             namespace=cache_namespace,
+             cache_hit=stats.hit,
+             duration_ms=duration_ms,
+             tokens=stats.output_tokens)
+
+    text = _strip_markdown_fences(raw)
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=api_key)
-
-        start = time.monotonic()
-        response = client.messages.create(
-            model=HAIKU_MODEL,
-            max_tokens=8192,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
-        )
-        duration_ms = int((time.monotonic() - start) * 1000)
-
-        raw = response.content[0].text
-        log.info("haiku_response", duration_ms=duration_ms, tokens=response.usage.output_tokens)
-
-        # Cost tracking
-        prices = AI_PRICING.get(HAIKU_MODEL, {"input": 1.0, "output": 5.0})
-        input_tokens = response.usage.input_tokens
-        output_tokens = response.usage.output_tokens
-        cost = round((input_tokens / 1_000_000) * prices["input"] + (output_tokens / 1_000_000) * prices["output"], 4)
-
-        # Strip markdown code fences if present
-        text = raw.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-        if text.endswith("```"):
-            text = text.rsplit("```", 1)[0]
-        text = text.strip()
-
         parsed = json.loads(text)
-        parsed["_raw"] = raw  # Preserve raw response for debug transparency
-        parsed["_cost"] = {
-            "model": HAIKU_MODEL,
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-            "total_cost_usd": cost,
-        }
-        return parsed
-
     except json.JSONDecodeError as e:
-        log.error("haiku_json_parse_error", error=str(e), raw=raw[:500])
+        log.error("haiku_json_parse_error",
+                  namespace=cache_namespace, error=str(e), raw=raw[:500])
         return {"_error": f"JSON-Parse-Fehler: {e}", "_raw": raw}
-    except Exception as e:
-        log.error("haiku_call_error", error=str(e))
-        return {"_error": f"API-Fehler: {e}", "_raw": raw}
+
+    parsed["_raw"] = raw
+    parsed["_cost"] = _build_cost_dict(HAIKU_MODEL, stats)
+    return parsed
 
 
 # ---------------------------------------------------------------------------
@@ -214,7 +230,11 @@ Entscheide für jeden Host: scan oder skip?
 Antwort im Format:
 {HOST_STRATEGY_SCHEMA}"""
 
-    result = _call_haiku(HOST_STRATEGY_SYSTEM, user_prompt)
+    result = _call_haiku(
+        HOST_STRATEGY_SYSTEM, user_prompt,
+        cache_namespace="ki1_host_strategy",
+        cache_ttl_seconds=CACHE_TTL_HOST_STRATEGY,
+    )
 
     # Save full AI debug (system prompt + user prompt + raw response)
     cost = result.get("_cost")
@@ -325,7 +345,11 @@ Korrigiere die CMS-Erkennung für jeden Host.
 Antwort im Format:
 {TECH_ANALYSIS_SCHEMA}"""
 
-    result = _call_haiku(TECH_ANALYSIS_SYSTEM, user_prompt)
+    result = _call_haiku(
+        TECH_ANALYSIS_SYSTEM, user_prompt,
+        cache_namespace="ki2_tech_analysis",
+        cache_ttl_seconds=CACHE_TTL_TECH_ANALYSIS,
+    )
 
     # Save full AI debug
     cost = result.get("_cost")
@@ -459,7 +483,11 @@ Konfiguriere die Phase-2-Tools optimal für diesen Host.
 Antwort im Format:
 {PHASE2_CONFIG_SCHEMA}"""
 
-    result = _call_haiku(PHASE2_CONFIG_SYSTEM, user_prompt)
+    result = _call_haiku(
+        PHASE2_CONFIG_SYSTEM, user_prompt,
+        cache_namespace="ki3_phase2_config",
+        cache_ttl_seconds=CACHE_TTL_PHASE2_CONFIG,
+    )
 
     # Save full AI debug
     cost = result.get("_cost")
@@ -503,117 +531,84 @@ Antwort im Format:
 # Sonnet client (for Phase 3 cross-tool reasoning)
 # ---------------------------------------------------------------------------
 
-def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384) -> dict[str, Any]:
-    """Call Claude Sonnet for complex reasoning tasks.
+def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384,
+                 cache_namespace: str = "sonnet_default",
+                 cache_ttl_seconds: int = 24 * 3600) -> dict[str, Any]:
+    """Cached Sonnet-Call mit temperature=0.
 
     Used for Phase 3 cross-tool correlation where Haiku's reasoning
     capability is insufficient.
     """
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        log.warning("ai_sonnet_no_api_key")
-        return {"_error": "ANTHROPIC_API_KEY nicht gesetzt"}
-
     raw = ""
+    start = time.monotonic()
+    response_dict, stats = cached_call(
+        model=SONNET_MODEL,
+        system=system_prompt,
+        messages=[{"role": "user", "content": user_prompt}],
+        temperature=0.0,
+        max_tokens=max_tokens,
+        cache_ttl_seconds=cache_ttl_seconds,
+        cache_namespace=cache_namespace,
+    )
+    duration_ms = int((time.monotonic() - start) * 1000)
+
+    if "_error" in response_dict:
+        return {"_error": response_dict["_error"], "_raw": ""}
+
+    raw = extract_text(response_dict)
+    log.info("sonnet_response",
+             namespace=cache_namespace,
+             cache_hit=stats.hit,
+             duration_ms=duration_ms,
+             tokens=stats.output_tokens)
+
+    text = _strip_markdown_fences(raw)
     try:
-        import anthropic
-        client = anthropic.Anthropic(api_key=api_key)
-
-        start = time.monotonic()
-        response = client.messages.create(
-            model=SONNET_MODEL,
-            max_tokens=max_tokens,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
-        )
-        duration_ms = int((time.monotonic() - start) * 1000)
-
-        raw = response.content[0].text
-        log.info("sonnet_response", duration_ms=duration_ms,
-                 tokens=response.usage.output_tokens)
-
-        # Cost tracking
-        prices = AI_PRICING.get(SONNET_MODEL, {"input": 3.0, "output": 15.0})
-        input_tokens = response.usage.input_tokens
-        output_tokens = response.usage.output_tokens
-        cost = round((input_tokens / 1_000_000) * prices["input"] + (output_tokens / 1_000_000) * prices["output"], 4)
-
-        # Strip markdown code fences if present
-        text = raw.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-        if text.endswith("```"):
-            text = text.rsplit("```", 1)[0]
-        text = text.strip()
-
         parsed = json.loads(text)
-        parsed["_raw"] = raw
-        parsed["_cost"] = {
-            "model": SONNET_MODEL,
-            "input_tokens": input_tokens,
-            "output_tokens": output_tokens,
-            "total_cost_usd": cost,
-        }
-        return parsed
-
     except json.JSONDecodeError as e:
-        log.error("sonnet_json_parse_error", error=str(e), raw=raw[:500])
+        log.error("sonnet_json_parse_error",
+                  namespace=cache_namespace, error=str(e), raw=raw[:500])
         return {"_error": f"JSON-Parse-Fehler: {e}", "_raw": raw}
-    except Exception as e:
-        log.error("sonnet_call_error", error=str(e))
-        return {"_error": f"API-Fehler: {e}", "_raw": raw}
+
+    parsed["_raw"] = raw
+    parsed["_cost"] = _build_cost_dict(SONNET_MODEL, stats)
+    return parsed
 
 
 # ---------------------------------------------------------------------------
 # Phase 3 Prioritization (after Phase 2, uses Sonnet)
 # ---------------------------------------------------------------------------
 
-PHASE3_SYSTEM = """Du bist ein Senior-Pentester der Findings aus verschiedenen Security-Scanning-Tools analysiert.
+PHASE3_SYSTEM = """Du bist ein Senior-Pentester. Du analysierst aggregierte Findings aus mehreren Security-Scanning-Tools.
 
-AUFGABE:
-Analysiere die aggregierten Findings und entscheide:
-1. Welche Findings haben hohe Konfidenz? (von mehreren Tools bestätigt, Version passt)
-2. Welche Findings haben niedrige Konfidenz? (nur ein Tool, kein Kontext)
-3. Welche Findings sind wahrscheinlich False Positives? (Version-Mismatch, WAF-Artefakt, CMS-Mismatch)
+DEINE EINZIGE AUFGABE:
+Pro Finding einen Confidence-Score (0.0–1.0) und eine Liste der bestaetigenden Tools/Signale vergeben.
 
-KONFIDENZ-REGELN:
-- Gleiche CVE aus mehreren Tools → hohe Konfidenz
-- ZAP-Finding + passende Service-Version aus nmap → hohe Konfidenz
-- ZAP-Finding für falsche Technologie (z.B. WordPress-spezifisch auf Shopware-Site) → False Positive
-- testssl-Finding + ZAP-SSL-Finding → merge zu einem Finding
-- wpscan-Finding + ZAP-Finding für gleiche Schwachstelle → hohe Konfidenz
+CONFIDENCE-REGELN:
+- Gleiche CVE aus mehreren Tools  → 0.90 – 1.00
+- ZAP-Finding + passende Service-Version aus nmap  → 0.85 – 0.95
+- testssl + ZAP fuer gleiche TLS-Schwaeche  → 0.85 – 0.95
+- wpscan + ZAP fuer gleiche WordPress-Schwaeche  → 0.85 – 0.95
+- Nur ein Tool, kein zusaetzlicher Kontext  → 0.40 – 0.60
+- Tool-Disagreement (z.B. ZAP meldet WordPress, Tech-Profile zeigt Shopware)  → 0.20 – 0.40
 
-PRIORISIERUNG:
-- Findings mit CVSS ≥ 9.0 → immer "high" Priorität
-- Findings mit aktiven Exploits → immer "high" Priorität
-- Informational-Findings ohne Sicherheitswert → "low" Priorität
+VERBOTEN (macht andere Stellen):
+- KEINE False-Positive-Markierung — das macht der deterministische FP-Filter (fp_filter.py).
+- KEINE Severity-Anpassung — das macht die Severity-Policy (severity_policy.py).
+- KEINE Finding-Auswahl / Priorisierung — das macht selection.py.
 
 Antworte NUR mit validem JSON, kein anderer Text."""
 
 PHASE3_SCHEMA = """{
-  "high_confidence_findings": [
+  "confidence_scores": [
     {
-      "finding_ref": "tool:title or CVE-ID",
+      "finding_ref": "tool:title  ODER  CVE-ID",
       "confidence": 0.95,
-      "corroboration": ["tool1_match", "version_confirmed"],
-      "enrich_priority": "high"
+      "corroboration": ["nmap_version_match", "shodan_confirmed"],
+      "reason": "Kurze Begruendung warum dieser Score"
     }
   ],
-  "low_confidence_findings": [
-    {
-      "finding_ref": "tool:title or CVE-ID",
-      "confidence": 0.3,
-      "reason": "Nur ein Tool, keine Bestätigung",
-      "enrich_priority": "low"
-    }
-  ],
-  "potential_false_positives": [
-    {
-      "finding_ref": "tool:title or CVE-ID",
-      "reason": "Version-Mismatch: Finding für nginx 1.18, aber nmap erkennt 1.24"
-    }
-  ],
-  "strategy_notes": "Zusammenfassung der Korrelationsanalyse"
+  "strategy_notes": "Kurze Zusammenfassung der Cross-Tool-Korrelation"
 }"""
 
 
@@ -645,11 +640,15 @@ Tech-Profiles der gescannten Hosts:
 
 WAF erkannt: {"Ja" if has_waf else "Nein"}
 
-Analysiere die Findings: Welche sind echt, welche sind False Positives?
+Vergib pro Finding einen Confidence-Score und liste die bestaetigenden Tools/Signale.
 Antwort im Format:
 {PHASE3_SCHEMA}"""
 
-    result = _call_sonnet(PHASE3_SYSTEM, user_prompt)
+    result = _call_sonnet(
+        PHASE3_SYSTEM, user_prompt,
+        cache_namespace="ki4_phase3",
+        cache_ttl_seconds=CACHE_TTL_PHASE3,
+    )
 
     # Save full AI debug
     cost = result.get("_cost")
@@ -659,20 +658,16 @@ Antwort im Format:
                         result.get("_raw", ""), result, cost=cost)
 
     error_detail = result.get("_error", "")
-    if not result or "high_confidence_findings" not in result:
+    if not result or "confidence_scores" not in result:
         reason = error_detail or "Ungültige KI-Antwort"
         log.warning("ai_phase3_fallback", reason=reason)
         return {
-            "high_confidence_findings": [],
-            "low_confidence_findings": [],
-            "potential_false_positives": [],
+            "confidence_scores": [],
             "strategy_notes": f"Fallback: programmatische Korrelation ({reason})",
         }
 
-    high = len(result.get("high_confidence_findings", []))
-    low = len(result.get("low_confidence_findings", []))
-    fp = len(result.get("potential_false_positives", []))
-    log.info("ai_phase3_complete", high=high, low=low, fp=fp)
+    n = len(result.get("confidence_scores", []))
+    log.info("ai_phase3_complete", confidence_scores=n)
 
     # Strip internal keys before return
     result.pop("_raw", None)

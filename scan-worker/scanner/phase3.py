@@ -140,7 +140,10 @@ def run_phase3(
     )
     correlated = correlator.correlate(all_findings)
 
-    # ── Step 4: AI Phase-3 Prioritization (Sonnet) ───────────
+    # ── Step 4: AI Phase-3 Confidence Boost (Sonnet) ─────────
+    # Hinweis (Q2/2026 Determinismus): KI #4 ist auf reinen Confidence-Boost
+    # reduziert. Sie setzt KEINE FP-Marker mehr (das macht fp_filter.py) und
+    # passt KEINE Severities an (das macht severity_policy.py im Reporter).
     ai_prioritization: dict[str, Any] = {}
     if len(correlated) > 5:  # Only worth calling AI for non-trivial finding sets
         progress_callback(order_id, "correlation", "ai_prioritization")
@@ -149,17 +152,26 @@ def run_phase3(
             finding_summary, tech_profiles, has_waf, order_id=order_id,
         )
 
-        # Apply AI FP suggestions to correlated findings
-        ai_fps = {fp.get("finding_ref", ""): fp.get("reason", "")
-                  for fp in ai_prioritization.get("potential_false_positives", [])}
+        # Apply confidence scores to correlated findings (KEIN FP-Marker mehr).
+        confidence_lookup: dict[str, dict[str, Any]] = {}
+        for entry in ai_prioritization.get("confidence_scores", []):
+            ref = entry.get("finding_ref", "")
+            if ref:
+                confidence_lookup[ref] = entry
+
         for cf in correlated:
             ref = f"{cf.primary.tool}:{cf.primary.title}"
             cve_ref = cf.primary.cve_id or ""
-            if ref in ai_fps or cve_ref in ai_fps:
-                reason = ai_fps.get(ref) or ai_fps.get(cve_ref, "")
-                if not cf.is_false_positive:  # Don't override programmatic FP
-                    cf.is_false_positive = True
-                    cf.fp_reason = f"AI: {reason}"
+            entry = confidence_lookup.get(ref) or confidence_lookup.get(cve_ref)
+            if not entry:
+                continue
+            new_conf = entry.get("confidence")
+            if isinstance(new_conf, (int, float)):
+                # Boost only — never reduce confidence below current value
+                cf.confidence = max(cf.confidence or 0.0, float(new_conf))
+            corroboration = entry.get("corroboration") or []
+            if corroboration:
+                cf.enrichment.setdefault("ai_corroboration", corroboration)
 
     # ── Step 5: False-Positive Filter ────────────────────────
     if "fp_filter" in phase3_tools:
