@@ -277,12 +277,12 @@ ops-findings-audit:
 
       \echo === FINDINGS_DATA ARRAY-LAENGE STATS ===
       SELECT
-        round(avg(jsonb_array_length(findings_data))::numeric, 1) AS avg_findings_per_report,
-        min(jsonb_array_length(findings_data)) AS min_findings,
-        max(jsonb_array_length(findings_data)) AS max_findings,
+        round(avg(jsonb_array_length(findings_data->'findings'))::numeric, 1) AS avg_findings_per_report,
+        min(jsonb_array_length(findings_data->'findings')) AS min_findings,
+        max(jsonb_array_length(findings_data->'findings')) AS max_findings,
         count(*) AS reports
       FROM reports
-      WHERE jsonb_typeof(findings_data) = 'array';
+      WHERE jsonb_typeof(findings_data->'findings') = 'array';
 
       \echo === POSITIVE FINDINGS (positive_findings JSONB-Array) ===
       SELECT
@@ -298,9 +298,9 @@ ops-findings-audit:
       SELECT
         r.id::text AS report_id,
         o.target_url,
-        jsonb_path_query_first(r.findings_data, '$[0].title') AS first_finding_title,
-        jsonb_path_query_first(r.findings_data, '$[0].severity') AS first_finding_severity,
-        jsonb_path_query_first(r.findings_data, '$[0].policy_id') AS first_finding_policy
+        jsonb_path_query_first(r.findings_data->'findings', '$[0].title')    AS first_finding_title,
+        jsonb_path_query_first(r.findings_data->'findings', '$[0].severity') AS first_finding_severity,
+        jsonb_path_query_first(r.findings_data->'findings', '$[0].policy_id') AS first_finding_policy
       FROM reports r
       LEFT JOIN orders o ON o.id = r.order_id
       WHERE r.policy_version IS NOT NULL
