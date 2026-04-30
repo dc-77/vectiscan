@@ -17,6 +17,7 @@ stages:
   - scan
   - test
   - deploy
+  - ops
 
 # =============================================================================
 # BUILD STAGE — Build & push Docker images for all four services
@@ -188,13 +189,27 @@ deploy-manual:
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
 
-rollback:
-  stage: deploy
+# =============================================================================
+# OPS STAGE — manuelle Operations-Jobs
+# =============================================================================
+# Liegt nach `deploy` in einer eigenen Stage, damit die Pipeline regulaer als
+# "passed" durchlaeuft (kein "blocked"-Status durch wartende manuelle Jobs).
+# Alle Jobs hier sind `when: manual` + `allow_failure: true` — werden nie
+# automatisch ausgefuehrt und blockieren den Pipeline-Status nicht.
+# =============================================================================
+
+.ops-base:
+  stage: ops
   tags: [vectigal]
   when: manual
+  allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_PIPELINE_SOURCE == "web"
+
+# Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
+rollback:
+  extends: .ops-base
   script:
     - cd ${DEPLOY_PATH}
     - cp docker-compose.yml.bak docker-compose.yml
@@ -215,24 +230,18 @@ rollback:
 # Erhalten bleiben users, customers, verified_domains, Schema.
 #
 # Nutzung:
-#   1. In GitLab: Pipeline starten (Web-UI) ODER auf einer existierenden
-#      main-Pipeline den Job manuell ausloesen.
-#   2. Variable CLEANUP_CONFIRM=vectiscan-prod muss in der Pipeline-Run-Form
-#      gesetzt werden — sonst bricht der Job mit Hinweis ab.
-#      (Schuetzt davor dass jemand den Job versehentlich klickt.)
-#   3. Optional: CLEANUP_NO_BACKUP=true ueberspringt das pg_dump-Backup.
+#   1. Auf einer main-Pipeline in der GitLab-UI den `cleanup-prod`-Job
+#      ausloesen UND die Job-Variable CLEANUP_CONFIRM=vectiscan-prod setzen
+#      (Variable im "Run job"-Dialog eintragen).
+#   2. Optional: CLEANUP_NO_BACKUP=true ueberspringt das pg_dump-Backup.
+#   3. Ohne CLEANUP_CONFIRM bricht der Job sofort mit Hinweis ab — Schutz
+#      vor versehentlichem Klick.
 #
 # Spec: docs/deterministic/01-cleanup.md, 99-CUTOVER.md
 # =============================================================================
 
 cleanup-prod:
-  stage: deploy
-  tags: [vectigal]
-  when: manual
-  allow_failure: false
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_PIPELINE_SOURCE == "web"
+  extends: .ops-base
   variables:
     # Override per Pipeline-Run via CI/CD-Variables.
     CLEANUP_CONFIRM: ""

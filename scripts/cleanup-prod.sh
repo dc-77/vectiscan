@@ -117,10 +117,24 @@ if [[ ! -f "$ENV_FILE" ]]; then
     exit 1
 fi
 
-set -a
-# shellcheck disable=SC1090
-source "$ENV_FILE"
-set +a
+# .env zeilenweise parsen — KEIN `source`, weil bash sonst Werte mit
+# Dollar-Zeichen (z.B. crypt-Hashes, Tokens mit $6$) als Variable-Refs
+# expandiert und unter `set -u` mit "Variable nicht gesetzt" abbricht.
+while IFS= read -r _line || [[ -n "$_line" ]]; do
+    # Kommentare / Leerzeilen ueberspringen
+    [[ -z "$_line" || "$_line" =~ ^[[:space:]]*# ]] && continue
+    # Erstes "=" trennt key vom value
+    _key="${_line%%=*}"
+    _val="${_line#*=}"
+    # Whitespace trimmen, optionale aussere Quotes entfernen
+    _key="${_key#"${_key%%[![:space:]]*}"}"
+    _key="${_key%"${_key##*[![:space:]]}"}"
+    [[ -z "$_key" ]] && continue
+    if [[ "$_val" =~ ^\".*\"$ ]]; then _val="${_val:1:-1}"; fi
+    if [[ "$_val" =~ ^\'.*\'$ ]]; then _val="${_val:1:-1}"; fi
+    export "$_key=$_val"
+done < "$ENV_FILE"
+unset _line _key _val
 
 DB_NAME="${POSTGRES_DB:-vectiscan}"
 DB_USER="${POSTGRES_USER:-vectiscan}"
