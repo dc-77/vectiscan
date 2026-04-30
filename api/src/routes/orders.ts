@@ -739,7 +739,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const result = await query(
-      'SELECT findings_data FROM reports WHERE order_id = $1 LIMIT 1',
+      `SELECT findings_data,
+              policy_version,
+              policy_id_distinct,
+              severity_counts AS audit_severity_counts
+         FROM reports
+        WHERE order_id = $1
+        ORDER BY created_at DESC
+        LIMIT 1`,
       [id],
     );
     if (result.rows.length === 0 || !(result.rows[0] as Record<string, unknown>).findings_data) {
@@ -760,11 +767,16 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       // finding_exclusions table doesn't exist yet — skip
     }
 
-    const findingsData = (result.rows[0] as Record<string, unknown>).findings_data as Record<string, unknown>;
+    const row = result.rows[0] as Record<string, unknown>;
+    const findingsData = row.findings_data as Record<string, unknown>;
     return {
       success: true,
       data: {
         ...findingsData,
+        // Migration-016-Audit-Felder durchreichen (Q2/2026 Determinismus)
+        policy_version: row.policy_version ?? null,
+        policy_id_distinct: row.policy_id_distinct ?? [],
+        audit_severity_counts: row.audit_severity_counts ?? null,
         excluded_finding_ids: excludedIds,
         exclusions: exclusionRows.map((r) => ({
           finding_id: r.finding_id,
