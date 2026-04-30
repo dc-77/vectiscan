@@ -207,6 +207,107 @@ deploy-manual:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_PIPELINE_SOURCE == "web"
 
+# =============================================================================
+# Findings-Audit (Read-Only) — Bewertung der Determinismus-Pipeline
+# =============================================================================
+# Liefert eine Übersicht ueber Reports + Findings: severity-Verteilung,
+# policy_id-Coverage, SP-FALLBACK-Rate, ai_cache-Hit-Statistik, etc.
+# Komplett read-only — kein DDL, keine Mutation. Logs ueber GitLab-API
+# auswertbar.
+ops-findings-audit:
+  extends: .ops-base
+  script:
+    - cd ${DEPLOY_PATH}
+    - |
+      docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -A -X <<'SQL'
+      \echo === ORDERS ===
+      SELECT status, count(*) FROM orders GROUP BY status ORDER BY 1;
+
+      \echo === REPORTS (count + policy_version) ===
+      SELECT policy_version, count(*) AS reports
+        FROM reports GROUP BY policy_version ORDER BY 1 NULLS LAST;
+
+      \echo === SEVERITY VERTEILUNG (alle Reports) ===
+      SELECT
+        SUM((severity_counts->>'critical')::int) AS critical,
+        SUM((severity_counts->>'high')::int)     AS high,
+        SUM((severity_counts->>'medium')::int)   AS medium,
+        SUM((severity_counts->>'low')::int)      AS low,
+        SUM((severity_counts->>'info')::int)     AS info,
+        count(*)                                  AS reports
+      FROM reports
+      WHERE severity_counts IS NOT NULL;
+
+      \echo === SEVERITY PRO REPORT ===
+      SELECT
+        r.id AS report_id,
+        o.target_url,
+        o.package,
+        r.created_at::date AS day,
+        r.policy_version,
+        r.severity_counts->>'critical' AS critical,
+        r.severity_counts->>'high'     AS high,
+        r.severity_counts->>'medium'   AS medium,
+        r.severity_counts->>'low'      AS low,
+        r.severity_counts->>'info'     AS info,
+        coalesce(array_length(r.policy_id_distinct,1),0) AS distinct_policies,
+        coalesce(jsonb_array_length(r.findings_data),0) AS findings_count
+      FROM reports r
+      LEFT JOIN orders o ON o.id = r.order_id
+      ORDER BY r.created_at DESC
+      LIMIT 20;
+
+      \echo === SP-FALLBACK RATE ===
+      SELECT
+        count(*) AS total_reports,
+        count(*) FILTER (WHERE 'SP-FALLBACK' = ANY(policy_id_distinct)) AS reports_with_fallback,
+        ROUND(100.0 * count(*) FILTER (WHERE 'SP-FALLBACK' = ANY(policy_id_distinct))
+              / NULLIF(count(*),0), 1) AS fallback_pct
+      FROM reports
+      WHERE policy_version IS NOT NULL;
+
+      \echo === DISTINCT POLICY-IDs (Top 30, sortiert nach Frequenz) ===
+      SELECT pid, count(*) AS hits
+      FROM reports r,
+           LATERAL unnest(r.policy_id_distinct) AS pid
+      WHERE r.policy_version IS NOT NULL
+      GROUP BY pid
+      ORDER BY 2 DESC, 1 ASC
+      LIMIT 30;
+
+      \echo === FINDINGS_DATA ARRAY-LAENGE STATS ===
+      SELECT
+        round(avg(jsonb_array_length(findings_data))::numeric, 1) AS avg_findings_per_report,
+        min(jsonb_array_length(findings_data)) AS min_findings,
+        max(jsonb_array_length(findings_data)) AS max_findings,
+        count(*) AS reports
+      FROM reports
+      WHERE jsonb_typeof(findings_data) = 'array';
+
+      \echo === POSITIVE FINDINGS (positive_findings JSONB-Array) ===
+      SELECT
+        round(avg(jsonb_array_length(findings_data->'positive_findings'))::numeric, 1)
+            AS avg_positive_findings,
+        count(*) FILTER (WHERE jsonb_array_length(findings_data->'positive_findings') > 0)
+            AS reports_with_positive,
+        count(*) AS total_reports
+      FROM reports
+      WHERE findings_data ? 'positive_findings';
+
+      \echo === RAW SAMPLE: erstes finding pro neueren Report ===
+      SELECT
+        r.id::text AS report_id,
+        o.target_url,
+        jsonb_path_query_first(r.findings_data, '$[0].title') AS first_finding_title,
+        jsonb_path_query_first(r.findings_data, '$[0].severity') AS first_finding_severity,
+        jsonb_path_query_first(r.findings_data, '$[0].policy_id') AS first_finding_policy
+      FROM reports r
+      LEFT JOIN orders o ON o.id = r.order_id
+      WHERE r.policy_version IS NOT NULL
+      ORDER BY r.created_at DESC
+      LIMIT 10;
+      SQL
+
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
 rollback:
   extends: .ops-base
