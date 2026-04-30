@@ -136,13 +136,23 @@ while IFS= read -r _line || [[ -n "$_line" ]]; do
 done < "$ENV_FILE"
 unset _line _key _val
 
-DB_NAME="${POSTGRES_DB:-vectiscan}"
-DB_USER="${POSTGRES_USER:-vectiscan}"
-DB_PASS="${POSTGRES_PASSWORD:?POSTGRES_PASSWORD missing in .env}"
+# DB-Variablen: prod-.env nutzt DB_* (siehe .gitlab-ci.yml deploy-base);
+# Spec-Vorschlag verwendete POSTGRES_* — beide Namen werden akzeptiert.
+DB_NAME="${POSTGRES_DB:-${DB_NAME:-vectiscan}}"
+DB_USER="${POSTGRES_USER:-${DB_USER:-vectiscan}}"
+DB_PASS="${POSTGRES_PASSWORD:-${DB_PASSWORD:-}}"
+if [[ -z "$DB_PASS" ]]; then
+    err "Weder POSTGRES_PASSWORD noch DB_PASSWORD in .env gesetzt"
+    exit 1
+fi
 
 MINIO_ENDPOINT_URL="${MINIO_ENDPOINT_URL:-http://minio:9000}"
-MINIO_AK="${MINIO_ACCESS_KEY:?MINIO_ACCESS_KEY missing in .env}"
-MINIO_SK="${MINIO_SECRET_KEY:?MINIO_SECRET_KEY missing in .env}"
+MINIO_AK="${MINIO_ACCESS_KEY:-}"
+MINIO_SK="${MINIO_SECRET_KEY:-}"
+if [[ -z "$MINIO_AK" || -z "$MINIO_SK" ]]; then
+    err "MINIO_ACCESS_KEY / MINIO_SECRET_KEY fehlen in .env"
+    exit 1
+fi
 
 # ------------------------------------------------------------------
 # Helpers
