@@ -22,6 +22,8 @@ const MIGRATION_012_PATH = path.join(__dirname, '..', 'migrations', '012_subscri
 const MIGRATION_013_PATH = path.join(__dirname, '..', 'migrations', '013_company_name.sql');
 const MIGRATION_014_PATH = path.join(__dirname, '..', 'migrations', '014_multi_target.sql');
 const MIGRATION_015_PATH = path.join(__dirname, '..', 'migrations', '015_performance_metrics.sql');
+const MIGRATION_016_PATH = path.join(__dirname, '..', 'migrations', '016_severity_policy.sql');
+const MIGRATION_017_PATH = path.join(__dirname, '..', 'migrations', '017_threat_intel_snapshots.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -186,6 +188,31 @@ export async function initDb(): Promise<void> {
 
   if (!perfMetricsColCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_015_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 016: Severity-Policy-Provenance auf reports (policy_version, policy_id_distinct, severity_counts)
+  const policyVersionColCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.columns
+      WHERE table_name = 'reports' AND column_name = 'policy_version'
+    ) AS exists
+  `);
+
+  if (!policyVersionColCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_016_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 017: Threat-Intel-Snapshots-Tabelle + orders.threat_intel_snapshot_id
+  const tiSnapshotsCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables WHERE table_name = 'threat_intel_snapshots'
+    ) AS exists
+  `);
+
+  if (!tiSnapshotsCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_017_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 
