@@ -24,6 +24,7 @@ const MIGRATION_014_PATH = path.join(__dirname, '..', 'migrations', '014_multi_t
 const MIGRATION_015_PATH = path.join(__dirname, '..', 'migrations', '015_performance_metrics.sql');
 const MIGRATION_016_PATH = path.join(__dirname, '..', 'migrations', '016_severity_policy.sql');
 const MIGRATION_017_PATH = path.join(__dirname, '..', 'migrations', '017_threat_intel_snapshots.sql');
+const MIGRATION_018_PATH = path.join(__dirname, '..', 'migrations', '018_severity_counts_trigger_fix.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -213,6 +214,24 @@ export async function initDb(): Promise<void> {
 
   if (!tiSnapshotsCheck.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_017_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 018: Trigger-Fix fuer severity_counts (016 las den falschen JSONB-Pfad).
+  // Existence-Check: prueft ob die Trigger-Funktion das richtige `findings_data->'findings'`
+  // referenziert. Wenn nein → Migration anwenden (CREATE OR REPLACE + Backfill, idempotent).
+  const triggerFnDefCheck = await pool.query(`
+    SELECT pg_get_functiondef(p.oid) AS def
+      FROM pg_proc p
+      JOIN pg_namespace n ON n.oid = p.pronamespace
+     WHERE p.proname = 'reports_update_severity_counts'
+       AND n.nspname = 'public'
+     LIMIT 1
+  `);
+
+  const triggerDef = (triggerFnDefCheck.rows[0]?.def as string | undefined) ?? '';
+  if (!triggerDef.includes("findings_data->'findings'")) {
+    const migrationSql = fs.readFileSync(MIGRATION_018_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 
