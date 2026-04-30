@@ -206,3 +206,54 @@ rollback:
   environment:
     name: production
     url: https://scan.vectigal.tech
+
+# =============================================================================
+# CLEANUP-PROD — Big-Bang Wipe (Q2/2026 Determinismus-Reset)
+# =============================================================================
+# Triggert scripts/cleanup-prod.sh auf vectigal-docker02. Wipet alle Scan-
+# Daten, Reports, Subscriptions, MinIO-Objekte, Threat-Intel/AI-Caches.
+# Erhalten bleiben users, customers, verified_domains, Schema.
+#
+# Nutzung:
+#   1. In GitLab: Pipeline starten (Web-UI) ODER auf einer existierenden
+#      main-Pipeline den Job manuell ausloesen.
+#   2. Variable CLEANUP_CONFIRM=vectiscan-prod muss in der Pipeline-Run-Form
+#      gesetzt werden — sonst bricht der Job mit Hinweis ab.
+#      (Schuetzt davor dass jemand den Job versehentlich klickt.)
+#   3. Optional: CLEANUP_NO_BACKUP=true ueberspringt das pg_dump-Backup.
+#
+# Spec: docs/deterministic/01-cleanup.md, 99-CUTOVER.md
+# =============================================================================
+
+cleanup-prod:
+  stage: deploy
+  tags: [vectigal]
+  when: manual
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+  variables:
+    # Override per Pipeline-Run via CI/CD-Variables.
+    CLEANUP_CONFIRM: ""
+    CLEANUP_NO_BACKUP: "false"
+  script:
+    - |
+      if [ "$CLEANUP_CONFIRM" != "vectiscan-prod" ]; then
+        echo "ERROR: Set CLEANUP_CONFIRM=vectiscan-prod in the pipeline-run form to confirm."
+        echo "       (Job wurde versehentlich getriggert oder Bestaetigung fehlt.)"
+        exit 1
+      fi
+    - cd ${DEPLOY_PATH}
+    - cp -f ${CI_PROJECT_DIR}/scripts/cleanup-prod.sh ./cleanup-prod.sh
+    - chmod +x ./cleanup-prod.sh
+    - |
+      # Bestaetigung an das Skript durchpipen + optional --no-backup
+      ARGS="--confirm"
+      if [ "$CLEANUP_NO_BACKUP" = "true" ]; then ARGS="$ARGS --no-backup"; fi
+      CONFIRMATION_STRING=vectiscan-prod \
+      PROJECT_ROOT=${DEPLOY_PATH} \
+        bash -c "echo vectiscan-prod | ./cleanup-prod.sh $ARGS"
+  environment:
+    name: production
+    url: https://scan.vectigal.tech
