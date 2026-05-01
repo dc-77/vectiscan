@@ -188,27 +188,47 @@ def run_phase3(
     cve_ids = _collect_cve_ids(correlated)
     enrichment_data: dict[str, dict[str, Any]] = {}
 
+    # M2 (2026-05-01): Daily-Snapshot anlegen / abrufen. Wir lesen erst aus
+    # dem Snapshot; nur fuer fehlende CVEs werden Live-Lookups gemacht und
+    # die Ergebnisse zurueck in den Snapshot gemerged. Folge-Scans im selben
+    # Tag treffen den Snapshot.
+    from scanner.threat_intel_snapshot import (
+        attach_snapshot_to_order,
+        get_or_create_today_snapshot_id,
+        get_snapshot_data,
+        merge_into_snapshot,
+    )
+    snapshot_id = get_or_create_today_snapshot_id()
+    if snapshot_id and order_id:
+        attach_snapshot_to_order(order_id, snapshot_id)
+    snap = get_snapshot_data(snapshot_id) if snapshot_id else {"nvd": {}, "kev": {}, "epss": {}}
+
     if cve_ids:
-        from concurrent.futures import ThreadPoolExecutor, as_completed
+        from concurrent.futures import ThreadPoolExecutor
 
         publish_event(order_id, {"type": "tool_starting", "tool": "nvd", "host": ""})
         progress_callback(order_id, "correlation", "enrichment")
         max_lookups = 5 if package == "webcheck" else 50
 
+        # CVEs die noch nicht im Snapshot sind
+        missing_nvd = [c for c in cve_ids if c not in (snap.get("nvd") or {})]
+        missing_epss = [c for c in cve_ids if c not in (snap.get("epss") or {})]
+        missing_kev = [c for c in cve_ids if c not in (snap.get("kev") or {})]
+
         def _enrich_nvd() -> dict[str, Any]:
-            if "nvd" not in phase3_tools:
+            if "nvd" not in phase3_tools or not missing_nvd:
                 return {}
-            return NVDClient().lookup_batch(cve_ids, max_lookups=max_lookups)
+            return NVDClient().lookup_batch(missing_nvd, max_lookups=max_lookups)
 
         def _enrich_epss() -> dict[str, Any]:
-            if "epss" not in phase3_tools:
+            if "epss" not in phase3_tools or not missing_epss:
                 return {}
-            return EPSSClient().lookup_batch(cve_ids)
+            return EPSSClient().lookup_batch(missing_epss)
 
         def _enrich_kev() -> dict[str, Any]:
-            if "cisa_kev" not in phase3_tools:
+            if "cisa_kev" not in phase3_tools or not missing_kev:
                 return {}
-            return CISAKEVLoader().check_batch(cve_ids)
+            return CISAKEVLoader().check_batch(missing_kev)
 
         def _enrich_exploitdb() -> dict[str, Any]:
             if "exploitdb" not in phase3_tools:
@@ -245,15 +265,29 @@ def run_phase3(
             except Exception as e:
                 log.error("exploitdb_enrichment_failed", error=str(e))
 
-        # Merge all enrichment data
+        # Frische Daten in den Snapshot mergen (lazy-fill)
+        if snapshot_id and (nvd_data or kev_data or epss_data):
+            merge_into_snapshot(
+                snapshot_id,
+                nvd_delta=nvd_data, kev_delta=kev_data, epss_delta=epss_data,
+            )
+            log.info("snapshot_merged",
+                     snapshot_id=snapshot_id,
+                     nvd_added=len(nvd_data), kev_added=len(kev_data), epss_added=len(epss_data))
+
+        # Merge: Snapshot-Daten + frische Live-Lookups
+        full_nvd = {**(snap.get("nvd") or {}), **nvd_data}
+        full_epss = {**(snap.get("epss") or {}), **epss_data}
+        full_kev = {**(snap.get("kev") or {}), **kev_data}
+
         for cve_id in cve_ids:
             entry: dict[str, Any] = {}
-            if cve_id in nvd_data:
-                entry["nvd"] = nvd_data[cve_id]
-            if cve_id in epss_data:
-                entry["epss"] = epss_data[cve_id]
-            if cve_id in kev_data:
-                entry["cisa_kev"] = kev_data[cve_id]
+            if cve_id in full_nvd:
+                entry["nvd"] = full_nvd[cve_id]
+            if cve_id in full_epss:
+                entry["epss"] = full_epss[cve_id]
+            if cve_id in full_kev:
+                entry["cisa_kev"] = full_kev[cve_id]
             if cve_id in edb_data:
                 entry["exploitdb"] = edb_data[cve_id]
             if entry:
