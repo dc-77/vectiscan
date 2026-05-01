@@ -208,6 +208,58 @@ deploy-manual:
     - if: $CI_PIPELINE_SOURCE == "web"
 
 # =============================================================================
+# Restart-Worker — gezieltes Restart einzelner Worker-Container ohne
+# einen vollen Cleanup. Nutzt Pipeline-Variable `WORKER` (Default report-worker).
+# =============================================================================
+ops-restart-worker:
+  extends: .ops-base
+  variables:
+    WORKER: report-worker
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "Restarting ${WORKER}..."
+    - docker compose restart ${WORKER}
+    - sleep 5
+    - docker compose ps ${WORKER}
+    - echo
+    - echo "=== Letzte 30 Log-Zeilen nach Restart ==="
+    - docker compose logs --tail=30 --no-color ${WORKER} 2>&1 | tail -30 || true
+
+# =============================================================================
+# Services-Status — Container-Status + BullMQ-Queue-Tiefen + Worker-Logs.
+# Nur Lesezugriff, kein restart. Ideal um zu sehen warum ein Job haengt.
+# =============================================================================
+ops-services-status:
+  extends: .ops-base
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "=== docker compose ps ==="
+    - docker compose ps --format 'table {{.Name}}\t{{.State}}\t{{.Status}}' || true
+    - echo
+    - echo "=== Redis BullMQ Queue-Tiefen ==="
+    - |
+      docker compose exec -T redis sh -c '
+        for q in precheck-pending scan-pending report-pending; do
+          len=$(redis-cli LLEN "$q" 2>/dev/null || echo "?")
+          printf "  %-22s %s\n" "$q" "$len"
+        done
+        echo
+        echo "  bull-namespaced (waiting/active/completed/failed):"
+        for prefix in bull:scan-pending bull:report-pending bull:precheck-pending; do
+          for s in waiting active completed failed delayed; do
+            len=$(redis-cli LLEN "${prefix}:${s}" 2>/dev/null || echo "0")
+            [ "$len" != "0" ] && [ "$len" != "?" ] && printf "    %-40s %s\n" "${prefix}:${s}" "$len"
+          done
+        done
+      '
+    - echo
+    - echo "=== report-worker Logs (letzte 100 Zeilen) ==="
+    - docker compose logs --tail=100 --no-color report-worker 2>&1 | tail -100 || true
+    - echo
+    - echo "=== scan-worker-1 Logs (letzte 30 Zeilen) ==="
+    - docker compose logs --tail=30 --no-color scan-worker-1 2>&1 | tail -30 || true
+
+# =============================================================================
 # Findings-Audit (Read-Only) — Bewertung der Determinismus-Pipeline
 # =============================================================================
 # Liefert eine Übersicht ueber Reports + Findings: severity-Verteilung,
