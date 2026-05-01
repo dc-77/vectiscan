@@ -60,7 +60,6 @@ export default function AdminPage() {
 
   const handleRoleToggle = async (user: AdminUser) => {
     const newRole = user.role === 'admin' ? 'customer' : 'admin';
-    if (!confirm(`Rolle von ${user.email} auf "${newRole}" ändern?`)) return;
     try {
       const res = await changeUserRole(user.id, newRole);
       if (res.success) {
@@ -74,7 +73,6 @@ export default function AdminPage() {
   };
 
   const handleApprove = async (review: PendingReview) => {
-    if (!confirm(`Scan für ${review.domain} freigeben und Report generieren?`)) return;
     try {
       const res = await approveOrder(review.id);
       if (res.success) {

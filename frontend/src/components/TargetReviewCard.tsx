@@ -96,7 +96,6 @@ export default function TargetReviewCard({ target, onChanged }: Props) {
   };
 
   const handleRestart = async () => {
-    if (typeof window !== 'undefined' && !window.confirm('Pre-Check für dieses Target neu starten?')) return;
     setBusy(true); setErr(null);
     const res = await restartPrecheck(target.id);
     if (!res.success) setErr(res.error || 'Restart fehlgeschlagen');

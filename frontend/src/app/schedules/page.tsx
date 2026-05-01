@@ -108,7 +108,6 @@ export default function SchedulesPage() {
   };
 
   const handleDelete = async (s: ScanSchedule) => {
-    if (!confirm(`Schedule für ${s.domain} löschen?`)) return;
     try {
       await deleteSchedule(s.id);
       fetchSchedules();

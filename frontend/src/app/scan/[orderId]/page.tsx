@@ -504,7 +504,6 @@ export default function ScanDetailPage() {
               <div className="flex items-center gap-2 ml-4 shrink-0">
                 <button
                   onClick={async () => {
-                    if (!confirm('Scan freigeben und Report generieren?')) return;
                     const res = await approveOrder(orderId);
                     if (res.success) {
                       const orderRes = await getOrderStatus(orderId);
