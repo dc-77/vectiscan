@@ -300,6 +300,24 @@ export interface Finding {
   in_cisa_kev?: boolean;
   exploit_available?: boolean;
   business_impact?: number;
+  // Q2/2026 Determinismus
+  policy_id?: string;
+  severity_provenance?: {
+    policy_id?: string;
+    policy_decision?: string;
+    policy_version?: string;
+    rationale?: string;
+    rule_references?: string[];
+  };
+  business_impact_score?: number;
+  affected_hosts?: string[];
+  // Threat-Intel (durchgereicht aus correlation_data.enrichment im /findings-Endpoint)
+  threat_intel?: {
+    cisa_kev?: { cveID?: string; knownRansomwareCampaignUse?: string } | null;
+    epss?: { epss?: number; percentile?: number } | null;
+    nvd?: { cvss_score?: number; cwe?: string } | null;
+    exploitdb?: Array<{ id: string }> | null;
+  } | null;
 }
 
 export interface PositiveFinding {
@@ -329,6 +347,11 @@ export interface FindingsData {
     reason: string;
     created_at: string;
   }>;
+  // Q2/2026 Audit-Felder (Migration 016/018, durchgereicht im /findings-Endpoint)
+  policy_version?: string | null;
+  policy_id_distinct?: string[];
+  audit_severity_counts?: Record<string, number> | null;
+  business_impact_score?: number | null;
 }
 
 export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[] }>> {

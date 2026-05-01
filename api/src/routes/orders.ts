@@ -739,13 +739,16 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const result = await query(
-      `SELECT findings_data,
-              policy_version,
-              policy_id_distinct,
-              severity_counts AS audit_severity_counts
-         FROM reports
-        WHERE order_id = $1
-        ORDER BY created_at DESC
+      `SELECT r.findings_data,
+              r.policy_version,
+              r.policy_id_distinct,
+              r.severity_counts AS audit_severity_counts,
+              o.correlation_data,
+              o.business_impact_score
+         FROM reports r
+         JOIN orders o ON o.id = r.order_id
+        WHERE r.order_id = $1
+        ORDER BY r.created_at DESC
         LIMIT 1`,
       [id],
     );
@@ -769,6 +772,27 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
     const row = result.rows[0] as Record<string, unknown>;
     const findingsData = row.findings_data as Record<string, unknown>;
+
+    // Threat-Intel pro Finding aus correlation_data.enrichment (CVE → {nvd, epss, cisa_kev, exploitdb})
+    // mergen — nur wo das Finding eine CVE-ID traegt. Frontend zeigt sonst keinen Badge.
+    const correlation = (row.correlation_data ?? null) as Record<string, unknown> | null;
+    const enrichment =
+      (correlation && (correlation.enrichment as Record<string, unknown> | undefined)) ?? null;
+    if (enrichment && Array.isArray(findingsData.findings)) {
+      const findingsArr = findingsData.findings as Array<Record<string, unknown>>;
+      for (const f of findingsArr) {
+        const cve = (f.cve_id as string | undefined) ?? (f.cve as string | undefined);
+        if (cve && typeof cve === 'string') {
+          // Findings können mehrere CVEs als Komma-Liste tragen — nimm die erste fuer das Badge.
+          const firstCve = cve.split(/[,\s]+/).find((c) => /^CVE-\d{4}-\d+$/i.test(c));
+          if (firstCve) {
+            const intel = enrichment[firstCve.toUpperCase()] ?? enrichment[firstCve];
+            if (intel) f.threat_intel = intel;
+          }
+        }
+      }
+    }
+
     return {
       success: true,
       data: {
@@ -777,6 +801,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         policy_version: row.policy_version ?? null,
         policy_id_distinct: row.policy_id_distinct ?? [],
         audit_severity_counts: row.audit_severity_counts ?? null,
+        // Order-Level Business-Impact-Score (aus Phase 3, vor Determinismus-Recompute)
+        business_impact_score: row.business_impact_score ?? null,
         excluded_finding_ids: excludedIds,
         exclusions: exclusionRows.map((r) => ({
           finding_id: r.finding_id,
