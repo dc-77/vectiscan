@@ -77,23 +77,57 @@ def cache_key(*,
               tools: Optional[list[dict]] = None,
               temperature: float = 0.0,
               max_tokens: int = 8192,
-              namespace: str = "default") -> str:
+              namespace: str = "default",
+              order_scope: Optional[str] = None,
+              host_scope: Optional[str] = None) -> str:
     """Deterministischer Cache-Key.
 
-    Nimmt ALLE Inputs auf, die das Output beeinflussen koennen.
-    Bei POLICY_VERSION-Bump invalidiert der Cache automatisch.
+    Zwei Modi:
+
+    1. **Inhalts-Hash (Default, legacy)** — ohne `order_scope`. Hash wird aus
+       allen Inputs (model + system + messages + tools + temp + max_tokens +
+       POLICY_VERSION + CACHE_VERSION) gebildet. Theoretisch deterministisch,
+       praktisch fast nie Cache-Hit weil Tool-Outputs in messages
+       Timestamps/IDs enthalten.
+
+    2. **Order-Scope (M1, 2026-05-01)** — wenn `order_scope` gesetzt ist,
+       basiert der Hash NUR auf `(namespace, order_scope, host_scope?,
+       policy_version, cache_version)`. Der eigentliche Inhalt der
+       Messages fliesst NICHT mehr in den Hash ein.
+       → Erst-Scan: Cache-Miss (KI generiert + persistiert).
+       → Re-Scan / regenerate-report derselben Order: garantierter Hit.
+       → host_scope ist optional fuer per-host-Calls (z.B. KI #3
+         Phase-2-Config laeuft pro Host).
+
+       WICHTIG: Diese Variante akzeptiert bewusst dass sich der KI-Input
+       theoretisch zwischen Erst- und Re-Scan minimal aendern koennte
+       (z.B. tagesaktueller NVD-Stand). Das ist gewollt — Cache-TTL
+       laeuft sowieso ab, und beim regenerate-report ist die DB ja
+       eingefroren.
     """
-    payload = {
-        "namespace": namespace,
-        "model": model,
-        "system": system,
-        "messages": messages,
-        "tools": tools,
-        "temperature": temperature,
-        "max_tokens": max_tokens,
-        "policy_version": POLICY_VERSION,
-        "cache_version": CACHE_VERSION,
-    }
+    if order_scope is not None:
+        payload: dict[str, Any] = {
+            "mode": "order_scope",
+            "namespace": namespace,
+            "order_scope": order_scope,
+            "host_scope": host_scope,
+            "model": model,
+            "policy_version": POLICY_VERSION,
+            "cache_version": CACHE_VERSION,
+        }
+    else:
+        payload = {
+            "mode": "input_hash",
+            "namespace": namespace,
+            "model": model,
+            "system": system,
+            "messages": messages,
+            "tools": tools,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "policy_version": POLICY_VERSION,
+            "cache_version": CACHE_VERSION,
+        }
     serialized = _canonicalize(payload)
     h = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
     return f"ai_cache:{namespace}:{h}"
@@ -197,6 +231,8 @@ def cached_call(*,
                 max_tokens: int = 8192,
                 cache_ttl_seconds: int = 86400,
                 cache_namespace: str = "default",
+                order_scope: Optional[str] = None,
+                host_scope: Optional[str] = None,
                 anthropic_client: Any = None,
                 ) -> tuple[dict, CacheStats]:
     """Cached Anthropic call.
@@ -208,10 +244,16 @@ def cached_call(*,
 
     Konvention: temperature=0.0 forcieren wir (deterministisch). Caller darf
     explizit anders setzen, sollte aber wissen warum.
+
+    Order-Scope (M1, 2026-05-01): wenn `order_scope` (z.B. order-uuid) gesetzt
+    ist, ist der Cache-Key unabhaengig vom Tool-Output-Inhalt — Re-Scans /
+    regenerate-report derselben Order treffen GARANTIERT den Cache.
+    `host_scope` zusaetzlich fuer per-host-Calls (KI #3 Phase-2-Config).
     """
     key = cache_key(
         model=model, system=system, messages=messages, tools=tools,
         temperature=temperature, max_tokens=max_tokens, namespace=cache_namespace,
+        order_scope=order_scope, host_scope=host_scope,
     )
     short_key = key[:24]
 

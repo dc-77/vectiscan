@@ -414,6 +414,7 @@ def process_job(job_data: dict) -> None:
                 consolidated_findings=consolidated_findings,
                 package=package,
                 debug_info=claude_debug,
+                order_id=order_id,
             )
             log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
             # No QA needed for tlscompliance (no CVSS findings)
@@ -425,6 +426,7 @@ def process_job(job_data: dict) -> None:
                 consolidated_findings=consolidated_findings,
                 package=package,
                 debug_info=claude_debug,
+                order_id=order_id,
             )
             log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
 

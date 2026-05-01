@@ -54,18 +54,36 @@ def cache_key(*,
               tools: Optional[list[dict]] = None,
               temperature: float = 0.0,
               max_tokens: int = 8192,
-              namespace: str = "default") -> str:
-    payload = {
-        "namespace": namespace,
-        "model": model,
-        "system": system,
-        "messages": messages,
-        "tools": tools,
-        "temperature": temperature,
-        "max_tokens": max_tokens,
-        "policy_version": POLICY_VERSION,
-        "cache_version": CACHE_VERSION,
-    }
+              namespace: str = "default",
+              order_scope: Optional[str] = None,
+              host_scope: Optional[str] = None) -> str:
+    """Order-Scope-Mode (M1): wenn order_scope gesetzt, basiert der Hash NUR
+    auf (namespace, order_scope, host_scope?, policy_version, cache_version).
+    Re-Scans / regenerate-report derselben Order treffen so garantiert den
+    Cache. Ohne order_scope: legacy Inhalts-Hash."""
+    if order_scope is not None:
+        payload: dict = {
+            "mode": "order_scope",
+            "namespace": namespace,
+            "order_scope": order_scope,
+            "host_scope": host_scope,
+            "model": model,
+            "policy_version": POLICY_VERSION,
+            "cache_version": CACHE_VERSION,
+        }
+    else:
+        payload = {
+            "mode": "input_hash",
+            "namespace": namespace,
+            "model": model,
+            "system": system,
+            "messages": messages,
+            "tools": tools,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "policy_version": POLICY_VERSION,
+            "cache_version": CACHE_VERSION,
+        }
     serialized = _canonicalize(payload)
     h = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
     return f"ai_cache:{namespace}:{h}"

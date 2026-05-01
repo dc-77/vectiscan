@@ -126,6 +126,44 @@ class TestCacheKey:
                       temperature=1.0)
         assert a != b
 
+    def test_order_scope_ignores_message_content(self):
+        """M1 (2026-05-01): bei gesetztem order_scope haengt der Hash NICHT
+        mehr am User-Prompt-Inhalt — Re-Scans derselben Order = Cache-Hit."""
+        from scanner.ai_cache import cache_key
+        a = cache_key(model="m", system="s",
+                      messages=[{"role": "user", "content": "tool output 1"}],
+                      order_scope="order-uuid-123")
+        b = cache_key(model="m", system="s",
+                      messages=[{"role": "user", "content": "tool output 2 — total different"}],
+                      order_scope="order-uuid-123")
+        assert a == b
+
+    def test_order_scope_isolates_different_orders(self):
+        from scanner.ai_cache import cache_key
+        a = cache_key(model="m", system="s", messages=[{"role": "user", "content": "x"}],
+                      order_scope="order-A")
+        b = cache_key(model="m", system="s", messages=[{"role": "user", "content": "x"}],
+                      order_scope="order-B")
+        assert a != b
+
+    def test_order_scope_with_host_scope_isolates_per_host(self):
+        from scanner.ai_cache import cache_key
+        a = cache_key(model="m", system="s", messages=[{"role": "user", "content": "x"}],
+                      order_scope="order-A", host_scope="1.2.3.4")
+        b = cache_key(model="m", system="s", messages=[{"role": "user", "content": "x"}],
+                      order_scope="order-A", host_scope="5.6.7.8")
+        assert a != b
+
+    def test_order_scope_vs_no_scope_different_keys(self):
+        """Order-Scope-Mode darf nicht denselben Hash ergeben wie Inhalts-Mode."""
+        from scanner.ai_cache import cache_key
+        no_scope = cache_key(model="m", system="s",
+                             messages=[{"role": "user", "content": "x"}])
+        with_scope = cache_key(model="m", system="s",
+                               messages=[{"role": "user", "content": "x"}],
+                               order_scope="some-order")
+        assert no_scope != with_scope
+
 
 # ---------------------------------------------------------------------------
 # Cache-Hit / Cache-Miss

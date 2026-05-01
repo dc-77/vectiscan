@@ -92,11 +92,17 @@ def _build_cost_dict(model: str, stats: CacheStats) -> dict[str, Any]:
 
 def _call_haiku(system_prompt: str, user_prompt: str,
                 cache_namespace: str = "haiku_default",
-                cache_ttl_seconds: int = 24 * 3600) -> dict[str, Any]:
+                cache_ttl_seconds: int = 24 * 3600,
+                order_scope: str | None = None,
+                host_scope: str | None = None) -> dict[str, Any]:
     """Cached Haiku-Call mit temperature=0.
 
     On failure, returns {"_error": "reason"} so callers can include the
     specific error in fallback reasoning shown to the user.
+
+    Order-Scope (M1, 2026-05-01): wenn `order_scope` (order_id) gesetzt ist,
+    haengt der Cache-Key NICHT mehr am Inhalt der messages — Re-Scans
+    derselben Order treffen garantiert den Cache.
 
     Caller-Vertrag (unveraendert):
       - parsed["_raw"]  : roher Antwort-Text (auch bei JSON-Parse-Fehler)
@@ -112,6 +118,8 @@ def _call_haiku(system_prompt: str, user_prompt: str,
         max_tokens=8192,
         cache_ttl_seconds=cache_ttl_seconds,
         cache_namespace=cache_namespace,
+        order_scope=order_scope,
+        host_scope=host_scope,
     )
     duration_ms = int((time.monotonic() - start) * 1000)
 
@@ -234,6 +242,7 @@ Antwort im Format:
         HOST_STRATEGY_SYSTEM, user_prompt,
         cache_namespace="ki1_host_strategy",
         cache_ttl_seconds=CACHE_TTL_HOST_STRATEGY,
+        order_scope=order_id or None,
     )
 
     # Save full AI debug (system prompt + user prompt + raw response)
@@ -349,6 +358,7 @@ Antwort im Format:
         TECH_ANALYSIS_SYSTEM, user_prompt,
         cache_namespace="ki2_tech_analysis",
         cache_ttl_seconds=CACHE_TTL_TECH_ANALYSIS,
+        order_scope=order_id or None,
     )
 
     # Save full AI debug
@@ -487,6 +497,8 @@ Antwort im Format:
         PHASE2_CONFIG_SYSTEM, user_prompt,
         cache_namespace="ki3_phase2_config",
         cache_ttl_seconds=CACHE_TTL_PHASE2_CONFIG,
+        order_scope=order_id or None,
+        host_scope=ip or None,
     )
 
     # Save full AI debug
@@ -533,11 +545,16 @@ Antwort im Format:
 
 def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384,
                  cache_namespace: str = "sonnet_default",
-                 cache_ttl_seconds: int = 24 * 3600) -> dict[str, Any]:
+                 cache_ttl_seconds: int = 24 * 3600,
+                 order_scope: str | None = None,
+                 host_scope: str | None = None) -> dict[str, Any]:
     """Cached Sonnet-Call mit temperature=0.
 
     Used for Phase 3 cross-tool correlation where Haiku's reasoning
     capability is insufficient.
+
+    Order-Scope (M1, 2026-05-01): bei gesetztem `order_scope` ist der
+    Cache-Key inhaltsunabhaengig — Re-Scans derselben Order = Cache-Hit.
     """
     raw = ""
     start = time.monotonic()
@@ -549,6 +566,8 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384,
         max_tokens=max_tokens,
         cache_ttl_seconds=cache_ttl_seconds,
         cache_namespace=cache_namespace,
+        order_scope=order_scope,
+        host_scope=host_scope,
     )
     duration_ms = int((time.monotonic() - start) * 1000)
 
@@ -648,6 +667,7 @@ Antwort im Format:
         PHASE3_SYSTEM, user_prompt,
         cache_namespace="ki4_phase3",
         cache_ttl_seconds=CACHE_TTL_PHASE3,
+        order_scope=order_id or None,
     )
 
     # Save full AI debug

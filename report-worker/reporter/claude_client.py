@@ -597,6 +597,7 @@ def call_claude(
     consolidated_findings: str,
     package: str = "professional",
     debug_info: dict[str, Any] | None = None,
+    order_id: str | None = None,
 ) -> dict[str, Any]:
     """Call Claude API to analyze scan data and generate findings.
 
@@ -665,7 +666,10 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
     max_tokens = MAX_TOKENS_BY_MODEL.get(model, 16384)
     messages_payload = [{"role": "user", "content": user_prompt}]
 
-    # Cache-Key inkl. POLICY_VERSION → bei Policy-Bump automatische Invalidierung.
+    # Cache-Key (M1, 2026-05-01): Order-Scope wenn order_id vorliegt — dann
+    # haengt der Hash NICHT mehr am consolidated_findings-Text und Re-Scans /
+    # regenerate-report derselben Order liefern garantiert byte-identisch.
+    # Ohne order_id: legacy Inhalts-Hash (kommt praktisch nicht mehr vor).
     cache_k = build_cache_key(
         model=model,
         system=system_prompt,
@@ -673,6 +677,7 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
         temperature=0.0,
         max_tokens=max_tokens,
         namespace=REPORTER_CACHE_NAMESPACE,
+        order_scope=order_id or None,
     )
 
     # Populate debug info (prompts are constant across retries)
