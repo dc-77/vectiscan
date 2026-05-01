@@ -10,6 +10,8 @@ import { getOrderStatus, getFindings, getScanResults, getReportDownloadUrl, getO
          OrderStatus, OrderEvents, FindingsData, ScanResult, ReportVersion, ScanDiff } from '@/lib/api';
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
+import ViewSwitcher from '@/components/scan/ViewSwitcher';
+import ModernView from './views/ModernView';
 
 type Tab = 'findings' | 'recommendations' | 'diff' | 'debug';
 
@@ -161,6 +163,19 @@ export default function ScanDetailPage() {
   const [regenerating, setRegenerating] = useState(false);
   const [reportVersions, setReportVersions] = useState<ReportVersion[]>([]);
 
+  // View-Switcher (Q2/2026): Default = 'modern', persistiert in localStorage.
+  const [view, setView] = useState<'modern' | 'hacker'>('modern');
+  useEffect(() => {
+    try {
+      const stored = typeof window !== 'undefined' ? window.localStorage.getItem('scanView') : null;
+      if (stored === 'modern' || stored === 'hacker') setView(stored);
+    } catch { /* localStorage unavailable, fallback bleibt 'modern' */ }
+  }, []);
+  const handleViewChange = useCallback((v: 'modern' | 'hacker') => {
+    setView(v);
+    try { window.localStorage.setItem('scanView', v); } catch { /* ignore */ }
+  }, []);
+
   useEffect(() => {
     if (!isLoggedIn()) { router.replace('/login'); return; }
     setAdmin(isAdmin());
@@ -230,6 +245,24 @@ export default function ScanDetailPage() {
     if (res.success) {
       const findingsRes = await getFindings(orderId);
       if (findingsRes.success && findingsRes.data) setFindings(findingsRes.data);
+    }
+  }, [orderId]);
+
+  const handleApprove = useCallback(async () => {
+    const res = await approveOrder(orderId);
+    if (res.success) {
+      const orderRes = await getOrderStatus(orderId);
+      if (orderRes.success && orderRes.data) setOrder(orderRes.data);
+    }
+  }, [orderId]);
+
+  const handleReject = useCallback(async () => {
+    const reason = prompt('Begründung für die Ablehnung:');
+    if (reason === null) return;
+    const res = await rejectOrder(orderId, reason);
+    if (res.success) {
+      const orderRes = await getOrderStatus(orderId);
+      if (orderRes.success && orderRes.data) setOrder(orderRes.data);
     }
   }, [orderId]);
 
@@ -309,6 +342,25 @@ export default function ScanDetailPage() {
     }
   }
 
+  // Modern-View ist Default seit Mai 2026. Hacker-View bleibt darunter
+  // als Legacy-Render-Pfad erreichbar.
+  if (view === 'modern') {
+    return (
+      <ModernView
+        order={order}
+        findings={findings}
+        aiData={aiData}
+        admin={admin}
+        view={view}
+        onViewChange={handleViewChange}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        onExclude={handleExclude}
+        onUnexclude={handleUnexclude}
+      />
+    );
+  }
+
   return (
     <main className="flex-1 flex flex-col px-4 py-6 md:px-8">
       <div className="max-w-6xl mx-auto w-full space-y-4">
@@ -325,6 +377,7 @@ export default function ScanDetailPage() {
             }`}>{statusLabel}</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <ViewSwitcher value={view} onChange={handleViewChange} />
             {isDone && order.hasReport && (
               <>
                 <a href={getReportDownloadUrl(orderId)}
