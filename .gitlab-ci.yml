@@ -141,6 +141,33 @@ test-report-worker:
     - echo "${GHCR_TOKEN}" | docker login ghcr.io -u dc-77 --password-stdin
   script:
     - cd ${DEPLOY_PATH}
+    # ── Pre-Deploy: aktive Scans verhindern damit der Container-Restart
+    #    keinen Mid-Phase2-Scan abwuergt (Daten waeren verloren, weil noch
+    #    nicht in MinIO hochgeladen). Bei DEPLOY_FORCE=true wird die Pruefung
+    #    uebersprungen — fuer Notfall-Hotfixes.
+    - |
+      if [ "${DEPLOY_FORCE:-false}" != "true" ]; then
+        ACTIVE=$(docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc "
+          SELECT count(*) FROM orders WHERE status IN
+            ('queued','scanning','passive_intel','dns_recon','scan_phase1','scan_phase2','scan_phase3','report_generating')
+        " 2>/dev/null | tr -d '[:space:]' || echo "?")
+        if [ "$ACTIVE" = "?" ]; then
+          echo "WARN: Konnte aktive Scans nicht pruefen (DB nicht erreichbar?). Fahre vorsichtig fort."
+        elif [ "$ACTIVE" -gt 0 ]; then
+          echo "ERROR: $ACTIVE aktive Scan(s) laufen — Deploy abgebrochen."
+          echo "       Warte bis sie fertig sind, oder setze DEPLOY_FORCE=true (Daten gehen verloren!)."
+          docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -c "
+            SELECT id, target_url, status, scan_started_at FROM orders WHERE status IN
+              ('queued','scanning','passive_intel','dns_recon','scan_phase1','scan_phase2','scan_phase3','report_generating')
+            ORDER BY scan_started_at DESC LIMIT 10
+          " 2>/dev/null || true
+          exit 1
+        else
+          echo "OK: keine aktiven Scans, Deploy darf weiterlaufen."
+        fi
+      else
+        echo "WARN: DEPLOY_FORCE=true — aktive Scans werden ignoriert."
+      fi
     - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
     - cp .env .env.bak 2>/dev/null || true
     - |
