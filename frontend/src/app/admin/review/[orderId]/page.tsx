@@ -92,7 +92,6 @@ export default function AdminReviewOrderPage() {
   const canRelease = stats.pending === 0 && stats.approved > 0;
 
   const handleRelease = async () => {
-    if (!window.confirm(`Auftrag freigeben? ${stats.approved} Target${stats.approved === 1 ? '' : 's'} werden gescannt.`)) return;
     setReleasing(true);
     const res = await releaseOrder(orderId);
     setReleasing(false);
