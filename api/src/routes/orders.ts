@@ -1028,7 +1028,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       const status = order.status as string;
       const allowedStatuses = [
         'report_complete', 'completed', 'failed', 'report_generating',
-        'cancelled', 'scan_complete',
+        'cancelled', 'scan_complete', 'delivered', 'pending_review',
       ];
       if (!allowedStatuses.includes(status)) {
         return reply.status(409).send({
