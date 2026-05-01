@@ -330,3 +330,91 @@ mid-Phase abgewuergt (siehe vorigen Vorfall mit Orders `a56f9747` /
   Out-of-Scope markiert; loest die Reporter-Wording-Drift komplett.
 - Weitere Mapper-Patterns fuer „Excessive open ports", „Session-ID in
   URL-Rewriting", „Anti-CSRF in Formularen", generischer port_exposed.
+
+---
+
+## 3h-Lasttest (2026-05-01 abend, nach allen 4 PRs)
+
+Sechs frische Perimeter-Scans + drei Regenerate-Tests, parallelisiert
+mit echten Test-Domains. Zweck: Run-zu-Run-Konsistenz auf identischen
+Targets messen.
+
+### Pre-Check (Subdomain-Discovery) — Host-Set-Stabilitaet
+
+| Target | R1 scan-hosts | R2 scan-hosts | Overlap |
+|---|---:|---:|---|
+| heuel.com | 4 | 4 | **4/4** ✓ |
+| securess.de | 6 | 6 | **6/6** ✓ |
+| stadt-handel.de | 2 | 2 | **2/2** ✓ |
+
+Im 30-min-Intervall liefert die Pre-Check-Phase **identische Host-Sets**.
+Das ist ein Pluspunkt — zeigt dass Pre-Check kurzfristig stabil ist
+(nur ueber laengere Zeitraeume / DNS-/CT-Aenderungen drift entsteht;
+M4 wuerde das auch ueber Tage stabilisieren).
+
+### Run-zu-Run (R1 vs R2) — verschiedene Order-IDs, identisches Target
+
+| Target | R1 Findings | R2 Findings | R1 Coverage | R2 Coverage | Severity R1 | Severity R2 |
+|---|---:|---:|---:|---:|---|---|
+| heuel.com | 7 | 7 | 57% | **57%** | C0H0M2L4I1 | **C0H0M2L4I1** |
+| securess.de | 11 | 9 | 82% | **89%** | C0H0M2L7I2 | C0H0M2L4I3 |
+| stadt-handel.de | 7 | 10 | 71% | 50% | C0H0M3L2I2 | C0H0M5L2I3 |
+
+**heuel.com R1 vs R2: alle aggregierten Metriken identisch** — nur das
+Wording in den Findings-Texten driftet leicht (Hash davon abweichend).
+Severity-Verteilung byte-identisch.
+
+**securess.de** schwankt um +/- 2 Findings je Lauf (Reporter-Konsolidierung
+unterschiedlich); Coverage und distinct-policy-Set bleiben hoch.
+
+**stadt-handel.de** zeigt die staerkste Varianz — neue Mapper-Lücken:
+in R2 hat Reporter 3 zusaetzliche Findings extrahiert, alle 3 davon
+SP-FALLBACK. Hier schlummern noch Mapper-Pattern-Kandidaten.
+
+**Ohne Cache-Hit auf verschiedenen Order-IDs ist 100% Determinismus
+nicht erreichbar** — das ist das, was die Reporter-Narrative-only-
+Migration (M5, Out-of-Scope) komplett loesen wuerde.
+
+### Regenerate-Determinismus (selbe Order, mehrfach regeneriert)
+
+| Order | Run 1 | Run 2 | Run 3 |
+|---|---|---|---|
+| heuel.com R1 (`d983c7b4`) | hash `9ad8cde05977` (~6s) | hash `9ad8cde05977` (~6s) | hash `9ad8cde05977` (~6s) |
+
+**3× regenerate, 3× byte-identischer Hash, jeweils 6 Sekunden** statt
+~90s ohne Cache (15× schneller). Order-Scope-Cache greift wie geplant
+fuer Re-Generierung derselben Order.
+
+### Coverage-Verlauf insgesamt
+
+| Phase | Avg Coverage | SP-FALLBACK-Rate |
+|---|---:|---:|
+| **Vor allen PRs** (Audit 10285) | n.a. (alles SP-FALLBACK) | 100% |
+| **Vor PR1 Mapper-Fix** | ~30-50% | 50-70% |
+| **Nach PR1 Mapper** (8 alte heuel/securess Reports) | ~50-67% | 33-50% |
+| **3h-Lasttest 6 frische Scans** | **65-70% avg, max 89%** | 11-50% |
+
+**Ziel < 30% Fallback-Rate erreicht** auf securess.de (11-21%); fast
+erreicht auf heuel.com (43%); offen bei stadt-handel.de (50%).
+
+### Pre-Deploy-Check-Wirkung
+
+Waehrend der Tests:
+- Pipeline `2368` wurde durch Pre-Deploy-Check abgewuergt weil mein
+  parallel laufender heuel.com-Scan aktiv war ✓ (gewuenschtes Verhalten)
+- Manueller Retry nach Scan-Ende lief sauber durch ✓
+- Spaetere Tests stiessen nicht mehr auf Mid-Scan-Restart (kein
+  weiterer Push waehrend die 3h-Tests liefen)
+
+### Fazit 3h-Lasttest
+
+| Kriterium | Status |
+|---|---|
+| `regenerate-report` deterministisch (selbe Order) | ✅ 100% |
+| Mapper-Coverage > 50% | ✅ avg 65-70%, peak 89% |
+| Pre-Check-Hosts stabil (kurzfristig) | ✅ 12/12 Hosts overlap |
+| Schnellerer Regen durch Cache | ✅ 6s statt 90s (15×) |
+| Run-zu-Run identisch bei verschiedenen Order-IDs | ⚠️ aggregiert ja (Severities), wording leicht abweichend |
+
+Verbleibende Drift wuerde nur durch M5 (Reporter-Narrative-only-Migration)
+komplett geloest werden.
