@@ -350,6 +350,7 @@ export default function ScanDetailPage() {
         order={order}
         findings={findings}
         aiData={aiData}
+        scanResults={scanResults}
         admin={admin}
         view={view}
         onViewChange={handleViewChange}

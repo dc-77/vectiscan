@@ -25,12 +25,14 @@ import PolicyCoverage from '@/components/scan/PolicyCoverage';
 import ScanStoryTimeline from '@/components/scan/ScanStoryTimeline';
 import SeverityDonut from '@/components/scan/SeverityDonut';
 import ThreatIntelBadge from '@/components/scan/ThreatIntelBadge';
+import ToolTrace from '@/components/scan/ToolTrace';
 import ViewSwitcher from '@/components/scan/ViewSwitcher';
 import {
   getReportDownloadUrl,
   type FindingsData,
   type OrderEvents,
   type OrderStatus,
+  type ScanResult,
 } from '@/lib/api';
 import { STATUS_LABELS } from '@/lib/utils';
 
@@ -39,6 +41,7 @@ interface Props {
   findings: FindingsData | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   aiData: (OrderEvents & Record<string, any>) | null;
+  scanResults: ScanResult[] | null;
   admin: boolean;
   view: 'modern' | 'hacker';
   onViewChange: (v: 'modern' | 'hacker') => void;
@@ -67,13 +70,14 @@ function formatDate(iso: string): string {
 }
 
 export default function ModernView({
-  order, findings, aiData, admin, view, onViewChange, onApprove, onReject,
+  order, findings, aiData, scanResults, admin, view, onViewChange, onApprove, onReject,
   onExclude, onUnexclude,
 }: Props) {
   const orderId = order.id ?? '';
 
   const [showStory, setShowStory] = useState(true);
   const [showCosts, setShowCosts] = useState(false);
+  const [showToolTrace, setShowToolTrace] = useState(false);
 
   const isDone = order.status === 'report_complete' || order.status === 'delivered';
   const isFailed = order.status === 'failed' || order.status === 'cancelled' || order.status === 'rejected';
@@ -99,7 +103,6 @@ export default function ModernView({
   // KI-Daten aus events
   const aiStrategy = aiData?.aiStrategy ?? null;
   const aiConfigs = aiData?.aiConfigs ?? null;
-  const toolOutputs = aiData?.toolOutputs ?? null;
   const discoveredHosts = aiData?.discoveredHosts ?? order.progress.discoveredHosts ?? null;
   // discoveredHosts kann Array oder Objekt mit .hosts sein
   const hostList = (() => {
@@ -315,13 +318,17 @@ export default function ModernView({
             <span className="text-xs text-slate-500">{showStory ? '▲ einklappen' : '▼ ausklappen'}</span>
           </button>
           {showStory && (
-            <div className="mt-4">
+            <div className="mt-4 space-y-2">
               <ScanStoryTimeline
                 aiStrategy={aiStrategy}
                 aiConfigs={aiConfigs}
-                toolOutputs={toolOutputs}
                 discoveredHosts={hostList}
               />
+              {admin && (scanResults?.length ?? 0) > 0 && (
+                <p className="text-[10px] text-slate-500 italic mt-2">
+                  Tool-Aufrufe (gobuster, nmap, zap, …) findest du im Tool-Trace-Tab unten.
+                </p>
+              )}
             </div>
           )}
         </section>
@@ -367,6 +374,34 @@ export default function ModernView({
                   ))}
                 </tbody>
               </table>
+            )}
+          </section>
+        )}
+
+        {/* ── TOOL-TRACE (admin-only, collapsible) ─ */}
+        {admin && (scanResults?.length ?? 0) > 0 && (
+          <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+            <button
+              type="button"
+              onClick={() => setShowToolTrace((v) => !v)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <h2 className="text-sm font-medium text-slate-300">
+                Tool-Trace{' '}
+                <span className="text-xs text-slate-500 font-normal">
+                  (Admin · {scanResults?.length ?? 0} Eintraege)
+                </span>
+              </h2>
+              <span className="text-xs text-slate-500">{showToolTrace ? '▲ einklappen' : '▼ ausklappen'}</span>
+            </button>
+            {showToolTrace && (
+              <div className="mt-4">
+                <ToolTrace
+                  scanResults={scanResults ?? []}
+                  aiConfigs={aiConfigs}
+                  discoveredHosts={hostList}
+                />
+              </div>
             )}
           </section>
         )}

@@ -1,13 +1,16 @@
 'use client';
 
 /**
- * ScanStoryTimeline — chronologische Erzaehlung des Scans:
- * KI-Decision (◉) -> Tool-Start (⚙) -> Skip (⊘) -> Finding (⚠).
+ * ScanStoryTimeline — semantische Erzaehlung der KI-Entscheidungen:
+ * Strategie -> Targeting -> Skip -> Phase-2-Config.
+ *
+ * Tool-Aufrufe (gobuster, nmap, zap, feroxbuster, …) bewusst NICHT mehr hier —
+ * sie waren zu technisch fuer Customer-Augen. Admin sieht sie unten im
+ * Tool-Trace-Tab (siehe ToolTrace.tsx).
  *
  * Datenquellen:
  *   - aiStrategy.hosts[]: scan/skip-Entscheidungen (KI #1)
  *   - aiConfigs (Map IP -> config): Phase-2-Config-Decisions (KI #3)
- *   - toolOutputs: chronologische Tool-Starts mit Summary
  */
 
 interface AiHost {
@@ -23,22 +26,14 @@ interface AiConfig {
   reasoning?: string;
 }
 
-interface ToolOutput {
-  tool: string;
-  host: string;
-  summary?: string;
-  ts?: number | string;
-}
-
 interface Props {
   aiStrategy?: { strategy_notes?: string; hosts?: AiHost[] } | null;
   aiConfigs?: Record<string, AiConfig> | null;
-  toolOutputs?: ToolOutput[] | null;
   discoveredHosts?: Array<{ ip: string; fqdns?: string[] }> | null;
 }
 
 type Item = {
-  type: 'strategy' | 'targeting' | 'skip' | 'config' | 'tool';
+  type: 'strategy' | 'targeting' | 'skip' | 'config';
   ts: number;
   title: string;
   detail?: string;
@@ -54,26 +49,17 @@ const ICONS: Record<string, { icon: string; ring: string; text: string }> = {
   targeting: { icon: '◉', ring: 'ring-cyan-500/30 bg-cyan-500/5',      text: 'text-cyan-300' },
   skip:      { icon: '⊘', ring: 'ring-slate-700 bg-slate-900',          text: 'text-slate-400' },
   config:    { icon: '⚙', ring: 'ring-purple-500/30 bg-purple-500/5',  text: 'text-purple-300' },
-  tool:      { icon: '⚡', ring: 'ring-emerald-500/30 bg-emerald-500/5', text: 'text-emerald-300' },
 };
 
 export default function ScanStoryTimeline({
   aiStrategy,
   aiConfigs,
-  toolOutputs,
   discoveredHosts,
 }: Props) {
   const items: Item[] = [];
-  // Wir haben keinen echten KI-Decision-Timestamp im Payload, nur Tool-Output-TS.
-  // Daher: Strategy + Targetings + Configs als ein Block ganz oben (logische Reihenfolge),
-  // dann Tool-Outputs chronologisch nach unten.
-  let baseTs = 0;
-  if (toolOutputs && toolOutputs.length > 0) {
-    const first = toolOutputs[0]?.ts;
-    if (typeof first === 'number') baseTs = first;
-    else if (typeof first === 'string') baseTs = new Date(first).getTime();
-  }
-  if (!baseTs) baseTs = Date.now();
+  // Wir haben keinen echten KI-Decision-Timestamp im Payload — also synthetisch
+  // einen Block "jetzt" mit logischer Reihenfolge: strategy -> targetings -> configs.
+  const baseTs = Date.now();
 
   if (aiStrategy?.strategy_notes) {
     items.push({
@@ -105,16 +91,6 @@ export default function ScanStoryTimeline({
       title: `${fqdnFor(ip, discoveredHosts)} — policy=${cfg.zap_scan_policy ?? 'standard'}${skipText}`,
       detail: cfg.reasoning,
       badge: 'KI #3',
-    });
-  });
-
-  (toolOutputs ?? []).forEach((t) => {
-    const ts = typeof t.ts === 'number' ? t.ts : t.ts ? new Date(t.ts).getTime() : baseTs;
-    items.push({
-      type: 'tool',
-      ts,
-      title: `${t.tool} → ${fqdnFor(t.host, discoveredHosts)}`,
-      detail: t.summary,
     });
   });
 
