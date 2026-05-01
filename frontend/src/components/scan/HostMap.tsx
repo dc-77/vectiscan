@@ -10,8 +10,6 @@
  *   - discoveredHosts: Fallback wenn keine AI-Strategy vorliegt
  */
 
-import { useState } from 'react';
-
 interface AiHost {
   ip: string;
   action?: 'scan' | 'skip';
@@ -45,8 +43,6 @@ function fqdnFor(host: AiHost | DiscoveredHost, discoveredHosts: DiscoveredHost[
 }
 
 export default function HostMap({ aiHosts, discoveredHosts, strategyNotes }: Props) {
-  const [expanded, setExpanded] = useState<string | null>(null);
-
   // Wenn keine aiStrategy vorliegt: simple Liste der discovered hosts
   if (!aiHosts || aiHosts.length === 0) {
     if (!discoveredHosts || discoveredHosts.length === 0) {
@@ -95,22 +91,19 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes }: Pro
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 items-start">
           {aiHosts.map((h) => {
-            const isOpen = expanded === h.ip;
             const isSkip = h.action === 'skip';
             const fqdn = fqdnFor(h, discoveredHosts);
             const prio = h.priority ? PRIORITY_STYLES[String(h.priority)] : null;
 
             return (
-              <button
+              <div
                 key={h.ip}
-                type="button"
-                onClick={() => setExpanded(isOpen ? null : h.ip)}
-                className={`rounded-lg border text-left transition-colors p-3 ${
+                className={`rounded-lg border p-3 ${
                   isSkip
-                    ? 'border-slate-800 bg-slate-950/30 hover:border-slate-700'
-                    : 'border-slate-700 bg-slate-900/60 hover:border-cyan-700'
+                    ? 'border-slate-800 bg-slate-950/30'
+                    : 'border-slate-700 bg-slate-900/60'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -135,19 +128,14 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes }: Pro
                 )}
                 {h.reasoning && (
                   <div
-                    className={`mt-2 text-xs leading-snug ${isSkip ? 'text-slate-500' : 'text-slate-400'} ${
-                      isOpen ? '' : 'line-clamp-2'
+                    className={`mt-2 text-xs leading-snug ${
+                      isSkip ? 'text-slate-500' : 'text-slate-400'
                     }`}
                   >
                     {h.reasoning}
                   </div>
                 )}
-                {h.reasoning && h.reasoning.length > 100 && (
-                  <div className="mt-1 text-[10px] text-slate-600">
-                    {isOpen ? '▲ weniger' : '▼ mehr'}
-                  </div>
-                )}
-              </button>
+              </div>
             );
           })}
         </div>
