@@ -680,6 +680,81 @@ SEVERITY_POLICIES: list[SeverityPolicy] = [
     ),
 
     # ----------------------------------------------------------------
+    # DATABASE-PORT-EXPOSURE (SP-DB-*)
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-DB-001",
+        finding_type="database_port_exposed",
+        final_severity=Severity.HIGH,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L",
+        cvss_score=7.3,
+        rationale="Datenbank-Port (3306/5432/27017/6379/...) oeffentlich "
+                  "erreichbar - Brute-Force, Default-Creds, ungepatchte "
+                  "DB-CVEs unmittelbares Risiko",
+        references=["CWE-200", "CWE-284", "OWASP2025-A05"],
+    ),
+
+    # ----------------------------------------------------------------
+    # CORS / CROSS-DOMAIN MISCONFIGURATION (SP-CORS-*)
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-CORS-001",
+        finding_type="cors_misconfiguration",
+        final_severity=Severity.MEDIUM,
+        cvss_vector="AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+        cvss_score=5.4,
+        rationale="CORS / Cross-Domain-Fehlkonfiguration (z.B. wildcard "
+                  "Access-Control-Allow-Origin, fehlerhafte Preflight-Logik) "
+                  "ermoeglicht Cross-Origin-Datenzugriff mit Auth-Cookies",
+        references=["CWE-942", "CWE-346", "OWASP2025-A05"],
+    ),
+
+    # ----------------------------------------------------------------
+    # JAVASCRIPT LIBRARY VULNERABILITIES (SP-JS-*)
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-JS-001",
+        finding_type="js_library_vulnerable",
+        final_severity=Severity.MEDIUM,
+        cvss_vector="AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+        cvss_score=5.4,
+        rationale="Eingebundene JavaScript-Bibliothek (jQuery, Bootstrap, "
+                  "AngularJS, …) mit bekannten Vulnerabilities — DOM-XSS / "
+                  "Prototype-Pollution typische Vektoren",
+        references=["CWE-1104", "CWE-79", "OWASP2025-A06"],
+    ),
+
+    # ----------------------------------------------------------------
+    # PRIVATE-IP / INTERNAL-ADDRESS DISCLOSURE (SP-DISC-009)
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-DISC-009",
+        finding_type="private_ip_disclosure",
+        final_severity=Severity.LOW,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+        cvss_score=3.7,
+        rationale="Private IP-Adressen (RFC1918 10.x, 172.16-31.x, 192.168.x) "
+                  "in HTTP-Antworten / Headers / Errorpages sichtbar — "
+                  "interne Netzwerk-Topologie wird Angreifern preisgegeben",
+        references=["CWE-200", "CWE-204"],
+    ),
+
+    # ----------------------------------------------------------------
+    # SUBRESOURCE INTEGRITY (SP-SRI-*)
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-SRI-001",
+        finding_type="sri_missing",
+        final_severity=Severity.LOW,
+        cvss_vector="AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+        cvss_score=3.1,
+        rationale="Externe JavaScript-/Stylesheet-Ressourcen ohne Subresource-"
+                  "Integrity-Hash eingebunden — kompromittierter CDN kann "
+                  "beliebigen Code ausliefern; Risiko abh. von CDN-Reputation",
+        references=["CWE-353", "OWASP2025-A06"],
+    ),
+
+    # ----------------------------------------------------------------
     # SSH HARDENING (SP-SSH-*)
     # ----------------------------------------------------------------
     SeverityPolicy(

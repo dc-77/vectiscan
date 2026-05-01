@@ -22,6 +22,51 @@ from typing import Optional
 # Pattern-Tabelle: (regex auf title|description|cwe, finding_type)
 # Reihenfolge ist wichtig — spezifischere Pattern zuerst.
 _PATTERNS: list[tuple[re.Pattern[str], str]] = [
+    # ── Datenbank-Port-Exposition (sehr spezifisch zuerst) ─
+    # Muss VOR generischen "Port exponiert" Patterns matchen.
+    (re.compile(
+        r"(?:mysql|mariadb|postgres|postgresql|mongodb|redis|elastic|elasticsearch|"
+        r"cassandra|couchdb|dynamodb)[-_ ]?(?:datenbank|database|server|port|service|dienst)?"
+        r".*(?:expon|publicly|oeffentlich|erreichbar|exposed|offen|3306|5432|27017|6379)",
+        re.I,
+     ), "database_port_exposed"),
+    (re.compile(
+        r"(?:port|tcp)[-_ ]?(?:3306|5432|27017|6379|9200|11211).*(?:expon|offen|erreichbar)",
+        re.I,
+     ), "database_port_exposed"),
+
+    # ── Cross-Domain / CORS Fehlkonfiguration ──────────────
+    (re.compile(
+        r"cross[-_ ]?(?:domain|origin)[-_ ]?(?:fehl|miss|konfig|configuration|policy)|"
+        r"\bcors\b.*(?:fehl|miss|wildcard|misconfig|insecure|unsicher)|"
+        r"access[-_ ]?control[-_ ]?allow[-_ ]?origin.*(?:wildcard|\*|miss|fehl)",
+        re.I,
+     ), "cors_misconfiguration"),
+
+    # ── JavaScript-Library-Vulnerability ───────────────────
+    (re.compile(
+        r"(?:verwundbare?|veraltete?|vulnerable|outdated)\s*(?:javascript|js)[-_ ]?(?:bibliothek|library)|"
+        r"(?:javascript|js)[-_ ]?(?:bibliothek|library).*(?:verwundbar|veraltet|vulnerable|outdated|cve)|"
+        r"\b(?:jquery|bootstrap|angularjs|moment\.js|lodash|underscore)\b\s*[<\d.]+.*(?:verwundbar|outdated|veraltet|vuln)",
+        re.I,
+     ), "js_library_vulnerable"),
+
+    # ── Private IP / Information-Leak in Antworten ─────────
+    (re.compile(
+        r"(?:private|interne)?\s*ip[-_ ]?(?:adress|address)e?n?.*(?:in|via|durch).*"
+        r"(?:antwort|response|http[-_ ]?antwort|http[-_ ]?response|leak|disclos|exposed|offengelegt|preisgegeben)|"
+        r"(?:rfc[-_ ]?1918|10\.\d|172\.(?:1[6-9]|2\d|3[01])\.|192\.168\.).*(?:expon|leak|disclos|offengelegt|preisgegeben)",
+        re.I,
+     ), "private_ip_disclosure"),
+
+    # ── Subresource Integrity (SRI) ────────────────────────
+    (re.compile(
+        r"(?:fehlende?|missing)\s*(?:sub[-_ ]?resource[-_ ]?integrity|sri)|"
+        r"\bsri\b.*(?:fehl|miss|not[-_ ]?set|nicht[-_ ]?gesetzt)|"
+        r"(?:sri|integrity)[-_ ]?hash.*(?:fehl|miss)",
+        re.I,
+     ), "sri_missing"),
+
     # ── WordPress Plugin- / Theme-Vulnerabilities ────────
     # Sammeltyp fuer alle bekannten WP-Plugin/Theme-Schwachstellen.
     # Faengt Findings wie "Slider Revolution", "Complianz", "Betheme",

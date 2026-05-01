@@ -138,6 +138,51 @@ from reporter.finding_type_mapper import annotate_finding_types, map_finding_typ
      "directory_listing_enabled"),
     ({"description": "Stack-Trace in Fehlermeldung sichtbar"},
      "error_message_with_stack"),
+
+    # ── PR1 / M3 — Fallback-Treiber-Patterns (2026-05-01) ──
+    # Datenbank-Port-Exposition
+    ({"title": "MySQL-Port (3306) auf Subdomain-Host exponiert"},
+     "database_port_exposed"),
+    ({"title": "MySQL-Datenbank öffentlich erreichbar mit veralteter Version"},
+     "database_port_exposed"),
+    ({"title": "PostgreSQL-Server publicly accessible"},
+     "database_port_exposed"),
+    ({"title": "Redis-Service offen auf Port 6379"},
+     "database_port_exposed"),
+    ({"title": "MongoDB-Datenbank exponiert"},
+     "database_port_exposed"),
+
+    # CORS / Cross-Domain
+    ({"title": "Cross-Domain-Fehlkonfiguration auf ose.heuel.com"},
+     "cors_misconfiguration"),
+    ({"description": "CORS Wildcard Access-Control-Allow-Origin"},
+     "cors_misconfiguration"),
+    ({"title": "Access-Control-Allow-Origin wildcard mit Credentials"},
+     "cors_misconfiguration"),
+
+    # JS-Library
+    ({"title": "Verwundbare JavaScript-Bibliothek auf ose.heuel.com"},
+     "js_library_vulnerable"),
+    ({"title": "Veraltete JavaScript-Bibliothek eingebunden"},
+     "js_library_vulnerable"),
+    ({"description": "Vulnerable JS library jQuery 1.12 bekannte CVE"},
+     "js_library_vulnerable"),
+
+    # Private-IP-Disclosure
+    ({"title": "Private IP-Adressen in HTTP-Antworten offengelegt"},
+     "private_ip_disclosure"),
+    ({"title": "Private IP-Adressen in öffentlichen Antworten"},
+     "private_ip_disclosure"),
+    ({"description": "RFC1918-Adresse 10.0.5.12 leak in Header"},
+     "private_ip_disclosure"),
+
+    # SRI
+    ({"title": "Fehlende Sub Resource Integrity (SRI) für externe Ressourcen"},
+     "sri_missing"),
+    ({"title": "Fehlende Sub Resource Integrity (SRI) auf externen Skripten"},
+     "sri_missing"),
+    ({"description": "SRI-Hash fehlt auf CDN-eingebundenem JS"},
+     "sri_missing"),
 ])
 def test_map_finding_type(finding, expected):
     assert map_finding_type(finding) == expected
