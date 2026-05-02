@@ -79,7 +79,11 @@ class TestPerimeter:
 
     def test_phase0b_full_dns(self):
         config = get_config("perimeter")
-        assert "amass" in config["phase0b_tools"]
+        # amass v5 entfernt (2026-05-03) — siehe Kommentar in packages.py.
+        # subfinder mit -all uebernimmt die Source-Coverage; certspotter +
+        # securitytrails ergaenzen als CT-Quellen.
+        assert "subfinder" in config["phase0b_tools"]
+        assert "crtsh" in config["phase0b_tools"]
         assert "gobuster_dns" in config["phase0b_tools"]
         assert "dane_tlsa" in config["phase0b_tools"]
 

@@ -435,6 +435,22 @@ function HomeContent() {
           gridTemplateRows: 'var(--scan-grid-rows)',
           gridTemplateColumns: 'var(--scan-grid-cols)',
         }}>
+        {/* Floating Back-to-Modern-View Toggle — Pendant zum ViewSwitcher
+            in /scan/<id>. Damit User aus dem Live-Terminal zurueck zur
+            Bericht-Ansicht kann. Position: oben rechts, ueber allem. */}
+        {orderId && (
+          <button
+            type="button"
+            onClick={() => {
+              try { window.localStorage.setItem('scanView', 'modern'); } catch { /* ignore */ }
+              router.push(`/scan/${orderId}`);
+            }}
+            className="fixed top-3 right-3 z-[9999] px-3 py-1.5 text-xs font-medium rounded-md bg-slate-900/90 ring-1 ring-cyan-500/40 text-cyan-200 hover:bg-cyan-500/20 transition-colors backdrop-blur"
+            title="Zurueck zur Bericht-Ansicht (Modern-View)"
+          >
+            ← Bericht
+          </button>
+        )}
         {/* CSS custom properties for responsive grid — mobile: stacked, desktop: 3-col */}
         <style>{`
           main { --scan-grid-areas: "progress" "sidebar" "hosts" "active" "terminal" "ailog";

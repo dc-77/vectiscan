@@ -59,7 +59,10 @@ class TestPhase0Packages:
 
         mock_crtsh.assert_called_once()
         mock_subfinder.assert_called_once()
-        mock_amass.assert_called_once()
+        # amass v5 ist seit 2026-05-03 aus phase0_tools entfernt
+        # (siehe packages.py: subfinder -all + certspotter decken die
+        # Sources besser ab als amass v5).
+        mock_amass.assert_not_called()
         mock_gobuster.assert_called_once()
         mock_zone.assert_called_once()
         mock_dnsx.assert_called_once()

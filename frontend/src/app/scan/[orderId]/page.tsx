@@ -174,7 +174,13 @@ export default function ScanDetailPage() {
   const handleViewChange = useCallback((v: 'modern' | 'hacker') => {
     setView(v);
     try { window.localStorage.setItem('scanView', v); } catch { /* ignore */ }
-  }, []);
+    // 'hacker' = echte Live-Terminal-Seite mit RadarTopology, ScanTerminal,
+    // AiDecisionFeed. Diese wohnt unter /scan?orderId=<id> (separate Page).
+    // Wir leiten dorthin um statt nur den View-State zu togglen.
+    if (v === 'hacker') {
+      router.push(`/scan?orderId=${orderId}`);
+    }
+  }, [orderId, router]);
 
   useEffect(() => {
     if (!isLoggedIn()) { router.replace('/login'); return; }

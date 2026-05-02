@@ -1154,11 +1154,11 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         phase0_timeout = config.get("phase0b_timeout", config.get("phase0_timeout", PHASE0_TIMEOUT))
         max_hosts = config["max_hosts"]
         phase0_tools = config.get("phase0b_tools", config.get("phase0_tools",
-                                  ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]))
+                                  ["crtsh", "subfinder", "gobuster_dns", "axfr", "dnsx"]))
     else:
         phase0_timeout = PHASE0_TIMEOUT
         max_hosts = MAX_HOSTS
-        phase0_tools = ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]
+        phase0_tools = ["crtsh", "subfinder", "gobuster_dns", "axfr", "dnsx"]
 
     phase0_start = time.monotonic()
     phase0_dir = os.path.join(scan_dir, "phase0")
