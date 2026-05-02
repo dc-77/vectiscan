@@ -428,14 +428,25 @@ def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dic
         order_id=order_id, host_ip=ip, phase=2, tool_name="wpscan",
     )
 
-    # WPScan returns various exit codes: 0=ok, 5=vulnerabilities found
-    if exit_code not in (0, 5):
+    # WPScan exit codes:
+    #   0 = ok, no vulnerabilities found
+    #   1 = generic error (e.g. CTRL-C)
+    #   3 = update DB failed but scan continues
+    #   4 = WordPress not detected on the target — kein Fehler!
+    #   5 = vulnerabilities found
+    # Frueher haben wir 4 als Failure gewertet → "wpscan exit=4" im Trace.
+    # Bei einer normalen Site ohne WordPress ist das aber das erwartete
+    # Ergebnis und das JSON enthaelt sinnvolle Info.
+    if exit_code not in (0, 4, 5):
         log.warning("wpscan_failed", fqdn=fqdn, exit_code=exit_code)
         return None
 
     try:
         with open(output_path, "r") as f:
             data = json.load(f)
+        if exit_code == 4 or not data.get("target_url"):
+            log.info("wpscan_no_wordpress", fqdn=fqdn)
+            return None  # Sauberer "kein WP"-Pfad: None zurueck, kein Failure.
         vuln_count = len(data.get("interesting_findings", []))
         plugins = len(data.get("plugins", {}))
         log.info("wpscan_complete", fqdn=fqdn, vulns=vuln_count, plugins=plugins)
@@ -555,10 +566,17 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
             "-H", "User-Agent: Mozilla/5.0 vectiscan",
             "-json",
             "-o", output_path,
-            "-t", "30",
-            "-rate", "50",
+            # Param-Mode: hoehere Threads + RPS, weil burp-parameter-names
+            # ~6500 Eintraege hat und 50 RPS in 130s nicht durchkommt.
+            "-t", "60",
+            "-rate", "100",
             "-timeout", "5",
-            "-ac",
+            # `-maxtime 150` laesst ffuf selbst sauber abbrechen +
+            # JSON-File schreiben, statt nach 180s vom run_tool gekillt zu
+            # werden (=> partial output, kein gueltiges JSON).
+            "-maxtime", "150",
+            # `-ac` autocalibrate raus — bei param-mode sendet es zusaetzliche
+            # Probes UND wartet auf jede Antwort, was den Run nochmal verlangsamt.
             "-s",
         ]
     else:
@@ -621,12 +639,12 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
         "-w", wordlist,
         "-d", str(depth),
         "-t", "30",
-        # `--auto-tune` passt rate-limit dynamisch an Server-Last an —
-        # wichtig fuer Live-Sites; festes Limit konnte sonst 5xx ausloesen.
-        "--auto-tune",
-        # `-s` (status-codes als Whitelist) und `--filter-status` (Blacklist)
-        # sind in feroxbuster mutually exclusive. Wir nehmen die Whitelist
-        # (200/301/302/307) — 403/404 sind dann implizit ausgeschlossen.
+        # `--rate-limit 100` statt `--auto-tune`: auto-tune regelt bei
+        # gut-reagierenden Servern auf 0 RPS runter weil es 5xx-Bursts
+        # erwartet → Scan-Timeout nach 150s mit nur Teil-Output. Festes
+        # Limit ist robuster, 100 RPS ist fuer die meisten Sites ok.
+        "--rate-limit", "100",
+        # `-s` (status-codes Whitelist); 403/404 implizit raus
         "-s", "200,301,302,307",
         # Filter sehr kleine Responses (typische "not found"-Pages 0-100b)
         "--filter-size", "0,1,2,3",
@@ -634,17 +652,13 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
         "-o", output_path,
         "--dont-scan", "logout|signout|delete",
         "--timeout", "5",
-        # `--no-recursion` zusammen mit `-d` ist redundant; `-d` bereits
-        # Tiefen-Limit. `--no-recursion` entfernt — `-d` steuert.
-        # User-Agent festlegen
         "-H", "User-Agent: Mozilla/5.0 vectiscan",
-        # `-q` quiet, `--silent` = noch leiser
         "--silent",
     ]
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=150,
+        timeout=240,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
