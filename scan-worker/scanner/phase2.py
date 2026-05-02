@@ -641,16 +641,23 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
         "-t", "30",
         # `--rate-limit 100` statt `--auto-tune`: auto-tune regelt bei
         # gut-reagierenden Servern auf 0 RPS runter weil es 5xx-Bursts
-        # erwartet → Scan-Timeout mit nur Teil-Output. Festes Limit ist
-        # robuster, 100 RPS ist fuer die meisten Sites ok.
+        # erwartet → Scan-Timeout mit nur Teil-Output.
         "--rate-limit", "100",
+        # `--dont-extract-links`: WordPress/BeTheme/SPA-Sites haben 50+
+        # Asset-URLs (JS/CSS/Image) im HTML; ohne diesen Flag scannt
+        # feroxbuster jede einzelne davon UND macht recursion auf jeder.
+        # dortmund-beach.com (10-Seiten WordPress) explodiert damit auf
+        # 240s+ TIMEOUT. Wir wollen nur die wordlist-basierten Pfade.
+        "--dont-extract-links",
+        # `--auto-bail`: bricht den Scan ab wenn der Server zu viele
+        # Fehler/Wildcard-200 produziert (typisch fuer WordPress-Catch-
+        # All-Routen "/<random> → Homepage"). Verhindert false-positives
+        # und Endlos-Scan.
+        "--auto-bail",
         # `--time-limit 3m`: feroxbuster bricht selbst sauber ab statt
         # vom run_tool nach 240s gekillt zu werden. Schreibt validen JSON.
-        # Bei recursion=2 + 4600-Wordlist auf grossen Sites kann sonst
-        # die Anzahl Sub-Scans explodieren.
         "--time-limit", "3m",
         # `--scan-limit 5`: max 5 parallele Scans (Top-Level + 4 Recursive).
-        # Verhindert dass tiefe Trees alles aufhalten.
         "--scan-limit", "5",
         # `-s` (status-codes Whitelist); 403/404 implizit raus
         "-s", "200,301,302,307",
