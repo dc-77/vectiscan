@@ -624,10 +624,10 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
         # `--auto-tune` passt rate-limit dynamisch an Server-Last an —
         # wichtig fuer Live-Sites; festes Limit konnte sonst 5xx ausloesen.
         "--auto-tune",
-        # 403 raus (CloudFlare-Noise)
+        # `-s` (status-codes als Whitelist) und `--filter-status` (Blacklist)
+        # sind in feroxbuster mutually exclusive. Wir nehmen die Whitelist
+        # (200/301/302/307) — 403/404 sind dann implizit ausgeschlossen.
         "-s", "200,301,302,307",
-        # Filter klassische 4xx/5xx-Junk-Antworten
-        "--filter-status", "403,404",
         # Filter sehr kleine Responses (typische "not found"-Pages 0-100b)
         "--filter-size", "0,1,2,3",
         "--json",
