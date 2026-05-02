@@ -434,7 +434,11 @@ function ScanRow({ order, admin, onDelete }: {
   const hasDetails = !['created', 'queued', 'verification_pending', 'verified'].includes(order.status);
   const duration = formatDuration(order.startedAt, order.finishedAt);
   const riskBadge = order.overallRisk ? RISK_BADGE[order.overallRisk.toUpperCase()] : null;
-  const rowHref = needsVerify ? `/verify/${order.id}` : isRunning ? `/?orderId=${order.id}` : undefined;
+  // Karten-Click-Ziel:
+  // - verification_pending / verified → /verify/<id> (eigene UX-Rolle)
+  // - alles andere mit Detail-Page → /scan/<id> (Modern-View, default seit Mai 2026)
+  // - created/queued (noch keine Daten) → nicht klickbar
+  const rowHref = needsVerify ? `/verify/${order.id}` : (hasDetails ? `/scan/${order.id}` : undefined);
 
   return (
     <div
@@ -484,12 +488,8 @@ function ScanRow({ order, admin, onDelete }: {
           <span>{order.startedAt ? formatDate(order.startedAt) : formatDate(order.createdAt)}</span>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
-          {hasDetails && (
-            <Link href={`/scan/${order.id}`} onClick={e => e.stopPropagation()}
-              className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors text-slate-400 hover:text-blue-400 bg-slate-800/50 hover:bg-slate-700/50">
-              Details
-            </Link>
-          )}
+          {/* "Details"-Button entfernt — die ganze Card ist jetzt klickbar
+              und fuehrt direkt zur Modern-View (/scan/<id>). */}
           {needsVerify && (
             <button onClick={e => { e.stopPropagation(); router.push(`/verify/${order.id}`); }}
               className="text-xs text-slate-400 hover:text-blue-400 font-medium px-3 py-1.5 bg-slate-800/50 hover:bg-slate-700/50 rounded-lg transition-colors">
