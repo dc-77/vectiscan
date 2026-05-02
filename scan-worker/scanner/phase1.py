@@ -16,6 +16,155 @@ from scanner.progress import publish_event
 log = structlog.get_logger()
 
 
+# ---------------------------------------------------------------------------
+# Tech-Signal-Extraktion fuer Playwright-basierte Tech-Detection
+# ---------------------------------------------------------------------------
+# Pattern-Matching nach Wappalyzer-Vorbild — leicht erweiterbar.
+# Quelle: bewaehrte Cookie-/Script-/Header-Patterns die in der Praxis
+# zuverlaessig sind. Bewusst klein gehalten — wir wollen keine Wappalyzer-
+# Komplettkopie, sondern die "stillen" SPAs (Next.js, Vue, React) erfassen.
+
+_COOKIE_PATTERNS: list[tuple[str, str]] = [
+    ("next-auth", "Next.js (auth)"),
+    ("__Secure-next-auth", "Next.js (auth)"),
+    ("_next", "Next.js"),
+    ("connect.sid", "Express"),
+    ("XSRF-TOKEN", "Laravel/Angular (XSRF)"),
+    ("laravel_session", "Laravel"),
+    ("ci_session", "CodeIgniter"),
+    ("PHPSESSID", "PHP"),
+    ("JSESSIONID", "Java/Servlet"),
+    ("ASP.NET_SessionId", "ASP.NET"),
+    ("wp-settings-", "WordPress"),
+    ("wordpress_logged_in", "WordPress"),
+    ("typo3-", "TYPO3"),
+    ("frontend_typo", "TYPO3"),
+    ("magento", "Magento"),
+    ("shopware", "Shopware"),
+    ("OptanonConsent", "OneTrust (Consent)"),
+    ("CookieConsent", "Cookiebot"),
+    ("_ga", "Google Analytics"),
+    ("_fbp", "Facebook Pixel"),
+    ("__cf_bm", "Cloudflare Bot Management"),
+    ("cfduid", "Cloudflare"),
+]
+
+_SCRIPT_PATTERNS: list[tuple[str, str]] = [
+    ("/_next/static/", "Next.js"),
+    ("/_nuxt/", "Nuxt.js"),
+    ("/wp-includes/", "WordPress"),
+    ("/wp-content/", "WordPress"),
+    ("/typo3temp/", "TYPO3"),
+    ("/sites/default/files/", "Drupal"),
+    ("/skin/frontend/", "Magento"),
+    ("/static/version", "Magento 2"),
+    ("/build/_buildManifest", "Next.js"),
+    ("/_app-", "Next.js (app router)"),
+    ("react-dom", "React"),
+    ("/vue.runtime", "Vue.js"),
+    ("/vue.global", "Vue.js"),
+    ("@angular/core", "Angular"),
+    ("svelte/internal", "Svelte"),
+    ("turbopack", "Turbopack/Next.js"),
+    ("googletagmanager.com", "Google Tag Manager"),
+    ("hotjar.com", "Hotjar"),
+    ("intercom.io", "Intercom"),
+    ("zendesk.com", "Zendesk"),
+    ("/cdn-cgi/", "Cloudflare CDN"),
+]
+
+_BODY_CLASS_PATTERNS: list[tuple[str, str]] = [
+    ("wp-", "WordPress"),
+    ("page-template", "WordPress"),
+    ("typo3", "TYPO3"),
+    ("drupal", "Drupal"),
+    ("joomla", "Joomla"),
+]
+
+_HEADER_PATTERNS: list[tuple[str, str, str]] = [
+    # (header_name, value_substring or "*", tech_name)
+    ("cf-ray", "*", "Cloudflare"),
+    ("x-vercel-id", "*", "Vercel"),
+    ("x-vercel-cache", "*", "Vercel"),
+    ("server-timing", "vercel", "Vercel"),
+    ("x-served-by", "*", "Fastly"),
+    ("x-cache", "varnish", "Varnish"),
+    ("x-amz-cf-id", "*", "AWS CloudFront"),
+    ("x-amzn-requestid", "*", "AWS API Gateway"),
+    ("x-azure-ref", "*", "Azure Front Door"),
+    ("x-github-request-id", "*", "GitHub Pages"),
+    ("x-pingback", "*", "WordPress (XML-RPC)"),
+    ("x-shopify-stage", "*", "Shopify"),
+    ("x-shopid", "*", "Shopify"),
+    ("x-drupal-cache", "*", "Drupal"),
+    ("x-typo3-parsetime", "*", "TYPO3"),
+    ("x-magento-tags", "*", "Magento"),
+]
+
+
+def _extract_all_tech_signals(redirect_data: dict[str, Any]) -> list[dict[str, str]]:
+    """Wandelt Playwright-`redirect_data` in eine webtech-aehnliche Liste um.
+
+    Wappalyzer-Lite: prueft Cookies, Script-URLs, Body-Classes, Meta-Tags
+    und Response-Headers gegen ein bewaehrtes Pattern-Set. Liefert auch
+    bei modernen SPAs (Next.js, Vue, Vercel) konkrete Tech-Eintraege —
+    vorher kam dort nur "no data".
+    """
+    seen: set[str] = set()
+    tech_list: list[dict[str, str]] = []
+
+    def _add(name: str, version: str = "") -> None:
+        key = name.strip().lower()
+        if key and key not in seen:
+            seen.add(key)
+            tech_list.append({"name": name, "version": version})
+
+    for fqdn_key, probe in (redirect_data or {}).items():
+        tech_info = probe.get("tech_info") or {}
+        headers = probe.get("response_headers") or {}
+
+        # 1. generator + powered_by + server (klassisch)
+        if tech_info.get("generator"):
+            _add(tech_info["generator"])
+        srv = headers.get("server", "")
+        if srv:
+            parts = srv.split("/", 1)
+            _add(parts[0], parts[1] if len(parts) > 1 else "")
+        powered = headers.get("x-powered-by", "") or tech_info.get("powered_by", "")
+        if powered:
+            _add(powered)
+
+        # 2. Cookies (Framework / CMS)
+        cookies = (tech_info.get("cookies") or "").lower()
+        if cookies:
+            for pat, name in _COOKIE_PATTERNS:
+                if pat.lower() in cookies:
+                    _add(name)
+
+        # 3. Scripts (Framework / 3rd-Party)
+        for src in tech_info.get("scripts") or []:
+            src_l = (src or "").lower()
+            for pat, name in _SCRIPT_PATTERNS:
+                if pat in src_l:
+                    _add(name)
+
+        # 4. Body-Classes (CMS)
+        body_classes = (tech_info.get("body_classes") or "").lower()
+        if body_classes:
+            for pat, name in _BODY_CLASS_PATTERNS:
+                if pat in body_classes:
+                    _add(name)
+
+        # 5. Header-Patterns (CDN / Hosting / CMS-Footprint)
+        headers_l = {k.lower(): str(v).lower() for k, v in (headers or {}).items()}
+        for h_name, h_val, name in _HEADER_PATTERNS:
+            v = headers_l.get(h_name, "")
+            if v and (h_val == "*" or h_val in v):
+                _add(name)
+
+    return tech_list
+
+
 def _parse_nmap_xml(xml_path: str) -> dict[str, Any]:
     """Parse nmap XML output into a structured dict."""
     result: dict[str, Any] = {
@@ -438,20 +587,14 @@ def run_phase1(
                     scan_dir=scan_dir, ip=ip,
                     web_probe_urls=wp_urls if wp_urls else None,
                 )
-                # Convert Playwright tech_info to webtech-compatible format
-                tech_list = []
-                for fqdn_key, probe in redirect_data.items():
-                    tech_info = probe.get("tech_info", {})
-                    if tech_info.get("generator"):
-                        tech_list.append({"name": tech_info["generator"], "version": ""})
-                    headers = probe.get("response_headers", {})
-                    server = headers.get("server", "")
-                    if server:
-                        parts = server.split("/", 1)
-                        tech_list.append({"name": parts[0], "version": parts[1] if len(parts) > 1 else ""})
-                    powered = headers.get("x-powered-by", "") or tech_info.get("powered_by", "")
-                    if powered:
-                        tech_list.append({"name": powered, "version": ""})
+                # Convert Playwright tech_info to webtech-compatible format.
+                # Frueher haben wir nur generator/Server/X-Powered-By gelesen
+                # — das laesst moderne SPAs (Next.js auf Vercel, etc.) ohne
+                # Tech-Erkennung dastehen, weil die diese Header gar nicht
+                # senden. Wir nutzen jetzt zusaetzlich scripts, cookies,
+                # meta_tags, body_classes + Header-Signaturen (cf-ray etc.)
+                # — Wappalyzer-style.
+                tech_list = _extract_all_tech_signals(redirect_data)
                 if tech_list:
                     webtech_result = {"tech": tech_list}
             except Exception as e:
@@ -465,7 +608,12 @@ def run_phase1(
         _save_result(order_id=order_id, host_ip=ip, phase=1,
                      tool_name="webtech",
                      raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False) if webtech_result
-                         else f"Playwright tech detection: no data for {', '.join(probe_fqdns)}",
+                         else (
+                             f"Keine Tech-Signaturen erkennbar fuer {', '.join(probe_fqdns)} "
+                             "(moderne SPA ohne Server/X-Powered-By/generator-Header und "
+                             "ohne Cookie-/Script-/Header-Pattern-Match). "
+                             "Phase 2 (httpx -tech-detect, nuclei) liefert weitere Signale."
+                         ),
                      exit_code=0 if webtech_result else 1,
                      duration_ms=0)
 
