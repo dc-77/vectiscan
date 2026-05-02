@@ -158,7 +158,8 @@ def test_phase0_tools_called_with_correct_timeouts(tmp_path: Path) -> None:
     with patch("scanner.phase0.run_tool", mock_run):
         run_subfinder("example.com", scan_dir, "scan-1")
         call_kwargs = mock_run.call_args
-        assert call_kwargs[1].get("timeout", call_kwargs[0][1] if len(call_kwargs[0]) > 1 else None) == 120
+        # subfinder bekam mehr Sources (-all -recursive) → 180s
+        assert call_kwargs[1].get("timeout", call_kwargs[0][1] if len(call_kwargs[0]) > 1 else None) == 180
 
     mock_run.reset_mock()
     with patch("scanner.phase0.run_tool", mock_run):

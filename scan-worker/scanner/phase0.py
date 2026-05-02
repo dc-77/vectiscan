@@ -122,7 +122,19 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     subdomains: list[str] = []
 
     # Use curl -o to write directly to file — avoids needing a second call
-    cmd = ["curl", "-s", "-o", output_path, f"https://crt.sh/?q=%.{domain}&output=json"]
+    cmd = [
+        "curl", "-s",
+        # crt.sh ist berüchtigt instabil (502/timeout); bisher hing curl
+        # bis zum tool-Timeout (60s) und produzierte 0 bytes. Mit hartem
+        # max-time + Retry kommen wir bei Hick-Ups schneller weiter.
+        "--max-time", "30",
+        "--retry", "2",
+        "--retry-delay", "5",
+        "--retry-connrefused",
+        "-A", "Mozilla/5.0 vectiscan",
+        "-o", output_path,
+        f"https://crt.sh/?q=%.{domain}&output=json",
+    ]
     exit_code, duration_ms = run_tool(
         cmd=cmd,
         timeout=60,
@@ -174,11 +186,22 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
         "subfinder", "-d", domain,
         "-silent", "-json",
         "-disable-update-check",
+        # `-all` aktiviert ALLE Source-Plugins (chaos, binaryedge,
+        # securitytrails, ...) statt nur Default-Set. Liefert deutlich
+        # mehr Subdomains. API-Keys via ~/.config/subfinder/provider-config.yaml.
+        "-all",
+        # `-recursive` enumeriert auch Subdomains-of-Subdomains
+        # (z.B. wenn `mail.example.com` gefunden, sucht nach `*.mail.example.com`).
+        "-recursive",
+        # Mehr Threads → schneller bei vielen Sources
+        "-t", "50",
+        # Timeout pro Provider in Sekunden — verhindert Haenger
+        "-timeout", "15",
         "-o", output_path,
     ]
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=120,
+        timeout=180,
         output_path=output_path,
         order_id=order_id,
         phase=0,
@@ -211,15 +234,22 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
 
 def run_amass(domain: str, scan_dir: str, order_id: str) -> list[str]:
-    """Run amass passive enumeration. Timeout 300s (5 Min)."""
+    """Run amass passive enumeration. Timeout 300s (5 Min).
+
+    amass v5 hat das `-json`-Flag entfernt — `-o <file>` schreibt die
+    gefundenen FQDNs als Plaintext (eine pro Zeile). Vorher (v4) wurde
+    JSON-Lines geschrieben; aktueller Code lieferte deshalb seit dem
+    v5-Upgrade IMMER 0 Subdomains.
+    """
     publish_event(order_id, {"type": "tool_starting", "tool": "amass", "host": domain})
-    output_path = os.path.join(scan_dir, "phase0", "amass.json")
+    output_path = os.path.join(scan_dir, "phase0", "amass.txt")
     subdomains: list[str] = []
 
     cmd = [
         "amass", "enum", "-passive",
         "-d", domain,
-        "-json", output_path,
+        "-nocolor",
+        "-o", output_path,
     ]
     exit_code, duration_ms = run_tool(
         cmd=cmd,
@@ -233,21 +263,22 @@ def run_amass(domain: str, scan_dir: str, order_id: str) -> list[str]:
     if exit_code not in (0,):
         log.warning("amass_failed", exit_code=exit_code)
 
-    # Parse JSON lines output
+    # Plain-text Output: jede Zeile ein FQDN (manchmal mit "[FQDN] " Prefix
+    # oder "name --> rrtype --> value" — wir extrahieren konservativ den
+    # Domain-Teil bis zum ersten Whitespace und filtern auf *.<domain>).
+    domain_lower = domain.lower()
     try:
         if os.path.exists(output_path):
-            with open(output_path, "r") as f:
+            with open(output_path, "r", encoding="utf-8", errors="replace") as f:
                 for line in f:
                     line = line.strip()
                     if not line:
                         continue
-                    try:
-                        entry = json.loads(line)
-                        name = entry.get("name", "").strip().lower()
-                        if name:
-                            subdomains.append(name)
-                    except json.JSONDecodeError:
-                        continue
+                    # Erste Spalte = FQDN-Kandidat
+                    candidate = line.split()[0].lower().strip(".,;:")
+                    # Nur akzeptieren wenn endet auf .<domain> oder == domain
+                    if candidate == domain_lower or candidate.endswith("." + domain_lower):
+                        subdomains.append(candidate)
             log.info("amass_complete", subdomains_found=len(subdomains))
     except Exception as e:
         log.warning("amass_parse_error", error=str(e))
@@ -265,6 +296,16 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
         "gobuster", "dns",
         "--domain", domain,
         "--wordlist", "/usr/share/wordlists/subdomains-top5000.txt",
+        # Wildcard-DNS (Domain antwortet auf *.domain mit gleicher IP) bricht
+        # gobuster sonst ab. Mit `--wildcard` versucht gobuster trotzdem zu
+        # enumerieren und filtert die Wildcard-IP heraus. Bergersysteme.com
+        # ist genau so ein Fall (alles 176.9.21.52).
+        "--wildcard",
+        # Default 10 threads → 50; bei 5000-Wort-Liste in 180s Timeout
+        # sonst nicht durchgekommen.
+        "--threads", "50",
+        # Timeout pro DNS-Request — bei langsamen Resolvern sonst Haenger
+        "--timeout", "5s",
         "-q",
         "-o", output_path,
     ]
@@ -312,7 +353,7 @@ def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, An
     # Step 1: resolve NS records
     try:
         ns_result = subprocess.run(
-            ["dig", "NS", domain, "+short"],
+            ["dig", "NS", domain, "+short", "+tries=1", "+time=5"],
             capture_output=True, text=True, timeout=15,
             start_new_session=True,
         )
@@ -333,7 +374,7 @@ def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, An
 
     # Step 2: try AXFR against each NS
     for ns in nameservers:
-        cmd = ["dig", f"@{ns}", domain, "AXFR"]
+        cmd = ["dig", f"@{ns}", domain, "AXFR", "+tries=1", "+time=10"]
 
         try:
             axfr_proc = subprocess.Popen(
@@ -394,12 +435,26 @@ def run_dnsx(subdomains: list[str], scan_dir: str, order_id: str) -> list[dict[s
         log.error("dnsx_tempfile_error", error=str(e))
         return validated
 
+    # Fixierte Resolver-Liste eliminiert die Resolver-Wahl-Drift
+    # (System-Default kann zwischen 8.8.8.8 / 1.1.1.1 / 9.9.9.9
+    # rotieren → unterschiedliche Antwort-Sets pro Lauf).
+    resolvers_path = os.path.join(os.path.dirname(__file__), "resolvers.txt")
     try:
         cmd = [
             "dnsx",
             "-l", tmp_path,
-            "-a", "-aaaa", "-cname",
+            # Erweitertes Record-Set: MX/NS/TXT brauchen wir fuer
+            # Email-Security-Findings ohnehin in dns_records — hier
+            # konsolidieren statt extra `dig`-Calls.
+            "-a", "-aaaa", "-cname", "-mx", "-ns", "-txt",
             "-resp", "-json",
+            # Fixierte Resolver (siehe Kommentar oben)
+            "-r", resolvers_path,
+            # Rate-Limit pro Sekunde — bei 200+ Subdomains wuerde
+            # Default-Speed Resolver throtteln.
+            "-rl", "100",
+            # Retry pro Query: bei UDP-Packet-Loss kein false-negative
+            "-retry", "2",
             "-o", output_path,
         ]
         exit_code, duration_ms = run_tool(
@@ -456,7 +511,7 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
         """Run a dig query and return stdout."""
         try:
             result = subprocess.run(
-                ["dig", qname, qtype, "+short"],
+                ["dig", qname, qtype, "+short", "+tries=1", "+time=5"],
                 capture_output=True, text=True, timeout=timeout,
                 start_new_session=True,
             )
@@ -829,6 +884,11 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str) 
             cmd = [
                 "httpx", "-u", fqdn, "-json", "-silent",
                 "-follow-redirects", "-status-code", "-title", "-timeout", "5",
+                # Bei Packet-Loss/transient-Fehler 1 Retry — sonst false-negative
+                "-retries", "1",
+                # `-fr` ist meta-refresh-follow zusaetzlich zu HTTP-Redirects;
+                # bei SPAs/CMS-Wartungsseiten oft notwendig.
+                "-fr",
             ]
             try:
                 result = subprocess.run(
@@ -901,6 +961,14 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     validates with dnsx, and creates the host inventory.
 
     Overall timeout: 10 minutes.
+
+    PR-M4 (2026-05-02): Falls fuer dieselbe Domain ein frischer
+    Subdomain-Snapshot existiert (TTL 24h, ueber `scan_targets.canonical`),
+    wird die Subdomain-Discovery-Phase (crt.sh / subfinder / amass /
+    gobuster_dns / axfr) uebersprungen und das gecachte Subdomain-Set
+    direkt an dnsx weitergereicht. Externe Drift-Quellen werden so
+    eliminiert; Re-Scans innerhalb der TTL haben ein deterministisches
+    Subdomain-Inventar.
     """
     # Use config if provided, otherwise default to professional
     # v2 uses phase0b_tools/phase0b_timeout; fall back to v1 keys for compat
@@ -921,12 +989,46 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     log.info("phase0_start", domain=domain, order_id=order_id)
 
     all_subdomains: list[str] = []
+    tool_sources: dict[str, list[str]] = {}
 
     def _time_remaining() -> float:
         elapsed = time.monotonic() - phase0_start
         return max(0, phase0_timeout - elapsed)
 
+    # --- PR-M4: Snapshot-Reuse vor Discovery ---
+    # ENV `SUBDOMAIN_SNAPSHOT_DISABLED=1` deaktiviert den Reuse explizit.
+    snapshot_used = False
+    snapshot_target_id: Optional[str] = None
+    if os.environ.get("SUBDOMAIN_SNAPSHOT_DISABLED", "").lower() not in ("1", "true", "yes"):
+        try:
+            from scanner.precheck import snapshot_store
+            snap = snapshot_store.find_fresh_for_domain(domain)
+            if snap and snap.get("subdomains"):
+                all_subdomains.extend(snap["subdomains"])
+                tool_sources = dict(snap.get("tool_sources") or {})
+                snapshot_target_id = snap.get("scan_target_id")
+                snapshot_used = True
+                age_min = snap.get("age_seconds", 0) // 60
+                log.info(
+                    "phase0_subdomain_snapshot_reused",
+                    domain=domain, order_id=order_id,
+                    subdomains=len(snap["subdomains"]),
+                    age_minutes=age_min,
+                    target_id=snapshot_target_id,
+                )
+                publish_event(order_id, {
+                    "type": "phase0_snapshot_reused",
+                    "orderId": order_id,
+                    "domain": domain,
+                    "subdomains": len(snap["subdomains"]),
+                    "ageMinutes": age_min,
+                })
+        except Exception as exc:
+            log.warning("phase0_snapshot_lookup_failed", error=str(exc))
+
     # --- Stufe 1: Subdomain Discovery + DNS Records (parallel) ---
+    # Bei Snapshot-Reuse nur DNS-Records + axfr neu, weil diese fuer
+    # Email-Security/Compliance-Reports relevant sind und billig.
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     zone_transfer: dict[str, Any] = {"success": False, "data": {}}
@@ -934,14 +1036,15 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
 
     discovery_futures: dict[Any, str] = {}
     with ThreadPoolExecutor(max_workers=6, thread_name_prefix="phase0b") as pool:
-        if "crtsh" in phase0_tools:
-            discovery_futures[pool.submit(run_crtsh, domain, scan_dir, order_id)] = "crtsh"
-        if "subfinder" in phase0_tools:
-            discovery_futures[pool.submit(run_subfinder, domain, scan_dir, order_id)] = "subfinder"
-        if "amass" in phase0_tools:
-            discovery_futures[pool.submit(run_amass, domain, scan_dir, order_id)] = "amass"
-        if "gobuster_dns" in phase0_tools:
-            discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
+        if not snapshot_used:
+            if "crtsh" in phase0_tools:
+                discovery_futures[pool.submit(run_crtsh, domain, scan_dir, order_id)] = "crtsh"
+            if "subfinder" in phase0_tools:
+                discovery_futures[pool.submit(run_subfinder, domain, scan_dir, order_id)] = "subfinder"
+            if "amass" in phase0_tools:
+                discovery_futures[pool.submit(run_amass, domain, scan_dir, order_id)] = "amass"
+            if "gobuster_dns" in phase0_tools:
+                discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
         if "axfr" in phase0_tools:
             discovery_futures[pool.submit(run_zone_transfer, domain, scan_dir, order_id)] = "axfr"
         discovery_futures[pool.submit(collect_dns_records, domain, scan_dir, order_id)] = "dns_records"
@@ -960,6 +1063,7 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                     # Subdomain enumeration tools return list[str]
                     subs = result if isinstance(result, list) else []
                     all_subdomains.extend(subs)
+                    tool_sources[tool_name] = list(subs)
                     log.info(f"phase0_{tool_name}_done", found=len(subs))
             except Exception as e:
                 log.error(f"phase0_{tool_name}_error", error=str(e))
@@ -991,6 +1095,25 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     # --- Web probe: quick HTTP check per host ---
     inventory["hosts"] = _probe_web_hosts(inventory.get("hosts", []), order_id, scan_dir)
 
+    # --- PR-M4: Snapshot persistieren (nur wenn neu enumeriert) ---
+    if not snapshot_used:
+        try:
+            from scanner.precheck import snapshot_store
+            target_id = _resolve_scan_target_id(order_id, domain)
+            if target_id and all_subdomains:
+                snapshot_store.save_for_target(
+                    scan_target_id=target_id,
+                    all_subdomains=all_subdomains,
+                    tool_sources=tool_sources,
+                )
+                log.info(
+                    "phase0_subdomain_snapshot_saved",
+                    target_id=target_id,
+                    subdomains=len(set(all_subdomains)),
+                )
+        except Exception as exc:
+            log.warning("phase0_snapshot_save_failed", error=str(exc))
+
     elapsed_ms = int((time.monotonic() - phase0_start) * 1000)
     log.info(
         "phase0_complete",
@@ -998,6 +1121,54 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         hosts_found=len(inventory.get("hosts", [])),
         skipped=len(inventory.get("skipped_hosts", [])),
         duration_ms=elapsed_ms,
+        snapshot_used=snapshot_used,
     )
 
     return inventory
+
+
+def _resolve_scan_target_id(order_id: str, domain: str) -> Optional[str]:
+    """Findet die `scan_target_id` zur aktuellen Domain dieser Order.
+
+    Match-Regel: erst exakter `canonical`-Hit fuer die Order, dann
+    Fallback ueber alle approved Targets der Subscription. Gibt
+    ``None`` zurueck wenn kein Treffer (Single-Target-Legacy-Order
+    ohne `scan_targets`-Eintrag).
+    """
+    try:
+        import psycopg2
+        import psycopg2.extras
+        conn = psycopg2.connect(
+            os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"),
+            connect_timeout=5,
+            options="-c statement_timeout=10000",
+        )
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                # 1. Direkt ueber Order
+                cur.execute(
+                    """SELECT t.id FROM scan_targets t
+                        WHERE t.order_id = %s AND LOWER(t.canonical) = %s
+                        LIMIT 1""",
+                    (order_id, (domain or "").lower()),
+                )
+                row = cur.fetchone()
+                if row:
+                    return str(row["id"])
+                # 2. Ueber Subscription der Order
+                cur.execute(
+                    """SELECT t.id FROM scan_targets t
+                        JOIN orders o ON o.subscription_id = t.subscription_id
+                       WHERE o.id = %s AND LOWER(t.canonical) = %s
+                         AND t.status = 'approved'
+                       LIMIT 1""",
+                    (order_id, (domain or "").lower()),
+                )
+                row = cur.fetchone()
+                if row:
+                    return str(row["id"])
+        finally:
+            conn.close()
+    except Exception:
+        return None
+    return None

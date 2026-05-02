@@ -77,10 +77,52 @@ def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-por
     nmap_port_args = nmap_ports.split()
 
     cmd = [
-        "nmap", "-sV", "-sC", "-T4",
+        "nmap",
+        # ── Discovery ──────────────────────────────────────────────────
+        # `-Pn` skip ICMP-Ping; wir wissen aus phase0 web_probe dass der
+        # Host lebt. Spart 1-3s pro Host und vermeidet false-negative
+        # bei ICMP-blockenden Firewalls.
+        "-Pn",
+        # `-n` keine reverse-DNS-Resolution waehrend Scan (haben wir
+        # bereits aus phase0 / merge_and_group). Spart oft 5-10s.
+        "-n",
+        # ── Service-Detection ─────────────────────────────────────────
+        "-sV",
+        # `--version-intensity 7` (Default 7, aber explizit fuer Determinismus)
+        # `--version-light` waere schneller aber ungenauer; lassen wir bei
+        # 7 fuer Compliance-/Insurance-Pakete; fuer WebCheck reicht 5.
+        "--version-intensity", "7",
+        # ── NSE Scripts ───────────────────────────────────────────────
+        # `-sC` lädt default-Scripts. Wir kappen pro Script auf 60s damit
+        # ein langsames NSE (z.B. http-enum) nicht den ganzen Scan blockt.
+        "-sC",
+        "--script-timeout", "60s",
+        # ── Performance / Reliability ─────────────────────────────────
+        "-T4",
+        # `--max-retries 2` reduziert default 10 → 2; verhindert dass
+        # gefilterte Ports den Scan auf Minuten ziehen. Mit `-T4` ohnehin
+        # schon aggressiv.
+        "--max-retries", "2",
+        # `--host-timeout` haerter als run_tool-Timeout (300s), damit
+        # nmap selbst kontrolliert abbricht und einen partial-XML schreibt
+        # statt SIGKILL ohne Output.
+        "--host-timeout", "240s",
+        # `--min-rate 100` garantiert Mindest-Paket-Rate; auf gefilterten
+        # Hosts (das was du gepostet hast: "997 filtered tcp ports
+        # no-response") laeuft sonst der Scan fast leer.
+        "--min-rate", "100",
+        # `--defeat-rst-ratelimit` umgeht RST-Throttling vieler Firewalls
+        # (Cisco/Fortinet) → mehr offene Ports detektiert.
+        "--defeat-rst-ratelimit",
+        # ── Ports ──────────────────────────────────────────────────────
         *nmap_port_args,
+        # ── Output ─────────────────────────────────────────────────────
+        "--open",  # nur offene Ports im NORMAL-Output (XML hat alles)
         "-oX", xml_path,
         "-oN", txt_path,
+        # `--reason` zeigt warum nmap eine Port-Klassifikation getroffen
+        # hat (syn-ack, no-response, ...) — gut fuer KI-Korrelation.
+        "--reason",
         ip,
     ]
 
@@ -115,7 +157,13 @@ def run_webtech(fqdn: str, host_dir: str, order_id: str) -> dict[str, Any]:
     # Try HTTPS first, fall back to HTTP if it fails
     for scheme in ("https", "http"):
         url = f"{scheme}://{fqdn}"
-        cmd = ["webtech", "-u", url, "--json"]
+        cmd = [
+            "webtech", "-u", url, "--json",
+            # User-Agent setzen damit WAF nicht "python-requests" blockt
+            "--user-agent", "Mozilla/5.0 vectiscan",
+            # Verbose ausschalten (sonst stderr zumuellt)
+            "--quiet",
+        ]
 
         webtech_proc = None
         try:
@@ -174,7 +222,14 @@ def run_wafw00f(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[di
 
     output_path = f"{phase1_dir}/wafw00f.json"
 
-    cmd = ["wafw00f", fqdn, "-o", output_path, "-f", "json"]
+    cmd = [
+        "wafw00f", fqdn,
+        # `-a` = "scan ALL detections, don't stop on first" — wichtig fuer
+        # Multi-WAF-Setups (z.B. CloudFlare vor F5 oder ModSecurity hinter
+        # nginx). Default stoppt nach erstem Treffer und untergewichtet.
+        "-a",
+        "-o", output_path, "-f", "json",
+    ]
 
     exit_code, duration_ms = run_tool(
         cmd=cmd,

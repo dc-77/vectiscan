@@ -63,8 +63,13 @@ def should_parallelize_stage2(
 
 
 def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
-                      severity: str = "MEDIUM", tool_name: str = "testssl") -> Optional[list]:
-    """Run a single testssl pass. Returns parsed JSON list or None."""
+                      severity: str = "MEDIUM", tool_name: str = "testssl",
+                      fast_mode: bool = False) -> Optional[list]:
+    """Run a single testssl pass. Returns parsed JSON list or None.
+
+    `fast_mode=True` (WebCheck-Paket): nutzt `--fast` (skip schwere
+    Cipher-Tests) — bei Schnellscans ausreichend.
+    """
     cmd = [
         "bash", "/opt/testssl.sh/testssl.sh",
         "--jsonfile", output_path,
@@ -73,7 +78,20 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
         "--warnings", "off",
         "--sneaky",
         "--hints",
+        # Connect-Timeout: bei langsamen Servern sonst Default 30s pro
+        # Cipher-Test → kann 5+ Min Scan kosten.
+        "--connect-timeout", "10",
+        "--openssl-timeout", "10",
+        # OCSP-Stapling-Check kostet 5-10s pro Host und bringt selten
+        # neue Findings; in Compliance-Tiefenscan trotzdem drin lassen.
     ]
+    if fast_mode:
+        cmd.extend([
+            "--fast",  # skip CSV/JSON-output overhead per cipher
+            "-p",      # nur Protocols (kein Cipher-Walk)
+            "-S",      # nur Server-Defaults
+            "-h",      # nur Header-Check
+        ])
     # Omit --severity to get ALL entries (incl. OK/INFO) for TR-03116-4
     if severity:
         cmd.extend(["--severity", severity])
@@ -103,8 +121,12 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
 
 
 def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str,
-                severity: str = "MEDIUM") -> Optional[list]:
+                severity: str = "MEDIUM",
+                fast_mode: bool = False) -> Optional[list]:
     """Run testssl.sh and return parsed JSON findings.
+
+    `fast_mode` aktiviert `--fast`-Pfad fuer WebCheck-Paket
+    (skip schwere Cipher-Walks, ~3x schneller).
 
     Single-pass execution — the previous double-verification strategy was
     removed because results were consistently identical in production.
@@ -114,7 +136,8 @@ def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     output_path = f"{phase2_dir}/testssl.json"
     return _run_testssl_once(fqdn, ip, output_path, order_id,
-                              severity=severity, tool_name="testssl")
+                              severity=severity, tool_name="testssl",
+                              fast_mode=fast_mode)
 
 
 WORDLIST_MAP = {
@@ -160,6 +183,21 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
         "-u", f"https://{fqdn}",
         "-w", wordlist,
         "-o", output_path,
+        # Default 10 threads = sehr langsam → 50
+        "-t", "50",
+        # Default-Extensions: PHP/Backup/Static → findet `.bak`-Files,
+        # vergessene `.old`-Backups, `.zip`-Releases.
+        "-x", "php,bak,txt,old,zip,html",
+        # Status-Codes: 200/301/302 als Treffer; 403 NICHT (zu viel Noise
+        # bei modernen WAFs, die alles auf 403 mappen).
+        "-s", "200,301,302,307",
+        # `-b ""` deaktiviert die `-s`-Negation (default 404,403);
+        # wir wollen explizit nur `-s` kontrollieren.
+        "-b", "404",
+        # Timeout pro Request — bei langsamem Backend sonst Haenger
+        "--timeout", "10s",
+        # Kein Banner spammen
+        "--no-error",
         "-q",
     ]
 
@@ -194,31 +232,56 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[s
     output_path = f"{phase2_dir}/headers.json"
     url = f"https://{fqdn}"
 
-    cmd = ["curl", "-sI", url]
+    # Strategie: erst HEAD (billig). Wenn der Server Security-Header
+    # nur bei GET liefert (manche Apache-Setups, viele SPA-Backends),
+    # GET-Fallback. Header werden bei beiden ueber `-D -` gesammelt.
+    head_cmd = [
+        "curl", "-sI",
+        "--max-time", "10",
+        "--retry", "1",
+        "-A", "Mozilla/5.0 vectiscan",
+        url,
+    ]
+    get_cmd = [
+        "curl", "-s",
+        "-X", "GET",
+        "-D", "-",        # dump headers to stdout
+        "-o", "/dev/null", # body weg
+        "--max-time", "10",
+        "--retry", "1",
+        "-L",             # follow redirects
+        "-A", "Mozilla/5.0 vectiscan",
+        url,
+    ]
 
-    # Capture stdout directly for header parsing — use Popen with process group
-    raw_headers = ""
-    curl_proc = None
-    try:
-        curl_proc = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            start_new_session=True,
-        )
-        raw_headers, _ = curl_proc.communicate(timeout=10)
-        log.info("header_check_fetched", fqdn=fqdn, exit_code=curl_proc.returncode)
-    except subprocess.TimeoutExpired:
-        log.warning("header_check_timeout", fqdn=fqdn)
-        if curl_proc is not None:
-            try:
-                os.killpg(curl_proc.pid, signal.SIGKILL)
-            except (ProcessLookupError, PermissionError):
-                curl_proc.kill()
-            curl_proc.wait()
-    except Exception as e:
-        log.error("header_check_error", fqdn=fqdn, error=str(e))
+    def _fetch(cmd_to_run: list[str]) -> str:
+        proc = None
+        try:
+            proc = subprocess.Popen(
+                cmd_to_run, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                text=True, start_new_session=True,
+            )
+            out, _ = proc.communicate(timeout=15)
+            return out or ""
+        except subprocess.TimeoutExpired:
+            if proc is not None:
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError):
+                    proc.kill()
+                proc.wait()
+            return ""
+        except Exception:
+            return ""
+
+    raw_headers = _fetch(head_cmd)
+    log.info("header_check_fetched", fqdn=fqdn, method="HEAD", bytes=len(raw_headers))
+    # Wenn HEAD weniger als 2 Header (= leeres oder nur Status-Line)
+    # liefert, GET-Fallback. Anti-WAF: einige WAFs blocken HEAD,
+    # lassen aber GET durch.
+    if raw_headers.count(":") < 2:
+        raw_headers = _fetch(get_cmd)
+        log.info("header_check_fallback_get", fqdn=fqdn, bytes=len(raw_headers))
 
     # Parse headers into dict
     headers: dict[str, str] = {}
@@ -286,6 +349,21 @@ def run_httpx(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict
         "-server",
         "-content-length",
         "-follow-redirects",
+        # Meta-refresh-follow zusaetzlich zu HTTP-Redirects (SPA/CMS-Wartung)
+        "-fr",
+        # Web-Server-Header + IP + ASN-Info — billig zu sammeln, gut fuer KI
+        "-ip",
+        "-cdn",
+        "-asn",
+        "-tls-grab",
+        # Methods + Probe-Path-Set
+        "-method",
+        # Bei Packet-Loss/transient-Fehler 1 Retry — sonst false-negative
+        "-retries", "1",
+        # Festes Timeout pro Probe
+        "-timeout", "10",
+        # User-Agent festlegen damit WAF nicht "python-requests" blockt
+        "-H", "User-Agent: Mozilla/5.0 vectiscan",
         "-silent",
     ]
 
@@ -332,6 +410,15 @@ def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dic
         "--random-user-agent",
         "--no-banner",
         "--disable-tls-checks",        # handle self-signed certs
+        # Rate-Limit: 200ms zwischen Requests = 5 req/s. Live-Kunden-
+        # Sites koennen sonst kurzzeitig in Rate-Limit-Trigger laufen.
+        "--throttle", "200",
+        # Request-Timeout pro HTTP-Call (sonst Default 60s)
+        "--request-timeout", "30",
+        # Max Threads: 5 statt Default 5 (explizit fuer Determinismus)
+        "--max-threads", "5",
+        # `--detection-mode mixed` (Default) — passive zuerst, aggressive nur wo noetig
+        "--detection-mode", "mixed",
     ]
     if api_token:
         cmd.extend(["--api-token", api_token])
@@ -393,11 +480,23 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
             "-u", f"https://{fqdn}/FUZZ",
             "-w", wordlist,
             "-e", extensions,
-            "-mc", "200,301,302,403",
-            "-fc", "404",
-            "-t", "40",
-            "-rate", "100",
+            # 403 als Treffer war zu noisy bei modernen WAFs (CloudFlare
+            # mappt alles auf 403). 200/301/302/307 reichen.
+            "-mc", "200,301,302,307",
+            "-fc", "404,403",
+            # 40 Threads × 100 RPS = effektiv 100 RPS — Live-Sites
+            # werden bei 50 RPS schonender behandelt.
+            "-t", "30",
+            "-rate", "50",
             "-timeout", "5",
+            # `-recursion -recursion-depth 1` findet Subverzeichnisse
+            "-recursion",
+            "-recursion-depth", "1",
+            # `-ac` autocalibrate filter (filtert false-positive Bursts
+            # wenn Server alles auf 200 mappt — sehr haeufig bei SPAs)
+            "-ac",
+            # User-Agent setzen
+            "-H", "User-Agent: Mozilla/5.0 vectiscan",
             "-json",
             "-o", output_path,
             "-s",  # silent (no banner)
@@ -415,13 +514,15 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
             "ffuf",
             "-u", f"https://{ip}/",
             "-H", f"Host: FUZZ.{target_domain}",
+            "-H", "User-Agent: Mozilla/5.0 vectiscan",
             "-w", wordlist,
-            "-mc", "200,301,302",
+            "-mc", "200,301,302,307",
             "-json",
             "-o", output_path,
-            "-t", "40",
-            "-rate", "100",
+            "-t", "30",
+            "-rate", "50",
             "-timeout", "5",
+            "-ac",  # autocalibrate
             "-s",
         ]
 
@@ -451,11 +552,13 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
             "-u", f"{target_url}?FUZZ=test",
             "-w", wordlist,
             "-mc", "200",
+            "-H", "User-Agent: Mozilla/5.0 vectiscan",
             "-json",
             "-o", output_path,
-            "-t", "40",
-            "-rate", "100",
+            "-t", "30",
+            "-rate", "50",
             "-timeout", "5",
+            "-ac",
             "-s",
         ]
     else:
@@ -518,13 +621,24 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
         "-w", wordlist,
         "-d", str(depth),
         "-t", "30",
-        "--rate-limit", "100",
-        "-s", "200,301,302,403",
+        # `--auto-tune` passt rate-limit dynamisch an Server-Last an —
+        # wichtig fuer Live-Sites; festes Limit konnte sonst 5xx ausloesen.
+        "--auto-tune",
+        # 403 raus (CloudFlare-Noise)
+        "-s", "200,301,302,307",
+        # Filter klassische 4xx/5xx-Junk-Antworten
+        "--filter-status", "403,404",
+        # Filter sehr kleine Responses (typische "not found"-Pages 0-100b)
+        "--filter-size", "0,1,2,3",
         "--json",
         "-o", output_path,
         "--dont-scan", "logout|signout|delete",
         "--timeout", "5",
-        "--no-recursion",
+        # `--no-recursion` zusammen mit `-d` ist redundant; `-d` bereits
+        # Tiefen-Limit. `--no-recursion` entfernt — `-d` steuert.
+        # User-Agent festlegen
+        "-H", "User-Agent: Mozilla/5.0 vectiscan",
+        # `-q` quiet, `--silent` = noch leiser
         "--silent",
     ]
 
@@ -959,8 +1073,11 @@ def run_phase2(
         if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
             publish_event(order_id, {"type": "tool_starting", "tool": "testssl", "host": ip})
             testssl_sev = (config or {}).get("testssl_severity", "MEDIUM")
+            # WebCheck = Schnellscan → fast_mode aktivieren.
+            testssl_fast = (config or {}).get("package", "") in ("webcheck", "basic")
             testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id,
-                                         severity=testssl_sev)
+                                         severity=testssl_sev,
+                                         fast_mode=testssl_fast)
             r["testssl"] = testssl_result
             r["_tools"] = ["testssl"]
             progress_callback(order_id, "testssl", "complete")
