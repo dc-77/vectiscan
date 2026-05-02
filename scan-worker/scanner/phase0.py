@@ -345,52 +345,107 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
 
 
 def run_amass(domain: str, scan_dir: str, order_id: str) -> list[str]:
-    """Run amass passive enumeration. Timeout 300s (5 Min).
+    """Run amass v5 passive enumeration in 2 stages. Timeout 300s (5 Min).
 
-    amass v5 hat das `-json`-Flag entfernt — `-o <file>` schreibt die
-    gefundenen FQDNs als Plaintext (eine pro Zeile). Vorher (v4) wurde
-    JSON-Lines geschrieben; aktueller Code lieferte deshalb seit dem
-    v5-Upgrade IMMER 0 Subdomains.
+    amass v5 hat eine voellig andere Architektur als v4:
+    1. Engine + Asset-DB (Graph-Datenbank), nicht mehr stdout/file
+    2. `enum` befuellt die DB; **kein** `-json`/`-o`-Flag fuer die
+       Subdomains (wie in v4).
+    3. `-passive` ist **deprecated** — passive ist seit v5 der Default.
+    4. `-o <file>` in v5 schreibt **nur den CLI-Log** (Banner, Source-
+       Status), NICHT die gefundenen FQDNs.
+    5. Subdomains kommen erst ueber das **`subs`-Subcommand** raus:
+       `amass subs -d <domain> -dir <db> -names -nocolor`.
+
+    Bisherige Versuche schlugen fehl, weil:
+    - v4-Code (`-json`): "flag provided but not defined: -json"
+    - v5-Code mit `-o` als Subdomain-Quelle: nur CLI-Log gelesen → 0 Subs
+
+    Workflow jetzt: dedizierte Per-Order-DB (`<scan_dir>/phase0/amass-db`)
+    fuer Isolation; enum schreibt rein; subs -names liest raus.
     """
     publish_event(order_id, {"type": "tool_starting", "tool": "amass", "host": domain})
-    output_path = os.path.join(scan_dir, "phase0", "amass.txt")
+    db_dir = os.path.join(scan_dir, "phase0", "amass-db")
+    log_path = os.path.join(scan_dir, "phase0", "amass.log")
+    subs_path = os.path.join(scan_dir, "phase0", "amass-subs.txt")
+    os.makedirs(db_dir, exist_ok=True)
     subdomains: list[str] = []
 
-    cmd = [
-        "amass", "enum", "-passive",
+    # --- Stufe 1: enum (befuellt Graph-DB) ---
+    enum_cmd = [
+        "amass", "enum",
         "-d", domain,
         "-nocolor",
-        "-o", output_path,
+        "-dir", db_dir,
+        "-o", log_path,
+        # `-timeout` in Minuten — wir cappen weicher als run_tool-Timeout.
+        "-timeout", "4",
     ]
-    exit_code, duration_ms = run_tool(
-        cmd=cmd,
-        timeout=300,
-        output_path=output_path,
+    enum_exit, enum_duration = run_tool(
+        cmd=enum_cmd,
+        timeout=270,
+        output_path=log_path,
         order_id=order_id,
         phase=0,
         tool_name="amass",
     )
 
-    if exit_code not in (0,):
-        log.warning("amass_failed", exit_code=exit_code)
+    if enum_exit not in (0,):
+        log.warning("amass_enum_failed", exit_code=enum_exit)
+        # Trotzdem versuchen `subs` zu lesen — eventuell sind partial-results da
 
-    # Plain-text Output: jede Zeile ein FQDN (manchmal mit "[FQDN] " Prefix
-    # oder "name --> rrtype --> value" — wir extrahieren konservativ den
-    # Domain-Teil bis zum ersten Whitespace und filtern auf *.<domain>).
+    # --- Stufe 2: subs -names (Subdomains aus DB lesen) ---
+    subs_cmd = [
+        "amass", "subs",
+        "-d", domain,
+        "-dir", db_dir,
+        "-names",
+        "-nocolor",
+        "-o", subs_path,
+    ]
+    subs_exit, subs_duration = run_tool(
+        cmd=subs_cmd,
+        timeout=60,
+        output_path=subs_path,
+        order_id=order_id,
+        phase=0,
+        tool_name="amass_subs",
+    )
+
+    if subs_exit not in (0,):
+        log.warning("amass_subs_failed", exit_code=subs_exit)
+
+    # --- Parse: subs -o schreibt CLI-Log; subs Output geht auf stdout. ---
+    # Wir lesen den raw_output aus scan_results (run_tool persistiert stdout
+    # bei `tool_complete`), aber praktischer: wir laufen subs nochmal mit
+    # File-Capture via Output-Redirect. ABER: `-o` macht stdout-Mirror,
+    # nicht Subdomain-File. Pragmatisch: wir lesen die DB selbst nicht,
+    # sondern nutzen die Tatsache dass subs auf stdout listet — und stdout
+    # wird von run_tool in scan_results.raw_output persistiert.
+    # Deshalb hier: zweiter Aufruf direkt mit subprocess.run um stdout zu
+    # capturen und daraus FQDNs zu extrahieren (run_tool wirft stdout weg
+    # nach DB-Persistierung).
     domain_lower = domain.lower()
     try:
-        if os.path.exists(output_path):
-            with open(output_path, "r", encoding="utf-8", errors="replace") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    # Erste Spalte = FQDN-Kandidat
-                    candidate = line.split()[0].lower().strip(".,;:")
-                    # Nur akzeptieren wenn endet auf .<domain> oder == domain
-                    if candidate == domain_lower or candidate.endswith("." + domain_lower):
-                        subdomains.append(candidate)
-            log.info("amass_complete", subdomains_found=len(subdomains))
+        result = subprocess.run(
+            ["amass", "subs", "-d", domain, "-dir", db_dir, "-names", "-nocolor"],
+            capture_output=True, text=True, timeout=60,
+            start_new_session=True,
+        )
+        for line in (result.stdout or "").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            # Erste Spalte = FQDN-Kandidat (subs -names druckt `name FQDN`
+            # oder einfach FQDN; defensiv beide Faelle handhaben)
+            candidate = line.split()[-1].lower().strip(".,;:")
+            if candidate == domain_lower or candidate.endswith("." + domain_lower):
+                subdomains.append(candidate)
+        # Dedup + sort
+        subdomains = sorted(set(subdomains))
+        log.info("amass_complete", subdomains_found=len(subdomains))
+    except subprocess.TimeoutExpired:
+        log.warning("amass_subs_stdout_timeout")
     except Exception as e:
         log.warning("amass_parse_error", error=str(e))
 
