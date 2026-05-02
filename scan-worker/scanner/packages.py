@@ -14,13 +14,13 @@ from typing import Any
 _PERIMETER_BASE: dict[str, Any] = {
     "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois"],
     "phase0a_timeout": 120,       # 2 Minuten
-    # amass v5 entfernt (2026-05-03): die neue Engine+DB-Architektur ist
-    # fuer 1-Shot-Subdomain-Discovery untauglich; enum schreibt 0 Bytes,
-    # subs findet "No names". subfinder mit -all -recursive deckt
-    # 30+ Sources ab (chaos, alienvault, anubis, bevigil, binaryedge,
-    # bufferover, c99, censys, certspotter, crtsh, etc.). Plus wir haben
-    # certspotter direkt + securitytrails als zusaetzliche CT-Quellen.
-    "phase0b_tools": ["crtsh", "subfinder", "gobuster_dns", "axfr", "dnsx",
+    # amass v5 als Backup-Discovery wieder aktiv (2026-05-03 nach
+    # Race-Bug-Fix mit `-brute`-Flag). Siehe docs/analyse/AMASS-V5-DIAGNOSE.md.
+    # Funktional zu 95% redundant zu subfinder + crtsh + certspotter +
+    # securitytrails, aber liefert zusaetzliche Subdomain-Permutations
+    # und DNS-Brute-Force-Treffer.
+    "phase0b_tools": ["crtsh", "subfinder", "amass", "gobuster_dns",
+                      "axfr", "dnsx",
                       "dnssec", "caa", "mta_sts", "dane_tlsa"],
     "phase0b_timeout": 900,       # 15 Minuten
     "max_hosts": 15,

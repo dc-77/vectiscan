@@ -372,13 +372,22 @@ def run_amass(domain: str, scan_dir: str, order_id: str) -> list[str]:
     subdomains: list[str] = []
 
     # --- Stufe 1: enum (befuellt Graph-DB) ---
+    # WICHTIG amass v5 Race-Condition (siehe docs/analyse/AMASS-V5-DIAGNOSE.md):
+    # enum pollt alle 2s SessionStats; wenn WorkItemsCompleted==WorkItemsTotal
+    # in 5 Polls hintereinander (10s) gilt es als "fertig". Bei leerem
+    # Datasource-Set (viele v5-Sources brauchen API-Keys, sind sonst aus)
+    # ist Total==0 von Anfang an → enum exit 0, DB bleibt leer.
+    # Workaround: `-brute` erzwingt ~5000 Wordlist-DNS-Queries als WorkItems
+    # → Race kann nicht triggern bevor Total > 0 ist.
     enum_cmd = [
         "amass", "enum",
         "-d", domain,
         "-nocolor",
         "-dir", db_dir,
         "-o", log_path,
-        # `-timeout` in Minuten — wir cappen weicher als run_tool-Timeout.
+        # Brute-Force erzwingt WorkItems → Race-Bug umgangen
+        "-brute",
+        # `-timeout` in Minuten
         "-timeout", "4",
     ]
     enum_exit, enum_duration = run_tool(
@@ -1154,11 +1163,11 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         phase0_timeout = config.get("phase0b_timeout", config.get("phase0_timeout", PHASE0_TIMEOUT))
         max_hosts = config["max_hosts"]
         phase0_tools = config.get("phase0b_tools", config.get("phase0_tools",
-                                  ["crtsh", "subfinder", "gobuster_dns", "axfr", "dnsx"]))
+                                  ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]))
     else:
         phase0_timeout = PHASE0_TIMEOUT
         max_hosts = MAX_HOSTS
-        phase0_tools = ["crtsh", "subfinder", "gobuster_dns", "axfr", "dnsx"]
+        phase0_tools = ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]
 
     phase0_start = time.monotonic()
     phase0_dir = os.path.join(scan_dir, "phase0")
