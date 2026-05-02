@@ -1146,6 +1146,28 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                     "subdomains": len(snap["subdomains"]),
                     "ageMinutes": age_min,
                 })
+                # Skip-Marker pro uebersprungenem Tool im scan_results
+                # persistieren — sonst sieht der User im Tool-Trace einfach
+                # "kein amass/crtsh/subfinder" und denkt es ist kaputt.
+                from scanner.tools import _save_result
+                skip_msg = (
+                    f"SKIPPED: Subdomain-Snapshot vom {snap.get('snapshot_ts')} "
+                    f"(Alter: {age_min} Min, TTL: {snap.get('ttl_hours', 24)}h) "
+                    f"wiederverwendet — {len(snap['subdomains'])} Subdomains aus "
+                    f"vorherigem Lauf. Re-Enumeration via Admin: "
+                    f"POST /api/admin/targets/{snapshot_target_id}/restart-precheck"
+                )
+                for skipped_tool in ("crtsh", "subfinder", "amass", "gobuster_dns"):
+                    if skipped_tool in (phase0_tools or []):
+                        try:
+                            _save_result(
+                                order_id=order_id, host_ip=None, phase=0,
+                                tool_name=skipped_tool,
+                                raw_output=skip_msg,
+                                exit_code=0, duration_ms=0,
+                            )
+                        except Exception:
+                            pass
         except Exception as exc:
             log.warning("phase0_snapshot_lookup_failed", error=str(exc))
 
