@@ -1,6 +1,6 @@
 import type { OrderListItem, Subscription } from './api';
 
-export type OrderGroupKind = 'subscription' | 'domain';
+export type OrderGroupKind = 'subscription' | 'domain' | 'order';
 
 export interface OrderGroupAggregates {
   totalScans: number;
@@ -122,11 +122,18 @@ export function groupOrders(
   const subOrders = new Map<string, OrderListItem[]>();
   const domainOrders = new Map<string, OrderListItem[]>();
 
+  // Multi-Target-Orders ohne Subscription bekommen eine eigene Group
+  // via Order-UUID — der `target_url`-Display-Name "multi-target (N)"
+  // taugt nicht als Routen-Key (Sonderzeichen, mehrdeutig).
+  const orderGroups: OrderListItem[] = [];
+
   for (const order of orders) {
     if (order.subscriptionId && subById.has(order.subscriptionId)) {
       const list = subOrders.get(order.subscriptionId) ?? [];
       list.push(order);
       subOrders.set(order.subscriptionId, list);
+    } else if ((order.targetCount ?? 1) > 1) {
+      orderGroups.push(order);
     } else {
       const list = domainOrders.get(order.domain) ?? [];
       list.push(order);
@@ -135,6 +142,20 @@ export function groupOrders(
   }
 
   const groups: OrderGroup[] = [];
+
+  // Multi-Target-Order-Groups (eine pro Order, key = ord:<uuid>)
+  for (const order of orderGroups) {
+    groups.push({
+      kind: 'order',
+      key: `ord:${order.id}`,
+      title: order.domain, // "multi-target (N)" oder canonical bei N=1
+      subtitle: `${order.targetCount ?? 0} Ziele`,
+      domain: order.domain,
+      domains: [order.domain],
+      orders: [order],
+      aggregates: aggregate([order]),
+    });
+  }
 
   // Subscription groups (incl. empty ones so the user sees their abo on the dashboard)
   for (const sub of subscriptions) {

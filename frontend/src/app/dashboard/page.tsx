@@ -344,9 +344,11 @@ function GroupCard({ group, admin }: { group: OrderGroup; admin: boolean }) {
           <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
             group.kind === 'subscription'
               ? 'bg-teal-500/15 text-teal-400'
+              : group.kind === 'order'
+              ? 'bg-indigo-500/15 text-indigo-300'
               : 'bg-slate-700 text-slate-400'
           }`}>
-            {group.kind === 'subscription' ? 'Abo' : 'Einzelscans'}
+            {group.kind === 'subscription' ? 'Abo' : group.kind === 'order' ? 'Multi-Target' : 'Einzelscans'}
           </span>
           <span className="font-semibold text-white text-sm truncate">{group.title}</span>
           <span className="text-xs text-slate-500 truncate">{group.subtitle}</span>

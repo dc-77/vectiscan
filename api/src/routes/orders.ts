@@ -171,7 +171,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const baseSelect = `SELECT o.id, o.target_url, o.package, o.status, o.error_message,
                     o.scan_started_at, o.scan_finished_at, o.created_at,
                     o.hosts_total, o.hosts_completed, o.current_tool, o.current_host,
-                    o.subscription_id, o.is_rescan,
+                    o.subscription_id, o.is_rescan, o.target_count,
                     c.email,
                     EXISTS(SELECT 1 FROM reports r2 WHERE r2.order_id = o.id) AS has_report,
                     (SELECT rr.findings_data->>'overall_risk' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS overall_risk,
@@ -209,6 +209,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       businessImpactScore: row.business_impact_score != null ? Number(row.business_impact_score) : null,
       subscriptionId: (row.subscription_id as string) || null,
       isRescan: row.is_rescan === true || row.is_rescan === 't',
+      targetCount: row.target_count != null ? Number(row.target_count) : null,
     }));
 
     return { success: true, data: { orders } };
@@ -226,6 +227,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const qp = request.query as Record<string, string | undefined>;
     const subscriptionIdFilter = qp.subscriptionId && UUID_REGEX.test(qp.subscriptionId) ? qp.subscriptionId : null;
     const domainFilter = qp.domain ? qp.domain.toLowerCase().slice(0, 255) : null;
+    const orderIdFilter = qp.orderId && UUID_REGEX.test(qp.orderId) ? qp.orderId : null;
 
     // Resolve customer_id
     let customerId = user.customerId;
@@ -249,6 +251,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       params.push(domainFilter);
       // Only plain single-domain groups (no subscription) — see /scans/dom:<domain>
       where.push(`o.target_url = $${params.length} AND o.subscription_id IS NULL`);
+    }
+    if (orderIdFilter) {
+      params.push(orderIdFilter);
+      // Multi-Target-Order ohne Subscription — siehe /scans/ord:<uuid>
+      where.push(`o.id = $${params.length}`);
     }
 
     const result = await query(

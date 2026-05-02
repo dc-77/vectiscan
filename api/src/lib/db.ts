@@ -25,6 +25,7 @@ const MIGRATION_015_PATH = path.join(__dirname, '..', 'migrations', '015_perform
 const MIGRATION_016_PATH = path.join(__dirname, '..', 'migrations', '016_severity_policy.sql');
 const MIGRATION_017_PATH = path.join(__dirname, '..', 'migrations', '017_threat_intel_snapshots.sql');
 const MIGRATION_018_PATH = path.join(__dirname, '..', 'migrations', '018_severity_counts_trigger_fix.sql');
+const MIGRATION_019_PATH = path.join(__dirname, '..', 'migrations', '019_subdomain_snapshot.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -232,6 +233,18 @@ export async function initDb(): Promise<void> {
   const triggerDef = (triggerFnDefCheck.rows[0]?.def as string | undefined) ?? '';
   if (!triggerDef.includes("findings_data->'findings'")) {
     const migrationSql = fs.readFileSync(MIGRATION_018_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 019: Subdomain-Snapshot pro scan_target (PR-M4).
+  const subdomainSnapshotCheck = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables
+      WHERE table_name = 'scan_target_subdomain_snapshots'
+    ) AS exists
+  `);
+  if (!subdomainSnapshotCheck.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_019_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

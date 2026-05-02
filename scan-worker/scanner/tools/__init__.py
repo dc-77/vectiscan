@@ -193,7 +193,20 @@ def _save_result(
     exit_code: int,
     duration_ms: int,
 ) -> None:
-    """Save tool result to scan_results table."""
+    """Save tool result to scan_results table.
+
+    PR-ABC (2026-05-02): raw_output durchlaeuft erst output_normalizer.normalize()
+    fuer bekannte Tools (httpx, wafw00f, dnsx). Strippt Timestamps,
+    Latencies, ASCII-Banner, Resolver-Reihenfolge — damit identische
+    Server-Antworten zu identischen Bytes fuehren und der KI-Cache greifen
+    kann (siehe TIEFENANALYSE-RUN-DRIFT-2026-05-02.md).
+    """
+    try:
+        from scanner.output_normalizer import normalize
+        raw_output = normalize(tool_name, raw_output)
+    except Exception:
+        # Bei Normalisierungs-Fehler nicht crashen — Original speichern
+        pass
     try:
         conn = get_db_connection()
         with conn.cursor() as cur:

@@ -100,6 +100,7 @@ export default function GroupDetailPage({ params }: PageProps) {
   const summaryFilter = (() => {
     if (groupKey.startsWith('sub:')) return { subscriptionId: groupKey.slice(4) };
     if (groupKey.startsWith('dom:')) return { domain: groupKey.slice(4) };
+    if (groupKey.startsWith('ord:')) return { orderId: groupKey.slice(4) };
     return undefined;
   })();
 

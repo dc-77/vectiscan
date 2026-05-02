@@ -528,6 +528,13 @@ export async function adminReviewRoutes(server: FastifyInstance): Promise<void> 
 
       // Alte Hosts-Eintraege verwerfen
       await query('DELETE FROM scan_target_hosts WHERE scan_target_id = $1', [targetId]);
+      // PR-M4: Subdomain-Snapshot ebenfalls invalidieren — Admin will hier
+      // explizit neu enumerieren, sonst wuerde der Snapshot greifen und das
+      // Restart waere wirkungslos.
+      await query(
+        'DELETE FROM scan_target_subdomain_snapshots WHERE scan_target_id = $1',
+        [targetId],
+      );
 
       const row = res.rows[0];
       if (row.order_id) {

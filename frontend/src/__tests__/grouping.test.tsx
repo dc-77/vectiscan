@@ -21,6 +21,7 @@ const baseOrder: OrderListItem = {
   businessImpactScore: 5.5,
   subscriptionId: null,
   isRescan: false,
+  targetCount: null,
 };
 
 const baseSub: Subscription = {

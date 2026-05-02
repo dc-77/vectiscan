@@ -276,6 +276,7 @@ export interface OrderListItem {
   businessImpactScore: number | null;
   subscriptionId: string | null;
   isRescan: boolean;
+  targetCount: number | null;
 }
 
 // --- Findings ---
@@ -374,11 +375,12 @@ export interface DashboardSummary {
 }
 
 export async function getDashboardSummary(
-  filter?: { subscriptionId?: string; domain?: string },
+  filter?: { subscriptionId?: string; domain?: string; orderId?: string },
 ): Promise<ApiResponse<DashboardSummary>> {
   const qs = new URLSearchParams();
   if (filter?.subscriptionId) qs.set('subscriptionId', filter.subscriptionId);
   if (filter?.domain) qs.set('domain', filter.domain);
+  if (filter?.orderId) qs.set('orderId', filter.orderId);
   const suffix = qs.toString() ? `?${qs.toString()}` : '';
   const res = await fetch(`${API_URL}/api/orders/dashboard-summary${suffix}`, {
     headers: authHeaders(),
