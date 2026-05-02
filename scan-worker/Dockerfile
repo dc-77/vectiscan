@@ -127,18 +127,31 @@ RUN apt-get update && \
 RUN pip3 install --no-cache-dir --break-system-packages wafw00f
 
 # ── 5. Wordlists ───────────────────────────────────────────────────
+# SecLists Industriestandard fuer Web-Discovery + Pentesting:
+#   common.txt              ~4.6k   Standard-Web-Pfade
+#   raft-medium-files.txt   ~17.5k  Sensitive-Files (.env, .git, backup.zip, dump.sql, ...)
+#   subdomains-top1m-5000   5k      DNS-Bruteforce
+#   burp-parameter-names    6.5k    HTTP-Parameter-Discovery
+#   CMS/wp-plugins.fuzz     ~4k     WordPress-Plugin-Pfade
 RUN mkdir -p /usr/share/wordlists /usr/share/wordlists/seclists/Discovery/Web-Content \
-             /usr/share/wordlists/seclists/Discovery/DNS && \
+             /usr/share/wordlists/seclists/Discovery/DNS \
+             /usr/share/wordlists/seclists/Discovery/Web-Content/CMS && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-5000.txt \
       -o /usr/share/wordlists/subdomains-top5000.txt && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt \
       -o /usr/share/wordlists/common.txt && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt \
       -o /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt && \
+    curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-medium-files.txt \
+      -o /usr/share/wordlists/raft-medium-files.txt && \
+    curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-medium-files.txt \
+      -o /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-files.txt && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-5000.txt \
       -o /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/burp-parameter-names.txt \
-      -o /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt
+      -o /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt && \
+    curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/CMS/wp-plugins.fuzz.txt \
+      -o /usr/share/wordlists/seclists/Discovery/Web-Content/CMS/wp-plugins.fuzz.txt
 
 # Curated wordlists for AI-adaptive scanning
 COPY wordlists/wordpress.txt /usr/share/wordlists/wordpress.txt

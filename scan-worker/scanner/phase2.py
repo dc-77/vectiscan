@@ -145,6 +145,9 @@ WORDLIST_MAP = {
     "wordpress": "/usr/share/wordlists/wordpress.txt",
     "api": "/usr/share/wordlists/api-endpoints.txt",
     "cms": "/usr/share/wordlists/cms-common.txt",
+    # Sensitive-Files (.env, .git/HEAD, backup.zip, dump.sql, etc.) —
+    # SecLists raft-medium-files.txt, ~17.5k Eintraege.
+    "sensitive": "/usr/share/wordlists/raft-medium-files.txt",
 }
 
 # SecLists paths for ffuf (installed from SecLists in Dockerfile)
@@ -153,7 +156,16 @@ FFUF_WORDLISTS = {
     "dir": f"{SECLISTS_DIR}/Discovery/Web-Content/common.txt",
     "vhost": f"{SECLISTS_DIR}/Discovery/DNS/subdomains-top1million-5000.txt",
     "param": f"{SECLISTS_DIR}/Discovery/Web-Content/burp-parameter-names.txt",
+    # Sensitive-Files-Modus fuer ffuf (siehe run_ffuf mode='sensitive').
+    "sensitive": f"{SECLISTS_DIR}/Discovery/Web-Content/raft-medium-files.txt",
+    # WordPress-Plugin-Pfade (~4k) — ergaenzt unsere kuratierte
+    # wordpress.txt mit den haeufigsten Plugin-Slugs.
+    "wp_plugins": f"{SECLISTS_DIR}/Discovery/Web-Content/CMS/wp-plugins.fuzz.txt",
 }
+
+# Critical-File-Extensions die wir bei jedem Scan an Pfade anhaengen —
+# typische Pentest-Quick-Wins (.env, .git/, dump.sql, config.bak, ...).
+CRITICAL_EXTENSIONS = "bak,old,sql,zip,tar.gz,tgz,env,backup,swp,save,orig,~"
 
 
 def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
@@ -185,9 +197,10 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
         "-o", output_path,
         # Default 10 threads = sehr langsam → 50
         "-t", "50",
-        # Default-Extensions: PHP/Backup/Static → findet `.bak`-Files,
-        # vergessene `.old`-Backups, `.zip`-Releases.
-        "-x", "php,bak,txt,old,zip,html",
+        # Erweiterte Extension-Liste: PHP + alle Sensitive-File-Endungen
+        # (env/git/bak/sql/...) — typische Pentest-Quick-Wins. CRITICAL_EXTENSIONS
+        # ist top-level konstant, damit Tests die Liste leicht checken koennen.
+        "-x", f"php,html,txt,{CRITICAL_EXTENSIONS}",
         # Status-Codes: 200/301/302 als Treffer; 403 NICHT (zu viel Noise
         # bei modernen WAFs, die alles auf 403 mappen).
         "-s", "200,301,302,307",
@@ -579,6 +592,36 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
             # Probes UND wartet auf jede Antwort, was den Run nochmal verlangsamt.
             "-s",
         ]
+
+    elif mode == "sensitive":
+        # Sensitive-File-Discovery: jagt nach .env/.git/backup.zip/dump.sql/...
+        # mittels SecLists raft-medium-files.txt (~17.5k Eintraege). Diese
+        # Files sind typische Pentest-Quick-Wins und finden sich oft in
+        # Production-Deployments.
+        wordlist = FFUF_WORDLISTS.get("sensitive", WORDLIST_MAP.get("sensitive"))
+        if not wordlist or not os.path.isfile(wordlist):
+            log.warning("ffuf_sensitive_wordlist_missing", path=wordlist)
+            return None
+        cmd = [
+            "ffuf",
+            "-u", f"https://{fqdn}/FUZZ",
+            "-w", wordlist,
+            "-mc", "200,301,302,307",
+            # 403 raus — viele Sensitive-Files (etwa /.git/HEAD) liefern bei
+            # WAFs 403 statt 404, sind aber trotzdem ein klares Signal.
+            # Wir matchen daher zusaetzlich auf 403 ueber `-fs` Statt-Filter:
+            "-mr", "200|301|302|307",
+            "-H", "User-Agent: Mozilla/5.0 vectiscan",
+            "-json",
+            "-o", output_path,
+            "-t", "60",
+            "-rate", "100",
+            "-timeout", "5",
+            "-maxtime", "180",
+            # Filter typische "weiche 200"-Wildcard-Antworten
+            "-fs", "0",
+            "-s",
+        ]
     else:
         log.warning("ffuf_unknown_mode", mode=mode)
         return None
@@ -628,15 +671,31 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
     if adaptive_config and adaptive_config.get("feroxbuster_depth"):
         depth = min(int(adaptive_config["feroxbuster_depth"]), 2)
 
-    wordlist = WORDLIST_MAP["common"]
+    # AI-adaptive wordlist selection — analog zu gobuster_dir. Bei
+    # WordPress/Drupal/Magento etc. nimmt die KI die curated wordlist;
+    # default ist common.txt (~4.6k).
+    wl_key = "common"
+    if adaptive_config and adaptive_config.get("feroxbuster_wordlist"):
+        wl_key = adaptive_config["feroxbuster_wordlist"]
+    elif adaptive_config and adaptive_config.get("gobuster_wordlist"):
+        # Fallback: gobuster-Choice mit-nutzen wenn KI nur das gesetzt hat.
+        wl_key = adaptive_config["gobuster_wordlist"]
+    wordlist = WORDLIST_MAP.get(wl_key, WORDLIST_MAP["common"])
     if not os.path.isfile(wordlist):
-        log.warning("feroxbuster_wordlist_missing", path=wordlist)
+        log.warning("feroxbuster_wordlist_missing", path=wordlist, wl_key=wl_key)
+        wordlist = WORDLIST_MAP["common"]
+    if not os.path.isfile(wordlist):
         return None
+    if wl_key != "common":
+        log.info("feroxbuster_adaptive_wordlist", ip=ip, wordlist=wl_key)
 
     cmd = [
         "feroxbuster",
         "-u", f"https://{fqdn}",
         "-w", wordlist,
+        # Critical-File-Extensions — analog gobuster_dir. Bei jedem
+        # gefundenen Pfad wird `<pfad>.bak`, `<pfad>.env`, etc. probiert.
+        "-x", CRITICAL_EXTENSIONS,
         "-d", str(depth),
         "-t", "30",
         # `--rate-limit 100` statt `--auto-tune`: auto-tune regelt bei
@@ -1279,6 +1338,24 @@ def run_phase2(
                                         f"{len(ferox_result)} paths (recursive, dedup applied)")
                 else:
                     publish_tool_output(order_id, "feroxbuster", ip, "No new paths")
+
+        # ffuf sensitive: Sensitive-File-Discovery (.env, .git/, dump.sql, ...)
+        # Eigener Run mit raft-medium-files.txt Wordlist — typische Pentest-
+        # Quick-Wins die in common.txt nicht ausreichend abgedeckt sind.
+        if (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip and has_web:
+            publish_event(order_id, {"type": "tool_starting", "tool": "ffuf_sensitive", "host": ip})
+            sens_config = dict(adaptive_config) if adaptive_config else {}
+            sens_config["ffuf_mode"] = "sensitive"
+            sens_result = run_ffuf(primary_fqdn, ip, host_dir, order_id,
+                                    adaptive_config=sens_config)
+            r["ffuf_sensitive"] = sens_result
+            r["_tools"].append("ffuf_sensitive")
+            progress_callback(order_id, "ffuf_sensitive", "complete")
+            if sens_result:
+                publish_tool_output(order_id, "ffuf_sensitive", ip,
+                                    f"{len(sens_result)} sensitive files exposed")
+            else:
+                publish_tool_output(order_id, "ffuf_sensitive", ip, "No sensitive files found")
 
         # wpscan (conditional on WordPress) — use final URL after redirects
         if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
