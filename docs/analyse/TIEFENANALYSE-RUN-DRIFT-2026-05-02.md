@@ -115,6 +115,25 @@ fuer komplette Determinismus-Garantie.
 
 ---
 
+## Stand 2026-05-02 — PR-ABC + PR-M4 umgesetzt
+
+| PR | Status | Wirkung |
+|---|---|---|
+| **A — Tool-Output-Normalizer fuer httpx** | DONE | `scanner/output_normalizer.py:normalize_httpx()` strippt `timestamp` + `time` aus jeder JSON-Zeile vor `_save_result()`. Identische Server-Antworten → identische Bytes. |
+| **B — wafw00f-Wrapper** | DONE | `normalize_wafw00f()` strippt ANSI-Codes + Banner-ASCII-Art, behaelt nur die Detection-Block-Zeilen ab `[*]/[+]/[-]`. Eliminiert die 1097-vs-622-Byte-Drift. |
+| **C — dnsx-Output sortieren** | DONE | `normalize_dnsx()` parst JSON-Lines, sortiert IP-/Resolver-Listen pro Zeile alphabetisch und Zeilen selbst nach `host`. Resolver-Reihenfolge irrelevant. |
+| **M4 — Pre-Check-Snapshot persistieren** | DONE | Migration 019 + `scanner/precheck/snapshot_store.py` + Hook in `phase0.run_phase0()`. Snapshot pro `scan_target_id` mit TTL 24h (override `SUBDOMAIN_SNAPSHOT_TTL_HOURS`). Re-Scan innerhalb TTL → crt.sh/subfinder/amass/gobuster_dns uebersprungen, gecachtes Subdomain-Set direkt an dnsx. axfr + dns_records laufen weiter (billig + Email-Security relevant). Admin-Restart-Precheck invalidiert Snapshot ueber `DELETE FROM scan_target_subdomain_snapshots`. |
+| E — M5 Reporter-Narrative-only | OPEN | groesster verbleibender Hebel; eigener PR-Block. |
+
+**Erwartete Wirkung der vier PRs zusammen:** Re-Scan derselben Domain
+innerhalb von 24h sollte byte-identische Tool-Outputs (modulo
+Server-Antwort-Aenderungen) liefern; KI-Cache-Hit-Rate steigt sichtbar
+weil Cache-Key auf Order-Scope basiert und Tool-Outputs jetzt stabil
+sind; Reporter-Sonnet sieht stabile Inputs. Verbleibende Drift kommt
+fast ausschliesslich aus Anthropic-API-Floating-Point-Rundungen (M5).
+
+---
+
 ## Wenn der User fragt „warum jeder Scan andere Ergebnisse?"
 
 **Praezise Antwort:**
