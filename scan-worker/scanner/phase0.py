@@ -116,45 +116,67 @@ def _classify_dangling_cname(cname_target: str) -> tuple[str, str]:
 
 
 def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
-    """Query crt.sh for certificate transparency subdomains. Timeout 30s."""
+    """Query crt.sh for certificate transparency subdomains. Timeout 60s.
+
+    Mit 3-Stufen-Self-Retry: crt.sh ist berüchtigt instabil (HTTP 502 / leere
+    Antworten trotz HTTP 200). curl `--retry 2` zaehlt nur Connection-Fehler,
+    nicht „leerer Response trotz 200". Wir wiederholen daher bis zu 3x mit
+    exponentiellem Backoff (5s, 15s, 30s) und akzeptieren erst wenn JSON
+    parsbar UND len(entries) > 0 ist.
+
+    Falls am Ende dennoch leer: leere Liste zurueckgeben — der Caller
+    (run_certificate_transparency) ruft dann certspotter als Fallback.
+    """
     publish_event(order_id, {"type": "tool_starting", "tool": "crtsh", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", "crtsh_raw.json")
+    parsed_path = os.path.join(scan_dir, "phase0", "crtsh.json")
     subdomains: list[str] = []
 
-    # Use curl -o to write directly to file — avoids needing a second call
-    cmd = [
-        "curl", "-s",
-        # crt.sh ist berüchtigt instabil (502/timeout); bisher hing curl
-        # bis zum tool-Timeout (60s) und produzierte 0 bytes. Mit hartem
-        # max-time + Retry kommen wir bei Hick-Ups schneller weiter.
-        "--max-time", "30",
-        "--retry", "2",
-        "--retry-delay", "5",
-        "--retry-connrefused",
-        "-A", "Mozilla/5.0 vectiscan",
-        "-o", output_path,
-        f"https://crt.sh/?q=%.{domain}&output=json",
-    ]
-    exit_code, duration_ms = run_tool(
-        cmd=cmd,
-        timeout=60,
-        output_path=output_path,
-        order_id=order_id,
-        phase=0,
-        tool_name="crtsh",
-    )
+    # 3-Stufen-Self-Retry mit exponentiellem Backoff. Erfolg = JSON parsbar
+    # UND mindestens ein Eintrag (entries > 0). curl `--retry` zaehlt nur
+    # Connection-Fehler, nicht „leere Antwort trotz HTTP 200" — daher hier
+    # in Python.
+    backoffs = [0, 5, 15]  # erste Sekunde sofort, dann 5s, dann 15s
+    last_attempt = 0
+    for attempt, sleep_s in enumerate(backoffs, start=1):
+        if sleep_s:
+            log.info("crtsh_retry_backoff", attempt=attempt, sleep_s=sleep_s)
+            time.sleep(sleep_s)
+        last_attempt = attempt
 
-    if exit_code != 0:
-        log.warning("crtsh_failed", exit_code=exit_code)
-        return subdomains
+        cmd = [
+            "curl", "-s",
+            "--max-time", "30",
+            "--retry", "1",
+            "--retry-delay", "3",
+            "--retry-connrefused",
+            "-A", "Mozilla/5.0 vectiscan",
+            "-o", output_path,
+            f"https://crt.sh/?q=%.{domain}&output=json",
+        ]
+        exit_code, duration_ms = run_tool(
+            cmd=cmd,
+            timeout=60,
+            output_path=output_path,
+            order_id=order_id,
+            phase=0,
+            tool_name="crtsh" if attempt == 1 else f"crtsh_retry{attempt}",
+        )
 
-    # Parse the saved file
-    parsed_path = os.path.join(scan_dir, "phase0", "crtsh.json")
-    try:
-        with open(output_path, "r") as f:
-            raw = f.read().strip()
-        if raw:
+        if exit_code != 0:
+            log.warning("crtsh_curl_failed", attempt=attempt, exit_code=exit_code)
+            continue
+
+        try:
+            with open(output_path, "r") as f:
+                raw = f.read().strip()
+            if not raw:
+                log.warning("crtsh_empty_response", attempt=attempt)
+                continue
             entries = json.loads(raw)
+            if not entries:
+                log.warning("crtsh_zero_entries", attempt=attempt)
+                continue
             seen: set[str] = set()
             for entry in entries:
                 name_value = entry.get("name_value", "")
@@ -165,13 +187,102 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
                     if name and (name.endswith(f".{domain}") or name == domain):
                         seen.add(name)
             subdomains = sorted(seen)
-
             with open(parsed_path, "w") as f:
                 json.dump({"subdomains": subdomains, "raw_count": len(entries)}, f, indent=2)
+            log.info("crtsh_complete", subdomains_found=len(subdomains), attempts_used=attempt)
+            break  # Erfolg
+        except (json.JSONDecodeError, FileNotFoundError, Exception) as e:
+            log.warning("crtsh_parse_error", attempt=attempt, error=str(e))
+            continue
 
-            log.info("crtsh_complete", subdomains_found=len(subdomains))
-    except (json.JSONDecodeError, FileNotFoundError, Exception) as e:
-        log.warning("crtsh_parse_error", error=str(e))
+    if not subdomains:
+        log.warning("crtsh_all_attempts_failed", attempts=last_attempt)
+
+    return subdomains
+
+
+def run_securitytrails_subdomains(domain: str, scan_dir: str, order_id: str) -> list[str]:
+    """SecurityTrails-Subdomain-Liste als 4. CT-Quelle in Phase 0b.
+
+    SecurityTrails liefert oft hunderte Subdomains (historische DNS-Daten),
+    die crt.sh + subfinder + amass nicht haben. Nur aktiv wenn
+    `SECURITYTRAILS_API_KEY` gesetzt ist — sonst stiller Skip.
+    """
+    publish_event(order_id, {"type": "tool_starting", "tool": "securitytrails", "host": domain})
+    output_path = os.path.join(scan_dir, "phase0", "securitytrails.json")
+    started = time.monotonic()
+
+    subdomains: list[str] = []
+    error: Optional[str] = None
+    try:
+        from scanner.passive.securitytrails_client import SecurityTrailsClient
+        client = SecurityTrailsClient()
+        if not client.available:
+            log.info("securitytrails_skipped", reason="no_api_key")
+            return []
+        subdomains = client.get_subdomains(domain)
+        log.info("securitytrails_complete", subdomains_found=len(subdomains))
+    except Exception as e:
+        error = str(e)
+        log.warning("securitytrails_error", error=error)
+
+    duration_ms = int((time.monotonic() - started) * 1000)
+    try:
+        payload = {"subdomains": subdomains, "error": error}
+        with open(output_path, "w") as f:
+            json.dump(payload, f, indent=2)
+        from scanner.tools import _save_result
+        _save_result(
+            order_id=order_id, host_ip=None, phase=0,
+            tool_name="securitytrails",
+            raw_output=json.dumps(payload, ensure_ascii=False),
+            exit_code=0 if not error else 1,
+            duration_ms=duration_ms,
+        )
+    except Exception as e:
+        log.warning("securitytrails_save_error", error=str(e))
+
+    return subdomains
+
+
+def run_certspotter(domain: str, scan_dir: str, order_id: str) -> list[str]:
+    """Cert-Transparency-Fallback ueber SSLMate certspotter API.
+
+    Wird aufgerufen wenn crt.sh komplett leer geblieben ist. Liefert in der
+    Regel dasselbe Subdomain-Set, in seltenen Faellen mehr (certspotter
+    indexiert auch Issuances die crt.sh noch nicht eingelesen hat).
+    """
+    publish_event(order_id, {"type": "tool_starting", "tool": "certspotter", "host": domain})
+    output_path = os.path.join(scan_dir, "phase0", "certspotter.json")
+    started = time.monotonic()
+
+    subdomains: list[str] = []
+    error: Optional[str] = None
+    try:
+        from scanner.passive.certspotter_client import CertSpotterClient
+        client = CertSpotterClient()
+        subdomains = client.get_subdomains(domain)
+        log.info("certspotter_complete", subdomains_found=len(subdomains))
+    except Exception as e:
+        error = str(e)
+        log.warning("certspotter_error", error=error)
+
+    duration_ms = int((time.monotonic() - started) * 1000)
+    # Persistiere als scan_results-Eintrag fuer Audit
+    try:
+        payload = {"subdomains": subdomains, "error": error}
+        with open(output_path, "w") as f:
+            json.dump(payload, f, indent=2)
+        from scanner.tools import _save_result
+        _save_result(
+            order_id=order_id, host_ip=None, phase=0,
+            tool_name="certspotter",
+            raw_output=json.dumps(payload, ensure_ascii=False),
+            exit_code=0 if not error else 1,
+            duration_ms=duration_ms,
+        )
+    except Exception as e:
+        log.warning("certspotter_save_error", error=str(e))
 
     return subdomains
 
@@ -352,8 +463,11 @@ def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, An
 
     # Step 1: resolve NS records
     try:
+        # @1.1.1.1 — fixierter Resolver, siehe scanner/resolvers.txt.
+        # Ohne Fixierung wechselt System-DNS zwischen Resolvern und liefert
+        # bei manchen Domains leicht andere NS-Listen pro Lauf.
         ns_result = subprocess.run(
-            ["dig", "NS", domain, "+short", "+tries=1", "+time=5"],
+            ["dig", "@1.1.1.1", "NS", domain, "+short", "+tries=2", "+time=5"],
             capture_output=True, text=True, timeout=15,
             start_new_session=True,
         )
@@ -510,8 +624,11 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
     def _dig_query(qname: str, qtype: str, timeout: int = 10) -> str:
         """Run a dig query and return stdout."""
         try:
+            # @1.1.1.1 — fixierter Resolver fuer SPF/DMARC/MX/NS. Diese
+            # Werte sind autoritativ, aber System-DNS kann gecachte stale
+            # Antworten liefern. Cloudflare-DNS ist global konsistent.
             result = subprocess.run(
-                ["dig", qname, qtype, "+short", "+tries=1", "+time=5"],
+                ["dig", "@1.1.1.1", qname, qtype, "+short", "+tries=2", "+time=5"],
                 capture_output=True, text=True, timeout=timeout,
                 start_new_session=True,
             )
@@ -764,8 +881,14 @@ def merge_and_group(
         if len(ips) == 1:
             deduped_ip_to_fqdns[ips[0]] = set(fqdn_set)
         else:
-            # Prefer IPv4 over IPv6, then shortest IP string
-            ipv4 = [ip for ip in ips if ":" not in ip]
+            # Prefer IPv4 over IPv6, then alphabetisch sortiert.
+            # CloudFlare/AnyCast-Dienste rotieren die DNS-Antwort-
+            # Reihenfolge bei jeder Anfrage (z.B. 104.16.10.6 in R1,
+            # 104.16.11.6 in R2). Ohne Sortierung waere die "Repraesentanten-
+            # IP" damit nicht-deterministisch und das gesamte host_inventory
+            # driftet. Mit `sorted(ipv4)[0]` haben wir immer die kleinste
+            # IP als Repraesentant.
+            ipv4 = sorted(ip for ip in ips if ":" not in ip)
             representative = ipv4[0] if ipv4 else sorted(ips, key=len)[0]
             deduped_ip_to_fqdns[representative] = set(fqdn_set)
             deduped_count += len(ips) - 1
@@ -1035,7 +1158,7 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     dns_records: dict[str, Any] = {"spf": None, "dmarc": None, "dkim": False, "mx": [], "ns": []}
 
     discovery_futures: dict[Any, str] = {}
-    with ThreadPoolExecutor(max_workers=6, thread_name_prefix="phase0b") as pool:
+    with ThreadPoolExecutor(max_workers=8, thread_name_prefix="phase0b") as pool:
         if not snapshot_used:
             if "crtsh" in phase0_tools:
                 discovery_futures[pool.submit(run_crtsh, domain, scan_dir, order_id)] = "crtsh"
@@ -1045,6 +1168,12 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                 discovery_futures[pool.submit(run_amass, domain, scan_dir, order_id)] = "amass"
             if "gobuster_dns" in phase0_tools:
                 discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
+            # SecurityTrails als 4. CT-Quelle, parallel. Nur wenn API-Key
+            # gesetzt — sonst Skip ohne Aufwand.
+            if os.environ.get("SECURITYTRAILS_API_KEY"):
+                discovery_futures[pool.submit(
+                    run_securitytrails_subdomains, domain, scan_dir, order_id,
+                )] = "securitytrails"
         if "axfr" in phase0_tools:
             discovery_futures[pool.submit(run_zone_transfer, domain, scan_dir, order_id)] = "axfr"
         discovery_futures[pool.submit(collect_dns_records, domain, scan_dir, order_id)] = "dns_records"
@@ -1067,6 +1196,23 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                     log.info(f"phase0_{tool_name}_done", found=len(subs))
             except Exception as e:
                 log.error(f"phase0_{tool_name}_error", error=str(e))
+
+    # --- certspotter-Fallback wenn crt.sh leer geblieben ist ---
+    # crt.sh ist die haeufigste Drift-/Ausfall-Quelle in Phase 0. Wenn es
+    # 0 Subdomains liefert, fragen wir certspotter (SSLMate) als zweite
+    # CT-Quelle. Beide CT-Logs indexieren denselben Bestand.
+    if not snapshot_used:
+        crtsh_results = tool_sources.get("crtsh") or []
+        if not crtsh_results:
+            try:
+                cs_subs = run_certspotter(domain, scan_dir, order_id)
+                if cs_subs:
+                    all_subdomains.extend(cs_subs)
+                    tool_sources["certspotter"] = list(cs_subs)
+                    log.info("phase0_certspotter_fallback_used",
+                             subdomains_found=len(cs_subs))
+            except Exception as e:
+                log.warning("phase0_certspotter_fallback_error", error=str(e))
 
     # Always include the base domain
     all_subdomains.append(domain)
@@ -1123,6 +1269,39 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         duration_ms=elapsed_ms,
         snapshot_used=snapshot_used,
     )
+
+    # Discovery-Health: pro Tool wieviele Subdomains kamen — fuer
+    # Abbruch-Logik in worker.py + UI-Sichtbarkeit. Bei Snapshot-Reuse
+    # markieren wir die Quelle als "snapshot".
+    discovery_health: dict[str, Any] = {
+        "snapshot_used": snapshot_used,
+        "tool_counts": {tool: len(set(subs)) for tool, subs in tool_sources.items()},
+        "total_subdomains": len(set(all_subdomains)),
+        "ct_sources_empty": (
+            not snapshot_used
+            and not tool_sources.get("crtsh")
+            and not tool_sources.get("certspotter")
+        ),
+    }
+    inventory["discovery_health"] = discovery_health
+
+    # Wenn alle CT-Quellen leer waren UND wir nicht aus Snapshot kommen,
+    # warnen wir explizit — das ist verdaechtig (Domain hat normalerweise
+    # mindestens 2-3 Subdomains in CT-Logs).
+    if discovery_health["ct_sources_empty"] and discovery_health["total_subdomains"] < 3:
+        log.warning(
+            "phase0_discovery_thin",
+            domain=domain,
+            total_subdomains=discovery_health["total_subdomains"],
+            tool_counts=discovery_health["tool_counts"],
+        )
+        publish_event(order_id, {
+            "type": "phase0_discovery_warning",
+            "orderId": order_id,
+            "domain": domain,
+            "message": "Alle CT-Quellen leer und sehr wenige Subdomains — Discovery moeglicherweise eingeschraenkt.",
+            "subdomainCount": discovery_health["total_subdomains"],
+        })
 
     return inventory
 

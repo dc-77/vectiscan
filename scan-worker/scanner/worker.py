@@ -283,6 +283,24 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     hosts = host_inventory.get("hosts", [])
     log.info("phase0b_done", order_id=order_id, hosts_found=len(hosts))
 
+    # Discovery-Health-Abbruch (PR-Robustheits-Plan, 2026-05-02):
+    # Wenn Phase 0 mit 0 Hosts endet, ist DNS-Resolution komplett
+    # gescheitert (Domain nicht aufloesbar oder alle Discovery-Quellen down).
+    # Statt scheinheiligen Report ueber nichts zu produzieren brechen wir
+    # mit klarer Fehlermeldung ab.
+    if len(hosts) == 0:
+        health = host_inventory.get("discovery_health", {})
+        msg = (
+            "Phase 0 Discovery hat 0 lebende Hosts gefunden. "
+            f"Domain '{domain}' ggf. nicht aufloesbar oder alle "
+            "DNS-/Discovery-Quellen ausgefallen. "
+            f"Tool-Counts: {health.get('tool_counts', {})}, "
+            f"CT-Sources leer: {health.get('ct_sources_empty', False)}."
+        )
+        log.error("phase0_no_hosts_abort", order_id=order_id, message=msg)
+        set_scan_failed(order_id, msg)
+        return
+
     # Re-run Shodan/AbuseIPDB with discovered IPs (if Phase 0a is enabled)
     if phase0a_tools and hosts:
         discovered_ips = [h["ip"] for h in hosts]
@@ -443,7 +461,10 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     except ValueError:
         phase1_cap = 3
     phase1_cap = max(1, phase1_cap)
-    max_parallel = min(phase1_cap, len(scan_hosts))
+    # max(1, ...) garantiert dass auch bei `len(scan_hosts) == 0` der
+    # ThreadPool startet (sonst ValueError "max_workers must be > 0").
+    # Bei 0 Hosts ist der Pool leer → kein Future submitted, sauberer No-Op.
+    max_parallel = max(1, min(phase1_cap, len(scan_hosts)))
     with ThreadPoolExecutor(max_workers=max_parallel, thread_name_prefix="phase1") as pool:
         futures = {
             pool.submit(_run_phase1_host, idx, host): idx
@@ -638,6 +659,9 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         # Legacy Mode: ZAP Singleton — parallel hosts cause context conflicts.
         # Packages without ZAP (e.g. tlscompliance) can safely parallelize.
         max_parallel_p2 = min(5, len(scannable)) if not has_zap else 1
+    # max(1, ...) verhindert ValueError wenn `scannable` leer ist (Pool ist
+    # dann ohnehin No-Op, aber ThreadPoolExecutor braucht >=1 worker).
+    max_parallel_p2 = max(1, max_parallel_p2)
     with ThreadPoolExecutor(max_workers=max_parallel_p2, thread_name_prefix="phase2") as pool:
         futures = {
             pool.submit(_run_phase2_host, idx, host, tp): idx

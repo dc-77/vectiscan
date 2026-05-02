@@ -35,7 +35,14 @@ class TestWorkerPackageFlow:
             "phase2_tools": ["headers"],
             "total_timeout": 600,
         }
-        mock_phase0.return_value = {"hosts": [], "domain": "example.com"}
+        # Mindestens 1 Host noetig — sonst greift der phase0_no_hosts_abort
+        # in worker.py (Robustheits-PR 2026-05-02).
+        mock_phase0.return_value = {
+            "hosts": [{"ip": "1.2.3.4", "fqdns": ["example.com"], "rdns": ""}],
+            "domain": "example.com",
+            "skipped_hosts": [],
+            "discovery_health": {"snapshot_used": False, "tool_counts": {}, "total_subdomains": 1, "ct_sources_empty": False},
+        }
 
         from scanner.worker import _process_job
         _process_job("scan-123", "example.com", "basic")
@@ -70,7 +77,14 @@ class TestWorkerPackageFlow:
             "phase2_tools": ["headers"],
             "total_timeout": 600,
         }
-        mock_phase0.return_value = {"hosts": [], "domain": "example.com"}
+        # Mindestens 1 Host noetig — sonst greift der phase0_no_hosts_abort
+        # in worker.py (Robustheits-PR 2026-05-02).
+        mock_phase0.return_value = {
+            "hosts": [{"ip": "1.2.3.4", "fqdns": ["example.com"], "rdns": ""}],
+            "domain": "example.com",
+            "skipped_hosts": [],
+            "discovery_health": {"snapshot_used": False, "tool_counts": {}, "total_subdomains": 1, "ct_sources_empty": False},
+        }
 
         from scanner.worker import _process_job
         _process_job("scan-456", "example.com", "nis2")
@@ -110,7 +124,14 @@ class TestWorkerPackageFlow:
             "phase3_timeout": 300,
             "total_timeout": 7200,
         }
-        mock_phase0.return_value = {"hosts": [], "domain": "example.com"}
+        # Mindestens 1 Host noetig — sonst greift der phase0_no_hosts_abort
+        # in worker.py (Robustheits-PR 2026-05-02).
+        mock_phase0.return_value = {
+            "hosts": [{"ip": "1.2.3.4", "fqdns": ["example.com"], "rdns": ""}],
+            "domain": "example.com",
+            "skipped_hosts": [],
+            "discovery_health": {"snapshot_used": False, "tool_counts": {}, "total_subdomains": 1, "ct_sources_empty": False},
+        }
 
         from scanner.worker import _process_job
         # Call without explicit package — should default to "perimeter"

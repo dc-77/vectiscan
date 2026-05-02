@@ -19,9 +19,26 @@ except ImportError:
 
 DEFAULT_TIMEOUT = 5.0
 
+# Fixierte DNS-Resolver — siehe scanner/resolvers.txt fuer dnsx.
+# Begruendung: System-Default-Resolver wechselt zwischen 8.8.8.8 / 1.1.1.1 /
+# Provider-DNS und liefert leicht abweichende Antwort-Sets pro Lauf.
+# Mit fixierter Liste (gleiche Reihenfolge wie scanner/resolvers.txt) ist
+# der Pre-Check und die Phase-0-DNS-Aufloesung reproduzierbar.
+# Ueber ENV `DNS_RESOLVERS` (Komma-Liste) kann man den Default ueberschreiben.
+import os as _os
+_DEFAULT_NAMESERVERS = [
+    "1.1.1.1", "1.0.0.1", "8.8.8.8", "8.8.4.4",
+    "9.9.9.9", "149.112.112.112", "208.67.222.222", "208.67.220.220",
+]
+FIXED_NAMESERVERS = [
+    s.strip() for s in _os.environ.get("DNS_RESOLVERS", ",".join(_DEFAULT_NAMESERVERS)).split(",")
+    if s.strip()
+]
+
 
 def _resolver(timeout: float = DEFAULT_TIMEOUT) -> "dns.resolver.Resolver":
-    r = dns.resolver.Resolver()
+    r = dns.resolver.Resolver(configure=False)
+    r.nameservers = list(FIXED_NAMESERVERS)
     r.timeout = timeout
     r.lifetime = timeout
     return r

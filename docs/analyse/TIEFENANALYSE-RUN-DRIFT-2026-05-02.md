@@ -134,6 +134,27 @@ fast ausschliesslich aus Anthropic-API-Floating-Point-Rundungen (M5).
 
 ---
 
+## Stand 2026-05-02 (Nachmittag) — Robustheits-PR umgesetzt
+
+Nachgelagerte Massnahmen gegen die externen Datenquellen-Drift:
+
+| Massnahme | Status | Wirkung |
+|---|---|---|
+| **CloudFlare-Edge-IP-Sortierung** | DONE | `phase0.py:merge_and_group` — `sorted(ipv4)[0]` statt `ipv4[0]` als Repraesentanten-IP. CloudFlare-Roundrobin produziert keine Drift mehr. |
+| **Fixierter DNS-Resolver an allen dig-Stellen** | DONE | `dig @1.1.1.1 NS/SPF/DMARC/MX` (vorher System-Default). Plus `dns_utils._resolver()` mit `nameservers=FIXED_NAMESERVERS`. AXFR bleibt @authoritative-NS. |
+| **Discovery-Health-Tracking + 0-Hosts-Abbruch** | DONE | `phase0.py` produziert `discovery_health`-Dict (per-Tool-Counts, ct_sources_empty); `worker.py` bricht mit `set_scan_failed` ab wenn 0 Hosts. Verhindert wertlose Reports bei DNS-Komplettausfall. |
+| **crt.sh 3-Stufen-Self-Retry** | DONE | `phase0.py:run_crtsh` retried bis zu 3x mit Backoff (5s, 15s); akzeptiert nur wenn JSON parsbar UND `entries > 0`. Fast alle crt.sh-„Hick-Ups" werden so durchgestanden. |
+| **certspotter als CT-Fallback** | DONE | `passive/certspotter_client.py` + `phase0.py:run_certspotter`. Wird gerufen wenn crt.sh trotz Retries leer ist. SSLMate-API ist seit Jahren stabil. |
+| **SecurityTrails als 4. CT-Quelle in Phase 0b** | DONE | `phase0.py:run_securitytrails_subdomains` parallel zu crt.sh/subfinder/amass; nur aktiv wenn `SECURITYTRAILS_API_KEY` gesetzt. Liefert oft hunderte historische Subdomains. |
+
+**Quintessenz nach diesem Block:** Im Normalfall hat der Scan jetzt
+**vier** parallele CT-/Subdomain-Quellen (crt.sh + certspotter +
+subfinder + securitytrails), plus amass + gobuster_dns. Single-Provider-
+Ausfall ist nahezu folgenlos. Bei DNS-Komplettausfall bricht der Scan
+sauber ab statt einen leeren Report zu produzieren.
+
+---
+
 ## Wenn der User fragt „warum jeder Scan andere Ergebnisse?"
 
 **Praezise Antwort:**
