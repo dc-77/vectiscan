@@ -35,6 +35,44 @@ def pack_results(scan_dir: str, order_id: str) -> str:
     return archive_path
 
 
+def upload_screenshots(scan_dir: str, order_id: str) -> dict[str, str]:
+    """Sammle alle screenshot_<fqdn>.png aus /tmp/scan-<id>/hosts/*/phase*/
+    und lade sie nach MinIO unter `screenshots/<orderId>/<fqdn>.png`.
+
+    Returns: dict {fqdn -> minio_object_key}. Leeres dict bei Fehlern oder
+    wenn keine Screenshots gefunden wurden — der Scan laeuft trotzdem.
+    """
+    from pathlib import Path
+    import re
+    out: dict[str, str] = {}
+    try:
+        client = get_minio_client()
+        bucket = "scan-screenshots"
+        if not client.bucket_exists(bucket):
+            client.make_bucket(bucket)
+        # Suche alle screenshot_*.png unter <scan_dir>/hosts/*/phase*/
+        scan_root = Path(scan_dir)
+        for png in scan_root.glob("hosts/*/phase*/screenshot_*.png"):
+            try:
+                # Filename: screenshot_<fqdn-with-underscores>.png — wieder zurueckmappen
+                # ist nicht eindeutig; daher nutzen wir einfach den Stem als Key
+                # und mappen nach FQDN ueber das Filename-Pattern (siehe redirect_probe.py:89:
+                # safe_fqdn = fqdn.replace(".", "_").replace("/", "")[:50]).
+                safe = png.stem.replace("screenshot_", "")
+                # Heuristisch: Underscores zurueck zu Punkten — funktioniert fuer
+                # normale FQDNs (kein User-Input-Underscore in Realdomains)
+                fqdn_guess = safe.replace("_", ".")
+                obj_key = f"{order_id}/{safe}.png"
+                client.fput_object(bucket, obj_key, str(png), content_type="image/png")
+                out[fqdn_guess] = obj_key
+            except Exception as e:
+                log.warning("screenshot_upload_failed", path=str(png), error=str(e))
+        log.info("screenshots_uploaded", order_id=order_id, count=len(out))
+    except Exception as e:
+        log.warning("screenshots_upload_skipped", error=str(e))
+    return out
+
+
 def upload_to_minio(archive_path: str, order_id: str) -> str:
     """Upload tar.gz to MinIO scan-rawdata bucket.
 

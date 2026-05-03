@@ -15,6 +15,21 @@ export interface HostInfo {
   ip: string;
   fqdns: string[];
   status: string;
+  // PR-Screenshots: bei Hosts mit web_probe.has_web=true wird ein
+  // Playwright-Screenshot in MinIO gespeichert. Pfad-Format:
+  // scan-screenshots/<orderId>/<safe_fqdn>.png. Frontend laedt via
+  // GET /api/orders/<id>/screenshot/<safe_fqdn>.
+  screenshot_minio_key?: string | null;
+}
+
+/** Hilfsfunktion: rechnet die Frontend-URL fuer den Site-Screenshot eines
+ * Hosts. Returns null wenn kein Screenshot fuer den Host vorhanden ist. */
+export function getHostScreenshotUrl(orderId: string, screenshotKey: string | null | undefined): string | null {
+  if (!screenshotKey) return null;
+  // Key-Format: "<orderId>/<safe_fqdn>.png" → wir extrahieren den safe-Teil
+  const match = screenshotKey.match(/^[^/]+\/(.+)\.png$/);
+  if (!match) return null;
+  return `${API_URL}/api/orders/${orderId}/screenshot/${match[1]}`;
 }
 
 export interface OrderProgress {

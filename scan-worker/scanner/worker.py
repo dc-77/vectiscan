@@ -569,6 +569,34 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
     _phase_checkpoint("phase1")
 
+    # ── Screenshot-Upload nach Phase 1 ───────────────────────
+    # Playwright erzeugt Site-Screenshots in <scan_dir>/hosts/*/phase2/
+    # screenshot_*.png (siehe redirect_probe.py:_take_screenshot). Wir laden
+    # sie nach MinIO unter scan-screenshots/<orderId>/<safe_fqdn>.png hoch
+    # und mappen die Keys ins host_inventory damit das Frontend Thumbnails
+    # zeigen kann.
+    try:
+        from scanner.upload import upload_screenshots
+        screenshot_keys = upload_screenshots(scan_dir, order_id)
+        if screenshot_keys:
+            for h in host_inventory.get("hosts", []):
+                fqdns = h.get("fqdns") or []
+                for f in fqdns:
+                    safe = f.replace(".", "_").replace("/", "")[:50]
+                    if safe in {k.split("/", 1)[-1].rsplit(".", 1)[0] for k in screenshot_keys.values()}:
+                        # Hostname bzw. Pseudo-FQDN-Key matched
+                        match = next(
+                            (key for key in screenshot_keys.values()
+                             if key.endswith(f"/{safe}.png")),
+                            None,
+                        )
+                        if match:
+                            h["screenshot_minio_key"] = match
+                            break
+            set_discovered_hosts(order_id, host_inventory)
+    except Exception as e:
+        log.warning("screenshot_persist_failed", error=str(e))
+
     # ── Phase 2: Deep Scan (parallel, max 3 hosts) ────────
     scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]
     scannable_total = len(scannable)

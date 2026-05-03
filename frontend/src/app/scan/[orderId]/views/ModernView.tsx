@@ -253,6 +253,7 @@ export default function ModernView({
               aiHosts={aiStrategy?.hosts ?? null}
               discoveredHosts={hostList}
               strategyNotes={aiStrategy?.strategy_notes ?? null}
+              orderId={order?.id}
             />
           </section>
         )}

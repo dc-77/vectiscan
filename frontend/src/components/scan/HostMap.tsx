@@ -22,13 +22,18 @@ interface DiscoveredHost {
   ip: string;
   fqdns?: string[];
   hostname?: string;
+  screenshot_minio_key?: string | null;
 }
 
 interface Props {
   aiHosts: AiHost[] | null | undefined;
   discoveredHosts: DiscoveredHost[] | null | undefined;
   strategyNotes?: string | null;
+  // PR-Screenshots: optional, fuer Thumbnail-Anzeige bei Hosts mit Web-Content.
+  orderId?: string;
 }
+
+import { getHostScreenshotUrl } from '@/lib/api';
 
 const PRIORITY_STYLES: Record<string, { badge: string; label: string }> = {
   '1': { badge: 'bg-red-500/15 text-red-300 ring-1 ring-red-500/30',     label: 'P1' },
@@ -42,7 +47,15 @@ function fqdnFor(host: AiHost | DiscoveredHost, discoveredHosts: DiscoveredHost[
   return dh?.fqdns?.[0] ?? dh?.hostname ?? '';
 }
 
-export default function HostMap({ aiHosts, discoveredHosts, strategyNotes }: Props) {
+function screenshotKeyFor(
+  host: AiHost | DiscoveredHost,
+  discoveredHosts: DiscoveredHost[] | null | undefined,
+): string | null {
+  const dh = discoveredHosts?.find((d) => d.ip === host.ip);
+  return dh?.screenshot_minio_key ?? null;
+}
+
+export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, orderId }: Props) {
   // Wenn keine aiStrategy vorliegt: simple Liste der discovered hosts
   if (!aiHosts || aiHosts.length === 0) {
     if (!discoveredHosts || discoveredHosts.length === 0) {
@@ -96,6 +109,10 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes }: Pro
             const isSkip = h.action === 'skip';
             const fqdn = fqdnFor(h, discoveredHosts);
             const prio = h.priority ? PRIORITY_STYLES[String(h.priority)] : null;
+            const screenshotKey = screenshotKeyFor(h, discoveredHosts);
+            const screenshotUrl = orderId && screenshotKey
+              ? getHostScreenshotUrl(orderId, screenshotKey)
+              : null;
 
             return (
               <div
@@ -125,6 +142,26 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes }: Pro
                   <div className={`mt-1 text-xs truncate ${isSkip ? 'text-slate-600' : 'text-slate-300'}`}>
                     {fqdn}
                   </div>
+                )}
+                {screenshotUrl && (
+                  /* Thumbnail mit Lightbox-on-click — alle Hosts mit
+                     web_probe.has_web=true bekommen einen Screenshot. */
+                  <a
+                    href={screenshotUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 block overflow-hidden rounded border border-slate-700 bg-slate-950"
+                    title="Site-Screenshot oeffnen"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={screenshotUrl}
+                      alt={`Screenshot ${fqdn}`}
+                      loading="lazy"
+                      className="h-24 w-full object-cover object-top opacity-90 hover:opacity-100 transition-opacity"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  </a>
                 )}
                 {h.reasoning && (
                   <div

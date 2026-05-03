@@ -570,6 +570,47 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     };
   });
 
+  // GET /api/orders/:id/screenshot/:safe — Screenshot eines Hosts (PNG-Stream)
+  // Hostnamen werden vom scan-worker mit . → _ gemappt + auf 50 chars gekuerzt
+  // (siehe redirect_probe.py:_take_screenshot). Wir nehmen den `safe`-String
+  // 1:1 und schauen scan-screenshots/<orderId>/<safe>.png. Auth wie /report:
+  // Customer sieht eigenes, Admin alles.
+  server.get<{ Params: { id: string; safe: string } }>(
+    '/api/orders/:id/screenshot/:safe',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id, safe } = request.params;
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID' });
+      }
+      // Path-Traversal verhindern
+      if (!/^[a-z0-9_-]{1,64}$/i.test(safe)) {
+        return reply.status(400).send({ success: false, error: 'Invalid screenshot key' });
+      }
+      const user = request.user!;
+      // Ownership-Check
+      const ownerCheck = await query(
+        'SELECT customer_id FROM orders WHERE id = $1',
+        [id],
+      );
+      if (ownerCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order nicht gefunden.' });
+      }
+      if (user.role !== 'admin' && user.customerId !== ownerCheck.rows[0].customer_id) {
+        return reply.status(403).send({ success: false, error: 'Kein Zugriff.' });
+      }
+      try {
+        const objKey = `${id}/${safe}.png`;
+        const stream = await minioClient.getObject('scan-screenshots', objKey);
+        reply.header('Content-Type', 'image/png');
+        reply.header('Cache-Control', 'private, max-age=3600');
+        return reply.send(stream);
+      } catch {
+        return reply.status(404).send({ success: false, error: 'Screenshot nicht gefunden.' });
+      }
+    },
+  );
+
   // GET /api/orders/:id/events — LiveView event replay (AI strategy, configs, tool outputs)
   server.get<{ Params: OrderParams }>('/api/orders/:id/events', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
