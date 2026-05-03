@@ -72,6 +72,22 @@ function formatDuration(startedAt: string | null, finishedAt: string | null): st
   return fmtDur(min);
 }
 
+/** Multi-Target-Order-Display: statt "multi-target (N)" die erste Target-
+ * Domain + "+N weitere" anzeigen. Single-Target und Subscriptions liefern
+ * order.domain unveraendert. Tooltip zeigt komplette Domain-Liste.
+ */
+function formatOrderDomainDisplay(order: OrderListItem): string {
+  const domain = order.domain || '';
+  const targets = (order.targets ?? []).map(t => t.canonical).filter(Boolean);
+  // Nur "multi-target (N)"-Display ersetzen wenn echte Targets vorliegen
+  if (/^multi-target\s*\(\d+\)$/i.test(domain) && targets.length > 0) {
+    const first = targets[0];
+    const rest = (order.targetCount ?? targets.length) - 1;
+    return rest > 0 ? `${first} +${rest}` : first;
+  }
+  return domain;
+}
+
 interface PageProps { params: Promise<{ groupKey: string }> }
 
 export default function GroupDetailPage({ params }: PageProps) {
@@ -465,7 +481,10 @@ function ScanRow({ order, admin, onDelete }: {
     >
       <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
-          <span className="font-mono text-blue-400 text-sm truncate">{order.domain}</span>
+          <span className="font-mono text-blue-400 text-sm truncate"
+                title={(order.targets ?? []).map(t => t.canonical).join(', ') || order.domain}>
+            {formatOrderDomainDisplay(order)}
+          </span>
           {order.isRescan && <span className="text-[10px] text-amber-400/70 bg-amber-400/10 px-1.5 py-0.5 rounded">Re-Scan</span>}
           {isDone && order.severityCounts && <SeverityCounts counts={order.severityCounts} />}
         </div>
