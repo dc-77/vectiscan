@@ -150,13 +150,25 @@ export function groupOrders(
 
   // Multi-Target-Order-Groups (eine pro Order, key = ord:<uuid>)
   for (const order of orderGroups) {
+    const targetsList = (order.targets ?? []).map(t => t.canonical).filter(Boolean);
+    const totalCount = order.targetCount ?? targetsList.length;
+    // Title: erste Domain als Hauptanzeige (statt generischem
+    // "multi-target (N)"-Display-Namen), plus Hinweis auf weitere.
+    const titleDomain = targetsList[0] || order.domain;
+    const titleSuffix = totalCount > 1 ? ` +${totalCount - 1}` : '';
+    // Subtitle: weitere Domains aufzaehlen (max. 3 sichtbar, dann "...").
+    const moreDomains = targetsList.slice(1, 4);
+    const overflowExtra = totalCount - 4;
+    const subtitle = moreDomains.length > 0
+      ? `${moreDomains.join(', ')}${overflowExtra > 0 ? ` … +${overflowExtra} weitere` : ''}`
+      : `${totalCount} Ziele`;
     groups.push({
       kind: 'order',
       key: `ord:${order.id}`,
-      title: order.domain, // "multi-target (N)" oder canonical bei N=1
-      subtitle: `${order.targetCount ?? 0} Ziele`,
+      title: titleDomain + titleSuffix,
+      subtitle,
       domain: order.domain,
-      domains: [order.domain],
+      domains: targetsList.length > 0 ? targetsList : [order.domain],
       orders: [order],
       aggregates: aggregate([order]),
     });

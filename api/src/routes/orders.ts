@@ -175,7 +175,15 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
                     c.email,
                     EXISTS(SELECT 1 FROM reports r2 WHERE r2.order_id = o.id) AS has_report,
                     (SELECT rr.findings_data->>'overall_risk' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS overall_risk,
-                    (SELECT rr.findings_data->'severity_counts' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS severity_counts
+                    (SELECT rr.findings_data->'severity_counts' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS severity_counts,
+                    -- Multi-Target-UX: bis zu 5 Targets pro Order ans Frontend
+                    -- liefern, damit das Dashboard die Domains direkt anzeigt
+                    -- statt nur "multi-target (N)".
+                    (SELECT json_agg(json_build_object('canonical', t.canonical))
+                       FROM (SELECT canonical FROM scan_targets
+                              WHERE order_id = o.id
+                              ORDER BY created_at LIMIT 5) t
+                    ) AS targets
              FROM orders o
              JOIN customers c ON o.customer_id = c.id`;
 
@@ -210,6 +218,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       subscriptionId: (row.subscription_id as string) || null,
       isRescan: row.is_rescan === true || row.is_rescan === 't',
       targetCount: row.target_count != null ? Number(row.target_count) : null,
+      targets: (row.targets as Array<{ canonical: string }> | null) || null,
     }));
 
     return { success: true, data: { orders } };

@@ -277,6 +277,9 @@ export interface OrderListItem {
   subscriptionId: string | null;
   isRescan: boolean;
   targetCount: number | null;
+  // Multi-Target-UX: bei N>1 listet das Frontend die Domains direkt
+  // (statt nur "multi-target (N)" anzuzeigen).
+  targets?: Array<{ canonical: string }> | null;
 }
 
 // --- Findings ---

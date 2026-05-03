@@ -227,9 +227,13 @@ export default function GroupDetailPage({ params }: PageProps) {
             <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
               group.kind === 'subscription'
                 ? 'bg-teal-500/15 text-teal-400'
+                : group.kind === 'order'
+                ? 'bg-indigo-500/15 text-indigo-300'
                 : 'bg-slate-700 text-slate-400'
             }`}>
-              {group.kind === 'subscription' ? 'Abo' : 'Einzelscans'}
+              {group.kind === 'subscription' ? 'Abo'
+                : group.kind === 'order' ? 'Multi-Target'
+                : 'Einzelscans'}
             </span>
             <h1 className="text-lg font-semibold text-white">{group.title}</h1>
             <span className="text-sm text-slate-500">{group.subtitle}</span>
@@ -238,6 +242,20 @@ export default function GroupDetailPage({ params }: PageProps) {
             + Neuer Scan
           </Link>
         </div>
+
+        {/* Multi-Target: alle Domains als Tag-Cloud direkt unter dem Header.
+            Bei Subscription ohnehin schon ueber subTargets-Subtitle sichtbar;
+            bei kind='order' sonst nur "+N" im Title. */}
+        {group.kind === 'order' && group.domains.length > 1 && (
+          <div className="flex flex-wrap gap-1.5">
+            {group.domains.map(d => (
+              <span key={d}
+                className="text-xs font-mono px-2 py-1 rounded bg-slate-800/70 text-slate-300 border border-slate-700">
+                {d}
+              </span>
+            ))}
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">{error}</div>
