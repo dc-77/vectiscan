@@ -83,6 +83,9 @@ def _build_cost_dict(model: str, stats: CacheStats) -> dict[str, Any]:
         "model": model,
         "input_tokens": stats.input_tokens,
         "output_tokens": stats.output_tokens,
+        "cache_creation_tokens": getattr(stats, "cache_creation_tokens", 0),
+        "cache_read_tokens": getattr(stats, "cache_read_tokens", 0),
+        "thinking_tokens": getattr(stats, "thinking_tokens", 0),
         "total_cost_usd": round(stats.cost_estimated_usd, 4),
         "cache_hit": stats.hit,
         "cache_age_seconds": stats.age_seconds,
@@ -90,9 +93,36 @@ def _build_cost_dict(model: str, stats: CacheStats) -> dict[str, Any]:
     }
 
 
+def _persist_cost(order_id: str | None, ki_step: str, model: str,
+                  stats: CacheStats, duration_ms: int | None = None,
+                  batch_id: str | None = None) -> None:
+    """M6 Hook (PR-KI-Optim): persistiere AI-Call-Kosten in ai_call_costs."""
+    if not order_id:
+        return
+    try:
+        from scanner.ai_cost_persist import persist_ai_call_cost
+        persist_ai_call_cost(
+            order_id=order_id,
+            ki_step=ki_step,
+            model=model,
+            input_tokens=stats.input_tokens,
+            output_tokens=stats.output_tokens,
+            cache_creation_tokens=getattr(stats, "cache_creation_tokens", 0),
+            cache_read_tokens=getattr(stats, "cache_read_tokens", 0),
+            thinking_tokens=getattr(stats, "thinking_tokens", 0),
+            total_cost_usd=stats.cost_estimated_usd,
+            cache_hit=stats.hit,
+            duration_ms=duration_ms,
+            batch_id=batch_id,
+        )
+    except Exception:
+        pass
+
+
 def _call_haiku(system_prompt: str, user_prompt: str,
                 cache_namespace: str = "haiku_default",
                 cache_ttl_seconds: int = 24 * 3600,
+                order_id: str | None = None,
                 order_scope: str | None = None,
                 host_scope: str | None = None) -> dict[str, Any]:
     """Cached Haiku-Call mit temperature=0.
@@ -143,6 +173,7 @@ def _call_haiku(system_prompt: str, user_prompt: str,
 
     parsed["_raw"] = raw
     parsed["_cost"] = _build_cost_dict(HAIKU_MODEL, stats)
+    _persist_cost(order_id, cache_namespace, HAIKU_MODEL, stats, duration_ms)
     return parsed
 
 
@@ -243,6 +274,7 @@ Antwort im Format:
         cache_namespace="ki1_host_strategy",
         cache_ttl_seconds=CACHE_TTL_HOST_STRATEGY,
         order_scope=order_id or None,
+        order_id=order_id,
     )
 
     # Save full AI debug (system prompt + user prompt + raw response)
@@ -359,6 +391,7 @@ Antwort im Format:
         cache_namespace="ki2_tech_analysis",
         cache_ttl_seconds=CACHE_TTL_TECH_ANALYSIS,
         order_scope=order_id or None,
+        order_id=order_id,
     )
 
     # Save full AI debug
@@ -499,6 +532,7 @@ Antwort im Format:
         cache_ttl_seconds=CACHE_TTL_PHASE2_CONFIG,
         order_scope=order_id or None,
         host_scope=ip or None,
+        order_id=order_id,
     )
 
     # Save full AI debug
@@ -547,7 +581,9 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384,
                  cache_namespace: str = "sonnet_default",
                  cache_ttl_seconds: int = 24 * 3600,
                  order_scope: str | None = None,
-                 host_scope: str | None = None) -> dict[str, Any]:
+                 host_scope: str | None = None,
+                 order_id: str | None = None,
+                 thinking_budget: int | None = None) -> dict[str, Any]:
     """Cached Sonnet-Call mit temperature=0.
 
     Used for Phase 3 cross-tool correlation where Haiku's reasoning
@@ -568,6 +604,7 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384,
         cache_namespace=cache_namespace,
         order_scope=order_scope,
         host_scope=host_scope,
+        thinking_budget=thinking_budget,
     )
     duration_ms = int((time.monotonic() - start) * 1000)
 
@@ -591,6 +628,8 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384,
 
     parsed["_raw"] = raw
     parsed["_cost"] = _build_cost_dict(SONNET_MODEL, stats)
+    _persist_cost(order_id or order_scope, cache_namespace, SONNET_MODEL,
+                  stats, duration_ms)
     return parsed
 
 
@@ -663,12 +702,103 @@ Vergib pro Finding einen Confidence-Score und liste die bestaetigenden Tools/Sig
 Antwort im Format:
 {PHASE3_SCHEMA}"""
 
-    result = _call_sonnet(
-        PHASE3_SYSTEM, user_prompt,
-        cache_namespace="ki4_phase3",
-        cache_ttl_seconds=CACHE_TTL_PHASE3,
-        order_scope=order_id or None,
-    )
+    # M3 (PR-KI-Optim, 2026-05-03): Extended Thinking fuer KI #4. Cross-Tool-
+    # Confidence ist Reasoning-intensiv (mehrere Tools korrelieren, FP-
+    # Erkennung). budget=8K bei max_tokens=24K = sicheres Verhaeltnis.
+    #
+    # M4 Tool Use (opt-in via KI4_USE_TOOLS=true): KI #4 ruft on-demand
+    # lookup_cve / lookup_epss / get_finding_corroboration. Nutzt
+    # ki4_tools.run_ki4_with_tools (Multi-Turn-Loop). Default OFF —
+    # bestehender single-shot _call_sonnet bleibt der bewaehrte Pfad.
+    use_tools = os.environ.get("KI4_USE_TOOLS", "").lower() in ("1", "true", "yes")
+    if use_tools:
+        try:
+            from scanner.ki4_tools import Ki4ToolHandler, run_ki4_with_tools
+            from scanner.threat_intel_snapshot import get_snapshot_data
+            import anthropic as _anthropic
+            api_key = os.environ.get("ANTHROPIC_API_KEY")
+            client = _anthropic.Anthropic(api_key=api_key) if api_key else None
+            # Snapshot-ID aus orders.threat_intel_snapshot_id holen
+            snapshot: dict = {}
+            if order_id:
+                try:
+                    import psycopg2 as _pg
+                    _conn = _pg.connect(
+                        os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"),
+                        connect_timeout=5,
+                    )
+                    try:
+                        with _conn.cursor() as _cur:
+                            _cur.execute(
+                                "SELECT threat_intel_snapshot_id FROM orders WHERE id = %s",
+                                (order_id,),
+                            )
+                            _row = _cur.fetchone()
+                            if _row and _row[0]:
+                                snapshot = get_snapshot_data(str(_row[0])) or {}
+                    finally:
+                        _conn.close()
+                except Exception:
+                    snapshot = {}
+            findings_by_host: dict[str, list] = {}
+            for f in finding_summary or []:
+                host = f.get("host") or "_unknown"
+                findings_by_host.setdefault(host, []).append(f)
+            if client:
+                handler = Ki4ToolHandler(snapshot, findings_by_host)
+                final_text, usage = run_ki4_with_tools(
+                    anthropic_client=client,
+                    model=SONNET_MODEL,
+                    system_prompt=PHASE3_SYSTEM,
+                    user_prompt=user_prompt,
+                    tool_handler=handler,
+                )
+                # Parse JSON like _call_sonnet
+                stripped = _strip_markdown_fences(final_text)
+                parsed = json.loads(stripped)
+                parsed["_raw"] = final_text
+                parsed["_cost"] = {
+                    "model": SONNET_MODEL,
+                    "tool_iterations": usage.get("tool_iterations", 0),
+                    "input_tokens": usage["input_tokens"],
+                    "output_tokens": usage["output_tokens"],
+                    "cache_read_tokens": usage["cache_read_tokens"],
+                    "cache_creation_tokens": usage["cache_creation_tokens"],
+                    "cache_hit": False,
+                }
+                result = parsed
+                # Audit-Trail
+                if order_id:
+                    try:
+                        from scanner.ai_cost_persist import persist_ai_call_cost
+                        persist_ai_call_cost(
+                            order_id=order_id, ki_step="ki4_phase3_tool_use",
+                            model=SONNET_MODEL,
+                            input_tokens=usage["input_tokens"],
+                            output_tokens=usage["output_tokens"],
+                            cache_creation_tokens=usage["cache_creation_tokens"],
+                            cache_read_tokens=usage["cache_read_tokens"],
+                            total_cost_usd=0.0,  # M5 berechnen wir's spaeter
+                            cache_hit=False,
+                        )
+                    except Exception:
+                        pass
+            else:
+                use_tools = False  # Fallback
+        except Exception as e:
+            log.warning("ki4_tool_use_failed_falling_back", error=str(e))
+            use_tools = False
+
+    if not use_tools:
+        result = _call_sonnet(
+            PHASE3_SYSTEM, user_prompt,
+            max_tokens=24576,
+            cache_namespace="ki4_phase3",
+            cache_ttl_seconds=CACHE_TTL_PHASE3,
+            order_scope=order_id or None,
+            order_id=order_id,
+            thinking_budget=8192,
+        )
 
     # Save full AI debug
     cost = result.get("_cost")

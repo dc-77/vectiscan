@@ -114,6 +114,27 @@ def _estimate_cost(model: str, in_tok: int, out_tok: int) -> float:
     return (in_tok / 1_000_000) * p["input"] + (out_tok / 1_000_000) * p["output"]
 
 
+def _estimate_prompt_cached_cost(
+    model: str, in_tok: int, out_tok: int,
+    cache_create_tok: int = 0, cache_read_tok: int = 0,
+) -> float:
+    """M1 (PR-KI-Optim 2026-05-03): Cost-Berechnung mit Prompt-Cache-Multipliern.
+
+    - Input (uncached): base * 1.0
+    - Cache write (5min ephemeral): base * 1.25
+    - Cache read: base * 0.10
+    """
+    p = AI_PRICING.get(model, {"input": 0.0, "output": 0.0})
+    base_in = p["input"] / 1_000_000
+    base_out = p["output"] / 1_000_000
+    return (
+        in_tok * base_in
+        + cache_create_tok * base_in * 1.25
+        + cache_read_tok * base_in * 0.10
+        + out_tok * base_out
+    )
+
+
 def get_cached_response(key: str) -> Optional[dict]:
     """Liest gecachten Eintrag. Returns None bei Miss/Fehler."""
     r = _get_redis()

@@ -146,6 +146,11 @@ class CacheStats:
     input_tokens: int = 0
     output_tokens: int = 0
     cache_key_short: str = ""
+    # M1 Prompt-Cache (PR-KI-Optim, 2026-05-03): zusaetzliche Token-Counters
+    cache_creation_tokens: int = 0
+    cache_read_tokens: int = 0
+    # M3 Extended Thinking (folgt) — Tokens fuer thinking blocks
+    thinking_tokens: int = 0
 
     def to_dict(self) -> dict:
         return {
@@ -154,8 +159,28 @@ class CacheStats:
             "cost_estimated_usd": round(self.cost_estimated_usd, 4),
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
+            "cache_creation_tokens": self.cache_creation_tokens,
+            "cache_read_tokens": self.cache_read_tokens,
+            "thinking_tokens": self.thinking_tokens,
             "cache_key_short": self.cache_key_short,
         }
+
+
+# M1 (PR-KI-Optim, 2026-05-03): Prompt-Caching
+# Min-Token-Schwelle pro Modell — unter dieser Groesse silent skip
+# (Anthropic erlaubt cache_control aber speichert nichts).
+PROMPT_CACHE_MIN_TOKENS_BY_MODEL = {
+    "claude-haiku-4-5-20251001": 4096,
+    "claude-sonnet-4-6": 2048,
+    "claude-opus-4-6": 4096,
+    "claude-opus-4-7": 4096,
+}
+# Faustregel: 1 Token ≈ 4 Chars Englisch / 3 Chars Deutsch
+# Wir sind konservativ und triggern Caching ab ca. 1.5x Min-Token-Char-Aequiv.
+def _system_should_be_cached(model: str, system: str) -> bool:
+    min_tok = PROMPT_CACHE_MIN_TOKENS_BY_MODEL.get(model, 2048)
+    # Konservativ: 3 Chars/Token → mindestens (min_tok * 3 * 1.5) Chars
+    return len(system or "") >= int(min_tok * 3 * 1.2)
 
 
 @dataclass
@@ -218,6 +243,28 @@ def _estimate_cost(model: str, in_tok: int, out_tok: int) -> float:
     return (in_tok / 1_000_000) * p["input"] + (out_tok / 1_000_000) * p["output"]
 
 
+def _estimate_prompt_cached_cost(
+    model: str, in_tok: int, out_tok: int,
+    cache_create_tok: int = 0, cache_read_tok: int = 0,
+) -> float:
+    """Erweiterte Cost-Berechnung mit Prompt-Cache-Multipliern.
+
+    Anthropic-Preisstruktur (Mai 2026):
+    - Input (uncached): base * 1.0
+    - Cache write (5min ephemeral): base * 1.25
+    - Cache read: base * 0.1
+    """
+    p = AI_PRICING.get(model, {"input": 0.0, "output": 0.0})
+    base_in = p["input"] / 1_000_000
+    base_out = p["output"] / 1_000_000
+    return (
+        in_tok * base_in
+        + cache_create_tok * base_in * 1.25
+        + cache_read_tok * base_in * 0.10
+        + out_tok * base_out
+    )
+
+
 # ---------------------------------------------------------------------------
 # Cached call
 # ---------------------------------------------------------------------------
@@ -234,6 +281,7 @@ def cached_call(*,
                 order_scope: Optional[str] = None,
                 host_scope: Optional[str] = None,
                 anthropic_client: Any = None,
+                thinking_budget: Optional[int] = None,
                 ) -> tuple[dict, CacheStats]:
     """Cached Anthropic call.
 
@@ -306,15 +354,37 @@ def cached_call(*,
                 hit=False, cache_key_short=short_key,
             )
 
+    # M1 Prompt Caching: System-Prompt als Block-Liste mit cache_control
+    # markieren (cache_read = 0.1x Base-Preis ab 2. Call). Nur wenn der
+    # System-Prompt gross genug ist — sonst silent skip durch Anthropic.
+    if _system_should_be_cached(model, system):
+        system_param: Any = [{
+            "type": "text",
+            "text": system,
+            "cache_control": {"type": "ephemeral"},  # 5min default-TTL
+        }]
+    else:
+        system_param = system
+
     api_kwargs: dict[str, Any] = {
         "model": model,
-        "system": system,
+        "system": system_param,
         "messages": messages,
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
     if tools:
         api_kwargs["tools"] = tools
+
+    # M3 Extended Thinking (PR-KI-Optim, 2026-05-03): wenn budget gesetzt,
+    # Thinking-Block aktivieren. Anthropic verlangt budget < max_tokens.
+    if thinking_budget and thinking_budget > 0:
+        # Bei Thinking ist temperature=1 erforderlich (forciert von Anthropic)
+        api_kwargs["temperature"] = 1.0
+        api_kwargs["thinking"] = {
+            "type": "enabled",
+            "budget_tokens": min(int(thinking_budget), max_tokens - 1024),
+        }
 
     try:
         response_obj = anthropic_client.messages.create(**api_kwargs)
@@ -337,7 +407,18 @@ def cached_call(*,
     usage = response_dict.get("usage") or {}
     in_tok = int(usage.get("input_tokens", 0) or 0)
     out_tok = int(usage.get("output_tokens", 0) or 0)
-    cost = _estimate_cost(model, in_tok, out_tok)
+    # M1: Prompt-Cache-Effizienz ablesbar machen
+    cache_creation_tok = int(usage.get("cache_creation_input_tokens", 0) or 0)
+    cache_read_tok = int(usage.get("cache_read_input_tokens", 0) or 0)
+    cost = _estimate_prompt_cached_cost(
+        model, in_tok, out_tok, cache_creation_tok, cache_read_tok,
+    )
+    if cache_creation_tok or cache_read_tok:
+        log.info("ai_prompt_cache_usage",
+                 model=model,
+                 cache_creation_tokens=cache_creation_tok,
+                 cache_read_tokens=cache_read_tok,
+                 input_tokens=in_tok)
 
     # 3) Cache write (best-effort)
     if r is not None:
@@ -361,6 +442,8 @@ def cached_call(*,
         cost_estimated_usd=cost,
         input_tokens=in_tok,
         output_tokens=out_tok,
+        cache_creation_tokens=cache_creation_tok,
+        cache_read_tokens=cache_read_tok,
         cache_key_short=short_key,
     )
     return response_dict, stats

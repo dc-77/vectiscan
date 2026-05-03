@@ -1489,4 +1489,89 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
   server.delete<{ Params: OrderParams }>('/api/scans/:id', async (request, reply) => {
     return reply.redirect(`/api/orders/${request.params.id}`, 307);
   });
+
+  // GET /api/admin/cost-overview?period=30d — Token-/Cost-Cockpit (Admin)
+  // M6 (PR-KI-Optim, 2026-05-03)
+  server.get<{ Querystring: { period?: string } }>(
+    '/api/admin/cost-overview',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request) => {
+      const period = (request.query.period || '30d').toLowerCase();
+      const days = period === '7d' ? 7 : period === '90d' ? 90 : 30;
+      const totals = await query<{
+        total_calls: string; total_cost_usd: string;
+        total_input_tokens: string; total_output_tokens: string;
+        total_cache_read_tokens: string; total_cache_creation_tokens: string;
+        cache_hits: string;
+      }>(
+        `SELECT COUNT(*) AS total_calls,
+                COALESCE(SUM(total_cost_usd), 0) AS total_cost_usd,
+                COALESCE(SUM(input_tokens), 0) AS total_input_tokens,
+                COALESCE(SUM(output_tokens), 0) AS total_output_tokens,
+                COALESCE(SUM(cache_read_tokens), 0) AS total_cache_read_tokens,
+                COALESCE(SUM(cache_creation_tokens), 0) AS total_cache_creation_tokens,
+                COALESCE(SUM(CASE WHEN cache_hit THEN 1 ELSE 0 END), 0) AS cache_hits
+           FROM ai_call_costs
+          WHERE created_at >= NOW() - ($1 || ' days')::interval`,
+        [String(days)],
+      );
+      const byStep = await query(
+        `SELECT ki_step, model,
+                COUNT(*) AS calls,
+                COALESCE(SUM(total_cost_usd), 0) AS cost_usd,
+                COALESCE(SUM(input_tokens), 0) AS input_tokens,
+                COALESCE(SUM(output_tokens), 0) AS output_tokens,
+                COALESCE(SUM(cache_read_tokens), 0) AS cache_read_tokens
+           FROM ai_call_costs
+          WHERE created_at >= NOW() - ($1 || ' days')::interval
+          GROUP BY ki_step, model
+          ORDER BY cost_usd DESC`,
+        [String(days)],
+      );
+      const topOrders = await query(
+        `SELECT order_id,
+                COUNT(*) AS calls,
+                COALESCE(SUM(total_cost_usd), 0) AS cost_usd
+           FROM ai_call_costs
+          WHERE created_at >= NOW() - ($1 || ' days')::interval AND order_id IS NOT NULL
+          GROUP BY order_id
+          ORDER BY cost_usd DESC
+          LIMIT 20`,
+        [String(days)],
+      );
+      const t = totals.rows[0];
+      return {
+        success: true,
+        data: {
+          period: `${days}d`,
+          totals: {
+            totalCalls: Number(t.total_calls),
+            totalCostUsd: Number(t.total_cost_usd),
+            totalInputTokens: Number(t.total_input_tokens),
+            totalOutputTokens: Number(t.total_output_tokens),
+            totalCacheReadTokens: Number(t.total_cache_read_tokens),
+            totalCacheCreationTokens: Number(t.total_cache_creation_tokens),
+            cacheHits: Number(t.cache_hits),
+            cacheHitRate: Number(t.total_calls) > 0
+              ? Number(t.cache_hits) / Number(t.total_calls)
+              : 0,
+          },
+          byStep: byStep.rows.map((r: Record<string, unknown>) => ({
+            kiStep: r.ki_step,
+            model: r.model,
+            calls: Number(r.calls),
+            costUsd: Number(r.cost_usd),
+            inputTokens: Number(r.input_tokens),
+            outputTokens: Number(r.output_tokens),
+            cacheReadTokens: Number(r.cache_read_tokens),
+          })),
+          topOrders: topOrders.rows.map((r: Record<string, unknown>) => ({
+            orderId: r.order_id,
+            calls: Number(r.calls),
+            costUsd: Number(r.cost_usd),
+          })),
+        },
+      };
+    },
+  );
 }

@@ -28,6 +28,7 @@ const MIGRATION_018_PATH = path.join(__dirname, '..', 'migrations', '018_severit
 const MIGRATION_019_PATH = path.join(__dirname, '..', 'migrations', '019_subdomain_snapshot.sql');
 const MIGRATION_020_PATH = path.join(__dirname, '..', 'migrations', '020_subscription_posture.sql');
 const MIGRATION_021_PATH = path.join(__dirname, '..', 'migrations', '021_vpn_strategy.sql');
+const MIGRATION_022_PATH = path.join(__dirname, '..', 'migrations', '022_ai_call_costs.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -271,6 +272,18 @@ export async function initDb(): Promise<void> {
   `);
   if (!vpn021Check.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_021_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 022: ai_call_costs Tabelle (PR-KI-Optim).
+  const aiCosts022Check = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.tables
+      WHERE table_name = 'ai_call_costs'
+    ) AS exists
+  `);
+  if (!aiCosts022Check.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_022_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

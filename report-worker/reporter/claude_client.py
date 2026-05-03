@@ -645,26 +645,40 @@ def call_claude(
 
         consolidated_findings = truncated
 
-    # Build user prompt (from architecture.md)
-    user_prompt = f"""
-Analysiere die folgenden Scan-Rohdaten für {domain}.
-
-HOST-INVENTAR:
-{json.dumps(host_inventory, indent=2)}
-
-TECHNOLOGIE-PROFILE (pro Host):
-{json.dumps(tech_profiles, indent=2)}
-
-SCAN-ERGEBNISSE:
-{consolidated_findings}
-
-Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
-"""
+    # M2 Cache-Prefix (PR-KI-Optim, 2026-05-03): User-Prompt als 2 Blocks
+    # bauen — statischer Teil (host_inventory + tech_profiles) mit
+    # cache_control, variabler Teil (Findings + Anweisung) ohne.
+    # Bei regenerate-report selber Order: Order-Scope-Cache greift komplett.
+    # Bei Reporter-Code-Aenderungen ohne Order-Scope-Hit: nur der
+    # variable Suffix bezahlt vollen Input-Preis, der Prefix kostet
+    # 0.1× Base.
+    static_prefix = (
+        f"Analysiere die folgenden Scan-Rohdaten für {domain}.\n\n"
+        f"HOST-INVENTAR:\n{json.dumps(host_inventory, indent=2)}\n\n"
+        f"TECHNOLOGIE-PROFILE (pro Host):\n{json.dumps(tech_profiles, indent=2)}\n\n"
+    )
+    variable_suffix = (
+        f"SCAN-ERGEBNISSE:\n{consolidated_findings}\n\n"
+        f"Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS\n"
+    )
+    # Backwards-compatible joined prompt (fuer Cache-Key + Debug-Output)
+    user_prompt = static_prefix + variable_suffix
 
     system_prompt = get_system_prompt(package)
     model = REPORT_MODELS.get(package, "claude-sonnet-4-6")
     max_tokens = MAX_TOKENS_BY_MODEL.get(model, 16384)
-    messages_payload = [{"role": "user", "content": user_prompt}]
+
+    # User-Message als Block-Liste mit Cache-Breakpoint nach dem Prefix.
+    # Cache greift nur wenn Prefix groesser als Modell-Min-Token-Schwelle.
+    if len(static_prefix) >= 8000:
+        user_content_blocks: list[dict[str, Any]] = [
+            {"type": "text", "text": static_prefix,
+             "cache_control": {"type": "ephemeral"}},
+            {"type": "text", "text": variable_suffix},
+        ]
+    else:
+        user_content_blocks = [{"type": "text", "text": user_prompt}]
+    messages_payload = [{"role": "user", "content": user_content_blocks}]
 
     # Cache-Key (M1, 2026-05-01): Order-Scope wenn order_id vorliegt — dann
     # haengt der Hash NICHT mehr am consolidated_findings-Text und Re-Scans /
@@ -730,33 +744,98 @@ Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS
                 # Opus needs more time for complex reports (32K tokens output)
                 api_timeout = 600.0 if "opus" in model else 120.0
 
-                response = client.messages.create(
-                    model=model,
-                    max_tokens=max_tokens,
-                    system=system_prompt,
-                    messages=messages_payload,
-                    temperature=0.0,
-                    timeout=api_timeout,
-                )
+                # M1 Prompt Caching (PR-KI-Optim, 2026-05-03):
+                # System-Prompt als Block-Liste mit cache_control markieren →
+                # ab dem 2. Call innerhalb der 5min-TTL bezahlen wir nur
+                # 0.1× Base-Preis fuer den System-Token-Block. Reporter-Prompts
+                # sind 8-12kB (Opus) → klar ueber 4096-Token-Min-Schwelle.
+                if len(system_prompt) >= 8000:  # Opus min ~ 4096 tok ≈ 12k chars (DE)
+                    system_param: Any = [{
+                        "type": "text",
+                        "text": system_prompt,
+                        "cache_control": {"type": "ephemeral"},
+                    }]
+                else:
+                    system_param = system_prompt
+
+                # M3 Extended Thinking (PR-KI-Optim, 2026-05-03):
+                # Bei Opus-Reports tieferes Reasoning fuer Findings-Selektion
+                # + Recommendation-Priorisierung. Budget 12K bei max 32K.
+                # Sonnet-Reports laufen ohne Thinking (haben begrenztere
+                # Komplexitaet, brauchen es nicht).
+                api_kwargs: dict[str, Any] = {
+                    "model": model,
+                    "max_tokens": max_tokens,
+                    "system": system_param,
+                    "messages": messages_payload,
+                    "temperature": 0.0,
+                    "timeout": api_timeout,
+                }
+                if "opus" in model and max_tokens >= 16000:
+                    api_kwargs["temperature"] = 1.0  # Anthropic-Constraint mit thinking
+                    api_kwargs["thinking"] = {
+                        "type": "enabled",
+                        "budget_tokens": min(12000, max_tokens - 4096),
+                    }
+                response = client.messages.create(**api_kwargs)
 
                 # Extract text from response
-                response_text = response.content[0].text
+                # Bei Extended Thinking ist content[0] ein thinking-Block;
+                # Text steht im ersten "text"-Block. Robust extrahieren.
+                response_text = ""
+                for block in response.content:
+                    btype = getattr(block, "type", None)
+                    if btype == "text" or (btype is None and hasattr(block, "text")):
+                        response_text = block.text
+                        break
+                if not response_text and response.content:
+                    response_text = getattr(response.content[0], "text", "") or ""
                 stop_reason = response.stop_reason  # "end_turn" or "max_tokens"
 
-                # Token cost tracking
+                # Token cost tracking (mit Prompt-Cache-Multipliern)
                 input_tokens = response.usage.input_tokens
                 output_tokens = response.usage.output_tokens
+                cache_create = getattr(response.usage, "cache_creation_input_tokens", 0) or 0
+                cache_read = getattr(response.usage, "cache_read_input_tokens", 0) or 0
                 prices = AI_PRICING.get(model, {"input": 3.0, "output": 15.0})
+                base_in = prices["input"] / 1_000_000
+                base_out = prices["output"] / 1_000_000
+                total_cost = (
+                    input_tokens * base_in
+                    + cache_create * base_in * 1.25
+                    + cache_read * base_in * 0.10
+                    + output_tokens * base_out
+                )
                 cost_info = {
                     "model": model,
                     "input_tokens": input_tokens,
                     "output_tokens": output_tokens,
-                    "input_cost_usd": round((input_tokens / 1_000_000) * prices["input"], 4),
-                    "output_cost_usd": round((output_tokens / 1_000_000) * prices["output"], 4),
-                    "total_cost_usd": round((input_tokens / 1_000_000) * prices["input"] + (output_tokens / 1_000_000) * prices["output"], 4),
+                    "cache_creation_input_tokens": cache_create,
+                    "cache_read_input_tokens": cache_read,
+                    "input_cost_usd": round(input_tokens * base_in, 4),
+                    "output_cost_usd": round(output_tokens * base_out, 4),
+                    "total_cost_usd": round(total_cost, 4),
                     "cache_hit": False,
                 }
             log.info("claude_cost", **cost_info)
+
+            # M6 (PR-KI-Optim, 2026-05-03): persistiere in ai_call_costs
+            try:
+                from reporter.ai_cost_persist import persist_ai_call_cost
+                persist_ai_call_cost(
+                    order_id=order_id,
+                    ki_step="reporter_v1",
+                    model=cost_info["model"],
+                    input_tokens=cost_info.get("input_tokens", 0),
+                    output_tokens=cost_info.get("output_tokens", 0),
+                    cache_creation_tokens=cost_info.get("cache_creation_input_tokens", 0),
+                    cache_read_tokens=cost_info.get("cache_read_input_tokens", 0),
+                    thinking_tokens=cost_info.get("thinking_tokens", 0),
+                    total_cost_usd=cost_info.get("total_cost_usd", 0.0),
+                    cache_hit=cost_info.get("cache_hit", False),
+                )
+            except Exception:
+                pass
 
             if debug_info is not None:
                 debug_info["cost"] = cost_info
