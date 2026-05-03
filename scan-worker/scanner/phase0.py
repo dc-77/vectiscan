@@ -681,6 +681,7 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
         "spf": None,
         "dmarc": None,
         "dkim": False,
+        "dkim_selectors": [],
         "mx": [],
         "ns": [],
     }
@@ -723,12 +724,42 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
     except Exception as e:
         log.warning("dmarc_lookup_error", error=str(e))
 
-    # DKIM (check default._domainkey)
-    try:
-        dkim_output = _dig_query(f"default._domainkey.{domain}", "TXT")
-        records["dkim"] = bool(dkim_output and "v=dkim1" in dkim_output.lower())
-    except Exception as e:
-        log.warning("dkim_lookup_error", error=str(e))
+    # DKIM — FIX 2026-05-03: vorher nur "default._domainkey" gepruft, was
+    # bei Sites mit Hornetsecurity (hse1/hse2), Office365 (selector1/2),
+    # Google Workspace (google), Mailchimp (k1/k2), SendGrid (s1/s2) etc.
+    # zu False-Positive "DKIM not configured" fuehrte. User-Bug-Beleg:
+    # securess.de hat hse1+hse2._domainkey aber default fehlt → fälschlich
+    # als DKIM-fehlend klassifiziert.
+    # Neu: probe gaengige Selektoren parallel; gefundene Selektoren werden
+    # gemerkt (records["dkim_selectors"]).
+    DKIM_SELECTORS = [
+        "default", "selector1", "selector2", "google", "k1", "k2",
+        "hse1", "hse2",  # Hornetsecurity
+        "s1", "s2",       # SendGrid / generisch
+        "mail", "dkim", "key1", "key2",
+        "smtpapi",        # SendGrid alt
+        "mxvault",        # MXroute
+        "mandrill",       # Mailchimp Transactional
+        "scph", "scph0123", "scph0124",  # SparkPost
+        "mta", "mta1", "mta2",
+        "primary", "secondary",
+        "fd", "fd2",      # Postfix-Variation
+    ]
+    found_selectors: list[str] = []
+    for sel in DKIM_SELECTORS:
+        try:
+            out = _dig_query(f"{sel}._domainkey.{domain}", "TXT")
+            if out and "v=dkim1" in out.lower():
+                found_selectors.append(sel)
+        except Exception:
+            pass
+    records["dkim"] = bool(found_selectors)
+    records["dkim_selectors"] = found_selectors
+    if found_selectors:
+        log.info("dkim_selectors_found", domain=domain, selectors=found_selectors)
+    else:
+        log.info("dkim_no_selectors_found", domain=domain,
+                 probed=len(DKIM_SELECTORS))
 
     # MX records
     try:
@@ -1241,7 +1272,7 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     zone_transfer: dict[str, Any] = {"success": False, "data": {}}
-    dns_records: dict[str, Any] = {"spf": None, "dmarc": None, "dkim": False, "mx": [], "ns": []}
+    dns_records: dict[str, Any] = {"spf": None, "dmarc": None, "dkim": False, "dkim_selectors": [], "mx": [], "ns": []}
 
     discovery_futures: dict[Any, str] = {}
     with ThreadPoolExecutor(max_workers=8, thread_name_prefix="phase0b") as pool:
