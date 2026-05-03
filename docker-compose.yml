@@ -76,6 +76,33 @@ services:
 
   # Worker 1 — legacy ZAP_BASE_URL fallback; pool mode activated via
   # ZAP_POOL_ENABLED=true once all four daemons are healthy (see §11.3).
+  # ─────────────────────────────────────────────────────────
+  # vpn-gw — adaptiver VPN-Proxy (PR-VPN, 2026-05-03)
+  # Default OFF; aktiv wenn EXPRESSVPN_ACCESS_TOKEN gesetzt + VPN_ENABLED=true
+  # Tinyproxy auf 3128 als HTTP-Proxy, control-api auf 8080 fuer connect/disconnect.
+  # Fallback wenn keine .deb / kein Token: Tinyproxy startet trotzdem und leitet
+  # den Verkehr direkt durch (= ohne VPN-Schutz, aber kein Service-Bruch).
+  # ─────────────────────────────────────────────────────────
+  vpn-gw:
+    build: ./vpn-gw
+    image: ghcr.io/dc-77/vectiscan/vpn-gw:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      EXPRESSVPN_ACCESS_TOKEN: ${EXPRESSVPN_ACCESS_TOKEN:-}
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - vectiscan-internal
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
   scan-worker-1:
     image: ghcr.io/dc-77/vectiscan/scan-worker:${TAG:-latest}
     restart: unless-stopped
@@ -99,6 +126,10 @@ services:
       ZAP_MAX_PARALLEL_PER_ORDER: ${ZAP_MAX_PARALLEL_PER_ORDER:-3}
       PHASE1_MAX_WORKERS: ${PHASE1_MAX_WORKERS:-3}
       PHASE2_STAGE2_WAF_SAFE: ${PHASE2_STAGE2_WAF_SAFE:-true}
+      # PR-VPN (2026-05-03): adaptive VPN-Activation bei WAF-Block
+      VPN_ENABLED: ${VPN_ENABLED:-false}
+      VPN_GATEWAY_URL: ${VPN_GATEWAY_URL:-http://vpn-gw:8080}
+      VPN_PROXY_URL: ${VPN_PROXY_URL:-http://vpn-gw:3128}
     deploy:
       resources:
         limits:
@@ -165,6 +196,10 @@ services:
       ZAP_MAX_PARALLEL_PER_ORDER: ${ZAP_MAX_PARALLEL_PER_ORDER:-3}
       PHASE1_MAX_WORKERS: ${PHASE1_MAX_WORKERS:-3}
       PHASE2_STAGE2_WAF_SAFE: ${PHASE2_STAGE2_WAF_SAFE:-true}
+      # PR-VPN (2026-05-03): adaptive VPN-Activation bei WAF-Block
+      VPN_ENABLED: ${VPN_ENABLED:-false}
+      VPN_GATEWAY_URL: ${VPN_GATEWAY_URL:-http://vpn-gw:8080}
+      VPN_PROXY_URL: ${VPN_PROXY_URL:-http://vpn-gw:3128}
     deploy:
       resources:
         limits:
@@ -205,6 +240,10 @@ services:
       ZAP_MAX_PARALLEL_PER_ORDER: ${ZAP_MAX_PARALLEL_PER_ORDER:-3}
       PHASE1_MAX_WORKERS: ${PHASE1_MAX_WORKERS:-3}
       PHASE2_STAGE2_WAF_SAFE: ${PHASE2_STAGE2_WAF_SAFE:-true}
+      # PR-VPN (2026-05-03): adaptive VPN-Activation bei WAF-Block
+      VPN_ENABLED: ${VPN_ENABLED:-false}
+      VPN_GATEWAY_URL: ${VPN_GATEWAY_URL:-http://vpn-gw:8080}
+      VPN_PROXY_URL: ${VPN_PROXY_URL:-http://vpn-gw:3128}
     deploy:
       resources:
         limits:

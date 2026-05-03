@@ -37,6 +37,125 @@ def _kill_process_group(proc: subprocess.Popen) -> None:
             pass
 
 
+def _build_env_with_vpn(order_id: Optional[str]) -> Optional[dict]:
+    """ENV-Dict mit HTTPS_PROXY/HTTP_PROXY wenn VPN aktiv ist (PR-VPN, 2026-05-03).
+
+    Returns None wenn keine VPN-Variablen gesetzt werden muessen — der
+    subprocess erbt dann das Process-ENV unmodifiziert.
+    """
+    if not order_id:
+        return None
+    try:
+        from scanner.vpn_switch import get_switch
+        sw = get_switch(order_id)
+        proxy = sw.current_proxy_url()
+        if not proxy:
+            return None
+        env = dict(os.environ)
+        env["HTTPS_PROXY"] = proxy
+        env["HTTP_PROXY"] = proxy
+        env["https_proxy"] = proxy
+        env["http_proxy"] = proxy
+        env["NO_PROXY"] = "localhost,127.0.0.1,::1"
+        return env
+    except Exception:
+        return None
+
+
+def _record_response_for_block_detection(
+    order_id: Optional[str], host_ip: Optional[str],
+    raw_output: Optional[str], exit_code: int, is_timeout: bool,
+) -> None:
+    """Sammle Response-Metriken fuer den BlockDetector.
+
+    Heuristik: extrahiere HTTP-Status aus raw_output (curl/httpx haben den
+    Code im JSON; ZAP/wpscan/nuclei strukturiert anders). Wenn nicht
+    parsbar: Status 0, body_size = len(raw_output).
+    """
+    if not order_id or not host_ip:
+        return
+    try:
+        from scanner.vpn_switch import get_switch
+        # WICHTIG: get_switch nicht initialisieren wenn VPN nicht verfuegbar
+        sw = get_switch(order_id)
+        if not sw.is_available():
+            return
+        # Heuristisches Status-Extraction
+        status = 0
+        body_excerpt = (raw_output or "")[:500]
+        body_size = len(raw_output or "")
+        if raw_output:
+            # Schnelle JSON-Status-Extraktion
+            for marker in ('"status_code":', '"status":'):
+                idx = raw_output.find(marker)
+                if idx != -1:
+                    chunk = raw_output[idx + len(marker):idx + len(marker) + 8].strip(' ,"')
+                    try:
+                        status = int(chunk.split(',')[0].split('"')[0])
+                        break
+                    except (ValueError, IndexError):
+                        pass
+
+        from scanner.waf_block_detector import BlockDetector
+        # BlockDetector ist per-Order-Singleton im VpnSwitch-Modul
+        det = _get_or_create_detector(order_id)
+        det.report_response(host_ip, status, body_size, body_excerpt, is_timeout=is_timeout)
+    except Exception:
+        pass
+
+
+# Per-Order BlockDetector-Singleton
+_detectors: dict = {}
+
+
+def _get_or_create_detector(order_id: str):
+    from scanner.waf_block_detector import BlockDetector
+    if order_id not in _detectors:
+        _detectors[order_id] = BlockDetector()
+    return _detectors[order_id]
+
+
+def _check_block_and_maybe_activate_vpn(
+    order_id: Optional[str], host_ip: Optional[str], tool_name: str,
+) -> bool:
+    """Prueft Block-Status. Wenn geblockt + VPN moeglich: activate.
+
+    Returns True wenn VPN wegen dieser Pruefung neu aktiviert wurde
+    (Caller kann dann Tool-Retry triggern).
+    """
+    if not order_id or not host_ip:
+        return False
+    try:
+        from scanner.vpn_switch import get_switch
+        sw = get_switch(order_id)
+        if not sw.is_available():
+            return False
+        det = _get_or_create_detector(order_id)
+        blocked, reason = det.is_blocked(host_ip)
+        if not blocked:
+            return False
+        if not sw.should_activate(host_ip, reason):
+            return False
+        if sw.is_active():
+            # VPN war schon an, Block trotzdem → Location rotieren
+            log.warning("vpn_already_active_but_still_blocked",
+                        host=host_ip, reason=reason, tool=tool_name)
+            ok = sw.rotate(host=host_ip)
+            if ok:
+                det.reset_host(host_ip)
+            return ok
+        # Erstaktivierung
+        log.warning("vpn_activating_due_to_block",
+                    host=host_ip, reason=reason, tool=tool_name)
+        ok = sw.enable(reason=reason, host=host_ip)
+        if ok:
+            det.reset_host(host_ip)
+        return ok
+    except Exception as e:
+        log.warning("vpn_check_failed", error=str(e))
+        return False
+
+
 def run_tool(
     cmd: list[str],
     timeout: int,
@@ -52,6 +171,12 @@ def run_tool(
     Uses start_new_session=True so that on timeout the entire process group
     (including child processes spawned by the tool) can be killed cleanly.
 
+    PR-VPN (2026-05-03): wenn VpnSwitch fuer diese order_id aktiv ist,
+    werden HTTPS_PROXY/HTTP_PROXY in die subprocess-ENV injiziert. Bei
+    Block-Detection (BlockDetector signalisiert "blocked") wird automatisch
+    1x Retry mit aktiviertem VPN durchgefuehrt — sofern VPN verfuegbar
+    UND Subscription-Strategy != 'never'.
+
     Args:
         cmd: Command and arguments as list
         timeout: Timeout in seconds
@@ -64,7 +189,22 @@ def run_tool(
     Returns:
         Tuple of (exit_code, duration_ms)
     """
-    log.info("tool_start", tool=tool_name, cmd=" ".join(cmd), timeout=timeout)
+    return _run_tool_with_optional_vpn(
+        cmd, timeout, output_path, order_id, host_ip, phase, tool_name,
+        retry_with_vpn=True,
+    )
+
+
+def _run_tool_with_optional_vpn(
+    cmd: list[str], timeout: int, output_path: Optional[str],
+    order_id: Optional[str], host_ip: Optional[str],
+    phase: int, tool_name: str,
+    retry_with_vpn: bool,
+) -> tuple[int, int]:
+    """Internal: wraps subprocess + Block-Detection + optional VPN-Retry."""
+    env = _build_env_with_vpn(order_id)
+    log.info("tool_start", tool=tool_name, cmd=" ".join(cmd), timeout=timeout,
+             via_vpn=bool(env))
     start = time.monotonic()
 
     proc: Optional[subprocess.Popen] = None
@@ -75,6 +215,7 @@ def run_tool(
             stderr=subprocess.PIPE,
             text=True,
             start_new_session=True,
+            env=env,
         )
         stdout, stderr = proc.communicate(timeout=timeout)
         duration_ms = int((time.monotonic() - start) * 1000)
@@ -104,6 +245,23 @@ def run_tool(
                         raw = f.read()
             except Exception:
                 pass
+
+        # PR-VPN Block-Detection: Response an Detector melden
+        _record_response_for_block_detection(
+            order_id, host_ip, raw, exit_code, is_timeout=False,
+        )
+        # Wenn dieser Run KEIN VPN-Retry war und der Detector jetzt sagt
+        # "blocked" → VPN aktivieren und Tool 1x retry ohne weitere Retries.
+        if retry_with_vpn and not env:
+            vpn_just_activated = _check_block_and_maybe_activate_vpn(
+                order_id, host_ip, tool_name,
+            )
+            if vpn_just_activated:
+                log.info("tool_retry_with_vpn", tool=tool_name, host=host_ip)
+                return _run_tool_with_optional_vpn(
+                    cmd, timeout, output_path, order_id, host_ip,
+                    phase, tool_name, retry_with_vpn=False,
+                )
 
         # Save result to scan_results table
         if order_id:
@@ -144,6 +302,21 @@ def run_tool(
                         log.info("tool_timeout_partial_output", tool=tool_name, chars=len(content))
             except Exception:
                 pass
+
+        # PR-VPN: Timeout zaehlt als Block-Signal
+        _record_response_for_block_detection(
+            order_id, host_ip, raw, -1, is_timeout=True,
+        )
+        if retry_with_vpn and not env:
+            vpn_just_activated = _check_block_and_maybe_activate_vpn(
+                order_id, host_ip, tool_name,
+            )
+            if vpn_just_activated:
+                log.info("tool_retry_with_vpn_after_timeout", tool=tool_name, host=host_ip)
+                return _run_tool_with_optional_vpn(
+                    cmd, timeout, output_path, order_id, host_ip,
+                    phase, tool_name, retry_with_vpn=False,
+                )
 
         if order_id:
             _save_result(

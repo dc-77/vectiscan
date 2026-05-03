@@ -843,6 +843,29 @@ def _finalize(
     # Mark scan as complete (report-worker will set pending_review after Claude analysis)
     set_scan_complete(order_id)
 
+    # PR-VPN: VPN-Activations-Audit-Trail in orders.vpn_activations persistieren
+    try:
+        from scanner.vpn_switch import cleanup_switch
+        activations = cleanup_switch(order_id)
+        if activations:
+            import psycopg2
+            conn = psycopg2.connect(
+                os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan"),
+                connect_timeout=5,
+            )
+            try:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "UPDATE orders SET vpn_activations = %s WHERE id = %s",
+                        (json.dumps(activations), order_id),
+                    )
+                conn.commit()
+            finally:
+                conn.close()
+            log.info("vpn_audit_persisted", order_id=order_id, count=len(activations))
+    except Exception as e:
+        log.warning("vpn_audit_persist_failed", error=str(e))
+
     publish_event(order_id, {
         "type": "status",
         "orderId": order_id,

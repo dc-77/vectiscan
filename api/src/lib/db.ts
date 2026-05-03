@@ -27,6 +27,7 @@ const MIGRATION_017_PATH = path.join(__dirname, '..', 'migrations', '017_threat_
 const MIGRATION_018_PATH = path.join(__dirname, '..', 'migrations', '018_severity_counts_trigger_fix.sql');
 const MIGRATION_019_PATH = path.join(__dirname, '..', 'migrations', '019_subdomain_snapshot.sql');
 const MIGRATION_020_PATH = path.join(__dirname, '..', 'migrations', '020_subscription_posture.sql');
+const MIGRATION_021_PATH = path.join(__dirname, '..', 'migrations', '021_vpn_strategy.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -258,6 +259,18 @@ export async function initDb(): Promise<void> {
   `);
   if (!posture020Check.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_020_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 021: VPN-Strategy + vpn_activations Audit (PR-VPN).
+  const vpn021Check = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.columns
+      WHERE table_name = 'subscriptions' AND column_name = 'vpn_strategy'
+    ) AS exists
+  `);
+  if (!vpn021Check.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_021_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 
