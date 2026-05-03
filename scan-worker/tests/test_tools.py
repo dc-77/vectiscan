@@ -33,12 +33,16 @@ def test_run_tool_success(mock_popen: MagicMock, mock_save: MagicMock) -> None:
     assert exit_code == 0
     assert isinstance(duration_ms, int)
     assert duration_ms >= 0
+    # PR-VPN (2026-05-03): run_tool injiziert ggf. HTTPS_PROXY-ENV. Wenn
+    # VPN nicht aktiv ist, wird env=None uebergeben (subprocess erbt das
+    # Process-ENV unmodifiziert).
     mock_popen.assert_called_once_with(
         ["echo", "hello"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
         start_new_session=True,
+        env=None,
     )
 
 
