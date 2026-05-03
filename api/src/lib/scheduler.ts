@@ -7,7 +7,7 @@
  * Also keeps legacy scan_schedules working for backward compatibility.
  */
 import { query } from './db.js';
-import { scanQueue, publishEvent } from './queue.js';
+import { scanQueue, reportQueue, publishEvent } from './queue.js';
 
 const INTERVAL_MS = 60_000;
 
@@ -165,11 +165,47 @@ async function tickLegacySchedules(): Promise<void> {
   }
 }
 
+/**
+ * PR-Posture (2026-05-03): periodischer Status-Report-Trigger.
+ *
+ * Pro aktiver Subscription: wenn last_status_report_at NULL ist ODER
+ * laenger als scan_interval zurueckliegt, schiebt einen
+ * subscription-status-report-Job in die report-pending-Queue.
+ */
+async function tickStatusReports(): Promise<void> {
+  const result = await query<{
+    id: string; scan_interval: string; last_status_report_at: Date | null;
+  }>(
+    `SELECT id, scan_interval, last_status_report_at
+       FROM subscriptions
+      WHERE status = 'active'
+        AND scan_interval IN ('weekly', 'monthly', 'quarterly')
+        AND (
+              last_status_report_at IS NULL
+           OR (scan_interval = 'weekly'    AND last_status_report_at < NOW() - INTERVAL '7 days')
+           OR (scan_interval = 'monthly'   AND last_status_report_at < NOW() - INTERVAL '30 days')
+           OR (scan_interval = 'quarterly' AND last_status_report_at < NOW() - INTERVAL '90 days')
+        )`,
+  );
+  for (const row of result.rows) {
+    try {
+      await reportQueue.add('subscription-status-report', {
+        subscriptionId: row.id,
+        triggerReason: 'scheduled',
+      });
+      console.log(`[scheduler] Status-Report enqueued for subscription ${row.id} (${row.scan_interval})`);
+    } catch (err) {
+      console.error(`[scheduler] Failed to enqueue status-report for ${row.id}:`, err);
+    }
+  }
+}
+
 async function tick(): Promise<void> {
   try {
     await expireSubscriptions();
     await tickSubscriptions();
     await tickLegacySchedules();
+    await tickStatusReports();
   } catch (err) {
     console.error('[scheduler] Tick error:', err);
   }

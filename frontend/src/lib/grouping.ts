@@ -1,4 +1,4 @@
-import type { OrderListItem, Subscription } from './api';
+import type { OrderListItem, Subscription, SubscriptionPosture } from './api';
 
 export type OrderGroupKind = 'subscription' | 'domain' | 'order';
 
@@ -11,6 +11,10 @@ export interface OrderGroupAggregates {
   severityCounts: Record<string, number>;
   lastScanAt: string | null;
   latestStatus: string | null;
+  // PR-Posture: bei Subscription-Groups statt naiver Sum, hier liegt
+  // die deduplizierte Posture pro Subscription. Wenn null → noch
+  // keine Aggregation gelaufen (Backfill ausstehend).
+  posture?: SubscriptionPosture | null;
 }
 
 export interface OrderGroup {
@@ -117,6 +121,7 @@ function aggregate(orders: OrderListItem[]): OrderGroupAggregates {
 export function groupOrders(
   orders: OrderListItem[],
   subscriptions: Subscription[],
+  posturesBySub?: Map<string, SubscriptionPosture | null>,
 ): OrderGroup[] {
   const subById = new Map(subscriptions.map(s => [s.id, s]));
   const subOrders = new Map<string, OrderListItem[]>();
@@ -162,6 +167,21 @@ export function groupOrders(
     const orderList = subOrders.get(sub.id) ?? [];
     const subTargets = (sub.targets ?? []).map(t => t.canonical || t.raw_input);
     const allDomains = Array.from(new Set([...subTargets, ...orderList.map(o => o.domain)])).sort();
+    const agg = aggregate(orderList);
+    // PR-Posture: bei Subscription-Groups die deduplizierte Posture
+    // statt naiver Severity-Sum verwenden — wenn vorhanden.
+    const posture = posturesBySub?.get(sub.id) ?? null;
+    if (posture && posture.severityCounts && posture.severityCounts.open) {
+      const open = posture.severityCounts.open;
+      agg.severityCounts = {
+        CRITICAL: open.CRITICAL ?? 0,
+        HIGH: open.HIGH ?? 0,
+        MEDIUM: open.MEDIUM ?? 0,
+        LOW: open.LOW ?? 0,
+        INFO: open.INFO ?? 0,
+      };
+      agg.posture = posture;
+    }
     groups.push({
       kind: 'subscription',
       key: `sub:${sub.id}`,
@@ -172,7 +192,7 @@ export function groupOrders(
       subscription: sub,
       domains: allDomains,
       orders: orderList,
-      aggregates: aggregate(orderList),
+      aggregates: agg,
     });
   }
 

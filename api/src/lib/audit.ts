@@ -42,7 +42,11 @@ export type AuditAction =
   | 'target.updated'
   | 'authorization.uploaded'
   | 'authorization.deleted'
-  | 'order.released';
+  | 'order.released'
+  | 'finding.accept_risk'
+  | 'finding.reopen'
+  | 'subscription.status_report_requested'
+  | 'subscription.status_report_generated';
 
 interface AuditEntry {
   orderId?: string | null;

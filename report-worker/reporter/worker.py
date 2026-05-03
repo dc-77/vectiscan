@@ -334,7 +334,23 @@ def process_job(job_data: dict) -> None:
       - rawDataPath       (str, e.g. "<orderId>.tar.gz")
       - hostInventory     (dict, Phase-0 host inventory)
       - techProfiles      (list[dict], per-host technology profiles)
+
+    PR-Posture (2026-05-03): Wenn `subscriptionId` statt `orderId` gesetzt
+    ist, wird kein scan-report sondern ein Subscription-Status-Report
+    erzeugt (siehe reporter/status_report_generator.py).
     """
+    # Subscription-Status-Report-Job (PR-Posture)
+    if job_data.get("subscriptionId") and not job_data.get("orderId"):
+        try:
+            from reporter.status_report_generator import process_status_report_job
+            report_id = process_status_report_job(job_data)
+            log.info("subscription_status_report_done",
+                     subscription_id=job_data["subscriptionId"], report_id=report_id)
+        except Exception as e:
+            log.exception("subscription_status_report_failed",
+                          subscription_id=job_data.get("subscriptionId"), error=str(e))
+        return
+
     order_id: str = job_data.get("orderId", job_data.get("scanId", ""))
     raw_data_path: str = job_data.get("rawDataPath", f"{order_id}.tar.gz")
     host_inventory: dict = job_data.get("hostInventory", {})
@@ -567,6 +583,26 @@ def process_job(job_data: dict) -> None:
                 log.info("previous_version_superseded", order_id=order_id, old_version=version - 1)
             except Exception as e:
                 log.warning("supersede_failed", error=str(e))
+
+        # -- 8c. Subscription-Posture-Aggregation (PR-Posture, 2026-05-03) ----
+        # Akkumuliert Findings ueber alle Scans der Subscription in
+        # consolidated_findings + tracked Lifecycle (open/resolved/regressed).
+        # Best-effort: bei Fehlern wird der Report trotzdem ausgeliefert.
+        try:
+            from reporter.posture_aggregator import aggregate_into_posture
+            posture = aggregate_into_posture(conn, order_id, findings_data)
+            if posture:
+                log.info(
+                    "posture_aggregation_done",
+                    order_id=order_id,
+                    score=posture.posture_score,
+                    new=posture.new_findings,
+                    resolved=posture.resolved_findings,
+                    regressed=posture.regressed_findings,
+                    trend=posture.trend_direction,
+                )
+        except Exception as e:
+            log.warning("posture_aggregation_failed", order_id=order_id, error=str(e))
 
         # -- 9. Update order status -----------------------------------------------
         # If admin approved (approved flag) or regeneration → report_complete.

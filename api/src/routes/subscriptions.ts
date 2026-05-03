@@ -401,4 +401,300 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
       };
     },
   );
+
+  // ── Subscription Posture (PR-Posture, 2026-05-03) ──────────────────────
+  // Aggregierte Sicherheits-Posture ueber alle Scans der Subscription.
+  // Ersetzt naive Severity-Counts-Summation in grouping.ts.
+
+  async function _checkSubscriptionAccess(
+    subId: string,
+    user: { customerId: string | null; role: string; sub: string; email: string },
+  ): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+    if (!UUID_REGEX.test(subId)) {
+      return { ok: false, status: 400, error: 'Invalid subscription ID' };
+    }
+    const sub = await query<{ customer_id: string }>(
+      'SELECT customer_id FROM subscriptions WHERE id = $1',
+      [subId],
+    );
+    if (sub.rows.length === 0) {
+      return { ok: false, status: 404, error: 'Abo nicht gefunden.' };
+    }
+    if (user.role !== 'admin' && user.customerId !== sub.rows[0].customer_id) {
+      return { ok: false, status: 403, error: 'Kein Zugriff auf dieses Abo.' };
+    }
+    return { ok: true };
+  }
+
+  // GET /api/subscriptions/:id/posture — aktueller Posture-Status
+  server.get<{ Params: { id: string } }>(
+    '/api/subscriptions/:id/posture',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const access = await _checkSubscriptionAccess(id, request.user!);
+      if (!access.ok) return reply.status(access.status).send({ success: false, error: access.error });
+
+      const res = await query(
+        `SELECT subscription_id, last_scan_order_id, last_aggregated_at,
+                severity_counts, posture_score, trend_direction, updated_at
+           FROM subscription_posture
+          WHERE subscription_id = $1`,
+        [id],
+      );
+      if (res.rows.length === 0) {
+        // Noch keine Aggregation gelaufen → leere Default-Posture
+        return {
+          success: true,
+          data: {
+            subscriptionId: id,
+            lastScanOrderId: null,
+            lastAggregatedAt: null,
+            severityCounts: { open: { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, INFO: 0 }, total_open: 0 },
+            postureScore: null,
+            trendDirection: 'unknown',
+            updatedAt: null,
+          },
+        };
+      }
+      const r = res.rows[0] as Record<string, unknown>;
+      return {
+        success: true,
+        data: {
+          subscriptionId: r.subscription_id,
+          lastScanOrderId: r.last_scan_order_id,
+          lastAggregatedAt: r.last_aggregated_at,
+          severityCounts: r.severity_counts,
+          postureScore: r.posture_score != null ? Number(r.posture_score) : null,
+          trendDirection: r.trend_direction,
+          updatedAt: r.updated_at,
+        },
+      };
+    },
+  );
+
+  // GET /api/subscriptions/:id/findings — alle consolidated_findings
+  server.get<{ Params: { id: string }; Querystring: { status?: string; severity?: string } }>(
+    '/api/subscriptions/:id/findings',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const access = await _checkSubscriptionAccess(id, request.user!);
+      if (!access.ok) return reply.status(access.status).send({ success: false, error: access.error });
+
+      const { status, severity } = request.query;
+      const where: string[] = ['subscription_id = $1'];
+      const params: unknown[] = [id];
+      if (status && ['open', 'resolved', 'regressed', 'risk_accepted'].includes(status)) {
+        params.push(status);
+        where.push(`status = $${params.length}`);
+      }
+      if (severity && ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'].includes(severity)) {
+        params.push(severity);
+        where.push(`severity = $${params.length}`);
+      }
+      const res = await query(
+        `SELECT id, host_ip, finding_type, port_or_path, status, severity, cvss_score,
+                title, description, first_seen_at, last_seen_at, resolved_at,
+                risk_accepted_at, risk_accepted_reason, metadata
+           FROM consolidated_findings
+          WHERE ${where.join(' AND ')}
+          ORDER BY
+            CASE severity WHEN 'CRITICAL' THEN 0 WHEN 'HIGH' THEN 1
+                          WHEN 'MEDIUM' THEN 2 WHEN 'LOW' THEN 3 ELSE 4 END,
+            first_seen_at DESC`,
+        params,
+      );
+      const findings = res.rows.map((r: Record<string, unknown>) => ({
+        id: r.id,
+        hostIp: r.host_ip,
+        findingType: r.finding_type,
+        portOrPath: r.port_or_path,
+        status: r.status,
+        severity: r.severity,
+        cvssScore: r.cvss_score != null ? Number(r.cvss_score) : null,
+        title: r.title,
+        description: r.description,
+        firstSeenAt: r.first_seen_at,
+        lastSeenAt: r.last_seen_at,
+        resolvedAt: r.resolved_at,
+        riskAcceptedAt: r.risk_accepted_at,
+        riskAcceptedReason: r.risk_accepted_reason,
+        metadata: r.metadata,
+      }));
+      return { success: true, data: { findings } };
+    },
+  );
+
+  // POST /api/subscriptions/:id/findings/:fid/accept-risk
+  server.post<{ Params: { id: string; fid: string }; Body: { reason?: string } }>(
+    '/api/subscriptions/:id/findings/:fid/accept-risk',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id, fid } = request.params;
+      const access = await _checkSubscriptionAccess(id, request.user!);
+      if (!access.ok) return reply.status(access.status).send({ success: false, error: access.error });
+      if (!UUID_REGEX.test(fid)) {
+        return reply.status(400).send({ success: false, error: 'Invalid finding ID' });
+      }
+      const reason = (request.body?.reason || '').trim();
+      if (!reason || reason.length < 5) {
+        return reply.status(400).send({ success: false, error: 'Begründung erforderlich (mind. 5 Zeichen).' });
+      }
+      const res = await query(
+        `UPDATE consolidated_findings
+            SET status = 'risk_accepted',
+                risk_accepted_at = NOW(),
+                risk_accepted_by = $1,
+                risk_accepted_reason = $2,
+                updated_at = NOW()
+          WHERE id = $3 AND subscription_id = $4
+          RETURNING id, status`,
+        [request.user!.sub, reason, fid, id],
+      );
+      if (res.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Finding nicht gefunden.' });
+      }
+      audit({
+        action: 'finding.accept_risk',
+        details: { subscriptionId: id, findingId: fid, reason, userId: request.user!.sub },
+        ip: request.ip,
+      });
+      return { success: true, data: { id: res.rows[0].id, status: res.rows[0].status } };
+    },
+  );
+
+  // POST /api/subscriptions/:id/findings/:fid/reopen
+  server.post<{ Params: { id: string; fid: string } }>(
+    '/api/subscriptions/:id/findings/:fid/reopen',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id, fid } = request.params;
+      const access = await _checkSubscriptionAccess(id, request.user!);
+      if (!access.ok) return reply.status(access.status).send({ success: false, error: access.error });
+      if (!UUID_REGEX.test(fid)) {
+        return reply.status(400).send({ success: false, error: 'Invalid finding ID' });
+      }
+      const res = await query(
+        `UPDATE consolidated_findings
+            SET status = 'open',
+                risk_accepted_at = NULL,
+                risk_accepted_by = NULL,
+                risk_accepted_reason = NULL,
+                updated_at = NOW()
+          WHERE id = $1 AND subscription_id = $2 AND status = 'risk_accepted'
+          RETURNING id, status`,
+        [fid, id],
+      );
+      if (res.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Finding nicht gefunden oder nicht risk_accepted.' });
+      }
+      audit({
+        action: 'finding.reopen',
+        details: { subscriptionId: id, findingId: fid, userId: request.user!.sub },
+        ip: request.ip,
+      });
+      return { success: true, data: { id: res.rows[0].id, status: res.rows[0].status } };
+    },
+  );
+
+  // GET /api/subscriptions/:id/posture-history — Score-Verlauf
+  server.get<{ Params: { id: string }; Querystring: { limit?: string } }>(
+    '/api/subscriptions/:id/posture-history',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const access = await _checkSubscriptionAccess(id, request.user!);
+      if (!access.ok) return reply.status(access.status).send({ success: false, error: access.error });
+      const limit = Math.min(Math.max(Number(request.query.limit || 50), 1), 200);
+      const res = await query(
+        `SELECT id, triggering_order_id, snapshot_at, posture_score,
+                severity_counts, new_findings, resolved_findings, regressed_findings
+           FROM posture_history
+          WHERE subscription_id = $1
+          ORDER BY snapshot_at DESC
+          LIMIT $2`,
+        [id, limit],
+      );
+      const history = res.rows.map((r: Record<string, unknown>) => ({
+        id: r.id,
+        triggeringOrderId: r.triggering_order_id,
+        snapshotAt: r.snapshot_at,
+        postureScore: Number(r.posture_score),
+        severityCounts: r.severity_counts,
+        newFindings: Number(r.new_findings),
+        resolvedFindings: Number(r.resolved_findings),
+        regressedFindings: Number(r.regressed_findings),
+      }));
+      return { success: true, data: { history } };
+    },
+  );
+
+  // POST /api/subscriptions/:id/status-report/generate — on-demand Status-PDF
+  server.post<{ Params: { id: string } }>(
+    '/api/subscriptions/:id/status-report/generate',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const access = await _checkSubscriptionAccess(id, request.user!);
+      if (!access.ok) return reply.status(access.status).send({ success: false, error: access.error });
+
+      // Enqueue Job an report-worker via Redis
+      // TODO Phase 5: report-worker konsumiert "subscription-status-report"-Queue
+      const { reportQueue } = await import('../lib/queue.js');
+      await reportQueue.add('subscription-status-report', {
+        subscriptionId: id,
+        triggerReason: 'on_demand',
+        requestedBy: request.user!.sub,
+      });
+      audit({
+        action: 'subscription.status_report_requested',
+        details: { subscriptionId: id, userId: request.user!.sub },
+        ip: request.ip,
+      });
+      return {
+        success: true,
+        data: { message: 'Status-Report wird generiert. PDF erscheint in den naechsten 1-2 Min.' },
+      };
+    },
+  );
+
+  // GET /api/subscriptions/:id/status-reports — Liste der erzeugten PDFs
+  server.get<{ Params: { id: string } }>(
+    '/api/subscriptions/:id/status-reports',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const access = await _checkSubscriptionAccess(id, request.user!);
+      if (!access.ok) return reply.status(access.status).send({ success: false, error: access.error });
+      const res = await query(
+        `SELECT id, period_start, period_end, trigger_reason, posture_score,
+                findings_open, findings_resolved, findings_regressed,
+                pdf_minio_key, pdf_size_bytes, generated_at
+           FROM subscription_status_reports
+          WHERE subscription_id = $1
+          ORDER BY generated_at DESC`,
+        [id],
+      );
+      return {
+        success: true,
+        data: {
+          reports: res.rows.map((r: Record<string, unknown>) => ({
+            id: r.id,
+            periodStart: r.period_start,
+            periodEnd: r.period_end,
+            triggerReason: r.trigger_reason,
+            postureScore: r.posture_score != null ? Number(r.posture_score) : null,
+            findingsOpen: r.findings_open,
+            findingsResolved: r.findings_resolved,
+            findingsRegressed: r.findings_regressed,
+            pdfMinioKey: r.pdf_minio_key,
+            pdfSizeBytes: r.pdf_size_bytes,
+            generatedAt: r.generated_at,
+            downloadUrl: r.pdf_minio_key ? `/api/subscriptions/${id}/status-reports/${r.id}/download` : null,
+          })),
+        },
+      };
+    },
+  );
 }

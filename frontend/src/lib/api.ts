@@ -486,6 +486,115 @@ export interface Subscription {
   targets: SubscriptionTarget[];
 }
 
+// PR-Posture: aggregierter Sicherheits-Status ueber alle Scans der Subscription
+export interface SubscriptionPosture {
+  subscriptionId: string;
+  lastScanOrderId: string | null;
+  lastAggregatedAt: string | null;
+  severityCounts: {
+    open?: { CRITICAL?: number; HIGH?: number; MEDIUM?: number; LOW?: number; INFO?: number };
+    total_open?: number;
+    resolved_total?: number;
+    regressed_total?: number;
+    accepted_total?: number;
+  };
+  postureScore: number | null;
+  trendDirection: 'improving' | 'stable' | 'degrading' | 'unknown';
+  updatedAt: string | null;
+}
+
+export interface ConsolidatedFinding {
+  id: string;
+  hostIp: string;
+  findingType: string;
+  portOrPath: string;
+  status: 'open' | 'resolved' | 'regressed' | 'risk_accepted';
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
+  cvssScore: number | null;
+  title: string;
+  description: string | null;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  resolvedAt: string | null;
+  riskAcceptedAt: string | null;
+  riskAcceptedReason: string | null;
+  metadata: Record<string, unknown>;
+}
+
+export interface PostureHistoryPoint {
+  id: string;
+  triggeringOrderId: string | null;
+  snapshotAt: string;
+  postureScore: number;
+  severityCounts: Record<string, unknown>;
+  newFindings: number;
+  resolvedFindings: number;
+  regressedFindings: number;
+}
+
+export async function getSubscriptionPosture(
+  subscriptionId: string,
+): Promise<ApiResponse<SubscriptionPosture>> {
+  const res = await fetch(`${API_URL}/api/subscriptions/${subscriptionId}/posture`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function getSubscriptionFindings(
+  subscriptionId: string,
+  filter?: { status?: string; severity?: string },
+): Promise<ApiResponse<{ findings: ConsolidatedFinding[] }>> {
+  const qs = new URLSearchParams();
+  if (filter?.status) qs.set('status', filter.status);
+  if (filter?.severity) qs.set('severity', filter.severity);
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  const res = await fetch(`${API_URL}/api/subscriptions/${subscriptionId}/findings${suffix}`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function acceptFindingRisk(
+  subscriptionId: string, findingId: string, reason: string,
+): Promise<ApiResponse<{ id: string; status: string }>> {
+  const res = await fetch(
+    `${API_URL}/api/subscriptions/${subscriptionId}/findings/${findingId}/accept-risk`,
+    { method: 'POST', headers: authHeaders(), body: JSON.stringify({ reason }) },
+  );
+  return handleResponse(res);
+}
+
+export async function reopenFinding(
+  subscriptionId: string, findingId: string,
+): Promise<ApiResponse<{ id: string; status: string }>> {
+  const res = await fetch(
+    `${API_URL}/api/subscriptions/${subscriptionId}/findings/${findingId}/reopen`,
+    { method: 'POST', headers: authHeaders() },
+  );
+  return handleResponse(res);
+}
+
+export async function getPostureHistory(
+  subscriptionId: string, limit = 50,
+): Promise<ApiResponse<{ history: PostureHistoryPoint[] }>> {
+  const res = await fetch(
+    `${API_URL}/api/subscriptions/${subscriptionId}/posture-history?limit=${limit}`,
+    { headers: authHeaders() },
+  );
+  return handleResponse(res);
+}
+
+export async function generateStatusReport(
+  subscriptionId: string,
+): Promise<ApiResponse<{ message: string }>> {
+  const res = await fetch(
+    `${API_URL}/api/subscriptions/${subscriptionId}/status-report/generate`,
+    { method: 'POST', headers: authHeaders() },
+  );
+  return handleResponse(res);
+}
+
 export async function createSubscription(data: {
   package: string; targets: TargetEntry[]; scanInterval: string; reportEmails: string[];
 }): Promise<ApiResponse<{ id: string; message: string }>> {

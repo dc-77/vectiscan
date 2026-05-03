@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { listOrders, deleteOrderPermanent, listSubscriptions, OrderListItem, Subscription } from '@/lib/api';
+import { listOrders, deleteOrderPermanent, listSubscriptions, getSubscriptionPosture, OrderListItem, Subscription, SubscriptionPosture } from '@/lib/api';
 import { isLoggedIn, isAdmin, clearToken } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
 import { groupOrders, OrderGroup } from '@/lib/grouping';
@@ -85,6 +85,7 @@ export default function Dashboard() {
 
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [postures, setPostures] = useState<Map<string, SubscriptionPosture | null>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>('all');
@@ -115,7 +116,19 @@ export default function Dashboard() {
         setError(ordersRes.error || 'Fehler beim Laden');
       }
       if (subsRes.success && subsRes.data) {
-        setSubscriptions(subsRes.data.subscriptions);
+        const subs = subsRes.data.subscriptions;
+        setSubscriptions(subs);
+        // PR-Posture: parallel alle Subscription-Postures laden — fuer
+        // dedup-basierte Severity-Counts in der GroupCard. Ein 404 ist ok
+        // (Subscription hat noch keine Aggregation gehabt).
+        const postureMap = new Map<string, SubscriptionPosture | null>();
+        await Promise.all(subs.map(async (s) => {
+          try {
+            const pr = await getSubscriptionPosture(s.id);
+            postureMap.set(s.id, pr.success && pr.data ? pr.data : null);
+          } catch { postureMap.set(s.id, null); }
+        }));
+        setPostures(postureMap);
       }
     } catch {
       setError('API nicht erreichbar');
@@ -150,7 +163,7 @@ export default function Dashboard() {
     }
   };
 
-  const groups = groupOrders(orders, subscriptions);
+  const groups = groupOrders(orders, subscriptions, postures);
   const filteredGroups = groups
     .filter(g => groupMatchesFilter(g, filter))
     .filter(g => groupMatchesSearch(g, searchQuery));
@@ -354,6 +367,27 @@ function GroupCard({ group, admin }: { group: OrderGroup; admin: boolean }) {
           <span className="text-xs text-slate-500 truncate">{group.subtitle}</span>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
+          {/* PR-Posture: Score + Trend-Pfeil bei Subscription-Groups,
+              wenn Posture-Daten vorhanden sind. Score 0-100, Farbe je nach Range. */}
+          {agg.posture && agg.posture.postureScore != null && group.subscription && (
+            <Link
+              href={`/subscription/${group.subscription.id}/posture`}
+              onClick={(e) => e.stopPropagation()}
+              className={`text-xs font-bold px-2 py-0.5 rounded inline-flex items-center gap-1 hover:brightness-110 ${
+                agg.posture.postureScore >= 80 ? 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
+                : agg.posture.postureScore >= 60 ? 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30'
+                : 'bg-red-500/15 text-red-300 ring-1 ring-red-500/30'
+              }`}
+              title={`Posture-Score ${Math.round(agg.posture.postureScore)} (open-Findings) — ${agg.posture.trendDirection}. Klick fuer Posture-Detail`}
+            >
+              <span>{Math.round(agg.posture.postureScore)}</span>
+              <span className="text-[10px]">
+                {agg.posture.trendDirection === 'improving' ? '↗'
+                 : agg.posture.trendDirection === 'degrading' ? '↘'
+                 : agg.posture.trendDirection === 'stable' ? '→' : ''}
+              </span>
+            </Link>
+          )}
           {riskBadge && (
             <span className={`${riskBadge.bg} ${riskBadge.text} ${riskBadge.border} text-xs font-bold px-2 py-0.5 rounded uppercase`}>
               {agg.latestRisk}
@@ -368,10 +402,22 @@ function GroupCard({ group, admin }: { group: OrderGroup; admin: boolean }) {
         </div>
       </div>
 
-      {/* Aggregated severity */}
+      {/* Aggregated severity (bei Subscription mit Posture: deduplizierte
+          open-Findings statt naiver Sum aus allen Scans) */}
       {totalSeverity > 0 && (
         <div className="mb-3">
           <SeverityCounts counts={agg.severityCounts} />
+          {agg.posture && (
+            <div className="text-[10px] text-slate-600 mt-1">
+              {agg.posture.severityCounts.total_open ?? 0} offen
+              {(agg.posture.severityCounts.resolved_total ?? 0) > 0 &&
+                ` · ${agg.posture.severityCounts.resolved_total} resolved`}
+              {(agg.posture.severityCounts.regressed_total ?? 0) > 0 &&
+                ` · ${agg.posture.severityCounts.regressed_total} regressed`}
+              {(agg.posture.severityCounts.accepted_total ?? 0) > 0 &&
+                ` · ${agg.posture.severityCounts.accepted_total} risk-accepted`}
+            </div>
+          )}
         </div>
       )}
 
