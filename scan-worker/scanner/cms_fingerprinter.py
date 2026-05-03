@@ -10,6 +10,7 @@ Max 20 requests per host (early-exit when high-confidence match found).
 from __future__ import annotations
 
 import json
+import os
 import re
 import ssl
 import urllib.error
@@ -107,7 +108,23 @@ PROBE_MATRIX: list[dict[str, Any]] = [
     {
         "cms": "Magento",
         "probes": ["/admin/", "/checkout/cart/"],
-        "body_patterns": [r"(?i)magento", r"(?i)mage"],
+        # FIX 2026-05-03: `(?i)mage` matchte JEDES "image"-Vorkommen
+        # → False-Positives auf jeder Site mit <img>-Tags
+        # (siehe portal.dew21.de + vorteile.dew21.de Bug-Report).
+        # Jetzt strenge Magento-spezifische Marker:
+        # - `(?i)magento` (Wortname)
+        # - `Mage.Cookies` / `var BASE_URL` (Magento 1 JS)
+        # - `/skin/frontend/` (Magento 1 Asset-Path)
+        # - `/static/version` + `Magento_Theme/` (Magento 2 Asset-Path)
+        # - `mage/cookies.js` / `mage/translate.js` (Magento JS)
+        "body_patterns": [
+            r"(?i)magento",
+            r"Mage\.Cookies",
+            r"/skin/frontend/",
+            r"Magento_Theme/",
+            r"mage/cookies\.js",
+            r"mage/translate\.js",
+        ],
         "confidence": 0.85,
     },
     {
@@ -118,14 +135,29 @@ PROBE_MATRIX: list[dict[str, Any]] = [
     },
     {
         "cms": "Craft CMS",
+        # FIX 2026-05-03: `(?i)craft` matchte "aircraft", "minecraft",
+        # "spacecraft", "Made with craft & love"-Marketing-Texte. Strenger:
+        # - "Craft CMS" (Markenname mit Suffix)
+        # - "craftcms.com" (Backlink im Footer)
+        # - "/cpresources/" (Craft-Asset-Path)
         "probes": ["/admin/login"],
-        "body_patterns": [r"(?i)craft"],
+        "body_patterns": [
+            r"Craft\s?CMS",
+            r"craftcms\.com",
+            r"/cpresources/",
+        ],
         "confidence": 0.85,
     },
     {
         "cms": "Strapi",
+        # FIX 2026-05-03: `(?i)strapi` ist OK weil seltenes Wort, aber
+        # enge Marker robuster. Strapi-Headers: "x-powered-by: Strapi".
         "probes": ["/admin/", "/_health"],
-        "body_patterns": [r"(?i)strapi"],
+        "body_patterns": [
+            r"(?i)strapi[\.\-/]",
+            r"Strapi\s?CMS",
+            r"strapi\.io",
+        ],
         "confidence": 0.80,
     },
     {
@@ -136,8 +168,15 @@ PROBE_MATRIX: list[dict[str, Any]] = [
     },
     {
         "cms": "PrestaShop",
+        # FIX 2026-05-03: `(?i)prestashop` ist OK aber sehr generic im
+        # Body. PrestaShop-spezifische Marker zusaetzlich:
         "probes": ["/admin/login", "/modules/"],
-        "body_patterns": [r"(?i)prestashop"],
+        "body_patterns": [
+            r"(?i)prestashop",
+            r"prestashop\.com",
+            r"/themes/.*?/assets/",
+            r"PS_VERSION",
+        ],
         "confidence": 0.80,
     },
 ]
@@ -442,10 +481,29 @@ class CMSFingerprinter:
                 confidence = probe_def["confidence"]
                 has_body_match = any("body match" in h for h in hits)
                 has_body_patterns = bool(probe_def.get("body_patterns"))
-                # If body_patterns are defined but none matched, this is a weak
-                # signal (generic path like /admin responded 200 but body doesn't
-                # confirm the CMS).  Reduce confidence significantly.
+                # FIX 2026-05-03: probes wie /admin/, /checkout/cart/,
+                # /admin/login sind generic — viele Sites antworten dort mit
+                # 200 (Login-Seite) ohne CMS zu sein. Wenn KEIN body_match
+                # → Confidence drastisch runter, plus Status-Code-Hits
+                # alleine reichen NICHT als CMS-Erkennung. Wir halten den
+                # Candidate trotzdem vor, aber mit confidence 0.15 → wird
+                # spaeter rausgefiltert oder vom KI #2-Korrektur ueberschrieben.
+                _GENERIC_PROBES = {
+                    "/admin/", "/admin/login", "/admin", "/login",
+                    "/checkout/cart/", "/user/login", "/_health",
+                    "/modules/",
+                }
+                generic_only = all(
+                    any(h.startswith(p + " →") for p in _GENERIC_PROBES)
+                    for h in hits if "body match" not in h and "cookie" not in h
+                )
                 if has_body_patterns and not has_body_match:
+                    if generic_only:
+                        # Reines "/admin → 200" ohne Inhalts-Bestaetigung
+                        # → praktisch wertlos. Kandidat verworfen.
+                        log.info("cms_probe_generic_only_skip",
+                                 cms=cms_name, fqdn=fqdn, hits=hits)
+                        continue
                     confidence = min(confidence, 0.3)
                     log.debug("cms_probe_no_body_match",
                               cms=cms_name, fqdn=fqdn, hits=hits)
@@ -600,25 +658,33 @@ class CMSFingerprinter:
         self._request_count = 0
         all_candidates: list[CMSCandidate] = []
 
-        # 1. webtech (from existing Phase 1 data)
+        # 1. webtech (from existing Phase 1 data) — primaerer Pfad seit
+        # phase1.py:_extract_all_tech_signals() (Wappalyzer-Lite mit
+        # Cookies, Scripts, Meta-Tags, Body-Classes, Header-Patterns).
         if webtech_result:
             wt_candidates = self.check_webtech(webtech_result)
             all_candidates.extend(wt_candidates)
 
-        # 2 + 4 + 5. Meta-tags (also collects cookies + headers from homepage)
+        # 2 + 4 + 5. Meta-tags (also collects cookies + headers from homepage).
+        # Diese Methoden lesen strukturierte Felder (Generator-Meta,
+        # X-Generator-Header, CMS-Cookies) — robust und ohne extra HTTP-Probes.
         meta_candidates = self.check_meta_tags(fqdn)
         all_candidates.extend(meta_candidates)
 
-        # Determine if we have an early CMS match (for targeted probing)
-        early_cms: Optional[str] = None
-        if all_candidates:
-            best = max(all_candidates, key=lambda c: c.confidence)
-            if best.confidence >= 0.70:
-                early_cms = best.cms
-
-        # 3. Probe matrix (targeted if early_cms found)
-        probe_candidates = self.run_probe_matrix(fqdn, early_cms=early_cms)
-        all_candidates.extend(probe_candidates)
+        # 3. Probe matrix (FIX 2026-05-03): per Default DEAKTIVIERT, weil
+        # historisch False-Positive-Quelle (z.B. Magento (?i)mage matchte
+        # 'image' im body, /admin/-Probe ist generic). Re-aktivierbar via
+        # ENV CMS_PROBE_MATRIX_ENABLED=true falls eine Site KEIN
+        # generator-Meta + KEINE CMS-Cookies sendet (selten, z.B. headless
+        # WP mit wp-json-only-Endpoint).
+        if os.environ.get("CMS_PROBE_MATRIX_ENABLED", "").lower() in ("1", "true", "yes"):
+            early_cms: Optional[str] = None
+            if all_candidates:
+                best = max(all_candidates, key=lambda c: c.confidence)
+                if best.confidence >= 0.70:
+                    early_cms = best.cms
+            probe_candidates = self.run_probe_matrix(fqdn, early_cms=early_cms)
+            all_candidates.extend(probe_candidates)
 
         result = self._merge_results(all_candidates)
 
