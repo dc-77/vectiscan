@@ -264,24 +264,31 @@ ops-services-status:
     - docker compose ps --format 'table {{.Name}}\t{{.State}}\t{{.Status}}' || true
     - echo
     - echo "=== Redis BullMQ Queue-Tiefen ==="
+    # `|| true` damit der Job nicht abbricht wenn ein Test-Step false-y ist
+    # (passiert z.B. wenn alle bull-prefix-LLENs 0 sind → letzter Test
+    # falsy → set -e killt das Skript bevor die nachfolgenden Echos kommen).
     - |
       docker compose exec -T redis sh -c '
+        set +e
         for q in precheck-pending scan-pending report-pending; do
-          len=$(redis-cli LLEN "$q" 2>/dev/null || echo "?")
-          printf "  %-22s %s\n" "$q" "$len"
+          len=$(redis-cli LLEN "$q" 2>/dev/null)
+          printf "  %-22s %s\n" "$q" "${len:-?}"
         done
         echo
         echo "  bull-namespaced (waiting/active/completed/failed):"
         for prefix in bull:scan-pending bull:report-pending bull:precheck-pending; do
           for s in waiting active completed failed delayed; do
-            len=$(redis-cli LLEN "${prefix}:${s}" 2>/dev/null || echo "0")
-            [ "$len" != "0" ] && [ "$len" != "?" ] && printf "    %-40s %s\n" "${prefix}:${s}" "$len"
+            len=$(redis-cli LLEN "${prefix}:${s}" 2>/dev/null)
+            if [ -n "$len" ] && [ "$len" != "0" ]; then
+              printf "    %-40s %s\n" "${prefix}:${s}" "$len"
+            fi
           done
         done
-      '
+        exit 0
+      ' || true
     - echo
-    - echo "=== report-worker Logs (letzte 100 Zeilen) ==="
-    - docker compose logs --tail=100 --no-color report-worker 2>&1 | tail -100 || true
+    - echo "=== report-worker Logs (letzte 200 Zeilen) ==="
+    - docker compose logs --tail=200 --no-color report-worker 2>&1 | tail -200 || true
     - echo
     - echo "=== scan-worker-1 Logs (letzte 30 Zeilen) ==="
     - docker compose logs --tail=30 --no-color scan-worker-1 2>&1 | tail -30 || true
