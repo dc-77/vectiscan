@@ -78,33 +78,32 @@ services:
   # ZAP_POOL_ENABLED=true once all four daemons are healthy (see §11.3).
   # ─────────────────────────────────────────────────────────
   # vpn-gw — adaptiver VPN-Proxy (PR-VPN, 2026-05-03)
-  # Default OFF; aktiv wenn EXPRESSVPN_ACCESS_TOKEN gesetzt + VPN_ENABLED=true
-  # Tinyproxy auf 3128 als HTTP-Proxy, control-api auf 8080 fuer connect/disconnect.
-  # Fallback wenn keine .deb / kein Token: Tinyproxy startet trotzdem und leitet
-  # den Verkehr direkt durch (= ohne VPN-Schutz, aber kein Service-Bruch).
+  # AUSKOMMENTIERT: deploy-auto kopiert nur docker-compose.yml ins
+  # DEPLOY_PATH, nicht vpn-gw/. Aktivierung erfordert:
+  #   1. CI-Build-Job fuer vpn-gw → ghcr.io-Push
+  #   2. Hier `image: ghcr.io/dc-77/vectiscan/vpn-gw:latest` einfuegen
+  #   3. EXPRESSVPN-DEB im Repo
+  # Bis dahin: scan-worker laeuft ohne vpn-gw → VpnSwitch.is_available()=False
+  # → Tools laufen direkt (Default-Verhalten vor PR-VPN), kein Funktionsverlust.
   # ─────────────────────────────────────────────────────────
-  vpn-gw:
-    # Image wird lokal aus ./vpn-gw gebaut (kein CI-Build-Job).
-    # Falls EXPRESSVPN-DEB im build-context liegt → vollwertige VPN-Funktion;
-    # sonst nur Tinyproxy-Passthrough (no-op-Fallback). Kein 'image:' damit
-    # docker-compose nicht versucht aus Registry zu pullen.
-    build: ./vpn-gw
-    restart: unless-stopped
-    environment:
-      EXPRESSVPN_ACCESS_TOKEN: ${EXPRESSVPN_ACCESS_TOKEN:-}
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-    networks:
-      - vectiscan-internal
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+  # vpn-gw:
+  #   build: ./vpn-gw
+  #   restart: unless-stopped
+  #   environment:
+  #     EXPRESSVPN_ACCESS_TOKEN: ${EXPRESSVPN_ACCESS_TOKEN:-}
+  #   cap_add:
+  #     - NET_ADMIN
+  #   devices:
+  #     - /dev/net/tun
+  #   sysctls:
+  #     - net.ipv4.conf.all.src_valid_mark=1
+  #   networks:
+  #     - vectiscan-internal
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+  #     interval: 30s
+  #     timeout: 5s
+  #     retries: 3
 
   scan-worker-1:
     image: ghcr.io/dc-77/vectiscan/scan-worker:${TAG:-latest}
