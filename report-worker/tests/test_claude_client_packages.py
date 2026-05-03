@@ -191,7 +191,7 @@ class TestCallClaudePackages:
             call_claude("example.com", {}, [], "", package="basic")
 
         call_args = mock_client.messages.create.call_args
-        system_prompt = call_args.kwargs["system"]
+        system_prompt = _extract_system_text(call_args.kwargs["system"])
         assert "CVSS-Vektorstring" not in system_prompt
         assert "Management-tauglich" in system_prompt
 
@@ -203,6 +203,21 @@ class TestCallClaudePackages:
             call_claude("example.com", {}, [], "", package="nis2")
 
         call_args = mock_client.messages.create.call_args
-        system_prompt = call_args.kwargs["system"]
+        system_prompt = _extract_system_text(call_args.kwargs["system"])
         assert "§30 BSIG" in system_prompt
         assert "Lieferkette" in system_prompt
+
+
+def _extract_system_text(system_param):
+    """M1 Prompt Caching (PR-KI-Optim, 2026-05-03): system kann jetzt
+    entweder str (kleine Prompts) oder list[{type:'text', text:..., cache_control:...}]
+    (cached Prompts) sein. Helper extrahiert den Text-Inhalt fuer Assertions."""
+    if isinstance(system_param, str):
+        return system_param
+    if isinstance(system_param, list):
+        parts = []
+        for block in system_param:
+            if isinstance(block, dict) and block.get("type") == "text":
+                parts.append(block.get("text", ""))
+        return "\n".join(parts)
+    return str(system_param)
