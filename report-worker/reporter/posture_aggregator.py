@@ -191,10 +191,23 @@ def aggregate_into_posture(
     log.info("posture_aggregate_start", order_id=order_id,
              subscription_id=subscription_id, findings_in=len(findings))
 
-    seen_finding_ids: set[str] = set()  # consolidated_finding-IDs in DIESEM Scan
+    # Defensives Rollback bei Exception in der Transaktion damit der Caller
+    # eine saubere conn weiterverwenden kann (siehe worker.py:8c).
+    try:
+        return _do_aggregate(conn, order_id, subscription_id, findings)
+    except Exception:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        raise
+
+
+def _do_aggregate(conn, order_id, subscription_id, findings):
+    seen_finding_ids: set[str] = set()
     new_count = 0
     regressed_count = 0
-    new_critical_high = 0  # fuer has_critical_change
+    new_critical_high = 0
     has_regression = False
 
     with conn.cursor() as cur:

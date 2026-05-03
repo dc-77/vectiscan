@@ -588,6 +588,11 @@ def process_job(job_data: dict) -> None:
         # Akkumuliert Findings ueber alle Scans der Subscription in
         # consolidated_findings + tracked Lifecycle (open/resolved/regressed).
         # Best-effort: bei Fehlern wird der Report trotzdem ausgeliefert.
+        # WICHTIG (2026-05-03 Fix): bei SQL-Exception im Aggregator landen
+        # wir in einem aborted-transaction-State; conn.rollback() ist
+        # noetig damit `_update_order_status` (naechster Step) nicht mit
+        # InFailedSqlTransaction crasht und der Order in report_generating
+        # haengen bleibt.
         try:
             from reporter.posture_aggregator import aggregate_into_posture
             posture = aggregate_into_posture(conn, order_id, findings_data)
@@ -603,6 +608,15 @@ def process_job(job_data: dict) -> None:
                 )
         except Exception as e:
             log.warning("posture_aggregation_failed", order_id=order_id, error=str(e))
+            try:
+                conn.rollback()
+            except Exception:
+                # conn moeglicherweise schon im broken state — neue holen
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+                conn = _get_db_connection()
 
         # -- 9. Update order status -----------------------------------------------
         # If admin approved (approved flag) or regeneration → report_complete.
