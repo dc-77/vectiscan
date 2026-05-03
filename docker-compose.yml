@@ -84,8 +84,11 @@ services:
   # den Verkehr direkt durch (= ohne VPN-Schutz, aber kein Service-Bruch).
   # ─────────────────────────────────────────────────────────
   vpn-gw:
+    # Image wird lokal aus ./vpn-gw gebaut (kein CI-Build-Job).
+    # Falls EXPRESSVPN-DEB im build-context liegt → vollwertige VPN-Funktion;
+    # sonst nur Tinyproxy-Passthrough (no-op-Fallback). Kein 'image:' damit
+    # docker-compose nicht versucht aus Registry zu pullen.
     build: ./vpn-gw
-    image: ghcr.io/dc-77/vectiscan/vpn-gw:${TAG:-latest}
     restart: unless-stopped
     environment:
       EXPRESSVPN_ACCESS_TOKEN: ${EXPRESSVPN_ACCESS_TOKEN:-}
