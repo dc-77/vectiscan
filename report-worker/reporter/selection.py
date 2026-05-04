@@ -35,6 +35,18 @@ TOP_N_PER_PACKAGE: dict[str, int] = {
     # tlscompliance laeuft eigenen Pfad ohne Top-N
 }
 
+# A3: Mindest-Findings pro Paket. Wenn Top-N weniger liefert (z.B. KI gab nur
+# 4 Findings zurueck obwohl perimeter 6 Min haette), werden Findings aus
+# `additional[]` (sortiert by business_impact) nachgezogen. Wenn auch additional
+# leer: Reporter-Retry-Hint wird ueber selection_result.retry_hint gemeldet.
+MIN_N_PER_PACKAGE: dict[str, int] = {
+    "webcheck":     3,
+    "perimeter":   6,
+    "compliance":  10,
+    "supplychain": 6,
+    "insurance":   6,
+}
+
 # Legacy-Aliase (CLAUDE.md): basic→webcheck, professional→perimeter, nis2→compliance
 PACKAGE_ALIASES: dict[str, str] = {
     "basic": "webcheck",
@@ -57,6 +69,8 @@ class SelectionResult:
     original_count: int = 0
     package: str = ""
     top_n: int = 0
+    floor_applied: int = 0  # A3: Anzahl aus additional[] nachgezogen
+    retry_hint: str | None = None  # A3: bei Unterproduktion fuer KI-Retry
 
     def __len__(self) -> int:
         return len(self.selected)
@@ -233,9 +247,34 @@ def select_findings(findings: list[dict],
     selected = consolidated[:top_n]
     additional = consolidated[top_n:]
 
+    # 4. Floor (A3) — wenn KI weniger Findings lieferte als Min, fuelle aus
+    # additional auf. Wenn auch das nicht reicht, retry_hint fuer Reporter.
+    # Floor greift nur bei Standard-top_n; explizites top_n_override
+    # respektiert was der Caller verlangt.
+    floor_applied = 0
+    retry_hint: str | None = None
+    min_n = MIN_N_PER_PACKAGE.get(package_norm, 0) if top_n_override is None else 0
+    if min_n > 0 and len(selected) < min_n:
+        deficit = min_n - len(selected)
+        if additional:
+            extra = additional[:deficit]
+            selected = selected + extra
+            additional = additional[deficit:]
+            floor_applied = len(extra)
+        if len(selected) < min_n:
+            retry_hint = (
+                f"package={package_norm} hat nur {len(selected)} Findings "
+                f"(Min {min_n}); KI lieferte zu wenig — Retry mit Hinweis "
+                f"sinnvoll."
+            )
+            logger.warning(
+                "selection_floor_underrun package=%s selected=%d min=%d",
+                package_norm, len(selected), min_n,
+            )
+
     logger.info(
-        "Selection [%s]: %d original -> %d consolidated -> %d selected (top %d)",
-        package_norm, original_count, len(consolidated), len(selected), top_n,
+        "Selection [%s]: %d original -> %d consolidated -> %d selected (top %d, floor +%d)",
+        package_norm, original_count, len(consolidated), len(selected), top_n, floor_applied,
     )
 
     return SelectionResult(
@@ -245,6 +284,8 @@ def select_findings(findings: list[dict],
         original_count=original_count,
         package=package_norm,
         top_n=top_n,
+        floor_applied=floor_applied,
+        retry_hint=retry_hint,
     )
 
 

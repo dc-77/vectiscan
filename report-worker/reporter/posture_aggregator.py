@@ -144,6 +144,41 @@ def _calculate_posture_score(severity_counts_open: dict[str, int]) -> float:
     return round(score, 2)
 
 
+def _calculate_determinism_score(conn, subscription_id: str) -> tuple[Optional[float], int]:
+    """D1: Determinismus-KPI ueber die letzten 3 Reports der Subscription.
+
+    Berechnung:
+        score = |intersection(policy_ids)| / |union(policy_ids)| * 100
+
+    Liest reports.policy_id_distinct[] der letzten 3 Reports der Subscription
+    (via orders.subscription_id JOIN). Bei <2 Reports: None (unbekannt).
+    Bei 2 Reports: Vergleich Reports[0] vs Reports[1] — bei 3+: alle 3.
+
+    Returns: (score 0-100 oder None, sample_size 0-3)
+    """
+    with conn.cursor() as cur:
+        cur.execute(
+            """SELECT r.policy_id_distinct
+                 FROM reports r
+                 JOIN orders o ON o.id = r.order_id
+                WHERE o.subscription_id = %s
+                  AND r.policy_id_distinct IS NOT NULL
+                ORDER BY r.created_at DESC
+                LIMIT 3""",
+            (subscription_id,),
+        )
+        rows = cur.fetchall()
+    sets = [set(r[0] or []) for r in rows if r[0]]
+    if len(sets) < 2:
+        return (None, len(sets))
+    intersection = set.intersection(*sets)
+    union = set.union(*sets)
+    if not union:
+        return (None, len(sets))
+    score = round(len(intersection) / len(union) * 100, 2)
+    return (score, len(sets))
+
+
 def _determine_trend(conn, subscription_id: str, current_score: float) -> str:
     """Trend-Richtung relativ zum letzten posture_history-Snapshot.
 
@@ -386,21 +421,27 @@ def _do_aggregate(conn, order_id, subscription_id, findings):
         score = _calculate_posture_score(open_counts)
         trend = _determine_trend(conn, subscription_id, score)
 
+        # D1: Determinismus-KPI ueber die letzten 3 Scans der Subscription
+        det_score, det_sample = _calculate_determinism_score(conn, subscription_id)
+
         # Upsert subscription_posture
         cur.execute(
             """INSERT INTO subscription_posture
                  (subscription_id, last_scan_order_id, last_aggregated_at,
-                  severity_counts, posture_score, trend_direction, updated_at)
-               VALUES (%s, %s, NOW(), %s, %s, %s, NOW())
+                  severity_counts, posture_score, trend_direction,
+                  determinism_score, determinism_sample_size, updated_at)
+               VALUES (%s, %s, NOW(), %s, %s, %s, %s, %s, NOW())
                ON CONFLICT (subscription_id) DO UPDATE SET
                   last_scan_order_id = EXCLUDED.last_scan_order_id,
                   last_aggregated_at = EXCLUDED.last_aggregated_at,
                   severity_counts = EXCLUDED.severity_counts,
                   posture_score = EXCLUDED.posture_score,
                   trend_direction = EXCLUDED.trend_direction,
+                  determinism_score = EXCLUDED.determinism_score,
+                  determinism_sample_size = EXCLUDED.determinism_sample_size,
                   updated_at = NOW()""",
             (subscription_id, order_id, json.dumps(severity_counts),
-             score, trend),
+             score, trend, det_score, det_sample),
         )
 
         # posture_history-Snapshot

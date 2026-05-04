@@ -581,6 +581,31 @@ Antworte NUR mit validem JSON:
 # Main QA pipeline
 # ---------------------------------------------------------------------------
 
+def _check_title_template(findings: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Check #9: Findings mit policy_id sollten einen deterministischen
+    Title aus TITLE_TEMPLATES haben (Determinismus).
+
+    Triggert wenn ein Finding policy_id hat aber `_title_template_missing`
+    Flag (gesetzt von title_policy.apply_title_template wenn Template fehlt).
+    """
+    issues: list[dict[str, Any]] = []
+    for f in findings:
+        if not f.get("policy_id"):
+            continue
+        if f.get("_title_template_missing"):
+            issues.append({
+                "check": "title_template",
+                "finding_id": f.get("id"),
+                "issue": (
+                    f"policy_id={f.get('policy_id')} hat kein Title-Template — "
+                    f"Title bleibt KI-frei und ist nicht reproduzierbar."
+                ),
+                "auto_fix": False,
+                "severity": "info",
+            })
+    return issues
+
+
 def run_qa_checks(
     claude_result: dict[str, Any],
     package: str = "perimeter",
@@ -610,6 +635,7 @@ def run_qa_checks(
     all_issues.extend(_check_cwe_semantic(findings))
     all_issues.extend(_check_positive_contradictions(
         findings, claude_result.get("positive_findings", [])))
+    all_issues.extend(_check_title_template(findings))
 
     # Apply auto-fixes
     auto_fixes = _apply_auto_fixes(claude_result, all_issues)
@@ -644,6 +670,7 @@ def run_qa_checks(
             "nis2_mapping",
             "cwe_semantic",
             "positive_contradictions",
+            "title_template",
         ],
     }
 

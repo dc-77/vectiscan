@@ -680,11 +680,28 @@ def call_claude(
         user_content_blocks = [{"type": "text", "text": user_prompt}]
     messages_payload = [{"role": "user", "content": user_content_blocks}]
 
-    # Cache-Key (M1, 2026-05-01): Order-Scope wenn order_id vorliegt — dann
-    # haengt der Hash NICHT mehr am consolidated_findings-Text und Re-Scans /
-    # regenerate-report derselben Order liefern garantiert byte-identisch.
-    # Ohne order_id: legacy Inhalts-Hash (kommt praktisch nicht mehr vor).
-    cache_k = build_cache_key(
+    # Cache-Key 3-stufig (A2, 2026-05-04):
+    #   1. content_hash (Order-uebergreifend) — Hit wenn Tool-Outputs identisch
+    #   2. order_scope (M1) — Hit garantiert bei regenerate-report
+    #   3. input_hash (Legacy)
+    # Beim Lookup probieren wir 1 → 2; beim Save schreiben wir BEIDE Keys.
+    from reporter.ai_cache import compute_content_hash
+    content_hash_val = compute_content_hash(
+        system_prompt,
+        json.dumps(host_inventory, sort_keys=True, ensure_ascii=False),
+        json.dumps(tech_profiles, sort_keys=True, ensure_ascii=False),
+        consolidated_findings,
+    )
+    cache_k_content = build_cache_key(
+        model=model,
+        system=system_prompt,
+        messages=messages_payload,
+        temperature=0.0,
+        max_tokens=max_tokens,
+        namespace=REPORTER_CACHE_NAMESPACE,
+        content_hash=content_hash_val,
+    )
+    cache_k_order = build_cache_key(
         model=model,
         system=system_prompt,
         messages=messages_payload,
@@ -692,7 +709,9 @@ def call_claude(
         max_tokens=max_tokens,
         namespace=REPORTER_CACHE_NAMESPACE,
         order_scope=order_id or None,
-    )
+    ) if order_id else cache_k_content
+    # Primaerer Save-Key bleibt order_scope (oder content_hash wenn keine Order)
+    cache_k = cache_k_order
 
     # Populate debug info (prompts are constant across retries)
     if debug_info is not None:
@@ -701,6 +720,7 @@ def call_claude(
         debug_info["package"] = package
         debug_info["domain"] = domain
         debug_info["cache_key"] = cache_k[:24]
+        debug_info["cache_key_content"] = cache_k_content[:24]
 
     # Retry logic: 5 attempts with exponential backoff for transient errors
     response_text: str | None = None
@@ -711,11 +731,18 @@ def call_claude(
         try:
             # Cache-Lookup nur beim ERSTEN Versuch — bei JSON-Parse-Fehler
             # invalidieren wir und greifen ab da live durch.
-            cache_entry = (
-                get_cached_response(cache_k)
-                if attempt == 0 and not cache_hit_consumed
-                else None
-            )
+            # A2: 2-Stufen-Lookup — content_hash (Order-uebergreifend) zuerst,
+            # order_scope als Fallback fuer regenerate-report.
+            cache_entry = None
+            cache_hit_kind = "miss"
+            if attempt == 0 and not cache_hit_consumed:
+                cache_entry = get_cached_response(cache_k_content)
+                if cache_entry is not None:
+                    cache_hit_kind = "content_hash"
+                elif cache_k_order != cache_k_content:
+                    cache_entry = get_cached_response(cache_k_order)
+                    if cache_entry is not None:
+                        cache_hit_kind = "order_scope"
 
             if cache_entry is not None:
                 cache_hit_consumed = True
@@ -733,9 +760,11 @@ def call_claude(
                     "output_cost_usd": round((output_tokens / 1_000_000) * prices["output"], 4),
                     "total_cost_usd": round(stats.cost_estimated_usd, 4),
                     "cache_hit": True,
+                    "cache_hit_kind": cache_hit_kind,
                     "cache_age_seconds": stats.age_seconds,
                 }
                 log.info("claude_cache_hit", domain=domain, model=model,
+                         hit_kind=cache_hit_kind,
                          age_s=round(stats.age_seconds or 0, 1))
             else:
                 log.info("claude_api_call", attempt=attempt + 1, domain=domain,
@@ -876,15 +905,21 @@ def call_claude(
                 positive=len(result.get("positive_findings", [])),
             )
             # Cache-Write nur bei Live-Call und erfolgreichem Parse.
+            # A2: BEIDE Keys schreiben — content_hash (Order-uebergreifend)
+            # + order_scope (regenerate-report). Bei Cache-Hit ist content_hash
+            # schon in Redis, order_scope-Key wird trotzdem gesetzt fuer
+            # garantierten regenerate-Hit.
             if not cost_info.get("cache_hit") and response_text:
-                set_cached_response(
-                    cache_k,
+                save_kwargs = dict(
                     response_text=response_text,
                     model=model,
                     input_tokens=input_tokens,
                     output_tokens=output_tokens,
                     cache_ttl_seconds=REPORTER_CACHE_TTL_SECONDS,
                 )
+                set_cached_response(cache_k_content, **save_kwargs)
+                if cache_k_order != cache_k_content:
+                    set_cached_response(cache_k_order, **save_kwargs)
 
             # Post-process validation pipeline:
             # 1. Cap implausible scores (e.g. robots.txt with CVSS 7.0)

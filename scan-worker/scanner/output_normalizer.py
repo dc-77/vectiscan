@@ -117,11 +117,205 @@ def normalize_dnsx(raw: Optional[str]) -> Optional[str]:
     return '\n'.join(out)
 
 
+# ============================================================
+# nmap (XML-Output): sortiert nach Port; strippt Laufzeit-Felder
+# ============================================================
+_NMAP_VOLATILE_ATTRS = re.compile(
+    r'\s+(?:start|startstr|end|endstr|elapsed|reason_ttl|extrareasons|'
+    r'extraports|scaninfo)="[^"]*"'
+)
+
+
+def normalize_nmap(raw: Optional[str]) -> Optional[str]:
+    """nmap-XML: strippt zeitabhaengige Attribute (start/end/elapsed/ttl).
+
+    Sortiert <port>-Elemente nicht (XML-Reihenfolge ist semantisch).
+    Fuer JSON-konvertierte Outputs siehe parser.py — diese Funktion arbeitet
+    nur am rohen XML/Text-Output von `nmap -oX`.
+    """
+    if not raw:
+        return raw
+    s = _NMAP_VOLATILE_ATTRS.sub('', raw)
+    # nmap-Header "Starting Nmap 7.94 ( https://nmap.org ) at 2026-..."
+    s = re.sub(r'\s+at\s+\d{4}-\d{2}-\d{2}[^\n"]*', '', s)
+    # Footer "Nmap done: 1 IP address (1 host up) scanned in 4.23 seconds"
+    s = re.sub(r'(?im)^.*scanned in\s+\d+\.\d+\s+seconds\s*$\n?', '', s)
+    return s
+
+
+# ============================================================
+# zap (JSON-Alerts): sortiert nach (pluginId, url, riskcode); strippt IDs
+# ============================================================
+_ZAP_VOLATILE_KEYS = ("alertId", "sourceid", "messageId", "id", "alertRef")
+
+
+def normalize_zap(raw: Optional[str]) -> Optional[str]:
+    """ZAP-JSON-Alerts: sortiert nach (pluginId, url, riskcode); strippt
+    scan-spezifische IDs (alertId, sourceid, messageId).
+    """
+    if not raw:
+        return raw
+    try:
+        data = json.loads(raw)
+    except Exception:
+        return raw
+
+    def _scrub(item: dict) -> dict:
+        out = {k: v for k, v in item.items() if k not in _ZAP_VOLATILE_KEYS}
+        return out
+
+    if isinstance(data, list):
+        scrubbed = [_scrub(it) if isinstance(it, dict) else it for it in data]
+        scrubbed.sort(
+            key=lambda x: (
+                str(x.get("pluginId", "")) if isinstance(x, dict) else "",
+                str(x.get("url", "")) if isinstance(x, dict) else "",
+                int(x.get("riskcode", 0)) if isinstance(x, dict) else 0,
+            )
+        )
+        return json.dumps(scrubbed, indent=2, sort_keys=True, ensure_ascii=False)
+    if isinstance(data, dict):
+        # Top-Level "alerts"-Wrapper
+        if isinstance(data.get("alerts"), list):
+            data["alerts"] = sorted(
+                [_scrub(it) if isinstance(it, dict) else it for it in data["alerts"]],
+                key=lambda x: (
+                    str(x.get("pluginId", "")) if isinstance(x, dict) else "",
+                    str(x.get("url", "")) if isinstance(x, dict) else "",
+                ),
+            )
+        return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
+    return raw
+
+
+# ============================================================
+# nuclei (JSONL): sortiert nach (template-id, matched-at); strippt timestamp
+# ============================================================
+_NUCLEI_VOLATILE_KEYS = ("timestamp", "curl-command", "request-id")
+
+
+def normalize_nuclei(raw: Optional[str]) -> Optional[str]:
+    """nuclei-JSONL: pro Zeile timestamp/curl-command strippen, dann
+    Zeilen nach (template-id, matched-at) sortieren.
+    """
+    if not raw:
+        return raw
+    parsed: list[tuple[tuple[str, str], dict]] = []
+    other: list[str] = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            obj = json.loads(line)
+        except Exception:
+            other.append(line)
+            continue
+        for k in _NUCLEI_VOLATILE_KEYS:
+            obj.pop(k, None)
+        # info.timestamp etc. auch
+        if isinstance(obj.get("info"), dict):
+            obj["info"].pop("timestamp", None)
+        key = (str(obj.get("template-id", "")), str(obj.get("matched-at", "")))
+        parsed.append((key, obj))
+    parsed.sort(key=lambda x: x[0])
+    out = [json.dumps(o, sort_keys=True, ensure_ascii=False) for _, o in parsed]
+    out.extend(sorted(other))
+    return '\n'.join(out)
+
+
+# ============================================================
+# nikto (JSON oder Plain-Text): sortiert nach (id, url)
+# ============================================================
+_NIKTO_VOLATILE_KEYS = ("scanstart", "scanend", "elapsed", "errors")
+
+
+def normalize_nikto(raw: Optional[str]) -> Optional[str]:
+    """nikto-Output: bei JSON sortiere `vulnerabilities` nach (id, url),
+    strippt scanstart/scanend/elapsed.
+    """
+    if not raw:
+        return raw
+    # Versuche JSON-Parse (nikto -Format json)
+    try:
+        data = json.loads(raw)
+    except Exception:
+        # Plain-Text-Fallback: Findings sortieren, Zeitstempel-Zeilen weg
+        lines = raw.splitlines()
+        # ALLE Zeilen die wie Zeitstempel/Statistik aussehen vorab raus
+        time_re = re.compile(r'(?i)\b(start time|end time|elapsed|host\(s\) tested)\b')
+        clean = [l for l in lines if not time_re.search(l)]
+        finding_lines = sorted(l for l in clean if l.startswith('+ '))
+        other_lines = [l for l in clean if not l.startswith('+ ')]
+        return '\n'.join(other_lines + finding_lines)
+
+    # JSON-Pfad
+    if isinstance(data, dict):
+        for k in _NIKTO_VOLATILE_KEYS:
+            data.pop(k, None)
+        vulns = data.get("vulnerabilities")
+        if isinstance(vulns, list):
+            data["vulnerabilities"] = sorted(
+                vulns,
+                key=lambda v: (
+                    str(v.get("id", "")) if isinstance(v, dict) else "",
+                    str(v.get("url", "")) if isinstance(v, dict) else "",
+                ),
+            )
+        return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
+    return raw
+
+
+# ============================================================
+# wpscan (JSON): sortiert plugins/themes/users nach Slug
+# ============================================================
+_WPSCAN_VOLATILE_KEYS = ("start_time", "stop_time", "elapsed", "requests_done",
+                          "cached_requests", "data_sent", "data_received",
+                          "used_memory", "scan_aborted")
+
+
+def normalize_wpscan(raw: Optional[str]) -> Optional[str]:
+    """wpscan-JSON: strippt Laufzeit-Statistiken; sortiert plugins/themes
+    alphabetisch nach Slug.
+    """
+    if not raw:
+        return raw
+    try:
+        data = json.loads(raw)
+    except Exception:
+        return raw
+    if not isinstance(data, dict):
+        return raw
+
+    for k in _WPSCAN_VOLATILE_KEYS:
+        data.pop(k, None)
+
+    # plugins/themes sind {slug: {...}} → konvertiere zu sortierter Liste-im-Dict
+    for collection in ("plugins", "themes"):
+        coll = data.get(collection)
+        if isinstance(coll, dict):
+            # Sortiert serialisieren via sort_keys (json.dumps mit sort_keys=True)
+            # zusaetzlich strippen wir interne timestamps in nested dicts
+            for slug, info in coll.items():
+                if isinstance(info, dict):
+                    info.pop("found_by", None)  # variiert pro Lauf
+
+    return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
+
+
 # Mapping tool_name -> normalizer
 _NORMALIZERS = {
     'httpx': normalize_httpx,
     'wafw00f': normalize_wafw00f,
     'dnsx': normalize_dnsx,
+    'nmap': normalize_nmap,
+    'zap': normalize_zap,
+    'zap_active': normalize_zap,
+    'zap_alerts': normalize_zap,
+    'zap_passive': normalize_zap,
+    'nuclei': normalize_nuclei,
+    'nikto': normalize_nikto,
+    'wpscan': normalize_wpscan,
 }
 
 
@@ -145,4 +339,9 @@ __all__ = [
     "normalize_httpx",
     "normalize_wafw00f",
     "normalize_dnsx",
+    "normalize_nmap",
+    "normalize_zap",
+    "normalize_nuclei",
+    "normalize_nikto",
+    "normalize_wpscan",
 ]

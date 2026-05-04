@@ -56,13 +56,31 @@ def cache_key(*,
               max_tokens: int = 8192,
               namespace: str = "default",
               order_scope: Optional[str] = None,
-              host_scope: Optional[str] = None) -> str:
-    """Order-Scope-Mode (M1): wenn order_scope gesetzt, basiert der Hash NUR
-    auf (namespace, order_scope, host_scope?, policy_version, cache_version).
-    Re-Scans / regenerate-report derselben Order treffen so garantiert den
-    Cache. Ohne order_scope: legacy Inhalts-Hash."""
-    if order_scope is not None:
+              host_scope: Optional[str] = None,
+              content_hash: Optional[str] = None) -> str:
+    """3-Modi-Cache-Key:
+
+    - **content_hash** (A2, hoechste Prio): Hash basiert auf
+      `(namespace, model, content_hash, policy_version)`. Order-uebergreifend
+      reproduzierbar wenn die normalisierten Tool-Outputs identisch sind.
+      Reporter berechnet den Hash aus consolidated_findings + host_inventory
+      + tech_profiles.
+    - **order_scope** (M1): Hash unabhaengig vom Inhalt — Re-Scans /
+      regenerate-report derselben Order treffen garantiert.
+    - **input_hash** (Legacy): Hash ueber Prompt-Inhalt — empfindlich auf
+      Tool-Output-Drift.
+    """
+    if content_hash is not None:
         payload: dict = {
+            "mode": "content_hash",
+            "namespace": namespace,
+            "model": model,
+            "content_hash": content_hash,
+            "policy_version": POLICY_VERSION,
+            "cache_version": CACHE_VERSION,
+        }
+    elif order_scope is not None:
+        payload = {
             "mode": "order_scope",
             "namespace": namespace,
             "order_scope": order_scope,
@@ -87,6 +105,18 @@ def cache_key(*,
     serialized = _canonicalize(payload)
     h = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
     return f"ai_cache:{namespace}:{h}"
+
+
+def compute_content_hash(*pieces: str) -> str:
+    """Hilfs-Hash ueber beliebige Strings (consolidated_findings + tech_profile etc.)
+    fuer A2 Sekundaer-Cache-Key. Stabil bei identischen Inputs."""
+    h = hashlib.sha256()
+    for p in pieces:
+        if p is None:
+            continue
+        h.update(b"\x00")  # Trennzeichen
+        h.update(str(p).encode("utf-8", errors="replace"))
+    return h.hexdigest()[:32]  # 32 chars = ausreichend
 
 
 @dataclass

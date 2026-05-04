@@ -30,6 +30,7 @@ const MIGRATION_020_PATH = path.join(__dirname, '..', 'migrations', '020_subscri
 const MIGRATION_021_PATH = path.join(__dirname, '..', 'migrations', '021_vpn_strategy.sql');
 const MIGRATION_022_PATH = path.join(__dirname, '..', 'migrations', '022_ai_call_costs.sql');
 const MIGRATION_023_PATH = path.join(__dirname, '..', 'migrations', '023_consolidated_findings_vhost.sql');
+const MIGRATION_024_PATH = path.join(__dirname, '..', 'migrations', '024_determinism_kpi.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -297,6 +298,18 @@ export async function initDb(): Promise<void> {
   `);
   if (!vhost023Check.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_023_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 024: subscription_posture.determinism_score (Drift-KPI).
+  const det024Check = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.columns
+      WHERE table_name = 'subscription_posture' AND column_name = 'determinism_score'
+    ) AS exists
+  `);
+  if (!det024Check.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_024_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

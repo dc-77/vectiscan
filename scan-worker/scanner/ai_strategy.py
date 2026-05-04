@@ -124,7 +124,8 @@ def _call_haiku(system_prompt: str, user_prompt: str,
                 cache_ttl_seconds: int = 24 * 3600,
                 order_id: str | None = None,
                 order_scope: str | None = None,
-                host_scope: str | None = None) -> dict[str, Any]:
+                host_scope: str | None = None,
+                content_hash: str | None = None) -> dict[str, Any]:
     """Cached Haiku-Call mit temperature=0.
 
     On failure, returns {"_error": "reason"} so callers can include the
@@ -150,6 +151,7 @@ def _call_haiku(system_prompt: str, user_prompt: str,
         cache_namespace=cache_namespace,
         order_scope=order_scope,
         host_scope=host_scope,
+        content_hash=content_hash,
     )
     duration_ms = int((time.monotonic() - start) * 1000)
 
@@ -289,12 +291,23 @@ Entscheide für jeden Host: scan oder skip?
 Antwort im Format:
 {HOST_STRATEGY_SCHEMA}"""
 
+    # C2: content_hash aus (domain, hosts, dns_findings) — Order-uebergreifend
+    # cache hit wenn host_inventory identisch ist (Subdomain-Snapshot + Tool-
+    # Output-Normalizer sorgen dafuer).
+    from scanner.ai_cache import compute_content_hash
+    ch = compute_content_hash(
+        domain, package,
+        json.dumps(hosts, sort_keys=True, ensure_ascii=False),
+        json.dumps(dns_findings, sort_keys=True, ensure_ascii=False),
+    )
+
     result = _call_haiku(
         HOST_STRATEGY_SYSTEM, user_prompt,
         cache_namespace="ki1_host_strategy",
         cache_ttl_seconds=CACHE_TTL_HOST_STRATEGY,
         order_scope=order_id or None,
         order_id=order_id,
+        content_hash=ch,
     )
 
     # Save full AI debug (system prompt + user prompt + raw response)
@@ -599,7 +612,34 @@ def plan_phase2_config(
     package: str,
     order_id: str = "",
 ) -> dict[str, Any]:
-    """Use Haiku to configure Phase 2 tools based on discovered tech stack."""
+    """Use Haiku to configure Phase 2 tools based on discovered tech stack.
+
+    C1 (Mai 2026): vorher deterministische Rule-Engine pruefen — wenn
+    eindeutiger Match (WordPress+kein-WAF, CF-WAF, SPA, etc.), kein
+    KI-Call notwendig. Spart ~$0.024/Order und garantiert reproduzierbare
+    Configs ueber wiederholte Scans.
+    """
+    # C1: Rule-Engine zuerst
+    from scanner.phase2_config_rules import try_rule_based_config
+    rule_result = try_rule_based_config(
+        tech_profile, package, host_inventory.get("domain", ""),
+    )
+    if rule_result is not None:
+        log.info("phase2_config_rule_based",
+                 ip=tech_profile.get("ip"),
+                 reason=rule_result.get("reasoning", ""))
+        # Save rule-based config als pseudo-debug fuer Audit
+        if order_id:
+            from scanner.tools import _save_result
+            _save_result(
+                order_id=order_id,
+                host_ip=tech_profile.get("ip"),
+                phase=1,
+                tool_name="ai_phase2_config_rule_based",
+                raw_output=json.dumps(rule_result, indent=2, ensure_ascii=False),
+                exit_code=0, duration_ms=0,
+            )
+        return rule_result
 
     # Build enriched input: tech profile + CMS details + Shodan services
     enriched_profile = {**tech_profile}
@@ -687,7 +727,8 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384,
                  order_scope: str | None = None,
                  host_scope: str | None = None,
                  order_id: str | None = None,
-                 thinking_budget: int | None = None) -> dict[str, Any]:
+                 thinking_budget: int | None = None,
+                 content_hash: str | None = None) -> dict[str, Any]:
     """Cached Sonnet-Call mit temperature=0.
 
     Used for Phase 3 cross-tool correlation where Haiku's reasoning
@@ -709,6 +750,7 @@ def _call_sonnet(system_prompt: str, user_prompt: str, max_tokens: int = 16384,
         order_scope=order_scope,
         host_scope=host_scope,
         thinking_budget=thinking_budget,
+        content_hash=content_hash,
     )
     duration_ms = int((time.monotonic() - start) * 1000)
 
@@ -790,6 +832,34 @@ def plan_phase3_prioritization(
     Returns:
         Prioritized finding list with confidence scores.
     """
+    # C3: Optionalitaetsgate — KI #4 ist der teuerste Scanner-Call (~$0.12).
+    # Skip wenn Cross-Tool-Korrelation keinen Mehrwert bringt:
+    #   - <5 Findings: zu wenig Daten fuer Konsens
+    #   - alle Findings vom selben Tool: kein Cross-Tool moeglich
+    #   - keine CVE-Findings: Threat-Intel-Lookup unnoetig
+    SKIP_THRESHOLD = 5
+    tools_seen = {f.get("tool") for f in (finding_summary or [])} - {None, ""}
+    has_cve = any(f.get("cve") or f.get("cve_id") for f in (finding_summary or []))
+    if (
+        len(finding_summary or []) < SKIP_THRESHOLD
+        or len(tools_seen) <= 1
+        or not has_cve
+    ):
+        log.info("ai_phase3_skipped_optional",
+                 finding_count=len(finding_summary or []),
+                 tool_count=len(tools_seen),
+                 has_cve=has_cve,
+                 reason="optionality_gate")
+        return {
+            "confidence_scores": [],
+            "strategy_notes": (
+                f"[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: "
+                f"findings={len(finding_summary or [])} < {SKIP_THRESHOLD} ODER "
+                f"tools={len(tools_seen)} <= 1 ODER cve={has_cve}"
+            ),
+            "_skipped_by_gate": True,
+        }
+
     # Truncate finding summary to avoid excessive token usage
     summary_truncated = finding_summary[:100]
 
@@ -894,6 +964,13 @@ Antwort im Format:
             use_tools = False
 
     if not use_tools:
+        # C2: content_hash aus (findings_summary, tech_profiles, has_waf)
+        from scanner.ai_cache import compute_content_hash
+        ki4_ch = compute_content_hash(
+            json.dumps(summary_truncated, sort_keys=True, ensure_ascii=False),
+            json.dumps(tech_profiles, sort_keys=True, ensure_ascii=False),
+            "waf:1" if has_waf else "waf:0",
+        )
         result = _call_sonnet(
             PHASE3_SYSTEM, user_prompt,
             max_tokens=24576,
@@ -902,6 +979,7 @@ Antwort im Format:
             order_scope=order_id or None,
             order_id=order_id,
             thinking_budget=8192,
+            content_hash=ki4_ch,
         )
 
     # Save full AI debug

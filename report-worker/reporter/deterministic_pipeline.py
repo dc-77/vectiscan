@@ -177,7 +177,21 @@ def apply_deterministic_pipeline(claude_output: dict,
     claude_output["findings"] = _writeback_to_claude(
         findings_in, normalized, sel.selected,
     )
+
+    # 5b. Title-Templates pro policy_id anwenden (Determinismus)
+    # Eliminiert KI-Wording-Drift ueber wiederholte Scans.
+    from reporter.title_policy import apply_titles
+    title_overridden = apply_titles(
+        claude_output["findings"],
+        scan_context={"domain": domain, **sc},
+    )
+    if title_overridden:
+        log.info("title_templates_applied", count=title_overridden,
+                 total=len(claude_output["findings"]))
+
     # Additional als separate Liste behalten (fuer „weitere Befunde"-Anhang)
+    # Title-Templates auch fuer additional anwenden (fuer Anhang-Konsistenz)
+    apply_titles(sel.additional, scan_context={"domain": domain, **sc})
     claude_output["additional_findings_summary"] = [
         {
             "id": f.get("finding_id"),

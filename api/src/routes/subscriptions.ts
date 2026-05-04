@@ -437,7 +437,8 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
 
       const res = await query(
         `SELECT subscription_id, last_scan_order_id, last_aggregated_at,
-                severity_counts, posture_score, trend_direction, updated_at
+                severity_counts, posture_score, trend_direction,
+                determinism_score, determinism_sample_size, updated_at
            FROM subscription_posture
           WHERE subscription_id = $1`,
         [id],
@@ -453,6 +454,8 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
             severityCounts: { open: { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, INFO: 0 }, total_open: 0 },
             postureScore: null,
             trendDirection: 'unknown',
+            determinismScore: null,
+            determinismSampleSize: 0,
             updatedAt: null,
           },
         };
@@ -465,6 +468,8 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
           lastScanOrderId: r.last_scan_order_id,
           lastAggregatedAt: r.last_aggregated_at,
           severityCounts: r.severity_counts,
+          determinismScore: r.determinism_score != null ? Number(r.determinism_score) : null,
+          determinismSampleSize: r.determinism_sample_size ?? 0,
           postureScore: r.posture_score != null ? Number(r.posture_score) : null,
           trendDirection: r.trend_direction,
           updatedAt: r.updated_at,

@@ -367,8 +367,6 @@ function HomeContent() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-4xl space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />
-
             <div className="bg-[#0F172A] border border-gray-800 rounded-lg p-5">
               <TargetInput
                 value={targets}
@@ -376,6 +374,8 @@ function HomeContent() {
                 disabled={submitting}
               />
             </div>
+
+            <PackageSelector selected={selectedPackage} onSelect={setSelectedPackage} />
 
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <p className="text-xs" style={{ color: '#64748B' }}>

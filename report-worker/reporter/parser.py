@@ -637,7 +637,9 @@ def _consolidate_findings(all_findings: list[dict[str, Any]]) -> str:
     carry a ``"host"`` key (set during ``parse_scan_data``).
     """
     # --- Deduplicate ---
-    seen: set[tuple[str, str]] = set()
+    # A4 (Mai 2026): vhost ist Teil des Dedup-Keys, damit Findings auf
+    # verschiedenen VHosts derselben IP nicht zu einem reduziert werden.
+    seen: set[tuple[str, str, str]] = set()
     unique: list[dict[str, Any]] = []
 
     for f in all_findings:
@@ -649,7 +651,8 @@ def _consolidate_findings(all_findings: list[dict[str, Any]]) -> str:
             or f.get("msg")
             or f.get("id", "")
         )
-        key = (tool, title)
+        vhost = f.get("vhost") or ""
+        key = (tool, title, vhost)
         if key in seen:
             continue
         seen.add(key)
@@ -681,6 +684,11 @@ def _consolidate_findings(all_findings: list[dict[str, Any]]) -> str:
             )
             lines.append(f"  [{severity}] ({tool}) {title}")
 
+            # A4: vhost durchreichen wenn vorhanden — Multi-VHost-Probe (Mai 2026)
+            # KI #5 soll Findings pro VHost als separate Treffer behandeln.
+            vhost_val = f.get("vhost")
+            if vhost_val and vhost_val != host:
+                lines.append(f"    vhost: {vhost_val}")
             if f.get("matched_at"):
                 lines.append(f"    matched-at: {f['matched_at']}")
             if f.get("description"):

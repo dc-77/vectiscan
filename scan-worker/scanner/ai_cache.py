@@ -70,6 +70,21 @@ def _canonicalize(obj: Any) -> str:
                       ensure_ascii=False, default=str)
 
 
+def compute_content_hash(*pieces: str) -> str:
+    """Hilfs-Hash ueber beliebige Strings fuer Sekundaer-Cache (C2).
+
+    Stabil bei identischen Inputs ueber Order-Grenzen hinweg —
+    Voraussetzung: Tool-Outputs sind via output_normalizer normalisiert.
+    """
+    h = hashlib.sha256()
+    for p in pieces:
+        if p is None:
+            continue
+        h.update(b"\x00")
+        h.update(str(p).encode("utf-8", errors="replace"))
+    return h.hexdigest()[:32]
+
+
 def cache_key(*,
               model: str,
               system: str,
@@ -79,7 +94,8 @@ def cache_key(*,
               max_tokens: int = 8192,
               namespace: str = "default",
               order_scope: Optional[str] = None,
-              host_scope: Optional[str] = None) -> str:
+              host_scope: Optional[str] = None,
+              content_hash: Optional[str] = None) -> str:
     """Deterministischer Cache-Key.
 
     Zwei Modi:
@@ -105,8 +121,22 @@ def cache_key(*,
        laeuft sowieso ab, und beim regenerate-report ist die DB ja
        eingefroren.
     """
-    if order_scope is not None:
+    # 3-Stufen Cache-Key (C2 erweitert M1):
+    #   1. content_hash (Order-uebergreifend) — hoechste Prio
+    #   2. order_scope (M1) — Re-Scans/regenerate-report
+    #   3. input_hash (Legacy)
+    if content_hash is not None:
         payload: dict[str, Any] = {
+            "mode": "content_hash",
+            "namespace": namespace,
+            "model": model,
+            "content_hash": content_hash,
+            "host_scope": host_scope,
+            "policy_version": POLICY_VERSION,
+            "cache_version": CACHE_VERSION,
+        }
+    elif order_scope is not None:
+        payload = {
             "mode": "order_scope",
             "namespace": namespace,
             "order_scope": order_scope,
@@ -280,6 +310,7 @@ def cached_call(*,
                 cache_namespace: str = "default",
                 order_scope: Optional[str] = None,
                 host_scope: Optional[str] = None,
+                content_hash: Optional[str] = None,
                 anthropic_client: Any = None,
                 thinking_budget: Optional[int] = None,
                 ) -> tuple[dict, CacheStats]:
@@ -298,19 +329,35 @@ def cached_call(*,
     regenerate-report derselben Order treffen GARANTIERT den Cache.
     `host_scope` zusaetzlich fuer per-host-Calls (KI #3 Phase-2-Config).
     """
-    key = cache_key(
+    # C2: Sekundaer-Cache content_hash hat Vorrang vor order_scope
+    primary_key = cache_key(
         model=model, system=system, messages=messages, tools=tools,
         temperature=temperature, max_tokens=max_tokens, namespace=cache_namespace,
-        order_scope=order_scope, host_scope=host_scope,
+        order_scope=order_scope, host_scope=host_scope, content_hash=content_hash,
     )
+    fallback_key = None
+    if content_hash is not None and order_scope is not None:
+        fallback_key = cache_key(
+            model=model, system=system, messages=messages, tools=tools,
+            temperature=temperature, max_tokens=max_tokens, namespace=cache_namespace,
+            order_scope=order_scope, host_scope=host_scope,
+        )
+    key = primary_key
     short_key = key[:24]
 
-    # 1) Cache lookup
+    # 1) Cache lookup — content_hash zuerst, dann order_scope-Fallback
     r = _get_redis()
     raw = None
+    cache_hit_kind = "content_hash" if content_hash is not None else (
+        "order_scope" if order_scope is not None else "input_hash")
     if r is not None:
         try:
-            raw = r.get(key)
+            raw = r.get(primary_key)
+            if raw is None and fallback_key is not None:
+                raw = r.get(fallback_key)
+                if raw is not None:
+                    cache_hit_kind = "order_scope_fallback"
+                    short_key = fallback_key[:24]
         except Exception as exc:
             log.warning("ai_cache_get_failed", error=str(exc), key=short_key)
             raw = None
@@ -434,6 +481,9 @@ def cached_call(*,
         }
         try:
             r.setex(key, cache_ttl_seconds, _canonicalize(entry))
+            # C2: bei content_hash + order_scope BEIDE schreiben
+            if fallback_key is not None and fallback_key != key:
+                r.setex(fallback_key, cache_ttl_seconds, _canonicalize(entry))
         except Exception as exc:
             log.warning("ai_cache_set_failed", error=str(exc), key=short_key)
 

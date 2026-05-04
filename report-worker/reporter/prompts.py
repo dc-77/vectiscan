@@ -72,6 +72,7 @@ Antworte ausschließlich in JSON nach folgendem Schema:
     {{
       "id": "VS-{_CURRENT_YEAR}-001",
       "title": "Kurzer, verständlicher Titel",
+      "title_vars": {{"host": "beispiel.de", "port": "443"}},
       "severity": "HIGH",
       "cvss_score": "7.5",
       "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
@@ -94,6 +95,11 @@ Antworte ausschließlich in JSON nach folgendem Schema:
     }}
   ]
 }}
+
+TITLE_VARS: Liefere ein Dict mit Schluessel-Variablen (host, domain, port,
+tech, cve_id, cookie_name, p_value für DMARC, etc.). Diese werden in deter-
+ministische Title-Templates eingesetzt — ueberschreibt deinen 'title' wenn
+eine policy_id zugeordnet wird, fuer reproduzierbare Titel ueber Re-Scans.
 """
 
 
@@ -208,6 +214,7 @@ Antworte ausschließlich in JSON nach folgendem Schema:
     {{
       "id": "VS-{_CURRENT_YEAR}-001",
       "title": "Kurzer, präziser Titel",
+      "title_vars": {{"host": "beispiel.de", "port": "3306", "tech": "MariaDB"}},
       "severity": "CRITICAL|HIGH|MEDIUM|LOW|INFO",
       "cvss_score": "8.6",
       "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:L",
@@ -234,6 +241,26 @@ Antworte ausschließlich in JSON nach folgendem Schema:
     }}
   ]
 }}
+
+TITLE_VARS — Determinismus-Vorgabe:
+Liefere pro Finding ein 'title_vars'-Dict mit den Schluesselvariablen die in
+den deterministischen Title-Templates verwendet werden. Beispiele:
+- host (FQDN, z.B. "ose.heuel.com" oder "heuel.com")
+- domain (Root-Domain, z.B. "heuel.com")
+- port (z.B. "3306", "443")
+- tech (z.B. "MariaDB", "WordPress 6.2.1", "Nginx 1.24")
+- version (z.B. "1.24.0")
+- cve_id (z.B. "CVE-2024-12345"), cvss (z.B. "8.6")
+- cookie_name (z.B. "JSESSIONID")
+- library (z.B. "jQuery 1.12.4"), plugin (z.B. "contact-form-7")
+- p_value (DMARC-Policy-Wert: "quarantine", "none")
+- private_ip, days (Cert-Ablauf), directive (CSP-Direktive)
+
+WICHTIG: Title-Templates ueberschreiben deinen 'title' deterministisch wenn
+eine policy_id zugeordnet wird (z.B. SP-DNS-010 fuer DMARC-quarantine →
+"DMARC-Policy 'quarantine' statt 'reject' fuer {{domain}}"). Damit erhalten
+wir konsistente Titel ueber wiederholte Scans hinweg. Daher sind die
+title_vars wichtiger als die freie Titel-Formulierung.
 
 BSI TR-03116-4 COMPLIANCE:
 Der Report enthält eine automatisch generierte Sektion

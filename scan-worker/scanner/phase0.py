@@ -833,6 +833,64 @@ def _is_mail_only_fqdn(fqdn: str) -> bool:
     return any(fqdn.lower().startswith(p) for p in _MAIL_PREFIXES)
 
 
+def _collapse_cdn_edge_ips(hosts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """B2: Kollabiert IPs gleicher CDN/Cloud-Range mit identischem FQDN-Set
+    zu einem logischen Host.
+
+    Beispiel: Cloudflare-Round-Robin fuer online.heuel.com liefert mal
+    104.16.10.6, mal 104.16.11.6. Beide sind CF-Edges fuer denselben
+    Service → werden zu einem Host mit primary_ip + edge_ips-Liste.
+
+    Heuristik:
+    - Provider via saas_heuristic.detect_cloud_provider (CF, AWS, Azure,
+      GCP, Hetzner-Cloud, Fastly)
+    - Mergen NUR wenn:
+      (a) selber Provider
+      (b) gleicher fqdn-Set
+      (c) keine eigenen rdns die auf eine Maschinen-Identitaet hinweisen
+    """
+    try:
+        from scanner.precheck.saas_heuristic import detect_cloud_provider
+    except Exception:
+        return hosts
+
+    # Gruppiere nach (provider, frozenset(fqdns))
+    groups: dict[tuple[str, frozenset], list[dict[str, Any]]] = {}
+    standalone: list[dict[str, Any]] = []
+    for h in hosts:
+        provider = detect_cloud_provider(h.get("ip", ""))
+        if not provider:
+            standalone.append(h)
+            continue
+        # Merge nur wenn rdns leer/Provider-generisch
+        rdns = (h.get("rdns") or "").lower()
+        if rdns and not any(p in rdns for p in (
+            "cloudflare", "amazonaws.com", "cloudfront", "azure",
+            "fastly", "googleusercontent", "akamai",
+        )):
+            # rdns deutet auf eigene Maschine → nicht mergen
+            standalone.append(h)
+            continue
+        key = (provider, frozenset(f.lower() for f in (h.get("fqdns") or [])))
+        groups.setdefault(key, []).append(h)
+
+    out: list[dict[str, Any]] = list(standalone)
+    for (provider, _fqdns), group in groups.items():
+        if len(group) == 1:
+            out.append(group[0])
+            continue
+        # Mehrere IPs gleicher Range + gleicher FQDNs → kollabieren
+        primary = group[0]  # erste IP als kanonisch
+        edge_ips = sorted(h["ip"] for h in group)
+        primary["edge_ips"] = edge_ips
+        primary["cdn_provider"] = provider
+        log.info("cdn_edge_collapse", provider=provider,
+                 primary_ip=primary["ip"], edge_count=len(edge_ips),
+                 fqdns=list(primary.get("fqdns", []))[:3])
+        out.append(primary)
+    return out
+
+
 def merge_and_group(
     domain: str,
     all_subdomains: list[str],
@@ -1013,6 +1071,11 @@ def merge_and_group(
             "fqdns": _sort_fqdns_by_relevance(list(fqdns), domain),
             "rdns": rdns,
         })
+
+    # B2 (Mai 2026): CDN-Edge-IPs gleichen Providers + gleicher FQDN-Set zu
+    # einem logischen Host kollabieren. Verhindert Round-Robin-Drift wie
+    # Cloudflare 104.16.10.6 vs 104.16.11.6 fuer denselben Service.
+    hosts = _collapse_cdn_edge_ips(hosts)
 
     # Prioritize hosts: base domain first, unique services high, cloud noise low
     _CLOUD_ONLY_PREFIXES = (
