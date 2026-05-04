@@ -220,6 +220,26 @@ STANDARD-REGELN:
 - CDN-Edge-Nodes (nur CDN-IP, kein eigener Content): skip (außer bei has_web=true mit eigenem Content)
 - Wenn unklar: lieber scannen als überspringen
 
+VHOST-MODELL (Multi-VHost-Probe seit Mai 2026):
+- Jeder Host hat ein Feld `vhosts: [{fqdn, status, title, final_url, aliases}]`
+  mit ALLEN echten Web-Anwendungen (primary VHosts) auf der IP.
+- Du entscheidest action/priority pro **Host (= IP)**, nicht pro VHost.
+  Ein Scan-Lauf deckt automatisch alle primary VHosts der IP ab.
+- Skip-Begruendung muss explizit ALLE primary VHosts als irrelevant einstufen.
+  Beispiel: IP mit vhosts=[ose.heuel.com (200, Login), edi.heuel.com (403)]
+  → scan, weil mindestens ose.heuel.com echten Content liefert.
+- Aliase (FQDNs die per Redirect oder Body-Hash auf einen primary zeigen) sind
+  schon dedupliziert — nicht doppelt zaehlen.
+- vhost_skipped[] zeigt FQDNs die als Parking/Extern-Redirect ausgeschlossen wurden.
+
+KRITISCHE NICHT-SKIPP-REGELN (werden notfalls automatisch erzwungen):
+- Mindestens 1 primary VHost mit status in [200,201,204,301,302,401,403,405]: NIEMALS skip
+  → Auch ein generischer Title wie "Redirector", "Welcome", "Default Page" ist KEIN Skip-Grund.
+- Cloudflare/WAF-403 ("Just a moment...", cf-ray-Header): scan mit niedriger Priorität (3),
+  NICHT skip — der Customer-Service liegt dahinter.
+- Nur dann skip wenn vhosts leer ist ODER alle vhosts auf externe out-of-scope Domains
+  redirecten (vhost_skipped[] zeigt das).
+
 Jeder Host braucht eine kurze Begründung (1 Satz).
 Priority: 1 = höchste Priorität, aufsteigend.
 
@@ -298,14 +318,98 @@ Antwort im Format:
             "strategy_notes": f"Fallback: alle Hosts scannen ({reason})"
         }
 
+    # Hard-override: live web hosts duerfen NIE per AI-Skip verschwinden.
+    # Verhindert false-skips bei "Redirector"-Titles, generischen Default-Pages
+    # und Cloudflare-WAF-403, hinter denen echter Customer-Content liegt.
+    overridden = _enforce_scan_for_live_web_hosts(result, hosts, domain)
+
     log.info("ai_host_strategy_complete",
              scan=sum(1 for h in result["hosts"] if h.get("action") == "scan"),
-             skip=sum(1 for h in result["hosts"] if h.get("action") == "skip"))
+             skip=sum(1 for h in result["hosts"] if h.get("action") == "skip"),
+             overridden_to_scan=overridden)
 
     # Strip internal keys before return
     result.pop("_raw", None)
     result.pop("_cost", None)
     return result
+
+
+def _enforce_scan_for_live_web_hosts(
+    strategy: dict[str, Any],
+    hosts: list[dict[str, Any]],
+    scope_domain: str,
+) -> int:
+    """KI-Skip aufheben wenn Host messbar Live-Web-Content liefert.
+
+    Returns: Anzahl der überschriebenen Hosts.
+    """
+    by_ip = {h.get("ip"): h for h in hosts if h.get("ip")}
+    overridden = 0
+    LIVE_STATUS = {200, 201, 202, 204, 301, 302, 401, 403, 405}
+    _ = scope_domain  # reserved for future scope-aware rules
+
+    for sh in strategy.get("hosts", []):
+        if sh.get("action") != "skip":
+            continue
+        ip = sh.get("ip")
+        host = by_ip.get(ip)
+        if not host:
+            continue
+
+        # Bevorzugt: vhosts-Liste (Multi-VHost-Probe seit Mai 2026)
+        vhosts = host.get("vhosts") or []
+        live_vhost = None
+        for v in vhosts:
+            status = v.get("status")
+            if status in LIVE_STATUS:
+                live_vhost = v
+                break
+
+        # Fallback: alte web_probe-Struktur (falls vhosts leer / Legacy)
+        if live_vhost is None:
+            wp = host.get("web_probe") or {}
+            if wp.get("has_web") and wp.get("status") in LIVE_STATUS:
+                # final_url-host == web_fqdn Check (alte Logik)
+                final_url = (wp.get("final_url") or "").lower()
+                web_fqdn = (wp.get("web_fqdn") or "").lower()
+                ok = True
+                if final_url and web_fqdn:
+                    try:
+                        from urllib.parse import urlparse
+                        fu_host = urlparse(final_url).hostname or ""
+                    except Exception:
+                        fu_host = ""
+                    if fu_host and fu_host != web_fqdn:
+                        ok = False
+                if ok:
+                    live_vhost = {
+                        "fqdn": web_fqdn or "?",
+                        "status": wp.get("status"),
+                        "title": wp.get("title") or "",
+                    }
+
+        if live_vhost is None:
+            continue
+
+        # Override — mindestens 1 primary VHost ist live
+        original_reason = sh.get("reasoning", "")
+        sh["action"] = "scan"
+        sh["priority"] = max(int(sh.get("priority") or 3), 3)
+        sh["reasoning"] = (
+            f"[AUTO-OVERRIDE] Host hat Live-Web-Content auf VHost "
+            f"{live_vhost.get('fqdn')} (HTTP {live_vhost.get('status')}) — "
+            f"KI-Skip verworfen. Original: {original_reason}"
+        )
+        sh["_overridden"] = "live_web_content"
+        overridden += 1
+        log.info("host_skip_overridden", ip=ip,
+                 vhost=live_vhost.get("fqdn"),
+                 status=live_vhost.get("status"),
+                 title=(live_vhost.get("title") or "")[:60],
+                 original=original_reason[:120],
+                 primary_vhost_count=len(vhosts))
+
+    return overridden
 
 
 # ---------------------------------------------------------------------------

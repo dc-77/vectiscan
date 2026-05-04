@@ -1,5 +1,6 @@
 """Phase 0: DNS-Reconnaissance — Subdomain-Enumeration und Host-Gruppierung."""
 
+import hashlib
 import json
 import os
 import signal
@@ -9,6 +10,7 @@ import tempfile
 import time
 from collections import defaultdict
 from typing import Any, Optional
+from urllib.parse import urlparse
 
 import structlog
 
@@ -1084,80 +1086,250 @@ def merge_and_group(
     return inventory
 
 
-def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str) -> list[dict[str, Any]]:
-    """Quick HTTP probe per host — determines which FQDNs serve web content.
+def _canonicalize_vhosts(host: dict[str, Any], scope_root: str) -> None:
+    """Klassifiziert _raw_probes in primary-VHosts + Aliase und schreibt
+    host['vhosts'] + host['web_probe'] (Compat).
 
-    Adds a 'web_probe' dict to each host with has_web, status, final_url, title, web_fqdn.
-    Uses httpx for fast probing (~1-5s per FQDN).
+    Aliase entstehen durch (a) HTTP-Redirect zu einer anderen FQDN auf
+    derselben IP, (b) identischer body_hash mit einem anderen primary.
+    Externe Redirects (final_url-host gehoert nicht zu fqdns dieses
+    Hosts UND nicht zur scope_root) werden als 'skip-extern' markiert.
+    """
+    raw_probes = host.pop("_raw_probes", []) or []
+    if not raw_probes:
+        host["vhosts"] = []
+        host["web_probe"] = {
+            "has_web": False, "status": None, "final_url": None,
+            "title": None, "web_fqdn": None,
+        }
+        return
+
+    own_fqdns = {f.lower() for f in host.get("fqdns", [])}
+    scope_root_lc = (scope_root or "").lower().lstrip(".")
+
+    # Schritt 1: Klassifiziere jede Probe
+    primaries: dict[str, dict[str, Any]] = {}
+    aliases: list[dict[str, Any]] = []  # {to_fqdn?, fqdn, status, reason}
+    skipped: list[dict[str, Any]] = []
+    by_body_hash: dict[str, str] = {}  # body_hash → primary fqdn
+
+    for probe in raw_probes:
+        fqdn = probe["fqdn"].lower()
+        final_url = probe["final_url"] or ""
+        try:
+            fu_host = (urlparse(final_url).hostname or "").lower()
+        except Exception:
+            fu_host = ""
+
+        # (a) HTTP-Redirect zu anderer eigener FQDN auf demselben Host
+        if fu_host and fu_host != fqdn and fu_host in own_fqdns:
+            aliases.append({
+                "fqdn": fqdn, "to_fqdn": fu_host,
+                "status": probe["status"], "reason": "redirect",
+            })
+            continue
+
+        # (b) Externer Redirect zu out-of-scope Domain
+        if fu_host and fu_host != fqdn and scope_root_lc and \
+                not fu_host.endswith(scope_root_lc) and fu_host not in own_fqdns:
+            skipped.append({
+                "fqdn": fqdn, "final_url": final_url,
+                "reason": f"redirect-extern → {fu_host}",
+            })
+            continue
+
+        # (c) Body-Hash-Dup: identischer Inhalt wie ein bereits gesehener primary
+        bh = probe["body_hash"]
+        if bh and bh in by_body_hash and by_body_hash[bh] != fqdn:
+            aliases.append({
+                "fqdn": fqdn, "to_fqdn": by_body_hash[bh],
+                "status": probe["status"], "reason": "body-hash-dup",
+            })
+            continue
+
+        # (d) Parking-Page → kein primary, aber web_probe zeigt es
+        if probe["parking"]:
+            skipped.append({
+                "fqdn": fqdn, "status": probe["status"],
+                "title": probe["title"], "reason": "parking",
+            })
+            continue
+
+        # → echter primary VHost
+        primaries[fqdn] = {
+            "fqdn": fqdn,
+            "status": probe["status"],
+            "title": probe["title"],
+            "final_url": probe["final_url"],
+            "body_hash": bh,
+            "is_primary": True,
+            "aliases": [],
+        }
+        if bh:
+            by_body_hash[bh] = fqdn
+
+    # Schritt 2: Aliase ihren primaries zuordnen (sofern Ziel ein primary ist)
+    for al in aliases:
+        target = al.get("to_fqdn")
+        if target and target in primaries:
+            primaries[target]["aliases"].append({
+                "fqdn": al["fqdn"], "status": al["status"], "reason": al["reason"],
+            })
+        else:
+            # Ziel selbst kein primary (z.B. eigene FQDN nicht geprobt) →
+            # als skipped fuehren, damit es im Frontend sichtbar bleibt
+            skipped.append({
+                "fqdn": al["fqdn"], "status": al["status"],
+                "reason": f"redirect → {target or '?'} (kein primary)",
+            })
+
+    # Sortierung: 200er zuerst (echter Content), dann andere Stati,
+    # dann kuerzeste FQDN. Sodass web_probe (= vhosts[0]) den besten
+    # Kandidaten zeigt — Cloudflare-WAF-403 verliert gegen 200 OK.
+    def _sort_key(v: dict[str, Any]) -> tuple:
+        status = v.get("status") or 0
+        is_2xx = 0 if 200 <= status < 300 else 1
+        is_3xx = 0 if 300 <= status < 400 else 1
+        return (is_2xx, is_3xx, len(v["fqdn"]), v["fqdn"])
+
+    vhosts = sorted(primaries.values(), key=_sort_key)
+    host["vhosts"] = vhosts
+    host["vhost_skipped"] = skipped
+
+    # Backwards-Compat: web_probe aus erstem primary
+    if vhosts:
+        v0 = vhosts[0]
+        host["web_probe"] = {
+            "has_web": True,
+            "status": v0["status"],
+            "final_url": v0["final_url"],
+            "title": v0["title"],
+            "web_fqdn": v0["fqdn"],
+        }
+    else:
+        # Kein primary → nutze ersten skipped (z.B. parking) als Compat-Probe
+        first_sk = skipped[0] if skipped else {}
+        host["web_probe"] = {
+            "has_web": False,
+            "status": first_sk.get("status"),
+            "final_url": None,
+            "title": first_sk.get("title"),
+            "web_fqdn": first_sk.get("fqdn"),
+            "parking": first_sk.get("reason") == "parking" or None,
+        }
+
+
+_PARKING_PATTERNS = [
+    "domain not configured", "nicht konfiguriert",
+    "froxlor", "plesk", "cpanel", "ispconfig",
+    "this domain is parked", "domain parking",
+    "coming soon", "under construction",
+    "default web page", "apache2 debian default",
+    "welcome to nginx", "test page for",
+]
+
+# Probe-Cap pro Host (Schutz gegen IP mit 50+ FQDNs)
+MAX_VHOSTS_PROBED = int(os.environ.get("MAX_VHOSTS_PROBED", "10"))
+
+
+def _probe_single_fqdn(fqdn: str, ip: str) -> dict[str, Any] | None:
+    """Probt EINE FQDN via httpx und liefert Roh-Probe-Dict zurueck.
+
+    Returns None bei Fehler/keine Antwort. Bei Erfolg:
+      {fqdn, status, title, final_url, body_hash, parking}
+    """
+    cmd = [
+        "httpx", "-u", fqdn, "-json", "-silent",
+        "-follow-redirects", "-status-code", "-title", "-timeout", "5",
+        "-retries", "1",
+        # body_hash bekommen wir via httpx -hash sha256 (Standard-Body-Hash)
+        "-hash", "sha256",
+        # `-fr` = meta-refresh-follow
+        "-fr",
+    ]
+    try:
+        result = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=10,
+            start_new_session=True,
+        )
+    except (subprocess.TimeoutExpired, Exception) as e:
+        log.debug("web_probe_error", ip=ip, fqdn=fqdn, error=str(e))
+        return None
+
+    if not (result.stdout and result.stdout.strip()):
+        return None
+
+    try:
+        data = json.loads(result.stdout.strip().split("\n")[0])
+    except (json.JSONDecodeError, IndexError):
+        return None
+
+    status = data.get("status_code") or data.get("status-code") or 0
+    try:
+        status = int(status)
+    except (TypeError, ValueError):
+        return None
+
+    if not status or not (200 <= status < 500):
+        return None
+
+    title = (data.get("title") or "")[:100]
+    final_url = data.get("final_url") or data.get("url", "") or ""
+    # httpx liefert hash entweder direkt als 'hash' Feld oder unter
+    # 'body_hash'; der genaue Key variiert je httpx-Version.
+    h = data.get("hash") or data.get("body_hash") or {}
+    if isinstance(h, dict):
+        body_hash = h.get("body_sha256") or h.get("sha256") or ""
+    else:
+        body_hash = str(h or "")
+
+    title_lower = title.lower()
+    is_parking = any(p in title_lower for p in _PARKING_PATTERNS)
+
+    return {
+        "fqdn": fqdn,
+        "status": status,
+        "title": title,
+        "final_url": final_url,
+        "body_hash": body_hash or "",
+        "parking": is_parking,
+    }
+
+
+def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
+                     domain: str = "") -> list[dict[str, Any]]:
+    """Quick HTTP probe per host — probt ALLE FQDNs (capped MAX_VHOSTS_PROBED).
+
+    Schreibt host['vhosts'] (canonicalized primary + Aliase) und
+    host['web_probe'] (Backwards-Compat = vhosts[0]).
     """
     from scanner.tools import _save_result
 
     for host in hosts:
-        probe: dict[str, Any] = {
-            "has_web": False, "status": None, "final_url": None,
-            "title": None, "web_fqdn": None,
-        }
-
-        for fqdn in host.get("fqdns", [])[:3]:
-            cmd = [
-                "httpx", "-u", fqdn, "-json", "-silent",
-                "-follow-redirects", "-status-code", "-title", "-timeout", "5",
-                # Bei Packet-Loss/transient-Fehler 1 Retry — sonst false-negative
-                "-retries", "1",
-                # `-fr` ist meta-refresh-follow zusaetzlich zu HTTP-Redirects;
-                # bei SPAs/CMS-Wartungsseiten oft notwendig.
-                "-fr",
-            ]
-            try:
-                result = subprocess.run(
-                    cmd, capture_output=True, text=True, timeout=10,
-                    start_new_session=True,
-                )
-                if result.stdout and result.stdout.strip():
-                    line = result.stdout.strip().split("\n")[0]
-                    data = json.loads(line)
-                    status = data.get("status_code") or data.get("status-code") or 0
-                    if status and 200 <= int(status) < 500:
-                        title = (data.get("title") or "")[:100]
-                        final_url = data.get("final_url") or data.get("url", "")
-
-                        # Detect parking/hosting panel pages — not real web content
-                        _PARKING_PATTERNS = [
-                            "domain not configured", "nicht konfiguriert",
-                            "froxlor", "plesk", "cpanel", "ispconfig",
-                            "this domain is parked", "domain parking",
-                            "coming soon", "under construction",
-                            "default web page", "apache2 debian default",
-                            "welcome to nginx", "test page for",
-                        ]
-                        title_lower = title.lower()
-                        is_parking = any(p in title_lower for p in _PARKING_PATTERNS)
-
-                        if is_parking:
-                            probe["has_web"] = False
-                            probe["status"] = int(status)
-                            probe["title"] = title
-                            probe["parking"] = True
-                            log.info("web_probe_parking_detected", ip=host["ip"],
-                                     fqdn=fqdn, title=title[:50])
-                            break
-
-                        probe["has_web"] = True
-                        probe["status"] = int(status)
-                        probe["final_url"] = final_url
-                        probe["title"] = title
-                        probe["web_fqdn"] = fqdn
-                        log.info("web_probe_found", ip=host["ip"], fqdn=fqdn,
-                                 status=status, title=title[:50])
-                        break
-            except (subprocess.TimeoutExpired, json.JSONDecodeError, Exception) as e:
-                log.debug("web_probe_error", ip=host["ip"], fqdn=fqdn, error=str(e))
+        raw_probes: list[dict[str, Any]] = []
+        for fqdn in host.get("fqdns", [])[:MAX_VHOSTS_PROBED]:
+            probe = _probe_single_fqdn(fqdn, host["ip"])
+            if probe is None:
                 continue
+            raw_probes.append(probe)
+            if probe["parking"]:
+                log.info("web_probe_parking_detected", ip=host["ip"],
+                         fqdn=fqdn, title=probe["title"][:50])
+            else:
+                log.info("web_probe_found", ip=host["ip"], fqdn=fqdn,
+                         status=probe["status"], title=probe["title"][:50])
 
-        host["web_probe"] = probe
+        host["_raw_probes"] = raw_probes
+        _canonicalize_vhosts(host, scope_root=domain)
 
-    # Save probe results as a scan_result for debug visibility
-    probe_summary = {h["ip"]: h.get("web_probe", {}) for h in hosts}
+    # Save probe results: pro Host vhosts + Compat-web_probe
+    probe_summary = {
+        h["ip"]: {
+            "web_probe": h.get("web_probe", {}),
+            "vhosts": h.get("vhosts", []),
+            "vhost_skipped": h.get("vhost_skipped", []),
+        } for h in hosts
+    }
     _save_result(
         order_id=order_id, host_ip=None, phase=0,
         tool_name="web_probe",
@@ -1166,7 +1338,9 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str) 
     )
 
     web_count = sum(1 for h in hosts if h.get("web_probe", {}).get("has_web"))
-    log.info("web_probe_complete", total=len(hosts), with_web=web_count)
+    vhost_count = sum(len(h.get("vhosts", [])) for h in hosts)
+    log.info("web_probe_complete", total=len(hosts), with_web=web_count,
+             primary_vhosts=vhost_count)
 
     return hosts
 
@@ -1356,7 +1530,8 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     )
 
     # --- Web probe: quick HTTP check per host ---
-    inventory["hosts"] = _probe_web_hosts(inventory.get("hosts", []), order_id, scan_dir)
+    inventory["hosts"] = _probe_web_hosts(inventory.get("hosts", []), order_id, scan_dir,
+                                          domain=domain)
 
     # --- PR-M4: Snapshot persistieren (nur wenn neu enumeriert) ---
     if not snapshot_used:

@@ -1005,6 +1005,7 @@ def run_phase2(
     progress_callback: Callable[[str, str, str], None],
     config: dict[str, Any] | None = None,
     adaptive_config: dict[str, Any] | None = None,
+    vhost_fqdns: list[str] | None = None,
 ) -> dict[str, Any]:
     """Orchestrate Phase 2 (deep scan) for a single host.
 
@@ -1016,9 +1017,12 @@ def run_phase2(
         order_id: Order UUID.
         progress_callback: Called after each tool with (order_id, tool_name, status).
         config: Package configuration dict (optional).
+        vhost_fqdns: Liste primary VHosts fuer Multi-VHost-Tools (ZAP-Spider,
+            ZAP-AJAX, header_check, httpx). Wenn None → Legacy fqdns[:5].
 
     Returns:
-        Results summary dict.
+        Results summary dict. Bei Multi-VHost: results['vhost_results'][fqdn]
+        haelt header_check/httpx-Ergebnisse pro VHost.
     """
     phase2_tools = None
     if config:
@@ -1033,6 +1037,12 @@ def run_phase2(
 
     # fqdns list is already sorted by relevance from phase0 (base domain first)
     primary_fqdn = fqdns[0] if fqdns else ip
+
+    # VHost-Loop-Targets (Multi-VHost-Probe). Legacy: fqdns[:5].
+    if not vhost_fqdns:
+        vhost_fqdns = list(fqdns[:5])
+    if not vhost_fqdns and primary_fqdn:
+        vhost_fqdns = [primary_fqdn]
 
     # Never skip tools on the base domain — it's the most important target
     domain = config.get("domain", "") if config else ""
@@ -1094,8 +1104,8 @@ def run_phase2(
 
         try:
             context_id = zap.create_context(context_name)
-            # Include ALL FQDNs in context scope
-            for fqdn_item in fqdns[:5]:
+            # Include ALL primary VHosts in context scope (Multi-VHost-Probe)
+            for fqdn_item in vhost_fqdns:
                 zap.include_in_context(context_name, f".*{_re.escape(fqdn_item)}.*")
 
             zap.configure_rate_limit(
@@ -1104,9 +1114,9 @@ def run_phase2(
                 delay_ms=ac.get("zap_spider_delay_ms", 0),
             )
 
-            # Spider each FQDN
+            # Spider each primary VHost
             spider_depth = ac.get("zap_spider_max_depth", 5)
-            for fqdn_item in fqdns[:5]:
+            for fqdn_item in vhost_fqdns:
                 publish_event(order_id, {"type": "tool_starting", "tool": "zap_spider", "host": ip})
                 spider_start = int(_time.monotonic() * 1000)
                 spider_id = zap.start_spider(f"https://{fqdn_item}", context_name=context_name,
@@ -1122,17 +1132,19 @@ def run_phase2(
                 log.info("zap_spider_fqdn_complete", fqdn=fqdn_item, urls=len(urls),
                          duration_ms=spider_duration)
 
-            # AJAX Spider (conditional on SPA)
+            # AJAX Spider (conditional on SPA) — sequenziell pro VHost,
+            # da ZAP nur 1 AJAX-Spider gleichzeitig erlaubt
             if ac.get("zap_ajax_spider_enabled") and "zap_ajax_spider" not in set(ac.get("skip_tools", [])):
                 publish_event(order_id, {"type": "tool_starting", "tool": "zap_ajax_spider", "host": ip})
-                zap.start_ajax_spider(f"https://{primary_fqdn}", context_name=context_name)
-                completed = zap.poll_until_complete(
-                    lambda: 100 if zap.ajax_spider_status() == "stopped" else 50,
-                    timeout=240, interval=10, stop_value=100,
-                    order_id=order_id, tool_name="zap_ajax_spider",
-                )
-                if not completed:
-                    zap.stop_ajax_spider()
+                for vh_ajax in vhost_fqdns:
+                    zap.start_ajax_spider(f"https://{vh_ajax}", context_name=context_name)
+                    completed = zap.poll_until_complete(
+                        lambda: 100 if zap.ajax_spider_status() == "stopped" else 50,
+                        timeout=240, interval=10, stop_value=100,
+                        order_id=order_id, tool_name="zap_ajax_spider",
+                    )
+                    if not completed:
+                        zap.stop_ajax_spider()
                 r["_tools"].append("zap_ajax_spider")
 
             unique_urls = sorted(set(all_spider_urls))
@@ -1143,11 +1155,12 @@ def run_phase2(
 
             # Save spider results to DB
             _save_result(order_id, ip, 2, "zap_spider",
-                         json.dumps({"urls_found": len(unique_urls), "fqdns_spidered": len(fqdns[:5]),
+                         json.dumps({"urls_found": len(unique_urls), "fqdns_spidered": len(vhost_fqdns),
+                                     "vhosts": list(vhost_fqdns),
                                      "urls": unique_urls[:50]}, indent=2),
                          0, 0)
             publish_tool_output(order_id, "zap_spider", ip,
-                                f"{len(unique_urls)} URLs from {len(fqdns[:5])} FQDNs")
+                                f"{len(unique_urls)} URLs from {len(vhost_fqdns)} VHosts")
             progress_callback(order_id, "zap_spider", "complete")
 
         except ZapError as e:
@@ -1177,39 +1190,49 @@ def run_phase2(
         return r
 
     def _run_quick_tools_stage1() -> dict[str, Any]:
-        """Fast independent tools: header_check, httpx.
+        """Fast independent tools: header_check, httpx — pro primary VHost.
 
         Each tool is isolated so a failure in one doesn't lose results from the other.
+        Multi-VHost-Probe (Mai 2026): laeuft pro VHost, damit Findings VHost-genau
+        zugeordnet werden koennen.
         """
-        r: dict[str, Any] = {"_tools": []}
+        r: dict[str, Any] = {"_tools": [], "vhost_results": {}}
         if phase2_tools is None or "headers" in phase2_tools:
-            try:
-                publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
-                header_result = run_header_check(primary_fqdn, ip, host_dir, order_id)
-                r["headers"] = header_result
-                r["_tools"].append("header_check")
-                progress_callback(order_id, "header_check", "complete")
-                score = header_result.get("score", "?/?") if header_result else "failed"
-                publish_tool_output(order_id, "header_check", ip, f"Security headers: {score}")
-                _save_result(order_id, ip, 2, "header_check",
-                             json.dumps(header_result, indent=2, ensure_ascii=False),
-                             0, 0)
-            except Exception as e:
-                log.error("header_check_failed", fqdn=primary_fqdn, ip=ip, error=str(e))
+            for vh in vhost_fqdns:
+                try:
+                    publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
+                    header_result = run_header_check(vh, ip, host_dir, order_id)
+                    if vh == primary_fqdn:
+                        r["headers"] = header_result
+                    r["vhost_results"].setdefault(vh, {})["headers"] = header_result
+                    score = header_result.get("score", "?/?") if header_result else "failed"
+                    publish_tool_output(order_id, "header_check", ip,
+                                        f"Security headers ({vh}): {score}")
+                    _save_result(order_id, ip, 2, "header_check",
+                                 json.dumps({"vhost": vh, "result": header_result},
+                                            indent=2, ensure_ascii=False),
+                                 0, 0)
+                except Exception as e:
+                    log.error("header_check_failed", fqdn=vh, ip=ip, error=str(e))
+            r["_tools"].append("header_check")
+            progress_callback(order_id, "header_check", "complete")
         if phase2_tools is None or "httpx" in phase2_tools:
-            try:
-                publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
-                httpx_result = run_httpx(primary_fqdn, ip, host_dir, order_id)
-                r["httpx"] = httpx_result
-                r["_tools"].append("httpx")
-                progress_callback(order_id, "httpx", "complete")
-                if httpx_result:
-                    publish_tool_output(order_id, "httpx", ip,
-                                        f"HTTP {httpx_result.get('status_code', '?')}")
-                else:
-                    publish_tool_output(order_id, "httpx", ip, "HTTP probe failed")
-            except Exception as e:
-                log.error("httpx_failed", fqdn=primary_fqdn, ip=ip, error=str(e))
+            for vh in vhost_fqdns:
+                try:
+                    publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
+                    httpx_result = run_httpx(vh, ip, host_dir, order_id)
+                    if vh == primary_fqdn:
+                        r["httpx"] = httpx_result
+                    r["vhost_results"].setdefault(vh, {})["httpx"] = httpx_result
+                    if httpx_result:
+                        publish_tool_output(order_id, "httpx", ip,
+                                            f"HTTP {httpx_result.get('status_code', '?')} ({vh})")
+                    else:
+                        publish_tool_output(order_id, "httpx", ip, f"HTTP probe failed ({vh})")
+                except Exception as e:
+                    log.error("httpx_failed", fqdn=vh, ip=ip, error=str(e))
+            r["_tools"].append("httpx")
+            progress_callback(order_id, "httpx", "complete")
         return r
 
     log.info("phase2_stage1_start", ip=ip, tools="testssl+zap_spider+quick")

@@ -18,11 +18,29 @@ interface AiHost {
   scan_hints?: Record<string, unknown>;
 }
 
+interface VHostAlias {
+  fqdn: string;
+  status?: number | null;
+  reason?: string;
+}
+
+interface VHost {
+  fqdn: string;
+  status?: number | null;
+  title?: string | null;
+  final_url?: string | null;
+  is_primary?: boolean;
+  aliases?: VHostAlias[];
+}
+
 interface DiscoveredHost {
   ip: string;
   fqdns?: string[];
   hostname?: string;
   screenshot_minio_key?: string | null;
+  // Multi-VHost-Probe (Mai 2026)
+  vhosts?: VHost[];
+  vhost_skipped?: Array<{ fqdn: string; reason?: string; status?: number | null }>;
 }
 
 interface Props {
@@ -143,6 +161,37 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, order
                     {fqdn}
                   </div>
                 )}
+                {(() => {
+                  const dh = discoveredHosts?.find((d) => d.ip === h.ip);
+                  const vhosts = dh?.vhosts || [];
+                  if (vhosts.length <= 1) return null;
+                  return (
+                    <div className="mt-1.5 space-y-0.5 text-[11px] leading-tight">
+                      <div className="font-mono uppercase tracking-wider text-[9px] text-slate-500">
+                        {vhosts.length} VHosts
+                      </div>
+                      {vhosts.map((v) => (
+                        <div key={v.fqdn} className="flex items-baseline gap-1.5">
+                          <span className={
+                            v.status && v.status >= 200 && v.status < 300
+                              ? 'text-emerald-400'
+                              : v.status && v.status >= 400
+                              ? 'text-amber-400'
+                              : 'text-slate-400'
+                          }>
+                            {v.status ?? '?'}
+                          </span>
+                          <span className="text-slate-300 truncate">{v.fqdn}</span>
+                          {v.aliases && v.aliases.length > 0 && (
+                            <span className="text-slate-500" title={v.aliases.map((a) => `${a.fqdn} (${a.reason})`).join(', ')}>
+                              +{v.aliases.length}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
                 {screenshotUrl && (
                   /* Thumbnail mit Lightbox-on-click — alle Hosts mit
                      web_probe.has_web=true bekommen einen Screenshot. */

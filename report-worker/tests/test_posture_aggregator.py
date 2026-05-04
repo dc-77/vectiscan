@@ -45,12 +45,27 @@ def test_extract_path_from_affected():
 
 def test_derive_dedup_key_full():
     f = {"host_ip": "1.2.3.4", "policy_id": "SP-HDR-006", "url_path": "/login"}
-    assert _derive_dedup_key(f) == ("1.2.3.4", "SP-HDR-006", "/login")
+    # Migration 023: Tuple um vhost erweitert (4. Element, default '')
+    assert _derive_dedup_key(f) == ("1.2.3.4", "SP-HDR-006", "/login", "")
 
 
 def test_derive_dedup_key_from_affected():
     f = {"affected": "https://example.com/api/v1", "policy_id": "SP-CSP-001"}
-    assert _derive_dedup_key(f) == ("example.com", "SP-CSP-001", "/api/v1")
+    # vhost wird hier aus dem Hostname (example.com) abgeleitet, da affected
+    # einen FQDN enthaelt der nicht gleich dem host_ip ist (host_ip leer →
+    # wird selbst aus example.com abgeleitet → fqdn == host → kein vhost-set)
+    key = _derive_dedup_key(f)
+    assert key is not None
+    assert key[:3] == ("example.com", "SP-CSP-001", "/api/v1")
+    # 4. Element (vhost) ist '' weil host == fqdn
+    assert key[3] == ""
+
+
+def test_derive_dedup_key_with_vhost():
+    """Multi-VHost-Probe: vhost-Feld wird in Key uebernommen."""
+    f = {"host_ip": "1.2.3.4", "vhost": "ose.heuel.com",
+         "policy_id": "SP-HDR-006", "url_path": "/login"}
+    assert _derive_dedup_key(f) == ("1.2.3.4", "SP-HDR-006", "/login", "ose.heuel.com")
 
 
 def test_derive_dedup_key_fallback_title():
@@ -106,20 +121,23 @@ class _FakeCursor:
             return
 
         # SELECT id, status FROM consolidated_findings WHERE ... (Existing-Check)
+        # Migration 023: vhost ist Teil des Keys (5 params)
         if "select id, status from consolidated_findings" in sql_low:
-            sub_id, host_ip, ftype, port = params
+            sub_id, host_ip, ftype, port, vhost = params
             row = next(
                 (cf for cf in self.store["consolidated_findings"]
                  if cf["subscription_id"] == sub_id
                  and cf["host_ip"] == host_ip
                  and cf["finding_type"] == ftype
-                 and cf["port_or_path"] == port),
+                 and cf["port_or_path"] == port
+                 and cf.get("vhost", "") == vhost),
                 None,
             )
             self._fetch_queue = [(row["id"], row["status"])] if row else [None]
             return
 
         # INSERT INTO consolidated_findings ... RETURNING id
+        # Migration 023: vhost als 5. Spalte (params[4]); severity rueckt auf [5]
         if "insert into consolidated_findings" in sql_low:
             cf_id = f"cf-{len(self.store['consolidated_findings']) + 1}"
             self.store["consolidated_findings"].append({
@@ -128,12 +146,13 @@ class _FakeCursor:
                 "host_ip": params[1],
                 "finding_type": params[2],
                 "port_or_path": params[3],
+                "vhost": params[4],
                 "status": "open",
-                "severity": params[4],
-                "cvss_score": params[5],
-                "title": params[6],
-                "first_seen_order_id": params[9],
-                "last_seen_order_id": params[10],
+                "severity": params[5],
+                "cvss_score": params[6],
+                "title": params[7],
+                "first_seen_order_id": params[10],
+                "last_seen_order_id": params[11],
             })
             self._fetch_queue = [(cf_id,)]
             return

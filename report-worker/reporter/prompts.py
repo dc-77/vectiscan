@@ -19,6 +19,11 @@ REGELN FÜR BEWERTUNG:
 - Maximal 5-8 Findings, fokussiert auf die wichtigsten Risiken
 - Management-tauglich formulieren, kein Fachjargon
 
+VHOST-AWARENESS (Multi-VHost-Probe seit Mai 2026):
+- Findings koennen ein 'vhost'-Feld tragen (= FQDN unter dem das Problem entdeckt wurde).
+- Bei Findings mit gesetztem vhost: in 'affected' das Format 'host:port (vhost: <fqdn>)' verwenden.
+- Identische Findings auf verschiedenen VHosts derselben IP sind SEPARATE Treffer (nicht zusammenfassen).
+
 CVSS-SCORING — STRENGE OBERGRENZEN:
 - Information Disclosure (Banner, robots.txt, Pfade): MAXIMAL LOW (2.0-3.5)
 - Fehlende Security Headers: MAXIMAL MEDIUM (4.0-5.5)

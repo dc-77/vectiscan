@@ -179,6 +179,7 @@ Branding-Farben aus `reporter/pdf/branding.py` — nicht hardcoden.
 - `docs/SCAN-TOOLS.md` — Tool-Konfig, Timeouts, Output-Format
 - `docs/architecture.md` — Architektur inkl. AI-Orchestrierung und Event-System
 - `docs/SCAN-PIPELINE-v2.md` — v2 Pipeline-Spec
+- `docs/PIPELINE-AI-FLOW.md` — vollständiger End-to-End-Trace inkl. aller 5 KI-Entscheidungen, Cache-Verhalten, bekannte Override-Patterns
 - `docs/deterministic/` — Q2/2026 Determinismus-Block
   (00-OVERVIEW, 01-cleanup, 02-severity-policy, 03-ai-determinism,
   04-deterministic-selection, 05-schema-migrations, 99-CUTOVER)

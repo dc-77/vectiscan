@@ -79,7 +79,7 @@ def _load_subscription_data(conn, subscription_id: str) -> Optional[dict]:
         posture = cur.fetchone()
 
         cur.execute(
-            """SELECT id, host_ip, finding_type, port_or_path, status, severity,
+            """SELECT id, host_ip, vhost, finding_type, port_or_path, status, severity,
                       cvss_score, title, description, first_seen_at, last_seen_at,
                       resolved_at, risk_accepted_at, risk_accepted_reason
                  FROM consolidated_findings

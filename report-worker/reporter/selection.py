@@ -111,8 +111,16 @@ def _normalized_evidence_hash(finding: dict) -> str:
 
 
 def _affected_host(finding: dict) -> str:
-    return (finding.get("host") or finding.get("host_ip") or finding.get("ip")
-            or finding.get("fqdn") or finding.get("affected") or "unknown")
+    """Affected-Host-Identifier fuer Konsolidierung.
+
+    Multi-VHost-Probe (Mai 2026): vhost (FQDN) hat Vorrang vor host_ip,
+    damit zwei VHosts auf derselben IP NICHT zu einem affected_host
+    konsolidiert werden — Findings sollen pro VHost getrennt sichtbar
+    bleiben.
+    """
+    return (finding.get("vhost") or finding.get("fqdn")
+            or finding.get("host") or finding.get("host_ip") or finding.get("ip")
+            or finding.get("affected") or "unknown")
 
 
 def consolidate(findings: list[dict]) -> tuple[list[dict], int]:

@@ -447,8 +447,14 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
             _check_timeout()
 
         web_probe = host.get("web_probe", {})
+        # Multi-VHost-Probe (Mai 2026): primary VHosts pro IP fuer
+        # CMS-Fingerprint, wafw00f, Playwright. Legacy-Hosts ohne
+        # vhosts-Feld fallen via iter_primary_vhosts auf fqdns[:N]
+        # zurueck.
+        from scanner.vhost_iter import iter_primary_vhosts
+        vhost_fqdns = iter_primary_vhosts(host)
         tech_profile = run_phase1(ip, fqdns, scan_dir, order_id, p1_callback, config,
-                                  web_probe=web_probe)
+                                  web_probe=web_probe, vhost_fqdns=vhost_fqdns)
 
         # Carry web_probe data from Phase 0 into tech_profile
         tech_profile["has_web"] = web_probe.get("has_web", True)
@@ -621,6 +627,11 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         ip = host["ip"]
         fqdns = host["fqdns"]
 
+        # Multi-VHost-Probe (Mai 2026): primary VHosts pro IP fuer
+        # ZAP-Spider/AJAX, header_check, httpx etc.
+        from scanner.vhost_iter import iter_primary_vhosts
+        host_vhost_fqdns = iter_primary_vhosts(host)
+
         _check_timeout()
 
         def p2_callback(oid: str, tool: str, status: str, _ip: str = ip) -> None:
@@ -630,7 +641,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
         if not pool_enabled:
             result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
-                                adaptive_config=adaptive_configs.get(ip, {}))
+                                adaptive_config=adaptive_configs.get(ip, {}),
+                                vhost_fqdns=host_vhost_fqdns)
             return idx, result
 
         # Pool-Mode: lease a ZAP, run, release — even on error.
@@ -670,7 +682,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
                 log.warning("zap_cleanup_skipped", zap_id=zap_id, error=str(cleanup_err))
 
             result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
-                                adaptive_config=adaptive_configs.get(ip, {}))
+                                adaptive_config=adaptive_configs.get(ip, {}),
+                                vhost_fqdns=host_vhost_fqdns)
             return idx, result
         finally:
             hb_stop.set()

@@ -494,7 +494,7 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
         where.push(`severity = $${params.length}`);
       }
       const res = await query(
-        `SELECT id, host_ip, finding_type, port_or_path, status, severity, cvss_score,
+        `SELECT id, host_ip, vhost, finding_type, port_or_path, status, severity, cvss_score,
                 title, description, first_seen_at, last_seen_at, resolved_at,
                 risk_accepted_at, risk_accepted_reason, metadata
            FROM consolidated_findings
@@ -508,6 +508,7 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
       const findings = res.rows.map((r: Record<string, unknown>) => ({
         id: r.id,
         hostIp: r.host_ip,
+        vhost: r.vhost ?? '',
         findingType: r.finding_type,
         portOrPath: r.port_or_path,
         status: r.status,

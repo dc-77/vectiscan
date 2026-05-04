@@ -51,17 +51,17 @@ class PostureSnapshot:
     has_critical_change: bool  # True wenn neue CRITICAL/HIGH oder Regression
 
 
-def _derive_dedup_key(finding: dict) -> Optional[tuple[str, str, str]]:
-    """Leite (host_ip, finding_type, port_or_path) aus einem Finding ab.
+def _derive_dedup_key(finding: dict) -> Optional[tuple[str, str, str, str]]:
+    """Leite (host_ip, finding_type, port_or_path, vhost) aus einem Finding ab.
+
+    Multi-VHost-Probe (Mai 2026, Migration 023): vhost ist Teil des
+    Lifecycle-Keys, damit Findings unterschiedlicher VHosts auf derselben IP
+    nicht zwischen Lifecycle-Eintraegen "springen" (false-resolved/-regressed).
+    Bei IP-globalen Tools (testssl, nmap) ist vhost = '' (= 'host-global').
 
     Returns None wenn unzureichende Daten — Finding wird dann nicht
     dedupliziert (sondern als Order-spezifisch behandelt = NICHT in
     consolidated_findings aufgenommen).
-
-    Erwartete Finding-Felder (aus deterministic_pipeline.py + Claude):
-        - host_ip ODER affected_hosts[0] ODER affected (URL/Hostname)
-        - policy_id (ideal) ODER finding_type ODER title-Hash (Fallback)
-        - url_path/affected (fuer Pfad) ODER port (fuer non-HTTP)
     """
     host_ip = (
         finding.get("host_ip")
@@ -84,7 +84,16 @@ def _derive_dedup_key(finding: dict) -> Optional[tuple[str, str, str]]:
         or _extract_path_from_affected(finding.get("affected") or finding.get("url") or "")
         or (str(finding.get("port")) if finding.get("port") else "")
     )
-    return (str(host_ip).strip(), str(finding_type).strip(), str(port_or_path or "").strip())
+    # vhost: aus finding.vhost ODER aus affected/url-Hostname (wenn != host_ip).
+    vhost = finding.get("vhost") or ""
+    if not vhost:
+        # Fallback: extrahiere Hostname aus affected/url, wenn das ein FQDN ist
+        # und nicht gleich der IP
+        candidate = _extract_host_from_affected(finding.get("affected") or finding.get("url"))
+        if candidate and candidate != str(host_ip).strip() and not candidate.replace(".", "").replace(":", "").isdigit():
+            vhost = candidate
+    return (str(host_ip).strip(), str(finding_type).strip(),
+            str(port_or_path or "").strip(), str(vhost or "").strip())
 
 
 _PORT_RE = None
@@ -215,7 +224,7 @@ def _do_aggregate(conn, order_id, subscription_id, findings):
             key = _derive_dedup_key(f)
             if not key:
                 continue
-            host_ip, finding_type, port_or_path = key
+            host_ip, finding_type, port_or_path, vhost = key
 
             severity = (f.get("severity") or "INFO").upper()
             if severity not in SEVERITY_WEIGHTS:
@@ -235,14 +244,15 @@ def _do_aggregate(conn, order_id, subscription_id, findings):
                 "evidence": f.get("evidence"),
             }
 
-            # Check existing
+            # Check existing (Migration 023: vhost ist Teil des Keys)
             cur.execute(
                 """SELECT id, status FROM consolidated_findings
                    WHERE subscription_id = %s
                      AND host_ip = %s
                      AND finding_type = %s
-                     AND port_or_path = %s""",
-                (subscription_id, host_ip, finding_type, port_or_path),
+                     AND port_or_path = %s
+                     AND vhost = %s""",
+                (subscription_id, host_ip, finding_type, port_or_path, vhost),
             )
             existing = cur.fetchone()
 
@@ -250,14 +260,14 @@ def _do_aggregate(conn, order_id, subscription_id, findings):
                 # NEU
                 cur.execute(
                     """INSERT INTO consolidated_findings
-                       (subscription_id, host_ip, finding_type, port_or_path,
+                       (subscription_id, host_ip, finding_type, port_or_path, vhost,
                         status, severity, cvss_score, title, description,
                         first_seen_order_id, first_seen_at,
                         last_seen_order_id, last_seen_at, metadata)
-                       VALUES (%s, %s, %s, %s, 'open', %s, %s, %s, %s,
+                       VALUES (%s, %s, %s, %s, %s, 'open', %s, %s, %s, %s,
                                %s, NOW(), %s, NOW(), %s)
                        RETURNING id""",
-                    (subscription_id, host_ip, finding_type, port_or_path,
+                    (subscription_id, host_ip, finding_type, port_or_path, vhost,
                      severity, cvss_num, title, description,
                      order_id, order_id, json.dumps(metadata)),
                 )

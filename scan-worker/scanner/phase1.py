@@ -421,10 +421,17 @@ def build_tech_profile(
     webtech_result: dict[str, Any],
     wafw00f_result: Optional[dict[str, Any]],
     host_dir: str,
+    vhost_fqdns: list[str] | None = None,
+    vhost_waf_results: dict[str, Optional[dict[str, Any]]] | None = None,
 ) -> dict[str, Any]:
     """Combine Phase 1 results into a unified tech profile.
 
     Saves tech_profile.json and returns the profile dict.
+
+    Args:
+        vhost_fqdns: Liste primary VHosts fuer Multi-VHost-CMS-Detection.
+            Wenn None: nutzt fqdns[0] (Legacy).
+        vhost_waf_results: Pro-VHost-WAF-Ergebnisse (analog).
     """
     open_ports = nmap_result.get("open_ports", [])
     services = nmap_result.get("services", [])
@@ -439,21 +446,45 @@ def build_tech_profile(
                 server = f"{product}/{version}".rstrip("/") if version else product
                 break
 
-    # CMS detection via fingerprinting engine (replaces old webtech+fallback logic)
+    # CMS detection via fingerprinting engine — pro VHost (Multi-VHost-Probe)
     cms = None
     cms_version = None
     cms_confidence = 0.0
     cms_details: dict[str, Any] = {}
-    primary_fqdn = fqdns[0] if fqdns else None
+    vhost_cms_results: dict[str, dict[str, Any]] = {}
+    primary_fqdn_local = fqdns[0] if fqdns else None
+    cms_vhost_targets = vhost_fqdns or ([primary_fqdn_local] if primary_fqdn_local else [])
 
-    if primary_fqdn:
+    if cms_vhost_targets:
         fingerprinter = CMSFingerprinter(max_requests=20)
-        cms_result: CMSResult = fingerprinter.fingerprint(primary_fqdn, webtech_result=webtech_result)
-        if cms_result.cms and cms_result.confidence >= 0.5:
-            cms = cms_result.cms
-            cms_version = cms_result.version
-            cms_confidence = cms_result.confidence
-            cms_details = cms_result.to_dict()
+        for vh in cms_vhost_targets:
+            try:
+                cms_result: CMSResult = fingerprinter.fingerprint(vh, webtech_result=webtech_result)
+            except Exception as e:
+                log.warning("cms_fingerprint_failed", vhost=vh, error=str(e))
+                continue
+            entry = {
+                "cms": cms_result.cms if cms_result.confidence >= 0.5 else None,
+                "cms_version": cms_result.version if cms_result.confidence >= 0.5 else None,
+                "cms_confidence": cms_result.confidence,
+                "details": cms_result.to_dict(),
+            }
+            vhost_cms_results[vh] = entry
+            # Primary VHost (erstes Element) gewinnt fuer Top-Level-Felder
+            if vh == cms_vhost_targets[0] and entry["cms"]:
+                cms = entry["cms"]
+                cms_version = entry["cms_version"]
+                cms_confidence = entry["cms_confidence"]
+                cms_details = entry["details"]
+        # Fallback: kein primary-CMS aber Sekundaer-VHost hat eines → nutze ersten
+        if not cms:
+            for vh, entry in vhost_cms_results.items():
+                if entry["cms"]:
+                    cms = entry["cms"]
+                    cms_version = entry["cms_version"]
+                    cms_confidence = entry["cms_confidence"]
+                    cms_details = entry["details"]
+                    break
     else:
         # No FQDN — fall back to webtech-only
         if isinstance(webtech_result, dict):
@@ -475,10 +506,20 @@ def build_tech_profile(
                 cms = tech
                 break
 
-    # Determine WAF
+    # Determine WAF — pro VHost (Multi-VHost-Probe) + primary
+    vhost_waf_map: dict[str, Optional[str]] = {}
+    if vhost_waf_results:
+        for vh, res in vhost_waf_results.items():
+            vhost_waf_map[vh] = (res or {}).get("firewall")
     waf = None
     if wafw00f_result:
         waf = wafw00f_result.get("firewall")
+    if waf is None and vhost_waf_map:
+        # Fallback: nimm ersten WAF-Treffer aus VHost-Map
+        for vh, w in vhost_waf_map.items():
+            if w:
+                waf = w
+                break
 
     # Determine service flags from open ports
     has_ssl = 443 in open_ports
@@ -493,6 +534,23 @@ def build_tech_profile(
 
     ftp_service = 21 in open_ports
 
+    # Pro-VHost-Detail-Map (Multi-VHost-Probe). Tools die spaeter VHost-
+    # spezifisch entscheiden (z.B. wpscan nur bei CMS=WordPress) koennen
+    # hier nachschauen statt nur das Top-Level-Feld zu nehmen.
+    vhost_results: dict[str, dict[str, Any]] = {}
+    for vh, entry in (vhost_cms_results or {}).items():
+        vhost_results[vh] = {
+            "cms": entry.get("cms"),
+            "cms_version": entry.get("cms_version"),
+            "cms_confidence": entry.get("cms_confidence"),
+            "waf": vhost_waf_map.get(vh),
+        }
+    # Auch FQDNs ohne CMS-Treffer aber mit WAF-Probe ergaenzen
+    for vh, w in (vhost_waf_map or {}).items():
+        if vh not in vhost_results:
+            vhost_results[vh] = {"cms": None, "cms_version": None,
+                                  "cms_confidence": 0.0, "waf": w}
+
     profile: dict[str, Any] = {
         "ip": ip,
         "fqdns": fqdns,
@@ -506,6 +564,8 @@ def build_tech_profile(
         "mail_services": mail_services,
         "ftp_service": ftp_service,
         "has_ssl": has_ssl,
+        "vhost_results": vhost_results,
+        "primary_vhost": (vhost_fqdns[0] if vhost_fqdns else (fqdns[0] if fqdns else None)),
     }
 
     # Save to disk
@@ -527,6 +587,7 @@ def run_phase1(
     progress_callback: Callable[[str, str, str], None],
     config: dict[str, Any] | None = None,
     web_probe: dict[str, Any] | None = None,
+    vhost_fqdns: list[str] | None = None,
 ) -> dict[str, Any]:
     """Orchestrate Phase 1 (technology detection) for a single host.
 
@@ -538,9 +599,14 @@ def run_phase1(
         progress_callback: Called after each tool with (order_id, tool_name, status).
         config: Package configuration dict (optional).
         web_probe: Phase 0 web_probe data with final_url for redirect-aware probing.
+        vhost_fqdns: Liste primary VHosts (Multi-VHost-Probe). Wenn None,
+            nutzt Legacy-Verhalten (fqdns[0] als einziger VHost).
 
     Returns:
-        Tech profile dict for this host.
+        Tech profile dict for this host. Bei Multi-VHost: tech_profile[
+        "vhost_results"][fqdn] enthaelt cms/cms_version/cms_confidence/waf
+        pro VHost. tech_profile["cms" etc.] zeigt die Werte des primary
+        VHost (vhost_fqdns[0]) fuer Backwards-Compat.
     """
     nmap_ports = config["nmap_ports"] if config else "--top-ports 1000"
 
@@ -561,6 +627,11 @@ def run_phase1(
     # fqdns list is already sorted by relevance from phase0
     primary_fqdn = fqdns[0] if fqdns else ip
 
+    # VHost-Liste fuer per-VHost-Tools (CMS, wafw00f, Playwright)
+    # Wenn kein vhost_fqdns uebergeben (Legacy-Path), nutze fqdns[:1].
+    if not vhost_fqdns:
+        vhost_fqdns = [primary_fqdn] if primary_fqdn else []
+
     # Probe multiple non-mail FQDNs to detect different services per IP
     from scanner.phase0 import _is_mail_only_fqdn
     probe_fqdns = [f for f in fqdns if not _is_mail_only_fqdn(f)][:3]
@@ -574,7 +645,9 @@ def run_phase1(
         publish_event(order_id, {"type": "tool_starting", "tool": "webtech", "host": ip})
         if _is_playwright_available():
             try:
-                pw_fqdns = [f for f in fqdns[:8] if f]  # Screenshot + tech probe per FQDN
+                # Playwright probt primary VHosts (Multi-VHost-Probe).
+                # Bei Legacy-Path (kein vhost_fqdns): vorher fqdns[:8] verwendet.
+                pw_fqdns = [f for f in (vhost_fqdns or fqdns[:8]) if f]
                 # Build web_probe URL map: use Phase 0 final_url if it redirected
                 wp_urls: dict[str, str] = {}
                 if web_probe and web_probe.get("final_url"):
@@ -617,11 +690,20 @@ def run_phase1(
                      exit_code=0 if webtech_result else 1,
                      duration_ms=0)
 
-    # Run wafw00f on primary FQDN
+    # Run wafw00f — pro VHost (Multi-VHost-Probe), erstes Ergebnis als primary
     wafw00f_result = None
+    vhost_waf_results: dict[str, Optional[dict[str, Any]]] = {}
     if "wafw00f" in phase1_tools:
         publish_event(order_id, {"type": "tool_starting", "tool": "wafw00f", "host": ip})
-        wafw00f_result = run_wafw00f(primary_fqdn, ip, host_dir, order_id)
+        for vh in vhost_fqdns:
+            try:
+                res = run_wafw00f(vh, ip, host_dir, order_id)
+            except Exception as e:
+                log.warning("wafw00f_failed", vhost=vh, error=str(e))
+                res = None
+            vhost_waf_results[vh] = res
+            if wafw00f_result is None and res:
+                wafw00f_result = res  # primary = erstes Element
         progress_callback(order_id, "wafw00f", "complete")
 
     # wafw00f already saved to scan_results by run_tool() inside run_wafw00f()
@@ -634,6 +716,8 @@ def run_phase1(
         webtech_result=webtech_result,
         wafw00f_result=wafw00f_result,
         host_dir=host_dir,
+        vhost_fqdns=vhost_fqdns,
+        vhost_waf_results=vhost_waf_results,
     )
 
     # Save redirect data for later use (AI Tech Analysis, CMS fingerprinter)

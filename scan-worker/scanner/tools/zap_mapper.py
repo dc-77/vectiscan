@@ -190,10 +190,26 @@ class ZapAlertMapper:
         # CVSS defaults
         cvss_score, cvss_vector = _SEVERITY_CVSS.get(severity, (0.0, ""))
 
+        # Multi-VHost-Probe (Mai 2026): vhost = echter Hostname aus Alert-URL,
+        # falls vorhanden — sonst fallback auf das uebergebene primary fqdn.
+        # So landet z.B. ZAP-Finding auf ose.heuel.com mit vhost='ose.heuel.com'
+        # statt nur 'edi.heuel.com' (= primary).
+        vhost = ""
+        if url:
+            try:
+                vh_host = urlparse(url).hostname or ""
+                if vh_host:
+                    vhost = vh_host
+            except Exception:
+                pass
+        if not vhost:
+            vhost = fqdn or ""
+
         return {
             "tool": tool,
             "host_ip": host_ip,
             "fqdn": fqdn,
+            "vhost": vhost,
             "cve_id": cve_id,
             "title": alert.get("name", alert.get("alert", "")),
             "severity": severity,
