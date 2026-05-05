@@ -9,6 +9,7 @@ import { FastifyInstance } from 'fastify';
 import { query } from '../lib/db.js';
 import { scanQueue, publishEvent, enqueuePrecheck } from '../lib/queue.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
 import { validateTarget, validateTargetBatch } from '../lib/validate.js';
 
@@ -701,6 +702,98 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
           })),
         },
       };
+    },
+  );
+
+  // ── Admin Endpoints ───────────────────────────────────────────
+  // POST /api/admin/subscriptions/:id/cancel — Abo beenden (status=cancelled)
+  // Sub bleibt erhalten (Audit-Trail), aber laufende/geplante Scans werden
+  // unterbunden. scan_targets bleiben ebenfalls.
+  server.post<{ Params: { id: string }; Body: { reason?: string } }>(
+    '/api/admin/subscriptions/:id/cancel',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params;
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid subscription ID' });
+      }
+      const reason = (request.body?.reason || '').slice(0, 500);
+
+      const subRow = await query<{ status: string; customer_id: string }>(
+        'SELECT status, customer_id FROM subscriptions WHERE id = $1',
+        [id],
+      );
+      if (subRow.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Abo nicht gefunden.' });
+      }
+      const sub = subRow.rows[0];
+      if (sub.status === 'cancelled') {
+        return reply.status(409).send({ success: false, error: 'Abo ist bereits cancelled.' });
+      }
+
+      await query(
+        `UPDATE subscriptions
+            SET status = 'cancelled', updated_at = NOW()
+          WHERE id = $1`,
+        [id],
+      );
+      audit({
+        action: 'subscription.cancelled',
+        details: { subscriptionId: id, customerId: sub.customer_id,
+                   previousStatus: sub.status, reason, userId: request.user!.sub },
+        ip: request.ip,
+      });
+      return { success: true, data: { id, status: 'cancelled' } };
+    },
+  );
+
+  // DELETE /api/admin/subscriptions/:id — vollstaendig loeschen.
+  // CASCADE ueber FK-Constraints: scan_targets, orders, reports, posture_*,
+  // consolidated_findings, scan_finding_observations werden mitgeloescht.
+  // Nur erlaubt wenn KEIN aktiver Scan laeuft (Schutz vor Datenverlust).
+  server.delete<{ Params: { id: string } }>(
+    '/api/admin/subscriptions/:id',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params;
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid subscription ID' });
+      }
+
+      const subRow = await query<{ customer_id: string; package: string; status: string }>(
+        'SELECT customer_id, package, status FROM subscriptions WHERE id = $1',
+        [id],
+      );
+      if (subRow.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Abo nicht gefunden.' });
+      }
+      const sub = subRow.rows[0];
+
+      // Schutz: keine laufenden Scans
+      const active = await query<{ count: string }>(
+        `SELECT COUNT(*) AS count
+           FROM orders o
+          WHERE o.subscription_id = $1
+            AND o.status IN ('precheck_running', 'pending_target_review',
+                              'scan-pending', 'scan_running', 'report_generating')`,
+        [id],
+      );
+      if (Number(active.rows[0]?.count || 0) > 0) {
+        return reply.status(409).send({
+          success: false,
+          error: `Abo hat ${active.rows[0].count} laufende(n) Scan(s). Erst abwarten oder Order canceln.`,
+        });
+      }
+
+      await query('DELETE FROM subscriptions WHERE id = $1', [id]);
+      audit({
+        action: 'subscription.deleted',
+        details: { subscriptionId: id, customerId: sub.customer_id,
+                   package: sub.package, previousStatus: sub.status,
+                   userId: request.user!.sub },
+        ip: request.ip,
+      });
+      return { success: true, data: { id, deleted: true } };
     },
   );
 }

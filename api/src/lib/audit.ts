@@ -46,7 +46,9 @@ export type AuditAction =
   | 'finding.accept_risk'
   | 'finding.reopen'
   | 'subscription.status_report_requested'
-  | 'subscription.status_report_generated';
+  | 'subscription.status_report_generated'
+  | 'subscription.cancelled'
+  | 'subscription.deleted';
 
 interface AuditEntry {
   orderId?: string | null;

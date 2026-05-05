@@ -223,6 +223,22 @@ export default function AdminPage() {
           </div>
         </Link>
 
+        {/* Abo-Verwaltung */}
+        <Link
+          href="/admin/subscriptions"
+          className="block bg-[#1e293b] rounded-lg border border-gray-800 p-4 transition-colors hover:border-gray-700"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-medium text-slate-300">Abo-Verwaltung</h2>
+              <p className="text-xs text-slate-500 mt-1">
+                Abos einsehen, beenden (status=cancelled) oder vollstaendig loeschen (CASCADE).
+              </p>
+            </div>
+            <span className="text-slate-400 text-xl">&rarr;</span>
+          </div>
+        </Link>
+
         {/* AI Costs */}
         {aiCosts && aiCosts.total_cost_usd > 0 && (
           <div className="bg-[#1e293b] rounded-lg border border-gray-800 p-4 space-y-4">

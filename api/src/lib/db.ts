@@ -31,6 +31,7 @@ const MIGRATION_021_PATH = path.join(__dirname, '..', 'migrations', '021_vpn_str
 const MIGRATION_022_PATH = path.join(__dirname, '..', 'migrations', '022_ai_call_costs.sql');
 const MIGRATION_023_PATH = path.join(__dirname, '..', 'migrations', '023_consolidated_findings_vhost.sql');
 const MIGRATION_024_PATH = path.join(__dirname, '..', 'migrations', '024_determinism_kpi.sql');
+const MIGRATION_025_PATH = path.join(__dirname, '..', 'migrations', '025_subscription_delete_safe.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -310,6 +311,21 @@ export async function initDb(): Promise<void> {
   `);
   if (!det024Check.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_024_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 025: orders.subscription_id ON DELETE SET NULL.
+  // Existence-Check: information_schema.referential_constraints — wir
+  // pruefen ob die FK aktuell SET NULL hat. Bei NO ACTION/RESTRICT muss
+  // umgestellt werden.
+  const fk025Check = await pool.query(`
+    SELECT delete_rule
+      FROM information_schema.referential_constraints
+     WHERE constraint_name = 'orders_subscription_id_fkey'
+  `);
+  const currentRule = fk025Check.rows[0]?.delete_rule;
+  if (currentRule && currentRule !== 'SET NULL') {
+    const migrationSql = fs.readFileSync(MIGRATION_025_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 
