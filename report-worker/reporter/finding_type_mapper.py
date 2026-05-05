@@ -120,11 +120,22 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
     # Server-Banner: erweitert um "Apache-Versionsinformation",
     # "PHP-Versions(information|disclosure)", "Versionsinformation im Header",
     # "Server-Header verraet/zeigt Version" etc.
+    # B1 Mai 2026: zusaetzlich "Server- und Technologie-Versionsinformationen",
+    # "versionsinformation in http", "server-banner mit version" (Title-Template-Form),
+    # "(nginx|apache|iis|php)/X.Y" als Banner-Marker.
     (re.compile(
         r"(?:apache|nginx|iis|php|openssh|ssh|tomcat|jetty|caddy)[-_ ]?versions?(?:[-_ ]?information)?|"
         r"server[-_ ]?(?:banner|header).*(?:version|verraet|zeigt|preisgibt|disclos)|"
         r"version.*(?:disclos|preisgegeben|im\s*header|im\s*banner|in\s*server[-_ ]?header)|"
-        r"(?:server|software|tech)[-_ ]?version[-_ ]?(?:disclosure|leakage|information)",
+        r"(?:server|software|tech)[-_ ]?version[-_ ]?(?:disclosure|leakage|information)|"
+        r"server[-_ –—]?\s*und\s*technologie[-_ ]?versions?information|"
+        r"server[-_ ]?\s*und\s*tech[-_ ]?versions?information|"
+        r"(?:technologie|tech)[-_ ]?versions?information(?:en)?\s*in\s*http|"
+        r"versions?information(?:en)?\s*in\s*(?:http|header|banner)|"
+        # Banner-Format mit `/`-Trenner (z.B. nginx/1.22.1 — nicht "PHP 5.6"):
+        r"(?:nginx|apache|iis|php|openssh)/\d+(?:\.\d+){1,3}|"
+        r"server[-_ ]?banner\s*mit\s*versions?[-_ ]?info|"
+        r"server[-_ ]?\s*und\s*technologie[-_ ]?versions?[-_ ]?info",
         re.I,
      ), "server_banner_with_version"),
     (re.compile(r"server[-_ ]?banner|server[-_ ]?header(?!.*version)", re.I),
@@ -151,8 +162,13 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
     # genannt → wir mappen auf cookie_no_secure (verbreitetste/relevante Default-Lücke).
     # Pattern erlaubt "Sicherheits" (deutsches Genitiv-Fugenelement) und Verneinung
     # vor ODER nach dem Keyword.
+    # B1 Mai 2026: zusaetzlich "Unsichere Cookie-Konfiguration", "Cookie-Konfiguration unsicher",
+    # "Session-Cookie ohne ..." (Template-Form ohne explizites "fehl").
     (re.compile(
-        r"cookie[-_ ]?(?:sicherheit|security)\w*[-_ ]?attribut\w*.*(?:fehl|miss|not\s*set)",
+        r"cookie[-_ ]?(?:sicherheit|security)\w*[-_ ]?attribut\w*.*(?:fehl|miss|not\s*set)|"
+        r"unsicher\w*\s*cookie[-_ ]?konfiguration|"
+        r"cookie[-_ ]?konfiguration\s*unsicher|"
+        r"session[-_ ]?cookie\s+ohne\s+(?:secure|httponly|samesite)",
         re.I,
      ), "cookie_no_secure"),
 
@@ -291,9 +307,16 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
      ), "mta_sts_missing"),
 
     # ── EOL Software ─────────────────────────────────────
+    # B1 Mai 2026: zusaetzlich "vor End-of-Life", "ohne Sicherheitsupdates",
+    # "kein Support mehr", "Microsoft hat den Support eingestellt"
     (re.compile(
         r"end[-_ ]?of[-_ ]?life|\beol\b|out[-_ ]?of[-_ ]?support|"
-        r"veraltet|unsupported\s*version|nicht\s*mehr\s*unterstuetzt",
+        r"veraltet|unsupported\s*version|nicht\s*mehr\s*unterstuetzt|"
+        r"vor\s+end[-_ ]?of[-_ ]?life|"
+        r"ohne\s+sicherheitsupdates|"
+        r"keine?\s*sicherheitsupdates\s+mehr|"
+        r"support\s+(?:eingestellt|beendet|laeuft\s*aus)|"
+        r"(?:exchange|windows\s*server|sql\s*server)\s+(?:200[0-9]|201[0-9])\s+(?:vor|wird|ist).*(?:eol|end[-_ ]?of[-_ ]?life|support)",
         re.I,
      ), "software_eol"),
 ]
@@ -332,13 +355,43 @@ def map_finding_type(finding: dict) -> Optional[str]:
     return None
 
 
-def annotate_finding_types(findings: list[dict]) -> list[dict]:
-    """Setzt finding_type IN-PLACE auf jedem Finding (wenn nicht schon gesetzt)."""
+def annotate_finding_types(findings: list[dict],
+                            use_ai_fallback: bool = True) -> list[dict]:
+    """Setzt finding_type IN-PLACE auf jedem Finding (wenn nicht schon gesetzt).
+
+    B2 (Mai 2026): wenn Regex-Match leer bleibt UND `use_ai_fallback=True`,
+    wird Haiku via `ai_finding_type_fallback.map_finding_type_via_ai`
+    befragt (gecacht 30 Tage). Bei API-Fehler oder unklarem Ergebnis →
+    finding_type bleibt None (= SP-FALLBACK in severity_policy).
+
+    Marker `_finding_type_source` auf jedem Finding fuer QA/Audit:
+      "regex" | "ai_fallback" | "preset"
+    """
+    needs_ai: list[dict] = []
     for f in findings:
-        if not f.get("finding_type"):
-            inferred = map_finding_type(f)
-            if inferred:
-                f["finding_type"] = inferred
+        if f.get("finding_type"):
+            f.setdefault("_finding_type_source", "preset")
+            continue
+        inferred = map_finding_type(f)
+        if inferred:
+            f["finding_type"] = inferred
+            f["_finding_type_source"] = "regex"
+        else:
+            needs_ai.append(f)
+
+    if use_ai_fallback and needs_ai:
+        try:
+            from reporter.ai_finding_type_fallback import map_finding_type_via_ai
+            for f in needs_ai:
+                ai_type = map_finding_type_via_ai(f)
+                if ai_type:
+                    f["finding_type"] = ai_type
+                    f["_finding_type_source"] = "ai_fallback"
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(
+                "ai_fallback_unavailable err=%s", e)
+
     return findings
 
 

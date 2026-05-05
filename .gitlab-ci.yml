@@ -412,6 +412,53 @@ rollback:
 # =============================================================================
 # CLEANUP-PROD — Big-Bang Wipe (Q2/2026 Determinismus-Reset)
 # =============================================================================
+# =============================================================================
+# EOL-DATA-SYNC: holt aktuelle EOL-Termine von endoflife.date und
+# regeneriert report-worker/reporter/eol_data_generated.py. Push erfolgt
+# durch den Job selbst (commit + push als Pipeline-Bot).
+#
+# Auslöser:
+#   - Manuell via GitLab-UI ("Run pipeline" + Job ausführen)
+#   - Schedule (CI_PIPELINE_SOURCE=schedule, weekly empfohlen):
+#     GitLab → CI/CD → Schedules → "EOL-Data-Sync (weekly)" anlegen,
+#     Cron z.B. "0 4 * * 1" (Mo 04:00 UTC).
+#
+# Sicherheitsnetz:
+#   - Wenn endoflife.date down ist (entries=0): exit 1, kein Push.
+#   - Bei keinen Aenderungen (`git diff --quiet`): kein Commit, kein Push.
+#
+# Lizenz-Hinweis: Daten von endoflife.date — CC-BY-4.0 — Attribution
+# bereits im Generated-Header verzeichnet.
+# =============================================================================
+
+eol-data-sync:
+  stage: ops
+  tags: [vectigal]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $EOL_SYNC == "true"
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+      allow_failure: true
+  script:
+    - python3 scripts/sync-eol-data.py
+    - |
+      cd "${CI_PROJECT_DIR}"
+      if git diff --quiet -- report-worker/reporter/eol_data_generated.py; then
+        echo "[INFO] keine EOL-Aenderungen — kein Commit notwendig."
+        exit 0
+      fi
+      git config user.email "ci-bot@vectiscan.local"
+      git config user.name  "VectiScan CI Bot"
+      git add report-worker/reporter/eol_data_generated.py
+      git commit -m "chore(eol): refresh EOL-Daten aus endoflife.date [skip ci]"
+      # Push via CI-Push-Token (vorab in CI/CD-Variables anlegen: CI_PUSH_TOKEN
+      # mit api+write_repo Scope). Falls nicht gesetzt: Job laeuft trocken.
+      if [ -n "$CI_PUSH_TOKEN" ]; then
+        git push "https://oauth2:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" HEAD:main
+      else
+        echo "[WARN] CI_PUSH_TOKEN nicht gesetzt — Aenderungen wurden lokal commited, aber nicht gepusht."
+      fi
+
 # Triggert scripts/cleanup-prod.sh auf vectigal-docker02. Wipet alle Scan-
 # Daten, Reports, Subscriptions, MinIO-Objekte, Threat-Intel/AI-Caches.
 # Erhalten bleiben users, customers, verified_domains, Schema.

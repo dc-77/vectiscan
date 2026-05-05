@@ -17,6 +17,9 @@ from reportlab.platypus import (
     KeepTogether,
 )
 import os
+import logging
+
+log = logging.getLogger(__name__)
 
 from reporter.pdf.branding import (
     COLORS, SEVERITY_COLORS, PACKAGE_BADGES,
@@ -829,6 +832,253 @@ def build_audit_trail(story, styles, audit_data):
     story.append(Spacer(1, SPACING_FINDING))
 
 
+# ============================================================
+# A3 — Insurance Builders (Versicherungs-Fragebogen / Risikobewertung /
+# Massnahmen zur Praemienreduktion). Werden gerendert wenn
+# report_data["insurance"] vorhanden ist (Insurance-Paket).
+# ============================================================
+
+_INS_ANSWER_LABEL = {
+    "PASS":         ("✓ Erfuellt",      "nis2_covered"),
+    "FAIL":         ("✗ Nicht erfuellt", "danger"),
+    "PARTIAL":      ("◐ Teilweise",      "nis2_partial"),
+    "NOT_ASSESSED": ("— Nicht bewertet",  "muted"),
+}
+_INS_RATING_COLOR = {
+    "LOW":      "nis2_covered",
+    "MEDIUM":   "nis2_partial",
+    "HIGH":     "warning",
+    "CRITICAL": "danger",
+}
+
+
+def build_insurance_questionnaire(story, styles, insurance_data):
+    """Sektion 5: Versicherungs-Fragebogen (PASS/FAIL/PARTIAL pro Item)."""
+    questionnaire = insurance_data.get("questionnaire") or []
+    story.append(PageBreak())
+    story.append(Paragraph("Versicherungs-Fragebogen", styles["SectionTitle"]))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, SPACING_PARAGRAPH))
+
+    if not questionnaire:
+        story.append(Paragraph(
+            "Versicherungs-Fragebogen konnte aus den Scan-Ergebnissen nicht "
+            "vollstaendig befuellt werden — manuelle Bewertung erforderlich.",
+            styles["BodyText2"],
+        ))
+        story.append(Spacer(1, SPACING_FINDING))
+        return
+
+    story.append(Paragraph(
+        "Bewertung der Pflichtkriterien fuer Cyber-Versicherungs-Antraege "
+        "auf Basis automatisch erhobener Scan-Daten. Items mit Status "
+        "<b>Nicht bewertet</b> erfordern manuelle Pruefung.",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, SPACING_PARAGRAPH))
+
+    header_style = ParagraphStyle("th_ins", fontName=FONT_HEADING,
+                                   fontSize=FONT_SIZE_TABLE_HEADER, leading=11,
+                                   textColor=COLORS["white"], alignment=TA_CENTER)
+    cell_label = ParagraphStyle("al_ins", fontName=FONT_BODY,
+                                 fontSize=FONT_SIZE_TABLE_CELL, leading=11,
+                                 textColor=COLORS["text"])
+    cell_value = ParagraphStyle("av_ins", fontName=FONT_BODY,
+                                 fontSize=FONT_SIZE_TABLE_CELL, leading=11,
+                                 textColor=COLORS["text"])
+
+    header_row = [
+        Paragraph("<b>Kategorie</b>", header_style),
+        Paragraph("<b>Frage</b>", header_style),
+        Paragraph("<b>Status</b>", header_style),
+        Paragraph("<b>Risiko</b>", header_style),
+    ]
+    rows = []
+    for q in questionnaire:
+        ans = q.get("answer", "NOT_ASSESSED")
+        label, color_key = _INS_ANSWER_LABEL.get(ans, _INS_ANSWER_LABEL["NOT_ASSESSED"])
+        status_p = ParagraphStyle("st_ins", fontName=FONT_HEADING,
+                                   fontSize=FONT_SIZE_TABLE_CELL, leading=11,
+                                   textColor=COLORS.get(color_key, COLORS["text"]),
+                                   alignment=TA_CENTER)
+        risk = q.get("risk_impact", "unknown")
+        rows.append([
+            Paragraph(q.get("category", "—"), cell_label),
+            Paragraph(q.get("question", "—"), cell_label),
+            Paragraph(label, status_p),
+            Paragraph(risk.upper(), cell_value),
+        ])
+    col_widths = [30 * mm, 95 * mm, 30 * mm, 15 * mm]
+    table = styled_table(header_row, rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, SPACING_FINDING))
+
+
+def build_insurance_risk_score(story, styles, insurance_data):
+    """Sektion 6: Risikobewertung (Score 0-100, Rating, Ransomware-Indikator)."""
+    risk = insurance_data.get("risk_score") or {}
+    story.append(PageBreak())
+    story.append(Paragraph("Risikobewertung", styles["SectionTitle"]))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, SPACING_PARAGRAPH))
+
+    if not risk:
+        story.append(Paragraph(
+            "Risiko-Score konnte nicht berechnet werden.",
+            styles["BodyText2"],
+        ))
+        story.append(Spacer(1, SPACING_FINDING))
+        return
+
+    score = risk.get("score", 0)
+    rating = risk.get("rating", "MEDIUM")
+    rw = risk.get("ransomware_indicator", "LOW")
+
+    build_risk_box(
+        story,
+        f"Versicherungs-Risiko-Score: {score} / 100",
+        rating,
+        f"Rating: {rating} — niedriger Score = besseres Versicherungsprofil.",
+    )
+    story.append(Spacer(1, SPACING_FINDING))
+
+    header_style = ParagraphStyle("th_rs", fontName=FONT_HEADING,
+                                   fontSize=FONT_SIZE_TABLE_HEADER, leading=11,
+                                   textColor=COLORS["white"], alignment=TA_CENTER)
+    cell_label = ParagraphStyle("al_rs", fontName=FONT_HEADING,
+                                 fontSize=FONT_SIZE_TABLE_CELL, leading=11,
+                                 textColor=COLORS["text"])
+    cell_value = ParagraphStyle("av_rs", fontName=FONT_BODY,
+                                 fontSize=FONT_SIZE_TABLE_CELL, leading=11,
+                                 textColor=COLORS["text"])
+    rating_color = COLORS.get(_INS_RATING_COLOR.get(rating, "muted"), COLORS["text"])
+    rating_p = ParagraphStyle("rt_rs", fontName=FONT_HEADING,
+                               fontSize=FONT_SIZE_TABLE_CELL, leading=11,
+                               textColor=rating_color)
+    header_row = [
+        Paragraph("<b>Kennzahl</b>", header_style),
+        Paragraph("<b>Wert</b>", header_style),
+    ]
+    data_rows = [
+        [Paragraph("Risiko-Score", cell_label),
+         Paragraph(str(score), cell_value)],
+        [Paragraph("Rating", cell_label),
+         Paragraph(rating, rating_p)],
+        [Paragraph("Ransomware-Indikator", cell_label),
+         Paragraph(rw, cell_value)],
+        [Paragraph("Methodik", cell_label),
+         Paragraph("Penalty/Bonus aus Fragebogen + Findings-Severity", cell_value)],
+    ]
+    col_widths = [55 * mm, 115 * mm]
+    table = styled_table(header_row, data_rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, SPACING_PARAGRAPH))
+    story.append(Paragraph(
+        "Score-Bereich: 0-25 LOW (sehr gut), 26-50 MEDIUM (akzeptabel), "
+        "51-75 HIGH (Pruefung empfohlen), 76-100 CRITICAL (Versicherung "
+        "moeglicherweise nicht abschliessbar ohne Massnahmen).",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, SPACING_FINDING))
+
+
+def build_insurance_premium_actions(story, styles, insurance_data):
+    """Sektion 7: Massnahmen zur Praemienreduktion."""
+    risk = insurance_data.get("risk_score") or {}
+    actions = risk.get("premium_reduction_actions") or []
+    story.append(PageBreak())
+    story.append(Paragraph("Massnahmen zur Praemienreduktion", styles["SectionTitle"]))
+    story.append(HorizontalLine(170 * mm, COLORS["accent"], 1))
+    story.append(Spacer(1, SPACING_PARAGRAPH))
+
+    if not actions:
+        story.append(Paragraph(
+            "Aktuell sind keine konkreten Massnahmen zur Praemienreduktion "
+            "ableitbar — das Sicherheitsprofil entspricht bereits den "
+            "Mindestanforderungen.",
+            styles["BodyText2"],
+        ))
+        story.append(Spacer(1, SPACING_FINDING))
+        return
+
+    story.append(Paragraph(
+        "Die folgenden Massnahmen koennen bei Umsetzung die "
+        "Versicherungs-Praemie reduzieren. Geschaetzte Werte sind "
+        "Richtwerte — die tatsaechliche Reduktion verhandelt der "
+        "Versicherer auf Basis vorgelegter Nachweise.",
+        styles["BodyText2"],
+    ))
+    story.append(Spacer(1, SPACING_PARAGRAPH))
+
+    header_style = ParagraphStyle("th_pa", fontName=FONT_HEADING,
+                                   fontSize=FONT_SIZE_TABLE_HEADER, leading=11,
+                                   textColor=COLORS["white"], alignment=TA_CENTER)
+    cell_value = ParagraphStyle("av_pa", fontName=FONT_BODY,
+                                 fontSize=FONT_SIZE_TABLE_CELL, leading=12,
+                                 textColor=COLORS["text"])
+
+    header_row = [
+        Paragraph("<b>#</b>", header_style),
+        Paragraph("<b>Massnahme</b>", header_style),
+    ]
+    rows = [[Paragraph(str(i + 1), cell_value),
+             Paragraph(action, cell_value)]
+            for i, action in enumerate(actions)]
+    col_widths = [10 * mm, 160 * mm]
+    table = styled_table(header_row, rows, col_widths, styles)
+    story.append(table)
+    story.append(Spacer(1, SPACING_FINDING))
+
+
+# ============================================================
+# A4 — TOC-Validator: entferne TOC-Eintraege fuer Sektionen die nicht
+# gerendert werden. Schutz gegen TOC↔Body-Mismatch.
+# ============================================================
+
+def _validate_toc(report_data, insurance_data, nis2):
+    """Entfernt TOC-Eintraege deren Sektion im report_data fehlt.
+
+    Mapping TOC-Title-Substring → Bedingung.
+    """
+    toc = report_data.get("toc") or []
+    if not toc:
+        return
+
+    has_insurance = bool(insurance_data and insurance_data.get("questionnaire") is not None)
+    has_questionnaire = has_insurance and bool(insurance_data.get("questionnaire"))
+    has_risk_score = has_insurance and bool(insurance_data.get("risk_score"))
+    has_audit = bool(nis2 and nis2.get("audit_trail"))
+    has_supply_chain = bool(nis2 and nis2.get("supply_chain"))
+
+    # (substring-pattern, present-flag)
+    DROP_RULES = [
+        ("Versicherungs-Fragebogen",      has_questionnaire),
+        ("Risikobewertung",               has_risk_score),
+        ("Praemienreduktion",             has_risk_score),  # actions kommen aus risk
+        ("Prämienreduktion",         has_risk_score),
+        ("Audit-Trail",                   has_audit),
+        ("Lieferketten",                  has_supply_chain),
+        ("Supply Chain",                  has_supply_chain),
+    ]
+
+    cleaned = []
+    dropped = []
+    for entry in toc:
+        # entry ist (number, title, sub) oder dict
+        title = entry[1] if isinstance(entry, (list, tuple)) and len(entry) > 1 else str(entry)
+        keep = True
+        for sub, present in DROP_RULES:
+            if sub in title and not present:
+                keep = False
+                dropped.append(title)
+                break
+        if keep:
+            cleaned.append(entry)
+    if dropped:
+        log.info("toc_validator_dropped count=%d titles=%s", len(dropped), dropped)
+    report_data["toc"] = cleaned
+
+
 def build_supply_chain_page(story, styles, supply_chain_data, scan_meta):
     """Build supply chain summary page (standalone 1-pager for section 30 Abs. 2 Nr. 4 BSIG)."""
     story.append(PageBreak())
@@ -1385,6 +1635,11 @@ def generate_report(report_data, output_path):
     styles = create_styles()
     story = []
     nis2 = report_data.get("nis2")
+    insurance_data = report_data.get("insurance")
+
+    # A4: TOC-Validator — entferne TOC-Eintraege fuer Sektionen die im
+    # report_data nicht befuellt sind (verhindert TOC↔Body-Mismatch).
+    _validate_toc(report_data, insurance_data, nis2)
 
     # --- Cover ---
     build_cover(story, styles, report_data.get("cover", {}))
@@ -1500,6 +1755,15 @@ def generate_report(report_data, output_path):
             # header and rows already contain Paragraph objects from _build_recommendations()
             story.append(styled_table(t["header"], t["rows"], t["widths"], styles))
         story.append(PageBreak())
+
+    # --- Insurance Sections (after Recommendations, before NIS2/Appendices) ---
+    # A3 (Mai 2026): Versicherungs-Fragebogen / Risikobewertung /
+    # Praemienreduktion. report_mapper baut report_data["insurance"] fuer
+    # Insurance-Paket — heute wird das HIER gerendert (vorher TOC↔Body-Mismatch).
+    if insurance_data:
+        build_insurance_questionnaire(story, styles, insurance_data)
+        build_insurance_risk_score(story, styles, insurance_data)
+        build_insurance_premium_actions(story, styles, insurance_data)
 
     # --- NIS2 Audit Trail (after Recommendations, before Appendices) ---
     if nis2 and nis2.get("audit_trail"):

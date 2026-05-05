@@ -585,8 +585,15 @@ def _check_title_template(findings: list[dict[str, Any]]) -> list[dict[str, Any]
     """Check #9: Findings mit policy_id sollten einen deterministischen
     Title aus TITLE_TEMPLATES haben (Determinismus).
 
-    Triggert wenn ein Finding policy_id hat aber `_title_template_missing`
-    Flag (gesetzt von title_policy.apply_title_template wenn Template fehlt).
+    Drei Faelle:
+      - `_title_template_missing=True` → Template fehlt komplett (Long-Tail
+        policy_id). Info-Issue, kein Auto-Fix moeglich (waere PR an
+        title_policy.py).
+      - `_title_template_incomplete=True` → Template existiert aber
+        Vars-Fallback hat eine Luecke gelassen → KI-Original ueberschrieb
+        rendered Title (A1 Sicherheitsnetz). D1: AUTO-FIX = Flag entfernen
+        und KI-Original als 'final' markieren (Self-healing — keine
+        weiteren Fixes noetig, A1 hat es schon korrekt geloest).
     """
     issues: list[dict[str, Any]] = []
     for f in findings:
@@ -601,6 +608,21 @@ def _check_title_template(findings: list[dict[str, Any]]) -> list[dict[str, Any]
                     f"Title bleibt KI-frei und ist nicht reproduzierbar."
                 ),
                 "auto_fix": False,
+                "severity": "info",
+            })
+        elif f.get("_title_template_incomplete"):
+            # D1: Auto-Fix — A1-Sicherheitsnetz hat KI-Original schon
+            # eingesetzt. Wir entfernen das Flag (kein QA-Issue mehr) und
+            # melden als auto-fixed.
+            f.pop("_title_template_incomplete", None)
+            issues.append({
+                "check": "title_template",
+                "finding_id": f.get("id"),
+                "issue": (
+                    f"policy_id={f.get('policy_id')} Template hatte fehlende "
+                    f"Platzhalter — KI-Original als Fallback uebernommen."
+                ),
+                "auto_fix": True,
                 "severity": "info",
             })
     return issues

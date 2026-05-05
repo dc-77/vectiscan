@@ -91,14 +91,25 @@
                                                  cache: reporter_v1 / 1d
                                                  cache_control: ephemeral
                                                  Extended Thinking 12K (Opus)
-   4. finding_type_mapper.annotate_finding_types  (deterministisch)
+   3a. eol_detector.detect_eol_findings  (deterministisch, Mai 2026)
+       └─ Pflicht-Findings fuer EOL-Software (Exchange 2016, Win-Server,
+         OpenSSL, Apache, PHP, ...) + CVE-Whitelist (ProxyShell etc.)
+       └─ merge_into_claude_findings: dedup nach (host_ip, finding_type, version)
+   4. finding_type_mapper.annotate_finding_types  (regex + Haiku-Fallback)
+       └─ B2 (Mai 2026): bei Regex-Miss → ai_finding_type_fallback.map_finding_type_via_ai
+         (gecacht 30d in reporter_v1_finding_type_fallback)
    5. severity_policy.apply_policy  (63 Regeln, Z. 1012)
       └─ überschreibt KI-Severities, setzt policy_id + provenance
    6. business_impact.recompute (Z. 182)
-   7. selection.select_findings (Z. 188)  ← Top-N je Paket
-   8. qa_check.run_qa_checks (Z. 584)  ← optional 1× Haiku
+   7. selection.select_findings (Z. 188)  ← Top-N je Paket + Floor (Min-N)
+   7a. title_policy.apply_titles  (Title-Templates + A1 Sicherheitsnetz)
+       └─ Smart-Var-Fallback aus evidence/description/affected/tech_profiles
+       └─ wenn rendered Title `?` enthaelt UND KI-Original nicht: KI gewinnt
+   8. qa_check.run_qa_checks (Z. 584)  ← Check #9 mit D1 Auto-Fix
    9. report_mapper.map_to_report_data + Compliance-Module
+   9a. generate_report._validate_toc  (A4: TOC-Eintraege ohne Body raus)
   10. generate_report.py (ReportLab) → PDF
+       └─ Insurance-Paket: build_insurance_questionnaire/risk_score/premium_actions
   11. MinIO scan-reports + DB reports-Insert + Order-Status
   12. posture_aggregator.aggregate_into_posture (Z. 174)
 ```

@@ -142,6 +142,25 @@ def apply_deterministic_pipeline(claude_output: dict,
     Returns: das (mutierte) claude_output
     """
     findings_in = claude_output.get("findings") or []
+    sc = scan_context or {}
+
+    # C2 (Mai 2026): EOL-Detector laeuft VOR der KI-Liste — Pflicht-Findings
+    # fuer EOL-Software (Exchange 2016, Win-Server 2012, OpenSSL 1.0, etc.)
+    # plus kritische Build-CVE-Whitelist (ProxyShell, Heartbleed, ...).
+    # Ergebnis wird mit Claude-Output dedupliziert (claude_findings wins
+    # fuer bessere Beschreibung; eol_detector setzt _deterministic_source).
+    try:
+        from reporter.eol_detector import detect_eol_findings, merge_into_claude_findings
+        tech_profiles = sc.get("tech_profiles") or sc.get("techProfiles") or []
+        eol_findings = detect_eol_findings(tech_profiles)
+        if eol_findings:
+            findings_in = merge_into_claude_findings(findings_in, eol_findings)
+            claude_output["findings"] = findings_in
+            log.info("eol_detector_findings_added", count=len(eol_findings),
+                     total_after_merge=len(findings_in))
+    except Exception as e:
+        log.warning("eol_detector_failed", error=str(e))
+
     if not findings_in:
         log.info("deterministic_pipeline_skipped_empty",
                  package=package, reason="no findings")
@@ -151,9 +170,7 @@ def apply_deterministic_pipeline(claude_output: dict,
                                             "selected_count": 0}
         return claude_output
 
-    sc = scan_context or {}
-
-    # 1. Normalisieren + finding_type ableiten
+    # 1. Normalisieren + finding_type ableiten (mit AI-Fallback bei Miss)
     normalized = _normalize_for_policy(findings_in)
     annotate_finding_types(normalized)
 
