@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import signal
 import subprocess
 import xml.etree.ElementTree as ET
@@ -102,6 +103,38 @@ _HEADER_PATTERNS: list[tuple[str, str, str]] = [
 ]
 
 
+_TECH_VERSION_TAIL_RE = re.compile(
+    r"^(.+?)[\s/](\d+(?:\.\d+){1,3}[a-z]?\d?)\s*$"
+)
+
+
+def _split_tech_name_version(name: str, version: str = "") -> tuple[str, str]:
+    """Trennt eine Versions-Endung vom Namen ab wenn version leer ist.
+
+    Beispiele:
+        ("WordPress 6.8.5", "")    -> ("WordPress", "6.8.5")
+        ("PHP/8.4.20", "")          -> ("PHP", "8.4.20")
+        ("nginx", "1.22.1")         -> ("nginx", "1.22.1")  # unveraendert
+        ("WordPress", "")           -> ("WordPress", "")    # keine Version drin
+        ("Next.js 14", "")          -> ("Next.js", "14")    # 1-Element-Version OK?
+                                       Nein — Regex fordert mind. 2 Punkt-Felder
+                                       um false-positives wie "Bootstrap 5" zu
+                                       vermeiden. → ("Next.js 14", "")
+
+    Wichtig: Heuristik konservativ — nur eindeutige Versions-Tails
+    (>= 2 Zahlengruppen mit Punkt) werden gesplittet. Single-Digit-Suffixe
+    bleiben am Namen (sind oft Marketing-Versionen, keine semantischen
+    Versions).
+    """
+    if version:
+        return name, version
+    n = (name or "").strip()
+    m = _TECH_VERSION_TAIL_RE.match(n)
+    if m:
+        return m.group(1).strip(), m.group(2).strip()
+    return n, ""
+
+
 def _extract_all_tech_signals(redirect_data: dict[str, Any]) -> list[dict[str, str]]:
     """Wandelt Playwright-`redirect_data` in eine webtech-aehnliche Liste um.
 
@@ -109,15 +142,32 @@ def _extract_all_tech_signals(redirect_data: dict[str, Any]) -> list[dict[str, s
     und Response-Headers gegen ein bewaehrtes Pattern-Set. Liefert auch
     bei modernen SPAs (Next.js, Vue, Vercel) konkrete Tech-Eintraege —
     vorher kam dort nur "no data".
+
+    Datenqualitaet (Mai 2026): `_add` normalisiert Bug-Faelle wie
+    `name="WordPress 6.8.5", version=""` zu `name="WordPress", version="6.8.5"`
+    und dedupliziert auf Basis des Namens — wenn dasselbe Tech 2x
+    auftaucht (1x mit Version, 1x ohne), gewinnt die Version.
     """
-    seen: set[str] = set()
+    seen: dict[str, int] = {}  # lowercase name -> idx in tech_list
     tech_list: list[dict[str, str]] = []
 
     def _add(name: str, version: str = "") -> None:
-        key = name.strip().lower()
-        if key and key not in seen:
-            seen.add(key)
-            tech_list.append({"name": name, "version": version})
+        # Bug-Fix: wenn Version im Namen steckt (z.B. "WordPress 6.8.5",
+        # "PHP/8.4.20"), splitten — sonst sieht KI/EOL-Detector verschmutzte
+        # Eintraege oder Duplikate.
+        norm_name, norm_version = _split_tech_name_version(name, version)
+        key = norm_name.strip().lower()
+        if not key:
+            return
+        if key in seen:
+            # Bestehender Eintrag: ergaenze Version wenn bisher leer
+            existing = tech_list[seen[key]]
+            if not existing["version"] and norm_version:
+                existing["version"] = norm_version
+                existing["name"] = norm_name  # konsistente Schreibweise
+            return
+        seen[key] = len(tech_list)
+        tech_list.append({"name": norm_name, "version": norm_version})
 
     for fqdn_key, probe in (redirect_data or {}).items():
         tech_info = probe.get("tech_info") or {}
