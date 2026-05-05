@@ -23,12 +23,17 @@ class _FakeCursor:
     def __init__(self):
         self.rows: list[Any] = []
         self.executed: list[tuple[str, tuple]] = []
+        # Default fetchone return; can be a single value or a list of returns
+        # consumed in order (fuer Tests die SELECT + INSERT modellieren).
         self._next_fetch: Any = None
+        self._fetch_queue: list[Any] | None = None
 
     def execute(self, sql: str, params: tuple = ()):
         self.executed.append((sql, params))
 
     def fetchone(self):
+        if self._fetch_queue is not None and self._fetch_queue:
+            return self._fetch_queue.pop(0)
         return self._next_fetch
 
     def __enter__(self):
@@ -112,19 +117,47 @@ def test_find_fresh_returns_dict_when_row_present(fake_db):
 # -----------------------------------------------------------------------------
 
 def test_save_normalizes_subdomains_and_dedupes(fake_db):
+    fake_db._next_fetch = None  # kein bestehender Snapshot
     snapshot_store.save_for_target(
         scan_target_id="22222222-2222-2222-2222-222222222222",
         all_subdomains=["A.x.com", "a.x.com", " B.x.com ", "", None or "c.x.com"],
         tool_sources={"crtsh": ["A.x.com", "a.x.com"], "subfinder": ["B.x.com"]},
     )
-    assert fake_db.executed, "kein SQL abgesetzt"
-    sql, params = fake_db.executed[0]
-    assert "INSERT INTO scan_target_subdomain_snapshots" in sql
-    assert "ON CONFLICT (scan_target_id) DO UPDATE" in sql
-    target_id, subs, sources_json, ttl = params
+    assert len(fake_db.executed) >= 2, "erwarte SELECT + INSERT"
+    # 1. SELECT prueft existierenden Eintrag
+    sel_sql, sel_params = fake_db.executed[0]
+    assert "SELECT all_subdomains, tool_sources" in sel_sql
+    assert sel_params == ("22222222-2222-2222-2222-222222222222",)
+    # 2. INSERT mit normalisiertem + sortiertem Set
+    ins_sql, ins_params = fake_db.executed[1]
+    assert "INSERT INTO scan_target_subdomain_snapshots" in ins_sql
+    assert "ON CONFLICT (scan_target_id) DO UPDATE" in ins_sql
+    target_id, subs, sources_json, ttl = ins_params
     assert target_id == "22222222-2222-2222-2222-222222222222"
     assert subs == ["a.x.com", "b.x.com", "c.x.com"]
     assert ttl == snapshot_store.DEFAULT_TTL_HOURS
+
+
+def test_save_merges_with_existing_snapshot_no_shrinkage(fake_db):
+    """Mai 2026: save_for_target merget mit bestehendem Set, nie Shrinkage."""
+    fake_db._next_fetch = (
+        ["existing1.x.com", "existing2.x.com", "shared.x.com"],
+        {"crtsh": ["existing1.x.com"], "subfinder": ["shared.x.com"]},
+    )
+    snapshot_store.save_for_target(
+        scan_target_id="aaaa1111-aaaa-1111-aaaa-111111111111",
+        all_subdomains=["new.x.com", "shared.x.com"],
+        tool_sources={"amass": ["new.x.com"], "subfinder": ["shared.x.com"]},
+    )
+    ins_sql, ins_params = fake_db.executed[1]
+    target_id, subs, sources_json, ttl = ins_params
+    # Vereinigung beider Sets
+    assert set(subs) == {"existing1.x.com", "existing2.x.com", "shared.x.com",
+                          "new.x.com"}
+    # tool_sources werden pro Tool gemerget (kein Tool faellt raus)
+    assert "crtsh" in sources_json.adapted
+    assert "subfinder" in sources_json.adapted
+    assert "amass" in sources_json.adapted
 
 
 def test_save_ignores_empty_target(fake_db):
@@ -133,13 +166,14 @@ def test_save_ignores_empty_target(fake_db):
 
 
 def test_save_uses_custom_ttl(fake_db):
+    fake_db._next_fetch = None
     snapshot_store.save_for_target(
         scan_target_id="33333333-3333-3333-3333-333333333333",
         all_subdomains=["x.x"],
         tool_sources={},
         ttl_hours=72,
     )
-    _, params = fake_db.executed[0]
+    _, params = fake_db.executed[1]
     assert params[3] == 72
 
 

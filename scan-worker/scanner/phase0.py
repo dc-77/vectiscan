@@ -1450,56 +1450,41 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         elapsed = time.monotonic() - phase0_start
         return max(0, phase0_timeout - elapsed)
 
-    # --- PR-M4: Snapshot-Reuse vor Discovery ---
-    # ENV `SUBDOMAIN_SNAPSHOT_DISABLED=1` deaktiviert den Reuse explizit.
-    snapshot_used = False
+    # --- Snapshot als ZUSAETZLICHER Seed (Mai 2026, securess.de-Drift-Fix) ---
+    # Frueher (PR-M4) hat ein <24h-Snapshot die Discovery-Tools komplett
+    # uebersprungen ("SKIPPED"-Marker). Resultat: ein einmaliger Magerlauf
+    # (crt.sh leer, subfinder 8 statt 33 Subs) wurde 24h lang perpetuiert.
+    # Jetzt: Snapshot-Subs werden ergaenzend gemerged, Discovery-Tools
+    # laufen IMMER. snapshot_store.save_for_target nutzt MERGE-Semantik
+    # (kein Shrinkage). ENV `SUBDOMAIN_SNAPSHOT_DISABLED=1` deaktiviert den
+    # Seed komplett (Notausgang fuer komplettes Cold-Start).
+    snapshot_seed: list[str] = []
     snapshot_target_id: Optional[str] = None
+    snapshot_age_min: Optional[int] = None
     if os.environ.get("SUBDOMAIN_SNAPSHOT_DISABLED", "").lower() not in ("1", "true", "yes"):
         try:
             from scanner.precheck import snapshot_store
             snap = snapshot_store.find_fresh_for_domain(domain)
             if snap and snap.get("subdomains"):
-                all_subdomains.extend(snap["subdomains"])
-                tool_sources = dict(snap.get("tool_sources") or {})
+                snapshot_seed = list(snap["subdomains"])
+                all_subdomains.extend(snapshot_seed)
+                tool_sources["snapshot"] = list(snapshot_seed)
                 snapshot_target_id = snap.get("scan_target_id")
-                snapshot_used = True
-                age_min = snap.get("age_seconds", 0) // 60
+                snapshot_age_min = (snap.get("age_seconds") or 0) // 60
                 log.info(
-                    "phase0_subdomain_snapshot_reused",
+                    "phase0_snapshot_seed_loaded",
                     domain=domain, order_id=order_id,
-                    subdomains=len(snap["subdomains"]),
-                    age_minutes=age_min,
+                    subdomains=len(snapshot_seed),
+                    age_minutes=snapshot_age_min,
                     target_id=snapshot_target_id,
                 )
                 publish_event(order_id, {
-                    "type": "phase0_snapshot_reused",
+                    "type": "phase0_snapshot_seed_loaded",
                     "orderId": order_id,
                     "domain": domain,
-                    "subdomains": len(snap["subdomains"]),
-                    "ageMinutes": age_min,
+                    "subdomains": len(snapshot_seed),
+                    "ageMinutes": snapshot_age_min,
                 })
-                # Skip-Marker pro uebersprungenem Tool im scan_results
-                # persistieren — sonst sieht der User im Tool-Trace einfach
-                # "kein amass/crtsh/subfinder" und denkt es ist kaputt.
-                from scanner.tools import _save_result
-                skip_msg = (
-                    f"SKIPPED: Subdomain-Snapshot vom {snap.get('snapshot_ts')} "
-                    f"(Alter: {age_min} Min, TTL: {snap.get('ttl_hours', 24)}h) "
-                    f"wiederverwendet — {len(snap['subdomains'])} Subdomains aus "
-                    f"vorherigem Lauf. Re-Enumeration via Admin: "
-                    f"POST /api/admin/targets/{snapshot_target_id}/restart-precheck"
-                )
-                for skipped_tool in ("crtsh", "subfinder", "amass", "gobuster_dns"):
-                    if skipped_tool in (phase0_tools or []):
-                        try:
-                            _save_result(
-                                order_id=order_id, host_ip=None, phase=0,
-                                tool_name=skipped_tool,
-                                raw_output=skip_msg,
-                                exit_code=0, duration_ms=0,
-                            )
-                        except Exception:
-                            pass
         except Exception as exc:
             log.warning("phase0_snapshot_lookup_failed", error=str(exc))
 
@@ -1513,21 +1498,21 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
 
     discovery_futures: dict[Any, str] = {}
     with ThreadPoolExecutor(max_workers=8, thread_name_prefix="phase0b") as pool:
-        if not snapshot_used:
-            if "crtsh" in phase0_tools:
-                discovery_futures[pool.submit(run_crtsh, domain, scan_dir, order_id)] = "crtsh"
-            if "subfinder" in phase0_tools:
-                discovery_futures[pool.submit(run_subfinder, domain, scan_dir, order_id)] = "subfinder"
-            if "amass" in phase0_tools:
-                discovery_futures[pool.submit(run_amass, domain, scan_dir, order_id)] = "amass"
-            if "gobuster_dns" in phase0_tools:
-                discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
-            # SecurityTrails als 4. CT-Quelle, parallel. Nur wenn API-Key
-            # gesetzt — sonst Skip ohne Aufwand.
-            if os.environ.get("SECURITYTRAILS_API_KEY"):
-                discovery_futures[pool.submit(
-                    run_securitytrails_subdomains, domain, scan_dir, order_id,
-                )] = "securitytrails"
+        # Discovery-Tools laufen IMMER (Snapshot ist nur Seed, nicht Skip).
+        if "crtsh" in phase0_tools:
+            discovery_futures[pool.submit(run_crtsh, domain, scan_dir, order_id)] = "crtsh"
+        if "subfinder" in phase0_tools:
+            discovery_futures[pool.submit(run_subfinder, domain, scan_dir, order_id)] = "subfinder"
+        if "amass" in phase0_tools:
+            discovery_futures[pool.submit(run_amass, domain, scan_dir, order_id)] = "amass"
+        if "gobuster_dns" in phase0_tools:
+            discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
+        # SecurityTrails als 4. CT-Quelle, parallel. Nur wenn API-Key
+        # gesetzt — sonst Skip ohne Aufwand.
+        if os.environ.get("SECURITYTRAILS_API_KEY"):
+            discovery_futures[pool.submit(
+                run_securitytrails_subdomains, domain, scan_dir, order_id,
+            )] = "securitytrails"
         if "axfr" in phase0_tools:
             discovery_futures[pool.submit(run_zone_transfer, domain, scan_dir, order_id)] = "axfr"
         discovery_futures[pool.submit(collect_dns_records, domain, scan_dir, order_id)] = "dns_records"
@@ -1554,19 +1539,20 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     # --- certspotter-Fallback wenn crt.sh leer geblieben ist ---
     # crt.sh ist die haeufigste Drift-/Ausfall-Quelle in Phase 0. Wenn es
     # 0 Subdomains liefert, fragen wir certspotter (SSLMate) als zweite
-    # CT-Quelle. Beide CT-Logs indexieren denselben Bestand.
-    if not snapshot_used:
-        crtsh_results = tool_sources.get("crtsh") or []
-        if not crtsh_results:
-            try:
-                cs_subs = run_certspotter(domain, scan_dir, order_id)
-                if cs_subs:
-                    all_subdomains.extend(cs_subs)
-                    tool_sources["certspotter"] = list(cs_subs)
-                    log.info("phase0_certspotter_fallback_used",
-                             subdomains_found=len(cs_subs))
-            except Exception as e:
-                log.warning("phase0_certspotter_fallback_error", error=str(e))
+    # CT-Quelle. Beide CT-Logs indexieren denselben Bestand. Laeuft auch
+    # bei Snapshot-Seed (Mai 2026), damit ein heutiger crt.sh-Ausfall nicht
+    # die einzige Coverage-Quelle bleibt.
+    crtsh_results = tool_sources.get("crtsh") or []
+    if not crtsh_results:
+        try:
+            cs_subs = run_certspotter(domain, scan_dir, order_id)
+            if cs_subs:
+                all_subdomains.extend(cs_subs)
+                tool_sources["certspotter"] = list(cs_subs)
+                log.info("phase0_certspotter_fallback_used",
+                         subdomains_found=len(cs_subs))
+        except Exception as e:
+            log.warning("phase0_certspotter_fallback_error", error=str(e))
 
     # Always include the base domain
     all_subdomains.append(domain)
@@ -1596,54 +1582,74 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     inventory["hosts"] = _probe_web_hosts(inventory.get("hosts", []), order_id, scan_dir,
                                           domain=domain)
 
-    # --- PR-M4: Snapshot persistieren (nur wenn neu enumeriert) ---
-    if not snapshot_used:
-        try:
-            from scanner.precheck import snapshot_store
-            target_id = _resolve_scan_target_id(order_id, domain)
-            if target_id and all_subdomains:
-                snapshot_store.save_for_target(
-                    scan_target_id=target_id,
-                    all_subdomains=all_subdomains,
-                    tool_sources=tool_sources,
-                )
-                log.info(
-                    "phase0_subdomain_snapshot_saved",
-                    target_id=target_id,
-                    subdomains=len(set(all_subdomains)),
-                )
-        except Exception as exc:
-            log.warning("phase0_snapshot_save_failed", error=str(exc))
+    # --- Snapshot persistieren (immer; MERGE-Semantik in save_for_target) ---
+    # Mai 2026: Snapshot wird nicht mehr als Skip-Schalter benutzt, sondern
+    # als Seed + dauerhafter Speicher. save_for_target merget mit dem
+    # bestehenden Set (kein Shrinkage) — auch ein Magerlauf bringt also
+    # nichts mehr durcheinander.
+    try:
+        from scanner.precheck import snapshot_store
+        target_id = snapshot_target_id or _resolve_scan_target_id(order_id, domain)
+        if target_id and all_subdomains:
+            snapshot_store.save_for_target(
+                scan_target_id=target_id,
+                all_subdomains=all_subdomains,
+                tool_sources=tool_sources,
+            )
+            log.info(
+                "phase0_subdomain_snapshot_saved",
+                target_id=target_id,
+                subdomains=len(set(all_subdomains)),
+            )
+    except Exception as exc:
+        log.warning("phase0_snapshot_save_failed", error=str(exc))
 
     elapsed_ms = int((time.monotonic() - phase0_start) * 1000)
+    snapshot_seeded = bool(snapshot_seed)
     log.info(
         "phase0_complete",
         domain=domain,
         hosts_found=len(inventory.get("hosts", [])),
         skipped=len(inventory.get("skipped_hosts", [])),
         duration_ms=elapsed_ms,
-        snapshot_used=snapshot_used,
+        snapshot_seeded=snapshot_seeded,
+        snapshot_seed_count=len(snapshot_seed),
     )
 
     # Discovery-Health: pro Tool wieviele Subdomains kamen — fuer
-    # Abbruch-Logik in worker.py + UI-Sichtbarkeit. Bei Snapshot-Reuse
-    # markieren wir die Quelle als "snapshot".
+    # Abbruch-Logik in worker.py + UI-Sichtbarkeit. Snapshot ist eine
+    # Quelle wie jede andere; ct_sources_empty bezieht sich nur auf die
+    # heutigen externen API-Treffer (crtsh + certspotter).
+    snapshot_set = set(snapshot_seed)
+    discovery_set: set[str] = set()
+    for tool, subs in tool_sources.items():
+        if tool == "snapshot":
+            continue
+        discovery_set.update(s for s in (subs or []) if s)
+    discovery_added = sorted(discovery_set - snapshot_set)
     discovery_health: dict[str, Any] = {
-        "snapshot_used": snapshot_used,
+        "snapshot_seeded": snapshot_seeded,
+        "snapshot_age_minutes": snapshot_age_min,
+        "snapshot_seed_count": len(snapshot_seed),
+        "discovery_added_count": len(discovery_added),
         "tool_counts": {tool: len(set(subs)) for tool, subs in tool_sources.items()},
+        "tools_with_zero_results": sorted(
+            tool for tool, subs in tool_sources.items()
+            if tool != "snapshot" and not subs
+        ),
         "total_subdomains": len(set(all_subdomains)),
         "ct_sources_empty": (
-            not snapshot_used
-            and not tool_sources.get("crtsh")
+            not tool_sources.get("crtsh")
             and not tool_sources.get("certspotter")
         ),
     }
     inventory["discovery_health"] = discovery_health
 
-    # Wenn alle CT-Quellen leer waren UND wir nicht aus Snapshot kommen,
+    # Wenn alle CT-Quellen leer waren UND wir keinen Snapshot-Seed haben,
     # warnen wir explizit — das ist verdaechtig (Domain hat normalerweise
     # mindestens 2-3 Subdomains in CT-Logs).
-    if discovery_health["ct_sources_empty"] and discovery_health["total_subdomains"] < 3:
+    if (discovery_health["ct_sources_empty"] and not snapshot_seeded
+            and discovery_health["total_subdomains"] < 3):
         log.warning(
             "phase0_discovery_thin",
             domain=domain,

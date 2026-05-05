@@ -601,6 +601,55 @@ def build_tech_profile(
             vhost_results[vh] = {"cms": None, "cms_version": None,
                                   "cms_confidence": 0.0, "waf": w}
 
+    # technologies[]: konsolidierte Tech-Liste fuer EOL-Detector + Reporter.
+    # Quellen (nach Prioritaet, Dedup ueber lowercase-Namen):
+    #   1. nmap-services product/version (alle Services, nicht nur HTTP —
+    #      smtp/imap/ssh/ftp-Banner sind EOL-relevant)
+    #   2. webtech_result["tech"] (Wappalyzer-Lite)
+    #   3. cms + cms_version (primary VHost)
+    technologies: list[dict[str, str]] = []
+    seen_tech: dict[str, int] = {}
+
+    def _add_tech(name: str, version: str = "") -> None:
+        n, v = _split_tech_name_version((name or "").strip(), (version or "").strip())
+        if not n:
+            return
+        key = n.lower()
+        if key in seen_tech:
+            existing = technologies[seen_tech[key]]
+            if not existing.get("version") and v:
+                existing["version"] = v
+                existing["name"] = n
+            return
+        seen_tech[key] = len(technologies)
+        technologies.append({"name": n, "version": v})
+
+    # 1. nmap services (alle, nicht nur HTTP)
+    for svc in services:
+        product = (svc.get("product") or "").strip()
+        version = (svc.get("version") or "").strip()
+        if product:
+            _add_tech(product, version)
+    # 2. webtech
+    if isinstance(webtech_result, dict):
+        wt_techs = webtech_result.get("tech") or []
+    elif isinstance(webtech_result, list):
+        wt_techs = webtech_result
+    else:
+        wt_techs = []
+    for t in wt_techs:
+        if isinstance(t, dict):
+            _add_tech(t.get("name", ""), t.get("version", ""))
+        elif isinstance(t, str):
+            _add_tech(t)
+    # 3. CMS (primary VHost) — z.B. WordPress, Microsoft Exchange
+    if cms:
+        _add_tech(cms, cms_version or "")
+    # Plus pro VHost-CMS, falls abweichend
+    for vh, entry in (vhost_cms_results or {}).items():
+        if entry.get("cms"):
+            _add_tech(entry["cms"], entry.get("cms_version") or "")
+
     profile: dict[str, Any] = {
         "ip": ip,
         "fqdns": fqdns,
@@ -616,6 +665,7 @@ def build_tech_profile(
         "has_ssl": has_ssl,
         "vhost_results": vhost_results,
         "primary_vhost": (vhost_fqdns[0] if vhost_fqdns else (fqdns[0] if fqdns else None)),
+        "technologies": technologies,
     }
 
     # Save to disk

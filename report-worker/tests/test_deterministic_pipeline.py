@@ -124,3 +124,38 @@ class TestRealClaudeFixture:
         # Saemtliche selektierten Findings haben policy_id
         for f in fixture["findings"]:
             assert "policy_id" in f
+
+
+class TestFindingTypePersisted:
+    """Mai 2026 (securess.de-Drift): finding_type muss im Writeback-Schritt
+    erhalten bleiben — frueher wurde es vom mapper gesetzt, dann aber im
+    `_writeback_to_claude` verworfen, sodass die API fuer ALLE Findings
+    `finding_type=null` lieferte."""
+
+    def test_finding_type_in_output(self):
+        claude_output = {"findings": _claude_response_findings()}
+        apply_deterministic_pipeline(
+            claude_output, package="perimeter", domain="beispiel.de",
+        )
+        for f in claude_output["findings"]:
+            # entweder vom Regex-Mapper gesetzt oder von der KI (use_ai_fallback
+            # ist default True; in Test-Umgebung ohne API-Key bleibt der
+            # Eintrag entweder regex-typed oder ohne finding_type — letzteres
+            # ist OK fuer SP-FALLBACK). Wir testen: wenn ein finding_type
+            # gesetzt wurde, dann landet er auch im Output.
+            if f.get("policy_id") and f.get("policy_id") != "SP-FALLBACK":
+                assert f.get("finding_type"), (
+                    f"finding_type fehlt obwohl policy_id={f.get('policy_id')}: {f}"
+                )
+
+    def test_finding_type_source_marker(self):
+        """_finding_type_source landet als Audit-Marker im Output."""
+        claude_output = {"findings": _claude_response_findings()}
+        apply_deterministic_pipeline(
+            claude_output, package="perimeter", domain="beispiel.de",
+        )
+        for f in claude_output["findings"]:
+            if f.get("finding_type"):
+                assert f.get("_finding_type_source") in (
+                    "regex", "ai_fallback", "preset",
+                ), f"Marker fehlt fuer {f}"

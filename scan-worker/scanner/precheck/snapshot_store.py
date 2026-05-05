@@ -86,19 +86,45 @@ def save_for_target(
     tool_sources: dict[str, list[str]],
     ttl_hours: int = DEFAULT_TTL_HOURS,
 ) -> None:
-    """Upsert eines Snapshots.
+    """Upsert eines Snapshots — MERGE-Semantik (Mai 2026).
 
     `tool_sources` ist eine Mapping `tool_name -> list[subdomain]`.
     Wird als JSONB persistiert, damit spaetere Audits sehen koennen,
     welcher Tool welche Subdomain beigetragen hat.
+
+    Konsistenz-Gate: Subdomain-Set wird mit dem bestehenden Eintrag
+    vereinigt — nie ersetzt. Damit kann ein partieller/schwacher
+    Discovery-Lauf den Snapshot nie verkleinern (Schutz gegen externe
+    API-Volatilitaet bei crt.sh/subfinder). Reduzierung nur explizit
+    via `invalidate_for_target()`.
     """
     if not scan_target_id:
         return
-    subs_norm = sorted(set(s.strip().lower() for s in (all_subdomains or []) if s and s.strip()))
-    sources_norm: dict[str, list[str]] = {}
+    subs_norm = set(s.strip().lower() for s in (all_subdomains or []) if s and s.strip())
+    sources_norm: dict[str, set[str]] = {}
     for tool, subs in (tool_sources or {}).items():
-        sources_norm[tool] = sorted(set(s.strip().lower() for s in subs if s and s.strip()))
+        sources_norm[tool] = set(s.strip().lower() for s in subs if s and s.strip())
+
     with _conn() as conn, conn.cursor() as cur:
+        # 1. Existierenden Eintrag laden + mergen
+        cur.execute(
+            """SELECT all_subdomains, tool_sources
+                 FROM scan_target_subdomain_snapshots
+                WHERE scan_target_id = %s""",
+            (scan_target_id,),
+        )
+        row = cur.fetchone()
+        if row:
+            existing_subs = set(row[0] or [])
+            subs_norm = subs_norm | existing_subs
+            existing_sources = dict(row[1] or {})
+            for tool, subs in existing_sources.items():
+                sources_norm.setdefault(tool, set()).update(s for s in (subs or []) if s)
+
+        subs_final = sorted(subs_norm)
+        sources_final = {tool: sorted(s) for tool, s in sources_norm.items()}
+
+        # 2. Upsert mit gemergetem Set
         cur.execute(
             """INSERT INTO scan_target_subdomain_snapshots
                  (scan_target_id, all_subdomains, tool_sources, snapshot_ts, ttl_hours)
@@ -109,7 +135,7 @@ def save_for_target(
                  snapshot_ts    = EXCLUDED.snapshot_ts,
                  ttl_hours      = EXCLUDED.ttl_hours,
                  updated_at     = NOW()""",
-            (scan_target_id, subs_norm, psycopg2.extras.Json(sources_norm), ttl_hours),
+            (scan_target_id, subs_final, psycopg2.extras.Json(sources_final), ttl_hours),
         )
         conn.commit()
 

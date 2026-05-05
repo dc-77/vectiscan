@@ -728,6 +728,18 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
     _phase_checkpoint("phase2")
 
+    # ── Tech-Profile-Enrichment (Mai 2026) ─────────────────
+    # Reichert tech_profiles[] um Phase-2-Signale an, die phase1 nicht
+    # kennt — primaer Microsoft Exchange Build aus header_check
+    # (x-feserver/x-owa-version) und zap_spider (/owa/auth/<build>/).
+    # Dadurch sieht der EOL-Detector im Reporter Exchange 2016 zuverlaessig.
+    try:
+        from scanner.tech_enricher import enrich_after_phase2
+        enrich_stats = enrich_after_phase2(tech_profiles, scan_dir)
+        log.info("tech_enricher_done", order_id=order_id, **enrich_stats)
+    except Exception as e:
+        log.warning("tech_enricher_failed", order_id=order_id, error=str(e))
+
     # ── Phase 3: Correlation & Enrichment ──────────────────
     phase3_result: dict[str, Any] = {}
     phase3_tools = config.get("phase3_tools", [])

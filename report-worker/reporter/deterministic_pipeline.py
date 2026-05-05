@@ -116,6 +116,14 @@ def _writeback_to_claude(claude_findings_in: list[dict],
             merged["business_impact_score"] = pf["business_impact_score"]
         if pf.get("affected_hosts"):
             merged["affected_hosts"] = pf["affected_hosts"]
+        # finding_type vom mapper persistieren (war frueher verloren -> alle
+        # Findings hatten finding_type=null in der API). _finding_type_source
+        # = "regex" | "ai_fallback" | "preset" fuer QA/Audit.
+        ft = pf.get("finding_type") or orig.get("finding_type")
+        if ft:
+            merged["finding_type"] = ft
+        if pf.get("_finding_type_source"):
+            merged["_finding_type_source"] = pf["_finding_type_source"]
         out.append(merged)
     return out
 
