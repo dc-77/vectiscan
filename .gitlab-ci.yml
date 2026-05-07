@@ -394,6 +394,47 @@ ops-findings-audit:
       LIMIT 10;
       SQL
 
+# =============================================================================
+# Baseline-Snapshot: KPI-Snapshot fuer Vor-/Nachher-Vergleich nach Audit-
+# Deployment (Scan-Optimierung-Changelog.md). Liefert:
+# - Orders/Reports/Subscriptions Counts
+# - POLICY_VERSION-Verteilung
+# - Severity-Verteilung (30d)
+# - KI-Cache-Hit-Quote pro Namespace (7d) + Kosten-Aggregat
+# - Determinismus-KPI (alle Subscriptions)
+# - policy_id-Verteilung Top 30
+# - consolidated_findings pro Paket
+# - Shodan-Pre-Warm-Status (Migration 026)
+# - Top finding_types
+# - Takeover/URLhaus-Findings
+# - Neue SP-DNS-* + SP-URLHAUS-001 Counts
+#
+# Komplett read-only. Output via GitLab-Job-Logs auswertbar.
+#
+# Nutzung: GitLab-UI → main-Pipeline → ops-baseline-snapshot manuell triggern.
+# Empfohlen: Snapshot 1× vor Test-Scan-Set + 1× nach Re-Scans
+# (Vorher/Nachher-Diff fuer Cache-Hit-Erhoehung etc.).
+# =============================================================================
+ops-baseline-snapshot:
+  extends: .ops-base
+  artifacts:
+    when: always
+    expire_in: 30 days
+    paths:
+      - baseline-snapshot.txt
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "=== Baseline-Snapshot (Scan-Optimierung KPIs) ==="
+    - |
+      cat ${CI_PROJECT_DIR}/scripts/ops-baseline-snapshot.sql | \
+      docker compose exec -T postgres psql \
+        -U "${DB_USER:-vectiscan}" \
+        -d "${DB_NAME:-vectiscan}" \
+        -X 2>&1 | tee ${CI_PROJECT_DIR}/baseline-snapshot.txt
+    - echo
+    - echo "=== Snapshot saved als job artifact 'baseline-snapshot.txt' (30d retention) ==="
+    - echo "=== Download via GitLab-UI: Job-Page -> Browse Artifacts ==="
+
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
 rollback:
   extends: .ops-base
