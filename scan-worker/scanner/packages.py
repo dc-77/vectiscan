@@ -22,12 +22,11 @@ _PERIMETER_BASE: dict[str, Any] = {
     # F-P0A-005: Cap fuer Shodan/AbuseIPDB IP-Loops (war hardcoded 15).
     # ENV-Override `PHASE0A_IP_CAP` ueberschreibt diesen Wert (Premium-Tier).
     "phase0a_ip_cap": 25,
-    # amass v5 als Backup-Discovery wieder aktiv (2026-05-03 nach
-    # Race-Bug-Fix mit `-brute`-Flag). Siehe docs/analyse/AMASS-V5-DIAGNOSE.md.
-    # Funktional zu 95% redundant zu subfinder + crtsh + certspotter +
-    # securitytrails, aber liefert zusaetzliche Subdomain-Permutations
-    # und DNS-Brute-Force-Treffer.
-    "phase0b_tools": ["crtsh", "subfinder", "amass", "gobuster_dns",
+    # F-P0B-003 (2026-05-07): amass v5 entfernt — Hard-Cap-Bottleneck
+    # (300s in 1/30 Aufrufen) + `-brute`-Doppelarbeit zu gobuster_dns.
+    # Permutation-/Brute-Force-Coverage uebernimmt jetzt gobuster_dns mit
+    # der gemergten ~30k-Wordlist (F-P0B-004).
+    "phase0b_tools": ["crtsh", "subfinder", "gobuster_dns",
                       "axfr", "dnsx",
                       "dnssec", "caa", "mta_sts", "dane_tlsa"],
     "phase0b_timeout": 900,       # 15 Minuten

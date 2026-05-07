@@ -80,9 +80,10 @@ class TestPerimeter:
 
     def test_phase0b_full_dns(self):
         config = get_config("perimeter")
-        # amass v5 mit -brute-Workaround wieder als Backup aktiv
-        # (2026-05-03, siehe AMASS-V5-DIAGNOSE.md).
-        assert "amass" in config["phase0b_tools"]
+        # F-P0B-003 (2026-05-07): amass v5 entfernt — Hard-Cap-Bottleneck +
+        # `-brute`-Doppelarbeit zu gobuster_dns. Permutation-Coverage
+        # uebernimmt jetzt gobuster_dns mit der gemergten ~30k-Wordlist.
+        assert "amass" not in config["phase0b_tools"]
         assert "subfinder" in config["phase0b_tools"]
         assert "crtsh" in config["phase0b_tools"]
         assert "gobuster_dns" in config["phase0b_tools"]

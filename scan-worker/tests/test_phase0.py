@@ -141,8 +141,12 @@ def test_run_crtsh_returns_empty_on_failure(tmp_path: Path) -> None:
 
 
 def test_phase0_tools_called_with_correct_timeouts(tmp_path: Path) -> None:
-    """Phase 0 tool invocations use the expected timeout values."""
-    from scanner.phase0 import run_crtsh, run_subfinder, run_amass, run_gobuster_dns
+    """Phase 0 tool invocations use the expected timeout values.
+
+    F-P0B-003 (2026-05-07): `run_amass` wurde entfernt — der entsprechende
+    Timeout-Test (enum 270s + subs 60s) ist hier weggefallen.
+    """
+    from scanner.phase0 import run_crtsh, run_subfinder, run_gobuster_dns
 
     scan_dir = str(tmp_path)
     (tmp_path / "phase0").mkdir()
@@ -160,20 +164,6 @@ def test_phase0_tools_called_with_correct_timeouts(tmp_path: Path) -> None:
         call_kwargs = mock_run.call_args
         # subfinder bekam mehr Sources (-all -recursive) → 180s
         assert call_kwargs[1].get("timeout", call_kwargs[0][1] if len(call_kwargs[0]) > 1 else None) == 180
-
-    mock_run.reset_mock()
-    with patch("scanner.phase0.run_tool", mock_run), \
-         patch("scanner.phase0.subprocess.run") as mock_subs_stdout:
-        # amass v5: 2 run_tool-Calls (enum 270s + subs 60s) + 1 subprocess.run
-        # fuer stdout-Capture.
-        mock_subs_stdout.return_value = type("R", (), {"stdout": ""})()
-        run_amass("example.com", scan_dir, "scan-1")
-        # Erster Call = enum mit 270s Timeout
-        first_call = mock_run.call_args_list[0]
-        assert first_call[1].get("timeout") == 270
-        # Zweiter Call = subs mit 60s
-        second_call = mock_run.call_args_list[1]
-        assert second_call[1].get("timeout") == 60
 
     mock_run.reset_mock()
     with patch("scanner.phase0.run_tool", mock_run):

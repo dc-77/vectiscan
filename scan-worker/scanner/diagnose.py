@@ -81,11 +81,6 @@ TOOLS: list[dict[str, Any]] = [
         "category": "phase0",
     },
     {
-        "name": "amass",
-        "version_cmd": ["amass", "-version"],
-        "category": "phase0",
-    },
-    {
         "name": "dnsx",
         "version_cmd": ["dnsx", "-version"],
         "category": "phase0",

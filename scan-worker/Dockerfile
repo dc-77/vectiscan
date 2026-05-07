@@ -58,13 +58,10 @@ RUN curl -fsSL https://github.com/sensepost/gowitness/releases/download/3.1.1/go
       -o /usr/local/bin/gowitness && \
     chmod +x /usr/local/bin/gowitness
 
-# amass v5.0.1
-RUN curl -fsSL https://github.com/owasp-amass/amass/releases/download/v5.0.1/amass_linux_amd64.tar.gz \
-      -o /tmp/amass.tar.gz && \
-    tar xzf /tmp/amass.tar.gz -C /tmp && \
-    mv /tmp/amass_linux_amd64/amass /usr/local/bin/amass && \
-    chmod +x /usr/local/bin/amass && \
-    rm -rf /tmp/amass.tar.gz /tmp/amass_linux_amd64
+# amass v5 entfernt (F-P0B-003, 2026-05-07): Hard-Cap-Bottleneck (300s) +
+# `-brute`-Doppelarbeit zu gobuster_dns mit der ~30k-Merged-Wordlist
+# (siehe F-P0B-004). <5% Subdomain-Coverage-Verlust durch Wegfall der
+# amass-Permutation-Heuristik; -50MB Image-Groesse.
 
 # katana v1.1.3
 RUN curl -fsSL https://github.com/projectdiscovery/katana/releases/download/v1.1.3/katana_1.1.3_linux_amd64.zip \
@@ -158,6 +155,23 @@ COPY wordlists/wordpress.txt /usr/share/wordlists/wordpress.txt
 COPY wordlists/api-endpoints.txt /usr/share/wordlists/api-endpoints.txt
 COPY wordlists/cms-common.txt /usr/share/wordlists/cms-common.txt
 
+# F-P0B-004 (2026-05-07): Merged DNS-Bruteforce-Wordlist fuer gobuster_dns
+# Quellen (alle deduplikat-gemerged via `sort -u`):
+#   1. SecLists subdomains-top1million-20000.txt        (~20k klassische Patterns)
+#   2. bitquark_20160227_subdomains_popular_1000000     (Top-10k, Bug-Bounty-derived)
+#   3. n0kovo_subdomains_small.txt                      (~10k frisch 2024 gepflegt)
+# Erwartete Endgroesse ~28-32k Eintraege (typische Ueberschneidung 20-30%).
+# Loest die zu enge `subdomains-top5000.txt`-Liste fuer gobuster_dns ab.
+RUN mkdir -p /opt/wordlists \
+ && curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-20000.txt \
+      -o /tmp/seclists.txt \
+ && curl -fsSL https://raw.githubusercontent.com/bitquark/dnspop/master/results/bitquark_20160227_subdomains_popular_1000000 \
+      | head -10000 > /tmp/bitquark.txt \
+ && curl -fsSL https://raw.githubusercontent.com/n0kovo/n0kovo_subdomains/main/n0kovo_subdomains_small.txt \
+      -o /tmp/n0kovo.txt \
+ && cat /tmp/seclists.txt /tmp/bitquark.txt /tmp/n0kovo.txt | sort -u > /opt/wordlists/dns-merged-30k.txt \
+ && rm /tmp/seclists.txt /tmp/bitquark.txt /tmp/n0kovo.txt
+
 # ── 6. Scanner code ────────────────────────────────────────────────
 WORKDIR /opt/scanner
 
@@ -186,7 +200,6 @@ COPY data/ /opt/scanner/data/
 RUN nmap --version; \
     nuclei -version; \
     subfinder -version; \
-    amass -version; \
     gobuster version; \
     dnsx -version; \
     gowitness version; \

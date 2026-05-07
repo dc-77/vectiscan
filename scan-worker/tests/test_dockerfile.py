@@ -11,7 +11,7 @@ EXPECTED_TOOLS: dict[str, str] = {
     "dnsx": "dnsx",
     "gobuster": "gobuster",
     "gowitness": "gowitness",
-    "amass": "amass",
+    # amass entfernt (F-P0B-003, 2026-05-07).
     "testssl.sh": "testssl.sh",
     "nikto": "nikto",
     "wafw00f": "wafw00f",

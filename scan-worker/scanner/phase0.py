@@ -365,125 +365,34 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
     return subdomains
 
 
-def run_amass(domain: str, scan_dir: str, order_id: str) -> list[str]:
-    """Run amass v5 passive enumeration in 2 stages. Timeout 300s (5 Min).
+# F-P0B-003 (2026-05-07): amass v5 entfernt.
+# Begruendung: Hard-Cap-Bottleneck (300s in 1/30 Aufrufen) + redundant zu
+# `gobuster_dns` durch `-brute`-Workaround fuer den v5-Race-Bug. Der
+# `gobuster_dns`-Pfad nutzt jetzt eine ~30k-Merged-Wordlist (F-P0B-004),
+# womit die Permutation-/Brute-Force-Coverage deutlich groesser ist als
+# die ~5k von amass-`-brute`. Erwarteter Subdomain-Coverage-Verlust <5%
+# (nur amass-Permutation-Heuristiken wie ALTRA/dns-permute fallen weg).
+# Snapshot-Schema (Migration 019) bleibt kompatibel — bestehende
+# `tool_sources["amass"]`-Eintraege koennen liegen bleiben, neue
+# Snapshots haben den Key nicht mehr.
 
-    amass v5 hat eine voellig andere Architektur als v4:
-    1. Engine + Asset-DB (Graph-Datenbank), nicht mehr stdout/file
-    2. `enum` befuellt die DB; **kein** `-json`/`-o`-Flag fuer die
-       Subdomains (wie in v4).
-    3. `-passive` ist **deprecated** — passive ist seit v5 der Default.
-    4. `-o <file>` in v5 schreibt **nur den CLI-Log** (Banner, Source-
-       Status), NICHT die gefundenen FQDNs.
-    5. Subdomains kommen erst ueber das **`subs`-Subcommand** raus:
-       `amass subs -d <domain> -dir <db> -names -nocolor`.
 
-    Bisherige Versuche schlugen fehl, weil:
-    - v4-Code (`-json`): "flag provided but not defined: -json"
-    - v5-Code mit `-o` als Subdomain-Quelle: nur CLI-Log gelesen → 0 Subs
-
-    Workflow jetzt: dedizierte Per-Order-DB (`<scan_dir>/phase0/amass-db`)
-    fuer Isolation; enum schreibt rein; subs -names liest raus.
-    """
-    publish_event(order_id, {"type": "tool_starting", "tool": "amass", "host": domain})
-    db_dir = os.path.join(scan_dir, "phase0", "amass-db")
-    log_path = os.path.join(scan_dir, "phase0", "amass.log")
-    subs_path = os.path.join(scan_dir, "phase0", "amass-subs.txt")
-    os.makedirs(db_dir, exist_ok=True)
-    subdomains: list[str] = []
-
-    # --- Stufe 1: enum (befuellt Graph-DB) ---
-    # WICHTIG amass v5 Race-Condition (siehe docs/analyse/AMASS-V5-DIAGNOSE.md):
-    # enum pollt alle 2s SessionStats; wenn WorkItemsCompleted==WorkItemsTotal
-    # in 5 Polls hintereinander (10s) gilt es als "fertig". Bei leerem
-    # Datasource-Set (viele v5-Sources brauchen API-Keys, sind sonst aus)
-    # ist Total==0 von Anfang an → enum exit 0, DB bleibt leer.
-    # Workaround: `-brute` erzwingt ~5000 Wordlist-DNS-Queries als WorkItems
-    # → Race kann nicht triggern bevor Total > 0 ist.
-    enum_cmd = [
-        "amass", "enum",
-        "-d", domain,
-        "-nocolor",
-        "-dir", db_dir,
-        "-o", log_path,
-        # Brute-Force erzwingt WorkItems → Race-Bug umgangen
-        "-brute",
-        # `-timeout` in Minuten
-        "-timeout", "4",
-    ]
-    enum_exit, enum_duration = run_tool(
-        cmd=enum_cmd,
-        timeout=270,
-        output_path=log_path,
-        order_id=order_id,
-        phase=0,
-        tool_name="amass",
-    )
-
-    if enum_exit not in (0,):
-        log.warning("amass_enum_failed", exit_code=enum_exit)
-        # Trotzdem versuchen `subs` zu lesen — eventuell sind partial-results da
-
-    # --- Stufe 2: subs -names (Subdomains aus DB lesen) ---
-    subs_cmd = [
-        "amass", "subs",
-        "-d", domain,
-        "-dir", db_dir,
-        "-names",
-        "-nocolor",
-        "-o", subs_path,
-    ]
-    subs_exit, subs_duration = run_tool(
-        cmd=subs_cmd,
-        timeout=60,
-        output_path=subs_path,
-        order_id=order_id,
-        phase=0,
-        tool_name="amass_subs",
-    )
-
-    if subs_exit not in (0,):
-        log.warning("amass_subs_failed", exit_code=subs_exit)
-
-    # --- Parse: subs -o schreibt CLI-Log; subs Output geht auf stdout. ---
-    # Wir lesen den raw_output aus scan_results (run_tool persistiert stdout
-    # bei `tool_complete`), aber praktischer: wir laufen subs nochmal mit
-    # File-Capture via Output-Redirect. ABER: `-o` macht stdout-Mirror,
-    # nicht Subdomain-File. Pragmatisch: wir lesen die DB selbst nicht,
-    # sondern nutzen die Tatsache dass subs auf stdout listet — und stdout
-    # wird von run_tool in scan_results.raw_output persistiert.
-    # Deshalb hier: zweiter Aufruf direkt mit subprocess.run um stdout zu
-    # capturen und daraus FQDNs zu extrahieren (run_tool wirft stdout weg
-    # nach DB-Persistierung).
-    domain_lower = domain.lower()
-    try:
-        result = subprocess.run(
-            ["amass", "subs", "-d", domain, "-dir", db_dir, "-names", "-nocolor"],
-            capture_output=True, text=True, timeout=60,
-            start_new_session=True,
-        )
-        for line in (result.stdout or "").splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            # Erste Spalte = FQDN-Kandidat (subs -names druckt `name FQDN`
-            # oder einfach FQDN; defensiv beide Faelle handhaben)
-            candidate = line.split()[-1].lower().strip(".,;:")
-            if candidate == domain_lower or candidate.endswith("." + domain_lower):
-                subdomains.append(candidate)
-        # Dedup + sort
-        subdomains = sorted(set(subdomains))
-        log.info("amass_complete", subdomains_found=len(subdomains))
-    except subprocess.TimeoutExpired:
-        log.warning("amass_subs_stdout_timeout")
-    except Exception as e:
-        log.warning("amass_parse_error", error=str(e))
-
-    return subdomains
+# F-P0B-004 (2026-05-07): Merged-Subdomain-Wordlist
+# SecLists-20k + bitquark-10k + n0kovo-small werden zur Build-Zeit im
+# Dockerfile gemerged + dedupliziert (~30k Eintraege). Loest die
+# zu enge `subdomains-top5000.txt` ab — moderne SaaS-/DevOps-Patterns
+# (api-v2, argocd, vault, webhook, staging-eu, ...) sind jetzt drin.
+GOBUSTER_DNS_WORDLIST_PATH = "/opt/wordlists/dns-merged-30k.txt"
 
 
 def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
-    """Run gobuster DNS brute-force. Timeout 180s (3 Min)."""
+    """Run gobuster DNS brute-force. Timeout 180s (3 Min).
+
+    F-P0B-004 (2026-05-07): nutzt die zur Build-Zeit gemergte ~30k-Wordlist
+    (`/opt/wordlists/dns-merged-30k.txt`), Threads 30 (statt 50) +
+    Per-Query-Timeout 3s (statt 5s) als Compromise zwischen Speed und
+    Customer-NS-Friendliness.
+    """
     publish_event(order_id, {"type": "tool_starting", "tool": "gobuster_dns", "host": domain})
     output_path = os.path.join(scan_dir, "phase0", "gobuster_dns.txt")
     subdomains: list[str] = []
@@ -491,17 +400,18 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
     cmd = [
         "gobuster", "dns",
         "--domain", domain,
-        "--wordlist", "/usr/share/wordlists/subdomains-top5000.txt",
+        "--wordlist", GOBUSTER_DNS_WORDLIST_PATH,
         # Wildcard-DNS (Domain antwortet auf *.domain mit gleicher IP) bricht
         # gobuster sonst ab. Mit `--wildcard` versucht gobuster trotzdem zu
         # enumerieren und filtert die Wildcard-IP heraus. Bergersysteme.com
         # ist genau so ein Fall (alles 176.9.21.52).
         "--wildcard",
-        # Default 10 threads → 50; bei 5000-Wort-Liste in 180s Timeout
-        # sonst nicht durchgekommen.
-        "--threads", "50",
-        # Timeout pro DNS-Request — bei langsamen Resolvern sonst Haenger
-        "--timeout", "5s",
+        # F-P0B-004: 30 Threads (statt 50) + 3s Per-Query-Timeout (statt 5s).
+        # Compromise zwischen Speed (~500 Q/s) und Customer-NS-Friendliness.
+        # Bei ~30k Wordlist-Groesse bleibt Worst-Case ~50-90s, max ~120-150s
+        # bei langsamen NS — unter dem 180s Wrapper-Timeout.
+        "--threads", "30",
+        "--timeout", "3s",
         "-q",
         "-o", output_path,
     ]
@@ -1625,11 +1535,14 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
 
     PR-M4 (2026-05-02): Falls fuer dieselbe Domain ein frischer
     Subdomain-Snapshot existiert (TTL 24h, ueber `scan_targets.canonical`),
-    wird die Subdomain-Discovery-Phase (crt.sh / subfinder / amass /
+    wird die Subdomain-Discovery-Phase (crt.sh / subfinder /
     gobuster_dns / axfr) uebersprungen und das gecachte Subdomain-Set
     direkt an dnsx weitergereicht. Externe Drift-Quellen werden so
     eliminiert; Re-Scans innerhalb der TTL haben ein deterministisches
     Subdomain-Inventar.
+
+    F-P0B-003 (2026-05-07): amass v5 wurde komplett entfernt
+    (Hard-Cap-Bottleneck + `-brute`-Doppelarbeit zu gobuster_dns).
 
     F-P0A-004 (Mai 2026): `seed_subdomains` ist eine optionale
     Subdomain-Liste aus Phase 0a (Shodan-DNS + SecurityTrails-Subdomains).
@@ -1644,11 +1557,11 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         phase0_timeout = config.get("phase0b_timeout", config.get("phase0_timeout", PHASE0_TIMEOUT))
         max_hosts = config["max_hosts"]
         phase0_tools = config.get("phase0b_tools", config.get("phase0_tools",
-                                  ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]))
+                                  ["crtsh", "subfinder", "gobuster_dns", "axfr", "dnsx"]))
     else:
         phase0_timeout = PHASE0_TIMEOUT
         max_hosts = MAX_HOSTS
-        phase0_tools = ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"]
+        phase0_tools = ["crtsh", "subfinder", "gobuster_dns", "axfr", "dnsx"]
 
     phase0_start = time.monotonic()
     phase0_dir = os.path.join(scan_dir, "phase0")
@@ -1744,8 +1657,9 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
             discovery_futures[pool.submit(run_certspotter, domain, scan_dir, order_id)] = "certspotter"
         if "subfinder" in phase0_tools:
             discovery_futures[pool.submit(run_subfinder, domain, scan_dir, order_id)] = "subfinder"
-        if "amass" in phase0_tools:
-            discovery_futures[pool.submit(run_amass, domain, scan_dir, order_id)] = "amass"
+        # F-P0B-003 (2026-05-07): amass v5 wurde entfernt (Hard-Cap-Bottleneck +
+        # `-brute`-Doppelarbeit zu gobuster_dns). Wenn Configs `"amass"` noch
+        # in `phase0b_tools` listen, wird der Eintrag stillschweigend ignoriert.
         if "gobuster_dns" in phase0_tools:
             discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
         # F-P0A-004 (Mai 2026): SecurityTrails-Doppelcall in Phase 0b entfernt.

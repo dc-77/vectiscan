@@ -118,7 +118,6 @@ def _is_host_reachable(ip: str, timeout: int = 5) -> bool:
 _VERSION_COMMANDS: list[tuple[str, list[str]]] = [
     ("nmap", ["nmap", "--version"]),
     ("subfinder", ["subfinder", "-version"]),
-    ("amass", ["amass", "-version"]),
     ("gobuster", ["gobuster", "version"]),
     ("dnsx", ["dnsx", "-version"]),
     ("testssl.sh", ["/opt/testssl.sh/testssl.sh", "--version"]),

@@ -8,6 +8,11 @@ import pytest
 from scanner.packages import get_config
 
 
+# F-P0B-003 (2026-05-07): amass v5 entfernt — `run_amass` existiert nicht
+# mehr in scanner.phase0. Frueher hier ueber `@patch("scanner.phase0.run_amass", ...)`
+# gemockt; entsprechende Patches/Assertions wurden geloescht.
+
+
 class TestPhase0Packages:
     """Test that phase0 only runs tools specified in config."""
 
@@ -15,11 +20,10 @@ class TestPhase0Packages:
     @patch("scanner.phase0.collect_dns_records", return_value={"spf": None, "dmarc": None, "dkim": False, "mx": [], "ns": []})
     @patch("scanner.phase0.run_zone_transfer", return_value={"success": False, "data": {}})
     @patch("scanner.phase0.run_gobuster_dns", return_value=["sub3.example.com"])
-    @patch("scanner.phase0.run_amass", return_value=["sub2.example.com"])
     @patch("scanner.phase0.run_subfinder", return_value=["sub1.example.com"])
     @patch("scanner.phase0.run_crtsh", return_value=["www.example.com"])
     def test_webcheck_only_runs_crtsh_and_subfinder(
-        self, mock_crtsh, mock_subfinder, mock_amass, mock_gobuster,
+        self, mock_crtsh, mock_subfinder, mock_gobuster,
         mock_zone, mock_dns, mock_dnsx, tmp_path
     ):
         from scanner.phase0 import run_phase0
@@ -31,7 +35,6 @@ class TestPhase0Packages:
 
         mock_crtsh.assert_called_once()
         mock_subfinder.assert_called_once()
-        mock_amass.assert_not_called()
         mock_gobuster.assert_not_called()
         mock_zone.assert_not_called()
         # dnsx is in webcheck phase0b_tools
@@ -43,11 +46,10 @@ class TestPhase0Packages:
     @patch("scanner.phase0.collect_dns_records", return_value={"spf": None, "dmarc": None, "dkim": False, "mx": [], "ns": []})
     @patch("scanner.phase0.run_zone_transfer", return_value={"success": False, "data": {}})
     @patch("scanner.phase0.run_gobuster_dns", return_value=["sub3.example.com"])
-    @patch("scanner.phase0.run_amass", return_value=["sub2.example.com"])
     @patch("scanner.phase0.run_subfinder", return_value=["sub1.example.com"])
     @patch("scanner.phase0.run_crtsh", return_value=["www.example.com"])
     def test_perimeter_runs_all_tools(
-        self, mock_crtsh, mock_subfinder, mock_amass, mock_gobuster,
+        self, mock_crtsh, mock_subfinder, mock_gobuster,
         mock_zone, mock_dns, mock_dnsx, tmp_path
     ):
         from scanner.phase0 import run_phase0
@@ -59,7 +61,6 @@ class TestPhase0Packages:
 
         mock_crtsh.assert_called_once()
         mock_subfinder.assert_called_once()
-        mock_amass.assert_called_once()
         mock_gobuster.assert_called_once()
         mock_zone.assert_called_once()
         mock_dnsx.assert_called_once()
@@ -69,11 +70,10 @@ class TestPhase0Packages:
     @patch("scanner.phase0.collect_dns_records", return_value={"spf": None, "dmarc": None, "dkim": False, "mx": [], "ns": []})
     @patch("scanner.phase0.run_zone_transfer", return_value={"success": False, "data": {}})
     @patch("scanner.phase0.run_gobuster_dns", return_value=[])
-    @patch("scanner.phase0.run_amass", return_value=[])
     @patch("scanner.phase0.run_subfinder", return_value=[])
     @patch("scanner.phase0.run_crtsh", return_value=[])
     def test_webcheck_max_hosts_limits_to_3(
-        self, mock_crtsh, mock_subfinder, mock_amass, mock_gobuster,
+        self, mock_crtsh, mock_subfinder, mock_gobuster,
         mock_zone, mock_dns, mock_dnsx, tmp_path
     ):
         """When 8 hosts are discovered, webcheck config should limit to 3."""

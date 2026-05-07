@@ -112,7 +112,7 @@ class TestWorkerPackageFlow:
     ):
         """Verify that when no package is specified, perimeter is used."""
         mock_get_config.return_value = {
-            "phase0b_tools": ["crtsh", "subfinder", "amass", "gobuster_dns", "axfr", "dnsx"],
+            "phase0b_tools": ["crtsh", "subfinder", "gobuster_dns", "axfr", "dnsx"],
             "phase0b_timeout": 900,
             "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois"],
             "phase0a_timeout": 120,
