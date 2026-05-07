@@ -162,7 +162,9 @@ def apply_deterministic_pipeline(claude_output: dict,
         tech_profiles = sc.get("tech_profiles") or sc.get("techProfiles") or []
         eol_findings = detect_eol_findings(tech_profiles)
         if eol_findings:
-            findings_in = merge_into_claude_findings(findings_in, eol_findings)
+            findings_in = merge_into_claude_findings(
+                findings_in, eol_findings, tech_profiles=tech_profiles,
+            )
             claude_output["findings"] = findings_in
             log.info("eol_detector_findings_added", count=len(eol_findings),
                      total_after_merge=len(findings_in))

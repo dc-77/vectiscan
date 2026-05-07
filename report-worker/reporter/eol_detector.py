@@ -367,28 +367,76 @@ def detect_eol_findings(
     return out
 
 
+_VERSION_PAT = re.compile(r"\b(\d+(?:\.\d+){1,3}(?:[a-z]\d?)?)\b")
+
+
 def merge_into_claude_findings(
     claude_findings: list[dict[str, Any]],
     eol_findings: list[dict[str, Any]],
+    *,
+    tech_profiles: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Merged EOL-Findings in Claude-Output. Dedup nach (host_ip,
-    finding_type, version) — wenn KI denselben Befund schon hat, gewinnt
-    Claude (bessere Beschreibung), aber `_deterministic_source` markiert
-    es trotzdem.
+    """Merged EOL-Findings in Claude-Output. Dedup-Key:
+    (normalized_host, finding_type, version).
+
+    F-RPT-007: Host-Resolution + Version-Recovery.
+
+    Vorher: dedup auf (host_ip, finding_type, version) — Claude-Findings
+    haben aber oft keinen host_ip (KI sieht nur FQDN/affected). Resultat:
+    Doppel-Findings im Report.
+
+    Jetzt:
+    - normalized_host = primary FQDN aus tech_profiles (FQDN > host > host_ip).
+      Cross-Mapping IP↔FQDN ueber tech_profiles[].fqdns.
+    - version = title_vars.version, fallback Title-Regex (Apache 2.2, etc.)
+
+    `tech_profiles=None` faellt auf altes Verhalten zurueck (kein Cross-Mapping).
     """
+    # ip_to_fqdn-Map aus tech_profiles
+    ip_to_fqdn: dict[str, str] = {}
+    for tp in tech_profiles or []:
+        ip = tp.get("ip", "")
+        fqdns = tp.get("fqdns") or []
+        if ip and fqdns:
+            # primary fqdn = erster Eintrag, lowercase
+            ip_to_fqdn[ip] = str(fqdns[0]).lower().strip()
+
+    def _normalize_host(f: dict) -> str:
+        """Bevorzugt FQDN > host > host_ip-mapped-zu-FQDN > host_ip."""
+        fqdn = (f.get("fqdn") or f.get("host") or "").lower().strip()
+        host_ip = f.get("host_ip") or ""
+        if not fqdn and host_ip in ip_to_fqdn:
+            fqdn = ip_to_fqdn[host_ip]
+        if fqdn:
+            return fqdn
+        return host_ip
+
+    def _extract_version(f: dict) -> str:
+        """Erst title_vars.version, dann Title-Regex-Fallback."""
+        tv = f.get("title_vars") or {}
+        if isinstance(tv, dict) and tv.get("version"):
+            return str(tv["version"])
+        title = f.get("title") or ""
+        m = _VERSION_PAT.search(title)
+        return m.group(1) if m else ""
+
     by_key: dict[tuple, dict] = {}
     for f in claude_findings or []:
-        ver = ""
-        if isinstance(f.get("title_vars"), dict):
-            ver = str(f["title_vars"].get("version", ""))
-        key = (f.get("host_ip", ""), f.get("finding_type", ""), ver)
+        key = (
+            _normalize_host(f),
+            f.get("finding_type", ""),
+            _extract_version(f),
+        )
         by_key[key] = f
 
     merged = list(claude_findings or [])
     added = 0
     for ef in eol_findings:
-        ver = (ef.get("title_vars") or {}).get("version", "")
-        key = (ef.get("host_ip", ""), ef.get("finding_type", ""), ver)
+        key = (
+            _normalize_host(ef),
+            ef.get("finding_type", ""),
+            _extract_version(ef),
+        )
         if key in by_key:
             # Markiere bestehenden Claude-Eintrag als deterministic-bestaetigt
             by_key[key]["_deterministic_source"] = ef.get(
