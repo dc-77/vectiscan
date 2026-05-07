@@ -555,21 +555,41 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
             log.warning("redirect_probe_failed", error=str(e))
 
         # ── AI Phase 2 Config (all hosts, after all Phase 1) ──
-        for host, profile in zip(scan_hosts, tech_profiles):
+        # F-KI3-001 (Mai 2026): ThreadPool max_workers=5 ueber den Host-Loop.
+        # plan_phase2_config ist Rule-Engine-pre-gated — KI laeuft nur bei
+        # No-Rule-Match. ThreadPool greift auf den Loop, nicht innerhalb von
+        # plan_phase2_config selbst (siehe ai_strategy.py).
+        ki3_targets = [
+            (host, profile) for host, profile in zip(scan_hosts, tech_profiles)
+            if not profile.get("skipped")
+        ]
+        _check_timeout()
+
+        def _run_ki3(host: dict[str, Any], profile: dict[str, Any]) -> tuple[str, dict[str, Any]]:
             ip = host["ip"]
-            if profile.get("skipped"):
-                continue
-
-            _check_timeout()
-
             adaptive_config = plan_phase2_config(profile, host_inventory, package, order_id=order_id)
-            adaptive_configs[ip] = adaptive_config
+            return ip, adaptive_config
 
-            adaptive_json = json.dumps(adaptive_config, indent=2, ensure_ascii=False)
-            _save_result(order_id=order_id, host_ip=ip, phase=1,
-                         tool_name="ai_phase2_config", raw_output=adaptive_json,
-                         exit_code=0, duration_ms=0)
-            publish_event(order_id, {"type": "ai_config", "ip": ip, "config": adaptive_config})
+        if ki3_targets:
+            ki3_workers = min(5, len(ki3_targets))
+            with ThreadPoolExecutor(max_workers=ki3_workers, thread_name_prefix="ki3") as ki3_pool:
+                ki3_futures = {
+                    ki3_pool.submit(_run_ki3, host, profile): host["ip"]
+                    for host, profile in ki3_targets
+                }
+                for fut in as_completed(ki3_futures):
+                    try:
+                        ip, adaptive_config = fut.result()
+                    except Exception as e:
+                        log.warning("ki3_phase2_config_failed",
+                                    ip=ki3_futures[fut], error=str(e))
+                        continue
+                    adaptive_configs[ip] = adaptive_config
+                    adaptive_json = json.dumps(adaptive_config, indent=2, ensure_ascii=False)
+                    _save_result(order_id=order_id, host_ip=ip, phase=1,
+                                 tool_name="ai_phase2_config", raw_output=adaptive_json,
+                                 exit_code=0, duration_ms=0)
+                    publish_event(order_id, {"type": "ai_config", "ip": ip, "config": adaptive_config})
 
         log.info("ai_phase2_configs_complete", order_id=order_id, configs=len(adaptive_configs))
 

@@ -254,11 +254,7 @@ HOST_STRATEGY_SCHEMA = """{
       "ip": "...",
       "action": "scan|skip",
       "priority": 1,
-      "reasoning": "...",
-      "scan_hints": {
-        "shodan_ports": [21, 22, 80, 443],
-        "focus_areas": ["web_vulns", "ssl", "ftp_security"]
-      }
+      "reasoning": "..."
     }
   ],
   "strategy_notes": "Kurze Zusammenfassung der Strategie",
@@ -334,12 +330,22 @@ Antwort im Format:
     # Hard-override: live web hosts duerfen NIE per AI-Skip verschwinden.
     # Verhindert false-skips bei "Redirector"-Titles, generischen Default-Pages
     # und Cloudflare-WAF-403, hinter denen echter Customer-Content liegt.
-    overridden = _enforce_scan_for_live_web_hosts(result, hosts, domain)
+    overridden_web = _enforce_scan_for_live_web_hosts(result, hosts, domain)
+
+    # F-KI1-002 (Mai 2026): Mailserver-Hosts (MX-Match oder offene Mail-Ports
+    # 25/465/587/110/143/993/995) ebenfalls hart auf scan setzen — selbst wenn
+    # die KI "skip" gesagt hat. Schuetzt vor verpassten Mail-Security-
+    # Compliance-Findings (SPF/DMARC/DKIM, STARTTLS, alte Postfix-Versionen).
+    overridden_mail = _enforce_scan_for_mailservers(
+        result, hosts, host_inventory.get("dns_findings", {}) or {}
+    )
 
     log.info("ai_host_strategy_complete",
              scan=sum(1 for h in result["hosts"] if h.get("action") == "scan"),
              skip=sum(1 for h in result["hosts"] if h.get("action") == "skip"),
-             overridden_to_scan=overridden)
+             overridden_to_scan=overridden_web + overridden_mail,
+             overridden_web=overridden_web,
+             overridden_mail=overridden_mail)
 
     # Strip internal keys before return
     result.pop("_raw", None)
@@ -421,6 +427,79 @@ def _enforce_scan_for_live_web_hosts(
                  title=(live_vhost.get("title") or "")[:60],
                  original=original_reason[:120],
                  primary_vhost_count=len(vhosts))
+
+    return overridden
+
+
+# Standardports fuer Mail-Services (SMTP/Submission/POP3/IMAP)
+MAIL_PORTS = {25, 465, 587, 110, 143, 993, 995}
+
+
+def _enforce_scan_for_mailservers(
+    strategy: dict[str, Any],
+    hosts: list[dict[str, Any]],
+    dns_findings: dict[str, Any],
+) -> int:
+    """KI-Skip aufheben wenn Host MX-Record traegt oder offene Mail-Ports hat.
+
+    F-KI1-002: Verhindert dass Mailserver durch ein KI-"skip" aus der Pipeline
+    fallen — sie liefern haeufig Mail-Security-Findings (SPF/DMARC/DKIM,
+    STARTTLS-Misconfig, veraltete MTA-Versionen) die fuer NIS2/§30 BSIG und
+    Insurance-Pakete relevant sind.
+
+    Returns: Anzahl der ueberschriebenen Hosts.
+    """
+    # MX-Targets sammeln (kann Liste von Strings oder Dicts sein)
+    mx_targets: set[str] = set()
+    for mx in (dns_findings.get("mx") or []):
+        if isinstance(mx, dict):
+            host_val = mx.get("host") or mx.get("exchange") or ""
+            if host_val:
+                mx_targets.add(str(host_val).strip(".").lower())
+        elif isinstance(mx, str):
+            mx_targets.add(mx.strip(".").lower())
+
+    by_ip = {h.get("ip"): h for h in hosts if h.get("ip")}
+    overridden = 0
+
+    for sh in strategy.get("hosts", []):
+        if sh.get("action") != "skip":
+            continue
+        ip = sh.get("ip")
+        host = by_ip.get(ip)
+        if not host:
+            continue
+
+        original_reason = sh.get("reasoning") or ""
+        marker: str | None = None
+
+        # 1) MX-Record-Match auf einer der FQDNs
+        fqdns = [str(f).strip(".").lower()
+                 for f in (host.get("fqdns") or []) if f]
+        if mx_targets and any(f in mx_targets for f in fqdns):
+            marker = "MX-Record"
+
+        # 2) Mail-Port offen (auch ohne MX, z.B. dedizierter MTA)
+        if marker is None:
+            open_ports = {int(p) for p in (host.get("open_ports") or [])
+                          if str(p).isdigit()}
+            mail_ports_open = open_ports & MAIL_PORTS
+            if mail_ports_open:
+                marker = f"Mail-Port {sorted(mail_ports_open)[0]}"
+
+        if marker is None:
+            continue
+
+        sh["action"] = "scan"
+        sh["priority"] = max(int(sh.get("priority") or 3), 3)
+        sh["reasoning"] = (
+            f"[HARD-OVERRIDE: {marker}] KI-Skip verworfen — Mailserver-Host "
+            f"liefert Mail-Security-Findings. Original: {original_reason}"
+        )
+        sh["_overridden"] = "mailserver"
+        overridden += 1
+        log.info("host_skip_overridden_mail", ip=ip, marker=marker,
+                 fqdns=fqdns[:3], original=original_reason[:120])
 
     return overridden
 
