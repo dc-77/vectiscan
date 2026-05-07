@@ -31,7 +31,7 @@ from scanner.progress import (
     set_scan_started,
     update_progress,
 )
-from scanner.upload import enqueue_report_job, pack_results, upload_to_minio
+from scanner.upload import enqueue_report_job, pack_results, prewarm_buckets, upload_to_minio
 from scanner.ai_strategy import plan_host_strategy, plan_phase2_config, plan_tech_analysis
 from scanner import scope as scope_module
 from scanner import zap_pool
@@ -1030,6 +1030,13 @@ def main() -> None:
 
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
     redis_client = redis.from_url(redis_url)
+
+    # F-PH9-001: MinIO-Buckets einmalig beim Worker-Start verifizieren —
+    # spart pro Scan zwei Roundtrips in upload_to_minio + upload_screenshots.
+    try:
+        prewarm_buckets()
+    except Exception as e:
+        log.warning("bucket_prewarm_outer_failed", error=str(e))
 
     # Register this container's ZAP pool membership at boot so newly added
     # daemons (e.g. scaling from 2 to 4 ZAPs) are picked up on the next restart.

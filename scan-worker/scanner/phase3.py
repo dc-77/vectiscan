@@ -208,7 +208,16 @@ def run_phase3(
 
         publish_event(order_id, {"type": "tool_starting", "tool": "nvd", "host": ""})
         progress_callback(order_id, "correlation", "enrichment")
-        max_lookups = 5 if package == "webcheck" else 50
+        # F-PH3-001: max_lookups 50->100 (perimeter), webcheck 5->10. Plus
+        # ENV-Override `NVD_MAX_LOOKUPS` fuer Edge-Cases (Insurance/Compliance
+        # mit hoher CVE-Last → 200/300). Default unset → Paket-Default.
+        _default_max = 10 if package == "webcheck" else 100
+        try:
+            max_lookups = int(os.environ.get("NVD_MAX_LOOKUPS", str(_default_max)))
+        except (TypeError, ValueError):
+            max_lookups = _default_max
+        if max_lookups < 1:
+            max_lookups = _default_max
 
         # CVEs die noch nicht im Snapshot sind
         missing_nvd = [c for c in cve_ids if c not in (snap.get("nvd") or {})]

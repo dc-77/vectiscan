@@ -876,8 +876,31 @@ def plan_phase3_prioritization(
             "_skipped_by_gate": True,
         }
 
-    # Truncate finding summary to avoid excessive token usage
-    summary_truncated = finding_summary[:100]
+    # F-KI4-001: Severity-Pre-Sort + Cap 100->150 + Critical/High-Guarantee.
+    # Vor Truncation severity-priorisieren (CRITICAL > HIGH > MEDIUM > LOW > INFO
+    # + KEV-Boost). Tiebreaker `finding_id` fuer Determinismus. Cap 150 deckt
+    # 95% realer Eingaben (Sonnet 4.6 Context-Window 200K, +50 Findings ~ 4K
+    # Tokens vernachlaessigbar). ENV-Override `KI4_FINDING_CAP` fuer Edge-Cases.
+    SEV_RANK = {"critical": 5, "high": 4, "medium": 3, "low": 2, "info": 1}
+
+    def _ki4_priority(f: dict[str, Any]) -> tuple:
+        sev = (f.get("severity") or "info").lower()
+        ti = f.get("threat_intel") or {}
+        en = f.get("enrichment") or {}
+        kev = bool(
+            (isinstance(ti, dict) and ti.get("in_kev"))
+            or (isinstance(en, dict) and en.get("cisa_kev"))
+        )
+        return (-int(kev), -SEV_RANK.get(sev, 1), str(f.get("finding_id", "")))
+
+    finding_summary_sorted = sorted(finding_summary or [], key=_ki4_priority)
+    try:
+        cap = int(os.environ.get("KI4_FINDING_CAP", "150"))
+    except (TypeError, ValueError):
+        cap = 150
+    if cap < 1:
+        cap = 1
+    summary_truncated = finding_summary_sorted[:cap]
 
     user_prompt = f"""Phase-2 Scan-Ergebnisse ({len(finding_summary)} Findings, zeige die ersten {len(summary_truncated)}):
 

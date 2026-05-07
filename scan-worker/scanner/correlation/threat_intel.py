@@ -9,7 +9,9 @@ from __future__ import annotations
 import json
 import os
 import subprocess
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Optional
 
 import redis
@@ -66,65 +68,104 @@ class NVDClient:
         self.session.headers.update({"User-Agent": "VectiScan/2.0"})
         if self.api_key:
             self.session.headers.update({"apiKey": self.api_key})
-        # Rate limiting: track last request time
+        # Rate limiting: track last request time (thread-safe via lock).
         self._last_request = 0.0
         self._min_interval = 0.6 if self.api_key else 6.0  # 50/30s vs 5/30s
+        self._rate_lock = threading.Lock()
 
     @property
     def available(self) -> bool:
         return True  # NVD works without key (just slower)
 
     def _rate_limit(self) -> None:
-        elapsed = time.monotonic() - self._last_request
-        if elapsed < self._min_interval:
-            time.sleep(self._min_interval - elapsed)
-        self._last_request = time.monotonic()
+        # Thread-safe rate-limit-Window: bei parallelen Workern serialisiert
+        # der Lock die `time.sleep`-Wartezeiten. Effektive RPS bleibt 1/min_interval.
+        with self._rate_lock:
+            elapsed = time.monotonic() - self._last_request
+            if elapsed < self._min_interval:
+                time.sleep(self._min_interval - elapsed)
+            self._last_request = time.monotonic()
 
     def lookup_cve(self, cve_id: str) -> Optional[dict[str, Any]]:
-        """Fetch CVE details from NVD. Returns enriched data or None."""
+        """Fetch CVE details from NVD. Returns enriched data or None.
+
+        F-PH3-001: 429-Backoff-Retry mit exponential 1s/2s/4s/8s.
+        """
         cache_key = f"nvd:{cve_id}"
         cached = _cache_get(cache_key)
         if cached:
             return cached
 
-        self._rate_limit()
-        try:
-            resp = self.session.get(
-                self.BASE_URL,
-                params={"cveId": cve_id},
-                timeout=15,
-            )
-            if resp.status_code == 429:
-                log.warning("nvd_rate_limited", cve=cve_id)
-                time.sleep(10)
+        # 429-Backoff: exponential 1/2/4/8s, max 4 Versuche.
+        backoff_schedule = (1.0, 2.0, 4.0, 8.0)
+        for attempt, backoff in enumerate(backoff_schedule):
+            self._rate_limit()
+            try:
+                resp = self.session.get(
+                    self.BASE_URL,
+                    params={"cveId": cve_id},
+                    timeout=15,
+                )
+                if resp.status_code == 429:
+                    log.warning(
+                        "nvd_rate_limited",
+                        cve=cve_id,
+                        attempt=attempt + 1,
+                        backoff_s=backoff,
+                    )
+                    if attempt < len(backoff_schedule) - 1:
+                        time.sleep(backoff)
+                        continue
+                    return None
+                if resp.status_code != 200:
+                    log.warning("nvd_http_error", cve=cve_id, status=resp.status_code)
+                    return None
+
+                data = resp.json()
+                vulns = data.get("vulnerabilities", [])
+                if not vulns:
+                    return None
+
+                cve_data = vulns[0].get("cve", {})
+                result = self._parse_cve(cve_id, cve_data)
+                _cache_set(cache_key, result, ttl=86400)  # 24h cache
+                return result
+
+            except Exception as e:
+                log.warning("nvd_lookup_error", cve=cve_id, error=str(e))
                 return None
-            if resp.status_code != 200:
-                log.warning("nvd_http_error", cve=cve_id, status=resp.status_code)
-                return None
+        return None
 
-            data = resp.json()
-            vulns = data.get("vulnerabilities", [])
-            if not vulns:
-                return None
+    def lookup_batch(self, cve_ids: list[str], max_lookups: int = 100) -> dict[str, dict[str, Any]]:
+        """Fetch multiple CVEs in parallel. Returns dict of cve_id → enrichment data.
 
-            cve_data = vulns[0].get("cve", {})
-            result = self._parse_cve(cve_id, cve_data)
-            _cache_set(cache_key, result, ttl=86400)  # 24h cache
-            return result
-
-        except Exception as e:
-            log.warning("nvd_lookup_error", cve=cve_id, error=str(e))
-            return None
-
-    def lookup_batch(self, cve_ids: list[str], max_lookups: int = 50) -> dict[str, dict[str, Any]]:
-        """Fetch multiple CVEs. Returns dict of cve_id → enrichment data."""
+        F-PH3-001: ThreadPoolExecutor mit dynamischer Concurrency:
+        - ohne NVD_API_KEY: max_workers=2 (Public Tier 5 req/30s)
+        - mit NVD_API_KEY:  max_workers=8 (Auth Tier 50 req/30s)
+        Rate-Limit serialisiert via `_rate_lock` in `_rate_limit`.
+        """
         results: dict[str, dict[str, Any]] = {}
-        for cve_id in cve_ids[:max_lookups]:
-            data = self.lookup_cve(cve_id)
-            if data:
-                results[cve_id] = data
-        log.info("nvd_batch_complete", requested=len(cve_ids),
-                 fetched=len(results), max=max_lookups)
+        targets = list(cve_ids[:max_lookups])
+        if not targets:
+            log.info("nvd_batch_complete", requested=len(cve_ids), fetched=0, max=max_lookups)
+            return results
+
+        max_workers = 8 if self.api_key else 2
+
+        def _fetch(cve_id: str) -> tuple[str, Optional[dict[str, Any]]]:
+            return cve_id, self.lookup_cve(cve_id)
+
+        with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="nvd") as pool:
+            for cve_id, data in pool.map(_fetch, targets):
+                if data:
+                    results[cve_id] = data
+        log.info(
+            "nvd_batch_complete",
+            requested=len(cve_ids),
+            fetched=len(results),
+            max=max_lookups,
+            workers=max_workers,
+        )
         return results
 
     def _parse_cve(self, cve_id: str, cve_data: dict) -> dict[str, Any]:
