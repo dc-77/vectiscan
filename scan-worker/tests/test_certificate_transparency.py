@@ -145,31 +145,14 @@ def test_crtsh_retry_succeeds_first_try(tmp_path, monkeypatch):
     assert call_count["n"] == 1
 
 
-def test_securitytrails_skipped_when_no_api_key(tmp_path, monkeypatch):
-    """Ohne SECURITYTRAILS_API_KEY → leere Liste, kein Throw."""
-    monkeypatch.delenv("SECURITYTRAILS_API_KEY", raising=False)
-    scan_dir = str(tmp_path)
-    os.makedirs(os.path.join(scan_dir, "phase0"), exist_ok=True)
-
-    subs = phase0.run_securitytrails_subdomains("x.com", scan_dir, "test-order")
-    assert subs == []
-
-
-def test_securitytrails_returns_subdomains_with_key(tmp_path, monkeypatch):
-    """Mit Key → SecurityTrailsClient.get_subdomains wird genutzt."""
-    monkeypatch.setenv("SECURITYTRAILS_API_KEY", "test-key")
-    scan_dir = str(tmp_path)
-    os.makedirs(os.path.join(scan_dir, "phase0"), exist_ok=True)
-
-    from scanner.passive import securitytrails_client as st_module
-
-    fake_client = MagicMock()
-    fake_client.available = True
-    fake_client.get_subdomains.return_value = ["a.x.com", "b.x.com"]
-    monkeypatch.setattr(st_module, "SecurityTrailsClient", lambda: fake_client)
-
-    subs = phase0.run_securitytrails_subdomains("x.com", scan_dir, "test-order")
-    assert subs == ["a.x.com", "b.x.com"]
+# F-P0A-004 (Mai 2026): `run_securitytrails_subdomains` entfernt; SecurityTrails
+# laeuft jetzt ausschliesslich in Phase 0a, die Subdomains kommen ueber
+# `seed_subdomains` an `run_phase0`. Die zwei alten Tests
+# (`test_securitytrails_skipped_when_no_api_key`,
+#  `test_securitytrails_returns_subdomains_with_key`) sind entfallen — die
+# neue Verdrahtung ist abgedeckt durch
+# `test_phase0a_passive_seed.py::TestPhase0aPassiveSubdomains` und
+# `TestPhase0SeedSubdomains`.
 
 
 def test_crtsh_retry_handles_zero_entries(tmp_path, monkeypatch):

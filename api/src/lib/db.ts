@@ -32,6 +32,7 @@ const MIGRATION_022_PATH = path.join(__dirname, '..', 'migrations', '022_ai_call
 const MIGRATION_023_PATH = path.join(__dirname, '..', 'migrations', '023_consolidated_findings_vhost.sql');
 const MIGRATION_024_PATH = path.join(__dirname, '..', 'migrations', '024_determinism_kpi.sql');
 const MIGRATION_025_PATH = path.join(__dirname, '..', 'migrations', '025_subscription_delete_safe.sql');
+const MIGRATION_026_PATH = path.join(__dirname, '..', 'migrations', '026_shodan_pre_warm.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -326,6 +327,19 @@ export async function initDb(): Promise<void> {
   const currentRule = fk025Check.rows[0]?.delete_rule;
   if (currentRule && currentRule !== 'SET NULL') {
     const migrationSql = fs.readFileSync(MIGRATION_025_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 026: Shodan Pre-Warm-Felder (subscriptions.shodan_scan_request,
+  // orders.pre_warm_requested) — F-P0A-006.
+  const preWarm026Check = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.columns
+      WHERE table_name = 'orders' AND column_name = 'pre_warm_requested'
+    ) AS exists
+  `);
+  if (!preWarm026Check.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_026_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

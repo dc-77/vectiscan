@@ -222,6 +222,22 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     log.info("scan_start", order_id=order_id, domain=domain)
     set_scan_started(order_id)
 
+    # F-P0A-006 (Mai 2026): Shodan on-demand Pre-Warm.
+    # Subscription-Pfad default-on, One-Off opt-in via orders.pre_warm_requested.
+    # Trigger erst nach Release-Punkt (= scan_authorizations bereits hochgeladen,
+    # status `queued`) — rechtliche Mitigation. Best-Effort Fire-and-Forget:
+    # bei API-Fehler wird der Scan normal weitergefuehrt, Phase 0a faellt
+    # auf bestehende Cached-Daten zurueck.
+    try:
+        from scanner.shodan_prewarm import maybe_trigger_prewarm
+        prewarm_scan_id = maybe_trigger_prewarm(order_id)
+        if prewarm_scan_id:
+            log.info("shodan_prewarm_triggered",
+                     order_id=order_id, scan_id=prewarm_scan_id)
+    except Exception as exc:
+        log.warning("shodan_prewarm_failed_silently",
+                    order_id=order_id, error=str(exc))
+
     # Performance-Tracking: Dauer pro Phase in Millisekunden.
     phase_durations_ms: dict[str, int] = {}
     _phase_cursor = {"t": time.monotonic()}
@@ -257,8 +273,13 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     _phase_checkpoint("phase0a")
 
     # ── Phase 0b: DNS Reconnaissance (active discovery) ────
+    # F-P0A-004 (Mai 2026): Phase-0a-Subdomains (Shodan-DNS + SecurityTrails)
+    # werden als seed an Phase 0b durchgereicht. Phase 0b ruft SecurityTrails
+    # nicht mehr selbst auf (Doppel-Call entfernt).
+    passive_seed = phase0a_results.get("passive_subdomains") or []
     update_progress(order_id, "dns_recon", "starting")
-    host_inventory = run_phase0(domain, scan_dir, order_id, config)
+    host_inventory = run_phase0(domain, scan_dir, order_id, config,
+                                seed_subdomains=passive_seed)
 
     # ── Multi-Target: non-enumerate Targets dazumergen + Scope-Enforcement ──
     if multi_target_context:

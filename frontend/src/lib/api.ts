@@ -163,11 +163,23 @@ export async function validateTargets(targets: TargetEntry[]): Promise<ApiRespon
   return handleResponse(res);
 }
 
-export async function createOrder(targets: TargetEntry[], pkg: string = 'perimeter'): Promise<ApiResponse<OrderWithTargets>> {
+export async function createOrder(
+  targets: TargetEntry[],
+  pkg: string = 'perimeter',
+  preWarmShodan: boolean = false,
+): Promise<ApiResponse<OrderWithTargets>> {
+  // F-P0A-006: preWarmShodan opt-in fuer One-Off-Orders. Default false.
+  // Wenn true triggert scan-worker beim Scan-Start POST /shodan/scan;
+  // frischere Shodan-Daten kommen 24-48h spaeter — Customer sollte
+  // Admin-Approval entsprechend verzoegern.
   const res = await fetch(`${API_URL}/api/orders`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify({ package: pkg, targets }),
+    body: JSON.stringify({
+      package: pkg,
+      targets,
+      pre_warm_shodan: preWarmShodan,
+    }),
   });
   return handleResponse(res);
 }

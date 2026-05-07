@@ -248,48 +248,10 @@ def run_crtsh(domain: str, scan_dir: str, order_id: str) -> list[str]:
     return subdomains
 
 
-def run_securitytrails_subdomains(domain: str, scan_dir: str, order_id: str) -> list[str]:
-    """SecurityTrails-Subdomain-Liste als 4. CT-Quelle in Phase 0b.
-
-    SecurityTrails liefert oft hunderte Subdomains (historische DNS-Daten),
-    die crt.sh + subfinder + amass nicht haben. Nur aktiv wenn
-    `SECURITYTRAILS_API_KEY` gesetzt ist — sonst stiller Skip.
-    """
-    publish_event(order_id, {"type": "tool_starting", "tool": "securitytrails", "host": domain})
-    output_path = os.path.join(scan_dir, "phase0", "securitytrails.json")
-    started = time.monotonic()
-
-    subdomains: list[str] = []
-    error: Optional[str] = None
-    try:
-        from scanner.passive.securitytrails_client import SecurityTrailsClient
-        client = SecurityTrailsClient()
-        if not client.available:
-            log.info("securitytrails_skipped", reason="no_api_key")
-            return []
-        subdomains = client.get_subdomains(domain)
-        log.info("securitytrails_complete", subdomains_found=len(subdomains))
-    except Exception as e:
-        error = str(e)
-        log.warning("securitytrails_error", error=error)
-
-    duration_ms = int((time.monotonic() - started) * 1000)
-    try:
-        payload = {"subdomains": subdomains, "error": error}
-        with open(output_path, "w") as f:
-            json.dump(payload, f, indent=2)
-        from scanner.tools import _save_result
-        _save_result(
-            order_id=order_id, host_ip=None, phase=0,
-            tool_name="securitytrails",
-            raw_output=json.dumps(payload, ensure_ascii=False),
-            exit_code=0 if not error else 1,
-            duration_ms=duration_ms,
-        )
-    except Exception as e:
-        log.warning("securitytrails_save_error", error=str(e))
-
-    return subdomains
+# F-P0A-004 (Mai 2026): `run_securitytrails_subdomains` entfernt.
+# Phase 0a uebernimmt SecurityTrails-Aufrufe (parallel zu shodan/whois);
+# die Subdomains kommen ueber `seed_subdomains` an `run_phase0`.
+# Doppel-Call gegen SecurityTrails-Free-Tier (50 Calls/mo) entfernt.
 
 
 def run_certspotter(domain: str, scan_dir: str, order_id: str) -> list[str]:
@@ -1651,7 +1613,8 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
     return hosts
 
 
-def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any] | None = None) -> dict[str, Any]:
+def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any] | None = None,
+               seed_subdomains: list[str] | None = None) -> dict[str, Any]:
     """
     Orchestrate Phase 0: DNS Reconnaissance.
 
@@ -1667,6 +1630,13 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     direkt an dnsx weitergereicht. Externe Drift-Quellen werden so
     eliminiert; Re-Scans innerhalb der TTL haben ein deterministisches
     Subdomain-Inventar.
+
+    F-P0A-004 (Mai 2026): `seed_subdomains` ist eine optionale
+    Subdomain-Liste aus Phase 0a (Shodan-DNS + SecurityTrails-Subdomains).
+    Die Eintraege werden dem Discovery-Pool hinzugefuegt und mit ihrer
+    Quelle in `tool_sources["phase0a_passive"]` gespeichert. Ersetzt den
+    bisherigen `run_securitytrails_subdomains`-Call in Phase 0b
+    (Doppel-Call gegen SecurityTrails-API entfernt).
     """
     # Use config if provided, otherwise default to professional
     # v2 uses phase0b_tools/phase0b_timeout; fall back to v1 keys for compat
@@ -1731,6 +1701,27 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         except Exception as exc:
             log.warning("phase0_snapshot_lookup_failed", error=str(exc))
 
+    # --- F-P0A-004: Phase-0a-Passive-Subdomains als Seed mergen ---
+    # Phase 0a hat Shodan-DNS und SecurityTrails-Subdomains schon gesammelt.
+    # Wir nehmen sie hier in den Discovery-Pool mit auf und entfernen damit
+    # den SecurityTrails-Doppelcall in Phase 0b. Die Quelle wird unter
+    # `phase0a_passive` in tool_sources gespeichert (Audit-Trail).
+    seed_passive: list[str] = []
+    if seed_subdomains:
+        seed_passive = sorted({
+            str(s).strip().lower().rstrip(".")
+            for s in seed_subdomains
+            if s and str(s).strip()
+        })
+        if seed_passive:
+            all_subdomains.extend(seed_passive)
+            tool_sources["phase0a_passive"] = list(seed_passive)
+            log.info(
+                "phase0_phase0a_seed_loaded",
+                domain=domain, order_id=order_id,
+                subdomains=len(seed_passive),
+            )
+
     # --- Stufe 1: Subdomain Discovery + DNS Records (parallel) ---
     # Bei Snapshot-Reuse nur DNS-Records + axfr neu, weil diese fuer
     # Email-Security/Compliance-Reports relevant sind und billig.
@@ -1757,12 +1748,11 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
             discovery_futures[pool.submit(run_amass, domain, scan_dir, order_id)] = "amass"
         if "gobuster_dns" in phase0_tools:
             discovery_futures[pool.submit(run_gobuster_dns, domain, scan_dir, order_id)] = "gobuster_dns"
-        # SecurityTrails als 4. CT-Quelle, parallel. Nur wenn API-Key
-        # gesetzt — sonst Skip ohne Aufwand.
-        if os.environ.get("SECURITYTRAILS_API_KEY"):
-            discovery_futures[pool.submit(
-                run_securitytrails_subdomains, domain, scan_dir, order_id,
-            )] = "securitytrails"
+        # F-P0A-004 (Mai 2026): SecurityTrails-Doppelcall in Phase 0b entfernt.
+        # Phase 0a ruft SecurityTrails bereits auf (parallel zu shodan/whois);
+        # die Subdomains kommen ueber `seed_subdomains` (= passive_subdomains)
+        # in den Discovery-Pool. webcheck-Paket nutzt SecurityTrails ohnehin
+        # nicht (phase0a_tools=["whois"]) — kein Verlust.
         if "axfr" in phase0_tools:
             discovery_futures[pool.submit(run_zone_transfer, domain, scan_dir, order_id)] = "axfr"
         discovery_futures[pool.submit(collect_dns_records, domain, scan_dir, order_id)] = "dns_records"

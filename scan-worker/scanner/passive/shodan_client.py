@@ -3,6 +3,7 @@
 import os
 from typing import Any
 
+import requests
 import structlog
 
 from scanner.passive.base_client import PassiveClient
@@ -44,6 +45,68 @@ class ShodanClient(PassiveClient):
             "subdomains": data.get("subdomains", []),
             "records": data.get("data", []),
         }
+
+    def request_scan(self, ips: list[str]) -> str | None:
+        """Trigger Shodan on-demand scan for IPs (F-P0A-006).
+
+        POST /shodan/scan with form-encoded `ips=<csv>` — returns the
+        scan_id when accepted. Used as Pre-Warm before a scheduled
+        Subscription-Re-Scan or for opt-in One-Off-Orders, so Phase 0a
+        sees fresh Shodan-Daten 24-48h spaeter.
+
+        Args:
+            ips: List of IPv4 addresses (max 50, caller-capped). Empty
+                 list returns None without API contact.
+
+        Returns:
+            scan_id string on success, None on failure or no API key.
+
+        Failure-Mode: returns None on any HTTP error. Callers should
+        treat this as best-effort fire-and-forget — Phase 0a degrades
+        gracefully to the existing cached Shodan-Daten.
+        """
+        if not self.available:
+            log.info("shodan_request_scan_skipped", reason="no_api_key")
+            return None
+        if not ips:
+            log.info("shodan_request_scan_skipped", reason="no_ips")
+            return None
+
+        # Cap defensiv (caller sollte bereits gecappt haben).
+        capped = list(ips)[:50]
+        ip_csv = ",".join(capped)
+
+        try:
+            resp = self.session.post(
+                f"{self.BASE_URL}/shodan/scan",
+                params={"key": self.api_key},
+                data={"ips": ip_csv},
+                timeout=self.timeout,
+            )
+        except requests.RequestException as e:
+            log.warning("shodan_request_scan_error", error=str(e), ip_count=len(capped))
+            return None
+
+        if resp.status_code >= 400:
+            log.warning("shodan_request_scan_http_error",
+                        status=resp.status_code, ip_count=len(capped))
+            return None
+
+        try:
+            data = resp.json()
+        except ValueError:
+            log.warning("shodan_request_scan_json_decode_error")
+            return None
+
+        scan_id = data.get("id")
+        if scan_id:
+            log.info("shodan_request_scan_submitted",
+                     scan_id=scan_id, ip_count=len(capped),
+                     credits_left=data.get("credits_left"))
+            return str(scan_id)
+
+        log.warning("shodan_request_scan_no_id", response=data)
+        return None
 
     def lookup_host(self, ip: str) -> dict[str, Any] | None:
         """Fetch open ports, services, and banners for an IP."""

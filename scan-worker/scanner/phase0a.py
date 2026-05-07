@@ -321,9 +321,42 @@ def run_phase0a(
             if progress_callback:
                 progress_callback(order_id, tool_name, "complete")
 
+    # ------------------------------------------------------------------
+    # F-P0A-004 (Mai 2026): Phase-0a-Subdomains an Phase 0b durchreichen.
+    # Phase 0a sammelt bereits `shodan_domain.subdomains[]` und
+    # `securitytrails.subdomains[]` — frueher hat Phase 0b denselben
+    # SecurityTrails-Call nochmal ausgefuehrt. Jetzt geben wir das
+    # vereinigte sortierte Set als `passive_subdomains` zurueck, das
+    # `worker.py` als `seed_subdomains` an `run_phase0` weiterreicht.
+    # SecurityTrails-Subdomains kommen bereits als FQDNs (mit Domain
+    # angehaengt), Shodan liefert nur Labels — wir normalisieren beide.
+    # ------------------------------------------------------------------
+    passive_subdomains: set[str] = set()
+    domain_norm = (domain or "").strip().lower().rstrip(".")
+    shodan_domain = results.get("shodan_domain") or {}
+    for s in shodan_domain.get("subdomains") or []:
+        if not s:
+            continue
+        label = str(s).strip().lower().rstrip(".")
+        if not label:
+            continue
+        # Shodan liefert Labels (z.B. "www") — an domain anhaengen wenn noetig.
+        if domain_norm and not label.endswith(f".{domain_norm}") and label != domain_norm:
+            fqdn = f"{label}.{domain_norm}"
+        else:
+            fqdn = label
+        passive_subdomains.add(fqdn)
+    st = results.get("securitytrails") or {}
+    for fq in st.get("subdomains") or []:
+        if not fq:
+            continue
+        passive_subdomains.add(str(fq).strip().lower().rstrip("."))
+    results["passive_subdomains"] = sorted(passive_subdomains)
+
     duration_ms = int((time.monotonic() - start) * 1000)
     log.info("phase0a_complete", order_id=order_id, duration_ms=duration_ms,
-             tools_run=list(results.keys()))
+             tools_run=list(results.keys()),
+             passive_subdomains=len(results["passive_subdomains"]))
 
     # Save combined summary
     _save_json(phase0a_dir, "summary.json", results)

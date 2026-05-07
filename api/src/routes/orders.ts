@@ -48,6 +48,10 @@ const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12
 interface CreateOrderBody {
   package?: string;
   targets?: Array<{ raw_input?: unknown; exclusions?: unknown }>;
+  // F-P0A-006: Opt-In Shodan-Pre-Warm fuer One-Off-Orders.
+  // Default false. Wenn true loest scan-worker beim Scan-Start
+  // POST /shodan/scan aus — frischere Shodan-Daten 24-48h spaeter.
+  pre_warm_shodan?: boolean;
 }
 
 interface OrderParams {
@@ -103,12 +107,15 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       ? validTargets[0].canonical!
       : `multi-target (${validTargets.length})`;
 
+    // F-P0A-006: opt-in Shodan-Pre-Warm fuer One-Off-Orders.
+    const preWarmRequested = body.pre_warm_shodan === true;
+
     // Insert order with precheck_running
     const orderResult = await query<{ id: string; status: string; package: string; created_at: Date }>(
-      `INSERT INTO orders (customer_id, target_url, package, status, target_count)
-       VALUES ($1, $2, $3, 'precheck_running', $4)
+      `INSERT INTO orders (customer_id, target_url, package, status, target_count, pre_warm_requested)
+       VALUES ($1, $2, $3, 'precheck_running', $4, $5)
        RETURNING id, status, package, created_at`,
-      [customerId, displayName, pkg, validTargets.length],
+      [customerId, displayName, pkg, validTargets.length, preWarmRequested],
     );
     const order = orderResult.rows[0];
 
@@ -142,7 +149,12 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     audit({
       orderId: order.id,
       action: 'order.created',
-      details: { package: pkg, targetCount: validTargets.length, targets: targetStubs.map(s => s.canonical) },
+      details: {
+        package: pkg,
+        targetCount: validTargets.length,
+        targets: targetStubs.map(s => s.canonical),
+        preWarmShodan: preWarmRequested,
+      },
       ip: request.ip,
     });
 
