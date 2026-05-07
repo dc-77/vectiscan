@@ -55,7 +55,7 @@ SELECT
     SUM(CASE WHEN cache_hit THEN 1 ELSE 0 END)::numeric / NULLIF(count(*), 0) * 100,
     1
   ) AS hit_rate_pct,
-  ROUND(SUM(cost_usd)::numeric, 4) AS total_cost_usd
+  ROUND(SUM(total_cost_usd)::numeric, 4) AS total_total_cost_usd
 FROM ai_call_costs
 WHERE created_at > now() - interval '7 days'
 GROUP BY ki_step
@@ -66,8 +66,8 @@ ORDER BY total_calls DESC;
 SELECT
   model,
   count(*) AS calls,
-  ROUND(SUM(cost_usd)::numeric, 2) AS total_usd,
-  ROUND(AVG(cost_usd)::numeric, 4) AS avg_per_call,
+  ROUND(SUM(total_cost_usd)::numeric, 2) AS total_usd,
+  ROUND(AVG(total_cost_usd)::numeric, 4) AS avg_per_call,
   SUM(input_tokens) AS in_tok,
   SUM(output_tokens) AS out_tok
 FROM ai_call_costs
@@ -81,7 +81,7 @@ ORDER BY total_usd DESC NULLS LAST;
 SELECT
   subscription_id,
   determinism_score,
-  jsonb_array_length(last_3_orders) AS orders_in_window,
+  determinism_sample_size,
   updated_at
 FROM subscription_posture
 WHERE determinism_score IS NOT NULL
@@ -92,29 +92,30 @@ LIMIT 20;
 \echo === 7. POLICY_ID-VERTEILUNG Top 30 (letzte 30 Tage) ===
 \echo (Drift-Indikator: welche policy_ids haeufig in Reports auftauchen)
 SELECT
-  policy_id,
+  metadata->>'policy_id' AS policy_id,
   count(*) AS occurrences,
-  count(DISTINCT order_id) AS in_orders
+  count(DISTINCT subscription_id) AS in_subs
 FROM consolidated_findings
-WHERE policy_id IS NOT NULL
+WHERE metadata->>'policy_id' IS NOT NULL
   AND created_at > now() - interval '30 days'
-GROUP BY policy_id
+GROUP BY metadata->>'policy_id'
 ORDER BY count(*) DESC
 LIMIT 30;
 
 \echo
 \echo === 8. CONSOLIDATED_FINDINGS PRO PAKET (letzte 30 Tage) ===
+-- consolidated_findings hat kein direktes order_id-Feld; via subscription_id verknuepfen
 SELECT
-  o.package,
-  count(DISTINCT cf.order_id) AS orders,
-  count(*)                    AS findings,
-  ROUND(count(*)::numeric / NULLIF(count(DISTINCT cf.order_id), 0), 1) AS avg_per_order,
+  s.package,
+  count(DISTINCT cf.subscription_id) AS subscriptions,
+  count(*)                            AS findings,
   SUM(CASE WHEN cf.severity = 'critical' THEN 1 ELSE 0 END) AS critical,
-  SUM(CASE WHEN cf.severity = 'high' THEN 1 ELSE 0 END)     AS high
+  SUM(CASE WHEN cf.severity = 'high' THEN 1 ELSE 0 END)     AS high,
+  SUM(CASE WHEN cf.severity = 'medium' THEN 1 ELSE 0 END)   AS medium
 FROM consolidated_findings cf
-JOIN orders o ON o.id = cf.order_id
+JOIN subscriptions s ON s.id = cf.subscription_id
 WHERE cf.created_at > now() - interval '30 days'
-GROUP BY o.package
+GROUP BY s.package
 ORDER BY findings DESC;
 
 \echo
@@ -137,7 +138,7 @@ WHERE shodan_scan_request IS NOT NULL;
 SELECT
   finding_type,
   count(*) AS occurrences,
-  ROUND(AVG(business_impact_score)::numeric, 2) AS avg_business_impact
+  ROUND(AVG((metadata->>'business_impact_score')::numeric), 2) AS avg_business_impact
 FROM consolidated_findings
 WHERE finding_type IS NOT NULL
   AND created_at > now() - interval '30 days'
@@ -153,22 +154,22 @@ SELECT
   count(*) AS findings
 FROM consolidated_findings
 WHERE finding_type IN ('subdomain_takeover', 'urlhaus_compromise_detected')
-   OR policy_id IN ('SP-URLHAUS-001')
+   OR metadata->>'policy_id' = 'SP-URLHAUS-001'
 GROUP BY finding_type, severity
 ORDER BY count(*) DESC;
 
 \echo
 \echo === 12. NEUE SP-DNS-* + SP-URLHAUS-* REGELN (P3) ===
 SELECT
-  policy_id,
+  metadata->>'policy_id' AS policy_id,
   count(*) AS occurrences
 FROM consolidated_findings
-WHERE policy_id IN (
+WHERE metadata->>'policy_id' IN (
   'SP-DNS-011', 'SP-DNS-012', 'SP-DNS-013', 'SP-DNS-014',
   'SP-URLHAUS-001'
 )
-GROUP BY policy_id
-ORDER BY policy_id;
+GROUP BY metadata->>'policy_id'
+ORDER BY metadata->>'policy_id';
 
 \echo
 \echo ============================================================================
