@@ -590,6 +590,54 @@ def _iterative_json_parse(text: str, max_fixes: int = 15) -> dict[str, Any]:
     raise json.JSONDecodeError("Max JSON fixes exceeded", text, 0)
 
 
+def _truncate_consolidated_findings(
+    consolidated_findings: str,
+    *,
+    max_chars: int = 150000,
+) -> str:
+    """F-RPT-006: fairer Round-Robin pro Host bei Ueberlauf.
+
+    re.split mit Capture-Group liefert: [pre, delim1, body1, delim2, body2, ...].
+    Jeder Host bekommt max ``per_host_cap = max_chars // n_real_hosts`` Chars,
+    danach Stop bei Gesamt-Cap.
+
+    Returns: gekuerzte Version (oder original wenn unter max_chars).
+    """
+    if len(consolidated_findings) <= max_chars:
+        return consolidated_findings
+
+    host_sections = re.split(r'(={50,}[\s\S]*?HOST:)', consolidated_findings)
+    # Fallback: keine HOST:-Marker gefunden -> hart cappen (Marker eingerechnet).
+    no_host_marker = "\n--- GEKUERZT (Hard-Cap, keine HOST-Sections) ---\n"
+    prologue_marker = "\n--- GEKUERZT (Prologue >max_chars) ---\n"
+    if len(host_sections) < 3:
+        budget = max(max_chars - len(no_host_marker), 0)
+        return consolidated_findings[:budget] + no_host_marker
+
+    n_real_hosts = max((len(host_sections) - 1) // 2, 1)
+    per_host_cap = max_chars // n_real_hosts
+
+    truncated = host_sections[0]  # alles vor erstem HOST: (Prologue/Header)
+    # Falls Prologue alleine schon das Cap sprengt: hart cappen.
+    if len(truncated) > max_chars:
+        budget = max(max_chars - len(prologue_marker), 0)
+        return truncated[:budget] + prologue_marker
+    i = 1
+    while i < len(host_sections) - 1:
+        delim = host_sections[i]
+        body = host_sections[i + 1]
+        section = delim + body
+        if len(section) > per_host_cap:
+            section = section[:per_host_cap] + (
+                "\n--- HOST-DATEN GEKUERZT (Pro-Host-Cap) ---\n"
+            )
+        if len(truncated) + len(section) > max_chars:
+            break
+        truncated += section
+        i += 2
+    return truncated
+
+
 def call_claude(
     domain: str,
     host_inventory: dict[str, Any],
@@ -619,31 +667,19 @@ def call_claude(
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    # Smart truncation — preserve complete host sections, prioritize variety
-    MAX_FINDINGS_CHARS = 120000  # ~30K tokens, well within Opus 200K context
+    # F-RPT-006: Smart truncation — fairer Round-Robin pro Host statt greedy.
+    # Cap 150K Chars (~37.5K Tokens, deckt 95% realer Eingaben). Opus 4.6/4.7
+    # 200K-Window minus System-Prompt + max_tokens-Output reicht aus.
+    MAX_FINDINGS_CHARS = 150000
 
     if len(consolidated_findings) > MAX_FINDINGS_CHARS:
         log.warning("consolidated_findings_truncated",
                     original_len=len(consolidated_findings),
                     truncated_to=MAX_FINDINGS_CHARS,
                     domain=domain)
-        # Split by host sections (marked by "HOST:" headers)
-        host_sections = re.split(r'(={50,}[\s\S]*?HOST:)', consolidated_findings)
-
-        # Reconstruct with per-host caps
-        truncated = ""
-        per_host_cap = MAX_FINDINGS_CHARS // max(len(host_sections) // 2, 1)
-
-        for i, section in enumerate(host_sections):
-            if len(truncated) + len(section) > MAX_FINDINGS_CHARS:
-                remaining = MAX_FINDINGS_CHARS - len(truncated)
-                if remaining > 500:
-                    truncated += section[:remaining]
-                truncated += f"\n\n--- GEKUERZT: weitere Daten im MinIO-Archiv ---"
-                break
-            truncated += section
-
-        consolidated_findings = truncated
+        consolidated_findings = _truncate_consolidated_findings(
+            consolidated_findings, max_chars=MAX_FINDINGS_CHARS,
+        )
 
     # M2 Cache-Prefix (PR-KI-Optim, 2026-05-03): User-Prompt als 2 Blocks
     # bauen — statischer Teil (host_inventory + tech_profiles) mit

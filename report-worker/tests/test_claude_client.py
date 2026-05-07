@@ -11,6 +11,7 @@ import pytest
 from reporter.claude_client import (
     _iterative_json_parse,
     _repair_json,
+    _truncate_consolidated_findings,
     _try_escape_inner_quote,
     call_claude,
     compute_cvss_score,
@@ -421,3 +422,35 @@ class TestIterativeJsonParse:
     def test_unfixable_raises(self) -> None:
         with pytest.raises(json.JSONDecodeError):
             _iterative_json_parse("totally not json at all")
+
+
+class TestTruncateConsolidatedFindings:
+    """F-RPT-006: Round-Robin pro Host statt greedy."""
+
+    def test_truncate_per_host_cap_enforced(self) -> None:
+        """200K+ Chars input mit 10 Hosts -> jeder Host gekuerzt, ersten Hosts erhalten."""
+        sections = []
+        for i in range(10):
+            sections.append("=" * 60 + f" HOST: host{i}.example.com")
+            sections.append("X" * 25000)  # 25K Body pro Host = 250K total
+        input_text = "\n".join(sections)
+        assert len(input_text) > 200000
+
+        out = _truncate_consolidated_findings(input_text, max_chars=150000)
+        assert len(out) <= 150000
+        # Jeder Host sollte gekuerzt sein
+        assert "--- HOST-DATEN GEKUERZT" in out
+        # Mindestens die ersten paar Hosts muessten erhalten sein
+        assert "host0.example.com" in out
+        assert "host1.example.com" in out
+
+    def test_truncate_skipped_under_cap(self) -> None:
+        """Input <max_chars bleibt unveraendert."""
+        text = "=" * 60 + " HOST: a.com\n" + "X" * 1000
+        assert _truncate_consolidated_findings(text, max_chars=150000) == text
+
+    def test_truncate_returns_string(self) -> None:
+        """Returns str, nicht None."""
+        out = _truncate_consolidated_findings("X" * 200000, max_chars=150000)
+        assert isinstance(out, str)
+        assert len(out) <= 150000
