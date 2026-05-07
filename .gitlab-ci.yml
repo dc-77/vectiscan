@@ -474,7 +474,7 @@ rollback:
   tags: [vectigal]
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && $SYNC_ENABLED == "true"
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
       when: manual
       allow_failure: true
 
@@ -484,7 +484,7 @@ eol-data-sync:
   # neue koennen `SYNC_ENABLED=true` verwenden. Beide funktionieren.
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && ($EOL_SYNC == "true" || $SYNC_ENABLED == "true")
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
       when: manual
       allow_failure: true
   script:
@@ -498,7 +498,7 @@ cloud-ranges-sync:
   <<: *sync-job-template
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && ($CLOUD_RANGES_SYNC == "true" || $SYNC_ENABLED == "true")
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
       when: manual
       allow_failure: true
   script:
@@ -514,7 +514,7 @@ takeover-list-sync:
   <<: *sync-job-template
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && ($TAKEOVER_SYNC == "true" || $SYNC_ENABLED == "true")
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
       when: manual
       allow_failure: true
   script:
@@ -529,7 +529,7 @@ known-vuln-builds-sync:
   <<: *sync-job-template
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && ($KNOWN_VULN_SYNC == "true" || $SYNC_ENABLED == "true")
-    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
       when: manual
       allow_failure: true
   script:
