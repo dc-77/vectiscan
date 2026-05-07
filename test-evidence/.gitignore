@@ -1,0 +1,5 @@
+# Test-Evidence-Outputs sind nicht zu committen — enthalten ggf. Customer-Daten
+# (Order-IDs, Targets, Findings).
+*
+!.gitignore
+!README.md
