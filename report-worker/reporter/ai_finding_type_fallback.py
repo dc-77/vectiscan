@@ -99,6 +99,8 @@ FINDING_TYPE_CATALOG: dict[str, str] = {
     "dmarc_pct_partial":          "DMARC pct<100 - nur teilweise Durchsetzung",
     "nsec3_iterations_nonzero":   "NSEC3 mit Iterations > 0 (RFC 9276 empfiehlt 0)",
     "software_eol":               "Eingesetzte Software ist End-of-Life ohne Sicherheitsupdates",
+    # F-P0A-003 — Threat-Intel
+    "urlhaus_compromise_detected": "Host bei URLhaus als kompromittiert gelistet (Malware / Phishing / C2)",
 }
 
 

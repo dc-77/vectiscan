@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # ====================================================================
 # Bei jeder Aenderung der Regeln HIER hochziehen. Wird im AI-Cache-Key
 # eingebaut, damit Cache nach Policy-Update automatisch invalidiert.
-POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-09.1")
+POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-10.1")
 
 
 # ====================================================================
@@ -809,6 +809,23 @@ SEVERITY_POLICIES: list[SeverityPolicy] = [
                   "Authentifizierung weiterhin erforderlich",
         references=["CWE-307"],
     ),
+
+    # ----------------------------------------------------------------
+    # THREAT-INTEL — URLhaus Compromise (SP-URLHAUS-*)
+    # F-P0A-003 (POLICY_VERSION 2026-05-10.1)
+    # URLhaus listet bekannte Malware-/Phishing-/C2-Distribution-URLs.
+    # Treffer = Host wird AKTIV als Angriffs-Infrastruktur genutzt.
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-URLHAUS-001",
+        finding_type="urlhaus_compromise_detected",
+        final_severity=Severity.CRITICAL,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+        cvss_score=10.0,
+        rationale="URLhaus listet Host als aktiv compromised — "
+                  "Malware-Distribution, Phishing oder C2",
+        references=["URLhaus", "MITRE ATT&CK T1583.001"],
+    ),
 ]
 
 
@@ -897,16 +914,20 @@ def extract_context_flags(finding: dict, scan_context: dict) -> dict[str, Any]:
     pct_value = dmarc_block.get("pct")
     if isinstance(pct_value, (int, float)) and pct_value < 100:
         flags["dmarc_pct_partial"] = True
-    elif (finding.get("evidence") or {}).get("dmarc_pct_partial"):
-        flags["dmarc_pct_partial"] = True
+    else:
+        ev = finding.get("evidence") or {}
+        if isinstance(ev, dict) and ev.get("dmarc_pct_partial"):
+            flags["dmarc_pct_partial"] = True
 
     dnssec_block = dns_security.get("dnssec") or {}
     if isinstance(dnssec_block, dict) and dnssec_block.get(
         "nsec3_rfc9276_violation"
     ):
         flags["nsec3_iterations_nonzero"] = True
-    elif (finding.get("evidence") or {}).get("nsec3_iterations_nonzero"):
-        flags["nsec3_iterations_nonzero"] = True
+    else:
+        ev = finding.get("evidence") or {}
+        if isinstance(ev, dict) and ev.get("nsec3_iterations_nonzero"):
+            flags["nsec3_iterations_nonzero"] = True
 
     # ── Threat-Intel (aus enrichment) ────────────────────
     # Unterstuetzt zwei Shapes:

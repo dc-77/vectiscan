@@ -117,6 +117,8 @@ POLICY_ID_TO_CATEGORIES: dict[str, set[str]] = {
     "SP-JS-001": {"access_control"},
     "SP-SRI-001": {"access_control"},
     "SP-SSH-001": {"default_login", "access_control"},
+    # F-P0A-003 — URLhaus Compromise-Detection (Datenabfluss + Access)
+    "SP-URLHAUS-001": {"data_exposure", "access_control"},
     # Fallback-Findings (ohne Policy) bekommen keine Kategorien
     "SP-FALLBACK": set(),
 }

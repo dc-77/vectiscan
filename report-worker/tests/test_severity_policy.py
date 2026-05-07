@@ -109,8 +109,9 @@ class TestPolicyRegistry:
             assert (
                 "KEV" in str(p.references)
                 or "Ransomware" in str(p.references)
+                or "URLhaus" in str(p.references)  # F-P0A-003 Threat-Intel
                 or p.policy_id.startswith("SP-DISC-008")  # .env exposure
-            ), f"{p.policy_id} ist critical ohne KEV/Ransomware/.env-Ref"
+            ), f"{p.policy_id} ist critical ohne KEV/Ransomware/URLhaus/.env-Ref"
 
 
 # ====================================================================

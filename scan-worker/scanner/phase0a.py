@@ -15,6 +15,10 @@ from scanner.passive.shodan_client import ShodanClient
 from scanner.passive.abuseipdb_client import AbuseIPDBClient
 from scanner.passive.securitytrails_client import SecurityTrailsClient
 from scanner.passive.whois_client import WhoisClient
+from scanner.passive.urlhaus_client import URLhausClient
+from scanner.passive.greynoise_client import GreyNoiseClient
+from scanner.passive.otx_client import OTXClient
+from scanner.passive.virustotal_client import VirusTotalClient
 from scanner.passive.dns_security import run_all_dns_security
 from scanner.progress import publish_event
 
@@ -46,6 +50,10 @@ def run_phase0a(
         - securitytrails: domain + subdomain data
         - whois: registrar data
         - dns_security: DNSSEC, CAA, MTA-STS, DANE results
+        - urlhaus: per-host compromise / malware-distribution hits (F-P0A-003)
+        - greynoise: per-IP background-noise classification (F-P0A-003)
+        - otx: domain reputation incl. pulse-count (F-P0A-003)
+        - virustotal: domain AV-engine voting summary (F-P0A-003)
     """
     phase0a_tools = config.get("phase0a_tools", [])
     start = time.monotonic()
@@ -170,11 +178,115 @@ def run_phase0a(
         _save_json(phase0a_dir, "dns_security.json", dns_sec)
         return "dns_security", dns_sec
 
+    # ------------------------------------------------------------------
+    # F-P0A-003 — neue Threat-Intel-Clients (URLhaus, GreyNoise, OTX, VT)
+    # ------------------------------------------------------------------
+    def _run_urlhaus() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "urlhaus", "host": domain})
+        client = URLhausClient()
+        # URLhaus: 1x Domain-Lookup + ggf. per IP (begrenzt auf capped_ips).
+        domain_resp = client.lookup_host(domain)
+        per_ip: dict[str, Any] = {}
+        if capped_ips:
+            with ThreadPoolExecutor(
+                max_workers=passive_concurrency,
+                thread_name_prefix="urlhaus_ips",
+            ) as inner:
+                futures = {inner.submit(client.lookup_host, ip): ip for ip in capped_ips}
+                for fut in as_completed(futures):
+                    ip = futures[fut]
+                    try:
+                        ip_resp = fut.result()
+                    except Exception as e:
+                        log.warning("urlhaus_ip_lookup_failed", ip=ip, error=str(e))
+                        continue
+                    if ip_resp:
+                        per_ip[ip] = ip_resp
+        result: dict[str, Any] = {}
+        if domain_resp:
+            result["domain"] = domain_resp
+            result["compromised"] = client.is_compromised(domain_resp)
+        if per_ip:
+            result["per_ip"] = per_ip
+            # Aggregat-Flag: irgendein IP-Treffer kompromittiert?
+            if not result.get("compromised"):
+                result["compromised"] = any(
+                    client.is_compromised(v) for v in per_ip.values()
+                )
+        if result:
+            _save_json(phase0a_dir, "urlhaus.json", result)
+        return "urlhaus", result or None
+
+    def _run_greynoise() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "greynoise", "host": domain})
+        client = GreyNoiseClient()
+        gn_results: dict[str, Any] = {}
+        if capped_ips:
+            with ThreadPoolExecutor(
+                max_workers=passive_concurrency,
+                thread_name_prefix="greynoise_ips",
+            ) as inner:
+                futures = {inner.submit(client.lookup_ip, ip): ip for ip in capped_ips}
+                for fut in as_completed(futures):
+                    ip = futures[fut]
+                    try:
+                        gn_data = fut.result()
+                    except Exception as e:
+                        log.warning("greynoise_ip_lookup_failed", ip=ip, error=str(e))
+                        continue
+                    if gn_data:
+                        gn_results[ip] = gn_data
+        if gn_results:
+            _save_json(phase0a_dir, "greynoise.json", gn_results)
+        return "greynoise", gn_results or None
+
+    def _run_otx() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "otx", "host": domain})
+        client = OTXClient()
+        domain_resp = client.lookup_domain(domain)
+        result: dict[str, Any] = {}
+        if domain_resp:
+            result["domain"] = domain_resp
+        # IP-Lookups optional (Free-Tier: 10 req/s, sicher fuer capped_ips).
+        per_ip: dict[str, Any] = {}
+        if capped_ips:
+            with ThreadPoolExecutor(
+                max_workers=passive_concurrency,
+                thread_name_prefix="otx_ips",
+            ) as inner:
+                futures = {inner.submit(client.lookup_ip, ip): ip for ip in capped_ips}
+                for fut in as_completed(futures):
+                    ip = futures[fut]
+                    try:
+                        ip_resp = fut.result()
+                    except Exception as e:
+                        log.warning("otx_ip_lookup_failed", ip=ip, error=str(e))
+                        continue
+                    if ip_resp:
+                        per_ip[ip] = ip_resp
+        if per_ip:
+            result["per_ip"] = per_ip
+        if result:
+            _save_json(phase0a_dir, "otx.json", result)
+        return "otx", result or None
+
+    def _run_virustotal() -> tuple[str, dict[str, Any] | None]:
+        publish_event(order_id, {"type": "tool_starting", "tool": "virustotal", "host": domain})
+        client = VirusTotalClient()
+        if not client.available:
+            log.info("virustotal_skipped", reason="no_api_key")
+            return "virustotal", None
+        domain_resp = client.lookup_domain(domain)
+        if not domain_resp:
+            return "virustotal", None
+        _save_json(phase0a_dir, "virustotal.json", domain_resp)
+        return "virustotal", domain_resp
+
     # --- Run all tools in parallel (Top-Level: ThreadPool importiert oben) ---
     phase0a_timeout = config.get("phase0a_timeout", 120)
     futures: dict[Any, str] = {}
 
-    with ThreadPoolExecutor(max_workers=5, thread_name_prefix="phase0a") as pool:
+    with ThreadPoolExecutor(max_workers=8, thread_name_prefix="phase0a") as pool:
         if "whois" in phase0a_tools:
             futures[pool.submit(_run_whois)] = "whois"
         if "shodan" in phase0a_tools:
@@ -183,6 +295,15 @@ def run_phase0a(
             futures[pool.submit(_run_abuseipdb)] = "abuseipdb"
         if "securitytrails" in phase0a_tools:
             futures[pool.submit(_run_securitytrails)] = "securitytrails"
+        # F-P0A-003 — Threat-Intel-Clients
+        if "urlhaus" in phase0a_tools:
+            futures[pool.submit(_run_urlhaus)] = "urlhaus"
+        if "greynoise" in phase0a_tools:
+            futures[pool.submit(_run_greynoise)] = "greynoise"
+        if "otx" in phase0a_tools:
+            futures[pool.submit(_run_otx)] = "otx"
+        if "virustotal" in phase0a_tools:
+            futures[pool.submit(_run_virustotal)] = "virustotal"
         futures[pool.submit(_run_dns_security)] = "dns_security"
 
         for future in as_completed(futures, timeout=phase0a_timeout):
@@ -259,6 +380,38 @@ def build_passive_intel_for_ai(
     if dmarc.get("dmarc_present"):
         intel["dmarc_p"] = dmarc.get("p")
         intel["dmarc_pct"] = dmarc.get("pct")
+
+    # F-P0A-003: URLhaus / GreyNoise / OTX / VT-Marker fuer KI #1 + Reporter
+    urlhaus = phase0a_results.get("urlhaus") or {}
+    if urlhaus.get("compromised"):
+        intel["urlhaus_compromised"] = True
+        domain_resp = urlhaus.get("domain") or {}
+        urls = domain_resp.get("urls") or []
+        if isinstance(urls, list) and urls:
+            intel["urlhaus_url_count"] = len(urls)
+        per_ip = urlhaus.get("per_ip") or {}
+        if ip in per_ip:
+            ip_urls = (per_ip[ip] or {}).get("urls") or []
+            if isinstance(ip_urls, list) and ip_urls:
+                intel["urlhaus_url_count_ip"] = len(ip_urls)
+
+    greynoise = phase0a_results.get("greynoise") or {}
+    if ip in greynoise:
+        gn = greynoise[ip]
+        intel["greynoise_classification"] = gn.get("classification")
+        intel["greynoise_noise"] = gn.get("noise")
+        intel["greynoise_riot"] = gn.get("riot")
+
+    otx = phase0a_results.get("otx") or {}
+    otx_domain = otx.get("domain") or {}
+    if otx_domain:
+        intel["otx_pulse_count"] = otx_domain.get("pulse_count", 0)
+
+    vt = phase0a_results.get("virustotal") or {}
+    if vt:
+        intel["vt_malicious"] = vt.get("malicious", 0)
+        intel["vt_suspicious"] = vt.get("suspicious", 0)
+        intel["vt_total_engines"] = vt.get("total_engines", 0)
 
     return intel
 

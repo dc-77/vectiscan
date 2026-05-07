@@ -226,6 +226,8 @@ TITLE_TEMPLATES: dict[str, str] = {
     "SP-JS-001": "JavaScript-Bibliothek {library} mit Schwachstelle auf {host}",
     "SP-SRI-001": "Subresource-Integrity (SRI) fehlt auf {host}",
     "SP-SSH-001": "SSH-Dienst ohne Brute-Force-Schutz auf {host}",
+    # F-P0A-003 — URLhaus Threat-Intel (2026-05-10.1)
+    "SP-URLHAUS-001": "Host {host} bei URLhaus als kompromittiert gelistet ({url_count} URLs)",
 }
 
 

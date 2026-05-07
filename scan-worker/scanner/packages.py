@@ -12,7 +12,12 @@ from typing import Any
 # Perimeter+ base config (shared by perimeter, compliance, supplychain, insurance)
 # ---------------------------------------------------------------------------
 _PERIMETER_BASE: dict[str, Any] = {
-    "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois"],
+    # F-P0A-003: Threat-Intel-Clients (URLhaus/GreyNoise/OTX/VirusTotal)
+    # ergaenzen die bestehenden Shodan/AbuseIPDB/SecurityTrails/WHOIS-Quellen.
+    # URLhaus/GreyNoise/OTX laufen ohne API-Key (Free-Tier), VT braucht einen
+    # Key, ueberspringt sich aber sauber wenn keiner gesetzt ist.
+    "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois",
+                      "urlhaus", "greynoise", "otx", "virustotal"],
     "phase0a_timeout": 120,       # 2 Minuten
     # F-P0A-005: Cap fuer Shodan/AbuseIPDB IP-Loops (war hardcoded 15).
     # ENV-Override `PHASE0A_IP_CAP` ueberschreibt diesen Wert (Premium-Tier).
@@ -46,8 +51,10 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
     # Schnellscan, wenige Tools, max 3 Hosts, einfacher Report
     # ------------------------------------------------------------------
     "webcheck": {
-        "phase0a_tools": ["whois"],
-        "phase0a_timeout": 30,        # nur WHOIS
+        # F-P0A-003: URLhaus + OTX kosten nichts (kein API-Key noetig) und
+        # bringen Compromise-/Reputation-Hits auch fuer den Schnellscan.
+        "phase0a_tools": ["whois", "urlhaus", "otx"],
+        "phase0a_timeout": 60,        # WHOIS + URLhaus + OTX
         "phase0b_tools": ["crtsh", "subfinder", "dnsx",
                           "dnssec", "caa", "mta_sts"],
         "phase0b_timeout": 300,       # 5 Minuten

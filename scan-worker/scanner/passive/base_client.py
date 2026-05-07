@@ -63,6 +63,43 @@ class PassiveClient:
 
         return None
 
+    def _post(self, url: str, data: dict | None = None,
+              headers: dict | None = None) -> dict[str, Any] | None:
+        """HTTP POST (form-encoded) with retries and error handling.
+
+        Returns parsed JSON or None on error/non-2xx. URLhaus and similar
+        APIs use form-encoded POST bodies — the helper mirrors `_get` so
+        clients only need the high-level call.
+        """
+        for attempt in range(DEFAULT_RETRIES + 1):
+            try:
+                resp = self.session.post(
+                    url, data=data, headers=headers,
+                    timeout=self.timeout,
+                )
+                if resp.status_code == 429:
+                    wait = min(2 ** attempt * 2, 30)
+                    log.warning(f"{self.name}_rate_limited", wait=wait, attempt=attempt)
+                    time.sleep(wait)
+                    continue
+
+                if resp.status_code >= 400:
+                    log.warning(f"{self.name}_http_error",
+                                status=resp.status_code, url=url)
+                    return None
+
+                return resp.json()
+
+            except requests.Timeout:
+                log.warning(f"{self.name}_timeout", url=url, attempt=attempt)
+            except requests.RequestException as e:
+                log.warning(f"{self.name}_request_error", error=str(e), attempt=attempt)
+            except ValueError:
+                log.warning(f"{self.name}_json_decode_error", url=url)
+                return None
+
+        return None
+
     @property
     def available(self) -> bool:
         """Whether this client has a valid API key configured."""

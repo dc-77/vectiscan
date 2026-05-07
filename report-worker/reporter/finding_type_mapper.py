@@ -344,6 +344,17 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
         r"(?:exchange|windows\s*server|sql\s*server)\s+(?:200[0-9]|201[0-9])\s+(?:vor|wird|ist).*(?:eol|end[-_ ]?of[-_ ]?life|support)",
         re.I,
      ), "software_eol"),
+
+    # ── F-P0A-003 — URLhaus / Threat-Intel Compromise ──────
+    (re.compile(
+        r"\burlhaus\b|"
+        r"(?:host|domain).*kompromit|"
+        r"(?:malware|phishing|c2|c&c|command[-_ ]?and[-_ ]?control).*"
+        r"(?:distribut|hosting|infrastruktur)|"
+        r"abuse\.ch|"
+        r"(?:listed|gelistet)\s+(?:as|als)\s+(?:compromised|kompromittiert)",
+        re.I,
+     ), "urlhaus_compromise_detected"),
 ]
 
 

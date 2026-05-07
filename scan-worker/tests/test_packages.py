@@ -41,8 +41,9 @@ class TestWebcheck:
         assert "gobuster_dns" not in config["phase0b_tools"]
 
     def test_phase0a_only_whois(self):
+        # F-P0A-003: webcheck includes URLhaus + OTX (free-tier, no key needed).
         config = get_config("webcheck")
-        assert config["phase0a_tools"] == ["whois"]
+        assert config["phase0a_tools"] == ["whois", "urlhaus", "otx"]
 
     def test_total_timeout(self):
         config = get_config("webcheck")
