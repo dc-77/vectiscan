@@ -20,6 +20,38 @@ _CATEGORIES_FULL = ["sqli", "xss", "lfi", "ssrf", "cmdi", "path_traversal"]
 _CATEGORIES_WAF_SAFE = ["sqli", "xss", "lfi"]
 _CATEGORIES_API = ["sqli", "ssrf", "cmdi", "auth_bypass"]
 
+# F-KI3-002: Hosted-CMS / Website-Builder — Server-Konfig nicht aenderbar,
+# Active-Scans erzeugen 403/429. Nur passive Checks + minimale XSS-Suche.
+_HOSTED_CMS = {
+    "shopify", "webflow", "wix", "squarespace",
+    "hubspot", "hubspot cms",
+}
+
+# F-KI3-002: Static-Hoster — kein Backend, nur statische Files.
+# Erkennung primaer ueber FQDN-Suffix; sekundaer ueber Server-Header
+# bei Custom-Domains (cloudflare/vercel/netlify/github-pages/s3).
+_STATIC_HOSTER_FQDN_SUFFIXES = (
+    ".github.io", ".netlify.app", ".vercel.app",
+    ".pages.dev", ".fly.dev", ".surge.sh",
+)
+_STATIC_HOSTER_SERVER_HINTS = (
+    "github.com",  # github-pages liefert "GitHub.com" als Server
+    "vercel",
+    "netlify",
+    "cloudflare",  # cloudflare pages
+    "amazons3", "amazonaws.com s3", "amazons3.amazonaws.com",
+)
+
+# F-KI3-002: Generic-CMS-Set — selbst-gehostete CMS, Standard-Scan-Profil.
+# Erweitert um die F-PH1-001-CMS (Pimcore, Sulu, Plone, SilverStripe,
+# Statamic) plus Contao/NEOS/Craft/Ghost/PrestaShop. WordPress, Shopware
+# und Magento haben separate Pfade (s.o./s.u.).
+_GENERIC_CMS = {
+    "drupal", "typo3", "joomla", "shopware", "magento",
+    "pimcore", "sulu", "plone", "silverstripe", "statamic",
+    "contao", "neos", "craft cms", "craft", "ghost", "prestashop",
+}
+
 
 def try_rule_based_config(
     tech_profile: dict[str, Any],
@@ -55,6 +87,49 @@ def try_rule_based_config(
             skip_tools=["zap_active", "zap_spider", "zap_ajax_spider",
                         "feroxbuster", "ffuf", "wpscan", "nikto"],
             reason="rule:mail-server-only",
+        )
+
+    # F-KI3-002: Hosted-CMS / Website-Builder (Shopify/Webflow/Wix/
+    # Squarespace/HubSpot) — Plattform haertet Server selbst, Active-Scans
+    # treffen WAF-Limits → passive-only + nur XSS-Klasse, alle Active-Tools
+    # skippen.
+    if cms in _HOSTED_CMS:
+        return _config(
+            policy="passive-only",
+            spider_depth=4,
+            ajax=False,
+            cats=["xss"],
+            rate=30, threads=2,
+            skip_tools=["zap_active", "feroxbuster", "ffuf", "wpscan",
+                        "nikto"],
+            reason=f"rule:hosted-cms-{cms.replace(' ', '-')}",
+        )
+
+    # F-KI3-002: Static-Hoster (GitHub Pages, Netlify, Vercel, Cloudflare
+    # Pages, S3) — kein Backend, nur statische Files. Erkennung ueber
+    # FQDN-Suffix (eindeutig) ODER Server-Header bei Custom-Domains in
+    # Kombi mit kein-CMS UND nur Web-Ports (80/443).
+    is_static_by_fqdn = any(
+        primary_fqdn.endswith(suffix)
+        for suffix in _STATIC_HOSTER_FQDN_SUFFIXES
+    )
+    is_static_by_server = (
+        not cms
+        and bool(server)
+        and any(hint in server for hint in _STATIC_HOSTER_SERVER_HINTS)
+        and bool(open_ports)
+        and open_ports.issubset({80, 443})
+    )
+    if is_static_by_fqdn or is_static_by_server:
+        return _config(
+            policy="passive-only",
+            spider_depth=3,
+            ajax=False,
+            cats=[],
+            rate=30, threads=2,
+            skip_tools=["zap_active", "feroxbuster", "ffuf", "wpscan",
+                        "nikto"],
+            reason="rule:static-hoster",
         )
 
     # WordPress + kein WAF + has_ssl  → Standard-Scan
@@ -120,8 +195,10 @@ def try_rule_based_config(
             reason="rule:webcheck-quick",
         )
 
-    # Generic CMS (Drupal, TYPO3, Joomla) ohne WAF
-    if cms in {"drupal", "typo3", "joomla", "shopware", "magento"} and not waf:
+    # Generic CMS — selbst-gehostete CMS-Familien ohne WAF.
+    # F-KI3-002: erweitert um Pimcore/Sulu/Plone/SilverStripe/Statamic/
+    # Contao/NEOS/Craft/Ghost/PrestaShop (F-PH1-001-Coverage).
+    if cms in _GENERIC_CMS and not waf:
         return _config(
             policy="standard",
             spider_depth=7,
@@ -129,7 +206,7 @@ def try_rule_based_config(
             cats=_CATEGORIES_FULL,
             rate=80, threads=8,
             skip_tools=["wpscan"],
-            reason=f"rule:{cms}-standard",
+            reason=f"rule:{cms.replace(' ', '-')}-standard",
         )
 
     # Kein deterministischer Match -> KI muss entscheiden
