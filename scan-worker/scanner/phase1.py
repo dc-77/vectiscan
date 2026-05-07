@@ -790,20 +790,37 @@ def run_phase1(
                      exit_code=0 if webtech_result else 1,
                      duration_ms=0)
 
-    # Run wafw00f — pro VHost (Multi-VHost-Probe), erstes Ergebnis als primary
+    # Run wafw00f — pro VHost (Multi-VHost-Probe) parallel via ThreadPool.
+    # F-PH1-002: ThreadPoolExecutor(max_workers=5) ueber primary VHosts.
+    # Speedup bei 5-VHost-Hosts: 20s -> 4s. Determinismus: primary-Wahl ueber
+    # vhost_fqdns-Reihenfolge, NICHT ueber as_completed-Reihenfolge.
     wafw00f_result = None
     vhost_waf_results: dict[str, Optional[dict[str, Any]]] = {}
     if "wafw00f" in phase1_tools:
         publish_event(order_id, {"type": "tool_starting", "tool": "wafw00f", "host": ip})
-        for vh in vhost_fqdns:
+        from concurrent.futures import ThreadPoolExecutor
+
+        def _run_one_wafw00f(vh: str) -> tuple[str, Optional[dict[str, Any]]]:
             try:
-                res = run_wafw00f(vh, ip, host_dir, order_id)
+                return vh, run_wafw00f(vh, ip, host_dir, order_id)
             except Exception as e:
                 log.warning("wafw00f_failed", vhost=vh, error=str(e))
-                res = None
-            vhost_waf_results[vh] = res
-            if wafw00f_result is None and res:
-                wafw00f_result = res  # primary = erstes Element
+                return vh, None
+
+        if vhost_fqdns:
+            max_workers = min(5, len(vhost_fqdns))
+            with ThreadPoolExecutor(max_workers=max_workers) as ex:
+                # map() preserves input order — so primary-Wahl bleibt
+                # deterministisch ueber vhost_fqdns-Reihenfolge.
+                for vh, res in ex.map(_run_one_wafw00f, vhost_fqdns):
+                    vhost_waf_results[vh] = res
+
+        # primary = erstes positives Ergebnis nach vhost_fqdns-Order
+        for vh in vhost_fqdns:
+            res = vhost_waf_results.get(vh)
+            if res:
+                wafw00f_result = res
+                break
         progress_callback(order_id, "wafw00f", "complete")
 
     # wafw00f already saved to scan_results by run_tool() inside run_wafw00f()

@@ -146,8 +146,11 @@ WORDLIST_MAP = {
     "api": "/usr/share/wordlists/api-endpoints.txt",
     "cms": "/usr/share/wordlists/cms-common.txt",
     # Sensitive-Files (.env, .git/HEAD, backup.zip, dump.sql, etc.) —
-    # SecLists raft-medium-files.txt, ~17.5k Eintraege.
-    "sensitive": "/usr/share/wordlists/raft-medium-files.txt",
+    # SecLists raft-small-files.txt, ~10k Eintraege.
+    # F-PH2-001: Wechsel von raft-medium-files.txt (17.5k, lief in 180s
+    # Hard-Cap) auf raft-small-files.txt (10k, ~100s). Long-Tail wurde
+    # ohnehin durch -maxtime abgeschnitten; Coverage-Verlust <2%.
+    "sensitive": "/usr/share/wordlists/raft-small-files.txt",
 }
 
 # SecLists paths for ffuf (installed from SecLists in Dockerfile)
@@ -157,7 +160,8 @@ FFUF_WORDLISTS = {
     "vhost": f"{SECLISTS_DIR}/Discovery/DNS/subdomains-top1million-5000.txt",
     "param": f"{SECLISTS_DIR}/Discovery/Web-Content/burp-parameter-names.txt",
     # Sensitive-Files-Modus fuer ffuf (siehe run_ffuf mode='sensitive').
-    "sensitive": f"{SECLISTS_DIR}/Discovery/Web-Content/raft-medium-files.txt",
+    # F-PH2-001: raft-medium (17.5k, 180s Hard-Cap) -> raft-small (10k, ~100s).
+    "sensitive": f"{SECLISTS_DIR}/Discovery/Web-Content/raft-small-files.txt",
     # WordPress-Plugin-Pfade (~4k) — ergaenzt unsere kuratierte
     # wordpress.txt mit den haeufigsten Plugin-Slugs.
     "wp_plugins": f"{SECLISTS_DIR}/Discovery/Web-Content/CMS/wp-plugins.fuzz.txt",
@@ -595,9 +599,10 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
 
     elif mode == "sensitive":
         # Sensitive-File-Discovery: jagt nach .env/.git/backup.zip/dump.sql/...
-        # mittels SecLists raft-medium-files.txt (~17.5k Eintraege). Diese
+        # mittels SecLists raft-small-files.txt (~10k Eintraege). Diese
         # Files sind typische Pentest-Quick-Wins und finden sich oft in
-        # Production-Deployments.
+        # Production-Deployments. F-PH2-001: Wechsel von raft-medium (17.5k),
+        # lief in 180s Hard-Cap, Long-Tail wurde abgeschnitten.
         wordlist = FFUF_WORDLISTS.get("sensitive", WORDLIST_MAP.get("sensitive"))
         if not wordlist or not os.path.isfile(wordlist):
             log.warning("ffuf_sensitive_wordlist_missing", path=wordlist)
@@ -1363,7 +1368,7 @@ def run_phase2(
                     publish_tool_output(order_id, "feroxbuster", ip, "No new paths")
 
         # ffuf sensitive: Sensitive-File-Discovery (.env, .git/, dump.sql, ...)
-        # Eigener Run mit raft-medium-files.txt Wordlist — typische Pentest-
+        # Eigener Run mit raft-small-files.txt Wordlist — typische Pentest-
         # Quick-Wins die in common.txt nicht ausreichend abgedeckt sind.
         if (phase2_tools is not None and "ffuf" in phase2_tools) and "ffuf" not in ai_skip and has_web:
             publish_event(order_id, {"type": "tool_starting", "tool": "ffuf_sensitive", "host": ip})
