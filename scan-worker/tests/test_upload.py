@@ -209,10 +209,12 @@ def test_upload_screenshots_uploads_all_pngs_in_parallel(
     mock_get_client.return_value = mock_client
 
     # Erstelle Screenshots-Layout: scan_dir/hosts/<ip>/phase1/screenshot_*.png
+    # F-PH1-003: Filenames behalten Dots (sanitized via _sanitize_vhost),
+    # nicht mehr Underscore-Substitution.
     scan_dir = tmp_path / "scan-data"
     host_dir = scan_dir / "hosts" / "1.2.3.4" / "phase1"
     host_dir.mkdir(parents=True)
-    fqdns = ["a_example_com", "b_example_com", "c_example_com"]
+    fqdns = ["a.example.com", "b.example.com", "c.example.com"]
     for safe in fqdns:
         (host_dir / f"screenshot_{safe}.png").write_bytes(b"fake-png")
 
@@ -225,6 +227,11 @@ def test_upload_screenshots_uploads_all_pngs_in_parallel(
     assert "c.example.com" in result
     # fput_object wurde fuer jeden Screenshot mindestens einmal aufgerufen
     assert mock_client.fput_object.call_count == 3
+    # F-PH1-003: Object-Keys enthalten <ip>__<vhost> Praefix
+    for vhost, key in result.items():
+        assert key.startswith("order-xyz/1.2.3.4__"), (
+            f"Key {key!r} fuer vhost {vhost} sollte 1.2.3.4__-Praefix haben"
+        )
 
 
 @patch("scanner.upload.get_minio_client")

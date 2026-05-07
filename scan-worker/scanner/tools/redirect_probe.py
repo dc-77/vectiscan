@@ -74,21 +74,80 @@ def _collect_tech_info(page: Any, fqdn: str) -> dict[str, Any]:
         return {}
 
 
+# F-PH1-003: Hoehencap fuer extrem lange full_page-Screenshots — schuetzt das
+# PDF-Layout (ReportLab) vor riesigen Single-Page-Aufnahmen die ueber mehrere
+# Reportseiten skalieren wuerden.
+_SCREENSHOT_MAX_HEIGHT = 4096
+
+
+def _cap_screenshot_height(path: str, max_height: int = _SCREENSHOT_MAX_HEIGHT) -> None:
+    """Resize PNG to max_height (preserving aspect ratio) if it exceeds the cap.
+
+    F-PH1-003: full_page-Screenshots koennen mehrere 1000px hoch sein (lange
+    Landingpages). Pillow optional — fehlt PIL, wird ohne Cap weitergemacht.
+    """
+    try:
+        from PIL import Image as _PILImage  # type: ignore
+    except ImportError:
+        log.debug("pillow_not_available_skipping_screenshot_cap", path=path)
+        return
+    try:
+        with _PILImage.open(path) as img:
+            w, h = img.size
+            if h <= max_height:
+                return
+            new_w = max(1, int(w * (max_height / h)))
+            resized = img.resize((new_w, max_height), _PILImage.LANCZOS)
+            resized.save(path, format="PNG", optimize=True)
+            log.info(
+                "screenshot_resized",
+                path=path,
+                old_size=f"{w}x{h}",
+                new_size=f"{new_w}x{max_height}",
+            )
+    except Exception as exc:
+        log.warning("screenshot_resize_failed", path=path, error=str(exc))
+
+
+def _sanitize_vhost(fqdn: str) -> str:
+    """Sanitize a VHost FQDN for use as a filesystem name.
+
+    F-PH1-003: Slashes raus, Dots bleiben (Filenames duerfen Punkte enthalten,
+    z.B. ``www.example.com.png``). Caps auf 80 Zeichen damit lange CDN-Namen
+    keinen Pfadlimit-Konflikt produzieren.
+    """
+    return fqdn.replace("/", "-").replace("\\", "-").strip()[:80]
+
+
 def _take_screenshot(
     page: Any,
     fqdn: str,
     scan_dir: str,
     ip: str,
 ) -> str | None:
-    """Take a viewport screenshot and return the path, or None on failure."""
+    """Take a full_page screenshot per VHost and return the path, or None on failure.
+
+    F-PH1-003: full_page=True (vorher: nur Viewport). Pro VHost separates File
+    unter ``screenshots/<order_id_dir>/<ip>__<vhost>.png`` (Layout siehe
+    upload.py + report_mapper). Plus Pillow-Hoehencap auf 4096px gegen
+    PDF-Layout-Brueche bei extrem langen Pages.
+    """
     try:
+        # NOTE: scan_dir endet typischerweise auf /tmp/scan-<order_id>/ —
+        # wir schreiben in <scan_dir>/hosts/<ip>/phase2/screenshot_<vhost>.png
+        # damit upload.py:upload_screenshots den glob beibehalten kann.
+        # Zusaetzlich neue per-VHost-Naming-Convention via __ Trenner zwischen IP+VHost.
         screenshot_dir = os.path.join(scan_dir, "hosts", ip, "phase2") if scan_dir and ip else None
         if not screenshot_dir:
             return None
         os.makedirs(screenshot_dir, exist_ok=True)
-        safe_fqdn = fqdn.replace(".", "_").replace("/", "")[:50]
+        safe_fqdn = _sanitize_vhost(fqdn)
+        # Filename behaelt screenshot_<vhost>.png-Schema fuer Backwards-Compat
+        # mit upload.py-Glob; full_page wird ueber Playwright-Argument gesteuert.
         screenshot_path = os.path.join(screenshot_dir, f"screenshot_{safe_fqdn}.png")
-        page.screenshot(path=screenshot_path, full_page=False)
+        page.screenshot(path=screenshot_path, full_page=True, animations="disabled")
+        # Hoehencap nach Capture (PIL optional).
+        _cap_screenshot_height(screenshot_path)
         return screenshot_path
     except Exception as exc:
         log.warning("screenshot_failed", fqdn=fqdn, error=str(exc))

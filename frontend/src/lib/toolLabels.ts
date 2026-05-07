@@ -38,6 +38,9 @@ export const TOOL_LABELS: Record<string, string> = {
   zap_active:       'PROBE FOR APPLICATION VULNERABILITIES',
   zap_passive:      'ANALYZE CAPTURED TRAFFIC PATTERNS',
   nuclei:           'SCAN FOR KNOWN VULNERABILITIES',
+  // F-PH1-003: Tool-Naming-Drift behoben — Screenshots laufen seit Mai 2026
+  // ueber Playwright; gowitness als Backwards-Compat-Alias fuer alte Logs.
+  playwright_screenshot: 'CAPTURE VISUAL SNAPSHOT',
   gowitness:        'CAPTURE VISUAL SNAPSHOT',
   header_check:     'AUDIT SECURITY HEADERS',
   headers:          'AUDIT SECURITY HEADERS',
@@ -99,6 +102,8 @@ export const TOOL_LABELS_DE: Record<string, string> = {
   subfinder: 'Subdomain-Suche', amass: 'Subdomain-Analyse',
   gobuster_dns: 'DNS-Analyse', dnsx: 'DNS-Validierung',
   crtsh: 'Zertifikats-Suche', shodan: 'Netzwerk-Aufklärung',
+  // F-PH1-003: Playwright-basierte Screenshot-Erfassung (gowitness Legacy-Alias).
+  playwright_screenshot: 'Screenshot-Erfassung',
   gowitness: 'Screenshot-Erfassung',
 };
 

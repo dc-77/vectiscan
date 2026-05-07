@@ -118,12 +118,15 @@ def _count_by_severity(findings: list[dict[str, Any]]) -> dict[str, int]:
 
 def _attach_thumbnails(
     findings: list[dict[str, Any]],
-    host_screenshots: dict[str, list[str]] | None,
+    host_screenshots: dict[str, list[Any]] | None,
 ) -> None:
     """Attach the first matching screenshot path to each finding (in-place).
 
     Matches by checking if any host IP appears in the finding's 'affected' text.
     Sets finding["thumbnail"] to the first screenshot path found, or None.
+
+    F-PH1-003: akzeptiert sowohl Legacy-Schema (Liste von Pfad-Strings) als
+    auch das neue Per-VHost-Schema (Liste von Dicts ``{vhost,path}``).
     """
     if not host_screenshots:
         log.debug("attach_thumbnails.no_screenshots")
@@ -134,13 +137,18 @@ def _attach_thumbnails(
     matched = 0
     for f in findings:
         affected = f.get("affected", "")
-        for ip, paths in host_screenshots.items():
-            if ip in affected and paths:
-                f["thumbnail"] = paths[0]
-                matched += 1
-                log.debug("attach_thumbnails.match",
-                          finding=f.get("id"), ip=ip, path=paths[0])
-                break
+        for ip, items in host_screenshots.items():
+            if ip not in affected or not items:
+                continue
+            first = items[0]
+            path = first["path"] if isinstance(first, dict) else first
+            if not path:
+                continue
+            f["thumbnail"] = path
+            matched += 1
+            log.debug("attach_thumbnails.match",
+                      finding=f.get("id"), ip=ip, path=path)
+            break
     log.info("attach_thumbnails.done", matched=matched, total=len(findings))
 
 
@@ -641,16 +649,45 @@ def _build_appendices(
 # ---------------------------------------------------------------------------
 
 
+# F-PH1-003: Cap fuer Screenshots pro Host im PDF — verhindert dass extrem
+# breit-aufgestellte Hosts (>5 primary VHosts) den Report aufblaehen. Rest
+# bleibt im MinIO-Archiv und ist im Frontend ueber Thumbnails erreichbar.
+_MAX_SCREENSHOTS_PER_HOST_IN_PDF = 5
+
+
+def _filename_to_vhost(path: str) -> str:
+    """Extract vhost label from a screenshot filename ``screenshot_<vhost>.png``.
+
+    F-PH1-003: Filename-Konvention aus redirect_probe._take_screenshot —
+    Punkte bleiben erhalten, Slashes wurden zu ``-``. Fallback: leerer String.
+    """
+    try:
+        from pathlib import Path as _Path
+        stem = _Path(path).stem
+        if stem.startswith("screenshot_"):
+            return stem[len("screenshot_"):]
+        return stem
+    except Exception:
+        return ""
+
+
 def _build_screenshot_data(
     host_inventory: dict[str, Any],
-    host_screenshots: dict[str, list[str]] | None,
+    host_screenshots: dict[str, list[Any]] | None,
 ) -> list[dict[str, Any]]:
     """Build a list of screenshot entries for the PDF generator.
 
     Returns a list of dicts, each with:
-        - label: human-readable host label (IP + FQDNs)
-        - paths: list of absolute file paths to screenshot images
-    Only includes hosts that actually have screenshots.
+        - label: human-readable host label (``<vhost> (Screenshot)``)
+        - paths: list of absolute file paths to screenshot images (1 per entry)
+
+    F-PH1-003: Pro primary VHost ein eigener Eintrag (nicht mehr 1 pro IP).
+    Akzeptiert beide Schemata fuer ``host_screenshots[ip]``:
+      * Liste von Pfaden (Legacy, str)
+      * Liste von Dicts ``{"vhost": fqdn, "path": ...}`` (Neu)
+
+    Cap: max ``_MAX_SCREENSHOTS_PER_HOST_IN_PDF`` Eintraege pro Host —
+    verbleibende Screenshots bleiben in MinIO erreichbar.
     """
     if not host_screenshots:
         return []
@@ -664,14 +701,52 @@ def _build_screenshot_data(
             fqdn_lookup[ip] = h.get("fqdns", [])
 
     entries: list[dict[str, Any]] = []
-    for ip, paths in host_screenshots.items():
-        if not paths:
+    for ip, items in host_screenshots.items():
+        if not items:
             continue
-        fqdns = fqdn_lookup.get(ip, [])
-        label = f"{ip} ({', '.join(fqdns)})" if fqdns else ip
-        # Show only the first screenshot per host to avoid duplicates
-        # (multiple FQDNs on the same IP often show the same page)
-        entries.append({"label": label, "paths": [paths[0]]})
+
+        # Normalisiere zu Liste von (vhost, path)-Tupeln.
+        normalized: list[tuple[str, str]] = []
+        for item in items:
+            if isinstance(item, dict):
+                vhost = str(item.get("vhost") or "")
+                path = str(item.get("path") or "")
+            else:
+                # Legacy: nur Pfad-String — VHost aus Filename extrahieren.
+                path = str(item)
+                vhost = _filename_to_vhost(path)
+            if not path:
+                continue
+            normalized.append((vhost, path))
+
+        if not normalized:
+            continue
+
+        # Deduplizieren auf Pfad-Ebene (gleicher Screenshot-File nicht
+        # zweimal einfuegen, falls beide Schemata parallel angeliefert werden).
+        seen_paths: set[str] = set()
+        deduped: list[tuple[str, str]] = []
+        for vhost, path in normalized:
+            if path in seen_paths:
+                continue
+            seen_paths.add(path)
+            deduped.append((vhost, path))
+
+        # Cap auf MAX pro Host.
+        capped = deduped[:_MAX_SCREENSHOTS_PER_HOST_IN_PDF]
+
+        # Fallback fuer VHost-Label: IP + FQDN-Liste aus Inventar.
+        ip_fallback_fqdns = fqdn_lookup.get(ip, [])
+
+        for vhost, path in capped:
+            if vhost:
+                label = f"{vhost} (Screenshot)"
+            elif ip_fallback_fqdns:
+                # Legacy-Pfad: VHost-Label nicht ableitbar — IP + FQDNs verwenden.
+                label = f"{ip} ({', '.join(ip_fallback_fqdns)}) (Screenshot)"
+            else:
+                label = f"{ip} (Screenshot)"
+            entries.append({"label": label, "paths": [path]})
 
     return entries
 

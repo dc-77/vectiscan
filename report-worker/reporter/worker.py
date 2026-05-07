@@ -398,7 +398,10 @@ def process_job(job_data: dict) -> None:
         parsed_inventory = parsed["host_inventory"]
         parsed_profiles = parsed["tech_profiles"]
         consolidated_findings = parsed["consolidated_findings"]
-        host_screenshots = parsed.get("host_screenshots", {})
+        # F-PH1-003: bevorzugt per-VHost-Schema falls verfuegbar (parser.py
+        # populiert beides parallel). _build_screenshot_data im report_mapper
+        # versteht beide Schemata.
+        host_screenshots = parsed.get("host_screenshots_per_vhost") or parsed.get("host_screenshots", {})
         log.info("scan_data_parsed", hosts=len(parsed_inventory.get("hosts", [])))
 
         # Use parsed inventory/profiles, fall back to job payload

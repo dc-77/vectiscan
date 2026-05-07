@@ -84,8 +84,8 @@ def pack_results(scan_dir: str, order_id: str) -> str:
 
 
 def upload_screenshots(scan_dir: str, order_id: str) -> dict[str, str]:
-    """Sammle alle screenshot_<fqdn>.png aus /tmp/scan-<id>/hosts/*/phase*/
-    und lade sie nach MinIO unter `screenshots/<orderId>/<fqdn>.png`.
+    """Sammle alle screenshot_<vhost>.png aus /tmp/scan-<id>/hosts/<ip>/phase*/
+    und lade sie nach MinIO unter `screenshots/<orderId>/<ip>__<vhost>.png`.
 
     Returns: dict {fqdn -> minio_object_key}. Leeres dict bei Fehlern oder
     wenn keine Screenshots gefunden wurden — der Scan laeuft trotzdem.
@@ -94,6 +94,10 @@ def upload_screenshots(scan_dir: str, order_id: str) -> dict[str, str]:
     Bucket-Existence wird ueber `ensure_bucket` (Modul-Cache) gecheckt.
     Pro Worker-Thread eigener Minio-Client (urllib3-PoolManager ist
     thread-safe, aber wir vermeiden geteilten State).
+
+    F-PH1-003: Per-VHost-Screenshots — der MinIO-Pfad enthaelt `<ip>__<vhost>`
+    damit gleiche IPs mit mehreren primary VHosts unterschiedliche Keys
+    bekommen (vorher: 1 Screenshot pro IP ueberschrieben).
     """
     out: dict[str, str] = {}
     bucket = "scan-screenshots"
@@ -102,7 +106,7 @@ def upload_screenshots(scan_dir: str, order_id: str) -> dict[str, str]:
         primary_client = get_minio_client()
         ensure_bucket(primary_client, bucket)
 
-        # Suche alle screenshot_*.png unter <scan_dir>/hosts/*/phase*/
+        # Suche alle screenshot_*.png unter <scan_dir>/hosts/<ip>/phase*/
         scan_root = Path(scan_dir)
         pngs = list(scan_root.glob("hosts/*/phase*/screenshot_*.png"))
         if not pngs:
@@ -111,13 +115,22 @@ def upload_screenshots(scan_dir: str, order_id: str) -> dict[str, str]:
 
         def _upload_one(png: Path) -> tuple[str, str] | None:
             try:
-                # Filename: screenshot_<fqdn-with-underscores>.png — wieder zurueckmappen
-                # ist nicht eindeutig; daher nutzen wir einfach den Stem als Key
-                # und mappen nach FQDN ueber das Filename-Pattern (siehe redirect_probe.py:89:
-                # safe_fqdn = fqdn.replace(".", "_").replace("/", "")[:50]).
+                # Filename-Schema (F-PH1-003): screenshot_<vhost-fqdn>.png — Punkte
+                # bleiben enthalten (siehe redirect_probe._sanitize_vhost), nur
+                # Slashes ersetzt. Pfad: hosts/<ip>/phase2/screenshot_<vhost>.png
+                # Daher koennen wir den IP aus dem Pfad ableiten und den VHost
+                # aus dem Filename — eindeutiges Mapping.
                 safe = png.stem.replace("screenshot_", "")
-                fqdn_guess = safe.replace("_", ".")
-                obj_key = f"{order_id}/{safe}.png"
+                fqdn_guess = safe  # safe = sanitized FQDN, Dots intakt
+                # IP aus Pfad: <scan_dir>/hosts/<ip>/phase*/screenshot_*.png
+                try:
+                    ip = png.parents[1].name
+                except IndexError:
+                    ip = "unknown"
+                # Per-VHost-Key: <order_id>/<ip>__<vhost>.png — verhindert
+                # Kollisionen wenn mehrere IPs dieselbe FQDN exposen oder
+                # eine IP mehrere VHosts faehrt.
+                obj_key = f"{order_id}/{ip}__{safe}.png"
                 # Eigener Client pro Thread — urllib3-PoolManager innen ist
                 # thread-safe, aber pro Thread vermeiden wir Race-Conditions
                 # auf etwaigen mutable Client-Members.

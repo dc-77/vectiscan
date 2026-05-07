@@ -446,13 +446,17 @@ def parse_headers_json(path: str) -> dict[str, Any]:
     return result
 
 
-def find_gowitness_screenshots(phase2_dir: str) -> list[str]:
+def find_playwright_screenshots(phase2_dir: str) -> list[str]:
     """Find screenshot files (PNG/JPEG) in a phase2 directory.
+
+    F-PH1-003: Tool-Naming-Drift behoben — frueher ``find_gowitness_screenshots``,
+    seit Mai 2026 nutzen wir Playwright. Funktion bleibt parser-intern weil sie
+    rein Filesystem-Discovery macht.
 
     Looks for image files produced by Playwright (or legacy gowitness).
     Common locations:
-    - ``<phase2>/gowitness/screenshots/*.png``
-    - ``<phase2>/gowitness/*.png``
+    - ``<phase2>/gowitness/screenshots/*.png`` (legacy)
+    - ``<phase2>/gowitness/*.png`` (legacy)
     - ``<phase2>/screenshots/*.png``
     - ``<phase2>/screenshot_*.png`` (Playwright output, fallback)
 
@@ -490,14 +494,18 @@ def find_gowitness_screenshots(phase2_dir: str) -> list[str]:
 
     if screenshots:
         log.info(
-            "gowitness_screenshots_found",
+            "playwright_screenshots_found",
             dir=phase2_dir,
             count=len(screenshots),
         )
     else:
-        log.debug("no_gowitness_screenshots", dir=phase2_dir)
+        log.debug("no_playwright_screenshots", dir=phase2_dir)
 
     return screenshots
+
+
+# Backwards-Compat-Alias — alte Imports + Konsumenten weiterhin lauffaehig.
+find_gowitness_screenshots = find_playwright_screenshots
 
 
 def parse_httpx(httpx_data: dict | None) -> dict[str, Any]:
@@ -1086,7 +1094,7 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             str(phase2 / "gobuster_dir.txt")
         )
 
-        host_data["screenshots"] = find_gowitness_screenshots(
+        host_data["screenshots"] = find_playwright_screenshots(
             str(phase2)
         )
 
@@ -1171,7 +1179,7 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             host_data["gobuster_dir"] = parse_gobuster_dir(
                 str(phase2 / "gobuster_dir.txt")
             )
-            host_data["screenshots"] = find_gowitness_screenshots(
+            host_data["screenshots"] = find_playwright_screenshots(
                 str(phase2)
             )
 
@@ -1216,16 +1224,29 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
         findings_length=len(consolidated),
     )
 
-    # 6. Collect gowitness screenshots per host
+    # 6. Collect Playwright screenshots per host (F-PH1-003: per-VHost)
+    # Schema (alt, weiterhin abwaertskompatibel): {ip: [path1, path2, ...]}
+    # Schema (neu, parallel verfuegbar): {ip: [{"vhost": fqdn, "path": ...}, ...]}
+    # report_mapper konsumiert beides — Liste-of-str = Legacy, Liste-of-dict = neu.
     host_screenshots: dict[str, list[str]] = {}
+    host_screenshots_per_vhost: dict[str, list[dict[str, str]]] = {}
     for ip, data in host_results.items():
         shots = data.get("screenshots", [])
-        if shots:
-            host_screenshots[ip] = shots
+        if not shots:
+            continue
+        host_screenshots[ip] = shots
+        per_vhost: list[dict[str, str]] = []
+        for path in shots:
+            # Filename-Konvention (F-PH1-003): screenshot_<vhost-fqdn>.png — Punkte
+            # bleiben enthalten. Fallback: Stem ohne "screenshot_"-Praefix.
+            stem = Path(path).stem
+            vhost = stem.replace("screenshot_", "", 1) if stem.startswith("screenshot_") else stem
+            per_vhost.append({"vhost": vhost, "path": path})
+        host_screenshots_per_vhost[ip] = per_vhost
 
     if host_screenshots:
         log.info(
-            "gowitness_screenshots_total",
+            "playwright_screenshots_total",
             hosts_with_screenshots=len(host_screenshots),
             total_screenshots=sum(len(v) for v in host_screenshots.values()),
         )
@@ -1246,6 +1267,8 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
         "tech_profiles": tech_profiles,
         "consolidated_findings": consolidated,
         "host_screenshots": host_screenshots,
+        # F-PH1-003: parallel verfuegbar fuer Konsumenten die VHost-Labels brauchen.
+        "host_screenshots_per_vhost": host_screenshots_per_vhost,
         "testssl_raw_by_host": testssl_raw_by_host,
         "headers_by_host": headers_by_host,
         "meta": meta,
