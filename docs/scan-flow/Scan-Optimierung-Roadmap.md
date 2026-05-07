@@ -9,8 +9,8 @@
 
 | Paket | Beschreibung | Status | Branch | Commit-Range |
 |---|---|---|---|---|
-| P0 | Foundation (Determinismus-Hygiene, ohne POLICY_VERSION-Bump) | completed (lokal), push pending | `feat/p0-foundation` | `pre-p0-foundation..50e6a67` (9 Commits) |
-| P1 | Quick-Wins (XS-Aufwand, parallelisierbar) | pending | `feat/p1-quickwins` | — |
+| P0 | Foundation (Determinismus-Hygiene, ohne POLICY_VERSION-Bump) | **deployed** (Pipeline 2411 success) | `feat/p0-foundation` | `pre-p0-foundation..28d36d3` (10 Commits) |
+| P1 | Quick-Wins (XS-Aufwand, gebündelt nach Phase) | completed (lokal), push pending | `feat/p1-quickwins` | `pre-p1-quickwins..92eec98` (5 Commits, 17 Findings) |
 | P2 | Maintained-Listen-Sync (auf F-XS-003 aufbauend) | pending | `feat/p2-sync-pipelines` | — |
 | P3 | Mail-Security & Discovery-Tiefe | pending | `feat/p3-mail-discovery` | — |
 | P4 | Phase 1/2 Tool-Erweiterungen (nuclei/katana) | pending | `feat/p4-tool-coverage` | — |
@@ -45,9 +45,17 @@
 
 ## P1 — Quick-Wins
 
-_(Findings: F-PRE-002, F-PRE-004, F-PRE-005, F-P0A-001, F-P0A-005, F-PH1-002, F-KI3-001, F-KI4-001, F-PH3-001, F-PH9-001, F-KI1-001, F-KI1-002, F-P0B-002, F-P0B-005, F-P0B-007, F-P0B-008, F-PH2-001 — 17 Findings)_
+**Ziel:** XS-Aufwand-Findings nach Phase gebündelt (5 Bundles → 5 Commits).
 
-Status-Tabelle wird befüllt sobald P0 deployed.
+| # | Bundle | Findings | Status | Commit |
+|---|---|---|---|---|
+| A | Pre-Check + Phase 0a | F-PRE-002, F-PRE-004, F-PRE-005, F-P0A-001, F-P0A-005 (5) | done | 8b554d1 |
+| B | Phase 0b | F-P0B-002, F-P0B-005, F-P0B-007, F-P0B-008 (4) | done | 9818850 |
+| C | Phase 1 + Phase 2 + Upload | F-PH1-002, F-PH2-001, F-PH9-001 (3) | done | 874c665 |
+| D | KI #4 + Phase 3 | F-KI4-001, F-PH3-001 (2) | done | 71faa97 |
+| E | KI #1 + KI #3 | F-KI1-001, F-KI1-002, F-KI3-001 (3) | done | 92eec98 |
+
+**Lokale Test-Suite:** scan-worker 405 grün (1 skip), report-worker 562 grün, scripts 7 grün — keine Regression.
 
 ---
 
@@ -71,4 +79,5 @@ Pro Paket vor dem Push setzen wir einen Tag `pre-p<N>-<datum>`, sodass bei Bedar
 | Tag | Commit | Datum |
 |---|---|---|
 | `pre-p0-foundation` | 948f6ba | 2026-05-08 |
+| `pre-p1-quickwins` | 28d36d3 | 2026-05-08 |
 
