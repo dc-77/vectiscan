@@ -98,13 +98,31 @@ STABLE_EVIDENCE_KEYS = (
     "cve_id", "cwe_id", "missing_directive", "exposed_path",
 )
 
+# F-RPT-002 (Mai 2026): Differenzierende title_vars-Felder, die ein Finding
+# als "anderes Problem" identifizieren — selbst wenn finding_type+policy_id
+# identisch sind. Beispiel: software_eol mit tech=php vs tech=python.
+# `port` ist hier explizit aufgenommen, weil database_port_exposed o.ae.
+# pro Port unterscheidbar bleiben muss; in _affected_host wird port NICHT
+# zur Host-Identitaet gezaehlt — er gehoert zum Problem, nicht zum Host.
+STABLE_TITLE_VARS = (
+    "port", "tech", "version", "plugin", "library",
+    "directive", "selector",
+)
+
 
 def _normalized_evidence_hash(finding: dict) -> str:
     """Hash ueber stabile Felder, die ein Finding ueber Hosts hinweg
-    als „dasselbe" identifizieren.
+    als "dasselbe" identifizieren.
 
     NICHT enthalten (variieren pro Host): host, ip, port, timestamp, finding_id.
-    Enthalten: finding_type, policy_id, cvss_vector, ausgewaehlte evidence-Felder.
+    Enthalten:
+      - finding_type, policy_id, cvss_vector
+      - ausgewaehlte evidence-Felder (STABLE_EVIDENCE_KEYS)
+      - ausgewaehlte title_vars (STABLE_TITLE_VARS) — F-RPT-002:
+        verhindert dass Findings mit gleichem finding_type aber
+        unterschiedlichen Tech/Version/Port/Plugin/Library/Directive/
+        Selector faelschlich konsolidieren (z.B. PHP 5.6 vs Python 2.7
+        beide als software_eol).
     """
     evidence = finding.get("evidence")
     if not isinstance(evidence, dict):
@@ -114,11 +132,26 @@ def _normalized_evidence_hash(finding: dict) -> str:
         for k in STABLE_EVIDENCE_KEYS
         if k in evidence and evidence.get(k) is not None
     }
+
+    # F-RPT-002: title_vars-Beitrag. Leere Strings und "?" (apply_titles-
+    # Sicherheitsnetz fuer fehlende Vars) werden ignoriert, damit sie nicht
+    # als kuenstliche Diskriminierung wirken — sonst wuerden 3 Findings ohne
+    # title_vars trotz identischem Problem in 3 Gruppen fallen.
+    title_vars = finding.get("title_vars") or {}
+    if not isinstance(title_vars, dict):
+        title_vars = {}
+    stable_tv = {
+        k: str(title_vars.get(k)).strip().lower()
+        for k in STABLE_TITLE_VARS
+        if title_vars.get(k) not in (None, "", "?")
+    }
+
     keypart = {
         "finding_type": finding.get("finding_type") or finding.get("type"),
         "policy_id": finding.get("policy_id"),
         "cvss_vector": finding.get("cvss_vector"),
         "evidence": stable_evidence,
+        "title_vars": stable_tv,
     }
     serialized = json.dumps(keypart, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()[:16]

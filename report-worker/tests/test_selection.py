@@ -108,6 +108,77 @@ class TestConsolidation:
         result, groups = consolidate([f1, f2])
         assert groups == 2
 
+    # ----------------------------------------------------------------
+    # F-RPT-002: title_vars-Diskriminierung (Mai 2026)
+    # ----------------------------------------------------------------
+    def test_eol_different_tech_not_consolidated(self):
+        """F-RPT-002: software_eol-Findings mit verschiedenen tech in title_vars
+        duerfen NICHT konsolidieren."""
+        f1 = make_finding(
+            finding_id="f-001", finding_type="software_eol",
+            policy_id="SP-EOL-002",
+            title_vars={"tech": "php", "version": "5.6"},
+        )
+        f2 = make_finding(
+            finding_id="f-002", finding_type="software_eol",
+            policy_id="SP-EOL-002",
+            title_vars={"tech": "python", "version": "2.7"},
+        )
+        result, groups = consolidate([f1, f2])
+        assert groups == 2, f"erwartet 2 separate Gruppen, bekam {groups}"
+
+    def test_db_port_different_ports_not_consolidated(self):
+        """F-RPT-002: database_port_exposed mit verschiedenen Ports trennen."""
+        f1 = make_finding(
+            finding_id="f-001", finding_type="database_port_exposed",
+            policy_id="SP-DB-001",
+            title_vars={"port": "3306"},
+        )
+        f2 = make_finding(
+            finding_id="f-002", finding_type="database_port_exposed",
+            policy_id="SP-DB-001",
+            title_vars={"port": "5432"},
+        )
+        result, groups = consolidate([f1, f2])
+        assert groups == 2
+
+    def test_eol_same_tech_different_hosts_consolidates(self):
+        """F-RPT-002: gleiches tech+version auf 2 Hosts -> immer noch 1 Gruppe."""
+        f1 = make_finding(
+            finding_id="f-001", host="host1.com", finding_type="software_eol",
+            policy_id="SP-EOL-001",
+            title_vars={"tech": "exchange", "version": "15.1"},
+        )
+        f2 = make_finding(
+            finding_id="f-002", host="host2.com", finding_type="software_eol",
+            policy_id="SP-EOL-001",
+            title_vars={"tech": "exchange", "version": "15.1"},
+        )
+        result, groups = consolidate([f1, f2])
+        assert groups == 1
+        assert sorted(result[0]["affected_hosts"]) == ["host1.com", "host2.com"]
+
+    def test_consolidate_ignores_question_mark_title_vars(self):
+        """F-RPT-002: '?'-Platzhalter aus apply_titles soll NICHT als
+        Differenzierung gelten."""
+        f1 = make_finding(
+            finding_id="f-001", finding_type="csp_unsafe_inline",
+            policy_id="SP-CSP-002",
+            title_vars={"directive": "?"},
+        )
+        f2 = make_finding(
+            finding_id="f-002", finding_type="csp_unsafe_inline",
+            policy_id="SP-CSP-002",
+            title_vars={"directive": ""},
+        )
+        f3 = make_finding(
+            finding_id="f-003", finding_type="csp_unsafe_inline",
+            policy_id="SP-CSP-002",
+            # kein title_vars
+        )
+        result, groups = consolidate([f1, f2, f3])
+        assert groups == 1, "?/empty/missing title_vars sollten zusammen gruppieren"
+
 
 # ====================================================================
 # 2. SELEKTION: TOP-N
