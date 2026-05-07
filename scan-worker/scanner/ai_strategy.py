@@ -19,6 +19,7 @@ from scanner.ai_cache import (
     AI_PRICING,
     CacheStats,
     cached_call,
+    compute_content_hash,
     extract_text,
 )
 
@@ -294,7 +295,6 @@ Antwort im Format:
     # C2: content_hash aus (domain, hosts, dns_findings) — Order-uebergreifend
     # cache hit wenn host_inventory identisch ist (Subdomain-Snapshot + Tool-
     # Output-Normalizer sorgen dafuer).
-    from scanner.ai_cache import compute_content_hash
     ch = compute_content_hash(
         domain, package,
         json.dumps(hosts, sort_keys=True, ensure_ascii=False),
@@ -503,12 +503,20 @@ Korrigiere die CMS-Erkennung für jeden Host.
 Antwort im Format:
 {TECH_ANALYSIS_SCHEMA}"""
 
+    # C2 (F-XS-002): content_hash aus (tech_profiles_summary, redirect_data) —
+    # Order-uebergreifender Cache-Hit wenn Tech-Inputs identisch sind.
+    ch = compute_content_hash(
+        json.dumps(tech_profiles_summary, sort_keys=True, ensure_ascii=False),
+        json.dumps(redirect_data, sort_keys=True, ensure_ascii=False),
+    )
+
     result = _call_haiku(
         TECH_ANALYSIS_SYSTEM, user_prompt,
         cache_namespace="ki2_tech_analysis",
         cache_ttl_seconds=CACHE_TTL_TECH_ANALYSIS,
         order_scope=order_id or None,
         order_id=order_id,
+        content_hash=ch,
     )
 
     # Save full AI debug
@@ -670,6 +678,13 @@ Konfiguriere die Phase-2-Tools optimal für diesen Host.
 Antwort im Format:
 {PHASE2_CONFIG_SCHEMA}"""
 
+    # C2 (F-XS-002): content_hash aus (enriched_profile, package) —
+    # Order-uebergreifender Cache-Hit wenn Tech-Profil identisch ist.
+    ch = compute_content_hash(
+        json.dumps(enriched_profile, sort_keys=True, ensure_ascii=False),
+        package,
+    )
+
     result = _call_haiku(
         PHASE2_CONFIG_SYSTEM, user_prompt,
         cache_namespace="ki3_phase2_config",
@@ -677,6 +692,7 @@ Antwort im Format:
         order_scope=order_id or None,
         host_scope=ip or None,
         order_id=order_id,
+        content_hash=ch,
     )
 
     # Save full AI debug
@@ -965,7 +981,6 @@ Antwort im Format:
 
     if not use_tools:
         # C2: content_hash aus (findings_summary, tech_profiles, has_waf)
-        from scanner.ai_cache import compute_content_hash
         ki4_ch = compute_content_hash(
             json.dumps(summary_truncated, sort_keys=True, ensure_ascii=False),
             json.dumps(tech_profiles, sort_keys=True, ensure_ascii=False),
