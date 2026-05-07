@@ -6,10 +6,14 @@ import pytest
 
 from reporter.business_impact import (
     PACKAGE_WEIGHTS,
+    POLICY_ID_TO_CATEGORIES,
+    RANSOMWARE_PORTS,
     SEVERITY_CVSS_MAP,
+    _classify_finding,
     order_score,
     recompute,
 )
+from reporter.severity_policy import SEVERITY_POLICIES
 
 
 class TestRecompute:
@@ -123,3 +127,47 @@ class TestOrderScore:
             {"business_impact_score": 5.0, "is_false_positive": False},
         ]
         assert order_score(findings) == 5.0
+
+
+class TestClassifyFinding:
+    """F-RPT-003: deterministische policy_id-basierte Klassifikation."""
+
+    def test_policy_id_categories_complete(self):
+        """F-RPT-003: jeder policy_id aus SEVERITY_POLICIES ist im Mapping
+        (verhindert silent gaps bei neuen Regeln)."""
+        severity_pids = {p.policy_id for p in SEVERITY_POLICIES}
+        mapping_pids = set(POLICY_ID_TO_CATEGORIES.keys())
+        missing = severity_pids - mapping_pids
+        assert not missing, f"policy_ids ohne Categories-Mapping: {sorted(missing)}"
+
+    def test_classify_finding_db_port_via_policy_id(self):
+        """F-RPT-003: SP-DB-001 -> data_exposure + default_login,
+        plus rdp_smb durch Port-Match wenn port in RANSOMWARE_PORTS."""
+        finding = {"policy_id": "SP-DB-001", "title": "Datenbank-Port 3306 erreichbar"}
+        cats = _classify_finding(finding)
+        assert "data_exposure" in cats
+        assert "default_login" in cats
+        # Port 3306 ist NICHT in RANSOMWARE_PORTS
+        assert "rdp_smb" not in cats
+
+    def test_classify_finding_ransomware_port_match(self):
+        """F-RPT-003: Port 3389 (RDP) -> rdp_smb auch ohne policy_id-Mapping."""
+        finding = {"policy_id": "SP-FALLBACK", "port": 3389}
+        cats = _classify_finding(finding)
+        assert "rdp_smb" in cats
+
+    def test_classify_finding_telnet_port_in_ransomware_set(self):
+        """F-RPT-003: Port 23 (Telnet) und 5800 (VNC alt) sind neu in
+        RANSOMWARE_PORTS."""
+        assert 23 in RANSOMWARE_PORTS
+        assert 5800 in RANSOMWARE_PORTS
+
+    def test_classify_finding_german_text_does_not_matter(self):
+        """F-RPT-003: deutsche Titel + Description matchen trotzdem korrekt
+        weil Klassifikation NUR ueber policy_id."""
+        f1 = {"policy_id": "SP-TLS-001", "title": "TLS-Konfiguration unsicher",
+              "description": "Veraltete Verschluesselung erkannt."}
+        f2 = {"policy_id": "SP-TLS-001", "title": "TLS configuration insecure",
+              "description": "Outdated encryption detected."}
+        assert _classify_finding(f1) == _classify_finding(f2)
+        assert "encryption" in _classify_finding(f1)

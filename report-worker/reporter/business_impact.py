@@ -49,7 +49,72 @@ PACKAGE_WEIGHTS: dict[str, dict[str, float]] = {
     "webcheck": {},
 }
 
-RANSOMWARE_PORTS = {3389, 445, 139, 5900, 5985, 5986}
+RANSOMWARE_PORTS = {3389, 445, 139, 5900, 5985, 5986, 23, 5800}
+
+# F-RPT-003: deterministische policy_id -> Kategorien-Mapping ersetzt
+# Keyword-Match in _classify_finding. Sprachunabhaengig (KI generiert
+# deutsche Narratives — englische Keywords matchten nicht).
+# Synchron pflegen mit reporter/severity_policy.py SEVERITY_POLICIES.
+POLICY_ID_TO_CATEGORIES: dict[str, set[str]] = {
+    # Header / Encryption-Hardening
+    "SP-HDR-001": {"encryption"}, "SP-HDR-002": {"encryption"},
+    "SP-HDR-003": {"encryption"}, "SP-HDR-004": {"encryption"},
+    "SP-HDR-005": set(), "SP-HDR-006": {"access_control"},
+    "SP-HDR-007": set(), "SP-HDR-008": set(),
+    "SP-HDR-009": {"encryption"},
+    # CSP
+    "SP-CSP-001": {"access_control"}, "SP-CSP-002": {"access_control"},
+    "SP-CSP-003": {"access_control"}, "SP-CSP-004": {"access_control"},
+    "SP-CSP-005": {"access_control"},
+    # Cookies
+    "SP-COOK-001": {"encryption"}, "SP-COOK-002": {"access_control"},
+    "SP-COOK-003": {"access_control"},
+    "SP-COOK-004": {"encryption", "authentication"},
+    "SP-COOK-005": {"access_control", "authentication"},
+    # CSRF
+    "SP-CSRF-001": {"access_control", "authentication"},
+    "SP-CSRF-002": {"access_control"}, "SP-CSRF-003": {"access_control"},
+    # Disclosure
+    "SP-DISC-001": set(), "SP-DISC-002": set(),
+    "SP-DISC-003": {"data_exposure"}, "SP-DISC-004": {"data_exposure"},
+    "SP-DISC-005": {"data_exposure"}, "SP-DISC-006": {"data_exposure"},
+    "SP-DISC-007": {"data_exposure"}, "SP-DISC-008": {"data_exposure"},
+    "SP-DISC-009": {"data_exposure"},
+    # TLS
+    "SP-TLS-001": {"encryption"}, "SP-TLS-002": {"encryption"},
+    "SP-TLS-003": {"encryption"}, "SP-TLS-004": {"encryption"},
+    "SP-TLS-005": {"encryption"}, "SP-TLS-006": {"encryption"},
+    "SP-TLS-007": {"encryption"},
+    # DNS / Mail-Auth
+    "SP-DNS-001": {"encryption"}, "SP-DNS-002": {"encryption"},
+    "SP-DNS-003": {"encryption"},
+    "SP-DNS-004": {"authentication"}, "SP-DNS-005": {"authentication"},
+    "SP-DNS-006": {"authentication"}, "SP-DNS-007": {"authentication"},
+    "SP-DNS-008": {"authentication", "encryption"},
+    "SP-DNS-009": {"authentication"}, "SP-DNS-010": {"authentication"},
+    # CVE — KEV-Pfade hoechstes Risiko
+    "SP-CVE-001": {"encryption", "access_control"},
+    "SP-CVE-002": {"access_control"}, "SP-CVE-003": {"access_control"},
+    "SP-CVE-004": {"access_control"},
+    # EOL — meist Daten-/Encryption-Risiko
+    "SP-EOL-001": {"data_exposure", "encryption", "access_control"},
+    "SP-EOL-002": {"data_exposure", "access_control"},
+    "SP-EOL-003": {"data_exposure", "access_control"},
+    "SP-EOL-004": {"access_control"},
+    # WordPress / User-Enum
+    "SP-WP-001": {"access_control"},
+    "SP-WP-002": {"data_exposure"},
+    "SP-ENUM-001": {"data_exposure"},
+    # Database-Port
+    "SP-DB-001": {"data_exposure", "default_login"},
+    # CORS / JS / SRI / SSH
+    "SP-CORS-001": {"access_control", "api_security"},
+    "SP-JS-001": {"access_control"},
+    "SP-SRI-001": {"access_control"},
+    "SP-SSH-001": {"default_login", "access_control"},
+    # Fallback-Findings (ohne Policy) bekommen keine Kategorien
+    "SP-FALLBACK": set(),
+}
 
 
 def _get_cvss(finding: dict) -> float:
@@ -77,48 +142,25 @@ def _get_cvss(finding: dict) -> float:
 
 
 def _classify_finding(finding: dict) -> set[str]:
-    """Klassifiziert ein Finding fuer Package-Weights."""
-    categories: set[str] = set()
-    title = (finding.get("title") or "").lower()
-    desc = (finding.get("description") or "").lower()
-    combined = f"{title} {desc}"
-    port = finding.get("port")
+    """Klassifiziert ein Finding fuer Package-Weights.
 
+    F-RPT-003: deterministisches Mapping ueber policy_id (statt Keyword-
+    Match in title+description). Sprachunabhaengig. RANSOMWARE_PORTS
+    (orthogonal zu policy_id) bleibt als Port-Match-Fallback.
+    """
+    categories: set[str] = set()
+    # Primaer: policy_id (deterministisch, sprachunabhaengig)
+    pid = (finding.get("policy_id") or "").strip()
+    if pid in POLICY_ID_TO_CATEGORIES:
+        categories |= POLICY_ID_TO_CATEGORIES[pid]
+    # Sekundaer: Port-basierte rdp_smb-Erkennung (orthogonal)
+    port = finding.get("port")
     if port:
         try:
             if int(port) in RANSOMWARE_PORTS:
                 categories.add("rdp_smb")
         except (ValueError, TypeError):
             pass
-    if any(t in combined for t in ("rdp", "smb", "remote desktop", "samba")):
-        categories.add("rdp_smb")
-
-    if any(t in combined for t in ("ssl", "tls", "cipher", "encryption",
-                                   "hsts", "certificate")):
-        categories.add("encryption")
-
-    if any(t in combined for t in ("default", "credential", "password", "admin login")):
-        categories.add("default_login")
-
-    if any(t in combined for t in ("access", "authorization", "permission",
-                                   "privilege", "bypass")):
-        categories.add("access_control")
-
-    if any(t in combined for t in ("api", "graphql", "swagger", "endpoint",
-                                   "rest", "oauth")):
-        categories.add("api_security")
-
-    if any(t in combined for t in ("authentication", "auth ", "session",
-                                   "token", "jwt")):
-        categories.add("authentication")
-
-    if any(t in combined for t in ("exposure", "disclosure", "leak",
-                                   "sensitive", "backup", "database")):
-        categories.add("data_exposure")
-
-    if any(t in combined for t in ("logging", "audit", "trace")):
-        categories.add("logging")
-
     return categories
 
 
@@ -215,6 +257,7 @@ __all__ = [
     "SEVERITY_CVSS_MAP",
     "PACKAGE_WEIGHTS",
     "RANSOMWARE_PORTS",
+    "POLICY_ID_TO_CATEGORIES",
     "recompute",
     "order_score",
 ]
