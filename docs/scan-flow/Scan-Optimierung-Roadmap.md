@@ -10,7 +10,7 @@
 | Paket | Beschreibung | Status | Branch | Commit-Range |
 |---|---|---|---|---|
 | P0 | Foundation (Determinismus-Hygiene, ohne POLICY_VERSION-Bump) | **deployed** (Pipeline 2411 success) | `feat/p0-foundation` | `pre-p0-foundation..28d36d3` (10 Commits) |
-| P1 | Quick-Wins (XS-Aufwand, gebündelt nach Phase) | completed (lokal), push pending | `feat/p1-quickwins` | `pre-p1-quickwins..92eec98` (5 Commits, 17 Findings) |
+| P1 | Quick-Wins (XS-Aufwand, gebündelt nach Phase) | **deployed** (Pipeline 2412 success) | `feat/p1-quickwins` | `pre-p1-quickwins..6c448d2` (6 Commits, 17 Findings) |
 | P2 | Maintained-Listen-Sync (auf F-XS-003 aufbauend) | pending | `feat/p2-sync-pipelines` | — |
 | P3 | Mail-Security & Discovery-Tiefe | pending | `feat/p3-mail-discovery` | — |
 | P4 | Phase 1/2 Tool-Erweiterungen (nuclei/katana) | pending | `feat/p4-tool-coverage` | — |
