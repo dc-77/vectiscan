@@ -506,7 +506,8 @@ def build_tech_profile(
     cms_vhost_targets = vhost_fqdns or ([primary_fqdn_local] if primary_fqdn_local else [])
 
     if cms_vhost_targets:
-        fingerprinter = CMSFingerprinter(max_requests=20)
+        # F-PH1-001 (2026-05-07): Probe-Cap 20→25 fuer +10 CMS-Coverage.
+        fingerprinter = CMSFingerprinter(max_requests=25)
         for vh in cms_vhost_targets:
             try:
                 cms_result: CMSResult = fingerprinter.fingerprint(vh, webtech_result=webtech_result)

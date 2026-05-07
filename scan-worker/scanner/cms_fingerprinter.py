@@ -4,7 +4,11 @@ Replaces the simple CMS-Fallback-Probe in phase1.py with a full detection pipeli
 DACH-market-optimized: Shopware 5/6, TYPO3, Contao alongside global CMS systems.
 
 All probes use HEAD/GET requests with User-Agent "VectiScan/1.0" and 5s timeout.
-Max 20 requests per host (early-exit when high-confidence match found).
+Max 25 requests per host (early-exit when high-confidence match found).
+
+F-PH1-001 (2026-05-07): +10 CMS (Pimcore, Sulu, Plone, SilverStripe, Statamic,
+Webflow, Shopify, HubSpot, Wix, Squarespace) + Probe-Cap 20→25 +
+BODY_REF_PATTERNS für Hosted-CMS-Static-CDN-Erkennung.
 """
 
 from __future__ import annotations
@@ -179,6 +183,122 @@ PROBE_MATRIX: list[dict[str, Any]] = [
         ],
         "confidence": 0.80,
     },
+    # ---- F-PH1-001 (2026-05-07): +10 CMS ----------------------------------
+    # Selbst-gehostete DACH-CMS (Pimcore/Sulu/Plone/SilverStripe/Statamic):
+    {
+        "cms": "Pimcore",
+        # DACH-Enterprise-CMS (Pimcore Inc., AT). Pfad-Marker: /pimcore/static/css/
+        # (Asset-Path im rendered HTML); /admin/login (Admin-UI). body_patterns
+        # eng gehalten weil "pimcore" im Body fast immer echtes Pimcore.
+        "probes": ["/pimcore/static/", "/admin/login"],
+        "body_patterns": [
+            r"(?i)pimcore",
+            r"/pimcore/static/",
+        ],
+        "confidence": 0.90,
+    },
+    {
+        "cms": "Sulu",
+        # DACH-Symfony-basiert (MASSIVE ART, DE). Admin-UI unter /admin/.
+        # body_patterns: "sulu" allein zu generisch (Personennamen) →
+        # eng auf Marker.
+        "probes": ["/admin/", "/uploads/media/"],
+        "body_patterns": [
+            r"Sulu\s?CMS",
+            r"sulu\.io",
+            r"/uploads/media/",
+        ],
+        "confidence": 0.85,
+    },
+    {
+        "cms": "Plone",
+        # Python-CMS (Plone Foundation). /portal_factory/ ist Plone-spezifischer
+        # Asset-Path; .cmsui-toolbar im rendered Body.
+        "probes": ["/portal_factory/", "/login_form"],
+        "body_patterns": [
+            r"Plone\s?Site",
+            r"plone\.org",
+            r"cmsui-toolbar",
+            r"/portal_factory/",
+        ],
+        "confidence": 0.85,
+    },
+    {
+        "cms": "SilverStripe",
+        # PHP-CMS (AU/NZ/UK). Asset-Path /_resources/themes/.
+        "probes": ["/admin/", "/_resources/themes/"],
+        "body_patterns": [
+            r"SilverStripe",
+            r"silverstripe\.org",
+            r"/_resources/themes/",
+        ],
+        "confidence": 0.85,
+    },
+    {
+        "cms": "Statamic",
+        # Flat-File-PHP-CMS. Control-Panel unter /cp/.
+        "probes": ["/cp/", "/cp/login"],
+        "body_patterns": [
+            r"(?i)statamic",
+            r"statamic\.com",
+        ],
+        "confidence": 0.85,
+    },
+    # Hosted-CMS / Static-Builder (Webflow/Shopify/HubSpot/Wix/Squarespace):
+    # Probe-Liste leer/minimal — Hosted-CMS antworten Active-Scans haeufig
+    # mit 403/429. Detection laeuft ueber meta_tag + cookie + body_refs +
+    # header. PROBE_MATRIX-Eintrag noetig fuer COOKIE_CMS_MAP-Lookup.
+    {
+        "cms": "Webflow",
+        "probes": [],
+        "body_patterns": [
+            r'data-wf-page=',
+            r'webflow\.css',
+            r'webflow\.js',
+            r'(?i)webflow',
+        ],
+        "confidence": 0.85,
+    },
+    {
+        "cms": "Shopify",
+        "probes": [],
+        "body_patterns": [
+            r'cdn\.shopify\.com',
+            r'Shopify\.shop',
+            r'(?i)shopify',
+        ],
+        "confidence": 0.90,
+    },
+    {
+        "cms": "HubSpot",
+        "probes": [],
+        "body_patterns": [
+            r'hs-scripts\.com',
+            r'hs-analytics\.net',
+            r'(?i)hubspot',
+        ],
+        "confidence": 0.85,
+    },
+    {
+        "cms": "Wix",
+        "probes": [],
+        "body_patterns": [
+            r'static\.wixstatic\.com',
+            r'wix\.com',
+            r'(?i)wix\.com',
+        ],
+        "confidence": 0.85,
+    },
+    {
+        "cms": "Squarespace",
+        "probes": [],
+        "body_patterns": [
+            r'static\.squarespace\.com',
+            r'squarespace\.com',
+            r'(?i)squarespace',
+        ],
+        "confidence": 0.85,
+    },
 ]
 
 # Cookie patterns → CMS mapping
@@ -198,6 +318,25 @@ COOKIE_CMS_MAP: list[tuple[str, str, Optional[str]]] = [
     (r"CraftSessionId", "Craft CMS", None),
     (r"ghost-admin", "Ghost", None),
     (r"PrestaShop", "PrestaShop", None),
+    # F-PH1-001 (2026-05-07): +10 CMS Cookies
+    (r"pimcore_config_perspective", "Pimcore", None),
+    (r"pimcore_admin_sid", "Pimcore", None),
+    (r"_sulu_token", "Sulu", None),
+    (r"_sulu_session", "Sulu", None),
+    (r"__ac", "Plone", None),  # Plone Auth-Cookie
+    (r"silverstripe", "SilverStripe", None),
+    (r"SilverStripe-sessid", "SilverStripe", None),
+    (r"statamic_session", "Statamic", None),
+    (r"shopify_y", "Shopify", None),
+    (r"_shopify_y", "Shopify", None),
+    (r"_shopify_s", "Shopify", None),
+    (r"__hssc", "HubSpot", None),
+    (r"__hstc", "HubSpot", None),
+    (r"__hssrc", "HubSpot", None),
+    (r"_wixCIDX", "Wix", None),
+    (r"_wix_browser", "Wix", None),
+    (r"^crumb$", "Squarespace", None),
+    (r"^SS_MID$", "Squarespace", None),
 ]
 
 # Meta-generator patterns → CMS + version extraction
@@ -213,6 +352,17 @@ META_GENERATOR_PATTERNS: list[tuple[str, str, Optional[str]]] = [
     (r"PrestaShop\s*([\d.]+)?", "PrestaShop", None),
     (r"NEOS\s*([\d.]+)?", "NEOS", None),
     (r"Craft\s*CMS\s*([\d.]+)?", "Craft CMS", None),
+    # F-PH1-001 (2026-05-07): +10 CMS
+    (r"Pimcore\s*([\d.]+)?", "Pimcore", None),
+    (r"Sulu\s*([\d.]+)?", "Sulu", None),
+    (r"Plone\s*([\d.]+)?", "Plone", None),
+    (r"SilverStripe\s*([\d.]+)?", "SilverStripe", None),
+    (r"Statamic\s*([\d.]+)?", "Statamic", None),
+    (r"Webflow", "Webflow", None),
+    (r"Shopify", "Shopify", None),
+    (r"HubSpot", "HubSpot", None),
+    (r"Wix\.com", "Wix", None),
+    (r"Squarespace", "Squarespace", None),
 ]
 
 # Header patterns for CMS detection
@@ -223,6 +373,62 @@ HEADER_CMS_PATTERNS: list[tuple[str, str, str]] = [
     ("x-generator", r"(?i)typo3", "TYPO3"),
     ("x-powered-by", r"(?i)shopware", "Shopware"),
     ("x-content-powered-by", r"(?i)strapi", "Strapi"),
+    # F-PH1-001 (2026-05-07): +10 CMS Header-Marker
+    ("x-pimcore-version", r".+", "Pimcore"),
+    ("x-pimcore-output-cache-tag", r".+", "Pimcore"),
+    ("x-powered-by", r"(?i)pimcore", "Pimcore"),
+    ("x-powered-by", r"(?i)sulu", "Sulu"),
+    ("x-powered-by", r"(?i)plone", "Plone"),
+    ("x-powered-by", r"(?i)silverstripe", "SilverStripe"),
+    ("x-powered-by", r"(?i)statamic", "Statamic"),
+    ("x-powered-by", r"(?i)hubspot", "HubSpot"),
+    ("x-shopify-stage", r".+", "Shopify"),
+    ("x-shopid", r".+", "Shopify"),
+    ("x-sq-region", r".+", "Squarespace"),
+    ("x-served-by", r"(?i)squarespace", "Squarespace"),
+    ("x-wix-request-id", r".+", "Wix"),
+    ("server", r"(?i)pepyaka", "Wix"),  # Wix-spezifischer Server-Header
+    ("x-hs-cache-config", r".+", "HubSpot"),
+    ("x-hs-content-id", r".+", "HubSpot"),
+]
+
+# F-PH1-001 (2026-05-07): Body-Reference-Patterns fuer Hosted-CMS,
+# die typischerweise Active-Path-Probes mit 403/429 beantworten.
+# Detection ueber Static-CDN-URLs, JS-Globals oder data-Attribute im
+# rendered HTML der Homepage.
+BODY_REF_PATTERNS: list[tuple[str, str, float]] = [
+    # (regex_pattern, cms_name, confidence)
+    # Webflow
+    (r'<html[^>]*\bdata-wf-page=', "Webflow", 0.90),
+    (r'\bwebflow\.(?:css|js)\b', "Webflow", 0.85),
+    (r'assets-global\.website-files\.com', "Webflow", 0.85),
+    # Shopify
+    (r'cdn\.shopify\.com', "Shopify", 0.90),
+    (r'\bShopify\.shop\s*=', "Shopify", 0.95),
+    (r'\bShopify\.theme\s*=', "Shopify", 0.90),
+    # HubSpot
+    (r'js\.hs-scripts\.com', "HubSpot", 0.90),
+    (r'js\.hs-analytics\.net', "HubSpot", 0.90),
+    (r'cdn2\.hubspot\.net', "HubSpot", 0.85),
+    # Wix
+    (r'static\.wixstatic\.com', "Wix", 0.90),
+    (r'static\.parastorage\.com', "Wix", 0.85),  # Wix-Editor
+    (r'\bwindow\.wixBiSession\b', "Wix", 0.95),
+    # Squarespace
+    (r'static\.squarespace\.com', "Squarespace", 0.90),
+    (r'images\.squarespace-cdn\.com', "Squarespace", 0.90),
+    (r'\bSquarespace\.', "Squarespace", 0.85),
+    # Pimcore (Asset-Path im rendered Body)
+    (r'/pimcore/static/', "Pimcore", 0.85),
+    # Sulu
+    (r'/uploads/media/\d+/', "Sulu", 0.70),  # Sulu-spezifischer Pfad
+    # Plone
+    (r'class="cmsui-toolbar"', "Plone", 0.85),
+    (r'/portal_factory/', "Plone", 0.80),
+    # SilverStripe
+    (r'/_resources/themes/', "SilverStripe", 0.85),
+    # Statamic
+    (r'\bstatamic\.com', "Statamic", 0.75),
 ]
 
 
@@ -294,7 +500,10 @@ class CMSFingerprinter:
     across methods boost overall confidence.
     """
 
-    def __init__(self, max_requests: int = 20):
+    def __init__(self, max_requests: int = 25):
+        # F-PH1-001 (2026-05-07): Cap 20→25 fuer +10 CMS-Probes (5 hosted-CMS
+        # nutzen probes=[] → 0 zusaetzliche Requests; 5 selbst-gehostete je
+        # ~2 Probes → +10. Cap-Erhoehung deckt das ab, Early-Exit bleibt aktiv.
         self.max_requests = max_requests
         self._request_count = 0
 
@@ -312,6 +521,9 @@ class CMSFingerprinter:
         cms_names = {
             "wordpress", "joomla", "drupal", "typo3", "magento", "shopify",
             "shopware", "wix", "prestashop", "contao", "neos", "craft", "strapi", "ghost",
+            # F-PH1-001 (2026-05-07): +10 CMS
+            "pimcore", "sulu", "plone", "silverstripe", "statamic",
+            "webflow", "hubspot", "squarespace",
         }
 
         techs: list[Any] = []
@@ -392,6 +604,14 @@ class CMSFingerprinter:
             if cookies:
                 cookie_candidates = self._match_cookies(cookies)
                 candidates.extend(cookie_candidates)
+
+            # F-PH1-001 (2026-05-07): Body-Reference-Scan fuer Hosted-CMS
+            # (Webflow/Shopify/HubSpot/Wix/Squarespace) und Static-Asset-Pfade
+            # selbst-gehosteter CMS (Pimcore/Plone/SilverStripe/Sulu/Statamic).
+            # Greift wenn meta_generator fehlt aber CDN-URLs/JS-Globals im Body.
+            if body:
+                body_ref_candidates = self._match_body_refs(body)
+                candidates.extend(body_ref_candidates)
 
             if candidates:
                 break  # Got results from first scheme, no need to retry
@@ -560,6 +780,29 @@ class CMSFingerprinter:
 
         return candidates
 
+    # -- Body-Reference matching helper (F-PH1-001) -----------------------
+
+    def _match_body_refs(self, body: str) -> list[CMSCandidate]:
+        """Scan rendered HTML body for hosted-CMS / static-asset markers."""
+        candidates: list[CMSCandidate] = []
+        seen: set[str] = set()
+        for pattern, cms_name, confidence in BODY_REF_PATTERNS:
+            if cms_name in seen:
+                continue  # one body-ref hit per CMS is enough
+            try:
+                m = re.search(pattern, body)
+            except re.error:
+                continue
+            if m:
+                seen.add(cms_name)
+                candidates.append(CMSCandidate(
+                    cms=cms_name,
+                    confidence=confidence,
+                    method="body_reference",
+                    details={"body_match": pattern},
+                ))
+        return candidates
+
     # -- Cookie matching helper -------------------------------------------
 
     def _match_cookies(self, cookies: list[tuple[str, str]]) -> list[CMSCandidate]:
@@ -699,3 +942,74 @@ class CMSFingerprinter:
         )
 
         return result
+
+
+# ---------------------------------------------------------------------------
+# Top-level convenience helper (F-PH1-001, used by tests)
+# ---------------------------------------------------------------------------
+
+def detect_cms(
+    html: str = "",
+    headers: Optional[dict[str, str]] = None,
+    cookies: Optional[dict[str, str]] = None,
+) -> dict[str, Any]:
+    """Pure-Python (no-HTTP) CMS detection for unit tests + offline analysis.
+
+    Inspects raw HTML body, response headers, and a cookie dict — runs all
+    body/cookie/header/meta-generator matchers and returns the best CMS guess.
+    Mirrors the logic used inside CMSFingerprinter.check_meta_tags + helpers.
+
+    Returns:
+        {"cms": "<Name|None>", "confidence": float,
+         "version": Optional[str], "methods": list[str]}
+    """
+    headers = {k.lower(): v for k, v in (headers or {}).items()}
+    cookies = cookies or {}
+    fp = CMSFingerprinter(max_requests=0)  # offline — no HTTP allowed
+    candidates: list[CMSCandidate] = []
+
+    # 1) Meta-Generator parsing
+    if html:
+        gen_match = re.search(
+            r'<meta\s+name=["\']generator["\']\s+content=["\']([^"\']+)["\']',
+            html, re.IGNORECASE,
+        )
+        if gen_match:
+            generator = gen_match.group(1)
+            for pattern, cms_name, _ in META_GENERATOR_PATTERNS:
+                m = re.search(pattern, generator, re.IGNORECASE)
+                if m:
+                    version = m.group(1) if m.lastindex and m.group(1) else None
+                    candidates.append(CMSCandidate(
+                        cms=cms_name, version=version, confidence=0.90,
+                        method="meta_tag",
+                        details={"meta_generator": generator},
+                    ))
+                    break
+
+    # 2) Header patterns
+    for header_name, value_pattern, cms_name in HEADER_CMS_PATTERNS:
+        header_val = headers.get(header_name, "")
+        if header_val and re.search(value_pattern, header_val):
+            candidates.append(CMSCandidate(
+                cms=cms_name, confidence=0.75,
+                method="response_header",
+                details={"header": header_name, "value": header_val},
+            ))
+
+    # 3) Cookies
+    if cookies:
+        cookie_pairs = [(k, v) for k, v in cookies.items()]
+        candidates.extend(fp._match_cookies(cookie_pairs))
+
+    # 4) Body refs
+    if html:
+        candidates.extend(fp._match_body_refs(html))
+
+    result = fp._merge_results(candidates)
+    return {
+        "cms": result.cms,
+        "confidence": result.confidence,
+        "version": result.version,
+        "methods": result.detection_methods,
+    }
