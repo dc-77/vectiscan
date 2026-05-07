@@ -12,8 +12,9 @@
 | P0 | Foundation (Determinismus-Hygiene, ohne POLICY_VERSION-Bump) | **deployed** (Pipeline 2411 success) | `feat/p0-foundation` | `pre-p0-foundation..28d36d3` (10 Commits) |
 | P1 | Quick-Wins (XS-Aufwand, gebündelt nach Phase) | **deployed** (Pipeline 2412 success) | `feat/p1-quickwins` | `pre-p1-quickwins..6c448d2` (6 Commits, 17 Findings) |
 | P2 | Maintained-Listen-Sync (auf F-XS-003 aufbauend) | **deployed** (Pipeline 2414 success) | `feat/p2-sync-pipelines` | `pre-p2-sync..1480b8b` (5 Commits, 4 Findings) |
-| P3 | Mail-Security & Discovery-Tiefe | completed (lokal), push pending | `feat/p3-mail-discovery` | `pre-p3-mail-discovery..2649035` (4 Commits, 7 Findings) |
-| P4 | Phase 1/2 Tool-Erweiterungen (nuclei/katana) | pending | `feat/p4-tool-coverage` | — |
+| P3 | Mail-Security & Discovery-Tiefe | **deployed** (Pipeline 2415 success) | `feat/p3-mail-discovery` | `pre-p3-mail-discovery..23d33de` (5 Commits, 7 Findings) |
+| P4a | Phase-1/KI-Coverage (CMS +10 + KI-Schema + Screenshots) | completed (lokal), push pending | `feat/p4a-phase1-ki-coverage` | `pre-p4a-phase1-ki..be0ad38` (3 Commits, 4 Findings) |
+| P4b | nuclei + katana (deferred) | deferred | `feat/p4b-nuclei-katana` (TBD) | — |
 
 ---
 
@@ -97,9 +98,27 @@
 
 ---
 
-## P4
+## P4a — Phase-1/KI-Coverage
 
-_(Detaillierte Tabellen werden befüllt sobald P3 deployed.)_
+**Ziel:** CMS-Detection-Coverage erweitern (DACH + Hosted), KI-Schemas/Rule-Engines anpassen, Screenshot-Pipeline. Kein POLICY_VERSION-Bump.
+
+| # | Bundle | Findings | Status | Commit |
+|---|---|---|---|---|
+| A | CMS-Fingerprinter | F-PH1-001 (1) | done | b0a17f1 |
+| B | KI-Schema-Erweiterung | F-KI2-001 + F-KI3-002 (2) | done | 182401f |
+| C | Screenshot-Pipeline | F-PH1-003 (1) | done | be0ad38 |
+
+**Lokale Test-Suite:** 1133 grün (579 report-worker + 525 scan-worker, 1 skip + 29 scripts). Frontend TS-compile clean.
+
+**Optionale Dep:** `Pillow>=11.0.0` (graceful fallback wenn fehlend).
+
+---
+
+## P4b — nuclei + katana (deferred)
+
+F-PH2-002 (nuclei + katana als Phase-2 Stage 3). L-Aufwand (~3 Tage), POLICY_VERSION-Bump erwartet wegen Severity-Flut. nikto + dalfox bleiben in Anhang A des Audit-Docs deferred.
+
+Kein laufender Branch — wartet auf eigenen Trigger.
 
 ---
 
@@ -120,4 +139,5 @@ Pro Paket vor dem Push setzen wir einen Tag `pre-p<N>-<datum>`, sodass bei Bedar
 | `pre-p1-quickwins` | 28d36d3 | 2026-05-08 |
 | `pre-p2-sync` | 3632e8a | 2026-05-08 |
 | `pre-p3-mail-discovery` | 1480b8b | 2026-05-08 |
+| `pre-p4a-phase1-ki` | 23d33de | 2026-05-08 |
 
