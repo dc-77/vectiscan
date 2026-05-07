@@ -7,6 +7,7 @@ dieselbe Auflösungs-Semantik nutzen.
 from __future__ import annotations
 
 import socket
+from concurrent.futures import ThreadPoolExecutor
 from typing import Iterable
 
 try:
@@ -120,11 +121,21 @@ def reverse_dns(ip: str, timeout: float = DEFAULT_TIMEOUT) -> str | None:
 
 
 def resolve_all(fqdn: str, timeout: float = DEFAULT_TIMEOUT) -> dict:
-    """Resolve A/AAAA/CNAME/MX/NS in one call. Returns dict of lists."""
-    return {
-        "a": resolve_a(fqdn, timeout),
-        "aaaa": resolve_aaaa(fqdn, timeout),
-        "cname": resolve_cname(fqdn, timeout),
-        "mx": resolve_mx(fqdn, timeout),
-        "ns": resolve_ns(fqdn, timeout),
-    }
+    """Resolve A/AAAA/CNAME/MX/NS in one call. Returns dict of lists.
+
+    Parallel via ThreadPoolExecutor(max_workers=5) — Worst-Case bei DNS-Stillstand
+    auf einer Record-Sorte: 5×5s sequenziell → 5s parallel. Jeder Sub-Call
+    instanziiert einen eigenen `dns.resolver.Resolver` (siehe `_resolver()`),
+    daher kein Thread-Safety-Problem. Output-Dict-Schluessel-Reihenfolge bleibt
+    deterministisch (a/aaaa/cname/mx/ns).
+    """
+    tasks = (
+        ("a", resolve_a),
+        ("aaaa", resolve_aaaa),
+        ("cname", resolve_cname),
+        ("mx", resolve_mx),
+        ("ns", resolve_ns),
+    )
+    with ThreadPoolExecutor(max_workers=5, thread_name_prefix="dns_resolve_all") as pool:
+        futures = {key: pool.submit(fn, fqdn, timeout) for key, fn in tasks}
+        return {key: futures[key].result() for key, _ in tasks}

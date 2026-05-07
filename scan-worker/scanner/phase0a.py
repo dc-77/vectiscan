@@ -57,6 +57,24 @@ def run_phase0a(
     results: dict[str, Any] = {}
     package = config.get("package", "perimeter")
 
+    # --- F-P0A-005: IP-Cap (paketabhaengig + ENV-Override) ---
+    ip_cap_env = os.environ.get("PHASE0A_IP_CAP")
+    if ip_cap_env and ip_cap_env.strip().isdigit():
+        ip_cap = int(ip_cap_env.strip())
+    else:
+        ip_cap = int(config.get("phase0a_ip_cap", 15))
+    capped_ips = ips[:ip_cap]
+
+    # --- F-P0A-001: Inner-Parallelization-Konfiguration ---
+    # Default 3 (schont Free-Tier ~1 req/s); ENV-Override fuer Premium-Keys.
+    passive_concurrency_env = os.environ.get("PASSIVE_INTEL_CONCURRENCY")
+    if passive_concurrency_env and passive_concurrency_env.strip().isdigit():
+        passive_concurrency = max(1, int(passive_concurrency_env.strip()))
+    else:
+        passive_concurrency = 3
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
     # --- Helper functions for parallel execution ---
 
     def _run_whois() -> tuple[str, dict[str, Any] | None]:
@@ -78,11 +96,23 @@ def run_phase0a(
         if domain_data:
             result["shodan_domain"] = domain_data
             _save_json(phase0a_dir, "shodan_domain.json", domain_data)
+        # F-P0A-001 (Option B): IP-Loop parallel via ThreadPoolExecutor.
         shodan_hosts: dict[str, Any] = {}
-        for ip in ips[:15]:
-            host_data = shodan.lookup_host(ip)
-            if host_data:
-                shodan_hosts[ip] = host_data
+        if capped_ips:
+            with ThreadPoolExecutor(
+                max_workers=passive_concurrency,
+                thread_name_prefix="shodan_ips",
+            ) as inner:
+                futures = {inner.submit(shodan.lookup_host, ip): ip for ip in capped_ips}
+                for fut in as_completed(futures):
+                    ip = futures[fut]
+                    try:
+                        host_data = fut.result()
+                    except Exception as e:
+                        log.warning("shodan_ip_lookup_failed", ip=ip, error=str(e))
+                        continue
+                    if host_data:
+                        shodan_hosts[ip] = host_data
         if shodan_hosts:
             result["shodan_hosts"] = shodan_hosts
             _save_json(phase0a_dir, "shodan_hosts.json", shodan_hosts)
@@ -94,11 +124,23 @@ def run_phase0a(
         if not client.available:
             log.info("abuseipdb_skipped", reason="no_api_key")
             return "abuseipdb", None
+        # F-P0A-001 (Option B): IP-Loop parallel via ThreadPoolExecutor.
         abuse_results: dict[str, Any] = {}
-        for ip in ips[:15]:
-            abuse_data = client.check_ip(ip)
-            if abuse_data:
-                abuse_results[ip] = abuse_data
+        if capped_ips:
+            with ThreadPoolExecutor(
+                max_workers=passive_concurrency,
+                thread_name_prefix="abuseipdb_ips",
+            ) as inner:
+                futures = {inner.submit(client.check_ip, ip): ip for ip in capped_ips}
+                for fut in as_completed(futures):
+                    ip = futures[fut]
+                    try:
+                        abuse_data = fut.result()
+                    except Exception as e:
+                        log.warning("abuseipdb_ip_lookup_failed", ip=ip, error=str(e))
+                        continue
+                    if abuse_data:
+                        abuse_results[ip] = abuse_data
         if abuse_results:
             _save_json(phase0a_dir, "abuseipdb.json", abuse_results)
         return "abuseipdb", abuse_results or None
@@ -109,11 +151,16 @@ def run_phase0a(
         if not st.available:
             log.info("securitytrails_skipped", reason="no_api_key")
             return "securitytrails", None
-        st_data = {
-            "domain": st.lookup_domain(domain),
-            "subdomains": st.get_subdomains(domain),
-            "dns_history": st.get_dns_history(domain),
-        }
+        # F-P0A-001 (Option C): drei API-Calls parallel.
+        with ThreadPoolExecutor(max_workers=3, thread_name_prefix="securitytrails") as inner:
+            f_domain = inner.submit(st.lookup_domain, domain)
+            f_subs = inner.submit(st.get_subdomains, domain)
+            f_hist = inner.submit(st.get_dns_history, domain)
+            st_data = {
+                "domain": f_domain.result(),
+                "subdomains": f_subs.result(),
+                "dns_history": f_hist.result(),
+            }
         _save_json(phase0a_dir, "securitytrails.json", st_data)
         return "securitytrails", st_data
 
@@ -123,9 +170,7 @@ def run_phase0a(
         _save_json(phase0a_dir, "dns_security.json", dns_sec)
         return "dns_security", dns_sec
 
-    # --- Run all tools in parallel ---
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-
+    # --- Run all tools in parallel (Top-Level: ThreadPool importiert oben) ---
     phase0a_timeout = config.get("phase0a_timeout", 120)
     futures: dict[Any, str] = {}
 

@@ -14,6 +14,9 @@ from typing import Any
 _PERIMETER_BASE: dict[str, Any] = {
     "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois"],
     "phase0a_timeout": 120,       # 2 Minuten
+    # F-P0A-005: Cap fuer Shodan/AbuseIPDB IP-Loops (war hardcoded 15).
+    # ENV-Override `PHASE0A_IP_CAP` ueberschreibt diesen Wert (Premium-Tier).
+    "phase0a_ip_cap": 25,
     # amass v5 als Backup-Discovery wieder aktiv (2026-05-03 nach
     # Race-Bug-Fix mit `-brute`-Flag). Siehe docs/analyse/AMASS-V5-DIAGNOSE.md.
     # Funktional zu 95% redundant zu subfinder + crtsh + certspotter +
@@ -80,8 +83,9 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
     # ------------------------------------------------------------------
     # InsuranceReport — "Nachweis für Cyberversicherung"
     # = Perimeter-Scan, Report mit Versicherungs-Fragebogen
+    # IP-Scope-heavy → hoeherer phase0a_ip_cap.
     # ------------------------------------------------------------------
-    "insurance": {**_PERIMETER_BASE},
+    "insurance": {**_PERIMETER_BASE, "phase0a_ip_cap": 50},
 
     # ------------------------------------------------------------------
     # TLSCompliance — "BSI TR-03116-4 Compliance-Prüfung"
