@@ -486,6 +486,21 @@ takeover-list-sync:
     - python3 scripts/sync-takeover-list.py
     - python3 scripts/_sync_commit.py scan-worker/data/takeover_data_generated.py
 
+# F-RPT-001: KNOWN_VULN_BUILDS-Sync via OSV-API + CISA-KEV (CVSS>=9.0 ODER
+# KEV-listed). Schreibt report-worker/reporter/known_vuln_builds_generated.py
+# — kombiniert mit Manual-Liste in `eol_detector.KNOWN_VULN_BUILDS_MANUAL`.
+# Schedule-Variable `KNOWN_VULN_SYNC=true` (oder global `SYNC_ENABLED=true`).
+known-vuln-builds-sync:
+  <<: *sync-job-template
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && ($KNOWN_VULN_SYNC == "true" || $SYNC_ENABLED == "true")
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+      allow_failure: true
+  script:
+    - python3 scripts/sync-known-vuln-builds.py
+    - python3 scripts/_sync_commit.py report-worker/reporter/known_vuln_builds_generated.py
+
 # Triggert scripts/cleanup-prod.sh auf vectigal-docker02. Wipet alle Scan-
 # Daten, Reports, Subscriptions, MinIO-Objekte, Threat-Intel/AI-Caches.
 # Erhalten bleiben users, customers, verified_domains, Schema.

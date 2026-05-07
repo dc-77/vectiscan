@@ -5,6 +5,7 @@ from datetime import date
 from reporter.eol_detector import (
     detect_eol_findings, merge_into_claude_findings,
     _normalize_vendor_product, _version_starts_with,
+    _version_in_range,
     EOL_DATA, KNOWN_VULN_BUILDS,
 )
 
@@ -205,3 +206,50 @@ def test_merge_different_versions_stay_separate():
     tech_profiles = [{"ip": "1.2.3.4", "fqdns": ["example.com"]}]
     merged = merge_into_claude_findings([claude], [eol], tech_profiles=tech_profiles)
     assert len(merged) == 2
+
+
+# --- F-RPT-001: Range-Matcher ---
+
+def test_version_in_range_le_operator():
+    """`<=2.4.55` matcht 2.4.55, 2.4.40, NICHT 2.4.56."""
+    assert _version_in_range("2.4.55", "<=2.4.55") is True
+    assert _version_in_range("2.4.40", "<=2.4.55") is True
+    assert _version_in_range("2.4.56", "<=2.4.55") is False
+    # Unterschiedliche Tuple-Laengen (Padding)
+    assert _version_in_range("2.4", "<=2.4.55") is True
+
+
+def test_version_in_range_lt_operator():
+    """`<2.4.60` matcht 2.4.59, NICHT 2.4.60."""
+    assert _version_in_range("2.4.59", "<2.4.60") is True
+    assert _version_in_range("2.4.60", "<2.4.60") is False
+    assert _version_in_range("2.4.61", "<2.4.60") is False
+
+
+def test_version_in_range_ge_operator():
+    """`>=1.23.0` matcht 1.23.0, 1.24.5, NICHT 1.22.99."""
+    assert _version_in_range("1.23.0", ">=1.23.0") is True
+    assert _version_in_range("1.24.5", ">=1.23.0") is True
+    assert _version_in_range("1.22.99", ">=1.23.0") is False
+
+
+def test_version_in_range_backwards_compat_prefix():
+    """Specs ohne Operator → Prefix-Match wie heute."""
+    # Backwards-Compat: "2.4.49" muss wie _version_starts_with funktionieren
+    assert _version_in_range("2.4.49", "2.4.49") is True
+    assert _version_in_range("2.4.49.1", "2.4.49") is True
+    assert _version_in_range("2.4.50", "2.4.49") is False
+    # Empty spec → False (kein Match besser als falscher Match)
+    assert _version_in_range("2.4.49", "") is False
+
+
+def test_known_vuln_builds_has_2024_entries():
+    """Sanity: F-RPT-001 Initial-Liste enthaelt 2024-Mega-Schwachstellen."""
+    # CitrixBleed
+    assert ("citrix", "netscaler", "13.1-49") in KNOWN_VULN_BUILDS
+    # Ivanti Connect Secure
+    assert ("ivanti", "connect-secure", "22.6") in KNOWN_VULN_BUILDS
+    # MOVEit
+    assert ("progress", "moveit", "2023.0.6") in KNOWN_VULN_BUILDS
+    # ScreenConnect
+    assert ("connectwise", "screenconnect", "23.9.7") in KNOWN_VULN_BUILDS

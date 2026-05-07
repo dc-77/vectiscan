@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # ====================================================================
 # Bei jeder Aenderung der Regeln HIER hochziehen. Wird im AI-Cache-Key
 # eingebaut, damit Cache nach Policy-Update automatisch invalidiert.
-POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-04-30.1")
+POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-08.1")
 
 
 # ====================================================================
