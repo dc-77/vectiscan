@@ -121,3 +121,49 @@ def test_web_probe_compat_fields_present():
     wp = host["web_probe"]
     for k in ("has_web", "status", "final_url", "title", "web_fqdn"):
         assert k in wp, f"web_probe fehlt Feld {k}"
+
+
+# ---------------------------------------------------------------------------
+# F-P0B-007: batch-httpx NDJSON-Parser
+# ---------------------------------------------------------------------------
+from scanner.phase0 import _parse_httpx_probe_line
+
+
+def test_parse_httpx_probe_line_basic():
+    """Parsed eine httpx-Zeile mit Status/Title/URL korrekt."""
+    line = {
+        "input": "https://www.example.com",
+        "url": "https://www.example.com",
+        "status_code": 200,
+        "title": "Example",
+        "final_url": "https://www.example.com/",
+        "hash": {"body_sha256": "abc123"},
+    }
+    probe = _parse_httpx_probe_line(line)
+    assert probe is not None
+    assert probe["fqdn"] == "www.example.com"
+    assert probe["status"] == 200
+    assert probe["title"] == "Example"
+    assert probe["body_hash"] == "abc123"
+    assert probe["parking"] is False
+
+
+def test_parse_httpx_probe_line_5xx_dropped():
+    """Status >=500 wird verworfen (analog _probe_single_fqdn)."""
+    assert _parse_httpx_probe_line({
+        "input": "https://x.com", "status_code": 503,
+    }) is None
+
+
+def test_parse_httpx_probe_line_parking_detected():
+    """Title-Pattern → parking=True."""
+    probe = _parse_httpx_probe_line({
+        "input": "https://x.com", "status_code": 200,
+        "title": "Welcome to nginx!", "hash": "h",
+    })
+    assert probe is not None
+    assert probe["parking"] is True
+
+
+def test_parse_httpx_probe_line_no_status_dropped():
+    assert _parse_httpx_probe_line({"input": "https://x.com"}) is None

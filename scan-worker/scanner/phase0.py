@@ -295,14 +295,26 @@ def run_subfinder(domain: str, scan_dir: str, order_id: str) -> list[str]:
     output_path = os.path.join(scan_dir, "phase0", "subfinder.json")
     subdomains: list[str] = []
 
+    # F-P0B-002 (Mai 2026): `-all` durch explizite `-sources`-Liste mit
+    # Free-Providern ersetzen. Begruendung: Container hat keinen
+    # provider-config.yaml — Premium-Provider (Chaos, BinaryEdge, Censys,
+    # GitHub, ZoomEye, Shodan, SecurityTrails) wurden silent geskippt.
+    # Explizite Liste macht Coverage sichtbar und audit-faehig. Premium-
+    # Provider werden orthogonal ueber Phase 0a abgedeckt.
+    # Quelle: docs/scan-flow/Scan-Optimierung.md §3.3.1 (F-P0B-002).
+    _SUBFINDER_FREE_SOURCES = ",".join([
+        "crtsh", "hackertarget", "wayback", "dnsdumpster", "alienvault",
+        "anubis", "bevigil", "bufferover", "cero", "certspotter",
+        "commoncrawl", "digitorus", "dnsrepo", "fofa", "fullhunt",
+        "hudsonrock", "leakix", "passivetotal", "quake", "rapiddns",
+        "sitedossier", "subdomaincenter", "threatbook", "virustotal",
+        "waybackarchive", "whoisxmlapi", "zoomeyeapi",
+    ])
     cmd = [
         "subfinder", "-d", domain,
         "-silent", "-json",
         "-disable-update-check",
-        # `-all` aktiviert ALLE Source-Plugins (chaos, binaryedge,
-        # securitytrails, ...) statt nur Default-Set. Liefert deutlich
-        # mehr Subdomains. API-Keys via ~/.config/subfinder/provider-config.yaml.
-        "-all",
+        "-sources", _SUBFINDER_FREE_SOURCES,
         # `-recursive` enumeriert auch Subdomains-of-Subdomains
         # (z.B. wenn `mail.example.com` gefunden, sucht nach `*.mail.example.com`).
         "-recursive",
@@ -841,16 +853,22 @@ def _collapse_cdn_edge_ips(hosts: list[dict[str, Any]]) -> list[dict[str, Any]]:
     104.16.10.6, mal 104.16.11.6. Beide sind CF-Edges fuer denselben
     Service → werden zu einem Host mit primary_ip + edge_ips-Liste.
 
-    Heuristik:
-    - Provider via saas_heuristic.detect_cloud_provider (CF, AWS, Azure,
-      GCP, Hetzner-Cloud, Fastly)
-    - Mergen NUR wenn:
-      (a) selber Provider
+    Heuristik (F-P0B-005, Mai 2026 angepasst): rdns-Suffix-Match VOR
+    IP-Range-Pruefung — damit Fastly/Akamai-Edges deren IP-Ranges nicht in
+    `_STATIC_RANGES` stehen (oder rotieren) trotzdem korrekt dedupliziert
+    werden. Suffix-Match statt Substring-Match (endswith) verhindert
+    False-Positives bei Customer-rdns wie `cdn-cloudflare-failover.kunde.de`.
+
+    Mergen NUR wenn:
+      (a) selber Provider (rdns-Suffix-Match ODER IP-Range-Match)
       (b) gleicher fqdn-Set
-      (c) keine eigenen rdns die auf eine Maschinen-Identitaet hinweisen
+      (c) Maschinen-rdns (kein Provider-Match) → nicht mergen
     """
     try:
-        from scanner.precheck.saas_heuristic import detect_cloud_provider
+        from scanner.precheck.saas_heuristic import (
+            detect_cloud_provider,
+            detect_provider_by_rdns,
+        )
     except Exception:
         return hosts
 
@@ -858,19 +876,23 @@ def _collapse_cdn_edge_ips(hosts: list[dict[str, Any]]) -> list[dict[str, Any]]:
     groups: dict[tuple[str, frozenset], list[dict[str, Any]]] = {}
     standalone: list[dict[str, Any]] = []
     for h in hosts:
-        provider = detect_cloud_provider(h.get("ip", ""))
+        rdns = (h.get("rdns") or "").lower().rstrip(".")
+        # 1) rdns-Suffix-Match zuerst — deckt Fastly/Akamai-Edges ab,
+        #    deren IP nicht in `_STATIC_RANGES` ist.
+        provider: Optional[str] = detect_provider_by_rdns(rdns) if rdns else None
+
+        # 2) Fallback: IP-Range-Match (nur wenn rdns leer ODER kein
+        #    Provider-Suffix-Match). Eine eigene Maschinen-rdns
+        #    (`webserver01.kunde.de`) verhindert den Merge — die IP gehoert
+        #    moeglicherweise einer Cloud-Range, aber der Server hat eigene
+        #    Identitaet.
+        if not provider and not rdns:
+            provider = detect_cloud_provider(h.get("ip", ""))
+
         if not provider:
             standalone.append(h)
             continue
-        # Merge nur wenn rdns leer/Provider-generisch
-        rdns = (h.get("rdns") or "").lower()
-        if rdns and not any(p in rdns for p in (
-            "cloudflare", "amazonaws.com", "cloudfront", "azure",
-            "fastly", "googleusercontent", "akamai",
-        )):
-            # rdns deutet auf eigene Maschine → nicht mergen
-            standalone.append(h)
-            continue
+
         key = (provider, frozenset(f.lower() for f in (h.get("fqdns") or [])))
         groups.setdefault(key, []).append(h)
 
@@ -1295,8 +1317,64 @@ _PARKING_PATTERNS = [
 MAX_VHOSTS_PROBED = int(os.environ.get("MAX_VHOSTS_PROBED", "10"))
 
 
+def _parse_httpx_probe_line(data: dict[str, Any]) -> dict[str, Any] | None:
+    """Parsed eine httpx-NDJSON-Zeile in das probe-Dict-Format.
+
+    Returns None wenn Status fehlt oder ausserhalb 200-499 — analog zum
+    alten `_probe_single_fqdn`. Liefert Schluessel:
+      {fqdn, status, title, final_url, body_hash, parking}
+    """
+    status = data.get("status_code") or data.get("status-code") or 0
+    try:
+        status = int(status)
+    except (TypeError, ValueError):
+        return None
+
+    if not status or not (200 <= status < 500):
+        return None
+
+    # httpx liefert die Eingabe-URL unter 'input'/'url'; den Hostnamen
+    # extrahieren wir daraus.
+    url_in = data.get("input") or data.get("url", "") or ""
+    try:
+        fqdn = (urlparse(url_in).hostname or "").lower()
+    except Exception:
+        fqdn = ""
+    if not fqdn:
+        # Fallback: 'host'-Feld
+        fqdn = (data.get("host") or "").lower()
+    if not fqdn:
+        return None
+
+    title = (data.get("title") or "")[:100]
+    final_url = data.get("final_url") or data.get("url", "") or ""
+    # httpx liefert hash entweder direkt als 'hash' Feld oder unter
+    # 'body_hash'; der genaue Key variiert je httpx-Version.
+    h = data.get("hash") or data.get("body_hash") or {}
+    if isinstance(h, dict):
+        body_hash = h.get("body_sha256") or h.get("sha256") or ""
+    else:
+        body_hash = str(h or "")
+
+    title_lower = title.lower()
+    is_parking = any(p in title_lower for p in _PARKING_PATTERNS)
+
+    return {
+        "fqdn": fqdn,
+        "status": status,
+        "title": title,
+        "final_url": final_url,
+        "body_hash": body_hash or "",
+        "parking": is_parking,
+    }
+
+
 def _probe_single_fqdn(fqdn: str, ip: str) -> dict[str, Any] | None:
     """Probt EINE FQDN via httpx und liefert Roh-Probe-Dict zurueck.
+
+    Wird seit F-P0B-007 (Mai 2026) im Hauptpfad nicht mehr benutzt —
+    `_probe_web_hosts` macht einen einzigen batch-httpx-Aufruf. Funktion
+    bleibt fuer Tests/Fallbacks erhalten.
 
     Returns None bei Fehler/keine Antwort. Bei Erfolg:
       {fqdn, status, title, final_url, body_hash, parking}
@@ -1327,59 +1405,123 @@ def _probe_single_fqdn(fqdn: str, ip: str) -> dict[str, Any] | None:
     except (json.JSONDecodeError, IndexError):
         return None
 
-    status = data.get("status_code") or data.get("status-code") or 0
-    try:
-        status = int(status)
-    except (TypeError, ValueError):
+    probe = _parse_httpx_probe_line(data)
+    if probe is None:
         return None
-
-    if not status or not (200 <= status < 500):
-        return None
-
-    title = (data.get("title") or "")[:100]
-    final_url = data.get("final_url") or data.get("url", "") or ""
-    # httpx liefert hash entweder direkt als 'hash' Feld oder unter
-    # 'body_hash'; der genaue Key variiert je httpx-Version.
-    h = data.get("hash") or data.get("body_hash") or {}
-    if isinstance(h, dict):
-        body_hash = h.get("body_sha256") or h.get("sha256") or ""
-    else:
-        body_hash = str(h or "")
-
-    title_lower = title.lower()
-    is_parking = any(p in title_lower for p in _PARKING_PATTERNS)
-
-    return {
-        "fqdn": fqdn,
-        "status": status,
-        "title": title,
-        "final_url": final_url,
-        "body_hash": body_hash or "",
-        "parking": is_parking,
-    }
+    # `_parse_httpx_probe_line` extrahiert fqdn aus URL; bei Single-Probe
+    # mit Hostname-only (kein Schema) kann das Feld leer sein → setze hier
+    # den explizit uebergebenen FQDN als Quelle.
+    probe["fqdn"] = probe["fqdn"] or fqdn.lower()
+    return probe
 
 
 def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
                      domain: str = "") -> list[dict[str, Any]]:
     """Quick HTTP probe per host — probt ALLE FQDNs (capped MAX_VHOSTS_PROBED).
 
+    F-P0B-007 (Mai 2026): batch-httpx via `-l <file> -threads 30` statt
+    eines subprocess-Aufrufs pro FQDN. Bei 25 FQDNs faellt Wall-Time von
+    ~50s auf ~5-10s. Schema-Auswahl uebernimmt httpx selbst (probiert
+    https → http). NDJSON-Output wird per `_parse_httpx_probe_line`
+    gemappt; pro FQDN gewinnt das erste 2xx-Result (Sort: Status-Klasse).
     Schreibt host['vhosts'] (canonicalized primary + Aliase) und
     host['web_probe'] (Backwards-Compat = vhosts[0]).
     """
     from scanner.tools import _save_result
 
+    # Sammle alle FQDNs (deterministisch sortiert, gecappt pro Host).
+    fqdn_to_host: dict[str, dict[str, Any]] = {}
+    all_fqdns: list[str] = []
+    for host in hosts:
+        for fqdn in host.get("fqdns", [])[:MAX_VHOSTS_PROBED]:
+            fl = fqdn.lower()
+            if fl in fqdn_to_host:
+                # FQDN bereits einer anderen Host-IP zugewiesen — bei
+                # CDN-Round-Robin moeglich. Erste Zuordnung gewinnt;
+                # Probe-Ergebnis wird allen Hosts derselben FQDN zugeordnet,
+                # aber wir tracken nur die erste hier.
+                continue
+            fqdn_to_host[fl] = host
+            all_fqdns.append(fl)
+
+    # Map: fqdn → probe-Dict (None wenn kein 2xx-3xx-4xx Result)
+    probes_by_fqdn: dict[str, dict[str, Any]] = {}
+
+    if all_fqdns:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".txt", delete=False, encoding="utf-8",
+        ) as tf:
+            for f in sorted(set(all_fqdns)):
+                tf.write(f + "\n")
+            list_path = tf.name
+
+        cmd = [
+            "httpx", "-l", list_path, "-json", "-silent",
+            "-follow-redirects", "-status-code", "-title",
+            "-timeout", "5", "-retries", "1",
+            "-hash", "sha256",
+            "-fr",  # meta-refresh-follow
+            "-threads", "30",
+        ]
+        # Worst-Case-Timeout: pro FQDN ~5s × ceil(N/30) + Overhead;
+        # konservativ auf 90s gecappt damit ein einziger Hang nicht das
+        # ganze Phase 0b haengen laesst.
+        batch_timeout = min(
+            90,
+            10 + 5 * (len(all_fqdns) // 30 + 1),
+        )
+        try:
+            result = subprocess.run(
+                cmd, capture_output=True, text=True,
+                timeout=batch_timeout,
+                start_new_session=True,
+            )
+            stdout = result.stdout or ""
+        except subprocess.TimeoutExpired:
+            log.warning("web_probe_batch_timeout", fqdns=len(all_fqdns),
+                        timeout_s=batch_timeout)
+            stdout = ""
+        except Exception as e:
+            log.debug("web_probe_batch_error", error=str(e))
+            stdout = ""
+        finally:
+            try:
+                os.unlink(list_path)
+            except OSError:
+                pass
+
+        # NDJSON parsen — pro FQDN das erste Ergebnis behalten.
+        for line in stdout.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                data = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            probe = _parse_httpx_probe_line(data)
+            if probe is None:
+                continue
+            fqdn_lc = probe["fqdn"]
+            # Erstes Result pro FQDN gewinnt (httpx-Output ist bei Threads
+            # nicht garantiert sortiert — eine deterministische Sortierung
+            # findet `_canonicalize_vhosts` ueber Status-Klasse).
+            probes_by_fqdn.setdefault(fqdn_lc, probe)
+
+    # Pro Host die zugehoerigen Probes einsammeln.
     for host in hosts:
         raw_probes: list[dict[str, Any]] = []
         for fqdn in host.get("fqdns", [])[:MAX_VHOSTS_PROBED]:
-            probe = _probe_single_fqdn(fqdn, host["ip"])
+            fl = fqdn.lower()
+            probe = probes_by_fqdn.get(fl)
             if probe is None:
                 continue
             raw_probes.append(probe)
             if probe["parking"]:
                 log.info("web_probe_parking_detected", ip=host["ip"],
-                         fqdn=fqdn, title=probe["title"][:50])
+                         fqdn=fl, title=probe["title"][:50])
             else:
-                log.info("web_probe_found", ip=host["ip"], fqdn=fqdn,
+                log.info("web_probe_found", ip=host["ip"], fqdn=fl,
                          status=probe["status"], title=probe["title"][:50])
 
         host["_raw_probes"] = raw_probes
@@ -1499,8 +1641,15 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     discovery_futures: dict[Any, str] = {}
     with ThreadPoolExecutor(max_workers=8, thread_name_prefix="phase0b") as pool:
         # Discovery-Tools laufen IMMER (Snapshot ist nur Seed, nicht Skip).
+        # F-P0B-008 (Mai 2026): crt.sh + certspotter werden PARALLEL
+        # angestossen statt certspotter als Fallback bei leerem crt.sh-Result.
+        # Beide CT-Logs werden anschliessend per Set-Vereinigung gemerged
+        # (`merge_and_group` deduppt sowieso). Coverage-Plus: certspotter
+        # indexiert frische Issuances die crt.sh manchmal noch nicht hat;
+        # kostet ~0.5s parallel, kein zusaetzlicher Wall-Time-Druck.
         if "crtsh" in phase0_tools:
             discovery_futures[pool.submit(run_crtsh, domain, scan_dir, order_id)] = "crtsh"
+            discovery_futures[pool.submit(run_certspotter, domain, scan_dir, order_id)] = "certspotter"
         if "subfinder" in phase0_tools:
             discovery_futures[pool.submit(run_subfinder, domain, scan_dir, order_id)] = "subfinder"
         if "amass" in phase0_tools:
@@ -1535,24 +1684,6 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                     log.info(f"phase0_{tool_name}_done", found=len(subs))
             except Exception as e:
                 log.error(f"phase0_{tool_name}_error", error=str(e))
-
-    # --- certspotter-Fallback wenn crt.sh leer geblieben ist ---
-    # crt.sh ist die haeufigste Drift-/Ausfall-Quelle in Phase 0. Wenn es
-    # 0 Subdomains liefert, fragen wir certspotter (SSLMate) als zweite
-    # CT-Quelle. Beide CT-Logs indexieren denselben Bestand. Laeuft auch
-    # bei Snapshot-Seed (Mai 2026), damit ein heutiger crt.sh-Ausfall nicht
-    # die einzige Coverage-Quelle bleibt.
-    crtsh_results = tool_sources.get("crtsh") or []
-    if not crtsh_results:
-        try:
-            cs_subs = run_certspotter(domain, scan_dir, order_id)
-            if cs_subs:
-                all_subdomains.extend(cs_subs)
-                tool_sources["certspotter"] = list(cs_subs)
-                log.info("phase0_certspotter_fallback_used",
-                         subdomains_found=len(cs_subs))
-        except Exception as e:
-            log.warning("phase0_certspotter_fallback_error", error=str(e))
 
     # Always include the base domain
     all_subdomains.append(domain)
