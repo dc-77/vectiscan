@@ -382,11 +382,22 @@ def annotate_finding_types(findings: list[dict],
     if use_ai_fallback and needs_ai:
         try:
             from reporter.ai_finding_type_fallback import map_finding_type_via_ai
-            for f in needs_ai:
-                ai_type = map_finding_type_via_ai(f)
-                if ai_type:
-                    f["finding_type"] = ai_type
-                    f["_finding_type_source"] = "ai_fallback"
+            from concurrent.futures import ThreadPoolExecutor
+            # F-RPT-004: parallelisiert Cold-Cache-Faelle (5-60s -> 1-3s).
+            # max_workers=5 schont Anthropic-Rate-Limits (Haiku Tier-1: 50 RPM
+            # = 0.83 req/s; max_workers=5 x 1s Latenz = 5 req/s — bleibt unter
+            # Limit; SDK-Retry/Backoff bei 429 bereits aktiv).
+            with ThreadPoolExecutor(max_workers=5) as ex:
+                futs = {ex.submit(map_finding_type_via_ai, f): f for f in needs_ai}
+                for fut in futs:
+                    f = futs[fut]
+                    try:
+                        ai_type = fut.result(timeout=10)
+                    except Exception:
+                        ai_type = None
+                    if ai_type:
+                        f["finding_type"] = ai_type
+                        f["_finding_type_source"] = "ai_fallback"
         except Exception as e:
             import logging
             logging.getLogger(__name__).warning(
