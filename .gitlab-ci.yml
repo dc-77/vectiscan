@@ -470,6 +470,22 @@ cloud-ranges-sync:
     - python3 scripts/sync-cloud-ranges.py
     - python3 scripts/_sync_commit.py scan-worker/data/cloud_ranges_generated.py
 
+# F-P0B-006: Subdomain-Takeover-Liste-Sync via EdOverflow can-i-take-over-xyz
+# (~35 vulnerable Services, Stand 2026-05). Schreibt
+# scan-worker/data/takeover_data_generated.py — kombiniert mit Manual-Liste
+# in `phase0._build_takeover_indicators()`.
+# Schedule-Variable `TAKEOVER_SYNC=true` (oder global `SYNC_ENABLED=true`).
+takeover-list-sync:
+  <<: *sync-job-template
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && ($TAKEOVER_SYNC == "true" || $SYNC_ENABLED == "true")
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+      allow_failure: true
+  script:
+    - python3 scripts/sync-takeover-list.py
+    - python3 scripts/_sync_commit.py scan-worker/data/takeover_data_generated.py
+
 # Triggert scripts/cleanup-prod.sh auf vectigal-docker02. Wipet alle Scan-
 # Daten, Reports, Subscriptions, MinIO-Objekte, Threat-Intel/AI-Caches.
 # Erhalten bleiben users, customers, verified_domains, Schema.

@@ -95,6 +95,51 @@ _TAKEOVER_NOT_POSSIBLE: list[tuple[str, str]] = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# Generated takeover indicators (EdOverflow can-i-take-over-xyz, F-P0B-006)
+# ---------------------------------------------------------------------------
+# Geladen aus `data/takeover_data_generated.py` (Sync-Skript
+# `scripts/sync-takeover-list.py`). Bei fehlendem Generated-File (z.B. frischer
+# Checkout vor erstem Sync-Lauf) leeres Dict — Klassifikation faellt dann
+# komplett auf die Manual-Listen zurueck.
+try:
+    from data.takeover_data_generated import (  # type: ignore[import-not-found]
+        TAKEOVER_INDICATORS_GENERATED as _GENERATED_TAKEOVER,
+    )
+except Exception:  # noqa: BLE001 — generated-File optional zur Build-Zeit
+    _GENERATED_TAKEOVER: dict[str, dict] = {}
+
+
+def _build_takeover_indicators() -> list[tuple[str, str]]:
+    """Kombiniert Generated-Eintraege mit Manual-Liste.
+
+    Reihenfolge: erst Manual (`_TAKEOVER_POSSIBLE`), dann Generated.
+    Suffix-Match in `_classify_dangling_cname` greift first-hit, dadurch
+    haben Manual-Kuratierte automatisch Vorrang bei Suffix-Kollisionen
+    (analog `saas_heuristic._build_combined_ranges()`). Pro Generated-Eintrag
+    werden alle `cname_patterns` als eigenstaendige Suffixe (`.<pattern>`)
+    eingetragen.
+    """
+    out: list[tuple[str, str]] = list(_TAKEOVER_POSSIBLE)
+    seen_suffixes = {suffix for suffix, _ in _TAKEOVER_POSSIBLE}
+    for slug, info in (_GENERATED_TAKEOVER or {}).items():
+        service_label = info.get("service") or slug
+        for cname in info.get("cname_patterns", []) or []:
+            if not isinstance(cname, str) or not cname:
+                continue
+            suffix = cname if cname.startswith(".") else f".{cname}"
+            suffix = suffix.lower()
+            if suffix in seen_suffixes:
+                continue
+            seen_suffixes.add(suffix)
+            out.append((suffix, service_label))
+    return out
+
+
+# Kombinierte Liste — beim Modul-Load einmal gebaut, danach read-only.
+_TAKEOVER_POSSIBLE_COMBINED: list[tuple[str, str]] = _build_takeover_indicators()
+
+
 def _classify_dangling_cname(cname_target: str) -> tuple[str, str]:
     """Classify a dangling CNAME target by subdomain takeover risk.
 
@@ -103,7 +148,7 @@ def _classify_dangling_cname(cname_target: str) -> tuple[str, str]:
     """
     target = cname_target.lower()
 
-    for suffix, service in _TAKEOVER_POSSIBLE:
+    for suffix, service in _TAKEOVER_POSSIBLE_COMBINED:
         if target.endswith(suffix):
             return "high", f"Subdomain-Takeover möglich ({service})"
 
