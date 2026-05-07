@@ -11,8 +11,8 @@
 |---|---|---|---|---|
 | P0 | Foundation (Determinismus-Hygiene, ohne POLICY_VERSION-Bump) | **deployed** (Pipeline 2411 success) | `feat/p0-foundation` | `pre-p0-foundation..28d36d3` (10 Commits) |
 | P1 | Quick-Wins (XS-Aufwand, gebündelt nach Phase) | **deployed** (Pipeline 2412 success) | `feat/p1-quickwins` | `pre-p1-quickwins..6c448d2` (6 Commits, 17 Findings) |
-| P2 | Maintained-Listen-Sync (auf F-XS-003 aufbauend) | completed (lokal), push pending | `feat/p2-sync-pipelines` | `pre-p2-sync..6df74bd` (4 Commits, 4 Findings) |
-| P3 | Mail-Security & Discovery-Tiefe | pending | `feat/p3-mail-discovery` | — |
+| P2 | Maintained-Listen-Sync (auf F-XS-003 aufbauend) | **deployed** (Pipeline 2414 success) | `feat/p2-sync-pipelines` | `pre-p2-sync..1480b8b` (5 Commits, 4 Findings) |
+| P3 | Mail-Security & Discovery-Tiefe | completed (lokal), push pending | `feat/p3-mail-discovery` | `pre-p3-mail-discovery..2649035` (4 Commits, 7 Findings) |
 | P4 | Phase 1/2 Tool-Erweiterungen (nuclei/katana) | pending | `feat/p4-tool-coverage` | — |
 
 ---
@@ -76,9 +76,30 @@
 
 ---
 
-## P3 / P4
+## P3 — Mail-Security & Discovery-Tiefe
 
-_(Detaillierte Tabellen werden befüllt sobald P2 deployed.)_
+**Ziel:** Mail-Sec-Coverage (TLS-RPT/BIMI/DMARC-Detail/NSEC3) + Phase-0a-Threat-Intel-Erweiterung + Discovery-Cleanup. POLICY_VERSION-Bumps 2026-05-08.1 → 2026-05-09.1 → 2026-05-10.1.
+
+| # | Bundle | Findings | Status | Commit |
+|---|---|---|---|---|
+| A | Mail-Security | F-P0A-002 + F-P0B-001 (2) | done | ae5fa74 |
+| B1 | Phase-0a Passive-Intel | F-P0A-003 (1) | done | 5a7d87e |
+| B2 | Subdomain-Reuse + Pre-Warm | F-P0A-004 + F-P0A-006 (2) | done | 36587de |
+| C | Discovery-Cleanup | F-P0B-003 + F-P0B-004 (2) | done | 2649035 |
+
+**Migration 026** (Shodan Pre-Warm): `orders.pre_warm_requested` + `subscriptions.shodan_scan_request` JSONB. Idempotent in `api/src/lib/db.ts::initDb()`.
+
+**Lokale Test-Suite:** 1080 grün (575 report-worker + 476 scan-worker, 1 skip + 29 scripts). API 89 grün. Frontend TS-compile clean.
+
+**POLICY_VERSION:** 2026-05-08.1 → **2026-05-10.1** (zwei Bumps in P3 für SP-DNS-011..014 und SP-URLHAUS-001).
+
+**DEFERRED:** Frontend Order-Form-Toggle für `pre_warm_shodan` (Backend bereit, UI fehlt — Customer kann's via direkten API-Call aktivieren).
+
+---
+
+## P4
+
+_(Detaillierte Tabellen werden befüllt sobald P3 deployed.)_
 
 ---
 
@@ -98,4 +119,5 @@ Pro Paket vor dem Push setzen wir einen Tag `pre-p<N>-<datum>`, sodass bei Bedar
 | `pre-p0-foundation` | 948f6ba | 2026-05-08 |
 | `pre-p1-quickwins` | 28d36d3 | 2026-05-08 |
 | `pre-p2-sync` | 3632e8a | 2026-05-08 |
+| `pre-p3-mail-discovery` | 1480b8b | 2026-05-08 |
 
