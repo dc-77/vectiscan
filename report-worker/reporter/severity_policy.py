@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # ====================================================================
 # Bei jeder Aenderung der Regeln HIER hochziehen. Wird im AI-Cache-Key
 # eingebaut, damit Cache nach Policy-Update automatisch invalidiert.
-POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-08.1")
+POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-09.1")
 
 
 # ====================================================================
@@ -560,6 +560,47 @@ SEVERITY_POLICIES: list[SeverityPolicy] = [
         rationale="MTA-STS-Policy fehlt - Mail-TLS-Hardening optional",
         references=["RFC-8461"],
     ),
+    # F-P0A-002 — neue Mail-/DNS-Security-Marker (POLICY_VERSION 2026-05-09.1)
+    SeverityPolicy(
+        policy_id="SP-DNS-011",
+        finding_type="tls_rpt_missing",
+        matches_when={"mx_present": True},
+        final_severity=Severity.LOW,
+        cvss_score=2.5,
+        rationale="TLS-RPT (RFC 8460) fehlt - keine TLS-Reporting-Adresse "
+                  "fuer fehlgeschlagene SMTP-TLS-Verbindungen",
+        references=["RFC-8460"],
+    ),
+    SeverityPolicy(
+        policy_id="SP-DNS-012",
+        finding_type="bimi_missing",
+        final_severity=Severity.INFO,
+        cvss_score=0.0,
+        rationale="BIMI-Record fehlt - Branding-Hinweis ohne direkten "
+                  "Security-Hebel (Logo-Anzeige in Mail-Clients)",
+        references=["BIMI-Draft"],
+    ),
+    SeverityPolicy(
+        policy_id="SP-DNS-013",
+        finding_type="dmarc_pct_partial",
+        matches_when={"dmarc_pct_partial": True},
+        final_severity=Severity.MEDIUM,
+        cvss_vector="AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N",
+        cvss_score=4.7,
+        rationale="DMARC pct<100 - nur teilweise Durchsetzung der Policy, "
+                  "Spoofing-Schutz nicht voll aktiv",
+        references=["RFC-7489"],
+    ),
+    SeverityPolicy(
+        policy_id="SP-DNS-014",
+        finding_type="nsec3_iterations_nonzero",
+        matches_when={"nsec3_iterations_nonzero": True},
+        final_severity=Severity.LOW,
+        cvss_score=2.0,
+        rationale="NSEC3 mit Iterations > 0 - RFC 9276 empfiehlt 0 "
+                  "(Aufwand fuer Resolver, kein Sicherheitsgewinn)",
+        references=["RFC-9276", "BSI-CS-018"],
+    ),
 
     # ----------------------------------------------------------------
     # CVE-DRIVEN (SP-CVE-*)
@@ -838,6 +879,34 @@ def extract_context_flags(finding: dict, scan_context: dict) -> dict[str, Any]:
     # ── DNS / MX (aus scan_context oder finding-eigenem dns-Block) ─
     dns_records = scan_context.get("dns_records") or finding.get("dns_records") or {}
     flags["mx_present"] = bool(dns_records.get("mx") or dns_records.get("mx_records"))
+
+    # F-P0A-002: DMARC-Policy-Detail (pct<100) und NSEC3-Iterations-Flags.
+    # Quelle 1 (bevorzugt): scan_context["dns_security"] enthaelt den
+    # zentralen Parser-Output aus mail_security_parsers.
+    # Quelle 2 (Fallback): finding["evidence"] mit denselben Feldern,
+    # damit Adhoc-Findings (z.B. Tests, manuelle Backfills) das Flag
+    # selbst setzen koennen.
+    dns_security = scan_context.get("dns_security") or {}
+    dmarc_block = (
+        dns_security.get("dmarc")
+        or dns_records.get("dmarc_policy")
+        or {}
+    )
+    if not isinstance(dmarc_block, dict):
+        dmarc_block = {}
+    pct_value = dmarc_block.get("pct")
+    if isinstance(pct_value, (int, float)) and pct_value < 100:
+        flags["dmarc_pct_partial"] = True
+    elif (finding.get("evidence") or {}).get("dmarc_pct_partial"):
+        flags["dmarc_pct_partial"] = True
+
+    dnssec_block = dns_security.get("dnssec") or {}
+    if isinstance(dnssec_block, dict) and dnssec_block.get(
+        "nsec3_rfc9276_violation"
+    ):
+        flags["nsec3_iterations_nonzero"] = True
+    elif (finding.get("evidence") or {}).get("nsec3_iterations_nonzero"):
+        flags["nsec3_iterations_nonzero"] = True
 
     # ── Threat-Intel (aus enrichment) ────────────────────
     # Unterstuetzt zwei Shapes:

@@ -93,6 +93,11 @@ FINDING_TYPE_CATALOG: dict[str, str] = {
     "dmarc_missing":              "DMARC-Record fehlt",
     "dkim_missing":               "DKIM-Record fehlt",
     "mta_sts_missing":            "MTA-STS-Policy fehlt",
+    # F-P0A-002 — TLS-RPT/BIMI/DMARC-pct/NSEC3 (POLICY_VERSION 2026-05-09.1)
+    "tls_rpt_missing":            "TLS-RPT (RFC 8460) Reporting-Adresse fehlt",
+    "bimi_missing":               "BIMI-Record fehlt (Mail-Logo-Branding)",
+    "dmarc_pct_partial":          "DMARC pct<100 - nur teilweise Durchsetzung",
+    "nsec3_iterations_nonzero":   "NSEC3 mit Iterations > 0 (RFC 9276 empfiehlt 0)",
     "software_eol":               "Eingesetzte Software ist End-of-Life ohne Sicherheitsupdates",
 }
 

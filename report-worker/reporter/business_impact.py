@@ -92,6 +92,11 @@ POLICY_ID_TO_CATEGORIES: dict[str, set[str]] = {
     "SP-DNS-006": {"authentication"}, "SP-DNS-007": {"authentication"},
     "SP-DNS-008": {"authentication", "encryption"},
     "SP-DNS-009": {"authentication"}, "SP-DNS-010": {"authentication"},
+    # F-P0A-002 — TLS-RPT, BIMI, DMARC pct<100, NSEC3-Iterations
+    "SP-DNS-011": {"encryption", "logging"},
+    "SP-DNS-012": set(),  # BIMI = Branding, kein Security-Hebel
+    "SP-DNS-013": {"authentication"},
+    "SP-DNS-014": {"encryption"},
     # CVE — KEV-Pfade hoechstes Risiko
     "SP-CVE-001": {"encryption", "access_control"},
     "SP-CVE-002": {"access_control"}, "SP-CVE-003": {"access_control"},

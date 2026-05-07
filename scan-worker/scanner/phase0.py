@@ -739,6 +739,7 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
     records: dict[str, Any] = {
         "spf": None,
         "dmarc": None,
+        "dmarc_policy": None,  # strukturierter DMARC-Parser (F-P0A-002)
         "dkim": False,
         "dkim_selectors": [],
         "mx": [],
@@ -772,46 +773,101 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
     except Exception as e:
         log.warning("spf_lookup_error", error=str(e))
 
-    # DMARC
+    # DMARC — F-P0A-002: structured parser via mail_security_parsers.
+    # Wir behalten das raw-`dmarc`-Feld (rueckwaertskompatibel fuer Reporter
+    # und Phase-3-Korrelation), ergaenzen aber `dmarc_policy` mit
+    # strukturierten Feldern (p, sp, pct, rua, ruf, aspf, adkim).
     try:
-        dmarc_output = _dig_query(f"_dmarc.{domain}", "TXT")
-        for line in dmarc_output.split("\n"):
-            line = line.strip().strip('"')
-            if "v=dmarc1" in line.lower():
-                records["dmarc"] = line
-                break
+        from scanner.passive.mail_security_parsers import (
+            check_dmarc_policy,
+        )
+        dmarc_policy = check_dmarc_policy(domain)
+        if dmarc_policy.get("dmarc_present"):
+            records["dmarc"] = dmarc_policy.get("raw")
+        records["dmarc_policy"] = dmarc_policy
     except Exception as e:
         log.warning("dmarc_lookup_error", error=str(e))
+        records.setdefault("dmarc_policy", None)
 
-    # DKIM — FIX 2026-05-03: vorher nur "default._domainkey" gepruft, was
-    # bei Sites mit Hornetsecurity (hse1/hse2), Office365 (selector1/2),
-    # Google Workspace (google), Mailchimp (k1/k2), SendGrid (s1/s2) etc.
-    # zu False-Positive "DKIM not configured" fuehrte. User-Bug-Beleg:
-    # securess.de hat hse1+hse2._domainkey aber default fehlt → fälschlich
-    # als DKIM-fehlend klassifiziert.
-    # Neu: probe gaengige Selektoren parallel; gefundene Selektoren werden
-    # gemerkt (records["dkim_selectors"]).
-    DKIM_SELECTORS = [
-        "default", "selector1", "selector2", "google", "k1", "k2",
-        "hse1", "hse2",  # Hornetsecurity
-        "s1", "s2",       # SendGrid / generisch
-        "mail", "dkim", "key1", "key2",
-        "smtpapi",        # SendGrid alt
-        "mxvault",        # MXroute
-        "mandrill",       # Mailchimp Transactional
-        "scph", "scph0123", "scph0124",  # SparkPost
-        "mta", "mta1", "mta2",
-        "primary", "secondary",
-        "fd", "fd2",      # Postfix-Variation
-    ]
+    # DKIM — F-P0B-001 (2026-05-07): Selektoren-Probe parallel
+    # (ThreadPoolExecutor max_workers=10) + erweiterte Liste fuer
+    # ESP/SaaS und DE-Provider (SES, Postmark, Mailgun, Mailjet, Brevo,
+    # Zoho, IONOS, STRATO, T-Online, GMX, ...).
+    # Vorher (2026-05-03 FIX): 25 Selektoren sequenziell — `for sel in
+    # DKIM_SELECTORS` Worst-Case 5-12s. Jetzt: ~44 Selektoren parallel,
+    # Worst-Case <2s gegen FIXED_NAMESERVERS (Cloudflare/Google/Quad9).
+    # Liste deduplizieren (Set) — manche Selektoren tauchen in mehreren
+    # Provider-Categories auf (z.B. selector1/selector2 fuer M365 + IONOS).
+    DKIM_SELECTORS = sorted({
+        # Klassisch / generisch
+        "default", "selector", "mail", "dkim", "email",
+        "key1", "key2", "primary", "secondary",
+        # Microsoft 365
+        "selector1", "selector2",
+        # Google Workspace
+        "google", "googledomains",
+        # Mailchimp
+        "k1", "k2", "mandrill",
+        # SendGrid
+        "s1", "s2", "smtpapi", "s2048", "s1024",
+        # Hornetsecurity
+        "hse1", "hse2",
+        # Amazon SES
+        "amazonses", "mxvault",
+        # Postmark
+        "pm", "postmark",
+        # Mailgun
+        "mg", "mailgun", "mailo", "smtp",
+        # Mailjet
+        "mailjet", "mj",
+        # Brevo (ehem. Sendinblue)
+        "brevo", "sib", "mailin", "sendinblue",
+        # Zoho
+        "zoho", "zmail",
+        # SparkPost
+        "scph", "scph0123", "scph0124", "pf2014",
+        # IONOS / 1&1
+        "1und1", "ionos1", "ionos2",
+        # STRATO
+        "strato1", "strato2",
+        # DE-Mailprovider
+        "t-online", "gmx",
+        # Konvention numbered selectors
+        "dkim1", "dkim-1", "dkim01", "dkim2", "dkim-2",
+        # Postfix-Variation
+        "mta", "mta1", "mta2", "fd", "fd2",
+        # PGP-style sigs
+        "sig1", "sig2",
+    })
     found_selectors: list[str] = []
-    for sel in DKIM_SELECTORS:
+
+    def _probe_dkim(sel: str) -> str | None:
         try:
             out = _dig_query(f"{sel}._domainkey.{domain}", "TXT")
             if out and "v=dkim1" in out.lower():
-                found_selectors.append(sel)
+                return sel
         except Exception:
-            pass
+            return None
+        return None
+
+    try:
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        with ThreadPoolExecutor(
+            max_workers=10, thread_name_prefix="dkim_probe",
+        ) as pool:
+            futures = {pool.submit(_probe_dkim, sel): sel for sel in DKIM_SELECTORS}
+            for fut in as_completed(futures):
+                try:
+                    sel = fut.result()
+                except Exception:
+                    sel = None
+                if sel:
+                    found_selectors.append(sel)
+    except Exception as e:
+        log.warning("dkim_parallel_error", error=str(e))
+
+    # Deterministisches Sort (parallel-Order ist nicht stable).
+    found_selectors = sorted(set(found_selectors))
     records["dkim"] = bool(found_selectors)
     records["dkim_selectors"] = found_selectors
     if found_selectors:

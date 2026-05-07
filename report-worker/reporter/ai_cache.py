@@ -19,7 +19,7 @@ import structlog
 
 log = structlog.get_logger()
 
-POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-08.1")
+POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-09.1")
 CACHE_VERSION = "v1"
 
 AI_PRICING: dict[str, dict[str, float]] = {

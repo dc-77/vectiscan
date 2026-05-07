@@ -1,10 +1,22 @@
-"""Extended DNS security checks — DNSSEC, CAA, MTA-STS, DANE/TLSA."""
+"""Extended DNS security checks — DNSSEC, CAA, MTA-STS, DANE/TLSA, TLS-RPT,
+BIMI, DMARC-Policy-Detail, NSEC3-Iterations.
+
+Mail-/DNS-Security-Parser leben in `scanner.passive.mail_security_parsers`
+(zentral fuer Phase 0a / Phase 0b / Reporter — siehe F-P0A-002).
+"""
 
 import subprocess
 from typing import Any
 
 import requests
 import structlog
+
+from scanner.passive.mail_security_parsers import (
+    check_bimi,
+    check_dmarc_policy,
+    check_nsec3_iterations,
+    check_tls_rpt,
+)
 
 log = structlog.get_logger()
 
@@ -60,14 +72,31 @@ def check_dnssec(domain: str) -> dict[str, Any]:
     if not dnssec_signed:
         issues.append("Domain is not DNSSEC-signed")
 
+    # NSEC3-Iterations (RFC 9276 / F-P0A-002): nur dann pruefen, wenn DNSSEC
+    # ueberhaupt aktiv ist — sonst ist NSEC3PARAM trivialerweise leer.
+    nsec3 = check_nsec3_iterations(domain) if dnssec_signed else {
+        "nsec3param_present": False,
+        "iterations": None,
+        "rfc9276_violation": False,
+        "issues": [],
+    }
+    if nsec3.get("rfc9276_violation"):
+        issues.append(
+            f"NSEC3 iterations={nsec3.get('iterations')} > 0 (RFC 9276)"
+        )
+
     result = {
         "dnssec_signed": dnssec_signed,
         "dnssec_valid": dnssec_valid,
         "ds_algorithm": ds_algorithm,
         "dnskey_count": len(dnskey.splitlines()) if dnskey else 0,
+        "nsec3_iterations": nsec3.get("iterations"),
+        "nsec3param_present": nsec3.get("nsec3param_present", False),
+        "nsec3_rfc9276_violation": nsec3.get("rfc9276_violation", False),
         "issues": issues,
     }
-    log.info("dnssec_check", domain=domain, signed=dnssec_signed, valid=dnssec_valid)
+    log.info("dnssec_check", domain=domain, signed=dnssec_signed, valid=dnssec_valid,
+             nsec3_iter=nsec3.get("iterations"))
     return result
 
 
@@ -159,8 +188,10 @@ def check_dane_tlsa(domain: str) -> dict[str, Any]:
 def run_all_dns_security(domain: str, package: str) -> dict[str, Any]:
     """Run all DNS security checks based on package level.
 
-    WebCheck: DNSSEC (basic), CAA (basic), MTA-STS (basic)
-    Perimeter+: All checks including DANE/TLSA with full detail
+    WebCheck:    DNSSEC, CAA, MTA-STS, TLS-RPT, DMARC-Policy
+    Perimeter+:  + DANE/TLSA, BIMI (Compliance/Insurance markers)
+
+    NSEC3-Iterations sind Bestandteil von `dnssec` und werden immer geprueft.
     """
     results: dict[str, Any] = {}
 
@@ -168,8 +199,14 @@ def run_all_dns_security(domain: str, package: str) -> dict[str, Any]:
     results["caa"] = check_caa(domain)
     results["mta_sts"] = check_mta_sts(domain)
 
-    # DANE/TLSA only for Perimeter+ packages
+    # F-P0A-002: zentrale Mail-Security-Parser (TLS-RPT, BIMI, DMARC-Detail)
+    results["tls_rpt"] = check_tls_rpt(domain)
+    results["dmarc"] = check_dmarc_policy(domain)
+
+    # DANE/TLSA + BIMI nur fuer Perimeter+ (BIMI ist Branding/Compliance-Marker
+    # ohne direkten Security-Hebel — webcheck spart die Lookup-Latenz).
     if package not in ("webcheck", "basic"):
         results["dane_tlsa"] = check_dane_tlsa(domain)
+        results["bimi"] = check_bimi(domain)
 
     return results

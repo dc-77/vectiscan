@@ -248,6 +248,17 @@ def build_passive_intel_for_ai(
     dnssec = dns_sec.get("dnssec", {})
     if dnssec:
         intel["dnssec_signed"] = dnssec.get("dnssec_signed", False)
+        if dnssec.get("nsec3_rfc9276_violation"):
+            intel["nsec3_rfc9276_violation"] = True
+
+    # F-P0A-002: Mail-Security-Marker fuer KI #1
+    tls_rpt = dns_sec.get("tls_rpt") or {}
+    if tls_rpt:
+        intel["tlsrpt_present"] = bool(tls_rpt.get("tlsrpt_present"))
+    dmarc = dns_sec.get("dmarc") or {}
+    if dmarc.get("dmarc_present"):
+        intel["dmarc_p"] = dmarc.get("p")
+        intel["dmarc_pct"] = dmarc.get("pct")
 
     return intel
 

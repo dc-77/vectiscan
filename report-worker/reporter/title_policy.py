@@ -201,6 +201,11 @@ TITLE_TEMPLATES: dict[str, str] = {
     "SP-DNS-008": "MTA-STS-Policy fehlt fuer {domain}",
     "SP-DNS-009": "DMARC-Policy auf 'none' statt 'quarantine' oder 'reject' fuer {domain}",
     "SP-DNS-010": "DMARC-Policy auf 'quarantine' statt 'reject' fuer {domain}",
+    # F-P0A-002 — neue Mail-/DNS-Security-Marker (2026-05-09.1)
+    "SP-DNS-011": "TLS-RPT (RFC 8460) fehlt fuer {domain}",
+    "SP-DNS-012": "BIMI-Record fehlt fuer {domain}",
+    "SP-DNS-013": "DMARC-Policy nur teilweise aktiv (pct={pct}) fuer {domain}",
+    "SP-DNS-014": "NSEC3 mit Iterations={iterations} > 0 (RFC 9276) fuer {domain}",
     # ── CVE (SP-CVE-*) ─────────────────────────────────────────────
     "SP-CVE-001": "{cve_id} mit aktiven Exploits ({tech}) auf {host}",
     "SP-CVE-002": "{cve_id} (CVSS {cvss}) in {tech} auf {host}",

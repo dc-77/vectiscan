@@ -305,6 +305,31 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
         r"mta[-_ ]?sts.*(?:miss|fehlt|not\s*(?:configured|set)|nicht\s*(?:gesetzt|konfiguriert))",
         re.I,
      ), "mta_sts_missing"),
+    # F-P0A-002 — TLS-RPT/BIMI/DMARC pct/NSEC3 (POLICY_VERSION 2026-05-09.1)
+    (re.compile(
+        r"tls[-_ ]?rpt.*(?:miss|fehlt|not\s*(?:configured|set)|nicht\s*(?:gesetzt|konfiguriert))|"
+        r"(?:miss|fehlt|kein|no)[\w\s-]*\btls[-_ ]?rpt\b|"
+        r"\b_smtp\._tls\b|\bRFC[-_ ]?8460\b",
+        re.I,
+     ), "tls_rpt_missing"),
+    (re.compile(
+        r"\bbimi\b.*(?:miss|fehlt|not\s*(?:configured|set)|nicht\s*(?:gesetzt|konfiguriert))|"
+        r"(?:miss|fehlt|kein|no)[\w\s-]*\bbimi\b|"
+        r"\bdefault\._bimi\b",
+        re.I,
+     ), "bimi_missing"),
+    (re.compile(
+        r"dmarc.*pct\s*[<=]\s*?\d{1,3}|"
+        r"dmarc.*pct[\s=:]*(?:[1-9]?\d)\b|"
+        r"dmarc[-_ ]?(?:policy)?.*(?:teilweise|partial(?:[\s-]?enforcement)?|nicht\s*voll(?:staendig)?\s*aktiv|nur\s*\d{1,2}\s*%)",
+        re.I,
+     ), "dmarc_pct_partial"),
+    (re.compile(
+        r"nsec3.*iterations?\s*(?:>\s*0|=\s*[1-9]\d*|nicht\s*0|non[-_ ]?zero)|"
+        r"\bRFC[-_ ]?9276\b|"
+        r"nsec3param.*iterations?",
+        re.I,
+     ), "nsec3_iterations_nonzero"),
 
     # ── EOL Software ─────────────────────────────────────
     # B1 Mai 2026: zusaetzlich "vor End-of-Life", "ohne Sicherheitsupdates",
