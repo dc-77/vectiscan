@@ -8,6 +8,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from typing import Optional
+from urllib.parse import urlparse
 
 import requests
 
@@ -16,6 +17,7 @@ DEFAULT_TIMEOUT = 5.0
 USER_AGENT = "VectiScan-Precheck/1.0"
 
 _PARKING_PATTERNS = [
+    # Englische Marker (bestehend)
     r"this\s+domain\s+is\s+for\s+sale",
     r"buy\s+this\s+domain",
     r"domain\s+parking",
@@ -30,8 +32,44 @@ _PARKING_PATTERNS = [
     r"apache2?\s+default\s+page",
     r"welcome\s+to\s+nginx",
     r"it\s+works!",
+    # F-PRE-001: deutsche Marker (DACH-Kundenbasis)
+    r"diese\s+domain\s+steht\s+zum\s+verkauf",
+    r"diese\s+domain\s+ist\s+(reserviert|geparkt)",
+    r"diese\s+seite\s+befindet\s+sich\s+im\s+aufbau",
+    r"wartungsarbeiten",
+    r"in\s+wartung",
+    # F-PRE-001: zusaetzliche englische Marker
+    r"under\s+maintenance",
+    r"this\s+domain\s+(has\s+)?expired",
+    r"domain\s+expired",
+    r"this\s+domain\s+is\s+(parked|reserved)",
+    # F-PRE-001: weitere Provider-Marker
+    r"namecheap",
+    r"bodis",
+    r"epik",
+    r"sav\.com",
+    r"uniregistry",
+    r"buydomains",
+    r"perfectdomain",
 ]
 _PARKING_RE = re.compile("|".join(_PARKING_PATTERNS), re.IGNORECASE)
+
+# F-PRE-001: Allowlist von Hosts, die als Parking-/Domain-Sale-Landing-Pages
+# bekannt sind. Wird in is_parking_page geprueft, falls ein Redirect dorthin
+# erfolgt (status==200, final_url-Hostname matcht) — fangt die
+# Redirect-zu-Landing-Page-Variante ohne Body-Match.
+_PARKING_REDIRECT_HOSTS = frozenset({
+    "sedoparking.com",
+    "parkingcrew.net",
+    "dan.com",
+    "afternic.com",
+    "bodis.com",
+    "parkingpage.namecheap.com",
+    "epik.com",
+    "uniregistry.com",
+    "sav.com",
+    "buydomains.com",
+})
 
 _TITLE_RE = re.compile(r"<title[^>]*>([^<]*)</title>", re.IGNORECASE | re.DOTALL)
 
@@ -63,7 +101,7 @@ def probe(url: str, timeout: float = DEFAULT_TIMEOUT) -> HttpProbe:
     body = resp.text or ""
     title_match = _TITLE_RE.search(body)
     title = title_match.group(1).strip() if title_match else None
-    parking = is_parking_page(title, body)
+    parking = is_parking_page(title, body, final_url=resp.url or "")
     return HttpProbe(
         url=url,
         status=resp.status_code,
@@ -90,8 +128,29 @@ def probe_both_schemes(fqdn_or_ip: str, timeout: float = DEFAULT_TIMEOUT) -> dic
     }
 
 
-def is_parking_page(title: Optional[str], body: str) -> bool:
+def is_parking_page(
+    title: Optional[str],
+    body: str,
+    final_url: str = "",
+) -> bool:
+    """Heuristik: erkennt Parking-/Maintenance-/Default-Pages.
+
+    Pruefreihenfolge (erste Trefferregel gewinnt):
+    1. Title-Pattern-Match
+    2. Body-Pattern-Match (erste 4000 Zeichen)
+    3. final_url-Hostname in _PARKING_REDIRECT_HOSTS (fangt
+       Redirect-zu-Landing-Page-Variante, F-PRE-001)
+    """
     if title and _PARKING_RE.search(title):
         return True
     snippet = (body or "")[:4000]
-    return bool(_PARKING_RE.search(snippet))
+    if _PARKING_RE.search(snippet):
+        return True
+    if final_url:
+        try:
+            host = (urlparse(final_url).hostname or "").lower()
+        except (ValueError, AttributeError):
+            host = ""
+        if host and host in _PARKING_REDIRECT_HOSTS:
+            return True
+    return False
