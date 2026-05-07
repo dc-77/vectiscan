@@ -431,33 +431,30 @@ rollback:
 # bereits im Generated-Header verzeichnet.
 # =============================================================================
 
-eol-data-sync:
+# YAML-Anchor: gemeinsame Defaults fuer alle Sync-Jobs (EOL-Data, kuenftig
+# auch Threat-Intel/CWE-Cache). Schedule-Trigger via `SYNC_ENABLED=true`,
+# manueller Trigger ueber GitLab-UI ("Run pipeline").
+.sync-job-template: &sync-job-template
   stage: ops
   tags: [vectigal]
   rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule" && $EOL_SYNC == "true"
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $SYNC_ENABLED == "true"
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+      allow_failure: true
+
+eol-data-sync:
+  <<: *sync-job-template
+  # Override fuer Backwards-Compat: alte Schedules nutzen `EOL_SYNC=true`,
+  # neue koennen `SYNC_ENABLED=true` verwenden. Beide funktionieren.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && ($EOL_SYNC == "true" || $SYNC_ENABLED == "true")
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
       allow_failure: true
   script:
     - python3 scripts/sync-eol-data.py
-    - |
-      cd "${CI_PROJECT_DIR}"
-      if git diff --quiet -- report-worker/reporter/eol_data_generated.py; then
-        echo "[INFO] keine EOL-Aenderungen — kein Commit notwendig."
-        exit 0
-      fi
-      git config user.email "ci-bot@vectiscan.local"
-      git config user.name  "VectiScan CI Bot"
-      git add report-worker/reporter/eol_data_generated.py
-      git commit -m "chore(eol): refresh EOL-Daten aus endoflife.date [skip ci]"
-      # Push via CI-Push-Token (vorab in CI/CD-Variables anlegen: CI_PUSH_TOKEN
-      # mit api+write_repo Scope). Falls nicht gesetzt: Job laeuft trocken.
-      if [ -n "$CI_PUSH_TOKEN" ]; then
-        git push "https://oauth2:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" HEAD:main
-      else
-        echo "[WARN] CI_PUSH_TOKEN nicht gesetzt — Aenderungen wurden lokal commited, aber nicht gepusht."
-      fi
+    - python3 scripts/_sync_commit.py report-worker/reporter/eol_data_generated.py
 
 # Triggert scripts/cleanup-prod.sh auf vectigal-docker02. Wipet alle Scan-
 # Daten, Reports, Subscriptions, MinIO-Objekte, Threat-Intel/AI-Caches.

@@ -19,10 +19,17 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import urllib.error
-import urllib.request
 from datetime import date, datetime
 from pathlib import Path
+
+# Lokaler Import — `_sync_lib` liegt im selben Ordner.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _sync_lib import (  # noqa: E402
+    SyncValidationError,
+    atomic_write_python_module,
+    fetch_with_retry,
+    validate_min_entries,
+)
 
 # ────────────────────────────────────────────────────────────────────
 # Mapping endoflife.date-Produkt -> (vendor, product, label) fuer
@@ -65,6 +72,9 @@ PRODUCTS: dict[str, dict] = {
 HIGH_RISK_VENDORS = {"openssl", "openssh", "microsoft", "apache", "nginx", "iis"}
 CRITICAL_RISK_PRODUCTS = {"exchange", "iis", "windows-server"}
 
+# Sanity-Schwelle: weniger als so viele Eintraege = vermutlich Quell-Panne
+MIN_EXPECTED_ENTRIES = 50
+
 
 def severity_for(vendor: str, product: str, days_eol: int) -> str:
     """Bestimme Default-Severity wenn endoflife.date keine eigene Kategorie hat."""
@@ -75,16 +85,13 @@ def severity_for(vendor: str, product: str, days_eol: int) -> str:
     return "MEDIUM" if days_eol > 0 else "LOW"
 
 
-def fetch_product(slug: str, timeout: float = 30.0) -> list[dict]:
-    """Holt JSON-Liste von Cycles fuer ein Produkt."""
+def fetch_product(slug: str, timeout: int = 30) -> list[dict]:
+    """Holt JSON-Liste von Cycles fuer ein Produkt — mit Retry/Backoff."""
     url = f"https://endoflife.date/api/{slug}.json"
     try:
-        with urllib.request.urlopen(url, timeout=timeout) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        print(f"  [WARN] {slug}: HTTP {e.code}", file=sys.stderr)
-        return []
-    except Exception as e:
+        body = fetch_with_retry(url, retries=3, timeout=timeout)
+        return json.loads(body)
+    except Exception as e:  # noqa: BLE001 — endoflife-Quelle, generisch loggen
         print(f"  [WARN] {slug}: {e}", file=sys.stderr)
         return []
 
@@ -135,37 +142,31 @@ def build_entries(today: date) -> dict[tuple[str, str, str], dict]:
     return out
 
 
-_HEADER = '''"""GENERIERT — NICHT MANUELL EDITIEREN.
-
-Quelle: endoflife.date (CC-BY-4.0)
-Generator: scripts/sync-eol-data.py
-Stand:    {ts}
-
-Manuelle Overrides + spezifische CVEs gehoeren in
-`reporter/eol_detector.py:EOL_DATA` — die haben Vorrang vor diesen
-generierten Eintraegen (Union-Loader in eol_detector).
-"""
-
-from __future__ import annotations
-
-# (vendor, product, version_prefix) -> info dict
-EOL_DATA_GENERATED: dict[tuple[str, str, str], dict] = {{
-'''
-_FOOTER = "}\n"
+def _build_header(timestamp: str) -> str:
+    """Baut den Modul-Docstring — bleibt inhaltlich identisch zur Vor-Refactor-Variante."""
+    return (
+        '"""GENERIERT — NICHT MANUELL EDITIEREN.\n'
+        '\n'
+        'Quelle: endoflife.date (CC-BY-4.0)\n'
+        'Generator: scripts/sync-eol-data.py\n'
+        f'Stand:    {timestamp}\n'
+        '\n'
+        'Manuelle Overrides + spezifische CVEs gehoeren in\n'
+        '`reporter/eol_detector.py:EOL_DATA` — die haben Vorrang vor diesen\n'
+        'generierten Eintraegen (Union-Loader in eol_detector).\n'
+        '"""\n'
+    )
 
 
 def write_module(entries: dict, dest: Path) -> None:
-    lines = [_HEADER.format(ts=datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"))]
-    for (vendor, product, cycle), info in sorted(entries.items()):
-        info_repr = ", ".join(
-            f'"{k}": {json.dumps(v, ensure_ascii=False)}'
-            for k, v in sorted(info.items())
-        )
-        lines.append(
-            f'    ("{vendor}", "{product}", "{cycle}"): {{{info_repr}}},\n'
-        )
-    lines.append(_FOOTER)
-    dest.write_text("".join(lines), encoding="utf-8")
+    header = _build_header(datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"))
+    atomic_write_python_module(
+        dest,
+        header=header,
+        data_name="EOL_DATA_GENERATED",
+        data_dict=entries,
+        dict_type_hint="dict[tuple[str, str, str], dict]",
+    )
     print(f"[INFO] wrote {len(entries)} entries -> {dest}")
 
 
@@ -179,8 +180,14 @@ def main() -> int:
 
     today = date.today()
     entries = build_entries(today)
-    if not entries:
-        print("[ERROR] keine Eintraege gefetched — Abbruch.", file=sys.stderr)
+
+    try:
+        validate_min_entries(
+            entries, min_count=MIN_EXPECTED_ENTRIES,
+            source_name="endoflife.date",
+        )
+    except SyncValidationError as e:
+        print(f"[ERROR] {e}", file=sys.stderr)
         return 1
 
     if args.dry_run:
