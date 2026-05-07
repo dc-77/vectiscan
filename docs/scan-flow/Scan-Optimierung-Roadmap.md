@@ -11,7 +11,7 @@
 |---|---|---|---|---|
 | P0 | Foundation (Determinismus-Hygiene, ohne POLICY_VERSION-Bump) | **deployed** (Pipeline 2411 success) | `feat/p0-foundation` | `pre-p0-foundation..28d36d3` (10 Commits) |
 | P1 | Quick-Wins (XS-Aufwand, gebündelt nach Phase) | **deployed** (Pipeline 2412 success) | `feat/p1-quickwins` | `pre-p1-quickwins..6c448d2` (6 Commits, 17 Findings) |
-| P2 | Maintained-Listen-Sync (auf F-XS-003 aufbauend) | pending | `feat/p2-sync-pipelines` | — |
+| P2 | Maintained-Listen-Sync (auf F-XS-003 aufbauend) | completed (lokal), push pending | `feat/p2-sync-pipelines` | `pre-p2-sync..6df74bd` (4 Commits, 4 Findings) |
 | P3 | Mail-Security & Discovery-Tiefe | pending | `feat/p3-mail-discovery` | — |
 | P4 | Phase 1/2 Tool-Erweiterungen (nuclei/katana) | pending | `feat/p4-tool-coverage` | — |
 
@@ -59,9 +59,26 @@
 
 ---
 
-## P2 / P3 / P4
+## P2 — Maintained-Listen-Sync
 
-_(Detaillierte Tabellen werden befüllt sobald P1 deployed.)_
+**Ziel:** Sync-Pipelines auf Basis F-XS-003-Helper-Lib (P0). POLICY_VERSION-Bump (2026-04-30.1 → 2026-05-08.1).
+
+| # | Finding | Status | Commit |
+|---|---|---|---|
+| 1 | F-PRE-001 — Parking-Pattern DACH + Provider + Redirect-Allowlist | done | 968a249 |
+| 2 | F-PRE-003 — cloud-ranges-sync (9 Provider, RIPEstat-ASNs) | done | 80b69c5 |
+| 3 | F-P0B-006 — takeover-list-sync (EdOverflow fingerprints.json) | done | 8a83dfc |
+| 4 | F-RPT-001 — KNOWN_VULN_BUILDS +15 Manual + OSV-Sync + Range-Matcher + POLICY_VERSION-Bump | done | 6df74bd |
+
+**Lokale Test-Suite:** 1011 grün (567 report-worker + 415 scan-worker, 1 skip + 29 scripts) — keine Regression.
+
+**POLICY_VERSION:** 2026-04-30.1 → 2026-05-08.1 (Cache-Invalidierung erwartet bei naechstem Re-Scan).
+
+---
+
+## P3 / P4
+
+_(Detaillierte Tabellen werden befüllt sobald P2 deployed.)_
 
 ---
 
@@ -80,4 +97,5 @@ Pro Paket vor dem Push setzen wir einen Tag `pre-p<N>-<datum>`, sodass bei Bedar
 |---|---|---|
 | `pre-p0-foundation` | 948f6ba | 2026-05-08 |
 | `pre-p1-quickwins` | 28d36d3 | 2026-05-08 |
+| `pre-p2-sync` | 3632e8a | 2026-05-08 |
 
