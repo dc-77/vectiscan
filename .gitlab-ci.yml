@@ -425,15 +425,9 @@ ops-baseline-snapshot:
   script:
     - cd ${DEPLOY_PATH}
     - echo "=== Baseline-Snapshot (Scan-Optimierung KPIs) ==="
-    - |
-      cat ${CI_PROJECT_DIR}/scripts/ops-baseline-snapshot.sql | \
-      docker compose exec -T postgres psql \
-        -U "${DB_USER:-vectiscan}" \
-        -d "${DB_NAME:-vectiscan}" \
-        -X 2>&1 | tee ${CI_PROJECT_DIR}/baseline-snapshot.txt
-    - echo
-    - echo "=== Snapshot saved als job artifact 'baseline-snapshot.txt' (30d retention) ==="
-    - echo "=== Download via GitLab-UI: Job-Page -> Browse Artifacts ==="
+    - cat ${CI_PROJECT_DIR}/scripts/ops-baseline-snapshot.sql | docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -X 2>&1 | tee ${CI_PROJECT_DIR}/baseline-snapshot.txt
+    - echo "=== Snapshot saved als job artifact baseline-snapshot.txt (30d retention) ==="
+    - echo "=== Download via GitLab-UI Job-Page -> Browse Artifacts ==="
 
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
 rollback:
