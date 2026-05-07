@@ -456,6 +456,20 @@ eol-data-sync:
     - python3 scripts/sync-eol-data.py
     - python3 scripts/_sync_commit.py report-worker/reporter/eol_data_generated.py
 
+# F-PRE-003: Cloud-Provider-IPv4-Ranges-Sync (AWS/GCP/Cloudflare/Fastly/
+# DigitalOcean + RIPEstat-ASNs fuer OVH/IONOS/STRATO/Hetzner-Online).
+# Schedule-Variable `CLOUD_RANGES_SYNC=true` (oder global `SYNC_ENABLED=true`).
+cloud-ranges-sync:
+  <<: *sync-job-template
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && ($CLOUD_RANGES_SYNC == "true" || $SYNC_ENABLED == "true")
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+      allow_failure: true
+  script:
+    - python3 scripts/sync-cloud-ranges.py
+    - python3 scripts/_sync_commit.py scan-worker/data/cloud_ranges_generated.py
+
 # Triggert scripts/cleanup-prod.sh auf vectigal-docker02. Wipet alle Scan-
 # Daten, Reports, Subscriptions, MinIO-Objekte, Threat-Intel/AI-Caches.
 # Erhalten bleiben users, customers, verified_domains, Schema.

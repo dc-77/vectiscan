@@ -177,6 +177,10 @@ RUN curl -fsSL https://github.com/projectdiscovery/httpx/releases/download/v1.6.
     rm -rf /tmp/httpx /tmp/httpx.zip
 
 COPY scanner/ /opt/scanner/scanner/
+# F-PRE-003: Generated-Cloud-Provider-Ranges (sync via scripts/sync-cloud-ranges.py)
+# Optionales Verzeichnis — bei frischem Checkout ohne Sync-Lauf existiert
+# nur __init__.py + Loader faellt im saas_heuristic auf _STATIC_RANGES zurueck.
+COPY data/ /opt/scanner/data/
 
 # ── 7. Verification ────────────────────────────────────────────────
 RUN nmap --version; \

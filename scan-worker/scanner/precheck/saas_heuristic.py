@@ -1,9 +1,15 @@
 """Cloud-Provider-Erkennung anhand bekannter IPv4-Ranges.
 
-Initial-Version mit statischen Haupt-Ranges. Eine wöchentliche
-Cron-Aktualisierung aus offiziellen Quellen (Azure ServiceTags,
-AWS ip-ranges.json, GCP _cloud-netblocks, Cloudflare ips-v4,
-Hetzner ASN) ist in MULTI-TARGET-PLAN §14 als Folge-Iteration vorgesehen.
+`_STATIC_RANGES` haelt manuelle Haupt-Eintraege (Stable-Defaults, schnelle
+Korrekturen ohne Sync-Lauf). Daneben werden Eintraege aus
+`data.cloud_ranges_generated.CLOUD_RANGES_GENERATED` (Sync-Skript
+`scripts/sync-cloud-ranges.py`, F-PRE-003) geladen — Manual ueberschreibt
+Generated bei gleichem Provider-Key.
+
+Quellen Sync: AWS ip-ranges.json, GCP cloud.json, Cloudflare ips-v4,
+Fastly public-ip-list, DigitalOcean google.csv, RIPEstat-ASNs fuer
+OVH/IONOS/STRATO/Hetzner-Online. Azure bleibt Manual-only (rotierender
+SAS-Download, vgl. Sync-Skript-Kommentar).
 """
 
 from __future__ import annotations
@@ -46,9 +52,32 @@ _STATIC_RANGES: dict[str, list[str]] = {
 }
 
 
+# Generierte Eintraege aus `scripts/sync-cloud-ranges.py` (F-PRE-003).
+# Wird per `data/cloud_ranges_generated.py` ausgeliefert. Bei fehlendem
+# Generated-File (z.B. frischer Checkout vor erstem Sync-Lauf) leeres Dict —
+# Kombi-Lookup faellt dann auf `_STATIC_RANGES` zurueck.
+try:
+    from data.cloud_ranges_generated import CLOUD_RANGES_GENERATED as _GENERATED_RANGES
+except Exception:  # noqa: BLE001 — generated-File optional zur Build-Zeit
+    _GENERATED_RANGES = {}
+
+
+def _build_combined_ranges() -> dict[str, list[str]]:
+    """Generated als Basis, Manual ueberschreibt bei gleichem Provider-Key.
+
+    Reihenfolge wichtig: erst Generated kopieren, dann Manual.update —
+    das stellt sicher, dass kuratierte Manual-Listen immer Vorrang haben
+    (z.B. wenn ein Sync-Lauf im Output kaputte Eintraege haette).
+    """
+    combined: dict[str, list[str]] = {k: list(v) for k, v in _GENERATED_RANGES.items()}
+    for provider, prefixes in _STATIC_RANGES.items():
+        combined[provider] = list(prefixes)
+    return combined
+
+
 def _compiled() -> list[tuple[str, ipaddress.IPv4Network]]:
     out: list[tuple[str, ipaddress.IPv4Network]] = []
-    for provider, ranges in _STATIC_RANGES.items():
+    for provider, ranges in _build_combined_ranges().items():
         for r in ranges:
             try:
                 out.append((provider, ipaddress.IPv4Network(r)))
