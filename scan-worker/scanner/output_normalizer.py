@@ -303,6 +303,196 @@ def normalize_wpscan(raw: Optional[str]) -> Optional[str]:
     return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
 
 
+# ============================================================
+# testssl (JSON-Output): Top-Level-Run-Metadaten weg, Findings sortiert
+# ============================================================
+_TESTSSL_VOLATILE_TOPLEVEL = (
+    "Invocation", "at", "startTime", "finishedTime", "runtime",
+    "version", "openssl", "service",
+)
+_TESTSSL_VOLATILE_PER_FINDING = ("id",)
+
+
+def normalize_testssl(raw: Optional[str]) -> Optional[str]:
+    """testssl JSON-Output: strippt Run-Metadaten + Per-Finding-IDs;
+    sortiert das Findings-Array stabil.
+
+    testssl produziert entweder ein Top-Level-Array von Findings oder ein
+    Dict mit Run-Metadata + 'scanResult'/'findings'-Liste. Beide Pfade
+    werden behandelt.
+    """
+    if not raw:
+        return raw
+    try:
+        data = json.loads(raw)
+    except Exception:
+        return raw
+
+    def _scrub_finding(item):
+        if not isinstance(item, dict):
+            return item
+        return {k: v for k, v in item.items() if k not in _TESTSSL_VOLATILE_PER_FINDING}
+
+    def _finding_key(item):
+        if not isinstance(item, dict):
+            return ("", "", "")
+        return (
+            str(item.get("cipher_name") or item.get("cipher") or ""),
+            str(item.get("id", "")),
+            str(item.get("finding", "")),
+        )
+
+    if isinstance(data, list):
+        scrubbed = [_scrub_finding(it) for it in data]
+        scrubbed.sort(key=_finding_key)
+        return json.dumps(scrubbed, indent=2, sort_keys=True, ensure_ascii=False)
+
+    if isinstance(data, dict):
+        for k in _TESTSSL_VOLATILE_TOPLEVEL:
+            data.pop(k, None)
+        # Findings-Liste kann unter unterschiedlichen Keys liegen
+        for findings_key in ("scanResult", "findings", "scan_result"):
+            findings = data.get(findings_key)
+            if isinstance(findings, list):
+                scrubbed = [_scrub_finding(it) for it in findings]
+                scrubbed.sort(key=_finding_key)
+                data[findings_key] = scrubbed
+        return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
+
+    return raw
+
+
+# ============================================================
+# ffuf (JSON): Top-Level-Time/Commandline weg, results nach url sortiert
+# ============================================================
+_FFUF_VOLATILE_TOPLEVEL = ("time", "commandline")
+_FFUF_VOLATILE_CONFIG = ("commandline", "outputfile", "proxyurl")
+_FFUF_VOLATILE_PER_RESULT = ("time", "host")
+
+
+def normalize_ffuf(raw: Optional[str]) -> Optional[str]:
+    """ffuf JSON-Output: strippt Run-Time + commandline + variable
+    Config-Felder; sortiert results-Array nach 'url'.
+    """
+    if not raw:
+        return raw
+    try:
+        data = json.loads(raw)
+    except Exception:
+        return raw
+    if not isinstance(data, dict):
+        return raw
+
+    for k in _FFUF_VOLATILE_TOPLEVEL:
+        data.pop(k, None)
+
+    cfg = data.get("config")
+    if isinstance(cfg, dict):
+        for k in _FFUF_VOLATILE_CONFIG:
+            cfg.pop(k, None)
+
+    results = data.get("results")
+    if isinstance(results, list):
+        scrubbed: list = []
+        for item in results:
+            if isinstance(item, dict):
+                scrubbed.append({k: v for k, v in item.items() if k not in _FFUF_VOLATILE_PER_RESULT})
+            else:
+                scrubbed.append(item)
+        scrubbed.sort(
+            key=lambda x: str(x.get("url", "")) if isinstance(x, dict) else str(x)
+        )
+        data["results"] = scrubbed
+
+    return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False)
+
+
+# ============================================================
+# katana (JSONL): pro Zeile timestamp weg, Zeilen alphabetisch
+# ============================================================
+_KATANA_VOLATILE_KEYS = ("timestamp",)
+_KATANA_REQUEST_VOLATILE_HEADERS = ("cookie", "Cookie", "authorization", "Authorization")
+
+
+def _katana_scrub_line(obj: dict) -> dict:
+    for k in _KATANA_VOLATILE_KEYS:
+        obj.pop(k, None)
+    for sub_key in ("request", "response"):
+        sub = obj.get(sub_key)
+        if isinstance(sub, dict):
+            sub.pop("timestamp", None)
+            headers = sub.get("headers")
+            if isinstance(headers, dict):
+                for hk in _KATANA_REQUEST_VOLATILE_HEADERS:
+                    headers.pop(hk, None)
+    return obj
+
+
+def normalize_katana(raw: Optional[str]) -> Optional[str]:
+    """katana JSONL: pro Zeile timestamp + sensitive Headers strippen;
+    Zeilen alphabetisch sortiert (nach endpoint/url, dann ganzer Zeile).
+    """
+    if not raw:
+        return raw
+    parsed: list[tuple[str, str]] = []
+    other: list[str] = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            obj = json.loads(line)
+        except Exception:
+            other.append(line)
+            continue
+        if isinstance(obj, dict):
+            obj = _katana_scrub_line(obj)
+            key = str(obj.get("endpoint") or obj.get("url") or "")
+            parsed.append((key, json.dumps(obj, sort_keys=True, ensure_ascii=False)))
+        else:
+            other.append(json.dumps(obj, sort_keys=True, ensure_ascii=False))
+    parsed.sort(key=lambda x: (x[0], x[1]))
+    out = [s for _, s in parsed]
+    out.extend(sorted(other))
+    return '\n'.join(out)
+
+
+# ============================================================
+# feroxbuster (JSONL): pro Zeile timestamp/response_time/wildcard weg
+# ============================================================
+_FEROX_VOLATILE_KEYS = ("timestamp", "response_time", "wildcard")
+
+
+def normalize_feroxbuster(raw: Optional[str]) -> Optional[str]:
+    """feroxbuster JSONL: strippt timestamp/response_time/wildcard pro
+    Zeile; Zeilen alphabetisch sortiert (nach url, dann ganzer Zeile).
+    """
+    if not raw:
+        return raw
+    parsed: list[tuple[str, str]] = []
+    other: list[str] = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            obj = json.loads(line)
+        except Exception:
+            other.append(line)
+            continue
+        if isinstance(obj, dict):
+            for k in _FEROX_VOLATILE_KEYS:
+                obj.pop(k, None)
+            key = str(obj.get("url", ""))
+            parsed.append((key, json.dumps(obj, sort_keys=True, ensure_ascii=False)))
+        else:
+            other.append(json.dumps(obj, sort_keys=True, ensure_ascii=False))
+    parsed.sort(key=lambda x: (x[0], x[1]))
+    out = [s for _, s in parsed]
+    out.extend(sorted(other))
+    return '\n'.join(out)
+
+
 # Mapping tool_name -> normalizer
 _NORMALIZERS = {
     'httpx': normalize_httpx,
@@ -316,6 +506,12 @@ _NORMALIZERS = {
     'nuclei': normalize_nuclei,
     'nikto': normalize_nikto,
     'wpscan': normalize_wpscan,
+    'testssl': normalize_testssl,
+    'testssl.sh': normalize_testssl,
+    'ffuf': normalize_ffuf,
+    'ffuf_sensitive': normalize_ffuf,
+    'katana': normalize_katana,
+    'feroxbuster': normalize_feroxbuster,
 }
 
 
@@ -344,4 +540,8 @@ __all__ = [
     "normalize_nuclei",
     "normalize_nikto",
     "normalize_wpscan",
+    "normalize_testssl",
+    "normalize_ffuf",
+    "normalize_katana",
+    "normalize_feroxbuster",
 ]
