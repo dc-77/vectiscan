@@ -464,9 +464,17 @@ def process_job(job_data: dict) -> None:
                 except Exception as e:
                     log.warning("report_cost_save_failed", error=str(e))
 
-            # -- 4b. Report QA — programmatic checks + Haiku plausibility ---------
+            # -- 4b. Report QA — programmatic checks (OHNE severity-cap) ----
+            # F-RPT-005: severity_evidence-Cap NACH der Determinismus-Pipeline
+            # anwenden, nur auf SP-FALLBACK-Findings — severity_policy
+            # ueberschreibt sonst eh ~95% der Findings (mit policy_id).
             enrichment = job_data.get("enrichment")
-            qa_report = run_qa_checks(claude_output, package=package, enrichment=enrichment)
+            qa_report = run_qa_checks(
+                claude_output,
+                package=package,
+                enrichment=enrichment,
+                apply_severity_cap=False,
+            )
             log.info("qa_complete",
                      quality_score=qa_report.get("quality_score"),
                      auto_fixes=qa_report.get("auto_fixes_applied", 0),
@@ -488,7 +496,40 @@ def process_job(job_data: dict) -> None:
                 scan_context=scan_context,
             )
 
-            # -- 4d. Recalculate overall_risk after QA + Policy corrections ---
+            # -- 4d. Severity-Cap nur fuer SP-FALLBACK-Findings (F-RPT-005) ---
+            # severity_policy hat fuer alle policy_id-Findings die Severity
+            # bereits final gesetzt. Nur bei SP-FALLBACK (kein Match in den
+            # ~63 Regeln) hat KI-Severity ueberlebt — hier macht der
+            # evidence-basierte Cap weiterhin Sinn.
+            fallback_findings = [
+                f for f in claude_output.get("findings", [])
+                if (f.get("policy_id") or "") == "SP-FALLBACK"
+            ]
+            if fallback_findings:
+                from reporter.qa_check import (
+                    _apply_auto_fixes,
+                    _check_severity_evidence,
+                )
+                cap_issues = _check_severity_evidence(fallback_findings)
+                cap_fixes = _apply_auto_fixes(
+                    {"findings": fallback_findings}, cap_issues,
+                )
+                if cap_fixes:
+                    log.info(
+                        "severity_cap_applied_to_fallback",
+                        count=cap_fixes,
+                        total_fallback=len(fallback_findings),
+                    )
+                # Audit-Flag: jedes betroffene Finding bekommt _qa_cap_applied
+                capped_ids = {
+                    i["finding_id"] for i in cap_issues
+                    if i.get("auto_fix") and i.get("check") == "severity_evidence"
+                }
+                for f in claude_output.get("findings", []):
+                    if f.get("id") in capped_ids:
+                        f["_qa_cap_applied"] = True
+
+            # -- 4e. Recalculate overall_risk after QA + Policy corrections ---
             _recalculate_overall_risk(claude_output)
 
         # -- 5. Map Claude output to report_data ------------------------------

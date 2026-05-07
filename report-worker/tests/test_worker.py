@@ -127,3 +127,75 @@ class TestProcessJob:
         mock_update_status.assert_called_once()
         args = mock_update_status.call_args
         assert args[0][2] == "failed"  # status arg
+
+
+# ---------------------------------------------------------------------------
+# F-RPT-005 — QA severity-cap order tests
+# ---------------------------------------------------------------------------
+
+
+class TestQASeverityCapOrder:
+    """F-RPT-005: severity_evidence-Cap soll erst nach der Determinismus-
+    Pipeline laufen und nur SP-FALLBACK-Findings cappen.
+
+    `run_qa_checks(apply_severity_cap=False)` ueberspringt den Cap-Check.
+    Default (True) erhaelt das alte Verhalten fuer Tests/Calls die nicht
+    migriert sind.
+    """
+
+    def test_qa_severity_cap_skipped_when_flag_false(self) -> None:
+        """run_qa_checks(apply_severity_cap=False) ueberspringt severity_evidence."""
+        from reporter.qa_check import run_qa_checks
+
+        findings = [{
+            "id": "f1",
+            "severity": "HIGH",
+            "title": "veraltete Software xyz",
+            "cvss_score": "5.0",
+            "cwe": "CWE-1104",
+            "recommendation": "update auf aktuelle Version durchfuehren",
+            "evidence": "",
+            "cve": "",
+        }]
+        out = {"findings": findings, "positive_findings": []}
+        run_qa_checks(out, package="webcheck", apply_severity_cap=False)
+        assert findings[0]["severity"] == "HIGH", \
+            "Cap haette nicht laufen sollen (apply_severity_cap=False)"
+
+    def test_qa_severity_cap_runs_when_flag_true(self) -> None:
+        """Default (oder True) belaesst altes Verhalten — Cap wird angewendet."""
+        from reporter.qa_check import run_qa_checks
+
+        findings = [{
+            "id": "f1",
+            "severity": "HIGH",
+            "title": "veraltete Software xyz",
+            "cvss_score": "5.0",
+            "cwe": "CWE-1104",
+            "recommendation": "update auf aktuelle Version durchfuehren",
+            "evidence": "",
+            "cve": "",
+        }]
+        out = {"findings": findings, "positive_findings": []}
+        run_qa_checks(out, package="webcheck", apply_severity_cap=True)
+        assert findings[0]["severity"] == "MEDIUM", \
+            "Cap haette laufen sollen (apply_severity_cap=True, kein CVE)"
+
+    def test_qa_severity_cap_default_is_true(self) -> None:
+        """Backwards-compat: ohne explizite Flag-Angabe wird gecappt."""
+        from reporter.qa_check import run_qa_checks
+
+        findings = [{
+            "id": "f1",
+            "severity": "HIGH",
+            "title": "veraltete Software xyz",
+            "cvss_score": "5.0",
+            "cwe": "CWE-1104",
+            "recommendation": "update auf aktuelle Version durchfuehren",
+            "evidence": "",
+            "cve": "",
+        }]
+        out = {"findings": findings, "positive_findings": []}
+        run_qa_checks(out, package="webcheck")
+        assert findings[0]["severity"] == "MEDIUM", \
+            "Default-Verhalten muss Cap anwenden (Flag default=True)"

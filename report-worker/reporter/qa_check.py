@@ -632,6 +632,7 @@ def run_qa_checks(
     claude_result: dict[str, Any],
     package: str = "perimeter",
     enrichment: dict[str, Any] | None = None,
+    apply_severity_cap: bool = True,
 ) -> dict[str, Any]:
     """Run the full QA pipeline on Claude's report output.
 
@@ -639,6 +640,11 @@ def run_qa_checks(
         claude_result: Parsed JSON from Claude API.
         package: Scan package name.
         enrichment: Phase 3 enrichment data (optional).
+        apply_severity_cap: F-RPT-005 — wenn False, wird der
+            `_check_severity_evidence`-Cap uebersprungen. Aufrufer (worker.py)
+            wendet den Cap dann gezielt nach `apply_deterministic_pipeline`
+            nur auf SP-FALLBACK-Findings an, weil severity_policy ansonsten
+            den Cap eh ueberschreibt.
 
     Returns:
         QA report dict with quality_score, issues, and fixes applied.
@@ -651,7 +657,8 @@ def run_qa_checks(
     all_issues.extend(_check_cwe_format(findings))
     all_issues.extend(_check_duplicates(findings))
     all_issues.extend(_check_required_fields(findings))
-    all_issues.extend(_check_severity_evidence(findings))
+    if apply_severity_cap:
+        all_issues.extend(_check_severity_evidence(findings))
     all_issues.extend(_check_epss_reference(findings, enrichment))
     all_issues.extend(_check_nis2_mapping(findings, package))
     all_issues.extend(_check_cwe_semantic(findings))
