@@ -245,10 +245,15 @@ def _load_known_vuln_union() -> dict[tuple[str, str, str], dict[str, Any]]:
     return merged
 
 
-# Final KNOWN_VULN_BUILDS: Union(Generated ∪ Manual), Manual hat Vorrang.
+# Final KNOWN_VULN_BUILDS: Union(Manual ∪ Generated). Manual zuerst eingefuegt,
+# damit bei mehreren matchenden Range-Specs auf gleicher Vendor/Product-Kombi
+# (z.B. Manual "2.4.49" und Generated "<2.4.60" matchen beide Apache 2.4.49)
+# der Manual-Eintrag im Iterator zuerst gefunden wird. Bei IDENTISCHEM Key
+# gewinnt Manual sowieso (zweites dict-update).
 KNOWN_VULN_BUILDS: dict[tuple[str, str, str], dict[str, Any]] = {
-    **_load_known_vuln_union(),
-    **KNOWN_VULN_BUILDS_MANUAL,  # Manual gewinnt
+    **KNOWN_VULN_BUILDS_MANUAL,
+    **{k: v for k, v in _load_known_vuln_union().items()
+       if k not in KNOWN_VULN_BUILDS_MANUAL},
 }
 
 
