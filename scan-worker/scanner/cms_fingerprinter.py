@@ -133,9 +133,19 @@ PROBE_MATRIX: list[dict[str, Any]] = [
     },
     {
         "cms": "NEOS",
+        # Neos CMS (Flow Framework). DACH-Enterprise (Neos GmbH, AT/DE).
+        # Marker:
+        #   - /neos/ Backend-Path (Login)
+        #   - "neos-"-Klassen-Praefix (z.B. neos-content)
+        #   - Flow-spezifische Resource-Pfade (/_Resources/Static/Packages/)
+        #   - X-Flow-Powered-Header (siehe HEADER_CMS_PATTERNS)
         "probes": ["/neos/"],
-        "body_patterns": [r"neos-"],
-        "confidence": 0.80,
+        "body_patterns": [
+            r"neos-",
+            r"/_Resources/Static/Packages/",
+            r"Neos\.Neos",
+        ],
+        "confidence": 0.85,
     },
     {
         "cms": "Craft CMS",
@@ -377,6 +387,10 @@ HEADER_CMS_PATTERNS: list[tuple[str, str, str]] = [
     ("x-pimcore-version", r".+", "Pimcore"),
     ("x-pimcore-output-cache-tag", r".+", "Pimcore"),
     ("x-powered-by", r"(?i)pimcore", "Pimcore"),
+    # Neos CMS (Flow Framework) — Test-Session Mai 2026 (heuel.com).
+    # X-Flow-Powered: "Flow Neos" oder "Flow X.Y" (Flow-only ohne Neos-CMS).
+    ("x-flow-powered", r"(?i)neos", "NEOS"),
+    ("x-flow-powered", r".+", "NEOS"),
     ("x-powered-by", r"(?i)sulu", "Sulu"),
     ("x-powered-by", r"(?i)plone", "Plone"),
     ("x-powered-by", r"(?i)silverstripe", "SilverStripe"),
@@ -429,6 +443,11 @@ BODY_REF_PATTERNS: list[tuple[str, str, float]] = [
     (r'/_resources/themes/', "SilverStripe", 0.85),
     # Statamic
     (r'\bstatamic\.com', "Statamic", 0.75),
+    # NEOS / Flow Framework — Test-Session Mai 2026 (heuel.com).
+    # Flow-Resource-Pfad ist sehr spezifisch und in jedem Neos-Rendered-HTML
+    # vorhanden. Neos-Package-Namespace dito.
+    (r'/_Resources/Static/Packages/', "NEOS", 0.90),
+    (r'\bNeos\.Neos\b', "NEOS", 0.85),
 ]
 
 

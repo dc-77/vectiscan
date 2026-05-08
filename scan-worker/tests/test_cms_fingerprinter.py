@@ -268,3 +268,37 @@ def test_unrelated_html_returns_no_cms():
     html = '<html><head><title>Plain</title></head><body><h1>Hi</h1></body></html>'
     result = detect_cms(html=html, headers={}, cookies={})
     assert result["cms"] is None
+
+
+# ---------------------------------------------------------------------------
+# Bug #9 (Test-Session Mai 2026, heuel.com): Neos CMS via X-Flow-Powered
+# Header und Flow-Resource-Pfade.
+# ---------------------------------------------------------------------------
+
+def test_neos_detected_via_x_flow_powered_header():
+    """heuel.com hat X-Flow-Powered: 'Flow Neos' — vor dem Fix nicht erkannt."""
+    result = detect_cms(
+        html="",
+        headers={"X-Flow-Powered": "Flow Neos"},
+        cookies={},
+    )
+    assert result["cms"] == "NEOS"
+    assert result["confidence"] >= 0.70
+
+
+def test_neos_detected_via_flow_resource_path():
+    """Flow-Framework-Resource-Pfade im rendered HTML → Neos-Detection."""
+    html = (
+        '<html><body>'
+        '<link rel="stylesheet" href="/_Resources/Static/Packages/Neos.Neos/Styles/main.css">'
+        '</body></html>'
+    )
+    result = detect_cms(html=html, headers={}, cookies={})
+    assert result["cms"] == "NEOS"
+
+
+def test_neos_detected_via_meta_generator():
+    """Bestehende meta_generator-Regel bleibt erhalten."""
+    html = '<html><head><meta name="generator" content="NEOS 8.3"></head></html>'
+    result = detect_cms(html=html, headers={}, cookies={})
+    assert result["cms"] == "NEOS"
