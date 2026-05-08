@@ -205,6 +205,30 @@ def apply_deterministic_pipeline(claude_output: dict,
         findings_in, normalized, sel.selected,
     )
 
+    # 5a. Recommendations.finding_refs auf ueberlebende IDs prunen.
+    # Ohne diesen Sync referenziert die Massnahmenplan-Tabelle Phantom-IDs
+    # von Findings, die durch Konsolidierung oder Top-N-Cap gedroppt wurden.
+    surviving_ids = {f.get("id") for f in claude_output["findings"] if f.get("id")}
+    recs_in = claude_output.get("recommendations") or []
+    if recs_in and surviving_ids:
+        pruned_recs: list[dict] = []
+        dropped_refs = 0
+        for rec in recs_in:
+            raw_refs = rec.get("finding_refs") or []
+            valid = [r for r in raw_refs if r in surviving_ids]
+            dropped_refs += len(raw_refs) - len(valid)
+            if not valid and raw_refs:
+                # Recommendation hatte Refs, alle wurden konsolidiert/gedroppt -> Massnahme orphan, drop.
+                continue
+            rec["finding_refs"] = valid
+            pruned_recs.append(rec)
+        if dropped_refs or len(pruned_recs) != len(recs_in):
+            log.info("recommendation_refs_pruned",
+                     dropped_refs=dropped_refs,
+                     dropped_recs=len(recs_in) - len(pruned_recs),
+                     surviving_findings=len(surviving_ids))
+        claude_output["recommendations"] = pruned_recs
+
     # 5b. Title-Templates pro policy_id anwenden (Determinismus)
     # Eliminiert KI-Wording-Drift ueber wiederholte Scans.
     from reporter.title_policy import apply_titles

@@ -177,7 +177,7 @@ HÄUFIG FALSCH BEWERTETE FINDINGS — Korrekte Scores:
   → INFO — offener Port allein ohne erreichbaren Dienst ist kein Befund
 
 METHODIK:
-Phase 0 — Reconnaissance: Passive Intelligence (Shodan, AbuseIPDB, WHOIS), DNS-Enumeration (subfinder, amass, gobuster, dnsx) und Web-Probe (httpx). KI-gestützte Host-Strategie bestimmt Scan-Prioritäten.
+Phase 0 — Reconnaissance: Passive Intelligence (Shodan, AbuseIPDB, WHOIS), DNS-Enumeration (subfinder, gobuster, dnsx, crt.sh, certspotter) und Web-Probe (httpx). KI-gestützte Host-Strategie bestimmt Scan-Prioritäten.
 
 Phase 1 — Technologie-Erkennung: Port-Scanning (nmap), Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) pro Host. KI-gestützte Tool-Konfiguration passt Phase-2-Parameter adaptiv an.
 

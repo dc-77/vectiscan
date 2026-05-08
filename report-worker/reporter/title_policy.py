@@ -191,15 +191,18 @@ TITLE_TEMPLATES: dict[str, str] = {
     "SP-TLS-006": "Selbstsigniertes TLS-Zertifikat auf {host}",
     "SP-TLS-007": "TLS-Konfiguration mit Schwaechen auf {host}",
     # ── DNS / Mail (SP-DNS-*) ──────────────────────────────────────
-    "SP-DNS-001": "DNSSEC-Kette unterbrochen fuer {domain}",
-    "SP-DNS-002": "DNSSEC fehlt fuer {domain}",
+    # IDs muessen mit reporter/severity_policy.py:finding_type-Zuordnung
+    # 1:1 uebereinstimmen (Test-Drift Mai 2026: title_policy war zu severity_policy
+    # versetzt → DKIM-Findings bekamen MTA-STS-Title etc.).
+    "SP-DNS-001": "DNSSEC fehlt fuer {domain}",
+    "SP-DNS-002": "DNSSEC-Kette unterbrochen fuer {domain}",
     "SP-DNS-003": "CAA-Record fehlt fuer {domain}",
-    "SP-DNS-004": "SPF-Policy auf softfail (~all) statt -all fuer {domain}",
-    "SP-DNS-005": "SPF-Record fehlt fuer {domain}",
+    "SP-DNS-004": "SPF-Record fehlt fuer {domain}",
+    "SP-DNS-005": "SPF-Policy auf softfail (~all) statt -all fuer {domain}",
     "SP-DNS-006": "DMARC-Record fehlt fuer {domain}",
-    "SP-DNS-007": "DKIM-Record fehlt fuer {domain}",
-    "SP-DNS-008": "MTA-STS-Policy fehlt fuer {domain}",
-    "SP-DNS-009": "DMARC-Policy auf 'none' statt 'quarantine' oder 'reject' fuer {domain}",
+    "SP-DNS-007": "DMARC-Policy auf 'none' statt 'quarantine' oder 'reject' fuer {domain}",
+    "SP-DNS-008": "DKIM-Record fehlt fuer {domain}",
+    "SP-DNS-009": "MTA-STS-Policy fehlt fuer {domain}",
     "SP-DNS-010": "DMARC-Policy auf 'quarantine' statt 'reject' fuer {domain}",
     # F-P0A-002 — neue Mail-/DNS-Security-Marker (2026-05-09.1)
     "SP-DNS-011": "TLS-RPT (RFC 8460) fehlt fuer {domain}",

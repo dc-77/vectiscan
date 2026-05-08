@@ -78,7 +78,7 @@ def _sort_findings_by_severity(findings: list[dict[str, Any]]) -> list[dict[str,
 # Comprehensive list of all scan tools used in the VectiScan pipeline
 SCAN_TOOLS = [
     {"tool": "subfinder", "description": "Passive Subdomain-Enumeration", "phase": "Phase 0"},
-    {"tool": "amass", "description": "OWASP Subdomain-Enumeration", "phase": "Phase 0"},
+    {"tool": "crt.sh / certspotter", "description": "Certificate-Transparency-Discovery", "phase": "Phase 0"},
     {"tool": "gobuster", "description": "DNS-Bruteforce / Directory-Enumeration", "phase": "Phase 0/2"},
     {"tool": "dnsx", "description": "DNS-Validierung und -Auflösung", "phase": "Phase 0"},
     {"tool": "httpx", "description": "HTTP-Probe und Service-Erkennung", "phase": "Phase 0"},
@@ -210,6 +210,7 @@ def _map_positive_finding(f: dict[str, Any]) -> dict[str, Any]:
         "evidence": _safe(f.get("evidence", "—")),
         "impact": "Positiver Befund — korrekte Konfiguration.",
         "recommendation": "Aktuelle Konfiguration beibehalten.",
+        "is_positive_finding": True,
         "label_description": "Beschreibung",
         "label_evidence": "Nachweis",
         "label_impact": "Bewertung",
@@ -384,7 +385,7 @@ def _build_scope(
                 "PTES-Standard (Penetration Testing Execution Standard) durchgeführt. "
                 "Der Scan umfasste vier Phasen:",
                 "<b>Phase 0 — Reconnaissance:</b> Passive Intelligence (Shodan, AbuseIPDB, WHOIS), "
-                "DNS-Enumeration (subfinder, amass, gobuster, dnsx) und Web-Probe (httpx). "
+                "DNS-Enumeration (subfinder, gobuster, dnsx, crt.sh, certspotter) und Web-Probe (httpx). "
                 "KI-gestützte Host-Strategie bestimmt Scan-Prioritäten.",
                 "<b>Phase 1 — Technologie-Erkennung:</b> Port-Scanning (nmap), "
                 "Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) "

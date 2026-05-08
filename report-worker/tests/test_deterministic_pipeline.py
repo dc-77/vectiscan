@@ -159,3 +159,80 @@ class TestFindingTypePersisted:
                 assert f.get("_finding_type_source") in (
                     "regex", "ai_fallback", "preset",
                 ), f"Marker fehlt fuer {f}"
+
+
+class TestRecommendationRefsPruned:
+    """Test-Session-Drift (Mai 2026): Massnahmenplan referenzierte Phantom-IDs
+    von Findings, die durch Konsolidierung gedroppt wurden. Pipeline muss
+    finding_refs auf ueberlebende IDs prunen + Recommendations ohne valide
+    Refs droppen."""
+
+    def test_drops_phantom_refs(self):
+        claude_output = {
+            "findings": _claude_response_findings(),
+            "recommendations": [
+                {
+                    "timeframe": "Sofort",
+                    "action": "Firewall fuer DB-Port",
+                    "finding_refs": ["VS-2026-001", "VS-2026-999"],  # 999 ghost
+                    "effort": "1 h",
+                },
+                {
+                    "timeframe": "Woche 1",
+                    "action": "Security-Header setzen",
+                    "finding_refs": ["VS-2026-002"],
+                    "effort": "2 h",
+                },
+            ],
+        }
+        apply_deterministic_pipeline(
+            claude_output, package="perimeter", domain="beispiel.de",
+        )
+        surviving_ids = {f["id"] for f in claude_output["findings"]}
+        for rec in claude_output["recommendations"]:
+            for ref in rec.get("finding_refs", []):
+                assert ref in surviving_ids, (
+                    f"Phantom-Ref {ref} im Maßnahmenplan (surviving={surviving_ids})"
+                )
+
+    def test_drops_orphan_recommendation(self):
+        """Recommendation deren Refs alle gedroppt sind muss komplett raus."""
+        claude_output = {
+            "findings": _claude_response_findings(),
+            "recommendations": [
+                {
+                    "timeframe": "Sofort",
+                    "action": "Phantom-Massnahme",
+                    "finding_refs": ["VS-2026-998", "VS-2026-999"],
+                    "effort": "—",
+                },
+                {
+                    "timeframe": "Woche 1",
+                    "action": "Reale Massnahme",
+                    "finding_refs": ["VS-2026-001"],
+                    "effort": "1 h",
+                },
+            ],
+        }
+        apply_deterministic_pipeline(
+            claude_output, package="perimeter", domain="beispiel.de",
+        )
+        actions = [r.get("action") for r in claude_output["recommendations"]]
+        assert "Phantom-Massnahme" not in actions
+        assert "Reale Massnahme" in actions
+
+    def test_keeps_recommendations_without_refs(self):
+        """Recommendation ohne finding_refs (allgemeine Massnahme) bleibt erhalten."""
+        claude_output = {
+            "findings": _claude_response_findings(),
+            "recommendations": [
+                {"timeframe": "Monat 1", "action": "Allgemeine Hygiene", "effort": "—"},
+            ],
+        }
+        apply_deterministic_pipeline(
+            claude_output, package="perimeter", domain="beispiel.de",
+        )
+        assert any(
+            r.get("action") == "Allgemeine Hygiene"
+            for r in claude_output["recommendations"]
+        )

@@ -369,8 +369,13 @@ def build_toc(story, styles, toc_entries):
 
 
 def _is_positive_finding(f):
-    """Check if a finding is a positive/INFO finding."""
-    return f.get("severity", "").upper() == "INFO"
+    """Check if a finding is a positive finding (well-configured aspect).
+
+    Set explicitly via report_mapper._map_positive_finding(). INFO severity alone
+    is not enough — KI emits informational notes about issues with severity=INFO
+    that must stay in the main findings section, not be moved to "Positive Befunde".
+    """
+    return f.get("is_positive_finding") is True
 
 
 def build_finding(story, styles, f, compact=False):
@@ -1711,7 +1716,6 @@ def generate_report(report_data, output_path):
     # --- Findings ---
     findings = report_data.get("findings", [])
     if findings:
-        # Split into negative (non-INFO) and positive (INFO) findings
         negative_findings = [f for f in findings if not _is_positive_finding(f)]
         positive_findings = [f for f in findings if _is_positive_finding(f)]
 

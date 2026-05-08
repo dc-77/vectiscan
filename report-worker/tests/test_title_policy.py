@@ -76,3 +76,34 @@ def test_host_fallback_from_finding_fields():
 def test_template_count_minimum():
     """Sanity: mindestens die ~25 wichtigsten policy_ids haben Templates."""
     assert len(TITLE_TEMPLATES) >= 25
+
+
+def test_dns_titles_aligned_with_severity_policy():
+    """Regression Mai 2026: title_policy SP-DNS-* Templates waren versetzt zu
+    severity_policy.finding_type-Zuordnung — DKIM-Findings bekamen MTA-STS-Title etc.
+    Lockt jetzt 1:1-Alignment zwischen den beiden Files ein.
+    """
+    from reporter.severity_policy import SEVERITY_POLICIES
+
+    # Erwartete Korrespondenz (severity_policy.finding_type -> Substring im Title)
+    expected = {
+        "spf_missing":       "SPF-Record fehlt",
+        "spf_softfail":      "SPF-Policy auf softfail",
+        "dmarc_missing":     "DMARC-Record fehlt",
+        "dmarc_p_none":      "DMARC-Policy auf 'none'",
+        "dmarc_p_quarantine":"DMARC-Policy auf 'quarantine'",
+        "dkim_missing":      "DKIM-Record fehlt",
+        "mta_sts_missing":   "MTA-STS-Policy fehlt",
+        "dnssec_missing":    "DNSSEC fehlt",
+        "dnssec_chain_broken":"DNSSEC-Kette unterbrochen",
+        "caa_missing":       "CAA-Record fehlt",
+    }
+    by_finding_type = {p.finding_type: p.policy_id for p in SEVERITY_POLICIES if p.finding_type}
+    for ft, expected_substr in expected.items():
+        pid = by_finding_type.get(ft)
+        assert pid, f"Severity-Policy hat keine Regel fuer {ft}"
+        template = TITLE_TEMPLATES.get(pid, "")
+        assert expected_substr in template, (
+            f"{pid} ({ft}) Title-Template '{template}' enthaelt nicht '{expected_substr}' "
+            "— title_policy.py drift?"
+        )
