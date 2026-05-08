@@ -35,6 +35,7 @@ import argparse
 import json
 import re
 import sys
+import urllib.error
 import urllib.request
 from datetime import datetime
 from pathlib import Path
@@ -52,7 +53,11 @@ from _sync_lib import (  # noqa: E402
 # ────────────────────────────────────────────────────────────────────
 # Quellen
 # ────────────────────────────────────────────────────────────────────
-OSV_QUERY_URL = "https://api.osv.dev/v1/query"
+# OSV /v1/query verlangt `version` ODER `commit` — fuer Server-Software ohne
+# Ecosystem (Apache/nginx/Confluence/...) kommt da nur HTTP 400 zurueck.
+# Wir nutzen stattdessen CISA-KEV als Vendor-/CVE-Source und fetchen die
+# Vuln-Details pro CVE-ID via OSV /v1/vulns/{id} (funktioniert ohne version).
+OSV_VULN_BY_ID_URL = "https://api.osv.dev/v1/vulns/{}"
 KEV_URL = (
     "https://www.cisa.gov/sites/default/files/feeds/"
     "known_exploited_vulnerabilities.json"
@@ -60,30 +65,31 @@ KEV_URL = (
 
 HTTP_HEADERS = {"User-Agent": "vectiscan-sync-known-vuln-builds/1.0"}
 
-# Vendor/Product/OSV-Mapping — nur Server-Software die Banner-matchbar ist.
-# (vendor_internal, product_internal, osv_package, ecosystem)
-# ecosystem="" → OSV ohne ecosystem-Filter (matched alle Quellen).
+# Vendor-Mapping: (vendor_internal, product_internal, kev_vendor_match,
+# kev_product_match). KEV-vendor/product werden case-insensitiv mit
+# `vendorProject` / `product` aus CISA-KEV verglichen (substring-Match).
+# Leerer kev_product_match = matche alle Produkte des Vendors.
 VENDORS: list[tuple[str, str, str, str]] = [
-    ("apache", "httpd",            "Apache HTTP Server", ""),
-    ("nginx", "",                  "nginx", ""),
-    ("atlassian", "confluence",    "Atlassian Confluence", ""),
-    ("atlassian", "jira",          "Atlassian Jira", ""),
-    ("atlassian", "bitbucket",     "Atlassian Bitbucket", ""),
-    ("gitlab", "",                 "GitLab", ""),
-    ("jetbrains", "teamcity",      "JetBrains TeamCity", ""),
-    ("microsoft", "exchange",      "Microsoft Exchange Server", ""),
-    ("microsoft", "iis",           "Microsoft IIS", ""),
-    ("citrix", "netscaler",        "Citrix NetScaler ADC", ""),
-    ("citrix", "adc",              "Citrix ADC", ""),
-    ("fortinet", "fortigate",      "Fortinet FortiOS", ""),
-    ("ivanti", "connect-secure",   "Ivanti Connect Secure", ""),
-    ("connectwise", "screenconnect", "ConnectWise ScreenConnect", ""),
-    ("progress", "moveit",         "Progress MOVEit Transfer", ""),
-    ("progress", "ws_ftp",         "Progress WS_FTP Server", ""),
-    ("vmware", "vcenter",          "VMware vCenter Server", ""),
-    ("vmware", "esxi",             "VMware ESXi", ""),
-    ("php", "",                    "PHP", ""),
-    ("openssl", "",                "OpenSSL", ""),
+    ("apache",      "httpd",          "apache",      "http server"),
+    ("nginx",       "",               "nginx",       ""),
+    ("atlassian",   "confluence",     "atlassian",   "confluence"),
+    ("atlassian",   "jira",           "atlassian",   "jira"),
+    ("atlassian",   "bitbucket",      "atlassian",   "bitbucket"),
+    ("gitlab",      "",               "gitlab",      ""),
+    ("jetbrains",   "teamcity",       "jetbrains",   "teamcity"),
+    ("microsoft",   "exchange",       "microsoft",   "exchange"),
+    ("microsoft",   "iis",            "microsoft",   "iis"),
+    ("citrix",      "netscaler",      "citrix",      "netscaler"),
+    ("citrix",      "adc",            "citrix",      "adc"),
+    ("fortinet",    "fortigate",      "fortinet",    "fortios"),
+    ("ivanti",      "connect-secure", "ivanti",      "connect secure"),
+    ("connectwise", "screenconnect",  "connectwise", "screenconnect"),
+    ("progress",    "moveit",         "progress",    "moveit"),
+    ("progress",    "ws_ftp",         "progress",    "ws_ftp"),
+    ("vmware",      "vcenter",        "vmware",      "vcenter"),
+    ("vmware",      "esxi",           "vmware",      "esxi"),
+    ("php",         "",               "php",         ""),
+    ("openssl",     "",               "openssl",     ""),
 ]
 
 # CVSS-Schwellwert fuer non-KEV-Eintraege
@@ -96,82 +102,100 @@ MIN_TOTAL_ENTRIES = 15
 
 # Cap pro Vendor/Product um Liste handhabbar zu halten
 MAX_PER_PRODUCT = 30
+# Cap pro CVE — CVE-OSV-Conversions enthalten oft CPE-Eintraege fuer
+# Oracle/IBM/Ubuntu-Pakete die Apache/Confluence/etc. einbetten. Wir brauchen
+# nur die obersten 3 Upstream-Ranges, sonst polluten Distro-Versionen den
+# KNOWN_VULN_BUILDS-Lookup.
+MAX_RANGES_PER_VULN = 3
 
 
 # ────────────────────────────────────────────────────────────────────
 # CISA-KEV
 # ────────────────────────────────────────────────────────────────────
 
-def fetch_kev_set() -> set[str]:
-    """Returns set of CVE-IDs (uppercase) in CISA-KEV.
+def fetch_kev_data() -> dict:
+    """Returns full CISA-KEV JSON-Document (mit vulnerabilities-Liste).
 
-    Bei Fehlschlag: leeres Set (kein Hard-Fail — wir koennen ohne KEV
-    fallen-back auf reinen CVSS-Filter).
+    Bei Fehlschlag: leeres Dict (kein Hard-Fail).
     """
     try:
         body = fetch_with_retry(KEV_URL, retries=3, timeout=30,
                                  headers=HTTP_HEADERS)
     except Exception as exc:  # noqa: BLE001
         print(f"  [WARN] KEV-Fetch fehlgeschlagen: {exc}", file=sys.stderr)
-        return set()
+        return {}
     try:
-        data = json.loads(body)
+        return json.loads(body)
     except Exception as exc:  # noqa: BLE001
         print(f"  [WARN] KEV-Parse fehlgeschlagen: {exc}", file=sys.stderr)
-        return set()
-    out: set[str] = set()
-    for v in data.get("vulnerabilities", []):
-        cve = (v.get("cveID") or "").strip().upper()
-        if cve:
-            out.add(cve)
-    return out
+        return {}
+
+
+def kev_cve_set(kev_data: dict) -> set[str]:
+    """Set aller CVE-IDs in KEV (fuer schnellen `in_kev`-Check)."""
+    return {
+        (v.get("cveID") or "").strip().upper()
+        for v in kev_data.get("vulnerabilities", [])
+        if (v.get("cveID") or "").strip().upper().startswith("CVE-")
+    }
 
 
 # ────────────────────────────────────────────────────────────────────
-# OSV
+# OSV (per CVE-ID — /v1/query benoetigt version, was wir fuer Server-
+# Software ohne Ecosystem nicht haben. /v1/vulns/{cve} funktioniert ohne.)
 # ────────────────────────────────────────────────────────────────────
 
-def fetch_osv_for_vendor(
-    osv_package: str,
-    *,
-    ecosystem: str = "",
-    timeout: int = 30,
-) -> list[dict]:
-    """OSV POST /v1/query mit package-name (+ optional ecosystem).
+def fetch_osv_vuln_by_cve(cve_id: str, *, timeout: int = 30) -> dict | None:
+    """OSV GET /v1/vulns/{cve_id} → vuln-detail-dict (oder None).
 
-    OSV-Schema (vereinfacht):
-        {"vulns": [{
-            "id": "CVE-2023-25690",
-            "summary": "...",
-            "affected": [{"package": {"name": "..."},
-                          "ranges": [{"events": [{"introduced":"0"},
-                                                  {"fixed":"2.4.56"}]}]}],
-            "severity": [{"type": "CVSS_V3", "score": "CVSS:3.1/AV:N/.../9.8"}],
-            ...
-        }]}
+    Schema-Diff zu /v1/query:
+      - `affected[].ranges[]` hat oft `type=GIT` mit commit-Hashes in events.
+      - Echte Versions-Strings stehen in
+        `affected[].ranges[].database_specific.versions[].(introduced|last_affected)`.
+      - `severity[].score` ist meist nur ein CVSS-Vector-String, kein Float.
     """
-    payload: dict = {"package": {"name": osv_package}}
-    if ecosystem:
-        payload["package"]["ecosystem"] = ecosystem
-    body_bytes = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        OSV_QUERY_URL,
-        data=body_bytes,
-        headers={**HTTP_HEADERS, "Content-Type": "application/json"},
-        method="POST",
-    )
+    url = OSV_VULN_BY_ID_URL.format(cve_id)
+    req = urllib.request.Request(url, headers=HTTP_HEADERS)
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             raw = resp.read().decode("utf-8")
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return None
+        print(f"  [WARN] OSV {cve_id}: {exc}", file=sys.stderr)
+        return None
     except Exception as exc:  # noqa: BLE001
-        print(f"  [WARN] OSV {osv_package!r}: {exc}", file=sys.stderr)
-        return []
+        print(f"  [WARN] OSV {cve_id}: {exc}", file=sys.stderr)
+        return None
     try:
-        data = json.loads(raw)
+        return json.loads(raw)
     except Exception as exc:  # noqa: BLE001
-        print(f"  [WARN] OSV-Parse {osv_package!r}: {exc}", file=sys.stderr)
-        return []
-    return data.get("vulns") or []
+        print(f"  [WARN] OSV-Parse {cve_id}: {exc}", file=sys.stderr)
+        return None
+
+
+def kev_cves_for_vendor(
+    kev_data: dict,
+    vendor_match: str,
+    product_match: str,
+) -> list[tuple[str, dict]]:
+    """Filtert CISA-KEV-Eintraege per case-insensitivem Substring-Match auf
+    vendorProject / product. Returns (cve_id, kev_entry) Liste.
+    """
+    out: list[tuple[str, dict]] = []
+    vm = (vendor_match or "").lower()
+    pm = (product_match or "").lower()
+    for v in kev_data.get("vulnerabilities", []):
+        vendor_proj = (v.get("vendorProject") or "").lower()
+        product = (v.get("product") or "").lower()
+        if vm and vm not in vendor_proj:
+            continue
+        if pm and pm not in product:
+            continue
+        cve = (v.get("cveID") or "").strip().upper()
+        if cve.startswith("CVE-"):
+            out.append((cve, v))
+    return out
 
 
 _CVSS_SCORE_PAT = re.compile(r"[\d.]+$")
@@ -228,37 +252,85 @@ def _aliases_to_cves(vuln: dict) -> list[str]:
     return out
 
 
+# Git-Commit-SHAs sind 7-40-Zeichen hex; Versions-Strings haben einen Punkt
+# ODER sind Sonder-Markers wie "0".
+_GIT_SHA = re.compile(r"^[0-9a-f]{7,40}$")
+
+
+def _is_version_like(val: str) -> bool:
+    """True wenn `val` wie eine Software-Version aussieht (nicht Commit-SHA)."""
+    if not val:
+        return False
+    if val == "0":  # OSV-Marker fuer "alle Versionen ab Anfang"
+        return True
+    if _GIT_SHA.match(val):
+        return False
+    # Mindestens ein Punkt (z.B. 2.4.55) ODER nicht-rein-hex
+    return "." in val
+
+
+def _pick_version(events: list[dict], key: str) -> str | None:
+    """Liefert den ersten version-like-Wert fuer `key` (fixed | last_affected)
+    aus events. Git-Commit-SHAs werden uebersprungen.
+    """
+    for e in events:
+        if key in e:
+            v = e.get(key)
+            if v and _is_version_like(str(v)):
+                return str(v)
+    return None
+
+
 def _range_specs_from_vuln(vuln: dict) -> list[str]:
-    """Extrahiert range_spec-Strings aus OSV-`affected[].ranges[].events`.
+    """Extrahiert range_spec-Strings aus OSV-affected-Daten.
 
-    Mappt:
-      events:[{"introduced":"0"}, {"fixed":"2.4.56"}] → "<2.4.56"
-      events:[{"introduced":"2.4.49"}, {"fixed":"2.4.51"}]
-        → ">=2.4.49" UND "<2.4.51"  (zwei Events → wir nehmen `<fixed` als Hauptcheck)
-      events:[{"introduced":"X"}, {"last_affected":"Y"}] → "<=Y"
+    Quellen (in Reihenfolge, erste die Versionen liefert gewinnt pro Range):
+      1. `affected[].ranges[].events[]` wenn versions-like
+         (ECOSYSTEM-type, klassischer /v1/query-Pfad).
+      2. `affected[].ranges[].database_specific.versions[]` (GIT-type-Fallback;
+         events enthalten dann nur Commit-SHAs).
+      3. `affected[].database_specific.unresolved_ranges[].events[]`
+         (CVE-DB-Source-Pfad fuer Server-Software wie Confluence/Fortinet/IIS
+         — OSV hat keine Ecosystem-Mapping aber CPE/version-data).
 
-    Pro vuln liefern wir nur den ENGSTEN range — typischerweise `<fixed`.
+    Mappings:
+      {fixed:2.4.56} → "<2.4.56"
+      {last_affected:2.4.55} → "<=2.4.55"
     """
     out: list[str] = []
     for aff in vuln.get("affected") or []:
+        # 1./2. ranges + database_specific.versions
         for rng in aff.get("ranges") or []:
             events = rng.get("events") or []
-            fixed = next((e.get("fixed") for e in events if "fixed" in e), None)
-            last_aff = next(
-                (e.get("last_affected") for e in events if "last_affected" in e),
-                None,
-            )
+            fixed = _pick_version(events, "fixed")
+            last_aff = _pick_version(events, "last_affected") if not fixed else None
+            if not fixed and not last_aff:
+                ds_versions = (rng.get("database_specific") or {}).get("versions") or []
+                fixed = _pick_version(ds_versions, "fixed")
+                last_aff = _pick_version(ds_versions, "last_affected") if not fixed else None
             if fixed:
                 out.append(f"<{fixed}")
             elif last_aff:
                 out.append(f"<={last_aff}")
-    # Dedup, stabile Reihenfolge
+        # 3. unresolved_ranges (Server-Software via CVE-Source-Conversion)
+        unresolved = (aff.get("database_specific") or {}).get("unresolved_ranges") or []
+        for rng in unresolved:
+            events = rng.get("events") or []
+            fixed = _pick_version(events, "fixed")
+            last_aff = _pick_version(events, "last_affected") if not fixed else None
+            if fixed:
+                out.append(f"<{fixed}")
+            elif last_aff:
+                out.append(f"<={last_aff}")
+    # Dedup, stabile Reihenfolge, Cap auf MAX_RANGES_PER_VULN
     seen: set[str] = set()
     uniq: list[str] = []
     for s in out:
         if s not in seen:
             seen.add(s)
             uniq.append(s)
+            if len(uniq) >= MAX_RANGES_PER_VULN:
+                break
     return uniq
 
 
@@ -286,47 +358,59 @@ def _passes_filter(
 
 def build_entries(
     *,
-    kev_set: set[str],
+    kev_data: dict,
     vendors: list[tuple[str, str, str, str]] | None = None,
 ) -> dict[tuple[str, str, str], dict]:
-    """Iteriert VENDORS, filtert OSV-Vulns nach KEV/CVSS, baut entries-Dict."""
+    """Iteriert VENDORS, holt KEV-CVEs pro Vendor, fetcht OSV-Details
+    pro CVE-ID, baut entries-Dict.
+
+    Filter: alle KEV-Eintraege passen (KEV ist per Definition aktiv exploited
+    → CRITICAL). Wir braeuchten OSV nur fuer die range_specs.
+    """
+    kev_set = kev_cve_set(kev_data)
     out: dict[tuple[str, str, str], dict] = {}
-    for vendor, product, osv_pkg, ecosystem in (vendors or VENDORS):
-        print(f"[INFO] OSV-Query: {osv_pkg} (ecosystem={ecosystem or '*'})")
-        vulns = fetch_osv_for_vendor(osv_pkg, ecosystem=ecosystem)
+    for vendor, product, kev_vendor, kev_product in (vendors or VENDORS):
+        print(f"[INFO] KEV-Filter: vendor={kev_vendor!r} product={kev_product!r}")
+        cves = kev_cves_for_vendor(kev_data, kev_vendor, kev_product)
+        if not cves:
+            print(f"  -> {vendor}/{product or '*'}: 0 KEV matches")
+            continue
+
         kept_for_product = 0
-        for v in vulns:
-            passes, cves, cvss = _passes_filter(v, kev_set=kev_set)
-            if not passes:
+        for cve_id, kev_entry in cves:
+            vuln = fetch_osv_vuln_by_cve(cve_id)
+            if not vuln:
+                # Kein OSV-Eintrag → fallback nutzt KEV-Daten ohne range_spec
+                # Wir koennen ohne range_spec keinen sinnvollen Eintrag bauen,
+                # also skip.
                 continue
-            ranges = _range_specs_from_vuln(v)
+            ranges = _range_specs_from_vuln(vuln)
             if not ranges:
                 continue
-            # Severity-Label: wenn KEV-listed → CRITICAL (KEV-Eintraege haben
-            # nachweislich aktive Exploits), sonst aus CVSS abgeleitet.
-            in_kev = any(c in kev_set for c in cves)
-            severity = "CRITICAL" if in_kev else _highest_severity_label(cvss)
-            # Name: erste 80 Zeichen der summary
-            summary = (v.get("summary") or v.get("id") or "").strip()
-            name = summary[:80] if summary else cves[0]
+            cve_aliases = _aliases_to_cves(vuln) or [cve_id]
+            severity = "CRITICAL"  # KEV = aktiv exploited
+            summary = (
+                vuln.get("summary")
+                or kev_entry.get("vulnerabilityName")
+                or cve_id
+            ).strip()
+            name = summary[:80]
 
-            # Pro range einen Eintrag — typischerweise nur 1
             for rng in ranges:
                 key = (vendor, product, rng)
-                # Falls dupliziert, vereinige cves
                 if key in out:
                     existing = out[key]
                     merged_cves: list[str] = list(existing.get("cves") or [])
-                    for c in cves:
+                    for c in cve_aliases:
                         if c not in merged_cves:
                             merged_cves.append(c)
                     existing["cves"] = merged_cves
                     continue
                 out[key] = {
-                    "cves": cves,
+                    "cves": cve_aliases,
                     "severity": severity,
                     "name": name,
-                    "_source": "osv+kev" if in_kev else "osv",
+                    "_source": "osv+kev",
                 }
                 kept_for_product += 1
                 if kept_for_product >= MAX_PER_PRODUCT:
@@ -335,7 +419,8 @@ def build_entries(
                 print(f"  [INFO] Cap MAX_PER_PRODUCT={MAX_PER_PRODUCT} erreicht "
                       f"fuer {vendor}/{product}.")
                 break
-        print(f"  -> {vendor}/{product or '*'}: {kept_for_product} kept")
+        print(f"  -> {vendor}/{product or '*'}: {kept_for_product} kept "
+              f"(von {len(cves)} KEV matches)")
     return out
 
 
@@ -388,10 +473,14 @@ def main() -> int:
     args = ap.parse_args()
 
     print("[INFO] fetching CISA-KEV ...")
-    kev_set = fetch_kev_set()
-    print(f"  -> KEV: {len(kev_set)} CVEs")
+    kev_data = fetch_kev_data()
+    kev_total = len(kev_data.get("vulnerabilities") or [])
+    print(f"  -> KEV: {kev_total} CVEs")
+    if kev_total == 0:
+        print("[ERROR] KEV-Fetch lieferte keine Daten — Abort.", file=sys.stderr)
+        return 1
 
-    entries = build_entries(kev_set=kev_set)
+    entries = build_entries(kev_data=kev_data)
 
     try:
         validate_min_entries(
