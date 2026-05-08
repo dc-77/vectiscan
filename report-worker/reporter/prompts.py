@@ -40,6 +40,15 @@ HÄUFIG FALSCH BEWERTET:
 - SSH mit Key-Auth, Passwort-Auth deaktiviert: INFO (NICHT LOW)
 - HTTP ohne HTTPS ohne Login-Formular: LOW 3.7
 
+CVE-DISZIPLIN — Halluzinations-Risiko vermeiden:
+- Nenne CVE-IDs NUR wenn die Versions-Range nachweisbar zur identifizierten
+  Version passt. Bekannte Verwechslungen:
+  • CVE-2024-6387 (regreSSHion) gilt NUR fuer OpenSSH 8.5p1-9.7p1 — NICHT bei 6.x/7.x.
+  • CVE-2021-41773/CVE-2021-42013 NUR fuer Apache 2.4.49/2.4.50 — NICHT 2.4.7.
+  • CVE-2014-0160 (Heartbleed) NUR fuer OpenSSL 1.0.1-1.0.1f.
+- Bei Unsicherheit: "mehrere bekannte CVEs in dieser Versions-Klasse" OHNE
+  spezifische CVE-ID. Lieber zu wenig als falsche CVEs.
+
 METHODIK:
 Der Scan wurde als automatisierter Schnellscan durchgeführt. Port-Scanning (nmap), Web-Technologie-Identifikation (webtech), HTTP-Header-Prüfung und Web-Schwachstellen-Scan (ZAP).
 
@@ -175,6 +184,24 @@ HÄUFIG FALSCH BEWERTETE FINDINGS — Korrekte Scores:
   → NICHT LOW — Version im Banner allein ist kein Risiko
 - Port offen aber Service antwortet nicht oder lehnt ab:
   → INFO — offener Port allein ohne erreichbaren Dienst ist kein Befund
+
+CVE-DISZIPLIN — Halluzinations-Risiko vermeiden:
+- Schreibe NUR CVE-IDs in Beschreibung/Nachweis, deren Versions-Range NACHWEISBAR
+  zur identifizierten Version passt. Jede CVE hat eine spezifische Versions-Range.
+- Konkrete Beispiele bekannter Verwechslungen:
+  • CVE-2024-6387 (regreSSHion) gilt NUR fuer OpenSSH 8.5p1 bis 9.7p1 — NICHT
+    fuer OpenSSH 6.x oder 7.x. Bei OpenSSH 6.6.1p1 niemals regreSSHion erwaehnen.
+  • CVE-2021-41773 / CVE-2021-42013 (Apache Path Traversal) gilt NUR fuer
+    Apache 2.4.49 bzw. 2.4.50 — NICHT fuer 2.4.7 oder andere 2.4.x.
+  • CVE-2014-0160 (Heartbleed) gilt NUR fuer OpenSSL 1.0.1 bis 1.0.1f — NICHT
+    fuer 0.9.8, 1.0.0, oder 1.0.1g+.
+- Wenn du dir bei einer CVE-Versions-Range UNSICHER bist:
+  → "mehrere bekannte CVEs in dieser Version-Klasse" schreiben, OHNE spezifische
+     CVE-Nummer.
+  → Lieber zu wenig CVE-IDs nennen als falsche.
+- KNOWN_VULN_BUILDS-Liste (deterministische Pflicht-Findings) liefert dir bei
+  Banner-Match die korrekte CVE-Liste — uebernimm die direkt, ergaenze keine
+  weiteren CVEs aus dem Gedaechtnis.
 
 METHODIK:
 Phase 0 — Reconnaissance: Passive Intelligence (Shodan, AbuseIPDB, WHOIS), DNS-Enumeration (subfinder, gobuster, dnsx, crt.sh, certspotter) und Web-Probe (httpx). KI-gestützte Host-Strategie bestimmt Scan-Prioritäten.
@@ -459,6 +486,15 @@ REGELN FÜR FINDINGS:
   WARN → LOW, FAIL bei optionalen Checks → MEDIUM
 - description: Erkläre was das Problem ist und warum es TR-03116-4-relevant ist
 - recommendation: Konkrete Schritte zur Behebung (Konfigurationsbeispiele)
+
+CVE-DISZIPLIN bei zugeordneten Schwachstellen:
+- CVE-IDs nur nennen wenn die Versions-Range nachweisbar zur identifizierten
+  Version passt. Bekannte Verwechslungen, die zu vermeiden sind:
+  • CVE-2024-6387 (regreSSHion) gilt NUR fuer OpenSSH 8.5p1-9.7p1 — NICHT
+    bei OpenSSH 6.x oder 7.x.
+  • CVE-2014-0160 (Heartbleed) gilt NUR fuer OpenSSL 1.0.1-1.0.1f.
+- Bei Unsicherheit: "mehrere bekannte CVEs in dieser Versions-Klasse" OHNE
+  spezifische CVE-Nummer.
 
 AUSNAHME — CNAME-basierte Cloud-Dienste (Hostname-Mismatch):
 Wenn "certificate does not match" auf einem Host gemeldet wird, der per CNAME auf
