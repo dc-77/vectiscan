@@ -334,13 +334,100 @@ def _build_executive_summary(
 # ---------------------------------------------------------------------------
 
 
+_STATUS_LABEL = {
+    "eol":      "EOL",
+    "outdated": "veraltet",
+    "current":  "aktuell",
+}
+
+
+def _build_tech_subtables(
+    hosts: list[dict[str, Any]],
+    tech_profiles_by_ip: dict[str, dict[str, Any]] | None,
+    styles: Any,
+) -> list[dict[str, Any]]:
+    """Pro Host eine kompakte Sub-Tabelle „Eingesetzte Technologien".
+
+    Migration 027 (Mai 2026): Quelle ist tech_profiles via tech_table_builder.
+    Bei leerem Profil oder leerer Tech-Tabelle wird ein Hinweis-Eintrag
+    angezeigt — Skip waere verwirrend bei rohen IPs.
+    """
+    from reporter.tech_table_builder import build_tech_table_for_host
+
+    if not tech_profiles_by_ip:
+        return []
+
+    blocks: list[dict[str, Any]] = []
+    for h in hosts:
+        ip = h.get("ip", "N/A")
+        profile = tech_profiles_by_ip.get(ip)
+        if not profile:
+            continue
+        rows = build_tech_table_for_host(profile)
+        if not rows:
+            continue
+
+        table_rows = []
+        for r in rows:
+            status_parts = [_STATUS_LABEL.get(r["status"], r["status"])]
+            if r.get("is_mega_cve"):
+                status_parts.append("Mega-CVE")
+            status_text = " · ".join(status_parts)
+            cves = r.get("cves") or []
+            if cves:
+                # ersten 3 CVEs zeigen, dann „+N weitere"
+                shown = ", ".join(cves[:3])
+                if len(cves) > 3:
+                    shown += f" (+{len(cves) - 3})"
+                cve_text = shown
+            else:
+                cve_text = "—"
+            extra = []
+            if r.get("eol_date"):
+                extra.append(f"EOL: {r['eol_date']}")
+            if r.get("latest_patch") and r["status"] != "current":
+                extra.append(f"aktuell: {r['latest_patch']}")
+            extra_text = " · ".join(extra) or "—"
+            table_rows.append([
+                Paragraph(_safe(r["name"]), styles["TableCell"]),
+                Paragraph(_safe(r["version"] or "—"), styles["TableCell"]),
+                Paragraph(_safe(r["category"]), styles["TableCell"]),
+                Paragraph(status_text, styles["TableCell"]),
+                Paragraph(extra_text, styles["TableCell"]),
+                Paragraph(_safe(cve_text), styles["TableCell"]),
+            ])
+
+        blocks.append({
+            "ip": ip,
+            "fqdns": h.get("fqdns", []),
+            "table": {
+                "header": [
+                    Paragraph("<b>Technologie</b>", styles["TableHeader"]),
+                    Paragraph("<b>Version</b>", styles["TableHeader"]),
+                    Paragraph("<b>Kategorie</b>", styles["TableHeader"]),
+                    Paragraph("<b>Status</b>", styles["TableHeader"]),
+                    Paragraph("<b>EOL / aktuelle Stable</b>", styles["TableHeader"]),
+                    Paragraph("<b>CVEs</b>", styles["TableHeader"]),
+                ],
+                "rows": table_rows,
+                "widths": [38 * mm, 18 * mm, 25 * mm, 20 * mm, 38 * mm, 30 * mm],
+            },
+        })
+    return blocks
+
+
 def _build_scope(
     domain: str,
     host_inventory: dict[str, Any],
     scan_meta: dict[str, Any],
     styles: Any,
+    tech_profiles_by_ip: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """Build the scope and methodology section."""
+    """Build the scope and methodology section.
+
+    Migration 027 (Mai 2026): tech_profiles_by_ip optional — pro Host wird
+    eine Sub-Tabelle „Eingesetzte Technologien" mit Status/EOL/CVE gerendert.
+    """
     hosts = host_inventory.get("hosts", [])
     scan_date = scan_meta.get("startedAt", datetime.now().isoformat())[:10]
 
@@ -361,6 +448,8 @@ def _build_scope(
             ]
         )
 
+    tech_blocks = _build_tech_subtables(hosts, tech_profiles_by_ip, styles)
+
     subsections = [
         {
             "title": "2.1&nbsp;&nbsp;&nbsp;Prüfungsumfang",
@@ -377,6 +466,7 @@ def _build_scope(
                 "rows": host_rows,
                 "widths": [50 * mm, 120 * mm],
             },
+            "host_tech_blocks": tech_blocks,
         },
         {
             "title": "2.2&nbsp;&nbsp;&nbsp;Methodik",
@@ -834,7 +924,13 @@ def map_professional_report(
         "executive_summary": _build_executive_summary(
             claude_output, domain, styles, severity_counts
         ),
-        "scope": _build_scope(domain, host_inventory, scan_meta, styles),
+        "scope": _build_scope(
+            domain, host_inventory, scan_meta, styles,
+            tech_profiles_by_ip={
+                p.get("ip"): p for p in (scan_meta.get("techProfiles") or [])
+                if p.get("ip")
+            },
+        ),
         "findings_section_label": "3&nbsp;&nbsp;&nbsp;Befunde",
         "findings": mapped_findings,
         "recommendations": _build_recommendations(recommendations, styles),

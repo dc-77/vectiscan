@@ -812,6 +812,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
               r.policy_version,
               r.policy_id_distinct,
               r.severity_counts AS audit_severity_counts,
+              r.tech_profiles,
+              r.additional_findings,
               o.correlation_data,
               o.business_impact_score
          FROM reports r
@@ -872,6 +874,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         audit_severity_counts: row.audit_severity_counts ?? null,
         // Order-Level Business-Impact-Score (aus Phase 3, vor Determinismus-Recompute)
         business_impact_score: row.business_impact_score ?? null,
+        // Migration-027 (Mai 2026): Per-Host-Tech-Tabelle + alle Findings inkl. additional
+        tech_profiles: row.tech_profiles ?? [],
+        additional_findings: row.additional_findings ?? [],
         excluded_finding_ids: excludedIds,
         exclusions: exclusionRows.map((r) => ({
           finding_id: r.finding_id,
@@ -881,6 +886,112 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       },
     };
   });
+
+  // GET /api/orders/:id/hosts/:host/findings — alle Findings (inkl. additional ueber Top-N-Cap)
+  // gefiltert nach affected_hosts oder vhost. Migration 027 (Mai 2026).
+  server.get<{ Params: OrderParams & { host: string } }>(
+    '/api/orders/:id/hosts/:host/findings',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id, host } = request.params;
+      const user = request.user!;
+
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
+      const decodedHost = decodeURIComponent(host).trim().toLowerCase();
+      if (!decodedHost) {
+        return reply.status(400).send({ success: false, error: 'host parameter required' });
+      }
+
+      // Ownership-Check
+      const orderCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [id]);
+      if (orderCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+      if (
+        user.role !== 'admin' &&
+        (orderCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId
+      ) {
+        return reply.status(403).send({ success: false, error: 'Access denied' });
+      }
+
+      const result = await query(
+        `SELECT findings_data, additional_findings, tech_profiles
+           FROM reports
+          WHERE order_id = $1
+          ORDER BY created_at DESC
+          LIMIT 1`,
+        [id],
+      );
+      if (result.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Keine Befunddaten verfügbar' });
+      }
+      const row = result.rows[0] as Record<string, unknown>;
+      const findingsData = (row.findings_data as Record<string, unknown> | null) ?? {};
+      const topNFindings = Array.isArray(findingsData.findings)
+        ? (findingsData.findings as Array<Record<string, unknown>>)
+        : [];
+      const additionalFindings = Array.isArray(row.additional_findings)
+        ? (row.additional_findings as Array<Record<string, unknown>>)
+        : [];
+
+      // 404 wenn der Host weder in tech_profiles noch in irgendeinem affected_hosts auftaucht.
+      const techProfiles = Array.isArray(row.tech_profiles)
+        ? (row.tech_profiles as Array<Record<string, unknown>>)
+        : [];
+      const knownHosts = new Set<string>();
+      for (const tp of techProfiles) {
+        if (typeof tp.ip === 'string') knownHosts.add(tp.ip.toLowerCase());
+        const fqdns = tp.fqdns;
+        if (Array.isArray(fqdns)) {
+          for (const f of fqdns) {
+            if (typeof f === 'string') knownHosts.add(f.toLowerCase());
+          }
+        }
+      }
+      const allFindings = [...topNFindings, ...additionalFindings];
+      // affected_hosts kann ein String oder Array sein — normalisieren
+      const matchHost = (f: Record<string, unknown>): boolean => {
+        const affected = f.affected_hosts;
+        if (Array.isArray(affected)) {
+          if (affected.some((h) => typeof h === 'string' && h.toLowerCase().includes(decodedHost))) {
+            return true;
+          }
+        }
+        const vhost = f.vhost;
+        if (typeof vhost === 'string' && vhost.toLowerCase() === decodedHost) {
+          return true;
+        }
+        const affectedField = f.affected;
+        if (typeof affectedField === 'string' && affectedField.toLowerCase().includes(decodedHost)) {
+          return true;
+        }
+        return false;
+      };
+
+      const matched = allFindings.filter(matchHost);
+      const matchedTopN = matched.filter((f) => topNFindings.includes(f)).length;
+
+      if (matched.length === 0 && !knownHosts.has(decodedHost)) {
+        return reply.status(404).send({
+          success: false,
+          error: `Host '${decodedHost}' nicht in dieser Order gefunden`,
+        });
+      }
+
+      return {
+        success: true,
+        data: {
+          host: decodedHost,
+          findings: matched,
+          total_count: matched.length,
+          top_n_count: matchedTopN,
+          additional_count: matched.length - matchedTopN,
+        },
+      };
+    },
+  );
 
   // GET /api/orders/:id/diff?compare=<otherId> — compare findings between two scans
   server.get<{ Params: OrderParams }>('/api/orders/:id/diff', { preHandler: [requireAuth] }, async (request, reply) => {

@@ -33,6 +33,7 @@ const MIGRATION_023_PATH = path.join(__dirname, '..', 'migrations', '023_consoli
 const MIGRATION_024_PATH = path.join(__dirname, '..', 'migrations', '024_determinism_kpi.sql');
 const MIGRATION_025_PATH = path.join(__dirname, '..', 'migrations', '025_subscription_delete_safe.sql');
 const MIGRATION_026_PATH = path.join(__dirname, '..', 'migrations', '026_shodan_pre_warm.sql');
+const MIGRATION_027_PATH = path.join(__dirname, '..', 'migrations', '027_tech_profiles_and_additional_findings.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -340,6 +341,20 @@ export async function initDb(): Promise<void> {
   `);
   if (!preWarm026Check.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_026_PATH, 'utf-8');
+    await pool.query(migrationSql);
+  }
+
+  // Migration 027: tech_profiles + additional_findings auf reports.
+  // Quelle fuer Per-Host-Tech-Tabelle (UI + PDF) und "alle Befunde
+  // anzeigen"-Drilldown ueber den Top-N-Cap hinaus.
+  const techProfiles027Check = await pool.query(`
+    SELECT EXISTS (
+      SELECT FROM information_schema.columns
+      WHERE table_name = 'reports' AND column_name = 'tech_profiles'
+    ) AS exists
+  `);
+  if (!techProfiles027Check.rows[0].exists) {
+    const migrationSql = fs.readFileSync(MIGRATION_027_PATH, 'utf-8');
     await pool.query(migrationSql);
   }
 

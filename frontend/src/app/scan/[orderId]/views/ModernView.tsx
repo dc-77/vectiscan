@@ -254,6 +254,15 @@ export default function ModernView({
               discoveredHosts={hostList}
               strategyNotes={aiStrategy?.strategy_notes ?? null}
               orderId={order?.id}
+              techProfilesByIp={
+                findings?.tech_profiles
+                  ? Object.fromEntries(
+                      findings.tech_profiles
+                        .filter((tp) => tp.ip)
+                        .map((tp) => [tp.ip, tp]),
+                    )
+                  : undefined
+              }
             />
           </section>
         )}

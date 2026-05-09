@@ -5,10 +5,20 @@
  * (Priority-Badge P1/P2/P3 + scan/skip-Status) und das Reasoning auf
  * einen Klick / Hover.
  *
- * Datenquellen (alle aus /api/orders/:id/events):
+ * Datenquellen:
  *   - aiStrategy.hosts[]: { ip, action, priority, reasoning, scan_hints }
+ *     (aus /api/orders/:id/events)
  *   - discoveredHosts: Fallback wenn keine AI-Strategy vorliegt
+ *   - techProfilesByIp: Phase-1-Tech-Profile pro IP (Migration 027, Mai 2026,
+ *     aus /api/orders/:id/findings.tech_profiles[]) — speist die TechTable
+ *     pro Host-Card.
  */
+
+import { useState } from 'react';
+
+import { PerHostFindingsDrawer } from './PerHostFindingsDrawer';
+import { TechTable } from './TechTable';
+import type { TechProfile } from '@/lib/api';
 
 interface AiHost {
   ip: string;
@@ -47,6 +57,8 @@ interface Props {
   aiHosts: AiHost[] | null | undefined;
   discoveredHosts: DiscoveredHost[] | null | undefined;
   strategyNotes?: string | null;
+  /** Migration 027: Phase-1-Tech-Profile pro IP. Speist die TechTable pro Host. */
+  techProfilesByIp?: Record<string, TechProfile> | undefined;
   // PR-Screenshots: optional, fuer Thumbnail-Anzeige bei Hosts mit Web-Content.
   orderId?: string;
 }
@@ -73,7 +85,8 @@ function screenshotKeyFor(
   return dh?.screenshot_minio_key ?? null;
 }
 
-export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, orderId }: Props) {
+export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, orderId, techProfilesByIp }: Props) {
+  const [drawerHost, setDrawerHost] = useState<string | null>(null);
   // Wenn keine aiStrategy vorliegt: simple Liste der discovered hosts
   if (!aiHosts || aiHosts.length === 0) {
     if (!discoveredHosts || discoveredHosts.length === 0) {
@@ -192,6 +205,22 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, order
                     </div>
                   );
                 })()}
+                {/* Migration 027 (Mai 2026): Per-Host-Tech-Tabelle */}
+                {techProfilesByIp?.[h.ip] && (
+                  <TechTable techProfile={techProfilesByIp[h.ip]} />
+                )}
+                {/* Migration 027: Drilldown zu allen Befunden fuer diesen Host */}
+                {orderId && !isSkip && (
+                  <button
+                    onClick={() => {
+                      const fqdn0 = (techProfilesByIp?.[h.ip]?.fqdns || [])[0];
+                      setDrawerHost(fqdn0 || h.ip);
+                    }}
+                    className="mt-2 text-[11px] text-cyan-400 hover:text-cyan-300 hover:underline"
+                  >
+                    Alle Befunde fuer diesen Host anzeigen →
+                  </button>
+                )}
                 {screenshotUrl && (
                   /* Thumbnail mit Lightbox-on-click — alle Hosts mit
                      web_probe.has_web=true bekommen einen Screenshot. */
@@ -226,6 +255,13 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, order
           })}
         </div>
       </div>
+      {drawerHost && orderId && (
+        <PerHostFindingsDrawer
+          orderId={orderId}
+          host={drawerHost}
+          onClose={() => setDrawerHost(null)}
+        />
+      )}
     </div>
   );
 }

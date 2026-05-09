@@ -110,12 +110,17 @@ def _create_report_record(
     excluded_findings: list[str] | None = None,
     policy_version: str | None = None,
     policy_id_distinct: list[str] | None = None,
+    tech_profiles: list[dict] | None = None,
+    additional_findings: list[dict] | None = None,
 ) -> tuple[str, str]:
     """Insert a row into the reports table and return (report_id, download_token).
 
     policy_version + policy_id_distinct werden in den Audit-Spalten der
     Migration 016 abgelegt. severity_counts wird automatisch via
     BEFORE-INSERT-Trigger aus findings_data abgeleitet.
+
+    Migration 027 (Mai 2026): tech_profiles + additional_findings — Quelle fuer
+    Per-Host-Tech-Tabelle und "alle Befunde anzeigen"-Drilldown.
     """
     download_token = str(uuid.uuid4())
     expires_at = datetime.now(timezone.utc) + timedelta(days=30)
@@ -125,9 +130,10 @@ def _create_report_record(
             INSERT INTO reports (
                 order_id, minio_bucket, minio_path, file_size_bytes,
                 download_token, expires_at, findings_data, version,
-                excluded_findings, policy_version, policy_id_distinct
+                excluded_findings, policy_version, policy_id_distinct,
+                tech_profiles, additional_findings
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
             (
@@ -138,6 +144,8 @@ def _create_report_record(
                 json.dumps(excluded_findings) if excluded_findings else None,
                 policy_version,
                 policy_id_distinct,  # psycopg2 maps Python list → TEXT[]
+                json.dumps(tech_profiles) if tech_profiles else None,
+                json.dumps(additional_findings) if additional_findings else None,
             ),
         )
         report_id = cur.fetchone()[0]
@@ -544,6 +552,8 @@ def process_job(job_data: dict) -> None:
             "completedAt": parsed_meta.get("finishedAt", datetime.now().isoformat()),
             "package": package,
             "toolVersions": parsed_meta.get("toolVersions", []),
+            # Migration 027 (Mai 2026): tech_profiles fuer Per-Host-Tech-Tabelle im PDF.
+            "techProfiles": effective_profiles or [],
         }
         report_data = map_to_report_data(
             claude_output=claude_output,
@@ -601,16 +611,31 @@ def process_job(job_data: dict) -> None:
         policy_version = claude_output.get("policy_version")
         policy_ids_raw = claude_output.get("policy_id_distinct") or []
         policy_id_distinct = [pid for pid in policy_ids_raw if pid] or None
+        # Migration 027: tech_profiles (1:1 aus Phase 1, mit pre-computed tech_rows
+        # via tech_table_builder als Single Source of Truth — Frontend nutzt diese
+        # statt eigener Klassifikation) + additional_findings (Voll-Body).
+        from reporter.tech_table_builder import build_tech_table_for_host
+        enriched_profiles: list[dict] | None = None
+        if effective_profiles:
+            enriched_profiles = []
+            for p in effective_profiles:
+                tech_rows = build_tech_table_for_host(p)
+                enriched_profiles.append({**p, "tech_rows": tech_rows})
+        additional_findings = claude_output.get("additional_findings_summary") or None
         report_id, download_token = _create_report_record(
             conn, order_id, minio_pdf_path, file_size, findings_data,
             version=version, excluded_findings=excluded if excluded else None,
             policy_version=policy_version,
             policy_id_distinct=policy_id_distinct,
+            tech_profiles=enriched_profiles,
+            additional_findings=additional_findings,
         )
         log.info("report_record_created", report_id=report_id,
                  download_token=download_token, version=version,
                  policy_version=policy_version,
-                 policy_id_count=len(policy_id_distinct or []))
+                 policy_id_count=len(policy_id_distinct or []),
+                 tech_profile_count=len(enriched_profiles or []),
+                 additional_finding_count=len(additional_findings or []))
 
         # -- 8b. Mark previous version as superseded --------------------------
         if version > 1:

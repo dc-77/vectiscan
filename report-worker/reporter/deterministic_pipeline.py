@@ -80,6 +80,30 @@ def _normalize_for_policy(claude_findings: list[dict]) -> list[dict]:
     return normalized
 
 
+def _merge_orig_with_policy(orig: dict, pf: dict) -> dict:
+    """Mergt KI-original + policy-normalisiertes Finding zu einem Output-dict."""
+    merged = dict(orig)  # preserve existing description/recommendation/impact
+    merged["severity"] = _to_upper_severity(pf.get("severity") or orig.get("severity"))
+    if pf.get("cvss_score") is not None:
+        merged["cvss_score"] = str(pf["cvss_score"])
+    if pf.get("cvss_vector"):
+        merged["cvss_vector"] = pf["cvss_vector"]
+    if pf.get("policy_id"):
+        merged["policy_id"] = pf["policy_id"]
+    if pf.get("severity_provenance"):
+        merged["severity_provenance"] = pf["severity_provenance"]
+    if pf.get("business_impact_score") is not None:
+        merged["business_impact_score"] = pf["business_impact_score"]
+    if pf.get("affected_hosts"):
+        merged["affected_hosts"] = pf["affected_hosts"]
+    ft = pf.get("finding_type") or orig.get("finding_type")
+    if ft:
+        merged["finding_type"] = ft
+    if pf.get("_finding_type_source"):
+        merged["_finding_type_source"] = pf["_finding_type_source"]
+    return merged
+
+
 def _writeback_to_claude(claude_findings_in: list[dict],
                          policy_findings: list[dict],
                          selected: list[dict]) -> list[dict]:
@@ -101,30 +125,25 @@ def _writeback_to_claude(claude_findings_in: list[dict],
         if fid not in selected_ids:
             continue
         pf = policy_by_id.get(fid, {})
-        merged = dict(orig)  # preserve existing description/recommendation/impact
-        # Override the deterministic-relevant fields
-        merged["severity"] = _to_upper_severity(pf.get("severity") or orig.get("severity"))
-        if pf.get("cvss_score") is not None:
-            merged["cvss_score"] = str(pf["cvss_score"])
-        if pf.get("cvss_vector"):
-            merged["cvss_vector"] = pf["cvss_vector"]
-        if pf.get("policy_id"):
-            merged["policy_id"] = pf["policy_id"]
-        if pf.get("severity_provenance"):
-            merged["severity_provenance"] = pf["severity_provenance"]
-        if pf.get("business_impact_score") is not None:
-            merged["business_impact_score"] = pf["business_impact_score"]
-        if pf.get("affected_hosts"):
-            merged["affected_hosts"] = pf["affected_hosts"]
-        # finding_type vom mapper persistieren (war frueher verloren -> alle
-        # Findings hatten finding_type=null in der API). _finding_type_source
-        # = "regex" | "ai_fallback" | "preset" fuer QA/Audit.
-        ft = pf.get("finding_type") or orig.get("finding_type")
-        if ft:
-            merged["finding_type"] = ft
-        if pf.get("_finding_type_source"):
-            merged["_finding_type_source"] = pf["_finding_type_source"]
-        out.append(merged)
+        out.append(_merge_orig_with_policy(orig, pf))
+    return out
+
+
+def _build_additional_findings_full_body(
+    claude_findings_in: list[dict],
+    additional_normalized: list[dict],
+) -> list[dict]:
+    """Baut Voll-Body-Dicts fuer die nicht-selektierten Findings.
+
+    Migration 027: API/Frontend brauchen Voll-Body um "alle Befunde anzeigen"-
+    Drilldown sinnvoll zu zeigen. Vorher nur id/title/severity/policy_id.
+    """
+    orig_by_id = {(f.get("id") or f.get("finding_id")): f for f in claude_findings_in}
+    out: list[dict] = []
+    for pf in additional_normalized:
+        fid = pf.get("finding_id")
+        orig = orig_by_id.get(fid, {})
+        out.append(_merge_orig_with_policy(orig, pf))
     return out
 
 
@@ -240,18 +259,14 @@ def apply_deterministic_pipeline(claude_output: dict,
         log.info("title_templates_applied", count=title_overridden,
                  total=len(claude_output["findings"]))
 
-    # Additional als separate Liste behalten (fuer „weitere Befunde"-Anhang)
-    # Title-Templates auch fuer additional anwenden (fuer Anhang-Konsistenz)
+    # Additional als separate Liste mit Voll-Body — Migration 027 (Mai 2026):
+    # API + Frontend brauchen description/recommendation/impact/cvss_*/affected_hosts
+    # damit "alle Befunde anzeigen"-Drilldown ohne Reporter-Re-Run funktioniert.
+    # Title-Templates vorab anwenden fuer Konsistenz mit Top-N.
     apply_titles(sel.additional, scan_context={"domain": domain, **sc})
-    claude_output["additional_findings_summary"] = [
-        {
-            "id": f.get("finding_id"),
-            "title": f.get("title"),
-            "severity": _to_upper_severity(f.get("severity")),
-            "policy_id": f.get("policy_id"),
-        }
-        for f in sel.additional
-    ]
+    claude_output["additional_findings_summary"] = _build_additional_findings_full_body(
+        findings_in, sel.additional,
+    )
     # Audit-Felder
     claude_output["policy_version"] = POLICY_VERSION
     claude_output["policy_id_distinct"] = sorted({

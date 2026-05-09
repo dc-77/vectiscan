@@ -1702,6 +1702,23 @@ def generate_report(report_data, output_path):
                 t = sub["table"]
                 story.append(styled_table(t["header"], t["rows"], t["widths"], styles))
                 story.append(Spacer(1, SPACING_PARAGRAPH))
+            # Migration 027 (Mai 2026): pro Host eine Sub-Tabelle „Eingesetzte Technologien"
+            for block in sub.get("host_tech_blocks", []) or []:
+                ip = block.get("ip", "?")
+                fqdns = block.get("fqdns") or []
+                fqdn_label = ", ".join(fqdns[:3]) if fqdns else "(kein FQDN)"
+                if len(fqdns) > 3:
+                    fqdn_label += f" (+{len(fqdns) - 3})"
+                heading = Paragraph(
+                    f"<b>Eingesetzte Technologien — {ip}</b> <font size='9'>({fqdn_label})</font>",
+                    styles["BodyText2"],
+                )
+                t = block["table"]
+                tbl = styled_table(t["header"], t["rows"], t["widths"], styles)
+                # Heading + Tabelle als KeepTogether-Block damit Host nicht
+                # ueber den Seitenumbruch zerlegt wird.
+                story.append(KeepTogether([heading, Spacer(1, 2 * mm), tbl]))
+                story.append(Spacer(1, SPACING_PARAGRAPH))
             if sub.get("info_box"):
                 build_info_box(story, sub["info_box"])
                 story.append(Spacer(1, SPACING_PARAGRAPH))

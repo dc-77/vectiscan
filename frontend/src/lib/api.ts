@@ -363,6 +363,47 @@ export interface Recommendation {
   effort: string;
 }
 
+// Migration 027 (Mai 2026): Phase-1-Tech-Profile pro Host. Quelle fuer
+// Per-Host-Tech-Tabelle (Name/Version/Status/EOL/CVE-Count) in UI + PDF.
+export interface TechRow {
+  name: string;
+  version: string;
+  category: string;
+  status: 'eol' | 'outdated' | 'current';
+  is_mega_cve: boolean;
+  eol_date: string;
+  latest_patch: string;
+  cves: string[];
+  vuln_name: string;
+  confidence: number | null;
+  source: string;
+}
+
+export interface TechProfile {
+  ip: string;
+  fqdns: string[];
+  cms: string | null;
+  cms_version: string | null;
+  cms_confidence?: number;
+  cms_details?: Record<string, unknown>;
+  server: string | null;
+  waf: string | null;
+  open_ports: number[];
+  mail_services?: boolean;
+  ftp_service?: boolean;
+  has_ssl?: boolean;
+  vhost_results?: Record<string, {
+    cms?: string | null;
+    cms_version?: string | null;
+    cms_confidence?: number;
+    waf?: string | null;
+  }>;
+  primary_vhost?: string | null;
+  technologies?: Array<{ name: string; version: string }>;
+  /** Pre-computed Tech-Rows aus tech_table_builder.py — Single Source of Truth. */
+  tech_rows?: TechRow[];
+}
+
 export interface FindingsData {
   overall_risk: string;
   overall_description: string;
@@ -383,6 +424,9 @@ export interface FindingsData {
   policy_id_distinct?: string[];
   audit_severity_counts?: Record<string, number> | null;
   business_impact_score?: number | null;
+  // Migration 027 (Mai 2026): Per-Host-Tech-Tabelle + alle Findings (auch ueber Top-N)
+  tech_profiles?: TechProfile[];
+  additional_findings?: Finding[];
 }
 
 export async function listOrders(): Promise<ApiResponse<{ orders: OrderListItem[] }>> {
@@ -462,6 +506,25 @@ export async function getFindings(orderId: string): Promise<ApiResponse<Findings
   const res = await fetch(`${API_URL}/api/orders/${orderId}/findings`, {
     headers: authHeaders(),
   });
+  return handleResponse(res);
+}
+
+// Migration 027 (Mai 2026): Per-Host-Findings-Drilldown — alle Findings (inkl.
+// additional ueber Top-N-Cap) gefiltert nach affected_hosts/vhost.
+export interface PerHostFindings {
+  host: string;
+  findings: Finding[];
+  total_count: number;
+  top_n_count: number;
+  additional_count: number;
+}
+
+export async function getOrderHostFindings(
+  orderId: string,
+  host: string,
+): Promise<ApiResponse<PerHostFindings>> {
+  const url = `${API_URL}/api/orders/${orderId}/hosts/${encodeURIComponent(host)}/findings`;
+  const res = await fetch(url, { headers: authHeaders() });
   return handleResponse(res);
 }
 
