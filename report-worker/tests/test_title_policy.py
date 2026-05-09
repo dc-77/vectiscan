@@ -1,5 +1,7 @@
 """Tests fuer reporter.title_policy (A1 — deterministische Title-Templates)."""
 
+import pytest
+
 from reporter.title_policy import (
     TITLE_TEMPLATES,
     apply_title_template,
@@ -78,32 +80,79 @@ def test_template_count_minimum():
     assert len(TITLE_TEMPLATES) >= 25
 
 
-def test_dns_titles_aligned_with_severity_policy():
-    """Regression Mai 2026: title_policy SP-DNS-* Templates waren versetzt zu
-    severity_policy.finding_type-Zuordnung — DKIM-Findings bekamen MTA-STS-Title etc.
-    Lockt jetzt 1:1-Alignment zwischen den beiden Files ein.
+def test_titles_aligned_with_severity_policy():
+    """Regression Mai 2026: title_policy Templates waren in mehreren Familien
+    versetzt zu severity_policy.finding_type-Zuordnung — DKIM-Findings bekamen
+    MTA-STS-Title, phpinfo bekam ".git-Verzeichnis"-Title etc.
+    Lockt 1:1-Alignment fuer ALLE Policy-Familien (nicht nur SP-DNS) ein.
     """
     from reporter.severity_policy import SEVERITY_POLICIES
 
     # Erwartete Korrespondenz (severity_policy.finding_type -> Substring im Title)
     expected = {
-        "spf_missing":       "SPF-Record fehlt",
-        "spf_softfail":      "SPF-Policy auf softfail",
-        "dmarc_missing":     "DMARC-Record fehlt",
-        "dmarc_p_none":      "DMARC-Policy auf 'none'",
-        "dmarc_p_quarantine":"DMARC-Policy auf 'quarantine'",
-        "dkim_missing":      "DKIM-Record fehlt",
-        "mta_sts_missing":   "MTA-STS-Policy fehlt",
-        "dnssec_missing":    "DNSSEC fehlt",
-        "dnssec_chain_broken":"DNSSEC-Kette unterbrochen",
-        "caa_missing":       "CAA-Record fehlt",
+        # SP-DNS-* Mail/DNS
+        "spf_missing":              "SPF-Record fehlt",
+        "spf_softfail":             "SPF-Policy auf softfail",
+        "dmarc_missing":            "DMARC-Record fehlt",
+        "dmarc_p_none":             "DMARC-Policy auf 'none'",
+        "dmarc_p_quarantine":       "DMARC-Policy auf 'quarantine'",
+        "dkim_missing":             "DKIM-Record fehlt",
+        "mta_sts_missing":          "MTA-STS-Policy fehlt",
+        "dnssec_missing":           "DNSSEC fehlt",
+        "dnssec_chain_broken":      "DNSSEC-Kette unterbrochen",
+        "caa_missing":              "CAA-Record fehlt",
+        # SP-DISC-* Information Disclosure
+        "server_banner_with_version":   "Server-Banner mit Versions-Info",
+        "server_banner_no_version":     "Server-Banner ohne Versions-Info",
+        "nginx_status_endpoint_open":   "Nginx-Status-Endpoint",
+        "phpinfo_exposed":              "phpinfo()-Endpoint",
+        "directory_listing_enabled":    "Directory-Listing aktiv",
+        "error_message_with_stack":     "Stacktrace",
+        "git_directory_exposed":        ".git-Verzeichnis",
+        "env_file_exposed":             ".env-Datei",
+        "private_ip_disclosure":        "Private IP-Adresse",
+        # SP-CSP-* Content-Security-Policy
+        "csp_unsafe_inline":            "'unsafe-inline'",
+        "csp_unsafe_eval":              "'unsafe-eval'",
+        "csp_wildcard_source":          "Wildcard-Quelle",
+        # SP-COOK-* Cookies
+        "cookie_no_secure":             "ohne Secure-Flag",
+        "cookie_no_httponly":           "ohne HttpOnly-Flag",
+        "cookie_no_samesite":           "ohne SameSite-Attribut",
+        # SP-WP-* WordPress
+        "wordpress_user_enumeration":   "WordPress-User-Enumeration",
+        # SP-ENUM-*
+        "user_enumeration":             "User-Enumeration",
+        # SP-DB-*
+        "database_port_exposed":        "Datenbank-Port",
+        # SP-CORS-*
+        "cors_misconfiguration":        "CORS",
+        # SP-JS-*
+        "js_library_vulnerable":        "JavaScript",
+        # SP-SRI-*
+        "sri_missing":                  "Subresource-Integrity",
+        # SP-SSH-*
+        "ssh_no_brute_force_protection": "Brute-Force-Schutz",
+        # SP-URLHAUS-*
+        "urlhaus_compromise_detected":   "URLhaus",
     }
-    by_finding_type = {p.finding_type: p.policy_id for p in SEVERITY_POLICIES if p.finding_type}
+    by_finding_type: dict[str, list[str]] = {}
+    for p in SEVERITY_POLICIES:
+        if p.finding_type:
+            by_finding_type.setdefault(p.finding_type, []).append(p.policy_id)
+
     for ft, expected_substr in expected.items():
-        pid = by_finding_type.get(ft)
-        assert pid, f"Severity-Policy hat keine Regel fuer {ft}"
-        template = TITLE_TEMPLATES.get(pid, "")
-        assert expected_substr in template, (
-            f"{pid} ({ft}) Title-Template '{template}' enthaelt nicht '{expected_substr}' "
-            "— title_policy.py drift?"
-        )
+        pids = by_finding_type.get(ft) or []
+        assert pids, f"Severity-Policy hat keine Regel fuer finding_type={ft!r}"
+        # Mindestens EINE der policy_ids fuer diesen finding_type muss ein
+        # Title-Template haben das den expected_substr enthaelt. (Manche
+        # finding_types haben mehrere policy_ids mit unterschiedlichen Schweren
+        # — z.B. csp_missing fuer SP-CSP-001 und SP-CSP-002, aber nur eine
+        # davon erscheint hier mit dem direkten substring.)
+        templates = [TITLE_TEMPLATES.get(p, "") for p in pids]
+        if not any(expected_substr in t for t in templates):
+            pytest.fail(
+                f"finding_type={ft!r} (policy_ids={pids}) hat kein Template "
+                f"das '{expected_substr}' enthaelt. Templates: {templates} — "
+                "title_policy.py drift?"
+            )

@@ -157,30 +157,38 @@ TITLE_TEMPLATES: dict[str, str] = {
     "SP-HDR-008": "Permissions-Policy-Header fehlt auf {host}",
     "SP-HDR-009": "HSTS-Preload-Eintrag fehlt fuer {host}",
     # ── CSP (SP-CSP-*) ─────────────────────────────────────────────
+    # IDs muessen mit reporter/severity_policy.py:finding_type-Zuordnung
+    # 1:1 uebereinstimmen — Test-Session-Drift Mai 2026: SP-CSP-002..005 waren
+    # versetzt (CSP-002 zeigte "unsafe-inline" obwohl severity_policy sagt
+    # csp_missing-fortgeschritten).
     "SP-CSP-001": "Content-Security-Policy fehlt auf {host}",
-    "SP-CSP-002": "CSP enthaelt 'unsafe-inline' auf {host}",
-    "SP-CSP-003": "CSP enthaelt 'unsafe-eval' auf {host}",
-    "SP-CSP-004": "CSP enthaelt Wildcard-Quelle auf {host}",
-    "SP-CSP-005": "CSP-Direktive {directive} unsicher konfiguriert auf {host}",
+    "SP-CSP-002": "Wirkungslose Content-Security-Policy auf {host}",
+    "SP-CSP-003": "CSP enthaelt 'unsafe-inline' auf {host}",
+    "SP-CSP-004": "CSP enthaelt 'unsafe-eval' auf {host}",
+    "SP-CSP-005": "CSP enthaelt Wildcard-Quelle auf {host}",
     # ── Cookies (SP-COOK-*) ────────────────────────────────────────
     "SP-COOK-001": "Cookie {cookie_name} ohne Secure-Flag auf {host}",
     "SP-COOK-002": "Cookie {cookie_name} ohne HttpOnly-Flag auf {host}",
     "SP-COOK-003": "Cookie {cookie_name} ohne SameSite-Attribut auf {host}",
     "SP-COOK-004": "Session-Cookie {cookie_name} ohne Secure-Flag auf {host}",
-    "SP-COOK-005": "Session-Cookie {cookie_name} ohne HttpOnly-Flag auf {host}",
+    # SP-COOK-005 → severity_policy.finding_type=cookie_no_samesite (war "HttpOnly")
+    "SP-COOK-005": "Session-Cookie {cookie_name} ohne SameSite-Attribut auf {host}",
     # ── CSRF (SP-CSRF-*) ───────────────────────────────────────────
     "SP-CSRF-001": "Anti-CSRF-Token fehlt auf Login-Formular {host}",
     "SP-CSRF-002": "Anti-CSRF-Token fehlt auf Formular {host}",
     "SP-CSRF-003": "Anti-CSRF-Token nicht erforderlich fuer State-Aenderung auf {host}",
     # ── Information Disclosure (SP-DISC-*) ────────────────────────
+    # Alignment mit severity_policy.finding_type (Test-Session Mai 2026):
+    # SP-DISC-003..008 waren versetzt — phpinfo-Findings bekamen z.B.
+    # ".git-Verzeichnis"-Title (SP-DISC-004 = phpinfo_exposed laut severity_policy).
     "SP-DISC-001": "Server-Banner mit Versions-Info auf {host}",
     "SP-DISC-002": "Server-Banner ohne Versions-Info auf {host}",
-    "SP-DISC-003": ".env-Datei oeffentlich erreichbar auf {host}",
-    "SP-DISC-004": ".git-Verzeichnis oeffentlich erreichbar auf {host}",
-    "SP-DISC-005": "phpinfo()-Endpoint oeffentlich erreichbar auf {host}",
-    "SP-DISC-006": "Directory-Listing aktiv auf {host}",
-    "SP-DISC-007": "Stacktrace in Fehlerseite auf {host}",
-    "SP-DISC-008": "Nginx-Status-Endpoint oeffentlich erreichbar auf {host}",
+    "SP-DISC-003": "Nginx-Status-Endpoint oeffentlich erreichbar auf {host}",
+    "SP-DISC-004": "phpinfo()-Endpoint oeffentlich erreichbar auf {host}",
+    "SP-DISC-005": "Directory-Listing aktiv auf {host}",
+    "SP-DISC-006": "Stacktrace in Fehlerseite auf {host}",
+    "SP-DISC-007": ".git-Verzeichnis oeffentlich erreichbar auf {host}",
+    "SP-DISC-008": ".env-Datei oeffentlich erreichbar auf {host}",
     "SP-DISC-009": "Private IP-Adresse {private_ip} im Response auf {host}",
     # ── TLS (SP-TLS-*) ─────────────────────────────────────────────
     "SP-TLS-001": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf {host}",
