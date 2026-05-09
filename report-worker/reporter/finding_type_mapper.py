@@ -99,6 +99,15 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
      ), "user_enumeration"),
 
     # ── Information Disclosure ───────────────────────────
+    # Framework-Dev-Build muss VOR generic directory_listing kommen — sonst
+    # matcht Haiku-Fallback react.development.js auf "Directory-Listing".
+    (re.compile(
+        r"react[.-]?development\.js|vue[.-]?runtime\.dev|angular[.-]?dev|"
+        r"react[.-]?dom[.-]?development|"
+        r"development[-_ ]?build.*(?:eingebunden|production|deployed|exposed)|"
+        r"dev[-_ ]?(?:build|mode|version).*(?:eingebunden|im\s*production|production)",
+        re.I,
+     ), "framework_dev_build_exposed"),
     (re.compile(r"\b\.env\b|env[-_ ]?file\s*expos", re.I), "env_file_exposed"),
     (re.compile(
         r"\.git[/\\]"                                  # .git/ or .git\

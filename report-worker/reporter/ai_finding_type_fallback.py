@@ -58,6 +58,7 @@ FINDING_TYPE_CATALOG: dict[str, str] = {
     "directory_listing_enabled":  "Directory-Listing aktiv",
     "error_message_with_stack":   "Stacktrace/Pfad in Fehlerseite sichtbar",
     "nginx_status_endpoint_open": "Nginx-Status-Endpoint oeffentlich",
+    "framework_dev_build_exposed": "Framework-Development-Build (react.development.js, vue.runtime.dev, etc.) im Production-Deployment exponiert — enthaelt Stack-Traces, Component-Namen, ggf. Source-Maps",
     "server_banner_with_version": "Server-Banner mit Versionsinformation",
     "server_banner_no_version":   "Server-Banner ohne Versionsinformation",
     "cookie_no_secure":           "Cookie ohne Secure-Flag",

@@ -190,6 +190,7 @@ TITLE_TEMPLATES: dict[str, str] = {
     "SP-DISC-007": ".git-Verzeichnis oeffentlich erreichbar auf {host}",
     "SP-DISC-008": ".env-Datei oeffentlich erreichbar auf {host}",
     "SP-DISC-009": "Private IP-Adresse {private_ip} im Response auf {host}",
+    "SP-DISC-010": "Framework-Development-Build {framework} in Production auf {host}",
     # ── TLS (SP-TLS-*) ─────────────────────────────────────────────
     "SP-TLS-001": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf {host}",
     "SP-TLS-002": "Schwache TLS-Cipher-Suites auf {host}",

@@ -779,6 +779,18 @@ SEVERITY_POLICIES: list[SeverityPolicy] = [
                   "interne Netzwerk-Topologie wird Angreifern preisgegeben",
         references=["CWE-200", "CWE-204"],
     ),
+    SeverityPolicy(
+        policy_id="SP-DISC-010",
+        finding_type="framework_dev_build_exposed",
+        final_severity=Severity.LOW,
+        cvss_vector="AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
+        cvss_score=3.7,
+        rationale="Framework-Development-Build im Production-Deployment "
+                  "(react.development.js, vue.runtime.dev.js, angular.dev.js) "
+                  "— enthaelt Stack-Traces, Component-Namen, ggf. Source-Maps. "
+                  "Performance-Penalty + Information-Disclosure",
+        references=["CWE-200", "CWE-489"],
+    ),
 
     # ----------------------------------------------------------------
     # SUBRESOURCE INTEGRITY (SP-SRI-*)

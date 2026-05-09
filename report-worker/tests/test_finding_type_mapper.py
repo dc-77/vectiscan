@@ -183,6 +183,16 @@ from reporter.finding_type_mapper import annotate_finding_types, map_finding_typ
      "sri_missing"),
     ({"description": "SRI-Hash fehlt auf CDN-eingebundenem JS"},
      "sri_missing"),
+
+    # Framework-Dev-Build (Mai 2026 — verhindert React-Dev → directory_listing-Misclassification)
+    ({"title": "React Development Build eingebunden",
+      "description": "react.development.js und react-dom.development.js werden in Production geladen"},
+     "framework_dev_build_exposed"),
+    ({"description": "vue.runtime.dev.js eingebunden statt prod build"},
+     "framework_dev_build_exposed"),
+    ({"title": "Angular dev-mode aktiv",
+      "description": "Angular development build im production deployed"},
+     "framework_dev_build_exposed"),
 ])
 def test_map_finding_type(finding, expected):
     assert map_finding_type(finding) == expected

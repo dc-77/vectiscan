@@ -80,6 +80,7 @@ POLICY_ID_TO_CATEGORIES: dict[str, set[str]] = {
     "SP-DISC-005": {"data_exposure"}, "SP-DISC-006": {"data_exposure"},
     "SP-DISC-007": {"data_exposure"}, "SP-DISC-008": {"data_exposure"},
     "SP-DISC-009": {"data_exposure"},
+    "SP-DISC-010": {"data_exposure"},  # Framework-Dev-Build (react.development.js etc.)
     # TLS
     "SP-TLS-001": {"encryption"}, "SP-TLS-002": {"encryption"},
     "SP-TLS-003": {"encryption"}, "SP-TLS-004": {"encryption"},
