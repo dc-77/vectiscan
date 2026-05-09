@@ -211,3 +211,80 @@ def test_admin_detail_fields_present(scan_date_2026):
     assert wp["source"] == "cms_fingerprint"
     assert apache["confidence"] is None
     assert apache["source"] == "server_banner"
+
+
+# ─── Banner-Suffix-Stripping (Mai 2026 — Test-Session-Folge) ─────────────
+
+
+def test_openssh_banner_suffix_stripped(scan_date_2026):
+    """OpenSSH-Banner mit Distro-Suffix → version ohne Suffix."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": None,
+        "technologies": [
+            {"name": "OpenSSH", "version": "9.6p1 Ubuntu 3ubuntu13.16"},
+        ],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    openssh = next(r for r in rows if "openssh" in r["name"].lower())
+    assert openssh["version"] == "9.6p1"
+
+
+def test_apache_banner_with_distro_suffix(scan_date_2026):
+    """'2.4.66 (Debian)' → '2.4.66'."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": None,
+        "technologies": [
+            {"name": "Apache", "version": "2.4.66 (Debian)"},
+        ],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    apache = next(r for r in rows if "apache" in r["name"].lower())
+    assert apache["version"] == "2.4.66"
+
+
+def test_apache_dedup_across_name_variants(scan_date_2026):
+    """'Apache' (technologies) + 'Apache/2.4.66' (server-banner) → 1 Eintrag mit Version 2.4.66."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": "Apache/2.4.66",
+        "technologies": [{"name": "Apache", "version": ""}],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    apache_rows = [r for r in rows if "apache" in r["name"].lower()]
+    assert len(apache_rows) == 1, f"Erwartet 1 Apache-Eintrag, gefunden {len(apache_rows)}"
+    assert apache_rows[0]["version"] == "2.4.66"
+
+
+def test_apache_httpd_dedup_no_version(scan_date_2026):
+    """'Apache' + 'Apache httpd' beide ohne Version → 1 Eintrag."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": None,
+        "technologies": [
+            {"name": "Apache", "version": ""},
+            {"name": "Apache httpd", "version": ""},
+        ],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    apache_rows = [r for r in rows if "apache" in r["name"].lower()]
+    assert len(apache_rows) == 1
+
+
+def test_apache_category_web_server_after_dedup(scan_date_2026):
+    """Wenn nur "Apache" reinkommt (ohne /httpd), muss vendor=apache+product=httpd
+    → category=Web-Server (nicht "Sonstiges")."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": None,
+        "technologies": [{"name": "Apache", "version": ""}],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    apache = next(r for r in rows if "apache" in r["name"].lower())
+    assert apache["category"] == "Web-Server", f"Got: {apache['category']}"

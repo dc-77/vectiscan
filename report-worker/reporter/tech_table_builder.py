@@ -28,6 +28,7 @@ Mai 2026 — Test-Session-Folge.
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from typing import Any
 
@@ -41,6 +42,31 @@ from reporter.eol_detector import (
     _version_in_range,
     _version_starts_with,
 )
+
+
+_BANNER_SUFFIX_RE = re.compile(
+    r"\s+(?:Ubuntu|Debian|RedHat|CentOS|Fedora|FreeBSD|"
+    r"\d+\+(?:deb|ubuntu|el)\d+u?\d*|"
+    r"\([^)]*\))",
+    re.IGNORECASE,
+)
+
+
+def _strip_banner_suffix(version: str) -> str:
+    """Schneidet Distro-/Build-Suffixes aus einem Version-String ab.
+
+    Beispiele:
+      "9.6p1 Ubuntu 3ubuntu13.16"      → "9.6p1"
+      "9.2p1 Debian 2+deb12u9"         → "9.2p1"
+      "2.4.66 (Debian)"                → "2.4.66"
+      "8.4p1 Debian 5+deb11u5"         → "8.4p1"
+    """
+    if not version:
+        return ""
+    m = _BANNER_SUFFIX_RE.search(version)
+    if m:
+        return version[:m.start()].strip()
+    return version.strip()
 
 
 def _major_compatible(actual_version: str, range_spec: str) -> bool:
@@ -224,14 +250,37 @@ def build_tech_table_for_host(
         known_vuln_builds = KNOWN_VULN_BUILDS
 
     rows: list[dict[str, Any]] = []
-    seen: set[tuple[str, str, str]] = set()
+    # Dedup-Key nutzt nur (vendor, product) — versions-Variant landet beim
+    # ersten Vorkommen. Verhindert dass "Apache" v="" + "Apache httpd" v=""
+    # als 2 Eintraege landen, oder "Apache 2.4.66" + "Apache" als 2 Eintraege.
+    seen: dict[tuple[str, str], int] = {}
 
     def _add(name: str, version: str, vendor: str, product: str,
              confidence: float | None, source: str) -> None:
-        key = (vendor.lower(), (product or "").lower(), (version or "").lower())
+        version = _strip_banner_suffix(version)
+        key = (vendor.lower(), (product or "").lower())
         if key in seen:
+            # Bereits vorhanden — wenn neuer Eintrag eine Version hat und der
+            # alte keine, upgrade die Version.
+            idx = seen[key]
+            existing = rows[idx]
+            if version and not existing["version"]:
+                existing["version"] = version
+                existing["name"] = name
+                existing["confidence"] = confidence
+                existing["source"] = source
+                # Re-classify mit neuer Version
+                status, is_mega_cve, info = _classify_status(
+                    vendor, product, version, eol_data, known_vuln_builds, scan_date,
+                )
+                existing["status"] = status
+                existing["is_mega_cve"] = is_mega_cve
+                existing["eol_date"] = info["eol_date"]
+                existing["latest_patch"] = info["latest_patch"]
+                existing["cves"] = info["cves"]
+                existing["vuln_name"] = info["vuln_name"]
             return
-        seen.add(key)
+        seen[key] = len(rows)
         status, is_mega_cve, info = _classify_status(
             vendor, product, version, eol_data, known_vuln_builds, scan_date,
         )
@@ -254,10 +303,8 @@ def build_tech_table_for_host(
     if cms:
         cms_version = tech_profile.get("cms_version") or ""
         vendor, product, _ = _normalize_vendor_product(f"{cms}/{cms_version}".rstrip("/"))
-        if vendor in ("", cms.lower()):
-            # Vendor unklar — nutze cms-Name als vendor
+        if not vendor:
             vendor = cms.lower()
-            product = ""
         confidence = tech_profile.get("cms_confidence")
         _add(cms, cms_version, vendor, product, confidence, "cms_fingerprint")
 
@@ -266,7 +313,10 @@ def build_tech_table_for_host(
     if server_banner:
         vendor, product, version = _normalize_vendor_product(server_banner)
         if vendor:
-            _add(server_banner, version, vendor, product, None, "server_banner")
+            # Display-Name kompakt: "Apache" statt "Apache/2.4.49 (Debian)"
+            display = vendor.title() + ((" " + product.upper()) if product == "iis"
+                       else (" " + product.title()) if product else "")
+            _add(display.strip(), version, vendor, product, None, "server_banner")
 
     # 3. technologies[] (deduplicated nmap+webtech+cms)
     for tech in tech_profile.get("technologies") or []:
@@ -277,9 +327,9 @@ def build_tech_table_for_host(
         if not name:
             continue
         vendor, product, parsed_version = _normalize_vendor_product(f"{name}/{version}".rstrip("/"))
-        if vendor in ("", name.lower()):
+        if not vendor:
+            # Wirklich kein Mapping erkannt — nutze name als vendor (z.B. "Roundcube")
             vendor = name.lower()
-            product = ""
         _add(name, version or parsed_version, vendor, product, None, "tech_detect")
 
     # 4. WAF (rein informativ — nicht EOL-bewertet, aber wichtige Info)
