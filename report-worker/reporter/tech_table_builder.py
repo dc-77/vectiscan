@@ -60,20 +60,26 @@ _BANNER_SUFFIX_RE = re.compile(
 
 
 def _strip_banner_suffix(version: str) -> str:
-    """Schneidet Distro-/Build-Suffixes aus einem Version-String ab.
+    """Schneidet Distro-/Build-Suffixes aus einem Version-String ab + verwirft
+    nicht-version-like Strings (z.B. Phase-1-Phantasie-Versionen wie "neos").
 
     Beispiele:
       "9.6p1 Ubuntu 3ubuntu13.16"      → "9.6p1"
       "9.2p1 Debian 2+deb12u9"         → "9.2p1"
       "2.4.66 (Debian)"                → "2.4.66"
       "8.4p1 Debian 5+deb11u5"         → "8.4p1"
+      "neos"                           → ""    (kein digit-Praefix)
+      "abc1.0"                         → ""    (kein digit-Praefix)
     """
     if not version:
         return ""
     m = _BANNER_SUFFIX_RE.search(version)
-    if m:
-        return version[:m.start()].strip()
-    return version.strip()
+    cleaned = (version[:m.start()] if m else version).strip()
+    # Nur akzeptieren wenn die Version mit Ziffer beginnt (Software-Versionen
+    # haben praktisch immer einen digit-Praefix).
+    if cleaned and not cleaned[0].isdigit():
+        return ""
+    return cleaned
 
 
 def _major_compatible(actual_version: str, range_spec: str) -> bool:
@@ -339,11 +345,20 @@ def build_tech_table_for_host(
         version = tech.get("version") or ""
         if not name:
             continue
-        vendor, product, parsed_version = _normalize_vendor_product(f"{name}/{version}".rstrip("/"))
+        # Vor _normalize_vendor_product bei erstem Whitespace cutten — sonst
+        # backtrackt der Regex bei "9.6p1 Ubuntu 3ubuntu13.16" und extrahiert
+        # falsche Version "3ubuntu13.16". Banner-Suffix-Stripping in _add greift
+        # spaeter eh nochmal.
+        version_head = version.split()[0] if version else ""
+        vendor, product, parsed_version = _normalize_vendor_product(f"{name}/{version_head}".rstrip("/"))
         if not vendor:
             # Wirklich kein Mapping erkannt — nutze name als vendor (z.B. "Roundcube")
             vendor = name.lower()
-        _add(name, version or parsed_version, vendor, product, None, "tech_detect")
+        # parsed_version gewinnt wenn _normalize eine Marketing-Korrektur machte
+        # (z.B. Exchange "2016" -> "15.1" Build-Mapping). Sonst Original-Version
+        # damit Banner-Suffix-Stripping in _add die volle Version sehen kann.
+        final_version = parsed_version if (parsed_version and parsed_version != version_head) else version
+        _add(name, final_version, vendor, product, None, "tech_detect")
 
     # 4. WAF (rein informativ — nicht EOL-bewertet, aber wichtige Info)
     waf = tech_profile.get("waf")

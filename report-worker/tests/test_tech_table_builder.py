@@ -320,6 +320,57 @@ def test_wordpress_4_7_is_eol(scan_date_2026):
     assert wp["status"] == "eol", f"Got: {wp['status']}"
 
 
+def test_neos_variants_dedup(scan_date_2026):
+    """heuel.com lieferte 'NEOS', 'Neos CMS', 'Neos Flow' als 3 Eintraege.
+    Nach _normalize_vendor_product-Erweiterung sollten alle drei auf
+    vendor=neos mappen → 1 Eintrag (Dedup-Key (vendor, product))."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": "NEOS", "cms_version": "",
+        "server": None,
+        "technologies": [
+            {"name": "Neos CMS", "version": ""},
+            {"name": "Neos Flow", "version": "neos"},  # invalid version
+        ],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    neos_rows = [r for r in rows if "neos" in r["name"].lower()]
+    assert len(neos_rows) == 1, f"Erwartet 1 Neos-Eintrag, gefunden {len(neos_rows)}: {[r['name'] for r in neos_rows]}"
+
+
+def test_invalid_version_string_stripped(scan_date_2026):
+    """Phase-1 hat manchmal nicht-numerische Strings als Version (z.B.
+    'Neos Flow' v='neos'). Sollte als leere Version gewertet werden."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": None,
+        "technologies": [{"name": "Neos Flow", "version": "neos"}],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    neos = next(r for r in rows if "neos" in r["name"].lower())
+    assert neos["version"] == "", f"Erwartet leere Version, got: {neos['version']!r}"
+
+
+def test_exchange_marketing_name_mapped_to_build(scan_date_2026):
+    """Microsoft Exchange '2016' → Build '15.1' fuer eol_data-Lookup. eol_data
+    hat Exchange 15.1 EOL 2025-10-14 (CRITICAL) → status=eol."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": None,
+        "technologies": [{"name": "Exchange", "version": "2016"}],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    exch = next(r for r in rows if "exchange" in r["name"].lower())
+    # Status muss "eol" sein wenn endoflife.date Microsoft Exchange 15.1 EOL hat
+    # (Mai 2026 sollte das geliefert haben — falls nicht, wird der Test failen
+    # und die Test-Dependency muss verifiziert werden)
+    assert exch["status"] in ("eol", "minor_eol"), (
+        f"Exchange 2016 sollte EOL sein (15.1 EOL 2025-10-14), got: {exch['status']}"
+    )
+
+
 def test_sort_order_eol_minor_eol_outdated_current(scan_date_2026):
     """Sortier-Order: eol > minor_eol > outdated > current."""
     profile = {

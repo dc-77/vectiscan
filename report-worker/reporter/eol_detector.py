@@ -343,6 +343,15 @@ def _normalize_vendor_product(tech_str: str) -> tuple[str, str, str]:
     if "iis" in name or "internet information" in name or name.startswith("microsoft-iis"):
         return ("microsoft", "iis", version)
     if "exchange" in name:
+        # Marketing-Name → Build-Major-Mapping (Mai 2026: securess.de owa.* hatte
+        # Exchange "2016" als version-string, das matchte aber keinen eol_data-
+        # Eintrag mit Build-Praefix "15.1".)
+        if version in ("2013", "2013 cu23"):
+            version = "15.0"
+        elif version in ("2016", "2016 cu23"):
+            version = "15.1"
+        elif version in ("2019", "2019 cu14"):
+            version = "15.2"
         return ("microsoft", "exchange", version)
     if "windows" in name and "server" in name:
         return ("microsoft", "windows-server", version)
@@ -350,6 +359,11 @@ def _normalize_vendor_product(tech_str: str) -> tuple[str, str, str]:
         return ("apache", "httpd", version)
     if "nginx" in name:
         return ("nginx", "", version)
+    # NEOS CMS / Neos Flow / Neos.Neos — alle als "neos" vendor (Mai 2026:
+    # heuel.com lieferte 3 separate Eintraege "NEOS", "Neos CMS", "Neos Flow"
+    # weil _normalize_vendor_product nichts erkannt hat).
+    if name.startswith("neos") or "neos cms" in name or "neos flow" in name:
+        return ("neos", "", version)
     if name.startswith("php"):
         return ("php", "", version)
     if name.startswith("python"):
