@@ -341,8 +341,21 @@ def build_tech_table_for_host(
     for tech in tech_profile.get("technologies") or []:
         if not isinstance(tech, dict):
             continue
-        name = tech.get("name") or ""
+        raw_name = tech.get("name") or ""
         version = tech.get("version") or ""
+        if not raw_name:
+            continue
+        # Phase-1-nmap-Banner sind manchmal newline-separated: "PHP/8.3.30\nPleskLin"
+        # → erste Zeile als name, Plesk/Distro-Suffixe ignorieren.
+        name = raw_name.split("\n")[0].strip()
+        # Manche Banner haben Version inline mit name: "PHP/8.3.30" → name="PHP",
+        # version="8.3.30" (nur wenn version-Slot bisher leer).
+        if not version and "/" in name:
+            head, _, tail = name.partition("/")
+            tail = tail.strip()
+            if tail and tail[0].isdigit():
+                name = head.strip()
+                version = tail
         if not name:
             continue
         # Vor _normalize_vendor_product bei erstem Whitespace cutten — sonst

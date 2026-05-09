@@ -352,6 +352,35 @@ def test_invalid_version_string_stripped(scan_date_2026):
     assert neos["version"] == "", f"Erwartet leere Version, got: {neos['version']!r}"
 
 
+def test_php_plesk_banner_split(scan_date_2026):
+    """nmap-Banner 'PHP/8.3.30\\nPleskLin' (Newline + Plesk-Suffix) → name='PHP', version='8.3.30'."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": None,
+        "technologies": [{"name": "PHP/8.3.30\nPleskLin", "version": ""}],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    php = next(r for r in rows if "php" in r["name"].lower())
+    assert php["version"] == "8.3.30"
+    # Name darf keinen Newline + keinen Slash mehr enthalten
+    assert "\n" not in php["name"]
+    assert php["name"].lower() == "php"
+
+
+def test_inline_version_in_name_extracted(scan_date_2026):
+    """'Apache/2.4.66' als technologies[].name + version="" → name='Apache', version='2.4.66'."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": None, "cms_version": None,
+        "server": None,
+        "technologies": [{"name": "Apache/2.4.66", "version": ""}],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    apache = next(r for r in rows if "apache" in r["name"].lower())
+    assert apache["version"] == "2.4.66"
+
+
 def test_exchange_marketing_name_mapped_to_build(scan_date_2026):
     """Microsoft Exchange '2016' → Build '15.1' fuer eol_data-Lookup. eol_data
     hat Exchange 15.1 EOL 2025-10-14 (CRITICAL) → status=eol."""
