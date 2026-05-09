@@ -12,16 +12,23 @@ Single Source of Truth:
   - `_version_starts_with()` -> Prefix-Match
   - `_days_since()` -> EOL-Distanz
 
-Status (drei sich-ausschliessende Zustaende):
-- "eol"      -> 🔴 EOL (eol_data.date < scan_date)
-- "outdated" -> 🟠 veraltet (version < latest_patch, aber nicht EOL)
-- "current"  -> 🟢 aktuell (>= latest_patch oder kein eol_data-Eintrag)
+Status (vier sich-ausschliessende Zustaende):
+- "eol"       -> 🔴 EOL kritisch (eol_data.severity in {CRITICAL, HIGH})
+- "minor_eol" -> 🟡 Minor-Version-EOL (severity in {MEDIUM, LOW}) — z.B. WordPress 6.5
+                spezifische Minor-Reihe kriegt keine Patches mehr, Major-Familie aktiv.
+                Customer sollte upgraden, aber nicht panic.
+- "outdated"  -> 🟠 veraltet (version < latest_patch, aber nicht EOL)
+- "current"   -> 🟢 aktuell (>= latest_patch oder kein eol_data-Eintrag)
 
 Plus orthogonaler Flag:
-- is_mega_cve -> ⚠️ KNOWN_VULN_BUILDS-Match (kann zusaetzlich zu eol/outdated/current gelten)
+- is_mega_cve -> ⚠️ KNOWN_VULN_BUILDS-Match (kann zusaetzlich zu jedem status gelten)
 
-UI/PDF kombiniert: Apache 2.2.34 -> "EOL + Mega-CVE", Apache 2.4.49 -> "veraltet + Mega-CVE",
-Apache 2.4.62 -> "aktuell".
+Beispiele:
+  WordPress 4.7 (2017 EOL, severity=CRITICAL)  -> "eol"
+  WordPress 6.8 (2025-12 EOL, severity=MEDIUM) -> "minor_eol"
+  Apache 2.2.34 (2017 EOL, severity=CRITICAL)  -> "eol" + is_mega_cve=True
+  Apache 2.4.49                                -> "outdated" + is_mega_cve=True
+  Apache 2.4.62                                -> "current"
 
 Mai 2026 — Test-Session-Folge.
 """
@@ -161,7 +168,7 @@ def _classify_status(
     """Klassifiziert (vendor, product, version).
 
     Returns (status, is_mega_cve, info):
-      status:       "eol" | "outdated" | "current"  — sich ausschliessende Zustaende
+      status:       "eol" | "minor_eol" | "outdated" | "current"  — sich ausschliessend
       is_mega_cve:  bool — orthogonal, kann zusaetzlich zu jedem status gelten
       info: dict mit Feldern eol_date, latest_patch, cves, vuln_name
     """
@@ -204,6 +211,12 @@ def _classify_status(
         if eol_date_iso:
             days = _days_since(eol_date_iso, scan_date)
             if days > 0:
+                # Severity aus eol_data steuert minor_eol vs eol — endoflife.date
+                # liefert MEDIUM/LOW fuer aktuelle Minor-Version-EOLs (z.B. WordPress
+                # 6.5 EOL 2024-07 ist nur MEDIUM, weil Major-Familie aktiv).
+                eol_sev = (matched_eol.get("severity") or "").upper()
+                if eol_sev in ("MEDIUM", "LOW"):
+                    return ("minor_eol", is_mega_cve, info)
                 return ("eol", is_mega_cve, info)
             # Nicht EOL aber moeglicherweise outdated wenn latest_patch != version
             if matched_eol.get("latest_patch"):
@@ -349,10 +362,10 @@ def build_tech_table_for_host(
             "source": "waf_detect",
         })
 
-    # Stable-Sort: Status-Schwere zuerst (eol > outdated > current),
+    # Stable-Sort: Status-Schwere zuerst (eol > minor_eol > outdated > current),
     # mega_cve-Flag erhoeht Prioritaet innerhalb gleichen Status,
     # dann Kategorie, dann Name.
-    _STATUS_ORDER = {"eol": 0, "outdated": 1, "current": 2}
+    _STATUS_ORDER = {"eol": 0, "minor_eol": 1, "outdated": 2, "current": 3}
     rows.sort(key=lambda r: (
         _STATUS_ORDER.get(r["status"], 99),
         0 if r.get("is_mega_cve") else 1,

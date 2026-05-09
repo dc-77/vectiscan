@@ -288,3 +288,48 @@ def test_apache_category_web_server_after_dedup(scan_date_2026):
     rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
     apache = next(r for r in rows if "apache" in r["name"].lower())
     assert apache["category"] == "Web-Server", f"Got: {apache['category']}"
+
+
+# ─── Minor-EOL Status (Mai 2026 — endoflife.date Severity-Mapping) ────────
+
+
+def test_wordpress_6_8_is_minor_eol(scan_date_2026):
+    """WordPress 6.8.5 EOL 2025-12-02 mit eol_data.severity=MEDIUM → minor_eol
+    (nicht eol — Customer-UX: aktuelle Major-Familie aktiv, nur Minor-Reihe out)."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": "WordPress", "cms_version": "6.8.5",
+        "server": None,
+        "technologies": [],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    wp = next(r for r in rows if "wordpress" in r["name"].lower())
+    assert wp["status"] == "minor_eol", f"Got: {wp['status']}"
+
+
+def test_wordpress_4_7_is_eol(scan_date_2026):
+    """WordPress 4.7 EOL 2017 mit severity=CRITICAL → eol (kritisch, alte Major)."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": "WordPress", "cms_version": "4.7.33",
+        "server": None,
+        "technologies": [],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    wp = next(r for r in rows if "wordpress" in r["name"].lower())
+    assert wp["status"] == "eol", f"Got: {wp['status']}"
+
+
+def test_sort_order_eol_minor_eol_outdated_current(scan_date_2026):
+    """Sortier-Order: eol > minor_eol > outdated > current."""
+    profile = {
+        "ip": "1", "fqdns": [],
+        "cms": "WordPress", "cms_version": "6.8.5",  # minor_eol
+        "server": "Apache/2.2.34",                   # eol (CRITICAL)
+        "technologies": [],
+    }
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    statuses = [r["status"] for r in rows]
+    apache_idx = next(i for i, r in enumerate(rows) if "apache" in r["name"].lower())
+    wp_idx = next(i for i, r in enumerate(rows) if "wordpress" in r["name"].lower())
+    assert apache_idx < wp_idx, f"eol muss vor minor_eol kommen, statuses={statuses}"

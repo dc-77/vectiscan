@@ -369,7 +369,7 @@ export interface TechRow {
   name: string;
   version: string;
   category: string;
-  status: 'eol' | 'outdated' | 'current';
+  status: 'eol' | 'minor_eol' | 'outdated' | 'current';
   is_mega_cve: boolean;
   eol_date: string;
   latest_patch: string;

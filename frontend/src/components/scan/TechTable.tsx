@@ -30,7 +30,7 @@ interface TechRow {
   name: string;
   version: string;
   category: string;
-  status: 'eol' | 'outdated' | 'current';
+  status: 'eol' | 'minor_eol' | 'outdated' | 'current';
   isMegaCve: boolean;
   eolDate: string;
   latestPatch: string;
@@ -42,9 +42,10 @@ interface TechRow {
 
 // Status-Style-Map (Tailwind-Klassen)
 const STATUS_STYLE: Record<TechRow['status'], { label: string; cls: string }> = {
-  eol:      { label: 'EOL',      cls: 'bg-red-900/60 text-red-200 border-red-700' },
-  outdated: { label: 'veraltet', cls: 'bg-amber-900/60 text-amber-200 border-amber-700' },
-  current:  { label: 'aktuell',  cls: 'bg-emerald-900/60 text-emerald-200 border-emerald-700' },
+  eol:       { label: 'EOL',       cls: 'bg-red-900/60 text-red-200 border-red-700' },
+  minor_eol: { label: 'Minor-EOL', cls: 'bg-yellow-900/60 text-yellow-200 border-yellow-700' },
+  outdated:  { label: 'veraltet',  cls: 'bg-amber-900/60 text-amber-200 border-amber-700' },
+  current:   { label: 'aktuell',   cls: 'bg-emerald-900/60 text-emerald-200 border-emerald-700' },
 };
 
 /**

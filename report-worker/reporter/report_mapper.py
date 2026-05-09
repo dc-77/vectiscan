@@ -335,9 +335,10 @@ def _build_executive_summary(
 
 
 _STATUS_LABEL = {
-    "eol":      "EOL",
-    "outdated": "veraltet",
-    "current":  "aktuell",
+    "eol":       "EOL",
+    "minor_eol": "Minor-EOL",
+    "outdated":  "veraltet",
+    "current":   "aktuell",
 }
 
 
