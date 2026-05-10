@@ -22,6 +22,8 @@ interface Props {
   techProfile: TechProfile;
   /** Wenn true: Confidence + Source-Spalten zeigen (admin/audit). */
   adminView?: boolean;
+  /** Wenn true: keine Collapse-Logik — alle Rows immer sichtbar (z.B. im Drawer). */
+  defaultExpanded?: boolean;
   /** Click-Handler fuer CVE-Count → springt zum Finding-Detail. */
   onCveClick?: (cves: string[]) => void;
 }
@@ -125,8 +127,8 @@ function backendRowsToFrontend(rows: NonNullable<TechProfile['tech_rows']>): Tec
   }));
 }
 
-export function TechTable({ techProfile, adminView = false, onCveClick }: Props) {
-  const [expanded, setExpanded] = useState(false);
+export function TechTable({ techProfile, adminView = false, defaultExpanded = false, onCveClick }: Props) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   // Backend liefert tech_rows[] vorberechnet (Migration 027) — Single Source of
   // Truth. Fallback: rohe Profile-Felder mit "current" als Default-Status (z.B.
@@ -137,7 +139,7 @@ export function TechTable({ techProfile, adminView = false, onCveClick }: Props)
 
   if (rows.length === 0) return null;
 
-  const showCollapsed = rows.length > 5 && !expanded;
+  const showCollapsed = !defaultExpanded && rows.length > 5 && !expanded;
   const visibleRows = showCollapsed ? rows.slice(0, 5) : rows;
 
   return (
@@ -145,7 +147,58 @@ export function TechTable({ techProfile, adminView = false, onCveClick }: Props)
       <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-500 border-b border-slate-800">
         Eingesetzte Technologien {rows.length > 5 ? `(${rows.length})` : ''}
       </div>
-      <table className="w-full text-[11px] leading-tight">
+      {/* Mobile: List-Pattern (md:hidden) */}
+      <ul className="md:hidden divide-y divide-slate-800">
+        {visibleRows.map((r, i) => {
+          const sty = STATUS_STYLE[r.status];
+          const extra: string[] = [];
+          if (r.eolDate) extra.push(`EOL ${r.eolDate}`);
+          if (r.latestPatch && r.status !== 'current') extra.push(`→ ${r.latestPatch}`);
+          return (
+            <li key={i} className="px-3 py-2">
+              <div className="flex items-start gap-2">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-sm text-slate-200">{r.name}</span>
+                    {r.version && <span className="font-mono text-xs text-cyan-300">{r.version}</span>}
+                  </div>
+                  <div className="text-[10px] text-slate-500">{r.category}</div>
+                  {extra.length > 0 && (
+                    <div className="mt-1 text-[10px] text-slate-400">{extra.join(' · ')}</div>
+                  )}
+                </div>
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  <span className={`inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${sty.cls}`}>
+                    {sty.label}
+                  </span>
+                  {r.isMegaCve && (
+                    <span className="inline-block rounded border border-orange-700 bg-orange-900/60 px-1.5 py-0.5 text-[10px] font-medium text-orange-200">
+                      Mega-CVE
+                    </span>
+                  )}
+                  {r.cves.length > 0 && (
+                    onCveClick ? (
+                      <button
+                        onClick={() => onCveClick(r.cves)}
+                        className="text-[10px] text-orange-300 hover:text-orange-200 hover:underline"
+                        title={r.cves.join(', ')}
+                      >
+                        {r.cves.length} CVE{r.cves.length === 1 ? '' : 's'}
+                      </button>
+                    ) : (
+                      <span className="text-[10px] text-orange-300" title={r.cves.join(', ')}>
+                        {r.cves.length} CVE{r.cves.length === 1 ? '' : 's'}
+                      </span>
+                    )
+                  )}
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {/* Desktop: Table */}
+      <table className="hidden md:table w-full text-[11px] leading-tight">
         <thead>
           <tr className="text-left text-slate-500 bg-slate-900/40">
             <th className="px-2 py-1 font-medium">Tech</th>
@@ -217,7 +270,7 @@ export function TechTable({ techProfile, adminView = false, onCveClick }: Props)
           })}
         </tbody>
       </table>
-      {rows.length > 5 && (
+      {!defaultExpanded && rows.length > 5 && (
         <button
           onClick={() => setExpanded(!expanded)}
           className="block w-full px-2 py-1 text-[10px] text-slate-500 hover:text-slate-300 hover:bg-slate-900/40 border-t border-slate-800"

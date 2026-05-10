@@ -12,6 +12,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { useDrawerA11y } from '@/hooks/useDrawerA11y';
 import { getOrderHostFindings, type Finding, type PerHostFindings } from '@/lib/api';
 
 interface Props {
@@ -60,6 +61,8 @@ export function PerHostFindingsDrawer({ orderId, host, onClose }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  const drawerRef = useDrawerA11y(true);
+
   const sortedFindings = (findings: Finding[]): Finding[] =>
     [...findings].sort((a, b) => {
       const sa = SEVERITY_ORDER[a.severity?.toUpperCase()] ?? 99;
@@ -79,7 +82,10 @@ export function PerHostFindingsDrawer({ orderId, host, onClose }: Props) {
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative ml-auto h-full w-full max-w-3xl overflow-y-auto border-l border-slate-700 bg-slate-950 shadow-2xl">
+      <div
+        ref={drawerRef}
+        className="relative ml-auto h-full w-full max-w-3xl overflow-y-auto border-l border-slate-700 bg-slate-950 shadow-2xl"
+      >
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-800 bg-slate-950/95 px-6 py-4 backdrop-blur">
           <div>
             <h2 className="text-lg font-medium text-slate-100">

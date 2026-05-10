@@ -21,9 +21,9 @@ import { useMemo, useState } from 'react';
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
 import HostMap from '@/components/scan/HostMap';
-import PolicyCoverage from '@/components/scan/PolicyCoverage';
+import { KpiBar } from '@/components/scan/KpiBar';
+import { ScanDetailNav } from '@/components/scan/ScanDetailNav';
 import ScanStoryTimeline from '@/components/scan/ScanStoryTimeline';
-import SeverityDonut from '@/components/scan/SeverityDonut';
 import ThreatIntelBadge from '@/components/scan/ThreatIntelBadge';
 import ToolTrace from '@/components/scan/ToolTrace';
 import ViewSwitcher from '@/components/scan/ViewSwitcher';
@@ -227,27 +227,44 @@ export default function ModernView({
           </div>
         )}
 
-        {/* ── METRICS-ROW: Severity-Donut + Policy-Coverage ── */}
+        {/* ── STICKY SUB-NAV ────────────────────── */}
         {findings && (
-          <div className="grid gap-4 md:grid-cols-2">
-            <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
-              <h2 className="text-sm font-medium text-slate-300 mb-3">Severity-Verteilung</h2>
-              <SeverityDonut counts={auditCounts} />
-            </section>
-            <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
-              <h2 className="text-sm font-medium text-slate-300 mb-3">Determinismus</h2>
-              <PolicyCoverage
-                findings={findings.findings ?? []}
-                policyIdDistinct={policyIdDistinct}
-                policyVersion={policyVersion}
-              />
-            </section>
-          </div>
+          <ScanDetailNav
+            sections={[
+              { id: 'uebersicht', label: 'Übersicht' },
+              { id: 'hosts', label: 'Hosts', count: aiStrategy?.hosts?.length ?? hostList.length },
+              { id: 'befunde', label: 'Befunde', count: findings.findings?.length },
+              ...(findings.recommendations?.length
+                ? [{ id: 'empfehlungen', label: 'Empfehlungen', count: findings.recommendations.length }]
+                : []),
+              { id: 'story', label: 'Scan-Story' },
+              ...(admin && (scanResults?.length ?? 0) > 0
+                ? [{ id: 'tool-trace', label: 'Tool-Trace', count: scanResults?.length }]
+                : []),
+            ]}
+          />
+        )}
+
+        {/* ── KPI-BAR (kompakte 4-Tile-Reihe) ────── */}
+        {findings && (
+          <section id="uebersicht" aria-label="Uebersicht" className="scroll-mt-32">
+            <KpiBar
+              severityCounts={auditCounts ?? {}}
+              totalFindings={findings.findings?.length ?? 0}
+              findings={findings.findings ?? []}
+              policyIdDistinct={policyIdDistinct}
+              policyVersion={policyVersion}
+              hostsTotal={aiStrategy?.hosts?.length ?? hostList.length}
+              scannedHosts={aiStrategy?.hosts?.filter((h: { action?: string }) => h.action !== 'skip').length ?? hostList.length}
+              skippedHosts={aiStrategy?.hosts?.filter((h: { action?: string }) => h.action === 'skip').length ?? 0}
+              pkg={pkg}
+            />
+          </section>
         )}
 
         {/* ── HOST-MAP ─────────────────────────── */}
         {(aiStrategy || hostList.length > 0) && (
-          <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+          <section id="hosts" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 scroll-mt-32">
             <h2 className="text-sm font-medium text-slate-300 mb-3">Host-Strategie</h2>
             <HostMap
               aiHosts={aiStrategy?.hosts ?? null}
@@ -269,7 +286,7 @@ export default function ModernView({
 
         {/* ── FINDINGS ─────────────────────────── */}
         {findings && (
-          <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+          <section id="befunde" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 scroll-mt-32">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-medium text-slate-300">
                 Befunde {findings.findings ? `(${findings.findings.length})` : ''}
@@ -309,7 +326,7 @@ export default function ModernView({
 
         {/* ── RECOMMENDATIONS ──────────────────── */}
         {findings && findings.recommendations && findings.recommendations.length > 0 && (
-          <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+          <section id="empfehlungen" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 scroll-mt-32">
             <h2 className="text-sm font-medium text-slate-300 mb-3">
               Empfehlungen ({findings.recommendations.length})
             </h2>
@@ -318,7 +335,7 @@ export default function ModernView({
         )}
 
         {/* ── STORY-TIMELINE (collapsible) ─────── */}
-        <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+        <section id="story" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 scroll-mt-32">
           <button
             type="button"
             onClick={() => setShowStory((v) => !v)}
@@ -390,7 +407,7 @@ export default function ModernView({
 
         {/* ── TOOL-TRACE (admin-only, collapsible) ─ */}
         {admin && (scanResults?.length ?? 0) > 0 && (
-          <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-5">
+          <section id="tool-trace" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 scroll-mt-32">
             <button
               type="button"
               onClick={() => setShowToolTrace((v) => !v)}

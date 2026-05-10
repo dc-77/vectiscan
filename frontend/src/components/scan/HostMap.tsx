@@ -16,9 +16,10 @@
 
 import { useState } from 'react';
 
+import { HostTechDrawer } from './HostTechDrawer';
 import { PerHostFindingsDrawer } from './PerHostFindingsDrawer';
-import { TechTable } from './TechTable';
-import type { TechProfile } from '@/lib/api';
+import { ScreenshotLightbox } from './ScreenshotLightbox';
+import type { TechProfile, TechRow } from '@/lib/api';
 
 interface AiHost {
   ip: string;
@@ -85,14 +86,59 @@ function screenshotKeyFor(
   return dh?.screenshot_minio_key ?? null;
 }
 
+// Severity-Rang fuer Tech-Summary-Sortierung — eol > minor_eol > outdated > current,
+// is_mega_cve gewinnt bei gleichem Status.
+const STATUS_RANK: Record<TechRow['status'], number> = {
+  eol: 0, minor_eol: 1, outdated: 2, current: 3,
+};
+
+function pickTopTechs(rows: TechRow[] | undefined, limit = 2): TechRow[] {
+  if (!rows || rows.length === 0) return [];
+  const sorted = [...rows].sort((a, b) => {
+    const sa = STATUS_RANK[a.status] ?? 99;
+    const sb = STATUS_RANK[b.status] ?? 99;
+    if (sa !== sb) return sa - sb;
+    if ((a.is_mega_cve ? 0 : 1) !== (b.is_mega_cve ? 0 : 1)) {
+      return (a.is_mega_cve ? 0 : 1) - (b.is_mega_cve ? 0 : 1);
+    }
+    return a.name.localeCompare(b.name);
+  });
+  return sorted.slice(0, limit);
+}
+
+function abnormalChips(rows: TechRow[] | undefined): Array<'eol' | 'minor_eol' | 'outdated' | 'mega_cve'> {
+  if (!rows || rows.length === 0) return [];
+  const set = new Set<'eol' | 'minor_eol' | 'outdated' | 'mega_cve'>();
+  for (const r of rows) {
+    if (r.status === 'eol') set.add('eol');
+    else if (r.status === 'minor_eol') set.add('minor_eol');
+    else if (r.status === 'outdated') set.add('outdated');
+    if (r.is_mega_cve) set.add('mega_cve');
+  }
+  return Array.from(set);
+}
+
+const CHIP_STYLE: Record<string, { label: string; cls: string }> = {
+  eol:       { label: 'EOL',       cls: 'bg-red-900/60 text-red-200 border-red-700' },
+  minor_eol: { label: 'Minor-EOL', cls: 'bg-yellow-900/60 text-yellow-200 border-yellow-700' },
+  outdated:  { label: 'veraltet',  cls: 'bg-amber-900/60 text-amber-200 border-amber-700' },
+  mega_cve:  { label: 'Mega-CVE',  cls: 'bg-orange-900/60 text-orange-200 border-orange-700' },
+};
+
 export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, orderId, techProfilesByIp }: Props) {
-  const [drawerHost, setDrawerHost] = useState<string | null>(null);
+  const [findingsDrawerHost, setFindingsDrawerHost] = useState<string | null>(null);
+  const [techDrawerIp, setTechDrawerIp] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<{ url: string; label: string } | null>(null);
   // Wenn keine aiStrategy vorliegt: simple Liste der discovered hosts
   if (!aiHosts || aiHosts.length === 0) {
     if (!discoveredHosts || discoveredHosts.length === 0) {
       return (
-        <div className="rounded-lg border border-slate-800 bg-slate-900/60 p-4 text-sm text-slate-500">
-          Noch keine Host-Daten verfügbar.
+        <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-6 text-center">
+          <div className="text-3xl mb-2 opacity-60" aria-hidden>🔍</div>
+          <div className="text-sm text-slate-400 font-medium">Noch keine Host-Daten</div>
+          <div className="mt-1 text-xs text-slate-500">
+            Pre-Check läuft. Sobald Targets validiert und DNS aufgelöst sind, erscheinen die Hosts hier.
+          </div>
         </div>
       );
     }
@@ -135,132 +181,247 @@ export default function HostMap({ aiHosts, discoveredHosts, strategyNotes, order
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 auto-rows-fr">
-          {aiHosts.map((h) => {
-            const isSkip = h.action === 'skip';
-            const fqdn = fqdnFor(h, discoveredHosts);
-            const prio = h.priority ? PRIORITY_STYLES[String(h.priority)] : null;
-            const screenshotKey = screenshotKeyFor(h, discoveredHosts);
-            const screenshotUrl = orderId && screenshotKey
-              ? getHostScreenshotUrl(orderId, screenshotKey)
-              : null;
-
-            return (
-              <div
+        {/* Scanned-Hosts-Grid */}
+        {scanned.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {scanned.map((h) => (
+              <ScannedHostCard
                 key={h.ip}
-                className={`rounded-lg border p-3 ${
-                  isSkip
-                    ? 'border-slate-800 bg-slate-950/30'
-                    : 'border-slate-700 bg-slate-900/60'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  {prio && (
-                    <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold ${prio.badge}`}>
-                      {prio.label}
-                    </span>
-                  )}
-                  <span
-                    className={`text-base ${isSkip ? 'text-slate-500' : 'text-emerald-400'}`}
-                    aria-label={isSkip ? 'skipped' : 'scanned'}
-                    title={isSkip ? 'Skipped' : 'Scanned'}
-                  >
-                    {isSkip ? '⊘' : '✓'}
-                  </span>
-                  <span className="font-mono text-xs text-cyan-300 truncate flex-1">{h.ip}</span>
-                </div>
-                {fqdn && (
-                  <div className={`mt-1 text-xs truncate ${isSkip ? 'text-slate-600' : 'text-slate-300'}`}>
-                    {fqdn}
-                  </div>
-                )}
-                {(() => {
-                  const dh = discoveredHosts?.find((d) => d.ip === h.ip);
-                  const vhosts = dh?.vhosts || [];
-                  if (vhosts.length <= 1) return null;
-                  return (
-                    <div className="mt-1.5 space-y-0.5 text-[11px] leading-tight">
-                      <div className="font-mono uppercase tracking-wider text-[9px] text-slate-500">
-                        {vhosts.length} VHosts
-                      </div>
-                      {vhosts.map((v) => (
-                        <div key={v.fqdn} className="flex items-baseline gap-1.5">
-                          <span className={
-                            v.status && v.status >= 200 && v.status < 300
-                              ? 'text-emerald-400'
-                              : v.status && v.status >= 400
-                              ? 'text-amber-400'
-                              : 'text-slate-400'
-                          }>
-                            {v.status ?? '?'}
-                          </span>
-                          <span className="text-slate-300 truncate">{v.fqdn}</span>
-                          {v.aliases && v.aliases.length > 0 && (
-                            <span className="text-slate-500" title={v.aliases.map((a) => `${a.fqdn} (${a.reason})`).join(', ')}>
-                              +{v.aliases.length}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-                {/* Migration 027 (Mai 2026): Per-Host-Tech-Tabelle */}
-                {techProfilesByIp?.[h.ip] && (
-                  <TechTable techProfile={techProfilesByIp[h.ip]} />
-                )}
-                {/* Migration 027: Drilldown zu allen Befunden fuer diesen Host */}
-                {orderId && !isSkip && (
-                  <button
-                    onClick={() => {
-                      const fqdn0 = (techProfilesByIp?.[h.ip]?.fqdns || [])[0];
-                      setDrawerHost(fqdn0 || h.ip);
-                    }}
-                    className="mt-2 text-[11px] text-cyan-400 hover:text-cyan-300 hover:underline"
-                  >
-                    Alle Befunde fuer diesen Host anzeigen →
-                  </button>
-                )}
-                {screenshotUrl && (
-                  /* Thumbnail mit Lightbox-on-click — alle Hosts mit
-                     web_probe.has_web=true bekommen einen Screenshot. */
-                  <a
-                    href={screenshotUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 block overflow-hidden rounded border border-slate-700 bg-slate-950"
-                    title="Site-Screenshot oeffnen"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={screenshotUrl}
-                      alt={`Screenshot ${fqdn}`}
-                      loading="lazy"
-                      className="h-24 w-full object-cover object-top opacity-90 hover:opacity-100 transition-opacity"
-                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                    />
-                  </a>
-                )}
-                {h.reasoning && (
-                  <div
-                    className={`mt-2 text-xs leading-snug ${
-                      isSkip ? 'text-slate-500' : 'text-slate-400'
-                    }`}
-                  >
-                    {h.reasoning}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                host={h}
+                discoveredHosts={discoveredHosts}
+                techProfile={techProfilesByIp?.[h.ip]}
+                orderId={orderId}
+                onOpenFindings={(label) => setFindingsDrawerHost(label)}
+                onOpenTech={(ip) => setTechDrawerIp(ip)}
+                onOpenLightbox={(url, label) => setLightbox({ url, label })}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Skipped-Hosts in Disclosure (default zu) */}
+        {skipped.length > 0 && (
+          <details className="mt-3 rounded-lg border border-slate-800 bg-slate-950/30">
+            <summary className="cursor-pointer px-3 py-2 text-xs text-slate-400 hover:text-slate-200 select-none">
+              <span className="mr-1">▸</span>
+              {skipped.length} Skipped Host{skipped.length === 1 ? '' : 's'} anzeigen
+            </summary>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 px-3 pb-3">
+              {skipped.map((h) => (
+                <SkippedHostCard key={h.ip} host={h} discoveredHosts={discoveredHosts} />
+              ))}
+            </div>
+          </details>
+        )}
       </div>
-      {drawerHost && orderId && (
+
+      {/* Drawers + Lightbox */}
+      {findingsDrawerHost && orderId && (
         <PerHostFindingsDrawer
           orderId={orderId}
-          host={drawerHost}
-          onClose={() => setDrawerHost(null)}
+          host={findingsDrawerHost}
+          onClose={() => setFindingsDrawerHost(null)}
         />
+      )}
+      {techDrawerIp && techProfilesByIp?.[techDrawerIp] && (
+        <HostTechDrawer
+          techProfile={techProfilesByIp[techDrawerIp]}
+          hostLabel={techProfilesByIp[techDrawerIp].fqdns?.[0] || techDrawerIp}
+          onClose={() => setTechDrawerIp(null)}
+          onOpenFindings={() => {
+            const label = techProfilesByIp[techDrawerIp].fqdns?.[0] || techDrawerIp;
+            setTechDrawerIp(null);
+            setFindingsDrawerHost(label);
+          }}
+        />
+      )}
+      {lightbox && (
+        <ScreenshotLightbox
+          url={lightbox.url}
+          hostLabel={lightbox.label}
+          onClose={() => setLightbox(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── Card-Components ──────────────────────────────────────────────────────
+
+interface ScannedHostCardProps {
+  host: AiHost;
+  discoveredHosts: DiscoveredHost[] | null | undefined;
+  techProfile?: TechProfile;
+  orderId?: string;
+  onOpenFindings: (label: string) => void;
+  onOpenTech: (ip: string) => void;
+  onOpenLightbox: (url: string, label: string) => void;
+}
+
+function ScannedHostCard({
+  host, discoveredHosts, techProfile, orderId,
+  onOpenFindings, onOpenTech, onOpenLightbox,
+}: ScannedHostCardProps) {
+  const fqdn = fqdnFor(host, discoveredHosts);
+  const prio = host.priority ? PRIORITY_STYLES[String(host.priority)] : null;
+  const dh = discoveredHosts?.find((d) => d.ip === host.ip);
+  const vhosts = dh?.vhosts || [];
+  const screenshotKey = screenshotKeyFor(host, discoveredHosts);
+  const screenshotUrl = orderId && screenshotKey
+    ? getHostScreenshotUrl(orderId, screenshotKey)
+    : null;
+  const techRows = techProfile?.tech_rows || [];
+  const topTechs = pickTopTechs(techRows);
+  const chips = abnormalChips(techRows);
+  const techLabel = techProfile?.fqdns?.[0] || host.ip;
+
+  return (
+    <div className="
+      flex flex-col gap-2 rounded-lg border border-slate-700 bg-slate-900/60 p-3
+      hover:border-slate-600 transition-colors
+    ">
+      {/* Header: Priority + Status + IP */}
+      <div className="flex items-center gap-2">
+        {prio && (
+          <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold ${prio.badge}`}>
+            {prio.label}
+          </span>
+        )}
+        <span
+          className="text-base text-emerald-400"
+          aria-label="scanned"
+          title="Scanned"
+        >
+          ✓
+        </span>
+        <span className="font-mono text-xs text-cyan-300 truncate flex-1">{host.ip}</span>
+      </div>
+
+      {/* Primaer-FQDN */}
+      {fqdn && (
+        <div className="text-xs text-slate-300 truncate">{fqdn}</div>
+      )}
+
+      {/* VHost-Summary (kompakt: nur wenn >1 VHost) */}
+      {vhosts.length > 1 && (
+        <div className="text-[11px] text-slate-500 truncate">
+          +{vhosts.length - 1} VHost{vhosts.length - 1 === 1 ? '' : 's'}
+          {vhosts[0]?.status && (
+            <span className={`ml-2 ${vhosts[0].status >= 200 && vhosts[0].status < 300
+              ? 'text-emerald-400/80' : 'text-amber-400/80'}`}>
+              · {vhosts[0].status}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Tech-Summary + Severity-Chips (nur wenn techProfile vorhanden) */}
+      {(topTechs.length > 0 || chips.length > 0) && (
+        <div className="flex flex-col gap-1.5 border-t border-slate-800 pt-2">
+          {topTechs.length > 0 && (
+            <div className="text-[11px] text-slate-300 truncate">
+              {topTechs.map((t, i) => (
+                <span key={i}>
+                  {i > 0 && <span className="text-slate-600 mx-1.5">·</span>}
+                  <span className="text-slate-200">{t.name}</span>
+                  {t.version && <span className="text-cyan-300/80 ml-1">{t.version}</span>}
+                </span>
+              ))}
+            </div>
+          )}
+          {chips.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {chips.slice(0, 3).map((c) => {
+                const sty = CHIP_STYLE[c];
+                return (
+                  <span
+                    key={c}
+                    className={`inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${sty.cls}`}
+                  >
+                    {sty.label}
+                  </span>
+                );
+              })}
+              {techRows.length > 0 && (
+                <button
+                  onClick={() => onOpenTech(host.ip)}
+                  className="ml-auto text-[10px] text-slate-500 hover:text-slate-300 hover:underline"
+                >
+                  {techRows.length} Tech ▸
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* AI-Reasoning, line-clamp-3 */}
+      {host.reasoning ? (
+        <div className="text-xs leading-snug text-slate-400 line-clamp-3 min-h-[3em] flex-1">
+          {host.reasoning}
+        </div>
+      ) : (
+        <div className="text-xs leading-snug text-slate-600 italic min-h-[3em] flex-1">
+          — Kein Targeting-Reasoning
+        </div>
+      )}
+
+      {/* Action-Row: 3 Buttons */}
+      <div className="flex gap-1.5 pt-2 border-t border-slate-800">
+        {orderId && (
+          <button
+            onClick={() => onOpenFindings(fqdn || host.ip)}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-slate-800/80 hover:bg-slate-700 px-2 py-1.5 text-[11px] text-slate-300 transition-colors"
+            title="Alle Befunde dieses Hosts"
+          >
+            <span aria-hidden>≡</span> Befunde
+          </button>
+        )}
+        <button
+          onClick={() => techRows.length > 0 && onOpenTech(host.ip)}
+          disabled={techRows.length === 0}
+          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-slate-800/80 hover:bg-slate-700 disabled:bg-slate-900/40 disabled:text-slate-600 disabled:cursor-not-allowed px-2 py-1.5 text-[11px] text-slate-300 transition-colors"
+          title={techRows.length > 0 ? `${techRows.length} Technologien` : 'Kein Tech-Profile'}
+        >
+          <span aria-hidden>⌘</span> Tech-Stack {techRows.length > 0 && <span className="text-slate-500">({techRows.length})</span>}
+        </button>
+        <button
+          onClick={() => screenshotUrl && onOpenLightbox(screenshotUrl, techLabel)}
+          disabled={!screenshotUrl}
+          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md bg-slate-800/80 hover:bg-slate-700 disabled:bg-slate-900/40 disabled:text-slate-600 disabled:cursor-not-allowed px-2 py-1.5 text-[11px] text-slate-300 transition-colors"
+          title={screenshotUrl ? 'Site-Screenshot anzeigen' : 'Kein Screenshot verfuegbar'}
+        >
+          <span aria-hidden>🖼</span> Site
+        </button>
+      </div>
+    </div>
+  );
+}
+
+interface SkippedHostCardProps {
+  host: AiHost;
+  discoveredHosts: DiscoveredHost[] | null | undefined;
+}
+
+function SkippedHostCard({ host, discoveredHosts }: SkippedHostCardProps) {
+  const fqdn = fqdnFor(host, discoveredHosts);
+  const prio = host.priority ? PRIORITY_STYLES[String(host.priority)] : null;
+  return (
+    <div className="rounded-md border border-slate-800 bg-slate-950/40 p-2.5">
+      <div className="flex items-center gap-2">
+        {prio && (
+          <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold ${prio.badge}`}>
+            {prio.label}
+          </span>
+        )}
+        <span className="text-base text-slate-500" aria-label="skipped" title="Skipped">⊘</span>
+        <span className="font-mono text-xs text-slate-400 truncate flex-1">{host.ip}</span>
+      </div>
+      {fqdn && <div className="mt-1 text-xs truncate text-slate-500">{fqdn}</div>}
+      {host.reasoning && (
+        <div className="mt-1.5 text-[11px] leading-snug text-slate-500 line-clamp-2">
+          {host.reasoning}
+        </div>
       )}
     </div>
   );
