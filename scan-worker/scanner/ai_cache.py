@@ -38,8 +38,8 @@ CACHE_VERSION = "v1"
 AI_PRICING: dict[str, dict[str, float]] = {
     "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},
     "claude-sonnet-4-6": {"input": 3.0, "output": 15.0},
-    "claude-opus-4-6": {"input": 15.0, "output": 75.0},
     "claude-opus-4-7": {"input": 15.0, "output": 75.0},
+    "claude-opus-4-6": {"input": 15.0, "output": 75.0},  # Legacy
 }
 
 
@@ -202,7 +202,8 @@ class CacheStats:
 PROMPT_CACHE_MIN_TOKENS_BY_MODEL = {
     "claude-haiku-4-5-20251001": 4096,
     "claude-sonnet-4-6": 2048,
-    "claude-opus-4-6": 4096,
+    "claude-opus-4-7": 4096,
+    "claude-opus-4-6": 4096,  # Legacy
     "claude-opus-4-7": 4096,
 }
 # Faustregel: 1 Token ≈ 4 Chars Englisch / 3 Chars Deutsch

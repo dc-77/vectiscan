@@ -30,24 +30,27 @@ log = structlog.get_logger()
 REPORT_MODELS: dict[str, str] = {
     "webcheck": "claude-sonnet-4-6",
     "basic": "claude-sonnet-4-6",
-    "perimeter": "claude-opus-4-6",
-    "professional": "claude-opus-4-6",
-    "compliance": "claude-opus-4-6",
-    "nis2": "claude-opus-4-6",
-    "supplychain": "claude-opus-4-6",
-    "insurance": "claude-opus-4-6",
+    "perimeter": "claude-opus-4-7",
+    "professional": "claude-opus-4-7",
+    "compliance": "claude-opus-4-7",
+    "nis2": "claude-opus-4-7",
+    "supplychain": "claude-opus-4-7",
+    "insurance": "claude-opus-4-7",
     "tlscompliance": "claude-sonnet-4-6",
 }
 
 MAX_TOKENS_BY_MODEL: dict[str, int] = {
     "claude-sonnet-4-6": 16384,
-    "claude-opus-4-6": 32000,
+    "claude-opus-4-7": 32000,
+    "claude-opus-4-6": 32000,  # Legacy
     "claude-haiku-4-5-20251001": 4096,
 }
 
 AI_PRICING: dict[str, dict[str, float]] = {
     "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},
     "claude-sonnet-4-6": {"input": 3.0, "output": 15.0},
+    "claude-opus-4-7": {"input": 15.0, "output": 75.0},
+    # Legacy-Pricing fuer aelteres Caching (Backwards-Compat).
     "claude-opus-4-6": {"input": 15.0, "output": 75.0},
 }
 

@@ -1447,26 +1447,31 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
                 tf.write(f + "\n")
             list_path = tf.name
 
-        # PR-G (Mai 2026): Realistischer User-Agent damit Plesk/Cloudflare/WAFs
-        # die httpx-Probe nicht filtern (Heuel-Setup: Plesk-Server hatte die
-        # httpx-Default-UA "httpx-client/X.X" silent gedroppt → has_web=False
-        # trotz live Website).
+        # PR-G/H (Mai 2026): Realistischer User-Agent + Accept-Header damit
+        # Plesk/Cloudflare/Azure-WAFs die httpx-Probe nicht filtern. Heuel-
+        # Setup (Plesk auf Azure) hatte mit Default-UA komplett geblockt,
+        # selbst mit Chrome-UA antwortet Azure manchmal nicht in 5-8s.
+        # Timeout konservativ auf 15s + 2 retries.
         cmd = [
             "httpx", "-l", list_path, "-json", "-silent",
             "-follow-redirects", "-status-code", "-title",
-            "-timeout", "8", "-retries", "1",
+            "-timeout", "15", "-retries", "2",
             "-hash", "sha256",
             "-fr",  # meta-refresh-follow
             "-threads", "30",
             "-H", "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                   "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "-H", "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,"
+                  "image/avif,image/webp,*/*;q=0.8",
+            "-H", "Accept-Language: de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
         ]
-        # Worst-Case-Timeout: pro FQDN ~5s × ceil(N/30) + Overhead;
-        # konservativ auf 90s gecappt damit ein einziger Hang nicht das
-        # ganze Phase 0b haengen laesst.
+        # Worst-Case-Timeout: pro FQDN ~15s × ceil(N/30) × (1 + retries) + Overhead;
+        # konservativ auf 180s gecappt damit ein einziger Hang nicht das
+        # ganze Phase 0b haengen laesst. PR-H: hochgezogen wegen Plesk/Azure-
+        # WAF-Slow-Response (15s/probe statt 5s).
         batch_timeout = min(
-            90,
-            10 + 5 * (len(all_fqdns) // 30 + 1),
+            180,
+            30 + 15 * (len(all_fqdns) // 30 + 1),
         )
         try:
             result = subprocess.run(

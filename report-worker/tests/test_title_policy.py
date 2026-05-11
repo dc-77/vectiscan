@@ -6,6 +6,7 @@ from reporter.title_policy import (
     TITLE_TEMPLATES,
     apply_title_template,
     apply_titles,
+    _cleanup_leftover_placeholders,
 )
 
 
@@ -156,3 +157,50 @@ def test_titles_aligned_with_severity_policy():
                 f"das '{expected_substr}' enthaelt. Templates: {templates} — "
                 "title_policy.py drift?"
             )
+
+
+# ---------------------------------------------------------------------------
+# PR-H (Mai 2026): Cleanup von uebrig gebliebenen {placeholder}-Literalen
+# ---------------------------------------------------------------------------
+
+def test_cleanup_replaces_host_from_title_vars():
+    title = "RDP-Dienst (Port 3389) oeffentlich erreichbar auf {host}"
+    f = {"title": title, "title_vars": {"host": "45.157.234.103"}}
+    out = _cleanup_leftover_placeholders(title, f, None)
+    assert out == "RDP-Dienst (Port 3389) oeffentlich erreichbar auf 45.157.234.103"
+
+
+def test_cleanup_falls_back_to_affected_hosts():
+    title = "FTP-Dienst auf {host}"
+    f = {"title": title, "affected_hosts": ["secumetrix.de"]}
+    out = _cleanup_leftover_placeholders(title, f, None)
+    assert out == "FTP-Dienst auf secumetrix.de"
+
+
+def test_cleanup_strips_dangling_preposition():
+    """Wenn kein host irgendwo zu finden ist, wird 'auf {host}' am Ende komplett entfernt."""
+    title = "JavaScript-Lib mit Schwachstelle auf {host}"
+    f = {"title": title}
+    out = _cleanup_leftover_placeholders(title, f, None)
+    # "auf " bleibt nicht dangling am Ende
+    assert "{" not in out
+    assert not out.endswith("auf")
+    assert out.startswith("JavaScript-Lib mit Schwachstelle")
+
+
+def test_cleanup_no_op_when_no_placeholders():
+    title = "Eindeutiger Titel ohne Platzhalter"
+    out = _cleanup_leftover_placeholders(title, {}, None)
+    assert out == title
+
+
+def test_apply_titles_cleans_kiraw_with_placeholders():
+    """End-to-End: KI-Title mit literalem {host} ohne policy_id wird trotzdem gecleant."""
+    findings = [{
+        "title": "FTP-Dienst (Klartext) auf {host}",
+        "title_vars": {"host": "45.157.234.103"},
+        # KEIN policy_id → apply_title_template macht early-return,
+        # _cleanup_leftover_placeholders muss trotzdem laufen.
+    }]
+    apply_titles(findings, scan_context=None)
+    assert findings[0]["title"] == "FTP-Dienst (Klartext) auf 45.157.234.103"

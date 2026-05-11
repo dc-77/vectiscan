@@ -333,6 +333,68 @@ def apply_title_template(finding: dict[str, Any], scan_context: dict[str, Any] |
     return rendered
 
 
+_LEFTOVER_PLACEHOLDER_RE = re.compile(r"\{([a-zA-Z_][a-zA-Z0-9_]*)\}")
+
+
+def _cleanup_leftover_placeholders(
+    title: str,
+    finding: dict[str, Any],
+    scan_context: dict[str, Any] | None,
+) -> str:
+    """Ersetze uebrig gebliebene ``{platzhalter}`` im Title.
+
+    PR-H (Mai 2026): KI generiert Titel wie ``"RDP-Dienst auf {host}"`` und
+    setzt den Platzhalter nicht selbst ein. Wenn keine policy_id zugeordnet
+    ist (oder das Template fehlt), bleibt der literal Placeholder stehen.
+    Wir versuchen jede uebrig gebliebene Variable aus title_vars +
+    abgeleiteten Quellen + affected_hosts/vhost/finding-Feldern zu ersetzen.
+    """
+    if "{" not in title:
+        return title
+
+    # Quellen-Lookup wie in apply_title_template
+    title_vars: dict[str, Any] = {}
+    if isinstance(finding.get("title_vars"), dict):
+        title_vars.update(finding["title_vars"])
+    if "host" not in title_vars:
+        host = (
+            finding.get("vhost")
+            or finding.get("fqdn")
+            or finding.get("affected_hosts", [None])[0]
+            or finding.get("host_ip")
+            or finding.get("host")
+        )
+        if host:
+            title_vars["host"] = str(host)
+    if "domain" not in title_vars and scan_context:
+        title_vars["domain"] = scan_context.get("domain", "")
+    if "cve_id" not in title_vars and finding.get("cve"):
+        title_vars["cve_id"] = finding["cve"]
+    if "cvss" not in title_vars and finding.get("cvss_score"):
+        title_vars["cvss"] = finding["cvss_score"]
+
+    def _replace(m: re.Match) -> str:
+        key = m.group(1)
+        val = title_vars.get(key)
+        if val in (None, "", "?"):
+            # Letzter Versuch: aus evidence/description ableiten
+            val = _derive_var_from_finding(key, finding, scan_context)
+        if val in (None, "", "?"):
+            # Kompletten Platzhalter (mit "auf " Praefix wenn vorhanden)
+            # einfach entfernen damit der Title les bar bleibt.
+            return ""
+        return str(val)
+
+    cleaned = _LEFTOVER_PLACEHOLDER_RE.sub(_replace, title)
+    # Doppelte/leftover Whitespace + dangling Praeposition aufraeumen
+    cleaned = re.sub(r"\s+auf\s*$", "", cleaned)  # "...erreichbar auf" am Ende
+    cleaned = re.sub(r"\s+bei\s*$", "", cleaned)
+    cleaned = re.sub(r"\s+fuer\s*$", "", cleaned)
+    cleaned = re.sub(r"\s+für\s*$", "", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned or title  # Niemals leeren String zurueck — Fallback Original
+
+
 def apply_titles(findings: list[dict[str, Any]],
                  scan_context: dict[str, Any] | None = None) -> int:
     """Wendet Title-Templates auf alle Findings an. Modifiziert in-place.
@@ -345,4 +407,11 @@ def apply_titles(findings: list[dict[str, Any]],
         if new_title and new_title != f.get("title"):
             f["title"] = new_title
             overridden += 1
+        # PR-H: leftover-Cleanup auch bei nicht-ueberschriebenen Titles
+        # (Original-KI-Title mit literalen Platzhaltern).
+        final_title = _cleanup_leftover_placeholders(
+            f.get("title", "") or "", f, scan_context,
+        )
+        if final_title != f.get("title"):
+            f["title"] = final_title
     return overridden

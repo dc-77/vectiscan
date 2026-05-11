@@ -377,12 +377,21 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         log.info("ai_strategy_skipped", reason="skip_ai_decisions=True", hosts=len(scan_hosts))
     else:
         # Enrich host inventory with passive intel for better AI decisions
+        # PR-H (Mai 2026): zusaetzlich passive_intel direkt auf host_inventory.hosts
+        # schreiben, damit es ueber host_inventory.json zum report-worker propagiert
+        # und in tech_profiles/tech_table angezeigt werden kann (Shodan-Services
+        # bisher nur in der KI-Strategie sichtbar, nicht im Customer-Output).
         enriched_inventory = {**host_inventory}
         if phase0a_results:
             enriched_hosts = []
             for h in hosts:
                 enriched = {**h}
-                enriched["passive_intel"] = build_passive_intel_for_ai(phase0a_results, h["ip"])
+                pi = build_passive_intel_for_ai(phase0a_results, h["ip"])
+                enriched["passive_intel"] = pi
+                # Auf das echte host-Dict (in-place, von beiden Listen geteilt
+                # via Mutable-Reference) schreiben damit downstream-Worker es
+                # nutzen koennen.
+                h["passive_intel"] = pi
                 enriched_hosts.append(enriched)
             enriched_inventory["hosts"] = enriched_hosts
             enriched_inventory["dns_security"] = phase0a_results.get("dns_security", {})
@@ -479,6 +488,29 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         # Carry web_probe data from Phase 0 into tech_profile
         tech_profile["has_web"] = web_probe.get("has_web", True)
         tech_profile["web_fqdn"] = web_probe.get("web_fqdn")
+
+        # PR-H (Mai 2026): passive_intel (Shodan/AbuseIPDB) ins tech_profile
+        # mergen — landet ueber Migration 027 in reports.tech_profiles und
+        # damit auch in der UI-Tech-Tabelle / dem KI-Prompt.
+        pi = host.get("passive_intel") or {}
+        if pi:
+            tech_profile["passive_intel"] = pi
+            shodan_services = pi.get("shodan_services") or {}
+            shodan_ports = pi.get("shodan_ports") or []
+            if shodan_services or shodan_ports:
+                # Compact-Liste fuer Tech-Tabellen-Anzeige: pro Port ein Eintrag
+                # mit Service-String wenn vorhanden, sonst nur Port-Label.
+                exposed: list[dict[str, Any]] = []
+                for port, svc in shodan_services.items():
+                    if svc:
+                        exposed.append({"port": str(port), "service": svc})
+                # Ports OHNE Service-String separat erfassen
+                covered = {e["port"] for e in exposed}
+                for port in shodan_ports:
+                    p = str(port)
+                    if p not in covered:
+                        exposed.append({"port": p, "service": ""})
+                tech_profile["exposed_services"] = exposed
 
         return idx, tech_profile
 

@@ -86,7 +86,7 @@ class TestCallClaude:
             )
         call_args = mock_anthropic.messages.create.call_args
         # Default package (perimeter) uses Opus with 32K tokens
-        assert call_args.kwargs["model"] == "claude-opus-4-6"
+        assert call_args.kwargs["model"] == "claude-opus-4-7"
         assert call_args.kwargs["max_tokens"] == 32000
 
     def test_missing_api_key_raises(self) -> None:

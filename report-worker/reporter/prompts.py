@@ -76,7 +76,7 @@ OUTPUT-FORMAT:
 Antworte ausschließlich in JSON nach folgendem Schema:
 {{
   "overall_risk": "CRITICAL|HIGH|MEDIUM|LOW",
-  "overall_description": "2-3 Sätze",
+  "overall_description": "AUSFUEHRLICHE Gesamtbewertung in 6-10 Saetzen (250-400 Woerter, mind. 2 Absaetze): Absatz 1 beschreibt das Gesamtbild der Infrastruktur (Anzahl Hosts, eingesetzte Technologien, Stack-Aktualitaet); Absatz 2 nennt die TOP-3 konkreten Risikobereiche mit Host-Namen und benennt explizit alle aus Shodan/passive Intel bekannten exponierten Dienste (z.B. 'auf 45.157.234.103 zusaetzlich Ollama Port 11434, RabbitMQ 5672, Redis 6379 erreichbar'), EOL-Software (z.B. 'Nginx 1.24.0 EOL seit 2024-04-23'), DNS-Defizite (DMARC=quarantine/none, fehlendes DKIM) und kritisch exponierte Datenbank-/Mail-/Admin-Ports namentlich. KEIN abstraktes 'erhebliche Angriffsflaeche' — der Leser muss aus dem Text wissen, WELCHE Hosts WELCHE Probleme haben.",
   "findings": [
     {{
       "id": "VS-{_CURRENT_YEAR}-001",
@@ -109,6 +109,26 @@ TITLE_VARS: Liefere ein Dict mit Schluessel-Variablen (host, domain, port,
 tech, cve_id, cookie_name, p_value für DMARC, etc.). Diese werden in deter-
 ministische Title-Templates eingesetzt — ueberschreibt deinen 'title' wenn
 eine policy_id zugeordnet wird, fuer reproduzierbare Titel ueber Re-Scans.
+
+WICHTIG — KEINE literalen Platzhalter im 'title':
+- Schreibe IMMER konkrete Werte direkt in den Titel-String: "RDP-Dienst (Port
+  3389) oeffentlich erreichbar auf 45.157.234.103" — NICHT "auf {{host}}".
+- Die in title_vars angegebenen Werte sind zusaetzliche strukturierte Metadaten,
+  nicht Ersatz fuer einen lesbaren Titel.
+- Wenn du dir ueber den Host unsicher bist: nimm den ersten Wert aus
+  affected_hosts oder host_ip — niemals literale "{{host}}".
+
+EOL-PFLICHT: Jede Tech-Row aus den TECHNOLOGIE-PROFILEN mit
+``status="eol"`` ODER ``is_mega_cve=true`` MUSS ein eigenes Finding ergeben
+(HIGH falls EOL, CRITICAL falls is_mega_cve oder beides). Beispiel: tech_row
+Nginx 1.24.0 mit eol_date=2024-04-23 → Finding "Nginx 1.24.0 hat das End of
+Life erreicht (seit 2024-04-23)" mit Empfehlung zum Upgrade auf latest_patch.
+
+SHODAN/PASSIVE-INTEL-PFLICHT: Wenn passive_intel.shodan_services oder
+exposed_services Ports/Services nennen, die kein eigenes Phase-2-Finding
+haben (Ollama Port 11434, RabbitMQ 5672, Redis 6379, etc.), MUSST du dafuer
+mindestens 1 sammelndes Finding "Zusaetzlich exponierte Dienste laut
+Shodan-Daten" mit Auflistung pro Host erstellen.
 """
 
 
@@ -236,7 +256,7 @@ OUTPUT-FORMAT:
 Antworte ausschließlich in JSON nach folgendem Schema:
 {{
   "overall_risk": "CRITICAL|HIGH|MEDIUM|LOW",
-  "overall_description": "2-3 Sätze Gesamtbewertung",
+  "overall_description": "AUSFUEHRLICHE Gesamtbewertung in 8-12 Saetzen (350-550 Woerter, 2-3 Absaetze). Absatz 1: Gesamtbild — Wieviele Hosts/IPs, Web-Stack-Diversitaet, eingesetzte Hauptservices (Web, Mail, DB, Admin), Aktualitaet (EOL-Indikatoren, ungepatchte Bekannte CVEs). Absatz 2: Konkrete Risikobereiche mit Host-Namen, explizite Auflistung exponierter Dienste aus Shodan/passive intel (Beispiel: 'auf IP X zusaetzlich Ollama Port 11434, RabbitMQ Port 5672, Redis Port 6379 sichtbar' oder 'Nginx 1.24.0 EOL seit 2024-04-23 auf X erkannt'), EOL-Software, DNS-Probleme (DMARC=quarantine/none, fehlendes DKIM), kritisch exponierte Ports (DB, Mail, Admin) namentlich. Absatz 3 (optional): Compliance/Reife-Bewertung. KEIN abstraktes 'erhebliche Angriffsflaeche' — der Leser muss aus dem Text wissen, WELCHE Hosts WELCHE Probleme haben. Wenn Shodan/passive_intel Daten Services nennen die im Scan nicht als Finding auftauchen (z.B. Ollama, RabbitMQ, Redis, exponiertes FTP), MUSST du sie hier explizit erwaehnen.",
   "findings": [
     {{
       "id": "VS-{_CURRENT_YEAR}-001",
@@ -288,6 +308,29 @@ eine policy_id zugeordnet wird (z.B. SP-DNS-010 fuer DMARC-quarantine →
 "DMARC-Policy 'quarantine' statt 'reject' fuer {{domain}}"). Damit erhalten
 wir konsistente Titel ueber wiederholte Scans hinweg. Daher sind die
 title_vars wichtiger als die freie Titel-Formulierung.
+
+ABER: schreibe im freien 'title'-Feld IMMER konkrete Werte direkt — NIE
+literale "{{host}}"/"{{port}}"/etc. Beispiel "RDP-Dienst (Port 3389) oeffentlich
+erreichbar auf 45.157.234.103" statt "auf {{host}}". Die title_vars sind
+strukturierte Metadaten ZUSAETZLICH — kein Ersatz fuer einen lesbaren Titel.
+
+EOL-PFLICHT: Jede Tech-Row aus den TECHNOLOGIE-PROFILEN mit ``status="eol"``
+ODER ``is_mega_cve=true`` MUSS ein eigenes Finding ergeben. Severity:
+- ``status="eol"`` alleine → HIGH (CVSS 7.0-8.0)
+- ``is_mega_cve=true`` (KEV-Match) → CRITICAL (CVSS 9.0-10.0) mit CVE-IDs aus cves[]
+- ``status="outdated"`` (latest_patch deutlich neuer) → MEDIUM (CVSS 4.0-6.0)
+Beispiel: Nginx 1.24.0 mit eol_date=2024-04-23, latest_patch=1.27.0 →
+Finding "Nginx 1.24.0 hat End of Life erreicht (seit 2024-04-23)" mit
+Empfehlung "Upgrade auf 1.27.0 oder neuer".
+
+SHODAN/PASSIVE-INTEL-PFLICHT: Wenn passive_intel.shodan_services oder
+host_inventory.hosts[].exposed_services Ports/Services nennen die kein eigenes
+Phase-2-Finding haben (Ollama 11434, RabbitMQ 5672, Redis 6379, MongoDB 27017,
+ElasticSearch 9200, Memcached 11211, etc.), MUSST du dafuer pro Host ein
+Finding mit klarer Auflistung erstellen — wenn die Dienste authentifiziert
+sind: MEDIUM 5.0-6.5; wenn ohne Auth/anonym erreichbar: HIGH 7.5-8.5.
+Title-Beispiel: "Zusaetzliche Management-Dienste ohne Firewall-Schutz
+auf 45.157.234.103 (Ollama, RabbitMQ, Redis)".
 
 BSI TR-03116-4 COMPLIANCE:
 Der Report enthält eine automatisch generierte Sektion

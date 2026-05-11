@@ -390,6 +390,40 @@ def build_tech_table_for_host(
             "source": "waf_detect",
         })
 
+    # 5. Shodan-exponierte Dienste (PR-H, Mai 2026)
+    # Aus passive_intel.shodan_services / shodan_ports. Diese Services sind
+    # bereits oeffentlich aus Internet sichtbar (Drittseiten-Sicht). Wir
+    # zeigen sie als eigene Kategorie "Exponierter Dienst" damit der Customer
+    # sie sieht, ohne in Phase 2 jeden Port aktiv geprobt haben zu muessen.
+    seen_exposed_ports: set[str] = set()
+    for entry in tech_profile.get("exposed_services") or []:
+        port = str(entry.get("port") or "").strip()
+        if not port or port in seen_exposed_ports:
+            continue
+        seen_exposed_ports.add(port)
+        svc_string = (entry.get("service") or "").strip()
+        # Service-Name z.B. "nginx 1.24.0" oder "" → "Port 11434"
+        name = svc_string if svc_string else f"Port {port}"
+        # Version aus Service-String separieren wenn moeglich
+        version = ""
+        parts = svc_string.rsplit(" ", 1)
+        if len(parts) == 2 and any(c.isdigit() for c in parts[1]):
+            name = parts[0]
+            version = parts[1]
+        rows.append({
+            "name": name,
+            "version": version,
+            "category": f"Exponierter Dienst (Port {port})",
+            "status": "current",  # Shodan kann EOL nicht bewerten
+            "is_mega_cve": False,
+            "eol_date": "",
+            "latest_patch": "",
+            "cves": [],
+            "vuln_name": "",
+            "confidence": None,
+            "source": "shodan",
+        })
+
     # Stable-Sort: Status-Schwere zuerst (eol > minor_eol > outdated > current),
     # mega_cve-Flag erhoeht Prioritaet innerhalb gleichen Status,
     # dann Kategorie, dann Name.
