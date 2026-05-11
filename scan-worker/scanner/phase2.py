@@ -418,38 +418,41 @@ def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dic
 
     api_token = os.environ.get("WPSCAN_API_TOKEN", "")
 
-    # PR-I (Mai 2026): Enumeration deutlich reduziert. Vorher `vp,vt,u1-5`
-    # lief systematisch in den 600s-Timeout (vp probiert ~3000 vulnerable
-    # plugins per HTTP-Request, vt ~300 themes, u1-5 5 User-Enum-Versuche
-    # x ~10 endpoints) — insbesondere bei langsamen Plesk/Cloudflare-Sites.
-    # Neu: nur `vp` (vulnerable plugins) + passive detection-mode + 100ms
-    # throttle. Damit < 60s pro Run, immer noch sinnvolle CVE-Coverage.
+    # PR-I (Mai 2026): Vollscope wiederhergestellt nach Performance-Reduktion.
+    # User-Entscheidung: hoechste Detection-Coverage trotz lange Laufzeit ist
+    # wichtiger als Schnelligkeit (Plugin/Theme/User-Enum + aktives Path-
+    # Probing). Timeout statt 600s jetzt 1200s damit Plesk/Cloudflare-Sites
+    # mit Rate-Limits + WAFs nicht mehr abgeschnitten werden.
+    # Throttle 100ms statt 200ms (verdoppelt die Request-Rate gegenueber
+    # dem Pre-Mai-2026-Stand) — bei 1200s Cap immer noch konservativ genug
+    # damit Customer-Sites nicht selbst rate-limited werden.
     cmd = [
         "wpscan",
         "--url", f"https://{fqdn}",
         "--format", "json",
         "--output", output_path,
-        "--enumerate", "vp",  # nur vulnerable plugins
-        "--plugins-detection", "passive",  # kein Brute-Force-Path-Scan
+        "--enumerate", "vp,vt,u1-5",  # vulnerable plugins, themes, user-enum 1-5
         "--random-user-agent",
         "--no-banner",
         "--disable-tls-checks",        # handle self-signed certs
-        # Rate-Limit: 100ms zwischen Requests = 10 req/s. Vorher 200ms.
-        # Plesk-Sites sind eh langsam, brauchen nicht zusaetzliche Drossel.
+        # Rate-Limit: 100ms zwischen Requests = 10 req/s.
         "--throttle", "100",
-        # Request-Timeout pro HTTP-Call (vorher 30s, gestrafft auf 20s).
-        "--request-timeout", "20",
+        # Request-Timeout pro HTTP-Call (Default 60s ist zu lang)
+        "--request-timeout", "30",
         # Connection-Timeout separat (Default 30s)
         "--connect-timeout", "10",
         "--max-threads", "5",
-        "--detection-mode", "passive",  # vorher mixed; kein /wp-admin etc. Probing
+        # `--detection-mode mixed` (Default) — passive zuerst, aggressive
+        # nur wo noetig (probiert /wp-admin/ + /wp-includes/ etc.)
+        "--detection-mode", "mixed",
     ]
     if api_token:
         cmd.extend(["--api-token", api_token])
 
-    # Timeout: passive-mode + nur vp ~30s typisch, 180s als Safety-Cap.
+    # Timeout: 1200s (20 min) Safety-Cap fuer Plesk/Cloudflare-Sites mit
+    # Rate-Limits. Vollscope-Run typisch 5-15min.
     exit_code, duration_ms = run_tool(
-        cmd=cmd, timeout=180, output_path=output_path,
+        cmd=cmd, timeout=1200, output_path=output_path,
         order_id=order_id, host_ip=ip, phase=2, tool_name="wpscan",
     )
 
