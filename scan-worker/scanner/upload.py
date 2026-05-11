@@ -186,6 +186,19 @@ def map_screenshots_to_hosts(
     for h in hosts:
         ip = h.get("ip", "")
         vhosts = h.get("vhosts") or []
+
+        # PR-G (Mai 2026): Fallback wenn Phase 0 web_probe leere vhosts liefert
+        # (z.B. httpx hat keine Antwort bekommen) — wir bauen synthetische
+        # VHost-Eintraege aus host.fqdns damit die Screenshots aus Phase 1
+        # (Playwright laeuft unabhaengig) trotzdem in der UI sichtbar werden.
+        synthetic = False
+        if not vhosts and h.get("fqdns"):
+            synthetic = True
+            vhosts = [
+                {"fqdn": f, "is_primary": (i == 0), "_synthetic": True}
+                for i, f in enumerate(h.get("fqdns") or [])
+            ]
+
         primary_key: str | None = None
         for v in vhosts:
             fqdn = (v.get("fqdn") or "").strip()
@@ -206,6 +219,18 @@ def map_screenshots_to_hosts(
                 v["screenshot_minio_key"] = candidate
                 if v.get("is_primary") and primary_key is None:
                     primary_key = candidate
+
+        # Synthetische vhosts nur dann persistieren wenn mindestens einer einen
+        # Screenshot-Key bekommen hat — sonst pollutet das die UI mit leeren
+        # FQDN-Karten ohne Daten.
+        if synthetic:
+            mapped = [v for v in vhosts if v.get("screenshot_minio_key")]
+            if mapped:
+                # Sortiere primary nach vorn (kompatibel zur Sort-Order von
+                # phase0._canonicalize_vhosts).
+                mapped.sort(key=lambda v: 0 if v.get("is_primary") else 1)
+                h["vhosts"] = mapped
+
         if primary_key:
             h["screenshot_minio_key"] = primary_key
         elif vhosts:

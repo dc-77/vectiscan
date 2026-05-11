@@ -167,3 +167,54 @@ def test_parse_httpx_probe_line_parking_detected():
 
 def test_parse_httpx_probe_line_no_status_dropped():
     assert _parse_httpx_probe_line({"input": "https://x.com"}) is None
+
+
+# ---------------------------------------------------------------------------
+# PR-G (Mai 2026): Hostname-Fallback wenn httpx -l <file> mit nackten
+# Hostnamen aufgerufen wird — input-Feld hat dann kein Scheme und urlparse
+# liefert keine hostname.
+# ---------------------------------------------------------------------------
+
+def test_parse_httpx_probe_line_bare_hostname_input():
+    """input='heuel.com' (kein Scheme) - Fallback nimmt input als hostname."""
+    probe = _parse_httpx_probe_line({
+        "input": "heuel.com",
+        "url": "https://heuel.com",
+        "status_code": 200,
+        "title": "Heuel - Home",
+    })
+    assert probe is not None
+    assert probe["fqdn"] == "heuel.com"
+    assert probe["status"] == 200
+
+
+def test_parse_httpx_probe_line_bare_hostname_with_port():
+    """input='heuel.com:8080' wird zu hostname=heuel.com (Port abgeschnitten)."""
+    probe = _parse_httpx_probe_line({
+        "input": "heuel.com:8080",
+        "url": "http://heuel.com:8080",
+        "status_code": 200,
+    })
+    assert probe is not None
+    assert probe["fqdn"] == "heuel.com"
+
+
+def test_parse_httpx_probe_line_falls_back_to_url_field():
+    """input fehlt voellig, aber url ist gesetzt -> hostname aus url."""
+    probe = _parse_httpx_probe_line({
+        "url": "https://heuel.com/",
+        "status_code": 200,
+    })
+    assert probe is not None
+    assert probe["fqdn"] == "heuel.com"
+
+
+def test_parse_httpx_probe_line_falls_back_to_host_field():
+    """Wenn weder input noch url einen Hostname produzieren, aber 'host' gesetzt ist."""
+    probe = _parse_httpx_probe_line({
+        "input": "/some/path",  # urlparse → hostname=None
+        "host": "heuel.com",
+        "status_code": 200,
+    })
+    assert probe is not None
+    assert probe["fqdn"] == "heuel.com"

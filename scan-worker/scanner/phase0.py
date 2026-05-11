@@ -1308,14 +1308,33 @@ def _parse_httpx_probe_line(data: dict[str, Any]) -> dict[str, Any] | None:
 
     # httpx liefert die Eingabe-URL unter 'input'/'url'; den Hostnamen
     # extrahieren wir daraus.
+    #
+    # PR-G (Mai 2026): Wenn `-l <file>` mit nackten Hostnamen (ohne Scheme)
+    # benutzt wird, ist `input` haeufig nur der Hostname (z.B. "heuel.com").
+    # ``urlparse("heuel.com").hostname`` gibt dann None zurueck. Fallback in
+    # mehreren Stufen: input-als-URL → input-als-Hostname → url-Feld → host.
     url_in = data.get("input") or data.get("url", "") or ""
     try:
         fqdn = (urlparse(url_in).hostname or "").lower()
     except Exception:
         fqdn = ""
+    if not fqdn and url_in:
+        # Kein Scheme → urlparse-fail. Wenn `input` wie ein blanker Hostname
+        # aussieht (kein '/' und max ein Doppelpunkt fuer Port), nimm es direkt.
+        candidate = url_in.strip().lower()
+        if candidate and "/" not in candidate and candidate.count(":") <= 1:
+            # Strip optional :port
+            fqdn = candidate.split(":")[0]
     if not fqdn:
-        # Fallback: 'host'-Feld
+        # Fallback: separates Feld aus httpx-Output
         fqdn = (data.get("host") or "").lower()
+    if not fqdn:
+        # Letzter Versuch: aus url-Feld (mit Scheme)
+        url_full = data.get("url", "") or ""
+        try:
+            fqdn = (urlparse(url_full).hostname or "").lower()
+        except Exception:
+            fqdn = ""
     if not fqdn:
         return None
 
@@ -1450,18 +1469,41 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
                 start_new_session=True,
             )
             stdout = result.stdout or ""
+            stderr = result.stderr or ""
+            exit_code = result.returncode
         except subprocess.TimeoutExpired:
             log.warning("web_probe_batch_timeout", fqdns=len(all_fqdns),
                         timeout_s=batch_timeout)
-            stdout = ""
+            stdout, stderr, exit_code = "", "", -1
         except Exception as e:
-            log.debug("web_probe_batch_error", error=str(e))
-            stdout = ""
+            log.warning("web_probe_batch_error", error=str(e))
+            stdout, stderr, exit_code = "", "", -2
         finally:
             try:
                 os.unlink(list_path)
             except OSError:
                 pass
+
+        # Diagnostik (PR-G Mai 2026): Bei leerem stdout immer stderr + exit_code
+        # loggen — sonst stillschweigender has_web=false fuer alle Hosts.
+        if not stdout.strip():
+            log.warning(
+                "web_probe_batch_empty_stdout",
+                exit_code=exit_code,
+                stderr=stderr[:500],
+                fqdns_count=len(all_fqdns),
+                fqdns_sample=all_fqdns[:5],
+                cmd=" ".join(cmd[:5]) + " ...",
+            )
+        else:
+            log.info(
+                "web_probe_batch_done",
+                exit_code=exit_code,
+                stdout_bytes=len(stdout),
+                stderr_bytes=len(stderr),
+                stderr_head=stderr[:200] if stderr else "",
+                fqdns=len(all_fqdns),
+            )
 
         # NDJSON parsen — pro FQDN das erste Ergebnis behalten.
         for line in stdout.splitlines():

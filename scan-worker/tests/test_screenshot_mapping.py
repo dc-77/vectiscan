@@ -147,3 +147,56 @@ def test_empty_inputs_safe() -> None:
     map_screenshots_to_hosts([], {}, "ord")
     map_screenshots_to_hosts([{"ip": "1.1.1.1", "vhosts": []}], {}, "ord")
     map_screenshots_to_hosts([{"ip": "1.1.1.1"}], {"x.example.com": "ord/1.1.1.1__x.example.com.png"}, "ord")
+
+
+# ---------------------------------------------------------------------------
+# PR-G (Mai 2026): Phase 0 web_probe-Ausfall — Fallback auf host.fqdns
+# ---------------------------------------------------------------------------
+
+def test_empty_vhosts_synthetic_fallback_from_fqdns() -> None:
+    """Wenn vhosts leer ist (web_probe-Bug), werden synthetische vhost-Eintraege
+    aus host.fqdns erzeugt und Screenshots zugeordnet."""
+    from scanner.upload import map_screenshots_to_hosts
+
+    hosts = [{
+        "ip": "217.72.203.132",
+        "fqdns": ["heuel.com", "www.heuel.com", "jobs.heuel.com"],
+        "vhosts": [],  # Phase 0 web_probe lieferte nichts
+    }]
+    screenshot_keys = {
+        "heuel.com":     "ord/217.72.203.132__heuel.com.png",
+        "www.heuel.com": "ord/217.72.203.132__www.heuel.com.png",
+    }
+    map_screenshots_to_hosts(hosts, screenshot_keys, "ord")
+
+    # Synthetische vhosts wurden geschrieben fuer jene mit Screenshot-Match.
+    assert len(hosts[0]["vhosts"]) == 2
+    fqdns = [v["fqdn"] for v in hosts[0]["vhosts"]]
+    assert "heuel.com" in fqdns
+    assert "www.heuel.com" in fqdns
+    # Primary (i==0 = heuel.com) ist vorne sortiert.
+    assert hosts[0]["vhosts"][0]["fqdn"] == "heuel.com"
+    assert hosts[0]["vhosts"][0]["is_primary"] is True
+    # Marker damit downstream-Code erkennt dass das nicht aus echtem web_probe kam.
+    assert hosts[0]["vhosts"][0]["_synthetic"] is True
+    # Top-Level Key auf primary
+    assert hosts[0]["screenshot_minio_key"] == "ord/217.72.203.132__heuel.com.png"
+
+
+def test_empty_vhosts_no_matches_does_not_pollute() -> None:
+    """Wenn vhosts leer + KEIN fqdn matched → keine synthetic vhosts persistiert."""
+    from scanner.upload import map_screenshots_to_hosts
+
+    hosts = [{
+        "ip": "9.9.9.9",
+        "fqdns": ["a.example.com", "b.example.com"],
+        "vhosts": [],
+    }]
+    screenshot_keys = {
+        "other.com": "ord/1.1.1.1__other.com.png",  # passt zu keinem fqdn
+    }
+    map_screenshots_to_hosts(hosts, screenshot_keys, "ord")
+
+    # vhosts bleibt leer — kein UI-Pollution mit FQDN-Karten ohne Bild.
+    assert hosts[0]["vhosts"] == []
+    assert "screenshot_minio_key" not in hosts[0]
