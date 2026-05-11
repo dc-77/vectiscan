@@ -1447,13 +1447,19 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
                 tf.write(f + "\n")
             list_path = tf.name
 
+        # PR-G (Mai 2026): Realistischer User-Agent damit Plesk/Cloudflare/WAFs
+        # die httpx-Probe nicht filtern (Heuel-Setup: Plesk-Server hatte die
+        # httpx-Default-UA "httpx-client/X.X" silent gedroppt → has_web=False
+        # trotz live Website).
         cmd = [
             "httpx", "-l", list_path, "-json", "-silent",
             "-follow-redirects", "-status-code", "-title",
-            "-timeout", "5", "-retries", "1",
+            "-timeout", "8", "-retries", "1",
             "-hash", "sha256",
             "-fr",  # meta-refresh-follow
             "-threads", "30",
+            "-H", "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         ]
         # Worst-Case-Timeout: pro FQDN ~5s × ceil(N/30) + Overhead;
         # konservativ auf 90s gecappt damit ein einziger Hang nicht das

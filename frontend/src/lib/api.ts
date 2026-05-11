@@ -79,13 +79,20 @@ export interface DiscoveredHost {
 }
 
 /** Hilfsfunktion: rechnet die Frontend-URL fuer den Site-Screenshot eines
- * Hosts. Returns null wenn kein Screenshot fuer den Host vorhanden ist. */
+ * Hosts. Returns null wenn kein Screenshot fuer den Host vorhanden ist.
+ *
+ * PR-G (Mai 2026): Da <img>-Tags keinen Authorization-Header schicken,
+ * haengen wir den JWT als `?token=` Query-Param an. Die requireAuth-
+ * Middleware akzeptiert beides (Header ODER Query). Token kommt aus
+ * localStorage, getToken() ist SSR-safe (returns null im Server-Render). */
 export function getHostScreenshotUrl(orderId: string, screenshotKey: string | null | undefined): string | null {
   if (!screenshotKey) return null;
   // Key-Format: "<orderId>/<safe_fqdn>.png" → wir extrahieren den safe-Teil
   const match = screenshotKey.match(/^[^/]+\/(.+)\.png$/);
   if (!match) return null;
-  return `${API_URL}/api/orders/${orderId}/screenshot/${match[1]}`;
+  const base = `${API_URL}/api/orders/${orderId}/screenshot/${match[1]}`;
+  const token = getToken();
+  return token ? `${base}?token=${encodeURIComponent(token)}` : base;
 }
 
 export interface OrderProgress {

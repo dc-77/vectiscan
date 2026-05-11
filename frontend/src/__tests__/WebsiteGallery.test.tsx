@@ -9,9 +9,12 @@ const MOCK_TECH: Record<string, TechProfile> = {
     fqdns: ['heuel.com'],
     cms: 'WordPress',
     cms_version: '6.4',
+    server: 'Apache/2.4',
+    waf: null,
+    open_ports: [80, 443],
     tech_rows: [
-      { name: 'WordPress', version: '6.4', category: 'cms', status: 'current', is_mega_cve: false, vuln_name: '', confidence: null, source: 'cms' },
-      { name: 'Apache',    version: '2.4', category: 'server', status: 'current', is_mega_cve: false, vuln_name: '', confidence: null, source: 'nmap' },
+      { name: 'WordPress', version: '6.4', category: 'cms', status: 'current', is_mega_cve: false, eol_date: '', latest_patch: '', cves: [], vuln_name: '', confidence: null, source: 'cms' },
+      { name: 'Apache',    version: '2.4', category: 'server', status: 'current', is_mega_cve: false, eol_date: '', latest_patch: '', cves: [], vuln_name: '', confidence: null, source: 'nmap' },
     ],
   },
 };
