@@ -360,13 +360,19 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
     }
 
+    // PR-I (Mai 2026): correlation_data NICHT mehr im default-Endpoint
+    // (kann mehrere MB pro Order werden — z.B. 1.7MB bei secumetrix.de).
+    // Das laesst den Frontend-Page-Load bei grossen Scans 3-4s blockieren.
+    // Stattdessen: business_impact_score + correlation_count als Metadaten,
+    // Vollinhalt via separatem GET /api/orders/:id/correlation Endpoint.
     const result = await query(
       `SELECT o.id, o.target_url, o.status, o.package, o.customer_id,
               o.discovered_hosts, o.hosts_total, o.hosts_completed,
               o.current_phase, o.current_tool, o.current_host,
               o.scan_started_at, o.scan_finished_at, o.error_message, o.created_at,
               o.subscription_id, o.is_rescan,
-              o.passive_intel_summary, o.correlation_data, o.business_impact_score
+              o.passive_intel_summary, o.business_impact_score,
+              jsonb_array_length(COALESCE(o.correlation_data, '[]'::jsonb)) AS correlation_count
        FROM orders o WHERE o.id = $1`,
       [id],
     );
@@ -431,13 +437,49 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         overallRisk: latestReport?.overall_risk || null,
         severityCounts: latestReport?.severity_counts || null,
         passiveIntelSummary: order.passive_intel_summary || null,
-        correlationData: order.correlation_data || null,
+        // PR-I: correlation_data wird separat geladen — hier nur count.
+        // Frontend zeigt es per Lazy-Fetch im Admin-Debug-Drawer.
+        correlationCount: Number(order.correlation_count || 0),
         businessImpactScore: order.business_impact_score != null ? Number(order.business_impact_score) : null,
         subscriptionId: (order.subscription_id as string) || null,
         isRescan: order.is_rescan === true || order.is_rescan === 't',
       },
     };
   });
+
+  // PR-I (Mai 2026): Separater Endpoint fuer das schwere correlation_data
+  // JSONB (kann mehrere MB sein). Nur on-demand laden — Default-Page-Load
+  // bleibt schnell.
+  server.get<{ Params: OrderParams }>(
+    '/api/orders/:id/correlation',
+    { preHandler: [requireAuth] },
+    async (request, reply) => {
+      const { id } = request.params;
+      const user = request.user!;
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
+      const res = await query(
+        `SELECT customer_id, correlation_data, business_impact_score, status
+         FROM orders WHERE id = $1`,
+        [id],
+      );
+      if (res.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+      const o = res.rows[0] as Record<string, unknown>;
+      if (user.role !== 'admin' && o.customer_id !== user.customerId) {
+        return reply.status(403).send({ success: false, error: 'Access denied' });
+      }
+      return {
+        success: true,
+        data: {
+          correlationData: o.correlation_data || [],
+          businessImpactScore: o.business_impact_score != null ? Number(o.business_impact_score) : null,
+        },
+      };
+    },
+  );
 
   // GET /api/orders/:id/report — auth via JWT or download_token
   server.get<{ Params: OrderParams }>('/api/orders/:id/report', async (request, reply) => {

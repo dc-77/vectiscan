@@ -118,8 +118,26 @@ export interface OrderStatus {
   error: string | null;
   hasReport: boolean;
   passiveIntelSummary?: Record<string, unknown> | null;
+  // PR-I (Mai 2026): correlationData wird nicht mehr im Default-Order-Endpoint
+  // mitgesendet (kann mehrere MB sein und blockiert den Page-Load).
+  // Hier nur die Anzahl als Light-weight Metadata, Vollinhalt via
+  // getOrderCorrelation(orderId) lazy nachladen.
+  correlationCount?: number;
+  /** @deprecated PR-I — Vollinhalt nicht mehr im Default-Response. Nutze getOrderCorrelation(orderId). */
   correlationData?: unknown[] | null;
   businessImpactScore?: number | null;
+}
+
+export interface OrderCorrelation {
+  correlationData: unknown[];
+  businessImpactScore: number | null;
+}
+
+export async function getOrderCorrelation(orderId: string): Promise<ApiResponse<OrderCorrelation>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/correlation`, {
+    headers: authHeaders(),
+  });
+  return handleResponse<OrderCorrelation>(res);
 }
 
 export interface ReportData {

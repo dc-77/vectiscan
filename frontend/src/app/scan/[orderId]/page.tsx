@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { isLoggedIn, isAdmin } from '@/lib/auth';
-import { getOrderStatus, getFindings, getScanResults, getReportDownloadUrl, getOrderEvents,
+import { getOrderStatus, getFindings, getScanResults, getReportDownloadUrl, getOrderEvents, getOrderCorrelation,
          excludeFinding, unexcludeFinding, regenerateReport, getReportVersions, approveOrder, rejectOrder,
          getScanDiff, listOrders,
          OrderStatus, OrderEvents, FindingsData, ScanResult, ReportVersion, ScanDiff } from '@/lib/api';
@@ -162,6 +162,9 @@ export default function ScanDetailPage() {
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
   const [regenerating, setRegenerating] = useState(false);
   const [reportVersions, setReportVersions] = useState<ReportVersion[]>([]);
+  // PR-I (Mai 2026): correlation_data lazy laden (1.7MB+ bei grossen Scans).
+  const [corrData, setCorrData] = useState<unknown[] | null>(null);
+  const [corrLoading, setCorrLoading] = useState(false);
 
   // View-Switcher (Q2/2026): Default = 'modern', persistiert in localStorage.
   const [view, setView] = useState<'modern' | 'hacker'>('modern');
@@ -806,7 +809,7 @@ export default function ScanDetailPage() {
                         aiStrategy: aiData?.aiStrategy || null,
                         aiConfigs: aiData?.aiConfigs || null,
                         passiveIntel: order.passiveIntelSummary || null,
-                        correlationData: order.correlationData || null,
+                        correlationData: corrData ?? null,
                         businessImpactScore: order.businessImpactScore || null,
                         toolResults: scanResults.map(r => ({
                           tool: r.toolName,
@@ -850,21 +853,42 @@ export default function ScanDetailPage() {
                 </div>
               )}
 
-              {/* Phase 3 Correlation Data */}
-              {order.correlationData && (order.correlationData as unknown[]).length > 0 && (
+              {/* Phase 3 Correlation Data — PR-I: lazy-loaded on details toggle */}
+              {(order.correlationCount ?? 0) > 0 && (
                 <div>
                   <h3 className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Korrelation &amp; Enrichment (Phase 3)</h3>
-                  <details className="bg-[#1e293b] rounded-lg border border-gray-800 mb-2">
+                  <details
+                    className="bg-[#1e293b] rounded-lg border border-gray-800 mb-2"
+                    onToggle={async (e) => {
+                      const el = e.currentTarget as HTMLDetailsElement;
+                      if (el.open && corrData === null && !corrLoading) {
+                        setCorrLoading(true);
+                        try {
+                          const res = await getOrderCorrelation(orderId);
+                          if (res.success && res.data) {
+                            setCorrData(res.data.correlationData);
+                          } else {
+                            setCorrData([]);
+                          }
+                        } finally {
+                          setCorrLoading(false);
+                        }
+                      }
+                    }}
+                  >
                     <summary className="px-4 py-2.5 text-sm font-mono text-violet-400 cursor-pointer hover:bg-[#253347]">
-                      Korrelierte Findings ({(order.correlationData as unknown[]).length})
+                      Korrelierte Findings ({order.correlationCount})
                       {order.businessImpactScore != null && (
                         <span className="ml-3 text-xs text-slate-500">Business-Impact: {order.businessImpactScore.toFixed(1)}/10</span>
                       )}
+                      {corrLoading && <span className="ml-3 text-xs text-slate-500">… laden</span>}
                     </summary>
-                    <pre className="px-4 pb-3 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto"
-                      style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
-                      {JSON.stringify(order.correlationData, null, 2)}
-                    </pre>
+                    {corrData !== null && (
+                      <pre className="px-4 pb-3 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap max-h-96 overflow-y-auto"
+                        style={{ scrollbarWidth: 'thin', scrollbarColor: '#1E3A5F #0C1222' }}>
+                        {JSON.stringify(corrData, null, 2)}
+                      </pre>
+                    )}
                   </details>
                 </div>
               )}
