@@ -275,12 +275,28 @@ function ScannedHostCard({
   const chips = abnormalChips(techRows);
   const techLabel = techProfile?.fqdns?.[0] || host.ip;
 
+  // PR-F (Mai 2026): Anchor-ID fuer Cross-Linking aus der Websites-Section.
+  // `vhosts` enthaelt alle primary VHosts dieses Hosts; der Chip rechts oben
+  // springt zur Websites-Section + scrollt sie ggf. in den Viewport.
+  const websiteCount = vhosts.length + (
+    (discoveredHosts?.find((d) => d.ip === host.ip)?.vhost_skipped?.length) || 0
+  );
+  const handleJumpToWebsites = () => {
+    const el = document.getElementById('websites');
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  };
+
   return (
-    <div className="
+    <div
+      id={`host-${host.ip}`}
+      className="
       flex flex-col gap-2 rounded-lg border border-slate-700 bg-slate-900/60 p-3
       hover:border-slate-600 transition-colors
-    ">
-      {/* Header: Priority + Status + IP */}
+    "
+    >
+      {/* Header: Priority + Status + IP + Websites-Chip */}
       <div className="flex items-center gap-2">
         {prio && (
           <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold ${prio.badge}`}>
@@ -295,6 +311,15 @@ function ScannedHostCard({
           ✓
         </span>
         <span className="font-mono text-xs text-cyan-300 truncate flex-1">{host.ip}</span>
+        {websiteCount > 0 && (
+          <button
+            onClick={handleJumpToWebsites}
+            className="shrink-0 rounded border border-slate-700 bg-slate-800/40 px-1.5 py-0.5 text-[10px] text-slate-300 hover:bg-slate-700 hover:text-cyan-200 transition-colors"
+            title="Zur Websites-Section springen"
+          >
+            {websiteCount} Website{websiteCount === 1 ? '' : 's'} ↑
+          </button>
+        )}
       </div>
 
       {/* Primaer-FQDN */}

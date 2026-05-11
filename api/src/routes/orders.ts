@@ -595,8 +595,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       if (!UUID_REGEX.test(id)) {
         return reply.status(400).send({ success: false, error: 'Invalid order ID' });
       }
-      // Path-Traversal verhindern
-      if (!/^[a-z0-9_-]{1,64}$/i.test(safe)) {
+      // Path-Traversal verhindern. Format seit PR-D (Mai 2026):
+      // `<ip>__<sanitized_fqdn>` mit Punkten in IP und FQDN.
+      // Allowed: a-z, 0-9, dot, underscore, hyphen, max 128 Zeichen.
+      // Slashes/Backslashes/null werden weiterhin abgelehnt.
+      if (!/^[a-z0-9._-]{1,128}$/i.test(safe)) {
         return reply.status(400).send({ success: false, error: 'Invalid screenshot key' });
       }
       const user = request.user!;

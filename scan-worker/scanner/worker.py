@@ -618,30 +618,101 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     # ── Screenshot-Upload nach Phase 1 ───────────────────────
     # Playwright erzeugt Site-Screenshots in <scan_dir>/hosts/*/phase2/
     # screenshot_*.png (siehe redirect_probe.py:_take_screenshot). Wir laden
-    # sie nach MinIO unter scan-screenshots/<orderId>/<safe_fqdn>.png hoch
-    # und mappen die Keys ins host_inventory damit das Frontend Thumbnails
-    # zeigen kann.
+    # sie nach MinIO unter scan-screenshots/<orderId>/<ip>__<safe>.png hoch
+    # und mappen die Keys pro VHost ins host_inventory damit das Frontend
+    # Per-VHost-Thumbnails zeigen kann (Multi-VHost-Probe seit Mai 2026).
+    #
+    # Bug-Fix Mai 2026: Vorher wurde pro IP nur 1 Screenshot gemappt (break im
+    # fqdns-Loop, falsche Sanitisierung) — bei Multi-VHost-IPs gingen alle
+    # weiteren Screenshots verloren. Jetzt: vhost-Level-Mapping plus
+    # backwards-kompatibler top-level-Key auf primary_vhost.
     try:
-        from scanner.upload import upload_screenshots
+        from scanner.upload import map_screenshots_to_hosts, upload_screenshots
         screenshot_keys = upload_screenshots(scan_dir, order_id)
         if screenshot_keys:
-            for h in host_inventory.get("hosts", []):
-                fqdns = h.get("fqdns") or []
-                for f in fqdns:
-                    safe = f.replace(".", "_").replace("/", "")[:50]
-                    if safe in {k.split("/", 1)[-1].rsplit(".", 1)[0] for k in screenshot_keys.values()}:
-                        # Hostname bzw. Pseudo-FQDN-Key matched
-                        match = next(
-                            (key for key in screenshot_keys.values()
-                             if key.endswith(f"/{safe}.png")),
-                            None,
-                        )
-                        if match:
-                            h["screenshot_minio_key"] = match
-                            break
-            set_discovered_hosts(order_id, host_inventory)
+            map_screenshots_to_hosts(
+                host_inventory.get("hosts", []), screenshot_keys, order_id,
+            )
     except Exception as e:
         log.warning("screenshot_persist_failed", error=str(e))
+
+    # ── Per-VHost Site-Summary (Heuristik + AI-Verfeinerung) ─
+    # PR-E (Mai 2026): Erzeugt 1-Satz-Snapshot + Klassifikation pro VHost.
+    # Heuristik deterministisch, AI-Refinement nur fuer web_content + Title
+    # (batched + cached). Schreibt das Ergebnis nach
+    # `host.vhosts[i].site_summary` und `host.vhost_skipped[i].site_summary`,
+    # damit das Frontend die "Websites"-Section bauen kann.
+    try:
+        from scanner.site_summary import build_summaries_for_host
+        from scanner.ai_site_descriptions import refine_with_ai
+
+        # tech_profile per IP. scan_hosts/tech_profiles laufen parallel.
+        tp_by_ip: dict[str, dict[str, Any]] = {}
+        for sh, tp in zip(scan_hosts, tech_profiles):
+            ip = sh.get("ip") or (tp.get("ip") if isinstance(tp, dict) else None)
+            if ip:
+                tp_by_ip[ip] = tp if isinstance(tp, dict) else {}
+
+        ai_candidates: list[dict[str, Any]] = []
+        tech_hint_by_fqdn: dict[str, str] = {}
+
+        for h in host_inventory.get("hosts", []):
+            tp = tp_by_ip.get(h.get("ip", ""), {})
+            summaries = build_summaries_for_host(h, tp)
+            # In-place auf vhosts schreiben
+            for v in h.get("vhosts") or []:
+                s = summaries.get((v.get("fqdn") or "").strip())
+                if s:
+                    v["site_summary"] = s.to_dict()
+                    if s.classification == "web_content" and (v.get("title") or "").strip():
+                        ai_candidates.append({
+                            "fqdn": v["fqdn"],
+                            "title": v.get("title"),
+                            "status": v.get("status"),
+                        })
+                        # Tech-Hint vorberechnen (Heuristik-Description ohne Title-Suffix)
+                        from scanner.site_summary import tech_label
+                        tech_hint_by_fqdn[v["fqdn"]] = tech_label(tp)
+            for sk in h.get("vhost_skipped") or []:
+                s = summaries.get((sk.get("fqdn") or "").strip())
+                if s:
+                    sk["site_summary"] = s.to_dict()
+
+        if ai_candidates and not skip_ai:
+            refined = refine_with_ai(
+                ai_candidates, order_id=order_id,
+                tech_hint_by_fqdn=tech_hint_by_fqdn,
+            )
+            if refined:
+                for h in host_inventory.get("hosts", []):
+                    for v in h.get("vhosts") or []:
+                        fqdn = (v.get("fqdn") or "").strip()
+                        new_desc = refined.get(fqdn)
+                        if new_desc and v.get("site_summary"):
+                            v["site_summary"]["description"] = new_desc
+                            v["site_summary"]["confidence"] = 0.95
+
+        set_discovered_hosts(order_id, host_inventory)
+
+        # PR-F: angereichertes host_inventory zusaetzlich nach Disk schreiben
+        # damit der report-worker es via parser.py liest und site_summary +
+        # screenshot_minio_key in den PDF-Report durchreicht.
+        try:
+            inv_path = os.path.join(scan_dir, "phase0", "host_inventory.json")
+            os.makedirs(os.path.dirname(inv_path), exist_ok=True)
+            with open(inv_path, "w", encoding="utf-8") as f:
+                json.dump(host_inventory, f, indent=2, ensure_ascii=False, default=str)
+        except Exception as e:
+            log.warning("host_inventory_resave_failed", error=str(e))
+    except Exception as e:
+        log.warning("site_summary_failed", error=str(e))
+        # Defensiv: set_discovered_hosts trotzdem aufrufen damit Screenshot-
+        # Keys aus dem Block davor gespeichert werden, falls die Summary-
+        # Berechnung crasht.
+        try:
+            set_discovered_hosts(order_id, host_inventory)
+        except Exception:
+            pass
 
     # ── Phase 2: Deep Scan (parallel, max 3 hosts) ────────
     scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]

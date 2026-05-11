@@ -766,12 +766,19 @@ def _filename_to_vhost(path: str) -> str:
 def _build_screenshot_data(
     host_inventory: dict[str, Any],
     host_screenshots: dict[str, list[Any]] | None,
+    *,
+    skip_non_content: bool = True,
 ) -> list[dict[str, Any]]:
     """Build a list of screenshot entries for the PDF generator.
 
     Returns a list of dicts, each with:
         - label: human-readable host label (``<vhost> (Screenshot)``)
         - paths: list of absolute file paths to screenshot images (1 per entry)
+        - caption: optional 1-Satz-Beschreibung aus ``vhost.site_summary.description``
+          (PR-F, Mai 2026). Wird vom PDF-Generator unter dem Bild gerendert.
+        - tech_chips: optional Liste von Kurz-Tech-Labels (PR-F).
+        - classification: optional Klassifikation aus site_summary (PR-F);
+          steuert ``skip_non_content``.
 
     F-PH1-003: Pro primary VHost ein eigener Eintrag (nicht mehr 1 pro IP).
     Akzeptiert beide Schemata fuer ``host_screenshots[ip]``:
@@ -780,17 +787,28 @@ def _build_screenshot_data(
 
     Cap: max ``_MAX_SCREENSHOTS_PER_HOST_IN_PDF`` Eintraege pro Host —
     verbleibende Screenshots bleiben in MinIO erreichbar.
+
+    PR-F (Mai 2026): Wenn ``skip_non_content=True`` (Default), werden VHosts
+    mit ``site_summary.is_real_content == False`` (Parking/Error/Non-Web)
+    nicht in den PDF-Report aufgenommen — der Kunde sieht nur produktive
+    Webseiten. Admin-Reports koennen das via Flag deaktivieren.
     """
     if not host_screenshots:
         return []
 
     hosts = host_inventory.get("hosts", [])
-    # Build IP -> FQDNs lookup
+    # Build IP -> FQDNs lookup + VHost-Lookup mit site_summary
     fqdn_lookup: dict[str, list[str]] = {}
+    vhost_lookup: dict[str, dict[str, Any]] = {}  # key = "<ip>|<fqdn>"
     for h in hosts:
         ip = h.get("ip", "")
-        if ip:
-            fqdn_lookup[ip] = h.get("fqdns", [])
+        if not ip:
+            continue
+        fqdn_lookup[ip] = h.get("fqdns", [])
+        for v in (h.get("vhosts") or []):
+            fqdn = (v.get("fqdn") or "").strip()
+            if fqdn:
+                vhost_lookup[f"{ip}|{fqdn}"] = v
 
     entries: list[dict[str, Any]] = []
     for ip, items in host_screenshots.items():
@@ -831,6 +849,15 @@ def _build_screenshot_data(
         ip_fallback_fqdns = fqdn_lookup.get(ip, [])
 
         for vhost, path in capped:
+            # Site-Summary + Tech-Profile-Lookup
+            v_data = vhost_lookup.get(f"{ip}|{vhost}", {})
+            summary = v_data.get("site_summary") if isinstance(v_data, dict) else None
+            classification = (summary or {}).get("classification") if summary else None
+
+            if skip_non_content and summary and summary.get("is_real_content") is False:
+                # Parking/Error/Non-Web → nicht im Customer-PDF.
+                continue
+
             if vhost:
                 label = f"{vhost} (Screenshot)"
             elif ip_fallback_fqdns:
@@ -838,9 +865,59 @@ def _build_screenshot_data(
                 label = f"{ip} ({', '.join(ip_fallback_fqdns)}) (Screenshot)"
             else:
                 label = f"{ip} (Screenshot)"
-            entries.append({"label": label, "paths": [path]})
+
+            entry: dict[str, Any] = {"label": label, "paths": [path]}
+            if summary and (desc := summary.get("description")):
+                entry["caption"] = str(desc)[:200]
+            # Tech-Chips: top-2 aus vhost-eigenem Banner oder host-level Tech
+            chips = _pdf_tech_chips(v_data, hosts, ip)
+            if chips:
+                entry["tech_chips"] = chips
+            if classification:
+                entry["classification"] = classification
+
+            entries.append(entry)
 
     return entries
+
+
+def _pdf_tech_chips(
+    vhost_data: dict[str, Any],
+    hosts: list[dict[str, Any]],
+    ip: str,
+    max_chips: int = 3,
+) -> list[str]:
+    """Sammle Top-Tech-Chips fuer eine PDF-Screenshot-Card.
+
+    Reihenfolge: VHost-eigene cms/cms_version > host-level cms/server >
+    technologies[]. Dedupliziert, capped auf ``max_chips``.
+    """
+    chips: list[str] = []
+    seen: set[str] = set()
+
+    def _add(name: str | None, ver: str | None = None) -> None:
+        if not name:
+            return
+        label = f"{name} {ver}".strip() if ver else str(name).strip()
+        key = label.lower()
+        if key in seen:
+            return
+        seen.add(key)
+        chips.append(label)
+
+    # VHost-CMS (Multi-VHost-Probe seit Mai 2026)
+    if isinstance(vhost_data, dict):
+        _add(vhost_data.get("cms"), vhost_data.get("cms_version"))
+
+    host = next((h for h in hosts if h.get("ip") == ip), {})
+    _add(host.get("cms"), host.get("cms_version"))
+    _add(host.get("server"))
+    for t in (host.get("technologies") or [])[:5]:
+        _add(t.get("name"), t.get("version"))
+        if len(chips) >= max_chips:
+            break
+
+    return chips[:max_chips]
 
 
 # ===========================================================================

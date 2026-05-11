@@ -156,6 +156,68 @@ def upload_screenshots(scan_dir: str, order_id: str) -> dict[str, str]:
     return out
 
 
+def map_screenshots_to_hosts(
+    hosts: list[dict],
+    screenshot_keys: dict[str, str],
+    order_id: str,
+) -> None:
+    """Verteile MinIO-Screenshot-Keys auf vhosts[].screenshot_minio_key.
+
+    Bug-Fix Mai 2026 (PR-D): Vorheriges Mapping setzte pro IP nur **einen**
+    Screenshot-Key (break im fqdns-Loop, falsche Sanitisierung mit
+    ``replace(".", "_")``). Bei Multi-VHost-IPs gingen alle weiteren
+    Screenshots verloren. Diese Funktion mappt Screenshots pro VHost.
+
+    Args:
+        hosts: Liste der Host-Dicts aus ``host_inventory["hosts"]``. Wird
+            in-place modifiziert. Pro Host wird ``vhosts[i].screenshot_minio_key``
+            gesetzt (falls Match); zusaetzlich ``screenshot_minio_key`` auf
+            Top-Level (Backwards-Compat fuer aelteres Frontend, kommt vom
+            primary_vhost oder Fallback auf ersten vorhandenen).
+        screenshot_keys: Output von :func:`upload_screenshots` —
+            ``{sanitized_fqdn -> "<order>/<ip>__<sanitized>.png"}``.
+        order_id: Order-ID fuer IP-Fallback-Match.
+    """
+    if not screenshot_keys:
+        return
+    # Lazy import: shared helper, vermeidet Zirkular-Import.
+    from scanner.tools.redirect_probe import sanitize_vhost
+
+    for h in hosts:
+        ip = h.get("ip", "")
+        vhosts = h.get("vhosts") or []
+        primary_key: str | None = None
+        for v in vhosts:
+            fqdn = (v.get("fqdn") or "").strip()
+            if not fqdn:
+                continue
+            safe = sanitize_vhost(fqdn)
+            candidate = screenshot_keys.get(safe)
+            if not candidate and ip:
+                # IP-Fallback: scan-screenshots-Key endet auf __<safe>.png
+                # unter <order>/<ip>__... .
+                candidate = next(
+                    (k for k in screenshot_keys.values()
+                     if k.startswith(f"{order_id}/{ip}__")
+                     and k.endswith(f"__{safe}.png")),
+                    None,
+                )
+            if candidate:
+                v["screenshot_minio_key"] = candidate
+                if v.get("is_primary") and primary_key is None:
+                    primary_key = candidate
+        if primary_key:
+            h["screenshot_minio_key"] = primary_key
+        elif vhosts:
+            fallback = next(
+                (v.get("screenshot_minio_key") for v in vhosts
+                 if v.get("screenshot_minio_key")),
+                None,
+            )
+            if fallback:
+                h["screenshot_minio_key"] = fallback
+
+
 def upload_to_minio(archive_path: str, order_id: str) -> str:
     """Upload tar.gz to MinIO scan-rawdata bucket.
 

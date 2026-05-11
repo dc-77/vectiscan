@@ -26,6 +26,7 @@ import { ScanDetailNav } from '@/components/scan/ScanDetailNav';
 import ScanStoryTimeline from '@/components/scan/ScanStoryTimeline';
 import ThreatIntelBadge from '@/components/scan/ThreatIntelBadge';
 import ToolTrace from '@/components/scan/ToolTrace';
+import { WebsiteGallery } from '@/components/scan/WebsiteGallery';
 import ViewSwitcher from '@/components/scan/ViewSwitcher';
 import {
   getReportDownloadUrl,
@@ -115,6 +116,26 @@ export default function ModernView({
   })();
 
   const costs = aiData?.costs ?? null;
+
+  // PR-F (Mai 2026): Anzahl der Websites/VHosts ueber alle hostList-Eintraege.
+  // Zaehlt primary VHosts + vhost_skipped Entries. Steuert Sub-Nav-Sichtbarkeit.
+  const totalWebsites = (() => {
+    let n = 0;
+    for (const h of hostList) {
+      const hh = h as { vhosts?: unknown[]; vhost_skipped?: unknown[] };
+      n += hh.vhosts?.length ?? 0;
+      n += hh.vhost_skipped?.length ?? 0;
+    }
+    return n;
+  })();
+
+  const techProfilesByIp = findings?.tech_profiles
+    ? Object.fromEntries(
+        findings.tech_profiles
+          .filter((tp) => tp.ip)
+          .map((tp) => [tp.ip, tp]),
+      )
+    : undefined;
 
   return (
     <main className="flex-1 flex flex-col px-4 py-6 md:px-8">
@@ -232,6 +253,9 @@ export default function ModernView({
           <ScanDetailNav
             sections={[
               { id: 'uebersicht', label: 'Übersicht' },
+              ...(totalWebsites > 0
+                ? [{ id: 'websites', label: 'Websites', count: totalWebsites }]
+                : []),
               { id: 'hosts', label: 'Hosts', count: aiStrategy?.hosts?.length ?? hostList.length },
               { id: 'befunde', label: 'Befunde', count: findings.findings?.length },
               ...(findings.recommendations?.length
@@ -262,6 +286,28 @@ export default function ModernView({
           </section>
         )}
 
+        {/* ── WEBSITES (FQDN-Gallery, vor Hosts) ── */}
+        {totalWebsites > 0 && order?.id && (
+          <section
+            id="websites"
+            className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 scroll-mt-32"
+          >
+            <div className="flex items-baseline justify-between mb-3">
+              <h2 className="text-sm font-medium text-slate-300">
+                Websites <span className="text-slate-500 tabular-nums ml-1">({totalWebsites})</span>
+              </h2>
+              <span className="text-[11px] text-slate-500">
+                Pro FQDN: Screenshot + Beschreibung + Sprung zum Host
+              </span>
+            </div>
+            <WebsiteGallery
+              discoveredHosts={hostList}
+              techProfilesByIp={techProfilesByIp}
+              orderId={order.id}
+            />
+          </section>
+        )}
+
         {/* ── HOST-MAP ─────────────────────────── */}
         {(aiStrategy || hostList.length > 0) && (
           <section id="hosts" className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 scroll-mt-32">
@@ -271,15 +317,7 @@ export default function ModernView({
               discoveredHosts={hostList}
               strategyNotes={aiStrategy?.strategy_notes ?? null}
               orderId={order?.id}
-              techProfilesByIp={
-                findings?.tech_profiles
-                  ? Object.fromEntries(
-                      findings.tech_profiles
-                        .filter((tp) => tp.ip)
-                        .map((tp) => [tp.ip, tp]),
-                    )
-                  : undefined
-              }
+              techProfilesByIp={techProfilesByIp}
             />
           </section>
         )}

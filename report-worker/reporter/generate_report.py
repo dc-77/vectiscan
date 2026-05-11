@@ -598,10 +598,12 @@ def build_screenshots_section(story, styles, screenshots):
     for entry in screenshots:
         label = entry.get("label", "Host")
         paths = entry.get("paths", [])
+        caption = entry.get("caption")
+        tech_chips = entry.get("tech_chips") or []
         for img_path in paths:
             if not os.path.isfile(img_path):
                 continue
-            # Build label + image as a KeepTogether block
+            # Build label + image + (PR-F) caption + tech-chips als KeepTogether-Block.
             img_block = []
             img_block.append(Paragraph(
                 f"<b>{label}</b>",
@@ -633,6 +635,18 @@ def build_screenshots_section(story, styles, screenshots):
                         img.drawWidth *= scale2
                         img.drawHeight = max_img_height
                 img_block.append(img)
+
+                # PR-F (Mai 2026): Description + Tech-Chips unter dem Bild.
+                if caption:
+                    img_block.append(Spacer(1, 2))
+                    img_block.append(Paragraph(
+                        f"<i>{caption}</i>",
+                        styles["BodyText2"],
+                    ))
+                if tech_chips:
+                    chips_str = "  ·  ".join(f"<b>{c}</b>" for c in tech_chips)
+                    img_block.append(Paragraph(chips_str, styles["BodyText2"]))
+
                 img_block.append(Spacer(1, SPACING_FINDING))
                 story.append(KeepTogether(img_block))
             except Exception:

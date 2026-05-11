@@ -74,14 +74,22 @@ def _collect_tech_info(page: Any, fqdn: str) -> dict[str, Any]:
         return {}
 
 
-def _sanitize_vhost(fqdn: str) -> str:
+def sanitize_vhost(fqdn: str) -> str:
     """Sanitize a VHost FQDN for use as a filesystem name.
 
     F-PH1-003: Slashes raus, Dots bleiben (Filenames duerfen Punkte enthalten,
     z.B. ``www.example.com.png``). Caps auf 80 Zeichen damit lange CDN-Namen
     keinen Pfadlimit-Konflikt produzieren.
+
+    Single source of truth fuer die Filename-Sanitisierung. Wird genutzt von
+    :func:`_take_screenshot` (hier), :func:`scanner.upload.upload_screenshots`
+    und vom screenshot-Mapping in :mod:`scanner.worker`.
     """
     return fqdn.replace("/", "-").replace("\\", "-").strip()[:80]
+
+
+# Backwards-compatible Alias (alter privater Name).
+_sanitize_vhost = sanitize_vhost
 
 
 def _take_screenshot(

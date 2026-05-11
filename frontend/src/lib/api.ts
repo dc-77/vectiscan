@@ -11,6 +11,47 @@ export interface OrderData {
   alreadyVerified?: boolean;
 }
 
+export interface VHostAlias {
+  fqdn: string;
+  status?: number | null;
+  reason?: string;
+}
+
+export type SiteClassification =
+  | 'web_content'
+  | 'control_panel'
+  | 'login_only'
+  | 'parking'
+  | 'error'
+  | 'non_web'
+  | 'unknown';
+
+export interface SiteSummary {
+  /** Heuristisch oder AI-verfeinert generierter 1-Satz-Snapshot der Site. */
+  description: string;
+  /** Grobe Klassifikation des VHost-Inhalts, treibt Filter-Pills im UI. */
+  classification: SiteClassification;
+  /** Default-Filter-Sichtbarkeit: True fuer real_content + control_panel. */
+  is_real_content: boolean;
+  /** 0.0-1.0 - 1.0 = Heuristik sicher, 0.95 = AI-verfeinert, <0.7 = generisch. */
+  confidence: number;
+}
+
+export interface VHost {
+  fqdn: string;
+  status?: number | null;
+  title?: string | null;
+  final_url?: string | null;
+  is_primary?: boolean;
+  aliases?: VHostAlias[];
+  // PR-D (Mai 2026): Per-VHost-Screenshot-Mapping. Format:
+  // "<orderId>/<ip>__<sanitized_fqdn>.png". Frontend laedt via
+  // GET /api/orders/<id>/screenshot/<sanitized_fqdn>.
+  screenshot_minio_key?: string | null;
+  // PR-E (Mai 2026): Heuristik + AI-verfeinerter 1-Satz-Snapshot pro VHost.
+  site_summary?: SiteSummary | null;
+}
+
 export interface HostInfo {
   ip: string;
   fqdns: string[];
@@ -20,6 +61,21 @@ export interface HostInfo {
   // scan-screenshots/<orderId>/<safe_fqdn>.png. Frontend laedt via
   // GET /api/orders/<id>/screenshot/<safe_fqdn>.
   screenshot_minio_key?: string | null;
+  // Multi-VHost-Probe seit Mai 2026 + PR-D/E Bug-Fix + SiteSummary.
+  vhosts?: VHost[];
+  vhost_skipped?: Array<{ fqdn: string; reason?: string; status?: number | null; title?: string | null; site_summary?: SiteSummary | null }>;
+}
+
+/** Datenstruktur wie sie aus ``orders.discovered_hosts`` (JSONB) ueber das
+ *  Order-API stream-down kommt. Lockerer als ``HostInfo`` (z.B. ``status``
+ *  optional weil precheck/scan-Phase unterschiedliche Felder fuellt). */
+export interface DiscoveredHost {
+  ip: string;
+  fqdns?: string[];
+  hostname?: string;
+  screenshot_minio_key?: string | null;
+  vhosts?: VHost[];
+  vhost_skipped?: Array<{ fqdn: string; reason?: string; status?: number | null; title?: string | null; site_summary?: SiteSummary | null }>;
 }
 
 /** Hilfsfunktion: rechnet die Frontend-URL fuer den Site-Screenshot eines
