@@ -179,6 +179,11 @@ def run_ki4_with_tools(
     final_text = ""
 
     for iteration in range(max_iterations):
+        # PR-I (Mai 2026): Opus 4.7 unterstuetzt {type:enabled,budget_tokens}
+        # nicht mehr. Solange das neue {type:adaptive}-Schema nicht stabil
+        # ist: bei Opus 4.7 thinking ueberspringen + temperature=0 lassen.
+        is_opus_47 = "opus-4-7" in model
+        use_thinking = thinking_budget and not is_opus_47
         api_kwargs = {
             "model": model,
             "max_tokens": max_tokens,
@@ -188,9 +193,9 @@ def run_ki4_with_tools(
             }] if len(system_prompt) > 8000 else system_prompt,
             "messages": messages,
             "tools": KI4_TOOLS,
-            "temperature": 1.0 if thinking_budget else 0.0,
+            "temperature": 1.0 if use_thinking else 0.0,
         }
-        if thinking_budget:
+        if use_thinking:
             api_kwargs["thinking"] = {
                 "type": "enabled",
                 "budget_tokens": min(thinking_budget, max_tokens - 4096),

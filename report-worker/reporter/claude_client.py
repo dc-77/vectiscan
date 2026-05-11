@@ -839,7 +839,16 @@ def call_claude(
                     "temperature": 0.0,
                     "timeout": api_timeout,
                 }
-                if "opus" in model and max_tokens >= 16000:
+                # Extended Thinking: bei Opus 4.6 mit `{type: enabled, budget_tokens}`.
+                # Opus 4.7 hat das alte Format verworfen und verlangt jetzt
+                # `{type: adaptive}` + `output_config.effort` (HTTP 400-Error
+                # "thinking.type.enabled is not supported for this model").
+                # Solange das neue Schema noch nicht stabil im SDK ist, lassen
+                # wir bei Opus 4.7 thinking ganz weg — das Modell ist auch ohne
+                # Extended Thinking deutlich staerker als Opus 4.6.
+                is_opus_47 = "opus-4-7" in model
+                is_opus_legacy = "opus" in model and not is_opus_47
+                if is_opus_legacy and max_tokens >= 16000:
                     api_kwargs["temperature"] = 1.0  # Anthropic-Constraint mit thinking
                     api_kwargs["thinking"] = {
                         "type": "enabled",
