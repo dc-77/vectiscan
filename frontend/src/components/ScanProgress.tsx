@@ -65,6 +65,8 @@ function calcProgress(status: string, hostsCompleted: number, hostsTotal: number
         scan_complete: [85, 85],
         report_generating: [90, 95],
         report_complete: [100, 100],
+        delivered: [100, 100],
+        pending_review: [85, 85],
       }
     : {
         created: [0, 0], queued: [0, 0],
@@ -76,6 +78,8 @@ function calcProgress(status: string, hostsCompleted: number, hostsTotal: number
         scan_complete: [85, 85],
         report_generating: [90, 95],
         report_complete: [100, 100],
+        delivered: [100, 100],
+        pending_review: [85, 85],
       };
 
   const range = PHASE_RANGES[status];
@@ -103,7 +107,9 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
   const label = PHASE_LABELS[status] || status;
   const phaseStyle = PHASE_COLORS[status] || { bg: 'bg-slate-700', text: 'text-slate-400' };
   const pkgLabel = PACKAGE_LABELS[scan.package] || scan.package.toUpperCase();
-  const isActive = !['report_complete', 'failed', 'cancelled'].includes(status);
+  // PR-I (Mai 2026): delivered + pending_review zaehlen als final / non-active —
+  // Cancel-Button + Live-Pulse + ETA werden ausgeblendet.
+  const isActive = !['report_complete', 'failed', 'cancelled', 'delivered', 'pending_review'].includes(status);
 
   const percent = calcProgress(status, progress.hostsCompleted, progress.hostsTotal, scan.package);
   const hostPhase = status === 'scan_phase1' || status === 'scan_phase2';
@@ -131,8 +137,8 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
         </span>
       </div>
 
-      {/* Progress bar */}
-      {isActive && (
+      {/* Progress bar — PR-I: auch bei delivered/pending_review sichtbar (100%/85%). */}
+      {(isActive || ['delivered', 'pending_review'].includes(status)) && (
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-slate-500">
             <span className="font-mono">
@@ -165,12 +171,18 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
         </div>
       )}
 
-      {/* Cancel button — inline */}
-      {onCancel && (
+      {/* Cancel button — inline. PR-I: nur bei aktiv laufendem Scan zeigen. */}
+      {onCancel && isActive && (
         <button onClick={onCancel} disabled={cancelling}
           className="text-red-400 hover:text-red-300 hover:bg-red-400/10 disabled:text-slate-600 text-xs font-medium px-3 py-1.5 rounded-lg border border-red-900/50 transition-colors">
           {cancelling ? 'Cancelling...' : 'Cancel scan'}
         </button>
+      )}
+      {/* PR-I: Bei fertigen Scans Link zum Bericht statt Cancel. */}
+      {!isActive && status === 'delivered' && (
+        <div className="flex items-center gap-2 text-xs text-emerald-400/80">
+          <span className="font-mono">✓ {progress.hostsTotal} Hosts gescannt</span>
+        </div>
       )}
     </div>
   );

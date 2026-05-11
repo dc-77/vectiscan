@@ -418,30 +418,38 @@ def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dic
 
     api_token = os.environ.get("WPSCAN_API_TOKEN", "")
 
+    # PR-I (Mai 2026): Enumeration deutlich reduziert. Vorher `vp,vt,u1-5`
+    # lief systematisch in den 600s-Timeout (vp probiert ~3000 vulnerable
+    # plugins per HTTP-Request, vt ~300 themes, u1-5 5 User-Enum-Versuche
+    # x ~10 endpoints) — insbesondere bei langsamen Plesk/Cloudflare-Sites.
+    # Neu: nur `vp` (vulnerable plugins) + passive detection-mode + 100ms
+    # throttle. Damit < 60s pro Run, immer noch sinnvolle CVE-Coverage.
     cmd = [
         "wpscan",
         "--url", f"https://{fqdn}",
         "--format", "json",
         "--output", output_path,
-        "--enumerate", "vp,vt,u1-5",  # vulnerable plugins, themes, users
+        "--enumerate", "vp",  # nur vulnerable plugins
+        "--plugins-detection", "passive",  # kein Brute-Force-Path-Scan
         "--random-user-agent",
         "--no-banner",
         "--disable-tls-checks",        # handle self-signed certs
-        # Rate-Limit: 200ms zwischen Requests = 5 req/s. Live-Kunden-
-        # Sites koennen sonst kurzzeitig in Rate-Limit-Trigger laufen.
-        "--throttle", "200",
-        # Request-Timeout pro HTTP-Call (sonst Default 60s)
-        "--request-timeout", "30",
-        # Max Threads: 5 statt Default 5 (explizit fuer Determinismus)
+        # Rate-Limit: 100ms zwischen Requests = 10 req/s. Vorher 200ms.
+        # Plesk-Sites sind eh langsam, brauchen nicht zusaetzliche Drossel.
+        "--throttle", "100",
+        # Request-Timeout pro HTTP-Call (vorher 30s, gestrafft auf 20s).
+        "--request-timeout", "20",
+        # Connection-Timeout separat (Default 30s)
+        "--connect-timeout", "10",
         "--max-threads", "5",
-        # `--detection-mode mixed` (Default) — passive zuerst, aggressive nur wo noetig
-        "--detection-mode", "mixed",
+        "--detection-mode", "passive",  # vorher mixed; kein /wp-admin etc. Probing
     ]
     if api_token:
         cmd.extend(["--api-token", api_token])
 
+    # Timeout: passive-mode + nur vp ~30s typisch, 180s als Safety-Cap.
     exit_code, duration_ms = run_tool(
-        cmd=cmd, timeout=600, output_path=output_path,
+        cmd=cmd, timeout=180, output_path=output_path,
         order_id=order_id, host_ip=ip, phase=2, tool_name="wpscan",
     )
 
