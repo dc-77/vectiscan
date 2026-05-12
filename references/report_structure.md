@@ -1,5 +1,13 @@
 # Pentest Report Structure Reference
 
+> **Stand 2026-05-13**: Dieses Dokument beschreibt den **Legacy-v1-Renderer**.
+> Der neue v2-Renderer (3-Schichten-Architektur, Hygiene-Skala neben CVSS,
+> Threat-Intel + Verifikations-Schritte pro Befund, 6 Anhaenge A-F) ist seit
+> M5+M6.1 (2026-05-13) implementiert und per ENV-Flag
+> `VECTISCAN_REPORT_LAYOUT=v2` aktivierbar (Big-Bang-Default-Flip steht
+> nach Pilot-Phase aus). Spec fuer v2: `docs/report-erstellung/02_Report_Aufbau_Neudesign.md`.
+> Code-Tree: `report-worker/reporter/pdf/v2/`.
+
 ## Table of Contents
 1. [PDF Layout Specifications](#pdf-layout)
 2. [Color Scheme](#colors)
@@ -9,6 +17,7 @@
 6. [CVSS Scoring Guide](#cvss-guide)
 7. [Common Findings Library](#common-findings)
 8. [Localization](#localization)
+9. [v2-Renderer (M1-M6 Redesign) — Kurzueberblick](#v2-renderer)
 
 ---
 
@@ -288,3 +297,70 @@ These are frequently encountered findings with pre-validated descriptions. Adapt
 | Cover classification | CLASSIFICATION: CONFIDENTIAL — AUTHORIZED RECIPIENTS ONLY |
 | Overall Risk Assessment | Overall Risk Assessment |
 | Disclaimer | This report represents the security posture at the time of testing... |
+
+---
+
+## v2-Renderer (M1-M6 Redesign) <a name="v2-renderer"></a>
+
+> Kompletter Master-Plan: `~/.claude/plans/ich-m-chte-gerne-das-iterative-nova.md`
+> Design-Spec: `docs/report-erstellung/02_Report_Aufbau_Neudesign.md`
+> Fehleranalyse: `docs/report-erstellung/01_Fehleranalyse_und_Korrekturplan.md`
+
+### Aktivierung
+ENV-Variable im `report-worker`-Container:
+```yaml
+VECTISCAN_REPORT_LAYOUT: v2   # Default bleibt v1 bis Big-Bang-Cutover
+```
+Code-Pfad: `report-worker/reporter/worker.py:667-682`.
+
+### 3-Schichten-Architektur
+
+| Schicht | Zielgruppe | Code-Pfad | Inhalt |
+|---|---|---|---|
+| **1 Frontpage** (S. 2) | Geschaeftsfuehrer | `pdf/v2/layers/frontpage.py` | Risiko-Ampel (5 Buckets) + Top-3-Hebel (kombinierte Massnahmen) + Compliance-Indikatoren |
+| **2 Strategie** (S. 3-9) | IT-Verantwortlicher | `pdf/v2/layers/strategy.py` | Geschaeftskontext, Methodik mit konkreten KI-Modellen, Tech-Tabelle v2 mit Patch-Status + Top-CVE, Service-Karte, Posture-Indikatoren, Befund-Landschaft, Screenshots (dedupliziert) |
+| **3 Befund-Details** (S. 11+) | Administrator/Dienstleister | `pdf/v2/layers/findings.py` | 7-Sektionen-Body pro Befund: WAS / NACHWEIS / THREAT INTEL (CVE+EPSS+KEV) / GESCHAEFTSAUSWIRKUNG / EMPFEHLUNG / VERIFIKATION / INTERNE REFERENZ |
+| **Anhang A-F** | Audit / Versicherung | `pdf/v2/layers/appendix.py` | A.1 CVSS · A.2 Hygiene-Skala · B Service-Inventar · C Tools mit Konfidenz · D Compliance-Mapping NIS2/BSI/ISO/DSGVO · E methodische Filterungen · F Wiederholungs-Trigger + Haftungsausschluss |
+
+### Daten-Aggregatoren (Single-Source-of-Truth pro Schicht)
+
+| Modul | Liefert |
+|---|---|
+| `reporter/layer1_aggregator.py` | `risk_ampel`, `top_hebel`, `overall_level`, `hygiene_split` |
+| `reporter/business_context.py` | Branchencluster + Datenarten-Annahme |
+| `reporter/v2_data.py` | `scope_meta`, `methodology_stats`, `compliance_indicators`, `tech_table_v2` |
+| `reporter/befund_landschaft.py` | Kategorisierung + Service-Cards |
+| `reporter/posture_v2.py` | 4 Posture-Indikatoren (Mail/Web/DNS/TLS) |
+| `reporter/verification_templates.py` | Pro policy_id Verifikations-Befehl (Top-15 gepflegt) |
+| `reporter/compliance_mappings.py` | NIS2/BSI/ISO/DSGVO pro Befund |
+| `reporter/screenshot_pipeline.py` | Body-Hash-Dedup + Cap max. 2 |
+
+### Hygiene-Skala vs CVSS
+
+Befunde tragen ein neues Feld `scale`:
+- `scale: "cvss"` (Default): ausnutzbare Schwachstelle mit CVSS v3.1-Vektor, Anhang A.1.
+- `scale: "hygiene"`: Best-Practice-Abweichung ohne ausnutzbaren Vektor (HSTS fehlt, Cookie-Flags, CSP). Anhang A.2 mit `hygiene_level: "low|medium|high"`. **Kein** CVSS-Score.
+
+### Severity-zu-Prioritaet-Mapping
+
+| Severity | Prioritaet |
+|---|---|
+| CRITICAL / HIGH | Unverzueglich (24-72h) |
+| MEDIUM | In Kuerze (1-2 Wochen) |
+| LOW | Mittelfristig (naechster Patch-/Release-Zyklus) |
+| INFO | Strategisch (laufendes Quartal) |
+
+### Threat-Intel-Sichtbarkeit
+
+Quellen pro Befund (Reihenfolge mit Fallback):
+1. `finding["cves"]` — `list[str]` oder `list[{cve_id, epss_score, kev}]`
+2. `finding["cve_id"]` + `finding["threat_intel"]` mit `epss_score` / `in_kev`
+3. `finding["enrichment"]` mit `cisa_kev` (struct) / `epss.epss` (struct)
+4. `finding["correlation_data"]` (merge)
+
+Sortierung: KEV-Eintraege zuerst, dann EPSS DESC, Top-3 angezeigt.
+
+### POLICY_VERSION
+
+Default: `2026-06-01.1` (`reporter/severity_policy.py:30`).
+Override via ENV: `VECTISCAN_POLICY_VERSION`. Audit-Trail-Feld in `reports.policy_version`.
