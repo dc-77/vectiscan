@@ -1,0 +1,23 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "HTTPS-Zertifikat exotisch konfiguriert",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "Zertifikatskette ungewöhnlich auf Port 443.",
+      "evidence": {"port": "443"},
+      "impact": "Vertrauensbasis suboptimal.",
+      "recommendation": "Zertifikatskette korrigieren."
+    }
+  ],
+  "recommendations": [
+    {
+      "text": "Port 8000 sofort durch Firewall blockieren.",
+      "finding_refs": ["VS-2026-001"]
+    }
+  ],
+  "package": "perimeter"
+}

@@ -1,0 +1,18 @@
+{
+  "overall_risk": "HIGH",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "WordPress 6.9.4 nicht-existente Version genannt",
+      "severity": "HIGH",
+      "cvss_score": 7.5,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "description": "Auf dem Server läuft WordPress 6.9.4 laut Finding-Text, aber die Tech-Tabelle weist 6.4.2 aus.",
+      "evidence": {"version_reported": "6.9.4"},
+      "impact": "Versionsbezeichnung im Report unzuverlässig.",
+      "recommendation": "Version verifizieren und korrigieren."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

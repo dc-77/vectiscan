@@ -1,0 +1,18 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "MariaDB ist nicht mehr supported in dieser Version",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "Laut Banner läuft mysql 5.7 — keine Security-Updates mehr. mysql.com sollte konsultiert werden.",
+      "evidence": {"banner": "5.7.30"},
+      "impact": "Datenbank ohne Patches anfällig für bekannte CVEs.",
+      "recommendation": "Auf eine unterstützte Major-Version migrieren."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

@@ -1,0 +1,29 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "TLS-Konfiguration unsicher",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "Schwache Cipher-Suites aktiv auf TLS-Endpunkt.",
+      "evidence": {"port": "443"},
+      "impact": "Cipher-Downgrade möglich auf TLS.",
+      "recommendation": "TLS 1.2 mit modernen Ciphers."
+    },
+    {
+      "id": "VS-2026-002",
+      "title": "TLS-Konfiguration unsicher",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "TLS 1.0 noch aktiviert auf einem zweiten Host TLS.",
+      "evidence": {"port": "8443"},
+      "impact": "Protokoll-Downgrade-Risiko auf TLS-Layer.",
+      "recommendation": "TLS 1.0 deaktivieren."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

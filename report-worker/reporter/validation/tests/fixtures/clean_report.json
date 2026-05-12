@@ -1,0 +1,58 @@
+{
+  "overall_risk": "MEDIUM",
+  "overall_description": "Gesamtrisiko mittel; einige Konfigurationsfehler aber keine kritischen RCEs.",
+  "severity_counts": {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 1, "LOW": 1, "INFO": 0},
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "RDP-Dienst auf 5.199.141.24 öffentlich erreichbar",
+      "severity": "HIGH",
+      "cvss_score": 7.5,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "cwe": "CWE-200",
+      "affected": "5.199.141.24:3389",
+      "description": "Der RDP-Dienst (Remote Desktop Protocol) auf Port 3389/tcp ist öffentlich erreichbar. Brute-Force-Attacken sind ohne weitere Schutzmechanismen wahrscheinlich.",
+      "evidence": {"service": "rdp", "port": "3389", "protocol": "tcp"},
+      "impact": "Unbefugter Remote-Zugriff bei erfolgreichen Brute-Force-Versuchen auf RDP.",
+      "recommendation": "RDP nicht öffentlich exponieren; VPN oder Zero-Trust-Proxy vorschalten.",
+      "policy_id": "SP-NET-001",
+      "finding_type": "rdp_exposed"
+    },
+    {
+      "id": "VS-2026-002",
+      "title": "SPF-Record fehlt für example.com",
+      "severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+      "cwe": "CWE-290",
+      "affected": "example.com",
+      "description": "Für die Domain example.com ist kein SPF-Record gesetzt. Mail-Spoofing wird damit nicht verhindert.",
+      "evidence": {"record_type": "SPF", "result": "missing"},
+      "impact": "Spoofing-Angriffe via gefälschter Absenderadressen sind erleichtert; SPF ist hier nicht konfiguriert.",
+      "recommendation": "SPF-Record im DNS anlegen.",
+      "policy_id": "SP-MAIL-001",
+      "finding_type": "spf_missing"
+    },
+    {
+      "id": "VS-2026-003",
+      "title": "HTTP-Sicherheits-Header fehlt: Content-Security-Policy",
+      "severity": "LOW",
+      "cvss_score": 4.3,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-693",
+      "affected": "https://example.com",
+      "description": "Der HTTP-Response-Header Content-Security-Policy fehlt. Damit fehlt eine Defense-in-Depth-Schicht gegen XSS.",
+      "evidence": {"header": "Content-Security-Policy", "present": false},
+      "impact": "XSS-Angriffe sind weniger gut abgemildert; HTTP fehlt der Header.",
+      "recommendation": "Content-Security-Policy-Header setzen.",
+      "policy_id": "SP-WEB-001",
+      "finding_type": "header_missing"
+    }
+  ],
+  "positive_findings": [],
+  "recommendations": [
+    {"text": "RDP über VPN/Zero-Trust schützen oder Zugriff einschränken.", "finding_refs": ["VS-2026-001"]},
+    {"text": "SPF-Record und CSP-Header gemeinsam etablieren.", "finding_refs": ["VS-2026-002", "VS-2026-003"]}
+  ],
+  "package": "perimeter"
+}

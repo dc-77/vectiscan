@@ -1,0 +1,18 @@
+{
+  "overall_risk": "HIGH",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "RDP-Dienst auf {host} öffentlich erreichbar",
+      "severity": "HIGH",
+      "cvss_score": 7.5,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "description": "RDP-Dienst auf Port 3389/tcp öffentlich.",
+      "evidence": {"port": "3389"},
+      "impact": "Brute-Force möglich.",
+      "recommendation": "VPN vorschalten."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

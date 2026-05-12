@@ -1,0 +1,22 @@
+{
+  "overall_risk": "LOW",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "HTTP-Header X-Frame-Options fehlt",
+      "severity": "LOW",
+      "cvss_score": 3.1,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
+      "description": "Der HTTP-Header X-Frame-Options fehlt im Response.",
+      "impact": "Clickjacking-Schutz fehlt.",
+      "recommendation": "Header setzen."
+    }
+  ],
+  "recommendations": [
+    {
+      "text": "Maßnahme XY umsetzen.",
+      "finding_refs": ["VS-2026-001", "VS-2026-999"]
+    }
+  ],
+  "package": "perimeter"
+}

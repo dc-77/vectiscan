@@ -38,11 +38,27 @@ def _load_eol_union() -> dict[tuple[str, str, str], dict[str, Any]]:
     Manual-Eintraege ueberschreiben Generated bei gleichem Schluessel —
     so koennen wir z.B. Exchange 2016 mit handgepflegten cves_post_eol
     behalten, auch wenn endoflife.date dasselbe Datum liefert.
+
+    M2 Track 2c — Schema-Bump: jeder Eintrag bekommt `source` (manual |
+    endoflife_date | community) und `last_validated_at` (ISO-Date) per
+    Default, falls nicht explizit gesetzt. Generated-Eintraege markieren
+    sich via `_source="endoflife.date"` automatisch.
     """
     merged: dict[tuple[str, str, str], dict[str, Any]] = {}
     try:
         from reporter.eol_data_generated import EOL_DATA_GENERATED
-        merged.update(EOL_DATA_GENERATED)
+        for k, v in EOL_DATA_GENERATED.items():
+            entry = dict(v)
+            # _source aus Generator-File auf neues source-Schema mappen
+            if "_source" in entry and "source" not in entry:
+                src = entry["_source"]
+                entry["source"] = (
+                    "endoflife_date" if "endoflife" in str(src).lower() else "community"
+                )
+            entry.setdefault("source", "endoflife_date")
+            # last_validated_at default = Generator-Stand
+            entry.setdefault("last_validated_at", "2026-05-05")
+            merged[k] = entry
     except Exception:
         pass  # generated-File noch nicht erzeugt → nur Manual nutzen
     return merged
@@ -119,6 +135,14 @@ EOL_DATA_MANUAL: dict[tuple[str, str, str], dict[str, Any]] = {
     ("postgresql", "", "11"): {"date": "2023-11-09", "severity": "MEDIUM"},
     ("postgresql", "", "10"): {"date": "2022-11-10", "severity": "MEDIUM"},
 }
+
+
+# M2 Track 2c — Schema-Default fuer EOL_DATA_MANUAL: source/last_validated_at
+# werden im Modul-Init einmal pro Eintrag injectet, falls nicht gesetzt.
+_MANUAL_DEFAULT_VALIDATED_AT = "2026-05-12"
+for _k, _v in EOL_DATA_MANUAL.items():
+    _v.setdefault("source", "manual")
+    _v.setdefault("last_validated_at", _MANUAL_DEFAULT_VALIDATED_AT)
 
 
 # Final EOL_DATA: Union (Generated ∪ Manual), Manual hat Vorrang.

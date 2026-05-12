@@ -508,6 +508,51 @@ def find_playwright_screenshots(phase2_dir: str) -> list[str]:
 find_gowitness_screenshots = find_playwright_screenshots
 
 
+# M2 Track 2c — Kernel-Blacklist (P2-04 / Doc 01): HTTPAPI/http.sys sind
+# Windows-Kernel-Komponenten, keine patchbare Anwendung. Bereits beim Parse
+# rausfiltern, damit sie nie in Phase-3-Findings oder Tech-Tabellen sickern.
+_PARSER_KERNEL_BLACKLIST: frozenset[str] = frozenset({
+    "microsoft httpapi httpd",
+    "httpapi",
+    "http.sys",
+    "microsoft-httpapi",
+    "windows kernel",
+})
+
+
+def _is_kernel_tech_token(token: str) -> bool:
+    """True wenn der Detection-Token einen Kernel-Treiber identifiziert."""
+    if not token:
+        return False
+    t = str(token).lower().strip()
+    if t in _PARSER_KERNEL_BLACKLIST:
+        return True
+    for bad in _PARSER_KERNEL_BLACKLIST:
+        if bad in t:
+            return True
+    return False
+
+
+def _filter_kernel_technologies(tech_list: Any) -> list:
+    """Filtert Kernel-Detections aus einer httpx-Tech-Liste raus."""
+    if not isinstance(tech_list, list):
+        return tech_list if tech_list else []
+    out: list = []
+    for entry in tech_list:
+        if isinstance(entry, str):
+            if _is_kernel_tech_token(entry):
+                continue
+            out.append(entry)
+        elif isinstance(entry, dict):
+            name = entry.get("name") or ""
+            if _is_kernel_tech_token(name):
+                continue
+            out.append(entry)
+        else:
+            out.append(entry)
+    return out
+
+
 def parse_httpx(httpx_data: dict | None) -> dict[str, Any]:
     """Parse httpx probe results."""
     if not httpx_data:
@@ -516,7 +561,7 @@ def parse_httpx(httpx_data: dict | None) -> dict[str, Any]:
         "status_code": httpx_data.get("status_code"),
         "title": httpx_data.get("title", ""),
         "server": httpx_data.get("webserver", ""),
-        "technologies": httpx_data.get("tech", []),
+        "technologies": _filter_kernel_technologies(httpx_data.get("tech", [])),
         "content_length": httpx_data.get("content_length"),
         "final_url": httpx_data.get("url", ""),
     }

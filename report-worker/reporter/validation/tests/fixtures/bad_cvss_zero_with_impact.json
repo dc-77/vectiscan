@@ -1,0 +1,17 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Schwache Auth-Konfiguration mit weitreichendem Impact",
+      "severity": "HIGH",
+      "cvss_score": 0.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+      "description": "Vektor sagt CIA=H aber Score ist 0.0 — Mismatch zwischen Score und Vektor.",
+      "impact": "Hochgradiger Impact, Score-Mismatch macht das Finding unbrauchbar.",
+      "recommendation": "Score korrigieren auf Basis des Vektors."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

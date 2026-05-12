@@ -1,0 +1,17 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Score deutlich abweichend vom Vektor",
+      "severity": "MEDIUM",
+      "cvss_score": 2.5,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+      "description": "Score-Vektor-Mismatch zur Library-Validierung. Vektor sagt ~9.8, Score steht auf 2.5.",
+      "impact": "Falsche Priorisierung durch zu niedrigen Score.",
+      "recommendation": "Score gemäß Vektor neu berechnen."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

@@ -17,6 +17,7 @@ Spec: docs/deterministic/02-severity-policy.md, 04-deterministic-selection.md.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 import structlog
@@ -258,6 +259,28 @@ def apply_deterministic_pipeline(claude_output: dict,
     if title_overridden:
         log.info("title_templates_applied", count=title_overridden,
                  total=len(claude_output["findings"]))
+
+    # 5c. ID-Renumerierung (M1 / Doc 01 Phase F)
+    # Vor M1 trugen Findings die Claude-vergebenen IDs (VS-YYYY-XXX), die
+    # nach FP-Filter / Konsolidierung / Top-N-Cap Luecken hatten. Ab M1:
+    #   - `policy_id` bleibt intern stabil (Audit-Trail)
+    #   - `external_id` wird lueckenlos VS-YYYY-001..N vergeben
+    #   - `id` (kundenseitig sichtbar) = external_id
+    #   - `original_claude_id` haelt den Pre-Renumerierungs-Wert fuer Audit
+    # WICHTIG: Nur claude_output["findings"] (Top-N) wird renumeriert;
+    # sel.additional behaelt seine Original-IDs, weil diese im Anhang
+    # "Methodisch ausgeschlossene Befunde" rein als Counts referenziert werden.
+    from reporter.id_renumber import remap_recommendation_refs, renumber_findings
+    id_remap = renumber_findings(
+        claude_output["findings"], year=datetime.now().year,
+    )
+    if id_remap:
+        refs_remapped = remap_recommendation_refs(
+            claude_output.get("recommendations") or [], id_remap,
+        )
+        log.info("id_renumbering_applied",
+                 findings_renumbered=len(id_remap),
+                 recommendation_refs_remapped=refs_remapped)
 
     # Additional als separate Liste mit Voll-Body — Migration 027 (Mai 2026):
     # API + Frontend brauchen description/recommendation/impact/cvss_*/affected_hosts

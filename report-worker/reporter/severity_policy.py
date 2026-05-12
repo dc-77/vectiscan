@@ -27,7 +27,13 @@ logger = logging.getLogger(__name__)
 # ====================================================================
 # Bei jeder Aenderung der Regeln HIER hochziehen. Wird im AI-Cache-Key
 # eingebaut, damit Cache nach Policy-Update automatisch invalidiert.
-POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-10.1")
+#
+# Bump-Historie:
+#   2026-05-10.1 -> 2026-06-01.1 (M2 Track 2d: SP-RDP-001/002/003 neu,
+#     SP-DB-001 auf C:H/I:H/A:H + SP-DB-002/003, SP-EOL-005 fuer EOL+
+#     Internet-facing+Tech-Critical. Neue Context-Flags: count_hosts_gt_one,
+#     is_eol, is_internet_facing, tech_critical. Cache-Wipe bei Cutover.)
+POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-06-01.1")
 
 
 # ====================================================================
@@ -673,6 +679,18 @@ SEVERITY_POLICIES: list[SeverityPolicy] = [
         rationale="WordPress mehrere Major-Versionen hinter Aktuell - bekannte RCE-Pfade",
         references=["CWE-1104"],
     ),
+    SeverityPolicy(
+        policy_id="SP-EOL-005",
+        finding_type="software_eol",
+        matches_when={"is_internet_facing": True, "tech_critical": True},
+        final_severity=Severity.CRITICAL,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        cvss_score=9.8,
+        rationale="EOL-Software + Internet-facing + sicherheitskritisches "
+                  "Produkt (DB/Mailserver/Webserver/OS) - akkumulierte unpatched "
+                  "CVEs, oft mit Public-Exploits. Direkter Initialvektor.",
+        references=["CWE-1104", "CISA-KEV"],
+    ),
 
     # ----------------------------------------------------------------
     # WORDPRESS PLUGIN- / THEME-VULNERABILITIES (SP-WP-*)
@@ -721,18 +739,97 @@ SEVERITY_POLICIES: list[SeverityPolicy] = [
     ),
 
     # ----------------------------------------------------------------
+    # REMOTE-DESKTOP (SP-RDP-*) - neu in POLICY_VERSION 2026-06-01.1
+    # RDP/3389 oeffentlich exponiert ist der mit Abstand haeufigste
+    # Initialvektor fuer Ransomware-Angriffe (CISA, Coveware-Reports
+    # 2023-2025). Default-Bewertung C:H/I:H/A:H mit AC:H weil
+    # Authentifizierung weiterhin noetig ist.
+    # Context-Flags:
+    #   - cve_in_kev / cve_ransomware boosten via SP-CVE-001/002 wenn
+    #     ein zugeordneter CVE im KEV-Katalog steht
+    #   - count_hosts_gt_one (mehrere Hosts exponiert) -> SP-RDP-002
+    #   - is_eol (alter Windows-Server) -> SP-RDP-003 mit CRITICAL
+    # ----------------------------------------------------------------
+    SeverityPolicy(
+        policy_id="SP-RDP-001",
+        finding_type="rdp_exposed",
+        final_severity=Severity.HIGH,
+        cvss_vector="AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        cvss_score=8.1,
+        rationale="RDP/3389 oeffentlich erreichbar - haeufigster Initialvektor "
+                  "fuer Ransomware. Authentifizierung erforderlich (AC:H) aber "
+                  "Brute-Force, Credential-Stuffing, BlueKeep-Klasse-CVEs als "
+                  "Pfade real.",
+        references=["CWE-284", "CWE-307", "CISA-KEV", "CVE-2019-0708"],
+    ),
+    SeverityPolicy(
+        policy_id="SP-RDP-002",
+        finding_type="rdp_exposed",
+        matches_when={"count_hosts_gt_one": True},
+        final_severity=Severity.CRITICAL,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        cvss_score=9.8,
+        rationale="Mehrere Windows-Hosts mit RDP/3389 oeffentlich - "
+                  "Angriffsflaeche multipliziert sich, Lateral-Movement-Risiko "
+                  "rechtfertigt CRITICAL.",
+        references=["CWE-284", "CISA-KEV"],
+    ),
+    SeverityPolicy(
+        policy_id="SP-RDP-003",
+        finding_type="rdp_exposed",
+        matches_when={"is_eol": True},
+        final_severity=Severity.CRITICAL,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        cvss_score=9.8,
+        rationale="RDP auf EOL-Windows-Server oeffentlich - keine Security-"
+                  "Patches mehr fuer bekannte CVEs (BlueKeep, DejaBlue, "
+                  "EsteemAudit). Direkter RCE-Vektor.",
+        references=["CWE-1104", "CISA-KEV", "CVE-2019-0708"],
+    ),
+
+    # ----------------------------------------------------------------
     # DATABASE-PORT-EXPOSURE (SP-DB-*)
+    # M2 Track 2d: SP-DB-001 von C:L/I:L/A:L auf C:H/I:H/A:H gehoben
+    # (P1-08). Bei erfolgreicher Authentifizierung ist der gesamte
+    # DB-Inhalt verloren - "Partial Impact" unterschaetzt das Risiko
+    # systematisch. Multi-Host und EOL-Varianten als CRITICAL.
     # ----------------------------------------------------------------
     SeverityPolicy(
         policy_id="SP-DB-001",
         finding_type="database_port_exposed",
         final_severity=Severity.HIGH,
-        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L",
-        cvss_score=7.3,
-        rationale="Datenbank-Port (3306/5432/27017/6379/...) oeffentlich "
-                  "erreichbar - Brute-Force, Default-Creds, ungepatchte "
-                  "DB-CVEs unmittelbares Risiko",
+        cvss_vector="AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        cvss_score=8.1,
+        rationale="Datenbank-Port (3306/5432/1433/1521/27017/6379/...) "
+                  "oeffentlich erreichbar - Bei erfolgreicher Authentifizierung "
+                  "(Brute-Force, Default-Creds, leaked-Creds) vollstaendiger "
+                  "Zugriff auf gespeicherte Daten. AC:H weil Authentifizierung "
+                  "weiterhin Pflicht.",
         references=["CWE-200", "CWE-284", "OWASP2025-A05"],
+    ),
+    SeverityPolicy(
+        policy_id="SP-DB-002",
+        finding_type="database_port_exposed",
+        matches_when={"is_eol": True},
+        final_severity=Severity.CRITICAL,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        cvss_score=9.8,
+        rationale="EOL-Datenbank oeffentlich erreichbar - keine Security-"
+                  "Patches mehr, bekannte CVE-Klassen mit Public-Exploits. "
+                  "Authentifizierung typischerweise umgehbar.",
+        references=["CWE-1104", "CWE-284", "CISA-KEV"],
+    ),
+    SeverityPolicy(
+        policy_id="SP-DB-003",
+        finding_type="database_port_exposed",
+        matches_when={"count_hosts_gt_one": True},
+        final_severity=Severity.CRITICAL,
+        cvss_vector="AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+        cvss_score=9.8,
+        rationale="Mehrere Hosts mit Datenbank-Port oeffentlich - "
+                  "Angriffsflaeche, Lateral-Movement und Credential-Stuffing "
+                  "kombiniert auf CRITICAL-Niveau.",
+        references=["CWE-200", "CWE-284", "CISA-KEV"],
     ),
 
     # ----------------------------------------------------------------
@@ -1023,6 +1120,70 @@ def extract_context_flags(finding: dict, scan_context: dict) -> dict[str, Any]:
         except (ValueError, TypeError):
             pass
 
+    # ====================================================================
+    # M2 Track 2d — NEW Context-Flags
+    # ====================================================================
+
+    # count_hosts_gt_one: True wenn Finding mehrere Hosts betrifft
+    ah = finding.get("affected_hosts") or []
+    if isinstance(ah, list) and len(ah) > 1:
+        flags["count_hosts_gt_one"] = True
+
+    # is_eol: True wenn EOL-Detector das Tech als EOL flagged.
+    # Quelle 1 (bevorzugt): evidence.is_eol direkt am Finding.
+    # Quelle 2 (Fallback): tech_profiles[*].tech_rows[*].patch_status=="eol"
+    # wenn das Finding-Host mit dem tech_profile-Host matched.
+    if isinstance(evidence, dict) and evidence.get("is_eol"):
+        flags["is_eol"] = True
+    else:
+        affected = (finding.get("affected") or finding.get("host")
+                    or finding.get("ip") or "")
+        for prof in tech_profiles:
+            prof_ip = prof.get("ip") or ""
+            prof_fqdns = prof.get("fqdns") or []
+            host_match = (
+                bool(prof_ip) and prof_ip in str(affected)
+            ) or any(fq and fq in str(affected) for fq in prof_fqdns)
+            if not host_match:
+                continue
+            for row in (prof.get("tech_rows") or []):
+                if row.get("patch_status") == "eol":
+                    flags["is_eol"] = True
+                    break
+            if flags.get("is_eol"):
+                break
+
+    # is_internet_facing: True wenn Host eine oeffentliche IP hat.
+    # Alle gescannten Hosts sind extern erreichbar, sonst waeren sie nicht
+    # im Inventory — also Default True. Aufrufer kann via evidence
+    # explizit auf False setzen wenn bekannt ist dass interne IP.
+    if isinstance(evidence, dict) and "is_internet_facing" in evidence:
+        flags["is_internet_facing"] = bool(evidence.get("is_internet_facing"))
+    else:
+        flags["is_internet_facing"] = True
+
+    # tech_critical: True wenn die betroffene Tech in der Critical-Liste ist.
+    # Greift bei DB/Mailserver/Webserver/OS — alle Tech-Klassen, deren EOL
+    # einen direkten Angriffspfad oeffnet.
+    TECH_CRITICAL_KEYWORDS = (
+        "exchange", "mariadb", "mysql", "postgres", "mongo", "redis",
+        "mssql", "oracle", "apache", "nginx", "iis", "ubuntu", "debian",
+        "windows server", "centos", "rhel", "openssh", "openssl",
+        "wordpress",
+    )
+    title_vars = finding.get("title_vars") or {}
+    if not isinstance(title_vars, dict):
+        title_vars = {}
+    tech_hint = (
+        (evidence.get("tech") if isinstance(evidence, dict) else "")
+        or title_vars.get("tech")
+        or primary_tech
+        or finding.get("affected", "")
+    )
+    tech_hint = str(tech_hint or "").lower()
+    if any(k in tech_hint for k in TECH_CRITICAL_KEYWORDS):
+        flags["tech_critical"] = True
+
     return flags
 
 
@@ -1204,6 +1365,25 @@ def apply_policy(findings: list[dict], scan_context: dict) -> list[dict]:
             fallback_count,
             sorted(miss_types.items(), key=lambda x: -x[1])[:5],
         )
+
+    # ── M2 Track 2a: CVSS-Konsistenz + Hygiene-Skala ──────────────────
+    # Nach allen Policy-Regel-Anwendungen: Vektor normalisieren, Score
+    # aus Vektor neu berechnen, Hygiene-Findings markieren. Lazy-Import
+    # gegen Circular-Risk (cvss_consistency darf ggf. severity_policy
+    # in Zukunft brauchen).
+    try:
+        from reporter import cvss_consistency as _cvss_consistency
+
+        for finding in findings:
+            try:
+                _cvss_consistency.apply_consistency(finding)
+            except Exception:  # pragma: no cover
+                logger.exception(
+                    "cvss_consistency.apply_consistency failed for finding %s",
+                    finding.get("id") or finding.get("title", "<unknown>"),
+                )
+    except Exception:  # pragma: no cover
+        logger.exception("cvss_consistency module unavailable -- skip")
 
     return findings
 

@@ -112,6 +112,7 @@ def _create_report_record(
     policy_id_distinct: list[str] | None = None,
     tech_profiles: list[dict] | None = None,
     additional_findings: list[dict] | None = None,
+    validation_warnings: dict | None = None,
 ) -> tuple[str, str]:
     """Insert a row into the reports table and return (report_id, download_token).
 
@@ -121,6 +122,10 @@ def _create_report_record(
 
     Migration 027 (Mai 2026): tech_profiles + additional_findings — Quelle fuer
     Per-Host-Tech-Tabelle und "alle Befunde anzeigen"-Drilldown.
+
+    Migration 028 (M1, Q2/2026): validation_warnings — Output der
+    ValidationGate (Phase A). Im WARN-Mode dokumentiert, im STRICT-Mode
+    landet hier nichts, weil der Build vor dem Insert abbricht.
     """
     download_token = str(uuid.uuid4())
     expires_at = datetime.now(timezone.utc) + timedelta(days=30)
@@ -131,9 +136,9 @@ def _create_report_record(
                 order_id, minio_bucket, minio_path, file_size_bytes,
                 download_token, expires_at, findings_data, version,
                 excluded_findings, policy_version, policy_id_distinct,
-                tech_profiles, additional_findings
+                tech_profiles, additional_findings, validation_warnings
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id
             """,
             (
@@ -146,6 +151,7 @@ def _create_report_record(
                 policy_id_distinct,  # psycopg2 maps Python list → TEXT[]
                 json.dumps(tech_profiles) if tech_profiles else None,
                 json.dumps(additional_findings) if additional_findings else None,
+                json.dumps(validation_warnings) if validation_warnings else None,
             ),
         )
         report_id = cur.fetchone()[0]
@@ -597,10 +603,83 @@ def process_job(job_data: dict) -> None:
 
         minio_pdf_path = f"{order_id}_v{version}.pdf" if version > 1 else f"{order_id}.pdf"
 
+        # -- 5d. Validation-Gate (M1) ----------------------------------------
+        # Phase A aus docs/report-erstellung/01_Fehleranalyse_und_Korrekturplan.md.
+        # Validiert findings_data + report_data BEVOR PDF/Upload — bei STRICT-
+        # Failure sparen wir uns die teure PDF-Generation und den MinIO-Upload.
+        from reporter.validation.gate import (
+            ValidationFailedError,
+            ValidationGate,
+            ValidationLevel,
+        )
+        findings_data_for_validation = _build_findings_data(
+            claude_output, package, report_data,
+        )
+        gate = ValidationGate.from_env()
+        gate_result = gate.run(
+            findings_data_for_validation,
+            report_data=report_data,
+            context={
+                "package": package,
+                "order_id": order_id,
+                "domain": domain,
+                # M1: raw tech_profiles fuer consistency/tech_table/eol checks
+                # (im report_data sind die Tech-Daten nur als Paragraph-
+                # Objekte unter scope.subsections[*].host_tech_blocks vorhanden,
+                # nicht direkt validierbar).
+                "tech_profiles": effective_profiles or [],
+            },
+        )
+        # Persist validation_warnings unabhaengig vom Level (auch
+        # passed=True wird dokumentiert — checks_run/skipped sind Audit).
+        validation_warnings_payload = gate_result.to_json()
+        report_data["_validation_warnings"] = validation_warnings_payload
+        if not gate_result.passed:
+            log.warning(
+                "validation_gate_failed",
+                order_id=order_id,
+                level=gate.level.value,
+                error_count=len(gate_result.errors),
+                warning_count=len(gate_result.warnings),
+            )
+            if gate.level == ValidationLevel.STRICT:
+                # In STRICT: Order auf failed setzen, kein PDF/Upload, kein
+                # report-record. Tech-Lead diagnostiziert via Logs +
+                # orders.error_message.
+                _update_order_status(
+                    conn, order_id, "failed",
+                    error_message=(
+                        f"Validation-Gate STRICT: "
+                        f"{len(gate_result.errors)} Defekte"
+                    ),
+                )
+                log.error(
+                    "validation_gate_strict_block",
+                    order_id=order_id,
+                    result=validation_warnings_payload,
+                )
+                raise ValidationFailedError(gate_result)
+
         # -- 6. Generate PDF --------------------------------------------------
+        # M3: V2-Renderer ueber ENV-Flag aktivierbar. Default bleibt
+        # Legacy v1 -- Big-Bang-Cutover erst in M6.
         pdf_path = work_dir / f"{order_id}.pdf"
-        generate_report(report_data, str(pdf_path))
-        log.info("pdf_generated", path=str(pdf_path), size=pdf_path.stat().st_size)
+        layout = os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower()
+        if layout == "v2":
+            from reporter.pdf.v2 import generate_report_v2
+            generate_report_v2(report_data, str(pdf_path))
+            log.info(
+                "pdf_generated_v2",
+                path=str(pdf_path),
+                size=pdf_path.stat().st_size,
+            )
+        else:
+            generate_report(report_data, str(pdf_path))
+            log.info(
+                "pdf_generated",
+                path=str(pdf_path),
+                size=pdf_path.stat().st_size,
+            )
 
         # -- 7. Upload PDF to MinIO -------------------------------------------
         file_size = _upload_report(minio_client, pdf_path, minio_pdf_path)
@@ -629,6 +708,7 @@ def process_job(job_data: dict) -> None:
             policy_id_distinct=policy_id_distinct,
             tech_profiles=enriched_profiles,
             additional_findings=additional_findings,
+            validation_warnings=validation_warnings_payload,
         )
         log.info("report_record_created", report_id=report_id,
                  download_token=download_token, version=version,
@@ -694,17 +774,25 @@ def process_job(job_data: dict) -> None:
         _update_order_status(conn, order_id, final_status)
         log.info("job_completed", order_id=order_id, package=package, status=final_status)
 
-    except Exception:
-        log.exception("job_failed", order_id=order_id)
-        # Best-effort: mark the order as failed in the database
-        try:
-            if conn is None:
-                conn = _get_db_connection()
-            import traceback
-            err_msg = traceback.format_exc()[-500:]  # keep last 500 chars
-            _update_order_status(conn, order_id, "failed", error_message=err_msg)
-        except Exception:
-            log.exception("failed_to_update_order_status", order_id=order_id)
+    except Exception as e:
+        # Validation-Gate-STRICT-Failure: Order ist bereits auf failed gesetzt
+        # mit kuratierter error_message. Nicht ueberschreiben — nur loggen +
+        # weiter mit finally-Cleanup.
+        from reporter.validation.gate import ValidationFailedError
+        if isinstance(e, ValidationFailedError):
+            log.warning("job_blocked_by_validation_gate", order_id=order_id,
+                        error_count=len(e.result.errors))
+        else:
+            log.exception("job_failed", order_id=order_id)
+            # Best-effort: mark the order as failed in the database
+            try:
+                if conn is None:
+                    conn = _get_db_connection()
+                import traceback
+                err_msg = traceback.format_exc()[-500:]  # keep last 500 chars
+                _update_order_status(conn, order_id, "failed", error_message=err_msg)
+            except Exception:
+                log.exception("failed_to_update_order_status", order_id=order_id)
     finally:
         # -- Upload Claude debug data (both success and failure) ---------------
         if claude_debug:

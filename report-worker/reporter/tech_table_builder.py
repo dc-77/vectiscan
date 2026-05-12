@@ -39,6 +39,8 @@ import re
 from datetime import date
 from typing import Any
 
+import logging
+
 from reporter.eol_detector import (
     EOL_DATA_MANUAL,
     KNOWN_VULN_BUILDS,
@@ -49,6 +51,89 @@ from reporter.eol_detector import (
     _version_in_range,
     _version_starts_with,
 )
+
+log = logging.getLogger(__name__)
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# M2 Track 2c: Kernel-Blacklist + Min-Public-Version-Whitelist
+# ─────────────────────────────────────────────────────────────────────────
+
+# Detection-Strings, die Kernel-Komponenten statt Anwendungssoftware
+# identifizieren — Service kommt aus dem Windows-Kernel (http.sys),
+# nicht aus einer patchbaren Anwendung. Werden komplett aus der Tech-
+# Tabelle entfernt (P2-04 / Doc 01).
+KERNEL_DETECTION_BLACKLIST: set[str] = {
+    "microsoft httpapi httpd",
+    "httpapi",
+    "http.sys",
+    "microsoft-httpapi",
+    "windows kernel",
+}
+
+# Min-Version-Whitelist: erste oeffentliche Version pro Tech.
+# Werte unterhalb dieser Schwelle deuten auf Tool-Mislabel
+# (z.B. Bootstrap 1 — wurde nie released; P1-05 / Doc 01).
+MIN_PUBLIC_VERSIONS: dict[str, int] = {
+    "bootstrap": 2,    # Bootstrap 1 nie veroeffentlicht
+    "angular": 1,      # Angular 1 = AngularJS legitim
+    "angularjs": 1,
+    "react": 0,        # React 0.x existiert
+    "vue": 1,
+    "vue.js": 1,
+    "jquery": 1,
+    "tailwind": 1,
+    "tailwindcss": 1,
+    "ember": 1,
+    "ember.js": 1,
+    "backbone": 0,
+    "next.js": 1,
+    "nextjs": 1,
+    "nuxt": 1,
+    "nuxt.js": 1,
+}
+
+
+def _is_kernel_detection(name: str) -> bool:
+    """True wenn der Detection-String einen Kernel-Treiber identifiziert."""
+    if not name:
+        return False
+    name_lower = name.lower().strip()
+    if name_lower in KERNEL_DETECTION_BLACKLIST:
+        return True
+    # Substring-Match fuer Banner-Varianten ("Microsoft-HTTPAPI/2.0" etc.)
+    for bad in KERNEL_DETECTION_BLACKLIST:
+        if bad in name_lower:
+            return True
+    return False
+
+
+def _major_int(version: str) -> int | None:
+    """Extrahiert die Major-Version als Integer ('1.2.3' → 1, '0.9' → 0)."""
+    if not version:
+        return None
+    m = re.match(r"\s*(\d+)", version)
+    if not m:
+        return None
+    try:
+        return int(m.group(1))
+    except ValueError:
+        return None
+
+
+def _violates_min_version(name: str, version: str) -> bool:
+    """True wenn die Version unter der ersten oeffentlichen Version liegt."""
+    if not version:
+        return False
+    name_lower = (name or "").lower().strip()
+    lookup_keys = [name_lower] + name_lower.split()
+    major = _major_int(version)
+    if major is None:
+        return False
+    for key in lookup_keys:
+        if key in MIN_PUBLIC_VERSIONS:
+            return major < MIN_PUBLIC_VERSIONS[key]
+    return False
 
 
 _BANNER_SUFFIX_RE = re.compile(
@@ -145,6 +230,115 @@ _CATEGORY_MAP: dict[tuple[str, str], str] = {
     ("vmware",      "vcenter"):         "Virtualisierung",
     ("vmware",      "esxi"):            "Virtualisierung",
 }
+
+
+def _confidence_label(confidence: float | None) -> str:
+    """Mappt Confidence-Score (0-1) auf User-facing-Label.
+
+    Conventions:
+      >= 0.8 → 'hoch'
+      >= 0.5 → 'mittel'
+      None oder < 0.5 → 'niedrig'
+    """
+    if confidence is None:
+        return "niedrig"
+    try:
+        c = float(confidence)
+    except (TypeError, ValueError):
+        return "niedrig"
+    if c >= 0.8:
+        return "hoch"
+    if c >= 0.5:
+        return "mittel"
+    return "niedrig"
+
+
+# Source-ID → User-facing Detection-Method-Label
+_DETECTION_SOURCE_LABELS: dict[str, str] = {
+    "cms_fingerprint":   "CMS-Fingerprint",
+    "server_banner":     "HTTP-Server-Banner",
+    "tech_detect":       "Tech-Detect",
+    "waf_detect":        "WAF-Detect",
+    "shodan":            "Shodan",
+    "webtech":           "webtech",
+    "nmap-banner":       "nmap-Banner",
+    "meta-generator":    "Meta-Tag",
+}
+
+
+def _detection_source_label(source: str) -> str:
+    """Mappt Source-ID auf User-facing Detection-Method-Label."""
+    if not source:
+        return ""
+    return _DETECTION_SOURCE_LABELS.get(source, source)
+
+
+# Mapping interner Status-Codes auf User-facing-Label fuer patch_status-Spalte.
+_PATCH_STATUS_MAP: dict[str, str] = {
+    "eol":         "eol",
+    "minor_eol":   "minor_eol",
+    "outdated":    "outdated",
+    "current":     "aktuell",
+}
+
+
+def _patch_status_from(status: str, version: str) -> str:
+    """Leitet patch_status aus internem status + version ab."""
+    if not version:
+        return "unbekannt"
+    return _PATCH_STATUS_MAP.get(status, "unbekannt")
+
+
+def _select_top_cve(cves: list) -> dict | None:
+    """Waehle Top-CVE pro Tech-Row.
+
+    Priorisierung:
+      1. KEV-Eintrag (kev=True)
+      2. Hoechster epss_score
+      3. Hoechster cvss_score
+
+    cves[] kann sowohl list[str] (Backwards-Compat) als auch list[dict] sein.
+    list[str] → kein Top-CVE-Auswahl moeglich (keine EPSS/KEV-Daten), nimm
+    den ersten als Default fuer die Spalte (M2 2c — sichtbar machen falls
+    Daten vorhanden, Anreicherung passiert woanders).
+    """
+    if not cves:
+        return None
+    # Liste von strings (Backwards-Compat)
+    if all(isinstance(c, str) for c in cves):
+        return {"cve_id": cves[0], "epss_score": None, "kev": False}
+    # Liste von dicts
+    dicts = [c for c in cves if isinstance(c, dict)]
+    if not dicts:
+        return None
+    # 1) KEV
+    kev = [c for c in dicts if c.get("kev")]
+    if kev:
+        c0 = kev[0]
+        return {"cve_id": c0.get("cve_id") or c0.get("id"),
+                "epss_score": c0.get("epss_score"),
+                "kev": True}
+    # 2) Highest EPSS
+    by_epss = sorted(
+        dicts,
+        key=lambda c: (c.get("epss_score") or -1),
+        reverse=True,
+    )
+    if by_epss and by_epss[0].get("epss_score") is not None:
+        c0 = by_epss[0]
+        return {"cve_id": c0.get("cve_id") or c0.get("id"),
+                "epss_score": c0.get("epss_score"),
+                "kev": bool(c0.get("kev"))}
+    # 3) Highest CVSS
+    by_cvss = sorted(
+        dicts,
+        key=lambda c: (c.get("cvss_score") or -1),
+        reverse=True,
+    )
+    c0 = by_cvss[0]
+    return {"cve_id": c0.get("cve_id") or c0.get("id"),
+            "epss_score": c0.get("epss_score"),
+            "kev": bool(c0.get("kev"))}
 
 
 def _category_for(vendor: str, product: str, name_hint: str) -> str:
@@ -249,17 +443,23 @@ def build_tech_table_for_host(
 
     Returns:
         Liste von Zeilen-Dicts mit Feldern:
-          name        : str   — z.B. "Apache HTTP Server"
-          version     : str   — z.B. "2.4.49"
-          category    : str   — z.B. "Web-Server"
-          status      : str   — "eol" | "outdated" | "current" (sich ausschliessend)
-          is_mega_cve : bool  — KNOWN_VULN_BUILDS-Match (orthogonal zu status)
-          eol_date    : str   — ISO-Datum oder ""
-          latest_patch: str   — empfohlene Stable-Version oder ""
-          cves        : list[str]  — bei is_mega_cve, sonst []
-          vuln_name   : str   — bei is_mega_cve, sonst ""
-          confidence  : float | None — fuer Admin-Detail
-          source      : str   — Detection-Method, fuer Admin-Detail
+          name             : str   — z.B. "Apache HTTP Server"
+          version          : str   — z.B. "2.4.49" oder "(Version unbekannt)"
+          category         : str   — z.B. "Web-Server"
+          status           : str   — DEPRECATED alias auf patch_status (Backwards-Compat
+                                      fuer alten PDF-Renderer; in M4 entfernt)
+          patch_status     : str   — "aktuell" | "outdated" | "eol" | "minor_eol" | "unbekannt"
+                                     (M2 Track 2c — semantisch klare Spalte)
+          is_mega_cve      : bool  — KNOWN_VULN_BUILDS-Match (orthogonal zu status)
+          eol_date         : str   — ISO-Datum oder ""
+          latest_patch     : str   — empfohlene Stable-Version oder ""
+          cves             : list[str]  — bei is_mega_cve, sonst []
+          vuln_name        : str   — bei is_mega_cve, sonst ""
+          confidence       : float | None — Detection-Confidence (numerisch)
+          confidence_label : str   — "hoch" | "mittel" | "niedrig" (M2)
+          source           : str   — Detection-Source-ID, fuer Admin-Detail
+          detection_source : str   — User-facing Detection-Method-Label (M2)
+          top_cve          : dict | None — {cve_id, epss_score, kev} (M2)
     """
     if scan_date is None:
         scan_date = date.today()
@@ -276,7 +476,28 @@ def build_tech_table_for_host(
 
     def _add(name: str, version: str, vendor: str, product: str,
              confidence: float | None, source: str) -> None:
+        # M2 2c — Kernel-Blacklist: HTTPAPI/http.sys etc. sind Kernel-Treiber,
+        # keine patchbare Anwendung. Skip komplett (P2-04 / Doc 01).
+        if _is_kernel_detection(name) or _is_kernel_detection(f"{vendor} {product}".strip()):
+            log.info(
+                "tech_table_kernel_skip",
+                extra={"name": name, "vendor": vendor, "product": product},
+            )
+            return
+
         version = _strip_banner_suffix(version)
+
+        # M2 2c — Min-Public-Version: Bootstrap 1 nie released etc.
+        # Statt zu skippen markieren wir als "unbekannt", weil die Tech
+        # selbst real ist, nur die Detection-Version unplausibel.
+        version_unknown = False
+        if version and _violates_min_version(name, version):
+            log.info(
+                "tech_table_min_version_violation",
+                extra={"name": name, "version": version},
+            )
+            version_unknown = True
+
         key = (vendor.lower(), (product or "").lower())
         if key in seen:
             # Bereits vorhanden — wenn neuer Eintrag eine Version hat und der
@@ -284,38 +505,91 @@ def build_tech_table_for_host(
             idx = seen[key]
             existing = rows[idx]
             if version and not existing["version"]:
+                if version_unknown:
+                    existing["version"] = "(Version unbekannt)"
+                    existing["patch_status"] = "unbekannt"
+                    existing["status"] = "unbekannt"
+                    existing["name"] = name
+                    existing["confidence"] = confidence
+                    existing["confidence_label"] = _confidence_label(confidence)
+                    existing["source"] = source
+                    existing["detection_source"] = _detection_source_label(source)
+                    return
                 existing["version"] = version
                 existing["name"] = name
                 existing["confidence"] = confidence
+                existing["confidence_label"] = _confidence_label(confidence)
                 existing["source"] = source
+                existing["detection_source"] = _detection_source_label(source)
                 # Re-classify mit neuer Version
                 status, is_mega_cve, info = _classify_status(
                     vendor, product, version, eol_data, known_vuln_builds, scan_date,
                 )
+                patch_status = _patch_status_from(status, version)
                 existing["status"] = status
+                existing["patch_status"] = patch_status
                 existing["is_mega_cve"] = is_mega_cve
                 existing["eol_date"] = info["eol_date"]
                 existing["latest_patch"] = info["latest_patch"]
                 existing["cves"] = info["cves"]
                 existing["vuln_name"] = info["vuln_name"]
+                existing["top_cve"] = _select_top_cve(info["cves"])
             return
         seen[key] = len(rows)
+
+        if version_unknown:
+            # Tech existiert, aber Detection-Version unplausibel → markieren.
+            rows.append({
+                "name": name,
+                "version": "(Version unbekannt)",
+                "category": _category_for(vendor, product, name),
+                "status": "unbekannt",
+                "patch_status": "unbekannt",
+                "is_mega_cve": False,
+                "eol_date": "",
+                "latest_patch": "",
+                "cves": [],
+                "vuln_name": "",
+                "confidence": confidence,
+                "confidence_label": _confidence_label(confidence),
+                "source": source,
+                "detection_source": _detection_source_label(source),
+                "top_cve": None,
+            })
+            return
+
         status, is_mega_cve, info = _classify_status(
             vendor, product, version, eol_data, known_vuln_builds, scan_date,
         )
+        patch_status = _patch_status_from(status, version)
         rows.append({
             "name": name,
             "version": version or "",
             "category": _category_for(vendor, product, name),
             "status": status,
+            "patch_status": patch_status,
             "is_mega_cve": is_mega_cve,
             "eol_date": info["eol_date"],
             "latest_patch": info["latest_patch"],
             "cves": info["cves"],
             "vuln_name": info["vuln_name"],
             "confidence": confidence,
+            "confidence_label": _confidence_label(confidence),
             "source": source,
+            "detection_source": _detection_source_label(source),
+            "top_cve": _select_top_cve(info["cves"]),
         })
+
+    # TODO M2 2c: Multi-VHost-Versions-Range — wenn ein Profil ueber
+    # vhost_results mehrere Versionen einer Software liefert (z.B. WordPress
+    # 6.9.4 auf www + 6.4.2 auf dev), sollte eine Zeile mit Range gebaut
+    # werden ("6.4.2-6.9.4 (verschiedene VHosts)"). Aktuell konsumiert der
+    # Builder nur das aggregierte tech_profile (hoechste/letzte Version
+    # gewinnt). Audit-Flag wird gesetzt falls Multi-VHost erkannt.
+    _multi_vhost_versions = False
+    vhost_results = tech_profile.get("vhost_results")
+    if isinstance(vhost_results, dict) and len(vhost_results) > 1:
+        _multi_vhost_versions = True
 
     # 1. CMS aus tech_profile
     cms = tech_profile.get("cms")
@@ -381,13 +655,17 @@ def build_tech_table_for_host(
             "version": "",
             "category": "WAF/Schutz",
             "status": "current",
+            "patch_status": "unbekannt",
             "is_mega_cve": False,
             "eol_date": "",
             "latest_patch": "",
             "cves": [],
             "vuln_name": "",
             "confidence": None,
+            "confidence_label": _confidence_label(None),
             "source": "waf_detect",
+            "detection_source": _detection_source_label("waf_detect"),
+            "top_cve": None,
         })
 
     # 5. Shodan-exponierte Dienste (PR-H, Mai 2026)
@@ -415,19 +693,30 @@ def build_tech_table_for_host(
             "version": version,
             "category": f"Exponierter Dienst (Port {port})",
             "status": "current",  # Shodan kann EOL nicht bewerten
+            "patch_status": _patch_status_from("current", version),
             "is_mega_cve": False,
             "eol_date": "",
             "latest_patch": "",
             "cves": [],
             "vuln_name": "",
             "confidence": None,
+            "confidence_label": _confidence_label(None),
             "source": "shodan",
+            "detection_source": _detection_source_label("shodan"),
+            "top_cve": None,
         })
+
+    # Multi-VHost-Audit-Flag durchsetzen (M2 2c — TODO-Stub bis echte
+    # Range-Logik kommt). Sichtbar fuer Downstream-Validator.
+    if _multi_vhost_versions:
+        for r in rows:
+            r["_multi_vhost_versions"] = True
 
     # Stable-Sort: Status-Schwere zuerst (eol > minor_eol > outdated > current),
     # mega_cve-Flag erhoeht Prioritaet innerhalb gleichen Status,
-    # dann Kategorie, dann Name.
-    _STATUS_ORDER = {"eol": 0, "minor_eol": 1, "outdated": 2, "current": 3}
+    # dann Kategorie, dann Name. "unbekannt" sortiert ans Ende.
+    _STATUS_ORDER = {"eol": 0, "minor_eol": 1, "outdated": 2,
+                     "current": 3, "unbekannt": 4}
     rows.sort(key=lambda r: (
         _STATUS_ORDER.get(r["status"], 99),
         0 if r.get("is_mega_cve") else 1,
@@ -437,4 +726,8 @@ def build_tech_table_for_host(
     return rows
 
 
-__all__ = ["build_tech_table_for_host"]
+__all__ = [
+    "build_tech_table_for_host",
+    "KERNEL_DETECTION_BLACKLIST",
+    "MIN_PUBLIC_VERSIONS",
+]

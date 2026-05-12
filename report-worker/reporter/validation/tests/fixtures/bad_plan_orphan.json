@@ -1,0 +1,23 @@
+{
+  "overall_risk": "LOW",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Schwache TLS-Cipher aktiv",
+      "severity": "LOW",
+      "cvss_score": 3.7,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "description": "TLS-Cipher schwach konfiguriert auf TLS-Endpoint.",
+      "evidence": {"port": "443"},
+      "impact": "Downgrade-Angriffe theoretisch möglich.",
+      "recommendation": "Schwache TLS-Cipher entfernen."
+    }
+  ],
+  "recommendations": [
+    {
+      "text": "Regelmäßige Wiederholung des TLS-Scans empfohlen.",
+      "finding_refs": []
+    }
+  ],
+  "package": "perimeter"
+}

@@ -1,0 +1,17 @@
+{
+  "overall_risk": "LOW",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Veraltete Frontend-Komponenten erkannt",
+      "severity": "LOW",
+      "cvss_score": 3.1,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "description": "Frontend-Komponenten in der Tech-Tabelle ausgewiesen.",
+      "impact": "Veraltete Frontend-Bibliotheken erhöhen Angriffsfläche.",
+      "recommendation": "Aktualisieren auf gepflegte Versionen."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

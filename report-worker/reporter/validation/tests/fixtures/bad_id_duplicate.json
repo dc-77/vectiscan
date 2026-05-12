@@ -1,0 +1,27 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Finding alpha mit eigenem Titel",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "Alpha-Beschreibung mit Detail.",
+      "impact": "Alpha-Impact.",
+      "recommendation": "Alpha-Massnahme."
+    },
+    {
+      "id": "VS-2026-001",
+      "title": "Finding beta mit anderem Titel",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "Beta-Beschreibung mit Detail.",
+      "impact": "Beta-Impact.",
+      "recommendation": "Beta-Massnahme."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

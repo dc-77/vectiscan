@@ -1,0 +1,17 @@
+{
+  "overall_risk": "LOW",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Information-Disclosure via Server-Banner",
+      "severity": "LOW",
+      "cvss_score": 3.1,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "description": "Banner zeigt internen Komponenten-Namen mit Versionsinfo.",
+      "impact": "Information-Disclosure.",
+      "recommendation": "Server-Banner unterdrücken."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

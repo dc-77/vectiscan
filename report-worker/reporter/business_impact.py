@@ -107,12 +107,21 @@ POLICY_ID_TO_CATEGORIES: dict[str, set[str]] = {
     "SP-EOL-002": {"data_exposure", "access_control"},
     "SP-EOL-003": {"data_exposure", "access_control"},
     "SP-EOL-004": {"access_control"},
+    # M2 Track 2d: EOL + Internet-facing + tech_critical
+    "SP-EOL-005": {"data_exposure", "encryption", "access_control"},
     # WordPress / User-Enum
     "SP-WP-001": {"access_control"},
     "SP-WP-002": {"data_exposure"},
     "SP-ENUM-001": {"data_exposure"},
-    # Database-Port
+    # Database-Port (M2 Track 2d: SP-DB-002 EOL, SP-DB-003 Multi-Host)
     "SP-DB-001": {"data_exposure", "default_login"},
+    "SP-DB-002": {"data_exposure", "default_login", "access_control"},
+    "SP-DB-003": {"data_exposure", "default_login", "access_control"},
+    # Remote-Desktop (M2 Track 2d, SP-RDP-*)
+    # Ransomware-Initialvektor #1 — rdp_smb-Kategorie + default_login
+    "SP-RDP-001": {"rdp_smb", "default_login", "access_control"},
+    "SP-RDP-002": {"rdp_smb", "default_login", "access_control"},
+    "SP-RDP-003": {"rdp_smb", "default_login", "access_control"},
     # CORS / JS / SRI / SSH
     "SP-CORS-001": {"access_control", "api_security"},
     "SP-JS-001": {"access_control"},

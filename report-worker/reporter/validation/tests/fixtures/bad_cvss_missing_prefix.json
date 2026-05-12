@@ -1,0 +1,17 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Vektor ohne CVSS-3.1-Prefix gespeichert",
+      "severity": "MEDIUM",
+      "cvss_score": 5.5,
+      "cvss_vector": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "description": "Der CVSS-Vektor ist ohne den CVSS:3.1/-Prefix gespeichert.",
+      "impact": "Inkonsistente Formatierung verhindert deterministisches Parsing.",
+      "recommendation": "Vektor mit Prefix CVSS:3.1/ versehen."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

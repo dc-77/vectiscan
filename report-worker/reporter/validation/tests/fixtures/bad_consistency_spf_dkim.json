@@ -1,0 +1,18 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "SPF-Record konfiguratorisch problematisch",
+      "severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+      "description": "Der DKIM-Selector default._domainkey liefert keinen gültigen DNS-TXT-Record. DKIM ist somit nicht aktiv.",
+      "evidence": {"selector": "default._domainkey", "result": "missing"},
+      "impact": "DKIM nicht aktiv, Mail-Signatur fehlt.",
+      "recommendation": "DKIM-Record im DNS hinterlegen."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

@@ -16,6 +16,13 @@ Smart-Fallback (A2): Vars wie cookie_name/private_ip/tech/port werden aus
 evidence/description/affected/tech_profiles abgeleitet wenn KI sie nicht
 explizit liefert. Sicherheitsnetz (A1): wenn der gerenderte Title `?`
 enthaelt aber der KI-Original keine Luecke hat → KI-Original gewinnt.
+
+M2 Track 2b (Mai 2026, P0-01/03/04/05):
+- Service-spezifische Banner-Templates (info_disclosure_banner_ssh/http/...)
+- Service-spezifische Mail-Security-Templates (mail_security_missing_spf/dkim/...)
+- Erweiterte host-Fallback-Kette (affected, affected_hosts, tech_profiles, ...)
+- TitleVarFallbackError + _title_degraded fuer "harte" Hosts-Luecken
+- Title-Token-Linter: nackte Zahlen (z.B. "Plugin 27") werden erkannt
 """
 
 from __future__ import annotations
@@ -243,6 +250,192 @@ TITLE_TEMPLATES: dict[str, str] = {
 }
 
 
+# M2 Track 2b (P0-05): service-spezifische Banner-Templates — gegen Doppel-Titel
+# bei info_disclosure_banner. Dispatcher in apply_title_template waehlt das
+# spezifischere Template wenn finding_type=="info_disclosure_banner" UND
+# title_vars["service"] in {ssh, http, smtp, ftp} gesetzt ist.
+# Discriminated-finding_type-Keys: passend zu finding_type_mapper.py-Patterns.
+SERVICE_BANNER_TEMPLATES: dict[str, str] = {
+    "info_disclosure_banner_ssh":     "SSH-Banner mit Versions-Info auf {host}",
+    "info_disclosure_banner_http":    "HTTP-Header mit Versions-Info auf {host}",
+    "info_disclosure_banner_smtp":    "SMTP-Banner mit Versions-Info auf {host}",
+    "info_disclosure_banner_ftp":     "FTP-Banner mit Versions-Info auf {host}",
+    "info_disclosure_banner_generic": "Service-Banner mit Versions-Info auf {host}",
+}
+
+# M2 Track 2b (P0-03): service-spezifische Mail-Security-Templates — gegen
+# falsche Klassifikation "SPF fehlt" im Title aber "DKIM fehlt" im Body.
+# Discriminated-finding_type-Keys.
+MAIL_SECURITY_TEMPLATES: dict[str, str] = {
+    "mail_security_missing_spf":   "SPF-Record fehlt fuer {domain}",
+    "mail_security_missing_dkim":  "DKIM-Record fehlt fuer {domain}",
+    "mail_security_missing_dmarc": "DMARC-Policy fehlt fuer {domain}",
+    "mail_security_dmarc_none":    "DMARC-Policy ohne Durchsetzung (p=none) fuer {domain}",
+}
+
+
+class TitleVarFallbackError(Exception):
+    """Wird geworfen wenn auch nach voller Fallback-Kette eine Pflicht-Var
+    (typisch {host}) nicht aufgeloest werden kann.
+
+    Wird in apply_titles gefangen → Finding bekommt `_title_degraded=True`,
+    der ValidationGate-Check titles.py meldet das als Error.
+    """
+
+    def __init__(self, finding_id: str | None, var: str, message: str = ""):
+        self.finding_id = finding_id
+        self.var = var
+        super().__init__(message or f"Konnte Title-Var '{var}' fuer Finding {finding_id} nicht aufloesen")
+
+
+# Standard-Service-Ports (Whitelist fuer Token-Linter, deckt sich mit
+# validation/checks/titles.py:_KNOWN_PORTS).
+_KNOWN_PORT_TOKENS: set[str] = {
+    "20", "21", "22", "23", "25", "53", "80", "110", "143",
+    "443", "465", "587", "636", "993", "995",
+    "1433", "1521", "1723", "2049", "3306", "3389",
+    "5432", "5900", "6379", "8080", "8443", "9200", "9300",
+    "27017", "11211", "5060", "5061",
+}
+
+# Einheiten/Plurale die einer Zahl folgen duerfen (z.B. "27 Plugins")
+_NUMBER_UNIT_RE = re.compile(
+    r"^(?:Plugins?|Hosts?|Subdomains?|Findings?|Komponenten|Zeilen|Tage|Tagen|"
+    r"Stunden|Monate|Monaten|Jahre|Jahren|Versionen|MB|GB|KB|TB|kbit|Mbit|Gbit|%)\b",
+    re.IGNORECASE,
+)
+_BARE_NUMBER_TOKEN_RE = re.compile(r"\b(\d+)\b")
+
+
+def _resolve_host_with_fallback(
+    finding: dict[str, Any],
+    scan_context: dict[str, Any] | None,
+) -> str | None:
+    """Aufgeweitete Host-Fallback-Kette fuer P0-01.
+
+    Reihenfolge:
+      1. finding["affected"]            (Liste oder CSV-String → erster Eintrag,
+                                         bei >1 Host: "first (+N weitere)")
+      2. finding["affected_hosts"]      (Liste → join CSV oder first+rest)
+      3. finding["title_vars"]["host"]
+      4. finding["vhost"] / finding["fqdn"]
+      5. finding["host"] / finding["host_ip"] / finding["ip"]
+      6. scan_context.host_inventory.hosts[*].fqdns (CSV-Sammelliste)
+      7. scan_context.tech_profiles[*].fqdns        (CSV-Sammelliste)
+      8. scan_context.domain                          (last resort)
+
+    Returns None wenn nichts auffindbar → Caller wirft TitleVarFallbackError.
+    """
+    def _format_multi(items: list[str]) -> str:
+        items = [str(x).strip() for x in items if x and str(x).strip()]
+        if not items:
+            return ""
+        if len(items) == 1:
+            return items[0]
+        return f"{items[0]} (+{len(items)-1} weitere)"
+
+    # 1. affected
+    affected = finding.get("affected")
+    if isinstance(affected, list) and affected:
+        host = _format_multi([str(x) for x in affected])
+        if host:
+            return host
+    elif isinstance(affected, str) and affected.strip():
+        parts = [p.strip() for p in affected.split(",") if p.strip()]
+        if parts:
+            return _format_multi(parts)
+
+    # 2. affected_hosts (Liste)
+    affected_hosts = finding.get("affected_hosts")
+    if isinstance(affected_hosts, list) and affected_hosts:
+        host = _format_multi([str(x) for x in affected_hosts])
+        if host:
+            return host
+
+    # 3. title_vars["host"]
+    tv = finding.get("title_vars") or {}
+    if isinstance(tv, dict):
+        host = tv.get("host")
+        if host and str(host).strip() and str(host).strip() != "?":
+            return str(host).strip()
+
+    # 4. vhost / fqdn
+    for key in ("vhost", "fqdn"):
+        v = finding.get(key)
+        if v and str(v).strip():
+            return str(v).strip()
+
+    # 5. host / host_ip / ip
+    for key in ("host", "host_ip", "ip"):
+        v = finding.get(key)
+        if v and str(v).strip():
+            return str(v).strip()
+
+    # 6. scan_context.host_inventory.hosts[*].fqdns
+    if scan_context:
+        hi = scan_context.get("host_inventory") or {}
+        hosts = hi.get("hosts") if isinstance(hi, dict) else None
+        if isinstance(hosts, list):
+            fqdns_all: list[str] = []
+            for h in hosts:
+                if isinstance(h, dict):
+                    fqdns = h.get("fqdns") or []
+                    if isinstance(fqdns, list):
+                        fqdns_all.extend([str(f) for f in fqdns if f])
+            if fqdns_all:
+                return ", ".join(dict.fromkeys(fqdns_all))  # de-dup mit Reihenfolge
+
+        # 7. scan_context.tech_profiles[*].fqdns
+        tps = scan_context.get("tech_profiles") or []
+        if isinstance(tps, list):
+            fqdns_all2: list[str] = []
+            for tp in tps:
+                if isinstance(tp, dict):
+                    fqdns = tp.get("fqdns") or []
+                    if isinstance(fqdns, list):
+                        fqdns_all2.extend([str(f) for f in fqdns if f])
+            if fqdns_all2:
+                return ", ".join(dict.fromkeys(fqdns_all2))
+
+        # 8. scan_context.domain
+        d = scan_context.get("domain")
+        if d and str(d).strip():
+            return str(d).strip()
+
+    return None
+
+
+def _validate_title_tokens(title: str) -> tuple[bool, list[str]]:
+    """Title-Linter (P0-04): erkennt nackte Zahl-Tokens ohne Port/Version/Einheit.
+
+    Erlaubt sind:
+      - Standard-Ports (22, 80, 443, ...)
+      - Versionsnummern mit Punkt (1.2.3 — bereits Bestandteil eines groesseren Tokens)
+      - Zahlen direkt gefolgt von einer Einheit ("27 Plugins", "30 Tage")
+
+    Returns: (is_clean, list_of_suspicious_tokens)
+    """
+    suspicious: list[str] = []
+    # Tokens nach Position scannen — Lookahead auf Einheit
+    for m in _BARE_NUMBER_TOKEN_RE.finditer(title):
+        num = m.group(1)
+        start, end = m.span()
+        # Teil einer Versionsnummer? (Punkt davor oder dahinter)
+        before = title[max(0, start - 1):start]
+        after = title[end:end + 1]
+        if before == "." or after == ".":
+            continue
+        # Standard-Port?
+        if num in _KNOWN_PORT_TOKENS:
+            continue
+        # Folgt eine Einheit/Plural?
+        rest = title[end:].lstrip()
+        if _NUMBER_UNIT_RE.match(rest):
+            continue
+        suspicious.append(num)
+    return (len(suspicious) == 0, suspicious)
+
+
 class _SafeDict(dict):
     """Dict-Subclass: gibt '?' zurueck wenn Key fehlt — verhindert KeyError
     bei fehlenden Platzhaltern in str.format_map().
@@ -265,14 +458,37 @@ def apply_title_template(finding: dict[str, Any], scan_context: dict[str, Any] |
     """
     policy_id = (finding.get("policy_id") or "").strip()
     original_title = finding.get("title", "") or ""
+    finding_type = (finding.get("finding_type") or "").strip()
+    title_vars_in = finding.get("title_vars") or {}
+    if not isinstance(title_vars_in, dict):
+        title_vars_in = {}
 
-    if not policy_id:
-        return original_title
+    # M2 Track 2b (P0-05/P0-03): Service-spezifische Templates haben Vorrang
+    # wenn ein Service-Discriminator vorliegt.
+    template: str | None = None
 
-    template = TITLE_TEMPLATES.get(policy_id)
+    # Banner-Service-Discriminator (info_disclosure_banner → ssh/http/smtp/ftp)
+    if finding_type == "info_disclosure_banner":
+        svc = str(title_vars_in.get("service") or "").lower().strip()
+        if svc in {"ssh", "http", "smtp", "ftp"}:
+            template = SERVICE_BANNER_TEMPLATES.get(f"info_disclosure_banner_{svc}")
+        else:
+            template = SERVICE_BANNER_TEMPLATES.get("info_disclosure_banner_generic")
+    # Service-spezifischer finding_type direkt (mail_security_missing_dkim etc.)
+    elif finding_type in SERVICE_BANNER_TEMPLATES:
+        template = SERVICE_BANNER_TEMPLATES[finding_type]
+    elif finding_type in MAIL_SECURITY_TEMPLATES:
+        template = MAIL_SECURITY_TEMPLATES[finding_type]
+
+    # Falls noch keins gewaehlt: ueber policy_id (bestehende Logik)
     if template is None:
-        finding["_title_template_missing"] = True
-        return original_title
+        if not policy_id:
+            # Auch ohne policy_id: cleanup-leftover-placeholders laeuft spaeter
+            return original_title
+        template = TITLE_TEMPLATES.get(policy_id)
+        if template is None:
+            finding["_title_template_missing"] = True
+            return original_title
 
     # Vars sammeln: bevorzugt finding.title_vars, sonst aus Felder ableiten
     title_vars: dict[str, Any] = {}
@@ -280,16 +496,11 @@ def apply_title_template(finding: dict[str, Any], scan_context: dict[str, Any] |
         title_vars.update(finding["title_vars"])
 
     # Fallback-Vars aus haeufigen Finding-Feldern (legacy host/domain/cve/cvss)
-    if "host" not in title_vars:
-        host = (
-            finding.get("vhost")
-            or finding.get("fqdn")
-            or finding.get("affected_hosts", [None])[0]
-            or finding.get("host_ip")
-            or finding.get("host")
-        )
+    # M2 Track 2b (P0-01): aufgeweitete Host-Fallback-Kette.
+    if "host" not in title_vars or not str(title_vars.get("host") or "").strip() or title_vars.get("host") == "?":
+        host = _resolve_host_with_fallback(finding, scan_context)
         if host:
-            title_vars["host"] = str(host)
+            title_vars["host"] = host
     if "domain" not in title_vars and scan_context:
         title_vars["domain"] = scan_context.get("domain", "?")
     if "domain" not in title_vars and "host" in title_vars:
@@ -340,6 +551,7 @@ def _cleanup_leftover_placeholders(
     title: str,
     finding: dict[str, Any],
     scan_context: dict[str, Any] | None,
+    strict: bool = False,
 ) -> str:
     """Ersetze uebrig gebliebene ``{platzhalter}`` im Title.
 
@@ -348,30 +560,44 @@ def _cleanup_leftover_placeholders(
     ist (oder das Template fehlt), bleibt der literal Placeholder stehen.
     Wir versuchen jede uebrig gebliebene Variable aus title_vars +
     abgeleiteten Quellen + affected_hosts/vhost/finding-Feldern zu ersetzen.
+
+    M2 Track 2b (P0-01): mit `strict=True` raisen wir TitleVarFallbackError,
+    wenn {host} nach der vollen Fallback-Kette nicht aufloesbar ist. Caller
+    (apply_titles) verwendet strict=True und fangt die Exception ab.
+    `strict=False` (default) ist der legacy-Pfad — gibt einen lesbaren Title
+    auch ohne Host zurueck (z.B. "JavaScript-Lib mit Schwachstelle").
     """
     if "{" not in title:
         return title
 
-    # Quellen-Lookup wie in apply_title_template
+    # Quellen-Lookup wie in apply_title_template — mit aufgeweiteter Host-Kette
     title_vars: dict[str, Any] = {}
     if isinstance(finding.get("title_vars"), dict):
         title_vars.update(finding["title_vars"])
-    if "host" not in title_vars:
-        host = (
-            finding.get("vhost")
-            or finding.get("fqdn")
-            or finding.get("affected_hosts", [None])[0]
-            or finding.get("host_ip")
-            or finding.get("host")
-        )
+    if "host" not in title_vars or not str(title_vars.get("host") or "").strip() or title_vars.get("host") == "?":
+        host = _resolve_host_with_fallback(finding, scan_context)
         if host:
-            title_vars["host"] = str(host)
+            title_vars["host"] = host
     if "domain" not in title_vars and scan_context:
         title_vars["domain"] = scan_context.get("domain", "")
     if "cve_id" not in title_vars and finding.get("cve"):
         title_vars["cve_id"] = finding["cve"]
     if "cvss" not in title_vars and finding.get("cvss_score"):
         title_vars["cvss"] = finding["cvss_score"]
+
+    # Pflicht-Pruefung (nur strict-Pfad): ist {host} Bestandteil des Templates
+    # und nicht aufloesbar?
+    if strict:
+        placeholder_keys = _LEFTOVER_PLACEHOLDER_RE.findall(title)
+        if "host" in placeholder_keys:
+            v = title_vars.get("host")
+            if v in (None, "", "?"):
+                raise TitleVarFallbackError(
+                    finding.get("id"),
+                    "host",
+                    f"Konnte {{host}} fuer Finding {finding.get('id')} nicht aufloesen "
+                    f"(keine affected/affected_hosts/vhost/host_ip/scan_context-Quelle)",
+                )
 
     def _replace(m: re.Match) -> str:
         key = m.group(1)
@@ -400,18 +626,53 @@ def apply_titles(findings: list[dict[str, Any]],
     """Wendet Title-Templates auf alle Findings an. Modifiziert in-place.
 
     Returns: Anzahl der Findings deren Title durch Template ueberschrieben wurde.
+
+    M2 Track 2b:
+    - Faengt TitleVarFallbackError → Finding bekommt `_title_degraded=True`.
+    - Token-Linter (P0-04): finale Titel mit nackten Zahl-Tokens werden
+      degradiert (z.B. "WordPress-Plugin 27 ..."). `_title_degraded=True` +
+      `_title_suspicious_tokens` gesetzt.
     """
     overridden = 0
     for f in findings:
-        new_title = apply_title_template(f, scan_context)
+        try:
+            new_title = apply_title_template(f, scan_context)
+        except TitleVarFallbackError as e:
+            f["_title_degraded"] = True
+            f["_title_degraded_reason"] = f"var_fallback_failed:{e.var}"
+            logger.warning(
+                "title_var_fallback_failed finding_id=%s var=%s",
+                e.finding_id, e.var,
+            )
+            new_title = f.get("title", "") or ""
         if new_title and new_title != f.get("title"):
             f["title"] = new_title
             overridden += 1
         # PR-H: leftover-Cleanup auch bei nicht-ueberschriebenen Titles
         # (Original-KI-Title mit literalen Platzhaltern).
-        final_title = _cleanup_leftover_placeholders(
-            f.get("title", "") or "", f, scan_context,
-        )
+        try:
+            final_title = _cleanup_leftover_placeholders(
+                f.get("title", "") or "", f, scan_context, strict=True,
+            )
+        except TitleVarFallbackError as e:
+            f["_title_degraded"] = True
+            f["_title_degraded_reason"] = f"var_fallback_failed:{e.var}"
+            logger.warning(
+                "title_cleanup_var_fallback_failed finding_id=%s var=%s",
+                e.finding_id, e.var,
+            )
+            final_title = f.get("title", "") or ""
         if final_title != f.get("title"):
             f["title"] = final_title
+
+        # M2 Track 2b (P0-04): Token-Linter — nackte Zahlen ohne Port/Version/Unit
+        if f.get("title"):
+            is_clean, suspicious = _validate_title_tokens(f["title"])
+            if not is_clean:
+                f["_title_degraded"] = True
+                f["_title_suspicious_tokens"] = suspicious
+                logger.info(
+                    "title_token_linter_flagged finding_id=%s suspicious=%s title=%r",
+                    f.get("id"), suspicious, f["title"][:80],
+                )
     return overridden

@@ -156,6 +156,10 @@ def _map_finding(f: dict[str, Any]) -> dict[str, Any]:
     """Map a Claude finding to the Skill finding format with German labels."""
     return {
         "id": _safe(f["id"]),
+        # M1 / Doc 02: external_id ist kundensichtbar (gleich id), policy_id
+        # ist interner Audit-Trail-Anker (Doc 02 Seite 11+, "Interne Referenz").
+        "external_id": _safe(f.get("external_id", f.get("id"))),
+        "policy_id": _safe(f.get("policy_id", "")),
         "title": _safe(f["title"]),
         "severity": f["severity"],
         "cvss_score": f["cvss_score"],
@@ -166,6 +170,10 @@ def _map_finding(f: dict[str, Any]) -> dict[str, Any]:
         "evidence": _safe(f["evidence"]),
         "impact": _safe(f["impact"]),
         "recommendation": _safe(f["recommendation"]),
+        # M2 Track 2a: Hygiene-/CVSS-Diskriminator für v2-Renderer (A.1/A.2)
+        "scale": f.get("scale", "cvss"),
+        "hygiene_level": f.get("hygiene_level"),
+        "score_provenance": f.get("score_provenance"),
         # Deutsche Labels
         "label_description": "Beschreibung",
         "label_evidence": "Nachweis",
@@ -178,6 +186,9 @@ def _map_basic_finding(f: dict[str, Any]) -> dict[str, Any]:
     """Map a basic-package Claude finding."""
     return {
         "id": _safe(f["id"]),
+        # M1 / Doc 02: external_id (kundensichtbar) + policy_id (intern).
+        "external_id": _safe(f.get("external_id", f.get("id"))),
+        "policy_id": _safe(f.get("policy_id", "")),
         "title": _safe(f["title"]),
         "severity": f["severity"],
         "cvss_score": f.get("cvss_score", "—"),
@@ -188,6 +199,10 @@ def _map_basic_finding(f: dict[str, Any]) -> dict[str, Any]:
         "evidence": _safe(f.get("evidence", "—")),
         "impact": _safe(f.get("impact", "—")),
         "recommendation": _safe(f["recommendation"]),
+        # M2 Track 2a: Hygiene-/CVSS-Diskriminator für v2-Renderer (A.1/A.2)
+        "scale": f.get("scale", "cvss"),
+        "hygiene_level": f.get("hygiene_level"),
+        "score_provenance": f.get("score_provenance"),
         # Deutsche Labels
         "label_description": "Beschreibung",
         "label_evidence": "Nachweis",
@@ -200,6 +215,9 @@ def _map_positive_finding(f: dict[str, Any]) -> dict[str, Any]:
     """Map a positive finding (INFO severity) with German labels."""
     return {
         "id": f.get("id", f"VS-{_CURRENT_YEAR}-POS"),
+        # M1 / Doc 02: external_id (kundensichtbar) + policy_id (intern).
+        "external_id": _safe(f.get("external_id", f.get("id", f"VS-{_CURRENT_YEAR}-POS"))),
+        "policy_id": _safe(f.get("policy_id", "")),
         "title": _safe(f["title"]),
         "severity": "INFO",
         "cvss_score": "—",
@@ -211,6 +229,10 @@ def _map_positive_finding(f: dict[str, Any]) -> dict[str, Any]:
         "impact": "Positiver Befund — korrekte Konfiguration.",
         "recommendation": "Aktuelle Konfiguration beibehalten.",
         "is_positive_finding": True,
+        # M2 Track 2a: positiv-Findings sind hygienisch neutral
+        "scale": f.get("scale", "cvss"),
+        "hygiene_level": f.get("hygiene_level"),
+        "score_provenance": f.get("score_provenance"),
         "label_description": "Beschreibung",
         "label_evidence": "Nachweis",
         "label_impact": "Bewertung",
@@ -1748,4 +1770,139 @@ def map_to_report_data(
 
         log.info("tr03116_compliance_added", hosts=len(tr03116_results))
 
+    # M3: V2-Renderer-Augmentierung. ENV-Flag-gesteuert.
+    # Default ist v1 (Legacy). Big-Bang-Cutover erst in M6.
+    import os as _os
+    if _os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower() == "v2":
+        _augment_for_v2(
+            report_data, claude_output, host_inventory, package, scan_meta,
+        )
+
     return report_data
+
+
+def _augment_for_v2(
+    report_data: dict[str, Any],
+    claude_output: dict[str, Any],
+    host_inventory: dict[str, Any],
+    package: str,
+    scan_meta: dict[str, Any],
+) -> None:
+    """Erweitert report_data um v2-spezifische Felder.
+
+    Greift NICHT in v1-Felder ein -- der alte Renderer ignoriert die neuen
+    Keys, der v2-Renderer konsumiert sie zusaetzlich.
+
+    Felder (M3 + M4):
+      - report_data["_renderer_layout"] = "v2"
+      - report_data["domain"]
+      - report_data["layer1"]               (M3 Aggregator)
+      - report_data["scope_meta"]           (M4 4c)
+      - report_data["methodology_stats"]    (M4 4c)
+      - report_data["business_context"]     (M4 4b)
+      - report_data["compliance_indicators"](M4 4a)
+      - report_data["tech_table_v2"]        (M4 4d)
+      - report_data["service_cards"]        (M4 4d)
+      - report_data["posture_indicators"]   (M4 4d)
+      - report_data["befund_landschaft"]    (M4 4d)
+    """
+    report_data["_renderer_layout"] = "v2"
+    report_data["domain"] = (
+        scan_meta.get("domain")
+        or host_inventory.get("domain")
+    )
+
+    tech_profiles = scan_meta.get("techProfiles") or []
+
+    # Layer1-Aggregation (Risiko-Ampel + Top-3-Hebel) -- lazy import,
+    # damit das Skelett auch funktioniert, wenn der Aggregator-Agent
+    # noch nicht gemerged ist.
+    try:
+        from reporter.layer1_aggregator import build_layer1  # type: ignore
+        report_data["layer1"] = build_layer1(
+            findings=claude_output.get("findings") or [],
+            recommendations=claude_output.get("recommendations") or [],
+            host_inventory=host_inventory,
+            package=package,
+        )
+    except ImportError:
+        log.info(
+            "v2_augment_layer1_aggregator_missing",
+            reason="layer1_aggregator not importable yet",
+        )
+        report_data["layer1"] = None
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_layer1_aggregator_failed", error=str(exc))
+        report_data["layer1"] = None
+
+    # ---- M4 Track 4c: Scope-Meta + Methodology-Stats ---------------
+    try:
+        from reporter.v2_data import (
+            build_scope_meta, build_methodology_stats,
+            build_compliance_indicators, build_tech_table_v2,
+        )
+        report_data["scope_meta"] = build_scope_meta(
+            scan_meta, host_inventory, claude_output,
+        )
+        report_data["methodology_stats"] = build_methodology_stats(
+            scan_meta, claude_output,
+        )
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_scope_methodology_failed", error=str(exc))
+        report_data.setdefault("scope_meta", None)
+        report_data.setdefault("methodology_stats", None)
+
+    # ---- M4 Track 4b: Business-Context -----------------------------
+    try:
+        from reporter.business_context import build_business_context
+        report_data["business_context"] = build_business_context(
+            scan_meta, host_inventory, claude_output,
+        )
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_business_context_failed", error=str(exc))
+        report_data["business_context"] = None
+
+    # ---- M4 Track 4a: Compliance-Indikatoren (Frontpage) -----------
+    try:
+        from reporter.v2_data import build_compliance_indicators
+        report_data["compliance_indicators"] = build_compliance_indicators(
+            claude_output, report_data.get("business_context"),
+        )
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_compliance_indicators_failed", error=str(exc))
+        report_data["compliance_indicators"] = None
+
+    # ---- M4 Track 4d: Tech-Table v2 / Service-Cards / Posture / Landschaft
+    try:
+        from reporter.v2_data import build_tech_table_v2
+        report_data["tech_table_v2"] = build_tech_table_v2(
+            host_inventory, tech_profiles,
+        )
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_tech_table_v2_failed", error=str(exc))
+        report_data["tech_table_v2"] = None
+
+    try:
+        from reporter.befund_landschaft import (
+            build_service_cards, build_befund_landschaft,
+        )
+        report_data["service_cards"] = build_service_cards(
+            host_inventory, tech_profiles,
+        )
+        report_data["befund_landschaft"] = build_befund_landschaft(
+            claude_output.get("findings") or [],
+            claude_output.get("positive_findings") or [],
+        )
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_landschaft_failed", error=str(exc))
+        report_data.setdefault("service_cards", None)
+        report_data.setdefault("befund_landschaft", None)
+
+    try:
+        from reporter.posture_v2 import build_posture_indicators
+        report_data["posture_indicators"] = build_posture_indicators(
+            claude_output, report_data.get("tr03116_compliance"),
+        )
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_posture_indicators_failed", error=str(exc))
+        report_data["posture_indicators"] = None

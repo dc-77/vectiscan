@@ -367,13 +367,136 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
 ]
 
 
+# M2 Track 2b (P0-05): Banner-Service-Discriminator-Patterns. Wenn
+# finding_type=="server_banner_with_version" gesetzt wird, leiten wir
+# zusaetzlich title_vars["service"] = "ssh"|"http"|"smtp"|"ftp" ab.
+_BANNER_SERVICE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
+    # SSH: OpenSSH-Banner haben Praefix "SSH-2.0-"
+    (re.compile(
+        r"\bSSH-2\.0\b|\bOpenSSH\b|\blibssh\b|\bdropbear\b|"
+        r"ssh[-_ ]?(?:banner|server|service|dienst)|"
+        r"\b(?:port\s*)?22\b.*(?:ssh|banner)",
+        re.I,
+     ), "ssh"),
+    # HTTP/Web: Apache/nginx/IIS/X-Powered-By
+    (re.compile(
+        r"\b(?:apache|nginx|iis|microsoft-iis|caddy|lighttpd|tomcat|jetty)\b"
+        r"|x[-_ ]?powered[-_ ]?by"
+        r"|http[-_ ]?(?:header|banner|response)"
+        r"|server[-_ ]?(?:header).*(?:apache|nginx|iis)",
+        re.I,
+     ), "http"),
+    # SMTP: ESMTP/Postfix/Sendmail/Exim
+    (re.compile(
+        r"\bESMTP\b|\bPostfix\b|\bSendmail\b|\bExim\b|\bMailEnable\b|"
+        r"smtp[-_ ]?(?:banner|server|service|greeting)|"
+        r"\b220\b.*smtp",
+        re.I,
+     ), "smtp"),
+    # FTP: ProFTPD/vsftpd/Pure-FTPd
+    (re.compile(
+        r"\bProFTPD\b|\bvsftpd\b|\bPure-FTPd\b|\bFileZilla\s*Server\b|"
+        r"ftp[-_ ]?(?:banner|server|service|greeting)|"
+        r"\b220\b.*ftp",
+        re.I,
+     ), "ftp"),
+]
+
+
+def _detect_banner_service(finding: dict) -> Optional[str]:
+    """Leitet aus evidence/title/description/affected den Service-Typ
+    eines info_disclosure_banner-Findings ab. Returns: "ssh"|"http"|"smtp"|"ftp"|None.
+    """
+    blobs: list[str] = []
+    for key in ("title", "description", "evidence", "affected", "service", "protocol"):
+        v = finding.get(key)
+        if isinstance(v, str):
+            blobs.append(v)
+        elif isinstance(v, dict):
+            # evidence kann dict sein → str-Werte sammeln
+            for vv in v.values():
+                if isinstance(vv, str):
+                    blobs.append(vv)
+    haystack = " | ".join(blobs)
+    if not haystack:
+        return None
+    for pat, svc in _BANNER_SERVICE_PATTERNS:
+        if pat.search(haystack):
+            return svc
+    return None
+
+
+# M2 Track 2b (P0-03): Mail-Security Cross-Check zwischen Title-Pattern und Body.
+# "SPF im Title aber DKIM im Body" → re-klassifizieren auf das Body-Pattern.
+_MAIL_KEY_PATTERNS = {
+    "spf":   re.compile(r"\bSPF\b", re.I),
+    "dkim":  re.compile(r"\bDKIM\b", re.I),
+    "dmarc": re.compile(r"\bDMARC\b", re.I),
+}
+
+# Mapping: erkannter Body-Key → severity_policy finding_type
+_MAIL_KEY_TO_FINDING_TYPE = {
+    "spf":   "spf_missing",
+    "dkim":  "dkim_missing",
+    "dmarc": "dmarc_missing",
+}
+
+
+def _crosscheck_mail_security(finding: dict, mapped_type: Optional[str]) -> Optional[str]:
+    """Wenn mapped_type ein SPF/DKIM/DMARC-_missing-Typ ist, pruefe ob Body
+    einen ANDEREN Mail-Key staerker erwaehnt. Falls ja → re-klassifizieren.
+
+    Beispiel: Title "SPF fehlt", Description "DKIM-Record nicht gesetzt".
+    → return "dkim_missing".
+
+    Falls alle drei Keys (SPF + DKIM + DMARC) im Body genannt sind → mapped_type
+    bleibt (generischer Mail-Security-Sammelbefund).
+    """
+    if mapped_type not in {"spf_missing", "dkim_missing", "dmarc_missing"}:
+        return None
+
+    title = str(finding.get("title") or "")
+    body_parts = [
+        str(finding.get("description") or ""),
+        str(finding.get("impact") or ""),
+        str(finding.get("evidence") or ""),
+    ]
+    body = " | ".join(body_parts)
+    if not body.strip():
+        return None
+
+    title_keys = {k for k, p in _MAIL_KEY_PATTERNS.items() if p.search(title)}
+    body_keys = {k for k, p in _MAIL_KEY_PATTERNS.items() if p.search(body)}
+
+    # Wenn alle drei im Body genannt sind → generisch bleiben.
+    if body_keys >= {"spf", "dkim", "dmarc"}:
+        return mapped_type
+
+    # Wenn mapped_type aus Title-Pattern resultiert (z.B. "spf_missing") aber
+    # body_keys NUR einen anderen Key enthaelt → re-klassifizieren.
+    type_to_key = {"spf_missing": "spf", "dkim_missing": "dkim", "dmarc_missing": "dmarc"}
+    current_key = type_to_key[mapped_type]
+    other_body_keys = body_keys - {current_key}
+
+    # Wenn current_key NICHT im Body, aber genau ein anderer Key DA ist → switch
+    if current_key not in body_keys and len(other_body_keys) == 1:
+        new_key = next(iter(other_body_keys))
+        return _MAIL_KEY_TO_FINDING_TYPE[new_key]
+
+    # Wenn current_key auch im Body ist, behalten wir mapped_type bei
+    # (Body bestaetigt Title).
+    return None
+
+
 def map_finding_type(finding: dict) -> Optional[str]:
     """Klassifiziert ein Claude-Finding in einen severity_policy finding_type.
 
     Reihenfolge der Auswertung:
     1. Wenn `cve` oder `cve_id` gesetzt → "cve_finding"
     2. Pattern-Matching ueber title + description + cwe (in dieser Reihenfolge)
-    3. Wenn nichts greift: None (Caller faellt auf SP-FALLBACK zurueck)
+    3. M2 Track 2b: Mail-Security-Crosscheck (P0-03) — SPF/DKIM/DMARC
+       Title vs. Body, re-klassifizieren wenn Body abweicht.
+    4. Wenn nichts greift: None (Caller faellt auf SP-FALLBACK zurueck)
     """
     # 1. CVE-Finding hat eigenen Pfad in severity_policy
     if finding.get("cve") or finding.get("cve_id"):
@@ -393,11 +516,19 @@ def map_finding_type(finding: dict) -> Optional[str]:
     if not haystack:
         return None
 
+    mapped: Optional[str] = None
     for pattern, finding_type in _PATTERNS:
         if pattern.search(haystack):
-            return finding_type
+            mapped = finding_type
+            break
 
-    return None
+    # 3. Mail-Security Cross-Check
+    if mapped:
+        crosschecked = _crosscheck_mail_security(finding, mapped)
+        if crosschecked:
+            mapped = crosschecked
+
+    return mapped
 
 
 def annotate_finding_types(findings: list[dict],
@@ -416,13 +547,26 @@ def annotate_finding_types(findings: list[dict],
     for f in findings:
         if f.get("finding_type"):
             f.setdefault("_finding_type_source", "preset")
-            continue
-        inferred = map_finding_type(f)
-        if inferred:
-            f["finding_type"] = inferred
-            f["_finding_type_source"] = "regex"
         else:
-            needs_ai.append(f)
+            inferred = map_finding_type(f)
+            if inferred:
+                f["finding_type"] = inferred
+                f["_finding_type_source"] = "regex"
+            else:
+                needs_ai.append(f)
+
+        # M2 Track 2b (P0-05): Wenn finding_type == "info_disclosure_banner"
+        # oder "server_banner_with_version" → service-Discriminator ableiten.
+        ft = f.get("finding_type") or ""
+        if ft in ("info_disclosure_banner", "server_banner_with_version"):
+            tv = f.get("title_vars")
+            if not isinstance(tv, dict):
+                tv = {}
+                f["title_vars"] = tv
+            if not tv.get("service"):
+                svc = _detect_banner_service(f)
+                if svc:
+                    tv["service"] = svc
 
     if use_ai_fallback and needs_ai:
         try:

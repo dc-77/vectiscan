@@ -1,0 +1,37 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "Finding A unique",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "Beschreibung A.",
+      "impact": "Impact A.",
+      "recommendation": "Recommend A."
+    },
+    {
+      "id": "VS-2026-002",
+      "title": "Finding B unique",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "Beschreibung B.",
+      "impact": "Impact B.",
+      "recommendation": "Recommend B."
+    },
+    {
+      "id": "VS-2026-004",
+      "title": "Finding D unique",
+      "severity": "MEDIUM",
+      "cvss_score": 5.0,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+      "description": "Beschreibung D.",
+      "impact": "Impact D.",
+      "recommendation": "Recommend D."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}
