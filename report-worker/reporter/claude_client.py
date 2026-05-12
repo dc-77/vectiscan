@@ -831,23 +831,24 @@ def call_claude(
                 # + Recommendation-Priorisierung. Budget 12K bei max 32K.
                 # Sonnet-Reports laufen ohne Thinking (haben begrenztere
                 # Komplexitaet, brauchen es nicht).
+                # PR-I (Mai 2026): Opus 4.7 hat zwei API-Brueche gegenueber 4.6:
+                # 1. `thinking.type.enabled` -> nur noch `adaptive` + effort
+                # 2. `temperature` ist deprecated (HTTP 400 "temperature is
+                #    deprecated for this model")
+                # Daher: bei Opus 4.7 weder temperature noch thinking setzen.
+                is_opus_47 = "opus-4-7" in model
+                is_opus_legacy = "opus" in model and not is_opus_47
+
                 api_kwargs: dict[str, Any] = {
                     "model": model,
                     "max_tokens": max_tokens,
                     "system": system_param,
                     "messages": messages_payload,
-                    "temperature": 0.0,
                     "timeout": api_timeout,
                 }
-                # Extended Thinking: bei Opus 4.6 mit `{type: enabled, budget_tokens}`.
-                # Opus 4.7 hat das alte Format verworfen und verlangt jetzt
-                # `{type: adaptive}` + `output_config.effort` (HTTP 400-Error
-                # "thinking.type.enabled is not supported for this model").
-                # Solange das neue Schema noch nicht stabil im SDK ist, lassen
-                # wir bei Opus 4.7 thinking ganz weg — das Modell ist auch ohne
-                # Extended Thinking deutlich staerker als Opus 4.6.
-                is_opus_47 = "opus-4-7" in model
-                is_opus_legacy = "opus" in model and not is_opus_47
+                if not is_opus_47:
+                    api_kwargs["temperature"] = 0.0
+
                 if is_opus_legacy and max_tokens >= 16000:
                     api_kwargs["temperature"] = 1.0  # Anthropic-Constraint mit thinking
                     api_kwargs["thinking"] = {

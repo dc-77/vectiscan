@@ -414,24 +414,25 @@ def cached_call(*,
     else:
         system_param = system
 
+    # PR-I (Mai 2026): Opus 4.7 hat zwei API-Brueche gegenueber 4.6:
+    # 1. `thinking.type.enabled` -> nur noch `adaptive` + effort
+    # 2. `temperature` ist deprecated (HTTP 400)
+    # Daher bei Opus 4.7 weder temperature noch thinking setzen.
+    is_opus_47 = "opus-4-7" in model
+
     api_kwargs: dict[str, Any] = {
         "model": model,
         "system": system_param,
         "messages": messages,
-        "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if not is_opus_47:
+        api_kwargs["temperature"] = temperature
     if tools:
         api_kwargs["tools"] = tools
 
     # M3 Extended Thinking (PR-KI-Optim, 2026-05-03): wenn budget gesetzt,
     # Thinking-Block aktivieren. Anthropic verlangt budget < max_tokens.
-    # PR-I (Mai 2026): Bei Opus 4.7 ist `{type:enabled, budget_tokens}` nicht
-    # mehr supportet — HTTP 400. Neues Schema waere `{type:adaptive}` +
-    # output_config.effort, aber das ist noch nicht stabil. Solange: bei
-    # Opus 4.7 thinking ueberspringen. Modell ist auch ohne Extended Thinking
-    # stark genug.
-    is_opus_47 = "opus-4-7" in model
     if thinking_budget and thinking_budget > 0 and not is_opus_47:
         # Bei Thinking ist temperature=1 erforderlich (forciert von Anthropic)
         api_kwargs["temperature"] = 1.0
