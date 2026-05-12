@@ -397,6 +397,20 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      # M2-Ende (2026-06-01): Validation-Gate STRICT. Defekte blockieren PDF-Build,
+      # Order geht auf failed mit Begruendung in error_message. Per ENV-Override
+      # auf "warn" oder "off" zurueckfallbar bei Prod-Incidents (siehe
+      # report-worker/reporter/validation/gate.py:ValidationLevel).
+      # POLICY_VERSION-Default kommt aus severity_policy.py:30 (2026-06-01.1) —
+      # bei Bedarf hier per VECTISCAN_POLICY_VERSION ENV-Var ueberschreiben.
+      VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-strict}
+      # M6 Cutover-Flag (Doc 02 Master-Plan):
+      #   - "v1" (Default): Legacy-Renderer aktiv.
+      #   - "v2": 3-Schichten-Architektur aktiv (Frontpage / Strategie /
+      #     Befund-Details + Anhaenge A-F). Aktivieren erst nach Pilot
+      #     + Tech-Lead-Review. Big-Bang-Flip auf v2 via .env oder hier
+      #     direkt setzen (`VECTISCAN_REPORT_LAYOUT: v2`).
+      VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v1}
     deploy:
       resources:
         limits:
