@@ -1793,7 +1793,7 @@ def _augment_for_v2(
     Greift NICHT in v1-Felder ein -- der alte Renderer ignoriert die neuen
     Keys, der v2-Renderer konsumiert sie zusaetzlich.
 
-    Felder (M3 + M4):
+    Felder (M3 + M4 + M5):
       - report_data["_renderer_layout"] = "v2"
       - report_data["domain"]
       - report_data["layer1"]               (M3 Aggregator)
@@ -1805,6 +1805,8 @@ def _augment_for_v2(
       - report_data["service_cards"]        (M4 4d)
       - report_data["posture_indicators"]   (M4 4d)
       - report_data["befund_landschaft"]    (M4 4d)
+      - report_data["compliance_mappings"]  (M5 5c — Anhang D)
+      - report_data["additional_findings"]  (M5 5c — Anhang E)
     """
     report_data["_renderer_layout"] = "v2"
     report_data["domain"] = (
@@ -1906,3 +1908,37 @@ def _augment_for_v2(
     except Exception as exc:  # pragma: no cover -- defensive
         log.warning("v2_augment_posture_indicators_failed", error=str(exc))
         report_data["posture_indicators"] = None
+
+    # ---- M5 Track 5c: Compliance-Mappings (Anhang D + inline) ------
+    try:
+        from reporter.compliance_mappings import build_compliance_mappings
+        # Mapping ueber die rohen Claude-Findings (bevor _safe-escape die
+        # Text-Felder veraendert) — gibt der Keyword-Klassifikation den
+        # natuerlichen Wortlaut.
+        report_data["compliance_mappings"] = build_compliance_mappings(
+            claude_output.get("findings") or [],
+        )
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_compliance_mappings_failed", error=str(exc))
+        report_data["compliance_mappings"] = {}
+
+    # ---- M5 Track 5c: additional_findings durchreichen (Anhang E) --
+    # Werden vom Renderer fuer die Filter-Statistik aufgeschluesselt.
+    try:
+        report_data["additional_findings"] = list(
+            claude_output.get("additional_findings") or []
+        )
+    except Exception:  # pragma: no cover
+        report_data["additional_findings"] = []
+
+    # ---- M6.1: Screenshot-Pipeline v2 (Body-Hash-Dedup + max 2) ----
+    # Original v1-Screenshots bleiben in report_data["screenshots"], damit
+    # der Alt-Renderer (Big-Bang-Cutover erst in M6.4) nicht unter v2-Caps
+    # leidet. v2 nutzt screenshots_v2.
+    try:
+        from reporter.screenshot_pipeline import dedup_and_cap
+        original_screenshots = report_data.get("screenshots") or []
+        report_data["screenshots_v2"] = dedup_and_cap(original_screenshots)
+    except Exception as exc:  # pragma: no cover - defensive
+        log.warning("v2_augment_screenshots_failed", error=str(exc))
+        report_data["screenshots_v2"] = []

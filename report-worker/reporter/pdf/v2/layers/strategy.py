@@ -15,13 +15,20 @@ from __future__ import annotations
 
 from typing import Any
 
-from reportlab.platypus import Paragraph, Spacer, PageBreak, Table, TableStyle
+import os
+
+from reportlab.platypus import (
+    Paragraph, Spacer, PageBreak, Table, TableStyle, Image, KeepTogether,
+)
 from reportlab.lib.units import mm
 
 from reporter.pdf.branding import COLORS
 from reporter.pdf.v2.flowables import (
     PostureIndicator, ServiceCard, KategorieBlock,
 )
+
+
+_MAX_IMAGE_WIDTH_V2 = 160 * mm
 
 
 # ====================================================================
@@ -336,6 +343,82 @@ def _build_posture_indicators(story, styles, data: dict[str, Any]) -> None:
 
 
 # ====================================================================
+# SCREENSHOTS v2 (M6.1 / Doc 01 Phase J)
+# ====================================================================
+def _build_screenshots_v2(story, styles, data: dict[str, Any]) -> None:
+    """Doc 02 + Doc 01 Phase J: max 2 Screenshots, Body-Hash-dedupliziert,
+    mit Caption fuer Mehrfach-Vorkommen.
+    """
+    entries = data.get("screenshots_v2") or []
+    if not entries:
+        return
+
+    story.append(Spacer(1, 4 * mm))
+    _subsection(story, styles, "Web-Oberflaechen")
+    story.append(Spacer(1, 1 * mm))
+    _body(
+        story, styles,
+        "Die folgenden Screenshots sind eine kuratierte Auswahl: identische "
+        "Standard-Seiten wurden auf ein Vorkommen konsolidiert; Doppel-"
+        "Erwaehnungen finden sich im Bilduntertitel.",
+    )
+    story.append(Spacer(1, 2 * mm))
+
+    label_style = (styles.get("ScreenshotLabel")
+                   or styles.get("SubsectionTitle") or styles["BodyText"])
+    body_style = styles.get("BodyText2") or styles["BodyText"]
+
+    for entry in entries:
+        paths = entry.get("paths") or []
+        if not paths:
+            continue
+        path = paths[0]
+        if not os.path.isfile(path):
+            continue
+        label = entry.get("label") or path
+
+        block = []
+        block.append(Paragraph(f"<b>{label}</b>", label_style))
+        try:
+            img = Image(path)
+            iw, ih = img.drawWidth, img.drawHeight
+            if iw > 0 and ih > 0:
+                scale = min(_MAX_IMAGE_WIDTH_V2 / iw, 1.0)
+                img.drawWidth = iw * scale
+                img.drawHeight = ih * scale
+                # Cap auf max. 120mm Hoehe
+                if img.drawHeight > 120 * mm:
+                    s = 120 * mm / img.drawHeight
+                    img.drawWidth *= s
+                    img.drawHeight = 120 * mm
+            block.append(img)
+        except Exception:
+            # Bild nicht lesbar -> Block verwerfen (keine halben Eintraege).
+            continue
+
+        caption = entry.get("caption")
+        if caption:
+            block.append(Spacer(1, 1 * mm))
+            block.append(Paragraph(f"<i>{caption}</i>", body_style))
+
+        dedup_caption = entry.get("caption_dedup")
+        if dedup_caption:
+            block.append(Spacer(1, 1 * mm))
+            block.append(Paragraph(
+                f"<font color='#64748B'><i>{dedup_caption}</i></font>",
+                body_style,
+            ))
+
+        tech_chips = entry.get("tech_chips") or []
+        if tech_chips:
+            chips_str = "  &middot;  ".join(f"<b>{c}</b>" for c in tech_chips)
+            block.append(Paragraph(chips_str, body_style))
+
+        block.append(Spacer(1, 4 * mm))
+        story.append(KeepTogether(block))
+
+
+# ====================================================================
 # SEITE 8-9 - BEFUND-LANDSCHAFT (Track 4d)
 # ====================================================================
 def _build_befund_landschaft(story, styles, data: dict[str, Any]) -> None:
@@ -387,5 +470,6 @@ def build_layer2_strategy(story, styles, data):
     _build_tech_stack(story, styles, data)
     _build_service_cards(story, styles, data)
     _build_posture_indicators(story, styles, data)
+    _build_screenshots_v2(story, styles, data)
     _build_befund_landschaft(story, styles, data)
     story.append(PageBreak())
