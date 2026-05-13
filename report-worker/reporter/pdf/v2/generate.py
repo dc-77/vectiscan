@@ -6,7 +6,9 @@ Pipeline:
 """
 import os
 
-from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate
+from reportlab.platypus import (
+    BaseDocTemplate, Frame, PageTemplate, NextPageTemplate,
+)
 from reportlab.lib.units import mm
 
 # WIDTH/HEIGHT werden in reporter.generate_report als A4-Tuple exportiert.
@@ -70,6 +72,9 @@ def generate_report_v2(report_data, output_path):
     styles = create_styles()
     story = []
 
+    # Cover-Seite mit Cover-Template, ab Seite 2 normal-Template.
+    # build_cover_v2 emittiert intern NextPageTemplate('normal') + PageBreak,
+    # so dass alle Folge-Seiten das normal-Template nutzen.
     build_cover_v2(story, styles, report_data.get("cover", {}))
     build_layer1_frontpage(story, styles, report_data)
     build_layer2_strategy(story, styles, report_data)

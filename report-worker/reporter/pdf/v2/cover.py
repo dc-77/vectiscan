@@ -1,7 +1,7 @@
 """V2 Cover: Klassifizierung sichtbar, Scope sichtbar, Risk-Indikator NICHT
 auf dem Cover (Datenschutz beim Drucker-Postfach).
 """
-from reportlab.platypus import Paragraph, Spacer, PageBreak
+from reportlab.platypus import Paragraph, Spacer, PageBreak, NextPageTemplate
 from reportlab.lib.units import mm
 
 from reporter.pdf.branding import CLASSIFICATION_LABEL_DE
@@ -45,4 +45,7 @@ def build_cover_v2(story, styles, cover_data):
         f"<font color='#64748B' size='8'>{CLASSIFICATION_LABEL_DE}</font>",
         body_style,
     ))
+    # WICHTIG: NextPageTemplate VOR PageBreak — der PageBreak triggert den
+    # Template-Wechsel beim Beginn der naechsten Seite.
+    story.append(NextPageTemplate("normal"))
     story.append(PageBreak())
