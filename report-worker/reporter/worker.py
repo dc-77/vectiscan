@@ -129,31 +129,75 @@ def _create_report_record(
     """
     download_token = str(uuid.uuid4())
     expires_at = datetime.now(timezone.utc) + timedelta(days=30)
+
+    # Migration 028 (validation_warnings) ist zeitweise nicht in allen Umgebungen
+    # verfuegbar — siehe Pipeline 2455-Issue. Detect column presence at runtime
+    # und passe INSERT entsprechend an. Sobald Migration 028 ueberall durch ist,
+    # kann der Fallback-Pfad entfernt werden.
     with conn.cursor() as cur:
-        cur.execute(
-            """
-            INSERT INTO reports (
-                order_id, minio_bucket, minio_path, file_size_bytes,
-                download_token, expires_at, findings_data, version,
-                excluded_findings, policy_version, policy_id_distinct,
-                tech_profiles, additional_findings, validation_warnings
+        cur.execute("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.columns
+                WHERE table_name = 'reports' AND column_name = 'validation_warnings'
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING id
-            """,
-            (
-                order_id, REPORTS_BUCKET, minio_path, file_size_bytes,
-                download_token, expires_at,
-                json.dumps(findings_data) if findings_data else None,
-                version,
-                json.dumps(excluded_findings) if excluded_findings else None,
-                policy_version,
-                policy_id_distinct,  # psycopg2 maps Python list → TEXT[]
-                json.dumps(tech_profiles) if tech_profiles else None,
-                json.dumps(additional_findings) if additional_findings else None,
-                json.dumps(validation_warnings) if validation_warnings else None,
-            ),
-        )
+        """)
+        has_validation_warnings_col = cur.fetchone()[0]
+
+    with conn.cursor() as cur:
+        if has_validation_warnings_col:
+            cur.execute(
+                """
+                INSERT INTO reports (
+                    order_id, minio_bucket, minio_path, file_size_bytes,
+                    download_token, expires_at, findings_data, version,
+                    excluded_findings, policy_version, policy_id_distinct,
+                    tech_profiles, additional_findings, validation_warnings
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
+                """,
+                (
+                    order_id, REPORTS_BUCKET, minio_path, file_size_bytes,
+                    download_token, expires_at,
+                    json.dumps(findings_data) if findings_data else None,
+                    version,
+                    json.dumps(excluded_findings) if excluded_findings else None,
+                    policy_version,
+                    policy_id_distinct,  # psycopg2 maps Python list → TEXT[]
+                    json.dumps(tech_profiles) if tech_profiles else None,
+                    json.dumps(additional_findings) if additional_findings else None,
+                    json.dumps(validation_warnings) if validation_warnings else None,
+                ),
+            )
+        else:
+            log.warning(
+                "validation_warnings_column_missing_skipping",
+                order_id=order_id,
+                hint="Run Migration 028 (api initDb auto-applies on next API start)",
+            )
+            cur.execute(
+                """
+                INSERT INTO reports (
+                    order_id, minio_bucket, minio_path, file_size_bytes,
+                    download_token, expires_at, findings_data, version,
+                    excluded_findings, policy_version, policy_id_distinct,
+                    tech_profiles, additional_findings
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id
+                """,
+                (
+                    order_id, REPORTS_BUCKET, minio_path, file_size_bytes,
+                    download_token, expires_at,
+                    json.dumps(findings_data) if findings_data else None,
+                    version,
+                    json.dumps(excluded_findings) if excluded_findings else None,
+                    policy_version,
+                    policy_id_distinct,
+                    json.dumps(tech_profiles) if tech_profiles else None,
+                    json.dumps(additional_findings) if additional_findings else None,
+                ),
+            )
         report_id = cur.fetchone()[0]
     conn.commit()
     return str(report_id), download_token

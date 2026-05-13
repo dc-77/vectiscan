@@ -34,6 +34,7 @@ const MIGRATION_024_PATH = path.join(__dirname, '..', 'migrations', '024_determi
 const MIGRATION_025_PATH = path.join(__dirname, '..', 'migrations', '025_subscription_delete_safe.sql');
 const MIGRATION_026_PATH = path.join(__dirname, '..', 'migrations', '026_shodan_pre_warm.sql');
 const MIGRATION_027_PATH = path.join(__dirname, '..', 'migrations', '027_tech_profiles_and_additional_findings.sql');
+const MIGRATION_028_PATH = path.join(__dirname, '..', 'migrations', '028_validation_warnings.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -356,6 +357,28 @@ export async function initDb(): Promise<void> {
   if (!techProfiles027Check.rows[0].exists) {
     const migrationSql = fs.readFileSync(MIGRATION_027_PATH, 'utf-8');
     await pool.query(migrationSql);
+  }
+
+  // Migration 028 (M1, Q2/2026): validation_warnings JSONB auf reports.
+  // Defensive try/catch: falls die Migration aus irgendeinem Grund scheitert
+  // (Permissions, transient DB-Issue, Filesystem-Quirk), soll der API-Start
+  // nicht in eine Restart-Loop fallen — der Report-Worker uebernimmt
+  // validation_warnings auch ohne diese Spalte (Feature degradiert dann).
+  try {
+    const validationWarnings028Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'reports' AND column_name = 'validation_warnings'
+      ) AS exists
+    `);
+    if (!validationWarnings028Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 028: validation_warnings JSONB');
+      const migrationSql = fs.readFileSync(MIGRATION_028_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 028 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 028 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created
