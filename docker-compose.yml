@@ -405,12 +405,13 @@ services:
       # bei Bedarf hier per VECTISCAN_POLICY_VERSION ENV-Var ueberschreiben.
       VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-strict}
       # M6 Cutover-Flag (Doc 02 Master-Plan):
-      #   - "v1" (Default): Legacy-Renderer aktiv.
-      #   - "v2": 3-Schichten-Architektur aktiv (Frontpage / Strategie /
-      #     Befund-Details + Anhaenge A-F). Aktivieren erst nach Pilot
-      #     + Tech-Lead-Review. Big-Bang-Flip auf v2 via .env oder hier
-      #     direkt setzen (`VECTISCAN_REPORT_LAYOUT: v2`).
-      VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v1}
+      #   - "v2" (Default seit 2026-05-13): 3-Schichten-Architektur aktiv
+      #     (Frontpage / Strategie / Befund-Details + Anhaenge A-F).
+      #     Big-Bang-Flip da noch keine echten Customer betroffen.
+      #   - "v1": Legacy-Renderer (bleibt im Code als Fallback bis nach
+      #     mehrwoechiger Pilot-Phase, dann separate Removal-PR).
+      #   Override per .env wenn ein Pilot-Reset noetig ist.
+      VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v2}
     deploy:
       resources:
         limits:
