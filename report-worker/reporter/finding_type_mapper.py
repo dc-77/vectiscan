@@ -355,13 +355,20 @@ _PATTERNS: list[tuple[re.Pattern[str], str]] = [
      ), "software_eol"),
 
     # ── F-P0A-003 — URLhaus / Threat-Intel Compromise ──────
+    # WICHTIG: keine breite `host.*kompromit`-Regel — die matcht greedy bis zu
+    # jedem "kompromittierten Netz/Zwischennetz" im Impact-Text und holt sich
+    # auch FTP-Cleartext-Befunde rein. Stattdessen explizit URLhaus-spezifische
+    # Phrasen.
     (re.compile(
         r"\burlhaus\b|"
-        r"(?:host|domain).*kompromit|"
-        r"(?:malware|phishing|c2|c&c|command[-_ ]?and[-_ ]?control).*"
-        r"(?:distribut|hosting|infrastruktur)|"
         r"abuse\.ch|"
-        r"(?:listed|gelistet)\s+(?:as|als)\s+(?:compromised|kompromittiert)",
+        r"(?:listed|gelistet)\s+(?:as|als)\s+(?:compromised|kompromittiert)|"
+        r"(?:malware|phishing|c2|c&c|command[-_ ]?and[-_ ]?control)[-_ ]"
+        r"(?:distribut|hosting|infrastruktur)|"
+        # "Host kompromittiert" als feste Phrase (max 20 Zeichen Abstand —
+        # erlaubt z.B. "Host xyz.de wird aktiv kompromittiert" aber
+        # blockiert greedy multi-sentence-Sprung).
+        r"(?:host|domain)\b[^.!?]{0,20}\bkompromit",
         re.I,
      ), "urlhaus_compromise_detected"),
 ]

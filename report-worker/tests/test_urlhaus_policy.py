@@ -61,6 +61,40 @@ def test_finding_type_mapper_recognises_urlhaus_text():
     assert map_finding_type(finding) == "urlhaus_compromise_detected"
 
 
+def test_finding_type_mapper_does_not_misclassify_ftp_cleartext_as_urlhaus():
+    """Regression M6.18: das Pattern '(?:host|domain).*kompromit' war zu
+    greedy und matchte greedy bis 'kompromittiertes Zwischennetz' im
+    Impact-Text. Damit wurde der echte FTP-Befund als URLhaus klassifiziert.
+    """
+    ftp = {
+        "title": "FTP-Dienst (Port 21) im Klartext exponiert auf 20.79.218.75",
+        "description": (
+            "Auf dem Host 20.79.218.75, der die EDI- und Mail-"
+            "Webschnittstellen bedient, ist Port 21 (FTP) oeffentlich "
+            "erreichbar."
+        ),
+        "impact": (
+            "Ein Angreifer mit Netzwerkzugriff (z.B. im selben WLAN oder "
+            "ueber ein kompromittiertes Zwischennetz) kann FTP-Anmeldedaten "
+            "mitlesen."
+        ),
+    }
+    result = map_finding_type(ftp)
+    assert result != "urlhaus_compromise_detected", (
+        f"FTP-Cleartext-Befund wurde faelschlich als URLhaus klassifiziert: {result}"
+    )
+
+
+def test_finding_type_mapper_recognises_host_kompromittiert_direct():
+    """Engerer Pattern-Match: 'Host wird aktiv kompromittiert' direkt
+    benannt soll weiterhin urlhaus_compromise_detected matchen."""
+    finding = {
+        "title": "Host wird aktiv kompromittiert",
+        "description": "Beobachtet C2-Verkehr von 192.0.2.1",
+    }
+    assert map_finding_type(finding) == "urlhaus_compromise_detected"
+
+
 def test_apply_policy_sets_critical_severity_for_urlhaus_finding():
     findings = [{
         "finding_type": "urlhaus_compromise_detected",

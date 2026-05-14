@@ -403,11 +403,12 @@ services:
       # report-worker/reporter/validation/gate.py:ValidationLevel).
       # POLICY_VERSION-Default kommt aus severity_policy.py:30 (2026-06-01.1) —
       # bei Bedarf hier per VECTISCAN_POLICY_VERSION ENV-Var ueberschreiben.
-      # M6.3 Pilot 2026-05-13: temporaer WARN damit Re-Gens alter Pre-M2-Orders
-      # nicht von Title-Drift / CVSS-Inconsistency / EOL-Check-Defekten geblockt
-      # werden. Defekte landen in reports.validation_warnings statt Order auf
-      # failed zu setzen. Zurueck auf STRICT nach Pilot-Verifikation.
-      VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-warn}
+      # M6.7 (2026-05-14): zurueck auf STRICT — der Pilot mit den 2 alten
+      # Orders ist abgeschlossen, alle bekannten Mapper-Bugs (M6.18 URLhaus-
+      # Fehlklassifikation) sind gefixt. Defekte blockieren ab jetzt wieder
+      # den PDF-Build (Order -> failed), damit ein neuer Frischscan auf
+      # heuel.com sauber durchgeht.
+      VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-strict}
       # M6 Cutover-Flag (Doc 02 Master-Plan):
       #   - "v2" (Default seit 2026-05-13): 3-Schichten-Architektur aktiv
       #     (Frontpage / Strategie / Befund-Details + Anhaenge A-F).
