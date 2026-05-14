@@ -22,6 +22,20 @@ def build_cover_v2(story, styles, cover_data):
     LIGHT = "#FFFFFF"
     SUBTLE = "#94A3B8"
 
+    # Title splitten: "Sicherheitsbewertung <domain>" → Heading + Domain-Zeile,
+    # damit lange Domains nicht ueber den Frame hinaus laufen.
+    title_text = str(title).strip()
+    headline = title_text
+    domain_line = ""
+    # Bekannte Heading-Prefixe extrahieren
+    for prefix in ("Sicherheitsbewertung", "Security Assessment", "Sicherheits-Assessment"):
+        if title_text.lower().startswith(prefix.lower()):
+            rest = title_text[len(prefix):].strip()
+            if rest:
+                headline = prefix
+                domain_line = rest
+            break
+
     story.append(Spacer(1, 40 * mm))
     story.append(Paragraph(
         f"<font color='{SUBTLE}' size='12'>{subtitle}</font>",
@@ -29,9 +43,15 @@ def build_cover_v2(story, styles, cover_data):
     ))
     story.append(Spacer(1, 6 * mm))
     story.append(Paragraph(
-        f"<font color='{LIGHT}' size='28'><b>{title}</b></font>",
+        f"<font color='{LIGHT}' size='24'><b>{headline}</b></font>",
         body_style,
     ))
+    if domain_line:
+        story.append(Spacer(1, 2 * mm))
+        story.append(Paragraph(
+            f"<font color='{LIGHT}' size='18'>{domain_line}</font>",
+            body_style,
+        ))
     story.append(Spacer(1, 12 * mm))
 
     # Cover-Meta: Domain, Hosts, Paket, Datum -- KEINE Risk-Stufe.

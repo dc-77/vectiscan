@@ -141,7 +141,12 @@ class KategorieBlock(Flowable):
 
 
 class PostureIndicator(Flowable):
-    """Mini-Dashboard fuer Mail/Web/DNS/TLS (Doc 02 Seite 7)."""
+    """Mini-Dashboard fuer Mail/Web/DNS/TLS (Doc 02 Seite 7).
+
+    Pro Sub-Indikator eine farbige Pille (gruen=ok, rot=fail, gelb=warn) mit
+    dem Sub-Label darin. Kein X/OK/! mehr — wirkt sonst wie eine kryptische
+    Statuszeile.
+    """
 
     def __init__(self, label: str, items: list[tuple[str, str]],  # (sub_label, status)
                  width: float = 170 * mm):
@@ -149,7 +154,7 @@ class PostureIndicator(Flowable):
         self.label = label or ""
         self.items = items or []
         self.width = width
-        self.height = 8 * mm
+        self.height = 10 * mm
 
     def wrap(self, *_args):
         return (self.width, self.height)
@@ -158,20 +163,36 @@ class PostureIndicator(Flowable):
         c = self.canv
         c.setFillColor(COLORS["text"])
         c.setFont("Helvetica-Bold", 9)
-        c.drawString(0, 2 * mm, f"{self.label}:")
+        c.drawString(0, 3 * mm, f"{self.label}:")
         x = 60 * mm
+
+        # Pillen-Farben pro Status — gefuellte Rechtecke mit Text drin.
+        bg_colors = {
+            "ok":   HexColor("#16A34A"),   # green-600
+            "fail": HexColor("#DC2626"),   # red-600
+            "warn": HexColor("#CA8A04"),   # yellow-600
+        }
         for sub, status in self.items[:6]:
-            c.setFont("Helvetica", 9)
             status_lc = (status or "").lower()
-            symbol = {"ok": "OK", "fail": "X", "warn": "!"}.get(
+            bg = bg_colors.get(status_lc, COLORS["muted"])
+            # Symbol vor dem Sub-Label
+            symbol = {"ok": "✓", "fail": "✗", "warn": "!"}.get(
                 status_lc, "-")
-            c.setFillColor({
-                "ok": HexColor("#22C55E"),
-                "fail": HexColor("#DC2626"),
-                "warn": HexColor("#EAB308"),
-            }.get(status_lc, COLORS["muted"]))
-            c.drawString(x, 2 * mm, f"{sub} {symbol}")
-            x += 25 * mm
+            pill_text = f" {symbol} {sub} "
+            text_w = c.stringWidth(pill_text, "Helvetica-Bold", 8.5)
+            pill_w = text_w + 2 * mm
+            pill_h = 5.5 * mm
+            pill_y = 1.5 * mm
+            # Gefuelltes Rounded-Rect als Hintergrund
+            c.setFillColor(bg)
+            c.setStrokeColor(bg)
+            c.roundRect(x, pill_y, pill_w, pill_h, 1.5 * mm,
+                        stroke=0, fill=1)
+            # Text in weiss
+            c.setFillColor(HexColor("#FFFFFF"))
+            c.setFont("Helvetica-Bold", 8.5)
+            c.drawString(x + 1 * mm, pill_y + 1.5 * mm, pill_text.strip())
+            x += pill_w + 2 * mm
 
 
 class ServiceCard(Flowable):

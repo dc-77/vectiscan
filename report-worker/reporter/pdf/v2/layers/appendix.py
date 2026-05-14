@@ -286,17 +286,20 @@ def _build_appendix_b(story, styles, data: dict[str, Any]) -> None:
     )
     story.append(Spacer(1, 3 * mm))
 
+    # Hosts mit Ports zuerst, danach eine kompakte Sammel-Zeile mit allen
+    # Hosts ohne erreichbare Ports (verhindert Whitespace-Seitenfortsaetze).
+    empty_hosts: list[str] = []
     for card in cards:
         host_label = card.get("host_label", "?")
         host_ip = card.get("ip") or ""
-        _subsection(story, styles, host_label)
-        story.append(Spacer(1, 1 * mm))
 
         ports = card.get("ports") or []
         if not ports:
-            _body(story, styles, "<i>(keine offenen Ports erkannt)</i>")
-            story.append(Spacer(1, 3 * mm))
+            empty_hosts.append(host_label)
             continue
+
+        _subsection(story, styles, host_label)
+        story.append(Spacer(1, 1 * mm))
 
         rows = []
         for entry in ports:
@@ -328,6 +331,15 @@ def _build_appendix_b(story, styles, data: dict[str, Any]) -> None:
             [16 * mm, 30 * mm, 22 * mm, 102 * mm],
         )
         story.append(Spacer(1, 3 * mm))
+
+    # Sammel-Zeile fuer alle Hosts ohne erreichbare Ports
+    if empty_hosts:
+        story.append(Spacer(1, 2 * mm))
+        _body(
+            story, styles,
+            "<i>Folgende Hosts haben in der externen Pruefung keine "
+            f"erreichbaren Ports gezeigt: {', '.join(empty_hosts)}.</i>",
+        )
 
     story.append(PageBreak())
 
