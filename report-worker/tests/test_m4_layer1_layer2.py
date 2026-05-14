@@ -254,6 +254,40 @@ class TestTrack4dArchitektur:
         assert port_colors[21] == "#F97316"   # orange
         assert port_colors[443] == "#22C55E"  # green
 
+    def test_service_cards_accept_prod_flat_int_format(self):
+        """Prod-Format: scan-worker/phase1.py speichert open_ports als list[int]
+        TOP-LEVEL im tech_profile.json (nicht unter nmap.open_ports)."""
+        host_inv = {"hosts": [{"ip": "5.199.141.24", "fqdns": ["heuel.com"]}]}
+        profiles = [{
+            "ip": "5.199.141.24",
+            "open_ports": [21, 22, 80, 443, 3306, 3389],  # FLAT LIST OF INT
+        }]
+        cards = build_service_cards(host_inv, profiles)
+        assert len(cards) == 1
+        ports_in_order = [p[0] for p in cards[0]["ports"]]
+        # Alle 6 Ports muessen erkannt werden
+        assert set(ports_in_order) == {21, 22, 80, 443, 3306, 3389}
+        # Red-First-Sort: 3306, 3389 zuerst (red), dann 21, 80 (orange),
+        # dann 22, 443 (gruen)
+        assert ports_in_order[0] in (3306, 3389)
+        assert ports_in_order[1] in (3306, 3389)
+
+    def test_service_cards_prefer_services_when_available(self):
+        """Wenn tech_profile['services'] vorhanden ist, sollte der Service-
+        Name daraus gezogen werden (statt nur die Port-Map)."""
+        host_inv = {"hosts": [{"ip": "1.2.3.4", "fqdns": []}]}
+        profiles = [{
+            "ip": "1.2.3.4",
+            "services": [
+                {"port": 8443, "name": "https-alt", "product": "nginx"},
+            ],
+        }]
+        cards = build_service_cards(host_inv, profiles)
+        assert len(cards) == 1
+        # 8443 ist nicht in SERVICE_LABELS -> Fallback nutzt service-Name
+        port_8443 = next((p for p in cards[0]["ports"] if p[0] == 8443), None)
+        assert port_8443 is not None
+
     def test_posture_email_fail_when_dkim_missing(self):
         co = {
             "findings": [

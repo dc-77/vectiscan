@@ -284,46 +284,55 @@ def build_service_cards(
         host_label = f"{(fqdns[0] if fqdns else ip)} - {ip}".strip(" -")
         profile = profile_by_ip.get(ip, {})
 
-        # 1. nmap.open_ports
         ports_seen: set[int] = set()
         port_entries: list[tuple[int, str, str]] = []
+
+        def _add_port(p: Any, svc: str | None = None) -> None:
+            """Akzeptiert int, str, oder dict mit 'port'-Key."""
+            try:
+                if isinstance(p, dict):
+                    port = int(p.get("port"))
+                    svc_in = svc or p.get("service") or p.get("name")
+                else:
+                    port = int(p)
+                    svc_in = svc
+            except (TypeError, ValueError):
+                return
+            if port in ports_seen:
+                return
+            ports_seen.add(port)
+            port_entries.append((
+                port,
+                _port_service_label(port, svc_in),
+                _port_color(port),
+            ))
+
+        # 1. tech_profile["open_ports"] TOP-LEVEL — Prod-Format aus
+        #    scan-worker/scanner/phase1.py:663 (flache list[int]).
+        for entry in profile.get("open_ports") or []:
+            _add_port(entry)
+
+        # 2. tech_profile["services"] (falls vorhanden, dann mit Service-Namen)
+        for entry in profile.get("services") or []:
+            _add_port(entry)
+
+        # 3. tech_profile["nmap"]["open_ports"] — Test-Fixture-Format
         nmap = profile.get("nmap") or {}
         for entry in nmap.get("open_ports") or []:
-            try:
-                port = int(entry.get("port"))
-            except (TypeError, ValueError):
-                continue
-            if port in ports_seen:
-                continue
-            ports_seen.add(port)
-            service_label = _port_service_label(port, entry.get("service"))
-            port_entries.append((port, service_label, _port_color(port)))
+            _add_port(entry)
 
-        # 2. Shodan-exposed_services Fallback
+        # 4. Shodan-exposed_services Fallback
         for entry in profile.get("exposed_services") or []:
             try:
                 port = int(entry.get("port"))
-            except (TypeError, ValueError):
+                svc = (entry.get("service") or "").split(" ")[0] or None
+            except (TypeError, ValueError, AttributeError):
                 continue
-            if port in ports_seen:
-                continue
-            ports_seen.add(port)
-            svc = (entry.get("service") or "").split(" ")[0] or None
-            port_entries.append((port, _port_service_label(port, svc),
-                                 _port_color(port)))
+            _add_port(port, svc)
 
-        # 3. inventory.open_ports (direkt am Host-Eintrag) — wenig benutzt,
-        # aber als Last-Ditch-Fallback ok
+        # 5. host_inventory.hosts[*].open_ports (Last-Ditch-Fallback)
         for entry in h.get("open_ports") or []:
-            try:
-                port = int(entry.get("port") if isinstance(entry, dict) else entry)
-            except (TypeError, ValueError):
-                continue
-            if port in ports_seen:
-                continue
-            ports_seen.add(port)
-            port_entries.append((port, _port_service_label(port, None),
-                                 _port_color(port)))
+            _add_port(entry)
 
         # Stable Sort: Risk-Color first (rot oben), dann Port-Number
         _color_order = {"#DC2626": 0, "#F97316": 1, "#22C55E": 2}

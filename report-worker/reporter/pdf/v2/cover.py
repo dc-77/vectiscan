@@ -15,14 +15,21 @@ def build_cover_v2(story, styles, cover_data):
     )
     body_style = styles.get("BodyText2") or styles["BodyText"]
 
+    # Hintergrund von draw_cover ist dunkel (#1a1a2e) — Texte MUESSEN hell sein.
+    # Auch der klassifizierungs-Bar wird von draw_cover (page decoration)
+    # selbst gerendert; wir bringen ihn NICHT zusaetzlich in der Story unter
+    # (sonst doppelt: einmal Bar unten + einmal Text oben).
+    LIGHT = "#FFFFFF"
+    SUBTLE = "#94A3B8"
+
     story.append(Spacer(1, 40 * mm))
     story.append(Paragraph(
-        f"<font color='#0F172A' size='14'>{subtitle}</font>",
+        f"<font color='{SUBTLE}' size='12'>{subtitle}</font>",
         body_style,
     ))
     story.append(Spacer(1, 6 * mm))
     story.append(Paragraph(
-        f"<font color='#0F172A' size='28'><b>{title}</b></font>",
+        f"<font color='{LIGHT}' size='28'><b>{title}</b></font>",
         body_style,
     ))
     story.append(Spacer(1, 12 * mm))
@@ -37,14 +44,9 @@ def build_cover_v2(story, styles, cover_data):
         if label_str.startswith(("ergebnis", "risiko", "befunde")):
             continue  # NEW v2: Risk-Indikator nicht auf Cover
         story.append(Paragraph(
-            f"<font size='10'><b>{label}</b> {value}</font>",
+            f"<font color='{LIGHT}' size='10'><b>{label}</b> {value}</font>",
             body_style,
         ))
-    story.append(Spacer(1, 18 * mm))
-    story.append(Paragraph(
-        f"<font color='#64748B' size='8'>{CLASSIFICATION_LABEL_DE}</font>",
-        body_style,
-    ))
     # WICHTIG: NextPageTemplate VOR PageBreak — der PageBreak triggert den
     # Template-Wechsel beim Beginn der naechsten Seite.
     story.append(NextPageTemplate("normal"))

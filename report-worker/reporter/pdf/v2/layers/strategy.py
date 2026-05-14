@@ -187,13 +187,13 @@ def _build_scope_methodology(story, styles, data: dict[str, Any]) -> None:
             f"Anhang E aufgeschluesselt.",
         )
 
-    # 2.3 Was leistet dieser Scan nicht?
+    # 2.3 Was leistet dieser Scan nicht? — kompakt, kein eigener PageBreak
+    # davor (haengt direkt an Methodik 2.2 an).
     story.append(Spacer(1, 4 * mm))
     _subsection(story, styles, "Was leistet dieser Scan nicht?")
     note = method.get("out_of_scope_note") or ""
     if note:
         _body(story, styles, note)
-
     story.append(PageBreak())
 
 

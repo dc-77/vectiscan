@@ -69,6 +69,18 @@ KERNEL_DETECTION_BLACKLIST: set[str] = {
     "http.sys",
     "microsoft-httpapi",
     "windows kernel",
+    # Security-Header werden von webtech/Wappalyzer als "Technology" getaggt
+    # — gehoeren aber NICHT in eine patchbare Tech-Liste. Sie werden ueber
+    # die Posture-Indikatoren bzw. Befunde getrennt behandelt.
+    "hsts",
+    "strict-transport-security",
+    "csp",
+    "content-security-policy",
+    "x-frame-options",
+    "x-content-type-options",
+    "referrer-policy",
+    "permissions-policy",
+    "feature-policy",
 }
 
 # Min-Version-Whitelist: erste oeffentliche Version pro Tech.

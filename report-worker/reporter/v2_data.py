@@ -207,13 +207,12 @@ def build_methodology_stats(
         "tool_versions": tool_versions,
         "phases": phases,
         "out_of_scope_note": (
-            "Was leistet dieser Scan nicht? Ein externer automatischer "
-            "Scan zeigt die erreichbare Angriffsflaeche und bekannte "
-            "Schwachstellenmuster. Er ersetzt nicht: Code-Reviews, interne "
-            "Audits, Konfigurations-Audits mit privilegiertem Zugang, "
-            "manuelle Penetrationstests. Empfohlene Ergaenzung bei "
-            "kritischen Befunden: gezielter manueller Pentest in den "
-            "betroffenen Komponenten."
+            "Ein externer automatischer Scan zeigt die erreichbare "
+            "Angriffsflaeche und bekannte Schwachstellenmuster. Er ersetzt "
+            "nicht: Code-Reviews, interne Audits, Konfigurations-Audits mit "
+            "privilegiertem Zugang, manuelle Penetrationstests. Empfohlene "
+            "Ergaenzung bei kritischen Befunden: gezielter manueller "
+            "Pentest in den betroffenen Komponenten."
         ),
     }
 
