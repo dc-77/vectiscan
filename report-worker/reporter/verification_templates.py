@@ -167,6 +167,57 @@ VERIFICATION_TEMPLATES: dict[str, str] = {
         "Erwartet: nmap kann keine exakte Version mehr bestimmen "
         "(nmap zeigt 'service' aber keine Build-Nummer)."
     ),
+    # ── CSP (SP-CSP-*) ────────────────────────────────────────────
+    "SP-CSP-001": (
+        "Nach CSP-Aktivierung:\n"
+        "$ curl -I https://{host} | grep -i content-security-policy\n"
+        "Erwartet: Header 'Content-Security-Policy:' ist vorhanden und "
+        "enthaelt mindestens 'default-src 'self'' bzw. eine restriktive "
+        "Direktive. Online-Test: csp-evaluator.withgoogle.com mit der "
+        "URL pruefen — keine 'High Severity'-Findings."
+    ),
+    # ── CSRF (SP-CSRF-*) ──────────────────────────────────────────
+    "SP-CSRF-001": (
+        "Nach CSRF-Token-Integration im Login-Formular:\n"
+        "$ curl -i https://{host}/login\n"
+        "Erwartet: Response enthaelt ein hidden-input 'csrf_token' bzw. "
+        "Set-Cookie mit '__Host-csrf'.\n"
+        "Manueller Test: Login-Formular ohne Token absenden — Server "
+        "muss 403/422 zurueckliefern."
+    ),
+    # ── Mail-Security DNS-005 / DNS-010 ───────────────────────────
+    "SP-DNS-005": (
+        "Nach SPF-Verschaerfung auf Hardfail (-all):\n"
+        "$ dig +short TXT {domain}\n"
+        "Erwartet: SPF-Record endet mit '-all' (statt '~all').\n"
+        "Stichprobe ueber externes Tool: mxtoolbox.com/spf.aspx — kein "
+        "'softfail'-Hinweis mehr."
+    ),
+    "SP-DNS-010": (
+        "Nach DMARC-Bump auf p=reject:\n"
+        "$ dig +short TXT _dmarc.{domain}\n"
+        "Erwartet: 'v=DMARC1; p=reject; pct=100' (vorher 'p=quarantine').\n"
+        "Vor dem Bump min. 14 Tage rua-Reports unter quarantine pruefen — "
+        "keine eigenen legitimen Mails in der Quarantaene."
+    ),
+    # ── JS-Bibliothek mit Schwachstelle (SP-JS-*) ─────────────────
+    "SP-JS-001": (
+        "Nach Migration auf supportete JS-Bibliotheks-Version:\n"
+        "$ curl -s https://{host} | grep -oE '({library}|raven|sentry)[^\"]*'\n"
+        "Erwartet: keine alte Major-Version mehr referenziert (z.B. bei "
+        "raven.js Migration auf @sentry/browser).\n"
+        "Dependency-Scan optional: 'npm audit' / 'yarn audit' im "
+        "Frontend-Build muss 'no known vulnerabilities' melden."
+    ),
+    # ── URLhaus / Threat-Intel (SP-URLHAUS-*) ─────────────────────
+    "SP-URLHAUS-001": (
+        "Nach Bereinigung kompromittierter Inhalte:\n"
+        "$ curl -s 'https://urlhaus.abuse.ch/api/' --data 'url=https://{host}/'\n"
+        "Erwartet: keine aktive URLhaus-Listung mehr (oder Aussortierung "
+        "ueber 'remove'-Request). Zusaetzlich: Hosting-Provider "
+        "informieren, Server-Logs auf Re-Infektion pruefen, Admin-"
+        "Credentials rotieren."
+    ),
 }
 
 
