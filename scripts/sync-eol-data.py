@@ -170,15 +170,100 @@ def write_module(entries: dict, dest: Path) -> None:
     print(f"[INFO] wrote {len(entries)} entries -> {dest}")
 
 
+def validate_existing_entries(today: date) -> int:
+    """M2 Track 2c — Validation-Pass ueber EOL_DATA_MANUAL + EOL_DATA_GENERATED.
+
+    Prueft:
+    - manual-Eintraege mit last_validated_at > 365 Tage alt → WARNING
+    - Eintraege ohne source → WARNING (Schema-Verstoss)
+
+    Liefert Anzahl Warnings (CI: Exit 1 bei > 0).
+    """
+    warnings = 0
+    # Lazy-Import, damit das Script standalone laufen kann (auch ohne
+    # vollstaendige PYTHONPATH-Setup).
+    repo_root = Path(__file__).resolve().parent.parent
+    sys.path.insert(0, str(repo_root / "report-worker"))
+    try:
+        from reporter.eol_detector import EOL_DATA_MANUAL  # type: ignore
+    except Exception as e:  # noqa: BLE001
+        print(f"[ERROR] Konnte EOL_DATA_MANUAL nicht laden: {e}",
+              file=sys.stderr)
+        return 1
+
+    try:
+        from reporter.eol_data_generated import EOL_DATA_GENERATED  # type: ignore
+    except Exception:
+        EOL_DATA_GENERATED = {}  # noqa: N806 — Fallback wenn Datei fehlt
+
+    # Manual-Eintraege: Stale-Check
+    for key, entry in EOL_DATA_MANUAL.items():
+        src = entry.get("source")
+        last = entry.get("last_validated_at")
+        if not src:
+            print(f"[WARN] Manual entry ohne source: {key}", file=sys.stderr)
+            warnings += 1
+            continue
+        if src != "manual":
+            continue
+        if not last:
+            print(f"[WARN] Manual entry ohne last_validated_at: {key}",
+                  file=sys.stderr)
+            warnings += 1
+            continue
+        try:
+            last_dt = datetime.fromisoformat(str(last)).date()
+        except Exception:
+            print(f"[WARN] Manual entry mit invalid last_validated_at: "
+                  f"{key} = {last!r}", file=sys.stderr)
+            warnings += 1
+            continue
+        days = (today - last_dt).days
+        if days > 365:
+            print(
+                f"[WARN] Manual entry stale: {key[0]} {key[2]} — "
+                f"last validated {last_dt.isoformat()} ({days}d ago)",
+                file=sys.stderr,
+            )
+            warnings += 1
+
+    # Generated-Eintraege: Schema-Check (sollte _source ODER source haben)
+    schema_violations = 0
+    for key, entry in EOL_DATA_GENERATED.items():
+        if "_source" not in entry and "source" not in entry:
+            schema_violations += 1
+    if schema_violations:
+        print(f"[WARN] {schema_violations} generated entries ohne source-Feld",
+              file=sys.stderr)
+        warnings += 1
+
+    print(
+        f"[INFO] Validation done: {len(EOL_DATA_MANUAL)} manual + "
+        f"{len(EOL_DATA_GENERATED)} generated entries, {warnings} warnings",
+    )
+    return warnings
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--dry-run", action="store_true",
                     help="Nur fetchen + zusammenfassen, nicht schreiben")
+    ap.add_argument("--validate-only", action="store_true",
+                    help="Nur Schema/Staleness-Validation von bereits "
+                         "vorhandenen Eintraegen (kein Fetch). "
+                         "Exit 1 bei >0 Warnings (CI-tauglich).")
     ap.add_argument("--out", default=None,
                     help="Override Output-Pfad (default: report-worker/reporter/eol_data_generated.py)")
     args = ap.parse_args()
 
     today = date.today()
+
+    # M2 2c — Validation-only-Mode: gegen endoflife.date NICHT fetchen,
+    # nur Schema + Staleness der vorhandenen Daten pruefen.
+    if args.validate_only:
+        warnings = validate_existing_entries(today)
+        return 1 if warnings > 0 else 0
+
     entries = build_entries(today)
 
     try:

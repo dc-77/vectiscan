@@ -7,3 +7,19 @@ __pycache__/
 .env
 *.log
 *.tsbuildinfo
+
+# Local working artefacts (nicht ins Repo) — Stand 2026-05-20
+docs/
+.claude/settings.local.json
+.playwright-mcp/
+screenshots/
+debug/
+redesign/
+
+# Root-level Temp- und Screenshot-Artefakte
+/.tmp-report.pdf
+/admin-subs-*.png
+/heuel-*.png
+/live-terminal-*.png
+/vectiscan-*.pdf
+
