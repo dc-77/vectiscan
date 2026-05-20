@@ -9,6 +9,12 @@ RUN npm run build
 
 # Production stage
 FROM node:22-slim
+# Sicherheits-Patches gegen aktuelle CVEs in der Debian-Basis (z.B.
+# libgnutls30 CVE-2026-33845/42010, vom Trivy-Scan erkannt). Wird bei
+# jedem Build neu ausgefuehrt — kostet ~30s, reduziert CRITICAL-CVEs.
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
 RUN groupadd -r vectiscan && useradd -r -g vectiscan -m vectiscan
 WORKDIR /app
 COPY package*.json ./

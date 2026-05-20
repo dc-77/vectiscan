@@ -4,7 +4,10 @@ LABEL maintainer="VectiScan" \
       description="Scan-Worker with security scanning tools"
 
 # ── 1. System packages ──────────────────────────────────────────────
+# upgrade -y zieht Sicherheits-Patches der Basis mit (z.B. libgnutls30
+# CVE-2026-33845/42010, vom Trivy-Scan erkannt).
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
       ca-certificates curl wget unzip jq dnsutils git bash \
       python3 python3-pip python3-venv \

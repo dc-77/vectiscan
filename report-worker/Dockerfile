@@ -1,6 +1,10 @@
 FROM debian:bookworm-slim
 
+# upgrade -y zieht Sicherheits-Patches der Basis mit (z.B. libgnutls30
+# CVE-2026-33845/42010, vom Trivy-Scan erkannt). Kombiniert mit den
+# Python-Pakten in einem RUN-Layer.
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
       python3 python3-pip python3-venv && \
     rm -rf /var/lib/apt/lists/*
