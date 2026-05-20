@@ -1,0 +1,29 @@
+{
+  "overall_risk": "LOW",
+  "findings": [
+    {
+      "id": "VS-2026-005",
+      "title": "DMARC-Policy 'quarantine' statt 'reject' fuer example.com",
+      "severity": "LOW",
+      "cvss_score": 3.1,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+      "description": "Der DMARC-Record fuer example.com setzt die Policy auf 'quarantine' (pct=100). Eine Hartreject-Konfiguration waere stringenter.",
+      "evidence": "v=DMARC1; p=quarantine; pct=100",
+      "impact": "Empfangende Server quarantaenisieren statt abzulehnen.",
+      "recommendation": "DMARC-Policy nach Monitoring-Phase auf p=reject anheben."
+    },
+    {
+      "id": "VS-2026-006",
+      "title": "SPF-Record mit Softfail ~all statt Hardfail -all (example.com)",
+      "severity": "LOW",
+      "cvss_score": 3.1,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+      "description": "Der SPF-Record fuer example.com endet auf '~all' (Softfail). Damit werden E-Mails von nicht-autorisierten Sendern markiert, aber nicht abgelehnt.",
+      "evidence": "v=spf1 include:_spf.google.com ~all",
+      "impact": "In Kombination mit der DMARC-Policy 'quarantine' (siehe VS-2026-005) bleibt ein Restrisiko fuer Spoofing-Angriffe.",
+      "recommendation": "Nach Pruefung aller berechtigten Sendquellen '~all' auf '-all' umstellen."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

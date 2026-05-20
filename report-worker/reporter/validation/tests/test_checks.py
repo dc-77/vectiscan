@@ -64,7 +64,6 @@ _BAD_FIXTURES_ERROR = [
     ("bad_id_gap.json", ids),
     ("bad_cvss_zero_with_impact.json", cvss_check),
     ("bad_cvss_missing_prefix.json", cvss_check),
-    ("bad_consistency_spf_dkim.json", consistency),
     ("bad_plan_unreferenced_port.json", plan),
     ("bad_plan_dead_ref.json", plan),
 ]
@@ -74,6 +73,9 @@ _BAD_FIXTURES_WARNING = [
     ("bad_id_duplicate.json", ids),
     ("bad_eol_mariadb_mysql.json", eol),
     ("bad_plan_orphan.json", plan),
+    # heuel.com-Vorfall Mai 2026: consistency-Issues sind generell Warnings
+    # (zu hohes FP-Risiko, Admin-Review noetig — siehe consistency.py-Docstring).
+    ("bad_consistency_spf_dkim.json", consistency),
 ]
 
 
@@ -189,7 +191,11 @@ def test_tech_table_empty_returns_warning() -> None:
 # ---------------------------------------------------------------------------
 
 def test_consistency_version_mismatch_with_tech_profile() -> None:
-    """Finding nennt WordPress 6.9.4, Tech-Tabelle hat 6.4.2 → Error."""
+    """Finding nennt WordPress 6.9.4, Tech-Tabelle hat 6.4.2 → Warning.
+
+    Mai 2026: consistency-Issues sind generell Warnings (siehe Docstring
+    in consistency.py).
+    """
     ctx = {
         "package": "perimeter",
         "tech_profiles": [{
@@ -201,10 +207,59 @@ def test_consistency_version_mismatch_with_tech_profile() -> None:
     issues = consistency.check(
         _load("bad_consistency_version_mismatch.json"), {}, ctx,
     )
-    errors = [i for i in issues if i.severity == "error"]
-    assert errors, f"Versions-Mismatch sollte Error sein. {issues}"
+    warnings = [i for i in issues if i.severity == "warning"]
+    assert warnings, f"Versions-Mismatch sollte Warning sein. {issues}"
     assert any("wordpress" in (i.detail.get("software") or "").lower()
-               for i in errors)
+               for i in warnings)
+    assert not [i for i in issues if i.severity == "error"], (
+        f"consistency darf keine errors emittieren. {issues}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Consistency: heuel.com False-Positive-Schutz (Mai 2026)
+# ---------------------------------------------------------------------------
+
+def test_consistency_skips_service_check_when_token_only_in_recommendation() -> None:
+    """FTP-Title + SFTP nur in Recommendation -> KEIN Issue.
+
+    Real-Vorfall heuel.com VS-2026-001: Title 'FTP klartextfaehig',
+    Recommendation 'FTP durch SFTP ersetzen'. Recommendation darf den
+    Service-Check nicht triggern.
+    """
+    issues = consistency.check(
+        _load("bad_consistency_recommendation_token.json"),
+        {},
+        {"package": "perimeter", "tech_profiles": []},
+    ) or []
+    service_issues = [
+        i for i in issues
+        if "Service-Verwechslung" in i.message
+    ]
+    assert not service_issues, (
+        f"Recommendation-Token darf Service-Check nicht triggern. {issues}"
+    )
+
+
+def test_consistency_skips_service_check_on_crossref() -> None:
+    """SPF-Title + DMARC-Token im Body mit 'siehe VS-...' -> KEIN Issue.
+
+    Real-Vorfall heuel.com VS-2026-006: Title 'SPF Softfail', Impact
+    'in Kombination mit DMARC-Policy (siehe VS-2026-005)'. Querverweise
+    auf andere Findings sind keine Service-Verwechslung.
+    """
+    issues = consistency.check(
+        _load("bad_consistency_crossref_skip.json"),
+        {},
+        {"package": "perimeter", "tech_profiles": []},
+    ) or []
+    service_issues = [
+        i for i in issues
+        if "Service-Verwechslung" in i.message
+    ]
+    assert not service_issues, (
+        f"Cross-Reference darf Service-Check nicht triggern. {issues}"
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -26,6 +26,7 @@ import { ScanDetailNav } from '@/components/scan/ScanDetailNav';
 import ScanStoryTimeline from '@/components/scan/ScanStoryTimeline';
 import ThreatIntelBadge from '@/components/scan/ThreatIntelBadge';
 import ToolTrace from '@/components/scan/ToolTrace';
+import ValidationWarnings from '@/components/scan/ValidationWarnings';
 import { WebsiteGallery } from '@/components/scan/WebsiteGallery';
 import ViewSwitcher from '@/components/scan/ViewSwitcher';
 import {
@@ -441,6 +442,17 @@ export default function ModernView({
               </table>
             )}
           </section>
+        )}
+
+        {/* ── VALIDATION-WARNINGS (admin-only, collapsible) ─ */}
+        {/* Sichtbar fuer Admins immer wenn ein Report existiert ODER der Scan
+            wegen STRICT-Validation-Gate failed ist (heuel.com-Vorfall Mai 2026). */}
+        {admin && (order.validationWarnings !== undefined || order.status === 'failed') && (
+          <ValidationWarnings
+            orderId={orderId}
+            orderStatus={order.status}
+            payload={order.validationWarnings ?? null}
+          />
         )}
 
         {/* ── TOOL-TRACE (admin-only, collapsible) ─ */}

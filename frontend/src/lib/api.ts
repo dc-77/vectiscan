@@ -106,6 +106,25 @@ export interface OrderProgress {
   lastCompletedTool: string | null;
 }
 
+export interface ValidationIssuePayload {
+  check: string;
+  severity: 'error' | 'warning' | string;
+  finding_id: string | null;
+  message: string;
+  detail?: Record<string, unknown>;
+}
+
+export interface ValidationWarningsPayload {
+  passed: boolean;
+  level: 'warn' | 'strict' | 'off' | string;
+  errors: ValidationIssuePayload[];
+  warnings: ValidationIssuePayload[];
+  checks_run: string[];
+  checks_skipped?: string[];
+  error_count: number;
+  warning_count: number;
+}
+
 export interface OrderStatus {
   id: string;
   domain: string;
@@ -126,6 +145,10 @@ export interface OrderStatus {
   /** @deprecated PR-I — Vollinhalt nicht mehr im Default-Response. Nutze getOrderCorrelation(orderId). */
   correlationData?: unknown[] | null;
   businessImpactScore?: number | null;
+  // Migration 028 + heuel.com-Vorfall Mai 2026: admin-only Output der
+  // ValidationGate. Null wenn kein Report existiert (z.B. STRICT-Block oder
+  // historischer Scan vor Migration 028).
+  validationWarnings?: ValidationWarningsPayload | null;
 }
 
 export interface OrderCorrelation {
@@ -1057,6 +1080,18 @@ export async function unexcludeFinding(orderId: string, findingId: string): Prom
 
 export async function regenerateReport(orderId: string): Promise<ApiResponse<{ message: string }>> {
   const res = await fetch(`${API_URL}/api/orders/${orderId}/regenerate-report`, {
+    method: 'POST',
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+/** Admin: Report-Job neu in die Queue stellen (z.B. nach Validation-Gate-Block).
+ *  Setzt Order auf 'scan_complete' zurueck und enqueued einen Report-Job mit
+ *  hostInventory/techProfiles aus den persistierten scan_results.
+ */
+export async function requeueReport(orderId: string): Promise<ApiResponse<{ message?: string }>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/requeue-report`, {
     method: 'POST',
     headers: authHeaders(),
   });

@@ -8,6 +8,15 @@ Adressiert aus Doc 01 (Fehleranalyse_und_Korrekturplan.md):
 
 Defensive Programmierung: Wenn Tech-Tabelle nicht zugaenglich, wird die
 P0-02-Pruefung uebersprungen (Warning), die P0-03-Pruefung laeuft trotzdem.
+
+WICHTIG (Mai 2026, heuel.com-Vorfall): Saemtliche consistency-Issues werden
+mit severity="warning" emittiert und blockieren den Build nicht (auch nicht
+in STRICT). Hintergrund: Der Service-Verwechslungs-Check hat ein hohes
+False-Positive-Risiko (Recommendation-Text nennt fast immer das Gegen-
+Token: "FTP durch SFTP ersetzen", "SPF/DKIM-aligned vor 'reject'") und
+auch Versionskonflikte koennen legitime Multi-Version-Faelle sein. Der
+Admin sieht die Defekte im Scan-Detail und kann den Report nach Korrektur
+neu erzeugen.
 """
 from __future__ import annotations
 
@@ -62,7 +71,12 @@ def _word_token_match(token: str, text: str) -> bool:
 
 
 def _body_text(finding: dict[str, Any]) -> str:
-    """Konkateniert description + evidence (als String) zu einem Body."""
+    """Konkateniert description + impact + recommendation + evidence (als String).
+
+    Wird fuer den Title-Body-Keyword-Overlap-Check (Warning) und den
+    P0-02-Versionskonflikt-Check verwendet — hier ist Recommendation
+    erwuenscht, weil Versionsangaben oft in der Empfehlung stehen.
+    """
     parts: list[str] = []
     if finding.get("description"):
         parts.append(str(finding["description"]))
@@ -79,6 +93,35 @@ def _body_text(finding: dict[str, Any]) -> str:
         except Exception:
             parts.append(str(ev))
     return "\n".join(parts)
+
+
+def _body_text_for_service_check(finding: dict[str, Any]) -> str:
+    """Body-Quelle fuer den P0-03 Service-Verwechslungs-Check.
+
+    OHNE `recommendation` — Loesungsempfehlungen nennen fast immer die
+    Alternativ-Technik ("FTP durch SFTP", "SPF/DKIM-aligned"), was den
+    naiven Token-Match triggern wuerde (heuel.com-Vorfall Mai 2026).
+    """
+    parts: list[str] = []
+    if finding.get("description"):
+        parts.append(str(finding["description"]))
+    if finding.get("impact"):
+        parts.append(str(finding["impact"]))
+    ev = finding.get("evidence")
+    if isinstance(ev, str):
+        parts.append(ev)
+    elif isinstance(ev, (dict, list)):
+        try:
+            parts.append(json.dumps(ev, ensure_ascii=False, default=str))
+        except Exception:
+            parts.append(str(ev))
+    return "\n".join(parts)
+
+
+# Querverweise auf andere Findings (z.B. "siehe VS-2026-005") sind kein
+# Service-Mismatch, sondern legitime Cross-References — der referenzierte
+# Service taucht dann zwangslaeufig im Body auf.
+_CROSSREF_PATTERN = re.compile(r"\bVS-\d{4}-\d{3,4}\b")
 
 
 def _get_tech_versions(
@@ -138,29 +181,34 @@ def check(
         if not title:
             continue
         body = _body_text(f)
+        service_body = _body_text_for_service_check(f)
 
-        # P0-03: Service-Verwechslung
-        for tok_a, tok_b in CONFLICTING_PAIRS:
-            if (
-                _word_token_match(tok_a, title)
-                and not _word_token_match(tok_b, title)
-                and _word_token_match(tok_b, body)
-            ):
-                issues.append(ValidationIssue(
-                    check="consistency",
-                    severity="error",
-                    finding_id=fid,
-                    message=(
-                        f"Title nennt {tok_a}, Body beschreibt {tok_b} "
-                        f"(Service-Verwechslung)"
-                    ),
-                    detail={
-                        "title_token": tok_a,
-                        "body_token": tok_b,
-                        "title": title,
-                    },
-                ))
-                break  # Pro Finding nur ein Conflict-Issue
+        # P0-03: Service-Verwechslung. Skip wenn der Body einen expliziten
+        # Querverweis auf ein anderes Finding traegt — dann ist das andere
+        # Token legitime Cross-Reference, kein Mismatch.
+        has_crossref = bool(_CROSSREF_PATTERN.search(service_body))
+        if not has_crossref:
+            for tok_a, tok_b in CONFLICTING_PAIRS:
+                if (
+                    _word_token_match(tok_a, title)
+                    and not _word_token_match(tok_b, title)
+                    and _word_token_match(tok_b, service_body)
+                ):
+                    issues.append(ValidationIssue(
+                        check="consistency",
+                        severity="warning",
+                        finding_id=fid,
+                        message=(
+                            f"Title nennt {tok_a}, Body beschreibt {tok_b} "
+                            f"(moegliche Service-Verwechslung — Admin-Review)"
+                        ),
+                        detail={
+                            "title_token": tok_a,
+                            "body_token": tok_b,
+                            "title": title,
+                        },
+                    ))
+                    break  # Pro Finding nur ein Conflict-Issue
 
         # Title-Body-Keyword-Overlap (Warning bei sehr generischen Titles)
         title_words = {w.lower() for w in _WORD_RE.findall(title)} - _STOPWORDS
@@ -209,7 +257,7 @@ def check(
                         ):
                             issues.append(ValidationIssue(
                                 check="consistency",
-                                severity="error",
+                                severity="warning",
                                 finding_id=fid,
                                 message=(
                                     f"Versionskonflikt {first_token}: "

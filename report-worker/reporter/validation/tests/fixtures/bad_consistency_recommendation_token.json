@@ -1,0 +1,18 @@
+{
+  "overall_risk": "MEDIUM",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "FTP-Dienst (Port 21) klartextfaehig auf 20.79.218.75",
+      "severity": "MEDIUM",
+      "cvss_score": 5.3,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "description": "Auf dem Host 20.79.218.75 ist Port 21 (FTP) oeffentlich erreichbar. FTP uebertraegt Anmeldedaten und Datenstroeme standardmaessig im Klartext.",
+      "evidence": "21/tcp open ftp",
+      "impact": "Angreifer im Netzwerkpfad koennen FTP-Credentials mitlesen.",
+      "recommendation": "Kurzfristig: FTP durch SFTP (ueber den bestehenden SSH-Dienst auf Port 22) oder FTPS mit erzwungenem TLS ersetzen."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

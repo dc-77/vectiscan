@@ -394,10 +394,14 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    // Check if report exists + get severity data from latest report
+    // Check if report exists + get severity data from latest report.
+    // validation_warnings (Migration 028) wird nur fuer Admins ausgeliefert
+    // — Customer-Payload bleibt unberuehrt.
+    const isAdmin = user.role === 'admin';
     const reportResult = await query(
       `SELECT id, findings_data->>'overall_risk' AS overall_risk,
-              findings_data->'severity_counts' AS severity_counts
+              findings_data->'severity_counts' AS severity_counts,
+              validation_warnings
        FROM reports WHERE order_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [id],
     );
@@ -443,6 +447,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         businessImpactScore: order.business_impact_score != null ? Number(order.business_impact_score) : null,
         subscriptionId: (order.subscription_id as string) || null,
         isRescan: order.is_rescan === true || order.is_rescan === 't',
+        // Validation-Gate-Output (Migration 028) — admin-only.
+        // Null wenn kein Report existiert (z.B. STRICT-Block vor Report-Erzeugung).
+        validationWarnings: isAdmin ? (latestReport?.validation_warnings ?? null) : undefined,
       },
     };
   });
