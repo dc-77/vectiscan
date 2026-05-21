@@ -1098,6 +1098,62 @@ export async function requeueReport(orderId: string): Promise<ApiResponse<{ mess
   return handleResponse(res);
 }
 
+// --- Finding-Overrides (Migration 029, Mai 2026) ---
+
+export interface FindingOverride {
+  id: string;
+  findingId: string;
+  field: string;            // 'cvss_score' | 'severity' | 'title' | '_ignored' | ...
+  value: unknown;
+  note: string | null;
+  createdAt: string | null;
+}
+
+/** Admin: liste alle Overrides fuer eine Order. */
+export async function getFindingOverrides(
+  orderId: string,
+): Promise<ApiResponse<{ overrides: FindingOverride[] }>> {
+  const res = await fetch(`${API_URL}/api/orders/${orderId}/overrides`, {
+    headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+/** Admin: setze/aktualisiere einen Override fuer ein Finding. */
+export async function setFindingOverride(
+  orderId: string,
+  findingId: string,
+  field: string,
+  value: unknown,
+  note?: string,
+): Promise<ApiResponse<FindingOverride>> {
+  const res = await fetch(
+    `${API_URL}/api/orders/${orderId}/findings/${encodeURIComponent(findingId)}/override`,
+    {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ field, value, note }),
+    },
+  );
+  return handleResponse(res);
+}
+
+/** Admin: loescht einen Override (Finding faellt zurueck auf Claude-Wert). */
+export async function deleteFindingOverride(
+  orderId: string,
+  findingId: string,
+  field: string,
+): Promise<ApiResponse<{ deleted: number }>> {
+  const res = await fetch(
+    `${API_URL}/api/orders/${orderId}/findings/${encodeURIComponent(findingId)}/override?field=${encodeURIComponent(field)}`,
+    {
+      method: 'DELETE',
+      headers: authHeaders(),
+    },
+  );
+  return handleResponse(res);
+}
+
 // --- Report Versions ---
 
 export interface ReportVersion {

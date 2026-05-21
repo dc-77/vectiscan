@@ -67,6 +67,24 @@ interface ExcludeBody {
   reason?: string;
 }
 
+interface OverrideBody {
+  field: string;        // 'cvss_score', 'severity', 'title', '_ignored', ...
+  value: unknown;       // numeric, string, boolean — landet in JSONB.value
+  note?: string;
+}
+
+// Whitelist der Felder die ueber das Override-API ueberschrieben werden duerfen.
+// Schuetzt vor SQL/JSONB-Injection durch beliebige field-Namen und gegen
+// fachliche Schaeden (z.B. ueberschreiben von 'id' oder 'evidence' wuerde
+// die Rohdaten korrumpieren).
+const ALLOWED_OVERRIDE_FIELDS = new Set([
+  'cvss_score',
+  'severity',
+  'title',
+  'description',
+  '_ignored',  // markiert Finding als "warnings akzeptiert" ohne Field-Edit
+]);
+
 export async function orderRoutes(server: FastifyInstance): Promise<void> {
   // POST /api/orders — requireAuth, multi-target
   // Body: { package, targets: [{raw_input, exclusions?}, ...] }
@@ -1225,6 +1243,170 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       audit({ orderId: id, action: 'finding.unexcluded', details: { findingId, userId: user.sub }, ip: request.ip });
 
       return { success: true, data: null };
+    },
+  );
+
+  // GET /api/orders/:id/overrides — list all overrides for an order (admin-only)
+  server.get<{ Params: OrderParams }>(
+    '/api/orders/:id/overrides',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params;
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID' });
+      }
+      try {
+        const result = await query(
+          `SELECT id, finding_id, field_name, new_value, note, created_at, created_by
+             FROM finding_overrides
+            WHERE order_id = $1
+            ORDER BY finding_id, field_name`,
+          [id],
+        );
+        return {
+          success: true,
+          data: {
+            overrides: result.rows.map((r: Record<string, unknown>) => ({
+              id: r.id,
+              findingId: r.finding_id,
+              field: r.field_name,
+              value: (r.new_value as Record<string, unknown>)?.value ?? null,
+              note: r.note,
+              createdAt: r.created_at ? (r.created_at as Date).toISOString() : null,
+              createdBy: r.created_by,
+            })),
+          },
+        };
+      } catch (err) {
+        // Tabelle existiert evtl. noch nicht (Migration 029 nicht angewendet)
+        const msg = err instanceof Error ? err.message : String(err);
+        if (/finding_overrides/.test(msg) && /does not exist/i.test(msg)) {
+          return { success: true, data: { overrides: [] } };
+        }
+        throw err;
+      }
+    },
+  );
+
+  // POST /api/orders/:id/findings/:findingId/override — set/update a field override (admin-only)
+  server.post<{ Params: FindingParams; Body: OverrideBody }>(
+    '/api/orders/:id/findings/:findingId/override',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id, findingId } = request.params;
+      const user = request.user!;
+      const { field, value, note } = request.body || ({} as OverrideBody);
+
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID' });
+      }
+      if (!field || typeof field !== 'string') {
+        return reply.status(400).send({ success: false, error: 'field is required' });
+      }
+      if (!ALLOWED_OVERRIDE_FIELDS.has(field)) {
+        return reply.status(400).send({
+          success: false,
+          error: `field '${field}' not allowed. Allowed: ${[...ALLOWED_OVERRIDE_FIELDS].join(', ')}`,
+        });
+      }
+      // value-Validierung pro Feld — defensive, damit das PDF nicht crashes
+      if (field === 'cvss_score') {
+        const n = typeof value === 'number' ? value : Number(value);
+        if (!Number.isFinite(n) || n < 0 || n > 10) {
+          return reply.status(400).send({ success: false, error: 'cvss_score must be 0..10' });
+        }
+      } else if (field === 'severity') {
+        const ALLOWED_SEVERITIES = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
+        if (typeof value !== 'string' || !ALLOWED_SEVERITIES.includes(value.toUpperCase())) {
+          return reply.status(400).send({
+            success: false,
+            error: `severity must be one of ${ALLOWED_SEVERITIES.join('/')}`,
+          });
+        }
+      } else if (field === '_ignored') {
+        if (typeof value !== 'boolean') {
+          return reply.status(400).send({ success: false, error: '_ignored must be boolean' });
+        }
+      } else if (field === 'title' || field === 'description') {
+        if (typeof value !== 'string' || value.length === 0 || value.length > 2000) {
+          return reply.status(400).send({ success: false, error: `${field} must be 1..2000 chars` });
+        }
+      }
+
+      const orderCheck = await query('SELECT id FROM orders WHERE id = $1', [id]);
+      if (orderCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+
+      try {
+        const ins = await query(
+          `INSERT INTO finding_overrides (order_id, finding_id, field_name, new_value, note, created_by)
+           VALUES ($1, $2, $3, $4::jsonb, $5, $6)
+           ON CONFLICT (order_id, finding_id, field_name)
+           DO UPDATE SET new_value = EXCLUDED.new_value, note = EXCLUDED.note,
+                         created_at = now(), created_by = EXCLUDED.created_by
+           RETURNING id, created_at`,
+          [id, findingId, field, JSON.stringify({ value }), note || null, user.sub],
+        );
+        audit({
+          orderId: id,
+          action: 'finding.overridden',
+          details: { findingId, field, value, note, userId: user.sub },
+          ip: request.ip,
+        });
+        const row = ins.rows[0] as Record<string, unknown>;
+        return {
+          success: true,
+          data: {
+            id: row.id,
+            findingId,
+            field,
+            value,
+            note: note || null,
+            createdAt: row.created_at ? (row.created_at as Date).toISOString() : null,
+          },
+        };
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (/finding_overrides/.test(msg) && /does not exist/i.test(msg)) {
+          return reply.status(503).send({
+            success: false,
+            error: 'finding_overrides Tabelle fehlt — Migration 029 ausstehend',
+          });
+        }
+        throw err;
+      }
+    },
+  );
+
+  // DELETE /api/orders/:id/findings/:findingId/override?field=cvss_score — remove an override (admin-only)
+  server.delete<{ Params: FindingParams; Querystring: { field?: string } }>(
+    '/api/orders/:id/findings/:findingId/override',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id, findingId } = request.params;
+      const user = request.user!;
+      const field = request.query.field;
+
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID' });
+      }
+      if (!field) {
+        return reply.status(400).send({ success: false, error: 'field query param required' });
+      }
+
+      const r = await query(
+        `DELETE FROM finding_overrides
+          WHERE order_id = $1 AND finding_id = $2 AND field_name = $3`,
+        [id, findingId, field],
+      );
+      audit({
+        orderId: id,
+        action: 'finding.override_removed',
+        details: { findingId, field, userId: user.sub },
+        ip: request.ip,
+      });
+      return { success: true, data: { deleted: r.rowCount ?? 0 } };
     },
   );
 

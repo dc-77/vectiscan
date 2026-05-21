@@ -56,6 +56,102 @@ def _get_db_connection() -> psycopg2.extensions.connection:
     return psycopg2.connect(DATABASE_URL)
 
 
+def _apply_finding_overrides(
+    findings_data: dict,
+    conn: Any,
+    order_id: str,
+) -> dict[str, list[dict]]:
+    """Apply admin-set finding_overrides (Migration 029) to findings_data.
+
+    Liest aus `finding_overrides` (order_id, finding_id, field_name, new_value)
+    und ueberschreibt die entsprechenden Felder im Finding-dict. Sonderfaelle:
+
+    - field='_ignored' (boolean): markiert das Finding als
+      `_admin_ignored_warnings = True`. Kein Feld-Override, nur informativ
+      fuer die UI — alle warnings dazu werden als "akzeptiert" angezeigt.
+    - field in {'cvss_score'}: numerisch gecastet.
+
+    Returns dict {finding_id -> list[applied_overrides]} fuer Logging/Audit.
+    Defensive: Wenn die Tabelle nicht existiert (Migration 029 fehlt),
+    returned {} und logged eine Warnung — Worker laeuft weiter.
+    """
+    applied: dict[str, list[dict]] = {}
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT finding_id, field_name, new_value
+                  FROM finding_overrides
+                 WHERE order_id = %s
+                """,
+                (order_id,),
+            )
+            rows = cur.fetchall()
+    except Exception as exc:
+        msg = str(exc)
+        if "finding_overrides" in msg and "does not exist" in msg.lower():
+            log.warning("finding_overrides_table_missing",
+                        order_id=order_id,
+                        hint="Run Migration 029 (api initDb auto-applies on next API start)")
+        else:
+            log.warning("finding_overrides_load_failed",
+                        order_id=order_id, error=msg)
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        return applied
+
+    if not rows:
+        return applied
+
+    # Index findings nach id fuer O(1)-Lookup
+    findings_list = findings_data.get("findings", []) or []
+    by_id: dict[str, dict] = {}
+    for f in findings_list:
+        fid = f.get("id") or f.get("external_id")
+        if fid:
+            by_id[str(fid)] = f
+
+    for fid, field, new_value in rows:
+        target = by_id.get(str(fid))
+        if target is None:
+            # Override fuer ein Finding das nicht (mehr) im Output ist —
+            # nur loggen, nicht failen (Re-Render kann legit weniger
+            # Findings haben als der vorherige Run).
+            log.info("finding_override_skipped_no_finding",
+                     order_id=order_id, finding_id=fid, field=field)
+            continue
+
+        # new_value ist JSONB → psycopg2 liefert das schon als dict
+        if not isinstance(new_value, dict) or "value" not in new_value:
+            log.warning("finding_override_invalid_payload",
+                        order_id=order_id, finding_id=fid, field=field)
+            continue
+        value = new_value["value"]
+
+        if field == "_ignored":
+            target["_admin_ignored_warnings"] = bool(value)
+        elif field == "cvss_score":
+            try:
+                target["cvss_score"] = float(value)
+            except (TypeError, ValueError):
+                log.warning("finding_override_cvss_not_numeric",
+                            order_id=order_id, finding_id=fid, value=value)
+                continue
+        else:
+            target[field] = value
+
+        applied.setdefault(str(fid), []).append({"field": field, "value": value})
+
+    if applied:
+        log.info("finding_overrides_applied",
+                 order_id=order_id,
+                 count=sum(len(v) for v in applied.values()),
+                 finding_count=len(applied))
+    return applied
+
+
 def _build_findings_data(claude_output: dict, package: str, report_data: dict | None = None) -> dict:
     """Build a JSON-serializable findings_data dict from Claude output."""
     findings = claude_output.get("findings", [])
@@ -659,6 +755,15 @@ def process_job(job_data: dict) -> None:
         findings_data_for_validation = _build_findings_data(
             claude_output, package, report_data,
         )
+        # Migration 029 (Mai 2026): Admin-Overrides auf einzelne Findings
+        # (cvss_score, severity, title, _ignored) — werden VOR der Gate
+        # appliziert, damit korrigierte Werte direkt validiert werden.
+        overrides_applied = _apply_finding_overrides(
+            findings_data_for_validation, conn, order_id,
+        )
+        if overrides_applied:
+            report_data["_finding_overrides_applied"] = overrides_applied
+
         gate = ValidationGate.from_env()
         gate_result = gate.run(
             findings_data_for_validation,

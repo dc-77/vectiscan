@@ -35,6 +35,7 @@ const MIGRATION_025_PATH = path.join(__dirname, '..', 'migrations', '025_subscri
 const MIGRATION_026_PATH = path.join(__dirname, '..', 'migrations', '026_shodan_pre_warm.sql');
 const MIGRATION_027_PATH = path.join(__dirname, '..', 'migrations', '027_tech_profiles_and_additional_findings.sql');
 const MIGRATION_028_PATH = path.join(__dirname, '..', 'migrations', '028_validation_warnings.sql');
+const MIGRATION_029_PATH = path.join(__dirname, '..', 'migrations', '029_finding_overrides.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -379,6 +380,27 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 028 FAILED (continuing without it):', err);
+  }
+
+  // Migration 029 (Mai 2026): finding_overrides — Admin korrigiert
+  // Findings pro-Field (cvss_score, severity, title) oder markiert sie
+  // als geprueft (_ignored). Re-Render via regenerate-report appliziert
+  // diese Overrides vor PDF.
+  try {
+    const findingOverrides029Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'finding_overrides'
+      ) AS exists
+    `);
+    if (!findingOverrides029Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 029: finding_overrides');
+      const migrationSql = fs.readFileSync(MIGRATION_029_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 029 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 029 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

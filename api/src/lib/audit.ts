@@ -20,6 +20,8 @@ export type AuditAction =
   | 'report.regenerate'
   | 'finding.excluded'
   | 'finding.unexcluded'
+  | 'finding.overridden'
+  | 'finding.override_removed'
   | 'user.registered'
   | 'user.login'
   | 'user.password_reset'
