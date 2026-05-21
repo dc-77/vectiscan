@@ -26,6 +26,32 @@ CMS_PROBE_PATHS: dict[str, str] = {
     "shopware": "/admin",
 }
 
+# CSS-Selektoren fuer typische Cookie-/Consent-Banner. Wir versuchen den
+# Accept/Close-Button per JS zu klicken, bevor der Screenshot gemacht wird.
+# Reihenfolge: erst Buttons die offensichtlich "akzeptieren"/"verstanden"
+# sagen, dann generische close-Buttons. Wenn keiner passt — egal, Screenshot
+# bleibt mit Banner sichtbar (besser als gar kein Screenshot).
+_COOKIE_DISMISS_JS = r"""() => {
+  const SELECTORS = [
+    'button#onetrust-accept-btn-handler',
+    'button#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll',
+    'button[data-testid="uc-accept-all-button"]',
+    'button.fc-cta-consent',
+    '#cookie-consent-accept', '#cookieAccept', '#acceptCookies',
+    'button[aria-label*="accept" i]', 'button[aria-label*="akzept" i]',
+    'button[id*="accept" i]', 'button[class*="accept" i]',
+    'button[id*="zustimmen" i]', 'button[class*="zustimmen" i]',
+    '.cc-allow', '.cc-accept', '.cookie-accept',
+  ];
+  for (const sel of SELECTORS) {
+    try {
+      const el = document.querySelector(sel);
+      if (el && el.offsetParent !== null) { el.click(); return sel; }
+    } catch (e) { /* ignore */ }
+  }
+  return null;
+}"""
+
 _TECH_DETECT_JS = """() => {
     const meta = document.querySelector('meta[name="generator"]');
     const poweredBy = document.querySelector('meta[http-equiv="X-Powered-By"]');
@@ -92,6 +118,77 @@ def sanitize_vhost(fqdn: str) -> str:
 _sanitize_vhost = sanitize_vhost
 
 
+def _wait_for_final_page(page: Any, fqdn: str, max_extra_seconds: int = 6) -> None:
+    """Wartet bis die Page wirklich final ist — fuer Screenshot/Tech-Detect.
+
+    Behandelt drei Faelle die `wait_until="domcontentloaded"` alleine NICHT
+    abdeckt:
+
+    1. **Meta-Refresh** (`<meta http-equiv="refresh" content="N; URL=...">`).
+       Beispiel: ose.heuel.com liefert eine Redirector-Page mit
+       `content="1; URL=/webmodule-ee/"`. networkidle ist nach ~500ms
+       erreicht, der Redirect feuert aber erst nach 1s — Screenshot waere
+       die leere Body.
+    2. **JS-Redirect** (`location.href = '...'` mit setTimeout).
+    3. **Spaete XHR-Requests** die Content nachladen.
+
+    Strategie: erst networkidle, dann pollen ob URL sich noch aendert.
+    """
+    # 1) Network beruhigen
+    try:
+        page.wait_for_load_state("networkidle", timeout=4000)
+    except Exception:
+        pass  # networkidle wird bei Long-Polling/WebSocket nie erreicht — egal
+
+    # 2) URL-Stabilitaet: alle 500ms checken ob sich noch was bewegt
+    last_url = page.url
+    stable_polls = 0
+    poll_count = max_extra_seconds * 2  # 2 polls pro Sekunde
+    for _ in range(poll_count):
+        try:
+            page.wait_for_timeout(500)
+        except Exception:
+            break
+        try:
+            current_url = page.url
+        except Exception:
+            break
+        if current_url == last_url:
+            stable_polls += 1
+            if stable_polls >= 3:  # 1.5s ohne URL-Change → stabil
+                break
+        else:
+            log.debug("redirect_probe_url_changed", fqdn=fqdn,
+                      from_url=last_url, to_url=current_url)
+            last_url = current_url
+            stable_polls = 0
+            # Nach dem Redirect nochmal Network beruhigen
+            try:
+                page.wait_for_load_state("networkidle", timeout=4000)
+            except Exception:
+                pass
+
+
+def _dismiss_cookie_banner(page: Any, fqdn: str) -> None:
+    """Versuche, Cookie-/Consent-Banner per Click wegzuraeumen.
+
+    Best-Effort: wenn kein Banner-Button gefunden wird, ist das OK — der
+    Screenshot enthaelt dann eben das Banner. Lieber Screenshot mit Banner
+    als Screenshot mit leerer weisser Seite.
+    """
+    try:
+        clicked = page.evaluate(_COOKIE_DISMISS_JS)
+        if clicked:
+            log.debug("cookie_banner_dismissed", fqdn=fqdn, selector=clicked)
+            # Kurz warten bis Banner-Animation fertig
+            try:
+                page.wait_for_timeout(400)
+            except Exception:
+                pass
+    except Exception as exc:
+        log.debug("cookie_dismiss_failed", fqdn=fqdn, error=str(exc))
+
+
 def _take_screenshot(
     page: Any,
     fqdn: str,
@@ -126,7 +223,7 @@ def _take_screenshot(
 def probe_redirects(
     fqdns: list[str],
     order_id: str = "",
-    timeout_per_page: int = 10,
+    timeout_per_page: int = 20,
     scan_dir: str = "",
     ip: str = "",
     web_probe_urls: dict[str, str] | None = None,
@@ -258,7 +355,17 @@ def _probe_single_fqdn(
 
             page.on("response", on_response)
 
-            page.goto(url, wait_until="networkidle", timeout=timeout_per_page * 1000)
+            # Phase 1: erstes Page-Load. `domcontentloaded` ist tolerant gegen
+            # spaete XHR-Calls (analytics, ads) die `networkidle` blocken.
+            page.goto(url, wait_until="domcontentloaded",
+                      timeout=timeout_per_page * 1000)
+
+            # Phase 2: warte auf finale Page (meta-refresh, JS-Redirect, ...).
+            # Mai 2026 Fix fuer ose.heuel.com Redirector-Pattern.
+            _wait_for_final_page(page, fqdn, max_extra_seconds=6)
+
+            # Phase 3: Cookie-/Consent-Banner wegklicken (best-effort)
+            _dismiss_cookie_banner(page, fqdn)
 
             final_url = page.url
             final_domain = _extract_domain(final_url)
@@ -269,10 +376,10 @@ def _probe_single_fqdn(
             except Exception:
                 page_title = ""
 
-            # Tech detection via JS evaluation
+            # Tech detection via JS evaluation (Phase 4 — nach final page)
             tech_info = _collect_tech_info(page, fqdn)
 
-            # Take screenshot (best effort)
+            # Take screenshot (best effort) — Phase 5, garantiert final
             screenshot_path = _take_screenshot(page, fqdn, scan_dir, ip)
 
             return {
@@ -317,7 +424,7 @@ def _probe_single_fqdn(
 
 def probe_cms_paths(
     fqdns: list[str],
-    timeout_per_page: int = 8,
+    timeout_per_page: int = 12,
 ) -> dict[str, dict[str, Any]]:
     """Probe CMS-specific paths (/wp-login.php, /wp-admin/, /typo3/) for each FQDN.
 
@@ -405,7 +512,10 @@ def _probe_single_cms_path(
 
         page.on("response", on_response)
 
-        page.goto(url, wait_until="networkidle", timeout=timeout_per_page * 1000)
+        page.goto(url, wait_until="domcontentloaded",
+                  timeout=timeout_per_page * 1000)
+        # Auch fuer CMS-Probes: meta-refresh / JS-Redirects abwarten.
+        _wait_for_final_page(page, f"{fqdn}{path}", max_extra_seconds=4)
 
         final_url = page.url
         final_domain = _extract_domain(final_url)

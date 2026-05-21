@@ -118,8 +118,11 @@ def test_bad_fixture_triggers_warning(fixture: str, check_mod: Any) -> None:
 # ---------------------------------------------------------------------------
 
 def test_cvss_score_vector_mismatch_when_library_available() -> None:
-    """Wenn cvss-Library installiert ist, muss ein Mismatch einen Error
-    triggern. Wenn nicht installiert, wird ein Warning erwartet (kein Crash).
+    """Mismatches sind Warnings (Mai 2026, securess.de-Vorfall) — nicht
+    blockierend. Admin-Override-UI loest das via Korrektur des Findings.
+
+    Wenn cvss-Library nicht installiert ist, wird zusaetzlich eine
+    Warning ueber die fehlende Lib emittiert.
     """
     issues = cvss_check.check(
         _load("bad_cvss_score_vector_mismatch.json"),
@@ -133,8 +136,15 @@ def test_cvss_score_vector_mismatch_when_library_available() -> None:
         library_available = False
 
     if library_available:
-        errors = [i for i in issues if i.severity == "error"]
-        assert errors, f"Library verfuegbar — Mismatch sollte Error sein. {issues}"
+        # Mismatch ist warning (nicht error), und keine errors aus cvss-check
+        warnings = [i for i in issues if i.severity == "warning"]
+        assert warnings, f"Library verfuegbar — Mismatch sollte Warning sein. {issues}"
+        assert any(
+            "weicht von Vektor-berechnetem" in w.message for w in warnings
+        ), f"Erwartet: Score-Mismatch-Warning. {issues}"
+        assert not [i for i in issues if i.severity == "error"], (
+            f"Score-Mismatch darf keinen Error mehr emittieren. {issues}"
+        )
     else:
         # Library fehlt → Warning (kein Crash)
         assert any(

@@ -10,6 +10,16 @@ geskipt — die landen in M2.
 
 Library `cvss` ist optional; falls nicht installiert, wird Score-vs-Vector
 nicht library-validiert (aber Substring-Checks laufen weiterhin).
+
+WICHTIG (Mai 2026, securess.de-Vorfall): Score-vs-Vektor-Mismatches sind
+*warnings* (nicht errors). Hintergrund: Claude (auch mit temperature=0)
+liefert konsistent Scores die um 0.1-0.6 vom mathematisch korrekten
+Base-Score abweichen — das sind keine echten Modell-Halluzinationen,
+sondern Rundungs-/Approximations-Artefakte. STRICT-Block wuerde jeden
+zweiten Scan failen. Admin sieht den Mismatch im UI und kann pro Finding
+den Claude-Score / den computed Score / einen eigenen Wert uebernehmen.
+Andere cvss-Defekte (P1-01 Zero-Score mit Impact, P2-05 Missing-Prefix,
+Invalid-Vector) bleiben *errors*.
 """
 from __future__ import annotations
 
@@ -119,11 +129,11 @@ def check(
             if abs(computed - score_f) > 0.1:
                 issues.append(ValidationIssue(
                     check="cvss",
-                    severity="error",
+                    severity="warning",
                     finding_id=fid,
                     message=(
                         f"CVSS-Score {score_f} weicht von Vektor-berechnetem "
-                        f"Base-Score {computed} ab"
+                        f"Base-Score {computed} ab — Admin-Review (Override-UI)"
                     ),
                     detail={
                         "cvss_score": score_f,
