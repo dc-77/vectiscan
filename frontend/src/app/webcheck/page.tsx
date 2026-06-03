@@ -6,11 +6,12 @@ import { LpView, PricingLink } from '@/components/WebCheckInteractions';
  * WebCheck-Landingpage — Kampagne „NIS2-WebCheck" (VEC-90).
  * Copy & Conversion-Spec: Greta (CMO), Brief in VEC-90 / Quelle GTM §2.3/§4.3.
  *
- * PUBLISH-GATE (verbindlich, §2.4): Diese Seite ist GEBAUT, aber noch NICHT
- * freigegeben. Alle Sicherheits-/Compliance-Zeilen sind claim-diszipliniert
- * verfasst und müssen vor Go-live von Sven gegengecheckt sein (VEC-92).
- * Daher: robots noindex/nofollow + nicht in der Navigation verlinkt.
- * Scharfschalten von Tracking/Lead-Routing: VEC-117. Go-live-Kopplung: VEC-14 (P0).
+ * PUBLISH-GATE (verbindlich, §2.4): Security-/Compliance-Zeilen sind §2.4-gegen-
+ * gecheckt — Sven-Wording-Sign-off §B erteilt am 2026-06-03 (VEC-92, publish-copy v2.1).
+ * Diese Seite trägt jetzt die claim-korrigierte v2.1-§B-Copy. Weiterhin GATED (nicht in
+ * der Copy): „DSGVO-konform" → VEC-35; Isolation/Mandantentrennung → VEC-14.
+ * Page-Go-live (index) bleibt gekoppelt an Tracking/Lead-Routing (VEC-117) + VEC-14 (P0):
+ * daher robots noindex/nofollow + nicht in der Navigation verlinkt, bis scharfgeschaltet.
  */
 
 const C = {
@@ -19,9 +20,9 @@ const C = {
 };
 
 export const metadata: Metadata = {
-  title: 'Kostenloser NIS2-WebCheck — Compliance-Nachweis für externe Systeme | VectiScan',
+  title: 'Kostenloser NIS2-WebCheck — Compliance-Report für externe Systeme | VectiScan',
   description:
-    'Automatisierter Security- & Compliance-Scan Ihrer von außen erreichbaren Systeme. Versionierter, audit-tauglicher Report mit Mapping zu NIS2, ISO 27001, BSI und NIST. E-Mail + Domain genügen.',
+    'Automatisierter Security- & Compliance-Scan Ihrer von außen erreichbaren Systeme. Versionierter, audit-tauglicher Report mit Mapping zu NIS2, ISO 27001, BSI-Grundschutz und DSGVO. E-Mail + Domain genügen.',
   robots: { index: false, follow: false }, // Publish-Gate: erst nach Sven-Sign-off (VEC-92) auf index.
 };
 
@@ -36,17 +37,19 @@ const I = {
   report: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6M8 13h8M8 17h5" /></svg>,
 };
 
-/* Proof-Leiste — alle Zeilen §2.4-belegbar. (S) = Sven-Gegencheck vor Publish (VEC-92). */
+/* Proof-Leiste — claim-korrigierte Copy v2.1 §B (VEC-92). Sven-Wording-Sign-off 2026-06-03.
+ * Quelle: publish-copy-Dokument auf VEC-92. Nur live-fähige Kacheln; „DSGVO-konform"
+ * bleibt gated an VEC-35, Isolation/Mandantentrennung gesperrt bis VEC-14. */
 const PROOF = [
-  { icon: I.map, title: 'Report mit Compliance-Mapping', text: 'NIS2 · ISO 27001 · BSI · NIST — Mapping/Nachweis zu den Standards, direkt im Report.' },
-  { icon: I.layers, title: 'Deterministische 6-Phasen-Pipeline', text: 'Reproduzierbarer, versionierter Scan-Ablauf — audit-tauglich nachvollziehbar.' },
-  { icon: I.flag, title: 'Made & hosted in Germany', text: 'Entwicklung und Hosting in Deutschland, DSGVO-konform.' }, // (S) VEC-92/VEC-95
-  { icon: I.compass, title: 'Auf dem Weg zu BSI C5', text: 'C5-orientierte Entwicklung — auf dem Weg zur Konformität.' }, // (S) VEC-92/VEC-99 — NIE „C5-zertifiziert"
+  { icon: I.map, title: 'Report mit Compliance-Mapping', text: 'NIS2 · ISO 27001 · BSI-Grundschutz · DSGVO — direkt im Report.', note: 'Mapping/Orientierung pro Befund — kein zertifizierter Konformitätsnachweis.' },
+  { icon: I.layers, title: 'Mehrstufiger Security-Scan', text: 'Versionierter, reproduzierbarer Report mit regelbasierter, deterministischer Risikobewertung — audit-tauglich.' },
+  { icon: I.compass, title: 'An den BSI-C5-Kriterien orientiert', text: 'C5-orientierte Entwicklung.' }, // (S) VEC-92/VEC-99 — NIE „C5-zertifiziert", NIE „auf dem Weg zu" (kein Roadmap-Beleg)
+  { icon: I.flag, title: 'Serverstandort Deutschland', text: 'Eigene Server in Deutschland, kein Public-Cloud-Hosting.' }, // (S) Sven-Re-Check 2026-06-03, Beleg VEC-99. Region-only — KEINE „keine US-Datenübermittlung"-Aussage (US-Subprozessoren offengelegt, VEC-124)
 ];
 
 const STEPS = [
   { n: 1, icon: I.mail, title: 'E-Mail + Domain eingeben', text: 'Geschäfts-E-Mail und die zu prüfende Domain — mehr braucht der Start nicht.' },
-  { n: 2, icon: I.scan, title: 'Verifizierter Scan läuft', text: 'Unsere deterministische Scan-Pipeline analysiert Ihre extern erreichbaren Systeme.' },
+  { n: 2, icon: I.scan, title: 'Verifizierter Scan läuft', text: 'Unser mehrstufiger Security-Scan analysiert Ihre extern erreichbaren Systeme.' },
   { n: 3, icon: I.report, title: 'Sample-Report per Mail', text: 'Sie erhalten einen versionierten Report mit Compliance-Mapping und priorisierten Maßnahmen.' },
 ];
 
@@ -70,12 +73,12 @@ export default function WebCheckLandingPage() {
               NIS2-WebCheck · kostenlos
             </p>
             <h1 className="text-[1.9rem] sm:text-4xl md:text-[2.9rem] font-bold leading-[1.12] tracking-tight mb-5" style={{ color: C.offWhite }}>
-              Prüffähiger Compliance-Nachweis für Ihre extern erreichbaren Systeme —{' '}
+              Prüffähiger Compliance-Report für Ihre extern erreichbaren Systeme —{' '}
               <span style={{ color: C.teal }}>in Tagen, nicht Monaten.</span>
             </h1>
             <p className="text-[15px] sm:text-base leading-relaxed max-w-xl mb-7" style={{ color: C.mutedLight }}>
               Automatisierter Security- &amp; Compliance-Scan Ihrer von außen erreichbaren Systeme.
-              Versionierter, audit-tauglicher Report mit Mapping zu NIS2, ISO 27001, BSI und NIST —
+              Versionierter, audit-tauglicher Report mit Mapping zu NIS2, ISO 27001, BSI-Grundschutz und DSGVO —
               ohne 5-stellige Beratung, ohne Wochen Wartezeit, ohne eigenes Security-Team.
             </p>
 
@@ -87,6 +90,7 @@ export default function WebCheckLandingPage() {
                   <div>
                     <p className="text-[13px] font-semibold mb-0.5" style={{ color: C.offWhite }}>{p.title}</p>
                     <p className="text-[11.5px] leading-relaxed" style={{ color: C.muted }}>{p.text}</p>
+                    {p.note && <p className="text-[10.5px] leading-snug mt-1 italic" style={{ color: `${C.muted}cc` }}>{p.note}</p>}
                   </div>
                 </div>
               ))}
@@ -107,9 +111,9 @@ export default function WebCheckLandingPage() {
       {/* ── TRUST-SIGNALE ── */}
       <section className="relative z-10 border-t border-b py-5" style={{ borderColor: 'rgba(45,212,191,0.08)' }}>
         <div className="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs" style={{ color: C.muted }}>
-          <span className="font-medium" style={{ color: C.mutedLight }}>Standards-Mapping: NIS2 · ISO 27001 · BSI · NIST</span>
+          <span className="font-medium" style={{ color: C.mutedLight }}>Standards-Mapping: NIS2 · ISO 27001 · BSI-Grundschutz · DSGVO</span>
           <span aria-hidden="true" style={{ color: `${C.muted}55` }}>·</span>
-          <span>DSGVO-konform</span>
+          <span>Serverstandort Deutschland</span>
           <span aria-hidden="true" style={{ color: `${C.muted}55` }}>·</span>
           <a href="mailto:support@vectigal.tech" className="hover:text-white transition-colors" style={{ color: C.muted }}>support@vectigal.tech</a>
           <span aria-hidden="true" style={{ color: `${C.muted}55` }}>·</span>
@@ -144,7 +148,7 @@ export default function WebCheckLandingPage() {
       <section className="relative z-10 py-12 md:py-16">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="text-[1.3rem] sm:text-2xl font-semibold mb-3" style={{ color: C.offWhite }}>Transparente Pakete — kein „Preis auf Anfrage".</h2>
-          <p className="text-sm mb-7" style={{ color: C.muted }}>Vom kostenlosen WebCheck bis zum vollständigen Compliance-Nachweis. Alle Stufen offen einsehbar.</p>
+          <p className="text-sm mb-7" style={{ color: C.muted }}>Vom kostenlosen WebCheck bis zum vollständigen Compliance-Report. Alle Stufen offen einsehbar.</p>
           <PricingLink
             className="inline-block px-8 py-3.5 rounded-lg text-sm font-medium transition-all duration-300 hover:border-[#2DD4BF60]"
             style={{ color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>
