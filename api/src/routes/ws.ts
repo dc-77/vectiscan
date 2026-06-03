@@ -4,10 +4,12 @@
  * Clients connect with an orderId query parameter and receive
  * real-time progress events via Redis Pub/Sub.
  * Also accepts legacy scanId param for backward compatibility.
+ * Auth: JWT via ?token= query param or Authorization: Bearer header.
  */
 import { FastifyInstance } from 'fastify';
 import { subscribe, unsubscribe } from '../lib/ws-manager.js';
 import { query } from '../lib/db.js';
+import { verifyJwt } from '../lib/auth.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -79,12 +81,42 @@ async function replayEvents(socket: import('ws').WebSocket, orderId: string): Pr
 }
 
 export async function wsRoutes(server: FastifyInstance): Promise<void> {
-  server.get('/ws', { websocket: true }, (socket, request) => {
+  server.get('/ws', { websocket: true }, async (socket, request) => {
     const url = new URL(request.url, 'http://localhost');
     const orderId = url.searchParams.get('orderId') || url.searchParams.get('scanId');
 
     if (!orderId || !UUID_REGEX.test(orderId)) {
       socket.close(4400, 'Invalid or missing orderId');
+      return;
+    }
+
+    // Auth: JWT from ?token= or Authorization: Bearer header
+    const tokenParam = url.searchParams.get('token');
+    const authHeader = request.headers.authorization;
+    const rawToken = tokenParam || (authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null);
+
+    if (!rawToken) {
+      socket.close(4401, 'Authentication required');
+      return;
+    }
+
+    let user;
+    try {
+      user = verifyJwt(rawToken);
+    } catch {
+      socket.close(4401, 'Invalid or expired token');
+      return;
+    }
+
+    // Ownership check
+    const orderCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [orderId]);
+    if (orderCheck.rows.length === 0) {
+      socket.close(4404, 'Order not found');
+      return;
+    }
+    const orderCustomerId = (orderCheck.rows[0] as Record<string, unknown>).customer_id;
+    if (user.role !== 'admin' && orderCustomerId !== user.customerId) {
+      socket.close(4403, 'Access denied');
       return;
     }
 

@@ -9,6 +9,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
 import { verifyAll } from '../services/VerificationService.js';
 import { audit } from '../lib/audit.js';
+import { requireAuth } from '../middleware/requireAuth.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const FQDN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
@@ -25,6 +26,7 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
   // POST /api/verify/check — verifiziert EIN scan_target (nur FQDN-Typen)
   server.post<{ Body: CheckBody }>(
     '/api/verify/check',
+    { preHandler: [requireAuth] },
     async (request: FastifyRequest<{ Body: CheckBody }>, reply: FastifyReply) => {
       const { targetId } = request.body || ({} as CheckBody);
       if (!targetId || !UUID_REGEX.test(targetId)) {
@@ -101,10 +103,21 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
   // GET /api/verify/status/:orderId — List der FQDN-Targets der Order + Verify-Status
   server.get<{ Params: StatusParams }>(
     '/api/verify/status/:orderId',
+    { preHandler: [requireAuth] },
     async (request: FastifyRequest<{ Params: StatusParams }>, reply: FastifyReply) => {
       const { orderId } = request.params;
+      const user = request.user!;
       if (!UUID_REGEX.test(orderId)) {
         return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
+      }
+
+      // Ownership check
+      const orderCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [orderId]);
+      if (orderCheck.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+      if (user.role !== 'admin' && (orderCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId) {
+        return reply.status(403).send({ success: false, error: 'Access denied' });
       }
 
       const result = await query<{
