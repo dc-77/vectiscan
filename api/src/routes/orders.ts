@@ -610,17 +610,22 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
   });
 
   // GET /api/orders/:id/results — Raw scan results per tool
-  server.get<{ Params: OrderParams }>('/api/orders/:id/results', async (request, reply) => {
+  server.get<{ Params: OrderParams }>('/api/orders/:id/results', { preHandler: [requireAuth] }, async (request, reply) => {
     const { id } = request.params;
+    const user = request.user!;
 
     if (!UUID_REGEX.test(id)) {
       return reply.status(400).send({ success: false, error: 'Invalid order ID format' });
     }
 
-    // Verify order exists
-    const orderResult = await query('SELECT id, status FROM orders WHERE id = $1', [id]);
+    // Verify order exists and check ownership
+    const orderResult = await query('SELECT id, status, customer_id FROM orders WHERE id = $1', [id]);
     if (orderResult.rows.length === 0) {
       return reply.status(404).send({ success: false, error: 'Order not found' });
+    }
+    const order = orderResult.rows[0] as Record<string, unknown>;
+    if (user.role !== 'admin' && order.customer_id !== user.customerId) {
+      return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
     // Fetch all scan_results for this order

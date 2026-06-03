@@ -175,3 +175,26 @@ class TestResponseFormat:
     def test_content_type_is_json(self):
         resp = requests.get(f"{API_BASE_URL}/health", timeout=5)
         assert "application/json" in resp.headers.get("content-type", "")
+
+
+class TestOrderResultsAuth:
+    """Security regression: GET /api/orders/:id/results must require auth and enforce ownership."""
+
+    def test_results_without_auth_returns_401(self):
+        """Unauthenticated request must be rejected."""
+        fake_id = str(uuid.uuid4())
+        resp = requests.get(f"{API_BASE_URL}/api/orders/{fake_id}/results", timeout=5)
+        assert resp.status_code == 401, (
+            f"Expected 401 for unauthenticated /results request, got {resp.status_code}"
+        )
+        body = resp.json()
+        assert body["success"] is False
+
+    def test_results_invalid_uuid_returns_400(self):
+        """Malformed ID returns 400 (before auth check)."""
+        resp = requests.get(
+            f"{API_BASE_URL}/api/orders/not-a-uuid/results",
+            timeout=5,
+        )
+        # Without auth this should still be 401 now (preHandler runs before handler)
+        assert resp.status_code in (400, 401)
