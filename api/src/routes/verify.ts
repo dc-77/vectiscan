@@ -29,19 +29,27 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
     { preHandler: [requireAuth] },
     async (request: FastifyRequest<{ Body: CheckBody }>, reply: FastifyReply) => {
       const { targetId } = request.body || ({} as CheckBody);
+      const user = request.user!;
       if (!targetId || !UUID_REGEX.test(targetId)) {
         return reply.status(400).send({ success: false, error: 'Invalid or missing targetId' });
       }
 
+      // Owner des Targets gleich mit aufloesen (ueber Order oder Subscription),
+      // damit der Object-Level-Authz-Check ohne zweite Query auskommt.
       const result = await query<{
         id: string;
         canonical: string;
         target_type: string;
         order_id: string | null;
         subscription_id: string | null;
+        owner_customer_id: string | null;
       }>(
-        `SELECT id, canonical, target_type, order_id, subscription_id
-         FROM scan_targets WHERE id = $1`,
+        `SELECT t.id, t.canonical, t.target_type, t.order_id, t.subscription_id,
+                COALESCE(o.customer_id, s.customer_id) AS owner_customer_id
+         FROM scan_targets t
+         LEFT JOIN orders o ON o.id = t.order_id
+         LEFT JOIN subscriptions s ON s.id = t.subscription_id
+         WHERE t.id = $1`,
         [targetId],
       );
       if (result.rows.length === 0) {
@@ -49,6 +57,21 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
       }
 
       const target = result.rows[0];
+
+      // Object-Level-Authorization (OWASP API1:2023 BOLA): ein Mandant darf nur
+      // EIGENE scan_targets verifizieren. Ohne diesen Check kann ein
+      // authentifizierter Kunde mit einer fremden targetId eine DNS/HTTP-
+      // Verifikation gegen ein fremdes Target ausloesen UND einen
+      // verified_domains-Eintrag unter dem customer_id des Opfers erzeugen
+      // (Cross-Tenant Tampering + Resource-Consumption). Fail-closed: ohne
+      // aufloesbaren Owner kein Zugriff (ausser admin).
+      if (
+        user.role !== 'admin' &&
+        (!target.owner_customer_id || target.owner_customer_id !== user.customerId)
+      ) {
+        return reply.status(403).send({ success: false, error: 'Kein Zugriff auf dieses Target.' });
+      }
+
       if (target.target_type !== 'fqdn_root' && target.target_type !== 'fqdn_specific') {
         return reply.status(400).send({
           success: false,
@@ -64,15 +87,8 @@ export async function verifyRoutes(server: FastifyInstance): Promise<void> {
       const verification = await verifyAll(target.canonical, token);
 
       if (verification.verified) {
-        const customerRes = await query<{ customer_id: string }>(
-          `SELECT COALESCE(o.customer_id, s.customer_id) AS customer_id
-           FROM scan_targets t
-           LEFT JOIN orders o ON o.id = t.order_id
-           LEFT JOIN subscriptions s ON s.id = t.subscription_id
-           WHERE t.id = $1`,
-          [targetId],
-        );
-        const customerId = customerRes.rows[0]?.customer_id;
+        // Owner wurde bereits beim Authz-Check aufgeloest — keine zweite Query.
+        const customerId = target.owner_customer_id;
         if (customerId) {
           await query(
             `INSERT INTO verified_domains (customer_id, domain, verification_method)
