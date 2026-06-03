@@ -1,0 +1,98 @@
+{
+  "target": "demo-shop.vectiscan-demo.test",
+  "company_name": "Demo-Shop GmbH",
+  "package": "webcheck",
+  "overall_risk": "MEDIUM",
+  "overall_description": "Der WebCheck-Schnellscan des Online-Shops zeigt eine grundsätzlich solide Konfiguration mit mehreren mittelschweren Schwächen in der Transport- und E-Mail-Sicherheit. Es wurden keine kritischen, unmittelbar ausnutzbaren Schwachstellen gefunden. Die identifizierten Punkte erhöhen jedoch das Risiko für Phishing im Namen der Domain sowie für Man-in-the-Middle-Angriffe gegen veraltete TLS-Clients und sollten zeitnah behoben werden.",
+  "severity_counts": { "CRITICAL": 0, "HIGH": 0, "MEDIUM": 4, "LOW": 2, "INFO": 0 },
+  "findings": [
+    {
+      "id": "WC-01",
+      "title": "Veraltete TLS-Protokolle (TLS 1.0 / 1.1) aktiv",
+      "severity": "MEDIUM",
+      "cvss_score": "5.9",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "cwe": "CWE-327",
+      "affected": "https://demo-shop.vectiscan-demo.test (Port 443)",
+      "description": "Der Webserver akzeptiert weiterhin TLS-1.0- und TLS-1.1-Verbindungen. Beide Protokolle gelten als veraltet (PCI-DSS-Deprecation, BSI TR-02102-2) und sind anfällig für bekannte Angriffe wie BEAST und POODLE-Varianten.",
+      "evidence": "testssl.sh: TLS 1.0 offered (deprecated), TLS 1.1 offered (deprecated), TLS 1.2 offered, TLS 1.3 offered.",
+      "impact": "Clients, die ausschließlich veraltete Protokolle nutzen, können zu unsicheren Verbindungen gezwungen werden. Erhöhtes Risiko für das Mitlesen sensibler Bestelldaten in Teilnetzen.",
+      "recommendation": "TLS 1.0 und 1.1 deaktivieren, ausschließlich TLS 1.2 und 1.3 mit modernen Cipher-Suites anbieten."
+    },
+    {
+      "id": "WC-02",
+      "title": "Fehlende Security-Header (HSTS, CSP, X-Content-Type-Options)",
+      "severity": "MEDIUM",
+      "cvss_score": "5.3",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+      "cwe": "CWE-693",
+      "affected": "HTTP-Antworten aller Seiten",
+      "description": "Wichtige Sicherheits-Header fehlen: Strict-Transport-Security (HSTS), Content-Security-Policy (CSP) und X-Content-Type-Options. Ohne HSTS sind SSL-Stripping-Angriffe möglich; ohne CSP steigt das Risiko erfolgreicher XSS-Angriffe.",
+      "evidence": "curl -I: keine Header 'Strict-Transport-Security', 'Content-Security-Policy', 'X-Content-Type-Options' vorhanden.",
+      "impact": "Erhöhte Anfälligkeit für SSL-Stripping, Clickjacking und Cross-Site-Scripting, insbesondere im Checkout-Bereich.",
+      "recommendation": "HSTS (max-age >= 31536000; includeSubDomains), eine restriktive CSP sowie X-Content-Type-Options: nosniff setzen."
+    },
+    {
+      "id": "WC-03",
+      "title": "Kein DMARC-Record vorhanden",
+      "severity": "MEDIUM",
+      "cvss_score": "5.0",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N",
+      "cwe": "CWE-290",
+      "affected": "_dmarc.demo-shop.vectiscan-demo.test (DNS)",
+      "description": "Für die Domain ist kein DMARC-Record veröffentlicht. Damit fehlt die übergeordnete Richtlinie zur Behandlung von E-Mails, die SPF/DKIM nicht bestehen.",
+      "evidence": "DNS-TXT-Abfrage für _dmarc.demo-shop.vectiscan-demo.test liefert NXDOMAIN.",
+      "impact": "Angreifer können im Namen der Domain Phishing-Mails versenden (Spoofing der Absenderadresse), ohne dass empfangende Server diese zuverlässig ablehnen.",
+      "recommendation": "DMARC-Record schrittweise einführen: zunächst p=none mit Reporting, nach Auswertung auf p=quarantine bzw. p=reject erhöhen."
+    },
+    {
+      "id": "WC-04",
+      "title": "SPF-Record mit zu lockerem Softfail (~all)",
+      "severity": "MEDIUM",
+      "cvss_score": "4.3",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+      "cwe": "CWE-290",
+      "affected": "demo-shop.vectiscan-demo.test (DNS TXT)",
+      "description": "Der SPF-Record endet mit ~all (Softfail) statt -all (Hardfail). Mails von nicht autorisierten Servern werden dadurch nur als 'verdächtig' markiert, nicht abgelehnt.",
+      "evidence": "v=spf1 include:_spf.example-mailer.test ~all",
+      "impact": "Geringerer Schutz vor Domain-Spoofing; in Kombination mit fehlendem DMARC wird Phishing erleichtert.",
+      "recommendation": "Nach Verifikation aller legitimen Versandquellen auf -all (Hardfail) umstellen."
+    },
+    {
+      "id": "WC-05",
+      "title": "Session-Cookie ohne Secure-Flag",
+      "severity": "LOW",
+      "cvss_score": "3.7",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-614",
+      "affected": "Set-Cookie: SHOP_SESSION",
+      "description": "Das Session-Cookie wird ohne Secure-Flag gesetzt und kann theoretisch über eine unverschlüsselte Verbindung übertragen werden.",
+      "evidence": "Set-Cookie: SHOP_SESSION=...; Path=/; HttpOnly (kein 'Secure').",
+      "impact": "Bei einem erzwungenen HTTP-Downgrade könnte das Cookie abgegriffen werden.",
+      "recommendation": "Secure- und SameSite-Attribute für alle Session-Cookies setzen."
+    },
+    {
+      "id": "WC-06",
+      "title": "Veraltete JavaScript-Bibliothek (jQuery 1.12.4)",
+      "severity": "LOW",
+      "cvss_score": "3.1",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-1104",
+      "affected": "/assets/js/jquery.min.js",
+      "description": "Die eingebundene jQuery-Version 1.12.4 ist veraltet und enthält bekannte XSS-Schwachstellen (CVE-2020-11022, CVE-2020-11023).",
+      "evidence": "Statische Analyse der eingebundenen Skripte: jQuery v1.12.4.",
+      "impact": "Erhöhtes Restrisiko für DOM-basiertes XSS bei unsachgemäßer Verwendung der Bibliothek.",
+      "recommendation": "Auf eine aktuelle jQuery-Version (>= 3.7) aktualisieren oder die Abhängigkeit entfernen."
+    }
+  ],
+  "positive_findings": [
+    { "title": "TLS 1.3 unterstützt", "description": "Der Server bietet moderne TLS-1.3-Verbindungen mit Forward Secrecy an." },
+    { "title": "HTTP-zu-HTTPS-Weiterleitung aktiv", "description": "Alle HTTP-Anfragen werden serverseitig auf HTTPS umgeleitet." },
+    { "title": "DKIM korrekt konfiguriert", "description": "Ausgehende Mails sind mit einem gültigen DKIM-Schlüssel signiert." }
+  ],
+  "recommendations": [
+    { "timeframe": "Sofort", "action": "DMARC-Record (p=none mit Reporting) veröffentlichen und SPF auf -all vorbereiten.", "effort": "Niedrig" },
+    { "timeframe": "30 Tage", "action": "TLS 1.0/1.1 deaktivieren und vollständigen Security-Header-Satz (HSTS, CSP, nosniff) ausrollen.", "effort": "Mittel" },
+    { "timeframe": "90 Tage", "action": "Frontend-Abhängigkeiten aktualisieren (jQuery) und Cookie-Attribute härten.", "effort": "Mittel" }
+  ]
+}
