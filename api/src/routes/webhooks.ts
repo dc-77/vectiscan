@@ -18,8 +18,17 @@ import { getStripe, getWebhookSecret, isStripeConfigured } from '../lib/stripe.j
 
 export async function webhookRoutes(server: FastifyInstance): Promise<void> {
   // Stripe-Signaturpruefung benoetigt den rohen Body. Dieser Parser ist auf
-  // den (encapsulated) Webhook-Scope beschraenkt und ueberschreibt den
-  // globalen JSON-Parser aus server.ts nicht.
+  // den (encapsulated) Webhook-Scope beschraenkt.
+  //
+  // WICHTIG: server.ts registriert global einen *eigenen* application/json-
+  // Parser. Ein vom Parent geerbter custom-Parser ist NICHT ueberschreibbar —
+  // ein blosses addContentTypeParser('application/json') wirft hier
+  // FST_ERR_CTP_ALREADY_PRESENT und die GESAMTE API bootet nicht
+  // (start() faengt es und macht process.exit(1)). Deshalb erst im
+  // Plugin-Scope den geerbten Parser droppen, dann den Buffer-Parser setzen.
+  // Das bleibt auf diesen encapsulated Scope beschraenkt; alle anderen Routen
+  // erhalten weiterhin den geparsten JSON-Body aus server.ts.
+  server.removeContentTypeParser('application/json');
   server.addContentTypeParser(
     'application/json',
     { parseAs: 'buffer' },
@@ -65,7 +74,15 @@ export async function webhookRoutes(server: FastifyInstance): Promise<void> {
 
     try {
       switch (event.type) {
+        // Sofortzahlung (Karte) ODER verzoegerte Zahlart, die spaeter erfolgreich
+        // einzieht (SEPA-Lastschrift/Sofort — im DE-Mittelstand verbreitet).
+        // Bei verzoegerten Methoden feuert 'completed' zuerst mit
+        // payment_status 'unpaid' (Abo bleibt korrekt pending), und erst
+        // 'async_payment_succeeded' bestaetigt den Geldeingang. Beide muessen
+        // auf dieselbe Aktivierungslogik laufen, sonst bleibt ein bezahltes
+        // Abo ewig pending (kein Scan-Kontingent).
         case 'checkout.session.completed':
+        case 'checkout.session.async_payment_succeeded':
           await handleCheckoutCompleted(event.data.object as Stripe.Checkout.Session, request);
           break;
         case 'checkout.session.expired':

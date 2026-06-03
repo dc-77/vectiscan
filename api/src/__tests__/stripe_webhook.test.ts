@@ -153,6 +153,37 @@ describe('POST /api/webhooks/stripe', () => {
     await app.close();
   });
 
+  it('activates on checkout.session.async_payment_succeeded (delayed SEPA/Sofort payment)', async () => {
+    // M1: bei verzoegerten Zahlarten feuert 'completed' zuerst unpaid (Abo
+    // bleibt pending), und erst 'async_payment_succeeded' bestaetigt den
+    // Geldeingang. Dieses Event muss dieselbe Aktivierung ausloesen.
+    installDbMock();
+    constructEvent.mockReturnValue({
+      id: 'evt_async_ok_1',
+      type: 'checkout.session.async_payment_succeeded',
+      data: {
+        object: {
+          id: 'cs_async_1',
+          payment_status: 'paid',
+          amount_total: 49000,
+          currency: 'eur',
+          subscription: 'sub_stripe_async',
+          metadata: { subscription_id: 'sub-uuid-async', price_id: 'price_perimeter' },
+        },
+      },
+    });
+
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(200);
+
+    const updateCall = mockQuery.mock.calls.find(([sql]) => String(sql).includes('UPDATE subscriptions') && String(sql).includes("status = 'active'"));
+    expect(updateCall).toBeDefined();
+    expect(updateCall![1]).toEqual(expect.arrayContaining(['sub-uuid-async', 49000, 'EUR', 'sub_stripe_async', 'price_perimeter', 'cs_async_1']));
+    expect(mockEnqueue).toHaveBeenCalledTimes(1);
+    await app.close();
+  });
+
   it('marks payment_failed and unlocks no quota on checkout.session.expired', async () => {
     installDbMock();
     constructEvent.mockReturnValue({
