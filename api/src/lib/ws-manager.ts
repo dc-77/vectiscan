@@ -53,7 +53,13 @@ export async function initWsManager(log: FastifyBaseLogger): Promise<void> {
   log.info('Email notification subscriber: listening on scan:events:*');
 }
 
-async function handleReportComplete(orderId: string): Promise<void> {
+/**
+ * Send the scan-complete notification(s) for an order and record the
+ * `report.notified` audit event. Exported for unit testing of the PA-4
+ * idempotency guard (VEC-32 AC#3). Safe to call repeatedly: recipients that
+ * already have a `report.notified` audit entry are skipped.
+ */
+export async function handleReportComplete(orderId: string): Promise<void> {
   try {
     // Load customer email, subscription report_emails, and download token
     const result = await query(
@@ -90,12 +96,36 @@ async function handleReportComplete(orderId: string): Promise<void> {
     }
     if (customerEmail) recipients.add(customerEmail.toLowerCase());
 
-    // Send email to each recipient
+    // Idempotency (PA-4 AC#3): a report regenerate re-sets the order to
+    // `report_complete` (report-worker worker.py), which re-fires this handler.
+    // Resend's Idempotency-Key only dedupes for ~24h, so a regenerate days
+    // later would double-send. Guard at the DB level: skip any recipient that
+    // already has a `report.notified` audit entry for this order. This also
+    // makes a crashed/retried run (process_lost_retry) safe to resume — only
+    // recipients not yet notified get an email.
+    const notified = await query(
+      `SELECT lower(details->>'recipient') AS recipient
+       FROM audit_log
+       WHERE order_id = $1 AND action = 'report.notified'`,
+      [orderId],
+    );
+    const alreadyNotified = new Set(
+      (notified.rows as Array<{ recipient: string | null }>)
+        .map((r) => r.recipient)
+        .filter((r): r is string => Boolean(r)),
+    );
+
+    // Send email to each recipient that has not been notified yet
     for (const email of recipients) {
+      if (alreadyNotified.has(email)) {
+        logger?.info({ orderId, email }, 'Report notification already sent — skipping (idempotent)');
+        continue;
+      }
       try {
         await sendScanCompleteEmail(email, domain, orderId, downloadToken);
         // Audit-Log: persist the dispatch event (PA-4 AC#3) so report
-        // delivery is verifiable beyond the application log.
+        // delivery is verifiable beyond the application log and serves as
+        // the idempotency marker for regenerates/retries.
         await audit({
           orderId,
           action: 'report.notified',
