@@ -41,7 +41,7 @@ reproduzierbarer Login). Alle Daten sind **synthetisch** (`.test`-TLD, keine PII
 |---|---|---|---|---|---|
 | **WebCheck** | `demo-shop.vectiscan-demo.test` | Demo-Shop GmbH | **MEDIUM** | 6 (0C/0H/4M/2L) | „Sauberes Schnell-Audit" |
 | **Perimeter** | `demo-corp.vectiscan-demo.test` | Demo-Corp AG | **HIGH** | 10 (1C/3H/4M/2L) | „Aha-Effekt" (SQLi + RDP + .git) |
-| **Compliance** | `demo-stadtwerke.vectiscan-demo.test` | Demo-Stadtwerke AöR | **CRITICAL** | 11 (1C/4H/5M/1L) | NIS2/§30-BSIG-Story |
+| **Compliance** | `demo-stadtwerke.vectiscan-demo.test` | Demo-Stadtwerke AöR | **CRITICAL** | 11 (1C/4H/4M/2L) | NIS2/§30-BSIG-Story |
 
 **Deep-Links zur Scan-Detailseite** (zuverlässiger Fallback, falls man sich
 über das Dashboard „verklickt" — direkt nach Login aufrufbar):

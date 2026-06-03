@@ -4,7 +4,7 @@
   "package": "compliance",
   "overall_risk": "CRITICAL",
   "overall_description": "Der Compliance-Scan der Demo-Stadtwerke AöR (fiktiver KRITIS-nahe Betreiber) kombiniert den technischen Perimeter-Vollscan mit einer Bewertung nach §30 BSIG (NIS2-Umsetzung) und BSI-Grundschutz. Es wurden eine kritische sowie mehrere hohe Schwachstellen identifiziert, die in Verbindung mit organisatorischen Lücken (fehlende MFA für administrative Zugänge, unzureichendes Logging/Monitoring, nicht dokumentierter Incident-Response-Prozess) ein erhebliches Compliance- und Betriebsrisiko darstellen. Mehrere Befunde berühren unmittelbar die nach §30 BSIG geforderten Risikomanagementmaßnahmen.",
-  "severity_counts": { "CRITICAL": 1, "HIGH": 4, "MEDIUM": 5, "LOW": 2, "INFO": 0 },
+  "severity_counts": { "CRITICAL": 1, "HIGH": 4, "MEDIUM": 4, "LOW": 2, "INFO": 0 },
   "findings": [
     {
       "id": "CO-01",

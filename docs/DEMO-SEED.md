@@ -23,7 +23,7 @@ Drei fertige Reports (`status = report_complete`, bezahlt):
 |---|---|---|---|
 | WebCheck | `demo-shop.vectiscan-demo.test` | MEDIUM | 6 (0C / 0H / 4M / 2L) |
 | Perimeter | `demo-corp.vectiscan-demo.test` | HIGH | 10 (1C / 3H / 4M / 2L) |
-| Compliance | `demo-stadtwerke.vectiscan-demo.test` | CRITICAL | 11 (1C / 4H / 5M / 1L) + NIS2/§30-BSIG-Summary |
+| Compliance | `demo-stadtwerke.vectiscan-demo.test` | CRITICAL | 11 (1C / 4H / 4M / 2L) + NIS2/§30-BSIG-Summary |
 
 Jeder Report enthält:
 - `reports.findings_data` → speist Dashboard, Risk-Gauge, Top-Findings, Severity-Counts.
