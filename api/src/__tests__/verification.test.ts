@@ -292,58 +292,108 @@ describe('Verification API', () => {
 
   const targetId = '650e8400-e29b-41d4-a716-446655440000';
 
+  // Default-Mock (beforeEach) liefert einen Admin-JWT; requireAuth verlangt aber
+  // immer einen Token-Header. Alle authentifizierten Requests senden daher diesen
+  // Header (der JWT-Inhalt kommt aus dem verifyJwt-Mock, nicht aus dem Token).
+  const AUTH_HEADER = { authorization: 'Bearer mock-jwt-token' };
+
   describe('POST /api/verify/check', () => {
+    it('should return 401 without authentication', async () => {
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
+      expect(res.statusCode).toBe(401);
+    });
+
     it('should return 400 for missing targetId', async () => {
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: {} });
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', headers: AUTH_HEADER, payload: {} });
       expect(res.statusCode).toBe(400);
     });
 
     it('should return 404 for non-existent target', async () => {
       mockQuery.mockResolvedValueOnce(EMPTY_RESULT);
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', headers: AUTH_HEADER, payload: { targetId } });
       expect(res.statusCode).toBe(404);
       expect(res.json().error).toBe('Target nicht gefunden');
     });
 
     it('should return 400 for IP/CIDR target', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: targetId, canonical: '85.22.47.32/27', target_type: 'cidr', order_id: orderId, subscription_id: null }],
+        rows: [{ id: targetId, canonical: '85.22.47.32/27', target_type: 'cidr', order_id: orderId, subscription_id: null, owner_customer_id: 'cust-1' }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', headers: AUTH_HEADER, payload: { targetId } });
       expect(res.statusCode).toBe(400);
       expect(res.json().error).toBe('verification_not_applicable_for_ip_targets');
     });
 
     it('should verify fqdn target and persist to verified_domains', async () => {
-      // 1. SELECT scan_target
+      // 1. SELECT scan_target inkl. owner_customer_id (per JOIN)
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: targetId, canonical: 'example.com', target_type: 'fqdn_root', order_id: orderId, subscription_id: null }],
+        rows: [{ id: targetId, canonical: 'example.com', target_type: 'fqdn_root', order_id: orderId, subscription_id: null, owner_customer_id: 'cust-1' }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
       mockVerifyAll.mockResolvedValueOnce({ verified: true, method: 'file' });
-      // 2. SELECT customer_id (owner lookup)
-      mockQuery.mockResolvedValueOnce({
-        rows: [{ customer_id: 'cust-1' }],
-        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
-      });
-      // 3. INSERT INTO verified_domains
+      // 2. INSERT INTO verified_domains (Owner stammt aus Query 1, keine zweite Owner-Query)
       mockQuery.mockResolvedValueOnce({ rows: [], command: 'INSERT', rowCount: 1, oid: 0, fields: [] });
 
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', headers: AUTH_HEADER, payload: { targetId } });
       expect(res.json()).toEqual({ success: true, data: { verified: true, method: 'file' } });
       // Der Scan wird durch Admin-Review gestartet, nicht durch die Verifikation.
       expect(mockScanQueueAdd).not.toHaveBeenCalled();
     });
 
+    // Regressionstest fuer VEC-14: BOLA / Cross-Tenant auf POST /api/verify/check.
+    // Vor dem Fix fehlte der Object-Level-Authz-Check: ein fremder, aber
+    // authentifizierter Kunde konnte mit der targetId eines anderen Mandanten
+    // eine Verifikation ausloesen und verified_domains des Opfers beschreiben.
+    // Dieser Test schlaegt gegen den alten Code fehl (dort 200 + verifyAll-Aufruf)
+    // und besteht gegen den gefixten Code (403, kein verifyAll, keine Persistenz).
+    it('should return 403 when a customer verifies another tenant\'s target (BOLA)', async () => {
+      const { verifyJwt } = require('../lib/auth');
+      (verifyJwt as jest.Mock).mockReturnValue({
+        sub: 'attacker-user', role: 'customer', customerId: 'cust-attacker', email: 'attacker@test.com',
+      });
+      // Target gehoert dem Opfer (cust-victim), nicht dem Angreifer.
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: targetId, canonical: 'victim.example.com', target_type: 'fqdn_root', order_id: orderId, subscription_id: null, owner_customer_id: 'cust-victim' }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      // Wuerde der alte (verwundbare) Code den Authz-Check ueberspringen, kaeme er
+      // bis hierher: Verifikation + Persistenz unter dem Opfer-customer_id.
+      mockVerifyAll.mockResolvedValueOnce({ verified: true, method: 'file' });
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'INSERT', rowCount: 1, oid: 0, fields: [] });
+
+      const res = await server.inject({
+        method: 'POST', url: '/api/verify/check',
+        headers: { authorization: 'Bearer attacker-jwt' },
+        payload: { targetId },
+      });
+
+      expect(res.statusCode).toBe(403);
+      // Keine Verifikation ausgeloest und nichts persistiert (nur die Owner-Query lief).
+      expect(mockVerifyAll).not.toHaveBeenCalled();
+      expect(mockQuery).toHaveBeenCalledTimes(1);
+    });
+
+    // Gegenprobe: Admin darf weiterhin jedes Target verifizieren (Admin-Bypass).
+    it('should allow admin to verify any target regardless of owner', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: targetId, canonical: 'example.com', target_type: 'fqdn_root', order_id: orderId, subscription_id: null, owner_customer_id: 'cust-someone-else' }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      mockVerifyAll.mockResolvedValueOnce({ verified: false, method: null });
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', headers: AUTH_HEADER, payload: { targetId } });
+      expect(res.statusCode).toBe(200);
+      expect(mockVerifyAll).toHaveBeenCalledTimes(1);
+    });
+
     it('should return verified:false without persistence on failure', async () => {
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: targetId, canonical: 'example.com', target_type: 'fqdn_root', order_id: orderId, subscription_id: null }],
+        rows: [{ id: targetId, canonical: 'example.com', target_type: 'fqdn_root', order_id: orderId, subscription_id: null, owner_customer_id: 'cust-1' }],
         command: 'SELECT', rowCount: 1, oid: 0, fields: [],
       });
       mockVerifyAll.mockResolvedValueOnce({ verified: false, method: null });
 
-      const res = await server.inject({ method: 'POST', url: '/api/verify/check', payload: { targetId } });
+      const res = await server.inject({ method: 'POST', url: '/api/verify/check', headers: AUTH_HEADER, payload: { targetId } });
       expect(res.json()).toEqual({ success: true, data: { verified: false, method: null } });
       // Nur der SELECT wurde durchgefuehrt, keine verified_domains-Persistenz.
       expect(mockQuery).toHaveBeenCalledTimes(1);
@@ -351,19 +401,44 @@ describe('Verification API', () => {
   });
 
   describe('GET /api/verify/status/:orderId', () => {
+    // Erste Query der Route ist der Ownership-Check (SELECT customer_id FROM orders);
+    // dann erst die Targets-Query. Beide muessen gemockt werden.
+    const ownerOrderRow = {
+      rows: [{ customer_id: 'cust-1' }], command: 'SELECT' as const, rowCount: 1, oid: 0, fields: [],
+    };
+
+    it('should return 401 without authentication', async () => {
+      const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}` });
+      expect(res.statusCode).toBe(401);
+    });
+
     it('should return 400 for invalid order ID', async () => {
-      const res = await server.inject({ method: 'GET', url: '/api/verify/status/not-a-uuid' });
+      const res = await server.inject({ method: 'GET', url: '/api/verify/status/not-a-uuid', headers: AUTH_HEADER });
       expect(res.statusCode).toBe(400);
     });
 
+    it('should return 403 when the order belongs to another tenant (BOLA)', async () => {
+      const { verifyJwt } = require('../lib/auth');
+      (verifyJwt as jest.Mock).mockReturnValue({
+        sub: 'attacker-user', role: 'customer', customerId: 'cust-attacker', email: 'attacker@test.com',
+      });
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ customer_id: 'cust-victim' }], command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}`, headers: { authorization: 'Bearer attacker-jwt' } });
+      expect(res.statusCode).toBe(403);
+    });
+
     it('should return empty list when order has no FQDN targets', async () => {
+      mockQuery.mockResolvedValueOnce(ownerOrderRow);
       mockQuery.mockResolvedValueOnce(EMPTY_RESULT);
-      const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}` });
+      const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}`, headers: AUTH_HEADER });
       expect(res.statusCode).toBe(200);
       expect(res.json().data).toEqual({ targets: [] });
     });
 
     it('should list FQDN targets with cached verification status', async () => {
+      mockQuery.mockResolvedValueOnce(ownerOrderRow);
       mockQuery.mockResolvedValueOnce({
         rows: [
           { id: targetId, canonical: 'example.com', target_type: 'fqdn_root', verified: true, method: 'dns_txt' },
@@ -371,7 +446,7 @@ describe('Verification API', () => {
         ],
         command: 'SELECT', rowCount: 2, oid: 0, fields: [],
       });
-      const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}` });
+      const res = await server.inject({ method: 'GET', url: `/api/verify/status/${orderId}`, headers: AUTH_HEADER });
       expect(res.json().data.targets).toHaveLength(2);
       expect(res.json().data.targets[0].verified).toBe(true);
       expect(res.json().data.targets[1].verified).toBe(false);
