@@ -183,4 +183,7 @@ Branding-Farben aus `reporter/pdf/branding.py` — nicht hardcoden.
 - `docs/deterministic/` — Q2/2026 Determinismus-Block
   (00-OVERVIEW, 01-cleanup, 02-severity-policy, 03-ai-determinism,
   04-deterministic-selection, 05-schema-migrations, 99-CUTOVER)
+- `MONITORING.md` — Monitoring/Logging/Alerting-Runbook (Uptime-Kuma,
+  Loki+Promtail, Grafana, Resend-Alerts) — A5/VEC-85
+- `OFFSITE-BACKUP-EVAL.md` — Off-Site-Backup-Bewertung + Empfehlung
 - `references/report_structure.md` — PDF-Layout
