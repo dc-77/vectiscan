@@ -12,6 +12,7 @@ import { wsRoutes } from './routes/ws.js';
 import { scheduleRoutes } from './routes/schedules.js';
 import { subscriptionRoutes } from './routes/subscriptions.js';
 import { adminReviewRoutes } from './routes/admin-review.js';
+import { webhookRoutes } from './routes/webhooks.js';
 import { startScheduler } from './lib/scheduler.js';
 
 export function buildServer() {
@@ -47,6 +48,8 @@ export function buildServer() {
   server.register(scheduleRoutes);
   server.register(subscriptionRoutes);
   server.register(adminReviewRoutes);
+  // Encapsulated plugin: nutzt eigenen Buffer-Body-Parser fuer Stripe-Signatur.
+  server.register(webhookRoutes);
 
   return server;
 }

@@ -31,6 +31,8 @@ export type AuditAction =
   | 'order.approved'
   | 'order.rejected'
   | 'subscription.created'
+  | 'subscription.payment_confirmed'
+  | 'subscription.payment_failed'
   | 'subscription.domain_requested'
   | 'subscription.domain_approved'
   | 'subscription.domain_rejected'
