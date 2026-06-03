@@ -12,6 +12,7 @@ import { type WebSocket } from 'ws';
 import { type FastifyBaseLogger } from 'fastify';
 import { query } from './db.js';
 import { sendScanCompleteEmail } from './email.js';
+import { audit } from './audit.js';
 
 /** Map of orderId -> Set of connected WebSocket clients */
 const clients = new Map<string, Set<WebSocket>>();
@@ -93,6 +94,13 @@ async function handleReportComplete(orderId: string): Promise<void> {
     for (const email of recipients) {
       try {
         await sendScanCompleteEmail(email, domain, orderId, downloadToken);
+        // Audit-Log: persist the dispatch event (PA-4 AC#3) so report
+        // delivery is verifiable beyond the application log.
+        await audit({
+          orderId,
+          action: 'report.notified',
+          details: { recipient: email, domain },
+        });
       } catch (err) {
         logger?.error({ err, orderId, email }, 'Failed to send report email to recipient');
       }
