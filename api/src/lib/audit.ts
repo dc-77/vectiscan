@@ -24,6 +24,7 @@ export type AuditAction =
   | 'finding.overridden'
   | 'finding.override_removed'
   | 'user.registered'
+  | 'onboarding.first_report_complete'
   | 'user.login'
   | 'user.password_reset'
   | 'user.role_changed'

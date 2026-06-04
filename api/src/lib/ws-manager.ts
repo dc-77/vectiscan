@@ -13,6 +13,7 @@ import { type FastifyBaseLogger } from 'fastify';
 import { query } from './db.js';
 import { sendScanCompleteEmail } from './email.js';
 import { audit } from './audit.js';
+import { computeTimeToValue } from './timeToValue.js';
 
 /** Map of orderId -> Set of connected WebSocket clients */
 const clients = new Map<string, Set<WebSocket>>();
@@ -136,6 +137,12 @@ export async function handleReportComplete(orderId: string): Promise<void> {
       }
     }
 
+    // VEC-87 (PA-7) AC3: Onboarding-Time-to-Value-Messpunkt. Beim ERSTEN
+    // report_complete eines Kunden die Spanne Registrierung→Ergebnis als
+    // auswertbares Audit-Event festhalten. Fire-and-forget, blockiert die
+    // Zustellung nicht.
+    await recordTimeToValue(orderId);
+
     // Mark order as delivered
     await query(
       "UPDATE orders SET status = 'delivered', updated_at = NOW() WHERE id = $1 AND status = 'report_complete'",
@@ -143,6 +150,60 @@ export async function handleReportComplete(orderId: string): Promise<void> {
     );
   } catch (err) {
     logger?.error({ err, orderId }, 'Failed to send report-complete notification');
+  }
+}
+
+/**
+ * VEC-87 (PA-7) AC3 — schreibt das `onboarding.first_report_complete`-Audit-
+ * Event, sobald ein Kunde seinen ersten Report fertig hat. Idempotent über die
+ * `priorCompletedCount`-Prüfung: nur der erste abgeschlossene Auftrag erzeugt
+ * das Event. Wirft nie (Onboarding-Metrik darf die Zustellung nie blockieren).
+ */
+async function recordTimeToValue(orderId: string): Promise<void> {
+  try {
+    const res = await query<{
+      registered_at: Date;
+      prior_completed: string | number;
+    }>(
+      `SELECT c.created_at AS registered_at,
+              (SELECT COUNT(*) FROM orders o2
+                 WHERE o2.customer_id = o.customer_id
+                   AND o2.id <> o.id
+                   AND o2.status IN ('report_complete', 'delivered')) AS prior_completed
+         FROM orders o
+         JOIN customers c ON c.id = o.customer_id
+        WHERE o.id = $1`,
+      [orderId],
+    );
+
+    if (res.rows.length === 0) {
+      logger?.warn({ orderId }, 'TTV: order not found — skipping onboarding measurement');
+      return;
+    }
+
+    const row = res.rows[0];
+    const ttv = computeTimeToValue({
+      registeredAt: new Date(row.registered_at),
+      completedAt: new Date(),
+      priorCompletedCount: Number(row.prior_completed),
+    });
+
+    // null ⇒ nicht der erste Report; Kennzahl bereits erfasst.
+    if (!ttv) return;
+
+    await audit({
+      orderId,
+      action: 'onboarding.first_report_complete',
+      details: {
+        registeredAt: ttv.registeredAt,
+        completedAt: ttv.completedAt,
+        ttvSeconds: ttv.ttvSeconds,
+        ttvMinutes: Math.round((ttv.ttvSeconds / 60) * 10) / 10,
+      },
+    });
+    logger?.info({ orderId, ttvSeconds: ttv.ttvSeconds }, 'Onboarding time-to-value recorded');
+  } catch (err) {
+    logger?.error({ err, orderId }, 'Failed to record onboarding time-to-value');
   }
 }
 
