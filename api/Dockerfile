@@ -21,6 +21,10 @@ COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=builder /app/dist ./dist
 COPY src/migrations ./dist/migrations
+# Demo-Seed-Fixtures (VEC-121/PA-6): seed-demo.js liest die JSON-Fixtures zur
+# Laufzeit via fs.readFileSync(__dirname/demo-data/*.json). tsc emittiert keine
+# .json — daher explizit ins dist kopieren, analog zu den Migrationen.
+COPY src/scripts/demo-data ./dist/scripts/demo-data
 USER vectiscan
 EXPOSE 4000
 CMD ["node", "dist/server.js"]
