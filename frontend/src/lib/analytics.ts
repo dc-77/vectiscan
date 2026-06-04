@@ -88,3 +88,71 @@ export function deriveQuelleKanal(): { quelle_kanal: string; utm: Record<string,
   }
   return { quelle_kanal: 'Direkt', utm };
 }
+
+/**
+ * Cookieloses First-Party-Analytics (VEC-36).
+ *
+ * Sendet ausschliesslich anonyme Daten an /api/analytics/collect: aufgerufener
+ * Pfad, Referrer-Domain und UTM-Parameter. KEINE personenbezogenen Daten, keine
+ * Cookies, kein localStorage, kein Besucher-Identifier — daher einwilligungsfrei
+ * (vgl. Datenschutzerklaerung Abschnitt 8). Ergaenzt den consent-gated
+ * VectiTrack-Seam oben; beide koexistieren bewusst nebeneinander.
+ */
+const ANALYTICS_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+
+export function trackPageview(path: string): void {
+  if (typeof window === 'undefined') return;
+
+  let referrer: string | undefined;
+  try {
+    // Nur Fremd-Referrer melden; interne Navigation hat keinen document.referrer
+    // der eigenen Domain im Sinne der Reichweitenmessung.
+    if (document.referrer) {
+      const refHost = new URL(document.referrer).hostname;
+      if (refHost && refHost !== window.location.hostname) {
+        referrer = document.referrer;
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  let utmSource: string | undefined;
+  let utmMedium: string | undefined;
+  let utmCampaign: string | undefined;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    utmSource = params.get('utm_source') || undefined;
+    utmMedium = params.get('utm_medium') || undefined;
+    utmCampaign = params.get('utm_campaign') || undefined;
+  } catch {
+    // ignore
+  }
+
+  const payload = JSON.stringify({
+    path,
+    referrer,
+    utmSource,
+    utmMedium,
+    utmCampaign,
+    eventType: 'pageview',
+  });
+
+  // sendBeacon ueberlebt Seitenwechsel; fetch als Fallback. Fehler werden
+  // bewusst verschluckt — Analytics darf den Nutzerfluss nie stoeren.
+  try {
+    const url = `${ANALYTICS_API_URL}/api/analytics/collect`;
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+    } else {
+      void fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true,
+      }).catch(() => {});
+    }
+  } catch {
+    // ignore
+  }
+}
