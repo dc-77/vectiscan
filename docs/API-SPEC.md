@@ -128,8 +128,8 @@ Job mit `approved=true` (Worker generiert PDF und setzt `report_complete`).
 ### POST /api/admin/orders/:id/reject
 Body: `{ "reason": "..." }`. Setzt Order auf `rejected` mit `review_notes`.
 
-### POST /api/orders/:id/requeue-report
-**Admin only.** Lädt host_inventory + tech_profiles + phase3-Daten aus
+### POST /api/admin/orders/:id/requeue-report
+**Admin only.** (VEC-133: unter `/api/admin/*` für Edge-Admin-Shield-Deckung.) Lädt host_inventory + tech_profiles + phase3-Daten aus
 `scan_results`, setzt Status auf `scan_complete` und enqueued einen neuen
 Report-Job. Für gescheiterte Reports.
 

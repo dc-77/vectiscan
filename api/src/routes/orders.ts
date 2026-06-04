@@ -1271,9 +1271,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     },
   );
 
-  // GET /api/orders/:id/overrides — list all overrides for an order (admin-only)
+  // GET /api/admin/orders/:id/overrides — list all overrides for an order (admin-only)
+  // VEC-133: unter /api/admin/* konsolidiert, damit der Edge-Admin-Shield die Route deckt.
   server.get<{ Params: OrderParams }>(
-    '/api/orders/:id/overrides',
+    '/api/admin/orders/:id/overrides',
     { preHandler: [requireAuth, requireAdmin] },
     async (request, reply) => {
       const { id } = request.params;
@@ -1313,9 +1314,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     },
   );
 
-  // POST /api/orders/:id/findings/:findingId/override — set/update a field override (admin-only)
+  // POST /api/admin/orders/:id/findings/:findingId/override — set/update a field override (admin-only)
+  // VEC-133: unter /api/admin/* konsolidiert (Edge-Admin-Shield-Deckung).
   server.post<{ Params: FindingParams; Body: OverrideBody }>(
-    '/api/orders/:id/findings/:findingId/override',
+    '/api/admin/orders/:id/findings/:findingId/override',
     { preHandler: [requireAuth, requireAdmin] },
     async (request, reply) => {
       const { id, findingId } = request.params;
@@ -1404,9 +1406,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     },
   );
 
-  // DELETE /api/orders/:id/findings/:findingId/override?field=cvss_score — remove an override (admin-only)
+  // DELETE /api/admin/orders/:id/findings/:findingId/override?field=cvss_score — remove an override (admin-only)
+  // VEC-133: unter /api/admin/* konsolidiert (Edge-Admin-Shield-Deckung).
   server.delete<{ Params: FindingParams; Querystring: { field?: string } }>(
-    '/api/orders/:id/findings/:findingId/override',
+    '/api/admin/orders/:id/findings/:findingId/override',
     { preHandler: [requireAuth, requireAdmin] },
     async (request, reply) => {
       const { id, findingId } = request.params;
@@ -1759,8 +1762,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
   });
 
   // --- Admin: Re-queue report generation ---
+  // VEC-133: unter /api/admin/* konsolidiert (Edge-Admin-Shield-Deckung).
   server.post<{ Params: OrderParams }>(
-    '/api/orders/:id/requeue-report',
+    '/api/admin/orders/:id/requeue-report',
     { preHandler: [requireAuth, requireAdmin] },
     async (request, reply) => {
       const { id } = request.params;

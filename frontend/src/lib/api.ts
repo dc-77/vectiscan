@@ -1091,7 +1091,7 @@ export async function regenerateReport(orderId: string): Promise<ApiResponse<{ m
  *  hostInventory/techProfiles aus den persistierten scan_results.
  */
 export async function requeueReport(orderId: string): Promise<ApiResponse<{ message?: string }>> {
-  const res = await fetch(`${API_URL}/api/orders/${orderId}/requeue-report`, {
+  const res = await fetch(`${API_URL}/api/admin/orders/${orderId}/requeue-report`, {
     method: 'POST',
     headers: authHeaders(),
   });
@@ -1113,7 +1113,7 @@ export interface FindingOverride {
 export async function getFindingOverrides(
   orderId: string,
 ): Promise<ApiResponse<{ overrides: FindingOverride[] }>> {
-  const res = await fetch(`${API_URL}/api/orders/${orderId}/overrides`, {
+  const res = await fetch(`${API_URL}/api/admin/orders/${orderId}/overrides`, {
     headers: authHeaders(),
   });
   return handleResponse(res);
@@ -1128,7 +1128,7 @@ export async function setFindingOverride(
   note?: string,
 ): Promise<ApiResponse<FindingOverride>> {
   const res = await fetch(
-    `${API_URL}/api/orders/${orderId}/findings/${encodeURIComponent(findingId)}/override`,
+    `${API_URL}/api/admin/orders/${orderId}/findings/${encodeURIComponent(findingId)}/override`,
     {
       method: 'POST',
       headers: authHeaders(),
@@ -1145,7 +1145,7 @@ export async function deleteFindingOverride(
   field: string,
 ): Promise<ApiResponse<{ deleted: number }>> {
   const res = await fetch(
-    `${API_URL}/api/orders/${orderId}/findings/${encodeURIComponent(findingId)}/override?field=${encodeURIComponent(field)}`,
+    `${API_URL}/api/admin/orders/${orderId}/findings/${encodeURIComponent(findingId)}/override?field=${encodeURIComponent(field)}`,
     {
       method: 'DELETE',
       headers: authHeaders(),
