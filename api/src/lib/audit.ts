@@ -55,7 +55,12 @@ export type AuditAction =
   | 'subscription.status_report_requested'
   | 'subscription.status_report_generated'
   | 'subscription.cancelled'
-  | 'subscription.deleted';
+  | 'subscription.deleted'
+  | 'webcheck.lead_created'
+  | 'webcheck.rate_limited'
+  | 'webcheck.scan_requested'
+  | 'webcheck.free_scan_window_hit'
+  | 'webcheck.doi_confirmed';
 
 interface AuditEntry {
   orderId?: string | null;

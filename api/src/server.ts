@@ -8,6 +8,7 @@ import { authRoutes } from './routes/auth.js';
 import { healthRoutes } from './routes/health.js';
 import { orderRoutes } from './routes/orders.js';
 import { verifyRoutes } from './routes/verify.js';
+import { webcheckRoutes } from './routes/webcheck.js';
 import { wsRoutes } from './routes/ws.js';
 import { scheduleRoutes } from './routes/schedules.js';
 import { subscriptionRoutes } from './routes/subscriptions.js';
@@ -44,6 +45,7 @@ export function buildServer() {
   server.register(healthRoutes);
   server.register(orderRoutes);
   server.register(verifyRoutes);
+  server.register(webcheckRoutes);
   server.register(wsRoutes);
   server.register(scheduleRoutes);
   server.register(subscriptionRoutes);

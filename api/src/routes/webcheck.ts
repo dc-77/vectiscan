@@ -1,0 +1,331 @@
+/**
+ * WebCheck-Free — öffentlicher, anonymer Self-Service-Lead-Magnet (VEC-91 / PA-11).
+ *
+ * Flow (ohne Login):
+ *   1. POST /api/webcheck/start  — E-Mail + Domain, Rate-Limit, Lead anlegen,
+ *      Verifikations-Token + Anleitung zurück, DOI-Mail (best effort) versenden.
+ *   2. POST /api/webcheck/verify — Domain-Kontrolle prüfen (Reuse VerificationService).
+ *      Bei Erfolg + freiem Fenster: anonymen Customer + Order(package=webcheck)
+ *      anlegen, Scan-Pipeline anstoßen. Report-Zustellung per Mail erfolgt über die
+ *      bestehende PA-4-Mechanik (download_token, ws-manager handleReportComplete).
+ *   3. GET  /api/webcheck/doi/confirm — Double-Opt-in Marketing-Einwilligung (DSGVO).
+ *
+ * SICHERHEIT: Dies ist ein öffentlicher, anonymer Endpunkt, der das Produkt
+ * exponiert. Schutzmaßnahmen hier: Domain-Verifikation VOR Scan (kein Scan fremder
+ * Domains), Rate-Limiting pro E-Mail/Domain/IP, genau ein Free-Scan pro verifizierter
+ * Domain pro Zeitfenster, erzwungenes WebCheck-Free-Paket. Die erzeugte Order läuft
+ * bewusst durch den NORMALEN Admin-Review-/Precheck-Pfad — eine vollautomatische
+ * Freigabe verifizierter anonymer Scans ist eine separate Security-Entscheidung
+ * (Sven), nicht der Default. Sven's Security-Sign-off ist vor Merge zwingend.
+ */
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import crypto from 'crypto';
+import { query } from '../lib/db.js';
+import { generateToken, verifyAll } from '../services/VerificationService.js';
+import { isValidDomain, validateTargetBatch } from '../lib/validate.js';
+import { enqueuePrecheck } from '../lib/queue.js';
+import { audit } from '../lib/audit.js';
+import { sendWebcheckDoiEmail } from '../lib/email.js';
+
+// --- Konfiguration (AC3/AC4) ---------------------------------------------------
+
+/** Anonyme Free-Scans sind immer und ausschließlich das limitierte WebCheck-Paket. */
+export const WEBCHECK_PACKAGE = 'webcheck' as const;
+
+/** Genau 1 Free-Scan pro verifizierter Domain in diesem Fenster (AC3). */
+export const FREE_SCAN_WINDOW_HOURS = 24;
+
+/** Rate-Limit-Schwellen pro Bezeichner im Fenster (AC4). */
+export const RATE_LIMITS = {
+  windowMinutes: 60,
+  maxPerEmail: 3,
+  maxPerDomain: 3,
+  maxPerIp: 5,
+} as const;
+
+// --- Pure Helfer (unit-testbar ohne DB) ---------------------------------------
+
+// Konservative, längen-begrenzte E-Mail-Prüfung. Bewusst streng, da öffentlich.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+export function isValidEmail(email: unknown): email is string {
+  if (typeof email !== 'string') return false;
+  const trimmed = email.trim();
+  if (trimmed.length === 0 || trimmed.length > 254) return false;
+  return EMAIL_REGEX.test(trimmed);
+}
+
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+export function normalizeDomain(domain: string): string {
+  return domain.trim().toLowerCase().replace(/\.$/, '');
+}
+
+/**
+ * Rate-Limit-Entscheidung (pure): true = drosseln. Schwelle ist erreicht, wenn die
+ * Zahl der bestehenden Einträge im Fenster >= Maximum ist (der neue Versuch wäre der
+ * (count+1)-te). Getrennt pro E-Mail/Domain/IP — der strengste Treffer gewinnt.
+ */
+export function decideRateLimited(counts: {
+  email: number;
+  domain: number;
+  ip: number;
+}): boolean {
+  return (
+    counts.email >= RATE_LIMITS.maxPerEmail ||
+    counts.domain >= RATE_LIMITS.maxPerDomain ||
+    counts.ip >= RATE_LIMITS.maxPerIp
+  );
+}
+
+/** UTM-/Quellfelder defensiv aus dem Request-Body extrahieren (AC7). */
+export function extractCapture(body: Record<string, unknown>): Record<string, string | null> {
+  const pick = (v: unknown): string | null =>
+    typeof v === 'string' && v.trim().length > 0 ? v.trim().slice(0, 255) : null;
+  return {
+    source: pick(body.source),
+    channel: pick(body.channel),
+    utm_source: pick(body.utm_source),
+    utm_medium: pick(body.utm_medium),
+    utm_campaign: pick(body.utm_campaign),
+    utm_term: pick(body.utm_term),
+    utm_content: pick(body.utm_content),
+    referrer: pick(body.referrer),
+    icp_segment: pick(body.icp_segment),
+  };
+}
+
+/** Verifikations-Anleitung für AC2 (DNS-TXT / Datei / Meta-Tag). */
+export function buildVerifyInstructions(domain: string, token: string) {
+  return {
+    token,
+    methods: [
+      { type: 'dns_txt', record: `_vectiscan-verify.${domain}`, value: token },
+      { type: 'file', path: `https://${domain}/.well-known/vectiscan-verify.txt`, value: token },
+      { type: 'meta_tag', value: `<meta name="vectiscan-verify" content="${token}">` },
+    ],
+  };
+}
+
+// --- Routen --------------------------------------------------------------------
+
+interface StartBody {
+  email?: unknown;
+  domain?: unknown;
+  [k: string]: unknown;
+}
+
+interface VerifyBody {
+  leadId?: unknown;
+}
+
+interface DoiQuery {
+  token?: string;
+}
+
+export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
+  // POST /api/webcheck/start — anonym (AC1, AC4, AC5-DOI-Start, AC7)
+  server.post<{ Body: StartBody }>('/api/webcheck/start', async (request, reply) => {
+    const body = (request.body || {}) as StartBody;
+
+    if (!isValidEmail(body.email)) {
+      return reply.status(400).send({ success: false, error: 'invalid_email' });
+    }
+    if (!isValidDomain(body.domain)) {
+      return reply.status(400).send({ success: false, error: 'invalid_domain' });
+    }
+
+    const email = normalizeEmail(body.email as string);
+    const domain = normalizeDomain(body.domain as string);
+    const ip = request.ip;
+    const win = `${RATE_LIMITS.windowMinutes} minutes`;
+
+    // Rate-Limit-Fensterzählung pro E-Mail/Domain/IP (AC4).
+    const counts = await query<{ email_count: string; domain_count: string; ip_count: string }>(
+      `SELECT
+         COUNT(*) FILTER (WHERE email = $1) AS email_count,
+         COUNT(*) FILTER (WHERE domain = $2) AS domain_count,
+         COUNT(*) FILTER (WHERE ip = $3) AS ip_count
+       FROM webcheck_leads
+       WHERE created_at > NOW() - INTERVAL '${win}'`,
+      [email, domain, ip],
+    );
+    const c = counts.rows[0];
+    if (
+      decideRateLimited({
+        email: Number(c?.email_count ?? 0),
+        domain: Number(c?.domain_count ?? 0),
+        ip: Number(c?.ip_count ?? 0),
+      })
+    ) {
+      audit({ orderId: null, action: 'webcheck.rate_limited', details: { domain }, ip });
+      return reply.status(429).send({ success: false, error: 'rate_limited' });
+    }
+
+    const verificationToken = generateToken();
+    const doiToken = crypto.randomUUID();
+    const cap = extractCapture(body);
+
+    const insert = await query<{ id: string }>(
+      `INSERT INTO webcheck_leads
+         (email, domain, verification_token, doi_token, doi_sent_at, ip,
+          source, channel, utm_source, utm_medium, utm_campaign, utm_term,
+          utm_content, referrer, icp_segment)
+       VALUES ($1,$2,$3,$4,NOW(),$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+       RETURNING id`,
+      [
+        email, domain, verificationToken, doiToken, ip,
+        cap.source, cap.channel, cap.utm_source, cap.utm_medium, cap.utm_campaign,
+        cap.utm_term, cap.utm_content, cap.referrer, cap.icp_segment,
+      ],
+    );
+    const leadId = insert.rows[0].id;
+
+    audit({ orderId: null, action: 'webcheck.lead_created', details: { leadId, domain }, ip });
+
+    // DOI-Mail (Marketing-Einwilligung) best effort — separat vom Report-Mail.
+    // Copy/Rechtsgrundlagentext werden von Greta (CMO/DSGVO) final geliefert (VEC-91-Child).
+    await sendWebcheckDoiEmail(email, domain, doiToken);
+
+    return reply.status(201).send({
+      success: true,
+      data: {
+        leadId,
+        domain,
+        verification: buildVerifyInstructions(domain, verificationToken),
+      },
+    });
+  });
+
+  // POST /api/webcheck/verify — anonym (AC2, AC3)
+  server.post<{ Body: VerifyBody }>('/api/webcheck/verify', async (request, reply) => {
+    const leadId = (request.body || ({} as VerifyBody)).leadId;
+    const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (typeof leadId !== 'string' || !UUID_REGEX.test(leadId)) {
+      return reply.status(400).send({ success: false, error: 'invalid_lead_id' });
+    }
+
+    const leadRes = await query<{
+      id: string; email: string; domain: string; verification_token: string;
+      verified: boolean; order_id: string | null;
+    }>(
+      `SELECT id, email, domain, verification_token, verified, order_id
+       FROM webcheck_leads WHERE id = $1`,
+      [leadId],
+    );
+    if (leadRes.rows.length === 0) {
+      return reply.status(404).send({ success: false, error: 'lead_not_found' });
+    }
+    const lead = leadRes.rows[0];
+
+    // Idempotenz: bereits angestoßener Scan → kein zweiter (AC3).
+    if (lead.order_id) {
+      return reply.send({
+        success: true,
+        data: { verified: true, scanStarted: false, alreadyRequested: true, orderId: lead.order_id },
+      });
+    }
+
+    // AC2: Domain-Kontrolle nachweisen (kein Scan fremder Domains).
+    const verification = await verifyAll(lead.domain, lead.verification_token);
+    if (!verification.verified) {
+      return reply.send({ success: true, data: { verified: false, scanStarted: false } });
+    }
+
+    await query(
+      `UPDATE webcheck_leads
+       SET verified = TRUE, verified_at = NOW(), verification_method = $2, updated_at = NOW()
+       WHERE id = $1`,
+      [lead.id, verification.method],
+    );
+
+    // AC3: genau 1 Free-Scan pro verifizierter Domain im Fenster.
+    const recent = await query<{ count: string }>(
+      `SELECT COUNT(*) AS count FROM webcheck_leads
+       WHERE domain = $1 AND scan_started_at IS NOT NULL
+         AND scan_started_at > NOW() - INTERVAL '${FREE_SCAN_WINDOW_HOURS} hours'`,
+      [lead.domain],
+    );
+    if (Number(recent.rows[0]?.count ?? 0) > 0) {
+      audit({ orderId: null, action: 'webcheck.free_scan_window_hit', details: { domain: lead.domain }, ip: request.ip });
+      return reply.status(429).send({
+        success: false,
+        error: 'free_scan_already_used',
+        data: { windowHours: FREE_SCAN_WINDOW_HOURS },
+      });
+    }
+
+    // Anonymen Customer + Order(package=webcheck) anlegen → Report-Mail via PA-4.
+    const batch = validateTargetBatch([{ raw_input: lead.domain }]);
+    if (batch.errors.length > 0 || batch.targets.some((t) => !t.valid)) {
+      return reply.status(400).send({ success: false, error: 'target_validation_failed' });
+    }
+    const t = batch.targets[0];
+
+    const customerRes = await query<{ id: string }>(
+      `INSERT INTO customers (email) VALUES ($1)
+       ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING id`,
+      [lead.email],
+    );
+    const customerId = customerRes.rows[0].id;
+
+    const orderRes = await query<{ id: string }>(
+      `INSERT INTO orders (customer_id, target_url, package, status, target_count)
+       VALUES ($1, $2, $3, 'precheck_running', 1) RETURNING id`,
+      [customerId, t.canonical, WEBCHECK_PACKAGE],
+    );
+    const orderId = orderRes.rows[0].id;
+
+    const targetRes = await query<{ id: string }>(
+      `INSERT INTO scan_targets
+         (order_id, raw_input, canonical, target_type, discovery_policy, status)
+       VALUES ($1, $2, $3, $4, $5, 'pending_precheck') RETURNING id`,
+      [orderId, t.raw_input, t.canonical, t.target_type, t.policy_default],
+    );
+
+    await query(
+      `UPDATE webcheck_leads SET order_id = $2, scan_started_at = NOW(), updated_at = NOW()
+       WHERE id = $1`,
+      [lead.id, orderId],
+    );
+
+    audit({
+      orderId,
+      action: 'webcheck.scan_requested',
+      details: { leadId: lead.id, domain: lead.domain, method: verification.method },
+      ip: request.ip,
+    });
+
+    await enqueuePrecheck({ orderId, targetIds: [targetRes.rows[0].id] });
+
+    return reply.send({
+      success: true,
+      data: { verified: true, scanStarted: true, orderId },
+    });
+  });
+
+  // GET /api/webcheck/doi/confirm?token=... — Double-Opt-in (AC5, DSGVO)
+  server.get<{ Querystring: DoiQuery }>('/api/webcheck/doi/confirm', async (request, reply) => {
+    const token = request.query?.token;
+    if (!token || typeof token !== 'string') {
+      return reply.status(400).send({ success: false, error: 'invalid_token' });
+    }
+
+    const res = await query<{ id: string }>(
+      `UPDATE webcheck_leads
+       SET consent_status = 'confirmed', doi_confirmed_at = NOW(), updated_at = NOW()
+       WHERE doi_token = $1 AND consent_status = 'pending'
+       RETURNING id`,
+      [token],
+    );
+    if (res.rows.length === 0) {
+      // Bereits bestätigt oder unbekannt — idempotent, kein Leak ob Token existiert.
+      return reply.send({ success: true, data: { confirmed: false } });
+    }
+
+    audit({ orderId: null, action: 'webcheck.doi_confirmed', details: { leadId: res.rows[0].id }, ip: request.ip });
+    return reply.send({ success: true, data: { confirmed: true } });
+  });
+}
