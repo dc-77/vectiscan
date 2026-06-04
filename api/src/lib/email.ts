@@ -85,6 +85,66 @@ export async function sendScanCompleteEmail(
 }
 
 /**
+ * Send WebCheck-Free double-opt-in confirmation email (VEC-91 / PA-11, DSGVO AC5).
+ *
+ * Bestätigt die Marketing-Einwilligung getrennt vom transaktionalen Report-Mail.
+ * HINWEIS: Die finale Copy + der Rechtsgrundlagen-/Widerrufstext werden von Greta
+ * (CMO/DSGVO) geliefert (VEC-91-Child). Bis dahin ein DSGVO-konformer Platzhalter
+ * mit Double-Opt-in-Link und Hinweis auf die Trennung von Produktdaten.
+ */
+export async function sendWebcheckDoiEmail(
+  to: string,
+  domain: string,
+  doiToken: string,
+): Promise<void> {
+  const client = getClient();
+  if (!client) return;
+
+  const confirmUrl = `${getApiUrl()}/api/webcheck/doi/confirm?token=${doiToken}`;
+
+  try {
+    const { error } = await client.emails.send({
+      from: getFrom(),
+      to,
+      subject: 'Bitte bestätigen Sie Ihren WebCheck-Free-Report',
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #0f172a;">Nur noch ein Klick</h2>
+          <p style="color: #334155; font-size: 16px;">
+            Sie haben einen kostenlosen WebCheck f&uuml;r <strong>${domain}</strong> angefordert.
+            Bitte best&auml;tigen Sie Ihre E-Mail-Adresse, damit wir Ihnen den Report
+            zusenden d&uuml;rfen.
+          </p>
+          <div style="margin: 30px 0;">
+            <a href="${confirmUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500; font-size: 16px;">
+              E-Mail best&auml;tigen
+            </a>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">
+            Falls Sie diese Anfrage nicht gestellt haben, k&ouml;nnen Sie diese E-Mail ignorieren &mdash;
+            ohne Best&auml;tigung verarbeiten wir Ihre Daten nicht zu Marketingzwecken.
+          </p>
+          <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;" />
+          <p style="color: #94a3b8; font-size: 12px;">
+            VectiScan &mdash; Automatisierte Security-Scan-Plattform
+          </p>
+        </div>
+      `,
+    }, {
+      headers: { 'Idempotency-Key': `webcheck-doi-${doiToken}` },
+    });
+
+    if (error) {
+      log.error({ error, to, domain }, 'Failed to send WebCheck DOI email');
+    } else {
+      log.info({ to, domain }, 'WebCheck DOI email sent');
+    }
+  } catch (err) {
+    log.error({ err, to, domain }, 'Error sending WebCheck DOI email');
+  }
+}
+
+/**
  * Send password reset email with a one-time link.
  */
 export async function sendPasswordResetEmail(

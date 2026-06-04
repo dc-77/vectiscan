@@ -38,6 +38,7 @@ const MIGRATION_028_PATH = path.join(__dirname, '..', 'migrations', '028_validat
 const MIGRATION_029_PATH = path.join(__dirname, '..', 'migrations', '029_finding_overrides.sql');
 const MIGRATION_030_PATH = path.join(__dirname, '..', 'migrations', '030_stripe_payment_flow.sql');
 const MIGRATION_031_PATH = path.join(__dirname, '..', 'migrations', '031_stripe_followup_hardening.sql');
+const MIGRATION_032_PATH = path.join(__dirname, '..', 'migrations', '032_webcheck_leads.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -442,6 +443,24 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 031 FAILED (continuing without it):', err);
+  }
+
+  // Migration 032 (VEC-91): WebCheck-Free Lead-Magnet — separate Lead-/Marketing-
+  // Tabelle webcheck_leads (DSGVO-Datentrennung). Additiv, idempotent.
+  try {
+    const webcheckLeadsCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables WHERE table_name = 'webcheck_leads'
+      ) AS exists
+    `);
+    if (!webcheckLeadsCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 032: webcheck_leads');
+      const migrationSql = fs.readFileSync(MIGRATION_032_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 032 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 032 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created
