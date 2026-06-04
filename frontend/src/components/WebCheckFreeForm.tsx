@@ -185,7 +185,7 @@ export default function WebCheckFreeForm() {
           nach Abschluss per E-Mail (Link 30 Tage gültig). Sie können dieses Fenster schließen.
         </p>
         {marketingConsent && (
-          <p className="text-xs leading-relaxed mt-3" style={{ color: `${C.muted}cc` }}>
+          <p className="text-xs leading-relaxed mt-3" style={{ color: C.muted }}>
             Zur Bestätigung Ihrer Marketing-Einwilligung erhalten Sie zusätzlich eine separate Bestätigungs-Mail
             (Double-Opt-in) — bitte klicken Sie den Link darin.
           </p>
@@ -232,19 +232,19 @@ export default function WebCheckFreeForm() {
         <div className="flex flex-col gap-3 mb-4">
           {dnsM && (
             <VerifyMethodCard label="DNS-TXT-Eintrag (empfohlen)">
-              <Mono>{dnsM.record}</Mono>
-              <Mono>{dnsM.value}</Mono>
+              <CodeRow caption="Name / Host:" value={dnsM.record ?? ''} />
+              <CodeRow caption="Wert:" value={dnsM.value} />
             </VerifyMethodCard>
           )}
           {fileM && (
             <VerifyMethodCard label="Datei auf Ihrem Webserver">
-              <Mono>{fileM.path}</Mono>
-              <Mono>{fileM.value}</Mono>
+              <CodeRow caption="Pfad:" value={fileM.path ?? ''} />
+              <CodeRow caption="Inhalt:" value={fileM.value} />
             </VerifyMethodCard>
           )}
           {metaM && (
             <VerifyMethodCard label="Meta-Tag im <head> Ihrer Startseite">
-              <Mono>{metaM.value}</Mono>
+              <CodeRow value={metaM.value} />
             </VerifyMethodCard>
           )}
         </div>
@@ -256,7 +256,7 @@ export default function WebCheckFreeForm() {
           style={{ backgroundColor: C.teal, color: C.slate }}>
           {phase === 'verifying' ? 'Wird geprüft …' : 'Verifizierung prüfen & Scan starten'}
         </button>
-        <p className="text-[11px] text-center mt-2" style={{ color: `${C.muted}cc` }}>
+        <p className="text-xs text-center mt-2" style={{ color: C.muted }}>
           Ihren Report erhalten Sie nach Abschluss per E-Mail an {email || 'Ihre Adresse'}.
         </p>
       </div>
@@ -290,7 +290,7 @@ export default function WebCheckFreeForm() {
         </div>
 
         {/* Marketing-Consent — FREIWILLIG, unangekreuzt (Kopplungsverbot, Greta §5.1). */}
-        <label className="flex items-start gap-2.5 text-[11px] leading-relaxed mt-0.5 cursor-pointer" style={{ color: C.muted }}>
+        <label className="flex items-start gap-2.5 text-xs leading-relaxed mt-0.5 cursor-pointer" style={{ color: C.muted }}>
           <input type="checkbox" checked={marketingConsent} onChange={e => setMarketingConsent(e.target.checked)}
             className="mt-0.5 accent-[#2DD4BF] shrink-0" style={{ width: 16, height: 16 }} />
           <span>Ja, ich möchte von Vectigal gelegentlich praxisnahe Hinweise zu IT-Sicherheit &amp; Compliance
@@ -306,12 +306,12 @@ export default function WebCheckFreeForm() {
           {phase === 'submitting' ? 'Wird gestartet …' : 'Kostenlosen WebCheck starten'}
         </button>
 
-        <p className="text-[11px] text-center leading-relaxed" style={{ color: `${C.muted}cc` }}>
+        <p className="text-xs text-center leading-relaxed" style={{ color: C.muted }}>
           Kostenlos · 1 Scan pro verifizierter Domain · Wir scannen nur Domains, deren Kontrolle Sie nachweisen.
         </p>
 
         {/* Datenschutz-Pflichthinweis (Greta §5.1) — Report unabhängig von der Einwilligung. */}
-        <p className="text-[11px] leading-relaxed mt-1" style={{ color: `${C.muted}aa` }}>
+        <p className="text-xs leading-relaxed mt-1" style={{ color: C.muted }}>
           Ihren Report erhalten Sie unabhängig von dieser Einwilligung. Wir verarbeiten Ihre Angaben zur Durchführung des
           angeforderten WebChecks. Details in unserer{' '}
           <a href="/datenschutz" className="underline hover:text-white" style={{ color: C.teal }}>Datenschutzerklärung</a>.
@@ -343,17 +343,59 @@ function CheckIcon() {
 function VerifyMethodCard({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="rounded-lg p-3" style={{ backgroundColor: C.slate, border: '1px solid rgba(45,212,191,0.12)' }}>
-      <p className="text-[11px] font-semibold mb-1.5" style={{ color: C.offWhite }}>{label}</p>
-      <div className="flex flex-col gap-1">{children}</div>
+      <p className="text-xs font-semibold mb-2" style={{ color: C.offWhite }}>{label}</p>
+      <div className="flex flex-col gap-2.5">{children}</div>
     </div>
   );
 }
 
-function Mono({ children }: { children: React.ReactNode }) {
+/**
+ * Verify-Code-Block mit optionalem Feld-Label (AC3 — Recognition over Recall)
+ * und Copy-to-Clipboard-Button (AC2). Ziel ≥36px hoch (Fitts); „Kopiert"-Feedback
+ * erscheint sofort beim Klick (<100ms) und klingt nach ~1,2 s ab.
+ */
+function CodeRow({ caption, value }: { caption?: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      // Fallback für ältere/abgesicherte Kontexte ohne Clipboard-API.
+      const ta = document.createElement('textarea');
+      ta.value = value;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch { /* still nichts — Nutzer kann manuell markieren */ }
+      document.body.removeChild(ta);
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
+
   return (
-    <code className="block text-[11px] break-all rounded px-2 py-1.5 font-mono"
-      style={{ backgroundColor: '#0b1220', color: C.teal, border: '1px solid rgba(45,212,191,0.10)' }}>
-      {children}
-    </code>
+    <div>
+      {caption && (
+        <p className="text-xs font-medium mb-1" style={{ color: C.muted }}>{caption}</p>
+      )}
+      <div className="flex items-stretch gap-1.5">
+        <code className="flex-1 min-w-0 text-xs break-all rounded px-2 py-2 font-mono"
+          style={{ backgroundColor: '#0b1220', color: C.teal, border: '1px solid rgba(45,212,191,0.10)' }}>
+          {value}
+        </code>
+        <button type="button" onClick={copy}
+          aria-label={copied ? 'In Zwischenablage kopiert' : 'In Zwischenablage kopieren'}
+          className="shrink-0 min-w-[5rem] px-3 rounded text-xs font-semibold transition-colors"
+          style={{
+            backgroundColor: copied ? `${C.teal}26` : `${C.teal}14`,
+            color: C.teal,
+            border: `1px solid ${C.teal}33`,
+          }}>
+          {copied ? '✓ Kopiert' : 'Kopieren'}
+        </button>
+      </div>
+    </div>
   );
 }
