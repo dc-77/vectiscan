@@ -580,3 +580,80 @@ cleanup-prod:
   environment:
     name: production
     url: https://scan.vectigal.tech
+
+# =============================================================================
+# VEC-143 — Edge-Auth-Gating: schliesst die internal-only-Flaechen per Basic-Auth.
+#
+# Root-Cause (VEC-143, bewiesen): die IP-Allowlist `internal-only@file` ist auf
+# vectigal-docker02 wirkungslos. `/etc/docker/daemon.json` hat `iptables:false`
+# -> userland docker-proxy SNAT't jede Quell-IP auf das Bridge-GW 172.18.0.1
+# (in 172.16.0.0/12) -> intern/extern an Traefik ununterscheidbar, 403 feuert nie.
+# Kein X-Forwarded-For -> ipStrategy/trustedIPs unmoeglich.
+#
+# Board-approved Fix (Option C): basicAuth-Middleware `internal-auth`, ADDITIV in
+# den host-eigenen File-Provider (/opt/traefik/config, watch:true) geschrieben;
+# die 4 betroffenen Router (web-admin, api-admin, status, logs) haengen in der
+# docker-compose.yml jetzt an `internal-auth@file` statt `internal-only@file`.
+# Das host-eigene security.yml bleibt unangetastet (kein Shared-Edge-Eingriff).
+#
+# Credential kommt aus der maskierten Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD
+# (Format `user:hash`, apr1/bcrypt). KEIN Secret im Repo. Manuell/API-getriggert,
+# KEIN Image-Build/-Pull (needs:[]). Idempotent.
+# =============================================================================
+ops-traefik-auth:
+  extends: .ops-base
+  needs: []
+  variables:
+    TRAEFIK_CFG: /opt/traefik/config
+  script:
+    - |
+      if [ -z "${TRAEFIK_INTERNAL_HTPASSWD}" ]; then
+        echo "FATAL: Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD fehlt (Format user:hash)."; exit 1
+      fi
+    - |
+      if [ ! -d "${TRAEFIK_CFG}" ]; then
+        echo "FATAL: ${TRAEFIK_CFG} nicht vorhanden — Traefik-Dynamic-Dir nicht gefunden."; exit 1
+      fi
+    # 1) basicAuth-Middleware additiv in den Host-File-Provider schreiben.
+    - sed "s#__TRAEFIK_INTERNAL_HTPASSWD__#${TRAEFIK_INTERNAL_HTPASSWD}#" ${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml > ${TRAEFIK_CFG}/vectiscan-auth.yml
+    - chmod 600 ${TRAEFIK_CFG}/vectiscan-auth.yml
+    - echo "=== vectiscan-auth.yml geschrieben ==="; ls -la ${TRAEFIK_CFG}/vectiscan-auth.yml
+    # 2) Traefik (watch:true) laedt hot — warten und Middleware-Existenz pruefen.
+    - sleep 6
+    - |
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
+      echo "Traefik=${TRAEFIK} Net=${NET}"
+      echo "--- middleware internal-auth@file ---"
+      docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/middlewares/internal-auth@file" || echo "(middleware-check fehlgeschlagen — Abbruch)"
+    # 3) Aktive-Scan-Guard (analog .deploy-base), dann die 4 Router neu labeln.
+    - cd ${DEPLOY_PATH}
+    - |
+      if [ "${DEPLOY_FORCE:-false}" != "true" ]; then
+        ACTIVE=$(docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc "SELECT count(*) FROM orders WHERE status IN ('queued','scanning','passive_intel','dns_recon','scan_phase1','scan_phase2','scan_phase3','report_generating')" 2>/dev/null | tr -d '[:space:]' || echo "?")
+        if [ "$ACTIVE" != "?" ] && [ "${ACTIVE:-0}" -gt 0 ]; then
+          echo "ERROR: $ACTIVE aktive Scan(s) — abgebrochen. DEPLOY_FORCE=true zum Erzwingen."; exit 1
+        fi
+        echo "Aktive Scans: ${ACTIVE:-0} — ok."
+      fi
+    - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
+    - cp ${CI_PROJECT_DIR}/docker-compose.yml .
+    - TAG=${TAG:-latest} docker compose up -d --no-deps --no-build frontend api uptime-kuma grafana
+    - sleep 10
+    - docker compose ps frontend api uptime-kuma grafana
+    # 4) Verifikation: die 4 Router haengen jetzt an internal-auth.
+    - |
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
+      for R in vectiscan-web-admin vectiscan-api-admin vectiscan-status vectiscan-logs; do
+        echo "--- router ${R}@docker ---"
+        docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/routers/${R}@docker" | head -c 500; echo
+      done
+    - echo "=== FERTIG === Extern verifizieren (Basic-Auth ist IP-unabhaengig)"
+    - echo "  curl -sI https://status.vectigal.tech/                       -> 401 erwartet"
+    - echo "  curl -sI https://scan.vectigal.tech/admin                    -> 401 erwartet"
+    - echo "  curl -sI https://scan-api.vectigal.tech/api/admin/review/queue -> 401 erwartet"
+    - echo "  curl -sI https://scan.vectigal.tech/                         -> 200 (oeffentlich, unveraendert)"
+  environment:
+    name: production
+    url: https://scan.vectigal.tech

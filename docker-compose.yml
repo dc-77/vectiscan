@@ -33,14 +33,15 @@ services:
       - "traefik.http.routers.vectiscan-web.tls=true"
       - "traefik.http.routers.vectiscan-web.tls.certresolver=letsencrypt"
       - "traefik.http.routers.vectiscan-web.middlewares=security-headers@file,rate-limit@file"
-      # VEC-34 AC2: Admin-Flächen (/admin/**) bleiben am Edge internal-only.
-      # Spezifischere Regel + höhere Priorität → externer Request auf /admin → internal-only@file → 403/timeout.
+      # VEC-34 AC2 / VEC-143: Admin-Flächen (/admin/**) sind am Edge auth-gegated (Basic-Auth).
+      # IP-Allowlist (internal-only) ist auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
+      # Spezifischere Regel + höhere Priorität → externer /admin-Request ohne Credentials → 401.
       - "traefik.http.routers.vectiscan-web-admin.rule=Host(`scan.vectigal.tech`) && PathPrefix(`/admin`)"
       - "traefik.http.routers.vectiscan-web-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-web-admin.tls=true"
       - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt"
       - "traefik.http.routers.vectiscan-web-admin.priority=100"
-      - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.routers.vectiscan-web-admin.service=vectiscan-web"
       - "traefik.http.services.vectiscan-web.loadbalancer.server.port=3000"
     depends_on:
@@ -85,14 +86,15 @@ services:
       - "traefik.http.routers.vectiscan-api.tls=true"
       - "traefik.http.routers.vectiscan-api.tls.certresolver=letsencrypt"
       - "traefik.http.routers.vectiscan-api.middlewares=security-headers@file,rate-limit@file"
-      # VEC-34 AC2: Admin-API (/api/admin/**) bleibt am Edge internal-only.
-      # Spezifischere Regel + höhere Priorität → externer Request auf /api/admin → internal-only@file → 403/timeout.
+      # VEC-34 AC2 / VEC-143: Admin-API (/api/admin/**) ist am Edge auth-gegated (Basic-Auth).
+      # IP-Allowlist (internal-only) auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
+      # Spezifischere Regel + höhere Priorität → externer /api/admin-Request ohne Credentials → 401.
       - "traefik.http.routers.vectiscan-api-admin.rule=Host(`scan-api.vectigal.tech`) && PathPrefix(`/api/admin`)"
       - "traefik.http.routers.vectiscan-api-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-api-admin.tls=true"
       - "traefik.http.routers.vectiscan-api-admin.tls.certresolver=letsencrypt"
       - "traefik.http.routers.vectiscan-api-admin.priority=100"
-      - "traefik.http.routers.vectiscan-api-admin.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.routers.vectiscan-api-admin.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.routers.vectiscan-api-admin.service=vectiscan-api"
       - "traefik.http.services.vectiscan-api.loadbalancer.server.port=4000"
       - "traefik.http.services.vectiscan-api.loadbalancer.healthcheck.path=/health"
@@ -541,7 +543,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.vectiscan-status.rule=Host(`status.vectigal.tech`)"
-      - "traefik.http.routers.vectiscan-status.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.routers.vectiscan-status.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.services.vectiscan-status.loadbalancer.server.port=3001"
     networks:
       - proxy-net
@@ -600,7 +602,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.vectiscan-logs.rule=Host(`logs.vectigal.tech`)"
-      - "traefik.http.routers.vectiscan-logs.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.routers.vectiscan-logs.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.services.vectiscan-logs.loadbalancer.server.port=3000"
     depends_on:
       - loki
