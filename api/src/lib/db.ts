@@ -36,6 +36,8 @@ const MIGRATION_026_PATH = path.join(__dirname, '..', 'migrations', '026_shodan_
 const MIGRATION_027_PATH = path.join(__dirname, '..', 'migrations', '027_tech_profiles_and_additional_findings.sql');
 const MIGRATION_028_PATH = path.join(__dirname, '..', 'migrations', '028_validation_warnings.sql');
 const MIGRATION_029_PATH = path.join(__dirname, '..', 'migrations', '029_finding_overrides.sql');
+const MIGRATION_030_PATH = path.join(__dirname, '..', 'migrations', '030_stripe_payment_flow.sql');
+const MIGRATION_031_PATH = path.join(__dirname, '..', 'migrations', '031_stripe_followup_hardening.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -403,6 +405,45 @@ export async function initDb(): Promise<void> {
     console.error('[initDb] Migration 029 FAILED (continuing without it):', err);
   }
 
+  // Migration 030 (PA-1 / VEC-33): Stripe Live Payment Flow — paid_at +
+  // stripe_checkout_session_id + status 'payment_failed' auf subscriptions
+  // sowie stripe_webhook_events (Idempotenz-Ledger).
+  try {
+    const stripeEvents030Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'stripe_webhook_events'
+      ) AS exists
+    `);
+    if (!stripeEvents030Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 030: stripe_payment_flow');
+      const migrationSql = fs.readFileSync(MIGRATION_030_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 030 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 030 FAILED (continuing without it):', err);
+  }
+
+  // Migration 031 (VEC-112): Stripe-Follow-up-Haertung — idempotenter
+  // Enqueue-Claim-Marker scan_targets.precheck_enqueued_at (L1 Atomicitaet).
+  try {
+    const precheckColCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'scan_targets' AND column_name = 'precheck_enqueued_at'
+      ) AS exists
+    `);
+    if (!precheckColCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 031: stripe_followup_hardening');
+      const migrationSql = fs.readFileSync(MIGRATION_031_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 031 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 031 FAILED (continuing without it):', err);
+  }
+
   // Seed admin account if configured and not yet created
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -423,4 +464,40 @@ export async function query<T extends pg.QueryResultRow = Record<string, unknown
   params?: unknown[],
 ): Promise<pg.QueryResult<T>> {
   return pool.query<T>(text, params);
+}
+
+/** Eine an einen Transaktions-Client gebundene query-Funktion. */
+export type TxQuery = <T extends pg.QueryResultRow = Record<string, unknown>>(
+  text: string,
+  params?: unknown[],
+) => Promise<pg.QueryResult<T>>;
+
+/**
+ * Fuehrt `fn` in einer DB-Transaktion aus (BEGIN/COMMIT, ROLLBACK bei Fehler).
+ * `fn` erhaelt eine an den Transaktions-Client gebundene query-Funktion —
+ * alle darueber abgesetzten Statements committen bzw. rollbacken gemeinsam.
+ *
+ * Wird (VEC-112/L1) genutzt, um Abo-Aktivierung + Scan-Kontingent-Enqueue
+ * atomar zu machen: schlaegt das Enqueue fehl, rollt auch die Aktivierung
+ * zurueck, sodass der Stripe-Retry sauber von vorne aufsetzt (kein bezahltes
+ * Abo ohne Scan-Kontingent).
+ */
+export async function withTransaction<T>(fn: (q: TxQuery) => Promise<T>): Promise<T> {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const q: TxQuery = (text, params) => client.query(text, params);
+    const result = await fn(q);
+    await client.query('COMMIT');
+    return result;
+  } catch (err) {
+    try {
+      await client.query('ROLLBACK');
+    } catch {
+      // ROLLBACK-Fehler nicht ueber den eigentlichen Fehler maskieren.
+    }
+    throw err;
+  } finally {
+    client.release();
+  }
 }

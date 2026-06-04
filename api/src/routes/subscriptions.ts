@@ -12,6 +12,12 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
 import { validateTarget, validateTargetBatch } from '../lib/validate.js';
+import {
+  isStripeConfigured,
+  getStripe,
+  getPriceIdForPackage,
+  getCheckoutUrls,
+} from '../lib/stripe.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_PACKAGES = ['perimeter', 'insurance', 'compliance', 'supplychain', 'webcheck', 'tlscompliance'];
@@ -53,16 +59,36 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
       customerId = custResult.rows[0].id;
     }
 
+    // PA-1 (VEC-33): Echter Zahlungsfluss. Ohne konfiguriertes Stripe wird
+    // KEIN Abo aktiviert — frueher entstand hier ein kostenloses aktives Abo.
+    if (!isStripeConfigured()) {
+      return reply.status(503).send({
+        success: false,
+        error: 'payment_not_configured',
+        message: 'Zahlungsabwicklung ist derzeit nicht verfuegbar. Bitte spaeter erneut versuchen.',
+      });
+    }
+    const priceId = getPriceIdForPackage(pkg);
+    if (!priceId) {
+      return reply.status(503).send({
+        success: false,
+        error: 'price_not_configured',
+        message: `Fuer Paket "${pkg}" ist kein Preis hinterlegt.`,
+      });
+    }
+
     const now = new Date();
     const expiresAt = new Date(now);
     expiresAt.setFullYear(expiresAt.getFullYear() + 1);
 
+    // Abo wird als 'pending' angelegt; Aktivierung erst nach bestaetigtem
+    // Stripe-Webhook (checkout.session.completed).
     const subResult = await query<{ id: string }>(
       `INSERT INTO subscriptions (customer_id, package, status, scan_interval, report_emails,
-       started_at, expires_at, amount_cents)
-       VALUES ($1, $2, 'active', $3, $4, NOW(), $5, 0)
+       expires_at, amount_cents, stripe_price_id)
+       VALUES ($1, $2, 'pending', $3, $4, $5, 0, $6)
        RETURNING id`,
-      [customerId, pkg, scanInterval, reportEmails, expiresAt.toISOString()],
+      [customerId, pkg, scanInterval, reportEmails, expiresAt.toISOString(), priceId],
     );
     const subscriptionId = subResult.rows[0].id;
 
@@ -91,11 +117,44 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
       });
     }
 
-    await enqueuePrecheck({ subscriptionId, targetIds });
+    // Hinweis: enqueuePrecheck wird NICHT hier ausgeloest. Das Scan-Kontingent
+    // wird erst nach bestaetigter Zahlung im Stripe-Webhook freigeschaltet
+    // (routes/webhooks.ts -> checkout.session.completed).
+
+    // Stripe-Checkout-Session erzeugen.
+    let checkoutUrl: string | null = null;
+    let checkoutSessionId: string | null = null;
+    try {
+      const { successUrl, cancelUrl } = getCheckoutUrls();
+      const session = await getStripe().checkout.sessions.create({
+        mode: 'subscription',
+        line_items: [{ price: priceId, quantity: 1 }],
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        client_reference_id: subscriptionId,
+        customer_email: user.email,
+        metadata: { subscription_id: subscriptionId, price_id: priceId },
+        subscription_data: { metadata: { subscription_id: subscriptionId } },
+      });
+      checkoutUrl = session.url;
+      checkoutSessionId = session.id;
+      await query(
+        'UPDATE subscriptions SET stripe_checkout_session_id = $1, updated_at = NOW() WHERE id = $2',
+        [session.id, subscriptionId],
+      );
+    } catch (err) {
+      request.log.error({ err, subscriptionId }, 'Stripe checkout session creation failed');
+      // Abo bleibt 'pending' und wird nie aktiviert; Kunde kann neu starten.
+      return reply.status(502).send({
+        success: false,
+        error: 'checkout_creation_failed',
+        message: 'Checkout konnte nicht gestartet werden. Bitte erneut versuchen.',
+      });
+    }
 
     audit({
       action: 'subscription.created',
-      details: { subscriptionId, package: pkg, targetCount: batch.targets.length, scanInterval, userId: user.sub },
+      details: { subscriptionId, package: pkg, targetCount: batch.targets.length, scanInterval, userId: user.sub, checkoutSessionId },
       ip: request.ip,
     });
 
@@ -104,11 +163,13 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
       data: {
         id: subscriptionId,
         package: pkg,
-        status: 'active',
+        status: 'pending',
         scanInterval,
         targets: targetStubs,
         expiresAt: expiresAt.toISOString(),
-        message: 'Abo erstellt. Targets durchlaufen Pre-Check + Admin-Review.',
+        checkoutUrl,
+        checkoutSessionId,
+        message: 'Abo angelegt. Bitte Zahlung via Stripe abschliessen — das Abo wird erst nach bestaetigter Zahlung aktiv.',
       },
     };
   });
