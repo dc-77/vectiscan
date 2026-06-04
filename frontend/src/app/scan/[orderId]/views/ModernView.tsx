@@ -177,6 +177,11 @@ export default function ModernView({
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
           {order.startedAt && <span>Gestartet: {formatDate(order.startedAt)}</span>}
           {order.finishedAt && <span>Fertig: {formatDate(order.finishedAt)}</span>}
+          {/* VEC-87 (PA-7) AC2: erwartete Dauer pro Paket sichtbar, solange der
+              Scan läuft — Time-to-Value klar kommuniziert. */}
+          {!isDone && !isFailed && order.estimatedDuration && (
+            <span className="text-cyan-400/80">Erwartete Dauer: {order.estimatedDuration}</span>
+          )}
           {order.progress.hostsTotal > 0 && (
             <span>
               {order.progress.hostsTotal} Host{order.progress.hostsTotal === 1 ? '' : 's'}
