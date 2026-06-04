@@ -1,0 +1,150 @@
+{
+  "target": "demo-corp.vectiscan-demo.test",
+  "company_name": "Demo-Corp AG",
+  "package": "perimeter",
+  "overall_risk": "HIGH",
+  "overall_description": "Der Perimeter-Vollscan der extern erreichbaren Infrastruktur der Demo-Corp AG deckt mehrere schwerwiegende Schwachstellen auf, die einen unmittelbaren Angriffsweg in das interne Netz eröffnen können. Besonders kritisch sind ein aus dem Internet erreichbarer RDP-Dienst, eine SQL-Injection im Kundenportal sowie ein exponiertes .git-Verzeichnis. In Kombination ermöglichen diese Befunde einem Angreifer mit geringem Aufwand die Kompromittierung von Anwendungsdaten und potenziell die laterale Bewegung im Netzwerk. Sofortiges Handeln wird empfohlen.",
+  "severity_counts": { "CRITICAL": 1, "HIGH": 3, "MEDIUM": 4, "LOW": 2, "INFO": 0 },
+  "findings": [
+    {
+      "id": "PR-01",
+      "title": "SQL-Injection im Kundenportal (Login-Parameter)",
+      "severity": "CRITICAL",
+      "cvss_score": "9.8",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+      "cwe": "CWE-89",
+      "affected": "https://portal.demo-corp.vectiscan-demo.test/login (Parameter 'user')",
+      "description": "Der Login-Endpunkt des Kundenportals ist anfällig für eine Boolean- und zeitbasierte blinde SQL-Injection. Über den Parameter 'user' lassen sich beliebige SQL-Abfragen einschleusen.",
+      "evidence": "sqlmap: Parameter 'user' is injectable (boolean-based blind, time-based blind). Back-end DBMS: PostgreSQL. Beispiel: user=' OR pg_sleep(5)-- führte zu 5 s Verzögerung.",
+      "impact": "Vollständiger Lesezugriff auf die Anwendungsdatenbank (Kundendaten, Passwort-Hashes) und potenzielle Code-Ausführung über DBMS-Funktionen.",
+      "recommendation": "Parametrisierte Queries / Prepared Statements durchgängig einsetzen, ein ORM verwenden und eine WAF-Regel als kompensierende Maßnahme aktivieren."
+    },
+    {
+      "id": "PR-02",
+      "title": "RDP (3389/tcp) aus dem Internet erreichbar",
+      "severity": "HIGH",
+      "cvss_score": "8.6",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "cwe": "CWE-284",
+      "affected": "gw.demo-corp.vectiscan-demo.test:3389",
+      "description": "Ein Remote-Desktop-Dienst ist ohne VPN oder Netzwerkbeschränkung direkt aus dem Internet erreichbar. RDP-Exposition ist ein primärer Initialvektor für Ransomware.",
+      "evidence": "nmap: 3389/tcp open ms-wbt-server. NLA aktiv, aber öffentlich erreichbar.",
+      "impact": "Brute-Force- und Credential-Stuffing-Angriffe; bei Erfolg interaktiver Zugriff auf einen Windows-Host.",
+      "recommendation": "RDP nicht direkt exponieren — Zugriff über VPN/Bastion-Host kanalisieren, MFA erzwingen und Quell-IPs einschränken."
+    },
+    {
+      "id": "PR-03",
+      "title": "Exponiertes .git-Verzeichnis mit Quellcode",
+      "severity": "HIGH",
+      "cvss_score": "7.5",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "cwe": "CWE-538",
+      "affected": "https://www.demo-corp.vectiscan-demo.test/.git/",
+      "description": "Das Versionskontroll-Verzeichnis .git ist über den Webserver abrufbar. Damit lässt sich der gesamte Quellcode der Anwendung rekonstruieren.",
+      "evidence": "GET /.git/config -> 200 OK; git-dumper rekonstruiert Repository inkl. config-Dateien mit API-Schlüsseln.",
+      "impact": "Offenlegung von Quellcode und potenziell eingebetteten Geheimnissen (API-Keys, DB-Strings), was weitere Angriffe erheblich erleichtert.",
+      "recommendation": "Zugriff auf .git serverseitig blockieren, Deployment ohne VCS-Metadaten durchführen und exponierte Geheimnisse rotieren."
+    },
+    {
+      "id": "PR-04",
+      "title": "Veraltete OpenSSH-Version mit bekannten CVEs",
+      "severity": "HIGH",
+      "cvss_score": "7.0",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+      "cwe": "CWE-1104",
+      "affected": "gw.demo-corp.vectiscan-demo.test:22 (OpenSSH 7.4)",
+      "description": "Der SSH-Dienst meldet OpenSSH 7.4, eine veraltete Version mit mehreren bekannten Schwachstellen (u. a. Username-Enumeration CVE-2018-15473).",
+      "evidence": "nmap -sV: 22/tcp open ssh OpenSSH 7.4 (protocol 2.0).",
+      "impact": "Username-Enumeration und erhöhtes Risiko bekannter Schwachstellen erleichtern gezielte Angriffe.",
+      "recommendation": "OpenSSH auf eine aktuelle Version aktualisieren, Key-basierte Authentifizierung erzwingen und Passwort-Login deaktivieren."
+    },
+    {
+      "id": "PR-05",
+      "title": "Schwache TLS-Cipher-Suiten (CBC, RSA-Key-Exchange)",
+      "severity": "MEDIUM",
+      "cvss_score": "5.9",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+      "cwe": "CWE-327",
+      "affected": "www.demo-corp.vectiscan-demo.test:443",
+      "description": "Der Webserver bietet schwache CBC-Cipher-Suiten und RSA-Schlüsselaustausch ohne Forward Secrecy an.",
+      "evidence": "testssl.sh: TLS_RSA_WITH_AES_128_CBC_SHA angeboten; kein ECDHE für ältere Suiten.",
+      "impact": "Erhöhtes Risiko für Padding-Oracle-Angriffe und nachträgliche Entschlüsselung bei kompromittiertem privatem Schlüssel.",
+      "recommendation": "Cipher-Suiten auf moderne AEAD-Verfahren (ECDHE + GCM/ChaCha20) beschränken."
+    },
+    {
+      "id": "PR-06",
+      "title": "Verbose Fehlerseiten mit Stack-Traces",
+      "severity": "MEDIUM",
+      "cvss_score": "5.3",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-209",
+      "affected": "https://portal.demo-corp.vectiscan-demo.test",
+      "description": "Bei Anwendungsfehlern werden detaillierte Stack-Traces inklusive Framework-Versionen und Dateipfaden ausgegeben.",
+      "evidence": "HTTP 500 liefert vollständigen Python/Flask-Traceback mit Pfaden /opt/app/....",
+      "impact": "Offenlegung von Technologie-Stack und interner Struktur erleichtert die Angriffsvorbereitung.",
+      "recommendation": "Produktive Fehlerbehandlung aktivieren (generische Fehlerseiten), Debug-Modus deaktivieren."
+    },
+    {
+      "id": "PR-07",
+      "title": "Fehlende Rate-Limitierung am Login-Endpunkt",
+      "severity": "MEDIUM",
+      "cvss_score": "5.3",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-307",
+      "affected": "https://portal.demo-corp.vectiscan-demo.test/login",
+      "description": "Der Login-Endpunkt setzt keine Rate-Limitierung oder Account-Lockout um.",
+      "evidence": "100 aufeinanderfolgende Fehlversuche ohne Drosselung oder Sperre möglich.",
+      "impact": "Ermöglicht effiziente Brute-Force- und Credential-Stuffing-Angriffe.",
+      "recommendation": "Rate-Limiting, exponentielles Backoff und CAPTCHA nach mehreren Fehlversuchen einführen."
+    },
+    {
+      "id": "PR-08",
+      "title": "HTTP-Methoden TRACE/TRACK aktiviert",
+      "severity": "MEDIUM",
+      "cvss_score": "4.3",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-16",
+      "affected": "www.demo-corp.vectiscan-demo.test",
+      "description": "Der Webserver akzeptiert die HTTP-Methode TRACE, die für Cross-Site-Tracing missbraucht werden kann.",
+      "evidence": "OPTIONS-Antwort listet 'Allow: GET, POST, TRACE'.",
+      "impact": "Unterstützung von Cross-Site-Tracing-Angriffen unter bestimmten Bedingungen.",
+      "recommendation": "TRACE/TRACK auf Webserver-Ebene deaktivieren."
+    },
+    {
+      "id": "PR-09",
+      "title": "Informations-Header geben Server-Version preis",
+      "severity": "LOW",
+      "cvss_score": "3.1",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-200",
+      "affected": "HTTP-Antwort-Header",
+      "description": "Die Header 'Server' und 'X-Powered-By' geben konkrete Produktversionen preis (nginx 1.18.0, PHP 7.4).",
+      "evidence": "Server: nginx/1.18.0; X-Powered-By: PHP/7.4.3.",
+      "impact": "Erleichtert das gezielte Mapping bekannter Schwachstellen.",
+      "recommendation": "Versions-Header unterdrücken (server_tokens off; expose_php Off)."
+    },
+    {
+      "id": "PR-10",
+      "title": "Directory-Listing auf Upload-Verzeichnis aktiv",
+      "severity": "LOW",
+      "cvss_score": "3.7",
+      "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "cwe": "CWE-548",
+      "affected": "https://www.demo-corp.vectiscan-demo.test/uploads/",
+      "description": "Für das Verzeichnis /uploads/ ist das Directory-Listing aktiviert, sodass hochgeladene Dateien aufgelistet werden.",
+      "evidence": "GET /uploads/ -> Auflistung von 47 Dateien (Index of /uploads).",
+      "impact": "Potenzielle Offenlegung versehentlich hochgeladener oder veralteter Dateien.",
+      "recommendation": "Directory-Listing deaktivieren (autoindex off) und Zugriffsschutz für Upload-Pfade einrichten."
+    }
+  ],
+  "positive_findings": [
+    { "title": "Network Level Authentication (NLA) bei RDP aktiv", "description": "Der RDP-Dienst erzwingt NLA, was unauthentifizierte Pre-Auth-Angriffe erschwert." },
+    { "title": "Keine anonymen FTP-Zugänge", "description": "Es wurden keine FTP-Dienste mit anonymem Zugang gefunden." },
+    { "title": "DNSSEC für die Hauptdomain aktiv", "description": "Die Zone ist mit gültigen DNSSEC-Signaturen abgesichert." }
+  ],
+  "recommendations": [
+    { "timeframe": "Sofort", "action": "SQL-Injection im Kundenportal beheben, RDP aus dem Internet entfernen und exponiertes .git-Verzeichnis sperren.", "effort": "Hoch" },
+    { "timeframe": "14 Tage", "action": "OpenSSH aktualisieren, schwache TLS-Cipher entfernen und Rate-Limiting am Login einführen.", "effort": "Mittel" },
+    { "timeframe": "30 Tage", "action": "Fehlerseiten härten, TRACE deaktivieren und Versions-Header sowie Directory-Listing abschalten.", "effort": "Niedrig" }
+  ]
+}

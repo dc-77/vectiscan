@@ -238,6 +238,28 @@ deploy-manual:
     - if: $CI_PIPELINE_SOURCE == "web"
 
 # =============================================================================
+# Demo-Seed (VEC-121 / PA-6) — seedet den synthetischen Demo-Mandanten
+# (demo@vectiscan.tech) im laufenden api-Container. Idempotent: raeumt
+# vorhandene Demo-Daten (feste UUIDs) auf und legt sie neu an, streng auf
+# DEMO_CUSTOMER_ID begrenzt (Tenant-Isolation). DATABASE_URL/MINIO_* kommen aus
+# der Container-Umgebung; DEMO_PASSWORD aus der maskierten CI/CD-Variable —
+# NICHT der Source-Default. Manuell ausloesen nach gruenem Deploy.
+# =============================================================================
+ops-seed-demo:
+  extends: .ops-base
+  script:
+    - cd ${DEPLOY_PATH}
+    - |
+      if [ -z "${DEMO_PASSWORD}" ]; then
+        echo "ERROR: CI/CD-Variable DEMO_PASSWORD ist nicht gesetzt — Abbruch."
+        echo "       In prod darf kein Source-Default verwendet werden (Sven, VEC-121)."
+        exit 1
+      fi
+    - echo "Seede Demo-Mandant (demo@vectiscan.tech) im api-Container..."
+    - docker compose exec -T -e DEMO_PASSWORD="${DEMO_PASSWORD}" api node dist/scripts/seed-demo.js
+    - echo "OK: Demo-Seed abgeschlossen."
+
+# =============================================================================
 # Restart-Worker — gezieltes Restart einzelner Worker-Container ohne
 # einen vollen Cleanup. Nutzt Pipeline-Variable `WORKER` (Default report-worker).
 # =============================================================================
