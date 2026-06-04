@@ -8,6 +8,11 @@ import { verifyJwt } from '../lib/auth.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
+import {
+  normalizeSeverityCounts,
+  sumSeverityCounts,
+  reconcileSeverityCounts,
+} from '../lib/severityCounts.js';
 
 async function streamReport(reply: FastifyReply, report: Record<string, unknown>) {
   const bucket = report.minio_bucket as string;
@@ -205,7 +210,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
                     c.email,
                     EXISTS(SELECT 1 FROM reports r2 WHERE r2.order_id = o.id) AS has_report,
                     (SELECT rr.findings_data->>'overall_risk' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS overall_risk,
-                    (SELECT rr.findings_data->'severity_counts' FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS severity_counts,
+                    -- VEC-123: autoritative, trigger-berechnete Spalte reports.severity_counts
+                    -- statt eingebettetem findings_data->'severity_counts' (Drift-Haertung).
+                    (SELECT rr.severity_counts FROM reports rr WHERE rr.order_id = o.id ORDER BY rr.created_at DESC LIMIT 1) AS severity_counts,
                     -- Multi-Target-UX: bis zu 5 Targets pro Order ans Frontend
                     -- liefern, damit das Dashboard die Domains direkt anzeigt
                     -- statt nur "multi-target (N)".
@@ -243,7 +250,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       finishedAt: row.scan_finished_at ? (row.scan_finished_at as Date).toISOString() : null,
       createdAt: (row.created_at as Date).toISOString(),
       overallRisk: (row.overall_risk as string) || null,
-      severityCounts: row.severity_counts || null,
+      // VEC-123: autoritative lower-case-Spalte → kanonische UPPER-case-Form
+      // normalisieren, damit Karten-Antwort byte-gleich zur bisherigen bleibt.
+      severityCounts: normalizeSeverityCounts(row.severity_counts),
       businessImpactScore: row.business_impact_score != null ? Number(row.business_impact_score) : null,
       subscriptionId: (row.subscription_id as string) || null,
       isRescan: row.is_rescan === true || row.is_rescan === 't',
@@ -300,11 +309,13 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const result = await query(
       `SELECT o.id, o.target_url AS domain, o.status, o.scan_finished_at,
               r.findings_data->>'overall_risk' AS overall_risk,
-              r.findings_data->'severity_counts' AS severity_counts,
+              -- VEC-123: autoritative severity_counts-Spalte (Trigger) statt
+              -- eingebettetem findings_data->'severity_counts'.
+              r.severity_counts AS severity_counts,
               r.findings_data->'findings' AS findings
        FROM orders o
        LEFT JOIN LATERAL (
-         SELECT findings_data FROM reports WHERE order_id = o.id ORDER BY created_at DESC LIMIT 1
+         SELECT findings_data, severity_counts FROM reports WHERE order_id = o.id ORDER BY created_at DESC LIMIT 1
        ) r ON true
        WHERE ${where.join(' AND ')}
        ORDER BY o.scan_finished_at DESC`,
@@ -320,12 +331,19 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
 
     for (const row of result.rows as Array<Record<string, unknown>>) {
       domains.add(row.domain as string);
-      const sev = row.severity_counts as Record<string, number> | null;
-      if (sev) {
-        totalFindings += (sev.CRITICAL || 0) + (sev.HIGH || 0) + (sev.MEDIUM || 0) + (sev.LOW || 0);
-        criticalCount += sev.CRITICAL || 0;
-        highCount += sev.HIGH || 0;
-      }
+      // VEC-123 AC2: gegen das gelistete findings-Array reconcilen, damit die
+      // aggregierten Karten-Zahlen strukturell den Findings entsprechen
+      // (kein stiller Drift). Quelle = autoritative Spalte, bei Abweichung
+      // gewinnt die frische Zaehlung aus den Findings.
+      const sev = reconcileSeverityCounts(row.severity_counts, row.findings, ({ recounted }) => {
+        request.log.warn(
+          { orderId: row.id, recounted, embedded: row.severity_counts },
+          'VEC-123: severity_counts drift in dashboard-summary reconciled to listed findings',
+        );
+      });
+      totalFindings += sev.CRITICAL + sev.HIGH + sev.MEDIUM + sev.LOW;
+      criticalCount += sev.CRITICAL;
+      highCount += sev.HIGH;
       // Collect top findings from latest scans (max 5)
       const findings = row.findings as Array<Record<string, unknown>> | null;
       if (findings && topFindings.length < 5) {
@@ -418,7 +436,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const isAdmin = user.role === 'admin';
     const reportResult = await query(
       `SELECT id, findings_data->>'overall_risk' AS overall_risk,
-              findings_data->'severity_counts' AS severity_counts,
+              -- VEC-123: autoritative Trigger-Spalte statt eingebettetem Feld.
+              severity_counts AS severity_counts,
               validation_warnings
        FROM reports WHERE order_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [id],
@@ -457,7 +476,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         error: order.error_message || null,
         hasReport,
         overallRisk: latestReport?.overall_risk || null,
-        severityCounts: latestReport?.severity_counts || null,
+        // VEC-123: lower-case-Spalte → kanonische UPPER-case-Form.
+        severityCounts: normalizeSeverityCounts(latestReport?.severity_counts),
         passiveIntelSummary: order.passive_intel_summary || null,
         // PR-I: correlation_data wird separat geladen — hier nur count.
         // Frontend zeigt es per Lazy-Fetch im Admin-Debug-Drawer.
@@ -943,7 +963,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       success: true,
       data: {
         ...findingsData,
-        // Migration-016-Audit-Felder durchreichen (Q2/2026 Determinismus)
+        // Migration-016-Audit-Felder durchreichen (Q2/2026 Determinismus).
+        // VEC-123: audit_severity_counts kommt bereits aus der autoritativen
+        // Trigger-Spalte reports.severity_counts (SELECT oben) — diese Detail-
+        // seite war nie ein Drift-Standort. Unveraendert gelassen.
         policy_version: row.policy_version ?? null,
         policy_id_distinct: row.policy_id_distinct ?? [],
         audit_severity_counts: row.audit_severity_counts ?? null,
@@ -1147,7 +1170,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     let versions: Array<Record<string, unknown>>;
     try {
       const result = await query(
-        `SELECT version, created_at, file_size_bytes, excluded_findings, findings_data->'severity_counts' AS severity_counts
+        `SELECT version, created_at, file_size_bytes, excluded_findings, severity_counts
          FROM reports WHERE order_id = $1
          ORDER BY version DESC`,
         [id],
@@ -1156,18 +1179,15 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     } catch {
       // version column doesn't exist yet — fallback
       const result = await query(
-        `SELECT created_at, file_size_bytes, findings_data->'severity_counts' AS severity_counts
+        `SELECT created_at, file_size_bytes, severity_counts
          FROM reports WHERE order_id = $1`,
         [id],
       );
       versions = result.rows as Array<Record<string, unknown>>;
     }
 
-    const sumSeverityCounts = (counts: unknown): number => {
-      if (!counts || typeof counts !== 'object') return 0;
-      return Object.values(counts as Record<string, number>).reduce((sum, v) => sum + (typeof v === 'number' ? v : 0), 0);
-    };
-
+    // VEC-123: sumSeverityCounts wird jetzt aus ../lib/severityCounts.js
+    // importiert; die autoritative Spalte ist bereits trigger-konsistent.
     return {
       success: true,
       data: {
@@ -1510,7 +1530,9 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       `SELECT o.id, o.target_url AS domain, o.package, o.status, o.created_at, o.scan_finished_at,
               o.correlation_data, o.business_impact_score,
               c.email AS customer_email,
-              r.findings_data
+              -- VEC-123: nur die autoritative Trigger-Spalte laden (findings_data
+              -- wurde hier nur fuer das eingebettete severity_counts gebraucht).
+              r.severity_counts
        FROM orders o
        LEFT JOIN customers c ON c.id = o.customer_id
        LEFT JOIN reports r ON r.order_id = o.id AND r.superseded_by IS NULL
@@ -1519,7 +1541,6 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     );
 
     const reviews = result.rows.map((row: Record<string, unknown>) => {
-      const findingsData = row.findings_data as Record<string, unknown> | null;
       return {
         id: row.id,
         domain: row.domain,
@@ -1529,7 +1550,8 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         createdAt: row.created_at,
         scanFinishedAt: row.scan_finished_at,
         businessImpactScore: row.business_impact_score,
-        severityCounts: findingsData?.severity_counts || null,
+        // VEC-123: autoritative Trigger-Spalte → kanonische UPPER-case-Form.
+        severityCounts: normalizeSeverityCounts(row.severity_counts),
       };
     });
 
