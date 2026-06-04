@@ -18,6 +18,7 @@ export type AuditAction =
   | 'report.generated'
   | 'report.downloaded'
   | 'report.regenerate'
+  | 'report.notified'
   | 'finding.excluded'
   | 'finding.unexcluded'
   | 'finding.overridden'
