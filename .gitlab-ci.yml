@@ -620,33 +620,41 @@ ops-traefik-auth:
       if [ -z "${TRAEFIK_INTERNAL_HTPASSWD}" ]; then
         echo "FATAL: Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD fehlt (Format user:hash)."; exit 1
       fi
+    # Traefik-Container ermitteln. Der File-Provider liest aus dem Container-Pfad
+    # /etc/traefik/config (= Host /opt/traefik/config, bind-mount). Da der Runner
+    # (gitlab-runner) /opt/traefik/config NICHT schreiben darf (root:root), werden
+    # die Dateien per `docker cp` in den Traefik-Container geschrieben — der
+    # Docker-Daemon laeuft als root, der Bind-Mount persistiert auf den Host.
     - |
-      if [ ! -d "${TRAEFIK_CFG}" ]; then
-        echo "FATAL: ${TRAEFIK_CFG} nicht vorhanden — Traefik-Dynamic-Dir nicht gefunden."; exit 1
-      fi
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      if [ -z "$TRAEFIK" ]; then echo "FATAL: kein Traefik-Container gefunden."; exit 1; fi
+      echo "Traefik-Container: $TRAEFIK"
+    - TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
     # 0) Klartext-Credential host-persistieren (optional), damit Operatoren es per
-    #    `sudo cat ${TRAEFIK_CFG}/.vectiscan-internal-cred` abholen koennen — kein
-    #    Klartext im Repo/Board (Muster wie .demo_password, VEC-154).
+    #    `sudo cat /opt/traefik/config/.vectiscan-internal-cred` abholen koennen —
+    #    kein Klartext im Repo/Board (Muster wie .demo_password, VEC-154).
     - |
       if [ -n "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" ]; then
-        printf '%s\n' "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" > ${TRAEFIK_CFG}/.vectiscan-internal-cred
-        chmod 600 ${TRAEFIK_CFG}/.vectiscan-internal-cred
-        echo "Klartext-Credential persistiert nach ${TRAEFIK_CFG}/.vectiscan-internal-cred (chmod 600)."
+        printf '%s\n' "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" > "${CI_PROJECT_DIR}/.cred.tmp"
+        chmod 600 "${CI_PROJECT_DIR}/.cred.tmp"
+        docker cp "${CI_PROJECT_DIR}/.cred.tmp" "${TRAEFIK}:/etc/traefik/config/.vectiscan-internal-cred"
+        rm -f "${CI_PROJECT_DIR}/.cred.tmp"
+        echo "Klartext-Credential persistiert nach ${TRAEFIK_CFG}/.vectiscan-internal-cred."
       else
         echo "Kein TRAEFIK_INTERNAL_CRED_PLAINTEXT gesetzt — ueberspringe Klartext-Persistierung."
       fi
     # 1) basicAuth-Middleware additiv in den Host-File-Provider schreiben.
-    - sed "s#__TRAEFIK_INTERNAL_HTPASSWD__#${TRAEFIK_INTERNAL_HTPASSWD}#" ${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml > ${TRAEFIK_CFG}/vectiscan-auth.yml
-    - chmod 600 ${TRAEFIK_CFG}/vectiscan-auth.yml
-    - echo "=== vectiscan-auth.yml geschrieben ==="; ls -la ${TRAEFIK_CFG}/vectiscan-auth.yml
+    - sed "s#__TRAEFIK_INTERNAL_HTPASSWD__#${TRAEFIK_INTERNAL_HTPASSWD}#" ${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml > "${CI_PROJECT_DIR}/vectiscan-auth.rendered.yml"
+    - docker cp "${CI_PROJECT_DIR}/vectiscan-auth.rendered.yml" "${TRAEFIK}:/etc/traefik/config/vectiscan-auth.yml"
+    - rm -f "${CI_PROJECT_DIR}/vectiscan-auth.rendered.yml"
+    - echo "=== vectiscan-auth.yml in ${TRAEFIK} geschrieben ==="; docker exec "$TRAEFIK" ls -la /etc/traefik/config/vectiscan-auth.yml || true
     # 2) Traefik (watch:true) laedt hot — warten und Middleware-Existenz pruefen.
     - sleep 6
     - |
-      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
       NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
       echo "Traefik=${TRAEFIK} Net=${NET}"
       echo "--- middleware internal-auth@file ---"
-      docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/middlewares/internal-auth@file" || echo "(middleware-check fehlgeschlagen — Abbruch)"
+      docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/middlewares/internal-auth@file" || echo "(middleware-check fehlgeschlagen)"
     # 3) Aktive-Scan-Guard (analog .deploy-base), dann die 4 Router neu labeln.
     - cd ${DEPLOY_PATH}
     - |
