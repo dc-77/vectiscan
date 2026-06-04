@@ -620,34 +620,39 @@ ops-traefik-auth:
       if [ -z "${TRAEFIK_INTERNAL_HTPASSWD}" ]; then
         echo "FATAL: Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD fehlt (Format user:hash)."; exit 1
       fi
-    # Traefik-Container ermitteln. Der File-Provider liest aus dem Container-Pfad
-    # /etc/traefik/config (= Host /opt/traefik/config, bind-mount). Da der Runner
-    # (gitlab-runner) /opt/traefik/config NICHT schreiben darf (root:root), werden
-    # die Dateien per `docker cp` in den Traefik-Container geschrieben — der
-    # Docker-Daemon laeuft als root, der Bind-Mount persistiert auf den Host.
+    # Traefik-Container ermitteln (fuer Netzwerk/Reload-Check). Der File-Provider
+    # liest aus /etc/traefik/config (= Host /opt/traefik/config, READ-ONLY in den
+    # Traefik-Container gemountet). Der Runner (gitlab-runner) darf /opt/traefik/config
+    # NICHT direkt schreiben (root:root) und der Traefik-Mount ist ro. Deshalb wird
+    # ueber einen kurzlebigen Helfer-Container mit eigenem RW-Bind-Mount geschrieben:
+    # der Docker-Daemon laeuft als root, der Bind-Mount persistiert auf den Host,
+    # Traefik (watch:true) laedt die neue Datei hot.
     - |
       TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
       if [ -z "$TRAEFIK" ]; then echo "FATAL: kein Traefik-Container gefunden."; exit 1; fi
       echo "Traefik-Container: $TRAEFIK"
     - TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+    - HELPER=busybox:1.36
+    - docker image inspect "$HELPER" >/dev/null 2>&1 || docker pull "$HELPER"
     # 0) Klartext-Credential host-persistieren (optional), damit Operatoren es per
     #    `sudo cat /opt/traefik/config/.vectiscan-internal-cred` abholen koennen —
     #    kein Klartext im Repo/Board (Muster wie .demo_password, VEC-154).
     - |
       if [ -n "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" ]; then
-        printf '%s\n' "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" > "${CI_PROJECT_DIR}/.cred.tmp"
-        chmod 600 "${CI_PROJECT_DIR}/.cred.tmp"
-        docker cp "${CI_PROJECT_DIR}/.cred.tmp" "${TRAEFIK}:/etc/traefik/config/.vectiscan-internal-cred"
-        rm -f "${CI_PROJECT_DIR}/.cred.tmp"
-        echo "Klartext-Credential persistiert nach ${TRAEFIK_CFG}/.vectiscan-internal-cred."
+        docker run --rm --user 0:0 -e C="${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" \
+          -v "${TRAEFIK_CFG}:/cfg" "$HELPER" \
+          sh -c 'printf "%s\n" "$C" > /cfg/.vectiscan-internal-cred && chmod 600 /cfg/.vectiscan-internal-cred'
+        echo "Klartext-Credential persistiert nach ${TRAEFIK_CFG}/.vectiscan-internal-cred (chmod 600)."
       else
         echo "Kein TRAEFIK_INTERNAL_CRED_PLAINTEXT gesetzt — ueberspringe Klartext-Persistierung."
       fi
     # 1) basicAuth-Middleware additiv in den Host-File-Provider schreiben.
-    - sed "s#__TRAEFIK_INTERNAL_HTPASSWD__#${TRAEFIK_INTERNAL_HTPASSWD}#" ${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml > "${CI_PROJECT_DIR}/vectiscan-auth.rendered.yml"
-    - docker cp "${CI_PROJECT_DIR}/vectiscan-auth.rendered.yml" "${TRAEFIK}:/etc/traefik/config/vectiscan-auth.yml"
-    - rm -f "${CI_PROJECT_DIR}/vectiscan-auth.rendered.yml"
-    - echo "=== vectiscan-auth.yml in ${TRAEFIK} geschrieben ==="; docker exec "$TRAEFIK" ls -la /etc/traefik/config/vectiscan-auth.yml || true
+    - |
+      RENDERED=$(sed "s#__TRAEFIK_INTERNAL_HTPASSWD__#${TRAEFIK_INTERNAL_HTPASSWD}#" ${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml)
+      docker run --rm --user 0:0 -e C="$RENDERED" \
+        -v "${TRAEFIK_CFG}:/cfg" "$HELPER" \
+        sh -c 'printf "%s\n" "$C" > /cfg/vectiscan-auth.yml && chmod 644 /cfg/vectiscan-auth.yml'
+    - echo "=== vectiscan-auth.yml geschrieben ==="; docker run --rm -v "${TRAEFIK_CFG}:/cfg:ro" "$HELPER" ls -la /cfg/vectiscan-auth.yml || true
     # 2) Traefik (watch:true) laedt hot — warten und Middleware-Existenz pruefen.
     - sleep 6
     - |
