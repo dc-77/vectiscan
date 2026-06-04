@@ -257,7 +257,9 @@ ops-seed-demo:
       fi
     - echo "Seede Demo-Mandant (demo@vectiscan.tech) im api-Container..."
     - docker compose exec -T -e DEMO_PASSWORD="${DEMO_PASSWORD}" api node dist/scripts/seed-demo.js
-    - echo "OK: Demo-Seed abgeschlossen."
+    # Single-quoted: ohne Quoting parst YAML 'echo "OK: ...' wegen des ': '
+    # als Map statt String (CI-Config-Error, VEC-121-Regression).
+    - 'echo "OK: Demo-Seed abgeschlossen."'
 
 # =============================================================================
 # Restart-Worker — gezieltes Restart einzelner Worker-Container ohne
