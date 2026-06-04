@@ -605,6 +605,16 @@ ops-traefik-auth:
   needs: []
   variables:
     TRAEFIK_CFG: /opt/traefik/config
+  # Eigene Rules: .ops-base auf main hat (noch) keine api-Source-Regel (der
+  # VEC-155-Fix lebt nur auf fix/vec-121). Daher hier explizit api/web/main
+  # anbieten, damit der Paperclip-Agent den Job per API-Pipeline starten kann.
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
   script:
     - |
       if [ -z "${TRAEFIK_INTERNAL_HTPASSWD}" ]; then
