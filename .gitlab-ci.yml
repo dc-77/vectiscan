@@ -614,6 +614,17 @@ ops-traefik-auth:
       if [ ! -d "${TRAEFIK_CFG}" ]; then
         echo "FATAL: ${TRAEFIK_CFG} nicht vorhanden — Traefik-Dynamic-Dir nicht gefunden."; exit 1
       fi
+    # 0) Klartext-Credential host-persistieren (optional), damit Operatoren es per
+    #    `sudo cat ${TRAEFIK_CFG}/.vectiscan-internal-cred` abholen koennen — kein
+    #    Klartext im Repo/Board (Muster wie .demo_password, VEC-154).
+    - |
+      if [ -n "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" ]; then
+        printf '%s\n' "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" > ${TRAEFIK_CFG}/.vectiscan-internal-cred
+        chmod 600 ${TRAEFIK_CFG}/.vectiscan-internal-cred
+        echo "Klartext-Credential persistiert nach ${TRAEFIK_CFG}/.vectiscan-internal-cred (chmod 600)."
+      else
+        echo "Kein TRAEFIK_INTERNAL_CRED_PLAINTEXT gesetzt — ueberspringe Klartext-Persistierung."
+      fi
     # 1) basicAuth-Middleware additiv in den Host-File-Provider schreiben.
     - sed "s#__TRAEFIK_INTERNAL_HTPASSWD__#${TRAEFIK_INTERNAL_HTPASSWD}#" ${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml > ${TRAEFIK_CFG}/vectiscan-auth.yml
     - chmod 600 ${TRAEFIK_CFG}/vectiscan-auth.yml
