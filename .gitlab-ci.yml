@@ -241,17 +241,38 @@ deploy-manual:
 # Demo-Seed (VEC-121 / PA-6) — seedet den synthetischen Demo-Mandanten
 # (demo@vectiscan.tech) im laufenden api-Container. Idempotent: raeumt
 # vorhandene Demo-Daten (feste UUIDs) auf und legt sie neu an, streng auf
-# DEMO_CUSTOMER_ID begrenzt (Tenant-Isolation). DATABASE_URL/MINIO_* kommen aus
-# der Container-Umgebung; DEMO_PASSWORD aus der maskierten CI/CD-Variable —
-# NICHT der Source-Default. Manuell ausloesen nach gruenem Deploy.
+# DEMO_CUSTOMER_ID begrenzt (Tenant-Isolation).
+#
+# DEMO_PASSWORD-Quelle (Prioritaet):
+#   1) maskierte CI/CD-Variable DEMO_PASSWORD (bevorzugt — sobald ein
+#      Maintainer sie setzt; erscheint dann als [MASKED] im Job-Log)
+#   2) host-persistiertes Zufalls-Secret ${DEPLOY_PATH}/.demo_password
+#      (stabil ueber Re-Seeds, ausserhalb des Repos, chmod 600). Wird einmalig
+#      mit `openssl rand` erzeugt, falls (1) nicht gesetzt ist.
+# In KEINEM Fall der dokumentierte Source-Default (Sven-Auflage, VEC-121).
+# Der Developer-Token kann keine maskierte CI/CD-Variable setzen (Maintainer-
+# only); Pfad (2) macht den Seed daher ohne Maintainer-Eingriff lauffaehig.
+# `needs: []` erlaubt das manuelle Ausloesen ohne erneuten Build/Deploy —
+# das Seed-Skript liegt bereits im laufenden api-Container.
 # =============================================================================
 ops-seed-demo:
   extends: .ops-base
+  needs: []
   script:
     - cd ${DEPLOY_PATH}
     - |
       if [ -z "${DEMO_PASSWORD}" ]; then
-        echo "ERROR: CI/CD-Variable DEMO_PASSWORD ist nicht gesetzt — Abbruch."
+        SECRET_FILE="${DEPLOY_PATH}/.demo_password"
+        if [ ! -s "${SECRET_FILE}" ]; then
+          ( umask 077; printf 'Demo-%s-2026!' "$(openssl rand -hex 6)" > "${SECRET_FILE}" )
+          chmod 600 "${SECRET_FILE}"
+          echo "Neues host-persistiertes Demo-Secret erzeugt (${SECRET_FILE}, chmod 600)."
+        fi
+        DEMO_PASSWORD="$(cat "${SECRET_FILE}")"
+        export DEMO_PASSWORD
+      fi
+      if [ -z "${DEMO_PASSWORD}" ]; then
+        echo "ERROR: DEMO_PASSWORD konnte weder aus CI/CD-Variable noch aus Host-Secret ermittelt werden — Abbruch."
         echo "       In prod darf kein Source-Default verwendet werden (Sven, VEC-121)."
         exit 1
       fi
