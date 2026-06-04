@@ -53,6 +53,19 @@ export function getPriceIdForPackage(pkg: string): string | null {
   return specific || process.env.STRIPE_PRICE_DEFAULT || null;
 }
 
+/**
+ * Ob `payment_status === 'no_payment_required'` ein Abo aktivieren darf
+ * (VEC-112/L2). Heute aktiviert Stripe dies nur bei 100%-Coupons/Trials —
+ * und genau die sind im aktuellen Checkout NICHT aktiviert (feste line_items,
+ * keine allow_promotion_codes). Ein 'no_payment_required'-Event ist daher
+ * unerwartet und wird per Default NICHT als kostenlose Aktivierung akzeptiert.
+ * Erst wenn Gutscheine/Trials bewusst eingefuehrt werden, schaltet das
+ * Deploy-Secret STRIPE_ALLOW_FREE_ACTIVATION=true die Aktivierung frei.
+ */
+export function isFreeActivationAllowed(): boolean {
+  return process.env.STRIPE_ALLOW_FREE_ACTIVATION === 'true';
+}
+
 /** Erfolgs-/Abbruch-URLs fuer die Checkout-Session. */
 export function getCheckoutUrls(): { successUrl: string; cancelUrl: string } {
   const base = process.env.APP_BASE_URL || 'https://scan.vectigal.tech';

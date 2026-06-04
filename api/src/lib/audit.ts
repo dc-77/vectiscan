@@ -33,6 +33,7 @@ export type AuditAction =
   | 'subscription.created'
   | 'subscription.payment_confirmed'
   | 'subscription.payment_failed'
+  | 'subscription.free_activation_blocked'
   | 'subscription.domain_requested'
   | 'subscription.domain_approved'
   | 'subscription.domain_rejected'
