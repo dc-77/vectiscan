@@ -1,0 +1,14 @@
+# VectiScan — Grafana-Dashboard-Provider. Ticket VEC-85 (A5 Monitoring).
+apiVersion: 1
+
+providers:
+  - name: vectiscan
+    orgId: 1
+    folder: VectiScan
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

@@ -1,0 +1,42 @@
+# VectiScan — Promtail: tailt alle Docker-Container-Logs (JSON-File-Driver)
+# und schickt sie an Loki. Ticket VEC-85 (A5 Monitoring).
+#
+# Liest /var/lib/docker/containers/*/*-json.log (read-only gemountet) und nutzt
+# den Docker-Socket zur Service-Discovery, um Container-Namen + Compose-Labels
+# als Loki-Labels anzuhaengen.
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: warn
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 15s
+    relabel_configs:
+      # Container-Name (ohne fuehrenden Slash) → Label "container"
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+      # Compose-Service-Name → Label "service"
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
+        target_label: 'service'
+      # Compose-Projekt → Label "project"
+      - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
+        target_label: 'project'
+      - target_label: 'host'
+        replacement: 'vectigal-docker02'
+    pipeline_stages:
+      # pino/structlog schreiben strukturiertes JSON auf stdout → level extrahieren
+      - json:
+          expressions:
+            level: level
+      - labels:
+          level:

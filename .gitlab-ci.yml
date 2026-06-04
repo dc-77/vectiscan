@@ -186,9 +186,12 @@ test-report-worker:
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
     - cp ${CI_PROJECT_DIR}/docker-compose.yml .
+    # Monitoring-Configs (VEC-85): Bind-Mounts in docker-compose.yml zeigen auf
+    # ./monitoring — daher die Configs neben docker-compose.yml mit ausrollen.
+    - rm -rf ./monitoring && cp -r ${CI_PROJECT_DIR}/monitoring .
     - docker compose pull
     - TAG=${TAG} docker compose up -d --remove-orphans
-    # Give all 7 containers time to pass health checks
+    # Give all containers time to pass health checks
     - sleep 30
     - docker compose ps
     - docker compose ps --format json | python3 -c "import sys,json; containers=[json.loads(line) for line in sys.stdin if line.strip()]; unhealthy=[c['Name'] for c in containers if c.get('Health','') not in ('','healthy') or c.get('State')!='running']; print('Unhealthy:',unhealthy) if unhealthy else print('All healthy'); exit(1 if unhealthy else 0)"

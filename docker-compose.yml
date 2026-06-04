@@ -8,6 +8,10 @@ volumes:
   vectiscan-pg-data:
   vectiscan-redis-data:
   vectiscan-minio-data:
+  # Monitoring-Stack (VEC-85, A5): self-hosted, spend-frei
+  vectiscan-kuma-data:
+  vectiscan-loki-data:
+  vectiscan-grafana-data:
 
 services:
   frontend:
@@ -483,4 +487,95 @@ services:
           cpus: "0.5"
           memory: 512M
     networks:
+      - vectiscan-internal
+
+  # ===========================================================================
+  # MONITORING-STACK (VEC-85, A5 — self-hosted, spend-frei)
+  # ---------------------------------------------------------------------------
+  # uptime-kuma : aktives Health-Probing der Services + Alerting (Resend-SMTP)
+  # loki        : zentrale Log-Aggregation (Filesystem-Storage, 14d Retention)
+  # promtail    : tailt alle Container-Logs via Docker-API → Loki
+  # grafana     : Log-Viewer (Loki-Datasource, vorprovisioniert)
+  # Configs unter ./monitoring/ (von deploy-auto neben compose ausgerollt).
+  # Bewusst OHNE healthcheck-Block: der Deploy-Gate wertet Container ohne
+  # Health-Feld als gesund → ein langsamer Monitoring-Start blockt kein Deploy.
+  # ===========================================================================
+  uptime-kuma:
+    image: louislam/uptime-kuma:1.23.16
+    restart: unless-stopped
+    volumes:
+      - vectiscan-kuma-data:/app/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vectiscan-status.rule=Host(`status.vectigal.tech`)"
+      - "traefik.http.routers.vectiscan-status.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.services.vectiscan-status.loadbalancer.server.port=3001"
+    networks:
+      - proxy-net
+      - vectiscan-internal
+
+  loki:
+    image: grafana/loki:2.9.8
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./monitoring/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - vectiscan-loki-data:/loki
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    networks:
+      - vectiscan-internal
+
+  promtail:
+    image: grafana/promtail:2.9.8
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - ./monitoring/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+    depends_on:
+      - loki
+    networks:
+      - vectiscan-internal
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-vectiscan-admin}
+      GF_SERVER_ROOT_URL: https://logs.vectigal.tech
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - vectiscan-grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 384M
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vectiscan-logs.rule=Host(`logs.vectigal.tech`)"
+      - "traefik.http.routers.vectiscan-logs.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.services.vectiscan-logs.loadbalancer.server.port=3000"
+    depends_on:
+      - loki
+    networks:
+      - proxy-net
       - vectiscan-internal
