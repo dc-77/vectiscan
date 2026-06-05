@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import WebCheckFreeForm from '@/components/WebCheckFreeForm';
 
 // Analytics-Seam stummschalten (kein window.VectiTrack im Test).
@@ -127,5 +127,89 @@ describe('WebCheckFreeForm', () => {
     fireEvent.change(screen.getByLabelText('Ihre Domain'), { target: { value: 'firma.de' } });
     fireEvent.click(screen.getByRole('button', { name: /Kostenlosen WebCheck starten/ }));
     await waitFor(() => expect(screen.getByText(/aktueller\s+WebCheck vor/)).toBeInTheDocument());
+  });
+
+  it('ohne Site-Key wird KEIN Turnstile-Widget gerendert (graceful, AC: inert)', () => {
+    render(<WebCheckFreeForm />);
+    expect(screen.queryByTestId('turnstile-widget')).not.toBeInTheDocument();
+  });
+});
+
+// ── VEC-189: Turnstile aktiv (Site-Key konfiguriert) ─────────────────────────
+describe('WebCheckFreeForm — Turnstile aktiv (VEC-189)', () => {
+  const SITE_KEY = '1x00000000000000000000AA'; // Cloudflare-Test-Site-Key
+  let renderedOpts: Record<string, (token?: string) => void> & { sitekey?: string };
+
+  beforeEach(() => {
+    global.fetch = jest.fn();
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = SITE_KEY;
+    renderedOpts = {} as typeof renderedOpts;
+    (window as unknown as { turnstile: unknown }).turnstile = {
+      render: jest.fn((_el: HTMLElement, opts: Record<string, unknown>) => {
+        renderedOpts = opts as typeof renderedOpts;
+        return 'wid-1';
+      }),
+      reset: jest.fn(),
+      remove: jest.fn(),
+    };
+  });
+  afterEach(() => {
+    delete process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+    delete (window as unknown as { turnstile?: unknown }).turnstile;
+    jest.clearAllMocks();
+  });
+
+  function turnstile() {
+    return (window as unknown as { turnstile: { render: jest.Mock; reset: jest.Mock } }).turnstile;
+  }
+
+  it('rendert das Widget mit dem konfigurierten Site-Key', async () => {
+    render(<WebCheckFreeForm />);
+    expect(screen.getByTestId('turnstile-widget')).toBeInTheDocument();
+    await waitFor(() => expect(turnstile().render).toHaveBeenCalled());
+    expect(renderedOpts.sitekey).toBe(SITE_KEY);
+  });
+
+  it('blockt Submit ohne Token (kein Netzwerk-Call) und zeigt Hinweis', async () => {
+    render(<WebCheckFreeForm />);
+    await waitFor(() => expect(turnstile().render).toHaveBeenCalled());
+    fireEvent.change(screen.getByLabelText('E-Mail-Adresse'), { target: { value: 'k@firma.de' } });
+    fireEvent.change(screen.getByLabelText('Ihre Domain'), { target: { value: 'firma.de' } });
+    fireEvent.click(screen.getByRole('button', { name: /Kostenlosen WebCheck starten/ }));
+    expect(screen.getByRole('alert')).toHaveTextContent(/kein Roboter/);
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('sendet captchaToken im Start-Payload nach Turnstile-Callback', async () => {
+    mockFetchOnce(201, {
+      success: true,
+      data: { leadId: 'id-1', domain: 'firma.de', verification: { token: 't', methods: [] } },
+    });
+    render(<WebCheckFreeForm />);
+    await waitFor(() => expect(turnstile().render).toHaveBeenCalled());
+    act(() => { renderedOpts.callback('captcha-xyz'); });
+
+    fireEvent.change(screen.getByLabelText('E-Mail-Adresse'), { target: { value: 'k@firma.de' } });
+    fireEvent.change(screen.getByLabelText('Ihre Domain'), { target: { value: 'firma.de' } });
+    fireEvent.click(screen.getByRole('button', { name: /Kostenlosen WebCheck starten/ }));
+
+    await waitFor(() => expect(screen.getByText('Domain-Kontrolle nachweisen')).toBeInTheDocument());
+    const [, opts] = (global.fetch as jest.Mock).mock.calls[0];
+    const payload = JSON.parse((opts as RequestInit).body as string);
+    expect(payload.captchaToken).toBe('captcha-xyz');
+  });
+
+  it('403 captcha_failed → Widget-Reset + erneute Aufforderung', async () => {
+    mockFetchOnce(403, { success: false, error: 'captcha_failed' });
+    render(<WebCheckFreeForm />);
+    await waitFor(() => expect(turnstile().render).toHaveBeenCalled());
+    act(() => { renderedOpts.callback('stale-token'); });
+
+    fireEvent.change(screen.getByLabelText('E-Mail-Adresse'), { target: { value: 'k@firma.de' } });
+    fireEvent.change(screen.getByLabelText('Ihre Domain'), { target: { value: 'firma.de' } });
+    fireEvent.click(screen.getByRole('button', { name: /Kostenlosen WebCheck starten/ }));
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/Sicherheitsprüfung fehlgeschlagen/));
+    expect(turnstile().reset).toHaveBeenCalledWith('wid-1');
   });
 });

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { track, deriveQuelleKanal } from '@/lib/analytics';
 
 /**
@@ -21,6 +21,13 @@ import { track, deriveQuelleKanal } from '@/lib/analytics';
  * Claim-Disziplin (AC6): keine Sicherheits-/Compliance-Claims hier — die trägt die
  * Seiten-Shell (VEC-90, Sven-Sign-off v2.1). Security-/QA-Abnahme des öffentlichen
  * Flows: Sven (VEC-169) vor Go-live.
+ *
+ * VEC-189 (Folge aus VEC-173): Cloudflare-Turnstile-Widget als Proof-of-Humanity in
+ * Schritt 1. Das Response-Token wird als `captchaToken` an /api/webcheck/start gesendet
+ * (Backend-Vertrag, api/src/routes/webcheck.ts). Graceful: ohne
+ * `NEXT_PUBLIC_TURNSTILE_SITE_KEY` ist das Widget ausgeblendet — exakt der inerte
+ * Backend-Zustand (ohne `WEBCHECK_TURNSTILE_SECRET` prüft die Server-Seite nicht).
+ * Reihenfolge-Risiko (VEC-189 Blast Radius): erst Widget live, dann Secret aktivieren.
  */
 
 const C = { teal: '#2DD4BF', slate: '#0F172A', slateLight: '#1E293B', offWhite: '#F8FAFC', muted: '#94A3B8' };
@@ -35,6 +42,92 @@ const DOMAIN_RE = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i;
 function normalizeDomain(raw: string): string {
   return raw.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
 }
+
+/* ── Cloudflare Turnstile (VEC-189) ─────────────────────────
+ * Explizites Rendern via window.turnstile.render(): in einer SPA berechenbarer
+ * als implizites Auto-Rendern (kein Re-Scan des DOM bei Phasenwechseln). Das
+ * Script wird höchstens einmal pro Seite geladen (Modul-Promise-Guard). */
+const TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+
+interface TurnstileApi {
+  render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+  reset: (id?: string) => void;
+  remove: (id?: string) => void;
+}
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
+
+let turnstileScriptPromise: Promise<void> | null = null;
+function loadTurnstileScript(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  if (window.turnstile) return Promise.resolve();
+  if (turnstileScriptPromise) return turnstileScriptPromise;
+  turnstileScriptPromise = new Promise<void>((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = TURNSTILE_SRC;
+    s.async = true;
+    s.defer = true;
+    s.onload = () => resolve();
+    s.onerror = () => { turnstileScriptPromise = null; reject(new Error('turnstile script load failed')); };
+    document.head.appendChild(s);
+  });
+  return turnstileScriptPromise;
+}
+
+export interface TurnstileHandle { reset: () => void }
+
+/**
+ * Rendert das Turnstile-Widget und meldet das Token (oder dessen Verfall) nach oben.
+ * `onToken`/`onExpire` müssen stabil sein (useCallback im Eltern-Element), sonst
+ * würde der Effekt das Widget bei jedem Render neu aufbauen.
+ */
+const TurnstileWidget = forwardRef<TurnstileHandle, {
+  siteKey: string;
+  onToken: (token: string) => void;
+  onExpire: () => void;
+}>(function TurnstileWidget({ siteKey, onToken, onExpire }, ref) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      if (widgetIdRef.current && window.turnstile) {
+        window.turnstile.reset(widgetIdRef.current);
+        onExpire();
+      }
+    },
+  }), [onExpire]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadTurnstileScript().then(() => {
+      if (cancelled || widgetIdRef.current || !containerRef.current || !window.turnstile) return;
+      widgetIdRef.current = window.turnstile.render(containerRef.current, {
+        sitekey: siteKey,
+        theme: 'dark',
+        action: 'webcheck_start',
+        callback: (token: string) => onToken(token),
+        'expired-callback': () => onExpire(),
+        'error-callback': () => onExpire(),
+      });
+    }).catch(() => {
+      // Script-Load fehlgeschlagen → kein Token. Backend ist fail-closed (bei
+      // gesetztem Secret), der Nutzer sieht beim Submit den Hinweis. Kein Crash.
+    });
+    return () => {
+      cancelled = true;
+      if (widgetIdRef.current && window.turnstile) {
+        try { window.turnstile.remove(widgetIdRef.current); } catch { /* idempotent */ }
+        widgetIdRef.current = null;
+      }
+    };
+  }, [siteKey, onToken, onExpire]);
+
+  return <div ref={containerRef} data-testid="turnstile-widget" className="min-h-[65px]" />;
+});
 
 interface VerifyMethod {
   type: 'dns_txt' | 'file' | 'meta_tag';
@@ -70,6 +163,16 @@ export default function WebCheckFreeForm() {
   const [verifiedDomain, setVerifiedDomain] = useState('');
   const [ctaFired, setCtaFired] = useState(false);
 
+  // VEC-189: Turnstile-Site-Key. Next.js inlined NEXT_PUBLIC_* zur Build-Zeit;
+  // im Test wird process.env zur Render-Zeit gelesen → graceful steuerbar.
+  const captchaSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
+  const captchaRequired = Boolean(captchaSiteKey);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const captchaRef = useRef<TurnstileHandle>(null);
+  // Stabile Callbacks: sonst baut der Widget-Effekt sich bei jedem Render neu auf.
+  const onCaptchaToken = useCallback((t: string) => setCaptchaToken(t), []);
+  const onCaptchaExpire = useCallback(() => setCaptchaToken(''), []);
+
   // Above-the-fold-CTA-Engagement (Zwischenmetrik „CTA-Klickrate"): einmal beim ersten Fokus.
   const onFirstFocus = () => {
     if (ctaFired) return;
@@ -88,6 +191,12 @@ export default function WebCheckFreeForm() {
 
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(mail)) { setError('Bitte gültige E-Mail-Adresse angeben.'); return; }
     if (!DOMAIN_RE.test(dom)) { setError('Bitte gültige Domain angeben, z. B. ihre-firma.de'); return; }
+    // VEC-189: Proof-of-Humanity. Nur erzwingen, wenn ein Site-Key konfiguriert ist
+    // (sonst ist auch das Backend inert) — kein Netzwerk-Call ohne Token.
+    if (captchaRequired && !captchaToken) {
+      setError('Bitte bestätigen Sie kurz, dass Sie kein Roboter sind.');
+      return;
+    }
 
     setPhase('submitting');
     const { quelle_kanal, utm } = deriveQuelleKanal();
@@ -105,6 +214,9 @@ export default function WebCheckFreeForm() {
       referrer: typeof document !== 'undefined' ? document.referrer : '',
       landing_path: typeof window !== 'undefined' ? window.location.pathname : '',
       ...utm,
+      // VEC-189: Turnstile-Token (Backend-Feldname `captchaToken`). Nur senden,
+      // wenn vorhanden — fehlt es, ist das Backend ohnehin inert oder fail-closed.
+      ...(captchaToken ? { captchaToken } : {}),
     };
 
     try {
@@ -116,6 +228,14 @@ export default function WebCheckFreeForm() {
       const json = await res.json().catch(() => null);
 
       if (res.status === 429) { setVerifiedDomain(dom); setPhase('rate_limited'); return; }
+      if (res.status === 403 && json?.error === 'captcha_failed') {
+        // VEC-189: Server hat das Token verworfen (single-use/abgelaufen) → frisches
+        // Token anfordern und Nutzer um erneute Bestätigung bitten.
+        captchaRef.current?.reset();
+        setError('Sicherheitsprüfung fehlgeschlagen. Bitte bestätigen Sie erneut, dass Sie kein Roboter sind.');
+        setPhase('form');
+        return;
+      }
       if (res.status === 400) {
         const code = json?.error;
         setError(code === 'invalid_email' ? 'Bitte gültige E-Mail-Adresse angeben.' : 'Bitte gültige Domain angeben, z. B. ihre-firma.de');
@@ -129,9 +249,12 @@ export default function WebCheckFreeForm() {
         setPhase('verify');
         return;
       }
+      // Generischer Fehlschlag: Token ist nach dem Submit verbraucht → zurücksetzen.
+      captchaRef.current?.reset();
       setError('Start fehlgeschlagen. Bitte später erneut versuchen oder support@vectigal.tech.');
       setPhase('form');
     } catch {
+      captchaRef.current?.reset();
       setError('Verbindung fehlgeschlagen. Bitte später erneut versuchen oder support@vectigal.tech.');
       setPhase('form');
     }
@@ -297,6 +420,16 @@ export default function WebCheckFreeForm() {
             (z.&nbsp;B. NIS2, DSGVO, ISO&nbsp;27001) sowie Produkt-Infos per E-Mail erhalten. Die Einwilligung kann ich
             jederzeit mit Wirkung für die Zukunft widerrufen.</span>
         </label>
+
+        {/* VEC-189: Turnstile — nur bei konfiguriertem Site-Key (sonst Backend inert). */}
+        {captchaRequired && (
+          <TurnstileWidget
+            siteKey={captchaSiteKey}
+            onToken={onCaptchaToken}
+            onExpire={onCaptchaExpire}
+            ref={captchaRef}
+          />
+        )}
 
         {error && <p className="text-xs" style={{ color: '#F87171' }} role="alert">{error}</p>}
 
