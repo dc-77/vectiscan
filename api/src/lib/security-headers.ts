@@ -11,20 +11,22 @@ import type { FastifyInstance } from 'fastify';
  *
  * Wir setzen den Header jetzt zusätzlich in der App-Schicht: versioniert,
  * per CI-Regressionstest abgesichert und garantiert mit kanonischem Namen.
- * Die Direktiven spiegeln die zuvor (unwirksam) konfigurierte Policy 1:1,
- * damit das Scharfschalten der Durchsetzung keine Verhaltensänderung über
- * den eigentlichen Fix hinaus bringt.
  *
- * Härtung (script-src ohne 'unsafe-inline' via Nonce/Hash) ist bewusst
- * ausgelagert — siehe Follow-up.
+ * VEC-207: Diese API liefert ausschließlich `application/json` (kein
+ * Dokument/Worker/Frame, keine HTML-/Static-Routen). Browser setzen CSP auf
+ * JSON-Responses ohnehin nicht durch — `script-src`/`style-src` etc. sind
+ * für ein reines JSON-Backend bedeutungslos, und das gespiegelte
+ * `'unsafe-inline'` ist irreführend (lädt zu False-Positive-Rechecks ein).
+ * Wir straffen daher auf eine minimale Lockdown-Policy: `default-src 'none'`
+ * verbietet jede Ressourcenklasse, `frame-ancestors 'none'` unterbindet das
+ * Einbetten einer (hypothetischen) Dokument-Response. Das Frontend bleibt
+ * unberührt — dessen Nonce-CSP wird in `frontend/middleware.ts` gesetzt
+ * (VEC-186/VEC-201). Sollte die API künftig HTML/Docs ausliefern, ist für
+ * diese Routen eine separate, lockerere Policy zu setzen.
  */
 export const CONTENT_SECURITY_POLICY = [
-  "default-src 'self'",
-  "connect-src 'self' https://scan-api.vectigal.tech wss://scan-api.vectigal.tech",
-  "script-src 'self' 'unsafe-inline'",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
-  "font-src 'self' data:",
+  "default-src 'none'",
+  "frame-ancestors 'none'",
 ].join('; ');
 
 /**
