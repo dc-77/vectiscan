@@ -185,6 +185,19 @@ test-report-worker:
       RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
+    # ── Deploy-Guard (VEC-217): RESEND_API_KEY ist eine *protected* CI-Var; auf
+    #    einem unprotected Branch erreicht sie den .env-Write nicht und landet
+    #    leer im Container -> E-Mail-/Lead-Routing ist STILL tot (Root-Cause
+    #    VEC-216). Nicht hart failen (E-Mail ist nicht scan-blocking), aber laut
+    #    sichtbar machen. Nur Praesenz wird geprueft, der Wert nie geloggt.
+    - |
+      if grep -q '^RESEND_API_KEY=$' .env; then
+        echo "WARN: RESEND_API_KEY ist LEER im .env — E-Mail-/Lead-Routing ist TOT."
+        echo "      Ursache i.d.R.: protected CI-Var trifft unprotected Branch (VEC-216)."
+        echo "      Scan-Funktion bleibt unberuehrt; nur Lead-/Mail-Versand betroffen."
+      else
+        echo "OK: RESEND_API_KEY im .env gesetzt (Wert wird nicht geloggt)."
+      fi
     - cp ${CI_PROJECT_DIR}/docker-compose.yml .
     # Monitoring-Configs (VEC-85): Bind-Mounts in docker-compose.yml zeigen auf
     # ./monitoring — daher die Configs neben docker-compose.yml mit ausrollen.
@@ -281,6 +294,34 @@ ops-seed-demo:
     # Single-quoted: ohne Quoting parst YAML 'echo "OK: ...' wegen des ': '
     # als Map statt String (CI-Config-Error, VEC-121-Regression).
     - 'echo "OK: Demo-Seed abgeschlossen."'
+
+# =============================================================================
+# Ops-Diag Lead-Mail (VEC-217) — Read-only Diagnose fuer RESEND/E-Mail-Routing.
+# Reproduziert die VEC-216-Diagnose in Sekunden: meldet Praesenz + LAENGE von
+# RESEND_API_KEY im laufenden api-Container (NIE den Wert) sowie
+# RESEND_FROM_EMAIL und greppt die api-Logs nach Lead-/RESEND-Spuren.
+# Komplett read-only — keine Mutation, kein Restart. `needs: []` -> ohne
+# Build/Deploy manuell triggerbar.
+# =============================================================================
+ops-diag-leadmail:
+  extends: .ops-base
+  needs: []
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "=== RESEND-Env im laufenden api-Container (read-only, Wert wird NIE geloggt) ==="
+    - |
+      docker compose exec -T api sh -c '
+        klen=${#RESEND_API_KEY}
+        if [ "${klen:-0}" -gt 0 ]; then
+          echo "  RESEND_API_KEY: gesetzt (Laenge=${klen})"
+        else
+          echo "  RESEND_API_KEY: LEER/FEHLT — E-Mail-/Lead-Routing ist tot (VEC-216)"
+        fi
+        echo "  RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-(leer)}"
+      ' || echo "(api-Container nicht erreichbar?)"
+    - echo
+    - echo "=== api-Logs (letzte 5000 Zeilen): Lead-/RESEND-Spuren ==="
+    - docker logs --tail 5000 vectiscan-api-1 2>&1 | grep -iE 'Demo-lead|RESEND' | tail -50 || echo "(keine Lead-/RESEND-Logzeilen gefunden)"
 
 # =============================================================================
 # Restart-Worker — gezieltes Restart einzelner Worker-Container ohne
