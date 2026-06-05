@@ -23,11 +23,29 @@ import { enqueuePrecheck } from '../lib/queue';
 import { sendWebcheckDoiEmail } from '../lib/email';
 import { verifyCaptcha } from '../lib/captcha';
 
-jest.mock('../lib/db', () => ({
-  query: jest.fn(),
-  initDb: jest.fn(),
-  pool: { end: jest.fn() },
-}));
+jest.mock('../lib/db', () => {
+  const query = jest.fn();
+  // withTransaction modelliert die echte Semantik so faithful wie für den TOCTOU-
+  // Test nötig: alle Transaktionen werden SERIALISIERT (entspricht dem per-Domain
+  // pg_advisory_xact_lock — alle Verifies dieser Suite betreffen dieselbe Domain)
+  // und teilen sich denselben query-Mock als Transaktions-Client. So sieht ein
+  // wartender zweiter Verify den committeten Zustand des ersten.
+  let txChain: Promise<unknown> = Promise.resolve();
+  const withTransaction = jest.fn((fn: (q: typeof query) => unknown) => {
+    const run = txChain.then(() => fn(query));
+    txChain = run.then(
+      () => undefined,
+      () => undefined,
+    );
+    return run;
+  });
+  return {
+    query,
+    withTransaction,
+    initDb: jest.fn(),
+    pool: { end: jest.fn() },
+  };
+});
 
 jest.mock('../lib/queue', () => ({
   enqueuePrecheck: jest.fn().mockResolvedValue(undefined),
@@ -99,13 +117,21 @@ interface DbState {
   newOrderId?: string;
   newTargetId?: string;
   doiUpdatedRows?: number; // Anzahl Zeilen, die DOI-UPDATE ... RETURNING liefert
+  // TOCTOU-Test (VEC-174): Lead-Lookup pro id + statefuler Free-Scan-Zähler.
+  leadsById?: Record<string, DbState['lead']>;
+  orderInsertCount?: number; // wie oft INSERT INTO orders tatsächlich lief
 }
 
 let dbState: DbState;
 
 function installQueryRouter() {
-  mockQuery.mockImplementation(async (sql: string) => {
+  mockQuery.mockImplementation(async (sql: string, params?: unknown[]) => {
     const s = String(sql);
+    // /verify: per-Domain Advisory-Lock (TOCTOU-Guard, VEC-174). Serialisierung
+    // selbst übernimmt der withTransaction-Mock; hier nur sauber „acquired" melden.
+    if (s.includes('pg_advisory_xact_lock')) {
+      return { rows: [{ pg_advisory_xact_lock: '' }] };
+    }
     // /start: Rate-Limit-Fensterzählung
     if (s.includes('COUNT(*) FILTER')) {
       const c = dbState.rateCounts ?? { email: 0, domain: 0, ip: 0 };
@@ -124,15 +150,21 @@ function installQueryRouter() {
     if (s.includes('INSERT INTO webcheck_leads')) {
       return { rows: [{ id: dbState.insertedLeadId ?? VALID_LEAD_ID }] };
     }
-    // /verify: Lead-Lookup
+    // /verify: Lead-Lookup (per id, falls leadsById gesetzt — sonst Single-Lead)
     if (s.includes('FROM webcheck_leads WHERE id')) {
+      const id = params?.[0] as string | undefined;
+      if (dbState.leadsById && id) {
+        const l = dbState.leadsById[id];
+        return { rows: l ? [l] : [] };
+      }
       return { rows: dbState.lead ? [dbState.lead] : [] };
     }
     // /verify: verified-Update
     if (s.includes('SET verified = TRUE')) {
       return { rows: [] };
     }
-    // /verify: Free-Scan-Fensterzählung
+    // /verify: Free-Scan-Fensterzählung (statefuler Zähler → spiegelt committete
+    // scan_started_at-Writes des bereits durchgelaufenen Verifies, VEC-174).
     if (s.includes('scan_started_at IS NOT NULL')) {
       return { rows: [{ count: String(dbState.recentFreeScans ?? 0) }] };
     }
@@ -142,14 +174,17 @@ function installQueryRouter() {
     }
     // /verify: Order-Insert
     if (s.includes('INSERT INTO orders')) {
+      dbState.orderInsertCount = (dbState.orderInsertCount ?? 0) + 1;
       return { rows: [{ id: dbState.newOrderId ?? 'order-1' }] };
     }
     // /verify: Scan-Target-Insert
     if (s.includes('INSERT INTO scan_targets')) {
       return { rows: [{ id: dbState.newTargetId ?? 'target-1' }] };
     }
-    // /verify: order_id-Update auf Lead
+    // /verify: order_id-Update auf Lead → schreibt den Free-Scan-Verbrauch fest,
+    // den ein wartender zweiter Verify danach im Fenster-COUNT sieht (VEC-174).
     if (s.includes('SET order_id = $2, scan_started_at = NOW()')) {
+      dbState.recentFreeScans = (dbState.recentFreeScans ?? 0) + 1;
       return { rows: [] };
     }
     // /doi/confirm: idempotenter Consent-Update
@@ -428,6 +463,45 @@ describe('WebCheck-Free Route-Level (VEC-176)', () => {
       // Scan wird genau einmal mit der frischen Order/Target enqueued
       expect(mockEnqueue).toHaveBeenCalledTimes(1);
       expect(mockEnqueue).toHaveBeenCalledWith({ orderId: 'order-77', targetIds: ['target-77'] });
+    });
+
+    // TOCTOU-Regression (VEC-174, F3 aus VEC-169): zwei nebenläufige Verifies für
+    // DIESELBE Domain (zwei verschiedene Leads, gleicher Eigentümer) dürfen zusammen
+    // GENAU EINEN Free-Scan auslösen. Ohne DB-Guard passieren beide den COUNT==0-Check
+    // und legen zwei Orders an; mit per-Domain Advisory-Lock + atomarem Gate gewinnt
+    // genau einer (200 scanStarted), der andere wird mit 429 abgewiesen.
+    it('nebenläufiger Doppel-Verify derselben Domain stößt genau 1 Free-Scan an', async () => {
+      const LEAD_A = '11111111-2222-3333-4444-555555555555';
+      const LEAD_B = '66666666-7777-8888-9999-000000000000';
+      dbState.leadsById = {
+        [LEAD_A]: {
+          id: LEAD_A, email: 'alice@example.com', domain: 'example.com',
+          verification_token: 'tok-a', verified: false, order_id: null,
+        },
+        [LEAD_B]: {
+          id: LEAD_B, email: 'bob@example.com', domain: 'example.com',
+          verification_token: 'tok-b', verified: false, order_id: null,
+        },
+      };
+      dbState.recentFreeScans = 0;
+
+      const [resA, resB] = await Promise.all([
+        app.inject({ method: 'POST', url: '/api/webcheck/verify', payload: { leadId: LEAD_A } }),
+        app.inject({ method: 'POST', url: '/api/webcheck/verify', payload: { leadId: LEAD_B } }),
+      ]);
+
+      const codes = [resA.statusCode, resB.statusCode].sort();
+      // Genau eine 200 (Scan gestartet) und eine 429 (Fenster belegt) — keine 2 Scans.
+      expect(codes).toEqual([200, 429]);
+      const winner = resA.statusCode === 200 ? resA : resB;
+      const loser = resA.statusCode === 429 ? resA : resB;
+      expect(winner.json().data).toMatchObject({ verified: true, scanStarted: true });
+      expect(loser.json().error).toBe('free_scan_already_used');
+
+      // Harter Beweis der Invariante: trotz zweier paralleler Verifies genau EIN
+      // Order-Insert und genau EIN enqueue.
+      expect(dbState.orderInsertCount).toBe(1);
+      expect(mockEnqueue).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -21,7 +21,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import crypto from 'crypto';
 import pino from 'pino';
-import { query } from '../lib/db.js';
+import { query, withTransaction } from '../lib/db.js';
 import { generateToken, verifyAll } from '../services/VerificationService.js';
 import { isValidDomain, validateTargetBatch } from '../lib/validate.js';
 import { enqueuePrecheck } from '../lib/queue.js';
@@ -330,14 +330,70 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
       [lead.id, verification.method],
     );
 
-    // AC3: genau 1 Free-Scan pro verifizierter Domain im Fenster.
-    const recent = await query<{ count: string }>(
-      `SELECT COUNT(*) AS count FROM webcheck_leads
-       WHERE domain = $1 AND scan_started_at IS NOT NULL
-         AND scan_started_at > NOW() - INTERVAL '${FREE_SCAN_WINDOW_HOURS} hours'`,
-      [lead.domain],
-    );
-    if (Number(recent.rows[0]?.count ?? 0) > 0) {
+    // Ziel-Validierung VOR dem Lock (rein CPU-seitig, kein Grund den Lock zu halten).
+    const batch = validateTargetBatch([{ raw_input: lead.domain }]);
+    if (batch.errors.length > 0 || batch.targets.some((t) => !t.valid)) {
+      return reply.status(400).send({ success: false, error: 'target_validation_failed' });
+    }
+    const t = batch.targets[0];
+
+    // AC3 + TOCTOU-Guard (VEC-174): Fenster-Prüfung und Order-Anlage laufen ATOMAR
+    // unter einem per-Domain Advisory-Lock. Zwei nebenläufige Verifies derselben
+    // Domain (zwei Leads, gleicher Eigentümer) werden serialisiert — der zweite
+    // sieht den `scan_started_at` des ersten und wird abgewiesen, statt dass beide
+    // den COUNT==0-Check passieren und zwei Free-Scans anstoßen. Der xact-Lock wird
+    // automatisch bei COMMIT/ROLLBACK freigegeben. `verifyAll()` (Netz-I/O) liegt
+    // bewusst VOR der Transaktion, damit der Lock nicht über langsame I/O hält.
+    const gate = await withTransaction(async (q) => {
+      // Namespaced 2-Key-Advisory-Lock (Klasse 'webcheck_free_scan_domain') →
+      // serialisiert pro Domain ohne mit anderen Advisory-Locks zu kollidieren.
+      await q(`SELECT pg_advisory_xact_lock(hashtext('webcheck_free_scan_domain'), hashtext($1))`, [lead.domain]);
+
+      // AC3: genau 1 Free-Scan pro verifizierter Domain im Fenster — jetzt rennfest.
+      const recent = await q<{ count: string }>(
+        `SELECT COUNT(*) AS count FROM webcheck_leads
+         WHERE domain = $1 AND scan_started_at IS NOT NULL
+           AND scan_started_at > NOW() - INTERVAL '${FREE_SCAN_WINDOW_HOURS} hours'`,
+        [lead.domain],
+      );
+      if (Number(recent.rows[0]?.count ?? 0) > 0) {
+        return { limited: true as const };
+      }
+
+      // Anonymen Customer + Order(package=webcheck) anlegen → Report-Mail via PA-4.
+      const customerRes = await q<{ id: string }>(
+        `INSERT INTO customers (email) VALUES ($1)
+         ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING id`,
+        [lead.email],
+      );
+      const customerId = customerRes.rows[0].id;
+
+      const orderRes = await q<{ id: string }>(
+        `INSERT INTO orders (customer_id, target_url, package, status, target_count)
+         VALUES ($1, $2, $3, 'precheck_running', 1) RETURNING id`,
+        [customerId, t.canonical, WEBCHECK_PACKAGE],
+      );
+      const orderId = orderRes.rows[0].id;
+
+      const targetRes = await q<{ id: string }>(
+        `INSERT INTO scan_targets
+           (order_id, raw_input, canonical, target_type, discovery_policy, status)
+         VALUES ($1, $2, $3, $4, $5, 'pending_precheck') RETURNING id`,
+        [orderId, t.raw_input, t.canonical, t.target_type, t.policy_default],
+      );
+
+      // Den Free-Scan-Verbrauch innerhalb derselben Transaktion festschreiben — der
+      // wartende zweite Verify sieht ihn erst nach COMMIT und damit garantiert.
+      await q(
+        `UPDATE webcheck_leads SET order_id = $2, scan_started_at = NOW(), updated_at = NOW()
+         WHERE id = $1`,
+        [lead.id, orderId],
+      );
+
+      return { limited: false as const, orderId, targetId: targetRes.rows[0].id };
+    });
+
+    if (gate.limited) {
       audit({ orderId: null, action: 'webcheck.free_scan_window_hit', details: { domain: lead.domain }, ip: request.ip });
       return reply.status(429).send({
         success: false,
@@ -346,52 +402,18 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
       });
     }
 
-    // Anonymen Customer + Order(package=webcheck) anlegen → Report-Mail via PA-4.
-    const batch = validateTargetBatch([{ raw_input: lead.domain }]);
-    if (batch.errors.length > 0 || batch.targets.some((t) => !t.valid)) {
-      return reply.status(400).send({ success: false, error: 'target_validation_failed' });
-    }
-    const t = batch.targets[0];
-
-    const customerRes = await query<{ id: string }>(
-      `INSERT INTO customers (email) VALUES ($1)
-       ON CONFLICT (email) DO UPDATE SET email = EXCLUDED.email RETURNING id`,
-      [lead.email],
-    );
-    const customerId = customerRes.rows[0].id;
-
-    const orderRes = await query<{ id: string }>(
-      `INSERT INTO orders (customer_id, target_url, package, status, target_count)
-       VALUES ($1, $2, $3, 'precheck_running', 1) RETURNING id`,
-      [customerId, t.canonical, WEBCHECK_PACKAGE],
-    );
-    const orderId = orderRes.rows[0].id;
-
-    const targetRes = await query<{ id: string }>(
-      `INSERT INTO scan_targets
-         (order_id, raw_input, canonical, target_type, discovery_policy, status)
-       VALUES ($1, $2, $3, $4, $5, 'pending_precheck') RETURNING id`,
-      [orderId, t.raw_input, t.canonical, t.target_type, t.policy_default],
-    );
-
-    await query(
-      `UPDATE webcheck_leads SET order_id = $2, scan_started_at = NOW(), updated_at = NOW()
-       WHERE id = $1`,
-      [lead.id, orderId],
-    );
-
     audit({
-      orderId,
+      orderId: gate.orderId,
       action: 'webcheck.scan_requested',
       details: { leadId: lead.id, domain: lead.domain, method: verification.method },
       ip: request.ip,
     });
 
-    await enqueuePrecheck({ orderId, targetIds: [targetRes.rows[0].id] });
+    await enqueuePrecheck({ orderId: gate.orderId, targetIds: [gate.targetId] });
 
     return reply.send({
       success: true,
-      data: { verified: true, scanStarted: true, orderId },
+      data: { verified: true, scanStarted: true, orderId: gate.orderId },
     });
   });
 
