@@ -330,7 +330,7 @@ ops-diag-leadmail:
         echo "  RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-(leer)}"
       ' || echo "(api-Container nicht erreichbar?)"
     - echo
-    - echo "=== api-Logs (letzte 5000 Zeilen): Lead-/RESEND-Spuren ==="
+    - 'echo "=== api-Logs (letzte 5000 Zeilen): Lead-/RESEND-Spuren ==="'
     - docker logs --tail 5000 vectiscan-api-1 2>&1 | grep -iE 'Demo-lead|RESEND' | tail -50 || echo "(keine Lead-/RESEND-Logzeilen gefunden)"
 
 # =============================================================================
