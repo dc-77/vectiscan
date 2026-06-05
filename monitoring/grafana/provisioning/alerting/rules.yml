@@ -1,0 +1,73 @@
+# VectiScan — Grafana Unified Alerting: Alert-Regeln. Ticket VEC-229.
+#
+# Schliesst den Observability-Loop zu VEC-228: Wenn der Report-Handler
+# (api/src/lib/ws-manager.ts) eine Report-Mail an >=1 Empfaenger NICHT von
+# Resend bestaetigt bekommt, versiegelt er die Order bewusst NICHT auf
+# `delivered`, schreibt ein `report.notify_failed`-Audit-Event und emittiert die
+# Warn-Logzeile "Report delivery incomplete — not marking delivered, leaving
+# recoverable for regenerate". Diese Zeile landet via Promtail in Loki und ist
+# der hier beobachtete Alert-Trigger.
+#
+# WICHTIG (Tech-Debt-Hinweis): Der LogQL-Matcher haengt am Wortlaut dieser
+# Warn-Message. Wird die Message in ws-manager.ts geaendert, MUSS der `expr`
+# unten mitgezogen werden. Das `report.notify_failed`-Audit selbst liegt in der
+# DB (Tabelle audit_log) und ist NICHT in Loki — Loki sieht nur die Logzeile.
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: vectiscan-report-delivery
+    folder: VectiScan
+    interval: 1m
+    rules:
+      - uid: report-notify-failed
+        title: 'Report-Mail unbestaetigt (report.notify_failed)'
+        # Bei NoData (kein Treffer im Zeitfenster = Normalfall) bleibt die Regel
+        # ruhig, statt fehlzualarmieren.
+        noDataState: OK
+        execErrState: Error
+        # Sofort feuern: ein einzelner stiller Report-Mail-Verlust soll sichtbar
+        # werden. count_over_time[10m] haelt das Signal ~10min, danach Resolve.
+        for: 0m
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: loki
+            model:
+              refId: A
+              datasource:
+                type: loki
+                uid: loki
+              editorMode: code
+              queryType: instant
+              # Bewusst KEIN level-Label-Selektor: Fastify/pino loggt in Prod
+              # numerische Level ("level":40), kein "warn"-String. Der eindeutige
+              # Message-Line-Filter ist der zuverlaessige Trigger.
+              expr: 'sum(count_over_time({project="vectiscan", service="api"} |~ `Report delivery incomplete` [10m]))'
+          - refId: C
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]
+        labels:
+          severity: warning
+          team: vectiscan
+        annotations:
+          summary: 'Mind. eine Report-Mail wurde von Resend nicht bestaetigt (report.notify_failed). Die betroffene Order bleibt recoverable in report_complete.'
+          description: 'Der Report-Handler konnte mind. einen Empfaenger nicht zustellen (transienter Resend-Fehler: 429/5xx/Netzwerk). Order NICHT auf delivered versiegelt, Audit-Event report.notify_failed geschrieben. Recovery = Report regenerieren (re-feuert den Handler, mailt nur noch nicht notified-Empfaenger). Runbook: MONITORING.md → "Alert: report.notify_failed".'
+        notification_settings:
+          receiver: ops-email
