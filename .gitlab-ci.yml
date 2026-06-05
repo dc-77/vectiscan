@@ -252,6 +252,17 @@ test-report-worker:
     # Monitoring-Configs (VEC-85): Bind-Mounts in docker-compose.yml zeigen auf
     # ./monitoring — daher die Configs neben docker-compose.yml mit ausrollen.
     - rm -rf ./monitoring && cp -r ${CI_PROJECT_DIR}/monitoring .
+    # ── VEC-268 Sende-Domain-Cutover: RESEND_FROM_EMAIL deterministisch auf
+    #    vectiscan.de zwingen. Eine *bestehende* (maskierte) CI-Var
+    #    RESEND_FROM_EMAIL mit dem ALTEN Wert (noreply@vectigal.tech) wuerde
+    #    sonst gewinnen: `docker compose` interpoliert ${RESEND_FROM_EMAIL}
+    #    bevorzugt aus der Shell-Env (CI-Vars sind exportiert) VOR der .env-Datei,
+    #    und ueberschreibt damit auch den docker-compose.yml-Default. Der explizite
+    #    Export hier macht den Cutover unabhaengig vom CI-Var-Zustand. Der Wert
+    #    enthaelt Leerzeichen -> nicht maskierbar -> in ops-diag-leadmail im
+    #    Klartext verifizierbar. Sobald die Board/Maintainer die alte CI-Var auf
+    #    diesen Wert korrigiert (oder loescht), kann dieser Override entfallen.
+    - export RESEND_FROM_EMAIL='VectiScan <noreply@vectiscan.de>'
     - docker compose pull
     - TAG=${TAG} docker compose up -d --remove-orphans
     # Give all containers time to pass health checks
