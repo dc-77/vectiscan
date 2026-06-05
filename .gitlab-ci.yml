@@ -29,7 +29,10 @@ stages:
   before_script:
     - echo "${GHCR_TOKEN}" | docker login ghcr.io -u dc-77 --password-stdin
   script:
-    - docker build --no-cache -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest ${SERVICE}/
+    # VEC-190: NEXT_PUBLIC_TURNSTILE_SITE_KEY (öffentlicher Site-Key) zur Build-Zeit
+    # durchreichen. Nur das frontend-Image deklariert die ARG; für die anderen
+    # Services ist der --build-arg ein harmloser, ungenutzter Hinweis (kein Fehler).
+    - docker build --no-cache --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY="${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}" -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest ${SERVICE}/
     - docker push ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
     - docker push ${BASE_IMAGE}/${SERVICE}:latest
   rules:
