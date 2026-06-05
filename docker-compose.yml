@@ -67,6 +67,17 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-noreply@vectigal.tech}
+      # VEC-247: Stripe-Konfig in den API-Container reichen. Ohne diese
+      # Passthroughs erreichte bisher KEINE Stripe-Variable den Container —
+      # /api/subscriptions antwortete daher strukturell mit 503
+      # (payment_not_configured / price_not_configured), Root-Cause des
+      # nicht funktionierenden Perimeter-Kaufs (VEC-223). Secret-Werte
+      # (Key/Webhook) bleiben leer bis als CI-Var gebunden; die price_id ist
+      # nicht geheim (Stripe gibt sie ohnehin client-seitig im Checkout aus).
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_PERIMETER: ${STRIPE_PRICE_PERIMETER:-}
+      STRIPE_PRICE_DEFAULT: ${STRIPE_PRICE_DEFAULT:-}
     deploy:
       resources:
         limits:

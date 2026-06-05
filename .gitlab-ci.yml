@@ -193,6 +193,10 @@ test-report-worker:
       ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       RESEND_API_KEY=${RESEND_API_KEY}
       RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}
+      STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      STRIPE_PRICE_PERIMETER=${STRIPE_PRICE_PERIMETER:-price_1TewEA1j7RvmOvLYHNA2lyM2}
+      STRIPE_PRICE_DEFAULT=${STRIPE_PRICE_DEFAULT}
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
     # ── Deploy-Guard (VEC-217): RESEND_API_KEY ist eine *protected* CI-Var; auf
@@ -207,6 +211,27 @@ test-report-worker:
         echo "      Scan-Funktion bleibt unberuehrt; nur Lead-/Mail-Versand betroffen."
       else
         echo "OK: RESEND_API_KEY im .env gesetzt (Wert wird nicht geloggt)."
+      fi
+    # ── Deploy-Guard (VEC-247): Stripe-Kauf (VEC-223). STRIPE_PRICE_PERIMETER
+    #    hat einen committeten, nicht-geheimen Test-Mode-Default und ist daher
+    #    immer gesetzt; eine CI-Var (z.B. Live-Price via VEC-14) ueberschreibt
+    #    ihn. STRIPE_SECRET_KEY ist das eigentliche Gate: ohne ihn antwortet
+    #    /api/subscriptions mit 503 (payment_not_configured). Nur Praesenz
+    #    pruefen, Werte nie loggen. Nicht hart failen (Kauf ist nicht
+    #    scan-blocking), aber laut sichtbar machen.
+    - |
+      if grep -q '^STRIPE_SECRET_KEY=$' .env; then
+        echo "WARN: STRIPE_SECRET_KEY ist LEER im .env — Perimeter-Kauf ist TOT (503 payment_not_configured)."
+        echo "      Ursache i.d.R.: CI-Var nicht gebunden (Maintainer) oder protected-Var auf unprotected Branch."
+        echo "      Scan-Funktion bleibt unberuehrt; nur der Abo-/Kauf-Flow betroffen."
+      else
+        echo "OK: STRIPE_SECRET_KEY im .env gesetzt (Wert wird nicht geloggt)."
+      fi
+    - |
+      if grep -q '^STRIPE_PRICE_PERIMETER=$' .env; then
+        echo "WARN: STRIPE_PRICE_PERIMETER ist LEER — /api/subscriptions antwortet 503 price_not_configured."
+      else
+        echo "OK: STRIPE_PRICE_PERIMETER im .env gesetzt (price-id ist nicht geheim)."
       fi
     - cp ${CI_PROJECT_DIR}/docker-compose.yml .
     # Monitoring-Configs (VEC-85): Bind-Mounts in docker-compose.yml zeigen auf
