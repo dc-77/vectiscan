@@ -66,8 +66,12 @@ function primeQueries(order: Record<string, unknown> | null, alreadyNotified: st
 }
 
 beforeEach(() => {
-  mockSend.mockClear();
+  mockSend.mockReset();
   mockAudit.mockClear();
+  // Default: Resend accepts the mail. The `report.notified` idempotency audit
+  // is now written ONLY on an accepted send (VEC-227), so tests must model the
+  // boolean contract of `sendScanCompleteEmail`.
+  mockSend.mockResolvedValue(true);
 });
 
 describe('handleReportComplete (PA-4)', () => {
@@ -138,5 +142,42 @@ describe('handleReportComplete (PA-4)', () => {
     await handleReportComplete(ORDER_ID);
 
     expect(mockSend).not.toHaveBeenCalled();
+  });
+
+  it('VEC-227: a transient send failure writes NO notified-audit and is retried', async () => {
+    // Single recipient (customer email only) to isolate the failure path.
+    const order = orderRow({ report_emails: null, subscription_id: null });
+
+    // --- Round 1: Resend does not accept the mail (429/5xx/network).
+    // `sendScanCompleteEmail` swallows the Resend error and returns `false`.
+    mockSend.mockResolvedValueOnce(false);
+    primeQueries(order, []);
+
+    await handleReportComplete(ORDER_ID);
+
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    expect(mockSend.mock.calls[0][0]).toBe('customer@example.com');
+    // Fail-Securely: an unaccepted send must NOT leave a `report.notified`
+    // idempotency marker — otherwise the report mail is silently lost.
+    expect(mockAudit).not.toHaveBeenCalled();
+
+    // --- Round 2: the report-complete handler fires again (regenerate/retry).
+    // Because no audit was written, the recipient is still "not notified" and
+    // gets re-mailed; this time Resend accepts and the audit is recorded.
+    mockSend.mockClear();
+    mockAudit.mockClear();
+    mockSend.mockResolvedValue(true);
+    primeQueries(order, []); // audit_log still has no notified entry
+
+    await handleReportComplete(ORDER_ID);
+
+    expect(mockSend).toHaveBeenCalledTimes(1);
+    expect(mockSend.mock.calls[0][0]).toBe('customer@example.com');
+    expect(mockAudit).toHaveBeenCalledTimes(1);
+    expect(mockAudit.mock.calls[0][0]).toMatchObject({
+      orderId: ORDER_ID,
+      action: 'report.notified',
+      details: { recipient: 'customer@example.com' },
+    });
   });
 });

@@ -31,15 +31,24 @@ function getApiUrl(): string {
 /**
  * Send scan-complete notification with report download link.
  * Uses the download_token from the reports table (no login needed).
+ *
+ * Returns `true` only when the mail was accepted by Resend. The caller
+ * (`handleReportComplete`) writes the `report.notified` idempotency audit ONLY
+ * on `true`, so a transient send failure (429/5xx/network) leaves no audit and
+ * the existing regenerate/retry path re-attempts later (bewusst at-least-once;
+ * Resend `Idempotency-Key: scan-complete-${orderId}` dedupes echte Doppelsends
+ * innerhalb ~24h). Fail-Securely: ein geschluckter Fehler würde sonst einen
+ * Empfänger dauerhaft als „notified" markieren und die Report-Mail still
+ * verlieren (VEC-227).
  */
 export async function sendScanCompleteEmail(
   to: string,
   domain: string,
   orderId: string,
   downloadToken: string,
-): Promise<void> {
+): Promise<boolean> {
   const client = getClient();
-  if (!client) return;
+  if (!client) return false;
 
   const downloadUrl = `${getApiUrl()}/api/orders/${orderId}/report?download_token=${downloadToken}`;
   const dashboardUrl = `${getFrontendUrl()}/dashboard`;
@@ -76,11 +85,13 @@ export async function sendScanCompleteEmail(
 
     if (error) {
       log.error({ error, to, orderId }, 'Failed to send scan-complete email');
-    } else {
-      log.info({ to, orderId, domain }, 'Scan-complete email sent');
+      return false;
     }
+    log.info({ to, orderId, domain }, 'Scan-complete email sent');
+    return true;
   } catch (err) {
     log.error({ err, to, orderId }, 'Error sending scan-complete email');
+    return false;
   }
 }
 
