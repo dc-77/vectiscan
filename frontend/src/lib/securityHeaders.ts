@@ -1,10 +1,15 @@
 /**
- * Kanonische Security-Header für das Next.js-Frontend (VEC-166).
+ * Kanonische Content-Security-Policy für das Next.js-Frontend.
  *
- * Die CSP wurde zuvor nur in der Host-Traefik-Middleware gesetzt — mit
- * malformiertem Namen (`contentsecuritypolicy` ohne Bindestriche), den Browser
- * ignorieren. Wir setzen sie jetzt versioniert und testbar über Next.js
- * `headers()` mit dem garantiert kanonischen Namen `Content-Security-Policy`.
+ * Geschichte:
+ * - VEC-166: Die CSP wurde zuvor nur in der Host-Traefik-Middleware gesetzt —
+ *   mit malformiertem Namen (`contentsecuritypolicy` ohne Bindestriche), den
+ *   Browser ignorieren. Seither setzen wir sie versioniert und testbar aus der
+ *   App mit dem garantiert kanonischen Namen `Content-Security-Policy`.
+ * - VEC-186 (Härtung): `script-src` trägt kein `'unsafe-inline'` mehr, sondern
+ *   ein pro Request frisch generiertes Nonce. Erst dadurch greift die CSP wieder
+ *   als echter XSS-Schutz. Das Nonce wird in `middleware.ts` erzeugt und gesetzt;
+ *   `buildCsp` bindet es an `script-src`.
  *
  * `connect-src` wird aus den Origins abgeleitet, zu denen das Frontend
  * client-seitig tatsächlich Verbindungen aufbaut:
@@ -16,8 +21,10 @@
  *     (VEC-166: Live-Traefik-Policy enthielt dieses Origin bewusst; die
  *     App-Schicht muss die Live-Policy faithful spiegeln, nicht verengen).
  *
- * Härtung (script-src ohne 'unsafe-inline' via Nonce/Hash) ist bewusst
- * ausgelagert — siehe Follow-up.
+ * `style-src` behält bewusst `'unsafe-inline'`: Tailwind und `next/font`
+ * injizieren Inline-Styles ohne Nonce-Unterstützung. Style-Injection ist ein
+ * deutlich schwächerer Angriffsvektor als Script-Injection; eine Hash-/Nonce-
+ * Härtung der Styles ist separat zu bewerten.
  */
 
 const DEFAULT_API_URL = 'http://localhost:4000';
@@ -35,7 +42,12 @@ function originOf(url?: string): string | null {
   }
 }
 
+/**
+ * Baut den CSP-Header-Wert. Das `nonce` MUSS pro Request frisch sein
+ * (siehe `middleware.ts`); es wird an `script-src` gebunden.
+ */
 export function buildCsp(
+  nonce: string,
   apiUrl: string = process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_URL,
   leadEndpoint: string | undefined = process.env.NEXT_PUBLIC_LEAD_ENDPOINT,
 ): string {
@@ -53,13 +65,13 @@ export function buildCsp(
   return [
     "default-src 'self'",
     `connect-src ${connectSrc}`,
-    "script-src 'self' 'unsafe-inline'",
+    `script-src 'self' 'nonce-${nonce}'`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "font-src 'self' data:",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
   ].join('; ');
-}
-
-export function securityHeaders(): { key: string; value: string }[] {
-  return [{ key: 'Content-Security-Policy', value: buildCsp() }];
 }

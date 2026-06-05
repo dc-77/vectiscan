@@ -1,17 +1,13 @@
 import type { NextConfig } from 'next';
-import { securityHeaders } from './src/lib/securityHeaders';
 
+/**
+ * Der Content-Security-Policy-Header wird seit VEC-186 nicht mehr statisch hier,
+ * sondern pro Request in `src/middleware.ts` gesetzt (Nonce-basierte CSP, kein
+ * `'unsafe-inline'` mehr in `script-src`). Ein statischer Header an dieser Stelle
+ * würde einen zweiten, konfligierenden CSP-Header erzeugen.
+ */
 const nextConfig: NextConfig = {
   output: 'standalone',
-  // VEC-166: kanonischer Content-Security-Policy-Header auf allen Routen.
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: securityHeaders(),
-      },
-    ];
-  },
 };
 
 export default nextConfig;
