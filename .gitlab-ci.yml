@@ -131,6 +131,23 @@ test-report-worker:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
 
+# VEC-160 / VEC-143 / VEC-269: Edge admin-guard regression gate (SICHERHEITSKRITISCH).
+# Fails the pipeline if a public Traefik router gains a Host() that is not also
+# covered by the /admin guard router with internal-auth@file — i.e. an
+# unguarded admin surface. Scoped to the self-contained test only (NOT all of
+# tests/, which still has unrelated staleness to reconcile separately).
+test-edge:
+  stage: test
+  tags: [vectigal]
+  image: python:3.12-slim
+  script:
+    - pip install pyyaml pytest
+    - pytest tests/test_edge_admin_guard.py -v
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_PIPELINE_SOURCE == "web"
+
 # =============================================================================
 # DEPLOY STAGE — Rolling deploy, manual deploy, and rollback
 # =============================================================================

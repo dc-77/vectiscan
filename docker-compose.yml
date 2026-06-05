@@ -28,7 +28,9 @@ services:
       - "traefik.enable=true"
       # VEC-34: Public-Router — Kunden erreichen das Frontend von außen per HTTPS.
       # `internal-only@file` hier bewusst abgelöst; Let's-Encrypt-Cert via Host-CertResolver.
-      - "traefik.http.routers.vectiscan-web.rule=Host(`scan.vectigal.tech`)"
+      # VEC-160/VEC-269: vectiscan.de + www als Alias (Phase 1) — selbes Frontend, kein Rebuild (CORS origin:true).
+      #          Hosts müssen öffentlich auf 62.217.52.165 (docker02-Public-IP) zeigen, sonst kein LE HTTP-01.
+      - "traefik.http.routers.vectiscan-web.rule=Host(`scan.vectigal.tech`) || Host(`vectiscan.de`) || Host(`www.vectiscan.de`)"
       - "traefik.http.routers.vectiscan-web.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-web.tls=true"
       - "traefik.http.routers.vectiscan-web.tls.certresolver=letsencrypt"
@@ -37,7 +39,9 @@ services:
       # IP-Allowlist (internal-only) ist auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
       # Spezifischere Regel + höhere Priorität → externer /admin-Request ohne Credentials → 401.
       # VEC-167: `PathRegexp((?i)…)` statt `PathPrefix` — Matcher case-INSENSITIV, sonst umgeht /ADMIN das Edge-Gate (404 statt 401).
-      - "traefik.http.routers.vectiscan-web-admin.rule=Host(`scan.vectigal.tech`) && PathRegexp(`(?i)^/admin`)"
+      # VEC-160/VEC-269 SICHERHEITSKRITISCH: Admin-Guard muss für ALLE Frontend-Hosts greifen (auch vectiscan.de + www),
+      #          sonst wäre /admin über die neuen Hosts ungeschützt. Host-Gruppe geklammert vor PathRegexp.
+      - "traefik.http.routers.vectiscan-web-admin.rule=(Host(`scan.vectigal.tech`) || Host(`vectiscan.de`) || Host(`www.vectiscan.de`)) && PathRegexp(`(?i)^/admin`)"
       - "traefik.http.routers.vectiscan-web-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-web-admin.tls=true"
       - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt"
