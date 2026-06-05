@@ -66,7 +66,7 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-noreply@vectigal.tech}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-VectiScan <noreply@vectiscan.de>}
       # VEC-247: Stripe-Konfig in den API-Container reichen. Ohne diese
       # Passthroughs erreichte bisher KEINE Stripe-Variable den Container —
       # /api/subscriptions antwortete daher strukturell mit 503

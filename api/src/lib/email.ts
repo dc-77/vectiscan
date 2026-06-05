@@ -17,7 +17,7 @@ function getClient(): Resend | null {
 }
 
 function getFrom(): string {
-  return process.env.RESEND_FROM_EMAIL || 'VectiScan <noreply@vectigal.tech>';
+  return process.env.RESEND_FROM_EMAIL || 'VectiScan <noreply@vectiscan.de>';
 }
 
 function getFrontendUrl(): string {
