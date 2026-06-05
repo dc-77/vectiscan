@@ -36,7 +36,8 @@ services:
       # VEC-34 AC2 / VEC-143: Admin-Flächen (/admin/**) sind am Edge auth-gegated (Basic-Auth).
       # IP-Allowlist (internal-only) ist auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
       # Spezifischere Regel + höhere Priorität → externer /admin-Request ohne Credentials → 401.
-      - "traefik.http.routers.vectiscan-web-admin.rule=Host(`scan.vectigal.tech`) && PathPrefix(`/admin`)"
+      # VEC-167: `PathRegexp((?i)…)` statt `PathPrefix` — Matcher case-INSENSITIV, sonst umgeht /ADMIN das Edge-Gate (404 statt 401).
+      - "traefik.http.routers.vectiscan-web-admin.rule=Host(`scan.vectigal.tech`) && PathRegexp(`(?i)^/admin`)"
       - "traefik.http.routers.vectiscan-web-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-web-admin.tls=true"
       - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt"
@@ -89,7 +90,8 @@ services:
       # VEC-34 AC2 / VEC-143: Admin-API (/api/admin/**) ist am Edge auth-gegated (Basic-Auth).
       # IP-Allowlist (internal-only) auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
       # Spezifischere Regel + höhere Priorität → externer /api/admin-Request ohne Credentials → 401.
-      - "traefik.http.routers.vectiscan-api-admin.rule=Host(`scan-api.vectigal.tech`) && PathPrefix(`/api/admin`)"
+      # VEC-167: `PathRegexp((?i)…)` statt `PathPrefix` — case-INSENSITIV, sonst umgeht /api/ADMIN das Edge-Gate (404 statt 401).
+      - "traefik.http.routers.vectiscan-api-admin.rule=Host(`scan-api.vectigal.tech`) && PathRegexp(`(?i)^/api/admin`)"
       - "traefik.http.routers.vectiscan-api-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-api-admin.tls=true"
       - "traefik.http.routers.vectiscan-api-admin.tls.certresolver=letsencrypt"

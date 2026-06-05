@@ -728,11 +728,32 @@ ops-traefik-auth:
         echo "--- router ${R}@docker ---"
         docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/routers/${R}@docker" | head -c 500; echo
       done
-    - echo "=== FERTIG === Extern verifizieren (Basic-Auth ist IP-unabhaengig)"
-    - echo "  curl -sI https://status.vectigal.tech/                       -> 401 erwartet"
-    - echo "  curl -sI https://scan.vectigal.tech/admin                    -> 401 erwartet"
-    - echo "  curl -sI https://scan-api.vectigal.tech/api/admin/review/queue -> 401 erwartet"
-    - echo "  curl -sI https://scan.vectigal.tech/                         -> 200 (oeffentlich, unveraendert)"
+    # 5) VEC-167 — Live-Smoke: Edge-Gate ist case-INSENSITIV. Sowohl die Original-
+    #    Schreibweise als auch Case-Varianten muessen 401 liefern (nicht 404).
+    #    Nicht-fatal (Job-Verifikation/Evidenz); FAIL wird explizit markiert.
+    - |
+      echo "=== VEC-167 Edge-Case-Smoke (extern, Basic-Auth ist IP-unabhaengig) ==="
+      VEC167_FAIL=0
+      check_code() { # $1=url  $2=erwartet
+        CODE=$(docker run --rm curlimages/curl:8.8.0 -s -o /dev/null -w '%{http_code}' --max-time 12 "$1" 2>/dev/null || echo "ERR")
+        if [ "$CODE" = "$2" ]; then echo "PASS  $1 -> $CODE"; else echo "FAIL  $1 -> $CODE (erwartet $2)"; VEC167_FAIL=1; fi
+      }
+      # Edge-Gate (401 erwartet) — Original + Case-Varianten
+      check_code "https://scan.vectigal.tech/admin"                     401
+      check_code "https://scan.vectigal.tech/ADMIN"                     401
+      check_code "https://scan.vectigal.tech/Admin"                     401
+      check_code "https://scan-api.vectigal.tech/api/admin/review/queue" 401
+      check_code "https://scan-api.vectigal.tech/api/ADMIN/review/queue" 401
+      check_code "https://scan-api.vectigal.tech/api/Admin/review/queue" 401
+      check_code "https://status.vectigal.tech/"                        401
+      # Oeffentlich (200 erwartet) — darf NICHT mit-gegated werden
+      check_code "https://scan.vectigal.tech/"                          200
+      if [ "$VEC167_FAIL" = "1" ]; then
+        echo "VEC-167-SMOKE: FAIL — Edge-Gate nicht case-insensitiv ODER public mit-gegated. Pruefen/Revert."
+      else
+        echo "VEC-167-SMOKE: ALLE PASS — Edge-Gate case-insensitiv, public unveraendert."
+      fi
+    - echo "=== FERTIG ==="
   environment:
     name: production
     url: https://scan.vectigal.tech
