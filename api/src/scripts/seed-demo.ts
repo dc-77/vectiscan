@@ -13,7 +13,7 @@
  *    lädt sie nach MinIO und füllt reports.findings_data für Dashboard/Risk-Gauge.
  *
  * Aufruf:   npm run seed:demo            (im api-Container / lokal mit DB+MinIO)
- * ENV:      DEMO_PASSWORD (Default: VectiScanDemo2026!)
+ * ENV:      DEMO_PASSWORD (Pflicht in CI; lokal greift sonst ein Dev-Fallback)
  *           DATABASE_URL, MINIO_* (wie API)
  */
 import fs from 'fs';
@@ -222,7 +222,10 @@ async function main(): Promise<void> {
   console.log('────────────────────────────────────────────────────────────');
   console.log(`Demo-Mandant:  VectiScan Demo GmbH`);
   console.log(`Demo-Login:    ${DEMO_EMAIL}`);
-  console.log(`Passwort:      ${process.env.DEMO_PASSWORD || 'VectiScanDemo2026!'}`);
+  // VEC-153 (Sven/Security, CWE-532): Passwort NICHT ins Log echoen. Bei host-
+  // Secret-Fallback (unmaskiert) landete der Klartext sonst im CI-Trace. Quelle
+  // bewusst nur benannt, nicht den Wert.
+  console.log('Passwort:      [redigiert] — siehe maskierte CI/CD-Variable DEMO_PASSWORD bzw. Host-Secret ${DEPLOY_PATH}/.demo_password');
   console.log('Fertig. 3 Reports (WebCheck, Perimeter, Compliance) geseedet.');
   await pool.end();
 }
