@@ -344,6 +344,19 @@ ops-seed-demo:
         echo "       In prod darf kein Source-Default verwendet werden (Sven, VEC-121)."
         exit 1
       fi
+      # VEC-260: Selbstheilung gegen den oeffentlich dokumentierten Quell-Default.
+      # Greift quellen-unabhaengig (CI-Var ODER Host-Secret): ist der aufgeloeste
+      # Wert das bekannte Default, rotiere das Host-Secret und nutze den frischen
+      # Zufallswert. Verhindert die VEC-260-Regression (Re-Seed schrieb still das
+      # bekannte Default, weil eine vorhandene Quelle genau diesen Wert lieferte).
+      if [ "${DEMO_PASSWORD}" = "VectiScanDemo2026!" ]; then
+        echo "WARN: aufgeloestes DEMO_PASSWORD == Quell-Default — rotiere Host-Secret auf Zufallswert (VEC-260)."
+        SECRET_FILE="${DEPLOY_PATH}/.demo_password"
+        ( umask 077; printf 'Demo-%s-2026!' "$(openssl rand -hex 6)" > "${SECRET_FILE}" )
+        chmod 600 "${SECRET_FILE}"
+        DEMO_PASSWORD="$(cat "${SECRET_FILE}")"
+        export DEMO_PASSWORD
+      fi
     - echo "Seede Demo-Mandant (demo@vectiscan.tech) im api-Container..."
     - docker compose exec -T -e DEMO_PASSWORD="${DEMO_PASSWORD}" api node dist/scripts/seed-demo.js
     # Single-quoted: ohne Quoting parst YAML 'echo "OK: ...' wegen des ': '
