@@ -20,6 +20,19 @@ reproduzierbarer Login). Alle Daten sind **synthetisch** (`.test`-TLD, keine PII
    docker compose exec api npm run seed:demo
    ```
    Voraussetzung: Postgres + MinIO laufen (`docker-compose.dev.yml`).
+   **Auf Prod** läuft der Seed **nicht** über `npm run seed:demo` von Hand,
+   sondern über den manuellen CI-Job **`ops-seed-demo`** (GitLab → main- bzw.
+   Web-Pipeline → Stage `ops` → Job manuell starten). Der Job führt das bereits
+   im laufenden `api`-Container gebündelte Skript aus (`needs: []`, kein
+   Build/Deploy nötig) und ist idempotent auf die festen Demo-UUIDs begrenzt.
+   ⚠️ **Passwort-Quelle auf Prod:** Der `ops-seed-demo`-Job nimmt das Passwort
+   aus der maskierten CI-Variable `DEMO_PASSWORD` bzw. — falls nicht gesetzt —
+   aus einem zufällig erzeugten, host-persistierten Secret
+   (`${DEPLOY_PATH}/.demo_password`), **niemals** dem unten genannten
+   Quell-Default (Security-Auflage VEC-121/Mitnick). Das hier dokumentierte
+   Passwort `VectiScanDemo2026!` gilt für den **aktuell ausgerollten** Seed-Stand;
+   nach einem **Re-Seed auf Prod** muss das Login-Passwort aus der jeweiligen
+   `DEMO_PASSWORD`-Quelle gezogen und diese Tabelle ggf. aktualisiert werden.
 2. **Frontend erreichbar** prüfen: `scan.vectigal.tech` (intern) bzw. lokal `http://localhost:3000`.
 3. **Browser vorbereiten:** Inkognito-Fenster (kein fremder Login-State), Zoom 100 %,
    Fenster groß genug, dass Risk-Gauge + Top-Findings ohne Scrollen sichtbar sind.
@@ -66,7 +79,9 @@ reproduzierbarer Login). Alle Daten sind **synthetisch** (`.test`-TLD, keine PII
   - Feld **„E-Mail-Adresse"** → `demo@vectiscan.tech`
   - Feld **„Passwort (min. 8 Zeichen)"** → `VectiScanDemo2026!`
   - Button **„Anmelden"** klicken.
-- **Erwarteter Bildschirm:** Redirect auf **`/dashboard`**. *(Screenshot-Platzhalter: `login.png`)*
+- **Erwarteter Bildschirm:** Redirect auf **`/dashboard`**.
+
+  ![Login-Maske mit aktivem Tab „Anmelden", E-Mail- und Passwortfeld](demo-screenshots/01-login.png)
 - **Talktrack:**
   > „Ihre Mitarbeiter melden sich an einem internen, abgesicherten Portal an —
   > kein öffentliches Internet, kein zusätzliches Tool zu installieren.
@@ -78,7 +93,8 @@ reproduzierbarer Login). Alle Daten sind **synthetisch** (`.test`-TLD, keine PII
   (Gesamtrisiko zeigt **CRITICAL** — das höchste Einzelrisiko der drei Pakete).
   Darunter pro Scan eine Karte mit **Risk-Badge** (CRITICAL/HIGH/MEDIUM, farbcodiert),
   **Status-Badge** („Fertig") und **Severity-Verteilung** (farbige Punkte C·H·M·L).
-  *(Screenshot-Platzhalter: `dashboard.png`)*
+
+  ![Dashboard: vier KPI-Karten (Domains 3, Scans 3, Aktive 0, Gesamtrisiko CRITICAL) und drei Scan-Karten mit Risk-Badge + Severity-Verteilung](demo-screenshots/02-dashboard.png)
 - **Talktrack:**
   > „Das ist die Vogelperspektive für die Geschäftsführung: Auf einen Blick sehen
   > Sie, wie viele Domains geprüft wurden und wo Sie aktuell stehen. Dieses rote
@@ -93,7 +109,15 @@ reproduzierbarer Login). Alle Daten sind **synthetisch** (`.test`-TLD, keine PII
     aufrufen (z. B. Perimeter `/scan/d0000000-0000-4000-a000-000000000102`).
 - **Erwarteter Bildschirm:** **Scan-Detailseite** mit Kopfzeile (Domain + Paket-Label
   + Status **„Fertig"**), KPI-Leiste (**Findings**, **Determinismus**, **Hosts**, **Paket**)
-  und dem **Befunde-Bereich** mit **Risk-Badge** + Befundzahl. *(Screenshot-Platzhalter: `scan-detail.png`)*
+  und dem **Befunde-Bereich** mit **Risk-Badge** + Befundzahl.
+
+  **Perimeter** (`demo-corp` — HIGH, der „Aha-Effekt"):
+
+  ![Scan-Detail Perimeter: Risk-Badge HIGH, KPI-Leiste, Befundliste mit SQL-Injection (CRITICAL 9.8), offenem RDP und exponiertem .git-Verzeichnis](demo-screenshots/03-scan-detail-perimeter.png)
+
+  **Compliance** (`demo-stadtwerke` — CRITICAL, NIS2/§30-BSIG):
+
+  ![Scan-Detail Compliance: Risk-Badge CRITICAL, Befundliste mit VPN-Gateway-RCE (CRITICAL 9.8), fehlender MFA, exponierter SMB-Freigabe und Logging-Lücke](demo-screenshots/04-scan-detail-compliance.png)
 
 ### Schritt 4 — Risk-Gauge + Top-Findings
 - **Erwarteter Bildschirm:** Risk-Badge (z. B. **HIGH** bei Perimeter), darunter die
@@ -112,7 +136,8 @@ reproduzierbarer Login). Alle Daten sind **synthetisch** (`.test`-TLD, keine PII
 - **Erwarteter Bildschirm:** Das **gebrandete PDF** öffnet sich/lädt herunter —
   Cover, Executive Summary (Risk-Box + Severity-Verteilung + Empfehlungen),
   detaillierte Befunde, positive Feststellungen, Haftungsausschluss.
-  *(Screenshot-Platzhalter: `pdf.png`)*
+
+  ![Gebrandetes PDF (Perimeter): Cover „VECTISCAN — Security Assessment Report", Demo-Hinweis „synthetische Daten / kein echter Scan", Executive Summary mit Gesamtrisiko HIGH; 7 Seiten](demo-screenshots/05-pdf-report.png)
 - **Talktrack:**
   > „Und das hier ist das, was Ihr IT-Team oder Ihr Auditor am Montag auf dem
   > Tisch hat: ein fertiger, gebrandeter Report — kein Rohdaten-Dump. Mit einem
@@ -182,6 +207,8 @@ reproduzierbarer Login). Alle Daten sind **synthetisch** (`.test`-TLD, keine PII
 | PDF lädt nicht | MinIO-Container läuft nicht / Objekt fehlt. Seed neu laufen lassen (legt PDFs in `scan-reports/demo/…` an). |
 | Fremder Login-State | Inkognito-Fenster nutzen. |
 | Daten „verändert" nach Test | Seed ist idempotent → einfach erneut ausführen, stellt deterministisch denselben Zustand her. |
+| Login auf Prod schlägt fehl nach Re-Seed | Der Prod-Job `ops-seed-demo` setzt das Passwort aus `DEMO_PASSWORD` (CI-Var) bzw. dem Host-Secret `${DEPLOY_PATH}/.demo_password`, **nicht** den Quell-Default. Aktuelles Passwort aus der jeweiligen Quelle ziehen (siehe Abschnitt 0). |
+| Scan-Detail zeigt „Determinismus 0 %" / „Hosts 0" | **Kosmetisch, kein Fehler.** Die Demo-Fixtures setzen `findings_data` (Risiko + Befunde + PDF), aber keine Policy-Provenienz/Host-Telemetrie. Risk-Badge, Befundliste und PDF sind vollständig. Beim Talktrack diese beiden KPI-Kacheln nicht thematisieren; Befunde + PDF zeigen. (Enrichment der Fixtures = Folge-Issue, kein Demo-Blocker.) |
 
 ---
 
