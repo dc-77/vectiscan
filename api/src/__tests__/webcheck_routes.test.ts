@@ -256,13 +256,19 @@ describe('WebCheck-Free Route-Level (VEC-176)', () => {
       expect(mockDoiEmail).not.toHaveBeenCalled();
     });
 
-    it('201 Happy-Path legt Lead an, versendet DOI-Mail, liefert Verify-Instruktionen', async () => {
+    it('201 Happy-Path legt Lead an, versendet DOI-Mail bei Einwilligung, liefert Verify-Instruktionen', async () => {
       dbState.rateCounts = { email: 0, domain: 0, ip: 0 };
       dbState.insertedLeadId = VALID_LEAD_ID;
       const res = await app.inject({
         method: 'POST',
         url: '/api/webcheck/start',
-        payload: { email: 'Alice@Example.COM', domain: 'Example.com', utm_source: 'google' },
+        payload: {
+          email: 'Alice@Example.COM',
+          domain: 'Example.com',
+          utm_source: 'google',
+          marketing_consent: true,
+          consent_text_version: 'v1.0',
+        },
       });
       expect(res.statusCode).toBe(201);
       const body = res.json();
@@ -279,7 +285,68 @@ describe('WebCheck-Free Route-Level (VEC-176)', () => {
       expect(insert).toBeDefined();
       expect(insert![1][0]).toBe('alice@example.com');
       expect(insert![1][1]).toBe('example.com');
+      // marketing_consent + consent_text_version werden für den Nachweis persistiert
+      expect(insert![1][14]).toBe(true);
+      expect(insert![1][15]).toBe('v1.0');
+      // DOI-Token erzeugt + DOI-Mail versendet
+      expect(insert![1][3]).toEqual(expect.any(String));
       expect(mockDoiEmail).toHaveBeenCalledTimes(1);
+    });
+
+    // --- DSGVO-Kopplungsverbot (VEC-173) ----------------------------------------
+    it('201 ohne marketing_consent: Lead für Scan, ABER KEINE DOI-Mail (Kopplungsverbot)', async () => {
+      dbState.rateCounts = { email: 0, domain: 0, ip: 0 };
+      dbState.insertedLeadId = VALID_LEAD_ID;
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/webcheck/start',
+        // marketing_consent fehlt vollständig — Default = keine Einwilligung
+        payload: { email: 'alice@example.com', domain: 'example.com' },
+      });
+      expect(res.statusCode).toBe(201);
+      const insert = mockQuery.mock.calls.find((c) => String(c[0]).includes('INSERT INTO webcheck_leads'));
+      expect(insert).toBeDefined();
+      // marketing_consent=false, kein Version-String, kein DOI-Token
+      expect(insert![1][14]).toBe(false);
+      expect(insert![1][15]).toBeNull();
+      expect(insert![1][3]).toBeNull();
+      // ENTSCHEIDEND: ohne Einwilligung wird KEINE Marketing-DOI-Mail versendet
+      expect(mockDoiEmail).not.toHaveBeenCalled();
+    });
+
+    it('marketing_consent=false ⇒ keine DOI-Mail; Version-String wird verworfen', async () => {
+      dbState.rateCounts = { email: 0, domain: 0, ip: 0 };
+      dbState.insertedLeadId = VALID_LEAD_ID;
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/webcheck/start',
+        payload: {
+          email: 'alice@example.com',
+          domain: 'example.com',
+          marketing_consent: false,
+          consent_text_version: 'v1.0',
+        },
+      });
+      expect(res.statusCode).toBe(201);
+      const insert = mockQuery.mock.calls.find((c) => String(c[0]).includes('INSERT INTO webcheck_leads'));
+      expect(insert![1][14]).toBe(false);
+      // Version ohne Einwilligung ist als Nachweis bedeutungslos → null
+      expect(insert![1][15]).toBeNull();
+      expect(mockDoiEmail).not.toHaveBeenCalled();
+    });
+
+    it('marketing_consent als String "true" zählt NICHT als Einwilligung (strikt boolesch)', async () => {
+      dbState.rateCounts = { email: 0, domain: 0, ip: 0 };
+      dbState.insertedLeadId = VALID_LEAD_ID;
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/webcheck/start',
+        payload: { email: 'alice@example.com', domain: 'example.com', marketing_consent: 'true' },
+      });
+      expect(res.statusCode).toBe(201);
+      const insert = mockQuery.mock.calls.find((c) => String(c[0]).includes('INSERT INTO webcheck_leads'));
+      expect(insert![1][14]).toBe(false);
+      expect(mockDoiEmail).not.toHaveBeenCalled();
     });
 
     // --- CAPTCHA-Gate (VEC-173, F2) ---------------------------------------------

@@ -144,6 +144,28 @@ export function extractCapture(body: Record<string, unknown>): Record<string, st
   };
 }
 
+/**
+ * Marketing-Einwilligung defensiv aus dem Request-Body lesen (AC5, VEC-173).
+ *
+ * DSGVO-Kopplungsverbot: Die Einwilligung gilt NUR als erteilt, wenn der Body
+ * `marketing_consent === true` (strikt boolesch) trägt — Default ist „keine
+ * Einwilligung". Die Consent-Text-Version wird ausschließlich bei erteilter
+ * Einwilligung übernommen (ein Versions-String ohne Einwilligung ist als
+ * Nachweis bedeutungslos).
+ */
+export function parseConsent(body: Record<string, unknown>): {
+  marketingConsent: boolean;
+  consentTextVersion: string | null;
+} {
+  const marketingConsent = body.marketing_consent === true;
+  const raw = body.consent_text_version;
+  const consentTextVersion =
+    marketingConsent && typeof raw === 'string' && raw.trim().length > 0
+      ? raw.trim().slice(0, 64)
+      : null;
+  return { marketingConsent, consentTextVersion };
+}
+
 /** Verifikations-Anleitung für AC2 (DNS-TXT / Datei / Meta-Tag). */
 export function buildVerifyInstructions(domain: string, token: string) {
   return {
@@ -254,29 +276,50 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
     }
 
     const verificationToken = generateToken();
-    const doiToken = crypto.randomUUID();
     const cap = extractCapture(body);
+
+    // DSGVO-Kopplungsverbot (VEC-173): Marketing-DOI ist strikt von der Scan-
+    // Erbringung entkoppelt. Nur bei `marketing_consent === true` wird ein
+    // DOI-Token erzeugt, consent_status='pending' gesetzt und die DOI-Mail
+    // versendet. Ohne Einwilligung entsteht der Lead allein für den Scan
+    // (consent_status='declined', legal_basis='none'), keine Marketing-Mail.
+    const { marketingConsent, consentTextVersion } = parseConsent(body);
+    const doiToken = marketingConsent ? crypto.randomUUID() : null;
 
     const insert = await query<{ id: string }>(
       `INSERT INTO webcheck_leads
          (email, domain, verification_token, doi_token, doi_sent_at, ip,
           source, channel, utm_source, utm_medium, utm_campaign, utm_term,
-          utm_content, referrer, icp_segment)
-       VALUES ($1,$2,$3,$4,NOW(),$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+          utm_content, referrer, icp_segment,
+          marketing_consent, consent_text_version, consent_status, legal_basis)
+       VALUES ($1,$2,$3,$4,
+          CASE WHEN $15::boolean THEN NOW() ELSE NULL END,
+          $5,$6,$7,$8,$9,$10,$11,$12,$13,$14,
+          $15,$16,
+          CASE WHEN $15::boolean THEN 'pending' ELSE 'declined' END,
+          CASE WHEN $15::boolean THEN 'consent_doi' ELSE 'none' END)
        RETURNING id`,
       [
         email, domain, verificationToken, doiToken, ip,
         cap.source, cap.channel, cap.utm_source, cap.utm_medium, cap.utm_campaign,
         cap.utm_term, cap.utm_content, cap.referrer, cap.icp_segment,
+        marketingConsent, consentTextVersion,
       ],
     );
     const leadId = insert.rows[0].id;
 
-    audit({ orderId: null, action: 'webcheck.lead_created', details: { leadId, domain }, ip });
+    audit({
+      orderId: null,
+      action: 'webcheck.lead_created',
+      details: { leadId, domain, marketingConsent },
+      ip,
+    });
 
-    // DOI-Mail (Marketing-Einwilligung) best effort — separat vom Report-Mail.
-    // Copy/Rechtsgrundlagentext werden von Greta (CMO/DSGVO) final geliefert (VEC-91-Child).
-    await sendWebcheckDoiEmail(email, domain, doiToken);
+    // DOI-Mail NUR bei erteilter Marketing-Einwilligung (Kopplungsverbot, UWG §7).
+    // Copy/Rechtsgrundlagentext final von Greta (CMO/DSGVO) geliefert (VEC-91-Child).
+    if (marketingConsent && doiToken) {
+      await sendWebcheckDoiEmail(email, domain, doiToken);
+    }
 
     return reply.status(201).send({
       success: true,
