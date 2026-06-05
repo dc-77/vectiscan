@@ -233,6 +233,21 @@ test-report-worker:
       else
         echo "OK: STRIPE_PRICE_PERIMETER im .env gesetzt (price-id ist nicht geheim)."
       fi
+    # ── Deploy-Guard (VEC-238 / Folge VEC-229): ADMIN_EMAIL speist ALERT_EMAIL_TO
+    #    (docker-compose.yml:619), den Empfaenger des Grafana-Contactpoints
+    #    ops-email. Ist ADMIN_EMAIL leer, feuert die report.notify_failed-Alert-
+    #    Regel (VEC-228/229) ins Leere -> Observability nur kosmetisch. db.ts:489
+    #    nutzt ADMIN_EMAIL nur conditional, ein leerer Wert crasht die App nicht;
+    #    die Praesenz ist also nicht aus "App laeuft" ableitbar. Nicht hart failen
+    #    (nicht scan-blocking), aber laut. Nur Praesenz pruefen, Wert nie loggen.
+    - |
+      if grep -q '^ADMIN_EMAIL=$' .env; then
+        echo "WARN: ADMIN_EMAIL ist LEER im .env — Grafana-Alert (VEC-229) hat KEINEN Empfaenger (ALERT_EMAIL_TO leer). report.notify_failed-Alert feuert ins Leere."
+        echo "      Ursache i.d.R.: CI-Var ADMIN_EMAIL leer/unset. Abhilfe: CI-Var setzen (Board)."
+        echo "      Scan-Funktion bleibt unberuehrt; nur die Alert-Zustellung betroffen."
+      else
+        echo "OK: ADMIN_EMAIL im .env gesetzt -> Grafana-Alert-Empfaenger vorhanden (Wert wird NICHT geloggt)."
+      fi
     - cp ${CI_PROJECT_DIR}/docker-compose.yml .
     # Monitoring-Configs (VEC-85): Bind-Mounts in docker-compose.yml zeigen auf
     # ./monitoring — daher die Configs neben docker-compose.yml mit ausrollen.
