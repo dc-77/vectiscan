@@ -170,6 +170,16 @@ test-report-worker:
       fi
     - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
     - cp .env .env.bak 2>/dev/null || true
+    # VEC-140 Go-live-Guard: Lead-Capture haengt am Mail-Versand. Eine leere
+    # RESEND_API_KEY-Variable (z.B. protected Var auf unprotected Branch) wuerde
+    # Mail-Routing STILL deaktivieren. Lieber laut abbrechen als still ausfallen.
+    # Log zeigt nur die Laenge, nie den Wert (Secrets-Hygiene).
+    - |
+      if [ -z "${RESEND_API_KEY}" ]; then
+        echo "ERROR: RESEND_API_KEY ist leer — CI-Variable nicht injiziert. Bei protected Var auf unprotected 'main' liefert GitLab keinen Wert. Deploy abgebrochen."
+        exit 1
+      fi
+      echo "OK: RESEND_API_KEY praesent (Laenge ${#RESEND_API_KEY})."
     - |
       cat > .env <<ENVEOF
       DB_NAME=${DB_NAME}
