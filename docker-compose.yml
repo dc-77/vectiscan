@@ -611,7 +611,12 @@ services:
       GF_SMTP_HOST: smtp.resend.com:587
       GF_SMTP_USER: resend
       GF_SMTP_PASSWORD: ${RESEND_API_KEY:-}
-      GF_SMTP_FROM_ADDRESS: ${RESEND_FROM_EMAIL:-noreply@vectigal.tech}
+      # VEC-268: GF_SMTP_FROM_ADDRESS muss eine REINE E-Mail sein (Display-Name
+      # gehoert in GF_SMTP_FROM_NAME). Nicht aus RESEND_FROM_EMAIL ableiten — das
+      # traegt seit dem Cutover die Form "VectiScan <noreply@vectiscan.de>", die
+      # Grafana beim SMTP-Config-Parse abweist (Container-Restart-Loop). Eigene,
+      # entkoppelte Variable mit reiner Cutover-Adresse als Default.
+      GF_SMTP_FROM_ADDRESS: ${GRAFANA_SMTP_FROM_ADDRESS:-noreply@vectiscan.de}
       GF_SMTP_FROM_NAME: VectiScan Alerting
       GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
       # Zieladresse fuer Alert-Mails (Ops-Postfach) → vom Alerting-Contactpoint
