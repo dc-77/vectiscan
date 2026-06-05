@@ -1,0 +1,16 @@
+# VectiScan — Grafana Unified Alerting: Contact-Point. Ticket VEC-229.
+# Schickt Alerts per E-Mail (Resend-SMTP, in docker-compose grafana.GF_SMTP_*
+# konfiguriert) ans Ops-Postfach. Die Zieladresse kommt aus der Umgebung
+# ($__env{ALERT_EMAIL_TO} = ADMIN_EMAIL), damit keine Adresse im Repo steht.
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: ops-email
+    receivers:
+      - uid: ops-email-resend
+        type: email
+        settings:
+          addresses: $__env{ALERT_EMAIL_TO}
+          singleEmail: false
+        disableResolveMessage: false

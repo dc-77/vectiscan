@@ -593,6 +593,19 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_ANALYTICS_REPORTING_ENABLED: "false"
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      # VEC-229: SMTP fuer Grafana-Alerting → Resend-SMTP (gleicher Kanal wie
+      # Uptime-Kuma, siehe MONITORING.md). Reused vorhandene Resend-Creds; der
+      # Schluessel landet via .env aus der CI auf dem Host (NIE im Image/Repo).
+      GF_SMTP_ENABLED: "true"
+      GF_SMTP_HOST: smtp.resend.com:587
+      GF_SMTP_USER: resend
+      GF_SMTP_PASSWORD: ${RESEND_API_KEY:-}
+      GF_SMTP_FROM_ADDRESS: ${RESEND_FROM_EMAIL:-noreply@vectigal.tech}
+      GF_SMTP_FROM_NAME: VectiScan Alerting
+      GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
+      # Zieladresse fuer Alert-Mails (Ops-Postfach) → vom Alerting-Contactpoint
+      # via $__env{ALERT_EMAIL_TO} referenziert.
+      ALERT_EMAIL_TO: ${ADMIN_EMAIL:-}
     volumes:
       - vectiscan-grafana-data:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
