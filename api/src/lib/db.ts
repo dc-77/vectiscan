@@ -40,6 +40,7 @@ const MIGRATION_030_PATH = path.join(__dirname, '..', 'migrations', '030_stripe_
 const MIGRATION_031_PATH = path.join(__dirname, '..', 'migrations', '031_stripe_followup_hardening.sql');
 const MIGRATION_032_PATH = path.join(__dirname, '..', 'migrations', '032_webcheck_leads.sql');
 const MIGRATION_033_PATH = path.join(__dirname, '..', 'migrations', '033_email_suppressions.sql');
+const MIGRATION_034_PATH = path.join(__dirname, '..', 'migrations', '034_reports_expires_at_default.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -480,6 +481,26 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 033 FAILED (continuing without it):', err);
+  }
+
+  // Migration 034 (VEC-180): Default-TTL (30 Tage) auf reports.expires_at —
+  // Defense-in-Depth gegen nie ablaufende anonyme Report-Deeplinks (CL-1/VEC-169).
+  // Idempotent: nur anwenden, wenn noch kein column_default gesetzt ist.
+  try {
+    const expiresDefaultCheck = await pool.query(`
+      SELECT column_default
+      FROM information_schema.columns
+      WHERE table_name = 'reports' AND column_name = 'expires_at'
+    `);
+    const currentDefault = expiresDefaultCheck.rows[0]?.column_default ?? null;
+    if (!currentDefault) {
+      console.log('[initDb] Applying Migration 034: reports.expires_at default (30d)');
+      const migrationSql = fs.readFileSync(MIGRATION_034_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 034 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 034 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created
