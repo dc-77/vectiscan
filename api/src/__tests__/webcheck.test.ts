@@ -5,11 +5,14 @@ import {
   normalizeEmail,
   normalizeDomain,
   decideRateLimited,
+  decideVelocityAlert,
+  recipientDomain,
   extractCapture,
   buildVerifyInstructions,
   WEBCHECK_PACKAGE,
   FREE_SCAN_WINDOW_HOURS,
   RATE_LIMITS,
+  VELOCITY,
 } from '../routes/webcheck.js';
 
 describe('WebCheck-Free Lead-Magnet (VEC-91 / PA-11)', () => {
@@ -57,6 +60,47 @@ describe('WebCheck-Free Lead-Magnet (VEC-91 / PA-11)', () => {
     });
     it('throttles when the IP threshold is reached', () => {
       expect(decideRateLimited({ email: 0, domain: 0, ip: RATE_LIMITS.maxPerIp })).toBe(true);
+    });
+  });
+
+  describe('recipientDomain (VEC-173)', () => {
+    it('extrahiert die Mail-Domain nach dem letzten @', () => {
+      expect(recipientDomain('alice@example.com')).toBe('example.com');
+      expect(recipientDomain('a.b+tag@sub.example.co.uk')).toBe('sub.example.co.uk');
+    });
+    it('liefert leeren String ohne @', () => {
+      expect(recipientDomain('kein-at-zeichen')).toBe('');
+    });
+  });
+
+  describe('decideVelocityAlert (VEC-173, F2)', () => {
+    it('löst nicht aus unterhalb beider Schwellen', () => {
+      const r = decideVelocityAlert({
+        global: VELOCITY.maxGlobal - 1,
+        recipientDomain: VELOCITY.maxPerRecipientDomain - 1,
+      });
+      expect(r.limited).toBe(false);
+      expect(r.reasons).toEqual([]);
+    });
+    it('löst bei globalem Spike aus', () => {
+      const r = decideVelocityAlert({ global: VELOCITY.maxGlobal, recipientDomain: 0 });
+      expect(r.limited).toBe(true);
+      expect(r.reasons).toContain('global');
+    });
+    it('löst bei Empfänger-Domain-Spike aus', () => {
+      const r = decideVelocityAlert({
+        global: 0,
+        recipientDomain: VELOCITY.maxPerRecipientDomain,
+      });
+      expect(r.limited).toBe(true);
+      expect(r.reasons).toContain('recipient_domain');
+    });
+    it('benennt beide Achsen, wenn beide Schwellen erreicht sind', () => {
+      const r = decideVelocityAlert({
+        global: VELOCITY.maxGlobal,
+        recipientDomain: VELOCITY.maxPerRecipientDomain,
+      });
+      expect(r.reasons).toEqual(expect.arrayContaining(['global', 'recipient_domain']));
     });
   });
 

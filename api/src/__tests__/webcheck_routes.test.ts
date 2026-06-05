@@ -21,6 +21,7 @@ import { query } from '../lib/db';
 import { verifyAll, generateToken } from '../services/VerificationService';
 import { enqueuePrecheck } from '../lib/queue';
 import { sendWebcheckDoiEmail } from '../lib/email';
+import { verifyCaptcha } from '../lib/captcha';
 
 jest.mock('../lib/db', () => ({
   query: jest.fn(),
@@ -38,6 +39,11 @@ jest.mock('../lib/audit', () => ({
 
 jest.mock('../lib/email', () => ({
   sendWebcheckDoiEmail: jest.fn().mockResolvedValue(undefined),
+}));
+
+// CAPTCHA standardmäßig „bestanden" (VEC-173, F2) — einzelne Tests übersteuern.
+jest.mock('../lib/captcha', () => ({
+  verifyCaptcha: jest.fn().mockResolvedValue({ ok: true, disabled: true }),
 }));
 
 jest.mock('../services/VerificationService', () => ({
@@ -69,6 +75,7 @@ const mockQuery = query as jest.Mock;
 const mockVerifyAll = verifyAll as jest.Mock;
 const mockEnqueue = enqueuePrecheck as jest.Mock;
 const mockDoiEmail = sendWebcheckDoiEmail as jest.Mock;
+const mockVerifyCaptcha = verifyCaptcha as jest.Mock;
 
 const VALID_LEAD_ID = '11111111-2222-3333-4444-555555555555';
 
@@ -78,6 +85,7 @@ const VALID_LEAD_ID = '11111111-2222-3333-4444-555555555555';
  */
 interface DbState {
   rateCounts?: { email: number; domain: number; ip: number };
+  velocityCounts?: { global: number; recipientDomain: number };
   insertedLeadId?: string;
   lead?: {
     id: string;
@@ -101,7 +109,16 @@ function installQueryRouter() {
     // /start: Rate-Limit-Fensterzählung
     if (s.includes('COUNT(*) FILTER')) {
       const c = dbState.rateCounts ?? { email: 0, domain: 0, ip: 0 };
-      return { rows: [{ email_count: String(c.email), domain_count: String(c.domain), ip_count: String(c.ip) }] };
+      const v = dbState.velocityCounts ?? { global: 0, recipientDomain: 0 };
+      return {
+        rows: [{
+          email_count: String(c.email),
+          domain_count: String(c.domain),
+          ip_count: String(c.ip),
+          global_count: String(v.global),
+          recipient_domain_count: String(v.recipientDomain),
+        }],
+      };
     }
     // /start: Lead-Insert
     if (s.includes('INSERT INTO webcheck_leads')) {
@@ -151,6 +168,7 @@ describe('WebCheck-Free Route-Level (VEC-176)', () => {
     jest.clearAllMocks();
     dbState = {};
     installQueryRouter();
+    mockVerifyCaptcha.mockResolvedValue({ ok: true, disabled: true });
     mockVerifyAll.mockResolvedValue({ verified: true, method: 'dns_txt' });
     (generateToken as jest.Mock).mockReturnValue('vectiscan-verify-mock12345678');
     app = Fastify();
@@ -227,6 +245,60 @@ describe('WebCheck-Free Route-Level (VEC-176)', () => {
       expect(insert![1][0]).toBe('alice@example.com');
       expect(insert![1][1]).toBe('example.com');
       expect(mockDoiEmail).toHaveBeenCalledTimes(1);
+    });
+
+    // --- CAPTCHA-Gate (VEC-173, F2) ---------------------------------------------
+    it('403 captcha_failed VOR jeglichem DB-Schreibzugriff/DOI-Versand', async () => {
+      mockVerifyCaptcha.mockResolvedValueOnce({ ok: false, disabled: false });
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/webcheck/start',
+        payload: { email: 'alice@example.com', domain: 'example.com', captchaToken: 'bad' },
+      });
+      expect(res.statusCode).toBe(403);
+      expect(res.json()).toEqual({ success: false, error: 'captcha_failed' });
+      // Fail-closed: weder Rate-Limit-Query noch Lead-Insert noch DOI-Mail
+      expect(mockQuery).not.toHaveBeenCalled();
+      expect(mockDoiEmail).not.toHaveBeenCalled();
+    });
+
+    it('reicht das CAPTCHA-Token an verifyCaptcha durch', async () => {
+      dbState.rateCounts = { email: 0, domain: 0, ip: 0 };
+      await app.inject({
+        method: 'POST',
+        url: '/api/webcheck/start',
+        payload: { email: 'alice@example.com', domain: 'example.com', captchaToken: 'tok-123' },
+      });
+      expect(mockVerifyCaptcha).toHaveBeenCalledWith('tok-123', expect.any(String));
+    });
+
+    // --- Aggregierte Velocity-Drossel (VEC-173, F2) -----------------------------
+    it('429 velocity_limited bei globalem Spike — kein Lead/keine DOI-Mail', async () => {
+      dbState.rateCounts = { email: 0, domain: 0, ip: 0 }; // per-Bezeichner-Limits NICHT erreicht
+      dbState.velocityCounts = { global: 200, recipientDomain: 0 }; // VELOCITY.maxGlobal
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/webcheck/start',
+        payload: { email: 'alice@example.com', domain: 'example.com' },
+      });
+      expect(res.statusCode).toBe(429);
+      expect(res.json()).toEqual({ success: false, error: 'velocity_limited' });
+      const insertCalls = mockQuery.mock.calls.filter((c) => String(c[0]).includes('INSERT INTO webcheck_leads'));
+      expect(insertCalls).toHaveLength(0);
+      expect(mockDoiEmail).not.toHaveBeenCalled();
+    });
+
+    it('429 velocity_limited bei Empfänger-Domain-Spike', async () => {
+      dbState.rateCounts = { email: 0, domain: 0, ip: 0 };
+      dbState.velocityCounts = { global: 0, recipientDomain: 25 }; // VELOCITY.maxPerRecipientDomain
+      const res = await app.inject({
+        method: 'POST',
+        url: '/api/webcheck/start',
+        payload: { email: 'victim@gmail.com', domain: 'example.com' },
+      });
+      expect(res.statusCode).toBe(429);
+      expect(res.json()).toEqual({ success: false, error: 'velocity_limited' });
+      expect(mockDoiEmail).not.toHaveBeenCalled();
     });
   });
 

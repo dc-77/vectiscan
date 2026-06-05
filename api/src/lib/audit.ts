@@ -58,6 +58,8 @@ export type AuditAction =
   | 'subscription.deleted'
   | 'webcheck.lead_created'
   | 'webcheck.rate_limited'
+  | 'webcheck.captcha_failed'
+  | 'webcheck.velocity_alert'
   | 'webcheck.scan_requested'
   | 'webcheck.free_scan_window_hit'
   | 'webcheck.doi_confirmed';

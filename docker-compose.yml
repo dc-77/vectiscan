@@ -65,6 +65,8 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-noreply@vectigal.tech}
+      # WebCheck-Free CAPTCHA (VEC-173): unset => Prüfung deaktiviert; in Prod setzen.
+      WEBCHECK_TURNSTILE_SECRET: ${WEBCHECK_TURNSTILE_SECRET:-}
     deploy:
       resources:
         limits:

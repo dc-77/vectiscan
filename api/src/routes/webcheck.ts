@@ -20,12 +20,16 @@
  */
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import crypto from 'crypto';
+import pino from 'pino';
 import { query } from '../lib/db.js';
 import { generateToken, verifyAll } from '../services/VerificationService.js';
 import { isValidDomain, validateTargetBatch } from '../lib/validate.js';
 import { enqueuePrecheck } from '../lib/queue.js';
 import { audit } from '../lib/audit.js';
 import { sendWebcheckDoiEmail } from '../lib/email.js';
+import { verifyCaptcha } from '../lib/captcha.js';
+
+const log = pino({ name: 'webcheck' });
 
 // --- Konfiguration (AC3/AC4) ---------------------------------------------------
 
@@ -42,6 +46,49 @@ export const RATE_LIMITS = {
   maxPerDomain: 3,
   maxPerIp: 5,
 } as const;
+
+/**
+ * Aggregierte Velocity-Schwellen (VEC-173, F2 aus VEC-169).
+ *
+ * Die per-E-Mail/Domain/IP-Limits (RATE_LIMITS) greifen pro Bezeichner und sind
+ * per IP-Rotation umgehbar: ein Angreifer kann viele verschiedene Opferadressen
+ * mit je 1 Mail bombardieren → Mail-Amplification / Spam-Relay. Diese Schwellen
+ * greifen AGGREGIERT (global + pro Empfänger-Mail-Domain) und kappen den Blast
+ * Radius unabhängig von der Quell-IP. Eine erreichte Schwelle ist zugleich ein
+ * alertbares Ereignis (`webcheck.velocity_alert` im audit_log → Grafana-Spike).
+ *
+ * Fenster bewusst auf RATE_LIMITS.windowMinutes (60min) ausgerichtet, damit beide
+ * Zählungen in EINER DB-Abfrage laufen. Konservativ dimensioniert; post-Launch
+ * anhand der realen Velocity-Metriken nachzuschärfen.
+ */
+export const VELOCITY = {
+  /** Gesamt-DOI-Mails über ALLE Leads pro Fenster. */
+  maxGlobal: 200,
+  /** DOI-Mails an EINE Empfänger-Mail-Domain (z.B. gmail.com) pro Fenster. */
+  maxPerRecipientDomain: 25,
+} as const;
+
+/** Empfänger-Mail-Domain (Teil nach dem letzten '@'), bereits normalisiert. */
+export function recipientDomain(email: string): string {
+  const at = email.lastIndexOf('@');
+  return at >= 0 ? email.slice(at + 1) : '';
+}
+
+/**
+ * Velocity-Entscheidung (pure): `limited` = aggregierte Schwelle erreicht,
+ * `reasons` benennt die ausgelösten Achsen für das Alert-Detail.
+ */
+export function decideVelocityAlert(counts: {
+  global: number;
+  recipientDomain: number;
+}): { limited: boolean; reasons: string[] } {
+  const reasons: string[] = [];
+  if (counts.global >= VELOCITY.maxGlobal) reasons.push('global');
+  if (counts.recipientDomain >= VELOCITY.maxPerRecipientDomain) {
+    reasons.push('recipient_domain');
+  }
+  return { limited: reasons.length > 0, reasons };
+}
 
 // --- Pure Helfer (unit-testbar ohne DB) ---------------------------------------
 
@@ -142,15 +189,37 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
     const ip = request.ip;
     const win = `${RATE_LIMITS.windowMinutes} minutes`;
 
-    // Rate-Limit-Fensterzählung pro E-Mail/Domain/IP (AC4).
-    const counts = await query<{ email_count: string; domain_count: string; ip_count: string }>(
+    // CAPTCHA (Proof-of-Humanity) VOR jeglichem DB-Schreibzugriff/DOI-Versand
+    // (VEC-173, F2). Env-gated: ohne WEBCHECK_TURNSTILE_SECRET deaktiviert, sonst
+    // fail-closed. Akzeptiert `captchaToken` oder den Turnstile-Default-Feldnamen.
+    const captchaToken =
+      typeof body.captchaToken === 'string'
+        ? body.captchaToken
+        : body['cf-turnstile-response'];
+    const captcha = await verifyCaptcha(captchaToken, ip);
+    if (!captcha.ok) {
+      audit({ orderId: null, action: 'webcheck.captcha_failed', details: { domain }, ip });
+      return reply.status(403).send({ success: false, error: 'captcha_failed' });
+    }
+
+    // Rate-Limit-Fensterzählung pro E-Mail/Domain/IP (AC4) + aggregierte
+    // Velocity-Zählung global/Empfänger-Mail-Domain (VEC-173, F2) in EINER Abfrage.
+    const counts = await query<{
+      email_count: string;
+      domain_count: string;
+      ip_count: string;
+      global_count: string;
+      recipient_domain_count: string;
+    }>(
       `SELECT
          COUNT(*) FILTER (WHERE email = $1) AS email_count,
          COUNT(*) FILTER (WHERE domain = $2) AS domain_count,
-         COUNT(*) FILTER (WHERE ip = $3) AS ip_count
+         COUNT(*) FILTER (WHERE ip = $3) AS ip_count,
+         COUNT(*) AS global_count,
+         COUNT(*) FILTER (WHERE split_part(email, '@', 2) = $4) AS recipient_domain_count
        FROM webcheck_leads
        WHERE created_at > NOW() - INTERVAL '${win}'`,
-      [email, domain, ip],
+      [email, domain, ip, recipientDomain(email)],
     );
     const c = counts.rows[0];
     if (
@@ -162,6 +231,26 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
     ) {
       audit({ orderId: null, action: 'webcheck.rate_limited', details: { domain }, ip });
       return reply.status(429).send({ success: false, error: 'rate_limited' });
+    }
+
+    // Aggregierte Velocity-Schwelle (VEC-173, F2): alertbares Spike-Ereignis +
+    // harte Drosselung gegen IP-Rotations-Mail-Amplification.
+    const velocity = decideVelocityAlert({
+      global: Number(c?.global_count ?? 0),
+      recipientDomain: Number(c?.recipient_domain_count ?? 0),
+    });
+    if (velocity.limited) {
+      const alertDetails = {
+        reasons: velocity.reasons,
+        recipientDomain: recipientDomain(email),
+        globalCount: Number(c?.global_count ?? 0),
+        recipientDomainCount: Number(c?.recipient_domain_count ?? 0),
+      };
+      // Stabiler Log-Marker für Loki/Grafana-Spike-Alert (siehe MONITORING.md);
+      // audit_log hält dieselbe Evidenz DB-seitig für Forensik.
+      log.warn({ event: 'webcheck_velocity_alert', ...alertDetails }, 'WebCheck velocity threshold reached');
+      audit({ orderId: null, action: 'webcheck.velocity_alert', details: alertDetails, ip });
+      return reply.status(429).send({ success: false, error: 'velocity_limited' });
     }
 
     const verificationToken = generateToken();
