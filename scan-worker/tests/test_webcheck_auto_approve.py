@@ -117,6 +117,30 @@ class TestAutoApproveGate:
         assert conn.rolled_back is True
         assert "status = 'queued'" not in _executed_sql(cur)
 
+    def test_c_foreign_lead_scope_pinned_in_gate_sql(self):
+        """(c) BOLA-Guard: der Lead-Count im Gate-SELECT MUSS pro Order gescoped
+        sein (`wl.order_id = o.id`) UND `verified = TRUE` verlangen.
+
+        Die mock-basierte Suite fuettert ``verified_leads`` als skalaren Count;
+        die Cross-Order-Bindung (Invariante (c) "fremder Lead") lebt einzig im
+        SQL-Subquery. Ohne diese Klausel wuerde ein verifizierter Lead EINER
+        Order eine FREMDE Order auto-freigeben (IDOR/BOLA auf das Approve-Gate,
+        OWASP API1). Dieser String-Guard schlaegt fehl, falls ein Refactor die
+        Order-Scope- oder verified-Bedingung still entfernt — auch ohne echte DB
+        (CI ``test-scan-worker`` hat keinen Postgres-Service). [VEC-177]
+        """
+        # Eligible-Pfad ausfuehren, damit der Gate-SELECT garantiert laeuft.
+        _, cur, _ = _run_with([ELIGIBLE_GATE, TARGET_ROW])
+        gate_sql = next(
+            sql for sql, _ in cur.executed if "webcheck_leads" in sql
+        )
+        assert "wl.order_id = o.id" in gate_sql, (
+            "Lead-Count NICHT pro Order gescoped -> Cross-Order-Auto-Approve (BOLA)"
+        )
+        assert "wl.verified = TRUE" in gate_sql
+        # Race-/Idempotenz-Lock auf der Order-Zeile muss erhalten bleiben.
+        assert "FOR UPDATE" in gate_sql
+
     def test_scope_escalation_blocked_target_count(self):
         """target_count != 1 (Scope-Eskalation) -> kein Auto-Approve."""
         gate = ("pending_target_review", "webcheck", 5, 1, 1, 1)
