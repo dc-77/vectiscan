@@ -346,6 +346,9 @@ export interface DemoFinding {
   evidence?: string;
   impact?: string;
   recommendation?: string;
+  // VEC-245: Determinismus-Provenienz (bleibt in findings_data, fuer KPI/Audit).
+  policy_id?: string;
+  severity_provenance?: Record<string, unknown>;
 }
 
 export interface DemoFindingsData {

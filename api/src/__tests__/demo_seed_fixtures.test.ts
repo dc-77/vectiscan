@@ -31,9 +31,17 @@ interface Fixture {
   company_name: string;
   overall_risk: string;
   severity_counts: Counts;
-  findings: Array<{ severity: string; title?: string }>;
+  findings: Array<{ severity: string; title?: string; policy_id?: string }>;
   nis2_compliance_summary?: Record<string, string>;
+  // VEC-245: Determinismus-Provenienz + Host-Telemetrie fuer die KPI-Kacheln.
+  policy_version?: string;
+  policy_id_distinct?: string[];
+  hosts?: Array<{ ip: string; fqdns: string[]; status?: string }>;
 }
+
+const POLICY_ID_RE = /^SP-[A-Z]+-\d{3}$/;
+// Erwartete Host-Zahl je Paket — deckungsgleich mit orders.hosts_total im Seed.
+const EXPECTED_HOSTS: Record<string, number> = { webcheck: 1, perimeter: 3, compliance: 3 };
 
 const DEMO_DIR = path.join(__dirname, '..', 'scripts', 'demo-data');
 
@@ -99,6 +107,34 @@ describe('Demo-Seed-Fixtures (VEC-120)', () => {
         const titles = fx.findings.map((f) => f.title || '').join(' | ');
         for (const needle of EXPECTED[pkg].mustContain) {
           expect(titles).toContain(needle);
+        }
+      });
+
+      // VEC-245: Scan-Detail-KPI „Determinismus 0 %" / „Hosts 0" beheben.
+      // Die Kacheln lesen Determinismus aus den per-Finding policy_id-Feldern
+      // und Hosts aus orders.discovered_hosts (Seed aus fx.hosts). Driften die
+      // Fixtures hier ab, stehen die Kacheln wieder auf 0.
+      it('jedes Finding traegt eine gueltige, nicht-Fallback policy_id (Determinismus > 0 %)', () => {
+        for (const f of fx.findings) {
+          expect(f.policy_id).toBeDefined();
+          expect(f.policy_id).not.toBe('SP-FALLBACK');
+          expect(f.policy_id as string).toMatch(POLICY_ID_RE);
+        }
+      });
+
+      it('policy_version + policy_id_distinct konsistent zu den Findings', () => {
+        expect(fx.policy_version).toBeTruthy();
+        const distinctFromFindings = [...new Set(fx.findings.map((f) => f.policy_id))].sort();
+        expect([...(fx.policy_id_distinct ?? [])].sort()).toEqual(distinctFromFindings);
+      });
+
+      it('Host-Telemetrie passt zu hosts_total (Hosts > 0)', () => {
+        expect(Array.isArray(fx.hosts)).toBe(true);
+        expect(fx.hosts!.length).toBe(EXPECTED_HOSTS[pkg]);
+        for (const h of fx.hosts!) {
+          expect(h.ip).toMatch(/^\d{1,3}(\.\d{1,3}){3}$/);
+          expect(Array.isArray(h.fqdns)).toBe(true);
+          expect(h.fqdns.length).toBeGreaterThan(0);
         }
       });
     });
