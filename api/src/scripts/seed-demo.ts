@@ -66,9 +66,22 @@ const SPECS: PkgSpec[] = [
   },
 ];
 
+/** Synthetische Host-Telemetrie aus der Fixture (HostInfo-kompatibel). */
+interface DemoHost {
+  ip: string;
+  fqdns: string[];
+  status: string;
+}
+
 interface Fixture extends DemoFindingsData {
   target: string;
   company_name: string;
+  // VEC-245: Determinismus-Provenienz + Host-Telemetrie fuer die KPI-Kacheln.
+  // policy_version/policy_id_distinct landen in den reports-Audit-Spalten
+  // (Migration 016), hosts in orders.discovered_hosts.
+  policy_version?: string;
+  policy_id_distinct?: string[];
+  hosts?: DemoHost[];
 }
 
 function loadFixture(pkg: string): Fixture {
@@ -76,9 +89,19 @@ function loadFixture(pkg: string): Fixture {
   return JSON.parse(fs.readFileSync(file, 'utf-8')) as Fixture;
 }
 
-/** Strippt Hilfsfelder → exakt das findings_data-Objekt, das auch der Report-Worker speichert. */
+/**
+ * Strippt Hilfsfelder → exakt das findings_data-Objekt, das auch der
+ * Report-Worker speichert. Audit-/Telemetrie-Felder (policy_version,
+ * policy_id_distinct, hosts) gehoeren in eigene DB-Spalten, nicht in
+ * findings_data, und werden hier entfernt. Die per-Finding-Provenienz
+ * (policy_id, severity_provenance) bleibt im findings-Array erhalten.
+ */
 function toFindingsData(fx: Fixture): Record<string, unknown> {
-  const { target: _t, company_name: _c, ...rest } = fx;
+  const {
+    target: _t, company_name: _c,
+    policy_version: _pv, policy_id_distinct: _pid, hosts: _h,
+    ...rest
+  } = fx;
   return rest;
 }
 
@@ -124,6 +147,18 @@ async function seed(): Promise<void> {
     const startedAt = new Date(new Date(spec.scannedAt).getTime() - 30 * 60 * 1000).toISOString();
     const totalFindings = fx.findings.length;
 
+    // VEC-245: Determinismus-Provenienz fuer die Scan-Detail-KPI-Kacheln.
+    // policy_id_distinct primaer aus der Fixture; Fallback = aus den Findings
+    // abgeleitet (haelt KPI auch ohne explizites Fixture-Feld konsistent).
+    const policyVersion = fx.policy_version ?? null;
+    const policyIdDistinct =
+      fx.policy_id_distinct ??
+      [...new Set(fx.findings.map((f) => f.policy_id).filter((p): p is string => !!p))].sort();
+    // Host-Telemetrie → orders.discovered_hosts (vom Frontend fuer die
+    // Hosts-Kachel gelesen). Anzahl deckt sich mit hosts_total.
+    const hosts: DemoHost[] = fx.hosts ?? [];
+    const hostsTotal = spec.pkg === 'webcheck' ? 1 : 3;
+
     // Order — fertig & bezahlt
     await query(
       `INSERT INTO orders (
@@ -132,6 +167,7 @@ async function seed(): Promise<void> {
          paid_at, amount_cents, currency,
          scan_started_at, scan_finished_at,
          hosts_total, hosts_completed, target_count,
+         discovered_hosts,
          created_at, updated_at
        ) VALUES (
          $1, $2, $3, $4, 'report_complete',
@@ -139,6 +175,7 @@ async function seed(): Promise<void> {
          $5, $6, 'EUR',
          $7, $5,
          $8, $8, 1,
+         $9::jsonb,
          $5, $5
        )`,
       [
@@ -149,7 +186,8 @@ async function seed(): Promise<void> {
         finishedAt,
         packagePriceCents(spec.pkg),
         startedAt,
-        spec.pkg === 'webcheck' ? 1 : 3,
+        hostsTotal,
+        JSON.stringify(hosts),
       ],
     );
 
@@ -169,12 +207,15 @@ async function seed(): Promise<void> {
       'Content-Type': 'application/pdf',
     });
 
-    // Report-Datensatz (severity_counts-Spalte wird per Trigger aus findings_data abgeleitet)
+    // Report-Datensatz (severity_counts-Spalte wird per Trigger aus findings_data abgeleitet).
+    // VEC-245: policy_version + policy_id_distinct (Migration 016) befuellen → Determinismus-
+    // KPI/Policy-Coverage zeigen plausible Werte statt 0 %.
     await query(
       `INSERT INTO reports (
          id, order_id, minio_bucket, minio_path, file_size_bytes,
-         download_token, download_count, expires_at, findings_data, version, created_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, 0, $7, $8, 1, $9)`,
+         download_token, download_count, expires_at, findings_data,
+         policy_version, policy_id_distinct, version, created_at
+       ) VALUES ($1, $2, $3, $4, $5, $6, 0, $7, $8, $9, $10::text[], 1, $11)`,
       [
         spec.reportId,
         spec.orderId,
@@ -184,6 +225,8 @@ async function seed(): Promise<void> {
         spec.downloadToken,
         new Date(new Date(finishedAt).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         JSON.stringify(findingsData),
+        policyVersion,
+        policyIdDistinct,
         finishedAt,
       ],
     );
