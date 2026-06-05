@@ -14,6 +14,11 @@ import {
   reconcileSeverityCounts,
 } from '../lib/severityCounts.js';
 
+// Report-Download-TTL (VEC-180/VEC-197): 30 Tage. Spiegelt den Worter-Default
+// (report-worker/reporter/worker.py: now + 30d Worker-Default) und Migration 034 (DB-DEFAULT).
+// Wird als effektiver Ablauf für Legacy-Zeilen ohne gesetztes expires_at genutzt.
+const REPORT_DOWNLOAD_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
 async function streamReport(reply: FastifyReply, report: Record<string, unknown>) {
   const bucket = report.minio_bucket as string;
   const objectPath = report.minio_path as string;
@@ -551,8 +556,17 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       }
 
       const report = tokenCheck.rows[0] as Record<string, unknown>;
-      const expiresAt = report.expires_at as Date | null;
-      if (expiresAt && new Date() > expiresAt) {
+      // VEC-197: Ablauf fail-CLOSED erzwingen. Ein `expires_at = NULL` (nur noch
+      // Legacy-Zeilen vor Migration 034 möglich) darf über den anonymen
+      // download_token-Deeplink NICHT „nie ablaufen". Fehlt das Ablaufdatum,
+      // gilt die dokumentierte 30-Tage-TTL ab created_at als effektiver Ablauf
+      // (identisch zur Backfill-Semantik created_at + 30d). Der JWT-Owner-Pfad
+      // bleibt unberührt — Eigentümer können jederzeit eingeloggt herunterladen.
+      const expiresAtRaw = report.expires_at as Date | string | null;
+      const effectiveExpiry = expiresAtRaw
+        ? new Date(expiresAtRaw)
+        : new Date(new Date(report.created_at as Date | string).getTime() + REPORT_DOWNLOAD_TTL_MS);
+      if (new Date() > effectiveExpiry) {
         return reply.status(410).send({ success: false, error: 'Download link expired' });
       }
 
