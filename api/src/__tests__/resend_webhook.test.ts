@@ -20,18 +20,30 @@ jest.mock('../lib/resend', () => {
   };
 });
 
-jest.mock('../lib/db', () => ({ query: jest.fn() }));
+jest.mock('../lib/db', () => ({ query: jest.fn(), withTransaction: jest.fn() }));
 jest.mock('../lib/audit', () => ({ audit: jest.fn().mockResolvedValue(undefined) }));
 
 import { resendWebhookRoutes } from '../routes/resend-webhook';
 import * as resendLib from '../lib/resend';
-import { query } from '../lib/db';
+import { query, withTransaction } from '../lib/db';
 import { audit } from '../lib/audit';
 
 const verify = (resendLib as unknown as { __verify: jest.Mock }).__verify;
 const mockConfigured = resendLib.isResendWebhookConfigured as jest.Mock;
 const mockQuery = query as jest.Mock;
+const mockTx = withTransaction as jest.Mock;
 const mockAudit = audit as jest.Mock;
+
+// withTransaction(fn) fuehrt die Route-Verarbeitung gegen die an den TX-Client
+// gebundene query-Funktion aus. Im Test delegieren wir sie auf denselben
+// mockQuery — so wirkt der gesamte Ledger-/Suppression-Pfad weiter ueber das
+// installDbMock, und ein geworfener Fehler propagiert (= echtes Rollback-/500-
+// Verhalten der Route, ohne echte DB).
+function installTxMock() {
+  mockTx.mockImplementation(async (fn: (q: typeof mockQuery) => Promise<unknown>) =>
+    fn(mockQuery),
+  );
+}
 
 /**
  * Idempotenz-Ledger-Mock: der erste INSERT je svix-id liefert rowCount 1,
@@ -85,6 +97,7 @@ function suppressionCalls() {
 beforeEach(() => {
   jest.clearAllMocks();
   mockConfigured.mockReturnValue(true);
+  installTxMock();
 });
 
 describe('POST /api/webcheck/resend-webhook', () => {
@@ -193,7 +206,7 @@ describe('POST /api/webcheck/resend-webhook', () => {
     await app.close();
   });
 
-  it('returns 500 and releases the idempotency claim when processing fails', async () => {
+  it('returns 500 and rolls back the idempotency claim when processing fails', async () => {
     const seen = new Set<string>();
     mockQuery.mockImplementation(async (sql: string, params: unknown[] = []) => {
       if (sql.includes('INSERT INTO resend_webhook_events')) {
@@ -214,11 +227,44 @@ describe('POST /api/webcheck/resend-webhook', () => {
     const app = await buildApp();
     const res = await post(app);
     expect(res.statusCode).toBe(500);
-    // Claim wieder freigegeben, damit Resends Retry erneut zustellen kann
-    const del = mockQuery.mock.calls.find(([sql]) =>
-      String(sql).includes('DELETE FROM resend_webhook_events'),
+    // Verarbeitung lief in withTransaction → der Fehler rollt Claim + Upsert
+    // gemeinsam zurueck. processed_at darf NIE markiert worden sein (sonst waere
+    // der Claim als „erledigt" zementiert und der Retry praellte als Duplikat ab).
+    expect(mockTx).toHaveBeenCalledTimes(1);
+    const processed = mockQuery.mock.calls.find(([sql]) =>
+      String(sql).includes('UPDATE resend_webhook_events SET processed_at'),
     );
-    expect(del).toBeDefined();
+    expect(processed).toBeUndefined();
+    await app.close();
+  });
+
+  it('processes claim, suppression and processed_at atomically (VEC-193/F-2)', async () => {
+    // Regression: Idempotenz-Claim, Suppression-Upsert UND processed_at-Update
+    // muessen in EINER Transaktion laufen. Sonst lässt ein harter Crash nach dem
+    // Upsert und vor processed_at den Claim gesetzt → Resend-Retry trifft
+    // ON CONFLICT → 200-Duplikat → restliche Empfaenger werden nie suppressed.
+    installDbMock();
+    verify.mockReturnValue({
+      type: 'email.bounced',
+      data: { email_id: 'eml_5', to: ['a@example.com', 'b@example.com'] },
+    });
+    const app = await buildApp();
+    const res = await post(app);
+    expect(res.statusCode).toBe(200);
+
+    // Genau eine Transaktion umschliesst die gesamte Wirkung.
+    expect(mockTx).toHaveBeenCalledTimes(1);
+
+    // Claim + beide Upserts + processed_at gehoeren zusammen in diese Transaktion.
+    const ledgerClaim = mockQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('INSERT INTO resend_webhook_events'),
+    );
+    const processed = mockQuery.mock.calls.filter(([sql]) =>
+      String(sql).includes('UPDATE resend_webhook_events SET processed_at'),
+    );
+    expect(ledgerClaim).toHaveLength(1);
+    expect(suppressionCalls()).toHaveLength(2);
+    expect(processed).toHaveLength(1);
     await app.close();
   });
 });
