@@ -45,28 +45,45 @@ def _resolver(timeout: float = DEFAULT_TIMEOUT) -> "dns.resolver.Resolver":
     return r
 
 
-def resolve_a(fqdn: str, timeout: float = DEFAULT_TIMEOUT) -> list[str]:
+def _filter_public(ips: list[str], public_only: bool) -> list[str]:
+    """Optional SSRF-Filter (VEC-196): geblockte/interne IPs entfernen.
+
+    Default ``public_only=False`` haelt das DNS-Reporting unveraendert (interne
+    A/AAAA-Records bleiben sichtbar). Egress-Pfade, die anschliessend verbinden,
+    setzen ``public_only=True`` -> Defense-in-Depth zusaetzlich zum
+    Resolve-and-Pin im :mod:`scanner.common.ssrf_guard`.
+    """
+    if not public_only:
+        return ips
+    from scanner.common.ssrf_guard import filter_public
+
+    return filter_public(ips)
+
+
+def resolve_a(fqdn: str, timeout: float = DEFAULT_TIMEOUT,
+              public_only: bool = False) -> list[str]:
     """Return A records (IPv4) for fqdn. Empty list if none/timeout."""
     if _HAS_DNSPYTHON:
         try:
             answers = _resolver(timeout).resolve(fqdn, "A")
-            return [r.to_text() for r in answers]
+            return _filter_public([r.to_text() for r in answers], public_only)
         except Exception:
             return []
     try:
         info = socket.getaddrinfo(fqdn, None, socket.AF_INET)
-        return sorted({i[4][0] for i in info})
+        return _filter_public(sorted({i[4][0] for i in info}), public_only)
     except Exception:
         return []
 
 
-def resolve_aaaa(fqdn: str, timeout: float = DEFAULT_TIMEOUT) -> list[str]:
+def resolve_aaaa(fqdn: str, timeout: float = DEFAULT_TIMEOUT,
+                 public_only: bool = False) -> list[str]:
     """Return AAAA records (IPv6) for fqdn. Empty list if none/timeout."""
     if not _HAS_DNSPYTHON:
         return []
     try:
         answers = _resolver(timeout).resolve(fqdn, "AAAA")
-        return [r.to_text() for r in answers]
+        return _filter_public([r.to_text() for r in answers], public_only)
     except Exception:
         return []
 
