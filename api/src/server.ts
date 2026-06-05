@@ -17,6 +17,7 @@ import { webhookRoutes } from './routes/webhooks.js';
 import { leadRoutes } from './routes/leads.js';
 import { analyticsRoutes } from './routes/analytics.js';
 import { startScheduler } from './lib/scheduler.js';
+import { registerSecurityHeaders } from './lib/security-headers.js';
 
 export function buildServer() {
   const server = Fastify({
@@ -27,6 +28,9 @@ export function buildServer() {
           : undefined,
     },
   });
+
+  // VEC-166: kanonischer Content-Security-Policy-Header (App-Schicht, testbar).
+  registerSecurityHeaders(server);
 
   server.register(cors, { origin: true, methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] });
 
