@@ -13,7 +13,8 @@
  *    lädt sie nach MinIO und füllt reports.findings_data für Dashboard/Risk-Gauge.
  *
  * Aufruf:   npm run seed:demo            (im api-Container / lokal mit DB+MinIO)
- * ENV:      DEMO_PASSWORD (Pflicht in CI; lokal greift sonst ein Dev-Fallback)
+ * ENV:      DEMO_PASSWORD (Pflicht — kein Default-Fallback mehr, VEC-258/260;
+ *           lokal entweder setzen oder bewusst DEMO_ALLOW_WELL_KNOWN_PASSWORD=1)
  *           DATABASE_URL, MINIO_* (wie API)
  */
 import fs from 'fs';
@@ -120,8 +121,42 @@ async function cleanup(): Promise<void> {
   await query('DELETE FROM customers WHERE id = $1', [DEMO_CUSTOMER_ID]);
 }
 
+/**
+ * VEC-258/VEC-260: Demo-Passwort streng aufloesen. Der Seed darf NIEMALS still
+ * das oeffentlich dokumentierte Quell-Default seeden (Sven-Auflage VEC-121) —
+ * sonst ist auf prod ein allgemein bekanntes Passwort gueltig (Re-Verif-FAIL
+ * VEC-260). Verteidigung am Engpass, unabhaengig von der Quelle (CI-Var,
+ * Host-Secret oder frueherer Code-Fallback):
+ *   - leer/ungesetzt   -> harter Abbruch (kein Default-Fallback mehr)
+ *   - == Quell-Default -> harter Abbruch, ausser expliziter Local-Dev-Opt-in
+ *     DEMO_ALLOW_WELL_KNOWN_PASSWORD=1
+ * Der Default steht hier nur als Denylist-Wert (kein Secret) und in KEINER
+ * console.*-Zeile (VEC-153 / CWE-532, Regressionstest demo_seed_no_password_echo).
+ */
+const WELL_KNOWN_DEFAULT = 'VectiScanDemo2026!';
+function resolveDemoPassword(): string {
+  const pw = (process.env.DEMO_PASSWORD ?? '').trim();
+  if (!pw) {
+    console.error(
+      'FATAL: DEMO_PASSWORD ist nicht gesetzt. Der Seed verwendet bewusst kein ' +
+        'Default mehr (VEC-258). Quelle: maskierte CI/CD-Var DEMO_PASSWORD oder ' +
+        'Host-Secret unter DEPLOY_PATH/.demo_password.',
+    );
+    process.exit(1);
+  }
+  if (pw === WELL_KNOWN_DEFAULT && process.env.DEMO_ALLOW_WELL_KNOWN_PASSWORD !== '1') {
+    console.error(
+      'FATAL: DEMO_PASSWORD entspricht dem oeffentlich dokumentierten Quell-Default. ' +
+        'Abbruch, um kein allgemein bekanntes Passwort live zu seeden (VEC-260). ' +
+        'Fuer lokale Demos bewusst DEMO_ALLOW_WELL_KNOWN_PASSWORD=1 setzen.',
+    );
+    process.exit(1);
+  }
+  return pw;
+}
+
 async function seed(): Promise<void> {
-  const password = process.env.DEMO_PASSWORD || 'VectiScanDemo2026!';
+  const password = resolveDemoPassword();
   const pwHash = await hashPassword(password);
 
   await ensureBucket();

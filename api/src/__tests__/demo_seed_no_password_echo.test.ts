@@ -45,3 +45,25 @@ describe('Demo-Seed Passwort-Echo (VEC-153, CWE-532)', () => {
     expect(/Passwort:\s*\[redigiert\]/.test(src)).toBe(true);
   });
 });
+
+describe('Demo-Seed verweigert Quell-Default (VEC-258/VEC-260)', () => {
+  const src = fs.readFileSync(SEED_SRC, 'utf-8');
+
+  it('kein stiller `|| Default`-Fallback mehr bei der Passwort-Aufloesung', () => {
+    // Die VEC-260-Regression entstand, weil der Seed bei leerem/Default-Wert
+    // still das oeffentlich dokumentierte Default seedete. Der OR-Fallback
+    // (`process.env.DEMO_PASSWORD || '<default>'`) darf nicht mehr existieren.
+    const orFallback = new RegExp(
+      'process\\.env\\.DEMO_PASSWORD\\s*\\|\\|\\s*[\'"]' + HARDCODED_DEFAULT,
+    );
+    expect(orFallback.test(src)).toBe(false);
+  });
+
+  it('lehnt den dokumentierten Quell-Default explizit ab (Guardrail vorhanden)', () => {
+    // resolveDemoPassword() muss den bekannten Default gegen einen Opt-in
+    // pruefen und sonst hart abbrechen.
+    expect(src.includes('WELL_KNOWN_DEFAULT')).toBe(true);
+    expect(src.includes('DEMO_ALLOW_WELL_KNOWN_PASSWORD')).toBe(true);
+    expect(/process\.exit\(1\)/.test(src)).toBe(true);
+  });
+});
