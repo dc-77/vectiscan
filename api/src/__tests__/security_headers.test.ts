@@ -36,10 +36,17 @@ describe('VEC-166: API Content-Security-Policy header', () => {
     expect(res.headers['contentsecuritypolicy']).toBeUndefined();
   });
 
-  it('CSP enthält die erwarteten Direktiven (default-src/connect-src self)', async () => {
+  it('VEC-207: straffe Lockdown-Policy für reines JSON-Backend', async () => {
     const res = await server.inject({ method: 'GET', url: '/__probe' });
     const csp = String(res.headers['content-security-policy']);
-    expect(csp).toContain("default-src 'self'");
-    expect(csp).toContain('connect-src');
+    expect(csp).toContain("default-src 'none'");
+    expect(csp).toContain("frame-ancestors 'none'");
+  });
+
+  it('VEC-207: kein irreführendes unsafe-inline / keine script-src-Direktive', async () => {
+    const res = await server.inject({ method: 'GET', url: '/__probe' });
+    const csp = String(res.headers['content-security-policy']);
+    expect(csp).not.toContain('unsafe-inline');
+    expect(csp).not.toContain('script-src');
   });
 });
