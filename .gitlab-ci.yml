@@ -141,8 +141,9 @@ test-edge:
   tags: [vectigal]
   image: python:3.12-slim
   script:
-    - pip install pyyaml pytest
-    - pytest tests/test_edge_admin_guard.py -v
+    # Runner ist Shell-Executor (image: wird ignoriert); System-Python ist PEP-668
+    # externally-managed → venv wie bei test-scan-worker/test-report-worker.
+    - python3 -m venv .venv && . .venv/bin/activate && pip install pyyaml pytest && pytest tests/test_edge_admin_guard.py -v
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
