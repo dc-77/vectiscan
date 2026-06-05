@@ -138,20 +138,23 @@ export function trackPageview(path: string): void {
     eventType: 'pageview',
   });
 
-  // sendBeacon ueberlebt Seitenwechsel; fetch als Fallback. Fehler werden
-  // bewusst verschluckt — Analytics darf den Nutzerfluss nie stoeren.
+  // VEC-209: Bewusst KEIN navigator.sendBeacon. sendBeacon sendet cross-origin
+  // zwingend Cookies (credentials mode 'include'), die Antwort wird dann ohne
+  // 'Access-Control-Allow-Credentials: true' vom Browser verworfen -> stiller
+  // Analytics-Verlust. Da der Beacon cookielos/anonym ist (VEC-36), senden wir
+  // per fetch mit 'credentials: omit' (Daten-Minimierung): keine Cookies, keine
+  // CORS-Credentials-Verwerfung. 'keepalive' ersetzt die Unload-Robustheit von
+  // sendBeacon (Pageview feuert ohnehin bei Routenwechsel, nicht beim Unload).
+  // Fehler werden bewusst verschluckt — Analytics darf den Nutzerfluss nie stoeren.
   try {
     const url = `${ANALYTICS_API_URL}/api/analytics/collect`;
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
-    } else {
-      void fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: payload,
-        keepalive: true,
-      }).catch(() => {});
-    }
+    void fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      credentials: 'omit',
+      keepalive: true,
+    }).catch(() => {});
   } catch {
     // ignore
   }
