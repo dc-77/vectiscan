@@ -194,6 +194,21 @@ export function makeGuardedLookup(
       family?: number,
     ) => void,
   ): void {
+    // Node ruft `lookup` je nach Aufrufer mit `all: true` (z. B. bei
+    // autoSelectFamily/Happy-Eyeballs, Default in Node ≥18) ODER `all: false`
+    // auf. Im all-Modus MUSS ein Array zurückgegeben werden, sonst wirft Node
+    // ERR_INVALID_IP_ADDRESS und die Verbindung schlägt für JEDEN legitimen
+    // Host fehl. Wir respektieren den Modus des Aufrufers.
+    const wantAll =
+      typeof options === 'object' && options !== null && (options as dns.LookupAllOptions).all === true;
+    const succeed = (address: string, family: number): void => {
+      if (wantAll) {
+        callback(null, [{ address, family }], family);
+      } else {
+        callback(null, address, family);
+      }
+    };
+
     // IP-Literale direkt prüfen (keine Auflösung nötig).
     const literalFamily = net.isIP(hostname);
     if (literalFamily !== 0) {
@@ -201,7 +216,7 @@ export function makeGuardedLookup(
         callback(new SsrfBlockedError(`Geblockte Zieladresse: ${hostname}`), '', literalFamily);
         return;
       }
-      callback(null, hostname, literalFamily);
+      succeed(hostname, literalFamily);
       return;
     }
 
@@ -222,7 +237,7 @@ export function makeGuardedLookup(
         return;
       }
       const pinned = allowed[0];
-      callback(null, pinned.address, pinned.family);
+      succeed(pinned.address, pinned.family);
     });
   };
 }

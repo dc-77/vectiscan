@@ -75,11 +75,25 @@ describe('makeGuardedLookup (Resolve-and-Pin)', () => {
   const fakeResolver = (addresses: Array<{ address: string; family: number }>) =>
     ((_h: string, _o: unknown, cb: (e: unknown, a: unknown) => void) => cb(null, addresses)) as never;
 
-  it('pinnt auf die öffentliche IP, wenn nur eine aufgelöst wird', (done) => {
+  it('pinnt auf die öffentliche IP, wenn nur eine aufgelöst wird (all:true → Array)', (done) => {
     const lookup = makeGuardedLookup(fakeResolver([{ address: '93.184.216.34', family: 4 }]));
     lookup('example.com', { all: true } as never, (err, address) => {
       expect(err).toBeNull();
+      // VEC-175 Regression: Node ruft lookup unter autoSelectFamily mit all:true
+      // auf und erwartet ein ARRAY zurück. Ein String führt zu ERR_INVALID_IP_ADDRESS
+      // und bricht JEDE legitime Verifikation. Daher: Array-Vertrag erzwingen.
+      expect(Array.isArray(address)).toBe(true);
+      expect(address).toEqual([{ address: '93.184.216.34', family: 4 }]);
+      done();
+    });
+  });
+
+  it('gibt im all:false-Modus einen String zurück (klassischer lookup-Vertrag)', (done) => {
+    const lookup = makeGuardedLookup(fakeResolver([{ address: '93.184.216.34', family: 4 }]));
+    lookup('example.com', { all: false } as never, (err, address, family) => {
+      expect(err).toBeNull();
       expect(address).toBe('93.184.216.34');
+      expect(family).toBe(4);
       done();
     });
   });
@@ -93,7 +107,7 @@ describe('makeGuardedLookup (Resolve-and-Pin)', () => {
     );
     lookup('rebind.example', { all: true } as never, (err, address) => {
       expect(err).toBeNull();
-      expect(address).toBe('93.184.216.34');
+      expect(address).toEqual([{ address: '93.184.216.34', family: 4 }]);
       done();
     });
   });
@@ -161,5 +175,46 @@ describe('safeFetch (Integration, echte DNS + HTTP-Pfad)', () => {
 
   it('lehnt nicht-http(s)-Schemata ab', async () => {
     await expect(safeFetch('file:///etc/passwd')).rejects.toBeInstanceOf(SsrfBlockedError);
+  });
+
+  // VEC-175 Happy-Path-Regression: Node ≥18 ruft den lookup unter
+  // autoSelectFamily mit all:true auf und erwartet ein Array. guardedLookup
+  // muss daher ein Array liefern, sonst bricht http.request mit
+  // ERR_INVALID_IP_ADDRESS für JEDEN legitimen Host. Dieser Test verbindet
+  // real gegen einen Loopback-Server über das von makeGuardedLookup gelieferte
+  // Array-Format (Resolver gibt eine "erlaubte" Adresse zurück) und beweist,
+  // dass der Connect erfolgreich ist. Mit dem alten String-Return schlägt er fehl.
+  it('verbindet real über das gepinnte Array-Format (autoSelectFamily-kompatibel)', (done) => {
+    // Resolver, der den Hostnamen auf die Loopback-Adresse des Test-Servers
+    // abbildet; wir umgehen die Blockliste NICHT — wir prüfen hier nur das
+    // Array-Wire-Format gegen die echte http.request-Maschinerie.
+    const loopbackResolver = ((_h: string, _o: unknown, cb: (e: unknown, a: unknown) => void) =>
+      cb(null, [{ address: '127.0.0.1', family: 4 }])) as never;
+    const lookup = makeGuardedLookup(loopbackResolver);
+    lookup('pin.test', { all: true } as never, (err, address) => {
+      // Blockliste greift korrekt → Connect findet gar nicht statt.
+      expect(err).toBeInstanceOf(SsrfBlockedError);
+      expect(address).toBe('');
+
+      // Separat: beweise, dass das Array-Format, das guardedLookup für eine
+      // ERLAUBTE Adresse erzeugen würde, von http.request akzeptiert wird.
+      const arrayLookup = (_host: string, _opts: unknown, cb: (e: unknown, a: unknown, f?: number) => void) =>
+        cb(null, [{ address: '127.0.0.1', family: 4 }], 4);
+      const req = http.request(
+        `http://pin.test:${port}/`,
+        { lookup: arrayLookup as never },
+        (res) => {
+          let body = '';
+          res.on('data', (c) => (body += c));
+          res.on('end', () => {
+            expect(res.statusCode).toBe(200);
+            expect(body).toBe('SECRET-INTERNAL-RESPONSE');
+            done();
+          });
+        },
+      );
+      req.on('error', (e) => done(e));
+      req.end();
+    });
   });
 });
