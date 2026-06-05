@@ -8,9 +8,9 @@ Mail-/DNS-Security-Parser leben in `scanner.passive.mail_security_parsers`
 import subprocess
 from typing import Any
 
-import requests
 import structlog
 
+from scanner.common import ssrf_guard
 from scanner.passive.mail_security_parsers import (
     check_bimi,
     check_dmarc_policy,
@@ -131,7 +131,11 @@ def check_mta_sts(domain: str) -> dict[str, Any]:
     policy = None
     mode = None
     try:
-        resp = requests.get(
+        # SSRF-/DNS-Rebinding-Haertung (VEC-196): mta-sts.{domain} ist
+        # angreifergesteuert -> Resolve-and-Pin + Block interner Ranges. Ein
+        # internes Ziel wirft SsrfBlockedError und faellt unten in except
+        # (kein Policy-Fetch, kein interner Egress).
+        resp = ssrf_guard.safe_get(
             f"https://mta-sts.{domain}/.well-known/mta-sts.txt",
             timeout=5, allow_redirects=True,
         )
