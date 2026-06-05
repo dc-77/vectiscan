@@ -41,6 +41,8 @@ const MIGRATION_031_PATH = path.join(__dirname, '..', 'migrations', '031_stripe_
 const MIGRATION_032_PATH = path.join(__dirname, '..', 'migrations', '032_webcheck_leads.sql');
 const MIGRATION_033_PATH = path.join(__dirname, '..', 'migrations', '033_email_suppressions.sql');
 const MIGRATION_034_PATH = path.join(__dirname, '..', 'migrations', '034_reports_expires_at_default.sql');
+const MIGRATION_035_PATH = path.join(__dirname, '..', 'migrations', '035_webcheck_marketing_consent.sql');
+const MIGRATION_036_PATH = path.join(__dirname, '..', 'migrations', '036_webcheck_consent_not_given.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -501,6 +503,50 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 034 FAILED (continuing without it):', err);
+  }
+
+  // Migration 035 (VEC-173): WebCheck-Marketing-Einwilligung als Art.-7-Nachweis
+  // (marketing_consent + consent_text_version). Idempotent: nur anwenden, wenn die
+  // Spalte marketing_consent auf webcheck_leads noch fehlt.
+  try {
+    const consentColCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'webcheck_leads' AND column_name = 'marketing_consent'
+      ) AS exists
+    `);
+    if (!consentColCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 035: webcheck marketing_consent');
+      const migrationSql = fs.readFileSync(MIGRATION_035_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 035 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 035 FAILED (continuing without it):', err);
+  }
+
+  // Migration 036 (VEC-198): consent_status 'not_given' (nie eingewilligt) vom
+  // echten 'declined' (aktive Ablehnung) trennen — CHECK-Erweiterung. Idempotent:
+  // nur anwenden, wenn der bestehende consent_status-CHECK 'not_given' noch nicht
+  // erlaubt.
+  try {
+    const notGivenCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM pg_constraint con
+        JOIN pg_class rel ON rel.oid = con.conrelid
+        WHERE rel.relname = 'webcheck_leads'
+          AND con.contype = 'c'
+          AND pg_get_constraintdef(con.oid) ILIKE '%not_given%'
+      ) AS exists
+    `);
+    if (!notGivenCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 036: webcheck consent_status not_given');
+      const migrationSql = fs.readFileSync(MIGRATION_036_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 036 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 036 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

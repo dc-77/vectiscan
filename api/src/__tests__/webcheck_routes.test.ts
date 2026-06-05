@@ -310,6 +310,12 @@ describe('WebCheck-Free Route-Level (VEC-176)', () => {
       expect(insert![1][14]).toBe(false);
       expect(insert![1][15]).toBeNull();
       expect(insert![1][3]).toBeNull();
+      // VEC-198/N1: der No-Consent-Pfad schreibt consent_status='not_given'
+      // (nie eingewilligt), NICHT mehr 'declined' (aktive Ablehnung).
+      const insertSql = String(insert![0]);
+      expect(insertSql).toContain("ELSE 'not_given'");
+      expect(insertSql).not.toContain("ELSE 'declined'");
+      expect(insertSql).toContain("ELSE 'none'"); // legal_basis bleibt 'none'
       // ENTSCHEIDEND: ohne Einwilligung wird KEINE Marketing-DOI-Mail versendet
       expect(mockDoiEmail).not.toHaveBeenCalled();
     });
@@ -401,6 +407,27 @@ describe('WebCheck-Free Route-Level (VEC-176)', () => {
       expect(res.statusCode).toBe(429);
       expect(res.json()).toEqual({ success: false, error: 'velocity_limited' });
       expect(mockDoiEmail).not.toHaveBeenCalled();
+    });
+
+    it('VEC-198/N2: Velocity-Achsen (global + recipient_domain) zählen NUR mail-sendende Leads, Rate-Limit-Achsen bleiben breit', async () => {
+      dbState.rateCounts = { email: 0, domain: 0, ip: 0 };
+      dbState.insertedLeadId = VALID_LEAD_ID;
+      await app.inject({
+        method: 'POST',
+        url: '/api/webcheck/start',
+        payload: { email: 'alice@example.com', domain: 'example.com' },
+      });
+      const countQuery = mockQuery.mock.calls.find((c) => String(c[0]).includes('COUNT(*) FILTER'));
+      expect(countQuery).toBeDefined();
+      const sql = String(countQuery![0]);
+      // Mail-Budget-Achsen: auf marketing_consent = TRUE gescopet
+      expect(sql).toMatch(/COUNT\(\*\) FILTER \(WHERE marketing_consent = TRUE\) AS global_count/);
+      expect(sql).toMatch(/recipient_domain_count/);
+      expect(sql).toMatch(/split_part\(email, '@', 2\) = \$4\s*\n?\s*AND marketing_consent = TRUE/);
+      // Abuse-Schutzschicht (E-Mail/Domain/IP) bleibt UNgescopet (breit)
+      expect(sql).toContain("COUNT(*) FILTER (WHERE email = $1) AS email_count");
+      expect(sql).toContain("COUNT(*) FILTER (WHERE domain = $2) AS domain_count");
+      expect(sql).toContain("COUNT(*) FILTER (WHERE ip = $3) AS ip_count");
     });
   });
 

@@ -62,9 +62,9 @@ export const RATE_LIMITS = {
  * anhand der realen Velocity-Metriken nachzuschärfen.
  */
 export const VELOCITY = {
-  /** Gesamt-DOI-Mails über ALLE Leads pro Fenster. */
+  /** Gesamt-DOI-Mails (nur `marketing_consent=TRUE`-Leads) pro Fenster (VEC-198/N2). */
   maxGlobal: 200,
-  /** DOI-Mails an EINE Empfänger-Mail-Domain (z.B. gmail.com) pro Fenster. */
+  /** DOI-Mails an EINE Empfänger-Mail-Domain (z.B. gmail.com) pro Fenster — nur mail-sendende Leads. */
   maxPerRecipientDomain: 25,
 } as const;
 
@@ -226,6 +226,14 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
 
     // Rate-Limit-Fensterzählung pro E-Mail/Domain/IP (AC4) + aggregierte
     // Velocity-Zählung global/Empfänger-Mail-Domain (VEC-173, F2) in EINER Abfrage.
+    //
+    // Die Mail-Amplification-Velocity-Achsen (global + recipient_domain) zählen
+    // NUR mail-sendende Zeilen `marketing_consent = TRUE` (VEC-198/N2): Sie
+    // schützen das DOI-Mail-Budget, also dürfen No-Consent-Scan-only-Leads es
+    // nicht aufzehren und legitime Consent-Signups in ein 429 drosseln
+    // (Self-Throttle/Conversion-Verlust). Die per-Bezeichner-Rate-Limits
+    // (E-Mail/Domain/IP, AC4) bleiben BREIT — sie sind die Abuse-Schutzschicht
+    // und gelten unabhängig vom Mailversand.
     const counts = await query<{
       email_count: string;
       domain_count: string;
@@ -237,8 +245,9 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
          COUNT(*) FILTER (WHERE email = $1) AS email_count,
          COUNT(*) FILTER (WHERE domain = $2) AS domain_count,
          COUNT(*) FILTER (WHERE ip = $3) AS ip_count,
-         COUNT(*) AS global_count,
-         COUNT(*) FILTER (WHERE split_part(email, '@', 2) = $4) AS recipient_domain_count
+         COUNT(*) FILTER (WHERE marketing_consent = TRUE) AS global_count,
+         COUNT(*) FILTER (WHERE split_part(email, '@', 2) = $4
+                          AND marketing_consent = TRUE) AS recipient_domain_count
        FROM webcheck_leads
        WHERE created_at > NOW() - INTERVAL '${win}'`,
       [email, domain, ip, recipientDomain(email)],
@@ -282,7 +291,11 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
     // Erbringung entkoppelt. Nur bei `marketing_consent === true` wird ein
     // DOI-Token erzeugt, consent_status='pending' gesetzt und die DOI-Mail
     // versendet. Ohne Einwilligung entsteht der Lead allein für den Scan
-    // (consent_status='declined', legal_basis='none'), keine Marketing-Mail.
+    // (consent_status='not_given', legal_basis='none'), keine Marketing-Mail.
+    // `not_given` (VEC-198/N1) statt `declined`: eine leere Opt-in-Box ist „nie
+    // eingewilligt", keine aktive Ablehnung — `declined` bleibt der echten
+    // Negativ-Aktion (DOI nicht in Frist / Opt-out) vorbehalten. Verhalten
+    // unverändert: ohne `confirmed` keine Marketing-Verarbeitung.
     const { marketingConsent, consentTextVersion } = parseConsent(body);
     const doiToken = marketingConsent ? crypto.randomUUID() : null;
 
@@ -296,7 +309,7 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
           CASE WHEN $15::boolean THEN NOW() ELSE NULL END,
           $5,$6,$7,$8,$9,$10,$11,$12,$13,$14,
           $15,$16,
-          CASE WHEN $15::boolean THEN 'pending' ELSE 'declined' END,
+          CASE WHEN $15::boolean THEN 'pending' ELSE 'not_given' END,
           CASE WHEN $15::boolean THEN 'consent_doi' ELSE 'none' END)
        RETURNING id`,
       [
