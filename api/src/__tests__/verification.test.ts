@@ -61,6 +61,17 @@ jest.mock('../services/VerificationService', () => {
   };
 });
 
+// VEC-175: verifyFile/verifyMetaTag nutzen jetzt den SSRF-gehärteten safeFetch
+// statt global.fetch. Wir mocken nur safeFetch und behalten die echte
+// IP-Block-Logik (isBlockedAddress etc.) über requireActual.
+jest.mock('../lib/ssrf-guard', () => {
+  const actual = jest.requireActual('../lib/ssrf-guard');
+  return {
+    ...actual,
+    safeFetch: jest.fn(),
+  };
+});
+
 jest.mock('../lib/audit', () => ({
   audit: jest.fn().mockResolvedValue(undefined),
 }));
@@ -94,6 +105,10 @@ const mockScanQueueAdd = scanQueue.add as jest.MockedFunction<typeof scanQueue.a
 
 const mockFetch = jest.fn() as jest.MockedFunction<typeof global.fetch>;
 global.fetch = mockFetch;
+
+// VEC-175: safeFetch-Mock für verifyFile/verifyMetaTag (Resolve-and-Pin-Wrapper).
+const { safeFetch } = jest.requireMock('../lib/ssrf-guard') as { safeFetch: jest.Mock };
+const mockSafeFetch = safeFetch;
 
 const { verifyAll: mockVerifyAll } = jest.requireMock('../services/VerificationService') as { verifyAll: jest.Mock };
 
@@ -152,30 +167,36 @@ describe('VerificationService', () => {
     const token = 'vectiscan-verify-abc123def456';
 
     it('should return verified:true when file contains the token', async () => {
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve(token) } as Response);
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve(token) });
       const result = await realVerifyFile('example.com', token);
       expect(result).toEqual({ verified: true, method: 'file' });
-      expect(mockFetch).toHaveBeenCalledWith(
+      expect(mockSafeFetch).toHaveBeenCalledWith(
         'https://example.com/.well-known/vectiscan-verify.txt',
-        expect.objectContaining({ signal: expect.any(AbortSignal) }),
       );
     });
 
     it('should handle whitespace around token', async () => {
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve(`  ${token}  \n`) } as Response);
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve(`  ${token}  \n`) });
       const result = await realVerifyFile('example.com', token);
       expect(result).toEqual({ verified: true, method: 'file' });
     });
 
     it('should return verified:false when content does not match', async () => {
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve('wrong') } as Response);
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve('wrong') });
       const result = await realVerifyFile('example.com', token);
       expect(result).toEqual({ verified: false, method: 'file' });
     });
 
     it('should return verified:false on network error', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('AbortError'));
+      mockSafeFetch.mockRejectedValueOnce(new Error('AbortError'));
       const result = await realVerifyFile('example.com', token);
+      expect(result).toEqual({ verified: false, method: 'file' });
+    });
+
+    it('should return verified:false when target resolves to a blocked (internal) IP', async () => {
+      // VEC-175: safeFetch wirft SsrfBlockedError → verifyFile fail-closed.
+      mockSafeFetch.mockRejectedValueOnce(new Error('Geblockte Zieladresse: 169.254.169.254'));
+      const result = await realVerifyFile('rebind.evil.example', token);
       expect(result).toEqual({ verified: false, method: 'file' });
     });
   });
@@ -185,33 +206,33 @@ describe('VerificationService', () => {
 
     it('should return verified:true with double quotes', async () => {
       const html = `<html><head><meta name="vectiscan-verify" content="${token}"></head></html>`;
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve(html) } as Response);
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve(html) });
       const result = await realVerifyMetaTag('example.com', token);
       expect(result).toEqual({ verified: true, method: 'meta_tag' });
     });
 
     it('should return verified:true with single quotes', async () => {
       const html = `<html><head><meta name='vectiscan-verify' content='${token}'></head></html>`;
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve(html) } as Response);
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve(html) });
       const result = await realVerifyMetaTag('example.com', token);
       expect(result).toEqual({ verified: true, method: 'meta_tag' });
     });
 
     it('should return verified:false when meta tag missing', async () => {
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve('<html></html>') } as Response);
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve('<html></html>') });
       const result = await realVerifyMetaTag('example.com', token);
       expect(result).toEqual({ verified: false, method: 'meta_tag' });
     });
 
     it('should return verified:false when content wrong', async () => {
       const html = '<meta name="vectiscan-verify" content="wrong-token">';
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve(html) } as Response);
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve(html) });
       const result = await realVerifyMetaTag('example.com', token);
       expect(result).toEqual({ verified: false, method: 'meta_tag' });
     });
 
     it('should return verified:false on fetch error', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Timeout'));
+      mockSafeFetch.mockRejectedValueOnce(new Error('Timeout'));
       const result = await realVerifyMetaTag('example.com', token);
       expect(result).toEqual({ verified: false, method: 'meta_tag' });
     });
@@ -222,16 +243,16 @@ describe('VerificationService', () => {
 
     it('should return first successful result', async () => {
       mockResolveTxt.mockResolvedValueOnce([[token]]);
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve('wrong') } as Response);
-      mockFetch.mockResolvedValueOnce({ text: () => Promise.resolve('<html></html>') } as Response);
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve('wrong') });
+      mockSafeFetch.mockResolvedValueOnce({ text: () => Promise.resolve('<html></html>') });
       const result = await realVerifyAll('example.com', token);
       expect(result.verified).toBe(true);
     });
 
     it('should return { verified: false, method: null } when all fail', async () => {
       mockResolveTxt.mockRejectedValueOnce(new Error('ENOTFOUND'));
-      mockFetch.mockRejectedValueOnce(new Error('error'));
-      mockFetch.mockRejectedValueOnce(new Error('error'));
+      mockSafeFetch.mockRejectedValueOnce(new Error('error'));
+      mockSafeFetch.mockRejectedValueOnce(new Error('error'));
       const result = await realVerifyAll('example.com', token);
       expect(result).toEqual({ verified: false, method: null });
     });
