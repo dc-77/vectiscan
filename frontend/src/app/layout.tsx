@@ -7,6 +7,17 @@ import { ToastProvider } from '@/components/Toast';
 import CookieConsent from '@/components/CookieConsent';
 import AnalyticsBeacon from '@/components/AnalyticsBeacon';
 
+/**
+ * VEC-186: Erzwingt dynamisches Rendering app-weit. Die Nonce-basierte CSP
+ * (siehe `middleware.ts`) braucht ein pro Request frisch in die Inline-/
+ * Hydration-Scripts injiziertes Nonce. Statisch prerenderte Seiten könnten kein
+ * Request-Nonce tragen und würden unter `script-src 'nonce-…'` (ohne
+ * 'unsafe-inline') brechen. VectiScan läuft als internes Tool hinter Traefik
+ * ohne CDN, daher ist der Static→Dynamic-Kostenunterschied gering und die
+ * Entscheidung umkehrbar.
+ */
+export const dynamic = 'force-dynamic';
+
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
