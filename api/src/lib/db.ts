@@ -39,6 +39,7 @@ const MIGRATION_029_PATH = path.join(__dirname, '..', 'migrations', '029_finding
 const MIGRATION_030_PATH = path.join(__dirname, '..', 'migrations', '030_stripe_payment_flow.sql');
 const MIGRATION_031_PATH = path.join(__dirname, '..', 'migrations', '031_stripe_followup_hardening.sql');
 const MIGRATION_032_PATH = path.join(__dirname, '..', 'migrations', '032_webcheck_leads.sql');
+const MIGRATION_033_PATH = path.join(__dirname, '..', 'migrations', '033_email_suppressions.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -461,6 +462,24 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 032 FAILED (continuing without it):', err);
+  }
+
+  // Migration 033 (VEC-188): E-Mail-Suppression-Liste + Resend-Webhook-Idempotenz-
+  // Ledger (Reputationsschutz aus VEC-173/F2). Additiv, idempotent.
+  try {
+    const suppressions033Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables WHERE table_name = 'email_suppressions'
+      ) AS exists
+    `);
+    if (!suppressions033Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 033: email_suppressions');
+      const migrationSql = fs.readFileSync(MIGRATION_033_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 033 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 033 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

@@ -1,7 +1,44 @@
 import { Resend } from 'resend';
 import pino from 'pino';
+import { query } from './db.js';
+import { audit } from './audit.js';
 
 const log = pino({ name: 'email' });
+
+/**
+ * Steht die Empfänger-Adresse auf der Suppression-Liste (VEC-188)?
+ *
+ * Gespeist aus Resend Bounce-/Complaint-Webhooks (`routes/resend-webhook.ts`).
+ * FAIL-OPEN: schlägt der Lookup fehl (DB-Hiccup), wird gesendet — eine
+ * unterdrückte legitime Transaktionsmail wäre schlimmer als ein Extra-Versand
+ * an eine eventuell tote Adresse. Suppression ist Reputationsschutz, kein
+ * Security-Gate.
+ */
+export async function isEmailSuppressed(email: string): Promise<boolean> {
+  try {
+    const res = await query<{ email: string }>(
+      'SELECT email FROM email_suppressions WHERE email = $1 LIMIT 1',
+      [email.trim().toLowerCase()],
+    );
+    return res.rows.length > 0;
+  } catch (err) {
+    log.error({ err, email }, 'Suppression lookup failed — failing OPEN (send proceeds)');
+    return false;
+  }
+}
+
+/**
+ * Pre-Send-Gate: true = Empfänger ist suppressed → Versand überspringen.
+ * Schreibt ein Audit-Event für die Forensik (warum kam keine Mail an?).
+ */
+async function skipIfSuppressed(to: string): Promise<boolean> {
+  if (await isEmailSuppressed(to)) {
+    log.info({ to }, 'Recipient on suppression list — email skipped');
+    await audit({ orderId: null, action: 'webcheck.suppression_skipped', details: { to } });
+    return true;
+  }
+  return false;
+}
 
 let resend: Resend | null = null;
 
@@ -40,6 +77,7 @@ export async function sendScanCompleteEmail(
 ): Promise<void> {
   const client = getClient();
   if (!client) return;
+  if (await skipIfSuppressed(to)) return;
 
   const downloadUrl = `${getApiUrl()}/api/orders/${orderId}/report?download_token=${downloadToken}`;
   const dashboardUrl = `${getFrontendUrl()}/dashboard`;
@@ -99,6 +137,7 @@ export async function sendWebcheckDoiEmail(
 ): Promise<void> {
   const client = getClient();
   if (!client) return;
+  if (await skipIfSuppressed(to)) return;
 
   const confirmUrl = `${getApiUrl()}/api/webcheck/doi/confirm?token=${doiToken}`;
 
@@ -153,6 +192,7 @@ export async function sendPasswordResetEmail(
 ): Promise<void> {
   const client = getClient();
   if (!client) return;
+  if (await skipIfSuppressed(to)) return;
 
   const resetUrl = `${getFrontendUrl()}/reset-password?token=${resetToken}`;
 

@@ -14,6 +14,7 @@ import { scheduleRoutes } from './routes/schedules.js';
 import { subscriptionRoutes } from './routes/subscriptions.js';
 import { adminReviewRoutes } from './routes/admin-review.js';
 import { webhookRoutes } from './routes/webhooks.js';
+import { resendWebhookRoutes } from './routes/resend-webhook.js';
 import { startScheduler } from './lib/scheduler.js';
 
 export function buildServer() {
@@ -52,6 +53,8 @@ export function buildServer() {
   server.register(adminReviewRoutes);
   // Encapsulated plugin: nutzt eigenen Buffer-Body-Parser fuer Stripe-Signatur.
   server.register(webhookRoutes);
+  // Encapsulated plugin: eigener Buffer-Body-Parser fuer die Resend/Svix-Signatur (VEC-188).
+  server.register(resendWebhookRoutes);
 
   return server;
 }

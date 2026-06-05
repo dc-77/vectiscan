@@ -62,7 +62,9 @@ export type AuditAction =
   | 'webcheck.velocity_alert'
   | 'webcheck.scan_requested'
   | 'webcheck.free_scan_window_hit'
-  | 'webcheck.doi_confirmed';
+  | 'webcheck.doi_confirmed'
+  | 'webcheck.email_suppressed'
+  | 'webcheck.suppression_skipped';
 
 interface AuditEntry {
   orderId?: string | null;
