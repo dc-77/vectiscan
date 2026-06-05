@@ -123,7 +123,19 @@ export async function handleReportComplete(orderId: string): Promise<void> {
         continue;
       }
       try {
-        await sendScanCompleteEmail(email, domain, orderId, downloadToken);
+        const sent = await sendScanCompleteEmail(email, domain, orderId, downloadToken);
+        // Fail-Securely (VEC-227): den `report.notified`-Audit NUR bei von
+        // Resend bestaetigter Annahme schreiben. Bei transientem Fehler
+        // (429/5xx/Netzwerk -> sent=false) bleibt kein Audit zurueck, sodass
+        // der bestehende Regenerate/Retry-Pfad denselben Empfaenger erneut
+        // anmailt (bewusst at-least-once; Resend-Idempotency-Key dedupt echte
+        // Doppelsends ~24h). Ohne diesen Guard wuerde ein geschluckter
+        // Sendefehler den Empfaenger dauerhaft als notified markieren und die
+        // Report-Mail still verlieren.
+        if (!sent) {
+          logger?.warn({ orderId, email }, 'Scan-complete email not accepted — leaving unnotified for retry');
+          continue;
+        }
         // Audit-Log: persist the dispatch event (PA-4 AC#3) so report
         // delivery is verifiable beyond the application log and serves as
         // the idempotency marker for regenerates/retries.
