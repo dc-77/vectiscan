@@ -8,37 +8,61 @@ import { createSubscription, TargetEntry } from '@/lib/api';
 import { getTier, formatEur } from '@/lib/pricing';
 import { isLoggedIn, getUser } from '@/lib/auth';
 import TargetInput from '@/components/TargetInput';
+// VEC-289: Paket-Identitaet/Name/Untertitel/Farbe aus dem kanonischen Katalog (SSoT).
+import { getPackage, type PackageKey } from '@/lib/catalog.generated';
 
 const MAX_TARGETS = 10;
 
-const PACKAGES = [
-  {
-    id: 'perimeter',
-    name: 'Perimeter-Scan',
-    subtitle: 'Vollständige Sicherheitsanalyse Ihrer Angriffsoberfläche',
-    recommended: true,
-    color: '#38BDF8',
-    features: [
-      'Vollständige Angriffsoberflächen-Analyse',
-      'Port-Scanning, Web-Schwachstellen, DNS, E-Mail-Security',
-      'PTES-konformer Report mit Executive Summary',
-      'Priorisierter Massnahmenplan mit Zeitrahmen',
-    ],
-  },
-  {
-    id: 'insurance',
-    name: 'Cyberversicherung',
-    subtitle: 'Nachweis fur Ihren Versicherungsantrag',
-    recommended: false,
-    color: '#34D399',
-    features: [
-      'Alles aus dem Perimeter-Scan',
-      '10-Punkte Versicherungs-Fragebogen',
-      'Risk-Score und Ransomware-Indikator',
-      'Nachweis fur Cyberversicherungsantrag',
-    ],
-  },
-] as const;
+// Kuratierte Verkaufs-Bullets je Paket (Copy-Domaene, T7/Belfort). Welche Pakete
+// der Wizard anbietet bzw. Name/Untertitel/Preis kommen aus dem Katalog.
+const CURATED_FEATURES: Record<string, string[]> = {
+  webcheck: [
+    'SSL/TLS, HTTP-Header, CMS-Erkennung',
+    'E-Mail-Security (SPF/DKIM/DMARC)',
+    'Basis-Port-Scan (Top 100)',
+    'Ampelbewertung — sofort einsatzbereit',
+  ],
+  perimeter: [
+    'Vollständige Angriffsoberflächen-Analyse',
+    'Port-Scanning, Web-Schwachstellen, DNS, E-Mail-Security',
+    'PTES-konformer Report mit Executive Summary',
+    'Priorisierter Maßnahmenplan mit Zeitrahmen',
+  ],
+  compliance: [
+    'Alles aus dem Perimeter-Scan',
+    '§30 BSIG-Mapping (NIS2)',
+    'BSI-Grundschutz-Referenzen',
+    'Audit-Trail für Behörden und Prüfer',
+  ],
+  supplychain: [
+    'Alles aus dem Perimeter-Scan',
+    'ISO 27001 Annex A Mapping',
+    'Lieferanten-Nachweis-Dokument',
+    'Auftraggeber-Kapitel im Report',
+  ],
+  insurance: [
+    'Alles aus dem Perimeter-Scan',
+    '10-Punkte Versicherungs-Fragebogen',
+    'Risk-Score und Ransomware-Indikator',
+    'Nachweis für Cyberversicherungsantrag',
+  ],
+};
+
+// VEC-290: Alle 5 Pakete aus dem Katalog. WebCheck (free) leitet direkt
+// zu /welcome weiter — kein Subscription-Wizard nötig.
+const WIZARD_PACKAGE_KEYS: PackageKey[] = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'];
+
+const PACKAGES = WIZARD_PACKAGE_KEYS.map((key) => {
+  const def = getPackage(key)!;
+  return {
+    id: def.key,
+    name: def.marketingName,
+    subtitle: def.subtitle,
+    recommended: def.sellability === 'self_service',
+    color: def.accentColor,
+    features: CURATED_FEATURES[def.key] ?? def.reportFocus,
+  };
+});
 
 const INTERVALS = [
   { id: 'weekly', label: 'Wöchentlich', desc: 'Scan jede Woche' },
@@ -175,20 +199,30 @@ export default function SubscribePage() {
         {step === 1 && (
           <div className="space-y-3">
             <p className="text-sm text-gray-400">Wählen Sie Ihr Scan-Paket:</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {PACKAGES.map((pkg) => {
                 const isSelected = selectedPackage === pkg.id;
+                const isFree = pkg.id === 'webcheck';
                 return (
                   <button key={pkg.id} onClick={() => setSelectedPackage(pkg.id)}
                     className={`text-left p-5 rounded-lg border-2 transition-all ${
                       isSelected
-                        ? 'border-[#2DD4BF] bg-[#2DD4BF]/5'
+                        ? 'bg-[#1e293b]'
                         : 'border-gray-800 bg-[#1e293b] hover:bg-[#253347] hover:border-gray-700'
-                    }`}>
+                    }`}
+                    style={isSelected ? { borderColor: pkg.color } : undefined}>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-sm font-semibold text-white">{pkg.name}</span>
                       {pkg.recommended && (
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/20 text-[#2DD4BF]">Empfohlen</span>
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+                          style={{ backgroundColor: `${pkg.color}25`, color: pkg.color }}>
+                          Empfohlen
+                        </span>
+                      )}
+                      {isFree && (
+                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-700 text-gray-400">
+                          Kostenlos
+                        </span>
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mb-3">{pkg.subtitle}</p>
@@ -344,12 +378,21 @@ export default function SubscribePage() {
             <div className="flex items-center gap-3">
               {!canAdvance() && step === 2 && <span className="text-xs" style={{ color: '#F59E0B' }}>Mindestens ein gültiges Ziel eingeben</span>}
               {!canAdvance() && step === 3 && <span className="text-xs" style={{ color: '#F59E0B' }}>Mindestens eine E-Mail-Adresse eingeben</span>}
-              <button onClick={() => { if (canAdvance()) setStep(step + 1); }}
-                disabled={!canAdvance()}
-                className="disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-2.5 rounded-lg transition-colors text-sm"
-                style={{ backgroundColor: canAdvance() ? '#2DD4BF' : undefined, color: canAdvance() ? '#0F172A' : undefined }}>
-                Weiter
-              </button>
+              {/* WebCheck ist kostenlos und braucht keinen Subscription-Wizard */}
+              {step === 1 && selectedPackage === 'webcheck' ? (
+                <Link href="/welcome"
+                  className="font-medium px-6 py-2.5 rounded-lg transition-colors text-sm text-center"
+                  style={{ backgroundColor: '#38BDF8', color: '#0F172A' }}>
+                  Kostenlos starten
+                </Link>
+              ) : (
+                <button onClick={() => { if (canAdvance()) setStep(step + 1); }}
+                  disabled={!canAdvance()}
+                  className="disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-2.5 rounded-lg transition-colors text-sm"
+                  style={{ backgroundColor: canAdvance() ? '#2DD4BF' : undefined, color: canAdvance() ? '#0F172A' : undefined }}>
+                  Weiter
+                </button>
+              )}
             </div>
           ) : (
             <button onClick={handleSubmit} disabled={submitting}

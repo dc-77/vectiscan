@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { getTier, formatEur } from '@/lib/pricing';
+import { PACKAGE_CATALOG, type PackageDef } from '@/lib/catalog.generated';
 
 const C = {
   slate: '#0F172A',
   slateLight: '#1E293B',
   teal: '#2DD4BF',
-  tealDark: '#14B8A6',
   offWhite: '#F8FAFC',
   muted: '#94A3B8',
   mutedLight: '#CBD5E1',
@@ -13,20 +13,23 @@ const C = {
   borderSubtle: 'rgba(30,58,95,0.35)',
 };
 
-const FEATURES = [
-  { name: 'Port-Scanning & Service-Erkennung', perimeter: true, insurance: true },
-  { name: 'DNS-Enumeration & Subdomain-Analyse', perimeter: true, insurance: true },
-  { name: 'Web-Schwachstellen-Scan (OWASP ZAP)', perimeter: true, insurance: true },
-  { name: 'SSL/TLS-Konfigurationsanalyse', perimeter: true, insurance: true },
-  { name: 'E-Mail-Security (SPF, DKIM, DMARC)', perimeter: true, insurance: true },
-  { name: 'HTTP-Security-Header-Prüfung', perimeter: true, insurance: true },
-  { name: 'KI-gestutzte Korrelation & FP-Filter', perimeter: true, insurance: true },
-  { name: 'Executive Summary + Massnahmenplan', perimeter: true, insurance: true },
-  { name: 'NIS2 / BSI-Compliance-Mapping', perimeter: true, insurance: true },
-  { name: 'Threat Intelligence (NVD, EPSS, CISA KEV)', perimeter: true, insurance: true },
-  { name: 'Versicherungs-Fragebogen (10 Punkte)', perimeter: false, insurance: true },
-  { name: 'Risk-Score & Ransomware-Indikator', perimeter: false, insurance: true },
-  { name: 'Versicherungskonformer Nachweis-Report', perimeter: false, insurance: true },
+// Feature columns for comparison table: [label, webcheck, perimeter, compliance, supplychain, insurance]
+const FEATURES: [string, boolean, boolean, boolean, boolean, boolean][] = [
+  ['E-Mail-Security (SPF/DKIM/DMARC)', true, true, true, true, true],
+  ['SSL/TLS-Konfigurationsanalyse', true, true, true, true, true],
+  ['HTTP-Security-Header-Prüfung', true, true, true, true, true],
+  ['Port-Scanning & Service-Erkennung', false, true, true, true, true],
+  ['Web-Schwachstellen (OWASP ZAP)', false, true, true, true, true],
+  ['DNS-Enumeration & Subdomain-Analyse', false, true, true, true, true],
+  ['KI-Korrelation & FP-Filter', false, true, true, true, true],
+  ['Executive Summary + Maßnahmenplan', false, true, true, true, true],
+  ['Threat Intel (NVD, EPSS, CISA KEV)', false, true, true, true, true],
+  ['NIS2 / §30 BSIG-Mapping', false, false, true, false, false],
+  ['BSI-Grundschutz-Referenzen', false, false, true, false, false],
+  ['ISO 27001 Annex A', false, false, false, true, false],
+  ['Lieferanten-Nachweis-Dokument', false, false, false, true, false],
+  ['Versicherungs-Fragebogen (10 Pkt.)', false, false, false, false, true],
+  ['Risk-Score & Ransomware-Indikator', false, false, false, false, true],
 ];
 
 function Check() {
@@ -36,7 +39,25 @@ function Dash() {
   return <span style={{ color: `${C.muted}40` }}>—</span>;
 }
 
+function ctaFor(pkg: PackageDef) {
+  if (pkg.sellability === 'free') return { label: 'Kostenlosen WebCheck starten', href: '/welcome', primary: true };
+  if (pkg.sellability === 'self_service') return { label: 'Jetzt kaufen', href: '/subscribe', primary: true };
+  return { label: 'Angebot anfragen', href: '/contact', primary: false };
+}
+
+function priceFor(pkg: PackageDef): { main: string; note: string } {
+  const tier = getTier(pkg.key);
+  if (pkg.sellability === 'free') return { main: 'Kostenlos', note: 'ohne Kreditkarte · kein Abo' };
+  if (pkg.sellability === 'self_service' && tier?.priceEur != null) {
+    return { main: `${formatEur(tier.priceEur)} / Jahr`, note: tier.billingNote };
+  }
+  return { main: 'Auf Anfrage', note: tier?.billingNote ?? 'Jahresabo — individuelle Preisgestaltung' };
+}
+
 export default function PricingPage() {
+  const freeAndSelfService = PACKAGE_CATALOG.filter(p => p.sellability !== 'sales_assisted');
+  const salesAssisted = PACKAGE_CATALOG.filter(p => p.sellability === 'sales_assisted');
+
   return (
     <main className="flex-1">
       {/* Hero */}
@@ -46,118 +67,126 @@ export default function PricingPage() {
             Pakete &amp; Preise
           </h1>
           <p className="text-base max-w-2xl mx-auto" style={{ color: C.muted }}>
-            Wählen Sie das passende Paket für Ihre Anforderungen.
-            Bis zu 30 Domains pro Abo, automatische Scans, geprüfte Reports.
+            Fünf Pakete — vom kostenlosen Schnell-Check bis zum Compliance- und Versicherungsnachweis.
           </p>
-        </div>
-      </section>
-
-      {/* WebCheck Teaser */}
-      <section className="pb-12">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="rounded-2xl p-6 sm:p-8 text-center" style={{ backgroundColor: C.slateLight, border: `1px solid ${C.border}` }}>
-            <p className="text-xs uppercase tracking-wider mb-3 font-medium" style={{ color: C.teal }}>Kostenlos testen</p>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: C.offWhite }}>WebCheck — Ihr erster Sicherheits-Scan</h2>
-            <p className="text-sm mb-6 max-w-lg mx-auto" style={{ color: C.muted }}>
-              Schnell-Scan Ihrer Domain in ~15 Minuten. DNS, E-Mail-Security und grundlegende Schwachstellen — kostenlos und unverbindlich.
-            </p>
-            <Link href="/welcome" className="inline-block px-7 py-3 rounded-lg text-sm font-semibold transition-all"
-              style={{ backgroundColor: C.teal, color: C.slate }}>
-              Kostenlosen WebCheck starten
-            </Link>
-          </div>
         </div>
       </section>
 
       {/* Package Cards */}
       <section id="pakete" className="pb-16">
-        <div className="max-w-4xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="max-w-5xl mx-auto px-6 space-y-6">
 
-          {/* Perimeter */}
-          <div className="rounded-xl p-7 relative flex flex-col"
-            style={{ backgroundColor: C.slateLight, border: `2px solid ${C.border}` }}>
-            <span className="absolute -top-3 left-6 text-[10px] font-semibold px-3 py-1 rounded-full"
-              style={{ backgroundColor: `${C.teal}20`, color: C.teal }}>Empfohlen</span>
-            <h2 className="text-xl font-semibold mt-2 mb-1" style={{ color: C.offWhite }}>Perimeter-Scan</h2>
-            <p className="text-sm mb-6" style={{ color: C.muted }}>
-              Vollständige Sicherheitsanalyse Ihrer externen IT-Infrastruktur
-            </p>
-            <ul className="space-y-2.5 mb-8 flex-1">
-              {['Bis zu 30 Domains / IPs / Subnetze', 'Wöchentliche, monatliche oder quartalsweise Scans',
-                '3 Re-Scans pro Jahr inklusive', 'Manuelle Qualitätsprüfung jedes Reports',
-                'PDF-Report per E-Mail an Ihr Team', 'NIS2 & BSI-Compliance-Mapping',
-              ].map(f => (
-                <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.mutedLight }}>
-                  <span className="mt-0.5" style={{ color: C.teal }}>&#x2713;</span> {f}
-                </li>
-              ))}
-            </ul>
-            <div className="border-t pt-5" style={{ borderColor: C.borderSubtle }}>
-              <p className="mb-1">
-                <span className="text-3xl font-semibold" style={{ color: C.offWhite }}>
-                  {formatEur(getTier('perimeter')!.priceEur!)}
-                </span>
-                <span className="text-sm ml-1" style={{ color: C.muted }}>/ Jahr</span>
-              </p>
-              <p className="text-xs mb-4" style={{ color: C.muted }}>{getTier('perimeter')!.billingNote}</p>
-              <Link href="/subscribe"
-                className="block w-full text-center px-5 py-3 rounded-lg text-sm font-medium transition-all"
-                style={{ backgroundColor: C.teal, color: C.slate }}>
-                Jetzt kaufen
-              </Link>
-            </div>
+          {/* Free + Self-service row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {freeAndSelfService.map(pkg => {
+              const cta = ctaFor(pkg);
+              const price = priceFor(pkg);
+              const isSelfService = pkg.sellability === 'self_service';
+              return (
+                <div key={pkg.key} className="rounded-xl p-7 relative flex flex-col"
+                  style={{
+                    backgroundColor: C.slateLight,
+                    border: isSelfService ? `2px solid ${pkg.accentColor}40` : `1px solid ${C.borderSubtle}`,
+                  }}>
+                  {pkg.badge && (
+                    <span className="absolute -top-3 left-6 text-[10px] font-semibold px-3 py-1 rounded-full"
+                      style={{ backgroundColor: `${pkg.accentColor}25`, color: pkg.accentColor }}>
+                      {pkg.badge}
+                    </span>
+                  )}
+                  <h2 className="text-xl font-semibold mt-2 mb-1" style={{ color: C.offWhite }}>{pkg.marketingName}</h2>
+                  <p className="text-sm mb-6" style={{ color: C.muted }}>{pkg.subtitle}</p>
+                  <ul className="space-y-2.5 mb-8 flex-1">
+                    {pkg.reportFocus.map(f => (
+                      <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.mutedLight }}>
+                        <span className="mt-0.5" style={{ color: pkg.accentColor }}>&#x2713;</span> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="border-t pt-5" style={{ borderColor: C.borderSubtle }}>
+                    <p className="mb-1">
+                      <span className="text-3xl font-semibold" style={{ color: C.offWhite }}>{price.main}</span>
+                    </p>
+                    <p className="text-xs mb-4" style={{ color: C.muted }}>{price.note}</p>
+                    <Link href={cta.href}
+                      className="block w-full text-center px-5 py-3 rounded-lg text-sm font-medium transition-all"
+                      style={cta.primary
+                        ? { backgroundColor: pkg.accentColor, color: C.slate }
+                        : { color: pkg.accentColor, border: `1px solid ${pkg.accentColor}40` }}>
+                      {cta.label}
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Insurance */}
-          <div className="rounded-xl p-7 flex flex-col"
-            style={{ backgroundColor: C.slateLight, border: `1px solid ${C.borderSubtle}` }}>
-            <h2 className="text-xl font-semibold mt-2 mb-1" style={{ color: C.offWhite }}>Cyberversicherung</h2>
-            <p className="text-sm mb-6" style={{ color: C.muted }}>
-              Nachweis-Report für Ihren Versicherungsantrag
-            </p>
-            <ul className="space-y-2.5 mb-8 flex-1">
-              {['Alles aus dem Perimeter-Scan', '10-Punkte Versicherungs-Fragebogen',
-                'Risk-Score & Ransomware-Indikator', 'Versicherungskonformer Nachweis',
-                'Direkt einreichbar beim Versicherer', 'Regelmäßige Aktualisierung für Verlängerung',
-              ].map(f => (
-                <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.mutedLight }}>
-                  <span className="mt-0.5" style={{ color: C.teal }}>&#x2713;</span> {f}
-                </li>
-              ))}
-            </ul>
-            <div className="border-t pt-5" style={{ borderColor: C.borderSubtle }}>
-              <p className="text-xs mb-4" style={{ color: C.muted }}>Jahresabo — individuelle Preisgestaltung</p>
-              <Link href="mailto:support@vectigal.tech?subject=Angebot%20Cyberversicherung&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20VectiScan%20Cyberversicherungs-Report.%0A%0AFirma%3A%20%0ADomains%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
-                className="block w-full text-center px-5 py-3 rounded-lg text-sm font-medium transition-colors"
-                style={{ color: C.teal, border: `1px solid ${C.teal}40` }}>
-                Angebot anfordern
-              </Link>
-            </div>
+          {/* Sales-assisted row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {salesAssisted.map(pkg => {
+              const cta = ctaFor(pkg);
+              const price = priceFor(pkg);
+              return (
+                <div key={pkg.key} className="rounded-xl p-7 flex flex-col"
+                  style={{ backgroundColor: C.slateLight, border: `1px solid ${C.borderSubtle}` }}>
+                  {pkg.badge && (
+                    <span className="inline-block self-start mb-3 text-[10px] font-semibold px-2.5 py-0.5 rounded-full"
+                      style={{ backgroundColor: `${pkg.accentColor}20`, color: pkg.accentColor }}>
+                      {pkg.badge}
+                    </span>
+                  )}
+                  <h2 className="text-lg font-semibold mb-1" style={{ color: C.offWhite }}>{pkg.marketingName}</h2>
+                  <p className="text-sm mb-5" style={{ color: C.muted }}>{pkg.subtitle}</p>
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {pkg.reportFocus.map(f => (
+                      <li key={f} className="flex items-start gap-2 text-sm" style={{ color: C.mutedLight }}>
+                        <span className="mt-0.5" style={{ color: pkg.accentColor }}>&#x2713;</span> {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="border-t pt-4" style={{ borderColor: C.borderSubtle }}>
+                    <p className="text-xs mb-3" style={{ color: C.muted }}>{price.note}</p>
+                    <Link href={cta.href}
+                      className="block w-full text-center px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+                      style={{ color: pkg.accentColor, border: `1px solid ${pkg.accentColor}40` }}>
+                      {cta.label}
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Feature Comparison Table */}
       <section className="py-16" style={{ backgroundColor: `${C.slateLight}40` }}>
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-xl font-semibold text-center mb-8" style={{ color: C.offWhite }}>
             Funktionsvergleich
           </h2>
-          <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${C.borderSubtle}` }}>
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-xl" style={{ border: `1px solid ${C.borderSubtle}` }}>
+            <table className="w-full text-sm" style={{ minWidth: '680px' }}>
               <thead>
                 <tr style={{ backgroundColor: C.slateLight }}>
                   <th className="text-left py-3 px-5 font-medium" style={{ color: C.muted }}>Funktion</th>
-                  <th className="text-center py-3 px-4 font-medium" style={{ color: C.teal }}>Perimeter</th>
-                  <th className="text-center py-3 px-4 font-medium" style={{ color: C.teal }}>Versicherung</th>
+                  {PACKAGE_CATALOG.map(pkg => (
+                    <th key={pkg.key} className="text-center py-3 px-3 font-medium text-xs"
+                      style={{ color: pkg.accentColor }}>
+                      {pkg.marketingName}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {FEATURES.map((f, i) => (
-                  <tr key={f.name} style={{ backgroundColor: i % 2 === 0 ? C.slate : `${C.slateLight}60` }}>
-                    <td className="py-2.5 px-5 text-xs" style={{ color: C.mutedLight }}>{f.name}</td>
-                    <td className="text-center py-2.5 px-4">{f.perimeter ? <Check /> : <Dash />}</td>
-                    <td className="text-center py-2.5 px-4">{f.insurance ? <Check /> : <Dash />}</td>
+                {FEATURES.map(([label, wc, per, comp, sc, ins], i) => (
+                  <tr key={label} style={{ backgroundColor: i % 2 === 0 ? C.slate : `${C.slateLight}60` }}>
+                    <td className="py-2.5 px-5 text-xs" style={{ color: C.mutedLight }}>{label}</td>
+                    <td className="text-center py-2.5 px-3">{wc ? <Check /> : <Dash />}</td>
+                    <td className="text-center py-2.5 px-3">{per ? <Check /> : <Dash />}</td>
+                    <td className="text-center py-2.5 px-3">{comp ? <Check /> : <Dash />}</td>
+                    <td className="text-center py-2.5 px-3">{sc ? <Check /> : <Dash />}</td>
+                    <td className="text-center py-2.5 px-3">{ins ? <Check /> : <Dash />}</td>
                   </tr>
                 ))}
               </tbody>
@@ -178,8 +207,8 @@ export default function PricingPage() {
               { title: 'Flexible Intervalle', text: 'Wöchentlich, monatlich oder quartalsweise — Sie bestimmen den Rhythmus.' },
               { title: '3 Re-Scans / Jahr', text: 'Nach der Behebung von Schwachstellen können Sie Nachscans beauftragen.' },
               { title: 'Manuelle Prüfung', text: 'Jeder Report wird vor Zustellung von einem Security-Analysten geprüft.' },
-              { title: 'PDF per E-Mail', text: 'Reports werden automatisch an alle definierten Empfaenger versandt.' },
-              { title: '12 Monate Laufzeit', text: 'Jahresabo mit automatischer Verlaengerung. Kuendigung jederzeit zum Laufzeitende.' },
+              { title: 'PDF per E-Mail', text: 'Reports werden automatisch an alle definierten Empfänger versandt.' },
+              { title: '12 Monate Laufzeit', text: 'Jahresabo mit automatischer Verlängerung. Kündigung jederzeit zum Laufzeitende.' },
             ].map(item => (
               <div key={item.title} className="p-4 rounded-lg" style={{ backgroundColor: C.slateLight, border: `1px solid ${C.borderSubtle}` }}>
                 <h3 className="text-sm font-semibold mb-1" style={{ color: C.offWhite }}>{item.title}</h3>
@@ -201,10 +230,10 @@ export default function PricingPage() {
             Ihnen ein maßgeschneidertes Angebot innerhalb von 24 Stunden.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="mailto:support@vectigal.tech?subject=VectiScan%20Angebot&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20VectiScan.%0A%0AFirma%3A%20%0ADomains%3A%20%0AGew%C3%BCnschtes%20Paket%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
+            <Link href="/contact"
               className="px-7 py-3 rounded-lg text-sm font-medium transition-all"
               style={{ backgroundColor: C.teal, color: C.slate }}>
-              support@vectigal.tech
+              Angebot anfragen
             </Link>
             <Link href="/subscribe"
               className="px-7 py-3 rounded-lg text-sm font-medium transition-colors"
@@ -212,6 +241,13 @@ export default function PricingPage() {
               Oder direkt Abo starten
             </Link>
           </div>
+          <p className="text-xs mt-6" style={{ color: C.muted }}>
+            Fragen zu einem Paket oder laufenden Abo?{' '}
+            <Link href="/contact" className="hover:underline" style={{ color: C.teal }}>
+              Support &amp; Kontakt
+            </Link>{' '}
+            — Erstantwort innerhalb von 1 Werktag.
+          </p>
         </div>
       </section>
     </main>

@@ -46,6 +46,7 @@ export default function RootLayout({
           <span>🔒 AES-256 verschlüsselt · Hosting in Deutschland · DSGVO-konform</span>
           <span className="hidden sm:inline" style={{ color: '#334155' }}>·</span>
           <span className="flex items-center gap-3">
+            <a href="/contact" className="hover:text-gray-300 transition-colors">Support</a>
             <a href="/impressum" className="hover:text-gray-300 transition-colors">Impressum</a>
             <a href="/datenschutz" className="hover:text-gray-300 transition-colors">Datenschutz</a>
             <a href="/agb" className="hover:text-gray-300 transition-colors">AGB</a>

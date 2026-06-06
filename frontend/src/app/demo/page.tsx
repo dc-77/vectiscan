@@ -63,8 +63,8 @@ export default function DemoPage() {
             ))}
             <div className="text-xs leading-relaxed pt-2" style={{ color: C.muted }}>
               Lieber direkt schreiben?{' '}
-              <a href="mailto:support@vectigal.tech" className="underline" style={{ color: C.teal }}>
-                support@vectigal.tech
+              <a href="mailto:support@vectiscan.de" className="underline" style={{ color: C.teal }}>
+                support@vectiscan.de
               </a>
             </div>
           </div>

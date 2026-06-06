@@ -8,6 +8,7 @@ import { isLoggedIn } from '@/lib/auth';
 import { track } from '@/lib/analytics';
 import { getTier, formatEur } from '@/lib/pricing';
 import { webcheckCtaHref, webcheckCtaLabel } from '@/lib/webcheck';
+import { PACKAGE_CATALOG } from '@/lib/catalog.generated';
 
 const C = {
   slate: '#0F172A', slateLight: '#1E293B', teal: '#2DD4BF', tealDark: '#14B8A6',
@@ -347,44 +348,53 @@ export default function LandingPage() {
       <section className="py-12 md:py-20 relative z-10">
         <div className="max-w-5xl mx-auto px-6">
           <Reveal><h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-12" style={{ color: C.offWhite }}>Vom kostenlosen Schnell-Check zum Vollscan.</h2></Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {[
-              { name: 'WebCheck', sub: 'Schnell-Scan Ihrer Domain in ~15 Min. DNS, E-Mail-Security, Basis-Schwachstellen — kostenlos und unverbindlich.', rec: false,
-                features: ['DNS- & Subdomain-Check', 'E-Mail-Security (SPF/DKIM/DMARC)', 'Basis-Schwachstellen-Scan', 'Sample-Report mit Compliance-Mapping'],
-                price: 'kostenlos', priceNote: 'ohne Kreditkarte',
-                ctaLabel: webcheckCtaLabel(), ctaHref: webcheckCtaHref(), ctaPrimary: false,
-                ctaTrack: 'webcheck_cta_click' as const },
-              { name: 'Perimeter-Scan', sub: 'Vollständige Sicherheitsanalyse Ihrer externen Angriffsoberfläche.', rec: true,
-                features: ['Port-Scanning & Service-Erkennung', 'Web-Schwachstellen-Analyse (OWASP)', 'DNS- & E-Mail-Security-Prüfung', 'PTES-konformer Report mit Maßnahmenplan', 'NIS2/BSI-Compliance-Mapping'],
-                price: `ab ${formatEur(getTier('perimeter')!.priceEur!)} / Jahr`, priceNote: getTier('perimeter')!.billingNote,
-                ctaLabel: 'Abo starten', ctaHref: '/subscribe', ctaPrimary: true,
-                ctaTrack: undefined },
-              { name: 'Cyberversicherung', sub: 'Nachweis und Dokumentation für Ihren Versicherungsantrag.', rec: false,
-                features: ['Alles aus dem Perimeter-Scan', '10-Punkte Versicherungs-Fragebogen', 'Risk-Score & Ransomware-Indikator', 'Versicherungskonformer Nachweis-Report', 'Direkt einreichbar bei Ihrem Versicherer'],
-                price: 'Individuelle Preisgestaltung', priceNote: 'auf Anfrage',
-                ctaLabel: 'Demo anfragen', ctaHref: '/demo', ctaPrimary: false,
-                ctaTrack: undefined },
-            ].map((p, i) => (
-              <Reveal key={p.name} delay={i * 120}><div className="rounded-2xl p-6 relative h-full flex flex-col transition-all duration-300 hover:shadow-[0_0_40px_#2DD4BF06]"
-                style={{ backgroundColor: C.slateLight, border: p.rec ? `1px solid ${C.teal}40` : '1px solid rgba(45,212,191,0.06)' }}>
-                {p.rec && <span className="absolute -top-2.5 left-5 text-[10px] font-semibold px-2.5 py-0.5 rounded-full" style={{ backgroundColor: `${C.teal}20`, color: C.teal }}>Empfohlen</span>}
-                <h3 className="text-lg font-semibold mt-2 mb-1" style={{ color: C.offWhite }}>{p.name}</h3>
-                <p className="text-xs mb-4" style={{ color: C.muted }}>{p.sub}</p>
-                <ul className="space-y-2 mb-5 flex-1">{p.features.map(f => <li key={f} className="flex items-start gap-2 text-xs" style={{ color: C.mutedLight }}><span style={{ color: C.teal }} className="mt-0.5">&#x2713;</span> {f}</li>)}</ul>
-                <div className="mb-4">
-                  <p className="text-sm font-semibold" style={{ color: C.offWhite }}>{p.price}</p>
-                  <p className="text-[11px]" style={{ color: C.muted }}>{p.priceNote}</p>
-                </div>
-                <Link href={p.ctaHref} onClick={p.ctaTrack ? () => track(p.ctaTrack!, { surface: 'home_packages' }) : undefined}
-                  className="block w-full text-center px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300"
-                  style={p.ctaPrimary
-                    ? { backgroundColor: C.teal, color: C.slate }
-                    : { color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>{p.ctaLabel}</Link>
-              </div></Reveal>
-            ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {PACKAGE_CATALOG.map((pkg, i) => {
+              const tier = getTier(pkg.key);
+              const isWebcheck = pkg.key === 'webcheck';
+              const isSelfService = pkg.sellability === 'self_service';
+              const ctaLabel = isWebcheck ? webcheckCtaLabel() : isSelfService ? 'Jetzt kaufen' : 'Angebot anfragen';
+              const ctaHref = isWebcheck ? webcheckCtaHref() : isSelfService ? '/subscribe' : '/contact';
+              const ctaPrimary = isSelfService;
+              const priceLabel = isWebcheck ? 'Kostenlos' : tier?.priceEur != null ? `ab ${formatEur(tier.priceEur)} / Jahr` : 'Auf Anfrage';
+              const priceNote = tier?.billingNote ?? '';
+              return (
+                <Reveal key={pkg.key} delay={i * 100}>
+                  <div className="rounded-2xl p-6 relative h-full flex flex-col transition-all duration-300 hover:shadow-[0_0_40px_#2DD4BF06]"
+                    style={{ backgroundColor: C.slateLight, border: isSelfService ? `1px solid ${pkg.accentColor}40` : '1px solid rgba(45,212,191,0.06)' }}>
+                    {pkg.badge && (
+                      <span className="absolute -top-2.5 left-5 text-[10px] font-semibold px-2.5 py-0.5 rounded-full"
+                        style={{ backgroundColor: `${pkg.accentColor}25`, color: pkg.accentColor }}>
+                        {pkg.badge}
+                      </span>
+                    )}
+                    <h3 className="text-lg font-semibold mt-2 mb-1" style={{ color: C.offWhite }}>{pkg.marketingName}</h3>
+                    <p className="text-xs mb-4" style={{ color: C.muted }}>{pkg.subtitle}</p>
+                    <ul className="space-y-2 mb-5 flex-1">
+                      {pkg.reportFocus.map(f => (
+                        <li key={f} className="flex items-start gap-2 text-xs" style={{ color: C.mutedLight }}>
+                          <span style={{ color: pkg.accentColor }} className="mt-0.5">&#x2713;</span> {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mb-4">
+                      <p className="text-sm font-semibold" style={{ color: C.offWhite }}>{priceLabel}</p>
+                      <p className="text-[11px]" style={{ color: C.muted }}>{priceNote}</p>
+                    </div>
+                    <Link href={ctaHref}
+                      onClick={isWebcheck ? () => track('webcheck_cta_click', { surface: 'home_packages' }) : undefined}
+                      className="block w-full text-center px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300"
+                      style={ctaPrimary
+                        ? { backgroundColor: pkg.accentColor, color: C.slate }
+                        : { color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>
+                      {ctaLabel}
+                    </Link>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
           <Reveal delay={200}><div className="text-center mt-8"><Link href="/pricing" onClick={() => track('webcheck_pricing_click', { surface: 'home_packages' })} className="text-sm font-medium hover:underline" style={{ color: C.teal }}>Alle Details und Preise vergleichen &#8594;</Link></div></Reveal>
-          <Reveal delay={250}><p className="text-[11px] text-center mt-3 font-light" style={{ color: `${C.muted}99` }}>Fünf technische Paket-Stufen (WebCheck · Perimeter · Compliance · SupplyChain · Insurance) — Details auf der Preisseite.</p></Reveal>
         </div>
       </section>
 
@@ -462,7 +472,7 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center gap-6">
-            <a href="mailto:support@vectigal.tech" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Kontakt</a>
+            <a href="mailto:support@vectiscan.de" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Kontakt</a>
             <a href="/impressum" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Impressum</a>
             <a href="/datenschutz" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Datenschutz</a>
             <a href="/agb" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>AGB</a>

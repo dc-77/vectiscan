@@ -35,8 +35,10 @@ export default function AppHeader() {
     navItems.push({ href: '/dashboard', label: 'Dashboard' });
     if (admin) navItems.push({ href: '/schedules', label: 'Zeitpläne' });
     navItems.push({ href: '/profile', label: 'Profil' });
+    navItems.push({ href: '/contact', label: 'Support' });
   } else {
     navItems.push({ href: '/pricing', label: 'Pakete & Preise' });
+    navItems.push({ href: '/contact', label: 'Support' });
     navItems.push({ href: '/login', label: 'Anmelden', highlight: true });
   }
 

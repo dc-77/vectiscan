@@ -3,6 +3,8 @@ networks:
     external: true
   vectiscan-internal:
     driver: bridge
+  twenty-internal:
+    driver: bridge
 
 volumes:
   vectiscan-pg-data:
@@ -12,6 +14,9 @@ volumes:
   vectiscan-kuma-data:
   vectiscan-loki-data:
   vectiscan-grafana-data:
+  # Twenty CRM (VEC-304)
+  twenty-pg-data:
+  twenty-server-data:
 
 services:
   frontend:
@@ -659,3 +664,84 @@ services:
     networks:
       - proxy-net
       - vectiscan-internal
+
+
+  # ── Twenty CRM (VEC-304 / VEC-301) ─────────────────────────────────────────────
+  # WICHTIG: Alle Twenty-Services hängen am Compose-Profil `crm` und werden vom
+  # Standard-Deploy (`docker compose up -d` ohne Profil) übersprungen. Grund:
+  # TWENTY_PG_PASSWORD/TWENTY_APP_SECRET sind auf dem Prod-Runner (noch) nicht
+  # gesetzt; ohne Gate brach `docker compose` schon beim Interpolieren ab und
+  # blockierte JEDEN main-Deploy (Pipeline 2624 deploy-auto failed). Zum
+  # Aktivieren der CRM: Secrets als CI-Variablen setzen + COMPOSE_PROFILES=crm
+  # bzw. `--profile crm` im Deploy ergänzen (Owner: VEC-304-Folge-Issue).
+  twenty-db:
+    image: postgres:16
+    profiles: ["crm"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: twenty
+      POSTGRES_PASSWORD: ${TWENTY_PG_PASSWORD:-}
+      POSTGRES_DB: twenty
+    volumes:
+      - twenty-pg-data:/var/lib/postgresql/data
+    networks:
+      - twenty-internal
+
+  twenty-redis:
+    image: redis:7
+    profiles: ["crm"]
+    restart: unless-stopped
+    networks:
+      - twenty-internal
+
+  twenty-server:
+    image: twentycrm/twenty:v2.9.0
+    profiles: ["crm"]
+    restart: unless-stopped
+    environment:
+      SERVER_URL: https://crm.vectigal.tech
+      PG_DATABASE_URL: postgres://twenty:${TWENTY_PG_PASSWORD:-}@twenty-db:5432/twenty
+      REDIS_URL: redis://twenty-redis:6379
+      APP_SECRET: ${TWENTY_APP_SECRET:-}
+      STORAGE_TYPE: local
+      DISABLE_DB_MIGRATIONS: "false"
+    depends_on:
+      - twenty-db
+      - twenty-redis
+    volumes:
+      - twenty-server-data:/app/packages/twenty-server/.local-storage
+    networks:
+      - twenty-internal
+      - proxy-net
+    labels:
+      - "traefik.enable=true"
+      # CRM-UI: internal-auth (Edge-Basic-Auth). PII-Daten → nicht öffentlich.
+      - "traefik.http.routers.twenty.rule=Host(`crm.vectigal.tech`)"
+      - "traefik.http.routers.twenty.entrypoints=websecure"
+      - "traefik.http.routers.twenty.tls=true"
+      - "traefik.http.routers.twenty.tls.certresolver=letsencrypt-http"
+      - "traefik.http.routers.twenty.middlewares=security-headers@file,internal-auth@file"
+      - "traefik.http.services.twenty.loadbalancer.server.port=3000"
+      # REST/API-Router ohne Basic-Auth (Bearer CRM_API_KEY via Lead-Router ausreichend)
+      - "traefik.http.routers.twenty-api.rule=Host(`crm.vectigal.tech`) && PathPrefix(`/api`,`/auth`,`/rest`)"
+      - "traefik.http.routers.twenty-api.entrypoints=websecure"
+      - "traefik.http.routers.twenty-api.tls=true"
+      - "traefik.http.routers.twenty-api.tls.certresolver=letsencrypt-http"
+      - "traefik.http.routers.twenty-api.middlewares=security-headers@file,rate-limit@file"
+      - "traefik.http.services.twenty-api.loadbalancer.server.port=3000"
+
+  twenty-worker:
+    image: twentycrm/twenty:v2.9.0
+    profiles: ["crm"]
+    restart: unless-stopped
+    command: ["yarn", "worker:prod"]
+    environment:
+      PG_DATABASE_URL: postgres://twenty:${TWENTY_PG_PASSWORD:-}@twenty-db:5432/twenty
+      REDIS_URL: redis://twenty-redis:6379
+      APP_SECRET: ${TWENTY_APP_SECRET:-}
+      SERVER_URL: https://crm.vectigal.tech
+      STORAGE_TYPE: local
+    depends_on:
+      - twenty-server
+    networks:
+      - twenty-internal

@@ -88,7 +88,7 @@ export default function WebCheckLeadForm() {
       // 404/501 = Backend noch nicht scharf (Go-live-Kopplung) → Warteliste-Fallback.
       if (res.status === 404 || res.status === 501) { setStatus('success'); return; }
       setStatus('error');
-      setError('Übermittlung fehlgeschlagen. Bitte später erneut versuchen oder support@vectigal.tech.');
+      setError('Übermittlung fehlgeschlagen. Bitte später erneut versuchen oder support@vectiscan.de.');
     } catch {
       // Netzwerk-/CORS-Fehler vor Go-live → Warteliste-Fallback statt Sackgasse.
       setStatus('success');

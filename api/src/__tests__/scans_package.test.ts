@@ -179,14 +179,15 @@ describe('Package selection (v2: 6 packages, Multi-Target)', () => {
       expect(res.json().data.package).toBe('insurance');
     });
 
-    it('should accept package=tlscompliance', async () => {
-      chainOrderInsert('tlscompliance');
+    // VEC-289: tlscompliance ist nicht mehr im kanonischen Kunden-Katalog (5 Pakete)
+    // und wird von der DB-Constraint ohnehin abgelehnt — daher 400 statt 201.
+    it('should reject package=tlscompliance (aus Katalog entfernt, VEC-289)', async () => {
       const res = await server.inject({
         method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
         payload: { package: 'tlscompliance', targets: [{ raw_input: 'example.com' }] },
       });
-      expect(res.statusCode).toBe(201);
-      expect(res.json().data.package).toBe('tlscompliance');
+      expect(res.statusCode).toBe(400);
+      expect(res.json().error).toContain('Invalid package');
     });
 
     it('should reject invalid package', async () => {

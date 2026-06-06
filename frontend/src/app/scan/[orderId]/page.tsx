@@ -303,10 +303,30 @@ export default function ScanDetailPage() {
   }
 
   if (error || !order) {
+    // VEC-283: NIE eine nackte "Access denied"-Sackgasse. Auch im Fehlerfall
+    // (Order nicht gefunden, fremde Order, transienter Ladefehler) fuehren wir
+    // den Nutzer mit klaren, handlungsfaehigen Optionen weiter.
     return (
-      <main className="flex-1 flex flex-col items-center justify-center px-4 gap-4">
-        <p className="text-red-400">{error || 'Scan nicht gefunden'}</p>
-        <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 text-sm">Zurück zum Dashboard</Link>
+      <main className="flex-1 flex flex-col items-center justify-center px-4 gap-5 text-center">
+        <div className="max-w-md flex flex-col items-center gap-3">
+          <h1 className="text-lg font-semibold text-white">Dieser Scan ist gerade nicht abrufbar</h1>
+          <p className="text-sm text-slate-400">
+            Der Scan existiert nicht, gehört zu einem anderen Konto oder konnte
+            gerade nicht geladen werden. Du kannst direkt einen neuen Scan starten
+            oder zurück zur Übersicht gehen.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center gap-3">
+          <Link
+            href="/scan"
+            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors"
+          >
+            Neuen Scan starten
+          </Link>
+          <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 text-sm">
+            Zurück zum Dashboard
+          </Link>
+        </div>
       </main>
     );
   }

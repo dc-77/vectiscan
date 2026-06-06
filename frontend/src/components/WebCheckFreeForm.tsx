@@ -251,11 +251,11 @@ export default function WebCheckFreeForm() {
       }
       // Generischer Fehlschlag: Token ist nach dem Submit verbraucht → zurücksetzen.
       captchaRef.current?.reset();
-      setError('Start fehlgeschlagen. Bitte später erneut versuchen oder support@vectigal.tech.');
+      setError('Start fehlgeschlagen. Bitte später erneut versuchen oder support@vectiscan.de.');
       setPhase('form');
     } catch {
       captchaRef.current?.reset();
-      setError('Verbindung fehlgeschlagen. Bitte später erneut versuchen oder support@vectigal.tech.');
+      setError('Verbindung fehlgeschlagen. Bitte später erneut versuchen oder support@vectiscan.de.');
       setPhase('form');
     }
   };
@@ -287,7 +287,7 @@ export default function WebCheckFreeForm() {
         setPhase('verify');
         return;
       }
-      setError('Prüfung fehlgeschlagen. Bitte erneut versuchen oder support@vectigal.tech.');
+      setError('Prüfung fehlgeschlagen. Bitte erneut versuchen oder support@vectiscan.de.');
       setPhase('verify');
     } catch {
       setError('Verbindung fehlgeschlagen. Bitte erneut versuchen.');

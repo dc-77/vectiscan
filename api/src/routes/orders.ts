@@ -13,6 +13,8 @@ import {
   sumSeverityCounts,
   reconcileSeverityCounts,
 } from '../lib/severityCounts.js';
+// VEC-289: kanonischer Paket-Katalog (single source of truth).
+import { PACKAGE_KEYS, getPackage, isPackageKey, type PackageKey } from '../lib/catalog.generated.js';
 
 // Report-Download-TTL (VEC-180/VEC-197): 30 Tage. Spiegelt den Worter-Default
 // (report-worker/reporter/worker.py: now + 30d Worker-Default) und Migration 034 (DB-DEFAULT).
@@ -41,17 +43,8 @@ async function streamReport(reply: FastifyReply, report: Record<string, unknown>
     .send(stream);
 }
 
-const VALID_PACKAGES = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance', 'tlscompliance'] as const;
-type ScanPackage = typeof VALID_PACKAGES[number];
-
-const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
-  webcheck: '~15–20 Minuten',
-  perimeter: '~60–90 Minuten',
-  compliance: '~65–95 Minuten',
-  supplychain: '~65–95 Minuten',
-  insurance: '~65–95 Minuten',
-  tlscompliance: '~5–10 Minuten',
-};
+// VEC-289: Validierung + Dauer-Labels stammen aus dem kanonischen Katalog.
+type ScanPackage = PackageKey;
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -104,10 +97,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const pkg = (body.package || 'perimeter').toLowerCase();
     const rawTargets = body.targets || [];
 
-    if (!VALID_PACKAGES.includes(pkg as ScanPackage)) {
+    if (!isPackageKey(pkg)) {
       return reply.status(400).send({
         success: false,
-        error: 'Invalid package. Must be webcheck, perimeter, compliance, supplychain, insurance, or tlscompliance.',
+        error: `Invalid package. Must be one of: ${PACKAGE_KEYS.join(', ')}.`,
       });
     }
 
@@ -233,7 +226,16 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       sql = `${baseSelect} ORDER BY o.created_at DESC`;
       params = [];
     } else {
-      sql = `${baseSelect} WHERE o.customer_id = $1 AND o.status IN ('report_complete', 'delivered', 'report_generating') ORDER BY o.created_at DESC`;
+      // VEC-297: KEINE Status-Whitelist mehr — konsistent zu GET /api/orders/:id
+      // (VEC-283). Der Customer sieht im Dashboard-Listing ALLE eigenen Orders in
+      // jedem Lebenszyklus-Status (precheck_running, pending_target_review,
+      // scan_running, report_generating, …), nicht erst wenn der Report fertig ist.
+      // Vorher zeigte die Whitelist (report_complete/delivered/report_generating)
+      // eine frisch angelegte, laufende Order NICHT in der Liste — ein Erstnutzer
+      // sah seine gerade gestartete Order nur via Direkt-URL /scan/[orderId], nicht
+      // im Dashboard. o.customer_id = $1 ist die einzige noetige Zugriffsgrenze;
+      // Report-Felder (overallRisk/severityCounts) bleiben null solange kein Report.
+      sql = `${baseSelect} WHERE o.customer_id = $1 ORDER BY o.created_at DESC`;
       params = [user.customerId];
     }
 
@@ -290,6 +292,13 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     // Build WHERE dynamically — ownership first, then optional scope filters
+    // VEC-297: dashboard-summary behaelt BEWUSST den completed-status-Filter.
+    // Anders als das Listing (GET /api/orders) ist dies ein Security-Cockpit-
+    // Aggregat (Domain-/Scan-/Findings-Zahlen, overallRisk) ueber abgeschlossene
+    // Scans. In-progress Orders haben keine Findings; sie aufzunehmen wuerde nur
+    // totalScans/domains mit ergebnislosen Eintraegen aufblaehen ("1 Scan, 0
+    // Findings" waehrend noch laeuft) — irrefuehrend fuer die Risiko-Karten.
+    // Die laufende Order ist via Listing + /scan/[orderId] sichtbar.
     const where: string[] = [`o.status IN ('report_complete', 'delivered', 'pending_review')`];
     const params: unknown[] = [];
     if (user.role !== 'admin') {
@@ -429,11 +438,16 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    // Visibility check: customers cannot access internal-status orders
-    const customerVisibleStatuses = ['report_complete', 'delivered', 'report_generating'];
-    if (user.role !== 'admin' && !customerVisibleStatuses.includes(order.status as string)) {
-      return reply.status(403).send({ success: false, error: 'Access denied' });
-    }
+    // VEC-283: KEINE Status-Whitelist mehr. Der Owner darf seine eigene Order
+    // in JEDEM Lebenszyklus-Status sehen (precheck_running, pending_target_review,
+    // scan_running, report_generating, …). Vorher blockierte eine Whitelist
+    // (nur report_complete/delivered/report_generating) den frisch registrierten
+    // Customer mit "Access denied", sobald er den ersten Scan startete und auf
+    // /scan/[orderId] (Status precheck_running) landete — eine Onboarding-Sackgasse.
+    // Die Ownership-Pruefung oben ist die einzige noetige Zugriffsgrenze; alle
+    // anderen owner-skopierten Endpoints (/results, /findings, /events,
+    // /correlation) machen es ebenso. Report-Inhalt bleibt separat gated
+    // (overallRisk/severityCounts sind null solange kein Report existiert).
 
     // Check if report exists + get severity data from latest report.
     // validation_warnings (Migration 028) wird nur fuer Admins ausgeliefert
@@ -465,7 +479,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         status: order.status,
         package: orderPackage,
         customerId: order.customer_id,
-        estimatedDuration: ESTIMATED_DURATIONS[orderPackage],
+        estimatedDuration: getPackage(orderPackage)?.durationLong ?? '',
         progress: {
           phase: order.current_phase || null,
           currentTool: order.current_tool || null,

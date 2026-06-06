@@ -16,18 +16,15 @@ import { query } from '../lib/db.js';
 import { sendDemoLeadEmail } from '../lib/email.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
+// VEC-289: Paket-Interesse stammt aus dem kanonischen Katalog (+ 'unsure'-Sentinel).
+import { PACKAGE_KEYS } from '../lib/catalog.generated.js';
 
 // Bewusst pragmatische E-Mail-Validierung (kein RFC-5322-Parser).
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const VALID_PACKAGES = new Set([
-  'webcheck',
-  'perimeter',
-  'compliance',
-  'supplychain',
-  'insurance',
-  'unsure',
-]);
+// Erlaubte `packageInterest`-Werte: die kanonischen Paket-Keys plus 'unsure'
+// (Lead weiss noch nicht, welches Paket).
+const VALID_PACKAGES = new Set<string>([...PACKAGE_KEYS, 'unsure']);
 
 interface LeadBody {
   name?: string;
