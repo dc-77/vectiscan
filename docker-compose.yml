@@ -33,7 +33,11 @@ services:
       - "traefik.http.routers.vectiscan-web.rule=Host(`scan.vectigal.tech`) || Host(`vectiscan.de`) || Host(`www.vectiscan.de`)"
       - "traefik.http.routers.vectiscan-web.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-web.tls=true"
-      - "traefik.http.routers.vectiscan-web.tls.certresolver=letsencrypt"
+      # VEC-269 ROOT-CAUSE: `letsencrypt`-Resolver nutzt DNS-01 via uniteddomains-Provider mit kaputtem
+      #          API-Key ("Invalid API key format") → Issuance für vectiscan.de/www schlug fehl (Default-Cert).
+      #          `letsencrypt-http` = HTTP-01 (entryPoint web) funktioniert. Behebt zugleich latenten
+      #          Renewal-Fehler für scan.vectigal.tech (Cert läuft Aug ab, DNS-Resolver wäre dann gescheitert).
+      - "traefik.http.routers.vectiscan-web.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-web.middlewares=security-headers@file,rate-limit@file"
       # VEC-34 AC2 / VEC-143: Admin-Flächen (/admin/**) sind am Edge auth-gegated (Basic-Auth).
       # IP-Allowlist (internal-only) ist auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
@@ -44,7 +48,8 @@ services:
       - "traefik.http.routers.vectiscan-web-admin.rule=(Host(`scan.vectigal.tech`) || Host(`vectiscan.de`) || Host(`www.vectiscan.de`)) && PathRegexp(`(?i)^/admin`)"
       - "traefik.http.routers.vectiscan-web-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-web-admin.tls=true"
-      - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt"
+      # VEC-269: gleicher HTTP-01-Resolver wie vectiscan-web (DNS-01/uniteddomains-Key kaputt).
+      - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-web-admin.priority=100"
       - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.routers.vectiscan-web-admin.service=vectiscan-web"
