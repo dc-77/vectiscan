@@ -717,7 +717,7 @@ services:
       - "traefik.http.routers.twenty-api.entrypoints=websecure"
       - "traefik.http.routers.twenty-api.tls=true"
       - "traefik.http.routers.twenty-api.tls.certresolver=letsencrypt-http"
-      - "traefik.http.routers.twenty-api.middlewares=security-headers@file"
+      - "traefik.http.routers.twenty-api.middlewares=security-headers@file,rate-limit@file"
       - "traefik.http.services.twenty-api.loadbalancer.server.port=3000"
 
   twenty-worker:
@@ -727,7 +727,7 @@ services:
     environment:
       PG_DATABASE_URL: postgres://twenty:${TWENTY_PG_PASSWORD}@twenty-db:5432/twenty
       REDIS_URL: redis://twenty-redis:6379
-      APP_SECRET: ${TWENTY_APP_SECRET}
+      APP_SECRET: ${TWENTY_APP_SECRET:?TWENTY_APP_SECRET not set}
       SERVER_URL: https://crm.vectigal.tech
       STORAGE_TYPE: local
     depends_on:
