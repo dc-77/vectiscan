@@ -123,6 +123,12 @@ export default function ScanNewPage() {
       } else if (res.error === 'target_validation_failed') {
         setError('Mindestens ein Ziel ist ungültig. Bitte prüfe deine Eingaben im ersten Schritt.');
         setStepId('target');
+      } else if (res.forbidden) {
+        // VEC-294: Server hat das Paket gesperrt (z.B. Abo zwischenzeitlich
+        // abgelaufen). Kein rohes „Access denied" — zurück zum Paket-Schritt,
+        // der dann den Inline-Freischalt-Schritt anbietet statt einer Sackgasse.
+        setError(`${getPackage(selectedPackage)?.marketingName ?? 'Dieses Paket'} ist für dein Konto aktuell nicht freigeschaltet. Wähle die Freischaltung oder ein anderes Paket.`);
+        setStepId('package');
       } else {
         setError(res.error || 'Der Scan konnte nicht gestartet werden. Bitte versuche es erneut.');
       }

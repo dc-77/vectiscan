@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 
 import Link from 'next/link';
 import { listUsers, changeUserRole, deleteUser, getAdminStats, getAiCosts, getPendingReviews, approveOrder, rejectOrder, getReviewQueue, AdminUser, AdminStats, AiCostsData, PendingReview } from '@/lib/api';
-import { isLoggedIn, isAdmin } from '@/lib/auth';
+import { useAdminGuard, AdminDenied } from '@/components/ds';
 
 
 function formatDate(iso: string): string {
@@ -16,8 +15,7 @@ function formatDate(iso: string): string {
 }
 
 export default function AdminPage() {
-  const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const { ready, denied } = useAdminGuard();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [aiCosts, setAiCosts] = useState<AiCostsData | null>(null);
@@ -25,14 +23,6 @@ export default function AdminPage() {
   const [targetReviewCount, setTargetReviewCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isLoggedIn() || !isAdmin()) {
-      router.replace('/dashboard');
-      return;
-    }
-    setReady(true);
-  }, [router]);
 
   const fetchData = useCallback(async () => {
     try {
@@ -114,6 +104,7 @@ export default function AdminPage() {
     }
   };
 
+  if (denied) return <AdminDenied />;
   if (!ready) return null;
 
   return (

@@ -4,5 +4,7 @@
 export { default as StatusChip } from './StatusChip';
 export { default as StateView } from './StateView';
 export type { StateVariant, StateAction } from './StateView';
+export { default as AdminDenied, useAdminGuard } from './AdminGate';
+export type { AdminGuardState } from './AdminGate';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { default as Skeleton, SkeletonBox, SkeletonList, SkeletonCards, SkeletonDetail } from './Skeleton';

@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { isLoggedIn, isAdmin } from '@/lib/auth';
+import { useAdminGuard, AdminDenied } from '@/components/ds';
 import { getReviewQueue, ReviewQueue } from '@/lib/api';
 
 function formatDate(iso: string): string {
@@ -14,19 +13,10 @@ function formatDate(iso: string): string {
 }
 
 export default function AdminReviewListPage() {
-  const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const { ready, denied } = useAdminGuard();
   const [queue, setQueue] = useState<ReviewQueue | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isLoggedIn() || !isAdmin()) {
-      router.replace('/dashboard');
-      return;
-    }
-    setReady(true);
-  }, [router]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -44,6 +34,7 @@ export default function AdminReviewListPage() {
     if (ready) load();
   }, [ready, load]);
 
+  if (denied) return <AdminDenied />;
   if (!ready) return null;
 
   const orders = queue?.orders || [];

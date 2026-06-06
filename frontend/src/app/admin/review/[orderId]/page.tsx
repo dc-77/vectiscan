@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { isLoggedIn, isAdmin } from '@/lib/auth';
+import { useAdminGuard, AdminDenied } from '@/components/ds';
 import {
   getReviewDetail, releaseOrder, deleteAuthorization,
   ReviewDetail, ScanAuthorization,
@@ -32,21 +32,13 @@ export default function AdminReviewOrderPage() {
   const params = useParams();
   const orderId = params.orderId as string;
 
-  const [ready, setReady] = useState(false);
+  const { ready, denied } = useAdminGuard();
   const [detail, setDetail] = useState<ReviewDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [releasing, setReleasing] = useState(false);
 
   const { events, connected } = useOrderProgress(ready ? orderId : null);
-
-  useEffect(() => {
-    if (!isLoggedIn() || !isAdmin()) {
-      router.replace('/dashboard');
-      return;
-    }
-    setReady(true);
-  }, [router]);
 
   const load = useCallback(async () => {
     const res = await getReviewDetail('order', orderId);
@@ -109,6 +101,7 @@ export default function AdminReviewOrderPage() {
     else setError(res.error || 'Löschen fehlgeschlagen');
   };
 
+  if (denied) return <AdminDenied />;
   if (!ready) return null;
 
   if (loading) {

@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { isLoggedIn, isAdmin } from '@/lib/auth';
+import { useAdminGuard, AdminDenied } from '@/components/ds';
 
 interface Totals {
   totalCalls: number;
@@ -33,18 +32,11 @@ interface TopOrder {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export default function AdminCostsPage() {
-  const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const { ready, denied } = useAdminGuard();
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
   const [totals, setTotals] = useState<Totals | null>(null);
   const [byStep, setByStep] = useState<ByStep[]>([]);
   const [topOrders, setTopOrders] = useState<TopOrder[]>([]);
-
-  useEffect(() => {
-    if (!isLoggedIn()) { router.replace('/login'); return; }
-    if (!isAdmin()) { router.replace('/dashboard'); return; }
-    setReady(true);
-  }, [router]);
 
   const load = useCallback(async () => {
     const token = typeof window !== 'undefined' ? window.localStorage.getItem('token') : null;
@@ -61,6 +53,7 @@ export default function AdminCostsPage() {
 
   useEffect(() => { if (ready) load(); }, [ready, load]);
 
+  if (denied) return <AdminDenied />;
   if (!ready || !totals) {
     return <main className="flex-1 px-4 py-6"><div className="max-w-6xl mx-auto text-slate-500">Lade…</div></main>;
   }
