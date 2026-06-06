@@ -1156,24 +1156,33 @@ ops-twenty-create-user-db:
     - |
       # 3) Workspace + Admin-User direkt in PostgreSQL anlegen
       # (Twenty v2.9.0 hat keinen REST/GraphQL-Endpoint für First-Setup)
+      set +e  # Fehler-Check explizit, nicht per set -e
       echo "=== Schema Discovery ==="
-      TABLES=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+      ALL_SCHEMAS=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
         psql -U twenty -d twenty -tAc \
-        "SELECT string_agg(table_name,',') FROM information_schema.tables WHERE table_schema='public';" \
-        2>/dev/null | tr -d ' \n' || echo "")
-      echo "Tables: ${TABLES}"
+        "SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog','information_schema') ORDER BY 1;" \
+        2>/dev/null | tr '\n' ',' || echo "NO_CONN")
+      echo "Schemas: ${ALL_SCHEMAS}"
+      ALL_TABLES=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc \
+        "SELECT table_schema||'.'||table_name FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema') ORDER BY 1 LIMIT 50;" \
+        2>/dev/null | tr '\n' '|' || echo "")
+      echo "All tables: ${ALL_TABLES}"
       WORKSPACE_COUNT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-        psql -U twenty -d twenty -tAc "SELECT count(*) FROM workspace;" 2>/dev/null | tr -d '[:space:]' || echo "0")
+        psql -U twenty -d twenty -tAc "SELECT count(*) FROM workspace;" 2>/dev/null | tr -d '[:space:]')
+      if [ -z "${WORKSPACE_COUNT}" ]; then WORKSPACE_COUNT=0; fi
       echo "Workspace-Count: ${WORKSPACE_COUNT}"
-      if [ "${WORKSPACE_COUNT}" = "0" ] || [ -z "${WORKSPACE_COUNT}" ]; then
+      if [ "${WORKSPACE_COUNT}" = "0" ]; then
         echo "INFO: Lege Workspace + Admin-User per SQL an"
         WS_ID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-          psql -U twenty -d twenty -tAc "SELECT gen_random_uuid();" 2>/dev/null | tr -d '[:space:]')
+          psql -U twenty -d twenty -tAc "SELECT gen_random_uuid();" 2>&1 | tr -d '[:space:]')
         USER_UUID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-          psql -U twenty -d twenty -tAc "SELECT gen_random_uuid();" 2>/dev/null | tr -d '[:space:]')
+          psql -U twenty -d twenty -tAc "SELECT gen_random_uuid();" 2>&1 | tr -d '[:space:]')
+        # pgcrypto-free invite hash using md5+clock_timestamp
         INVITE_HASH=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-          psql -U twenty -d twenty -tAc "SELECT encode(gen_random_bytes(16),'hex');" 2>/dev/null | tr -d '[:space:]')
-        echo "WS_ID=${WS_ID} USER_UUID=${USER_UUID}"
+          psql -U twenty -d twenty -tAc \
+          "SELECT substring(md5(random()::text||clock_timestamp()::text) for 32);" 2>&1 | tr -d '[:space:]')
+        echo "WS_ID=${WS_ID} USER_UUID=${USER_UUID} INVITE_HASH=${INVITE_HASH}"
         # Insert workspace
         WS_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
           psql -U twenty -d twenty -tAc \
