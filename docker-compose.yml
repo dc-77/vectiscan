@@ -725,6 +725,7 @@ services:
       - "traefik.http.routers.twenty.tls=true"
       - "traefik.http.routers.twenty.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.twenty.middlewares=security-headers@file,internal-auth@file"
+      - "traefik.http.routers.twenty.service=twenty"
       - "traefik.http.services.twenty.loadbalancer.server.port=3000"
       # REST/API-Router ohne Basic-Auth (Bearer CRM_API_KEY via Lead-Router ausreichend)
       - "traefik.http.routers.twenty-api.rule=Host(`crm.vectigal.tech`) && PathPrefix(`/api`,`/auth`,`/rest`)"
@@ -732,6 +733,7 @@ services:
       - "traefik.http.routers.twenty-api.tls=true"
       - "traefik.http.routers.twenty-api.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.twenty-api.middlewares=security-headers@file,rate-limit@file"
+      - "traefik.http.routers.twenty-api.service=twenty-api"
       - "traefik.http.services.twenty-api.loadbalancer.server.port=3000"
 
   twenty-worker:
