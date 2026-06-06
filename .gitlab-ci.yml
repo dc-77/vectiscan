@@ -1054,6 +1054,12 @@ ops-twenty-admin-invite:
   script:
     - cd ${DEPLOY_PATH}
     - echo "=== VEC-326 Twenty Admin Setup fuer ${TARGET_EMAIL} ==="
+    - |
+      SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
+      if [ -f "${SENTINEL}" ]; then
+        echo "INFO: VEC-326 bereits provisioniert (Sentinel vorhanden) — kein erneuter Invite, keine Mail"
+        exit 0
+      fi
     - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
     - cp ${CI_PROJECT_DIR}/docker-compose.yml .
     - echo "OK docker-compose.yml aktualisiert EMAIL_DRIVER=smtp fuer twenty-server"
@@ -1130,6 +1136,12 @@ ops-twenty-create-user-db:
     - cd ${DEPLOY_PATH}
     - echo "=== VEC-326 DB-Fallback Anlegen von ${TARGET_EMAIL} in Twenty ==="
     - |
+      SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
+      if [ -f "${SENTINEL}" ]; then
+        echo "INFO: VEC-326 bereits provisioniert (Sentinel vorhanden) — kein Re-Insert, keine Mail"
+        exit 0
+      fi
+    - |
       # 1) Temporaeres Passwort generieren (persistent auf Host, wie .demo_password)
       PWD_FILE="${DEPLOY_PATH}/.vec326_crm_password"
       if [ ! -f "${PWD_FILE}" ]; then
@@ -1192,14 +1204,12 @@ ops-twenty-create-user-db:
         psql -U twenty -d twenty -tAc \
         "SELECT id FROM core.\"user\" WHERE email='${TARGET_EMAIL}';" 2>/dev/null | tr -d '[:space:]')
       echo "Existing user: ${EXISTING_USER}"
+      USER_IS_NEW=0
       if [ -n "${EXISTING_USER}" ]; then
-        # Twenty v2.9.0 uses camelCase column names
-        echo "INFO: User bereits vorhanden — aktualisiere passwordHash"
-        COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-          psql -U twenty -d twenty -tAc \
-          "UPDATE core.\"user\" SET \"passwordHash\"='${HASH}' WHERE email='${TARGET_EMAIL}';" 2>&1
+        echo "INFO: User bereits vorhanden (idempotent) — kein Re-Insert, kein Passwort-Reset"
         USER_UUID="${EXISTING_USER}"
       else
+        USER_IS_NEW=1
         echo "INFO: Erstelle neuen User in core.user (camelCase columns)"
         USER_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
           psql -U twenty -d twenty -tAc \
@@ -1238,7 +1248,14 @@ ops-twenty-create-user-db:
       WORKSPACE_SETUP=DONE
       export WORKSPACE_SETUP
     - |
-      # 4) Login-Credentials-Email via Resend (curl, wie guide-email)
+      # 4) Login-Credentials-Email via Resend — nur bei Erstanlage (idempotent)
+      SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
+      if [ "${USER_IS_NEW}" != "1" ]; then
+        echo "INFO: User war bereits vorhanden — keine Credentials-Email (idempotent)"
+        touch "${SENTINEL}" 2>/dev/null || true
+        echo "INFO: Sentinel gesetzt (${SENTINEL}) — kuenftige Pipeline-Laeufe ueberspringen"
+        exit 0
+      fi
       RESEND_KEY="${RESEND_API_KEY:-${RESEND_MANAGEMENT:-}}"
       if [ -z "${RESEND_KEY}" ]; then
         echo "WARN: Kein Resend-Key — kein Credentials-Email"; exit 0
@@ -1252,6 +1269,9 @@ ops-twenty-create-user-db:
       if echo "${RESEND_OUT}" | grep -q '"id"'; then
         CRED_EMAIL_ID=$(echo "${RESEND_OUT}" | node -e "const d=[];process.stdin.on('data',c=>d.push(c));process.stdin.on('end',()=>console.log(JSON.parse(d.join('')).id||'unknown'));" 2>/dev/null || echo "unknown")
         echo "OK: Credentials-Email gesendet Resend-ID=${CRED_EMAIL_ID}"
+        SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
+        touch "${SENTINEL}" 2>/dev/null || true
+        echo "INFO: Sentinel gesetzt (${SENTINEL}) — kuenftige Pipeline-Laeufe ueberspringen"
       else
         echo "WARN: Credentials-Email fehlgeschlagen: ${RESEND_OUT}"
       fi
