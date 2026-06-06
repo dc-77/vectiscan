@@ -1113,7 +1113,9 @@ ops-twenty-admin-invite:
 # =============================================================================
 ops-twenty-create-user-db:
   extends: .ops-base
-  needs: []
+  needs:
+    - job: ops-twenty-admin-invite
+      optional: true
   variables:
     TARGET_EMAIL: "daniel.czischke@bs-consulting-gmbh.de"
     TARGET_FIRST: "Daniel"
@@ -1160,7 +1162,7 @@ ops-twenty-create-user-db:
         echo "INFO: Kein Workspace — initialisiere via Twenty sign-up API (erster User wird Admin-Owner)"
         PASS_B64_INNER=$(printf '%s' "${TEMP_PASS}" | base64 -w0)
         # First: introspect to discover the correct signup mutation name
-        INTROSPECT_NODE="const http=require('http');function post(path,body,cb){const o={hostname:'localhost',port:3000,path,method:'POST',headers:{'Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}};const r=http.request(o,res=>{let b='';res.on('data',c=>b+=c);res.on('end',()=>cb(b))});r.on('error',e=>cb('ERR:'+e.message));r.write(body);r.end()}post('/graphql',JSON.stringify({query:'{__schema{mutationType{fields{name}}}}'}),$r=>{try{const fs=JSON.parse($r).data.__schema.mutationType.fields.map(f=>f.name);console.log('MUTS:'+fs.filter(f=>/sign|register|auth|workspace/i.test(f)).join(','))}catch(e){console.log('ERR:'+e.message)}})"
+        INTROSPECT_NODE="const http=require('http');function post(path,body,cb){const o={hostname:'localhost',port:3000,path,method:'POST',headers:{'Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}};const rq=http.request(o,res=>{let b='';res.on('data',c=>b+=c);res.on('end',()=>cb(b))});rq.on('error',e=>cb('ERR:'+e.message));rq.write(body);rq.end()}post('/graphql',JSON.stringify({query:'{__schema{mutationType{fields{name}}}}}'}),function(intr){try{const fs=JSON.parse(intr).data.__schema.mutationType.fields.map(function(f){return f.name});console.log('MUTS:'+fs.filter(function(f){return /sign|register|auth|workspace/i.test(f)}).join(','))}catch(e){console.log('ERR:'+e.message)}})"
         MUTS_RESP=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-server node -e "${INTROSPECT_NODE}" 2>/dev/null || echo "EXEC_ERROR")
         echo "Available auth mutations: ${MUTS_RESP}"
         # Pick mutation name from introspection result
