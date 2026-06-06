@@ -1,0 +1,26 @@
+# VEC-143 — Edge-Auth-Gating fuer die internal-only-Flaechen.
+#
+# Warum: Die IP-Allowlist `internal-only@file` ist auf vectigal-docker02
+# strukturell WIRKUNGSLOS — `/etc/docker/daemon.json` hat `iptables: false`,
+# wodurch der userland docker-proxy jede Quell-IP per SNAT auf das
+# Bridge-Gateway 172.18.0.1 umschreibt. 172.18.0.1 liegt in 172.16.0.0/12,
+# also gilt JEDER Request (intern wie extern) als "intern" und 403 feuert nie.
+# Ein ipStrategy/trustedIPs-Fix ist mangels echter Client-IP / X-Forwarded-For
+# unmoeglich. Board-approved Fix (VEC-143 Option C): Auth-Gating statt IP.
+#
+# Diese Datei wird beim Deploy ADDITIV in den host-eigenen Traefik-
+# File-Provider (`/opt/traefik/config`, directory + watch:true) geschrieben.
+# Sie laesst das host-eigene `security.yml` (security-headers, rate-limit,
+# internal-only) UNANGETASTET — Blast-Radius nur die vectiscan-Router.
+#
+# Der Platzhalter __TRAEFIK_INTERNAL_HTPASSWD__ wird vom CI-Job `ops-traefik-auth`
+# aus der maskierten Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD ersetzt
+# (Format `user:hash`, apr1/bcrypt). KEIN Credential im Repo.
+http:
+  middlewares:
+    internal-auth:
+      basicAuth:
+        realm: "Vectigal Intern"
+        removeHeader: true
+        users:
+          - "__TRAEFIK_INTERNAL_HTPASSWD__"

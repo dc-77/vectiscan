@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { createSubscription, TargetEntry } from '@/lib/api';
+import { getTier, formatEur } from '@/lib/pricing';
 import { isLoggedIn, getUser } from '@/lib/auth';
 import TargetInput from '@/components/TargetInput';
 
@@ -96,6 +97,14 @@ export default function SubscribePage() {
         reportEmails: validEmails,
       });
       if (res.success) {
+        // Self-Service-Kauf (VEC-223): Backend legt das Abo als 'pending' an und
+        // liefert eine Stripe-Checkout-URL. Das Abo wird erst nach bestaetigter
+        // Zahlung (checkout.session.completed-Webhook) aktiv. Zur sicheren
+        // Stripe-Zahlung weiterleiten, statt nur eine Erfolgsmeldung zu zeigen.
+        if (res.data?.checkoutUrl) {
+          window.location.href = res.data.checkoutUrl;
+          return;
+        }
         setSuccess(res.data?.id || 'ok');
       } else {
         setError(res.error || 'Unbekannter Fehler');
@@ -302,13 +311,21 @@ export default function SubscribePage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Preis</span>
-                <span className="text-white">Wird nach Prüfung mitgeteilt</span>
+                <span className="text-white font-medium">
+                  {(() => {
+                    const tier = getTier(selectedPackage);
+                    return tier?.purchasable && tier.priceEur != null
+                      ? `${formatEur(tier.priceEur)} / Jahr`
+                      : 'Auf Anfrage';
+                  })()}
+                </span>
               </div>
             </div>
             <div className="border-t border-gray-700 pt-3">
               <p className="text-xs text-gray-500">
-                Nach der Bestellung werden Ihre Domains von einem Administrator geprüft. Der Preis wird Ihnen individuell mitgeteilt.
-                Nach Freigabe startet der erste Scan automatisch.
+                {getTier(selectedPackage)?.purchasable
+                  ? 'Sie werden zur sicheren Stripe-Zahlung weitergeleitet. Das Abo wird erst nach bestätigter Zahlung aktiv. Anschließend prüft ein Administrator Ihre Domains zur Freigabe, danach startet der erste Scan automatisch.'
+                  : 'Nach der Bestellung werden Ihre Domains von einem Administrator geprüft. Der Preis wird Ihnen individuell mitgeteilt. Nach Freigabe startet der erste Scan automatisch.'}
               </p>
             </div>
           </div>

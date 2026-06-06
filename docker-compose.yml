@@ -28,19 +28,30 @@ services:
       - "traefik.enable=true"
       # VEC-34: Public-Router — Kunden erreichen das Frontend von außen per HTTPS.
       # `internal-only@file` hier bewusst abgelöst; Let's-Encrypt-Cert via Host-CertResolver.
-      - "traefik.http.routers.vectiscan-web.rule=Host(`scan.vectigal.tech`)"
+      # VEC-160/VEC-269: vectiscan.de + www als Alias (Phase 1) — selbes Frontend, kein Rebuild (CORS origin:true).
+      #          Hosts müssen öffentlich auf 62.217.52.165 (docker02-Public-IP) zeigen, sonst kein LE HTTP-01.
+      - "traefik.http.routers.vectiscan-web.rule=Host(`scan.vectigal.tech`) || Host(`vectiscan.de`) || Host(`www.vectiscan.de`)"
       - "traefik.http.routers.vectiscan-web.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-web.tls=true"
-      - "traefik.http.routers.vectiscan-web.tls.certresolver=letsencrypt"
+      # VEC-269 ROOT-CAUSE: `letsencrypt`-Resolver nutzt DNS-01 via uniteddomains-Provider mit kaputtem
+      #          API-Key ("Invalid API key format") → Issuance für vectiscan.de/www schlug fehl (Default-Cert).
+      #          `letsencrypt-http` = HTTP-01 (entryPoint web) funktioniert. Behebt zugleich latenten
+      #          Renewal-Fehler für scan.vectigal.tech (Cert läuft Aug ab, DNS-Resolver wäre dann gescheitert).
+      - "traefik.http.routers.vectiscan-web.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-web.middlewares=security-headers@file,rate-limit@file"
-      # VEC-34 AC2: Admin-Flächen (/admin/**) bleiben am Edge internal-only.
-      # Spezifischere Regel + höhere Priorität → externer Request auf /admin → internal-only@file → 403/timeout.
-      - "traefik.http.routers.vectiscan-web-admin.rule=Host(`scan.vectigal.tech`) && PathPrefix(`/admin`)"
+      # VEC-34 AC2 / VEC-143: Admin-Flächen (/admin/**) sind am Edge auth-gegated (Basic-Auth).
+      # IP-Allowlist (internal-only) ist auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
+      # Spezifischere Regel + höhere Priorität → externer /admin-Request ohne Credentials → 401.
+      # VEC-167: `PathRegexp((?i)…)` statt `PathPrefix` — Matcher case-INSENSITIV, sonst umgeht /ADMIN das Edge-Gate (404 statt 401).
+      # VEC-160/VEC-269 SICHERHEITSKRITISCH: Admin-Guard muss für ALLE Frontend-Hosts greifen (auch vectiscan.de + www),
+      #          sonst wäre /admin über die neuen Hosts ungeschützt. Host-Gruppe geklammert vor PathRegexp.
+      - "traefik.http.routers.vectiscan-web-admin.rule=(Host(`scan.vectigal.tech`) || Host(`vectiscan.de`) || Host(`www.vectiscan.de`)) && PathRegexp(`(?i)^/admin`)"
       - "traefik.http.routers.vectiscan-web-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-web-admin.tls=true"
-      - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt"
+      # VEC-269: gleicher HTTP-01-Resolver wie vectiscan-web (DNS-01/uniteddomains-Key kaputt).
+      - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-web-admin.priority=100"
-      - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.routers.vectiscan-web-admin.service=vectiscan-web"
       - "traefik.http.services.vectiscan-web.loadbalancer.server.port=3000"
     depends_on:
@@ -64,9 +75,28 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
-      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-noreply@vectigal.tech}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-VectiScan <noreply@vectiscan.de>}
       # WebCheck-Free CAPTCHA (VEC-173): unset => Prüfung deaktiviert; in Prod setzen.
       WEBCHECK_TURNSTILE_SECRET: ${WEBCHECK_TURNSTILE_SECRET:-}
+      # VEC-36: Routing-Ziel fuer Demo-/Lead-Anfragen explizit in den Container
+      # reichen. Ohne diesen Passthrough erreichte SALES_LEAD_EMAIL nie den
+      # Runtime-Container -> Code-Default 'kontakt@vectigal.gmbh' (UNbetreutes
+      # Postfach) griff, Resend meldete routed:true, aber kein Lead kam beim
+      # Vertrieb an. Nicht geheim -> committeter, per CI-Var ueberschreibbarer
+      # Default auf die betreuten Marken-Postfaecher. Komma-separiert = mehrere
+      # Empfaenger.
+      SALES_LEAD_EMAIL: ${SALES_LEAD_EMAIL:-support@vectiscan.de,kontakt@vectigal.ai}
+      # VEC-247: Stripe-Konfig in den API-Container reichen. Ohne diese
+      # Passthroughs erreichte bisher KEINE Stripe-Variable den Container —
+      # /api/subscriptions antwortete daher strukturell mit 503
+      # (payment_not_configured / price_not_configured), Root-Cause des
+      # nicht funktionierenden Perimeter-Kaufs (VEC-223). Secret-Werte
+      # (Key/Webhook) bleiben leer bis als CI-Var gebunden; die price_id ist
+      # nicht geheim (Stripe gibt sie ohnehin client-seitig im Checkout aus).
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_PERIMETER: ${STRIPE_PRICE_PERIMETER:-}
+      STRIPE_PRICE_DEFAULT: ${STRIPE_PRICE_DEFAULT:-}
     deploy:
       resources:
         limits:
@@ -87,14 +117,16 @@ services:
       - "traefik.http.routers.vectiscan-api.tls=true"
       - "traefik.http.routers.vectiscan-api.tls.certresolver=letsencrypt"
       - "traefik.http.routers.vectiscan-api.middlewares=security-headers@file,rate-limit@file"
-      # VEC-34 AC2: Admin-API (/api/admin/**) bleibt am Edge internal-only.
-      # Spezifischere Regel + höhere Priorität → externer Request auf /api/admin → internal-only@file → 403/timeout.
-      - "traefik.http.routers.vectiscan-api-admin.rule=Host(`scan-api.vectigal.tech`) && PathPrefix(`/api/admin`)"
+      # VEC-34 AC2 / VEC-143: Admin-API (/api/admin/**) ist am Edge auth-gegated (Basic-Auth).
+      # IP-Allowlist (internal-only) auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
+      # Spezifischere Regel + höhere Priorität → externer /api/admin-Request ohne Credentials → 401.
+      # VEC-167: `PathRegexp((?i)…)` statt `PathPrefix` — case-INSENSITIV, sonst umgeht /api/ADMIN das Edge-Gate (404 statt 401).
+      - "traefik.http.routers.vectiscan-api-admin.rule=Host(`scan-api.vectigal.tech`) && PathRegexp(`(?i)^/api/admin`)"
       - "traefik.http.routers.vectiscan-api-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-api-admin.tls=true"
       - "traefik.http.routers.vectiscan-api-admin.tls.certresolver=letsencrypt"
       - "traefik.http.routers.vectiscan-api-admin.priority=100"
-      - "traefik.http.routers.vectiscan-api-admin.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.routers.vectiscan-api-admin.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.routers.vectiscan-api-admin.service=vectiscan-api"
       - "traefik.http.services.vectiscan-api.loadbalancer.server.port=4000"
       - "traefik.http.services.vectiscan-api.loadbalancer.healthcheck.path=/health"
@@ -543,7 +575,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.vectiscan-status.rule=Host(`status.vectigal.tech`)"
-      - "traefik.http.routers.vectiscan-status.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.routers.vectiscan-status.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.services.vectiscan-status.loadbalancer.server.port=3001"
     networks:
       - proxy-net
@@ -591,6 +623,24 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_ANALYTICS_REPORTING_ENABLED: "false"
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      # VEC-229: SMTP fuer Grafana-Alerting → Resend-SMTP (gleicher Kanal wie
+      # Uptime-Kuma, siehe MONITORING.md). Reused vorhandene Resend-Creds; der
+      # Schluessel landet via .env aus der CI auf dem Host (NIE im Image/Repo).
+      GF_SMTP_ENABLED: "true"
+      GF_SMTP_HOST: smtp.resend.com:587
+      GF_SMTP_USER: resend
+      GF_SMTP_PASSWORD: ${RESEND_API_KEY:-}
+      # VEC-268: GF_SMTP_FROM_ADDRESS muss eine REINE E-Mail sein (Display-Name
+      # gehoert in GF_SMTP_FROM_NAME). Nicht aus RESEND_FROM_EMAIL ableiten — das
+      # traegt seit dem Cutover die Form "VectiScan <noreply@vectiscan.de>", die
+      # Grafana beim SMTP-Config-Parse abweist (Container-Restart-Loop). Eigene,
+      # entkoppelte Variable mit reiner Cutover-Adresse als Default.
+      GF_SMTP_FROM_ADDRESS: ${GRAFANA_SMTP_FROM_ADDRESS:-noreply@vectiscan.de}
+      GF_SMTP_FROM_NAME: VectiScan Alerting
+      GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
+      # Zieladresse fuer Alert-Mails (Ops-Postfach) → vom Alerting-Contactpoint
+      # via $__env{ALERT_EMAIL_TO} referenziert.
+      ALERT_EMAIL_TO: ${ADMIN_EMAIL:-}
     volumes:
       - vectiscan-grafana-data:/var/lib/grafana
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
@@ -602,7 +652,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.vectiscan-logs.rule=Host(`logs.vectigal.tech`)"
-      - "traefik.http.routers.vectiscan-logs.middlewares=security-headers@file,internal-only@file"
+      - "traefik.http.routers.vectiscan-logs.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.services.vectiscan-logs.loadbalancer.server.port=3000"
     depends_on:
       - loki

@@ -19,6 +19,7 @@ export type AuditAction =
   | 'report.downloaded'
   | 'report.regenerate'
   | 'report.notified'
+  | 'report.notify_failed'
   | 'finding.excluded'
   | 'finding.unexcluded'
   | 'finding.overridden'

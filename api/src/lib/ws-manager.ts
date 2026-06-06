@@ -116,6 +116,12 @@ export async function handleReportComplete(orderId: string): Promise<void> {
         .filter((r): r is string => Boolean(r)),
     );
 
+    // VEC-228: Empfaenger, deren Send NICHT von Resend bestaetigt wurde
+    // (sent=false ODER Exception). Bleibt am Schleifenende ein solcher uebrig,
+    // wird die Order NICHT auf `delivered` versiegelt und ein observables
+    // `report.notify_failed`-Audit geschrieben (Fail Securely + Observability).
+    const unconfirmed: string[] = [];
+
     // Send email to each recipient that has not been notified yet
     for (const email of recipients) {
       if (alreadyNotified.has(email)) {
@@ -123,7 +129,20 @@ export async function handleReportComplete(orderId: string): Promise<void> {
         continue;
       }
       try {
-        await sendScanCompleteEmail(email, domain, orderId, downloadToken);
+        const sent = await sendScanCompleteEmail(email, domain, orderId, downloadToken);
+        // Fail-Securely (VEC-227): den `report.notified`-Audit NUR bei von
+        // Resend bestaetigter Annahme schreiben. Bei transientem Fehler
+        // (429/5xx/Netzwerk -> sent=false) bleibt kein Audit zurueck, sodass
+        // der bestehende Regenerate/Retry-Pfad denselben Empfaenger erneut
+        // anmailt (bewusst at-least-once; Resend-Idempotency-Key dedupt echte
+        // Doppelsends ~24h). Ohne diesen Guard wuerde ein geschluckter
+        // Sendefehler den Empfaenger dauerhaft als notified markieren und die
+        // Report-Mail still verlieren.
+        if (!sent) {
+          logger?.warn({ orderId, email }, 'Scan-complete email not accepted — leaving unnotified for retry');
+          unconfirmed.push(email);
+          continue;
+        }
         // Audit-Log: persist the dispatch event (PA-4 AC#3) so report
         // delivery is verifiable beyond the application log and serves as
         // the idempotency marker for regenerates/retries.
@@ -134,6 +153,7 @@ export async function handleReportComplete(orderId: string): Promise<void> {
         });
       } catch (err) {
         logger?.error({ err, orderId, email }, 'Failed to send report email to recipient');
+        unconfirmed.push(email);
       }
     }
 
@@ -143,7 +163,27 @@ export async function handleReportComplete(orderId: string): Promise<void> {
     // Zustellung nicht.
     await recordTimeToValue(orderId);
 
-    // Mark order as delivered
+    // VEC-228: Order NUR dann als `delivered` versiegeln, wenn KEIN Empfaenger
+    // unbestaetigt blieb. Bei mindestens einem unbestaetigten Send bleibt die
+    // Order in `report_complete` (recoverable: ein Regenerate feuert den Handler
+    // erneut und re-mailt nur die noch nicht notified-Empfaenger) und wir
+    // schreiben ein `report.notify_failed`-Audit, damit der sonst stille Verlust
+    // beobachtbar/alertbar wird. Linsen: Fail Securely, Complete Mediation,
+    // Observability.
+    if (unconfirmed.length > 0) {
+      logger?.warn(
+        { orderId, unconfirmed: unconfirmed.length },
+        'Report delivery incomplete — not marking delivered, leaving recoverable for regenerate',
+      );
+      await audit({
+        orderId,
+        action: 'report.notify_failed',
+        details: { recipients: unconfirmed, domain, count: unconfirmed.length },
+      });
+      return;
+    }
+
+    // Mark order as delivered (alle Empfaenger bestaetigt)
     await query(
       "UPDATE orders SET status = 'delivered', updated_at = NOW() WHERE id = $1 AND status = 'report_complete'",
       [orderId],

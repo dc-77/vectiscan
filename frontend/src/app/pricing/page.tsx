@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { getTier, formatEur } from '@/lib/pricing';
 
 const C = {
   slate: '#0F172A',
@@ -92,11 +93,17 @@ export default function PricingPage() {
               ))}
             </ul>
             <div className="border-t pt-5" style={{ borderColor: C.borderSubtle }}>
-              <p className="text-xs mb-4" style={{ color: C.muted }}>Jahresabo — individuelle Preisgestaltung</p>
-              <Link href="mailto:kontakt@vectigal.gmbh?subject=Angebot%20Perimeter-Scan&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20VectiScan%20Perimeter-Scan.%0A%0AFirma%3A%20%0ADomains%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
+              <p className="mb-1">
+                <span className="text-3xl font-semibold" style={{ color: C.offWhite }}>
+                  {formatEur(getTier('perimeter')!.priceEur!)}
+                </span>
+                <span className="text-sm ml-1" style={{ color: C.muted }}>/ Jahr</span>
+              </p>
+              <p className="text-xs mb-4" style={{ color: C.muted }}>{getTier('perimeter')!.billingNote}</p>
+              <Link href="/subscribe"
                 className="block w-full text-center px-5 py-3 rounded-lg text-sm font-medium transition-all"
                 style={{ backgroundColor: C.teal, color: C.slate }}>
-                Angebot anfordern
+                Jetzt kaufen
               </Link>
             </div>
           </div>

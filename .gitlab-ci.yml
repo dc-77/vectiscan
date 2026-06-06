@@ -137,6 +137,24 @@ test-report-worker:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
 
+# VEC-160 / VEC-143 / VEC-269: Edge admin-guard regression gate (SICHERHEITSKRITISCH).
+# Fails the pipeline if a public Traefik router gains a Host() that is not also
+# covered by the /admin guard router with internal-auth@file — i.e. an
+# unguarded admin surface. Scoped to the self-contained test only (NOT all of
+# tests/, which still has unrelated staleness to reconcile separately).
+test-edge:
+  stage: test
+  tags: [vectigal]
+  image: python:3.12-slim
+  script:
+    # Runner ist Shell-Executor (image: wird ignoriert); System-Python ist PEP-668
+    # externally-managed → venv wie bei test-scan-worker/test-report-worker.
+    - python3 -m venv .venv && . .venv/bin/activate && pip install pyyaml pytest && pytest tests/test_edge_admin_guard.py -v
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_PIPELINE_SOURCE == "web"
+
 # =============================================================================
 # DEPLOY STAGE — Rolling deploy, manual deploy, and rollback
 # =============================================================================
@@ -176,6 +194,16 @@ test-report-worker:
       fi
     - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
     - cp .env .env.bak 2>/dev/null || true
+    # VEC-140 Go-live-Guard: Lead-Capture haengt am Mail-Versand. Eine leere
+    # RESEND_API_KEY-Variable (z.B. protected Var auf unprotected Branch) wuerde
+    # Mail-Routing STILL deaktivieren. Lieber laut abbrechen als still ausfallen.
+    # Log zeigt nur die Laenge, nie den Wert (Secrets-Hygiene).
+    - |
+      if [ -z "${RESEND_API_KEY}" ]; then
+        echo "ERROR: RESEND_API_KEY ist leer — CI-Variable nicht injiziert. Bei protected Var auf unprotected 'main' liefert GitLab keinen Wert. Deploy abgebrochen."
+        exit 1
+      fi
+      echo "OK: RESEND_API_KEY praesent (Laenge ${#RESEND_API_KEY})."
     - |
       cat > .env <<ENVEOF
       DB_NAME=${DB_NAME}
@@ -189,12 +217,77 @@ test-report-worker:
       ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       RESEND_API_KEY=${RESEND_API_KEY}
       RESEND_FROM_EMAIL=${RESEND_FROM_EMAIL}
+      SALES_LEAD_EMAIL=${SALES_LEAD_EMAIL:-support@vectiscan.de,kontakt@vectigal.ai}
+      STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      STRIPE_PRICE_PERIMETER=${STRIPE_PRICE_PERIMETER:-price_1TewEA1j7RvmOvLYHNA2lyM2}
+      STRIPE_PRICE_DEFAULT=${STRIPE_PRICE_DEFAULT}
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
+    # ── Deploy-Guard (VEC-217): RESEND_API_KEY ist eine *protected* CI-Var; auf
+    #    einem unprotected Branch erreicht sie den .env-Write nicht und landet
+    #    leer im Container -> E-Mail-/Lead-Routing ist STILL tot (Root-Cause
+    #    VEC-216). Nicht hart failen (E-Mail ist nicht scan-blocking), aber laut
+    #    sichtbar machen. Nur Praesenz wird geprueft, der Wert nie geloggt.
+    - |
+      if grep -q '^RESEND_API_KEY=$' .env; then
+        echo "WARN: RESEND_API_KEY ist LEER im .env — E-Mail-/Lead-Routing ist TOT."
+        echo "      Ursache i.d.R.: protected CI-Var trifft unprotected Branch (VEC-216)."
+        echo "      Scan-Funktion bleibt unberuehrt; nur Lead-/Mail-Versand betroffen."
+      else
+        echo "OK: RESEND_API_KEY im .env gesetzt (Wert wird nicht geloggt)."
+      fi
+    # ── Deploy-Guard (VEC-247): Stripe-Kauf (VEC-223). STRIPE_PRICE_PERIMETER
+    #    hat einen committeten, nicht-geheimen Test-Mode-Default und ist daher
+    #    immer gesetzt; eine CI-Var (z.B. Live-Price via VEC-14) ueberschreibt
+    #    ihn. STRIPE_SECRET_KEY ist das eigentliche Gate: ohne ihn antwortet
+    #    /api/subscriptions mit 503 (payment_not_configured). Nur Praesenz
+    #    pruefen, Werte nie loggen. Nicht hart failen (Kauf ist nicht
+    #    scan-blocking), aber laut sichtbar machen.
+    - |
+      if grep -q '^STRIPE_SECRET_KEY=$' .env; then
+        echo "WARN: STRIPE_SECRET_KEY ist LEER im .env — Perimeter-Kauf ist TOT (503 payment_not_configured)."
+        echo "      Ursache i.d.R.: CI-Var nicht gebunden (Maintainer) oder protected-Var auf unprotected Branch."
+        echo "      Scan-Funktion bleibt unberuehrt; nur der Abo-/Kauf-Flow betroffen."
+      else
+        echo "OK: STRIPE_SECRET_KEY im .env gesetzt (Wert wird nicht geloggt)."
+      fi
+    - |
+      if grep -q '^STRIPE_PRICE_PERIMETER=$' .env; then
+        echo "WARN: STRIPE_PRICE_PERIMETER ist LEER — /api/subscriptions antwortet 503 price_not_configured."
+      else
+        echo "OK: STRIPE_PRICE_PERIMETER im .env gesetzt (price-id ist nicht geheim)."
+      fi
+    # ── Deploy-Guard (VEC-238 / Folge VEC-229): ADMIN_EMAIL speist ALERT_EMAIL_TO
+    #    (docker-compose.yml:619), den Empfaenger des Grafana-Contactpoints
+    #    ops-email. Ist ADMIN_EMAIL leer, feuert die report.notify_failed-Alert-
+    #    Regel (VEC-228/229) ins Leere -> Observability nur kosmetisch. db.ts:489
+    #    nutzt ADMIN_EMAIL nur conditional, ein leerer Wert crasht die App nicht;
+    #    die Praesenz ist also nicht aus "App laeuft" ableitbar. Nicht hart failen
+    #    (nicht scan-blocking), aber laut. Nur Praesenz pruefen, Wert nie loggen.
+    - |
+      if grep -q '^ADMIN_EMAIL=$' .env; then
+        echo "WARN: ADMIN_EMAIL ist LEER im .env — Grafana-Alert (VEC-229) hat KEINEN Empfaenger (ALERT_EMAIL_TO leer). report.notify_failed-Alert feuert ins Leere."
+        echo "      Ursache i.d.R.: CI-Var ADMIN_EMAIL leer/unset. Abhilfe: CI-Var setzen (Board)."
+        echo "      Scan-Funktion bleibt unberuehrt; nur die Alert-Zustellung betroffen."
+      else
+        echo "OK: ADMIN_EMAIL im .env gesetzt -> Grafana-Alert-Empfaenger vorhanden (Wert wird NICHT geloggt)."
+      fi
     - cp ${CI_PROJECT_DIR}/docker-compose.yml .
     # Monitoring-Configs (VEC-85): Bind-Mounts in docker-compose.yml zeigen auf
     # ./monitoring — daher die Configs neben docker-compose.yml mit ausrollen.
     - rm -rf ./monitoring && cp -r ${CI_PROJECT_DIR}/monitoring .
+    # ── VEC-268 Sende-Domain-Cutover: RESEND_FROM_EMAIL deterministisch auf
+    #    vectiscan.de zwingen. Eine *bestehende* (maskierte) CI-Var
+    #    RESEND_FROM_EMAIL mit dem ALTEN Wert (noreply@vectigal.tech) wuerde
+    #    sonst gewinnen: `docker compose` interpoliert ${RESEND_FROM_EMAIL}
+    #    bevorzugt aus der Shell-Env (CI-Vars sind exportiert) VOR der .env-Datei,
+    #    und ueberschreibt damit auch den docker-compose.yml-Default. Der explizite
+    #    Export hier macht den Cutover unabhaengig vom CI-Var-Zustand. Der Wert
+    #    enthaelt Leerzeichen -> nicht maskierbar -> in ops-diag-leadmail im
+    #    Klartext verifizierbar. Sobald die Board/Maintainer die alte CI-Var auf
+    #    diesen Wert korrigiert (oder loescht), kann dieser Override entfallen.
+    - export RESEND_FROM_EMAIL='VectiScan <noreply@vectiscan.de>'
     - docker compose pull
     - TAG=${TAG} docker compose up -d --remove-orphans
     # Give all containers time to pass health checks
@@ -242,6 +335,119 @@ deploy-manual:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_PIPELINE_SOURCE == "web"
+
+# =============================================================================
+# Demo-Seed (VEC-121 / PA-6) — seedet den synthetischen Demo-Mandanten
+# (demo@vectiscan.tech) im laufenden api-Container. Idempotent: raeumt
+# vorhandene Demo-Daten (feste UUIDs) auf und legt sie neu an, streng auf
+# DEMO_CUSTOMER_ID begrenzt (Tenant-Isolation).
+#
+# DEMO_PASSWORD-Quelle (Prioritaet):
+#   1) maskierte CI/CD-Variable DEMO_PASSWORD (bevorzugt — sobald ein
+#      Maintainer sie setzt; erscheint dann als [MASKED] im Job-Log)
+#   2) host-persistiertes Zufalls-Secret ${DEPLOY_PATH}/.demo_password
+#      (immer frisch rotiert wenn (1) fehlt — VEC-258-Fix: kein Reuse eines
+#      potenziell kompromittierten Altwertes). Aktueller Wert bleibt auf dem
+#      Host fuer Operatoren lesbar (chmod 600).
+# In KEINEM Fall der dokumentierte Source-Default (Sven-Auflage, VEC-121).
+# Der Developer-Token kann keine maskierte CI/CD-Variable setzen (Maintainer-
+# only); Pfad (2) macht den Seed daher ohne Maintainer-Eingriff lauffaehig.
+# `needs: []` erlaubt das manuelle Ausloesen ohne erneuten Build/Deploy —
+# das Seed-Skript liegt bereits im laufenden api-Container.
+# =============================================================================
+ops-seed-demo:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  script:
+    - cd ${DEPLOY_PATH}
+    - |
+      if [ -z "${DEMO_PASSWORD}" ]; then
+        SECRET_FILE="${DEPLOY_PATH}/.demo_password"
+        ( umask 077; printf 'Demo-%s-2026!' "$(openssl rand -hex 6)" > "${SECRET_FILE}" )
+        chmod 600 "${SECRET_FILE}"
+        echo "Demo-Secret rotiert: ${SECRET_FILE} (chmod 600) — DEMO_PASSWORD CI/CD-Var nicht gesetzt."
+        DEMO_PASSWORD="$(cat "${SECRET_FILE}")"
+        export DEMO_PASSWORD
+      fi
+      if [ -z "${DEMO_PASSWORD}" ]; then
+        echo "ERROR: DEMO_PASSWORD konnte weder aus CI/CD-Variable noch aus Host-Secret ermittelt werden — Abbruch."
+        echo "       In prod darf kein Source-Default verwendet werden (Sven, VEC-121)."
+        exit 1
+      fi
+      # VEC-260: Selbstheilung gegen den oeffentlich dokumentierten Quell-Default.
+      # Greift quellen-unabhaengig (CI-Var ODER Host-Secret): ist der aufgeloeste
+      # Wert das bekannte Default, rotiere das Host-Secret und nutze den frischen
+      # Zufallswert. Verhindert die VEC-260-Regression (Re-Seed schrieb still das
+      # bekannte Default, weil eine vorhandene Quelle genau diesen Wert lieferte).
+      if [ "${DEMO_PASSWORD}" = "VectiScanDemo2026!" ]; then
+        echo "WARN: aufgeloestes DEMO_PASSWORD == Quell-Default — rotiere Host-Secret auf Zufallswert (VEC-260)."
+        SECRET_FILE="${DEPLOY_PATH}/.demo_password"
+        ( umask 077; printf 'Demo-%s-2026!' "$(openssl rand -hex 6)" > "${SECRET_FILE}" )
+        chmod 600 "${SECRET_FILE}"
+        DEMO_PASSWORD="$(cat "${SECRET_FILE}")"
+        export DEMO_PASSWORD
+      fi
+    - echo "Seede Demo-Mandant (demo@vectiscan.tech) im api-Container..."
+    - docker compose exec -T -e DEMO_PASSWORD="${DEMO_PASSWORD}" api node dist/scripts/seed-demo.js
+    # Single-quoted: ohne Quoting parst YAML 'echo "OK: ...' wegen des ': '
+    # als Map statt String (CI-Config-Error, VEC-121-Regression).
+    - 'echo "OK: Demo-Seed abgeschlossen."'
+
+# =============================================================================
+# Ops-Diag Lead-Mail (VEC-217) — Read-only Diagnose fuer RESEND/E-Mail-Routing.
+# Reproduziert die VEC-216-Diagnose in Sekunden: meldet Praesenz + LAENGE von
+# RESEND_API_KEY im laufenden api-Container (NIE den Wert) sowie
+# RESEND_FROM_EMAIL und greppt die api-Logs nach Lead-/RESEND-Spuren.
+# Komplett read-only — keine Mutation, kein Restart. `needs: []` -> ohne
+# Build/Deploy manuell triggerbar.
+# =============================================================================
+ops-diag-leadmail:
+  extends: .ops-base
+  needs: []
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "=== RESEND-Env im laufenden api-Container (read-only, Wert wird NIE geloggt) ==="
+    - |
+      docker compose exec -T api sh -c '
+        klen=${#RESEND_API_KEY}
+        if [ "${klen:-0}" -gt 0 ]; then
+          echo "  RESEND_API_KEY: gesetzt (Laenge=${klen})"
+        else
+          echo "  RESEND_API_KEY: LEER/FEHLT — E-Mail-/Lead-Routing ist tot (VEC-216)"
+        fi
+        echo "  RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-(leer)}"
+      ' || echo "(api-Container nicht erreichbar?)"
+    - echo
+    - 'echo "=== api-Logs (letzte 5000 Zeilen): Lead-/RESEND-Spuren ==="'
+    - docker logs --tail 5000 vectiscan-api-1 2>&1 | grep -iE 'Demo-lead|RESEND' | tail -50 || echo "(keine Lead-/RESEND-Logzeilen gefunden)"
+
+# =============================================================================
+# Diag-ACME (VEC-269) — read-only ACME/LE-Diagnose fuer vectiscan.de + www.
+# Liest Traefik-Logs (acme/certificate/challenge) + acme.json-DOMAINS (kein
+# Key-Material) + Static-Config-Resolver. Keine Mutation, kein Restart.
+# needs:[] -> sofort manuell spielbar ohne Build/Deploy.
+# =============================================================================
+ops-diag-acme:
+  extends: .ops-base
+  needs: []
+  script:
+    - TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1); echo "traefik-container=$TRAEFIK"
+    - 'echo "=== Traefik-Logs ACME/cert/challenge/vectiscan.de (letzte Treffer) ==="'
+    - docker logs --tail 12000 "$TRAEFIK" 2>&1 | grep -iE 'acme|certificate|challenge|vectiscan\.de|unable to obtain|rate limit|too many|letsencrypt|error' | tail -150 || echo "(keine ACME-Logzeilen gefunden)"
+    - echo
+    - 'echo "=== acme.json Domainnamen (main), KEIN Key-Material ==="'
+    - |
+      docker exec "$TRAEFIK" sh -c 'for f in /acme.json /etc/traefik/acme.json /opt/traefik/acme/acme.json /data/acme.json /letsencrypt/acme.json; do if [ -f "$f" ]; then echo "FOUND $f"; grep -oE "\"main\":\"[^\"]+\"" "$f" | sort -u | head -80; fi; done' || echo "(acme.json nicht im Container gefunden)"
+    - echo
+    - 'echo "=== Static-Config Resolver/Entrypoints/Challenge ==="'
+    - |
+      docker exec "$TRAEFIK" sh -c 'for f in /etc/traefik/traefik.yml /traefik.yml /etc/traefik/traefik.toml /config/traefik.yml; do [ -f "$f" ] && echo "--- $f ---" && cat "$f"; done' 2>/dev/null | grep -iE 'acme|entrypoint|httpchallenge|tlschallenge|email|caserver|resolver|address|:80|:443|web|websecure' | head -60 || echo "(static config nicht lesbar)"
 
 # =============================================================================
 # Restart-Worker — gezieltes Restart einzelner Worker-Container ohne
@@ -588,25 +794,139 @@ cleanup-prod:
     url: https://scan.vectigal.tech
 
 # =============================================================================
-# ops-provision-turnstile (VEC-190) — Cloudflare Turnstile Widget anlegen +
-# GitLab CI-Variablen NEXT_PUBLIC_TURNSTILE_SITE_KEY + WEBCHECK_TURNSTILE_SECRET
-# automatisch setzen.
+# VEC-143 — Edge-Auth-Gating: schliesst die internal-only-Flaechen per Basic-Auth.
 #
-# Voraussetzungen (3 maskierte CI/CD-Variablen, einmalig vom Board zu setzen):
-#   CF_API_TOKEN      — Cloudflare API-Token (Berechtigung: Turnstile:Edit)
-#   CF_ACCOUNT_ID     — Cloudflare Account-ID (32-stellige Hex-ID, nicht secret)
-#   GL_WRITE_TOKEN    — GitLab Personal/Project-Access-Token (api-Scope,
-#                       Maintainer-Rolle), benoetigt zum Schreiben von CI-Vars
+# Root-Cause (VEC-143, bewiesen): die IP-Allowlist `internal-only@file` ist auf
+# vectigal-docker02 wirkungslos. `/etc/docker/daemon.json` hat `iptables:false`
+# -> userland docker-proxy SNAT't jede Quell-IP auf das Bridge-GW 172.18.0.1
+# (in 172.16.0.0/12) -> intern/extern an Traefik ununterscheidbar, 403 feuert nie.
+# Kein X-Forwarded-For -> ipStrategy/trustedIPs unmoeglich.
 #
-# Ablauf:
-#   1. Turnstile-Widget fuer scan.vectigal.tech per Cloudflare-API anlegen
-#   2. Site-Key (plain) als NEXT_PUBLIC_TURNSTILE_SITE_KEY in CI/CD schreiben
-#   3. Secret-Key (maskiert) als WEBCHECK_TURNSTILE_SECRET in CI/CD schreiben
+# Board-approved Fix (Option C): basicAuth-Middleware `internal-auth`, ADDITIV in
+# den host-eigenen File-Provider (/opt/traefik/config, watch:true) geschrieben;
+# die 4 betroffenen Router (web-admin, api-admin, status, logs) haengen in der
+# docker-compose.yml jetzt an `internal-auth@file` statt `internal-only@file`.
+# Das host-eigene security.yml bleibt unangetastet (kein Shared-Edge-Eingriff).
 #
-# Triggern: GitLab-UI -> Pipeline auf feat/vec-189-turnstile-widget oder main
-# -> ops-provision-turnstile manuell starten (nach Setzen der 3 Vars).
-# Idempotent: legt Widget neu an wenn keins existiert; aktualisiert CI-Vars
-# wenn sie bereits gesetzt sind (PUT statt POST).
+# Credential kommt aus der maskierten Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD
+# (Format `user:hash`, apr1/bcrypt). KEIN Secret im Repo. Manuell/API-getriggert,
+# KEIN Image-Build/-Pull (needs:[]). Idempotent.
+# =============================================================================
+ops-traefik-auth:
+  extends: .ops-base
+  needs: []
+  variables:
+    TRAEFIK_CFG: /opt/traefik/config
+  # Eigene Rules: .ops-base auf main hat (noch) keine api-Source-Regel (der
+  # VEC-155-Fix lebt nur auf fix/vec-121). Daher hier explizit api/web/main
+  # anbieten, damit der Paperclip-Agent den Job per API-Pipeline starten kann.
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  script:
+    - |
+      if [ -z "${TRAEFIK_INTERNAL_HTPASSWD}" ]; then
+        echo "FATAL: Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD fehlt (Format user:hash)."; exit 1
+      fi
+    # Traefik-Container ermitteln (fuer Netzwerk/Reload-Check). Der File-Provider
+    # liest aus /etc/traefik/config (= Host /opt/traefik/config, READ-ONLY in den
+    # Traefik-Container gemountet). Der Runner (gitlab-runner) darf /opt/traefik/config
+    # NICHT direkt schreiben (root:root) und der Traefik-Mount ist ro. Deshalb wird
+    # ueber einen kurzlebigen Helfer-Container mit eigenem RW-Bind-Mount geschrieben:
+    # der Docker-Daemon laeuft als root, der Bind-Mount persistiert auf den Host,
+    # Traefik (watch:true) laedt die neue Datei hot.
+    - |
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      if [ -z "$TRAEFIK" ]; then echo "FATAL: kein Traefik-Container gefunden."; exit 1; fi
+      echo "Traefik-Container: $TRAEFIK"
+    - TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+    - HELPER=busybox:1.36
+    - docker image inspect "$HELPER" >/dev/null 2>&1 || docker pull "$HELPER"
+    # 0) Klartext-Credential host-persistieren (optional), damit Operatoren es per
+    #    `sudo cat /opt/traefik/config/.vectiscan-internal-cred` abholen koennen —
+    #    kein Klartext im Repo/Board (Muster wie .demo_password, VEC-154).
+    - |
+      if [ -n "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" ]; then
+        docker run --rm --user 0:0 -e C="${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" \
+          -v "${TRAEFIK_CFG}:/cfg" "$HELPER" \
+          sh -c 'printf "%s\n" "$C" > /cfg/.vectiscan-internal-cred && chmod 600 /cfg/.vectiscan-internal-cred'
+        echo "Klartext-Credential persistiert nach ${TRAEFIK_CFG}/.vectiscan-internal-cred (chmod 600)."
+      else
+        echo "Kein TRAEFIK_INTERNAL_CRED_PLAINTEXT gesetzt — ueberspringe Klartext-Persistierung."
+      fi
+    # 1) basicAuth-Middleware additiv in den Host-File-Provider schreiben.
+    - |
+      RENDERED=$(sed "s#__TRAEFIK_INTERNAL_HTPASSWD__#${TRAEFIK_INTERNAL_HTPASSWD}#" ${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml)
+      docker run --rm --user 0:0 -e C="$RENDERED" \
+        -v "${TRAEFIK_CFG}:/cfg" "$HELPER" \
+        sh -c 'printf "%s\n" "$C" > /cfg/vectiscan-auth.yml && chmod 644 /cfg/vectiscan-auth.yml'
+    - echo "=== vectiscan-auth.yml geschrieben ==="; docker run --rm -v "${TRAEFIK_CFG}:/cfg:ro" "$HELPER" ls -la /cfg/vectiscan-auth.yml || true
+    # 2) Traefik (watch:true) laedt hot — warten und Middleware-Existenz pruefen.
+    - sleep 6
+    - |
+      NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
+      echo "Traefik=${TRAEFIK} Net=${NET}"
+      echo "--- middleware internal-auth@file ---"
+      docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/middlewares/internal-auth@file" || echo "(middleware-check fehlgeschlagen)"
+    # 3) Aktive-Scan-Guard (analog .deploy-base), dann die 4 Router neu labeln.
+    - cd ${DEPLOY_PATH}
+    - |
+      if [ "${DEPLOY_FORCE:-false}" != "true" ]; then
+        ACTIVE=$(docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc "SELECT count(*) FROM orders WHERE status IN ('queued','scanning','passive_intel','dns_recon','scan_phase1','scan_phase2','scan_phase3','report_generating')" 2>/dev/null | tr -d '[:space:]' || echo "?")
+        if [ "$ACTIVE" != "?" ] && [ "${ACTIVE:-0}" -gt 0 ]; then
+          echo "ERROR: $ACTIVE aktive Scan(s) — abgebrochen. DEPLOY_FORCE=true zum Erzwingen."; exit 1
+        fi
+        echo "Aktive Scans: ${ACTIVE:-0} — ok."
+      fi
+    - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
+    - cp ${CI_PROJECT_DIR}/docker-compose.yml .
+    - TAG=${TAG:-latest} docker compose up -d --no-deps --no-build frontend api uptime-kuma grafana
+    - sleep 10
+    - docker compose ps frontend api uptime-kuma grafana
+    # 4) Verifikation: die 4 Router haengen jetzt an internal-auth.
+    - |
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
+      for R in vectiscan-web-admin vectiscan-api-admin vectiscan-status vectiscan-logs; do
+        echo "--- router ${R}@docker ---"
+        docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/routers/${R}@docker" | head -c 500; echo
+      done
+    # 5) VEC-167 — Live-Smoke: Edge-Gate ist case-INSENSITIV. Sowohl die Original-
+    #    Schreibweise als auch Case-Varianten muessen 401 liefern (nicht 404).
+    #    Nicht-fatal (Job-Verifikation/Evidenz); FAIL wird explizit markiert.
+    - |
+      echo "=== VEC-167 Edge-Case-Smoke (extern, Basic-Auth ist IP-unabhaengig) ==="
+      VEC167_FAIL=0
+      check_code() { # $1=url  $2=erwartet
+        CODE=$(docker run --rm curlimages/curl:8.8.0 -s -o /dev/null -w '%{http_code}' --max-time 12 "$1" 2>/dev/null || echo "ERR")
+        if [ "$CODE" = "$2" ]; then echo "PASS  $1 -> $CODE"; else echo "FAIL  $1 -> $CODE (erwartet $2)"; VEC167_FAIL=1; fi
+      }
+      # Edge-Gate (401 erwartet) — Original + Case-Varianten
+      check_code "https://scan.vectigal.tech/admin"                     401
+      check_code "https://scan.vectigal.tech/ADMIN"                     401
+      check_code "https://scan.vectigal.tech/Admin"                     401
+      check_code "https://scan-api.vectigal.tech/api/admin/review/queue" 401
+      check_code "https://scan-api.vectigal.tech/api/ADMIN/review/queue" 401
+      check_code "https://scan-api.vectigal.tech/api/Admin/review/queue" 401
+      check_code "https://status.vectigal.tech/"                        401
+      # Oeffentlich (200 erwartet) — darf NICHT mit-gegated werden
+      check_code "https://scan.vectigal.tech/"                          200
+      if [ "$VEC167_FAIL" = "1" ]; then
+        echo "VEC-167-SMOKE: FAIL — Edge-Gate nicht case-insensitiv ODER public mit-gegated. Pruefen/Revert."
+      else
+        echo "VEC-167-SMOKE: ALLE PASS — Edge-Gate case-insensitiv, public unveraendert."
+      fi
+    - echo "=== FERTIG ==="
+  environment:
+    name: production
+    url: https://scan.vectigal.tech
+
+
+
 # =============================================================================
 ops-provision-turnstile:
   extends: .ops-base

@@ -12,6 +12,8 @@ from urllib.parse import urlparse
 
 import requests
 
+from scanner.common import ssrf_guard
+
 
 DEFAULT_TIMEOUT = 5.0
 USER_AGENT = "VectiScan-Precheck/1.0"
@@ -85,16 +87,21 @@ class HttpProbe:
 
 
 def probe(url: str, timeout: float = DEFAULT_TIMEOUT) -> HttpProbe:
-    """GET a URL, follow redirects, extract title + parking heuristic."""
+    """GET a URL, follow redirects, extract title + parking heuristic.
+
+    SSRF-/DNS-Rebinding-Haertung (VEC-196): Aufloesung und Verbindung laufen
+    ueber ``ssrf_guard.safe_get`` (Resolve-and-Pin + Block interner Ranges).
+    Ein geblocktes (internes) Ziel wird wie ein Netzwerkfehler behandelt.
+    """
     try:
-        resp = requests.get(
+        resp = ssrf_guard.safe_get(
             url,
             timeout=timeout,
             allow_redirects=True,
             headers={"User-Agent": USER_AGENT},
             verify=False,
         )
-    except requests.exceptions.RequestException as exc:
+    except (requests.exceptions.RequestException, ssrf_guard.SsrfBlockedError) as exc:
         return HttpProbe(url=url, status=None, title=None,
                          final_url=None, parking=False, error=str(exc))
 

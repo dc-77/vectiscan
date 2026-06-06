@@ -232,8 +232,8 @@ export default function LandingPage() {
             VectiScan analysiert Ihre exponierte IT-Infrastruktur automatisiert auf Schwachstellen — regelmäßig, zuverlässig, nach anerkannten Standards. Damit Sie Gewissheit haben.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/pricing" className="w-full sm:w-auto px-8 py-4 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-[1.02] cta-glow"
-              style={{ backgroundColor: C.teal, color: C.slate }}>Jetzt Angebot anfordern</Link>
+            <Link href="/demo" className="w-full sm:w-auto px-8 py-4 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-[1.02] cta-glow"
+              style={{ backgroundColor: C.teal, color: C.slate }}>Demo anfragen</Link>
             <Link href="/pricing#pakete" className="w-full sm:w-auto px-8 py-4 rounded-lg text-sm font-medium transition-all duration-300 hover:border-[#2DD4BF60] text-center"
               style={{ color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>Pakete vergleichen</Link>
           </div>
@@ -357,8 +357,8 @@ export default function LandingPage() {
           <h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold mb-4" style={{ color: C.offWhite }}>Bereit für Ihren ersten Security-Scan?</h2>
           <p className="text-sm mb-8 font-light" style={{ color: C.muted }}>Lassen Sie sich ein individuelles Angebot erstellen — oder starten Sie direkt.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/pricing" className="w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-semibold transition-all duration-300 cta-glow text-center"
-              style={{ backgroundColor: C.teal, color: C.slate }}>Angebot anfordern</Link>
+            <Link href="/demo" className="w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-semibold transition-all duration-300 cta-glow text-center"
+              style={{ backgroundColor: C.teal, color: C.slate }}>Demo anfragen</Link>
             <Link href="/subscribe" className="w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-medium transition-all duration-300 text-center"
               style={{ color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>Direkt Abo starten</Link>
           </div>
@@ -378,6 +378,7 @@ export default function LandingPage() {
             <a href="mailto:kontakt@vectigal.gmbh" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Kontakt</a>
             <a href="/impressum" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Impressum</a>
             <a href="/datenschutz" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Datenschutz</a>
+            <a href="/agb" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>AGB</a>
           </div>
           <p className="text-xs font-light" style={{ color: `${C.muted}60` }}>&copy; 2026 Vectigal GmbH</p>
         </div>

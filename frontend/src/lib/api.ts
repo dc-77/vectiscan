@@ -794,7 +794,7 @@ export async function generateStatusReport(
 
 export async function createSubscription(data: {
   package: string; targets: TargetEntry[]; scanInterval: string; reportEmails: string[];
-}): Promise<ApiResponse<{ id: string; message: string }>> {
+}): Promise<ApiResponse<{ id: string; message: string; status?: string; checkoutUrl?: string | null; checkoutSessionId?: string | null }>> {
   const res = await fetch(`${API_URL}/api/subscriptions`, {
     method: 'POST',
     headers: authHeaders(),

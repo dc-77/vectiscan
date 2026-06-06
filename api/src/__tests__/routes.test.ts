@@ -611,6 +611,55 @@ describe('API Routes', () => {
 
       expect(res.statusCode).toBe(410);
     });
+
+    // VEC-197: fail-CLOSED auf NULL expires_at. Legacy-Zeilen ohne Ablaufdatum
+    // dürfen über den anonymen Deeplink nicht ewig erreichbar sein — es gilt die
+    // 30-Tage-TTL ab created_at.
+    it('should allow NULL-expires_at download when created within 30d (fail-closed TTL)', async () => {
+      const recent = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000); // vor 5 Tagen
+      mockQuery.mockResolvedValueOnce({
+        rows: [{
+          minio_bucket: 'scan-reports',
+          minio_path: `${orderId}.pdf`,
+          file_size_bytes: 1024,
+          created_at: recent,
+          expires_at: null, // Legacy-Zeile ohne Ablaufdatum
+          target_url: 'example.com',
+        }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'UPDATE', rowCount: 1, oid: 0, fields: [] });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}/report?download_token=null-recent`,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers['content-type']).toBe('application/pdf');
+    });
+
+    it('should reject NULL-expires_at download when created over 30d ago (fail-closed TTL)', async () => {
+      const old = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000); // vor 31 Tagen
+      mockQuery.mockResolvedValueOnce({
+        rows: [{
+          minio_bucket: 'scan-reports',
+          minio_path: `${orderId}.pdf`,
+          file_size_bytes: 1024,
+          created_at: old,
+          expires_at: null, // Legacy-Zeile ohne Ablaufdatum → TTL aus created_at
+          target_url: 'example.com',
+        }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}/report?download_token=null-old`,
+      });
+
+      expect(res.statusCode).toBe(410);
+    });
   });
 
   describe('POST /api/auth/forgot-password', () => {

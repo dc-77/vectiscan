@@ -165,12 +165,65 @@ Funnel-Rollout setzen — Launch-Checkliste.
   geparst, `level` als Label) mit 14-Tage-Retention.
 - Laufzeit-Alerts (Down/Recovery) per Resend-Mail an `ADMIN_EMAIL`.
 
+**Abgedeckt (Ergänzung VEC-229):**
+- **Log-basiertes Alerting** via Grafana Unified Alerting — erste Regel:
+  `report.notify_failed` (s. Abschnitt unten). Weitere Log-Alerts additiv als
+  Regel-Gruppe unter `monitoring/grafana/provisioning/alerting/`.
+
 **Bewusst nicht (Scope-Grenze / Folge-Tickets):**
 - Metriken/APM (Prometheus, Tracing) — nicht Teil von VEC-85; bei Bedarf
   separates Ticket.
-- Log-basiertes Alerting (z. B. „>N Errors/min") — Grafana-Alerting wäre der
-  nächste Schritt; aktuell deckt Kuma das Uptime-Alerting ab.
+- Generisches Schwellwert-Alerting („>N Errors/min" o. ä.) über alle Services —
+  noch nicht verdrahtet; das Muster steht jetzt (VEC-229), neue Regeln sind eine
+  additive YAML-Datei.
 - Off-Site-Backup — siehe `OFFSITE-BACKUP-EVAL.md`.
+
+---
+
+## Alert: `report.notify_failed` (VEC-229)
+
+**Was es bedeutet:** Der Report-Handler (`api/src/lib/ws-manager.ts`) hat beim
+Versand der fertigen Report-Mail **mindestens einen Empfänger nicht von Resend
+bestätigt** bekommen (transienter Fehler: 429/5xx/Netzwerk). Gemäß VEC-227/228
+wird die Order dann **nicht** auf `delivered` versiegelt, sondern bleibt
+**recoverable in `report_complete`**, und es wird ein Audit-Event
+`report.notify_failed` (`details: { recipients, domain, count }`) geschrieben.
+Es geht also **kein Report still verloren** — er ist nur noch nicht zugestellt.
+
+**Severity:** `warning` (Observability/low). Kein Security-/Datenleck. Der
+P0-Verlustpfad ist durch VEC-227+228 bereits geschlossen; dieser Alert macht den
+verbleibenden „transienter Fehler ohne Folge-Regenerate"-Fall aktiv sichtbar.
+
+**Handlungsschritt (Recovery):**
+1. Betroffene Order im Audit-Log identifizieren (Grafana → Explore →
+   `{project="vectiscan", service="api"} |~ "Report delivery incomplete"`;
+   `orderId` steht in der Logzeile). Vollständige Details (`recipients`, `domain`)
+   liegen im DB-Audit-Event `report.notify_failed` der Order.
+2. **Report regenerieren** — das re-feuert den Handler. Er mailt idempotent nur
+   die Empfänger an, für die noch **kein** `report.notified`-Audit existiert
+   (kein Doppelsend an bereits zugestellte Empfänger).
+3. Bleibt der Alert nach Regenerate bestehen → Resend-Status / `RESEND_API_KEY` /
+   Domain-Verifizierung prüfen (vgl. VEC-216/226), nicht nur einzelne Order.
+
+**Wie verdrahtet (IaC):**
+- Trigger ist die Warn-Logzeile `"Report delivery incomplete — not marking
+  delivered, leaving recoverable for regenerate"`, die der Handler **zusammen
+  mit** dem `report.notify_failed`-Audit emittiert. Promtail tailt sie nach Loki.
+  > Das Audit-Event selbst lebt in der DB-Tabelle `audit_log`, **nicht** in Loki.
+  > Loki/Grafana alerten auf die korrespondierende Logzeile. Ändert sich der
+  > Wortlaut der Message in `ws-manager.ts`, muss `expr` in
+  > `monitoring/grafana/provisioning/alerting/rules.yml` mitgezogen werden.
+- Regel: `monitoring/grafana/provisioning/alerting/rules.yml`
+  (Gruppe `vectiscan-report-delivery`, eval 1 min, `for: 0m`,
+  `sum(count_over_time(… |~ "Report delivery incomplete" [10m])) > 0`,
+  `noDataState: OK`).
+- Benachrichtigung: Contact-Point `ops-email`
+  (`monitoring/grafana/provisioning/alerting/contactpoints.yml`) → Resend-SMTP →
+  `ADMIN_EMAIL`. SMTP-Config: `GF_SMTP_*` im `grafana`-Service der
+  `docker-compose.yml` (gleiche Resend-Creds wie die Customer-Mails).
+- **Voraussetzung Live-Mail:** Wie bei den Customer-Mails muss die Resend-
+  Absender-Domain verifiziert sein (vgl. VEC-226). Bis dahin ist die Regel aktiv
+  und in Grafana sichtbar, die Mail-Zustellung hängt am selben Domain-Gate.
 
 ## Betrieb / Troubleshooting
 

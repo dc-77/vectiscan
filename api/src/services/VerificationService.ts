@@ -1,5 +1,6 @@
 import dns from 'dns/promises';
 import crypto from 'crypto';
+import { safeFetch } from '../lib/ssrf-guard.js';
 
 export interface VerificationResult {
   verified: boolean;
@@ -24,20 +25,15 @@ export async function verifyDnsTxt(domain: string, token: string): Promise<Verif
 
 export async function verifyFile(domain: string, token: string): Promise<VerificationResult> {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
-
-    try {
-      const response = await fetch(
-        `https://${domain}/.well-known/vectiscan-verify.txt`,
-        { signal: controller.signal }
-      );
-      const body = await response.text();
-      const verified = body.trim() === token;
-      return { verified, method: 'file' };
-    } finally {
-      clearTimeout(timeout);
-    }
+    // safeFetch pinnt auf eine validierte öffentliche IP (Resolve-and-Pin) und
+    // blockt private/link-local/loopback/metadata-Ziele — Schutz gegen
+    // DNS-Rebinding (VEC-175). Bei geblocktem Ziel wirft safeFetch → catch unten.
+    const response = await safeFetch(
+      `https://${domain}/.well-known/vectiscan-verify.txt`,
+    );
+    const body = await response.text();
+    const verified = body.trim() === token;
+    return { verified, method: 'file' };
   } catch {
     return { verified: false, method: 'file' };
   }
@@ -45,24 +41,15 @@ export async function verifyFile(domain: string, token: string): Promise<Verific
 
 export async function verifyMetaTag(domain: string, token: string): Promise<VerificationResult> {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
-
-    try {
-      const response = await fetch(`https://${domain}`, {
-        signal: controller.signal,
-      });
-      const body = await response.text();
-      const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(
-        `<meta\\s+name\\s*=\\s*['"]vectiscan-verify['"]\\s+content\\s*=\\s*['"]${escaped}['"]\\s*/?>`,
-        'i'
-      );
-      const verified = regex.test(body);
-      return { verified, method: 'meta_tag' };
-    } finally {
-      clearTimeout(timeout);
-    }
+    const response = await safeFetch(`https://${domain}`);
+    const body = await response.text();
+    const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(
+      `<meta\\s+name\\s*=\\s*['"]vectiscan-verify['"]\\s+content\\s*=\\s*['"]${escaped}['"]\\s*/?>`,
+      'i'
+    );
+    const verified = regex.test(body);
+    return { verified, method: 'meta_tag' };
   } catch {
     return { verified: false, method: 'meta_tag' };
   }
