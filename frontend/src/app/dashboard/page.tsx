@@ -7,28 +7,9 @@ import { listOrders, deleteOrderPermanent, listSubscriptions, getSubscriptionPos
 import { isLoggedIn, isAdmin, clearToken } from '@/lib/auth';
 import SeverityCounts from '@/components/SeverityCounts';
 import { groupOrders, OrderGroup } from '@/lib/grouping';
+import StateView from '@/components/ds/StateView';
+import StatusChip from '@/components/ds/StatusChip';
 
-import { STATUS_LABELS } from '@/lib/utils';
-
-const PHASE_LABELS = STATUS_LABELS;
-
-const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
-  verification_pending: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  created:             { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  queued:              { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  scanning:            { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  passive_intel:       { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  dns_recon:           { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  scan_phase1:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  scan_phase2:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  scan_phase3:         { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  scan_complete:       { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  report_generating:   { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  report_complete:     { bg: 'bg-slate-700',   text: 'text-slate-300' },
-  failed:              { bg: 'bg-red-500/15',  text: 'text-red-400' },
-  cancelled:           { bg: 'bg-red-500/15',  text: 'text-red-400' },
-  verified:            { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-};
 
 const PACKAGE_STYLES: Record<string, { label: string }> = {
   // v2 package names
@@ -178,6 +159,17 @@ export default function Dashboard() {
     failed: groups.filter(g => g.aggregates.failedScans > 0).length,
   };
 
+  // ── Onboarding-Zustandslogik A/B/C (VEC-293) ─────────────────────
+  // A: kein Abo, kein abgeschlossener WebCheck → Erstnutzer-State
+  // B: kein Abo, aber mindestens ein fertiger WebCheck → Upgrade-State
+  // C: aktives Abo → Voll-Dashboard (kein Overlay)
+  const hasActiveSub = subscriptions.length > 0;
+  const completedWebchecks = orders.filter(
+    o => ['webcheck', 'basic'].includes(o.package ?? '') && o.status === 'report_complete'
+  );
+  const hasDoneWebcheck = completedWebchecks.length > 0;
+  const dashboardState: 'A' | 'B' | 'C' = hasActiveSub ? 'C' : hasDoneWebcheck ? 'B' : 'A';
+
   if (!ready) return null;
 
   return (
@@ -186,12 +178,21 @@ export default function Dashboard() {
         {/* Title */}
         <h1 className="text-lg font-semibold text-white">Dashboard</h1>
 
-        {/* Upsell banner if no subscriptions */}
-        {!loading && subscriptions.length === 0 && orders.length > 0 && (
-          <Link href="/subscribe"
-            className="block bg-[#1e293b] border border-blue-800/30 rounded-lg p-3 text-sm text-blue-400 hover:text-blue-300 hover:bg-[#253347] transition-colors">
-            Automatisieren Sie Ihre Scans mit einem Abo &rarr;
-          </Link>
+        {/* ── Zustand A: Erstnutzer (kein Abo, kein WebCheck) ──────── */}
+        {!loading && dashboardState === 'A' && (
+          <StateView
+            variant="empty"
+            title="Willkommen — starten Sie Ihren ersten Scan"
+            description="Ein kostenloser WebCheck zeigt Ihnen sofort, wo Ihr Webauftritt steht."
+            actions={[
+              { label: 'WebCheck starten', href: '/webcheck', variant: 'primary' },
+            ]}
+          >
+            <Link href="/subscribe" className="text-sm mt-1 inline-block"
+              style={{ color: 'var(--text-muted)' }}>
+              Alle Pakete ansehen →
+            </Link>
+          </StateView>
         )}
 
         {/* KPI Summary Cards */}
@@ -263,22 +264,15 @@ export default function Dashboard() {
           <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">{error}</div>
         )}
         {loading && <div className="text-center py-12 text-gray-500">Lade Aufträge...</div>}
-        {!loading && orders.length === 0 && (
-          <div className="text-center py-16 space-y-4">
-            <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#2DD4BF12', border: '2px solid #2DD4BF30' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" strokeWidth="1.5" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <h2 className="text-lg font-semibold" style={{ color: '#F8FAFC' }}>Willkommen bei VectiScan</h2>
-            <p className="text-sm max-w-sm mx-auto" style={{ color: '#94A3B8' }}>
-              In wenigen Minuten wissen Sie, wie sicher Ihre IT-Infrastruktur ist. Starten Sie Ihren ersten Scan oder erstellen Sie ein Abo für regelmäßige Überwachung.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Link href="/welcome" className="px-6 py-3 rounded-lg text-sm font-semibold transition-all cta-glow"
-                style={{ backgroundColor: '#2DD4BF', color: '#0F172A' }}>Ersten Scan starten</Link>
-              <Link href="/subscribe" className="px-6 py-3 rounded-lg text-sm font-medium transition-colors"
-                style={{ color: '#F8FAFC', border: '1px solid rgba(45,212,191,0.25)' }}>Abo erstellen</Link>
-            </div>
-          </div>
+
+        {/* ── Zustand C leer: Abo aktiv, aber noch kein Scan ────────── */}
+        {!loading && dashboardState === 'C' && orders.length === 0 && (
+          <StateView
+            variant="empty"
+            title="Alles bereit — starten Sie Ihren ersten Scan"
+            description={`Ihr ${subscriptions[0]?.package ?? 'Abo'}-Abo ist aktiv. Geben Sie Ihre Domain ein.`}
+            actions={[{ label: 'Neuer Scan', href: '/scan', variant: 'primary' }]}
+          />
         )}
 
         {/* Group cards */}
@@ -306,6 +300,31 @@ export default function Dashboard() {
         {!loading && groups.length > 0 && filteredGroups.length === 0 && (
           <div className="text-center py-12 text-gray-500">Keine Pakete mit diesem Filter.</div>
         )}
+
+        {/* ── Zustand B: WebCheck-Ergebnis vorhanden, kein Abo ─────── */}
+        {!loading && dashboardState === 'B' && (() => {
+          const latestWebcheck = completedWebchecks[completedWebchecks.length - 1];
+          const sc = latestWebcheck?.severityCounts;
+          const findingCount = sc ? Object.values(sc).reduce((s, v) => s + v, 0) : 0;
+          const description = findingCount > 0
+            ? `${findingCount} Schwachstellen gefunden. Ein Perimeter-Scan deckt Netzwerk, Subdomains und DSGVO-Konformität auf.`
+            : 'Ihr WebCheck ist sauber — ein Perimeter-Scan bestätigt das für Ihr gesamtes Netzwerk.';
+          return (
+            <StateView
+              variant="info"
+              title="Gehen Sie tiefer — Ihre Sicherheitslage vollständig sehen"
+              description={description}
+              actions={[
+                { label: 'Perimeter-Scan freischalten', href: '/subscribe?package=perimeter', variant: 'primary' },
+              ]}
+            >
+              <Link href="/subscribe" className="text-sm mt-1 inline-block"
+                style={{ color: 'var(--text-muted)' }}>
+                Alle Pakete vergleichen →
+              </Link>
+            </StateView>
+          );
+        })()}
 
         {/* Admin: Delete legacy individual orders inline */}
         {admin && groups.some(g => g.kind === 'domain') && (
@@ -340,9 +359,6 @@ function GroupCard({ group, admin }: { group: OrderGroup; admin: boolean }) {
     ? PACKAGE_STYLES[sub.package]?.label || sub.package.toUpperCase()
     : null;
   const riskBadge = agg.latestRisk ? RISK_BADGE[agg.latestRisk] : null;
-  const statusLabel = agg.latestStatus ? (PHASE_LABELS[agg.latestStatus] || agg.latestStatus) : null;
-  const statusStyle = agg.latestStatus ? (PHASE_COLORS[agg.latestStatus] || { bg: 'bg-slate-700', text: 'text-slate-400' }) : null;
-  const isActiveGroup = agg.activeScans > 0;
   const totalSeverity = agg.severityCounts.CRITICAL + agg.severityCounts.HIGH + agg.severityCounts.MEDIUM + agg.severityCounts.LOW;
   const groupHref = `/scans/${group.key}`;
 
@@ -393,11 +409,8 @@ function GroupCard({ group, admin }: { group: OrderGroup; admin: boolean }) {
               {agg.latestRisk}
             </span>
           )}
-          {statusLabel && statusStyle && (
-            <span className={`${statusStyle.bg} ${statusStyle.text} text-xs font-medium px-2.5 py-1 rounded inline-flex items-center gap-1.5`}>
-              {isActiveGroup && <span className="w-1.5 h-1.5 bg-current rounded-full animate-pulse" />}
-              {statusLabel}
-            </span>
+          {agg.latestStatus && (
+            <StatusChip status={agg.latestStatus} size="sm" />
           )}
         </div>
       </div>
