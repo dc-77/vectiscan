@@ -462,7 +462,7 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center gap-6">
-            <a href="mailto:support@vectigal.tech" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Kontakt</a>
+            <a href="mailto:support@vectiscan.de" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Kontakt</a>
             <a href="/impressum" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Impressum</a>
             <a href="/datenschutz" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Datenschutz</a>
             <a href="/agb" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>AGB</a>

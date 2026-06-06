@@ -115,7 +115,7 @@ export default function WebCheckLandingPage() {
           <span aria-hidden="true" style={{ color: `${C.muted}55` }}>·</span>
           <span>Serverstandort Deutschland</span>
           <span aria-hidden="true" style={{ color: `${C.muted}55` }}>·</span>
-          <a href="mailto:support@vectigal.tech" className="hover:text-white transition-colors" style={{ color: C.muted }}>support@vectigal.tech</a>
+          <a href="mailto:support@vectiscan.de" className="hover:text-white transition-colors" style={{ color: C.muted }}>support@vectiscan.de</a>
           <span aria-hidden="true" style={{ color: `${C.muted}55` }}>·</span>
           <a href="/impressum" className="hover:text-white transition-colors" style={{ color: C.muted }}>Impressum</a>
           <span aria-hidden="true" style={{ color: `${C.muted}55` }}>·</span>
