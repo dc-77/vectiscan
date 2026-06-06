@@ -1154,88 +1154,90 @@ ops-twenty-create-user-db:
       echo "OK: Bcrypt-Hash generiert (Laenge=${#HASH})"
       export HASH
     - |
-      # 3) Workspace + Admin-User direkt in PostgreSQL anlegen
-      # (Twenty v2.9.0 hat keinen REST/GraphQL-Endpoint für First-Setup)
-      set +e  # Fehler-Check explizit, nicht per set -e
-      echo "=== Schema Discovery ==="
-      ALL_SCHEMAS=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-        psql -U twenty -d twenty -tAc \
-        "SELECT schema_name FROM information_schema.schemata WHERE schema_name NOT IN ('pg_catalog','information_schema') ORDER BY 1;" \
-        2>/dev/null | tr '\n' ',' || echo "NO_CONN")
-      echo "Schemas: ${ALL_SCHEMAS}"
-      ALL_TABLES=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-        psql -U twenty -d twenty -tAc \
-        "SELECT table_schema||'.'||table_name FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema') ORDER BY 1 LIMIT 50;" \
-        2>/dev/null | tr '\n' '|' || echo "")
-      echo "All tables: ${ALL_TABLES}"
+      # 3) Workspace + Admin-User in core-Schema anlegen (Twenty v2.9.0 nutzt core.*, nicht public.*)
+      set +e
+      echo "=== core-Schema Status ==="
+      # Check workspace count in core schema
       WORKSPACE_COUNT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-        psql -U twenty -d twenty -tAc "SELECT count(*) FROM workspace;" 2>/dev/null | tr -d '[:space:]')
+        psql -U twenty -d twenty -tAc "SELECT count(*) FROM core.workspace;" 2>/dev/null | tr -d '[:space:]')
       if [ -z "${WORKSPACE_COUNT}" ]; then WORKSPACE_COUNT=0; fi
-      echo "Workspace-Count: ${WORKSPACE_COUNT}"
+      echo "core.workspace count: ${WORKSPACE_COUNT}"
+      # Get workspace column info for diagnostic
+      echo "=== core.workspace columns ==="
+      COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
+        "SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_schema='core' AND table_name='workspace' ORDER BY ordinal_position;" 2>&1
+      echo "=== core.user columns ==="
+      COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
+        "SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_schema='core' AND table_name='user' ORDER BY ordinal_position;" 2>&1
+      # Get or create workspace
       if [ "${WORKSPACE_COUNT}" = "0" ]; then
-        echo "INFO: Lege Workspace + Admin-User per SQL an"
-        WS_ID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-          psql -U twenty -d twenty -tAc "SELECT gen_random_uuid();" 2>&1 | tr -d '[:space:]')
-        USER_UUID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-          psql -U twenty -d twenty -tAc "SELECT gen_random_uuid();" 2>&1 | tr -d '[:space:]')
-        # pgcrypto-free invite hash using md5+clock_timestamp
+        echo "INFO: Erstelle Workspace in core.workspace"
         INVITE_HASH=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
           psql -U twenty -d twenty -tAc \
           "SELECT substring(md5(random()::text||clock_timestamp()::text) for 32);" 2>&1 | tr -d '[:space:]')
-        echo "WS_ID=${WS_ID} USER_UUID=${USER_UUID} INVITE_HASH=${INVITE_HASH}"
-        # Insert workspace
         WS_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
           psql -U twenty -d twenty -tAc \
-          "INSERT INTO workspace (id, display_name, subscription_status, plan, invite_hash)
-           VALUES ('${WS_ID}', 'VectiScan CRM', 'active', 'FREE', '${INVITE_HASH}')
-           ON CONFLICT DO NOTHING RETURNING id;" 2>&1)
-        echo "Workspace: ${WS_RESULT}"
-        if echo "${WS_RESULT}" | grep -q "ERROR"; then
-          echo "WARN: Workspace-Insert fehlgeschlagen — Schema-Info:"
-          COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
-            "SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_schema='public' AND table_name='workspace' ORDER BY ordinal_position;" 2>&1
-          exit 1
-        fi
-        # Insert user
+          "INSERT INTO core.workspace (display_name, invite_hash) VALUES ('VectiScan CRM', '${INVITE_HASH}') RETURNING id;" 2>&1)
+        echo "Workspace insert: ${WS_RESULT}"
+        WS_ID=$(echo "${WS_RESULT}" | grep -E '^[0-9a-f-]{36}$' | tr -d '[:space:]')
+      else
+        WS_ID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc "SELECT id FROM core.workspace LIMIT 1;" 2>/dev/null | tr -d '[:space:]')
+        echo "Existing workspace: ${WS_ID}"
+      fi
+      echo "Using WS_ID: ${WS_ID}"
+      if [ -z "${WS_ID}" ]; then echo "ERROR: Kein Workspace-ID — Abbruch"; exit 1; fi
+      # Check / create user in core.user
+      EXISTING_USER=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc \
+        "SELECT id FROM core.\"user\" WHERE email='${TARGET_EMAIL}';" 2>/dev/null | tr -d '[:space:]')
+      echo "Existing user: ${EXISTING_USER}"
+      if [ -n "${EXISTING_USER}" ]; then
+        echo "INFO: User bereits vorhanden — aktualisiere Passwort"
+        COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "UPDATE core.\"user\" SET password_hash='${HASH}', default_workspace_id='${WS_ID}' WHERE email='${TARGET_EMAIL}';" 2>&1
+        USER_UUID="${EXISTING_USER}"
+      else
+        echo "INFO: Erstelle neuen User in core.user"
         USER_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
           psql -U twenty -d twenty -tAc \
-          "INSERT INTO \"user\" (id, email, password_hash, first_name, last_name, default_workspace_id, email_verified)
-           VALUES ('${USER_UUID}', '${TARGET_EMAIL}', '${HASH}', '${TARGET_FIRST}', '${TARGET_LAST}', '${WS_ID}', true)
-           ON CONFLICT (email) DO UPDATE SET password_hash='${HASH}', default_workspace_id='${WS_ID}', email_verified=true
+          "INSERT INTO core.\"user\" (email, password_hash, first_name, last_name, default_workspace_id)
+           VALUES ('${TARGET_EMAIL}', '${HASH}', '${TARGET_FIRST}', '${TARGET_LAST}', '${WS_ID}')
            RETURNING id;" 2>&1)
-        echo "User: ${USER_RESULT}"
+        echo "User insert: ${USER_RESULT}"
         if echo "${USER_RESULT}" | grep -q "ERROR"; then
-          echo "WARN: User-Insert fehlgeschlagen — Schema-Info:"
-          COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
-            "SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_schema='public' AND table_name='user' ORDER BY ordinal_position;" 2>&1
-          exit 1
-        fi
-        # Get confirmed user ID
-        ACTUAL_USER_ID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-          psql -U twenty -d twenty -tAc \
-          "SELECT id FROM \"user\" WHERE email='${TARGET_EMAIL}';" 2>/dev/null | tr -d '[:space:]')
-        echo "Confirmed user ID: ${ACTUAL_USER_ID}"
-        # Insert user-workspace junction (try both common table names)
-        UW_TABLE=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-          psql -U twenty -d twenty -tAc \
-          "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('user_workspace','workspace_member') LIMIT 1;" \
-          2>/dev/null | tr -d '[:space:]')
-        echo "UW Table: ${UW_TABLE}"
-        if [ -n "${UW_TABLE}" ]; then
-          UW_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          echo "WARN: Fehler — versuche ohne default_workspace_id"
+          USER_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
             psql -U twenty -d twenty -tAc \
-            "INSERT INTO ${UW_TABLE} (id, user_id, workspace_id, role)
-             VALUES (gen_random_uuid(), '${ACTUAL_USER_ID}', '${WS_ID}', 'OWNER')
-             ON CONFLICT DO NOTHING RETURNING id;" 2>&1)
-          echo "UserWorkspace: ${UW_RESULT}"
-        else
-          echo "WARN: Kein user_workspace/workspace_member table gefunden"
+            "INSERT INTO core.\"user\" (email, password_hash, first_name, last_name)
+             VALUES ('${TARGET_EMAIL}', '${HASH}', '${TARGET_FIRST}', '${TARGET_LAST}')
+             RETURNING id;" 2>&1)
+          echo "User insert v2: ${USER_RESULT}"
         fi
-        WORKSPACE_SETUP=DONE
-      else
-        echo "OK: Workspace vorhanden — ueberspringe"
-        WORKSPACE_SETUP=EXISTING
+        USER_UUID=$(echo "${USER_RESULT}" | grep -E '^[0-9a-f-]{36}$' | tr -d '[:space:]')
+        if [ -z "${USER_UUID}" ]; then
+          USER_UUID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+            psql -U twenty -d twenty -tAc \
+            "SELECT id FROM core.\"user\" WHERE email='${TARGET_EMAIL}';" 2>/dev/null | tr -d '[:space:]')
+        fi
       fi
+      echo "User UUID: ${USER_UUID}"
+      # user_workspace junction in core schema
+      UW_TABLE=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc \
+        "SELECT table_name FROM information_schema.tables WHERE table_schema='core' AND table_name IN ('user_workspace','workspace_member','userWorkspace') LIMIT 1;" \
+        2>/dev/null | tr -d '[:space:]')
+      echo "UW Table: core.${UW_TABLE}"
+      if [ -n "${UW_TABLE}" ] && [ -n "${USER_UUID}" ]; then
+        UW_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "INSERT INTO core.\"${UW_TABLE}\" (user_id, workspace_id, role)
+           VALUES ('${USER_UUID}', '${WS_ID}', 'OWNER')
+           ON CONFLICT DO NOTHING RETURNING user_id;" 2>&1)
+        echo "UW insert: ${UW_RESULT}"
+      fi
+      WORKSPACE_SETUP=DONE
       export WORKSPACE_SETUP
     - |
       # 4) Login-Credentials-Email via Resend (curl, wie guide-email)
