@@ -11,6 +11,9 @@ variables:
   BASE_IMAGE: ${REGISTRY}/dc-77/vectiscan
   APP_NAME: vectiscan
   DEPLOY_PATH: /opt/apps/${APP_NAME}
+  # VEC-190: Cloudflare Turnstile Site Key (oeffentlich — kein Secret)
+  # Wird via --build-arg in den Frontend-Build inlinent (commit 1bc3b74).
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: "0x4AAAAAADfzZnijCBUdqMMD"
 
 stages:
   - build
@@ -29,7 +32,10 @@ stages:
   before_script:
     - echo "${GHCR_TOKEN}" | docker login ghcr.io -u dc-77 --password-stdin
   script:
-    - docker build --no-cache -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest ${SERVICE}/
+    # VEC-190: NEXT_PUBLIC_TURNSTILE_SITE_KEY (öffentlicher Site-Key) zur Build-Zeit
+    # durchreichen. Nur das frontend-Image deklariert die ARG; für die anderen
+    # Services ist der --build-arg ein harmloser, ungenutzter Hinweis (kein Fehler).
+    - docker build --no-cache --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY="${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}" -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest ${SERVICE}/
     - docker push ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
     - docker push ${BASE_IMAGE}/${SERVICE}:latest
   rules:
@@ -918,3 +924,82 @@ ops-traefik-auth:
   environment:
     name: production
     url: https://scan.vectigal.tech
+
+
+
+# =============================================================================
+ops-provision-turnstile:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  script:
+    - |
+      set -e
+
+      if [ -z "${CF_API_TOKEN}" ] || [ -z "${CF_ACCOUNT_ID}" ]; then
+        echo "ERROR: CF_API_TOKEN und CF_ACCOUNT_ID muessen als maskierte CI/CD-Variablen gesetzt sein."
+        exit 1
+      fi
+      if [ -z "${GL_WRITE_TOKEN}" ]; then
+        echo "ERROR: GL_WRITE_TOKEN (GitLab PAT api-Scope + Maintainer) fehlt."
+        echo "       GitLab: User Settings -> Access Tokens -> api-Scope -> als CI-Var GL_WRITE_TOKEN setzen."
+        exit 1
+      fi
+
+      echo "Erstelle Cloudflare Turnstile Widget fuer scan.vectigal.tech + vectigal.tech ..."
+      CF_RESPONSE=$(curl -s -f -X POST \
+        "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/challenges/widgets" \
+        -H "Authorization: Bearer ${CF_API_TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d '{"name":"VectiScan Webcheck","domains":["scan.vectigal.tech","vectigal.tech"],"mode":"managed","offlabel":false}')
+
+      CF_SUCCESS=$(echo "${CF_RESPONSE}" | sed -n 's/.*"success":\([a-z]*\).*/\1/p' | head -1)
+      if [ "${CF_SUCCESS}" != "true" ]; then
+        echo "ERROR: Cloudflare API Fehler (Secret redacted):"
+        echo "${CF_RESPONSE}" | sed 's/"secret":"[^"]*"/"secret":"[REDACTED]"/g'
+        exit 1
+      fi
+
+      SITE_KEY=$(echo "${CF_RESPONSE}" | sed -n 's/.*"sitekey":"\([^"]*\)".*/\1/p')
+      SECRET_KEY=$(echo "${CF_RESPONSE}" | sed -n 's/.*"secret":"\([^"]*\)".*/\1/p')
+
+      if [ -z "${SITE_KEY}" ] || [ -z "${SECRET_KEY}" ]; then
+        echo "ERROR: Konnte Site-Key oder Secret-Key nicht aus CF-Antwort extrahieren."
+        exit 1
+      fi
+
+      echo "Widget angelegt. Site Key: ${SITE_KEY}"
+      echo "Secret Key: [MASKED]"
+
+      GL_VARS_API="${CI_SERVER_URL}/api/v4/projects/${CI_PROJECT_ID}/variables"
+
+      _set_var() {
+        local KEY="$1" MASKED="$3"
+        HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "${GL_VARS_API}/${KEY}" \
+          -H "PRIVATE-TOKEN: ${GL_WRITE_TOKEN}" \
+          --data-urlencode "value=$2" \
+          -d "masked=${MASKED}&protected=false&variable_type=env_var")
+        if [ "${HTTP}" = "404" ]; then
+          HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${GL_VARS_API}" \
+            -H "PRIVATE-TOKEN: ${GL_WRITE_TOKEN}" \
+            --data-urlencode "key=${KEY}" \
+            --data-urlencode "value=$2" \
+            -d "masked=${MASKED}&protected=false&variable_type=env_var")
+        fi
+        echo "  ${KEY}: HTTP ${HTTP}"
+        [ "${HTTP}" = "200" ] || [ "${HTTP}" = "201" ] || { echo "ERROR: Konnte ${KEY} nicht setzen."; return 1; }
+      }
+
+      echo "Setze GitLab CI-Variablen ..."
+      _set_var "NEXT_PUBLIC_TURNSTILE_SITE_KEY" "${SITE_KEY}" "false"
+      _set_var "WEBCHECK_TURNSTILE_SECRET" "${SECRET_KEY}" "true"
+
+      echo "=== Provisionierung abgeschlossen ==="
+      echo "  NEXT_PUBLIC_TURNSTILE_SITE_KEY = ${SITE_KEY}"
+      echo "  WEBCHECK_TURNSTILE_SECRET      = [MASKED]"
+      echo "  Naechster Schritt: feat/vec-189-turnstile-widget mergen + build triggern."

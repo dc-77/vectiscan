@@ -76,6 +76,8 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-VectiScan <noreply@vectiscan.de>}
+      # WebCheck-Free CAPTCHA (VEC-173): unset => Prüfung deaktiviert; in Prod setzen.
+      WEBCHECK_TURNSTILE_SECRET: ${WEBCHECK_TURNSTILE_SECRET:-}
       # VEC-36: Routing-Ziel fuer Demo-/Lead-Anfragen explizit in den Container
       # reichen. Ohne diesen Passthrough erreichte SALES_LEAD_EMAIL nie den
       # Runtime-Container -> Code-Default 'kontakt@vectigal.gmbh' (UNbetreutes

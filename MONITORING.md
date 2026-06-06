@@ -127,6 +127,36 @@ redeployen. Bis dahin reicht das Default hinter `internal-only`.
 
 ---
 
+## WebCheck-Free Mail-Amplification-Alert (VEC-173)
+
+Der öffentliche, anonyme Endpunkt `POST /api/webcheck/start` versendet eine
+DOI-Bestätigungsmail. Schutz gegen Mail-Amplification/Spam-Relay (F2 aus
+VEC-169) ist mehrschichtig: CAPTCHA (Turnstile) vor dem Versand + aggregierte
+Velocity-Drossel (global + pro Empfänger-Mail-Domain), die per IP-Rotation NICHT
+umgehbar ist.
+
+Bei erreichter Velocity-Schwelle loggt `api` einen stabilen JSON-Marker
+(zusätzlich zur `audit_log`-Zeile `webcheck.velocity_alert` für DB-Forensik):
+
+```
+{"event":"webcheck_velocity_alert","reasons":["global"|"recipient_domain"],...}
+```
+
+**Grafana-Alert (empfohlen, Loki-Query):** Spike auf den Marker alerten —
+```
+count_over_time({project="vectiscan", service="api"} | json | event="webcheck_velocity_alert" [5m])
+```
+Schwelle z. B. `> 0` über 5min ⇒ Mail an `ADMIN_EMAIL`. Ebenso optional auf
+`event="webcheck_captcha_failed"`-Spikes (Bot-Flut-Indikator). Die Code-Schwellen
+(`VELOCITY.maxGlobal` / `maxPerRecipientDomain` in `routes/webcheck.ts`) sind
+konservativ vordimensioniert und post-Launch anhand realer Velocity nachzuschärfen.
+
+**CAPTCHA-Config:** `WEBCHECK_TURNSTILE_SECRET` (docker-compose `api`-env). Unset
+⇒ CAPTCHA deaktiviert (fail-open, nur Dev/Test). In Prod vor breitem
+Funnel-Rollout setzen — Launch-Checkliste.
+
+---
+
 ## Was deckt das ab — und was nicht
 
 **Abgedeckt:**

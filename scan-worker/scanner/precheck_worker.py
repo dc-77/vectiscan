@@ -28,7 +28,18 @@ from scanner.precheck import runner, writer
 log = structlog.get_logger()
 
 
-def _handle_job(job: dict[str, Any]) -> None:
+def _enqueue_scan(order_id: str, package: str, client: "redis.Redis | None") -> None:
+    """Scan-Job in die `scan-pending`-Liste schieben (spiegelt scanQueue.add).
+
+    Re-nutzt die bestehende Worker-Redis-Verbindung, faellt aber auf eine eigene
+    zurueck, falls keine uebergeben wurde (z.B. in Unit-Tests).
+    """
+    payload = json.dumps({"orderId": order_id, "package": package})
+    cl = client or redis.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379"))
+    cl.rpush("scan-pending", payload)
+
+
+def _handle_job(job: dict[str, Any], client: "redis.Redis | None" = None) -> None:
     order_id = job.get("orderId")
     sub_id = job.get("subscriptionId")
     target_ids = job.get("targetIds") or []
@@ -66,6 +77,19 @@ def _handle_job(job: dict[str, Any]) -> None:
                     "details": summaries,
                 },
             })
+            # VEC-172: Verifizierte WebCheck-Free-Orders ueberspringen das
+            # Admin-Gate — die Scan-Autorisierung ist via Domain-Kontrolle
+            # kryptografisch bewiesen. Komplettmediation/deny-by-default in
+            # writer.try_auto_approve_webcheck_order: NUR webcheck + verifizierter
+            # Lead + 1 Target werden freigegeben, alles andere bleibt im Gate.
+            if writer.try_auto_approve_webcheck_order(order_id):
+                _enqueue_scan(order_id, "webcheck", client)
+                publish_event(order_id, {
+                    "type": "status",
+                    "orderId": order_id,
+                    "status": "queued",
+                })
+                log.info("webcheck_auto_approved", order=order_id)
     else:
         remaining = writer.count_pending_targets(order_id=None, subscription_id=sub_id)
         if remaining == 0:
@@ -87,7 +111,7 @@ def wait_for_jobs(client: redis.Redis) -> None:
             _, job_data = result
             job = json.loads(job_data.decode() if isinstance(job_data, bytes) else job_data)
             try:
-                _handle_job(job)
+                _handle_job(job, client)
             except Exception as exc:
                 log.error("precheck_job_failed", error=str(exc))
         except redis.ConnectionError:

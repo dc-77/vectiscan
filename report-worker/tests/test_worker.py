@@ -199,3 +199,47 @@ class TestQASeverityCapOrder:
         run_qa_checks(out, package="webcheck")
         assert findings[0]["severity"] == "MEDIUM", \
             "Default-Verhalten muss Cap anwenden (Flag default=True)"
+
+
+class TestCreateReportRecordExpiry:
+    """VEC-180 (CL-1/VEC-169): Jeder Report-Datensatz — auch anonyme
+    WebCheck-Free-Reports — bekommt eine 30-Tage-TTL auf expires_at, damit der
+    Download-Deeplink ablaeuft und der Copy-Claim "Link 30 Tage gueltig" stimmt.
+    """
+
+    def _mock_conn(self) -> MagicMock:
+        conn = MagicMock()
+        cur = conn.cursor.return_value.__enter__.return_value
+        # 1. fetchone(): validation_warnings-Spalten-Check -> existiert.
+        # 2. fetchone(): RETURNING id des INSERT.
+        cur.fetchone.side_effect = [(True,), ("report-id-xyz",)]
+        return conn
+
+    def _insert_params(self, conn: MagicMock) -> tuple:
+        from reporter.worker import _create_report_record
+        report_id, token = _create_report_record(
+            conn, "order-webcheck-123", "scan-reports/r.pdf", 4242,
+        )
+        assert report_id == "report-id-xyz"
+        assert token  # download_token (uuid) wird erzeugt
+        cur = conn.cursor.return_value.__enter__.return_value
+        insert_calls = [
+            c for c in cur.execute.call_args_list
+            if "INSERT INTO reports" in c.args[0]
+        ]
+        assert len(insert_calls) == 1, "genau ein Report-Insert erwartet"
+        return insert_calls[0].args[1]
+
+    def test_expires_at_is_set_30_days_out(self) -> None:
+        from datetime import datetime, timezone, timedelta
+
+        params = self._insert_params(self._mock_conn())
+        # Param-Reihenfolge: order_id, bucket, minio_path, file_size,
+        # download_token, expires_at, ...
+        expires_at = params[5]
+        assert isinstance(expires_at, datetime), "expires_at muss gesetzt sein (nicht NULL)"
+        now = datetime.now(timezone.utc)
+        delta = expires_at - now
+        # ~30 Tage, grosszuegige Toleranz fuer Laufzeit/CI-Jitter.
+        assert timedelta(days=29, hours=23) < delta < timedelta(days=30, minutes=5), \
+            f"expires_at muss ~30 Tage in der Zukunft liegen, war {delta}"

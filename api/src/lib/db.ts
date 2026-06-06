@@ -40,6 +40,11 @@ const MIGRATION_030_PATH = path.join(__dirname, '..', 'migrations', '030_stripe_
 const MIGRATION_031_PATH = path.join(__dirname, '..', 'migrations', '031_stripe_followup_hardening.sql');
 const MIGRATION_032_PATH = path.join(__dirname, '..', 'migrations', '032_lead_capture.sql');
 const MIGRATION_033_PATH = path.join(__dirname, '..', 'migrations', '033_analytics_events.sql');
+const MIGRATION_034_PATH = path.join(__dirname, '..', 'migrations', '034_webcheck_leads.sql');
+const MIGRATION_035_PATH = path.join(__dirname, '..', 'migrations', '035_email_suppressions.sql');
+const MIGRATION_036_PATH = path.join(__dirname, '..', 'migrations', '036_reports_expires_at_default.sql');
+const MIGRATION_037_PATH = path.join(__dirname, '..', 'migrations', '037_webcheck_marketing_consent.sql');
+const MIGRATION_038_PATH = path.join(__dirname, '..', 'migrations', '038_webcheck_consent_not_given.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -483,6 +488,106 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 033 FAILED (continuing without it):', err);
+  }
+
+  // Migration 034 (VEC-91): WebCheck-Free Lead-Magnet — separate Lead-/Marketing-
+  // Tabelle webcheck_leads (DSGVO-Datentrennung). Additiv, idempotent.
+  try {
+    const webcheckLeadsCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables WHERE table_name = 'webcheck_leads'
+      ) AS exists
+    `);
+    if (!webcheckLeadsCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 034: webcheck_leads');
+      const migrationSql = fs.readFileSync(MIGRATION_034_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 034 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 034 FAILED (continuing without it):', err);
+  }
+
+  // Migration 035 (VEC-188): E-Mail-Suppression-Liste + Resend-Webhook-Idempotenz-
+  // Ledger (Reputationsschutz aus VEC-173/F2). Additiv, idempotent.
+  try {
+    const suppressions035Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables WHERE table_name = 'email_suppressions'
+      ) AS exists
+    `);
+    if (!suppressions035Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 035: email_suppressions');
+      const migrationSql = fs.readFileSync(MIGRATION_035_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 035 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 035 FAILED (continuing without it):', err);
+  }
+
+  // Migration 036 (VEC-180): Default-TTL (30 Tage) auf reports.expires_at —
+  // Defense-in-Depth gegen nie ablaufende anonyme Report-Deeplinks (CL-1/VEC-169).
+  // Idempotent: nur anwenden, wenn noch kein column_default gesetzt ist.
+  try {
+    const expiresDefaultCheck = await pool.query(`
+      SELECT column_default
+      FROM information_schema.columns
+      WHERE table_name = 'reports' AND column_name = 'expires_at'
+    `);
+    const currentDefault = expiresDefaultCheck.rows[0]?.column_default ?? null;
+    if (!currentDefault) {
+      console.log('[initDb] Applying Migration 036: reports.expires_at default (30d)');
+      const migrationSql = fs.readFileSync(MIGRATION_036_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 036 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 036 FAILED (continuing without it):', err);
+  }
+
+  // Migration 037 (VEC-173): WebCheck-Marketing-Einwilligung als Art.-7-Nachweis
+  // (marketing_consent + consent_text_version). Idempotent: nur anwenden, wenn die
+  // Spalte marketing_consent auf webcheck_leads noch fehlt.
+  try {
+    const consentColCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'webcheck_leads' AND column_name = 'marketing_consent'
+      ) AS exists
+    `);
+    if (!consentColCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 037: webcheck marketing_consent');
+      const migrationSql = fs.readFileSync(MIGRATION_037_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 037 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 037 FAILED (continuing without it):', err);
+  }
+
+  // Migration 038 (VEC-198): consent_status 'not_given' (nie eingewilligt) vom
+  // echten 'declined' (aktive Ablehnung) trennen — CHECK-Erweiterung. Idempotent:
+  // nur anwenden, wenn der bestehende consent_status-CHECK 'not_given' noch nicht
+  // erlaubt.
+  try {
+    const notGivenCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM pg_constraint con
+        JOIN pg_class rel ON rel.oid = con.conrelid
+        WHERE rel.relname = 'webcheck_leads'
+          AND con.contype = 'c'
+          AND pg_get_constraintdef(con.oid) ILIKE '%not_given%'
+      ) AS exists
+    `);
+    if (!notGivenCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 038: webcheck consent_status not_given');
+      const migrationSql = fs.readFileSync(MIGRATION_038_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 038 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 038 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

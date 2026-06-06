@@ -9,11 +9,13 @@ import { authRoutes } from './routes/auth.js';
 import { healthRoutes } from './routes/health.js';
 import { orderRoutes } from './routes/orders.js';
 import { verifyRoutes } from './routes/verify.js';
+import { webcheckRoutes } from './routes/webcheck.js';
 import { wsRoutes } from './routes/ws.js';
 import { scheduleRoutes } from './routes/schedules.js';
 import { subscriptionRoutes } from './routes/subscriptions.js';
 import { adminReviewRoutes } from './routes/admin-review.js';
 import { webhookRoutes } from './routes/webhooks.js';
+import { resendWebhookRoutes } from './routes/resend-webhook.js';
 import { leadRoutes } from './routes/leads.js';
 import { analyticsRoutes } from './routes/analytics.js';
 import { startScheduler } from './lib/scheduler.js';
@@ -70,12 +72,15 @@ export function buildServer() {
   server.register(healthRoutes);
   server.register(orderRoutes);
   server.register(verifyRoutes);
+  server.register(webcheckRoutes);
   server.register(wsRoutes);
   server.register(scheduleRoutes);
   server.register(subscriptionRoutes);
   server.register(adminReviewRoutes);
   // Encapsulated plugin: nutzt eigenen Buffer-Body-Parser fuer Stripe-Signatur.
   server.register(webhookRoutes);
+  // Encapsulated plugin: eigener Buffer-Body-Parser fuer die Resend/Svix-Signatur (VEC-188).
+  server.register(resendWebhookRoutes);
   server.register(leadRoutes);
   server.register(analyticsRoutes);
 
