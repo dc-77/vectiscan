@@ -69,7 +69,11 @@ export default function PackageSelector({ selected, onSelect }: Props) {
             <div
               key={pkg.key}
               data-testid={`package-${pkg.key}`}
+              role="button"
+              tabIndex={0}
+              aria-pressed={isSelected}
               onClick={() => onSelect(pkg.key)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(pkg.key); } }}
               className="relative w-full rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
               style={{
                 borderWidth: '2px',
@@ -140,7 +144,11 @@ export default function PackageSelector({ selected, onSelect }: Props) {
             <div
               key={pkg.key}
               data-testid={`package-${pkg.key}`}
+              role="button"
+              tabIndex={0}
+              aria-pressed={isSelected}
               onClick={() => onSelect(pkg.key)}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(pkg.key); } }}
               className="relative rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
               style={{
                 borderWidth: '2px',
