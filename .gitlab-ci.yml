@@ -1159,10 +1159,10 @@ ops-twenty-create-user-db:
       if [ "${WORKSPACE_COUNT}" = "0" ] || [ -z "${WORKSPACE_COUNT}" ]; then
         echo "INFO: Kein Workspace — initialisiere via Twenty sign-up API (erster User wird Admin-Owner)"
         PASS_B64_INNER=$(printf '%s' "${TEMP_PASS}" | base64 -w0)
-        SIGNUP_NODE="const http=require('http');const p=Buffer.from('${PASS_B64_INNER}','base64').toString();const email='${TARGET_EMAIL}';const body=JSON.stringify({email:email,password:p,workspaceName:'VectiScan CRM',locale:'en'});const opts={hostname:'localhost',port:3000,path:'/auth/sign-up',method:'POST',headers:{'Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}};const req=http.request(opts,res=>{let b='';res.on('data',c=>b+=c);res.on('end',()=>process.stdout.write(b+'\n'))});req.on('error',e=>process.stdout.write('ERR:'+e.message+'\n'));req.write(body);req.end();"
+        SIGNUP_NODE="const http=require('http');const p=Buffer.from('${PASS_B64_INNER}','base64').toString();const email='${TARGET_EMAIL}';const q=JSON.stringify({query:'mutation SignUp(\$email:String!,\$password:String!,\$workspaceName:String!){signUp(email:\$email,password:\$password,workspaceName:\$workspaceName){loginToken{token}}}',variables:{email:email,password:p,workspaceName:'VectiScan CRM'}});const opts={hostname:'localhost',port:3000,path:'/graphql',method:'POST',headers:{'Content-Type':'application/json','Content-Length':Buffer.byteLength(q)}};const req=http.request(opts,res=>{let b='';res.on('data',c=>b+=c);res.on('end',()=>process.stdout.write(b+'\n'))});req.on('error',e=>process.stdout.write('ERR:'+e.message+'\n'));req.write(q);req.end();"
         SIGNUP_RESP=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-server node -e "${SIGNUP_NODE}" 2>/dev/null || echo "EXEC_ERROR")
         echo "Sign-up response: ${SIGNUP_RESP}"
-        if echo "${SIGNUP_RESP}" | grep -qE '"token"|"tokens"|"user"'; then
+        if echo "${SIGNUP_RESP}" | grep -qE '"token"|"loginToken"'; then
           echo "OK: Workspace + erster User (Daniel) angelegt"
           WORKSPACE_SETUP=DONE
         elif echo "${SIGNUP_RESP}" | grep -q "already exists\|CONFLICT"; then
