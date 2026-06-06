@@ -301,7 +301,9 @@ test-edge:
     #    diesen Wert korrigiert (oder loescht), kann dieser Override entfallen.
     - export RESEND_FROM_EMAIL='VectiScan <noreply@vectiscan.de>'
     - docker compose pull
-    - TAG=${TAG} docker compose up -d --remove-orphans
+    # VEC-320: COMPOSE_PROFILES=crm stellt sicher dass Twenty-CRM-Container
+    # bei jedem Deploy mitgestartet werden (nicht nur beim ersten manuellen Start).
+    - COMPOSE_PROFILES=crm TAG=${TAG} docker compose up -d --remove-orphans
     # Give all containers time to pass health checks
     - sleep 30
     - docker compose ps
