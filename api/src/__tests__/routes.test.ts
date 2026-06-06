@@ -322,6 +322,53 @@ describe('API Routes', () => {
       expect(body.data.hasReport).toBe(false);
     });
 
+    // VEC-283: frisch registrierter Customer startet ersten Scan → Order ist
+    // precheck_running. Der Owner MUSS seine eigene in-progress Order sehen
+    // duerfen (keine "Access denied"-Sackgasse). Regressionsschutz.
+    it('should return 200 for customer accessing own in-progress order (precheck_running)', async () => {
+      mockVerifyJwt.mockReturnValue({
+        sub: 'user-uuid-1234',
+        role: 'customer',
+        customerId: 'cust-uuid-1234',
+        email: 'customer@test.com',
+      } as ReturnType<typeof verifyJwt>);
+
+      mockQuery
+        .mockResolvedValueOnce({
+          rows: [{
+            id: orderId,
+            target_url: 'example.com',
+            status: 'precheck_running',
+            package: 'webcheck',
+            customer_id: 'cust-uuid-1234',
+            discovered_hosts: null,
+            hosts_total: 0,
+            hosts_completed: 0,
+            current_phase: null,
+            current_tool: null,
+            current_host: null,
+            scan_started_at: null,
+            scan_finished_at: null,
+            error_message: null,
+            created_at: new Date(),
+          }],
+          command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+        })
+        // report SELECT — kein Report waehrend precheck
+        .mockResolvedValueOnce({ rows: [], command: 'SELECT', rowCount: 0, oid: 0, fields: [] });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}`,
+        headers: AUTH_HEADER,
+      });
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body.success).toBe(true);
+      expect(body.data.status).toBe('precheck_running');
+      expect(body.data.hasReport).toBe(false);
+    });
+
     it('should return 403 for customer accessing another users order', async () => {
       mockVerifyJwt.mockReturnValue({
         sub: 'user-uuid-5678',

@@ -429,11 +429,16 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    // Visibility check: customers cannot access internal-status orders
-    const customerVisibleStatuses = ['report_complete', 'delivered', 'report_generating'];
-    if (user.role !== 'admin' && !customerVisibleStatuses.includes(order.status as string)) {
-      return reply.status(403).send({ success: false, error: 'Access denied' });
-    }
+    // VEC-283: KEINE Status-Whitelist mehr. Der Owner darf seine eigene Order
+    // in JEDEM Lebenszyklus-Status sehen (precheck_running, pending_target_review,
+    // scan_running, report_generating, …). Vorher blockierte eine Whitelist
+    // (nur report_complete/delivered/report_generating) den frisch registrierten
+    // Customer mit "Access denied", sobald er den ersten Scan startete und auf
+    // /scan/[orderId] (Status precheck_running) landete — eine Onboarding-Sackgasse.
+    // Die Ownership-Pruefung oben ist die einzige noetige Zugriffsgrenze; alle
+    // anderen owner-skopierten Endpoints (/results, /findings, /events,
+    // /correlation) machen es ebenso. Report-Inhalt bleibt separat gated
+    // (overallRisk/severityCounts sind null solange kein Report existiert).
 
     // Check if report exists + get severity data from latest report.
     // validation_warnings (Migration 028) wird nur fuer Admins ausgeliefert
