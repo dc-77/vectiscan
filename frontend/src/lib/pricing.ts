@@ -1,13 +1,18 @@
-// Single source of truth fuer die *Anzeige*-Preise auf der Marketing-/Checkout-
-// Oberflaeche (Pricing-Seite + Subscribe-Zusammenfassung).
+// Anzeige-Preise + Sellability fuer Marketing-/Checkout-Oberflaechen
+// (Pricing-Seite, Homepage-Karten, Subscribe-Wizard).
+//
+// VEC-289: Diese Datei leitet ALLES aus dem kanonischen Katalog
+// (`@/lib/catalog.generated`, SSoT = catalog/packages.catalog.json) ab.
+// Keine hartkodierten Paket-Namen oder -Preise mehr hier.
 //
 // WICHTIG: Der tatsaechliche Geldfluss laeuft NICHT ueber diese Zahlen, sondern
 // ueber die serverseitig hinterlegte Stripe `price_id` (ENV `STRIPE_PRICE_<PAKET>`,
 // siehe api/src/lib/stripe.ts::getPriceIdForPackage). Diese Datei steuert nur die
 // dargestellte Preisangabe und ob ein Tier self-service kaufbar ist.
 //
-// Betraege = CEO-freigegebenes Launch-Pricing (VEC-53), netto/Jahr. Pro Tier per
-// ENV `NEXT_PUBLIC_PRICE_<PAKET>_EUR` ueberschreibbar — kein verstreutes Hardcode.
+// Pro Tier per ENV `NEXT_PUBLIC_PRICE_<PAKET>_EUR` ueberschreibbar.
+
+import { PACKAGE_CATALOG, type PackageDef } from '@/lib/catalog.generated';
 
 export interface TierDisplay {
   /** Paket-Key, identisch mit dem Backend-Package-Namen (subscriptions/Stripe). */
@@ -20,28 +25,41 @@ export interface TierDisplay {
   purchasable: boolean;
 }
 
-function envPrice(key: string, fallback: number): number {
+function envPrice(key: string, fallback: number | null): number | null {
   const raw = process.env[key];
   const n = raw != null && raw !== '' ? Number(raw) : NaN;
   return Number.isFinite(n) ? n : fallback;
 }
 
-// Launch-Tier (VEC-223): Perimeter ist der erste self-service kaufbare Tier.
-// Weitere Tiers bleiben vorerst "auf Anfrage", bis sie freigegeben/verdrahtet sind.
-export const TIERS: Record<string, TierDisplay> = {
-  perimeter: {
-    packageId: 'perimeter',
-    priceEur: envPrice('NEXT_PUBLIC_PRICE_PERIMETER_EUR', 1490),
-    billingNote: 'netto zzgl. USt. · Jahresabo',
-    purchasable: true,
-  },
-  insurance: {
-    packageId: 'insurance',
-    priceEur: null,
-    billingNote: 'Jahresabo — individuelle Preisgestaltung',
-    purchasable: false,
-  },
-};
+function billingNoteFor(pkg: PackageDef): string {
+  switch (pkg.sellability) {
+    case 'free':
+      return 'kostenlos & unverbindlich';
+    case 'self_service':
+      return 'netto zzgl. USt. · Jahresabo';
+    case 'sales_assisted':
+    default:
+      return 'Jahresabo — individuelle Preisgestaltung';
+  }
+}
+
+function toTier(pkg: PackageDef): TierDisplay {
+  return {
+    packageId: pkg.key,
+    // Preis nur bei self-service-Tiers anzeigen; Sales-assisted/Free => kein Festpreis.
+    priceEur:
+      pkg.sellability === 'self_service'
+        ? envPrice(pkg.priceEnvKey, pkg.priceEur)
+        : null,
+    billingNote: billingNoteFor(pkg),
+    purchasable: pkg.sellability === 'self_service',
+  };
+}
+
+/** Anzeige-Tiers fuer alle Pakete, key-indiziert — abgeleitet aus dem Katalog. */
+export const TIERS: Record<string, TierDisplay> = Object.fromEntries(
+  PACKAGE_CATALOG.map((pkg) => [pkg.key, toTier(pkg)]),
+);
 
 export function getTier(packageId: string): TierDisplay | undefined {
   return TIERS[packageId];

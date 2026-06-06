@@ -8,37 +8,44 @@ import { createSubscription, TargetEntry } from '@/lib/api';
 import { getTier, formatEur } from '@/lib/pricing';
 import { isLoggedIn, getUser } from '@/lib/auth';
 import TargetInput from '@/components/TargetInput';
+// VEC-289: Paket-Identitaet/Name/Untertitel/Farbe aus dem kanonischen Katalog (SSoT).
+import { getPackage, type PackageKey } from '@/lib/catalog.generated';
 
 const MAX_TARGETS = 10;
 
-const PACKAGES = [
-  {
-    id: 'perimeter',
-    name: 'Perimeter-Scan',
-    subtitle: 'Vollständige Sicherheitsanalyse Ihrer Angriffsoberfläche',
-    recommended: true,
-    color: '#38BDF8',
-    features: [
-      'Vollständige Angriffsoberflächen-Analyse',
-      'Port-Scanning, Web-Schwachstellen, DNS, E-Mail-Security',
-      'PTES-konformer Report mit Executive Summary',
-      'Priorisierter Massnahmenplan mit Zeitrahmen',
-    ],
-  },
-  {
-    id: 'insurance',
-    name: 'Cyberversicherung',
-    subtitle: 'Nachweis fur Ihren Versicherungsantrag',
-    recommended: false,
-    color: '#34D399',
-    features: [
-      'Alles aus dem Perimeter-Scan',
-      '10-Punkte Versicherungs-Fragebogen',
-      'Risk-Score und Ransomware-Indikator',
-      'Nachweis fur Cyberversicherungsantrag',
-    ],
-  },
-] as const;
+// Kuratierte Verkaufs-Bullets je Paket (Copy-Domaene, T7/Belfort). Welche Pakete
+// der Wizard anbietet bzw. Name/Untertitel/Preis kommen aus dem Katalog.
+const CURATED_FEATURES: Record<string, string[]> = {
+  perimeter: [
+    'Vollständige Angriffsoberflächen-Analyse',
+    'Port-Scanning, Web-Schwachstellen, DNS, E-Mail-Security',
+    'PTES-konformer Report mit Executive Summary',
+    'Priorisierter Massnahmenplan mit Zeitrahmen',
+  ],
+  insurance: [
+    'Alles aus dem Perimeter-Scan',
+    '10-Punkte Versicherungs-Fragebogen',
+    'Risk-Score und Ransomware-Indikator',
+    'Nachweis fur Cyberversicherungsantrag',
+  ],
+};
+
+// Im Wizard angebotene Pakete (Reihenfolge bewusst). Eine Erweiterung des
+// Wizard-Scope auf weitere Pakete ist Sache des Post-Login-Flows (VEC-285, UX);
+// hier bleibt der bestehende Umfang, die Daten kommen aber aus dem Katalog.
+const WIZARD_PACKAGE_KEYS: PackageKey[] = ['perimeter', 'insurance'];
+
+const PACKAGES = WIZARD_PACKAGE_KEYS.map((key) => {
+  const def = getPackage(key)!;
+  return {
+    id: def.key,
+    name: def.marketingName,
+    subtitle: def.subtitle,
+    recommended: def.sellability === 'self_service',
+    color: def.accentColor,
+    features: CURATED_FEATURES[def.key] ?? def.reportFocus,
+  };
+});
 
 const INTERVALS = [
   { id: 'weekly', label: 'Wöchentlich', desc: 'Scan jede Woche' },
