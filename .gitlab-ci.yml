@@ -11,6 +11,9 @@ variables:
   BASE_IMAGE: ${REGISTRY}/dc-77/vectiscan
   APP_NAME: vectiscan
   DEPLOY_PATH: /opt/apps/${APP_NAME}
+  # VEC-190: Cloudflare Turnstile Site Key (oeffentlich — kein Secret)
+  # Wird via --build-arg in den Frontend-Build inlinent (commit 1bc3b74).
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: "0x4AAAAAADfzZnijCBUdqMMD"
 
 stages:
   - build
