@@ -191,7 +191,7 @@ export default function ScanNewPage() {
               Zurück
             </button>
             <button type="button" onClick={goNext} className={btnPrimary} style={{ backgroundColor: 'var(--tone-active)', color: 'var(--slate)' }}>
-              Weiter
+              {needsUpgrade ? 'Weiter zur Freischaltung' : 'Weiter zur Bestätigung'}
             </button>
           </div>
         </section>
@@ -223,8 +223,8 @@ export default function ScanNewPage() {
                   <span>{f}</span>
                 </li>
               ))}
-              <li className="pt-1 text-xs" style={{ color: 'var(--text-dim)' }}>{priceHint(pkgDef)}</li>
             </ul>
+            <p className="mt-2 text-xs text-center" style={{ color: 'var(--text-dim)' }}>{priceHint(pkgDef)}</p>
           </StateView>
           <div className="flex justify-start">
             <button type="button" onClick={goBack} className={btnSecondary} style={{ color: 'var(--text)', border: '1px solid var(--border-subtle)' }}>
