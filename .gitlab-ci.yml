@@ -1047,6 +1047,8 @@ ops-twenty-admin-invite:
     TRAEFIK_CFG: /opt/traefik/config
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "web"
     - if: $CI_PIPELINE_SOURCE == "api"
       when: always
@@ -1058,6 +1060,12 @@ ops-twenty-admin-invite:
       SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
       if [ -f "${SENTINEL}" ]; then
         echo "INFO: VEC-326 bereits provisioniert (Sentinel vorhanden) — kein erneuter Invite, keine Mail"
+        exit 0
+      fi
+    - |
+      MAIL_SENTINEL="${DEPLOY_PATH}/.vec326_mail_sent"
+      if [ -f "${MAIL_SENTINEL}" ]; then
+        echo "INFO: Mails bereits gesendet (${MAIL_SENTINEL}) — already sent, skip"
         exit 0
       fi
     - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
@@ -1109,6 +1117,9 @@ ops-twenty-admin-invite:
         echo "ERROR: Kein Resend-Key verfuegbar"; exit 1
       fi
       python3 ${CI_PROJECT_DIR}/scripts/vec326-crm-guide.py
+      MAIL_SENTINEL="${DEPLOY_PATH}/.vec326_mail_sent"
+      ( umask 077; touch "${MAIL_SENTINEL}"; chmod 600 "${MAIL_SENTINEL}" )
+      echo "INFO: Mail-Sentinel gesetzt (${MAIL_SENTINEL}) — kuenftige Laeufe ueberspringen"
     - echo "=== VEC-326 abgeschlossen ==="
 
 # =============================================================================
@@ -1128,6 +1139,8 @@ ops-twenty-create-user-db:
     TARGET_LAST: "Czischke"
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "web"
     - if: $CI_PIPELINE_SOURCE == "api"
       when: always
