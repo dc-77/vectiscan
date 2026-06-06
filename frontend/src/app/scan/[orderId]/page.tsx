@@ -11,6 +11,7 @@ import { getOrderStatus, getFindings, getScanResults, getReportDownloadUrl, getO
 import FindingsViewer from '@/components/FindingsViewer';
 import RecommendationsViewer from '@/components/RecommendationsViewer';
 import ViewSwitcher from '@/components/scan/ViewSwitcher';
+import { StateView, SkeletonDetail } from '@/components/ds';
 import ModernView from './views/ModernView';
 
 type Tab = 'findings' | 'recommendations' | 'diff' | 'debug';
@@ -299,34 +300,31 @@ export default function ScanDetailPage() {
   if (!ready) return null;
 
   if (loading) {
-    return <main className="flex-1 flex items-center justify-center"><span className="text-slate-500">Lade Scan-Details...</span></main>;
+    // VEC-314/§5.3 (H9): Skeleton statt "Lade…"-Text — Doherty/wahrgenommene Latenz.
+    return (
+      <main className="flex-1 flex flex-col px-4 py-6 md:px-8">
+        <div className="max-w-6xl mx-auto w-full">
+          <SkeletonDetail />
+        </div>
+      </main>
+    );
   }
 
   if (error || !order) {
-    // VEC-283: NIE eine nackte "Access denied"-Sackgasse. Auch im Fehlerfall
-    // (Order nicht gefunden, fremde Order, transienter Ladefehler) fuehren wir
-    // den Nutzer mit klaren, handlungsfaehigen Optionen weiter.
+    // VEC-283/VEC-314: NIE eine nackte "Access denied"-Sackgasse. Kanonisches
+    // DS-StateView-Muster (variant=error) mit handlungsfähigen Aktionen statt
+    // Custom-Markup — eine Fehler-/Access-Sprache über alle Seiten.
     return (
-      <main className="flex-1 flex flex-col items-center justify-center px-4 gap-5 text-center">
-        <div className="max-w-md flex flex-col items-center gap-3">
-          <h1 className="text-lg font-semibold text-white">Dieser Scan ist gerade nicht abrufbar</h1>
-          <p className="text-sm text-slate-400">
-            Der Scan existiert nicht, gehört zu einem anderen Konto oder konnte
-            gerade nicht geladen werden. Du kannst direkt einen neuen Scan starten
-            oder zurück zur Übersicht gehen.
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          <Link
-            href="/scan"
-            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors"
-          >
-            Neuen Scan starten
-          </Link>
-          <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 text-sm">
-            Zurück zum Dashboard
-          </Link>
-        </div>
+      <main className="flex-1 flex items-center justify-center px-4">
+        <StateView
+          variant="error"
+          title="Dieser Scan ist gerade nicht abrufbar"
+          description="Der Scan existiert nicht, gehört zu einem anderen Konto oder konnte gerade nicht geladen werden. Du kannst direkt einen neuen Scan starten oder zurück zur Übersicht gehen."
+          actions={[
+            { label: 'Neuen Scan starten', href: '/scan', variant: 'primary' },
+            { label: 'Zurück zum Dashboard', href: '/dashboard', variant: 'secondary' },
+          ]}
+        />
       </main>
     );
   }

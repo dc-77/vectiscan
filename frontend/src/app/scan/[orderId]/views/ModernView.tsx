@@ -29,6 +29,8 @@ import ToolTrace from '@/components/scan/ToolTrace';
 import ValidationWarnings from '@/components/scan/ValidationWarnings';
 import { WebsiteGallery } from '@/components/scan/WebsiteGallery';
 import ViewSwitcher from '@/components/scan/ViewSwitcher';
+import PhaseTimeline from '@/components/scan/PhaseTimeline';
+import StatusChip from '@/components/ds/StatusChip';
 import {
   getReportDownloadUrl,
   type FindingsData,
@@ -36,7 +38,6 @@ import {
   type OrderStatus,
   type ScanResult,
 } from '@/lib/api';
-import { STATUS_LABELS } from '@/lib/utils';
 
 interface Props {
   order: OrderStatus;
@@ -88,7 +89,11 @@ export default function ModernView({
   const isPendingTargetReview = order.status === 'pending_target_review';
 
   const pkg = PKG_LABELS[order.package] ?? order.package;
-  const statusLabel = STATUS_LABELS[order.status] ?? order.status;
+
+  // Scan läuft aktiv (zwischen Freigabe und Report) → ruhige Phasen-Timeline zeigen.
+  const isRunning =
+    !isDone && !isFailed && !isPendingReview && !isPrecheckRunning && !isPendingTargetReview &&
+    order.status !== 'verification_pending' && order.status !== 'created';
 
   // Augment findings mit threat_intel-Badge (FindingsViewer erwartet kein
   // direktes Threat-Intel-Slot — wir rendern ein Wrapper-Element rundherum).
@@ -149,15 +154,8 @@ export default function ModernView({
             </Link>
             <h1 className="text-xl font-semibold text-white truncate">{order.domain}</h1>
             <span className="text-xs uppercase tracking-wider text-slate-500">{pkg}</span>
-            <span
-              className={`text-xs px-2 py-0.5 rounded ${
-                isDone ? 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
-                : isFailed ? 'bg-red-500/15 text-red-300 ring-1 ring-red-500/30'
-                : 'bg-cyan-500/15 text-cyan-300 ring-1 ring-cyan-500/30'
-              }`}
-            >
-              {statusLabel}
-            </span>
+            {/* VEC-314/H8: Kunden-Klartext-Status via DS-StatusChip statt rohem Code. */}
+            <StatusChip status={order.status} />
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
@@ -252,6 +250,13 @@ export default function ModernView({
           <div className="rounded-lg border border-cyan-800/50 bg-cyan-950/20 px-4 py-3 text-sm text-cyan-300">
             Report wird generiert…
           </div>
+        )}
+
+        {/* ── LIVE-PHASEN-TIMELINE (VEC-314, §5.3) ──────────
+            Ruhiger Klartext-Indikator während der Scan läuft. Die cinematic
+            Live-Energie (Radar/Terminal) ist opt-in über den View-Switcher. */}
+        {isRunning && (
+          <PhaseTimeline status={order.status} phase={order.progress.phase} />
         )}
 
         {/* ── STICKY SUB-NAV ────────────────────── */}
