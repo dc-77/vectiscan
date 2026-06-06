@@ -709,6 +709,15 @@ services:
       APP_SECRET: ${TWENTY_APP_SECRET:-}
       STORAGE_TYPE: local
       DISABLE_DB_MIGRATIONS: "false"
+      # VEC-326: E-Mail-Versand für Workspace-Einladungen via Resend SMTP
+      EMAIL_DRIVER: smtp
+      EMAIL_FROM_ADDRESS: ${RESEND_FROM_EMAIL:-noreply@vectiscan.de}
+      EMAIL_FROM_NAME: VectiScan CRM
+      EMAIL_SYSTEM_ADDRESS: ${RESEND_FROM_EMAIL:-noreply@vectiscan.de}
+      EMAIL_SMTP_HOST: smtp.resend.com
+      EMAIL_SMTP_PORT: "587"
+      EMAIL_SMTP_USER: resend
+      EMAIL_SMTP_PASSWORD: ${RESEND_API_KEY:-}
     depends_on:
       - twenty-db
       - twenty-redis

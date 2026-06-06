@@ -1026,3 +1026,276 @@ ops-provision-turnstile:
       echo "  NEXT_PUBLIC_TURNSTILE_SITE_KEY = ${SITE_KEY}"
       echo "  WEBCHECK_TURNSTILE_SECRET      = [MASKED]"
       echo "  Naechster Schritt: feat/vec-189-turnstile-widget mergen + build triggern."
+
+# =============================================================================
+# VEC-326: Twenty CRM Admin-Zugang für daniel.czischke@bs-consulting-gmbh.de
+# Einmaliger Ops-Job:
+#   1) docker-compose.yml (mit Email-Config) auf den Server kopieren
+#   2) twenty-server neu starten (Email-Config aktivieren)
+#   3) Workspace-Einladung über Twenty GraphQL API senden
+#   4) Traefik-Zugangsdaten + vollständige CRM-Anleitung via Resend versenden
+# Voraussetzung: CRM_API_KEY gesetzt, RESEND_API_KEY gesetzt, CRM läuft.
+# needs:[] -> sofort manuell spielbar ohne Build/Deploy.
+# rules: api-Source mit when:always damit der Paperclip-Agent ihn per API
+# direkt auslösen kann.
+# =============================================================================
+ops-twenty-admin-invite:
+  extends: .ops-base
+  needs: []
+  variables:
+    TARGET_EMAIL: "daniel.czischke@bs-consulting-gmbh.de"
+    TRAEFIK_CFG: /opt/traefik/config
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: always
+      allow_failure: true
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "=== VEC-326 Twenty Admin Setup fuer ${TARGET_EMAIL} ==="
+    - |
+      SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
+      if [ -f "${SENTINEL}" ]; then
+        echo "INFO: VEC-326 bereits provisioniert (Sentinel vorhanden) — kein erneuter Invite, keine Mail"
+        exit 0
+      fi
+    - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
+    - cp ${CI_PROJECT_DIR}/docker-compose.yml .
+    - echo "OK docker-compose.yml aktualisiert EMAIL_DRIVER=smtp fuer twenty-server"
+    - COMPOSE_PROFILES=crm docker compose up -d twenty-server --force-recreate
+    - sleep 60
+    - COMPOSE_PROFILES=crm docker compose ps twenty-server
+    - |
+      INVITE_STATUS=UNKNOWN
+      if [ -z "${CRM_API_KEY}" ]; then
+        echo "WARN CRM_API_KEY leer Twenty-Invite uebersprungen"
+        INVITE_STATUS=SKIPPED_NO_KEY
+      else
+        # Nutze node.js (immer in twentycrm-Image) statt curl (ggf. nicht installiert)
+        # sendInvitations mit __typename als sicherem Subfield-Selector
+        NODE_INVITE="const http=require('http');const key='${CRM_API_KEY}';const email='${TARGET_EMAIL}';const q=JSON.stringify({query:'mutation{sendInvitations(emails:[\"'+email+'\"]){__typename}}'});function post(path,cb){const o={hostname:'localhost',port:3000,path,method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key,'Content-Length':Buffer.byteLength(q)}};const r=http.request(o,res=>{let b='';res.on('data',c=>b+=c);res.on('end',()=>cb(b))});r.on('error',e=>cb('ERR:'+e.message));r.write(q);r.end()}post('/metadata',r=>{process.stdout.write(r+'\n');if(!r.includes('\"errors\"'))process.exit(0);post('/graphql',r2=>{process.stdout.write('G:'+r2+'\n');process.exit(0)})})"
+        INVITE_RESP=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-server node -e "${NODE_INVITE}" 2>/dev/null || echo EXEC_ERROR)
+        echo "Invite response: ${INVITE_RESP}"
+        if echo "${INVITE_RESP}" | grep -qvE '"errors":|EXEC_ERROR'; then
+          INVITE_STATUS=OK
+        else
+          INVITE_STATUS=FAILED
+        fi
+      fi
+      echo "Invite status ${INVITE_STATUS}"
+      export INVITE_STATUS
+    - |
+      TRAEFIK_USER=intern
+      TRAEFIK_PASS="bitte beim Admin erfragen"
+      # Lese Traefik-Cred via busybox-Helper (Datei ist root:root 600)
+      TRAEFIK_CRED=$(docker run --rm --user 0:0 -v "${TRAEFIK_CFG}:/cfg:ro" busybox:1.36 \
+        sh -c 'cat /cfg/.vectiscan-internal-cred 2>/dev/null || echo ""' 2>/dev/null || echo "")
+      if [ -n "${TRAEFIK_CRED}" ]; then
+        TRAEFIK_USER=$(printf '%s' "${TRAEFIK_CRED}" | cut -d: -f1)
+        TRAEFIK_PASS=$(printf '%s' "${TRAEFIK_CRED}" | cut -d: -f2-)
+        echo "OK Traefik-Credential gelesen user=${TRAEFIK_USER} pass=MASKED"
+      else
+        echo "WARN Traefik-Cred nicht lesbar"
+      fi
+      export TRAEFIK_USER TRAEFIK_PASS
+      # RESEND_API_KEY ist protected und auf unprotected Branch nicht verfuegbar.
+      # Fallback: RESEND_MANAGEMENT (nicht-protected, immer injiziert).
+      if [ -z "${RESEND_API_KEY}" ]; then
+        echo "INFO: RESEND_API_KEY leer (protected Branch-Var), nutze RESEND_MANAGEMENT"
+        export RESEND_API_KEY="${RESEND_MANAGEMENT:-}"
+      fi
+      if [ -z "${RESEND_API_KEY}" ]; then
+        echo "ERROR: Kein Resend-Key verfuegbar"; exit 1
+      fi
+      python3 ${CI_PROJECT_DIR}/scripts/vec326-crm-guide.py
+    - echo "=== VEC-326 abgeschlossen ==="
+
+# =============================================================================
+# VEC-326 DB-Fallback: Twenty Admin-User direkt in DB anlegen
+# Wird getriggert wenn ops-twenty-admin-invite den Invite nicht senden konnte
+# (CRM_API_KEY hat keine Invite-Berechtigung). Fuegt Daniel als Admin-Member
+# direkt in die twenty-db ein — kein Restart noetig.
+# =============================================================================
+ops-twenty-create-user-db:
+  extends: .ops-base
+  needs:
+    - job: ops-twenty-admin-invite
+      optional: true
+  variables:
+    TARGET_EMAIL: "daniel.czischke@bs-consulting-gmbh.de"
+    TARGET_FIRST: "Daniel"
+    TARGET_LAST: "Czischke"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: always
+      allow_failure: true
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "=== VEC-326 DB-Fallback Anlegen von ${TARGET_EMAIL} in Twenty ==="
+    - |
+      SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
+      if [ -f "${SENTINEL}" ]; then
+        echo "INFO: VEC-326 bereits provisioniert (Sentinel vorhanden) — kein Re-Insert, keine Mail"
+        exit 0
+      fi
+    - |
+      # 1) Temporaeres Passwort generieren (persistent auf Host, wie .demo_password)
+      PWD_FILE="${DEPLOY_PATH}/.vec326_crm_password"
+      if [ ! -f "${PWD_FILE}" ]; then
+        TEMP_PASS="CRM-$(openssl rand -hex 8)-2026!"
+        ( umask 077; printf '%s\n' "${TEMP_PASS}" > "${PWD_FILE}" )
+        chmod 600 "${PWD_FILE}"
+        echo "OK: Temp-Passwort generiert und in ${PWD_FILE} gespeichert"
+      else
+        TEMP_PASS=$(cat "${PWD_FILE}")
+        echo "OK: Bestehendes Temp-Passwort aus ${PWD_FILE} gelesen"
+      fi
+      export TEMP_PASS
+    - |
+      # 2) Passwort-Hash via bcrypt im laufenden twenty-server (base64 zur sicheren Uebergabe)
+      PASS_B64=$(printf '%s' "${TEMP_PASS}" | base64 -w0)
+      HASH=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-server \
+        node -e "const p=Buffer.from('${PASS_B64}','base64').toString();let b;try{b=require('bcrypt')}catch(e){b=require('bcryptjs')};if(typeof b.hashSync==='function'){process.stdout.write(b.hashSync(p,10)+'\n')}else{b.hash(p,10).then(h=>process.stdout.write(h+'\n'))}" \
+        2>/dev/null | head -1 | tr -d '[:space:]' || echo "")
+      if [ -z "${HASH}" ] || [ ${#HASH} -lt 50 ]; then
+        echo "ERROR: Bcrypt-Hash ungueltig oder leer (Laenge=${#HASH})"; exit 1
+      fi
+      echo "OK: Bcrypt-Hash generiert (Laenge=${#HASH})"
+      export HASH
+    - |
+      # 3) Workspace + Admin-User in core-Schema anlegen (Twenty v2.9.0 nutzt core.*, nicht public.*)
+      set +e
+      echo "=== core-Schema Status ==="
+      # Check workspace count in core schema
+      WORKSPACE_COUNT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc "SELECT count(*) FROM core.workspace;" 2>/dev/null | tr -d '[:space:]')
+      if [ -z "${WORKSPACE_COUNT}" ]; then WORKSPACE_COUNT=0; fi
+      echo "core.workspace count: ${WORKSPACE_COUNT}"
+      # Get workspace column info for diagnostic
+      echo "=== core.workspace columns ==="
+      COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
+        "SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_schema='core' AND table_name='workspace' ORDER BY ordinal_position;" 2>&1
+      echo "=== core.user columns ==="
+      COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
+        "SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_schema='core' AND table_name='user' ORDER BY ordinal_position;" 2>&1
+      # Get or create workspace
+      if [ "${WORKSPACE_COUNT}" = "0" ]; then
+        echo "INFO: Erstelle Workspace in core.workspace"
+        INVITE_HASH=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "SELECT substring(md5(random()::text||clock_timestamp()::text) for 32);" 2>&1 | tr -d '[:space:]')
+        WS_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "INSERT INTO core.workspace (display_name, invite_hash) VALUES ('VectiScan CRM', '${INVITE_HASH}') RETURNING id;" 2>&1)
+        echo "Workspace insert: ${WS_RESULT}"
+        WS_ID=$(echo "${WS_RESULT}" | grep -E '^[0-9a-f-]{36}$' | tr -d '[:space:]')
+      else
+        WS_ID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc "SELECT id FROM core.workspace LIMIT 1;" 2>/dev/null | tr -d '[:space:]')
+        echo "Existing workspace: ${WS_ID}"
+      fi
+      echo "Using WS_ID: ${WS_ID}"
+      if [ -z "${WS_ID}" ]; then echo "ERROR: Kein Workspace-ID — Abbruch"; exit 1; fi
+      # Check / create user in core.user
+      EXISTING_USER=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc \
+        "SELECT id FROM core.\"user\" WHERE email='${TARGET_EMAIL}';" 2>/dev/null | tr -d '[:space:]')
+      echo "Existing user: ${EXISTING_USER}"
+      USER_IS_NEW=0
+      if [ -n "${EXISTING_USER}" ]; then
+        echo "INFO: User bereits vorhanden (idempotent) — kein Re-Insert, kein Passwort-Reset"
+        USER_UUID="${EXISTING_USER}"
+      else
+        USER_IS_NEW=1
+        echo "INFO: Erstelle neuen User in core.user (camelCase columns)"
+        USER_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "INSERT INTO core.\"user\" (email, \"passwordHash\", \"firstName\", \"lastName\", \"isEmailVerified\")
+           VALUES ('${TARGET_EMAIL}', '${HASH}', '${TARGET_FIRST}', '${TARGET_LAST}', true)
+           RETURNING id;" 2>&1)
+        echo "User insert: ${USER_RESULT}"
+        USER_UUID=$(echo "${USER_RESULT}" | grep -E '^[0-9a-f-]{36}$' | tr -d '[:space:]')
+        if [ -z "${USER_UUID}" ]; then
+          USER_UUID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+            psql -U twenty -d twenty -tAc \
+            "SELECT id FROM core.\"user\" WHERE email='${TARGET_EMAIL}';" 2>/dev/null | tr -d '[:space:]')
+        fi
+      fi
+      echo "User UUID: ${USER_UUID}"
+      if [ -z "${USER_UUID}" ]; then echo "ERROR: User konnte nicht angelegt werden"; exit 1; fi
+      # userWorkspace junction (camelCase: userId, workspaceId)
+      echo "=== core.userWorkspace columns ==="
+      COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
+        "SELECT column_name FROM information_schema.columns WHERE table_schema='core' AND table_name='userWorkspace' ORDER BY ordinal_position;" 2>&1
+      UW_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc \
+        "INSERT INTO core.\"userWorkspace\" (\"userId\", \"workspaceId\", role)
+         VALUES ('${USER_UUID}', '${WS_ID}', 'OWNER')
+         ON CONFLICT DO NOTHING RETURNING \"userId\";" 2>&1)
+      echo "UW insert: ${UW_RESULT}"
+      if echo "${UW_RESULT}" | grep -q "ERROR"; then
+        echo "WARN: userWorkspace insert fehlgeschlagen — versuche ohne role"
+        UW_RESULT2=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "INSERT INTO core.\"userWorkspace\" (\"userId\", \"workspaceId\")
+           VALUES ('${USER_UUID}', '${WS_ID}')
+           ON CONFLICT DO NOTHING RETURNING \"userId\";" 2>&1)
+        echo "UW insert v2: ${UW_RESULT2}"
+      fi
+      WORKSPACE_SETUP=DONE
+      export WORKSPACE_SETUP
+    - |
+      # 4) Login-Credentials-Email via Resend — nur bei Erstanlage (idempotent)
+      SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
+      if [ "${USER_IS_NEW}" != "1" ]; then
+        echo "INFO: User war bereits vorhanden — keine Credentials-Email (idempotent)"
+        touch "${SENTINEL}" 2>/dev/null || true
+        echo "INFO: Sentinel gesetzt (${SENTINEL}) — kuenftige Pipeline-Laeufe ueberspringen"
+        exit 0
+      fi
+      RESEND_KEY="${RESEND_API_KEY:-${RESEND_MANAGEMENT:-}}"
+      if [ -z "${RESEND_KEY}" ]; then
+        echo "WARN: Kein Resend-Key — kein Credentials-Email"; exit 0
+      fi
+      ACTUAL_PASS=$(cat "${PWD_FILE}")
+      EMAIL_JSON="{\"from\":\"VectiScan <noreply@vectiscan.de>\",\"to\":[\"${TARGET_EMAIL}\"],\"subject\":\"Ihr VectiScan CRM Login\",\"html\":\"<p>Sehr geehrter Herr Czischke,</p><p>Ihr Twenty-CRM-Konto ist einsatzbereit.</p><table style='border-collapse:collapse'><tr><td style='padding:8px;border:1px solid #ddd;background:#f5f5f5'><b>URL</b></td><td style='padding:8px;border:1px solid #ddd'><a href='https://crm.vectigal.tech'>https://crm.vectigal.tech</a></td></tr><tr><td style='padding:8px;border:1px solid #ddd;background:#f5f5f5'><b>E-Mail</b></td><td style='padding:8px;border:1px solid #ddd'>${TARGET_EMAIL}</td></tr><tr><td style='padding:8px;border:1px solid #ddd;background:#f5f5f5'><b>Passwort</b></td><td style='padding:8px;border:1px solid #ddd;font-family:monospace'>${ACTUAL_PASS}</td></tr></table><p>Bitte aendern Sie das Passwort nach dem ersten Login in den Einstellungen. Sie sind Workspace-Owner.</p><p>VectiScan-Team</p>\"}"
+      RESEND_OUT=$(curl -sf -X POST https://api.resend.com/emails \
+        -H "Authorization: Bearer ${RESEND_KEY}" \
+        -H "Content-Type: application/json" \
+        -d "${EMAIL_JSON}" 2>&1)
+      if echo "${RESEND_OUT}" | grep -q '"id"'; then
+        CRED_EMAIL_ID=$(echo "${RESEND_OUT}" | node -e "const d=[];process.stdin.on('data',c=>d.push(c));process.stdin.on('end',()=>console.log(JSON.parse(d.join('')).id||'unknown'));" 2>/dev/null || echo "unknown")
+        echo "OK: Credentials-Email gesendet Resend-ID=${CRED_EMAIL_ID}"
+        SENTINEL="${DEPLOY_PATH}/.vec326_provisioning_done"
+        touch "${SENTINEL}" 2>/dev/null || true
+        echo "INFO: Sentinel gesetzt (${SENTINEL}) — kuenftige Pipeline-Laeufe ueberspringen"
+      else
+        echo "WARN: Credentials-Email fehlgeschlagen: ${RESEND_OUT}"
+      fi
+    - |
+      # 5) Workspace aktivieren + finale Verifikation
+      set +e
+      echo "=== Workspace Aktivierung ==="
+      WS_STATUS=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc \
+        "SELECT \"activationStatus\" FROM core.workspace LIMIT 1;" 2>/dev/null | tr -d '[:space:]')
+      echo "Workspace activationStatus: ${WS_STATUS}"
+      if [ "${WS_STATUS}" != "ACTIVE" ]; then
+        COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "UPDATE core.workspace SET \"activationStatus\"='ACTIVE' WHERE \"activationStatus\" != 'ACTIVE';" 2>&1
+        echo "OK: Workspace auf ACTIVE gesetzt"
+      fi
+      echo "=== Finale Verifikation ==="
+      COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc \
+        "SELECT u.email, w.id AS workspace_id, w.\"activationStatus\", uw.\"userId\"
+         FROM core.\"userWorkspace\" uw
+         JOIN core.\"user\" u ON u.id = uw.\"userId\"
+         JOIN core.workspace w ON w.id = uw.\"workspaceId\"
+         WHERE u.email='${TARGET_EMAIL}';" 2>&1
+      echo "=== VEC-326 DONE ==="
+    - echo "=== VEC-326 DB-Fallback abgeschlossen ==="

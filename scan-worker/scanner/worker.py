@@ -179,6 +179,11 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
     config = get_config(package)
     config["domain"] = domain  # Pass domain to Phase 2 for base-domain protection
+    # VEC-308: package schon vor Phase 2 in config, damit der testssl-Runner
+    # (_run_testssl_group) den fast_mode-Pfad fuer WebCheck korrekt waehlt.
+    # Bisher erst in Phase 3 gesetzt → WebCheck lief faelschlich den vollen
+    # Cipher-Walk (~5 Min/Host, sprengt das 20-Min-WebCheck-Budget).
+    config["package"] = package
 
     start = time.monotonic()
 

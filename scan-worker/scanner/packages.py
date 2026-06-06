@@ -33,8 +33,12 @@ _PERIMETER_BASE: dict[str, Any] = {
     "max_hosts": 15,
     "nmap_ports": "--top-ports 1000",
     "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
+    # VEC-308: testssl ist Teil des perimeter-Vertrags (report_mapper
+    # _build_scope + SCAN_TOOLS-Appendix versprechen TLS-Analyse). Runner
+    # in phase2._run_testssl_group ist gated auf "testssl" in phase2_tools.
     "phase2_tools": ["zap_spider", "zap_active",
                      "ffuf", "feroxbuster",
+                     "testssl",
                      "headers", "httpx", "wpscan"],
     "phase3_tools": ["nvd", "epss", "cisa_kev", "exploitdb", "correlator",
                      "fp_filter", "business_impact"],
@@ -60,7 +64,11 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
         "max_hosts": 3,
         "nmap_ports": "--top-ports 100",
         "phase1_tools": ["nmap", "webtech", "wafw00f", "cms_fingerprint"],
+        # VEC-308: testssl gehoert zum WebCheck-Vertrag (report_mapper
+        # _build_basic_scope verspricht testssl.sh SSL-Analyse). Schnellscan
+        # nutzt fast_mode (phase2._run_testssl_group, package=webcheck).
         "phase2_tools": ["zap_spider", "zap_passive",
+                         "testssl",
                          "headers", "httpx", "wpscan"],
         "phase3_tools": ["nvd", "cisa_kev", "correlator", "fp_filter"],
         "phase3_timeout": 120,        # 2 Minuten
