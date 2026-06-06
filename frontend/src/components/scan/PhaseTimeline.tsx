@@ -13,7 +13,7 @@
  */
 
 import StatusChip from '@/components/ds/StatusChip';
-import { statusMeta, TONE_COLOR } from '@/lib/status';
+import { TONE_COLOR } from '@/lib/status';
 
 interface Phase {
   /** Kanonische Worker-Phasen-Keys, die diesen Schritt markieren. */
@@ -64,7 +64,7 @@ export default function PhaseTimeline({
         {PHASES.map((p, i) => {
           const state: PhaseState = i < activeIdx ? 'done' : i === activeIdx ? 'active' : 'pending';
           const isLast = i === PHASES.length - 1;
-          const doneColor = TONE_COLOR[statusMeta('scan_complete').tone]; // success
+          const doneColor = TONE_COLOR['success']; // abgeschlossene Phasen → grün (Jakob's Law)
           const dotColor =
             state === 'done' ? doneColor
             : state === 'active' ? TONE_COLOR['active']
