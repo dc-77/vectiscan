@@ -152,8 +152,8 @@ describe('WebCheck-Free Lead-Magnet (VEC-91 / PA-11)', () => {
   });
 });
 
-describe('Migration 032 webcheck_leads schema (VEC-91)', () => {
-  const migrationPath = path.join(__dirname, '..', 'migrations', '032_webcheck_leads.sql');
+describe('Migration 034 webcheck_leads schema (VEC-91)', () => {
+  const migrationPath = path.join(__dirname, '..', 'migrations', '034_webcheck_leads.sql');
 
   it('migration file exists', () => {
     expect(fs.existsSync(migrationPath)).toBe(true);
