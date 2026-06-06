@@ -270,6 +270,51 @@ describe('API Routes', () => {
       const queryCall = mockQuery.mock.calls[0];
       expect(queryCall[0]).toContain('WHERE o.customer_id = $1');
       expect(queryCall[1]).toEqual(['cust-uuid-5678']);
+      // VEC-297: KEINE Status-Whitelist mehr — Customer sieht alle eigenen Orders
+      // in jedem Lebenszyklus-Status, nicht nur abgeschlossene Reports.
+      expect(queryCall[0]).not.toContain('o.status IN');
+    });
+
+    it('VEC-297: should list in-progress orders for customer (no status whitelist)', async () => {
+      mockVerifyJwt.mockReturnValue({
+        sub: 'user-uuid-5678',
+        role: 'customer',
+        customerId: 'cust-uuid-5678',
+        email: 'customer@test.com',
+      } as ReturnType<typeof verifyJwt>);
+
+      mockQuery.mockResolvedValueOnce({
+        rows: [{
+          id: '550e8400-e29b-41d4-a716-446655440099',
+          target_url: 'example.com',
+          email: 'customer@test.com',
+          package: 'webcheck',
+          status: 'precheck_running',
+          error_message: null,
+          scan_started_at: null,
+          scan_finished_at: null,
+          created_at: new Date(),
+          has_report: false,
+        }],
+        command: 'SELECT',
+        rowCount: 1,
+        oid: 0,
+        fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: '/api/orders',
+        headers: AUTH_HEADER,
+      });
+
+      expect(res.statusCode).toBe(200);
+      const body = res.json();
+      expect(body.success).toBe(true);
+      expect(body.data.orders).toHaveLength(1);
+      // Die laufende Order erscheint im Dashboard-Listing (nicht nur via Direkt-URL).
+      expect(body.data.orders[0].status).toBe('precheck_running');
+      expect(body.data.orders[0].hasReport).toBe(false);
     });
   });
 

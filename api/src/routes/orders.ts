@@ -233,7 +233,16 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       sql = `${baseSelect} ORDER BY o.created_at DESC`;
       params = [];
     } else {
-      sql = `${baseSelect} WHERE o.customer_id = $1 AND o.status IN ('report_complete', 'delivered', 'report_generating') ORDER BY o.created_at DESC`;
+      // VEC-297: KEINE Status-Whitelist mehr — konsistent zu GET /api/orders/:id
+      // (VEC-283). Der Customer sieht im Dashboard-Listing ALLE eigenen Orders in
+      // jedem Lebenszyklus-Status (precheck_running, pending_target_review,
+      // scan_running, report_generating, …), nicht erst wenn der Report fertig ist.
+      // Vorher zeigte die Whitelist (report_complete/delivered/report_generating)
+      // eine frisch angelegte, laufende Order NICHT in der Liste — ein Erstnutzer
+      // sah seine gerade gestartete Order nur via Direkt-URL /scan/[orderId], nicht
+      // im Dashboard. o.customer_id = $1 ist die einzige noetige Zugriffsgrenze;
+      // Report-Felder (overallRisk/severityCounts) bleiben null solange kein Report.
+      sql = `${baseSelect} WHERE o.customer_id = $1 ORDER BY o.created_at DESC`;
       params = [user.customerId];
     }
 
@@ -290,6 +299,13 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     // Build WHERE dynamically — ownership first, then optional scope filters
+    // VEC-297: dashboard-summary behaelt BEWUSST den completed-status-Filter.
+    // Anders als das Listing (GET /api/orders) ist dies ein Security-Cockpit-
+    // Aggregat (Domain-/Scan-/Findings-Zahlen, overallRisk) ueber abgeschlossene
+    // Scans. In-progress Orders haben keine Findings; sie aufzunehmen wuerde nur
+    // totalScans/domains mit ergebnislosen Eintraegen aufblaehen ("1 Scan, 0
+    // Findings" waehrend noch laeuft) — irrefuehrend fuer die Risiko-Karten.
+    // Die laufende Order ist via Listing + /scan/[orderId] sichtbar.
     const where: string[] = [`o.status IN ('report_complete', 'delivered', 'pending_review')`];
     const params: unknown[] = [];
     if (user.role !== 'admin') {
