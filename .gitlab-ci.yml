@@ -1154,43 +1154,77 @@ ops-twenty-create-user-db:
       echo "OK: Bcrypt-Hash generiert (Laenge=${#HASH})"
       export HASH
     - |
-      # 3) Workspace-Check: wenn leer, ersten User via sign-up API anlegen (intern, kein Traefik)
+      # 3) Workspace + Admin-User direkt in PostgreSQL anlegen
+      # (Twenty v2.9.0 hat keinen REST/GraphQL-Endpoint für First-Setup)
+      echo "=== Schema Discovery ==="
+      TABLES=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        psql -U twenty -d twenty -tAc \
+        "SELECT string_agg(table_name,',') FROM information_schema.tables WHERE table_schema='public';" \
+        2>/dev/null | tr -d ' \n' || echo "")
+      echo "Tables: ${TABLES}"
       WORKSPACE_COUNT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
         psql -U twenty -d twenty -tAc "SELECT count(*) FROM workspace;" 2>/dev/null | tr -d '[:space:]' || echo "0")
       echo "Workspace-Count: ${WORKSPACE_COUNT}"
       if [ "${WORKSPACE_COUNT}" = "0" ] || [ -z "${WORKSPACE_COUNT}" ]; then
-        echo "INFO: Kein Workspace — initialisiere via Twenty sign-up API (erster User wird Admin-Owner)"
-        PASS_B64_INNER=$(printf '%s' "${TEMP_PASS}" | base64 -w0)
-        # First: introspect to discover the correct signup mutation name
-        INTROSPECT_NODE="const http=require('http');function post(path,body,cb){const o={hostname:'localhost',port:3000,path,method:'POST',headers:{'Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}};const rq=http.request(o,res=>{let b='';res.on('data',c=>b+=c);res.on('end',()=>cb(b))});rq.on('error',e=>cb('ERR:'+e.message));rq.write(body);rq.end()}post('/graphql',JSON.stringify({query:'{__schema{mutationType{fields{name}}}}}'}),function(intr){try{const fs=JSON.parse(intr).data.__schema.mutationType.fields.map(function(f){return f.name});console.log('MUTS:'+fs.filter(function(f){return /sign|register|auth|workspace/i.test(f)}).join(','))}catch(e){console.log('ERR:'+e.message)}})"
-        MUTS_RESP=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-server node -e "${INTROSPECT_NODE}" 2>/dev/null || echo "EXEC_ERROR")
-        echo "Available auth mutations: ${MUTS_RESP}"
-        # Pick mutation name from introspection result
-        MUT_NAME=""
-        for CAND in signUpWithWorkspace signUp signUpWithEmail createWorkspace; do
-          if echo "${MUTS_RESP}" | grep -q "${CAND}"; then
-            MUT_NAME="${CAND}"
-            break
-          fi
-        done
-        if [ -z "${MUT_NAME}" ]; then
-          echo "ERROR: No sign-up mutation found in schema — cannot create workspace"; exit 1
+        echo "INFO: Lege Workspace + Admin-User per SQL an"
+        WS_ID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc "SELECT gen_random_uuid();" 2>/dev/null | tr -d '[:space:]')
+        USER_UUID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc "SELECT gen_random_uuid();" 2>/dev/null | tr -d '[:space:]')
+        INVITE_HASH=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc "SELECT encode(gen_random_bytes(16),'hex');" 2>/dev/null | tr -d '[:space:]')
+        echo "WS_ID=${WS_ID} USER_UUID=${USER_UUID}"
+        # Insert workspace
+        WS_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "INSERT INTO workspace (id, display_name, subscription_status, plan, invite_hash)
+           VALUES ('${WS_ID}', 'VectiScan CRM', 'active', 'FREE', '${INVITE_HASH}')
+           ON CONFLICT DO NOTHING RETURNING id;" 2>&1)
+        echo "Workspace: ${WS_RESULT}"
+        if echo "${WS_RESULT}" | grep -q "ERROR"; then
+          echo "WARN: Workspace-Insert fehlgeschlagen — Schema-Info:"
+          COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
+            "SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_schema='public' AND table_name='workspace' ORDER BY ordinal_position;" 2>&1
+          exit 1
         fi
-        echo "Using mutation: ${MUT_NAME}"
-        SIGNUP_NODE="const http=require('http');const p=Buffer.from('${PASS_B64_INNER}','base64').toString();const email='${TARGET_EMAIL}';const mn='${MUT_NAME}';const q=JSON.stringify({query:'mutation M(\$e:String!,\$pw:String!,\$wn:String!){'+mn+'(email:\$e,password:\$pw,workspaceName:\$wn){loginToken{token}}}',variables:{e:email,pw:p,wn:'VectiScan CRM'}});const o={hostname:'localhost',port:3000,path:'/graphql',method:'POST',headers:{'Content-Type':'application/json','Content-Length':Buffer.byteLength(q)}};const r=http.request(o,res=>{let b='';res.on('data',c=>b+=c);res.on('end',()=>process.stdout.write(b+'\n'))});r.on('error',e=>process.stdout.write('ERR:'+e.message+'\n'));r.write(q);r.end();"
-        SIGNUP_RESP=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-server node -e "${SIGNUP_NODE}" 2>/dev/null || echo "EXEC_ERROR")
-        echo "Sign-up response: ${SIGNUP_RESP}"
-        if echo "${SIGNUP_RESP}" | grep -qE '"token"|"loginToken"'; then
-          echo "OK: Workspace + erster User (Daniel) angelegt"
-          WORKSPACE_SETUP=DONE
-        elif echo "${SIGNUP_RESP}" | grep -q "already exists\|CONFLICT"; then
-          echo "INFO: User bereits vorhanden"
-          WORKSPACE_SETUP=EXISTS
+        # Insert user
+        USER_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "INSERT INTO \"user\" (id, email, password_hash, first_name, last_name, default_workspace_id, email_verified)
+           VALUES ('${USER_UUID}', '${TARGET_EMAIL}', '${HASH}', '${TARGET_FIRST}', '${TARGET_LAST}', '${WS_ID}', true)
+           ON CONFLICT (email) DO UPDATE SET password_hash='${HASH}', default_workspace_id='${WS_ID}', email_verified=true
+           RETURNING id;" 2>&1)
+        echo "User: ${USER_RESULT}"
+        if echo "${USER_RESULT}" | grep -q "ERROR"; then
+          echo "WARN: User-Insert fehlgeschlagen — Schema-Info:"
+          COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
+            "SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_schema='public' AND table_name='user' ORDER BY ordinal_position;" 2>&1
+          exit 1
+        fi
+        # Get confirmed user ID
+        ACTUAL_USER_ID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "SELECT id FROM \"user\" WHERE email='${TARGET_EMAIL}';" 2>/dev/null | tr -d '[:space:]')
+        echo "Confirmed user ID: ${ACTUAL_USER_ID}"
+        # Insert user-workspace junction (try both common table names)
+        UW_TABLE=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+          psql -U twenty -d twenty -tAc \
+          "SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('user_workspace','workspace_member') LIMIT 1;" \
+          2>/dev/null | tr -d '[:space:]')
+        echo "UW Table: ${UW_TABLE}"
+        if [ -n "${UW_TABLE}" ]; then
+          UW_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+            psql -U twenty -d twenty -tAc \
+            "INSERT INTO ${UW_TABLE} (id, user_id, workspace_id, role)
+             VALUES (gen_random_uuid(), '${ACTUAL_USER_ID}', '${WS_ID}', 'OWNER')
+             ON CONFLICT DO NOTHING RETURNING id;" 2>&1)
+          echo "UserWorkspace: ${UW_RESULT}"
         else
-          echo "ERROR: Sign-up fehlgeschlagen"; exit 1
+          echo "WARN: Kein user_workspace/workspace_member table gefunden"
         fi
+        WORKSPACE_SETUP=DONE
       else
-        echo "OK: Workspace vorhanden — ueberspringe Initialisierung"
+        echo "OK: Workspace vorhanden — ueberspringe"
         WORKSPACE_SETUP=EXISTING
       fi
       export WORKSPACE_SETUP
