@@ -431,7 +431,7 @@ export default function Dashboard() {
               ] as [StatusFilter, string, number][]).map(([key, label, count]) => {
                 const selected = filter === key;
                 return (
-                  <button key={key} onClick={() => setFilter(key)}
+                  <button key={key} onClick={() => { setFilter(key); setPage(1); }}
                     className="px-3 py-1.5 rounded-full text-sm font-medium transition-colors"
                     style={selected
                       ? { color: 'var(--tone-active)', backgroundColor: 'color-mix(in srgb, var(--tone-active) 15%, transparent)', boxShadow: 'inset 0 0 0 1px color-mix(in srgb, var(--tone-active) 30%, transparent)' }
