@@ -26,7 +26,7 @@ export default function ImpressumPage() {
         <section className="space-y-2 text-sm leading-relaxed" style={{ color: '#94A3B8' }}>
           <h2 className="text-base font-semibold" style={{ color: '#F8FAFC' }}>Kontakt</h2>
           <p>
-            E-Mail: <a href="mailto:kontakt@vectigal.gmbh" className="hover:underline" style={{ color: '#2DD4BF' }}>kontakt@vectigal.gmbh</a><br />
+            E-Mail: <a href="mailto:support@vectigal.tech" className="hover:underline" style={{ color: '#2DD4BF' }}>support@vectigal.tech</a><br />
             Telefon: +49 231 586 939 30
           </p>
         </section>

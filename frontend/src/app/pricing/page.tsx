@@ -127,7 +127,7 @@ export default function PricingPage() {
             </ul>
             <div className="border-t pt-5" style={{ borderColor: C.borderSubtle }}>
               <p className="text-xs mb-4" style={{ color: C.muted }}>Jahresabo — individuelle Preisgestaltung</p>
-              <Link href="mailto:kontakt@vectigal.gmbh?subject=Angebot%20Cyberversicherung&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20VectiScan%20Cyberversicherungs-Report.%0A%0AFirma%3A%20%0ADomains%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
+              <Link href="mailto:support@vectigal.tech?subject=Angebot%20Cyberversicherung&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20den%20VectiScan%20Cyberversicherungs-Report.%0A%0AFirma%3A%20%0ADomains%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
                 className="block w-full text-center px-5 py-3 rounded-lg text-sm font-medium transition-colors"
                 style={{ color: C.teal, border: `1px solid ${C.teal}40` }}>
                 Angebot anfordern
@@ -201,10 +201,10 @@ export default function PricingPage() {
             Ihnen ein maßgeschneidertes Angebot innerhalb von 24 Stunden.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="mailto:kontakt@vectigal.gmbh?subject=VectiScan%20Angebot&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20VectiScan.%0A%0AFirma%3A%20%0ADomains%3A%20%0AGew%C3%BCnschtes%20Paket%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
+            <Link href="mailto:support@vectigal.tech?subject=VectiScan%20Angebot&body=Guten%20Tag%2C%0A%0Aich%20interessiere%20mich%20f%C3%BCr%20VectiScan.%0A%0AFirma%3A%20%0ADomains%3A%20%0AGew%C3%BCnschtes%20Paket%3A%20%0A%0AMit%20freundlichen%20Gr%C3%BC%C3%9Fen"
               className="px-7 py-3 rounded-lg text-sm font-medium transition-all"
               style={{ backgroundColor: C.teal, color: C.slate }}>
-              kontakt@vectigal.gmbh
+              support@vectigal.tech
             </Link>
             <Link href="/subscribe"
               className="px-7 py-3 rounded-lg text-sm font-medium transition-colors"

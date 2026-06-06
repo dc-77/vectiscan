@@ -11,7 +11,7 @@ export default function DatenschutzPage() {
         <H2>1. Verantwortlicher</H2>
         <p>
           Vectigal GmbH, Heiliger Weg 60, 44135 Dortmund<br />
-          E-Mail: <a href="mailto:kontakt@vectigal.gmbh" className="hover:underline" style={{ color: '#2DD4BF' }}>kontakt@vectigal.gmbh</a>
+          E-Mail: <a href="mailto:support@vectigal.tech" className="hover:underline" style={{ color: '#2DD4BF' }}>support@vectigal.tech</a>
         </p>
 
         <H2>2. Erhebung und Verarbeitung personenbezogener Daten</H2>
@@ -148,7 +148,7 @@ export default function DatenschutzPage() {
         </ul>
         <p>
           Zur Ausübung Ihrer Rechte wenden Sie sich an{' '}
-          <a href="mailto:kontakt@vectigal.gmbh" className="hover:underline" style={{ color: '#2DD4BF' }}>kontakt@vectigal.gmbh</a>.
+          <a href="mailto:support@vectigal.tech" className="hover:underline" style={{ color: '#2DD4BF' }}>support@vectigal.tech</a>.
         </p>
 
         <H2>12. Aufsichtsbehörde</H2>

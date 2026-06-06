@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { VectiScanShield } from '@/components/VectiScanLogo';
 import { isLoggedIn } from '@/lib/auth';
+import { track } from '@/lib/analytics';
+import { getTier, formatEur } from '@/lib/pricing';
+import { webcheckCtaHref, webcheckCtaLabel } from '@/lib/webcheck';
 
 const C = {
   slate: '#0F172A', slateLight: '#1E293B', teal: '#2DD4BF', tealDark: '#14B8A6',
@@ -12,6 +15,21 @@ const C = {
 };
 
 /* ── Hooks ────────────────────────────────────────────────── */
+// WCAG 2.2.2: respektiert die Betriebssystem-Einstellung „reduzierte Bewegung"
+// für die JS-getriebenen Animationen (CSS-Seite deckt globals.css ab).
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReduced(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return reduced;
+}
+
 function useReveal(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -30,13 +48,17 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 }
 
 function useGlitch() {
+  const reduced = usePrefersReducedMotion();
   const [on, setOn] = useState(false);
   useEffect(() => {
+    // Hero-Glitch ist dezent und bei reduzierter Bewegung komplett aus
+    // (Security-Marke: kein hektisches Flackern, WCAG 2.2.2).
+    if (reduced) { setOn(false); return; }
     let t: ReturnType<typeof setTimeout>;
-    const fire = () => { setOn(true); setTimeout(() => setOn(false), 50); t = setTimeout(fire, 6000 + Math.random() * 9000); };
-    t = setTimeout(fire, 3000 + Math.random() * 5000);
+    const fire = () => { setOn(true); setTimeout(() => setOn(false), 50); t = setTimeout(fire, 9000 + Math.random() * 12000); };
+    t = setTimeout(fire, 4000 + Math.random() * 6000);
     return () => clearTimeout(t);
-  }, []);
+  }, [reduced]);
   return on;
 }
 
@@ -53,27 +75,32 @@ function OrderIdRedirect() {
 
 /* ── Cursor Glow (full page, very subtle) ─────────────── */
 function CursorGlow() {
+  const reduced = usePrefersReducedMotion();
   const [pos, setPos] = useState({ x: -1000, y: -1000 });
   useEffect(() => {
+    if (reduced) return;
     const h = (e: MouseEvent) => setPos({ x: e.clientX, y: e.clientY });
     window.addEventListener('mousemove', h); return () => window.removeEventListener('mousemove', h);
-  }, []);
+  }, [reduced]);
+  if (reduced) return null;
   return <div className="pointer-events-none fixed inset-0 z-0"
     style={{ background: `radial-gradient(800px circle at ${pos.x}px ${pos.y}px, ${C.teal}05, transparent 50%)` }} />;
 }
 
 /* ── Hero Shield with lerp parallax ───────────────────── */
 function HeroShield({ containerRef }: { containerRef: React.RefObject<HTMLElement | null> }) {
+  const reduced = usePrefersReducedMotion();
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [isTouch, setIsTouch] = useState(false);
   const target = useRef({ x: 0, y: 0 });
   const current = useRef({ x: 0, y: 0 });
   const raf = useRef(0);
+  const noParallax = isTouch || reduced;
 
   useEffect(() => { setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0); }, []);
 
   useEffect(() => {
-    if (isTouch) return;
+    if (noParallax) return;
     const onMove = (e: MouseEvent) => {
       const el = containerRef.current; if (!el) return;
       const r = el.getBoundingClientRect();
@@ -93,14 +120,14 @@ function HeroShield({ containerRef }: { containerRef: React.RefObject<HTMLElemen
     window.addEventListener('mouseleave', onLeave);
     raf.current = requestAnimationFrame(animate);
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseleave', onLeave); cancelAnimationFrame(raf.current); };
-  }, [isTouch, containerRef]);
+  }, [noParallax, containerRef]);
 
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ perspective: '1000px' }}>
       {/* Teal glow behind shield */}
       <div className="absolute w-[300px] h-[300px] sm:w-[450px] sm:h-[450px] rounded-full"
         style={{ background: `radial-gradient(circle, ${C.teal}0A 0%, transparent 70%)`, filter: 'blur(40px)' }} />
-      <div style={{ transform: isTouch ? 'none' : `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`, willChange: 'transform' }}>
+      <div style={{ transform: noParallax ? 'none' : `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`, willChange: 'transform' }}>
         <svg viewBox="0 0 200 210" fill="none" aria-hidden="true"
           className="w-[280px] h-[294px] sm:w-[400px] sm:h-[420px] md:w-[500px] md:h-[525px] opacity-[0.12]">
           <path d="M100 8 L178 48 L178 116 C178 156 144 186 100 200 C56 186 22 156 22 116 L22 48 Z"
@@ -130,14 +157,17 @@ const I = {
 
 /* ── Steps ────────────────────────────────────────────── */
 function StepSequence() {
+  const reduced = usePrefersReducedMotion();
   const { ref, visible } = useReveal();
   const [active, setActive] = useState(-1);
   useEffect(() => {
     if (!visible) return;
+    // Reduzierte Bewegung: keine Auto-Advance-Schleife, alle Schritte statisch sichtbar.
+    if (reduced) { setActive(3); return; }
     const s = setTimeout(() => setActive(0), 400);
     const iv = setInterval(() => setActive(p => (p + 1) % 4), 3000);
     return () => { clearTimeout(s); clearInterval(iv); };
-  }, [visible]);
+  }, [visible, reduced]);
   const steps = [
     { title: 'Ziele definieren', text: 'Domains, IPs oder Subnetze — bis zu 30 Ziele pro Abo' },
     { title: 'Automatisch scannen', text: 'Regelmäßige Scans im gewählten Intervall' },
@@ -180,13 +210,15 @@ function StepSequence() {
 
 /* ── Trust Badge with flicker ─────────────────────────── */
 function TrustBadge({ text, delay }: { text: string; delay: number }) {
+  const reduced = usePrefersReducedMotion();
   const [dim, setDim] = useState(false);
   useEffect(() => {
+    if (reduced) { setDim(false); return; }
     let t: ReturnType<typeof setTimeout>;
     const fire = () => { setDim(true); setTimeout(() => setDim(false), 200); t = setTimeout(fire, 5000 + Math.random() * 8000); };
     t = setTimeout(fire, delay + Math.random() * 5000);
     return () => clearTimeout(t);
-  }, [delay]);
+  }, [delay, reduced]);
   return <span className="text-xs font-medium tracking-wide uppercase transition-opacity duration-200"
     style={{ color: C.muted, opacity: dim ? 0.3 : 1 }}>{text}</span>;
 }
@@ -219,31 +251,35 @@ export default function LandingPage() {
         <HeroShield containerRef={heroRef} />
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
           <p className="text-xs sm:text-sm uppercase tracking-[0.25em] mb-4 sm:mb-6 font-medium" style={{ color: C.teal }}>
-            Automatisierte Perimeter-Analyse
+            Automatisierte Schwachstellen-Scans nach PTES
           </p>
           <h1 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight mb-4 sm:mb-5" style={{ color: C.offWhite }}>
             Kennen Sie Ihre<br />
-            <span style={{ color: C.teal, textShadow: glitching ? '2px 0 #EF4444, -2px 0 #3B82F6' : 'none' }}>Angriffsoberfläche</span>?
+            <span style={{ color: C.teal, textShadow: glitching ? '1px 0 #2DD4BF, -1px 0 #3B82F6' : 'none' }}>Angriffsoberfläche</span>?
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl font-normal mb-3" style={{ color: C.teal }}>
             Finden, bevor es andere tun.
           </p>
           <p className="text-[15px] sm:text-base max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed font-light" style={{ color: C.muted }}>
-            VectiScan analysiert Ihre exponierte IT-Infrastruktur automatisiert auf Schwachstellen — regelmäßig, zuverlässig, nach anerkannten Standards. Damit Sie Gewissheit haben.
+            VectiScan analysiert Ihre exponierte IT-Infrastruktur automatisiert auf Schwachstellen — regelmäßig, zuverlässig, nach anerkannten Standards. Damit Sie Lücken schließen, bevor sie ausgenutzt werden.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/demo" className="w-full sm:w-auto px-8 py-4 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-[1.02] cta-glow"
-              style={{ backgroundColor: C.teal, color: C.slate }}>Demo anfragen</Link>
-            <Link href="/pricing#pakete" className="w-full sm:w-auto px-8 py-4 rounded-lg text-sm font-medium transition-all duration-300 hover:border-[#2DD4BF60] text-center"
-              style={{ color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>Pakete vergleichen</Link>
+            <Link href={webcheckCtaHref()} onClick={() => track('webcheck_cta_click', { surface: 'home_hero' })}
+              className="w-full sm:w-auto px-8 py-4 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-[1.02] cta-glow text-center"
+              style={{ backgroundColor: C.teal, color: C.slate }}>{webcheckCtaLabel()}</Link>
+            <Link href="/demo" className="w-full sm:w-auto px-8 py-4 rounded-lg text-sm font-medium transition-all duration-300 hover:border-[#2DD4BF60] text-center"
+              style={{ color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>Demo anfragen</Link>
           </div>
+          <p className="text-xs mt-4 font-light" style={{ color: `${C.muted}B0` }}>
+            Kostenlos · ohne Kreditkarte · Ergebnis in ~15&nbsp;Minuten
+          </p>
         </div>
       </section>
 
       {/* ── TRUST BAR ─────────────────────────────── */}
       <div className="border-t border-b py-4 relative z-10" style={{ borderColor: 'rgba(45,212,191,0.08)' }}>
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-2 px-4">
-          {['BSI-konform', 'PTES-Standard', 'CVSS v3.1', 'DSGVO-konform', 'Hosting in DE'].map((t, i) =>
+          {['BSI-Grundschutz-Mapping', 'PTES-konform', 'CVSS v3.1', 'DSGVO-konform', 'Hosting in DE'].map((t, i) =>
             <TrustBadge key={t} text={t} delay={i * 1000} />)}
         </div>
       </div>
@@ -259,7 +295,7 @@ export default function LandingPage() {
             {[
               { icon: I.search, title: 'Unbekannte Angriffsoberfläche', text: 'Vergessene Subdomains, Testserver, offene Ports — Ihre externe IT-Landschaft ist größer als Sie denken. Jeder exponierte Dienst ist ein potenzielles Einfallstor.' },
               { icon: I.alert, title: 'Veraltete Software', text: 'End-of-Life Betriebssysteme, fehlende Patches, bekannte CVEs — Schwachstellen, die seit Monaten öffentlich dokumentiert sind und aktiv ausgenutzt werden.' },
-              { icon: I.clipboard, title: 'Compliance-Druck', text: 'NIS2, BSI-Grundschutz, Cyberversicherungen — alle fordern regelmäßige Nachweise Ihrer IT-Sicherheit. Ohne belastbare Dokumentation wird es teuer.' },
+              { icon: I.clipboard, title: 'Compliance-Druck', text: 'NIS2, BSI-Grundschutz, Cyberversicherungen — alle fordern regelmäßige Nachweise Ihrer IT-Sicherheit. Ohne belastbaren Nachweis riskieren Sie Bußgelder und Versicherungslücken.' },
             ].map(({ icon, title, text }, i) => (
               <Reveal key={title} delay={i * 120}><div className="p-6 rounded-2xl h-full" style={{ backgroundColor: C.slateLight }}>
                 <div className="mb-3" style={{ color: C.teal }}>{icon}</div>
@@ -309,25 +345,46 @@ export default function LandingPage() {
 
       {/* ── PACKAGES ──────────────────────────────── */}
       <section className="py-12 md:py-20 relative z-10">
-        <div className="max-w-4xl mx-auto px-6">
-          <Reveal><h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-12" style={{ color: C.offWhite }}>Zwei Pakete. Ein Ziel: Ihre Sicherheit.</h2></Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="max-w-5xl mx-auto px-6">
+          <Reveal><h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-12" style={{ color: C.offWhite }}>Vom kostenlosen Schnell-Check zum Vollscan.</h2></Reveal>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
-              { name: 'Perimeter-Scan', sub: 'Vollständige Sicherheitsanalyse Ihrer externen Angriffsoberfläche', rec: true,
-                features: ['Port-Scanning & Service-Erkennung', 'Web-Schwachstellen-Analyse (OWASP)', 'DNS- & E-Mail-Security-Prüfung', 'PTES-konformer Report mit Maßnahmenplan', 'NIS2/BSI-Compliance-Mapping'] },
-              { name: 'Cyberversicherung', sub: 'Nachweis und Dokumentation für Ihren Versicherungsantrag', rec: false,
-                features: ['Alles aus dem Perimeter-Scan', '10-Punkte Versicherungs-Fragebogen', 'Risk-Score & Ransomware-Indikator', 'Versicherungskonformer Nachweis-Report', 'Direkt einreichbar bei Ihrem Versicherer'] },
+              { name: 'WebCheck', sub: 'Schnell-Scan Ihrer Domain in ~15 Min. DNS, E-Mail-Security, Basis-Schwachstellen — kostenlos und unverbindlich.', rec: false,
+                features: ['DNS- & Subdomain-Check', 'E-Mail-Security (SPF/DKIM/DMARC)', 'Basis-Schwachstellen-Scan', 'Sample-Report mit Compliance-Mapping'],
+                price: 'kostenlos', priceNote: 'ohne Kreditkarte',
+                ctaLabel: webcheckCtaLabel(), ctaHref: webcheckCtaHref(), ctaPrimary: false,
+                ctaTrack: 'webcheck_cta_click' as const },
+              { name: 'Perimeter-Scan', sub: 'Vollständige Sicherheitsanalyse Ihrer externen Angriffsoberfläche.', rec: true,
+                features: ['Port-Scanning & Service-Erkennung', 'Web-Schwachstellen-Analyse (OWASP)', 'DNS- & E-Mail-Security-Prüfung', 'PTES-konformer Report mit Maßnahmenplan', 'NIS2/BSI-Compliance-Mapping'],
+                price: `ab ${formatEur(getTier('perimeter')!.priceEur!)} / Jahr`, priceNote: getTier('perimeter')!.billingNote,
+                ctaLabel: 'Abo starten', ctaHref: '/subscribe', ctaPrimary: true,
+                ctaTrack: undefined },
+              { name: 'Cyberversicherung', sub: 'Nachweis und Dokumentation für Ihren Versicherungsantrag.', rec: false,
+                features: ['Alles aus dem Perimeter-Scan', '10-Punkte Versicherungs-Fragebogen', 'Risk-Score & Ransomware-Indikator', 'Versicherungskonformer Nachweis-Report', 'Direkt einreichbar bei Ihrem Versicherer'],
+                price: 'Individuelle Preisgestaltung', priceNote: 'auf Anfrage',
+                ctaLabel: 'Demo anfragen', ctaHref: '/demo', ctaPrimary: false,
+                ctaTrack: undefined },
             ].map((p, i) => (
-              <Reveal key={p.name} delay={i * 120}><div className="rounded-2xl p-6 relative h-full transition-all duration-300 hover:shadow-[0_0_40px_#2DD4BF06]" style={{ backgroundColor: C.slateLight }}>
+              <Reveal key={p.name} delay={i * 120}><div className="rounded-2xl p-6 relative h-full flex flex-col transition-all duration-300 hover:shadow-[0_0_40px_#2DD4BF06]"
+                style={{ backgroundColor: C.slateLight, border: p.rec ? `1px solid ${C.teal}40` : '1px solid rgba(45,212,191,0.06)' }}>
                 {p.rec && <span className="absolute -top-2.5 left-5 text-[10px] font-semibold px-2.5 py-0.5 rounded-full" style={{ backgroundColor: `${C.teal}20`, color: C.teal }}>Empfohlen</span>}
                 <h3 className="text-lg font-semibold mt-2 mb-1" style={{ color: C.offWhite }}>{p.name}</h3>
                 <p className="text-xs mb-4" style={{ color: C.muted }}>{p.sub}</p>
-                <ul className="space-y-2 mb-5">{p.features.map(f => <li key={f} className="flex items-start gap-2 text-xs" style={{ color: C.mutedLight }}><span style={{ color: C.teal }} className="mt-0.5">&#x2713;</span> {f}</li>)}</ul>
-                <p className="text-xs font-medium" style={{ color: C.muted }}>Preis auf Anfrage</p>
+                <ul className="space-y-2 mb-5 flex-1">{p.features.map(f => <li key={f} className="flex items-start gap-2 text-xs" style={{ color: C.mutedLight }}><span style={{ color: C.teal }} className="mt-0.5">&#x2713;</span> {f}</li>)}</ul>
+                <div className="mb-4">
+                  <p className="text-sm font-semibold" style={{ color: C.offWhite }}>{p.price}</p>
+                  <p className="text-[11px]" style={{ color: C.muted }}>{p.priceNote}</p>
+                </div>
+                <Link href={p.ctaHref} onClick={p.ctaTrack ? () => track(p.ctaTrack!, { surface: 'home_packages' }) : undefined}
+                  className="block w-full text-center px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300"
+                  style={p.ctaPrimary
+                    ? { backgroundColor: C.teal, color: C.slate }
+                    : { color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>{p.ctaLabel}</Link>
               </div></Reveal>
             ))}
           </div>
-          <Reveal delay={200}><div className="text-center mt-8"><Link href="/pricing" className="text-sm font-medium hover:underline" style={{ color: C.teal }}>Alle Details und Preise vergleichen &#8594;</Link></div></Reveal>
+          <Reveal delay={200}><div className="text-center mt-8"><Link href="/pricing" onClick={() => track('webcheck_pricing_click', { surface: 'home_packages' })} className="text-sm font-medium hover:underline" style={{ color: C.teal }}>Alle Details und Preise vergleichen &#8594;</Link></div></Reveal>
+          <Reveal delay={250}><p className="text-[11px] text-center mt-3 font-light" style={{ color: `${C.muted}99` }}>Fünf technische Paket-Stufen (WebCheck · Perimeter · Compliance · SupplyChain · Insurance) — Details auf der Preisseite.</p></Reveal>
         </div>
       </section>
 
@@ -336,6 +393,32 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6">
           <Reveal><h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-12 md:mb-16" style={{ color: C.offWhite }}>So funktioniert&apos;s</h2></Reveal>
           <StepSequence />
+        </div>
+      </section>
+
+      {/* ── SOCIAL PROOF (ehrlich, ohne erfundene Zahlen) ── */}
+      <section className="py-12 md:py-20 relative z-10">
+        <div className="max-w-4xl mx-auto px-6">
+          <Reveal><div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+            {[
+              { stat: 'Jeder Report', label: 'wird vor Zustellung manuell geprüft — keine automatischen Fehlalarme.' },
+              { stat: '~15 Min', label: 'bis zum WebCheck-Ergebnis Ihrer Domain.' },
+              { stat: '20+ Scanner', label: 'kombiniert mit KI-gestützter Korrelation nach CVSS v3.1.' },
+            ].map(s => (
+              <div key={s.stat} className="p-5 rounded-2xl text-center h-full" style={{ backgroundColor: C.slateLight, border: '1px solid rgba(45,212,191,0.06)' }}>
+                <p className="text-xl font-semibold mb-1" style={{ color: C.teal }}>{s.stat}</p>
+                <p className="text-xs leading-relaxed" style={{ color: C.muted }}>{s.label}</p>
+              </div>
+            ))}
+          </div></Reveal>
+          {process.env.NEXT_PUBLIC_SAMPLE_REPORT_URL && (
+            <Reveal delay={120}><div className="text-center">
+              <a href={process.env.NEXT_PUBLIC_SAMPLE_REPORT_URL} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium hover:underline" style={{ color: C.teal }}>
+                So sieht Ihr Report aus — Beispiel-Report ansehen &#8594;
+              </a>
+            </div></Reveal>
+          )}
         </div>
       </section>
 
@@ -355,13 +438,17 @@ export default function LandingPage() {
       <section className="py-12 md:py-24 relative z-10">
         <Reveal><div className="max-w-2xl mx-auto px-6 text-center">
           <h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold mb-4" style={{ color: C.offWhite }}>Bereit für Ihren ersten Security-Scan?</h2>
-          <p className="text-sm mb-8 font-light" style={{ color: C.muted }}>Lassen Sie sich ein individuelles Angebot erstellen — oder starten Sie direkt.</p>
+          <p className="text-sm mb-8 font-light" style={{ color: C.muted }}>Starten Sie mit dem kostenlosen WebCheck — oder buchen Sie direkt den Perimeter-Scan.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link href="/demo" className="w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-semibold transition-all duration-300 cta-glow text-center"
-              style={{ backgroundColor: C.teal, color: C.slate }}>Demo anfragen</Link>
+            <Link href={webcheckCtaHref()} onClick={() => track('webcheck_cta_click', { surface: 'home_final_cta' })}
+              className="w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-semibold transition-all duration-300 cta-glow text-center"
+              style={{ backgroundColor: C.teal, color: C.slate }}>{webcheckCtaLabel()}</Link>
             <Link href="/subscribe" className="w-full sm:w-auto px-8 py-3.5 rounded-lg text-sm font-medium transition-all duration-300 text-center"
               style={{ color: C.offWhite, border: '1px solid rgba(45,212,191,0.25)' }}>Direkt Abo starten</Link>
           </div>
+          <p className="text-xs mt-5 font-light" style={{ color: C.muted }}>
+            Lieber persönlich? <Link href="/demo" className="hover:underline" style={{ color: C.teal }}>Demo anfragen</Link>
+          </p>
         </div></Reveal>
       </section>
 
@@ -375,7 +462,7 @@ export default function LandingPage() {
             </span>
           </div>
           <div className="flex items-center gap-6">
-            <a href="mailto:kontakt@vectigal.gmbh" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Kontakt</a>
+            <a href="mailto:support@vectigal.tech" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Kontakt</a>
             <a href="/impressum" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Impressum</a>
             <a href="/datenschutz" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>Datenschutz</a>
             <a href="/agb" className="text-xs font-light hover:text-white transition-colors" style={{ color: C.muted }}>AGB</a>

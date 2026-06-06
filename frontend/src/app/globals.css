@@ -48,6 +48,26 @@ body {
   outline-offset: 2px;
 }
 
+/* ── Reduced-Motion-Guard (WCAG 2.2.2) ──────────
+   Deaktiviert alle CSS-Animationen/Transitions sowie das Scanline-Overlay,
+   wenn der Nutzer prefers-reduced-motion: reduce gesetzt hat. JS-getriebene
+   Animationen (Hero-Glitch, Parallax-Shield, Trust-Badge-Flicker, Step-Auto-
+   Advance, Cursor-Glow) werden zusätzlich in page.tsx via usePrefersReducedMotion
+   abgeschaltet. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .scanline-overlay {
+    display: none !important;
+  }
+}
+
 /* ── Landing Page Animations ──────────────────── */
 @keyframes shieldPulse {
   0%, 100% { opacity: 0.35; filter: drop-shadow(0 0 0px rgba(45, 212, 191, 0)); }
