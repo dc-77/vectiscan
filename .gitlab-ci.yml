@@ -431,14 +431,14 @@ ops-diag-acme:
   needs: []
   script:
     - TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1); echo "traefik-container=$TRAEFIK"
-    - echo "=== Traefik-Logs: ACME/cert/challenge/vectiscan.de (letzte Treffer) ==="
+    - 'echo "=== Traefik-Logs ACME/cert/challenge/vectiscan.de (letzte Treffer) ==="'
     - docker logs --tail 12000 "$TRAEFIK" 2>&1 | grep -iE 'acme|certificate|challenge|vectiscan\.de|unable to obtain|rate limit|too many|letsencrypt|error' | tail -150 || echo "(keine ACME-Logzeilen gefunden)"
     - echo
-    - echo "=== acme.json: nur Domainnamen (main/sans), KEIN Key-Material ==="
+    - 'echo "=== acme.json Domainnamen (main), KEIN Key-Material ==="'
     - |
       docker exec "$TRAEFIK" sh -c 'for f in /acme.json /etc/traefik/acme.json /opt/traefik/acme/acme.json /data/acme.json /letsencrypt/acme.json; do if [ -f "$f" ]; then echo "FOUND $f"; grep -oE "\"main\":\"[^\"]+\"" "$f" | sort -u | head -80; fi; done' || echo "(acme.json nicht im Container gefunden)"
     - echo
-    - echo "=== Static-Config: Resolver/Entrypoints/Challenge ==="
+    - 'echo "=== Static-Config Resolver/Entrypoints/Challenge ==="'
     - |
       docker exec "$TRAEFIK" sh -c 'for f in /etc/traefik/traefik.yml /traefik.yml /etc/traefik/traefik.toml /config/traefik.yml; do [ -f "$f" ] && echo "--- $f ---" && cat "$f"; done' 2>/dev/null | grep -iE 'acme|entrypoint|httpchallenge|tlschallenge|email|caserver|resolver|address|:80|:443|web|websecure' | head -60 || echo "(static config nicht lesbar)"
 
