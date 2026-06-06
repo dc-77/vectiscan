@@ -1193,28 +1193,20 @@ ops-twenty-create-user-db:
         "SELECT id FROM core.\"user\" WHERE email='${TARGET_EMAIL}';" 2>/dev/null | tr -d '[:space:]')
       echo "Existing user: ${EXISTING_USER}"
       if [ -n "${EXISTING_USER}" ]; then
-        echo "INFO: User bereits vorhanden — aktualisiere Passwort"
+        # Twenty v2.9.0 uses camelCase column names
+        echo "INFO: User bereits vorhanden — aktualisiere passwordHash"
         COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
           psql -U twenty -d twenty -tAc \
-          "UPDATE core.\"user\" SET password_hash='${HASH}', default_workspace_id='${WS_ID}' WHERE email='${TARGET_EMAIL}';" 2>&1
+          "UPDATE core.\"user\" SET \"passwordHash\"='${HASH}' WHERE email='${TARGET_EMAIL}';" 2>&1
         USER_UUID="${EXISTING_USER}"
       else
-        echo "INFO: Erstelle neuen User in core.user"
+        echo "INFO: Erstelle neuen User in core.user (camelCase columns)"
         USER_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
           psql -U twenty -d twenty -tAc \
-          "INSERT INTO core.\"user\" (email, password_hash, first_name, last_name, default_workspace_id)
-           VALUES ('${TARGET_EMAIL}', '${HASH}', '${TARGET_FIRST}', '${TARGET_LAST}', '${WS_ID}')
+          "INSERT INTO core.\"user\" (email, \"passwordHash\", \"firstName\", \"lastName\", \"isEmailVerified\")
+           VALUES ('${TARGET_EMAIL}', '${HASH}', '${TARGET_FIRST}', '${TARGET_LAST}', true)
            RETURNING id;" 2>&1)
         echo "User insert: ${USER_RESULT}"
-        if echo "${USER_RESULT}" | grep -q "ERROR"; then
-          echo "WARN: Fehler — versuche ohne default_workspace_id"
-          USER_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
-            psql -U twenty -d twenty -tAc \
-            "INSERT INTO core.\"user\" (email, password_hash, first_name, last_name)
-             VALUES ('${TARGET_EMAIL}', '${HASH}', '${TARGET_FIRST}', '${TARGET_LAST}')
-             RETURNING id;" 2>&1)
-          echo "User insert v2: ${USER_RESULT}"
-        fi
         USER_UUID=$(echo "${USER_RESULT}" | grep -E '^[0-9a-f-]{36}$' | tr -d '[:space:]')
         if [ -z "${USER_UUID}" ]; then
           USER_UUID=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
@@ -1223,19 +1215,25 @@ ops-twenty-create-user-db:
         fi
       fi
       echo "User UUID: ${USER_UUID}"
-      # user_workspace junction in core schema
-      UW_TABLE=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+      if [ -z "${USER_UUID}" ]; then echo "ERROR: User konnte nicht angelegt werden"; exit 1; fi
+      # userWorkspace junction (camelCase: userId, workspaceId)
+      echo "=== core.userWorkspace columns ==="
+      COMPOSE_PROFILES=crm docker compose exec -T twenty-db psql -U twenty -d twenty -tAc \
+        "SELECT column_name FROM information_schema.columns WHERE table_schema='core' AND table_name='userWorkspace' ORDER BY ordinal_position;" 2>&1
+      UW_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
         psql -U twenty -d twenty -tAc \
-        "SELECT table_name FROM information_schema.tables WHERE table_schema='core' AND table_name IN ('user_workspace','workspace_member','userWorkspace') LIMIT 1;" \
-        2>/dev/null | tr -d '[:space:]')
-      echo "UW Table: core.${UW_TABLE}"
-      if [ -n "${UW_TABLE}" ] && [ -n "${USER_UUID}" ]; then
-        UW_RESULT=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
+        "INSERT INTO core.\"userWorkspace\" (\"userId\", \"workspaceId\", role)
+         VALUES ('${USER_UUID}', '${WS_ID}', 'OWNER')
+         ON CONFLICT DO NOTHING RETURNING \"userId\";" 2>&1)
+      echo "UW insert: ${UW_RESULT}"
+      if echo "${UW_RESULT}" | grep -q "ERROR"; then
+        echo "WARN: userWorkspace insert fehlgeschlagen — versuche ohne role"
+        UW_RESULT2=$(COMPOSE_PROFILES=crm docker compose exec -T twenty-db \
           psql -U twenty -d twenty -tAc \
-          "INSERT INTO core.\"${UW_TABLE}\" (user_id, workspace_id, role)
-           VALUES ('${USER_UUID}', '${WS_ID}', 'OWNER')
-           ON CONFLICT DO NOTHING RETURNING user_id;" 2>&1)
-        echo "UW insert: ${UW_RESULT}"
+          "INSERT INTO core.\"userWorkspace\" (\"userId\", \"workspaceId\")
+           VALUES ('${USER_UUID}', '${WS_ID}')
+           ON CONFLICT DO NOTHING RETURNING \"userId\";" 2>&1)
+        echo "UW insert v2: ${UW_RESULT2}"
       fi
       WORKSPACE_SETUP=DONE
       export WORKSPACE_SETUP
