@@ -35,9 +35,21 @@ stages:
     # VEC-190: NEXT_PUBLIC_TURNSTILE_SITE_KEY (öffentlicher Site-Key) zur Build-Zeit
     # durchreichen. Nur das frontend-Image deklariert die ARG; für die anderen
     # Services ist der --build-arg ein harmloser, ungenutzter Hinweis (kein Fehler).
-    - docker build --no-cache --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY="${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}" -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} -t ${BASE_IMAGE}/${SERVICE}:latest ${SERVICE}/
+    # VEC-220: SHA-Tag immer bauen+pushen (deploy-auto/-manual pinnen darauf).
+    - docker build --no-cache --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY="${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}" -t ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} ${SERVICE}/
     - docker push ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
-    - docker push ${BASE_IMAGE}/${SERVICE}:latest
+    # VEC-220 (DoD-2): den mutable :latest-Tag NUR von main aktualisieren, damit
+    # develop-/web-Builds ihn nicht mehr ueberschreiben. :latest spiegelt damit
+    # immer den letzten Prod-(main-)Stand; lokale `docker compose up`-Fallbacks
+    # (${TAG:-latest}) ziehen keinen ungeprueften Branch-Code mehr.
+    - |
+      if [ "${CI_COMMIT_BRANCH}" = "main" ]; then
+        docker tag ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA} ${BASE_IMAGE}/${SERVICE}:latest
+        docker push ${BASE_IMAGE}/${SERVICE}:latest
+        echo "OK: :latest aktualisiert (main)."
+      else
+        echo "SKIP: :latest-Push auf Branch '${CI_COMMIT_BRANCH}' uebersprungen (nur main aktualisiert den mutable Tag)."
+      fi
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -305,7 +317,13 @@ deploy-auto:
   extends: .deploy-base
   stage: deploy
   variables:
-    TAG: latest
+    # VEC-220: immutable, commit-gepinnter Tag statt mutable :latest.
+    # Frueher rollte `TAG: latest` aus, was ZULETZT auf :latest gepusht wurde —
+    # bei verschraenkten main/develop-Pipelines (Single-Runner) konnte das ein
+    # FREMDES (z.B. develop-) Image sein (Deployment-Integritaets-Race).
+    # `deploy-manual` pinnt bereits auf SHA — analog hier. Jeder Commit = eigener
+    # Tag => race-immun gegen parallele Branch-Pushes.
+    TAG: ${CI_COMMIT_SHORT_SHA}
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
