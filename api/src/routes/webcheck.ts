@@ -28,6 +28,7 @@ import { enqueuePrecheck } from '../lib/queue.js';
 import { audit } from '../lib/audit.js';
 import { sendWebcheckDoiEmail } from '../lib/email.js';
 import { verifyCaptcha } from '../lib/captcha.js';
+import { upsertLeadToCrm, notifySales } from '../lib/crm.js';
 
 const log = pino({ name: 'webcheck' });
 
@@ -480,11 +481,23 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(400).send({ success: false, error: 'invalid_token' });
     }
 
-    const res = await query<{ id: string }>(
+    const res = await query<{
+      id: string;
+      email: string;
+      domain: string | null;
+      icp_segment: string | null;
+      source: string | null;
+      channel: string | null;
+      utm_source: string | null;
+      utm_medium: string | null;
+      utm_campaign: string | null;
+      referrer: string | null;
+    }>(
       `UPDATE webcheck_leads
        SET consent_status = 'confirmed', doi_confirmed_at = NOW(), updated_at = NOW()
        WHERE doi_token = $1 AND consent_status = 'pending'
-       RETURNING id`,
+       RETURNING id, email, domain, icp_segment, source, channel,
+                 utm_source, utm_medium, utm_campaign, referrer`,
       [token],
     );
     if (res.rows.length === 0) {
@@ -492,7 +505,32 @@ export async function webcheckRoutes(server: FastifyInstance): Promise<void> {
       return reply.send({ success: true, data: { confirmed: false } });
     }
 
-    audit({ orderId: null, action: 'webcheck.doi_confirmed', details: { leadId: res.rows[0].id }, ip: request.ip });
+    const lead = res.rows[0];
+    audit({ orderId: null, action: 'webcheck.doi_confirmed', details: { leadId: lead.id }, ip: request.ip });
+
+    // CRM-Upsert NUR nach bestätigter Einwilligung (VEC-301 / VEC-173 Kopplungs-
+    // verbot): erst jetzt darf der Lead ins Twenty CRM. Best-effort — ein CRM-/
+    // Notify-Fehler darf die Bestätigung des Nutzers nie scheitern lassen; der
+    // Lead liegt persistiert in der DB. Ohne CRM_WEBHOOK_URL = Trockenmodus (No-op).
+    try {
+      const crmLead = {
+        email: lead.email,
+        domain: lead.domain,
+        icpSegment: lead.icp_segment,
+        source: lead.source,
+        channel: lead.channel,
+        utmSource: lead.utm_source,
+        utmMedium: lead.utm_medium,
+        utmCampaign: lead.utm_campaign,
+        referrer: lead.referrer,
+      };
+      const crm = await upsertLeadToCrm(crmLead);
+      const sales = await notifySales(crmLead);
+      log.info({ leadId: lead.id, crm: crm.reason ?? crm.action, sales: sales.reason ?? sales.notified }, 'webcheck lead CRM routing');
+    } catch (err) {
+      log.error({ err, leadId: lead.id }, 'CRM routing failed after DOI confirm (lead persisted, non-fatal)');
+    }
+
     return reply.send({ success: true, data: { confirmed: true } });
   });
 }
