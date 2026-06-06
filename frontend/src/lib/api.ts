@@ -173,6 +173,12 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
+  /** HTTP-Status der Antwort (nur bei Fehler-Pfaden gesetzt). */
+  status?: number;
+  /** VEC-294: True bei HTTP 403. Erlaubt Consumern, statt eines rohen
+   *  „Access denied"-Strings einen kontextuellen Zustand (Upgrade-Schritt
+   *  bzw. StateView) zu rendern. */
+  forbidden?: boolean;
 }
 
 function authHeaders(): Record<string, string> {
@@ -191,6 +197,22 @@ async function handleResponse<T>(res: Response): Promise<ApiResponse<T>> {
       window.location.href = '/login';
     }
     return { success: false, error: 'Sitzung abgelaufen. Bitte erneut anmelden.' };
+  }
+  // VEC-294: 403 generisch abfangen (vorher nur 401). Ein rohes 403 darf
+  // niemals als „Access denied"-Sackgasse beim Customer landen — wir
+  // normalisieren auf eine Klartext-Meldung und setzen `forbidden`, damit
+  // der Aufrufer in einen geführten Zustand (Upgrade-Schritt / StateView)
+  // verzweigen kann statt den Backend-String roh anzuzeigen.
+  if (res.status === 403) {
+    const body = await res.json().catch(() => null);
+    // Maschinen-Codes (z.B. 'subscription_required', 'captcha_failed')
+    // bleiben für gezielte Verzweigung erhalten; nur generische/leere
+    // Fehler werden auf Klartext gehoben.
+    const raw = body && typeof body.error === 'string' ? body.error : '';
+    const friendly = raw && raw !== 'Forbidden' && raw !== 'Access denied'
+      ? raw
+      : 'Für diese Aktion fehlt dir die nötige Berechtigung.';
+    return { success: false, status: 403, forbidden: true, error: friendly };
   }
   return res.json();
 }

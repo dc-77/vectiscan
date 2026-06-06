@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { isLoggedIn, isAdmin } from '@/lib/auth';
+import { useAdminGuard, AdminDenied } from '@/components/ds';
 
 interface Subscription {
   id: string;
@@ -24,18 +23,11 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 export default function AdminSubscriptionsPage() {
-  const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const { ready, denied } = useAdminGuard();
   const [subs, setSubs] = useState<Subscription[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'active' | 'cancelled'>('all');
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isLoggedIn()) { router.replace('/login'); return; }
-    if (!isAdmin()) { router.replace('/dashboard'); return; }
-    setReady(true);
-  }, [router]);
 
   const load = useCallback(async () => {
     const token = typeof window !== 'undefined' ? window.localStorage.getItem('token') : null;
@@ -103,6 +95,7 @@ export default function AdminSubscriptionsPage() {
     }
   }
 
+  if (denied) return <AdminDenied />;
   if (!ready) return null;
 
   const filtered = subs.filter(s =>
