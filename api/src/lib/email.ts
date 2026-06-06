@@ -95,12 +95,24 @@ export async function sendScanCompleteEmail(
   }
 }
 
-function getSalesLeadEmail(): string {
+function getSalesLeadEmail(): string | string[] {
   // Routing-Ziel fuer eingehende Demo-/Lead-Anfragen. Konfigurierbar via ENV,
   // damit der Vertriebs-Posteingang ohne Code-Aenderung umgezogen werden kann.
-  // Default = das einzige nachweislich veroeffentlichte + betreute Postfach
-  // (kundenseitige Marken-Domain .gmbh; vectigal.tech ist nur Versand/Infra).
-  return process.env.SALES_LEAD_EMAIL || 'kontakt@vectigal.gmbh';
+  // Mehrere Empfaenger sind komma-separiert erlaubt (Redundanz: der Lead landet
+  // in JEDEM genannten Postfach).
+  // WICHTIG (VEC-36): Das fruehere Default 'kontakt@vectigal.gmbh' war ein
+  // UNbetreutes Postfach. Resend nahm den Send an (routed:true), aber die Mail
+  // erreichte den Vertrieb nie -> Akzeptanz "Leads landen verlaesslich beim
+  // Vertrieb" war faktisch verletzt. Default zeigt jetzt auf die vom Vertrieb
+  // bestaetigten, real abgerufenen Marken-Postfaecher (support@vectiscan.de
+  // leitet an kontakt@vectigal.ai weiter). Empfaenger MUSS ein abgerufenes
+  // Postfach sein, sonst ist 'routed:true' wertlos.
+  const raw = process.env.SALES_LEAD_EMAIL || 'support@vectiscan.de,kontakt@vectigal.ai';
+  const list = raw
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return list.length > 1 ? list : list[0] || 'support@vectiscan.de';
 }
 
 export interface DemoLead {

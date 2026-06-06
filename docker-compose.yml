@@ -76,6 +76,14 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
       RESEND_API_KEY: ${RESEND_API_KEY:-}
       RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-VectiScan <noreply@vectiscan.de>}
+      # VEC-36: Routing-Ziel fuer Demo-/Lead-Anfragen explizit in den Container
+      # reichen. Ohne diesen Passthrough erreichte SALES_LEAD_EMAIL nie den
+      # Runtime-Container -> Code-Default 'kontakt@vectigal.gmbh' (UNbetreutes
+      # Postfach) griff, Resend meldete routed:true, aber kein Lead kam beim
+      # Vertrieb an. Nicht geheim -> committeter, per CI-Var ueberschreibbarer
+      # Default auf die betreuten Marken-Postfaecher. Komma-separiert = mehrere
+      # Empfaenger.
+      SALES_LEAD_EMAIL: ${SALES_LEAD_EMAIL:-support@vectiscan.de,kontakt@vectigal.ai}
       # VEC-247: Stripe-Konfig in den API-Container reichen. Ohne diese
       # Passthroughs erreichte bisher KEINE Stripe-Variable den Container —
       # /api/subscriptions antwortete daher strukturell mit 503
