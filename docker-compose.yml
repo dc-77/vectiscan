@@ -667,12 +667,20 @@ services:
 
 
   # ── Twenty CRM (VEC-304 / VEC-301) ─────────────────────────────────────────────
+  # WICHTIG: Alle Twenty-Services hängen am Compose-Profil `crm` und werden vom
+  # Standard-Deploy (`docker compose up -d` ohne Profil) übersprungen. Grund:
+  # TWENTY_PG_PASSWORD/TWENTY_APP_SECRET sind auf dem Prod-Runner (noch) nicht
+  # gesetzt; ohne Gate brach `docker compose` schon beim Interpolieren ab und
+  # blockierte JEDEN main-Deploy (Pipeline 2624 deploy-auto failed). Zum
+  # Aktivieren der CRM: Secrets als CI-Variablen setzen + COMPOSE_PROFILES=crm
+  # bzw. `--profile crm` im Deploy ergänzen (Owner: VEC-304-Folge-Issue).
   twenty-db:
     image: postgres:16
+    profiles: ["crm"]
     restart: unless-stopped
     environment:
       POSTGRES_USER: twenty
-      POSTGRES_PASSWORD: ${TWENTY_PG_PASSWORD:?TWENTY_PG_PASSWORD not set}
+      POSTGRES_PASSWORD: ${TWENTY_PG_PASSWORD:-}
       POSTGRES_DB: twenty
     volumes:
       - twenty-pg-data:/var/lib/postgresql/data
@@ -681,18 +689,20 @@ services:
 
   twenty-redis:
     image: redis:7
+    profiles: ["crm"]
     restart: unless-stopped
     networks:
       - twenty-internal
 
   twenty-server:
     image: twentycrm/twenty:v2.9.0
+    profiles: ["crm"]
     restart: unless-stopped
     environment:
       SERVER_URL: https://crm.vectigal.tech
-      PG_DATABASE_URL: postgres://twenty:${TWENTY_PG_PASSWORD}@twenty-db:5432/twenty
+      PG_DATABASE_URL: postgres://twenty:${TWENTY_PG_PASSWORD:-}@twenty-db:5432/twenty
       REDIS_URL: redis://twenty-redis:6379
-      APP_SECRET: ${TWENTY_APP_SECRET:?TWENTY_APP_SECRET not set}
+      APP_SECRET: ${TWENTY_APP_SECRET:-}
       STORAGE_TYPE: local
       DISABLE_DB_MIGRATIONS: "false"
     depends_on:
@@ -722,12 +732,13 @@ services:
 
   twenty-worker:
     image: twentycrm/twenty:v2.9.0
+    profiles: ["crm"]
     restart: unless-stopped
     command: ["yarn", "worker:prod"]
     environment:
-      PG_DATABASE_URL: postgres://twenty:${TWENTY_PG_PASSWORD}@twenty-db:5432/twenty
+      PG_DATABASE_URL: postgres://twenty:${TWENTY_PG_PASSWORD:-}@twenty-db:5432/twenty
       REDIS_URL: redis://twenty-redis:6379
-      APP_SECRET: ${TWENTY_APP_SECRET:?TWENTY_APP_SECRET not set}
+      APP_SECRET: ${TWENTY_APP_SECRET:-}
       SERVER_URL: https://crm.vectigal.tech
       STORAGE_TYPE: local
     depends_on:
