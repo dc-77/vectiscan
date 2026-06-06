@@ -102,6 +102,10 @@ services:
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       STRIPE_PRICE_PERIMETER: ${STRIPE_PRICE_PERIMETER:-}
       STRIPE_PRICE_DEFAULT: ${STRIPE_PRICE_DEFAULT:-}
+      # VEC-301: CRM-Upsert-Vars (Twenty REST). Leer → crm.ts bleibt im Trockenmodus (No-op).
+      CRM_WEBHOOK_URL: ${CRM_WEBHOOK_URL:-}
+      CRM_API_KEY: ${CRM_API_KEY:-}
+      SALES_NOTIFY_URL: ${SALES_NOTIFY_URL:-}
     deploy:
       resources:
         limits:

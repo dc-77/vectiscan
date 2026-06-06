@@ -234,6 +234,9 @@ test-edge:
       STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
       STRIPE_PRICE_PERIMETER=${STRIPE_PRICE_PERIMETER:-price_1TewEA1j7RvmOvLYHNA2lyM2}
       STRIPE_PRICE_DEFAULT=${STRIPE_PRICE_DEFAULT}
+      CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL:-}
+      CRM_API_KEY=${CRM_API_KEY:-}
+      SALES_NOTIFY_URL=${SALES_NOTIFY_URL:-}
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
     # ── Deploy-Guard (VEC-217): RESEND_API_KEY ist eine *protected* CI-Var; auf
