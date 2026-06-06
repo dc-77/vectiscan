@@ -1,6 +1,9 @@
 'use client';
 
-export type ScanPackage = 'webcheck' | 'perimeter' | 'compliance' | 'supplychain' | 'insurance' | 'tlscompliance';
+// VEC-289: Pakete + Anzeige-Daten stammen aus dem kanonischen Katalog (SSoT).
+import { PACKAGE_CATALOG, type PackageKey } from '@/lib/catalog.generated';
+
+export type ScanPackage = PackageKey;
 
 interface PackageInfo {
   key: ScanPackage;
@@ -15,78 +18,18 @@ interface PackageInfo {
   accentColor: string;
 }
 
-const PACKAGES: PackageInfo[] = [
-  {
-    key: 'webcheck',
-    title: 'WebCheck',
-    subtitle: 'SSL, Headers, CMS, E-Mail-Schutz — kompakter Report mit Ampel',
-    reportFocus: ['Top-100-Port-Scan', 'Mail-Security (SPF/DMARC/DKIM)', 'Ampelbewertung'],
-    duration: '~15–20 Min',
-    hosts: '3',
-    tier: 'quick',
-    accentColor: '#38BDF8',
-  },
-  {
-    key: 'tlscompliance',
-    title: 'TLS-Compliance',
-    subtitle: 'BSI TR-03116-4 Prüfung mit Compliance-Bescheinigung und Checklisten.',
-    reportFocus: ['TLS-Versionen & Cipher', 'Zertifikats-Prüfung', 'Checkliste für interne Punkte'],
-    duration: '~5–10 Min',
-    hosts: '15',
-    tier: 'quick',
-    badge: 'BSI',
-    badgeColor: '#16A34A',
-    accentColor: '#16A34A',
-  },
-  {
-    key: 'perimeter',
-    title: 'PerimeterScan',
-    subtitle: 'Vollständige Angriffsflächen-Analyse mit priorisiertem Maßnahmenplan.',
-    reportFocus: ['PTES-konformer Report', 'Executive Summary', 'Priorisierte Maßnahmen'],
-    duration: '~60–90 Min',
-    hosts: '15',
-    tier: 'perimeter',
-    badge: 'Empfohlen',
-    badgeColor: '#38BDF8',
-    accentColor: '#38BDF8',
-  },
-  {
-    key: 'compliance',
-    title: 'ComplianceScan',
-    subtitle: 'Perimeter-Scan mit NIS2-Compliance-Nachweis.',
-    reportFocus: ['§30 BSIG-Mapping', 'BSI-Grundschutz-Refs', 'Audit-Trail'],
-    duration: '~65–95 Min',
-    hosts: '15',
-    tier: 'perimeter',
-    badge: 'NIS2',
-    badgeColor: '#EAB308',
-    accentColor: '#EAB308',
-  },
-  {
-    key: 'supplychain',
-    title: 'SupplyChain',
-    subtitle: 'Sicherheitsnachweis für NIS2-pflichtige Auftraggeber.',
-    reportFocus: ['ISO 27001 Annex A', 'Lieferanten-Nachweis', 'Auftraggeber-Kapitel'],
-    duration: '~65–95 Min',
-    hosts: '15',
-    tier: 'perimeter',
-    badge: 'ISO 27001',
-    badgeColor: '#A78BFA',
-    accentColor: '#A78BFA',
-  },
-  {
-    key: 'insurance',
-    title: 'InsuranceReport',
-    subtitle: 'Nachweis für Cyberversicherung mit Risikobewertung.',
-    reportFocus: ['10-Punkte Fragebogen', 'Risk-Score', 'Ransomware-Indikator'],
-    duration: '~65–95 Min',
-    hosts: '15',
-    tier: 'perimeter',
-    badge: 'Versicherung',
-    badgeColor: '#34D399',
-    accentColor: '#34D399',
-  },
-];
+const PACKAGES: PackageInfo[] = PACKAGE_CATALOG.map((pkg) => ({
+  key: pkg.key,
+  title: pkg.marketingName,
+  subtitle: pkg.subtitle,
+  reportFocus: pkg.reportFocus,
+  duration: pkg.durationShort,
+  hosts: String(pkg.maxHosts),
+  tier: pkg.tier,
+  badge: pkg.badge ?? undefined,
+  badgeColor: pkg.badgeColor ?? undefined,
+  accentColor: pkg.accentColor,
+}));
 
 const SHARED_CAPABILITIES = [
   'Port-Analyse', 'Passive Aufklärung', 'Schwachstellen-Scan', 'Webserver-Analyse', 'Verzeichnis-Scan',

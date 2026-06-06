@@ -13,6 +13,8 @@ import {
   sumSeverityCounts,
   reconcileSeverityCounts,
 } from '../lib/severityCounts.js';
+// VEC-289: kanonischer Paket-Katalog (single source of truth).
+import { PACKAGE_KEYS, getPackage, isPackageKey, type PackageKey } from '../lib/catalog.generated.js';
 
 // Report-Download-TTL (VEC-180/VEC-197): 30 Tage. Spiegelt den Worter-Default
 // (report-worker/reporter/worker.py: now + 30d Worker-Default) und Migration 034 (DB-DEFAULT).
@@ -41,17 +43,8 @@ async function streamReport(reply: FastifyReply, report: Record<string, unknown>
     .send(stream);
 }
 
-const VALID_PACKAGES = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance', 'tlscompliance'] as const;
-type ScanPackage = typeof VALID_PACKAGES[number];
-
-const ESTIMATED_DURATIONS: Record<ScanPackage, string> = {
-  webcheck: '~15–20 Minuten',
-  perimeter: '~60–90 Minuten',
-  compliance: '~65–95 Minuten',
-  supplychain: '~65–95 Minuten',
-  insurance: '~65–95 Minuten',
-  tlscompliance: '~5–10 Minuten',
-};
+// VEC-289: Validierung + Dauer-Labels stammen aus dem kanonischen Katalog.
+type ScanPackage = PackageKey;
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -104,10 +97,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const pkg = (body.package || 'perimeter').toLowerCase();
     const rawTargets = body.targets || [];
 
-    if (!VALID_PACKAGES.includes(pkg as ScanPackage)) {
+    if (!isPackageKey(pkg)) {
       return reply.status(400).send({
         success: false,
-        error: 'Invalid package. Must be webcheck, perimeter, compliance, supplychain, insurance, or tlscompliance.',
+        error: `Invalid package. Must be one of: ${PACKAGE_KEYS.join(', ')}.`,
       });
     }
 
@@ -470,7 +463,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         status: order.status,
         package: orderPackage,
         customerId: order.customer_id,
-        estimatedDuration: ESTIMATED_DURATIONS[orderPackage],
+        estimatedDuration: getPackage(orderPackage)?.durationLong ?? '',
         progress: {
           phase: order.current_phase || null,
           currentTool: order.current_tool || null,

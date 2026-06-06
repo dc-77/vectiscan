@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { isLoggedIn } from '@/lib/auth';
 import { listSchedules, createSchedule, updateSchedule, deleteSchedule, ScanSchedule } from '@/lib/api';
+// VEC-289: Paket-Optionen aus dem kanonischen Katalog (SSoT).
+import { PACKAGE_CATALOG } from '@/lib/catalog.generated';
 
 const SCHEDULE_TYPES = [
   { value: 'weekly', label: 'Wöchentlich' },
@@ -13,14 +15,7 @@ const SCHEDULE_TYPES = [
   { value: 'once', label: 'Einmalig' },
 ];
 
-const PACKAGES = [
-  { value: 'webcheck', label: 'WebCheck' },
-  { value: 'perimeter', label: 'Perimeter-Scan' },
-  { value: 'compliance', label: 'Compliance-Scan' },
-  { value: 'supplychain', label: 'SupplyChain' },
-  { value: 'insurance', label: 'Cyberversicherung' },
-  { value: 'tlscompliance', label: 'TLS-Compliance' },
-];
+const PACKAGES = PACKAGE_CATALOG.map((pkg) => ({ value: pkg.key, label: pkg.marketingName }));
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString('de-DE', {

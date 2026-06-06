@@ -157,6 +157,18 @@ Pfade nur in POSIX-Form (Git Bash). Details: Memory `reference_gitlab_api.md`.
 
 Legacy-Aliase: `basic→webcheck`, `professional→perimeter`, `nis2→compliance`.
 
+**Kanonischer Paket-Katalog (SSoT, VEC-289):** Einzige Wahrheit ist
+`catalog/packages.catalog.json` (key, Marketing-Name, Sellability, Preis,
+Host-Limit, Top-N, Stripe-Key, Compliance-Modul). `node scripts/gen-catalog.js`
+generiert daraus je ein TS-Modul pro Service (`api/src/lib/catalog.generated.ts`,
+`frontend/src/lib/catalog.generated.ts` — getrennte Docker-Build-Kontexte, daher
+Codegen statt geteiltem Modul). Nur die JSON editieren, dann regenerieren +
+committen. Drift-Guard: `api/src/__tests__/catalog.parity.test.ts` (erzwingt
+Generate==SSoT und SSoT==DB-CHECK-Constraints). Keine hartkodierten Paketlisten
+oder Anzeige-Namen/Preise mehr — alle Consumer (Homepage/Pricing/subscribe/
+PackageSelector/schedules/DemoRequestForm + Backend-Validierung) lesen aus dem
+Katalog. `tlscompliance` ist NICHT im Kunden-Katalog (v1, vgl. VEC-284).
+
 Paket steuert: Scan-Tools/Timeouts (`scanner/packages.py`),
 Phase-3-Enrichment-Tiefe, Claude-Prompt-Variante (`reporter/prompts.py`),
 Report-Mapper, Compliance-Module, PDF-Sektionen, Top-N (`selection.py`).

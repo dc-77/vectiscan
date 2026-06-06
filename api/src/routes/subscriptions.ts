@@ -18,9 +18,10 @@ import {
   getPriceIdForPackage,
   getCheckoutUrls,
 } from '../lib/stripe.js';
+// VEC-289: kanonischer Paket-Katalog (single source of truth).
+import { isPackageKey, PACKAGE_KEYS } from '../lib/catalog.generated.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const VALID_PACKAGES = ['perimeter', 'insurance', 'compliance', 'supplychain', 'webcheck', 'tlscompliance'];
 
 export async function subscriptionRoutes(server: FastifyInstance): Promise<void> {
 
@@ -32,8 +33,8 @@ export async function subscriptionRoutes(server: FastifyInstance): Promise<void>
     const body = request.body as Record<string, unknown> | null;
 
     const pkg = (body?.package as string || 'perimeter').toLowerCase();
-    if (!VALID_PACKAGES.includes(pkg)) {
-      return reply.status(400).send({ success: false, error: `Ungültiges Paket: ${pkg}` });
+    if (!isPackageKey(pkg)) {
+      return reply.status(400).send({ success: false, error: `Ungültiges Paket: ${pkg}. Erlaubt: ${PACKAGE_KEYS.join(', ')}` });
     }
 
     const scanInterval = (body?.scanInterval as string || 'monthly').toLowerCase();

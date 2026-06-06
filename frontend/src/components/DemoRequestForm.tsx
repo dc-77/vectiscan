@@ -1,6 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+// VEC-289: Paket-Interesse-Optionen aus dem kanonischen Katalog (deckungsgleich
+// mit der Backend-Validierung in api/src/routes/leads.ts).
+import { PACKAGE_CATALOG } from '@/lib/catalog.generated';
 
 /**
  * Demo-/Beratungs-Anfrage (Lead-Capture, VEC-36).
@@ -24,11 +27,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 const PACKAGES = [
   { value: '', label: 'Paket-Interesse (optional)' },
-  { value: 'webcheck', label: 'WebCheck' },
-  { value: 'perimeter', label: 'Perimeter' },
-  { value: 'compliance', label: 'Compliance (NIS2 / ISO 27001 / BSI)' },
-  { value: 'supplychain', label: 'SupplyChain' },
-  { value: 'insurance', label: 'Insurance' },
+  ...PACKAGE_CATALOG.map((p) => ({ value: p.key, label: p.marketingName })),
   { value: 'unsure', label: 'Noch unsicher — bitte beraten' },
 ];
 

@@ -4,11 +4,12 @@
 import { FastifyInstance } from 'fastify';
 import { query } from '../lib/db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+// VEC-289: kanonischer Paket-Katalog (single source of truth).
+import { isPackageKey } from '../lib/catalog.generated.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DOMAIN_REGEX = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 const SCHEDULE_TYPES = ['weekly', 'monthly', 'quarterly', 'once'] as const;
-const PACKAGES = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'] as const;
 
 const SCHEDULE_LABELS: Record<string, string> = {
   weekly: 'Wöchentlich',
@@ -88,7 +89,7 @@ export async function scheduleRoutes(server: FastifyInstance): Promise<void> {
     if (!DOMAIN_REGEX.test(domain)) {
       return reply.status(400).send({ success: false, error: 'Ungültige Domain' });
     }
-    if (!PACKAGES.includes(pkg as typeof PACKAGES[number])) {
+    if (!isPackageKey(pkg)) {
       return reply.status(400).send({ success: false, error: 'Ungültiges Paket' });
     }
     if (!SCHEDULE_TYPES.includes(scheduleType as typeof SCHEDULE_TYPES[number])) {
@@ -209,7 +210,7 @@ export async function scheduleRoutes(server: FastifyInstance): Promise<void> {
     let paramIdx = 1;
 
     if (body.package !== undefined) {
-      if (!PACKAGES.includes(body.package as typeof PACKAGES[number])) {
+      if (!isPackageKey(body.package)) {
         return reply.status(400).send({ success: false, error: 'Ungültiges Paket' });
       }
       updates.push(`package = $${paramIdx++}`);
