@@ -15,6 +15,26 @@
   --severity-medium: #3B82F6;
   --severity-low: #22C55E;
 
+  /* ── Design-System Semantic-Tokens (VEC-306) ──────────
+     Eine Web-Akzentfarbe (Teal). Flächen/Ränder/Text als Vars statt
+     hartkodierter Hex in Komponenten. Scanline/Glow bleiben /scan-only. */
+  --surface:        #1E293B; /* Karten/Panels auf Slate-Grund */
+  --surface-2:      #253347; /* Hover/erhöhte Fläche */
+  --surface-inset:  #0C1222; /* eingelassene Bereiche (Terminal/Code) */
+  --border-subtle:  rgba(45,212,191,0.12);
+  --border-muted:   rgba(148,163,184,0.14);
+  --text:           #F8FAFC;
+  --text-muted:     #94A3B8;
+  --text-dim:       #64748B;
+
+  /* Status-Tönungen (Farb-Unabhängigkeit: Chip trägt zusätzlich Icon+Label) */
+  --tone-active:    #2DD4BF; /* laufend / aktiv (Teal-Akzent) */
+  --tone-success:   #22C55E; /* fertig / zugestellt */
+  --tone-info:      #3B82F6; /* wartet / in Bearbeitung (neutral-positiv) */
+  --tone-warn:      #F59E0B; /* Handlung nötig */
+  --tone-danger:    #EF4444; /* Fehler / abgelehnt */
+  --tone-neutral:   #94A3B8; /* erstellt / abgebrochen */
+
   /* Legacy aliases */
   --brand-slate: var(--slate);
   --brand-slate-light: var(--slate-light);
@@ -101,6 +121,22 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* ── DS Spinner (VEC-306, StatusChip) ───────────────── */
+@keyframes dsSpin { to { transform: rotate(360deg); } }
+.ds-spin { animation: dsSpin 0.9s linear infinite; transform-origin: center; }
+
+/* ── Skeleton-Shimmer (VEC-306 DS, H9) ──────────────── */
+@keyframes skeletonShimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.ds-skeleton {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.6s ease-in-out infinite;
+  border-radius: 8px;
 }
 
 /* Global scanline overlay */
