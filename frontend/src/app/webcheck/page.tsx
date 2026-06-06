@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import WebCheckLeadForm from '@/components/WebCheckLeadForm';
+import WebCheckFreeForm from '@/components/WebCheckFreeForm';
 import { LpView, PricingLink } from '@/components/WebCheckInteractions';
 
 /*
@@ -101,9 +101,9 @@ export default function WebCheckLandingPage() {
           <div className="lg:sticky lg:top-24">
             <div className="mb-3 text-center lg:text-left">
               <p className="text-sm font-semibold" style={{ color: C.offWhite }}>Kostenlosen WebCheck starten</p>
-              <p className="text-xs" style={{ color: C.muted }}>Free-Start — keine Kreditkarte, kein langes Formular.</p>
+              <p className="text-xs" style={{ color: C.muted }}>Ohne Account, ohne Installation — E-Mail + Domain genügen.</p>
             </div>
-            <WebCheckLeadForm />
+            <WebCheckFreeForm />
           </div>
         </div>
       </section>

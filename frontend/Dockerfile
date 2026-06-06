@@ -6,6 +6,12 @@ RUN npm ci
 COPY . .
 ARG NEXT_PUBLIC_API_URL=https://scan-api.vectigal.tech
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+# VEC-190: Cloudflare-Turnstile-Site-Key (öffentlich, im Client-JS sichtbar) zur
+# Build-Zeit ins Next.js-Bundle inlinen. Default leer → Widget bleibt inert
+# (WebCheckFreeForm blendet ohne Key aus). CI reicht den Wert via --build-arg aus
+# der CI/CD-Var NEXT_PUBLIC_TURNSTILE_SITE_KEY durch (siehe .gitlab-ci.yml).
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=""
+ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
 RUN npm run build
 
 # Production stage
