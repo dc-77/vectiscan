@@ -728,12 +728,15 @@ services:
       - proxy-net
     labels:
       - "traefik.enable=true"
-      # CRM-UI: internal-auth (Edge-Basic-Auth). PII-Daten → nicht öffentlich.
+      # CRM-UI: KEIN internal-auth (Edge-Basic-Auth) — Twenty ist eine SPA, deren
+      # XHR/GraphQL/WebSocket-Requests mit einem Basic-Auth-Gate inkompatibel sind
+      # (zweites, nicht erfüllbares Auth-Popup). Schutz übernimmt Twentys eigener
+      # vollwertiger Workspace-Login. security-headers bleibt.
       - "traefik.http.routers.twenty.rule=Host(`crm.vectigal.tech`)"
       - "traefik.http.routers.twenty.entrypoints=websecure"
       - "traefik.http.routers.twenty.tls=true"
       - "traefik.http.routers.twenty.tls.certresolver=letsencrypt-http"
-      - "traefik.http.routers.twenty.middlewares=security-headers@file,internal-auth@file"
+      - "traefik.http.routers.twenty.middlewares=security-headers@file"
       - "traefik.http.routers.twenty.service=twenty"
       - "traefik.http.services.twenty.loadbalancer.server.port=3000"
       # REST/API-Router ohne Basic-Auth (Bearer CRM_API_KEY via Lead-Router ausreichend)
