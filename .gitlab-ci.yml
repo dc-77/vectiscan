@@ -237,6 +237,8 @@ test-edge:
       CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL:-}
       CRM_API_KEY=${CRM_API_KEY:-}
       SALES_NOTIFY_URL=${SALES_NOTIFY_URL:-}
+      TWENTY_PG_PASSWORD=${TWENTY_PG_PASSWORD:-}
+      TWENTY_APP_SECRET=${TWENTY_APP_SECRET:-}
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
     # ── Deploy-Guard (VEC-217): RESEND_API_KEY ist eine *protected* CI-Var; auf
