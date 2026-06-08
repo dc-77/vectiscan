@@ -8,18 +8,19 @@ export default function ImpressumPage() {
           <h2 className="text-base font-semibold" style={{ color: '#F8FAFC' }}>Angaben gemäß § 5 TMG</h2>
           <p>
             Vectigal GmbH<br />
-            Heiliger Weg 60<br />
+            Olpe 31-33<br />
             44135 Dortmund
           </p>
           <p>
-            <strong style={{ color: '#CBD5E1' }}>Geschäftsführer:</strong> Daniel Czischke
+            <strong style={{ color: '#CBD5E1' }}>Vertreten durch den Geschäftsführer:</strong><br />
+            Daniel Czischke
           </p>
           <p>
             <strong style={{ color: '#CBD5E1' }}>Registergericht:</strong> Amtsgericht Dortmund<br />
-            <strong style={{ color: '#CBD5E1' }}>Registernummer:</strong> HRB 35553
+            <strong style={{ color: '#CBD5E1' }}>Registernummer:</strong> HRB 38214
           </p>
           <p>
-            <strong style={{ color: '#CBD5E1' }}>USt-IdNr.:</strong> DE366aborea (beantragt)
+            <strong style={{ color: '#CBD5E1' }}>Steuernummer:</strong> steht noch aus
           </p>
         </section>
 
@@ -27,7 +28,7 @@ export default function ImpressumPage() {
           <h2 className="text-base font-semibold" style={{ color: '#F8FAFC' }}>Kontakt</h2>
           <p>
             E-Mail: <a href="mailto:support@vectiscan.de" className="hover:underline" style={{ color: '#2DD4BF' }}>support@vectiscan.de</a><br />
-            Telefon: +49 231 586 939 30
+            Telefon: 0157-72707069
           </p>
         </section>
 
@@ -35,7 +36,7 @@ export default function ImpressumPage() {
           <h2 className="text-base font-semibold" style={{ color: '#F8FAFC' }}>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
           <p>
             Daniel Czischke<br />
-            Heiliger Weg 60<br />
+            Olpe 31-33<br />
             44135 Dortmund
           </p>
         </section>

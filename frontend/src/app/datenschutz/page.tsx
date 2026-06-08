@@ -10,7 +10,7 @@ export default function DatenschutzPage() {
 
         <H2>1. Verantwortlicher</H2>
         <p>
-          Vectigal GmbH, Heiliger Weg 60, 44135 Dortmund<br />
+          Vectigal GmbH, Olpe 31-33, 44135 Dortmund<br />
           E-Mail: <a href="mailto:support@vectiscan.de" className="hover:underline" style={{ color: '#2DD4BF' }}>support@vectiscan.de</a>
         </p>
 
