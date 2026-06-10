@@ -41,14 +41,22 @@ export default function AdminReviewOrderPage() {
   const { events, connected } = useOrderProgress(ready ? orderId : null);
 
   const load = useCallback(async () => {
-    const res = await getReviewDetail('order', orderId);
-    if (res.success && res.data) {
-      setDetail(res.data);
-      setError(null);
-    } else {
-      setError(res.error || 'Review-Detail konnte nicht geladen werden.');
+    // VEC-349: try/finally garantiert, dass loading IMMER zurückgesetzt wird —
+    // auch wenn getReviewDetail() wirft (Netzwerk-Reject, ungültiger Body).
+    // Ohne diesen Guard hing die Detailseite ewig auf „Lade Review...".
+    try {
+      const res = await getReviewDetail('order', orderId);
+      if (res.success && res.data) {
+        setDetail(res.data);
+        setError(null);
+      } else {
+        setError(res.error || 'Review-Detail konnte nicht geladen werden.');
+      }
+    } catch {
+      setError('Review-Detail konnte nicht geladen werden (Verbindungsfehler).');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [orderId]);
 
   useEffect(() => {

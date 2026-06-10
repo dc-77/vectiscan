@@ -214,7 +214,19 @@ async function handleResponse<T>(res: Response): Promise<ApiResponse<T>> {
       : 'Für diese Aktion fehlt dir die nötige Berechtigung.';
     return { success: false, status: 403, forbidden: true, error: friendly };
   }
-  return res.json();
+  // VEC-349: res.json() darf niemals unbehandelt werfen. Ein nicht-JSON-Body
+  // (Traefik-502/504-HTML, leerer 500-Body, Gateway-Timeout) ließ den Aufrufer
+  // sonst in einer unbehandelten Rejection hängen → endloser Spinner statt
+  // Error-State. Wir normalisieren auf die {success,error}-Konvention.
+  try {
+    return await res.json();
+  } catch {
+    return {
+      success: false,
+      status: res.status,
+      error: `Server-Antwort ungültig (HTTP ${res.status}).`,
+    } as ApiResponse<T>;
+  }
 }
 
 // --- Auth ---

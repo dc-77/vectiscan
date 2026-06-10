@@ -20,14 +20,22 @@ export default function AdminReviewListPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await getReviewQueue();
-    if (res.success && res.data) {
-      setQueue(res.data);
-      setError(null);
-    } else {
-      setError(res.error || 'Review-Queue konnte nicht geladen werden.');
+    // VEC-349: try/finally garantiert, dass loading IMMER zurückgesetzt wird —
+    // auch wenn getReviewQueue() wirft (Netzwerk-Reject, ungültiger Body).
+    // Ohne diesen Guard hing die Seite ewig auf „Lade Review-Queue...".
+    try {
+      const res = await getReviewQueue();
+      if (res.success && res.data) {
+        setQueue(res.data);
+        setError(null);
+      } else {
+        setError(res.error || 'Review-Queue konnte nicht geladen werden.');
+      }
+    } catch {
+      setError('Review-Queue konnte nicht geladen werden (Verbindungsfehler).');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
