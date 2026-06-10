@@ -293,6 +293,46 @@ def parse_testssl_raw(path: str) -> list[dict[str, Any]]:
     return raw
 
 
+def _ssl_expected(host_data: dict[str, Any]) -> bool:
+    """True wenn der Host einen HTTPS/TLS-Dienst anbietet, fuer den testssl
+    Daten liefern *sollte* (offener 443/8443/9443 oder ueber HTTPS gefetchte
+    Header). Dient zur Unterscheidung "testssl haette laufen muessen" vs.
+    "kein TLS-Dienst, zu Recht nichts geprueft" (VEC-373 D4b)."""
+    nmap = host_data.get("nmap", {})
+    if isinstance(nmap, dict):
+        for p in nmap.get("open_ports", []):
+            try:
+                if int(str(p.get("port", "")).strip()) in (443, 8443, 9443):
+                    return True
+            except (ValueError, TypeError):
+                continue
+    headers = host_data.get("headers", {})
+    if isinstance(headers, dict) and str(headers.get("url", "")).startswith("https"):
+        return True
+    return False
+
+
+def compute_testssl_status(testssl_json_path: str, host_data: dict[str, Any]) -> str:
+    """Deterministischer testssl-Status fuer einen Host (VEC-373 D4b).
+
+    - ``"ok"``      : testssl schrieb gueltiges JSON (auch ein leeres ``[]`` =
+                      lief sauber, keine Findings ueber dem Severity-Filter).
+    - ``"failed"``  : ein TLS-Dienst war vorhanden, aber testssl schrieb KEIN
+                      gueltiges JSON (Datei fehlt / leer / Usage-Banner /
+                      kaputtes JSON) → Tool-Failure (laut markieren, damit die
+                      KI keine TLS/HSTS-Aussagen erfindet).
+    - ``"skipped"`` : kein TLS-Dienst erkannt → testssl zu Recht ohne Daten.
+
+    Wichtig: NICHT an der Finding-Anzahl festmachen — ``--severity MEDIUM``
+    filtert OK/INFO bereits in testssl raus, ein sauberer Host liefert also
+    legitim ``[]``. Das verlaessliche "lief vs. gescheitert"-Signal ist, ob
+    ueberhaupt gueltiges JSON geschrieben wurde (``_read_json`` != None).
+    """
+    if _read_json(testssl_json_path) is not None:
+        return "ok"
+    return "failed" if _ssl_expected(host_data) else "skipped"
+
+
 def parse_nikto_json(path: str) -> list[dict[str, Any]]:
     """Parse nikto JSON output.
 
@@ -845,6 +885,24 @@ def consolidate_findings(
 
         # --- 3. testssl ---
         testssl = data.get("testssl", [])
+        testssl_status = data.get("testssl_status", "ok")
+        if not testssl and testssl_status == "failed":
+            # VEC-373 (D4b): testssl haette laufen muessen (TLS-Dienst da),
+            # lieferte aber keine Daten. Fail-loud im Prompt, damit die KI
+            # KEINE TLS/HSTS-Findings erfindet (Quelle der "HSTS max-age=0"-
+            # Halluzination). Lieber "nicht geprueft" als falscher Befund.
+            lines.append("")
+            lines.append("--- SSL/TLS ANALYSIS (testssl.sh) ---")
+            lines.append(
+                "  [TOOL-FEHLER] testssl.sh lieferte KEINE verwertbaren Daten "
+                "(Scan fehlgeschlagen / kein gueltiges JSON)."
+            )
+            lines.append(
+                "  WICHTIG: TLS/SSL-Protokolle, Cipher-Suites, Zertifikate und "
+                "HSTS wurden NICHT geprueft. Triff dazu KEINE Aussagen und "
+                "erzeuge KEINE TLS-, Cipher-, Zertifikats- oder HSTS-Findings "
+                "(insb. keine 'HSTS max-age'-Aussagen). Status: nicht geprueft."
+            )
         if testssl:
             lines.append("")
             lines.append("--- SSL/TLS ANALYSIS (testssl.sh) ---")
@@ -1143,6 +1201,16 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             str(phase2)
         )
 
+        # VEC-373 (D4b): testssl-Status erst NACH nmap+headers berechnen
+        # (braucht open_ports + headers.url zur SSL-Erwartung).
+        host_data["testssl_status"] = compute_testssl_status(
+            str(phase2 / "testssl.json"), host_data
+        )
+        if host_data["testssl_status"] == "failed":
+            log.error("testssl_no_data_for_host", ip=ip,
+                      note="TLS-Dienst vorhanden, aber testssl ohne Daten — "
+                           "Report markiert TLS/HSTS als NICHT geprueft")
+
         # httpx
         httpx_path = os.path.join(str(phase2), "httpx.json")
         if os.path.isfile(httpx_path):
@@ -1227,6 +1295,12 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             host_data["screenshots"] = find_playwright_screenshots(
                 str(phase2)
             )
+            host_data["testssl_status"] = compute_testssl_status(
+                str(phase2 / "testssl.json"), host_data
+            )
+            if host_data["testssl_status"] == "failed":
+                log.error("testssl_no_data_for_host", ip=ip,
+                          note="TLS-Dienst vorhanden, aber testssl ohne Daten")
 
             # httpx
             httpx_path = os.path.join(str(phase2), "httpx.json")

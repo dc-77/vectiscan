@@ -16,6 +16,7 @@ from reporter.parser import (
     parse_nikto_json,
     parse_headers_json,
     parse_gobuster_dir,
+    compute_testssl_status,
     consolidate_findings,
     parse_scan_data,
 )
@@ -179,6 +180,85 @@ class TestParseGobusterDir:
 
     def test_missing_file_returns_empty(self) -> None:
         assert parse_gobuster_dir("/nonexistent/gobuster.txt") == []
+
+
+# ---------------------------------------------------------------------------
+# compute_testssl_status (VEC-373 D4b: fail-loud)
+# ---------------------------------------------------------------------------
+
+
+class TestComputeTestsslStatus:
+    _SSL_HOST = {"nmap": {"open_ports": [{"port": 443, "protocol": "tcp",
+                                          "service": "https"}]}}
+    _NO_SSL_HOST = {"nmap": {"open_ports": [{"port": 80, "protocol": "tcp",
+                                             "service": "http"}]}}
+
+    def test_valid_empty_json_is_ok(self, tmp_path: Path) -> None:
+        # Sauberer Lauf ohne MEDIUM+ Findings → [] → "ok" (kein False-Positive).
+        p = tmp_path / "testssl.json"
+        p.write_text("[]")
+        assert compute_testssl_status(str(p), self._SSL_HOST) == "ok"
+
+    def test_valid_findings_json_is_ok(self, tmp_path: Path) -> None:
+        p = tmp_path / "testssl.json"
+        p.write_text(json.dumps([{"id": "x", "severity": "HIGH", "finding": "y"}]))
+        assert compute_testssl_status(str(p), self._SSL_HOST) == "ok"
+
+    def test_missing_file_with_ssl_is_failed(self, tmp_path: Path) -> None:
+        assert compute_testssl_status(
+            str(tmp_path / "nope.json"), self._SSL_HOST
+        ) == "failed"
+
+    def test_usage_banner_file_with_ssl_is_failed(self, tmp_path: Path) -> None:
+        # testssl-Usage-Banner statt JSON (3.3dev-Bug) → kein gueltiges JSON.
+        p = tmp_path / "testssl.json"
+        p.write_text('"testssl.sh [options] <URI>"    or    "testssl.sh <options>"')
+        assert compute_testssl_status(str(p), self._SSL_HOST) == "failed"
+
+    def test_missing_file_without_ssl_is_skipped(self, tmp_path: Path) -> None:
+        assert compute_testssl_status(
+            str(tmp_path / "nope.json"), self._NO_SSL_HOST
+        ) == "skipped"
+
+    def test_https_headers_url_implies_ssl_expected(self, tmp_path: Path) -> None:
+        host = {"nmap": {"open_ports": []},
+                "headers": {"url": "https://example.com"}}
+        assert compute_testssl_status(str(tmp_path / "nope.json"), host) == "failed"
+
+
+class TestTestsslFailLoudPrompt:
+    """VEC-373 D4b: bei testssl-Failure muss der Claude-Prompt explizit
+    sagen, dass TLS/HSTS NICHT geprueft wurde (statt den Block still
+    wegzulassen) — sonst halluziniert die KI 'HSTS max-age=0'."""
+
+    def test_failed_status_emits_loud_warning(self) -> None:
+        host_results = {
+            "1.2.3.4": {
+                "fqdns": ["example.com"],
+                "nmap": {"open_ports": [{"port": 443, "protocol": "tcp",
+                                         "service": "https"}], "summary": "1 open"},
+                "testssl": [],
+                "testssl_status": "failed",
+                "headers": {"missing": [], "present": [], "score": "0/0"},
+            }
+        }
+        out = consolidate_findings(host_results, {})
+        assert "TOOL-FEHLER" in out
+        assert "NICHT geprueft" in out
+        assert "HSTS" in out
+
+    def test_skipped_status_stays_silent(self) -> None:
+        host_results = {
+            "1.2.3.4": {
+                "fqdns": ["example.com"],
+                "nmap": {"open_ports": [], "summary": "no ports"},
+                "testssl": [],
+                "testssl_status": "skipped",
+                "headers": {"missing": [], "present": [], "score": "0/0"},
+            }
+        }
+        out = consolidate_findings(host_results, {})
+        assert "TOOL-FEHLER" not in out
 
 
 # ---------------------------------------------------------------------------

@@ -107,7 +107,16 @@ RUN git clone --depth 1 https://gitlab.com/exploit-database/exploitdb.git /opt/e
 RUN nuclei -update-templates
 
 # ── 3. testssl.sh ───────────────────────────────────────────────────
-RUN git clone --depth 1 https://github.com/drwetter/testssl.sh.git /opt/testssl.sh
+# VEC-373: STABILEN Release-Tag pinnen, NICHT den Default-Branch klonen.
+# Der Default-Branch ist `3.3dev` (instabiler Dev-Branch). Dort hat das
+# Option-Parsing einen Bug: das Case-Pattern fuer `--connect-timeout`
+# (Space-Form `--connect-timeout 10`) ist durch ein fehlendes `|` mit
+# `--socket-timeout` verklebt → testssl behandelt `--connect-timeout` als
+# unrecognized option, druckt den Usage-Banner und beendet mit Exit 1.
+# Exit 1 liegt im "ok"-Bereich → der Fehler wurde still durchgereicht
+# (leeres JSON → keine SSL-Findings → AI-Halluzination "HSTS max-age=0").
+# v3.2.3 hat korrektes Parsing fuer alle von uns genutzten Flags.
+RUN git clone --depth 1 --branch v3.2.3 https://github.com/drwetter/testssl.sh.git /opt/testssl.sh
 ENV PATH="/opt/testssl.sh:${PATH}"
 
 # ── 3b. nikto (not in bookworm-slim repos) ────────────────────────

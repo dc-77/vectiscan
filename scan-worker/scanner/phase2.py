@@ -86,11 +86,17 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
         # neue Findings; in Compliance-Tiefenscan trotzdem drin lassen.
     ]
     if fast_mode:
+        # VEC-373: Langform statt Single-Letter, damit die Flag-Semantik
+        # unzweideutig ist und nicht erneut driftet. (`-h` = `--headers`,
+        # NICHT help — die alte Inline-Doku war hier korrekt, aber die
+        # Kurzform ist fehleranfaellig.) `--fast` entfaellt: bei expliziter
+        # Test-Gruppen-Auswahl (Protocols/Server-Defaults/Headers) laeuft
+        # ohnehin kein voller Cipher-Walk, `--fast` ist ein No-op und in
+        # neueren testssl-Versionen deprecated.
         cmd.extend([
-            "--fast",  # skip CSV/JSON-output overhead per cipher
-            "-p",      # nur Protocols (kein Cipher-Walk)
-            "-S",      # nur Server-Defaults
-            "-h",      # nur Header-Check
+            "--protocols",        # nur Protocols (kein Cipher-Walk)
+            "--server-defaults",  # nur Server-Defaults (Cert/Extensions)
+            "--headers",          # HTTP-Security-Header (HSTS etc.)
         ])
     # Omit --severity to get ALL entries (incl. OK/INFO) for TR-03116-4
     if severity:
@@ -110,14 +116,44 @@ def _run_testssl_once(fqdn: str, ip: str, output_path: str, order_id: str,
         tool_name=tool_name,
     )
 
+    # VEC-373 (D4b): Tool-Failures NICHT mehr still verschlucken. testssl
+    # nutzt Exit 0/1 fuer Erfolg (1 = "Findings vorhanden"); alles andere ist
+    # ein echter Fehler. Zusaetzlich gilt ein leeres/ungueltiges JSON oder ein
+    # durchgereichter Usage-Banner als Failure. In allen Faellen: laut loggen
+    # und None zurueckgeben (None == failed, [] == lief sauber ohne Findings).
     if exit_code not in (0, 1):
+        log.error("testssl_failed", reason="bad_exit_code", exit_code=exit_code,
+                  fqdn=fqdn, ip=ip, order_id=order_id)
         return None
 
     try:
         with open(output_path, "r") as f:
-            return json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError):
+            raw = f.read()
+    except FileNotFoundError:
+        log.error("testssl_failed", reason="no_output_file", exit_code=exit_code,
+                  fqdn=fqdn, ip=ip, output_path=output_path, order_id=order_id)
         return None
+
+    # Usage-Banner / Help-Text durchgereicht (z.B. unrecognized option) →
+    # testssl ist abgebrochen, bevor es echte Checks gefahren hat.
+    if "testssl.sh [options]" in raw or "testssl.sh <options>" in raw:
+        log.error("testssl_failed", reason="usage_banner_in_output",
+                  exit_code=exit_code, fqdn=fqdn, ip=ip, order_id=order_id)
+        return None
+
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        log.error("testssl_failed", reason="invalid_json", exit_code=exit_code,
+                  fqdn=fqdn, ip=ip, error=str(e), order_id=order_id)
+        return None
+
+    if not isinstance(data, list):
+        log.error("testssl_failed", reason="unexpected_format", exit_code=exit_code,
+                  fqdn=fqdn, ip=ip, order_id=order_id)
+        return None
+
+    return data
 
 
 def run_testssl(fqdn: str, ip: str, host_dir: str, order_id: str,
@@ -1198,11 +1234,20 @@ def run_phase2(
             r["testssl"] = testssl_result
             r["_tools"] = ["testssl"]
             progress_callback(order_id, "testssl", "complete")
-            if testssl_result:
-                count = len(testssl_result) if isinstance(testssl_result, list) else 1
-                publish_tool_output(order_id, "testssl", ip, f"{count} SSL/TLS checks completed")
+            # VEC-373 (D4b): None == Tool-Failure, [] == lief sauber ohne
+            # Findings. Beides unterscheiden statt beides als "No findings".
+            if testssl_result is None:
+                r["testssl_status"] = "failed"
+                log.error("testssl_no_data", ip=ip, order_id=order_id,
+                          fast_mode=testssl_fast,
+                          note="testssl lieferte keine verwertbaren Daten")
+                publish_tool_output(order_id, "testssl", ip,
+                                    "FEHLER: testssl lieferte keine Daten")
             else:
-                publish_tool_output(order_id, "testssl", ip, "No SSL findings")
+                r["testssl_status"] = "ok"
+                count = len(testssl_result)
+                publish_tool_output(order_id, "testssl", ip,
+                                    f"{count} SSL/TLS checks completed")
         return r
 
     def _run_quick_tools_stage1() -> dict[str, Any]:
