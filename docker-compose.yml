@@ -106,6 +106,9 @@ services:
       CRM_WEBHOOK_URL: ${CRM_WEBHOOK_URL:-}
       CRM_API_KEY: ${CRM_API_KEY:-}
       SALES_NOTIFY_URL: ${SALES_NOTIFY_URL:-}
+      # VEC-363: Live-Check (SofortScan) — Adresse des internen webcheck-core
+      # (nur vectiscan-internal erreichbar). Default zeigt auf den Service-Namen.
+      WEBCHECK_CORE_URL: ${WEBCHECK_CORE_URL:-http://webcheck-core:3000}
     deploy:
       resources:
         limits:
@@ -160,6 +163,34 @@ services:
         condition: service_started
     networks:
       - proxy-net
+      - vectiscan-internal
+
+  # ─────────────────────────────────────────────────────────
+  # webcheck-core — interner Live-Check-Kern (VEC-363 / VEC-360 §5 Option A).
+  # Upstream: Lissy93/web-check (MIT, s. NOTICE). NUR der technische Kern;
+  # die Astro-UI ist via DISABLE_GUI deaktiviert. KEINE Traefik-Exposure,
+  # KEIN proxy-net — ausschließlich über die /api/live-check/*-Fassade der
+  # API erreichbar. Keys/Tokens als ENV (leer = Modul degradiert sauber).
+  webcheck-core:
+    image: lissy93/web-check:v2.1.9
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      # Kein eingebautes GUI/Astro — wir nutzen nur die /api/<modul>-Endpunkte.
+      DISABLE_GUI: "true"
+      # Optionale Drittanbieter-Keys (Spike VEC-362: überwiegend key-frei).
+      # Leer lassen → die betroffenen Module liefern degradierte Ergebnisse,
+      # statt zu crashen. In Prod via CI-Var binden, falls vorhanden.
+      SHODAN_API_KEY: ${WEBCHECK_SHODAN_API_KEY:-}
+      GOOGLE_CLOUD_API_KEY: ${WEBCHECK_GOOGLE_CLOUD_API_KEY:-}
+      CLOUDMERSIVE_API_KEY: ${WEBCHECK_CLOUDMERSIVE_API_KEY:-}
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          # Chromium (Screenshot) ist die schwerste Abhängigkeit (Spike VEC-362).
+          memory: 1G
+    networks:
       - vectiscan-internal
 
   # Worker 1 — legacy ZAP_BASE_URL fallback; pool mode activated via

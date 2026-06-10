@@ -18,6 +18,7 @@ import { webhookRoutes } from './routes/webhooks.js';
 import { resendWebhookRoutes } from './routes/resend-webhook.js';
 import { leadRoutes } from './routes/leads.js';
 import { analyticsRoutes } from './routes/analytics.js';
+import { liveCheckRoutes } from './routes/live-check.js';
 import { startScheduler } from './lib/scheduler.js';
 import { registerSecurityHeaders } from './lib/security-headers.js';
 
@@ -83,6 +84,8 @@ export function buildServer() {
   server.register(resendWebhookRoutes);
   server.register(leadRoutes);
   server.register(analyticsRoutes);
+  // VEC-363: Live-Check (SofortScan) Auth-Fassade vor webcheck-core.
+  server.register(liveCheckRoutes);
 
   return server;
 }
