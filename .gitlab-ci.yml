@@ -950,6 +950,73 @@ ops-traefik-auth:
     name: production
     url: https://scan.vectigal.tech
 
+# =============================================================================
+# VEC-378 — Admin-Release für QA-WebCheck-Order (Re-Scan VEC-376)
+# Genehmigt Target für Order 46ce8dcc-4236-4c15-895a-ad32586d484a und queued
+# den WebCheck-Scan. Einmaliger Ops-Job; wird per API-Pipeline getriggert.
+# Voraussetzung: ADMIN_EMAIL + ADMIN_PASSWORD als CI-Variablen gesetzt.
+# =============================================================================
+ops-admin-release-vec378:
+  stage: ops
+  tags: [vectigal]
+  needs: []
+  allow_failure: true
+  variables:
+    ORDER_ID: "46ce8dcc-4236-4c15-895a-ad32586d484a"
+    API_BASE: "https://scan-api.vectigal.tech"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: always
+  script:
+    - echo "=== VEC-378 Admin-Release: ${ORDER_ID} ==="
+    - |
+      if [ -z "${ADMIN_EMAIL}" ] || [ -z "${ADMIN_PASSWORD}" ]; then
+        echo "FATAL: ADMIN_EMAIL oder ADMIN_PASSWORD nicht gesetzt (CI-Variable fehlt)"
+        exit 1
+      fi
+    - |
+      TOKEN=$(curl -sf -X POST "${API_BASE}/api/auth/login" \
+        -H "Content-Type: application/json" \
+        -d "{\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASSWORD}\"}" \
+        | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+      if [ -z "$TOKEN" ]; then
+        echo "FATAL: Admin-Login fehlgeschlagen (kein Token in Response)"
+        exit 1
+      fi
+      echo "OK: Admin-Token erhalten (Länge=${#TOKEN})"
+    - |
+      REVIEW=$(curl -sf -X GET "${API_BASE}/api/admin/review/order/${ORDER_ID}" \
+        -H "Authorization: Bearer ${TOKEN}")
+      echo "Review-Response (gekürzt): $(echo "$REVIEW" | head -c 500)"
+      TARGET_ID=$(echo "$REVIEW" | grep -o '"id":"[0-9a-f-]*"' | head -1 | cut -d'"' -f4)
+      if [ -z "$TARGET_ID" ]; then
+        echo "FATAL: Keine Target-ID aus Review-Endpoint extrahiert"
+        exit 1
+      fi
+      echo "OK: Target-ID=${TARGET_ID}"
+    - |
+      APPROVE=$(curl -sf -X POST "${API_BASE}/api/admin/targets/${TARGET_ID}/approve" \
+        -H "Authorization: Bearer ${TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d '{"notes":"VEC-378 QA-Re-Scan, board-vetted target dortmund-beach.com"}')
+      echo "Approve-Response: ${APPROVE}"
+      if echo "$APPROVE" | grep -q '"success":true'; then
+        echo "OK: Target approved"
+      else
+        echo "WARN: Approve-Response enthält kein success:true — manuell prüfen"
+      fi
+    - |
+      RELEASE=$(curl -sf -X POST "${API_BASE}/api/admin/orders/${ORDER_ID}/release" \
+        -H "Authorization: Bearer ${TOKEN}" \
+        -H "Content-Type: application/json")
+      echo "Release-Response: ${RELEASE}"
+      if echo "$RELEASE" | grep -q '"success":true'; then
+        echo "=== RELEASE ERFOLGREICH: Order gequeued, WebCheck startet ==="
+      else
+        echo "FATAL: Release fehlgeschlagen — Response: ${RELEASE}"
+        exit 1
+      fi
+    - echo "=== VEC-378 DONE: Scan queued, ~15-20 Min bis report_complete ==="
 
 
 # =============================================================================
