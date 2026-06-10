@@ -13,13 +13,17 @@ type Tab = 'login' | 'register';
 // lib/authorizationConsent.ts und WebCheckLeadForm.tsx (getrennte Build-Kontexte).
 const FREE_MAIL = /@(gmail|googlemail|gmx|web|yahoo|ymail|hotmail|outlook|live|icloud|me|aol|t-online|freenet|mail|proton|protonmail|mailbox)\.[a-z.]+$/i;
 
-// Vorgeschlagener Berechtigungs-Erklaerungstext (DRAFT — Board/Recht-Freigabe vor
-// Go-live, VEC-364). Version wird serverseitig autoritativ gesetzt.
+// Berechtigungs-Erklaerungstext (erweiterte Variante). Board/Recht-Freigabe:
+// Confirmation 62b445cb accepted 2026-06-10 (VEC-364). Byte-identisch mit dem
+// Backend-Text in api/src/lib/authorizationConsent.ts. Version serverseitig gesetzt.
 const AUTHORIZATION_CONSENT_TEXT =
   'Ich bestätige, dass ich ausschließlich Domains, IP-Adressen und Systeme zum Scan beauftrage, ' +
   'für die ich selbst Inhaber bin oder über eine nachweisbare, ausdrückliche Genehmigung des ' +
-  'Inhabers verfüge, und erteile VectiScan hiermit die Genehmigung, die im gewählten Paket ' +
-  'beschriebenen Sicherheits-Scans für diese Ziele durchzuführen.';
+  'Inhabers verfüge. Für die von mir beauftragten Ziele erteile ich VectiScan hiermit die ' +
+  'Genehmigung, die im gewählten Paket beschriebenen Sicherheits-Scans durchzuführen. Mir ist ' +
+  'bekannt, dass das Scannen fremder Systeme ohne Genehmigung rechtswidrig sein kann ' +
+  '(insb. §§ 202a–202c StGB), und ich stelle VectiScan von Ansprüchen Dritter frei, die aus ' +
+  'von mir ohne Genehmigung beauftragten Scans entstehen.';
 
 const inputClass = `w-full bg-transparent border rounded-lg px-4 py-3 text-[#F8FAFC] placeholder-[#64748B]
   focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] transition-colors text-sm`;

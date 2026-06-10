@@ -22,17 +22,19 @@
 export const AUTHORIZATION_CONSENT_VERSION = '2026-06-10.1' as const;
 
 /**
- * Vorgeschlagener Erklaerungstext (DRAFT — Board/Recht-Freigabe vor Go-live, VEC-364).
- * Die Version oben verweist auf GENAU diesen Wortlaut.
+ * Erklaerungstext (erweiterte Variante). Board/Recht-Freigabe des Wortlauts:
+ * Confirmation 62b445cb accepted 2026-06-10 (Dokument consent-wording, VEC-364).
+ * Die Version oben verweist auf GENAU diesen Wortlaut — byte-identisch mit dem
+ * im Frontend angezeigten Text (frontend/src/app/login/page.tsx).
  */
 export const AUTHORIZATION_CONSENT_TEXT =
-  'Ich bestaetige, dass ich ausschliesslich Domains, IP-Adressen und Systeme zum Scan ' +
-  'beauftrage, fuer die ich selbst Inhaber bin oder ueber eine nachweisbare, ' +
-  'ausdrueckliche Genehmigung des Inhabers verfuege. Fuer die von mir beauftragten Ziele ' +
-  'erteile ich VectiScan hiermit die Genehmigung, die im gewaehlten Paket beschriebenen ' +
-  'Sicherheits-Scans durchzufuehren. Mir ist bekannt, dass das Scannen fremder Systeme ohne ' +
-  'Genehmigung rechtswidrig sein kann (insb. §§ 202a-202c StGB), und ich stelle ' +
-  'VectiScan von Anspruechen Dritter frei, die aus von mir ohne Genehmigung beauftragten ' +
+  'Ich bestätige, dass ich ausschließlich Domains, IP-Adressen und Systeme zum Scan ' +
+  'beauftrage, für die ich selbst Inhaber bin oder über eine nachweisbare, ' +
+  'ausdrückliche Genehmigung des Inhabers verfüge. Für die von mir beauftragten Ziele ' +
+  'erteile ich VectiScan hiermit die Genehmigung, die im gewählten Paket beschriebenen ' +
+  'Sicherheits-Scans durchzuführen. Mir ist bekannt, dass das Scannen fremder Systeme ohne ' +
+  'Genehmigung rechtswidrig sein kann (insb. §§ 202a–202c StGB), und ich stelle ' +
+  'VectiScan von Ansprüchen Dritter frei, die aus von mir ohne Genehmigung beauftragten ' +
   'Scans entstehen.';
 
 /**
