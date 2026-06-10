@@ -18,6 +18,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import pino from 'pino';
 import { query } from '../lib/db.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { requireAdmin } from '../middleware/requireAdmin.js';
 import {
   LIVE_CHECK_MODULES,
   getLiveCheckModule,
@@ -25,6 +26,11 @@ import {
   type TargetCheckResult,
 } from '../lib/liveCheck.js';
 import { LiveCheckLimiter } from '../lib/liveCheckLimiter.js';
+import {
+  summarizeAbuse,
+  type LiveCheckAuditRow,
+  type LiveCheckAuditStatus,
+} from '../lib/liveCheckAbuse.js';
 
 const log = pino({ name: 'live-check' });
 
@@ -246,6 +252,44 @@ export async function liveCheckRoutes(server: FastifyInstance): Promise<void> {
       } finally {
         limiter.release(user.sub);
       }
+    },
+  );
+
+  // Abuse-Monitoring (VEC-368, §6): read-only Admin-Auswertung über
+  // live_check_audit. Verdichtet das Audit-Log zu Abuse-Signalen pro Akteur
+  // (User/IP) über ein konfigurierbares Zeitfenster. Kein State, kein Schreiben.
+  server.get(
+    '/api/admin/live-check/abuse',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const q = request.query as Record<string, string>;
+      // Fenster in Stunden, geklemmt auf [1, 720] (max. 30 Tage).
+      const hours = Math.min(720, Math.max(1, Number(q?.hours) || 24));
+      // Akteurs-Cap für die Antwort.
+      const topN = Math.min(500, Math.max(1, Number(q?.top) || 50));
+
+      const rows = await query<{
+        user_id: string | null;
+        ip_address: string | null;
+        status: string;
+      }>(
+        `SELECT user_id, ip_address::text AS ip_address, status
+           FROM live_check_audit
+          WHERE created_at >= NOW() - ($1 || ' hours')::interval`,
+        [String(hours)],
+      );
+
+      const auditRows: LiveCheckAuditRow[] = rows.rows.map((r) => ({
+        userId: r.user_id,
+        ip: r.ip_address,
+        status: r.status as LiveCheckAuditStatus,
+      }));
+
+      const summary = summarizeAbuse(auditRows, { topN });
+      return reply.send({
+        success: true,
+        data: { windowHours: hours, ...summary },
+      });
     },
   );
 }

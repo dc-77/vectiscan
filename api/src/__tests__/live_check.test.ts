@@ -6,6 +6,7 @@ import {
   checkTarget,
 } from '../lib/liveCheck';
 import { LiveCheckLimiter } from '../lib/liveCheckLimiter';
+import { summarizeAbuse, type LiveCheckAuditRow } from '../lib/liveCheckAbuse';
 
 // ──────────────────────────────────────────────────────────────────────────
 // VEC-363 — Live-Check-Fassade: Modul-Allowlist, SSRF-Target-Härtung, Limiter
@@ -152,5 +153,76 @@ describe('LiveCheckLimiter', () => {
     if (!third.ok) expect(third.reason).toBe('too_many_concurrent');
     lim.release('u');
     expect(lim.acquire('u', t).ok).toBe(true);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// VEC-368 — Abuse-Monitoring: Aggregation über live_check_audit
+// ──────────────────────────────────────────────────────────────────────────
+describe('summarizeAbuse', () => {
+  const row = (
+    userId: string | null,
+    ip: string | null,
+    status: LiveCheckAuditRow['status'],
+  ): LiveCheckAuditRow => ({ userId, ip, status });
+
+  it('zählt Totals und distinct Akteure korrekt', () => {
+    const s = summarizeAbuse([
+      row('u1', '1.1.1.1', 'ok'),
+      row('u1', '1.1.1.1', 'ok'),
+      row('u2', '2.2.2.2', 'rate_limited'),
+    ]);
+    expect(s.totals.total).toBe(3);
+    expect(s.totals.ok).toBe(2);
+    expect(s.totals.rateLimited).toBe(1);
+    expect(s.totals.distinctActors).toBe(2);
+  });
+
+  it('flaggt einen SSRF-Prober ab 3 blocked und sortiert ihn nach oben', () => {
+    const s = summarizeAbuse([
+      row('attacker', '6.6.6.6', 'blocked'),
+      row('attacker', '6.6.6.6', 'blocked'),
+      row('attacker', '6.6.6.6', 'blocked'),
+      row('normal', '9.9.9.9', 'ok'),
+    ]);
+    expect(s.actors[0].userId).toBe('attacker');
+    expect(s.actors[0].blocked).toBe(3);
+    expect(s.actors[0].flagged).toBe(true);
+    expect(s.totals.flaggedActors).toBe(1);
+    // blocked-Gewicht 5 → Score 15.
+    expect(s.actors[0].score).toBe(15);
+  });
+
+  it('flaggt über den Score-Schwellwert (gemischte Signale)', () => {
+    // 2×blocked(10) + 3×rate_limited(6) = 16 >= 15.
+    const s = summarizeAbuse([
+      row('mix', '5.5.5.5', 'blocked'),
+      row('mix', '5.5.5.5', 'blocked'),
+      row('mix', '5.5.5.5', 'rate_limited'),
+      row('mix', '5.5.5.5', 'rate_limited'),
+      row('mix', '5.5.5.5', 'rate_limited'),
+    ]);
+    expect(s.actors[0].score).toBe(16);
+    expect(s.actors[0].flagged).toBe(true);
+  });
+
+  it('flaggt einen sauberen Vielnutzer NICHT', () => {
+    const rows = Array.from({ length: 30 }, () => row('poweruser', '8.8.8.8', 'ok'));
+    const s = summarizeAbuse(rows);
+    expect(s.actors[0].total).toBe(30);
+    expect(s.actors[0].flagged).toBe(false);
+    expect(s.totals.flaggedActors).toBe(0);
+  });
+
+  it('fällt auf die IP zurück, wenn keine userId vorhanden ist', () => {
+    const s = summarizeAbuse([row(null, '7.7.7.7', 'blocked')]);
+    expect(s.actors[0].actor).toBe('ip:7.7.7.7');
+  });
+
+  it('respektiert topN', () => {
+    const rows = Array.from({ length: 10 }, (_, i) => row(`u${i}`, null, 'ok'));
+    const s = summarizeAbuse(rows, { topN: 3 });
+    expect(s.actors.length).toBe(3);
+    expect(s.totals.distinctActors).toBe(10);
   });
 });
