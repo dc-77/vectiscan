@@ -1018,6 +1018,54 @@ ops-admin-release-vec378:
       fi
     - 'echo "=== VEC-378 DONE: Scan queued, ~15-20 Min bis report_complete ==="'
 
+# =============================================================================
+# VEC-378 Ops-Job: Order-Status prüfen (report_complete?)
+# Einmaliger Check-Job; per API-Pipeline triggerbar.
+# =============================================================================
+ops-check-order-status-vec378:
+  stage: ops
+  tags: [vectigal]
+  needs: []
+  allow_failure: true
+  variables:
+    ORDER_ID: "46ce8dcc-4236-4c15-895a-ad32586d484a"
+    API_BASE: "https://scan-api.vectigal.tech"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: always
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+  script:
+    - 'echo "=== VEC-378 Order-Status-Check: ${ORDER_ID} ==="'
+    - |
+      if [ -z "${ADMIN_EMAIL}" ] || [ -z "${ADMIN_PASSWORD}" ]; then
+        echo "FATAL: ADMIN_EMAIL oder ADMIN_PASSWORD nicht gesetzt"
+        exit 1
+      fi
+    - |
+      TOKEN=$(curl -sf -X POST "${API_BASE}/api/auth/login" \
+        -H "Content-Type: application/json" \
+        -d "{\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASSWORD}\"}" \
+        | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
+      if [ -z "$TOKEN" ]; then
+        echo "FATAL: Admin-Login fehlgeschlagen"
+        exit 1
+      fi
+    - |
+      STATUS_RESP=$(curl -sf -X GET "${API_BASE}/api/orders/${ORDER_ID}" \
+        -H "Authorization: Bearer ${TOKEN}")
+      ORDER_STATUS=$(echo "$STATUS_RESP" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
+      echo "ORDER_STATUS=${ORDER_STATUS}"
+      if [ "${ORDER_STATUS}" = "report_complete" ]; then
+        echo "=== SCAN_DONE: report_complete — Mitnick kann QA starten ==="
+      elif [ "${ORDER_STATUS}" = "scan_running" ] || [ "${ORDER_STATUS}" = "queued" ] || [ "${ORDER_STATUS}" = "scan_pending" ]; then
+        echo "=== SCAN_RUNNING: Noch nicht fertig, Status=${ORDER_STATUS} ==="
+      else
+        echo "=== STATUS=${ORDER_STATUS} — evtl. pending_review oder anderer Zwischenstatus ==="
+      fi
+
 
 # =============================================================================
 ops-provision-turnstile:
