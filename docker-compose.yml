@@ -141,6 +141,18 @@ services:
       - "traefik.http.routers.vectiscan-api-admin.priority=100"
       - "traefik.http.routers.vectiscan-api-admin.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.routers.vectiscan-api-admin.service=vectiscan-api"
+      # VEC-358: CORS-Preflight (OPTIONS) darf basicAuth nicht erreichen — Browser sendet
+      # OPTIONS ohne Authorization-Header, 401 hat keine CORS-Header → Browser blockt.
+      # Dieser Router hat Priorität 110 > 100 und matcht NUR OPTIONS, sodass Fastify
+      # (cors origin:true) die CORS-Antwort liefern kann. Echte Admin-Requests bleiben
+      # auf dem vectiscan-api-admin-Router (basicAuth + requireAdmin-JWT in der App).
+      - "traefik.http.routers.vectiscan-api-admin-preflight.rule=Host(`scan-api.vectigal.tech`) && PathRegexp(`(?i)^/api/admin`) && Method(`OPTIONS`)"
+      - "traefik.http.routers.vectiscan-api-admin-preflight.entrypoints=websecure"
+      - "traefik.http.routers.vectiscan-api-admin-preflight.tls=true"
+      - "traefik.http.routers.vectiscan-api-admin-preflight.tls.certresolver=letsencrypt-http"
+      - "traefik.http.routers.vectiscan-api-admin-preflight.priority=110"
+      - "traefik.http.routers.vectiscan-api-admin-preflight.middlewares=security-headers@file"
+      - "traefik.http.routers.vectiscan-api-admin-preflight.service=vectiscan-api"
       - "traefik.http.services.vectiscan-api.loadbalancer.server.port=4000"
       - "traefik.http.services.vectiscan-api.loadbalancer.healthcheck.path=/health"
       - "traefik.http.services.vectiscan-api.loadbalancer.healthcheck.interval=15s"
