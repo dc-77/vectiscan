@@ -972,7 +972,7 @@ ops-admin-release-vec378:
     - if: $CI_PIPELINE_SOURCE == "web"
       when: manual
   script:
-    - echo "=== VEC-378 Admin-Release: ${ORDER_ID} ==="
+    - 'echo "=== VEC-378 Admin-Release: ${ORDER_ID} ==="'
     - |
       if [ -z "${ADMIN_EMAIL}" ] || [ -z "${ADMIN_PASSWORD}" ]; then
         echo "FATAL: ADMIN_EMAIL oder ADMIN_PASSWORD nicht gesetzt (CI-Variable fehlt)"
@@ -1020,7 +1020,7 @@ ops-admin-release-vec378:
         echo "FATAL: Release fehlgeschlagen — Response: ${RELEASE}"
         exit 1
       fi
-    - echo "=== VEC-378 DONE: Scan queued, ~15-20 Min bis report_complete ==="
+    - 'echo "=== VEC-378 DONE: Scan queued, ~15-20 Min bis report_complete ==="'
 
 
 # =============================================================================
