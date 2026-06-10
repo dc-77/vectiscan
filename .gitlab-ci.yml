@@ -967,6 +967,10 @@ ops-admin-release-vec378:
   rules:
     - if: $CI_PIPELINE_SOURCE == "api"
       when: always
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
   script:
     - echo "=== VEC-378 Admin-Release: ${ORDER_ID} ==="
     - |
