@@ -45,6 +45,7 @@ const MIGRATION_035_PATH = path.join(__dirname, '..', 'migrations', '035_email_s
 const MIGRATION_036_PATH = path.join(__dirname, '..', 'migrations', '036_reports_expires_at_default.sql');
 const MIGRATION_037_PATH = path.join(__dirname, '..', 'migrations', '037_webcheck_marketing_consent.sql');
 const MIGRATION_038_PATH = path.join(__dirname, '..', 'migrations', '038_webcheck_consent_not_given.sql');
+const MIGRATION_039_PATH = path.join(__dirname, '..', 'migrations', '039_user_authorization_consent.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -588,6 +589,26 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 038 FAILED (continuing without it):', err);
+  }
+
+  // Migration 039 (VEC-364): verpflichtende, versionierte Scan-Berechtigungs-
+  // Bestätigung am Konto (authorization_consent_version + _at). Idempotent: nur
+  // anwenden, wenn die Spalte authorization_consent_version auf users noch fehlt.
+  try {
+    const authConsentColCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'users' AND column_name = 'authorization_consent_version'
+      ) AS exists
+    `);
+    if (!authConsentColCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 039: user authorization_consent');
+      const migrationSql = fs.readFileSync(MIGRATION_039_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 039 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 039 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

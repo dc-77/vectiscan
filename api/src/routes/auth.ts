@@ -7,6 +7,10 @@ import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { sendPasswordResetEmail } from '../lib/email.js';
 import { audit } from '../lib/audit.js';
+import {
+  AUTHORIZATION_CONSENT_VERSION,
+  isFreemailEmail,
+} from '../lib/authorizationConsent.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_PASSWORD_LENGTH = 8;
@@ -15,6 +19,7 @@ interface RegisterBody {
   email: string;
   password: string;
   companyName?: string;
+  authorizationConsent?: boolean;
 }
 
 interface LoginBody {
@@ -34,16 +39,36 @@ interface ResetPasswordBody {
 export async function authRoutes(server: FastifyInstance): Promise<void> {
   // POST /api/auth/register
   server.post<{ Body: RegisterBody }>('/api/auth/register', async (request, reply) => {
-    const { email, password, companyName } = request.body || {};
+    const { email, password, companyName, authorizationConsent } = request.body || {};
 
     if (!email || !EMAIL_REGEX.test(email)) {
       return reply.status(400).send({ success: false, error: 'Ungültige E-Mail-Adresse.' });
+    }
+
+    // Firmen-E-Mail-Pflicht (VEC-364, Board-Vorgabe): Freemail-/Consumer-Provider
+    // werden bei der Registrierung geblockt. Jeder Check erfordert ein Konto mit
+    // Firmen-E-Mail.
+    if (isFreemailEmail(email)) {
+      return reply.status(400).send({
+        success: false,
+        error: 'Bitte registrieren Sie sich mit Ihrer Firmen-E-Mail-Adresse (keine Freemail-Adresse).',
+      });
     }
 
     if (!password || password.length < MIN_PASSWORD_LENGTH) {
       return reply.status(400).send({
         success: false,
         error: `Passwort muss mindestens ${MIN_PASSWORD_LENGTH} Zeichen haben.`,
+      });
+    }
+
+    // Verpflichtende Scan-Berechtigungs-Bestätigung (VEC-364). Die Version wird
+    // serverseitig autoritativ gesetzt (Client kann sie nicht fälschen); ohne
+    // explizites `true` keine Registrierung.
+    if (authorizationConsent !== true) {
+      return reply.status(400).send({
+        success: false,
+        error: 'Die Scan-Berechtigungs-Bestätigung ist erforderlich, um ein Konto zu erstellen.',
       });
     }
 
@@ -65,8 +90,11 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
     // Create user
     const passwordHash = await hashPassword(password);
     const userResult = await query<{ id: string; email: string; role: string }>(
-      "INSERT INTO users (email, password_hash, role, customer_id) VALUES ($1, $2, 'customer', $3) RETURNING id, email, role",
-      [email.toLowerCase(), passwordHash, customerId],
+      `INSERT INTO users (email, password_hash, role, customer_id,
+                          authorization_consent_version, authorization_consent_at)
+       VALUES ($1, $2, 'customer', $3, $4, NOW())
+       RETURNING id, email, role`,
+      [email.toLowerCase(), passwordHash, customerId, AUTHORIZATION_CONSENT_VERSION],
     );
     const user = userResult.rows[0];
 
@@ -77,7 +105,11 @@ export async function authRoutes(server: FastifyInstance): Promise<void> {
       email: user.email,
     };
 
-    audit({ action: 'user.registered', details: { userId: user.id, email: user.email }, ip: request.ip });
+    audit({
+      action: 'user.registered',
+      details: { userId: user.id, email: user.email, authorizationConsentVersion: AUTHORIZATION_CONSENT_VERSION },
+      ip: request.ip,
+    });
 
     return reply.status(201).send({
       success: true,

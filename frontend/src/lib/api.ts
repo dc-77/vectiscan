@@ -240,11 +240,16 @@ export async function login(email: string, password: string): Promise<ApiRespons
   return res.json();
 }
 
-export async function register(email: string, password: string, companyName?: string): Promise<ApiResponse<AuthResponse>> {
+export async function register(
+  email: string,
+  password: string,
+  companyName?: string,
+  authorizationConsent?: boolean,
+): Promise<ApiResponse<AuthResponse>> {
   const res = await fetch(`${API_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password, companyName: companyName || undefined }),
+    body: JSON.stringify({ email, password, companyName: companyName || undefined, authorizationConsent }),
   });
   return res.json();
 }

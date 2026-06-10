@@ -9,6 +9,18 @@ import { VectiScanShield } from '@/components/VectiScanLogo';
 
 type Tab = 'login' | 'register';
 
+// Firmen-E-Mail-Pflicht (VEC-364) — deckungsgleich mit der API-Liste in
+// lib/authorizationConsent.ts und WebCheckLeadForm.tsx (getrennte Build-Kontexte).
+const FREE_MAIL = /@(gmail|googlemail|gmx|web|yahoo|ymail|hotmail|outlook|live|icloud|me|aol|t-online|freenet|mail|proton|protonmail|mailbox)\.[a-z.]+$/i;
+
+// Vorgeschlagener Berechtigungs-Erklaerungstext (DRAFT — Board/Recht-Freigabe vor
+// Go-live, VEC-364). Version wird serverseitig autoritativ gesetzt.
+const AUTHORIZATION_CONSENT_TEXT =
+  'Ich bestätige, dass ich ausschließlich Domains, IP-Adressen und Systeme zum Scan beauftrage, ' +
+  'für die ich selbst Inhaber bin oder über eine nachweisbare, ausdrückliche Genehmigung des ' +
+  'Inhabers verfüge, und erteile VectiScan hiermit die Genehmigung, die im gewählten Paket ' +
+  'beschriebenen Sicherheits-Scans für diese Ziele durchzuführen.';
+
 const inputClass = `w-full bg-transparent border rounded-lg px-4 py-3 text-[#F8FAFC] placeholder-[#64748B]
   focus:outline-none focus:border-[#2DD4BF] focus:ring-1 focus:ring-[#2DD4BF] transition-colors text-sm`;
 
@@ -19,6 +31,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [authorizationConsent, setAuthorizationConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -26,12 +39,14 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     if (!email.trim() || !password.trim()) { setError('Bitte alle Felder ausfüllen.'); return; }
+    if (tab === 'register' && FREE_MAIL.test(email.trim().toLowerCase())) { setError('Bitte registrieren Sie sich mit Ihrer Firmen-E-Mail-Adresse (keine Freemail-Adresse).'); return; }
     if (tab === 'register' && password !== passwordConfirm) { setError('Passwörter stimmen nicht überein.'); return; }
     if (tab === 'register' && password.length < 8) { setError('Passwort muss mindestens 8 Zeichen haben.'); return; }
+    if (tab === 'register' && !authorizationConsent) { setError('Bitte bestätigen Sie die Scan-Berechtigung, um fortzufahren.'); return; }
 
     setLoading(true);
     try {
-      const res = tab === 'login' ? await login(email, password) : await register(email, password, companyName || undefined);
+      const res = tab === 'login' ? await login(email, password) : await register(email, password, companyName || undefined, authorizationConsent);
       if (res.success && res.data) { setToken(res.data.token); router.push('/dashboard'); }
       else { setError(res.error || 'Unbekannter Fehler'); }
     } catch { setError('API nicht erreichbar.'); }
@@ -73,7 +88,7 @@ export default function LoginPage() {
                 className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
             )}
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="E-Mail-Adresse" autoFocus disabled={loading}
+              placeholder={tab === 'register' ? 'Firmen-E-Mail-Adresse' : 'E-Mail-Adresse'} autoFocus disabled={loading}
               className={inputClass} style={{ borderColor: 'rgba(148,163,184,0.2)' }} />
             <div>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)}
@@ -99,6 +114,12 @@ export default function LoginPage() {
                 <label className="flex items-start gap-2 text-xs" style={{ color: '#64748B' }}>
                   <input type="checkbox" required className="mt-0.5 accent-[#2DD4BF]" />
                   <span>Ich akzeptiere die <a href="/datenschutz" className="underline" style={{ color: '#2DD4BF' }}>Datenschutzerklärung</a> und stimme der Verarbeitung meiner Daten zu.</span>
+                </label>
+                <label className="flex items-start gap-2 text-xs" style={{ color: '#64748B' }}>
+                  <input type="checkbox" required checked={authorizationConsent}
+                    onChange={e => setAuthorizationConsent(e.target.checked)}
+                    className="mt-0.5 accent-[#2DD4BF]" />
+                  <span>{AUTHORIZATION_CONSENT_TEXT}</span>
                 </label>
               </>
             )}
