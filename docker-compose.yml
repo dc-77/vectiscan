@@ -129,23 +129,20 @@ services:
       - "traefik.http.routers.vectiscan-api.tls=true"
       - "traefik.http.routers.vectiscan-api.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-api.middlewares=security-headers@file,rate-limit@file"
-      # VEC-34 AC2 / VEC-143: Admin-API (/api/admin/**) ist am Edge auth-gegated (Basic-Auth).
-      # IP-Allowlist (internal-only) auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
-      # Spezifischere Regel + höhere Priorität → externer /api/admin-Request ohne Credentials → 401.
-      # VEC-167: `PathRegexp((?i)…)` statt `PathPrefix` — case-INSENSITIV, sonst umgeht /api/ADMIN das Edge-Gate (404 statt 401).
+      # VEC-370: Admin-API (/api/admin/**) — basicAuth (internal-auth@file) entfernt.
+      # Auth erfolgt ausschließlich durch App-seitiges JWT requireAdmin (Rolle admin).
+      # basicAuth war funktionsbrechend für SPA-XHRs (Browser sendet kein Basic bei fetch()).
+      # VEC-167: `PathRegexp((?i)…)` statt `PathPrefix` — case-INSENSITIV.
       - "traefik.http.routers.vectiscan-api-admin.rule=Host(`scan-api.vectigal.tech`) && PathRegexp(`(?i)^/api/admin`)"
       - "traefik.http.routers.vectiscan-api-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-api-admin.tls=true"
       # VEC-347: gleicher HTTP-01-Resolver wie vectiscan-api (DNS-01/uniteddomains-Key kaputt, s. VEC-269).
       - "traefik.http.routers.vectiscan-api-admin.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-api-admin.priority=100"
-      - "traefik.http.routers.vectiscan-api-admin.middlewares=security-headers@file,internal-auth@file"
+      - "traefik.http.routers.vectiscan-api-admin.middlewares=security-headers@file"
       - "traefik.http.routers.vectiscan-api-admin.service=vectiscan-api"
-      # VEC-358: CORS-Preflight (OPTIONS) darf basicAuth nicht erreichen — Browser sendet
-      # OPTIONS ohne Authorization-Header, 401 hat keine CORS-Header → Browser blockt.
-      # Dieser Router hat Priorität 110 > 100 und matcht NUR OPTIONS, sodass Fastify
-      # (cors origin:true) die CORS-Antwort liefern kann. Echte Admin-Requests bleiben
-      # auf dem vectiscan-api-admin-Router (basicAuth + requireAdmin-JWT in der App).
+      # VEC-358: OPTIONS-Preflight-Router bleibt harmlos (höhere Prio 110, matcht nur OPTIONS).
+      # Mit removal von basicAuth ist er nicht mehr zwingend nötig, aber schadet nicht.
       - "traefik.http.routers.vectiscan-api-admin-preflight.rule=Host(`scan-api.vectigal.tech`) && PathRegexp(`(?i)^/api/admin`) && Method(`OPTIONS`)"
       - "traefik.http.routers.vectiscan-api-admin-preflight.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-api-admin-preflight.tls=true"
