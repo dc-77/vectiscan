@@ -121,10 +121,13 @@ services:
       - "traefik.enable=true"
       # VEC-34: Public-Router — Kunden erreichen die API von außen per HTTPS.
       # `internal-only@file` hier bewusst abgelöst; Let's-Encrypt-Cert via Host-CertResolver.
+      # VEC-347: `letsencrypt-http` = HTTP-01 (entryPoint web). `letsencrypt`-DNS-01-Resolver ist kaputt
+      #          (uniteddomains-API-Key ungültig, Root-Cause VEC-269). Cert läuft Aug 2026 ab; Renewal
+      #          über DNS-01 würde fehlschlagen → Default-Self-Signed. HTTP-01 löst das dauerhaft.
       - "traefik.http.routers.vectiscan-api.rule=Host(`scan-api.vectigal.tech`)"
       - "traefik.http.routers.vectiscan-api.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-api.tls=true"
-      - "traefik.http.routers.vectiscan-api.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.vectiscan-api.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-api.middlewares=security-headers@file,rate-limit@file"
       # VEC-34 AC2 / VEC-143: Admin-API (/api/admin/**) ist am Edge auth-gegated (Basic-Auth).
       # IP-Allowlist (internal-only) auf diesem Host wirkungslos (Docker-SNAT, daemon iptables:false → alle IPs = 172.18.0.1).
@@ -133,7 +136,8 @@ services:
       - "traefik.http.routers.vectiscan-api-admin.rule=Host(`scan-api.vectigal.tech`) && PathRegexp(`(?i)^/api/admin`)"
       - "traefik.http.routers.vectiscan-api-admin.entrypoints=websecure"
       - "traefik.http.routers.vectiscan-api-admin.tls=true"
-      - "traefik.http.routers.vectiscan-api-admin.tls.certresolver=letsencrypt"
+      # VEC-347: gleicher HTTP-01-Resolver wie vectiscan-api (DNS-01/uniteddomains-Key kaputt, s. VEC-269).
+      - "traefik.http.routers.vectiscan-api-admin.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-api-admin.priority=100"
       - "traefik.http.routers.vectiscan-api-admin.middlewares=security-headers@file,internal-auth@file"
       - "traefik.http.routers.vectiscan-api-admin.service=vectiscan-api"
