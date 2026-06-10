@@ -5,7 +5,7 @@ import {
   normalizeTargetHost,
   checkTarget,
 } from '../lib/liveCheck';
-import { LiveCheckLimiter } from '../lib/liveCheckLimiter';
+import { LiveCheckLimiter, DEFAULT_LIVE_CHECK_LIMITS } from '../lib/liveCheckLimiter';
 import { summarizeAbuse, type LiveCheckAuditRow } from '../lib/liveCheckAbuse';
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -153,6 +153,45 @@ describe('LiveCheckLimiter', () => {
     if (!third.ok) expect(third.reason).toBe('too_many_concurrent');
     lim.release('u');
     expect(lim.acquire('u', t).ok).toBe(true);
+  });
+
+  // VEC-381 — Window-Headroom: 2 volle SofortScans (20+20 Calls) müssen ins
+  // Fenster passen; erst der 41. Call läuft ins Fensterlimit.
+  it('bietet Headroom für zwei volle Scans (Default-Limits)', () => {
+    expect(DEFAULT_LIVE_CHECK_LIMITS.maxPerWindow).toBe(40);
+    const lim = new LiveCheckLimiter(); // produktive Default-Limits
+    const t = 7_000_000;
+    for (let i = 0; i < DEFAULT_LIVE_CHECK_LIMITS.maxPerWindow; i++) {
+      const r = lim.acquire('u', t);
+      expect(r.ok).toBe(true);
+      lim.release('u'); // sequenziell, damit nur das Fenster (nicht Concurrency) greift
+    }
+    const over = lim.acquire('u', t);
+    expect(over.ok).toBe(false);
+    if (!over.ok) expect(over.reason).toBe('rate_limited');
+  });
+
+  // VEC-381 — too_many_concurrent zählt NICHT ins Sliding-Window (acquire pusht
+  // erst nach dem Concurrency-Check). Client-Retries kosten so kein Window-Budget.
+  it('verbraucht bei too_many_concurrent kein Fenster-Budget', () => {
+    const lim = new LiveCheckLimiter({ windowMs: 60_000, maxPerWindow: 5, maxConcurrent: 1 });
+    const t = 8_000_000;
+    expect(lim.acquire('u', t).ok).toBe(true); // 1 Fenster-Hit, Slot belegt
+    for (let i = 0; i < 10; i++) {
+      const r = lim.acquire('u', t); // jeweils too_many_concurrent
+      expect(r.ok).toBe(false);
+      if (!r.ok) expect(r.reason).toBe('too_many_concurrent');
+    }
+    lim.release('u');
+    // Trotz 10 abgewiesener Versuche sind erst 1 Fenster-Hit verbraucht → 4 frei.
+    for (let i = 0; i < 4; i++) {
+      const r = lim.acquire('u', t);
+      expect(r.ok).toBe(true);
+      lim.release('u');
+    }
+    const over = lim.acquire('u', t);
+    expect(over.ok).toBe(false);
+    if (!over.ok) expect(over.reason).toBe('rate_limited');
   });
 });
 
