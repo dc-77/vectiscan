@@ -23,7 +23,7 @@ import AppHeader from '@/components/AppHeader';
 const APP_PREFIXES = [
   '/dashboard', '/scan', '/scans', '/profile', '/schedules',
   '/subscribe', '/verify', '/welcome', '/admin',
-  '/subscription', '/subscriptions',
+  '/subscription', '/subscriptions', '/live-check',
 ];
 
 function isAppPath(pathname: string) {
@@ -89,6 +89,13 @@ function AdminIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
       <circle cx="12" cy="12" r="3" />
       <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+    </svg>
+  );
+}
+function ZapIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
     </svg>
   );
 }
@@ -194,6 +201,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   // ─── NAV-Items (rollenabhängig) ─────────────────────────────
   const primaryTabs: NavItem[] = [
     { href: '/dashboard', label: 'Dashboard', icon: <DashboardIcon />, mobileTab: true },
+    { href: '/live-check', label: 'Sofort-Check', icon: <ZapIcon />, mobileTab: false },
     { href: '/scans', label: 'Meine Scans', icon: <ScanListIcon />, mobileTab: true },
     { href: '/subscribe', label: 'Abos & Zeitpläne', icon: <SubscribeIcon />, mobileTab: true },
     { href: '/scan/new', label: 'Neuer Scan', icon: <PlusCircleIcon />, mobileTab: true },
