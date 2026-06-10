@@ -62,12 +62,19 @@ export function buildCsp(
 
   const connectSrc = connectParts.join(' ');
 
+  // img-src MUSS das API-Origin führen: Scan-Screenshots werden als <img> direkt
+  // vom Backend geladen (getHostScreenshotUrl → `${API_URL}/api/orders/.../screenshot/...`,
+  // cross-origin, da Frontend und API auf getrennten Subdomains laufen). Ohne das
+  // Origin blockt der Browser ALLE Report-Screenshots still (VEC-372 D1). Analog zur
+  // connect-src-Ableitung — relative Pfade/data: sind weiterhin von 'self'/data: gedeckt.
+  const imgSrc = ["'self'", 'data:', apiUrl].join(' ');
+
   return [
     "default-src 'self'",
     `connect-src ${connectSrc}`,
     `script-src 'self' 'nonce-${nonce}'`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data:",
+    `img-src ${imgSrc}`,
     "font-src 'self' data:",
     "object-src 'none'",
     "base-uri 'self'",

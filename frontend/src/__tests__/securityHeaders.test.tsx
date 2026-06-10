@@ -64,6 +64,20 @@ describe('VEC-166/VEC-186: Frontend Content-Security-Policy', () => {
     expect(connect.trim()).toBe("connect-src 'self' https://scan-api.vectigal.tech wss://scan-api.vectigal.tech");
   });
 
+  /**
+   * VEC-372 D1: Report-Screenshots werden als <img> direkt vom Backend-Origin
+   * geladen (cross-origin, da Frontend/API auf getrennten Subdomains laufen).
+   * Die DURCHGESETZTE CSP MUSS das API-Origin in img-src führen — sonst blockt
+   * der Browser ALLE gowitness-Screenshots still.
+   */
+  it('nimmt das API-Origin in img-src auf (Report-Screenshots, VEC-372)', () => {
+    const csp = buildCsp(NONCE, 'https://scan-api.vectigal.tech');
+    const imgSrc = csp.split(';').map((d) => d.trim()).find((d) => d.startsWith('img-src')) || '';
+    expect(imgSrc).toContain("'self'");
+    expect(imgSrc).toContain('data:');
+    expect(imgSrc).toContain('https://scan-api.vectigal.tech');
+  });
+
   it('belässt style-src bewusst auf unsafe-inline (Tailwind/next-font)', () => {
     const csp = buildCsp(NONCE);
     const styleSrc = csp.split(';').map((d) => d.trim()).find((d) => d.startsWith('style-src'));

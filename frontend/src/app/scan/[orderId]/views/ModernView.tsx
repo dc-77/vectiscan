@@ -30,6 +30,7 @@ import ValidationWarnings from '@/components/scan/ValidationWarnings';
 import { WebsiteGallery } from '@/components/scan/WebsiteGallery';
 import ViewSwitcher from '@/components/scan/ViewSwitcher';
 import PhaseTimeline from '@/components/scan/PhaseTimeline';
+import { reconcileSeverityCounts } from '@/lib/severityCounts';
 import StatusChip from '@/components/ds/StatusChip';
 import {
   getReportDownloadUrl,
@@ -103,7 +104,13 @@ export default function ModernView({
     return (findings?.findings ?? []).filter((f) => f.threat_intel && typeof f.threat_intel === 'object');
   }, [findings]);
 
-  const auditCounts = findings?.audit_severity_counts ?? findings?.severity_counts ?? null;
+  // VEC-372 D2: Übersicht/KpiBar zeigte im Produktiv-Report "7 Info" statt
+  // 1H/3M/2L/1I — das eingebettete severity_counts driftete von den gelisteten
+  // Findings. Severity-Verteilung deterministisch aus den tatsächlichen Findings
+  // ableiten (autoritative Trigger-Spalte mit Findings-Nachzählung abgleichen).
+  const auditCounts = findings
+    ? reconcileSeverityCounts(findings.audit_severity_counts ?? null, findings.findings ?? [])
+    : null;
   const policyVersion = findings?.policy_version ?? null;
   const policyIdDistinct = findings?.policy_id_distinct ?? null;
 

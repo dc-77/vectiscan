@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { FindingsData, Finding } from '@/lib/api';
 import SeverityCounts from './SeverityCounts';
+import { reconcileSeverityCounts } from '@/lib/severityCounts';
 import { cvssLabel } from '@/lib/utils';
 
 const SEVERITY_ORDER = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
@@ -48,8 +49,19 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
   const filtered = filter ? sorted.filter(f => f.severity?.toUpperCase() === filter) : sorted;
   const isBasic = data.package === 'basic' || data.package === 'webcheck';
 
+  // VEC-372 D2: Die Severity-Verteilung MUSS aus den tatsächlich gelisteten
+  // Findings stammen, nicht aus dem eingebetteten data.severity_counts (das im
+  // Produktiv-Report alle 7 Befunde fälschlich als INFO labelte → Risiko massiv
+  // untertrieben). reconcileSeverityCounts nimmt die autoritative Trigger-Spalte
+  // (audit_severity_counts) und gleicht sie gegen das findings-Array ab; bei Drift
+  // gewinnt die Nachzählung aus den gerenderten Findings (Ground Truth dieser Karte).
+  const baseCounts: Record<string, number> = reconcileSeverityCounts(
+    data.audit_severity_counts ?? null,
+    data.findings,
+  );
+
   // Compute adjusted severity counts (excluding manually excluded findings)
-  const adjustedCounts: Record<string, number> = { ...data.severity_counts };
+  const adjustedCounts: Record<string, number> = { ...baseCounts };
   if (excludedIds.length > 0) {
     for (const f of data.findings) {
       if (excludedIds.includes(f.id)) {
@@ -85,7 +97,7 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
           </span>
         </div>
         <div className="flex items-center gap-3 flex-1">
-          <SeverityCounts counts={hasExclusions ? adjustedCounts : data.severity_counts} />
+          <SeverityCounts counts={hasExclusions ? adjustedCounts : baseCounts} />
           {hasExclusionChanges && onRegenerateReport && (
             <button
               onClick={onRegenerateReport}
@@ -102,7 +114,11 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
       </div>
 
       {data.overall_description && (
-        <p className="text-sm text-slate-400 px-5 leading-relaxed">{data.overall_description}</p>
+        // VEC-372 D3: Befundtext kommt vom report-worker als Plain-Text mit
+        // \n\n-getrennten Absätzen. whitespace-pre-line erhält diese Absatz-
+        // umbrüche (kollabiert aber Inline-Whitespace) statt sie als einen
+        // einzigen Fliesstext-Block zu rendern.
+        <p className="text-sm text-slate-400 px-5 leading-relaxed whitespace-pre-line">{data.overall_description}</p>
       )}
 
       {/* Filter Pills */}
@@ -116,7 +132,7 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
           Alle ({data.findings.length})
         </button>
         {SEVERITY_ORDER.map(key => {
-          const count = data.severity_counts[key] || 0;
+          const count = baseCounts[key] || 0;
           if (count === 0) return null;
           return (
             <button
