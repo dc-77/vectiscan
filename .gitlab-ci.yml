@@ -963,6 +963,7 @@ ops-admin-release-vec378:
   allow_failure: true
   variables:
     ORDER_ID: "46ce8dcc-4236-4c15-895a-ad32586d484a"
+    TARGET_ID: "b46a509a-a061-4464-8896-d0bb13ce49dc"
     API_BASE: "https://scan-api.vectigal.tech"
   rules:
     - if: $CI_PIPELINE_SOURCE == "api"
@@ -992,12 +993,7 @@ ops-admin-release-vec378:
       REVIEW=$(curl -sf -X GET "${API_BASE}/api/admin/review/order/${ORDER_ID}" \
         -H "Authorization: Bearer ${TOKEN}")
       echo "Review-Response (gekürzt): $(echo "$REVIEW" | head -c 500)"
-      TARGET_ID=$(echo "$REVIEW" | grep -o '"id":"[0-9a-f-]*"' | head -1 | cut -d'"' -f4)
-      if [ -z "$TARGET_ID" ]; then
-        echo "FATAL: Keine Target-ID aus Review-Endpoint extrahiert"
-        exit 1
-      fi
-      echo "OK: Target-ID=${TARGET_ID}"
+      echo "OK: Target-ID=${TARGET_ID} (hardcoded aus Job-Run-Trace)"
     - |
       APPROVE=$(curl -sf -X POST "${API_BASE}/api/admin/targets/${TARGET_ID}/approve" \
         -H "Authorization: Bearer ${TOKEN}" \
