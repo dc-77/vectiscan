@@ -19,7 +19,11 @@ export interface LiveCheckLimits {
 
 export const DEFAULT_LIVE_CHECK_LIMITS: LiveCheckLimits = {
   windowMs: 60_000,
-  maxPerWindow: 20, // 20 Modul-Aufrufe/User/Minute (~1 Voll-Scan der BEHALTEN-Module)
+  // 40 Modul-Aufrufe/User/Minute = Headroom für 2 volle Scans der 20 BEHALTEN-
+  // Module. Ein Voll-Scan (20 Calls) + Reload/Retry sprengt das Fenster damit
+  // nicht mehr (VEC-381). too_many_concurrent zählt NICHT ins Fenster (acquire()
+  // pusht erst nach dem Concurrency-Check), Retries kosten also kein Window-Budget.
+  maxPerWindow: 40,
   maxConcurrent: 4,
 };
 

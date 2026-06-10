@@ -27,6 +27,83 @@ function authHeaders(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+// ---------------------------------------------------------------------------
+// Concurrency-/Retry-Parameter (VEC-381)
+// ---------------------------------------------------------------------------
+
+/**
+ * Maximale gleichzeitig laufende Modul-Aufrufe im Client.
+ * MUSS ≤ Server-Cap `liveCheckLimiter.maxConcurrent` (= 4) sein, damit der
+ * SofortScan nicht 16 Module sofort in ein 429 `too_many_concurrent` laufen
+ * lässt (VEC-381). Der gemeinsame Server-Slot wird erst in dessen `finally`
+ * freigegeben — die kleine Race zwischen Antwort und `release()` fängt der
+ * bounded Retry unten ab.
+ */
+export const CLIENT_CONCURRENCY = 4;
+
+/** Bounded Retries bei transientem `too_many_concurrent`. */
+const MAX_CONCURRENT_RETRIES = 4;
+/** Untergrenze des Backoffs; Server liefert retryAfter=2s, wir reagieren schneller. */
+const RETRY_BASE_MS = 400;
+/** Deckel pro Wartezeit, damit ein einzelnes Modul den Scan nicht ausbremst. */
+const RETRY_MAX_MS = 2_000;
+
+/** Abbruchbarer Sleep — lehnt mit AbortError ab, wenn das Signal feuert. */
+function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException('Aborted', 'AbortError'));
+      return;
+    }
+    const onAbort = () => {
+      clearTimeout(timer);
+      reject(new DOMException('Aborted', 'AbortError'));
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+/** 429-Body normalisieren: `{ error, retryAfter }` (siehe api/routes/live-check.ts). */
+async function parse429(res: Response): Promise<{ error: string | null; retryAfter: number | null }> {
+  try {
+    const body = await res.json();
+    return {
+      error: typeof body?.error === 'string' ? body.error : null,
+      retryAfter: typeof body?.retryAfter === 'number' ? body.retryAfter : null,
+    };
+  } catch {
+    return { error: null, retryAfter: null };
+  }
+}
+
+/**
+ * Worker-Pool mit fester Nebenläufigkeit: verarbeitet `items` mit höchstens
+ * `limit` gleichzeitig laufenden `worker`-Aufrufen. So respektiert der Client
+ * den Server-Concurrency-Cap, statt alle Module gleichzeitig zu feuern.
+ * `worker` darf NICHT werfen — Fehler/Abbruch behandelt der Aufrufer.
+ */
+export async function runPool<T>(
+  items: readonly T[],
+  limit: number,
+  worker: (item: T, index: number) => Promise<void>,
+): Promise<void> {
+  if (items.length === 0) return;
+  let cursor = 0;
+  const size = Math.max(1, Math.min(limit, items.length));
+  async function loop(): Promise<void> {
+    for (;;) {
+      const i = cursor++;
+      if (i >= items.length) return;
+      await worker(items[i], i);
+    }
+  }
+  await Promise.all(Array.from({ length: size }, () => loop()));
+}
+
 export async function fetchModules(): Promise<CheckModule[]> {
   const res = await fetch(`${API_URL}/api/live-check/modules`, {
     headers: authHeaders(),
@@ -41,29 +118,52 @@ export async function runModule(
   target: string,
   signal?: AbortSignal,
 ): Promise<Pick<CheckResult, 'status' | 'summary' | 'detail'>> {
-  let res: Response;
-  try {
-    res = await fetch(
-      `${API_URL}/api/live-check/run/${encodeURIComponent(moduleKey)}?target=${encodeURIComponent(target)}`,
-      { headers: authHeaders(), signal },
-    );
-  } catch {
-    return { status: 'error', summary: 'Nicht erreichbar', detail: null };
+  const url = `${API_URL}/api/live-check/run/${encodeURIComponent(moduleKey)}?target=${encodeURIComponent(target)}`;
+
+  // Bounded Retry-Loop nur für transientes `too_many_concurrent`. Jeder andere
+  // Ausgang (Erfolg, Fensterlimit, Fehler, Timeout) verlässt die Schleife sofort.
+  for (let attempt = 0; ; attempt++) {
+    let res: Response;
+    try {
+      res = await fetch(url, { headers: authHeaders(), signal });
+    } catch {
+      if (signal?.aborted) return { status: 'error', summary: 'Abgebrochen', detail: null };
+      return { status: 'error', summary: 'Nicht erreichbar', detail: null };
+    }
+
+    if (res.status === 429) {
+      const { error, retryAfter } = await parse429(res);
+      // Transient: der Concurrency-Slot ist gleich wieder frei → kurz warten,
+      // erneut versuchen. Fensterlimit (`rate_limited`) ist NICHT transient.
+      if (error === 'too_many_concurrent' && attempt < MAX_CONCURRENT_RETRIES) {
+        const waitMs = Math.min(
+          RETRY_MAX_MS,
+          Math.max(RETRY_BASE_MS, (retryAfter ?? 0) * 1000),
+        );
+        try {
+          await sleep(waitMs, signal);
+        } catch {
+          return { status: 'error', summary: 'Abgebrochen', detail: null };
+        }
+        continue;
+      }
+      // Fensterlimit erreicht oder Retries erschöpft → Meldung zeigen.
+      return { status: 'error', summary: 'Bitte warten (Rate-Limit)', detail: null };
+    }
+
+    if (res.status === 504) return { status: 'error', summary: 'Timeout', detail: null };
+    if (!res.ok) return { status: 'error', summary: 'Nicht verfügbar', detail: null };
+
+    let body: { success: boolean; data?: { result?: unknown } };
+    try {
+      body = await res.json();
+    } catch {
+      return { status: 'error', summary: 'Ungültige Antwort', detail: null };
+    }
+
+    if (!body.success) return { status: 'error', summary: 'Nicht verfügbar', detail: null };
+    return deriveStatus(moduleKey, body.data?.result);
   }
-
-  if (res.status === 429) return { status: 'error', summary: 'Bitte warten (Rate-Limit)', detail: null };
-  if (res.status === 504) return { status: 'error', summary: 'Timeout', detail: null };
-  if (!res.ok) return { status: 'error', summary: 'Nicht verfügbar', detail: null };
-
-  let body: { success: boolean; data?: { result?: unknown } };
-  try {
-    body = await res.json();
-  } catch {
-    return { status: 'error', summary: 'Ungültige Antwort', detail: null };
-  }
-
-  if (!body.success) return { status: 'error', summary: 'Nicht verfügbar', detail: null };
-  return deriveStatus(moduleKey, body.data?.result);
 }
 
 // ---------------------------------------------------------------------------

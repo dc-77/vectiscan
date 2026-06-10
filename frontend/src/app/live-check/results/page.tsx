@@ -18,6 +18,8 @@ import SeverityCounts from '@/components/SeverityCounts';
 import {
   fetchModules,
   runModule,
+  runPool,
+  CLIENT_CONCURRENCY,
   overallStatus,
   statusScore,
   GROUP_LABELS,
@@ -112,28 +114,30 @@ function useLiveCheck(target: string) {
       // Global 60s timeout
       const globalTimer = setTimeout(() => ctrl.abort(), 60_000);
 
-      await Promise.allSettled(
-        mods.map(async (m) => {
-          try {
-            const r = await runModule(m.key, target, ctrl.signal);
-            if (!ctrl.signal.aborted) {
-              setResults(prev => {
-                const next = new Map(prev);
-                next.set(m.key, { ...m, ...r });
-                return next;
-              });
-            }
-          } catch {
-            if (!ctrl.signal.aborted) {
-              setResults(prev => {
-                const next = new Map(prev);
-                next.set(m.key, { ...m, status: 'error', summary: 'Nicht verfügbar' });
-                return next;
-              });
-            }
+      // Worker-Pool statt allSettled über alle Module: höchstens
+      // CLIENT_CONCURRENCY (= Server-Cap 4) Modul-Aufrufe gleichzeitig, damit
+      // die übrigen nicht sofort in 429 too_many_concurrent laufen (VEC-381).
+      await runPool(mods, CLIENT_CONCURRENCY, async (m) => {
+        if (ctrl.signal.aborted) return;
+        try {
+          const r = await runModule(m.key, target, ctrl.signal);
+          if (!ctrl.signal.aborted) {
+            setResults(prev => {
+              const next = new Map(prev);
+              next.set(m.key, { ...m, ...r });
+              return next;
+            });
           }
-        }),
-      );
+        } catch {
+          if (!ctrl.signal.aborted) {
+            setResults(prev => {
+              const next = new Map(prev);
+              next.set(m.key, { ...m, status: 'error', summary: 'Nicht verfügbar' });
+              return next;
+            });
+          }
+        }
+      });
 
       clearTimeout(globalTimer);
 
