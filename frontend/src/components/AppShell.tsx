@@ -23,7 +23,7 @@ import AppHeader from '@/components/AppHeader';
 const APP_PREFIXES = [
   '/dashboard', '/scan', '/scans', '/profile', '/schedules',
   '/subscribe', '/verify', '/welcome', '/admin',
-  '/subscription',
+  '/subscription', '/subscriptions',
 ];
 
 function isAppPath(pathname: string) {
