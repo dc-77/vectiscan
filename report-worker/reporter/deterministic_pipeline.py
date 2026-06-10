@@ -290,6 +290,23 @@ def apply_deterministic_pipeline(claude_output: dict,
     claude_output["additional_findings_summary"] = _build_additional_findings_full_body(
         findings_in, sel.additional,
     )
+
+    # 5d. CVE-Referenz-Guard (VEC-377): KI-genannte CVE-IDs gegen die
+    # autoritative NVD/KEV/EPSS-Anreicherung + kuratierte Build-Tabellen
+    # validieren. Nicht auflösbare (halluzinierte) CVE-IDs werden im Text
+    # durch einen neutralen Marker ersetzt — die Vulnerability-Klasse bleibt
+    # erhalten, nur die unbelegte CVE-Referenz wird zurueckgehalten.
+    from reporter.cve_guard import apply_cve_guard
+    cve_stats = apply_cve_guard(
+        claude_output, enrichment=sc.get("enrichment"),
+    )
+    claude_output["cve_guard_stats"] = cve_stats
+    if cve_stats["removed_count"]:
+        log.info("cve_guard_applied",
+                 removed=cve_stats["removed_count"],
+                 distinct=cve_stats["distinct_removed"],
+                 allowlist_size=cve_stats["allowlist_size"])
+
     # Audit-Felder
     claude_output["policy_version"] = POLICY_VERSION
     claude_output["policy_id_distinct"] = sorted({

@@ -117,6 +117,11 @@ Spec: `docs/deterministic/`. Stand: produktiv ab Migration 016/017.
 - **Selection** (`reporter/selection.py`) konsolidiert über Hosts und wählt
   Top-N pro Paket: WebCheck 8, Perimeter 15, Compliance 20, SupplyChain 15,
   Insurance 15. Stable-Sort mit `finding_id` als Tiebreaker.
+- **CVE-Guard** (`reporter/cve_guard.py`, VEC-377) — validiert alle KI-genannten
+  CVE-IDs gegen die autoritative Allowlist (Phase-3-`enrichment`-Keys NVD/KEV/EPSS
+  + kuratierte Build-Tabellen). Nicht auflösbare (halluzinierte) CVE-Referenzen
+  werden im Text durch „nicht verifizierte CVE-Referenz" ersetzt, die
+  Vulnerability-Klasse bleibt erhalten. Stats in `claude_output["cve_guard_stats"]`.
 - **AI-Cache** (`scan-worker/scanner/ai_cache.py`,
   `report-worker/reporter/ai_cache.py`) — alle 5 KI-Calls laufen mit
   `temperature=0.0` durch Redis-Cache; Hash inkl. `POLICY_VERSION` (Auto-
