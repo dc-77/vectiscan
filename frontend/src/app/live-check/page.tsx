@@ -4,9 +4,10 @@
 // Route: /live-check (post-login, AppShell)
 // VEC-366 — UX nach VEC-365 §2
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { isLoggedIn } from '@/lib/auth';
 
 function ZapIcon() {
   return (
@@ -39,6 +40,12 @@ export default function LiveCheckPage() {
   const [target, setTarget] = useState('');
   const [touched, setTouched] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      router.replace('/login');
+    }
+  }, [router]);
 
   const valid = isValidTarget(target);
   const showError = touched && target.trim().length > 0 && !valid;

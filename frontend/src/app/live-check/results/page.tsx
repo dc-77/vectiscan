@@ -7,6 +7,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { isLoggedIn } from '@/lib/auth';
 
 import CheckTile from '@/components/ds/CheckTile';
 import LiveCheckProgress from '@/components/ds/LiveCheckProgress';
@@ -171,6 +172,99 @@ function buildSeverityCounts(results: Map<string, CheckResult>): Record<string, 
 }
 
 // ---------------------------------------------------------------------------
+// Detail line extraction (drives CheckTile progressive disclosure)
+// ---------------------------------------------------------------------------
+
+function extractDetailLines(result: CheckResult): string[] {
+  if (!result.detail || typeof result.detail !== 'object' || Array.isArray(result.detail)) return [];
+  const r = result.detail as Record<string, unknown>;
+  const lines: string[] = [];
+
+  switch (result.key) {
+    case 'http-headers': {
+      const missing = Array.isArray(r.missingHeaders) ? (r.missingHeaders as string[]) : [];
+      missing.slice(0, 3).forEach(h => lines.push(`Fehlt: ${h}`));
+      break;
+    }
+    case 'cookies': {
+      const ins: unknown[] = Array.isArray(r.insecureCookies) ? r.insecureCookies
+        : Array.isArray(r.unsecureCookies) ? r.unsecureCookies : [];
+      ins.slice(0, 3).forEach(c => {
+        const name = typeof c === 'object' && c !== null && 'name' in c
+          ? (c as { name: string }).name : String(c);
+        lines.push(`Cookie: ${name}`);
+      });
+      break;
+    }
+    case 'ports': {
+      const ports: unknown[] = Array.isArray(r.ports) ? r.ports
+        : Array.isArray(r.openPorts) ? r.openPorts : [];
+      ports.slice(0, 3).forEach(p => {
+        if (typeof p === 'number') { lines.push(`Port ${p}`); return; }
+        if (typeof p === 'object' && p !== null) {
+          const obj = p as Record<string, unknown>;
+          const num = obj.port ?? obj.portNumber ?? '';
+          const svc = typeof obj.service === 'string' ? obj.service : '';
+          lines.push(`Port ${num}${svc ? ` (${svc})` : ''}`);
+        }
+      });
+      break;
+    }
+    case 'ssl': {
+      if (typeof r.issuer === 'string') lines.push(`Aussteller: ${r.issuer}`);
+      if (typeof r.subject === 'string') lines.push(`Domain: ${r.subject}`);
+      if (typeof r.daysUntilExpiry === 'number') lines.push(`Gültig noch: ${r.daysUntilExpiry} Tage`);
+      break;
+    }
+    case 'tls': {
+      const protos = Array.isArray(r.supportedProtocols) ? (r.supportedProtocols as string[]) : [];
+      protos.slice(0, 3).forEach(p => lines.push(p));
+      break;
+    }
+    case 'dns': {
+      const recs: unknown[] = Array.isArray(r.dns) ? r.dns : [];
+      recs.slice(0, 3).forEach(d => {
+        if (typeof d === 'object' && d !== null) {
+          const obj = d as Record<string, unknown>;
+          const val = obj.address ?? obj.value ?? obj.data ?? '';
+          lines.push(`${obj.type ?? '?'}: ${val}`);
+        }
+      });
+      break;
+    }
+    case 'redirects': {
+      const chain: unknown[] = Array.isArray(r.redirects) ? r.redirects : [];
+      chain.slice(0, 3).forEach(s => {
+        if (typeof s === 'string') lines.push(s);
+        else if (typeof s === 'object' && s !== null && 'url' in s) lines.push((s as { url: string }).url);
+      });
+      break;
+    }
+    case 'mail-config': {
+      if (!r.spf && !r.hasSPF) lines.push('SPF nicht konfiguriert');
+      if (!r.dkim && !r.hasDKIM) lines.push('DKIM nicht konfiguriert');
+      if (!r.dmarc && !r.hasDMARC) lines.push('DMARC nicht konfiguriert');
+      break;
+    }
+    case 'threats': {
+      if (typeof r.totalThreats === 'number' && r.totalThreats > 0)
+        lines.push(`${r.totalThreats} Bedrohung${r.totalThreats !== 1 ? 'en' : ''} erkannt`);
+      if (Array.isArray(r.sources)) (r.sources as string[]).slice(0, 2).forEach(s => lines.push(s));
+      break;
+    }
+    case 'block-lists': {
+      if (typeof r.listedOn === 'number' && r.listedOn > 0)
+        lines.push(`Auf ${r.listedOn} Blockliste${r.listedOn !== 1 ? 'n' : ''} gelistet`);
+      break;
+    }
+    default:
+      break;
+  }
+
+  return lines;
+}
+
+// ---------------------------------------------------------------------------
 // Screenshot rendering
 // ---------------------------------------------------------------------------
 
@@ -178,10 +272,10 @@ function ScreenshotSection({ result }: { result: CheckResult }) {
   const r = result.detail as Record<string, unknown> | null;
   if (!r) return null;
 
+  // Only data: URIs render inline — external URLs would be blocked by CSP img-src 'self' data:
   const src: string | null =
     typeof r.screenshot === 'string' ? r.screenshot
     : typeof r.image === 'string' ? r.image
-    : typeof r.url === 'string' ? r.url
     : null;
 
   if (!src) {
@@ -199,7 +293,8 @@ function ScreenshotSection({ result }: { result: CheckResult }) {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
-        alt={`Screenshot`}
+        alt="Screenshot"
+        onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
         className="rounded-lg overflow-hidden border border-slate-700 w-full max-h-64 object-cover object-top"
       />
     </div>
@@ -216,6 +311,13 @@ export default function LiveCheckResultsPage() {
   const target = searchParams.get('target') ?? '';
 
   const { modules, results, phase, done, total, abort } = useLiveCheck(target);
+
+  // Auth guard — must be logged in to access live-check
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      router.replace('/login');
+    }
+  }, [router]);
 
   // Redirect to input if no target
   useEffect(() => {
@@ -370,6 +472,7 @@ export default function LiveCheckResultsPage() {
                     label={r.label}
                     status={r.status}
                     summary={r.summary}
+                    detailLines={extractDetailLines(r)}
                   />
                 ))}
               </div>
