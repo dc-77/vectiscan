@@ -172,7 +172,7 @@ services:
   # KEIN proxy-net — ausschließlich über die /api/live-check/*-Fassade der
   # API erreichbar. Keys/Tokens als ENV (leer = Modul degradiert sauber).
   webcheck-core:
-    image: lissy93/web-check:v2.1.9
+    image: lissy93/web-check:2.1.9@sha256:fa26f4dc781a187fb3f9e4958c7faee29af628e2fc78a335930e0c3ad28d5acd
     restart: unless-stopped
     environment:
       PORT: "3000"
