@@ -31,9 +31,10 @@ const PACKAGES: PackageInfo[] = PACKAGE_CATALOG.map((pkg) => ({
   accentColor: pkg.accentColor,
 }));
 
+// '15 Hosts' entfernt — maxHosts wird pro Karte angezeigt (VEC-348 Bug-Fix).
 const SHARED_CAPABILITIES = [
   'Port-Analyse', 'Passive Aufklärung', 'Schwachstellen-Scan', 'Webserver-Analyse', 'Verzeichnis-Scan',
-  'Skript-Injection-Test', 'Bedrohungsanalyse', 'KI-Korrelation', '15 Hosts',
+  'Skript-Injection-Test', 'Bedrohungsanalyse', 'KI-Korrelation',
 ];
 
 interface Props {
@@ -48,7 +49,7 @@ function CheckCircle({ color }: { color: string }) {
       style={{ backgroundColor: color }}
     >
       <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M2.5 6L5 8.5L9.5 3.5" stroke="var(--slate)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </span>
   );
@@ -64,7 +65,7 @@ export default function PackageSelector({ selected, onSelect }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {quickPkgs.map((pkg) => {
           const isSelected = selected === pkg.key;
-          const borderColor = isSelected ? pkg.accentColor : '#334155';
+          const borderColor = isSelected ? pkg.accentColor : 'var(--border-muted)';
           return (
             <div
               key={pkg.key}
@@ -74,7 +75,7 @@ export default function PackageSelector({ selected, onSelect }: Props) {
               aria-pressed={isSelected}
               onClick={() => onSelect(pkg.key)}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(pkg.key); } }}
-              className="relative w-full rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
+              className="relative w-full rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[var(--surface)] hover:bg-[var(--surface-2)]"
               style={{
                 borderWidth: '2px',
                 borderStyle: 'solid',
@@ -86,7 +87,7 @@ export default function PackageSelector({ selected, onSelect }: Props) {
               {pkg.badge && (
                 <span
                   className="absolute -top-2.5 left-4 text-xs font-bold px-3 py-0.5 rounded-full"
-                  style={{ backgroundColor: pkg.badgeColor || pkg.accentColor, color: '#0F172A' }}
+                  style={{ backgroundColor: pkg.badgeColor || pkg.accentColor, color: 'var(--slate)' }}
                 >
                   {pkg.badge}
                 </span>
@@ -95,15 +96,15 @@ export default function PackageSelector({ selected, onSelect }: Props) {
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="text-2xl shrink-0">&#9889;</span>
                   <div className="min-w-0">
-                    <h3 className="text-white font-semibold text-base">{pkg.title}</h3>
-                    <p className="text-[#94A3B8] text-sm mt-0.5">{pkg.subtitle}</p>
+                    <h3 className="text-[var(--text)] font-semibold text-base">{pkg.title}</h3>
+                    <p className="text-[var(--text-muted)] text-sm mt-0.5">{pkg.subtitle}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:ml-auto shrink-0">
-                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8]">
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[var(--surface-inset)] text-[var(--text-muted)]">
                     {pkg.duration}
                   </span>
-                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#334155] text-[#94A3B8]">
+                  <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[var(--surface-inset)] text-[var(--text-muted)]">
                     max {pkg.hosts} Hosts
                   </span>
                 </div>
@@ -115,20 +116,20 @@ export default function PackageSelector({ selected, onSelect }: Props) {
 
       {/* ── Divider ─────────────────────────────────────────── */}
       <div className="flex items-center gap-3">
-        <div className="flex-1 h-px bg-[#1E3A5F]" />
-        <span className="text-[10px] font-mono uppercase tracking-widest text-[#475569]">
+        <div className="flex-1 h-px bg-[var(--border-subtle)]" />
+        <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--text-dim)]">
           Full Perimeter Scan
         </span>
-        <div className="flex-1 h-px bg-[#1E3A5F]" />
+        <div className="flex-1 h-px bg-[var(--border-subtle)]" />
       </div>
-      <p className="text-center text-xs text-[#64748B] -mt-3">
+      <p className="text-center text-xs text-[var(--text-dim)] -mt-3">
         Alle 4 Varianten scannen identisch — der Report-Typ macht den Unterschied.
       </p>
 
       {/* ── Shared Capabilities ─────────────────────────────── */}
       <div className="flex flex-wrap gap-1.5 justify-center">
         {SHARED_CAPABILITIES.map((cap) => (
-          <span key={cap} className="text-[11px] text-[#64748B] bg-[#0F172A] px-2 py-0.5 rounded">
+          <span key={cap} className="text-[11px] text-[var(--text-dim)] bg-[var(--surface)] px-2 py-0.5 rounded">
             {cap}
           </span>
         ))}
@@ -138,7 +139,7 @@ export default function PackageSelector({ selected, onSelect }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {perimeterPkgs.map((pkg) => {
           const isSelected = selected === pkg.key;
-          const borderColor = isSelected ? pkg.accentColor : (pkg.key === 'perimeter' ? `${pkg.accentColor}30` : '#334155');
+          const borderColor = isSelected ? pkg.accentColor : (pkg.key === 'perimeter' ? `${pkg.accentColor}30` : 'var(--border-muted)');
 
           return (
             <div
@@ -149,7 +150,7 @@ export default function PackageSelector({ selected, onSelect }: Props) {
               aria-pressed={isSelected}
               onClick={() => onSelect(pkg.key)}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(pkg.key); } }}
-              className="relative rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[#1E293B] hover:bg-[#253347]"
+              className="relative rounded-xl p-4 cursor-pointer transition-all duration-200 bg-[var(--surface)] hover:bg-[var(--surface-2)]"
               style={{
                 borderWidth: '2px',
                 borderStyle: 'solid',
@@ -163,7 +164,7 @@ export default function PackageSelector({ selected, onSelect }: Props) {
                   className={`absolute -top-2.5 left-4 font-bold px-3 py-0.5 rounded-full ${
                     pkg.key === 'perimeter' ? 'text-sm px-4' : 'text-xs'
                   }`}
-                  style={{ backgroundColor: pkg.badgeColor, color: '#0F172A' }}
+                  style={{ backgroundColor: pkg.badgeColor, color: 'var(--slate)' }}
                   data-testid={`badge-${pkg.key}`}
                 >
                   {pkg.badge}
@@ -175,15 +176,15 @@ export default function PackageSelector({ selected, onSelect }: Props) {
 
               {/* Content */}
               <div className="mt-2">
-                <h3 className="text-white font-semibold text-base">{pkg.title}</h3>
-                <p className="text-[#94A3B8] text-xs mt-1">{pkg.subtitle}</p>
+                <h3 className="text-[var(--text)] font-semibold text-base">{pkg.title}</h3>
+                <p className="text-[var(--text-muted)] text-xs mt-1">{pkg.subtitle}</p>
 
                 {/* Duration + Hosts */}
                 <div className="flex items-center gap-2 mt-2.5">
-                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#334155] text-[#94A3B8]">
+                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[var(--surface-inset)] text-[var(--text-muted)]">
                     {pkg.duration}
                   </span>
-                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#334155] text-[#94A3B8]">
+                  <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[var(--surface-inset)] text-[var(--text-muted)]">
                     max {pkg.hosts} Hosts
                   </span>
                 </div>
@@ -193,7 +194,7 @@ export default function PackageSelector({ selected, onSelect }: Props) {
                   {pkg.reportFocus.map((item) => (
                     <li
                       key={item}
-                      className="text-xs text-[#CBD5E1] pl-3"
+                      className="text-xs text-[var(--text-muted)] pl-3"
                       style={{ borderLeft: `2px solid ${pkg.accentColor}40` }}
                     >
                       {item}
