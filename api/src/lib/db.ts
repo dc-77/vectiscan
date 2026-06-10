@@ -46,6 +46,7 @@ const MIGRATION_036_PATH = path.join(__dirname, '..', 'migrations', '036_reports
 const MIGRATION_037_PATH = path.join(__dirname, '..', 'migrations', '037_webcheck_marketing_consent.sql');
 const MIGRATION_038_PATH = path.join(__dirname, '..', 'migrations', '038_webcheck_consent_not_given.sql');
 const MIGRATION_039_PATH = path.join(__dirname, '..', 'migrations', '039_user_authorization_consent.sql');
+const MIGRATION_040_PATH = path.join(__dirname, '..', 'migrations', '040_live_check_audit.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -609,6 +610,25 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 039 FAILED (continuing without it):', err);
+  }
+
+  // Migration 040 (VEC-363): Live-Check-Scan-Audit-Log (live_check_audit).
+  // Idempotent: nur anwenden, wenn die Tabelle noch fehlt.
+  try {
+    const liveCheckAuditCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables
+        WHERE table_name = 'live_check_audit'
+      ) AS exists
+    `);
+    if (!liveCheckAuditCheck.rows[0].exists) {
+      console.log('[initDb] Applying Migration 040: live_check_audit');
+      const migrationSql = fs.readFileSync(MIGRATION_040_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 040 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 040 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

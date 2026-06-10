@@ -1,0 +1,39 @@
+VectiScan — Third-Party Notices
+================================
+
+Dieses Produkt enthält bzw. betreibt Software Dritter. Die folgenden Hinweise
+erfüllen die Namensnennungs-Pflichten der jeweiligen Lizenzen.
+
+--------------------------------------------------------------------------------
+web-check (Live-Check / "SofortScan"-Kern, betrieben als interner Service
+`webcheck-core`, VEC-360 / VEC-363)
+--------------------------------------------------------------------------------
+
+Projekt: Lissy93/web-check  (https://github.com/Lissy93/web-check)
+Lizenz:  MIT License
+
+MIT License
+
+Copyright (c) 2023 Alicia Sykes
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Hinweis zum Modul-Schnitt: VectiScan reicht nur einen kuratierten Teil der
+web-check-Module durch (BEHALTEN-Liste, VEC-360 §7). Der GPL-lizenzierte
+Tech-Stack-Detektor (wappalyzer) wird NICHT angeboten (Spike VEC-362).
