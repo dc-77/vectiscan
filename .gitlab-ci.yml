@@ -1265,7 +1265,12 @@ ops-verify-crm-vec328:
   script:
     - cd ${DEPLOY_PATH}
     - docker compose exec -T api sh -c 'echo CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL}' || echo api-nicht-erreichbar
-    - docker logs --tail 3000 vectiscan-api-1 2>&1 | grep "crm-lookup-failed" | tail -5 || echo PASS-kein-crm-lookup-failed
+    - echo "=== CRM_API_KEY Laenge (kein Wert) ==="
+    - docker compose exec -T api sh -c 'klen=${#CRM_API_KEY}; echo "CRM_API_KEY length=${klen:-0}"' || echo api-nicht-erreichbar
+    - echo "=== HTTP-Status Twenty REST /rest/people (direkt aus api-Container) ==="
+    - docker compose exec -T api sh -c 'curl -s -o /tmp/crm_resp.json -w "HTTP_STATUS:%{http_code}" -H "Authorization: Bearer $CRM_API_KEY" -H "Content-Type: application/json" http://vectiscan-twenty-server-1:3000/rest/people 2>&1 && echo "" && head -c 300 /tmp/crm_resp.json' || echo api-nicht-erreichbar
+    - echo "=== crm.ts WARN logs (HTTP-Status bei lookup failed) ==="
+    - docker logs --tail 3000 vectiscan-api-1 2>&1 | grep -E '"msg":"CRM upsert: lookup failed|crm-lookup-failed' | tail -10 || echo PASS-kein-crm-lookup-failed
 
 # =============================================================================
 # ops-e2e-vec387: Post-Deploy-Runtime-Beleg CRM-Upsert via interner URL (VEC-387).
