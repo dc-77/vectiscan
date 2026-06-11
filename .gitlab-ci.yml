@@ -1382,19 +1382,33 @@ ops-rotate-crm-api-key:
       # -e PGPASSWORD (ohne =Wert) reicht die Job-Env in den Container; Wert wird nie geloggt.
       PSQL="docker exec -e PGPASSWORD ${DB_CTR} psql -U twenty -d twenty -tAc"
 
-      # ── 2) Schema-Discovery ─────────────────────────────────────────────
+      # ── 2) Schema-Discovery (mit Auto-Create falls Tabelle fehlt) ──────
       echo "Suche workspace-Schema mit apiKey-Tabelle ..."
       APIKEY_ROW=$(${PSQL} "SELECT table_schema||'|'||table_name FROM information_schema.tables WHERE LOWER(table_name)='apikey' AND table_schema LIKE 'workspace_%' ORDER BY table_schema LIMIT 1")
       if [ -z "${APIKEY_ROW}" ]; then
-        echo "FATAL: Keine apiKey-Tabelle (case-insensitive) in einem workspace_*-Schema gefunden. Vorhandene Schemata:"
-        ${PSQL} "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'workspace_%'"
-        echo "Vorhandene Tabellen im ersten workspace-Schema:"
-        FIRST_SCHEMA=$(${PSQL} "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'workspace_%' ORDER BY schema_name LIMIT 1")
-        [ -n "${FIRST_SCHEMA}" ] && ${PSQL} "SELECT table_name FROM information_schema.tables WHERE table_schema='${FIRST_SCHEMA}' ORDER BY table_name"
-        exit 1
+        echo "  apiKey-Tabelle nicht gefunden — ermittle erstes workspace_*-Schema fuer Auto-Create ..."
+        APIKEY_SCHEMA=$(${PSQL} "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'workspace_%' ORDER BY schema_name LIMIT 1")
+        if [ -z "${APIKEY_SCHEMA}" ]; then
+          echo "FATAL: Kein workspace_*-Schema in der Datenbank vorhanden."
+          exit 1
+        fi
+        APIKEY_TABLE="apiKey"
+        echo "  Lege Tabelle \"${APIKEY_TABLE}\" in Schema \"${APIKEY_SCHEMA}\" an (Twenty-Standard-Schema) ..."
+        ${PSQL} "CREATE TABLE IF NOT EXISTS \"${APIKEY_SCHEMA}\".\"${APIKEY_TABLE}\" (
+          \"id\"         UUID        NOT NULL DEFAULT gen_random_uuid(),
+          \"name\"       TEXT        NOT NULL DEFAULT '',
+          \"expiresAt\"  TIMESTAMPTZ,
+          \"revokedAt\"  TIMESTAMPTZ,
+          \"createdAt\"  TIMESTAMPTZ NOT NULL DEFAULT now(),
+          \"updatedAt\"  TIMESTAMPTZ NOT NULL DEFAULT now(),
+          \"deletedAt\"  TIMESTAMPTZ,
+          CONSTRAINT \"PK_apiKey\" PRIMARY KEY (\"id\")
+        );"
+        echo "  Tabelle angelegt."
+      else
+        APIKEY_SCHEMA=$(echo "${APIKEY_ROW}" | cut -d'|' -f1)
+        APIKEY_TABLE=$(echo "${APIKEY_ROW}" | cut -d'|' -f2)
       fi
-      APIKEY_SCHEMA=$(echo "${APIKEY_ROW}" | cut -d'|' -f1)
-      APIKEY_TABLE=$(echo "${APIKEY_ROW}" | cut -d'|' -f2)
       echo "  apiKey-Schema: ${APIKEY_SCHEMA}, Tabelle: ${APIKEY_TABLE}"
 
       WS_SUFFIX=${APIKEY_SCHEMA#workspace_}
