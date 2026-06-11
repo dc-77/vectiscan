@@ -14,10 +14,14 @@ export type DetailBlock =
   | {
       type: 'kv';
       items: { key: string; value: string; badge?: BadgeVariant }[];
+      /** Lange Blöcke (>8 Items) in scrollbaren Container (VEC-399) */
+      scrollable?: boolean;
     }
   | {
       type: 'list';
       items: { text: string; badge?: BadgeVariant }[];
+      /** Lange Blöcke (>8 Items) in scrollbaren Container (VEC-399) */
+      scrollable?: boolean;
     }
   | {
       type: 'badge-row';
@@ -36,6 +40,8 @@ interface CheckTileProps {
   hiddenCount?: number;
   /** Übersteuert lokalen expanded-State (für "Alle aufklappen") */
   forceExpanded?: boolean;
+  /** Anchor-id für Severity-Drilldown-Scroll (VEC-399): id="tile-{tileId}" */
+  tileId?: string;
   className?: string;
 }
 
@@ -119,38 +125,49 @@ function Pill({ variant, children }: { variant: BadgeVariant; children?: React.R
   );
 }
 
+// Lange Blöcke (>8 Items, scrollable) bekommen einen begrenzten Scroll-Container,
+// statt Daten abzuschneiden (VEC-399, Tesler's Law: Komplexität liegt im Datensatz).
+function ScrollWrap({ scrollable, children }: { scrollable?: boolean; children: React.ReactNode }) {
+  if (!scrollable) return <>{children}</>;
+  return <div className="max-h-48 overflow-y-auto pr-1">{children}</div>;
+}
+
 function DetailBlockView({ block }: { block: DetailBlock }) {
   switch (block.type) {
     case 'kv':
       return (
-        <div className="space-y-1.5">
-          {block.items.map((it, i) => (
-            <div key={i} className="flex items-center gap-3 text-xs">
-              <span className="shrink-0 text-slate-500">{it.key}</span>
-              <span className="flex-1 min-w-0 flex items-center justify-end gap-1.5">
-                <span className="min-w-0 truncate font-mono text-slate-200">{it.value}</span>
-                {it.badge && <Pill variant={it.badge} />}
-              </span>
-            </div>
-          ))}
-        </div>
+        <ScrollWrap scrollable={block.scrollable}>
+          <div className="space-y-1.5">
+            {block.items.map((it, i) => (
+              <div key={i} className="flex items-center gap-3 text-xs">
+                <span className="shrink-0 text-slate-500">{it.key}</span>
+                <span className="flex-1 min-w-0 flex items-center justify-end gap-1.5">
+                  <span className="min-w-0 truncate font-mono text-slate-200">{it.value}</span>
+                  {it.badge && <Pill variant={it.badge} />}
+                </span>
+              </div>
+            ))}
+          </div>
+        </ScrollWrap>
       );
     case 'list':
       return (
-        <ul className="space-y-1">
-          {block.items.map((it, i) => (
-            <li key={i} className="flex items-start gap-2 text-xs text-slate-400">
-              {it.badge ? (
-                <span className={`mt-0.5 shrink-0 ${BADGE_META[it.badge].text}`} aria-hidden>
-                  {BADGE_META[it.badge].glyph || '›'}
-                </span>
-              ) : (
-                <span className="mt-0.5 shrink-0 text-slate-600" aria-hidden>›</span>
-              )}
-              <span className="min-w-0 break-words">{it.text}</span>
-            </li>
-          ))}
-        </ul>
+        <ScrollWrap scrollable={block.scrollable}>
+          <ul className="space-y-1">
+            {block.items.map((it, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-slate-400">
+                {it.badge ? (
+                  <span className={`mt-0.5 shrink-0 ${BADGE_META[it.badge].text}`} aria-hidden>
+                    {BADGE_META[it.badge].glyph || '›'}
+                  </span>
+                ) : (
+                  <span className="mt-0.5 shrink-0 text-slate-600" aria-hidden>›</span>
+                )}
+                <span className="min-w-0 break-words">{it.text}</span>
+              </li>
+            ))}
+          </ul>
+        </ScrollWrap>
       );
     case 'badge-row':
       return (
@@ -167,7 +184,7 @@ function DetailBlockView({ block }: { block: DetailBlock }) {
 
 export default function CheckTile({
   label, status, summary, detail, detailLines = [], hiddenCount = 0,
-  forceExpanded, className = '',
+  forceExpanded, tileId, className = '',
 }: CheckTileProps) {
   const [localExpanded, setLocalExpanded] = useState(false);
   const meta = STATUS_META[status] ?? STATUS_META.error;
@@ -187,7 +204,8 @@ export default function CheckTile({
 
   return (
     <div
-      className={`bg-slate-800 border border-slate-700 rounded-lg ${meta.borderClass} ${className}`}
+      id={tileId ? `tile-${tileId}` : undefined}
+      className={`bg-slate-800 border border-slate-700 rounded-lg ${meta.borderClass} ${className} scroll-mt-4`}
       style={{ opacity: isLoading ? 0.85 : 1 }}
     >
       <button

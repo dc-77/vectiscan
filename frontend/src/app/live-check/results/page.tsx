@@ -14,6 +14,7 @@ import LiveCheckProgress from '@/components/ds/LiveCheckProgress';
 import CTAStaircase from '@/components/ds/CTAStaircase';
 import StateView from '@/components/ds/StateView';
 import SeverityCounts from '@/components/SeverityCounts';
+import SeverityDrilldown from '@/components/ds/SeverityDrilldown';
 
 import {
   fetchModules,
@@ -234,7 +235,9 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
   if (!r) return { detail: [], hiddenCount: 0 };
 
   const detail: DetailBlock[] = [];
-  let hiddenCount = 0;
+  // VEC-399: Caps entfernt — alle Rohdaten frei sichtbar; hiddenCount bleibt 0
+  // (Prop für Backwards-Compat behalten, wird nach diesem Spec nie > 0).
+  const hiddenCount = 0;
 
   switch (result.key) {
     case 'ssl': {
@@ -243,16 +246,24 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
       const subject = asStr(r.subject);
       const validTo = asStr(r.validTo) ?? asStr(r.validUntil);
       const days = asNum(r.daysUntilExpiry);
+      const sigAlgo = asStr(r.signatureAlgorithm) ?? asStr(r.sigalg);
+      const keySize = asNum(r.keySize) ?? asNum(r.bits);
       if (issuer) kv.push({ key: 'Aussteller', value: issuer });
       if (subject) kv.push({ key: 'Domain', value: subject });
       if (validTo) kv.push({ key: 'Gültig bis', value: validTo });
       if (days !== undefined) kv.push({ key: 'Noch gültig', value: `${days} Tage`, badge: expiryVariant(days) });
+      if (sigAlgo) kv.push({ key: 'Signatur', value: sigAlgo });
+      if (keySize !== undefined) kv.push({ key: 'Schlüssellänge', value: `${keySize} bit` });
+      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      // Alle SANs — eine Zeile je SAN, scrollbar ab 8 (VEC-399, kein slice)
       const sans = asArr(r.altNames).filter((s): s is string => typeof s === 'string');
       if (sans.length > 0) {
-        kv.push({ key: 'SANs', value: sans.slice(0, 3).join(', ') });
-        hiddenCount += Math.max(0, sans.length - 3);
+        detail.push({
+          type: 'kv',
+          items: sans.map(s => ({ key: 'SAN', value: s })),
+          scrollable: sans.length > 8,
+        });
       }
-      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
       break;
     }
 
@@ -267,8 +278,13 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
       if (typeof r.forwardSecrecy === 'boolean')
         kv.push({ key: 'Forward Secrecy', value: r.forwardSecrecy ? 'aktiv' : 'inaktiv', badge: r.forwardSecrecy ? 'ok' : 'warn' });
       if (kv.length > 0) detail.push({ type: 'kv', items: kv });
-      const ciphers = asArr(r.cipherSuites).length || asArr(r.ciphers).length;
-      hiddenCount += ciphers;
+      // Cipher Suites vollständig als scrollbare Liste (VEC-399, vorher nur gezählt+gated)
+      const ciphers = (asArr(r.cipherSuites).length > 0 ? asArr(r.cipherSuites) : asArr(r.ciphers))
+        .map(c => asStr(c) ?? asStr(asObj(c)?.name) ?? asStr(asObj(c)?.cipher))
+        .filter((s): s is string => !!s);
+      if (ciphers.length > 0) {
+        detail.push({ type: 'list', items: ciphers.map(c => ({ text: c })), scrollable: ciphers.length > 8 });
+      }
       break;
     }
 
@@ -292,12 +308,18 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
         ? SEC_HEADERS.filter(h => Object.keys(headersObj).some(k => k.toLowerCase() === h.toLowerCase()))
         : [];
       if (present.length > 0) {
-        detail.push({ type: 'list', items: present.slice(0, 4).map(h => ({ text: h, badge: 'ok' as BadgeVariant })) });
-        hiddenCount += Math.max(0, present.length - 4);
+        detail.push({
+          type: 'list',
+          items: present.map(h => ({ text: h, badge: 'ok' as BadgeVariant })),
+          scrollable: present.length > 8,
+        });
       }
       if (missing.length > 0) {
-        detail.push({ type: 'list', items: missing.slice(0, 5).map(h => ({ text: h, badge: 'fail' as BadgeVariant })) });
-        hiddenCount += Math.max(0, missing.length - 5);
+        detail.push({
+          type: 'list',
+          items: missing.map(h => ({ text: h, badge: 'fail' as BadgeVariant })),
+          scrollable: missing.length > 8,
+        });
       }
       break;
     }
@@ -310,13 +332,12 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
       }
       const issues = asArr(r.issues);
       if (issues.length > 0) {
-        const items = issues.slice(0, 3).map(it => {
+        const items = issues.map(it => {
           const o = asObj(it);
           const text = asStr(it) ?? asStr(o?.title) ?? asStr(o?.message) ?? 'Problem';
           return { text, badge: 'fail' as BadgeVariant };
         });
-        detail.push({ type: 'list', items });
-        hiddenCount += Math.max(0, issues.length - 3);
+        detail.push({ type: 'list', items, scrollable: items.length > 8 });
       }
       break;
     }
@@ -339,7 +360,7 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
         ? cookies
         : asArr(r.insecureCookies).length > 0 ? asArr(r.insecureCookies) : asArr(r.unsecureCookies);
       if (src.length > 0) {
-        const items = src.slice(0, 3).map(c => {
+        const items = src.map(c => {
           const o = asObj(c);
           const name = asStr(o?.name) ?? asStr(c) ?? 'Cookie';
           const flag = (label: string, v: unknown) => `${label} ${v === true ? '✓' : '✗'}`;
@@ -349,8 +370,7 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
             : [];
           return { key: name, value: parts.join(' · ') };
         });
-        detail.push({ type: 'kv', items });
-        hiddenCount += Math.max(0, src.length - 3);
+        detail.push({ type: 'kv', items, scrollable: items.length > 8 });
       }
       break;
     }
@@ -381,8 +401,7 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
       });
       const sources = asArr(r.sources).filter((s): s is string => typeof s === 'string');
       if (sources.length > 0) {
-        detail.push({ type: 'list', items: sources.slice(0, 3).map(s => ({ text: s })) });
-        hiddenCount += Math.max(0, sources.length - 3);
+        detail.push({ type: 'list', items: sources.map(s => ({ text: s })), scrollable: sources.length > 8 });
       }
       break;
     }
@@ -398,8 +417,11 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
         .map(l => asStr(l) ?? asStr(asObj(l)?.name))
         .filter((s): s is string => !!s);
       if (names.length > 0) {
-        detail.push({ type: 'list', items: names.slice(0, 3).map(t => ({ text: t, badge: 'fail' as BadgeVariant })) });
-        hiddenCount += Math.max(0, names.length - 3);
+        detail.push({
+          type: 'list',
+          items: names.map(t => ({ text: t, badge: 'fail' as BadgeVariant })),
+          scrollable: names.length > 8,
+        });
       }
       break;
     }
@@ -414,12 +436,11 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
           const ib = DNS_TYPE_ORDER.indexOf(asStr(b.type) ?? '');
           return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
         });
-        const items = sorted.slice(0, 5).map(o => ({
+        const items = sorted.map(o => ({
           key: asStr(o.type) ?? '?',
           value: asStr(o.address) ?? asStr(o.value) ?? asStr(o.data) ?? '',
         }));
-        detail.push({ type: 'kv', items });
-        hiddenCount += Math.max(0, recs.length - 5);
+        detail.push({ type: 'kv', items, scrollable: items.length > 8 });
       }
       break;
     }
@@ -451,8 +472,11 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
         .filter((s): s is string => !!s);
       if (recs.length > 0) {
         const sorted = [...recs].sort((a, b) => (/^v=spf1/i.test(b) ? 1 : 0) - (/^v=spf1/i.test(a) ? 1 : 0));
-        detail.push({ type: 'list', items: sorted.slice(0, 4).map(t => ({ text: truncate(t, 60) })) });
-        hiddenCount += Math.max(0, recs.length - 4);
+        detail.push({
+          type: 'list',
+          items: sorted.map(t => ({ text: truncate(t, 120) })),
+          scrollable: sorted.length > 8,
+        });
       }
       break;
     }
@@ -483,15 +507,16 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
     case 'ports': {
       const ports = asArr(r.ports).length > 0 ? asArr(r.ports) : asArr(r.openPorts);
       if (ports.length > 0) {
-        const items = ports.slice(0, 3).map(p => {
+        const items = ports.map(p => {
           if (typeof p === 'number') return { key: String(p), value: '' };
           const o = asObj(p);
           const num = asNum(o?.port) ?? asNum(o?.portNumber);
           const svc = asStr(o?.service) ?? '';
-          return { key: num !== undefined ? String(num) : '?', value: svc };
+          const proto = asStr(o?.protocol);
+          const value = [svc, proto].filter(Boolean).join(' / ');
+          return { key: num !== undefined ? String(num) : '?', value };
         });
-        detail.push({ type: 'kv', items });
-        hiddenCount += Math.max(0, ports.length - 3);
+        detail.push({ type: 'kv', items, scrollable: items.length > 8 });
       }
       break;
     }
@@ -600,6 +625,18 @@ export default function LiveCheckResultsPage() {
   // "Alle aufklappen" pro Gruppe (VEC-395 §4). Wert übersteuert lokalen
   // CheckTile-State via forceExpanded; undefined = Tile entscheidet selbst.
   const [groupAllExpanded, setGroupAllExpanded] = useState<Map<CheckGroup, boolean>>(new Map());
+
+  // Severity-Drilldown (VEC-399): Klick auf einen Befund expandiert die
+  // zugehörige Tile gezielt (übersteuert groupAllExpanded) + scrollt sie an.
+  const [keyExpanded, setKeyExpanded] = useState<Map<string, boolean>>(new Map());
+
+  const onDrilldownSelect = useCallback((key: string) => {
+    setKeyExpanded(prev => new Map(prev).set(key, true));
+    // Kurze Verzögerung, damit die Tile vor dem Scroll aufgeklappt gerendert ist.
+    setTimeout(() => {
+      document.getElementById(`tile-${key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }, []);
 
   // Auth guard — must be logged in to access live-check
   useEffect(() => {
@@ -740,6 +777,12 @@ export default function LiveCheckResultsPage() {
         );
       })()}
 
+      {/* Severity-Drilldown (VEC-399): welche Checks machen H/M aus.
+          Nur bei abgeschlossenem Scan — während running sind Counts unvollständig. */}
+      {(phase === 'done' || phase === 'aborted') && (
+        <SeverityDrilldown results={resultsList} onSelect={onDrilldownSelect} />
+      )}
+
       {/* Check sections by group */}
       <div className="space-y-8">
         {GROUP_ORDER.map(group => {
@@ -779,12 +822,17 @@ export default function LiveCheckResultsPage() {
                 {itemDetails.map(({ result: r, detail, hiddenCount }) => (
                   <CheckTile
                     key={r.key}
+                    tileId={r.key}
                     label={r.label}
                     status={r.status}
                     summary={r.summary}
                     detail={detail}
                     hiddenCount={hiddenCount}
-                    forceExpanded={groupAllExpanded.has(group) ? allExpanded : undefined}
+                    forceExpanded={
+                      keyExpanded.has(r.key)
+                        ? keyExpanded.get(r.key)
+                        : groupAllExpanded.has(group) ? allExpanded : undefined
+                    }
                   />
                 ))}
               </div>
