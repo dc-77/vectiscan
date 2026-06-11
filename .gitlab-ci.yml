@@ -1384,13 +1384,18 @@ ops-rotate-crm-api-key:
 
       # ── 2) Schema-Discovery ─────────────────────────────────────────────
       echo "Suche workspace-Schema mit apiKey-Tabelle ..."
-      APIKEY_SCHEMA=$(${PSQL} "SELECT table_schema FROM information_schema.tables WHERE table_name='apiKey' AND table_schema LIKE 'workspace_%' ORDER BY table_schema LIMIT 1")
-      if [ -z "${APIKEY_SCHEMA}" ]; then
-        echo "FATAL: Keine apiKey-Tabelle in einem workspace_*-Schema gefunden. Vorhandene Schemata:"
+      APIKEY_ROW=$(${PSQL} "SELECT table_schema||'|'||table_name FROM information_schema.tables WHERE LOWER(table_name)='apikey' AND table_schema LIKE 'workspace_%' ORDER BY table_schema LIMIT 1")
+      if [ -z "${APIKEY_ROW}" ]; then
+        echo "FATAL: Keine apiKey-Tabelle (case-insensitive) in einem workspace_*-Schema gefunden. Vorhandene Schemata:"
         ${PSQL} "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'workspace_%'"
+        echo "Vorhandene Tabellen im ersten workspace-Schema:"
+        FIRST_SCHEMA=$(${PSQL} "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'workspace_%' ORDER BY schema_name LIMIT 1")
+        [ -n "${FIRST_SCHEMA}" ] && ${PSQL} "SELECT table_name FROM information_schema.tables WHERE table_schema='${FIRST_SCHEMA}' ORDER BY table_name"
         exit 1
       fi
-      echo "  apiKey-Schema: ${APIKEY_SCHEMA}"
+      APIKEY_SCHEMA=$(echo "${APIKEY_ROW}" | cut -d'|' -f1)
+      APIKEY_TABLE=$(echo "${APIKEY_ROW}" | cut -d'|' -f2)
+      echo "  apiKey-Schema: ${APIKEY_SCHEMA}, Tabelle: ${APIKEY_TABLE}"
 
       WS_SUFFIX=${APIKEY_SCHEMA#workspace_}
       WORKSPACE_ID=$(${PSQL} "SELECT id FROM core.workspace WHERE replace(id::text,'-','')='${WS_SUFFIX}' LIMIT 1")
@@ -1406,7 +1411,7 @@ ops-rotate-crm-api-key:
 
       # ── 3) Neuen apiKey-Datensatz anlegen ───────────────────────────────
       echo "Lege neuen apiKey-Datensatz an ..."
-      NEW_KEY_ID=$(${PSQL} "INSERT INTO \"${APIKEY_SCHEMA}\".\"apiKey\" (id, name, \"expiresAt\", \"revokedAt\", \"createdAt\", \"updatedAt\") VALUES (gen_random_uuid(), 'vectiscan-lead-router', NULL, NULL, now(), now()) RETURNING id")
+      NEW_KEY_ID=$(${PSQL} "INSERT INTO \"${APIKEY_SCHEMA}\".\"${APIKEY_TABLE}\" (id, name, \"expiresAt\", \"revokedAt\", \"createdAt\", \"updatedAt\") VALUES (gen_random_uuid(), 'vectiscan-lead-router', NULL, NULL, now(), now()) RETURNING id")
       if [ -z "${NEW_KEY_ID}" ]; then
         echo "FATAL: INSERT lieferte keine id zurueck."
         exit 1
