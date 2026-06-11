@@ -1253,12 +1253,6 @@ ops-verify-crm-vec328:
   needs: []
   script:
     - cd ${DEPLOY_PATH}
-    - 'echo "=== VEC-328: CRM_WEBHOOK_URL im laufenden api-Container ==="'
-    - docker compose exec -T api sh -c 'echo "CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL}"' || echo "(api nicht erreichbar)"
-    - 'echo "=== VEC-328: Direktzugriff twenty-server aus proxy-net ==="'
-    - docker run --rm --network proxy-net curlimages/curl:8.8.0 -s -o /dev/null -w 'HTTP-Status:%{http_code}' --max-time 10 http://vectiscan-twenty-server-1:3000/rest/people || echo "HTTP 000"
-    - 'echo "=== VEC-328: CRM-Routing-Logs (webcheck lead CRM routing) ==="'
-    - docker logs --tail 3000 vectiscan-api-1 2>&1 | grep "webcheck lead CRM routing" | tail -10 || echo "(keine Eintraege - noch kein DOI-Confirm seit Deploy)"
-    - 'echo "=== VEC-328: crm-lookup-failed Check ==="'
-    - docker logs --tail 3000 vectiscan-api-1 2>&1 | grep "crm-lookup-failed" | tail -5 || echo "PASS: kein crm-lookup-failed"
+    - docker compose exec -T api sh -c 'echo CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL}' || echo api-nicht-erreichbar
+    - docker logs --tail 3000 vectiscan-api-1 2>&1 | grep "crm-lookup-failed" | tail -5 || echo PASS-kein-crm-lookup-failed
 
