@@ -1318,3 +1318,157 @@ ops-e2e-vec387:
         -c "DELETE FROM webcheck_leads WHERE email LIKE 'e2e-vec387%'; SELECT count(*) AS remaining FROM webcheck_leads WHERE email LIKE 'e2e-vec387%';"
       echo "=== VEC-387 E2E DONE ==="
 
+
+# =============================================================================
+# CRM-API-Key-Rotation (VEC-391 / Folge VEC-390) — generiert vollautomatisch
+# einen frischen Twenty-API-Key, aktualisiert die CI-Var CRM_API_KEY und
+# triggert einen Redeploy, der den neuen Key in die Container-.env schreibt.
+#
+# Root-Cause VEC-390: der bisherige CRM_API_KEY (JWT, Laenge 444) wird von
+# Twenty mit HTTP 401 abgelehnt (Key widerrufen/abgelaufen). Loesung: neuer
+# apiKey-Datensatz im workspace-Schema + frisch gemintetes HS256-JWT, signiert
+# mit dem Twenty APP_SECRET.
+#
+# Ablauf:
+#   1) Preflight: GL_WRITE_TOKEN + TWENTY_PG_PASSWORD muessen gesetzt sein.
+#   2) Schema-Discovery: workspace_<id>-Schema mit "apiKey"-Tabelle finden,
+#      zugehoerige workspace-UUID aus core.workspace ableiten.
+#   3) Neuen apiKey-Datensatz anlegen (RETURNING id).
+#   4) JWT im twenty-server-Container minten — das Signing-Secret
+#      (process.env.APP_SECRET) verlaesst den Container NICHT (kein Log-Leak).
+#   5) CI-Var CRM_API_KEY via GL_WRITE_TOKEN (PUT, masked=true) aktualisieren.
+#   6) Redeploy auf main triggern (POST .../pipeline?ref=main) — deploy-auto
+#      schreibt den rotierten Key aus der CI-Var frisch in die .env. Ein
+#      lokales `compose up` aus diesem Job wuerde noch den ALTEN, zur
+#      Job-Startzeit injizierten CRM_API_KEY sehen (deshalb der Pipeline-Trigger).
+#
+# Secrets-Hygiene: weder APP_SECRET, PG-Passwort noch das gemintete JWT werden
+# geloggt. Der Token wird ausschliesslich per --data-urlencode an die GitLab-API
+# uebergeben; PGPASSWORD/Secret werden via Container-Env weitergereicht.
+#
+# Idempotenz: jeder Lauf legt einen NEUEN apiKey-Datensatz an (Altkeys bleiben
+# gueltig, bis manuell revoked). Gewollt — ein fehlgeschlagener Rollout
+# invalidiert keinen funktionierenden Altkey (Blast-Radius klein).
+#
+# Manuell triggerbar (web/api), needs: [] — laeuft ohne erneuten Build/Deploy.
+# =============================================================================
+ops-rotate-crm-api-key:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  script:
+    - |
+      set -e
+
+      # ── 1) Preflight ────────────────────────────────────────────────────
+      if [ -z "${GL_WRITE_TOKEN}" ]; then
+        echo "FATAL: GL_WRITE_TOKEN (GitLab PAT api-Scope + Maintainer) fehlt — CI-Var-Update unmoeglich."
+        echo "       GitLab: User Settings -> Access Tokens -> api-Scope -> als CI-Var GL_WRITE_TOKEN setzen."
+        exit 1
+      fi
+      if [ -z "${TWENTY_PG_PASSWORD}" ]; then
+        echo "FATAL: TWENTY_PG_PASSWORD fehlt — psql-Zugriff auf twenty-db unmoeglich."
+        exit 1
+      fi
+
+      DB_CTR="vectiscan-twenty-db-1"
+      SRV_CTR="vectiscan-twenty-server-1"
+      export PGPASSWORD="${TWENTY_PG_PASSWORD}"
+      # -e PGPASSWORD (ohne =Wert) reicht die Job-Env in den Container; Wert wird nie geloggt.
+      PSQL="docker exec -e PGPASSWORD ${DB_CTR} psql -U twenty -d twenty -tAc"
+
+      # ── 2) Schema-Discovery ─────────────────────────────────────────────
+      echo "Suche workspace-Schema mit apiKey-Tabelle ..."
+      APIKEY_SCHEMA=$(${PSQL} "SELECT table_schema FROM information_schema.tables WHERE table_name='apiKey' AND table_schema LIKE 'workspace_%' ORDER BY table_schema LIMIT 1")
+      if [ -z "${APIKEY_SCHEMA}" ]; then
+        echo "FATAL: Keine apiKey-Tabelle in einem workspace_*-Schema gefunden. Vorhandene Schemata:"
+        ${PSQL} "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'workspace_%'"
+        exit 1
+      fi
+      echo "  apiKey-Schema: ${APIKEY_SCHEMA}"
+
+      WS_SUFFIX=${APIKEY_SCHEMA#workspace_}
+      WORKSPACE_ID=$(${PSQL} "SELECT id FROM core.workspace WHERE replace(id::text,'-','')='${WS_SUFFIX}' LIMIT 1")
+      if [ -z "${WORKSPACE_ID}" ]; then
+        echo "  Schema-Suffix-Mapping leer — Fallback: aelteste workspace-UUID."
+        WORKSPACE_ID=$(${PSQL} "SELECT id FROM core.workspace ORDER BY \"createdAt\" LIMIT 1")
+      fi
+      if [ -z "${WORKSPACE_ID}" ]; then
+        echo "FATAL: Konnte workspace-UUID nicht ermitteln (core.workspace leer?)."
+        exit 1
+      fi
+      echo "  workspace-UUID: ${WORKSPACE_ID}"
+
+      # ── 3) Neuen apiKey-Datensatz anlegen ───────────────────────────────
+      echo "Lege neuen apiKey-Datensatz an ..."
+      NEW_KEY_ID=$(${PSQL} "INSERT INTO \"${APIKEY_SCHEMA}\".\"apiKey\" (id, name, \"expiresAt\", \"revokedAt\", \"createdAt\", \"updatedAt\") VALUES (gen_random_uuid(), 'vectiscan-lead-router', NULL, NULL, now(), now()) RETURNING id")
+      if [ -z "${NEW_KEY_ID}" ]; then
+        echo "FATAL: INSERT lieferte keine id zurueck."
+        exit 1
+      fi
+      echo "  Neuer apiKey-Datensatz: ${NEW_KEY_ID}"
+
+      # ── 4) JWT minten (Signing-Secret bleibt im Container) ──────────────
+      echo "Minte HS256-JWT im ${SRV_CTR} ..."
+      NEW_JWT=$(docker exec \
+        -e VS_WS_ID="${WORKSPACE_ID}" \
+        -e VS_KEY_ID="${NEW_KEY_ID}" \
+        ${SRV_CTR} node -e '
+          const jwt = require("jsonwebtoken");
+          const secret = process.env.APP_SECRET;
+          if (!secret) { console.error("APP_SECRET im twenty-server-Container nicht gesetzt"); process.exit(1); }
+          const token = jwt.sign(
+            { sub: process.env.VS_WS_ID, workspaceId: process.env.VS_WS_ID, apiKeyId: process.env.VS_KEY_ID, type: "API_KEY" },
+            secret,
+            { algorithm: "HS256", expiresIn: "100y" }
+          );
+          process.stdout.write(token);
+        ')
+      if [ -z "${NEW_JWT}" ]; then
+        echo "FATAL: JWT-Minting lieferte leeren Token (jsonwebtoken nicht require-bar oder APP_SECRET fehlt)."
+        exit 1
+      fi
+      # Nur die Payload (kein Secret) zur Verifikation ausgeben; Token selbst NIE loggen.
+      echo "  JWT gemintet. Payload-Verifikation:"
+      docker exec -e VS_TOKEN="${NEW_JWT}" ${SRV_CTR} node -e 'console.log(JSON.stringify(require("jsonwebtoken").decode(process.env.VS_TOKEN)))'
+
+      # ── 5) CI-Var CRM_API_KEY aktualisieren ─────────────────────────────
+      echo "Aktualisiere CI-Var CRM_API_KEY (maskiert, Wert nie geloggt) ..."
+      GL_VARS_API="${CI_SERVER_URL}/api/v4/projects/${CI_PROJECT_ID}/variables"
+      HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "${GL_VARS_API}/CRM_API_KEY" \
+        -H "PRIVATE-TOKEN: ${GL_WRITE_TOKEN}" \
+        --data-urlencode "value=${NEW_JWT}" \
+        -d "masked=true&protected=false&variable_type=env_var")
+      if [ "${HTTP}" = "404" ]; then
+        HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${GL_VARS_API}" \
+          -H "PRIVATE-TOKEN: ${GL_WRITE_TOKEN}" \
+          --data-urlencode "key=CRM_API_KEY" \
+          --data-urlencode "value=${NEW_JWT}" \
+          -d "masked=true&protected=false&variable_type=env_var")
+      fi
+      echo "  CRM_API_KEY-Update: HTTP ${HTTP}"
+      [ "${HTTP}" = "200" ] || [ "${HTTP}" = "201" ] || { echo "FATAL: CI-Var-Update fehlgeschlagen (HTTP ${HTTP})."; exit 1; }
+
+      # ── 6) Redeploy triggern ────────────────────────────────────────────
+      echo "Triggere Redeploy (main-Pipeline) ..."
+      PIPE_HTTP=$(curl -s -o /tmp/pipe.json -w "%{http_code}" -X POST \
+        "${CI_SERVER_URL}/api/v4/projects/${CI_PROJECT_ID}/pipeline?ref=main" \
+        -H "PRIVATE-TOKEN: ${GL_WRITE_TOKEN}")
+      echo "  Pipeline-Trigger: HTTP ${PIPE_HTTP}"
+      if [ "${PIPE_HTTP}" = "200" ] || [ "${PIPE_HTTP}" = "201" ]; then
+        PIPE_ID=$(sed -n 's/.*"id":\([0-9]*\).*/\1/p' /tmp/pipe.json | head -1)
+        echo "  Neue Pipeline: ${PIPE_ID} (deploy-auto schreibt den rotierten Key in die .env)."
+      else
+        echo "WARN: Redeploy-Trigger fehlgeschlagen (HTTP ${PIPE_HTTP}). CI-Var ist bereits rotiert —"
+        echo "      einen main-Deploy manuell ausloesen, dann ops-e2e-vec387 verifizieren."
+      fi
+
+      echo "=== CRM-API-Key-Rotation abgeschlossen ==="
+      echo "  workspace: ${WORKSPACE_ID}"
+      echo "  apiKeyId:  ${NEW_KEY_ID}"
+      echo "  Naechster Schritt: nach Deploy ops-e2e-vec387 -> erwartet crm=created|exists."
