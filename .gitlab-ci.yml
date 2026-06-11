@@ -1256,3 +1256,44 @@ ops-verify-crm-vec328:
     - docker compose exec -T api sh -c 'echo CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL}' || echo api-nicht-erreichbar
     - docker logs --tail 3000 vectiscan-api-1 2>&1 | grep "crm-lookup-failed" | tail -5 || echo PASS-kein-crm-lookup-failed
 
+# =============================================================================
+# ops-e2e-vec387: Post-Deploy-Runtime-Beleg CRM-Upsert via interner URL (VEC-387).
+# Führt einen vollen DOI-Confirm durch und prüft ob api-Container crm=created/
+# crm=exists loggt (statt crm-lookup-failed). Bestanden wenn: API-Log zeigt
+# crm=created oder crm=exists nach dem Confirm-Aufruf.
+# needs: [] → läuft unabhängig, kein Re-Deploy erforderlich.
+# =============================================================================
+ops-e2e-vec387:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "=== VEC-387 Post-Deploy E2E: CRM crm=created Beleg ==="
+    - echo "Pipeline deployt mit CRM_WEBHOOK_URL=intern (ca47dcf / Pipeline 2745)"
+    # Cleanup vorherige Testdaten
+    - |
+      docker compose exec -T postgres psql -U "${DB_USER}" -d "${DB_NAME}" \
+        -c "DELETE FROM webcheck_leads WHERE email LIKE 'e2e-vec387%';" 2>&1 || true
+    # Frischen Lead mit DOI-Token anlegen
+    - |
+      DOI_TOKEN=$(docker compose exec -T postgres psql -U "${DB_USER}" -d "${DB_NAME}" -tAc \
+        "INSERT INTO webcheck_leads (email, domain, verification_token, doi_token, doi_sent_at, ip, marketing_consent, consent_text_version, consent_status, legal_basis)
+         VALUES ('e2e-vec387@vectigal.tech', 'vectigal.tech', 'e2e-vec387-token', gen_random_uuid()::text, NOW(), '127.0.0.1', TRUE, 'v1-e2e', 'pending', 'consent')
+         RETURNING doi_token;" | tr -d '[:space:]')
+      echo "DOI Token: ${DOI_TOKEN}"
+      echo "=== DOI Confirm via scan-api.vectigal.tech ==="
+      curl -sv "https://scan-api.vectigal.tech/api/webcheck/doi/confirm?token=${DOI_TOKEN}" 2>&1 | grep -E '< HTTP|confirmed|success'
+      sleep 5
+      echo "=== API-Log: CRM-Routing (Beleg crm=created/exists) ==="
+      docker compose logs --tail=100 --no-color api 2>&1 | grep -iE 'crm=|crm-lookup-failed|webcheck lead CRM' | tail -15
+      echo "=== CRM_WEBHOOK_URL im api-Container ==="
+      docker compose exec -T api sh -c 'echo CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL}' || echo api-nicht-erreichbar
+      echo "=== Cleanup ==="
+      docker compose exec -T postgres psql -U "${DB_USER}" -d "${DB_NAME}" \
+        -c "DELETE FROM webcheck_leads WHERE email LIKE 'e2e-vec387%'; SELECT count(*) AS remaining FROM webcheck_leads WHERE email LIKE 'e2e-vec387%';"
+      echo "=== VEC-387 E2E DONE ==="
+
