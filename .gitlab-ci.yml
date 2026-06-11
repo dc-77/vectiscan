@@ -1425,7 +1425,7 @@ ops-rotate-crm-api-key:
 
       # ── 3) Neuen apiKey-Datensatz anlegen ───────────────────────────────
       echo "Lege neuen apiKey-Datensatz an ..."
-      NEW_KEY_ID=$(${PSQL} "INSERT INTO \"${APIKEY_SCHEMA}\".\"${APIKEY_TABLE}\" (id, name, \"expiresAt\", \"revokedAt\", \"createdAt\", \"updatedAt\") VALUES (gen_random_uuid(), 'vectiscan-lead-router', NULL, NULL, now(), now()) RETURNING id")
+      NEW_KEY_ID=$(${PSQL} "INSERT INTO \"${APIKEY_SCHEMA}\".\"${APIKEY_TABLE}\" (id, name, \"expiresAt\", \"revokedAt\", \"createdAt\", \"updatedAt\") VALUES (gen_random_uuid(), 'vectiscan-lead-router', NULL, NULL, now(), now()) RETURNING id" | head -1 | tr -d '[:space:]')
       if [ -z "${NEW_KEY_ID}" ]; then
         echo "FATAL: INSERT lieferte keine id zurueck."
         exit 1
