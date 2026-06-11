@@ -1284,6 +1284,7 @@ ops-verify-crm-vec328:
 # Führt einen vollen DOI-Confirm durch und prüft ob api-Container crm=created/
 # crm=exists loggt (statt crm-lookup-failed). Bestanden wenn: API-Log zeigt
 # crm=created oder crm=exists nach dem Confirm-Aufruf.
+# Grep erfasst jetzt auch den Demo-Lead-Pfad ("demo lead CRM") — VEC-407.
 # needs: [] → läuft unabhängig, kein Re-Deploy erforderlich.
 # =============================================================================
 ops-e2e-vec387:
@@ -1310,7 +1311,7 @@ ops-e2e-vec387:
       curl -sv "https://scan-api.vectigal.tech/api/webcheck/doi/confirm?token=${DOI_TOKEN}" 2>&1 | grep -E "< HTTP|confirmed|success"
       sleep 5
       echo "=== API-Log: CRM-Routing (Beleg crm=created/exists) ==="
-      docker compose logs --tail=100 --no-color api 2>&1 | grep -iE "crm=|crm-lookup-failed|webcheck lead CRM" | tail -15 || echo "(no CRM log entry found)"
+      docker compose logs --tail=100 --no-color api 2>&1 | grep -iE "crm=|crm-lookup-failed|webcheck lead CRM|demo lead CRM" | tail -15 || echo "(no CRM log entry found)"
       echo "=== CRM_WEBHOOK_URL im api-Container ==="
       docker compose exec -T api env | grep CRM_WEBHOOK_URL || echo api-nicht-erreichbar
       echo "=== Cleanup ==="
