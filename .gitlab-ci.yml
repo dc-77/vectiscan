@@ -1257,7 +1257,7 @@ ops-verify-crm-vec328:
     - docker compose exec -T api sh -c 'echo "CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL}"' || echo "(api nicht erreichbar)"
     - echo ""
     - echo "=== Schritt 2: Direktzugriff twenty-server aus proxy-net ==="
-    - docker run --rm --network proxy-net curlimages/curl:8.8.0 -s -o /dev/null -w "HTTP %{http_code}\n" --max-time 10 http://vectiscan-twenty-server-1:3000/rest/people || echo "HTTP 000 (nicht erreichbar)"
+    - docker run --rm --network proxy-net curlimages/curl:8.8.0 -s -o /dev/null -w 'HTTP %{http_code}' --max-time 10 http://vectiscan-twenty-server-1:3000/rest/people && echo "" || echo "HTTP 000 (nicht erreichbar)"
     - echo ""
     - echo "=== Schritt 3: Letzte CRM-Logzeilen aus vectiscan-api-1 ==="
     - docker logs --tail 3000 vectiscan-api-1 2>&1 | grep "webcheck lead CRM routing" | tail -10 || echo "(keine CRM-Routing-Logzeilen — noch kein DOI-Confirm seit Deploy)"
