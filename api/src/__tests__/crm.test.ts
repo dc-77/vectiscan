@@ -79,9 +79,33 @@ describe('upsertLeadToCrm — Idempotenz', () => {
     }) as typeof fetch);
 
     const r = await upsertLeadToCrm(LEAD, cfg);
-    expect(r).toEqual({ synced: true, action: 'created', status: 201 });
+    // LEAD hat keine `company` → kein Company-Upsert, companyId bleibt null.
+    expect(r).toEqual({ synced: true, action: 'created', status: 201, companyId: null });
     expect(calls.some((c) => c.startsWith('GET'))).toBe(true);
     expect(calls.some((c) => c.startsWith('POST'))).toBe(true);
+  });
+
+  it('legt bei Demo-Lead mit Firma eine Company an und verknüpft die Person (VEC-117)', async () => {
+    const LEAD_WITH_COMPANY = { ...LEAD, fullName: 'Erika Mustermann', company: 'ACME GmbH' };
+    const personBodies: Array<Record<string, unknown>> = [];
+    jest.spyOn(global, 'fetch').mockImplementation((async (url: string, init?: RequestInit) => {
+      const isCompanies = String(url).includes('/rest/companies');
+      if (!init?.method || init.method === 'GET') {
+        // Person-Lookup leer; Company-Lookup leer → beide werden angelegt.
+        return { ok: true, status: 200, json: async () => ({ data: { people: [], companies: [] } }) } as Response;
+      }
+      if (isCompanies) {
+        return { ok: true, status: 201, json: async () => ({ data: { createCompany: { id: 'c1' } } }) } as Response;
+      }
+      if (init?.body) personBodies.push(JSON.parse(String(init.body)));
+      return { ok: true, status: 201, json: async () => ({ data: { createPerson: { id: 'p1' } } }) } as Response;
+    }) as typeof fetch);
+
+    const r = await upsertLeadToCrm(LEAD_WITH_COMPANY, cfg);
+    expect(r.synced).toBe(true);
+    expect(r.companyId).toBe('c1');
+    // Person trägt die verknüpfte companyId und den echten Namen.
+    expect(personBodies[0]).toMatchObject({ companyId: 'c1', name: { firstName: 'Erika', lastName: 'Mustermann' } });
   });
 
   it('legt NICHT an, wenn die Person bereits existiert', async () => {
