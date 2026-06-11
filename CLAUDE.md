@@ -204,3 +204,8 @@ Branding-Farben aus `reporter/pdf/branding.py` — nicht hardcoden.
   Loki+Promtail, Grafana, Resend-Alerts) — A5/VEC-85
 - `OFFSITE-BACKUP-EVAL.md` — Off-Site-Backup-Bewertung + Empfehlung
 - `references/report_structure.md` — PDF-Layout
+- `docs/CRM-KEY-ROTATION.md` — Twenty-CRM Key-Rotation-Runbook (VEC-398).
+  **Policy: API-Only, kein Direkt-DB-Zugriff/Schema-Poking auf Twenty.**
+  Lead-Sync via REST (`api/src/lib/crm.ts`). Key-Rotation = Token manuell in
+  Twenty-UI erzeugen → CI-Var via `ops-rotate-crm-api-key` setzen. Einzige
+  sanktionierte DB-Ausnahme: einmaliges First-Admin-Bootstrap (VEC-324/326).
