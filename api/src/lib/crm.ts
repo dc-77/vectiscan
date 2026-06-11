@@ -22,6 +22,10 @@ const log = pino({ name: 'crm' });
 
 export interface CrmLead {
   email: string;
+  /** Voller Name (z. B. aus dem Demo-Formular) — wird auf first/last gemappt. */
+  fullName?: string | null;
+  /** Firmenname (Demo-Formular) — legt in Twenty eine verknüpfte Company an. */
+  company?: string | null;
   domain?: string | null;
   icpSegment?: string | null;
   source?: string | null;
@@ -55,16 +59,38 @@ export function loadCrmConfig(env: NodeJS.ProcessEnv = process.env): CrmConfig {
  * angelegte Custom-Fields → Folge-Issue. `domain` wird als Firmen-Hinweis im
  * Nachnamen mitgeführt, damit der Vertrieb den Scan-Bezug ohne Custom-Field sieht.
  */
-export function buildTwentyPerson(lead: CrmLead): Record<string, unknown> {
+export function buildTwentyPerson(lead: CrmLead, companyId?: string | null): Record<string, unknown> {
   const email = String(lead.email).trim().toLowerCase();
   const localPart = email.split('@')[0] || email;
+  // Echter Name (Demo-Formular) hat Vorrang; sonst E-Mail-Localpart als Fallback.
+  let firstName = localPart;
+  let lastName = lead.company ? `(${lead.company})` : lead.domain ? `(${lead.domain})` : '';
+  const trimmedName = (lead.fullName || '').trim();
+  if (trimmedName) {
+    const parts = trimmedName.split(/\s+/);
+    firstName = parts[0];
+    lastName = parts.length > 1 ? parts.slice(1).join(' ') : '';
+  }
   const person: Record<string, unknown> = {
     emails: { primaryEmail: email },
-    name: { firstName: localPart, lastName: lead.domain ? `(${lead.domain})` : '' },
+    name: { firstName, lastName },
   };
   // jobTitle ist ein Standard-Textfeld → grobe Qualifizierung ohne Custom-Field.
   if (lead.icpSegment) person.jobTitle = lead.icpSegment;
+  // Verknüpfte Firma (falls in Twenty angelegt) — Standard-Relation `companyId`.
+  if (companyId) person.companyId = companyId;
   return person;
+}
+
+/**
+ * Bildet eine Firma auf Twentys REST `/rest/companies`-Schema ab. Nur Standard-
+ * Felder (`name`, optional `domainName`), damit Twenty die Anlage nicht mit 400
+ * ablehnt.
+ */
+export function buildTwentyCompany(lead: CrmLead): Record<string, unknown> {
+  const company: Record<string, unknown> = { name: String(lead.company).trim() };
+  if (lead.domain) company.domainName = { primaryLinkUrl: `https://${lead.domain}` };
+  return company;
 }
 
 async function twentyFetch(
@@ -93,6 +119,58 @@ export interface CrmUpsertResult {
   reason?: string;
   status?: number;
   action?: 'created' | 'exists';
+  companyId?: string | null;
+}
+
+/**
+ * Leitet aus der konfigurierten People-URL (`CRM_WEBHOOK_URL`, i. d. R.
+ * `…/rest/people`) die Companies-URL ab. Best-effort: schlägt das Mapping fehl,
+ * wird die Company-Anlage übersprungen (Person wird trotzdem angelegt).
+ */
+function companiesUrlFrom(webhookUrl: string): string | null {
+  const base = webhookUrl.replace(/\/+$/, '');
+  if (/\/people$/.test(base)) return base.replace(/\/people$/, '/companies');
+  return null;
+}
+
+/**
+ * Upsert einer Firma by name → gibt die Twenty-Company-id zurück (zum Verknüpfen
+ * der Person). Vollständig best-effort: jeder Fehler ergibt `null`, sodass die
+ * Personen-Anlage nie scheitert. Idempotent (Suche vor Anlage).
+ */
+export async function upsertCompanyToCrm(
+  lead: CrmLead,
+  cfg: CrmConfig = loadCrmConfig(),
+): Promise<string | null> {
+  if (!cfg.webhookUrl || !lead.company) return null;
+  const url = companiesUrlFrom(cfg.webhookUrl);
+  if (!url) return null;
+  const name = String(lead.company).trim();
+  try {
+    const filter = `name[eq]:${encodeURIComponent(name)}`;
+    const found = await twentyFetch(`${url}?filter=${filter}&depth=0`, cfg.apiKey);
+    if (found.ok) {
+      const companies = (found.body as { data?: { companies?: Array<{ id?: string }> } } | null)?.data
+        ?.companies;
+      if (Array.isArray(companies) && companies.length > 0 && companies[0]?.id) {
+        return companies[0].id;
+      }
+    }
+    const created = await twentyFetch(url, cfg.apiKey, {
+      method: 'POST',
+      body: JSON.stringify(buildTwentyCompany(lead)),
+    });
+    if (created.ok) {
+      const id = (created.body as { data?: { createCompany?: { id?: string } } } | null)?.data
+        ?.createCompany?.id;
+      return id ?? null;
+    }
+    log.warn({ status: created.status }, 'CRM company upsert: create failed — Person ohne Firma');
+    return null;
+  } catch (err) {
+    log.error({ err: String(err) }, 'CRM company upsert error — Person ohne Firma');
+    return null;
+  }
 }
 
 /**
@@ -131,15 +209,16 @@ export async function upsertLeadToCrm(
     return { synced: false, reason: 'crm-lookup-error' };
   }
 
-  // 2) Anlegen.
+  // 2) Firma (best-effort) anlegen/finden, dann Person mit Verknüpfung anlegen.
+  const companyId = await upsertCompanyToCrm(lead, cfg);
   try {
     const created = await twentyFetch(base, cfg.apiKey, {
       method: 'POST',
-      body: JSON.stringify(buildTwentyPerson(lead)),
+      body: JSON.stringify(buildTwentyPerson(lead, companyId)),
     });
     if (created.ok) {
-      log.info({ email }, 'CRM upsert: person created');
-      return { synced: true, action: 'created', status: created.status };
+      log.info({ email, companyId }, 'CRM upsert: person created');
+      return { synced: true, action: 'created', status: created.status, companyId };
     }
     log.error({ status: created.status }, 'CRM upsert: create failed');
     return { synced: false, reason: 'crm-create-failed', status: created.status };
@@ -161,10 +240,12 @@ export async function notifySales(
   cfg: CrmConfig = loadCrmConfig(),
 ): Promise<SalesNotifyResult> {
   if (!cfg.salesNotifyUrl) return { notified: false, reason: 'sales-notify-not-configured' };
+  const who = (lead.fullName && lead.fullName.trim()) || lead.email;
   const text =
-    `Neuer bestätigter WebCheck-Lead: ${lead.email}` +
-    (lead.domain ? ` (${lead.domain})` : '') +
-    (lead.icpSegment ? ` · ICP ${lead.icpSegment}` : '') +
+    `Neuer Lead: ${who}` +
+    (who !== lead.email ? ` <${lead.email}>` : '') +
+    (lead.company ? ` · ${lead.company}` : lead.domain ? ` (${lead.domain})` : '') +
+    (lead.icpSegment ? ` · ${lead.icpSegment}` : '') +
     (lead.channel ? ` · Kanal ${lead.channel}` : '');
   try {
     const res = await fetch(cfg.salesNotifyUrl, {

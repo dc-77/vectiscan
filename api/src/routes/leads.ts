@@ -14,6 +14,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { query } from '../lib/db.js';
 import { sendDemoLeadEmail } from '../lib/email.js';
+import { upsertLeadToCrm, notifySales } from '../lib/crm.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 // VEC-289: Paket-Interesse stammt aus dem kanonischen Katalog (+ 'unsure'-Sentinel).
@@ -141,6 +142,40 @@ export async function leadRoutes(server: FastifyInstance): Promise<void> {
         );
       } catch (err) {
         request.log.error({ err, leadId }, 'Failed to update lead routing_status');
+      }
+
+      // VEC-117 Folgefix: Demo-Lead zusätzlich ins Twenty-CRM (Person + verknüpfte
+      // Firma). Best-effort, non-fatal — der Lead liegt bereits in der DB und ging
+      // per E-Mail an den Vertrieb. Gleiche Einwilligungs-/Zweckbasis wie das
+      // bestehende E-Mail-Routing (aktive Demo-Anfrage mit ausdrücklicher Einwilligung,
+      // body.consent === true; kein Marketing-DOI nötig). Ohne CRM_WEBHOOK_URL =
+      // Trockenmodus (No-op). Fehler dürfen die Lead-Annahme nie scheitern lassen.
+      try {
+        const crm = await upsertLeadToCrm({
+          email: lead.email,
+          fullName: lead.name,
+          company: lead.company,
+          domain: lead.targetDomain,
+          icpSegment: lead.packageInterest,
+          source: 'demo_form',
+          utmSource: lead.utmSource,
+          utmMedium: lead.utmMedium,
+          utmCampaign: lead.utmCampaign,
+          referrer: lead.referrer,
+        });
+        const sales = await notifySales({
+          email: lead.email,
+          fullName: lead.name,
+          company: lead.company,
+          domain: lead.targetDomain,
+          icpSegment: lead.packageInterest,
+        });
+        request.log.info(
+          { leadId, crm: crm.reason ?? crm.action, sales: sales.reason ?? sales.notified },
+          'demo lead CRM routing',
+        );
+      } catch (err) {
+        request.log.error({ err, leadId }, 'CRM routing failed for demo lead (lead persisted, non-fatal)');
       }
 
       return reply.send({ success: true, data: { id: leadId, routed } });
