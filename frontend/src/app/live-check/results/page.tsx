@@ -9,7 +9,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { isLoggedIn } from '@/lib/auth';
 
-import CheckTile from '@/components/ds/CheckTile';
+import CheckTile, { type DetailBlock, type BadgeVariant } from '@/components/ds/CheckTile';
 import LiveCheckProgress from '@/components/ds/LiveCheckProgress';
 import CTAStaircase from '@/components/ds/CTAStaircase';
 import StateView from '@/components/ds/StateView';
@@ -176,96 +176,377 @@ function buildSeverityCounts(results: Map<string, CheckResult>): Record<string, 
 }
 
 // ---------------------------------------------------------------------------
-// Detail line extraction (drives CheckTile progressive disclosure)
+// Detail extraction (drives CheckTile progressive disclosure) — VEC-395
+//
+// Liefert pro Modul strukturierte Detail-Blöcke + hiddenCount. Mapping exakt
+// nach UX-Spec VEC-394 §3/§5. Free zeigt 3–5 sinnvolle Datenpunkte; alles
+// darüber bleibt hinter `hiddenCount` ("+N weitere im vollständigen Report").
+//
+// Defensiv wie deriveStatus(): jedes Feld wird typgeprüft. Fehlt/ist ein Feld
+// unerwartet, entfällt lieber der Block als ein Crash.
 // ---------------------------------------------------------------------------
 
-function extractDetailLines(result: CheckResult): string[] {
-  if (!result.detail || typeof result.detail !== 'object' || Array.isArray(result.detail)) return [];
-  const r = result.detail as Record<string, unknown>;
-  const lines: string[] = [];
+type Obj = Record<string, unknown>;
+
+function asObj(v: unknown): Obj | null {
+  return typeof v === 'object' && v !== null && !Array.isArray(v) ? (v as Obj) : null;
+}
+function asArr(v: unknown): unknown[] {
+  return Array.isArray(v) ? v : [];
+}
+function asStr(v: unknown): string | undefined {
+  return typeof v === 'string' && v.trim() !== '' ? v : undefined;
+}
+function asNum(v: unknown): number | undefined {
+  return typeof v === 'number' && !Number.isNaN(v) ? v : undefined;
+}
+function yesNo(v: unknown): string {
+  return v === true ? 'ja' : 'nein';
+}
+function truncate(s: string, n: number): string {
+  return s.length > n ? `${s.slice(0, n - 1)}…` : s;
+}
+function expiryVariant(days: number): BadgeVariant {
+  if (days < 14) return 'fail';
+  if (days < 30) return 'warn';
+  return 'ok';
+}
+function protoVariant(p: string): BadgeVariant {
+  if (/TLSv?1\.3|TLSv?1\.2/i.test(p)) return 'ok';
+  if (/TLSv?1\.1|TLSv?1\.0|SSLv/i.test(p)) return 'fail';
+  return 'neutral';
+}
+function statusCodeVariant(code: number): BadgeVariant {
+  if (code >= 200 && code < 300) return 'ok';
+  if (code >= 300 && code < 400) return 'neutral';
+  return 'fail';
+}
+// Häufige Security-Header für den "vorhanden"-Block (http-headers).
+const SEC_HEADERS = [
+  'Strict-Transport-Security', 'Content-Security-Policy', 'X-Frame-Options',
+  'X-Content-Type-Options', 'Referrer-Policy', 'Permissions-Policy',
+];
+// Reihenfolge für DNS-Records (A/MX/NS zuerst).
+const DNS_TYPE_ORDER = ['A', 'AAAA', 'MX', 'NS', 'CNAME', 'TXT', 'SOA'];
+
+function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCount: number } {
+  const r = asObj(result.detail);
+  if (!r) return { detail: [], hiddenCount: 0 };
+
+  const detail: DetailBlock[] = [];
+  let hiddenCount = 0;
 
   switch (result.key) {
-    case 'http-headers': {
-      const missing = Array.isArray(r.missingHeaders) ? (r.missingHeaders as string[]) : [];
-      missing.slice(0, 3).forEach(h => lines.push(`Fehlt: ${h}`));
-      break;
-    }
-    case 'cookies': {
-      const ins: unknown[] = Array.isArray(r.insecureCookies) ? r.insecureCookies
-        : Array.isArray(r.unsecureCookies) ? r.unsecureCookies : [];
-      ins.slice(0, 3).forEach(c => {
-        const name = typeof c === 'object' && c !== null && 'name' in c
-          ? (c as { name: string }).name : String(c);
-        lines.push(`Cookie: ${name}`);
-      });
-      break;
-    }
-    case 'ports': {
-      const ports: unknown[] = Array.isArray(r.ports) ? r.ports
-        : Array.isArray(r.openPorts) ? r.openPorts : [];
-      ports.slice(0, 3).forEach(p => {
-        if (typeof p === 'number') { lines.push(`Port ${p}`); return; }
-        if (typeof p === 'object' && p !== null) {
-          const obj = p as Record<string, unknown>;
-          const num = obj.port ?? obj.portNumber ?? '';
-          const svc = typeof obj.service === 'string' ? obj.service : '';
-          lines.push(`Port ${num}${svc ? ` (${svc})` : ''}`);
-        }
-      });
-      break;
-    }
     case 'ssl': {
-      if (typeof r.issuer === 'string') lines.push(`Aussteller: ${r.issuer}`);
-      if (typeof r.subject === 'string') lines.push(`Domain: ${r.subject}`);
-      if (typeof r.daysUntilExpiry === 'number') lines.push(`Gültig noch: ${r.daysUntilExpiry} Tage`);
+      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [];
+      const issuer = asStr(r.issuer);
+      const subject = asStr(r.subject);
+      const validTo = asStr(r.validTo) ?? asStr(r.validUntil);
+      const days = asNum(r.daysUntilExpiry);
+      if (issuer) kv.push({ key: 'Aussteller', value: issuer });
+      if (subject) kv.push({ key: 'Domain', value: subject });
+      if (validTo) kv.push({ key: 'Gültig bis', value: validTo });
+      if (days !== undefined) kv.push({ key: 'Noch gültig', value: `${days} Tage`, badge: expiryVariant(days) });
+      const sans = asArr(r.altNames).filter((s): s is string => typeof s === 'string');
+      if (sans.length > 0) {
+        kv.push({ key: 'SANs', value: sans.slice(0, 3).join(', ') });
+        hiddenCount += Math.max(0, sans.length - 3);
+      }
+      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
       break;
     }
+
     case 'tls': {
-      const protos = Array.isArray(r.supportedProtocols) ? (r.supportedProtocols as string[]) : [];
-      protos.slice(0, 3).forEach(p => lines.push(p));
+      const protos = asArr(r.supportedProtocols).filter((p): p is string => typeof p === 'string');
+      if (protos.length > 0) {
+        detail.push({ type: 'badge-row', items: protos.map(p => ({ label: p, variant: protoVariant(p) })) });
+      }
+      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [];
+      if (typeof r.ocspStapling === 'boolean')
+        kv.push({ key: 'OCSP Stapling', value: r.ocspStapling ? 'aktiv' : 'inaktiv', badge: r.ocspStapling ? 'ok' : 'warn' });
+      if (typeof r.forwardSecrecy === 'boolean')
+        kv.push({ key: 'Forward Secrecy', value: r.forwardSecrecy ? 'aktiv' : 'inaktiv', badge: r.forwardSecrecy ? 'ok' : 'warn' });
+      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      const ciphers = asArr(r.cipherSuites).length || asArr(r.ciphers).length;
+      hiddenCount += ciphers;
       break;
     }
-    case 'dns': {
-      const recs: unknown[] = Array.isArray(r.dns) ? r.dns : [];
-      recs.slice(0, 3).forEach(d => {
-        if (typeof d === 'object' && d !== null) {
-          const obj = d as Record<string, unknown>;
-          const val = obj.address ?? obj.value ?? obj.data ?? '';
-          lines.push(`${obj.type ?? '?'}: ${val}`);
-        }
-      });
+
+    case 'hsts': {
+      const enabled = r.compatible === true || r.isEnabled === true || !!r.hstsHeader;
+      const maxAge = asNum(r.maxAge);
+      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [
+        { key: 'Status', value: enabled ? 'aktiv' : 'inaktiv', badge: enabled ? 'ok' : 'warn' },
+      ];
+      if (maxAge !== undefined) kv.push({ key: 'Max-Age', value: `${Math.round(maxAge / 86400)} Tage` });
+      if (typeof r.includeSubDomains === 'boolean') kv.push({ key: 'includeSubDomains', value: yesNo(r.includeSubDomains) });
+      if (typeof r.preload === 'boolean') kv.push({ key: 'Preload', value: yesNo(r.preload) });
+      detail.push({ type: 'kv', items: kv });
       break;
     }
-    case 'redirects': {
-      const chain: unknown[] = Array.isArray(r.redirects) ? r.redirects : [];
-      chain.slice(0, 3).forEach(s => {
-        if (typeof s === 'string') lines.push(s);
-        else if (typeof s === 'object' && s !== null && 'url' in s) lines.push((s as { url: string }).url);
-      });
+
+    case 'http-headers': {
+      const missing = asArr(r.missingHeaders).filter((h): h is string => typeof h === 'string');
+      const headersObj = asObj(r.headers);
+      const present: string[] = headersObj
+        ? SEC_HEADERS.filter(h => Object.keys(headersObj).some(k => k.toLowerCase() === h.toLowerCase()))
+        : [];
+      if (present.length > 0) {
+        detail.push({ type: 'list', items: present.slice(0, 4).map(h => ({ text: h, badge: 'ok' as BadgeVariant })) });
+        hiddenCount += Math.max(0, present.length - 4);
+      }
+      if (missing.length > 0) {
+        detail.push({ type: 'list', items: missing.slice(0, 5).map(h => ({ text: h, badge: 'fail' as BadgeVariant })) });
+        hiddenCount += Math.max(0, missing.length - 5);
+      }
       break;
     }
-    case 'mail-config': {
-      if (!r.spf && !r.hasSPF) lines.push('SPF nicht konfiguriert');
-      if (!r.dkim && !r.hasDKIM) lines.push('DKIM nicht konfiguriert');
-      if (!r.dmarc && !r.hasDMARC) lines.push('DMARC nicht konfiguriert');
+
+    case 'http-security': {
+      const score = asNum(r.score);
+      if (score !== undefined) {
+        const badge: BadgeVariant = score >= 75 ? 'ok' : score >= 50 ? 'warn' : 'fail';
+        detail.push({ type: 'kv', items: [{ key: 'Score', value: `${score}/100`, badge }] });
+      }
+      const issues = asArr(r.issues);
+      if (issues.length > 0) {
+        const items = issues.slice(0, 3).map(it => {
+          const o = asObj(it);
+          const text = asStr(it) ?? asStr(o?.title) ?? asStr(o?.message) ?? 'Problem';
+          return { text, badge: 'fail' as BadgeVariant };
+        });
+        detail.push({ type: 'list', items });
+        hiddenCount += Math.max(0, issues.length - 3);
+      }
       break;
     }
+
+    case 'firewall': {
+      const detected = r.hasFirewall === true || r.detected === true || r.firewallDetected === true;
+      const name = asStr(r.firewall) ?? asStr(r.waf);
+      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [
+        { key: 'WAF erkannt', value: detected ? (name ?? 'ja') : 'nein', badge: detected ? 'ok' : 'warn' },
+      ];
+      const type = asStr(r.type);
+      if (type) kv.push({ key: 'Typ', value: type });
+      detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    case 'cookies': {
+      const cookies = asArr(r.cookies);
+      const src = cookies.length > 0
+        ? cookies
+        : asArr(r.insecureCookies).length > 0 ? asArr(r.insecureCookies) : asArr(r.unsecureCookies);
+      if (src.length > 0) {
+        const items = src.slice(0, 3).map(c => {
+          const o = asObj(c);
+          const name = asStr(o?.name) ?? asStr(c) ?? 'Cookie';
+          const flag = (label: string, v: unknown) => `${label} ${v === true ? '✓' : '✗'}`;
+          const same = asStr(o?.sameSite);
+          const parts = o
+            ? [flag('Secure', o.secure), flag('HttpOnly', o.httpOnly), same ? `SameSite: ${same}` : null].filter(Boolean)
+            : [];
+          return { key: name, value: parts.join(' · ') };
+        });
+        detail.push({ type: 'kv', items });
+        hiddenCount += Math.max(0, src.length - 3);
+      }
+      break;
+    }
+
+    case 'security-txt': {
+      const found = r.found === true || r.isPresent === true || r.exists === true || !!r.securityTxt;
+      const fields = asObj(r.fields) ?? r;
+      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [
+        { key: 'Gefunden', value: yesNo(found), badge: found ? 'ok' : 'warn' },
+      ];
+      const contact = asStr(fields.contact) ?? asStr(r.contact);
+      const expires = asStr(fields.expires) ?? asStr(r.expires);
+      if (contact) kv.push({ key: 'Contact', value: contact });
+      if (expires) kv.push({ key: 'Expires', value: expires });
+      detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
     case 'threats': {
-      if (typeof r.totalThreats === 'number' && r.totalThreats > 0)
-        lines.push(`${r.totalThreats} Bedrohung${r.totalThreats !== 1 ? 'en' : ''} erkannt`);
-      if (Array.isArray(r.sources)) (r.sources as string[]).slice(0, 2).forEach(s => lines.push(s));
+      const total = asNum(r.totalThreats) ?? 0;
+      const cats = asArr(r.categories).filter((c): c is string => typeof c === 'string');
+      detail.push({
+        type: 'kv',
+        items: [
+          { key: 'Bedrohungen', value: String(total), badge: total > 0 ? 'fail' : 'ok' },
+          { key: 'Kategorien', value: cats.length > 0 ? cats.join(', ') : '—' },
+        ],
+      });
+      const sources = asArr(r.sources).filter((s): s is string => typeof s === 'string');
+      if (sources.length > 0) {
+        detail.push({ type: 'list', items: sources.slice(0, 3).map(s => ({ text: s })) });
+        hiddenCount += Math.max(0, sources.length - 3);
+      }
       break;
     }
+
     case 'block-lists': {
-      if (typeof r.listedOn === 'number' && r.listedOn > 0)
-        lines.push(`Auf ${r.listedOn} Blockliste${r.listedOn !== 1 ? 'n' : ''} gelistet`);
+      const listedOn = asNum(r.listedOn) ?? 0;
+      detail.push({
+        type: 'kv',
+        items: [{ key: 'Gelistet auf', value: `${listedOn} Listen`, badge: listedOn > 0 ? 'fail' : 'ok' }],
+      });
+      const lists = asArr(r.lists).length > 0 ? asArr(r.lists) : asArr(r.blocklists);
+      const names = lists
+        .map(l => asStr(l) ?? asStr(asObj(l)?.name))
+        .filter((s): s is string => !!s);
+      if (names.length > 0) {
+        detail.push({ type: 'list', items: names.slice(0, 3).map(t => ({ text: t, badge: 'fail' as BadgeVariant })) });
+        hiddenCount += Math.max(0, names.length - 3);
+      }
       break;
     }
+
+    case 'dns': {
+      const recs = asArr(r.dns)
+        .map(d => asObj(d))
+        .filter((o): o is Obj => !!o);
+      if (recs.length > 0) {
+        const sorted = [...recs].sort((a, b) => {
+          const ia = DNS_TYPE_ORDER.indexOf(asStr(a.type) ?? '');
+          const ib = DNS_TYPE_ORDER.indexOf(asStr(b.type) ?? '');
+          return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+        });
+        const items = sorted.slice(0, 5).map(o => ({
+          key: asStr(o.type) ?? '?',
+          value: asStr(o.address) ?? asStr(o.value) ?? asStr(o.data) ?? '',
+        }));
+        detail.push({ type: 'kv', items });
+        hiddenCount += Math.max(0, recs.length - 5);
+      }
+      break;
+    }
+
+    case 'dnssec': {
+      const enabled = r.isDnssecEnabled === true || r.dnssecEnabled === true || r.valid === true || r.isPresent === true;
+      const algo = asStr(r.algorithm);
+      detail.push({
+        type: 'kv',
+        items: [
+          { key: 'DNSSEC aktiv', value: yesNo(enabled), badge: enabled ? 'ok' : 'warn' },
+          { key: 'Algorithmus', value: algo ?? '—' },
+        ],
+      });
+      break;
+    }
+
+    case 'dns-server': {
+      const servers = asArr(r.dnsServer)
+        .map(s => asStr(s) ?? asStr(asObj(s)?.address) ?? asStr(asObj(s)?.hostname))
+        .filter((s): s is string => !!s);
+      if (servers.length > 0) detail.push({ type: 'list', items: servers.map(t => ({ text: t })) });
+      break;
+    }
+
+    case 'txt-records': {
+      const recs = (asArr(r.txtRecords).length > 0 ? asArr(r.txtRecords) : asArr(r.records))
+        .map(t => asStr(t) ?? asStr(asObj(t)?.value))
+        .filter((s): s is string => !!s);
+      if (recs.length > 0) {
+        const sorted = [...recs].sort((a, b) => (/^v=spf1/i.test(b) ? 1 : 0) - (/^v=spf1/i.test(a) ? 1 : 0));
+        detail.push({ type: 'list', items: sorted.slice(0, 4).map(t => ({ text: truncate(t, 60) })) });
+        hiddenCount += Math.max(0, recs.length - 4);
+      }
+      break;
+    }
+
+    case 'mail-config': {
+      const hasSPF = !!(r.spf || r.hasSPF);
+      const hasDKIM = !!(r.dkim || r.hasDKIM);
+      const hasDMARC = !!(r.dmarc || r.hasDMARC);
+      const hasBIMI = !!(r.bimi || r.hasBIMI);
+      const spfVal = asStr(r.spf) ?? (hasSPF ? 'konfiguriert' : 'nicht konfiguriert');
+      const dkimSel = asStr(r.dkimSelector);
+      const dkimVal = hasDKIM ? (dkimSel ? `Selektor: ${dkimSel}` : 'konfiguriert') : 'nicht konfiguriert';
+      const policy = (asStr(r.dmarcPolicy) ?? asStr(r.policy) ?? '').toLowerCase();
+      const dmarcBadge: BadgeVariant = !hasDMARC ? 'fail' : /reject|quarantine/.test(policy) ? 'ok' : 'warn';
+      const dmarcVal = !hasDMARC ? 'nicht konfiguriert' : policy ? `p=${policy}` : 'konfiguriert';
+      detail.push({
+        type: 'kv',
+        items: [
+          { key: 'SPF', value: truncate(spfVal, 48), badge: hasSPF ? 'ok' : 'fail' },
+          { key: 'DKIM', value: dkimVal, badge: hasDKIM ? 'ok' : 'fail' },
+          { key: 'DMARC', value: dmarcVal, badge: dmarcBadge },
+          { key: 'BIMI', value: hasBIMI ? 'konfiguriert' : 'nicht konfiguriert', badge: hasBIMI ? 'ok' : 'fail' },
+        ],
+      });
+      break;
+    }
+
+    case 'ports': {
+      const ports = asArr(r.ports).length > 0 ? asArr(r.ports) : asArr(r.openPorts);
+      if (ports.length > 0) {
+        const items = ports.slice(0, 3).map(p => {
+          if (typeof p === 'number') return { key: String(p), value: '' };
+          const o = asObj(p);
+          const num = asNum(o?.port) ?? asNum(o?.portNumber);
+          const svc = asStr(o?.service) ?? '';
+          return { key: num !== undefined ? String(num) : '?', value: svc };
+        });
+        detail.push({ type: 'kv', items });
+        hiddenCount += Math.max(0, ports.length - 3);
+      }
+      break;
+    }
+
+    case 'redirects': {
+      const chain = asArr(r.redirects);
+      if (chain.length > 0) {
+        const items = chain.map(s => {
+          if (typeof s === 'string') return { text: s };
+          const o = asObj(s);
+          const url = asStr(o?.url) ?? '';
+          const code = asNum(o?.status) ?? asNum(o?.statusCode);
+          return code !== undefined
+            ? { text: `${url} (${code})`, badge: statusCodeVariant(code) }
+            : { text: url };
+        }).filter(it => it.text.trim() !== '');
+        if (items.length > 0) detail.push({ type: 'list', items });
+      }
+      break;
+    }
+
+    case 'get-ip': {
+      const ip = asStr(r.ip) ?? asStr(r.ipAddress);
+      const country = asStr(r.country);
+      const cc = asStr(r.countryCode);
+      const city = asStr(r.city);
+      const isp = asStr(r.org) ?? asStr(r.isp) ?? asStr(r.asn);
+      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [];
+      if (ip) kv.push({ key: 'IP-Adresse', value: ip });
+      if (country) kv.push({ key: 'Land', value: cc ? `${country} [${cc}]` : country });
+      if (city) kv.push({ key: 'Stadt', value: city });
+      if (isp) kv.push({ key: 'ISP / AS', value: isp });
+      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    case 'server-status': {
+      const code = asNum(r.statusCode) ?? asNum(r.status) ?? 200;
+      const server = asStr(r.server);
+      const rt = asNum(r.responseTime) ?? asNum(r.responseTimeMs);
+      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [
+        { key: 'HTTP-Status', value: String(code), badge: statusCodeVariant(code) },
+      ];
+      if (server) kv.push({ key: 'Server', value: server });
+      if (rt !== undefined) kv.push({ key: 'Antwortzeit', value: `${rt} ms` });
+      detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    // screenshot: separat als ScreenshotSection gerendert — kein Detail-Block.
     default:
       break;
   }
 
-  return lines;
+  return { detail, hiddenCount };
 }
 
 // ---------------------------------------------------------------------------
@@ -315,6 +596,10 @@ export default function LiveCheckResultsPage() {
   const target = searchParams.get('target') ?? '';
 
   const { modules, results, phase, done, total, abort } = useLiveCheck(target);
+
+  // "Alle aufklappen" pro Gruppe (VEC-395 §4). Wert übersteuert lokalen
+  // CheckTile-State via forceExpanded; undefined = Tile entscheidet selbst.
+  const [groupAllExpanded, setGroupAllExpanded] = useState<Map<CheckGroup, boolean>>(new Map());
 
   // Auth guard — must be logged in to access live-check
   useEffect(() => {
@@ -464,19 +749,42 @@ export default function LiveCheckResultsPage() {
           const displayItems = group === 'info' ? items.filter(r => r.key !== 'screenshot') : items;
           if (displayItems.length === 0) return null;
 
+          // Detail einmal pro Item ableiten; bestimmt auch, ob "Alle aufklappen" sinnvoll ist.
+          const itemDetails = displayItems.map(r => ({ result: r, ...extractDetail(r) }));
+          const groupHasDetail = itemDetails.some(d => d.detail.length > 0);
+          const allExpanded = groupAllExpanded.get(group) === true;
+
           return (
             <section key={group}>
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-3">
-                {GROUP_LABELS[group]}
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {displayItems.map(r => (
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  {GROUP_LABELS[group]}
+                </h2>
+                {groupHasDetail && (
+                  <button
+                    type="button"
+                    onClick={() => setGroupAllExpanded(prev => {
+                      const next = new Map(prev);
+                      next.set(group, !allExpanded);
+                      return next;
+                    })}
+                    className="text-xs text-slate-600 hover:text-slate-400 transition-colors"
+                    aria-expanded={allExpanded}
+                  >
+                    {allExpanded ? 'Alle einklappen' : 'Alle aufklappen'}
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                {itemDetails.map(({ result: r, detail, hiddenCount }) => (
                   <CheckTile
                     key={r.key}
                     label={r.label}
                     status={r.status}
                     summary={r.summary}
-                    detailLines={extractDetailLines(r)}
+                    detail={detail}
+                    hiddenCount={hiddenCount}
+                    forceExpanded={groupAllExpanded.has(group) ? allExpanded : undefined}
                   />
                 ))}
               </div>
