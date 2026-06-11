@@ -234,7 +234,7 @@ test-edge:
       STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
       STRIPE_PRICE_PERIMETER=${STRIPE_PRICE_PERIMETER:-price_1TewEA1j7RvmOvLYHNA2lyM2}
       STRIPE_PRICE_DEFAULT=${STRIPE_PRICE_DEFAULT}
-      CRM_WEBHOOK_URL=${CRM_WEBHOOK_URL:-}
+      CRM_WEBHOOK_URL=http://vectiscan-twenty-server-1:3000/rest/people
       CRM_API_KEY=${CRM_API_KEY:-}
       SALES_NOTIFY_URL=${SALES_NOTIFY_URL:-}
       TWENTY_PG_PASSWORD=${TWENTY_PG_PASSWORD:-}
@@ -289,6 +289,17 @@ test-edge:
         echo "      Scan-Funktion bleibt unberuehrt; nur die Alert-Zustellung betroffen."
       else
         echo "OK: ADMIN_EMAIL im .env gesetzt -> Grafana-Alert-Empfaenger vorhanden (Wert wird NICHT geloggt)."
+      fi
+    # ── Deploy-Guard (VEC-328): CRM_API_KEY ist der Bearer-Token fuer den Twenty-CRM-Upsert.
+    #    Ohne ihn antwortet /rest/people mit 403 (FORBIDDEN_EXCEPTION) → crm-lookup-failed.
+    #    CRM_WEBHOOK_URL ist jetzt hardcoded auf den internen Container-URL (bypasses Traefik).
+    - |
+      if grep -q '^CRM_API_KEY=$' .env; then
+        echo "WARN: CRM_API_KEY ist LEER im .env — CRM-Lead-Upsert ist TOT (403 from Twenty)."
+        echo "      Ursache i.d.R.: CI-Var CRM_API_KEY leer/unset. Abhilfe: CI-Var setzen (Maintainer)."
+        echo "      DOI-Confirm-Flow bleibt unberuehrt; nur CRM-Sync betroffen."
+      else
+        echo "OK: CRM_API_KEY im .env gesetzt (Wert wird nicht geloggt). CRM_WEBHOOK_URL=intern."
       fi
     - cp ${CI_PROJECT_DIR}/docker-compose.yml .
     # Monitoring-Configs (VEC-85): Bind-Mounts in docker-compose.yml zeigen auf
