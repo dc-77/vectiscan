@@ -1165,52 +1165,62 @@ ops-fix-crm-traefik-vec328:
       allow_failure: true
   script:
     - cd ${DEPLOY_PATH}
-    # --- Schritt 1: Container-Labels prüfen (vor Recreate) ---
+    # --- Schritt 1: Traefik static config lesen (Docker provider + constraints) ---
     - |
-      echo "=== twenty-server Container-Labels (aktuell) ==="
-      docker inspect vectiscan-twenty-server-1 \
-        --format '{{range $k,$v := .Config.Labels}}{{$k}}={{$v}}{{"\n"}}{{end}}' \
-        | grep -i "traefik" | sort
-    # --- Schritt 2: Traefik-Config untersuchen ---
-    - |
-      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
-      echo "Traefik Container: $TRAEFIK"
-      echo "=== Traefik Networks ==="
-      docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+      echo "=== /opt/traefik/traefik.yml ==="
+      cat /opt/traefik/traefik.yml 2>/dev/null || echo "NICHT GEFUNDEN"
       echo ""
-      echo "=== Traefik Labels ==="
-      docker inspect "$TRAEFIK" --format '{{range $k,$v := .Config.Labels}}{{$k}}={{$v}}{{"\n"}}{{end}}'
-    # --- Schritt 3: ALLE Traefik Docker-Routers listen ---
+      echo "=== /opt/traefik/*.yml (alle Configs) ==="
+      ls /opt/traefik/*.yml /opt/traefik/*.toml 2>/dev/null || echo "keine weiteren configs"
+      echo ""
+      echo "=== /opt/traefik/docker-compose.yml ==="
+      cat /opt/traefik/docker-compose.yml 2>/dev/null || echo "NICHT GEFUNDEN"
+    # --- Schritt 2: Traefik API via curl-Container (korrekte Methode) ---
     - |
       TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
-      # Traefik API von innen via localhost (port 8080 oft nur lokal gebunden)
-      echo "=== Alle Traefik Routers (via exec) ==="
-      docker exec "$TRAEFIK" wget -qO- "http://localhost:8080/api/http/routers?per_page=100" 2>/dev/null \
-        | tr ',' '\n' | grep '"name"' | head -40 || echo "exec-Methode fehlgeschlagen"
-    - |
-      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
-      echo "=== twenty-api@docker gezielt ==="
-      docker exec "$TRAEFIK" wget -qO- "http://localhost:8080/api/http/routers/twenty-api@docker" 2>/dev/null || echo "nicht gefunden"
+      TRAEFIK_IP=$(docker inspect "$TRAEFIK" --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' | awk '{print $1}')
+      echo "Traefik Container: $TRAEFIK | IP: $TRAEFIK_IP"
+      echo ""
+      echo "=== Alle Docker-Provider Routers (via curl auf proxy-net) ==="
+      docker run --rm --network proxy-net curlimages/curl:8.8.0 -s --max-time 10 \
+        "http://${TRAEFIK_IP}:8080/api/http/routers?per_page=200" 2>/dev/null \
+        | tr ',' '\n' | grep '"name"' | sort | head -60
       echo ""
       echo "=== twenty@docker gezielt ==="
-      docker exec "$TRAEFIK" wget -qO- "http://localhost:8080/api/http/routers/twenty@docker" 2>/dev/null || echo "nicht gefunden"
-    # --- Schritt 4: Force-Recreate (Traefik-Labels neu applizieren) ---
+      docker run --rm --network proxy-net curlimages/curl:8.8.0 -s --max-time 10 \
+        "http://${TRAEFIK_IP}:8080/api/http/routers/twenty@docker" 2>/dev/null | head -5
+      echo ""
+      echo "=== twenty-api@docker gezielt ==="
+      docker run --rm --network proxy-net curlimages/curl:8.8.0 -s --max-time 10 \
+        "http://${TRAEFIK_IP}:8080/api/http/routers/twenty-api@docker" 2>/dev/null | head -5
+    # --- Schritt 3: socket-proxy Config (was darf Traefik sehen?) ---
+    - |
+      SPROXY=$(docker ps --format '{{.Names}}' | grep -i socket.proxy | head -1)
+      echo "socket-proxy Container: $SPROXY"
+      if [ -n "$SPROXY" ]; then
+        echo "=== socket-proxy Env (Zugriffsliste) ==="
+        docker inspect "$SPROXY" --format '{{range .Config.Env}}{{.}}{{"\n"}}{{end}}' | sort
+      fi
+    # --- Schritt 4: Force-Recreate twenty-server + twenty-worker ---
     - echo "=== Force-Recreate twenty-server + twenty-worker ==="
     - COMPOSE_PROFILES=crm docker compose up -d --force-recreate --no-build twenty-server twenty-worker
     - sleep 20
     - docker compose ps twenty-server twenty-worker
-    # --- Schritt 5: Labels nach Recreate prüfen ---
-    - |
-      echo "=== twenty-server Container-Labels (NACH Recreate) ==="
-      docker inspect vectiscan-twenty-server-1 \
-        --format '{{range $k,$v := .Config.Labels}}{{$k}}={{$v}}{{"\n"}}{{end}}' \
-        | grep -i "traefik" | sort
-    # --- Schritt 6: Traefik Router nach Recreate prüfen ---
+    # --- Schritt 5: Nach Recreate: Traefik Router via curl prüfen ---
     - |
       TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
-      echo "=== twenty-api@docker nach Recreate ==="
-      docker exec "$TRAEFIK" wget -qO- "http://localhost:8080/api/http/routers/twenty-api@docker" 2>/dev/null || echo "NICHT GEFUNDEN"
-    # --- Schritt 7: Smoke-Test REST direkt ---
+      TRAEFIK_IP=$(docker inspect "$TRAEFIK" --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' | awk '{print $1}')
+      echo "=== twenty-api@docker NACH Recreate ==="
+      RESULT=$(docker run --rm --network proxy-net curlimages/curl:8.8.0 -s --max-time 10 \
+        "http://${TRAEFIK_IP}:8080/api/http/routers/twenty-api@docker" 2>/dev/null)
+      echo "$RESULT"
+      if echo "$RESULT" | grep -q '"name"'; then
+        echo "PASS: twenty-api@docker Router registriert"
+      else
+        echo "FAIL: Router fehlt trotz korrekter Labels — Root-Cause in Traefik-Config (constraints/network?)"
+        exit 1
+      fi
+    # --- Schritt 6: Smoke-Test REST direkt ---
     - |
       TWENTY_IP=$(docker inspect vectiscan-twenty-server-1 \
         --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' | awk '{print $1}')
