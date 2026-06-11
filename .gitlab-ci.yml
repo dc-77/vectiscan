@@ -316,6 +316,17 @@ test-edge:
     #    Klartext verifizierbar. Sobald die Board/Maintainer die alte CI-Var auf
     #    diesen Wert korrigiert (oder loescht), kann dieser Override entfallen.
     - export RESEND_FROM_EMAIL='VectiScan <noreply@vectiscan.de>'
+    # ── VEC-388 CRM-URL-Override: Root-Cause aus VEC-387 — die CI-Variable
+    #    CRM_WEBHOOK_URL traegt noch den Traefik-Public-URL (crm.vectigal.tech,
+    #    gesetzt in VEC-304). Sie ist als Shell-Env exportiert und gewinnt bei
+    #    `docker compose up` VOR der .env-Datei (Zeile 237) UND vor dem
+    #    docker-compose.yml-Interpolations-Default (${CRM_WEBHOOK_URL:-}). Die
+    #    .env-Hardcodierung aus VEC-386 war dadurch inert. Identisches
+    #    Precedence-Muster wie RESEND_FROM_EMAIL oben; gleiche Loesung: expliziter
+    #    Export macht den internen Container-URL deterministisch, unabhaengig vom
+    #    CI-Var-Zustand (Twenty bypasst Traefik via proxy-net, kein 401). Sobald
+    #    Maintainer die CI-Var loescht/auf intern korrigiert, kann der Override weg.
+    - export CRM_WEBHOOK_URL='http://vectiscan-twenty-server-1:3000/rest/people'
     - docker compose pull
     # VEC-320: COMPOSE_PROFILES=crm stellt sicher dass Twenty-CRM-Container
     # bei jedem Deploy mitgestartet werden (nicht nur beim ersten manuellen Start).
