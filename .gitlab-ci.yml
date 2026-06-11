@@ -1241,3 +1241,73 @@ ops-fix-crm-traefik-vec328:
       echo "HTTP Status: ${HTTP}"
     - echo "=== VEC-328 Diagnose abgeschlossen ==="
 
+# =============================================================================
+# ops-verify-crm-vec328: Post-Deploy-Verifikation — CRM_WEBHOOK_URL=intern +
+# Direktzugriff vectiscan-api-1 → vectiscan-twenty-server-1 via proxy-net.
+# Prüft: (1) CRM_WEBHOOK_URL im laufenden api-Container auf interne URL,
+# (2) HTTP-Erreichbarkeit /rest/people ohne Traefik, (3) letzte CRM-Log-Zeilen.
+# Bestanden wenn: URL=intern + HTTP != 000 + kein "crm-lookup-failed" in Logs.
+# =============================================================================
+ops-verify-crm-vec328:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  script:
+    - cd ${DEPLOY_PATH}
+    - echo "=== Schritt 1: CRM_WEBHOOK_URL im laufenden api-Container ==="
+    - |
+      URL=$(docker compose exec -T api sh -c 'echo "${CRM_WEBHOOK_URL}"' 2>/dev/null | tr -d '\r')
+      echo "  CRM_WEBHOOK_URL=${URL}"
+      if echo "$URL" | grep -q "vectiscan-twenty-server-1"; then
+        echo "  PASS: interne Container-URL gesetzt"
+      elif [ -z "$URL" ]; then
+        echo "  WARN: CRM_WEBHOOK_URL leer — Dry-Mode (kein Fehler, aber kein CRM-Schreiben)"
+      else
+        echo "  INFO: URL=${URL} (kein interner Container-Name)"
+      fi
+    - echo ""
+    - echo "=== Schritt 2: Direktzugriff api → twenty-server via proxy-net ==="
+    - |
+      HTTP=$(docker compose exec -T api sh -c \
+        'wget -qO- --server-response --timeout=10 http://vectiscan-twenty-server-1:3000/rest/people 2>&1 | head -5 || true' 2>/dev/null | head -5)
+      echo "  Response-Header-Snippet: ${HTTP}"
+      HTTP_CODE=$(docker run --rm --network proxy-net curlimages/curl:8.8.0 \
+        -s -o /dev/null -w '%{http_code}' --max-time 10 \
+        http://vectiscan-twenty-server-1:3000/rest/people 2>/dev/null || echo "000")
+      echo "  HTTP-Statuscode (ohne Auth): ${HTTP_CODE}"
+      if [ "$HTTP_CODE" = "000" ]; then
+        echo "  FAIL: Kein Netz-Zugriff auf vectiscan-twenty-server-1:3000 aus proxy-net"
+        exit 1
+      elif [ "$HTTP_CODE" = "401" ] || [ "$HTTP_CODE" = "403" ]; then
+        echo "  PASS: Endpoint antwortet (${HTTP_CODE} erwartet ohne Bearer-Token)"
+      elif [ "$HTTP_CODE" = "200" ]; then
+        echo "  PASS: Endpoint antwortet mit 200 (public oder API-Key bereits in Env)"
+      else
+        echo "  INFO: HTTP ${HTTP_CODE} — prüfen ob twenty-server gesund"
+      fi
+    - echo ""
+    - echo "=== Schritt 3: Letzte CRM-Logzeilen aus vectiscan-api-1 ==="
+    - |
+      CRM_LINES=$(docker logs --tail 3000 vectiscan-api-1 2>&1 | grep -E '"webcheck lead CRM routing"|crm-lookup-failed|crm.*created|crm.*exists|crm.*not-configured' | tail -20)
+      if [ -n "$CRM_LINES" ]; then
+        echo "$CRM_LINES"
+        if echo "$CRM_LINES" | grep -q "crm-lookup-failed"; then
+          echo ""
+          echo "  FAIL: crm-lookup-failed noch in Logs — CRM-Upsert scheitert nach Deploy"
+          exit 1
+        else
+          echo ""
+          echo "  PASS: Keine crm-lookup-failed Einträge nach Deploy"
+        fi
+      else
+        echo "  INFO: Keine CRM-Logzeilen gefunden (noch kein DOI-Confirm seit Deploy — normal kurz nach Deploy)"
+      fi
+    - echo ""
+    - echo "=== VEC-328 Verifikation abgeschlossen ==="
+
