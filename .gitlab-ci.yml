@@ -1144,3 +1144,58 @@ ops-provision-turnstile:
       echo "  WEBCHECK_TURNSTILE_SECRET      = [MASKED]"
       echo "  Naechster Schritt: feat/vec-189-turnstile-widget mergen + build triggern."
 
+# =============================================================================
+# VEC-328 — Traefik twenty-api@docker Router-Fix (Force-Recreate twenty-server)
+# twenty-server lief ohne COMPOSE_PROFILES=crm gestartet → Labels fehlen →
+# twenty-api@docker nicht in Traefik registriert → /rest/* läuft über
+# twenty@docker (internal-auth@file) → 401 → crm-lookup-failed.
+# Dieser einmalige Ops-Job force-recreated twenty-server + twenty-worker
+# damit Traefik die Labels aufnimmt und /rest/* korrekt geroutet wird.
+# Danach entfällt dieser Job (oder bleibt als idempotenter Notfall-Reset).
+# =============================================================================
+ops-fix-crm-traefik-vec328:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  script:
+    - cd ${DEPLOY_PATH}
+    # Force-recreate twenty-server + twenty-worker mit crm-Profile damit
+    # Traefik die Labels für twenty-api@docker aufnimmt (VEC-328 Fix)
+    - COMPOSE_PROFILES=crm docker compose up -d --force-recreate --no-build twenty-server twenty-worker
+    - sleep 20
+    - docker compose ps twenty-server twenty-worker
+    # Prüfen ob Traefik den twenty-api@docker Router jetzt kennt
+    - |
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
+      echo "=== Traefik Router twenty-api@docker ==="
+      RESULT=$(docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 \
+        "http://${TRAEFIK}:8080/api/http/routers/twenty-api@docker" 2>/dev/null)
+      echo "$RESULT"
+      if echo "$RESULT" | grep -q '"name"'; then
+        echo "PASS: twenty-api@docker Router registriert"
+      else
+        echo "FAIL: twenty-api@docker Router fehlt noch — prüfe Traefik-Logs"
+        exit 1
+      fi
+    # Smoke-Test: REST-API direkt gegen Container-IP
+    - |
+      TWENTY_IP=$(docker inspect vectiscan-twenty-server-1 \
+        --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' | awk '{print $1}')
+      echo "=== REST Smoke-Test: http://${TWENTY_IP}:3000/rest/people ==="
+      HTTP=$(docker run --rm curlimages/curl:8.8.0 -s -o /dev/null -w '%{http_code}' \
+        --max-time 10 "http://${TWENTY_IP}:3000/rest/people?limit=1" 2>/dev/null)
+      echo "HTTP Status: ${HTTP}"
+      if [ "$HTTP" = "200" ] || [ "$HTTP" = "401" ]; then
+        echo "PASS: Container erreichbar (${HTTP})"
+      else
+        echo "WARN: Unerwarteter Status ${HTTP}"
+      fi
+    - echo "=== VEC-328 Fix abgeschlossen — twenty-api@docker Router aktiv ==="
+
