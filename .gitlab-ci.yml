@@ -1277,16 +1277,17 @@ ops-e2e-vec387:
       echo "Stack laeuft mit CRM_WEBHOOK_URL=intern (ca47dcf / Pipeline 2745)"
       docker compose exec -T postgres psql -U "${DB_USER}" -d "${DB_NAME}" \
         -c "DELETE FROM webcheck_leads WHERE email LIKE 'e2e-vec387%';" 2>&1 || true
+      docker compose exec -T postgres psql -U "${DB_USER}" -d "${DB_NAME}" \
+        -c "INSERT INTO webcheck_leads (email, domain, verification_token, doi_token, doi_sent_at, ip, marketing_consent, consent_text_version, consent_status, legal_basis)
+            VALUES ('e2e-vec387@vectigal.tech', 'vectigal.tech', 'e2e-vec387-token', gen_random_uuid()::text, NOW(), '127.0.0.1', TRUE, 'v1-e2e', 'pending', 'consent');"
       DOI_TOKEN=$(docker compose exec -T postgres psql -U "${DB_USER}" -d "${DB_NAME}" -tAc \
-        "INSERT INTO webcheck_leads (email, domain, verification_token, doi_token, doi_sent_at, ip, marketing_consent, consent_text_version, consent_status, legal_basis)
-         VALUES ('e2e-vec387@vectigal.tech', 'vectigal.tech', 'e2e-vec387-token', gen_random_uuid()::text, NOW(), '127.0.0.1', TRUE, 'v1-e2e', 'pending', 'consent')
-         RETURNING doi_token;" | tr -d '[:space:]')
-      echo "DOI Token: ${DOI_TOKEN}"
+        "SELECT doi_token FROM webcheck_leads WHERE email='e2e-vec387@vectigal.tech' AND consent_status='pending' ORDER BY created_at DESC LIMIT 1;" | tr -d '[:space:]')
+      echo "DOI Token (clean): ${DOI_TOKEN}"
       echo "=== DOI Confirm via scan-api.vectigal.tech ==="
       curl -sv "https://scan-api.vectigal.tech/api/webcheck/doi/confirm?token=${DOI_TOKEN}" 2>&1 | grep -E "< HTTP|confirmed|success"
       sleep 5
       echo "=== API-Log: CRM-Routing (Beleg crm=created/exists) ==="
-      docker compose logs --tail=100 --no-color api 2>&1 | grep -iE "crm=|crm-lookup-failed|webcheck lead CRM" | tail -15
+      docker compose logs --tail=100 --no-color api 2>&1 | grep -iE "crm=|crm-lookup-failed|webcheck lead CRM" | tail -15 || echo "(no CRM log entry found)"
       echo "=== CRM_WEBHOOK_URL im api-Container ==="
       docker compose exec -T api env | grep CRM_WEBHOOK_URL || echo api-nicht-erreichbar
       echo "=== Cleanup ==="
