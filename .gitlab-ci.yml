@@ -1165,26 +1165,52 @@ ops-fix-crm-traefik-vec328:
       allow_failure: true
   script:
     - cd ${DEPLOY_PATH}
-    # Force-recreate twenty-server + twenty-worker mit crm-Profile damit
-    # Traefik die Labels für twenty-api@docker aufnimmt (VEC-328 Fix)
+    # --- Schritt 1: Container-Labels prüfen (vor Recreate) ---
+    - |
+      echo "=== twenty-server Container-Labels (aktuell) ==="
+      docker inspect vectiscan-twenty-server-1 \
+        --format '{{range $k,$v := .Config.Labels}}{{$k}}={{$v}}{{"\n"}}{{end}}' \
+        | grep -i "traefik" | sort
+    # --- Schritt 2: Traefik-Config untersuchen ---
+    - |
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      echo "Traefik Container: $TRAEFIK"
+      echo "=== Traefik Networks ==="
+      docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}'
+      echo ""
+      echo "=== Traefik Labels ==="
+      docker inspect "$TRAEFIK" --format '{{range $k,$v := .Config.Labels}}{{$k}}={{$v}}{{"\n"}}{{end}}'
+    # --- Schritt 3: ALLE Traefik Docker-Routers listen ---
+    - |
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      # Traefik API von innen via localhost (port 8080 oft nur lokal gebunden)
+      echo "=== Alle Traefik Routers (via exec) ==="
+      docker exec "$TRAEFIK" wget -qO- "http://localhost:8080/api/http/routers?per_page=100" 2>/dev/null \
+        | tr ',' '\n' | grep '"name"' | head -40 || echo "exec-Methode fehlgeschlagen"
+    - |
+      TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
+      echo "=== twenty-api@docker gezielt ==="
+      docker exec "$TRAEFIK" wget -qO- "http://localhost:8080/api/http/routers/twenty-api@docker" 2>/dev/null || echo "nicht gefunden"
+      echo ""
+      echo "=== twenty@docker gezielt ==="
+      docker exec "$TRAEFIK" wget -qO- "http://localhost:8080/api/http/routers/twenty@docker" 2>/dev/null || echo "nicht gefunden"
+    # --- Schritt 4: Force-Recreate (Traefik-Labels neu applizieren) ---
+    - echo "=== Force-Recreate twenty-server + twenty-worker ==="
     - COMPOSE_PROFILES=crm docker compose up -d --force-recreate --no-build twenty-server twenty-worker
     - sleep 20
     - docker compose ps twenty-server twenty-worker
-    # Prüfen ob Traefik den twenty-api@docker Router jetzt kennt
+    # --- Schritt 5: Labels nach Recreate prüfen ---
+    - |
+      echo "=== twenty-server Container-Labels (NACH Recreate) ==="
+      docker inspect vectiscan-twenty-server-1 \
+        --format '{{range $k,$v := .Config.Labels}}{{$k}}={{$v}}{{"\n"}}{{end}}' \
+        | grep -i "traefik" | sort
+    # --- Schritt 6: Traefik Router nach Recreate prüfen ---
     - |
       TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
-      NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
-      echo "=== Traefik Router twenty-api@docker ==="
-      RESULT=$(docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 \
-        "http://${TRAEFIK}:8080/api/http/routers/twenty-api@docker" 2>/dev/null)
-      echo "$RESULT"
-      if echo "$RESULT" | grep -q '"name"'; then
-        echo "PASS: twenty-api@docker Router registriert"
-      else
-        echo "FAIL: twenty-api@docker Router fehlt noch — prüfe Traefik-Logs"
-        exit 1
-      fi
-    # Smoke-Test: REST-API direkt gegen Container-IP
+      echo "=== twenty-api@docker nach Recreate ==="
+      docker exec "$TRAEFIK" wget -qO- "http://localhost:8080/api/http/routers/twenty-api@docker" 2>/dev/null || echo "NICHT GEFUNDEN"
+    # --- Schritt 7: Smoke-Test REST direkt ---
     - |
       TWENTY_IP=$(docker inspect vectiscan-twenty-server-1 \
         --format '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' | awk '{print $1}')
@@ -1192,10 +1218,5 @@ ops-fix-crm-traefik-vec328:
       HTTP=$(docker run --rm curlimages/curl:8.8.0 -s -o /dev/null -w '%{http_code}' \
         --max-time 10 "http://${TWENTY_IP}:3000/rest/people?limit=1" 2>/dev/null)
       echo "HTTP Status: ${HTTP}"
-      if [ "$HTTP" = "200" ] || [ "$HTTP" = "401" ]; then
-        echo "PASS: Container erreichbar (${HTTP})"
-      else
-        echo "WARN: Unerwarteter Status ${HTTP}"
-      fi
-    - echo "=== VEC-328 Fix abgeschlossen — twenty-api@docker Router aktiv ==="
+    - echo "=== VEC-328 Diagnose abgeschlossen ==="
 
