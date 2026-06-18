@@ -1,0 +1,97 @@
+{
+  "_comment": "VEC-437 (C1) — Realm-Import fuer die dedizierte VectiScan-Keycloak. Parent VEC-421, Spike VEC-430 (docs/AUTH-SSO-VEC-430-SPIKE.md). Die zwei `secret`-Felder tragen Platzhalter und werden vom CI-Job ops-keycloak-provision aus maskierten Pipeline-Variablen ersetzt, BEVOR die Datei in den Import-Ordner des Containers gelegt wird. KEIN echtes Secret im Repo. Import laeuft beim ersten Start via `--import-realm` (Strategie IGNORE_EXISTING: bestehender Realm wird nicht ueberschrieben).",
+  "realm": "vectiscan",
+  "enabled": true,
+  "displayName": "Vectigal SSO",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "bruteForceProtected": true,
+  "groups": [
+    {
+      "name": "vectiscan-admin",
+      "path": "/vectiscan-admin",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "vectiscan-grafana",
+      "name": "VectiScan Grafana (logs.vectigal.tech)",
+      "description": "OIDC-Client fuer Grafanas natives Generic-OAuth (Spike VEC-430 §2a).",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "bearerOnly": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "secret": "__KEYCLOAK_GRAFANA_SECRET__",
+      "redirectUris": [
+        "https://logs.vectigal.tech/login/generic_oauth"
+      ],
+      "webOrigins": [
+        "https://logs.vectigal.tech"
+      ],
+      "defaultClientScopes": ["openid", "profile", "email", "roles"],
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "claim.name": "groups"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "vectiscan-oauth2-proxy",
+      "name": "VectiScan oauth2-proxy (status + /admin forwardAuth)",
+      "description": "OIDC-Client fuer den oauth2-proxy vor Uptime-Kuma (status.vectigal.tech) und Frontend /admin (scan.vectigal.tech) via Traefik forwardAuth (Spike VEC-430 §2b/2c).",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "bearerOnly": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "secret": "__KEYCLOAK_OAUTH2_PROXY_SECRET__",
+      "redirectUris": [
+        "https://status.vectigal.tech/oauth2/callback",
+        "https://scan.vectigal.tech/oauth2/callback"
+      ],
+      "webOrigins": [
+        "https://status.vectigal.tech",
+        "https://scan.vectigal.tech"
+      ],
+      "defaultClientScopes": ["openid", "profile", "email", "roles"],
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "claim.name": "groups"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -239,6 +239,9 @@ test-edge:
       SALES_NOTIFY_URL=${SALES_NOTIFY_URL:-}
       TWENTY_PG_PASSWORD=${TWENTY_PG_PASSWORD:-}
       TWENTY_APP_SECRET=${TWENTY_APP_SECRET:-}
+      KC_DB_PASSWORD=${KC_DB_PASSWORD:-}
+      KC_BOOTSTRAP_ADMIN_USERNAME=${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD=${KC_BOOTSTRAP_ADMIN_PASSWORD:-}
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
     # ── Deploy-Guard (VEC-217): RESEND_API_KEY ist eine *protected* CI-Var; auf
@@ -971,6 +974,81 @@ ops-traefik-auth:
   environment:
     name: production
     url: https://scan.vectigal.tech
+
+# =============================================================================
+# VEC-437 (C1) — Keycloak-SSO provisionieren (dedizierte Instanz, Parent VEC-421).
+#
+# Rendert die Realm-Import-Datei (Client-Secrets aus maskierten CI-Vars statt
+# Repo-Platzhalter), legt sie nach ${DEPLOY_PATH}/keycloak/import/ und startet
+# das Compose-Profil `sso` (keycloak-db + keycloak). Default-Deploys lassen das
+# sso-Profil aus -> dieser Job ist der EINZIGE Aktivierungspfad. Idempotent:
+# Realm-Import-Strategie IGNORE_EXISTING ueberschreibt einen bestehenden Realm nicht.
+# KEIN Image-Build/-Pull-Zwang (needs:[]); manuell/API-getriggert.
+#
+# Benoetigte maskierte Pipeline-Variablen (Owner: Hamilton/Maintainer; Dev-Token
+# kann sie NICHT setzen):
+#   KC_DB_PASSWORD                 Postgres-Passwort der Keycloak-DB
+#   KC_BOOTSTRAP_ADMIN_PASSWORD    Master-Admin-Passwort (Erststart)
+#   KEYCLOAK_GRAFANA_SECRET        Client-Secret vectiscan-grafana
+#   KEYCLOAK_OAUTH2_PROXY_SECRET   Client-Secret vectiscan-oauth2-proxy
+#   KC_BOOTSTRAP_ADMIN_USERNAME    (optional, Default `admin`)
+# Details + Verifikation: docs/AUTH-SSO-C1-KEYCLOAK.md
+# =============================================================================
+ops-keycloak-provision:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  script:
+    - |
+      MISS=""
+      for V in KC_DB_PASSWORD KC_BOOTSTRAP_ADMIN_PASSWORD KEYCLOAK_GRAFANA_SECRET KEYCLOAK_OAUTH2_PROXY_SECRET; do
+        eval "VAL=\${$V}"
+        if [ -z "$VAL" ]; then MISS="$MISS $V"; fi
+      done
+      if [ -n "$MISS" ]; then
+        echo "FATAL: maskierte Pipeline-Variable(n) fehlen:$MISS"
+        echo "       Maintainer muss sie als masked CI/CD-Variablen setzen (s. docs/AUTH-SSO-C1-KEYCLOAK.md)."
+        exit 1
+      fi
+      echo "OK: alle 4 KC-Secrets praesent (Werte werden nie geloggt)."
+    - cd ${DEPLOY_PATH}
+    # 1) Aktuelles Compose ausrollen (enthaelt die keycloak/keycloak-db-Services).
+    - cp docker-compose.yml docker-compose.yml.bak 2>/dev/null || true
+    - cp ${CI_PROJECT_DIR}/docker-compose.yml .
+    # 2) Realm-Import rendern: Platzhalter -> echte Secrets. python3 statt sed
+    #    (robust gegen Sonderzeichen in Secrets). Ziel chmod 600 (enthaelt Secrets).
+    - mkdir -p ${DEPLOY_PATH}/keycloak/import
+    # python3 -c (kein Heredoc -> kein YAML-Indent-Footgun). Secrets via Env,
+    # nie als Argv (taucht sonst in ps/Logs auf). Assert bricht ab, falls ein
+    # Platzhalter uebrig bleibt (z.B. Tippfehler im Var-Namen).
+    - |
+      SRC=${CI_PROJECT_DIR}/keycloak/import/vectiscan-realm.json \
+      DST=${DEPLOY_PATH}/keycloak/import/vectiscan-realm.json \
+      python3 -c 'import os; d=open(os.environ["SRC"]).read(); d=d.replace("__KEYCLOAK_GRAFANA_SECRET__",os.environ["KEYCLOAK_GRAFANA_SECRET"]).replace("__KEYCLOAK_OAUTH2_PROXY_SECRET__",os.environ["KEYCLOAK_OAUTH2_PROXY_SECRET"]); assert "__KEYCLOAK_" not in d, "Platzhalter nicht ersetzt"; open(os.environ["DST"],"w").write(d); print("Realm-Import gerendert ->", os.environ["DST"])'
+    - chmod 600 ${DEPLOY_PATH}/keycloak/import/vectiscan-realm.json
+    - echo "=== Import-Datei (kein Secret-Echo) ==="; ls -la ${DEPLOY_PATH}/keycloak/import/
+    # 3) sso-Profil starten (zusaetzlich zu crm). Secrets kommen als exportierte
+    #    CI-Vars in die compose-Interpolation; .env traegt sie fuer Reboots nach.
+    - COMPOSE_PROFILES=crm,sso TAG=${TAG:-latest} docker compose up -d --no-build keycloak-db keycloak
+    - sleep 25
+    - docker compose ps keycloak-db keycloak
+    # 4) Verifikation: Container laeuft + OIDC-Discovery vom Host (Token/JWKS-Pfad)
+    #    UND extern ueber Traefik (Browser-Redirect-Pfad) erreichbar.
+    - 'echo "=== OIDC-Discovery extern (Browser-Pfad) ==="'
+    - |
+      DISC="https://id.vectigal.tech/realms/vectiscan/.well-known/openid-configuration"
+      CODE=$(docker run --rm curlimages/curl:8.8.0 -s -o /dev/null -w '%{http_code}' --max-time 20 "$DISC" 2>/dev/null || echo ERR)
+      echo "GET $DISC -> $CODE (200 erwartet, sobald LE-Cert ausgestellt ist)"
+    - echo "=== FERTIG — naechster Schritt C2/C3 (Grafana-OIDC + oauth2-proxy) ==="
+  environment:
+    name: production
+    url: https://id.vectigal.tech
 
 # =============================================================================
 # VEC-378 — Admin-Release für QA-WebCheck-Order (Re-Scan VEC-376)

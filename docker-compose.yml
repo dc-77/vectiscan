@@ -5,6 +5,10 @@ networks:
     driver: bridge
   twenty-internal:
     driver: bridge
+  # Keycloak-SSO (VEC-437/VEC-421): eigenes internes Netz, isoliert von der
+  # App-DB. keycloak haengt zusaetzlich am proxy-net (Traefik-Route).
+  keycloak-internal:
+    driver: bridge
 
 volumes:
   vectiscan-pg-data:
@@ -17,6 +21,8 @@ volumes:
   # Twenty CRM (VEC-304)
   twenty-pg-data:
   twenty-server-data:
+  # Keycloak-SSO (VEC-437) — dedizierte Instanz, eigene DB
+  keycloak-pg-data:
 
 services:
   frontend:
@@ -807,3 +813,94 @@ services:
       - twenty-server
     networks:
       - twenty-internal
+
+  # ── Keycloak-SSO (VEC-437 / C1, Parent VEC-421) ────────────────────────────
+  # Dedizierte VectiScan-Keycloak (Board-Entscheid: kein Reuse). Spike VEC-430
+  # (docs/AUTH-SSO-VEC-430-SPIKE.md), Runbook docs/AUTH-SSO-C1-KEYCLOAK.md.
+  #
+  # WICHTIG — Profil-Gate `sso` (Lehre aus VEC-304/Twenty): keycloak + keycloak-db
+  # haengen am Compose-Profil `sso` und werden vom Standard-Deploy (COMPOSE_PROFILES=crm)
+  # UEBERSPRUNGEN. Aktivierung ausschliesslich ueber den gegateten Ops-Job
+  # `ops-keycloak-provision` (rendert Realm-Secrets + startet das sso-Profil).
+  # Alle KC-Secrets als ${VAR:-} mit Soft-Default -> ein fehlendes Secret bricht
+  # `docker compose` NICHT (kein ${VAR:?}, das wuerde wie bei VEC-304 jeden
+  # main-Deploy blockieren). Blast-Radius beim Default-Deploy: null.
+  #
+  # Non-Root: das offizielle Keycloak-Image laeuft als UID 1000 (kein root) —
+  # gleiche Konvention wie die uebrigen Stock-Infra-Images (postgres/twenty/grafana),
+  # daher KEIN eigenes Multi-Stage-Dockerfile (nur unsere 4 App-Services bauen wir).
+  # NAT/iptables/ens192-MASQUERADE des Scan-Workers: NICHT beruehrt.
+  keycloak-db:
+    image: postgres:16
+    profiles: ["sso"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD:-}
+      POSTGRES_DB: keycloak
+    volumes:
+      - keycloak-pg-data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - keycloak-internal
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    profiles: ["sso"]
+    restart: unless-stopped
+    # start (Prod-Modus) + Realm-Import beim ersten Start. --optimized=false laesst
+    # den Build (db=postgres) zur Laufzeit laufen — fuer eine interne IdP-Instanz
+    # akzeptabel (kein eigenes Build-Stage noetig, s. Kommentar oben).
+    command: ["start", "--optimized=false", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD:-}
+      # Oeffentlicher Issuer-Host — vom Browser (Redirect) UND von docker02
+      # (Token/JWKS) per HTTPS erreichbar. *.vectigal.tech zeigt bereits auf den
+      # Server (CLAUDE.md), daher kein neuer DNS-Eintrag noetig.
+      KC_HOSTNAME: https://id.vectigal.tech
+      # Traefik terminiert TLS und spricht den Container per HTTP an.
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "false"
+      # Master-Admin-Bootstrap (nur beim allerersten Start wirksam). KC 26+ Var-Namen.
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD:-}
+    volumes:
+      # Realm-Import: der CI-Job ops-keycloak-provision rendert die Secrets und
+      # legt die fertige Datei nach ${DEPLOY_PATH}/keycloak/import/ (read-only Mount).
+      - ./keycloak/import:/opt/keycloak/data/import:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      # SSO-Login-Seite ist bewusst OHNE internal-auth (eine IdP-Login-Seite muss
+      # erreichbar sein; rate-limit schuetzt). LE-Cert via HTTP-01-Resolver wie ueberall.
+      - "traefik.http.routers.vectiscan-keycloak.rule=Host(`id.vectigal.tech`)"
+      - "traefik.http.routers.vectiscan-keycloak.entrypoints=websecure"
+      - "traefik.http.routers.vectiscan-keycloak.tls=true"
+      - "traefik.http.routers.vectiscan-keycloak.tls.certresolver=letsencrypt-http"
+      - "traefik.http.routers.vectiscan-keycloak.middlewares=security-headers@file,rate-limit@file"
+      - "traefik.http.routers.vectiscan-keycloak.service=vectiscan-keycloak"
+      - "traefik.http.services.vectiscan-keycloak.loadbalancer.server.port=8080"
+    networks:
+      - proxy-net
+      - keycloak-internal
