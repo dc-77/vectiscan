@@ -23,6 +23,7 @@ import {
   LIVE_CHECK_MODULES,
   getLiveCheckModule,
   checkTarget,
+  toUpstreamTarget,
   type TargetCheckResult,
 } from '../lib/liveCheck.js';
 import { LiveCheckLimiter } from '../lib/liveCheckLimiter.js';
@@ -163,7 +164,9 @@ export async function liveCheckRoutes(server: FastifyInstance): Promise<void> {
         }
 
         // 4. Upstream-Aufruf an webcheck-core (interner, vertrauenswürdiger Host).
-        const upstreamUrl = `${CORE_URL}/api/${mod.upstream}?url=${encodeURIComponent(target.host)}`;
+        // VEC-411: schema-qualifizierter Ziel-Param — sonst werfen Upstream-
+        // Module mit `new URL()` (ssl/tls/headers/…) auf nacktem Hostnamen.
+        const upstreamUrl = `${CORE_URL}/api/${mod.upstream}?url=${encodeURIComponent(toUpstreamTarget(target.host))}`;
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
         let data: unknown;

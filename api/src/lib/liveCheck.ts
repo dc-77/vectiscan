@@ -73,6 +73,27 @@ export function getLiveCheckModule(key: string): LiveCheckModule | undefined {
   return MODULE_BY_KEY.get(key);
 }
 
+/**
+ * Baut den schema-qualifizierten `?url=`-Parameter für webcheck-core (VEC-411).
+ *
+ * Mehrere Upstream-Module (ssl, tls, headers, http-security, redirects, …)
+ * rufen intern `new URL(url)` — auf einem NACKTEN Hostnamen wirft das
+ * ("Invalid URL"), das Modul liefert dann `{ error }`/500 und unsere Fassade
+ * reicht das als "nicht verfügbar" durch (Symptom: SSL-Erkennung scheint kaputt).
+ *
+ * web-check.xyz selbst übergibt nie einen nackten Hostnamen: seine Vercel-/
+ * Netlify-Wrapper normalisieren via `normalizeUrl` (https:// voranstellen). Der
+ * von uns betriebene standalone `server.js` (DISABLE_GUI) macht das NICHT und
+ * reicht `req.query.url` roh an die Handler. Wir replizieren `normalizeUrl`
+ * deshalb hier identisch — damit ist der an den Upstream gelieferte Input
+ * exakt der von web-check.xyz getestete (maximale Parität).
+ *
+ * Idempotent: ein bereits http(s)-präfigiertes Ziel bleibt unverändert.
+ */
+export function toUpstreamTarget(host: string): string {
+  return /^https?:\/\//i.test(host) ? host : `https://${host}`;
+}
+
 // ---------------------------------------------------------------------------
 // 2. Target-Validierung + SSRF-Härtung
 // ---------------------------------------------------------------------------
