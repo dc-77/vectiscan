@@ -9,7 +9,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { isLoggedIn } from '@/lib/auth';
 
-import CheckTile, { type DetailBlock, type BadgeVariant } from '@/components/ds/CheckTile';
+import CheckTile from '@/components/ds/CheckTile';
 import LiveCheckProgress from '@/components/ds/LiveCheckProgress';
 import CTAStaircase from '@/components/ds/CTAStaircase';
 import StateView from '@/components/ds/StateView';
@@ -25,9 +25,7 @@ import {
   statusScore,
   GROUP_LABELS,
   GROUP_ORDER,
-  sslDaysUntilExpiry,
-  sslCertName,
-  sslSans,
+  extractDetail,
   type CheckModule,
   type CheckResult,
   type CheckGroup,
@@ -180,410 +178,10 @@ function buildSeverityCounts(results: Map<string, CheckResult>): Record<string, 
 }
 
 // ---------------------------------------------------------------------------
-// Detail extraction (drives CheckTile progressive disclosure) — VEC-395
-//
-// Liefert pro Modul strukturierte Detail-Blöcke + hiddenCount. Mapping exakt
-// nach UX-Spec VEC-394 §3/§5. Free zeigt 3–5 sinnvolle Datenpunkte; alles
-// darüber bleibt hinter `hiddenCount` ("+N weitere im vollständigen Report").
-//
-// Defensiv wie deriveStatus(): jedes Feld wird typgeprüft. Fehlt/ist ein Feld
-// unerwartet, entfällt lieber der Block als ein Crash.
-// ---------------------------------------------------------------------------
-
-type Obj = Record<string, unknown>;
-
-function asObj(v: unknown): Obj | null {
-  return typeof v === 'object' && v !== null && !Array.isArray(v) ? (v as Obj) : null;
-}
-function asArr(v: unknown): unknown[] {
-  return Array.isArray(v) ? v : [];
-}
-function asStr(v: unknown): string | undefined {
-  return typeof v === 'string' && v.trim() !== '' ? v : undefined;
-}
-function asNum(v: unknown): number | undefined {
-  return typeof v === 'number' && !Number.isNaN(v) ? v : undefined;
-}
-function yesNo(v: unknown): string {
-  return v === true ? 'ja' : 'nein';
-}
-function truncate(s: string, n: number): string {
-  return s.length > n ? `${s.slice(0, n - 1)}…` : s;
-}
-function expiryVariant(days: number): BadgeVariant {
-  if (days < 14) return 'fail';
-  if (days < 30) return 'warn';
-  return 'ok';
-}
-function protoVariant(p: string): BadgeVariant {
-  if (/TLSv?1\.3|TLSv?1\.2/i.test(p)) return 'ok';
-  if (/TLSv?1\.1|TLSv?1\.0|SSLv/i.test(p)) return 'fail';
-  return 'neutral';
-}
-function statusCodeVariant(code: number): BadgeVariant {
-  if (code >= 200 && code < 300) return 'ok';
-  if (code >= 300 && code < 400) return 'neutral';
-  return 'fail';
-}
-// Häufige Security-Header für den "vorhanden"-Block (http-headers).
-const SEC_HEADERS = [
-  'Strict-Transport-Security', 'Content-Security-Policy', 'X-Frame-Options',
-  'X-Content-Type-Options', 'Referrer-Policy', 'Permissions-Policy',
-];
-// Reihenfolge für DNS-Records (A/MX/NS zuerst).
-const DNS_TYPE_ORDER = ['A', 'AAAA', 'MX', 'NS', 'CNAME', 'TXT', 'SOA'];
-
-function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCount: number } {
-  const r = asObj(result.detail);
-  if (!r) return { detail: [], hiddenCount: 0 };
-
-  const detail: DetailBlock[] = [];
-  // VEC-399: Caps entfernt — alle Rohdaten frei sichtbar; hiddenCount bleibt 0
-  // (Prop für Backwards-Compat behalten, wird nach diesem Spec nie > 0).
-  const hiddenCount = 0;
-
-  switch (result.key) {
-    case 'ssl': {
-      // Felder nach realer web-check-2.1.9-Antwort (rohes getPeerCertificate):
-      // subject/issuer = Objekte, valid_from/valid_to = Strings, bits =
-      // Schlüssellänge, subjectaltname = Komma-String. Mapping via sslHelfer
-      // (VEC-411) — alte Feldnamen (validTo/keySize/altNames/issuer-String)
-      // existierten upstream nie → Karte blieb leer.
-      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [];
-      const issuer = sslCertName(r.issuer, 'O');
-      const subject = sslCertName(r.subject, 'CN');
-      const validFrom = asStr(r.valid_from) ?? asStr(r.validFrom);
-      const validTo = asStr(r.valid_to) ?? asStr(r.validTo) ?? asStr(r.validUntil);
-      const days = sslDaysUntilExpiry(r);
-      const keySize = asNum(r.bits) ?? asNum(r.keySize);
-      const serial = asStr(r.serialNumber);
-      if (issuer) kv.push({ key: 'Aussteller', value: issuer });
-      if (subject) kv.push({ key: 'Domain', value: subject });
-      if (validFrom) kv.push({ key: 'Gültig ab', value: validFrom });
-      if (validTo) kv.push({ key: 'Gültig bis', value: validTo });
-      if (days !== null) kv.push({ key: 'Noch gültig', value: `${days} Tage`, badge: expiryVariant(days) });
-      if (keySize !== undefined) kv.push({ key: 'Schlüssellänge', value: `${keySize} bit` });
-      if (serial) kv.push({ key: 'Seriennummer', value: truncate(serial, 40) });
-      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
-      // Alle SANs — eine Zeile je SAN, scrollbar ab 8 (VEC-399, kein slice)
-      const sans = sslSans(r);
-      if (sans.length > 0) {
-        detail.push({
-          type: 'kv',
-          items: sans.map(s => ({ key: 'SAN', value: s })),
-          scrollable: sans.length > 8,
-        });
-      }
-      break;
-    }
-
-    case 'tls': {
-      const protos = asArr(r.supportedProtocols).filter((p): p is string => typeof p === 'string');
-      if (protos.length > 0) {
-        detail.push({ type: 'badge-row', items: protos.map(p => ({ label: p, variant: protoVariant(p) })) });
-      }
-      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [];
-      if (typeof r.ocspStapling === 'boolean')
-        kv.push({ key: 'OCSP Stapling', value: r.ocspStapling ? 'aktiv' : 'inaktiv', badge: r.ocspStapling ? 'ok' : 'warn' });
-      if (typeof r.forwardSecrecy === 'boolean')
-        kv.push({ key: 'Forward Secrecy', value: r.forwardSecrecy ? 'aktiv' : 'inaktiv', badge: r.forwardSecrecy ? 'ok' : 'warn' });
-      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
-      // Cipher Suites vollständig als scrollbare Liste (VEC-399, vorher nur gezählt+gated)
-      const ciphers = (asArr(r.cipherSuites).length > 0 ? asArr(r.cipherSuites) : asArr(r.ciphers))
-        .map(c => asStr(c) ?? asStr(asObj(c)?.name) ?? asStr(asObj(c)?.cipher))
-        .filter((s): s is string => !!s);
-      if (ciphers.length > 0) {
-        detail.push({ type: 'list', items: ciphers.map(c => ({ text: c })), scrollable: ciphers.length > 8 });
-      }
-      break;
-    }
-
-    case 'hsts': {
-      const enabled = r.compatible === true || r.isEnabled === true || !!r.hstsHeader;
-      const maxAge = asNum(r.maxAge);
-      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [
-        { key: 'Status', value: enabled ? 'aktiv' : 'inaktiv', badge: enabled ? 'ok' : 'warn' },
-      ];
-      if (maxAge !== undefined) kv.push({ key: 'Max-Age', value: `${Math.round(maxAge / 86400)} Tage` });
-      if (typeof r.includeSubDomains === 'boolean') kv.push({ key: 'includeSubDomains', value: yesNo(r.includeSubDomains) });
-      if (typeof r.preload === 'boolean') kv.push({ key: 'Preload', value: yesNo(r.preload) });
-      detail.push({ type: 'kv', items: kv });
-      break;
-    }
-
-    case 'http-headers': {
-      const missing = asArr(r.missingHeaders).filter((h): h is string => typeof h === 'string');
-      const headersObj = asObj(r.headers);
-      const present: string[] = headersObj
-        ? SEC_HEADERS.filter(h => Object.keys(headersObj).some(k => k.toLowerCase() === h.toLowerCase()))
-        : [];
-      if (present.length > 0) {
-        detail.push({
-          type: 'list',
-          items: present.map(h => ({ text: h, badge: 'ok' as BadgeVariant })),
-          scrollable: present.length > 8,
-        });
-      }
-      if (missing.length > 0) {
-        detail.push({
-          type: 'list',
-          items: missing.map(h => ({ text: h, badge: 'fail' as BadgeVariant })),
-          scrollable: missing.length > 8,
-        });
-      }
-      break;
-    }
-
-    case 'http-security': {
-      const score = asNum(r.score);
-      if (score !== undefined) {
-        const badge: BadgeVariant = score >= 75 ? 'ok' : score >= 50 ? 'warn' : 'fail';
-        detail.push({ type: 'kv', items: [{ key: 'Score', value: `${score}/100`, badge }] });
-      }
-      const issues = asArr(r.issues);
-      if (issues.length > 0) {
-        const items = issues.map(it => {
-          const o = asObj(it);
-          const text = asStr(it) ?? asStr(o?.title) ?? asStr(o?.message) ?? 'Problem';
-          return { text, badge: 'fail' as BadgeVariant };
-        });
-        detail.push({ type: 'list', items, scrollable: items.length > 8 });
-      }
-      break;
-    }
-
-    case 'firewall': {
-      const detected = r.hasFirewall === true || r.detected === true || r.firewallDetected === true;
-      const name = asStr(r.firewall) ?? asStr(r.waf);
-      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [
-        { key: 'WAF erkannt', value: detected ? (name ?? 'ja') : 'nein', badge: detected ? 'ok' : 'warn' },
-      ];
-      const type = asStr(r.type);
-      if (type) kv.push({ key: 'Typ', value: type });
-      detail.push({ type: 'kv', items: kv });
-      break;
-    }
-
-    case 'cookies': {
-      const cookies = asArr(r.cookies);
-      const src = cookies.length > 0
-        ? cookies
-        : asArr(r.insecureCookies).length > 0 ? asArr(r.insecureCookies) : asArr(r.unsecureCookies);
-      if (src.length > 0) {
-        const items = src.map(c => {
-          const o = asObj(c);
-          const name = asStr(o?.name) ?? asStr(c) ?? 'Cookie';
-          const flag = (label: string, v: unknown) => `${label} ${v === true ? '✓' : '✗'}`;
-          const same = asStr(o?.sameSite);
-          const parts = o
-            ? [flag('Secure', o.secure), flag('HttpOnly', o.httpOnly), same ? `SameSite: ${same}` : null].filter(Boolean)
-            : [];
-          return { key: name, value: parts.join(' · ') };
-        });
-        detail.push({ type: 'kv', items, scrollable: items.length > 8 });
-      }
-      break;
-    }
-
-    case 'security-txt': {
-      const found = r.found === true || r.isPresent === true || r.exists === true || !!r.securityTxt;
-      const fields = asObj(r.fields) ?? r;
-      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [
-        { key: 'Gefunden', value: yesNo(found), badge: found ? 'ok' : 'warn' },
-      ];
-      const contact = asStr(fields.contact) ?? asStr(r.contact);
-      const expires = asStr(fields.expires) ?? asStr(r.expires);
-      if (contact) kv.push({ key: 'Contact', value: contact });
-      if (expires) kv.push({ key: 'Expires', value: expires });
-      detail.push({ type: 'kv', items: kv });
-      break;
-    }
-
-    case 'threats': {
-      const total = asNum(r.totalThreats) ?? 0;
-      const cats = asArr(r.categories).filter((c): c is string => typeof c === 'string');
-      detail.push({
-        type: 'kv',
-        items: [
-          { key: 'Bedrohungen', value: String(total), badge: total > 0 ? 'fail' : 'ok' },
-          { key: 'Kategorien', value: cats.length > 0 ? cats.join(', ') : '—' },
-        ],
-      });
-      const sources = asArr(r.sources).filter((s): s is string => typeof s === 'string');
-      if (sources.length > 0) {
-        detail.push({ type: 'list', items: sources.map(s => ({ text: s })), scrollable: sources.length > 8 });
-      }
-      break;
-    }
-
-    case 'block-lists': {
-      const listedOn = asNum(r.listedOn) ?? 0;
-      detail.push({
-        type: 'kv',
-        items: [{ key: 'Gelistet auf', value: `${listedOn} Listen`, badge: listedOn > 0 ? 'fail' : 'ok' }],
-      });
-      const lists = asArr(r.lists).length > 0 ? asArr(r.lists) : asArr(r.blocklists);
-      const names = lists
-        .map(l => asStr(l) ?? asStr(asObj(l)?.name))
-        .filter((s): s is string => !!s);
-      if (names.length > 0) {
-        detail.push({
-          type: 'list',
-          items: names.map(t => ({ text: t, badge: 'fail' as BadgeVariant })),
-          scrollable: names.length > 8,
-        });
-      }
-      break;
-    }
-
-    case 'dns': {
-      const recs = asArr(r.dns)
-        .map(d => asObj(d))
-        .filter((o): o is Obj => !!o);
-      if (recs.length > 0) {
-        const sorted = [...recs].sort((a, b) => {
-          const ia = DNS_TYPE_ORDER.indexOf(asStr(a.type) ?? '');
-          const ib = DNS_TYPE_ORDER.indexOf(asStr(b.type) ?? '');
-          return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
-        });
-        const items = sorted.map(o => ({
-          key: asStr(o.type) ?? '?',
-          value: asStr(o.address) ?? asStr(o.value) ?? asStr(o.data) ?? '',
-        }));
-        detail.push({ type: 'kv', items, scrollable: items.length > 8 });
-      }
-      break;
-    }
-
-    case 'dnssec': {
-      const enabled = r.isDnssecEnabled === true || r.dnssecEnabled === true || r.valid === true || r.isPresent === true;
-      const algo = asStr(r.algorithm);
-      detail.push({
-        type: 'kv',
-        items: [
-          { key: 'DNSSEC aktiv', value: yesNo(enabled), badge: enabled ? 'ok' : 'warn' },
-          { key: 'Algorithmus', value: algo ?? '—' },
-        ],
-      });
-      break;
-    }
-
-    case 'dns-server': {
-      const servers = asArr(r.dnsServer)
-        .map(s => asStr(s) ?? asStr(asObj(s)?.address) ?? asStr(asObj(s)?.hostname))
-        .filter((s): s is string => !!s);
-      if (servers.length > 0) detail.push({ type: 'list', items: servers.map(t => ({ text: t })) });
-      break;
-    }
-
-    case 'txt-records': {
-      const recs = (asArr(r.txtRecords).length > 0 ? asArr(r.txtRecords) : asArr(r.records))
-        .map(t => asStr(t) ?? asStr(asObj(t)?.value))
-        .filter((s): s is string => !!s);
-      if (recs.length > 0) {
-        const sorted = [...recs].sort((a, b) => (/^v=spf1/i.test(b) ? 1 : 0) - (/^v=spf1/i.test(a) ? 1 : 0));
-        detail.push({
-          type: 'list',
-          items: sorted.map(t => ({ text: truncate(t, 120) })),
-          scrollable: sorted.length > 8,
-        });
-      }
-      break;
-    }
-
-    case 'mail-config': {
-      const hasSPF = !!(r.spf || r.hasSPF);
-      const hasDKIM = !!(r.dkim || r.hasDKIM);
-      const hasDMARC = !!(r.dmarc || r.hasDMARC);
-      const hasBIMI = !!(r.bimi || r.hasBIMI);
-      const spfVal = asStr(r.spf) ?? (hasSPF ? 'konfiguriert' : 'nicht konfiguriert');
-      const dkimSel = asStr(r.dkimSelector);
-      const dkimVal = hasDKIM ? (dkimSel ? `Selektor: ${dkimSel}` : 'konfiguriert') : 'nicht konfiguriert';
-      const policy = (asStr(r.dmarcPolicy) ?? asStr(r.policy) ?? '').toLowerCase();
-      const dmarcBadge: BadgeVariant = !hasDMARC ? 'fail' : /reject|quarantine/.test(policy) ? 'ok' : 'warn';
-      const dmarcVal = !hasDMARC ? 'nicht konfiguriert' : policy ? `p=${policy}` : 'konfiguriert';
-      detail.push({
-        type: 'kv',
-        items: [
-          { key: 'SPF', value: truncate(spfVal, 48), badge: hasSPF ? 'ok' : 'fail' },
-          { key: 'DKIM', value: dkimVal, badge: hasDKIM ? 'ok' : 'fail' },
-          { key: 'DMARC', value: dmarcVal, badge: dmarcBadge },
-          { key: 'BIMI', value: hasBIMI ? 'konfiguriert' : 'nicht konfiguriert', badge: hasBIMI ? 'ok' : 'fail' },
-        ],
-      });
-      break;
-    }
-
-    case 'ports': {
-      const ports = asArr(r.ports).length > 0 ? asArr(r.ports) : asArr(r.openPorts);
-      if (ports.length > 0) {
-        const items = ports.map(p => {
-          if (typeof p === 'number') return { key: String(p), value: '' };
-          const o = asObj(p);
-          const num = asNum(o?.port) ?? asNum(o?.portNumber);
-          const svc = asStr(o?.service) ?? '';
-          const proto = asStr(o?.protocol);
-          const value = [svc, proto].filter(Boolean).join(' / ');
-          return { key: num !== undefined ? String(num) : '?', value };
-        });
-        detail.push({ type: 'kv', items, scrollable: items.length > 8 });
-      }
-      break;
-    }
-
-    case 'redirects': {
-      const chain = asArr(r.redirects);
-      if (chain.length > 0) {
-        const items = chain.map(s => {
-          if (typeof s === 'string') return { text: s };
-          const o = asObj(s);
-          const url = asStr(o?.url) ?? '';
-          const code = asNum(o?.status) ?? asNum(o?.statusCode);
-          return code !== undefined
-            ? { text: `${url} (${code})`, badge: statusCodeVariant(code) }
-            : { text: url };
-        }).filter(it => it.text.trim() !== '');
-        if (items.length > 0) detail.push({ type: 'list', items });
-      }
-      break;
-    }
-
-    case 'get-ip': {
-      const ip = asStr(r.ip) ?? asStr(r.ipAddress);
-      const country = asStr(r.country);
-      const cc = asStr(r.countryCode);
-      const city = asStr(r.city);
-      const isp = asStr(r.org) ?? asStr(r.isp) ?? asStr(r.asn);
-      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [];
-      if (ip) kv.push({ key: 'IP-Adresse', value: ip });
-      if (country) kv.push({ key: 'Land', value: cc ? `${country} [${cc}]` : country });
-      if (city) kv.push({ key: 'Stadt', value: city });
-      if (isp) kv.push({ key: 'ISP / AS', value: isp });
-      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
-      break;
-    }
-
-    case 'server-status': {
-      const code = asNum(r.statusCode) ?? asNum(r.status) ?? 200;
-      const server = asStr(r.server);
-      const rt = asNum(r.responseTime) ?? asNum(r.responseTimeMs);
-      const kv: { key: string; value: string; badge?: BadgeVariant }[] = [
-        { key: 'HTTP-Status', value: String(code), badge: statusCodeVariant(code) },
-      ];
-      if (server) kv.push({ key: 'Server', value: server });
-      if (rt !== undefined) kv.push({ key: 'Antwortzeit', value: `${rt} ms` });
-      detail.push({ type: 'kv', items: kv });
-      break;
-    }
-
-    // screenshot: separat als ScreenshotSection gerendert — kein Detail-Block.
-    default:
-      break;
-  }
-
-  return { detail, hiddenCount };
-}
-
+// Detail-Extraktion (`extractDetail`) lebt jetzt zentral in `@/lib/liveCheck`
+// (VEC-413) — eine Wahrheit für Status- UND Detail-Mapping gegen die reale
+// web-check-2.1.9-Antwort. Vorher war sie hier dupliziert und gegen vermutete
+// Feldnamen geschrieben (= wiederkehrender Bug, vgl. VEC-411).
 // ---------------------------------------------------------------------------
 // Screenshot rendering
 // ---------------------------------------------------------------------------
@@ -592,11 +190,19 @@ function ScreenshotSection({ result }: { result: CheckResult }) {
   const r = result.detail as Record<string, unknown> | null;
   if (!r) return null;
 
-  // Only data: URIs render inline — external URLs would be blocked by CSP img-src 'self' data:
-  const src: string | null =
-    typeof r.screenshot === 'string' ? r.screenshot
-    : typeof r.image === 'string' ? r.image
+  // web-check 2.1.9 liefert das Bild als ROHES Base64 in `image` (kein data:-URI,
+  // VEC-413) — ohne `data:image/png;base64,`-Präfix rendert <img> nichts. Bereits
+  // präfigierte data:-URIs bleiben unverändert; externe http(s)-URLs würden ohnehin
+  // an CSP img-src 'self' data: scheitern → nicht inline rendern.
+  const raw: string | null =
+    typeof r.image === 'string' && r.image.trim() !== '' ? r.image
+    : typeof r.screenshot === 'string' && r.screenshot.trim() !== '' ? r.screenshot
     : null;
+  const src: string | null =
+    raw === null ? null
+    : /^data:/i.test(raw) ? raw
+    : /^https?:\/\//i.test(raw) ? null
+    : `data:image/png;base64,${raw}`;
 
   if (!src) {
     return (

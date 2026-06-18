@@ -1,9 +1,15 @@
 /**
  * Live-Check (SofortScan) — Frontend-Lib (VEC-366).
  * Kapselt alle API-Calls an /api/live-check/* und leitet Modul-Roh-Daten
- * in CheckStatus (pass/warn/fail/error) um.
+ * in CheckStatus (pass/warn/fail/error) + strukturierte Detail-Blöcke um.
+ *
+ * VEC-413: Das gesamte Upstream→Anzeige-Mapping (Status UND Detail) lebt jetzt
+ * in DIESER Datei (vorher war `extractDetail` in der Results-Page dupliziert).
+ * Eine Wahrheit, gegen die REALE web-check-2.1.9-Antwort geschrieben (nicht
+ * gegen vermutete Feldnamen — das war der wiederkehrende Bug, vgl. VEC-411).
  */
 import { getToken } from './auth';
+import type { DetailBlock, BadgeVariant } from '@/components/ds/CheckTile';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
@@ -246,13 +252,186 @@ export function sslSans(r: ObjLike): string[] {
   return [];
 }
 
-function deriveStatus(
+// ---------------------------------------------------------------------------
+// Generische Typ-Helfer (VEC-413) — defensiv gegen jede Upstream-Shape
+// ---------------------------------------------------------------------------
+
+function asArr(v: unknown): unknown[] {
+  return Array.isArray(v) ? v : [];
+}
+function asStr(v: unknown): string | undefined {
+  return typeof v === 'string' && v.trim() !== '' ? v : undefined;
+}
+function asNum(v: unknown): number | undefined {
+  return typeof v === 'number' && !Number.isNaN(v) ? v : undefined;
+}
+function yesNo(v: unknown): string {
+  return v === true ? 'ja' : 'nein';
+}
+function truncate(s: string, n: number): string {
+  return s.length > n ? `${s.slice(0, n - 1)}…` : s;
+}
+function expiryVariant(days: number): BadgeVariant {
+  if (days < 14) return 'fail';
+  if (days < 30) return 'warn';
+  return 'ok';
+}
+function protoVariant(p: string): BadgeVariant {
+  if (/TLSv?1\.3|TLSv?1\.2/i.test(p)) return 'ok';
+  if (/TLSv?1\.1|TLSv?1\.0|SSLv/i.test(p)) return 'fail';
+  return 'neutral';
+}
+function statusCodeVariant(code: number): BadgeVariant {
+  if (code >= 200 && code < 300) return 'ok';
+  if (code >= 300 && code < 400) return 'neutral';
+  return 'fail';
+}
+
+/** TXT-Record-Eintrag → eine Zeile. web-check liefert Chunk-Arrays (string[]). */
+function joinTxt(entry: unknown): string {
+  if (typeof entry === 'string') return entry;
+  if (Array.isArray(entry)) return entry.filter((x) => typeof x === 'string').join('');
+  return '';
+}
+
+// Security-Header für http-headers (reale Antwort = lowercased Header-Map).
+const SEC_HEADERS = [
+  'strict-transport-security',
+  'content-security-policy',
+  'x-frame-options',
+  'x-content-type-options',
+  'referrer-policy',
+  'permissions-policy',
+];
+// Reihenfolge für DNS-Records (A/MX/NS zuerst).
+const DNS_TYPE_ORDER = ['A', 'AAAA', 'MX', 'NS', 'CNAME', 'TXT', 'SOA', 'SRV', 'PTR'];
+
+// http-security (Upstream-Feldname → deutsches Header-Label).
+const HTTP_SEC_LABELS: Record<string, string> = {
+  contentSecurityPolicy: 'Content-Security-Policy',
+  strictTransportPolicy: 'Strict-Transport-Security',
+  xContentTypeOptions: 'X-Content-Type-Options',
+  xFrameOptions: 'X-Frame-Options',
+  xXSSProtection: 'X-XSS-Protection',
+  referrerPolicy: 'Referrer-Policy',
+  permissionsPolicy: 'Permissions-Policy',
+  crossOriginOpenerPolicy: 'Cross-Origin-Opener-Policy',
+  crossOriginResourcePolicy: 'Cross-Origin-Resource-Policy',
+  crossOriginEmbedderPolicy: 'Cross-Origin-Embedder-Policy',
+};
+// Kern-Header, deren Fehlen die Severity treibt.
+const HTTP_SEC_CORE = ['contentSecurityPolicy', 'strictTransportPolicy', 'xFrameOptions', 'xContentTypeOptions'];
+
+// ---------------------------------------------------------------------------
+// E-Mail-Sicherheit (mail-config) — reale Antwort hat KEINE spf/dkim/dmarc-
+// Flags, nur `txtRecords` (Array von TXT-Chunk-Arrays). VEC-413 Bug #1: das
+// alte Mapping las r.spf/r.dkim/r.dmarc → alle undefined → false CRITICAL.
+// SPF/DMARC/DKIM/BIMI werden aus den TXT-Records erkannt. BIMI ist rein
+// kosmetisch und DKIM-Selektor-Discovery ist unvollständig → keiner von beiden
+// treibt die Severity (sonst entstehen wieder falsche kritische Befunde).
+// ---------------------------------------------------------------------------
+
+interface MailFacts {
+  spf: string | null;
+  dmarc: string | null;
+  dkim: string | null;
+  bimi: string | null;
+  dmarcPolicy: string | null;
+  hasSPF: boolean;
+  hasDMARC: boolean;
+  hasDKIM: boolean;
+  hasBIMI: boolean;
+}
+
+function mailFacts(r: ObjLike): MailFacts {
+  const txts = asArr(r.txtRecords).map(joinTxt).filter(Boolean);
+  const spf = txts.find((t) => /^v=spf1\b/i.test(t)) ?? null;
+  const dmarc = txts.find((t) => /^v=dmarc1\b/i.test(t)) ?? null;
+  const bimi = txts.find((t) => /^v=bimi1\b/i.test(t)) ?? null;
+  // DKIM-Record (von findDkim mit in txtRecords gepusht): v=DKIM1 ODER ein
+  // domainkey-typischer "k=…; p=<base64>". SPF/DMARC/BIMI matchen das nicht.
+  const dkim =
+    txts.find((t) => /(^|;|\s)v=dkim1\b/i.test(t) || (/\bk=/.test(t) && /\bp=[A-Za-z0-9+/]/.test(t))) ?? null;
+  const dmarcPolicy = dmarc ? (dmarc.match(/\bp=\s*([a-z]+)/i)?.[1]?.toLowerCase() ?? null) : null;
+  return {
+    spf,
+    dmarc,
+    dkim,
+    bimi,
+    dmarcPolicy,
+    hasSPF: !!spf,
+    hasDMARC: !!dmarc,
+    hasDKIM: !!dkim,
+    hasBIMI: !!bimi,
+  };
+}
+
+/** HSTS-Direktiven aus dem rohen `Strict-Transport-Security`-Header parsen. */
+function parseHsts(header: string | undefined): { maxAge?: number; includeSubDomains: boolean; preload: boolean } {
+  if (!header) return { includeSubDomains: false, preload: false };
+  const m = header.match(/max-age=(\d+)/i);
+  return {
+    maxAge: m ? Number(m[1]) : undefined,
+    includeSubDomains: /includesubdomains/i.test(header),
+    preload: /preload/i.test(header),
+  };
+}
+
+/** DNS-Records aus der typ-keyed Upstream-Antwort in {type,value}-Zeilen. */
+function dnsRecords(r: ObjLike): { type: string; value: string }[] {
+  const out: { type: string; value: string }[] = [];
+  for (const t of DNS_TYPE_ORDER) {
+    const v = r[t];
+    if (t === 'SOA') {
+      if (isObj(v)) out.push({ type: 'SOA', value: asStr(v.nsname) ?? asStr(v.hostmaster) ?? 'vorhanden' });
+      continue;
+    }
+    for (const item of asArr(v)) {
+      if (t === 'MX' && isObj(item)) {
+        const ex = asStr(item.exchange);
+        if (ex) out.push({ type: 'MX', value: `${ex} (prio ${asNum(item.priority) ?? '?'})` });
+      } else if (t === 'TXT') {
+        const line = truncate(joinTxt(item), 80);
+        if (line) out.push({ type: 'TXT', value: line });
+      } else if (typeof item === 'string') {
+        out.push({ type: t, value: item });
+      } else if (isObj(item)) {
+        const val = asStr(item.value) ?? asStr(item.address);
+        if (val) out.push({ type: t, value: val });
+      }
+    }
+  }
+  return out;
+}
+
+/** Threats: konservative Treffer-Erkennung über key-freie + key-pflichtige Quellen. */
+function threatHit(r: ObjLike): boolean {
+  const sb = isObj(r.safeBrowsing) && r.safeBrowsing.unsafe === true;
+  const uh =
+    isObj(r.urlHaus) &&
+    (r.urlHaus.query_status === 'ok' || r.urlHaus.query_status === 'OK') &&
+    asArr(r.urlHaus.urls).length > 0;
+  const pt =
+    isObj(r.phishTank) &&
+    (r.phishTank.in_database === 'true' || r.phishTank.in_database === true) &&
+    (r.phishTank.valid === 'true' || r.phishTank.valid === true);
+  return sb || uh || pt;
+}
+
+export function deriveStatus(
   moduleKey: string,
   result: unknown,
 ): Pick<CheckResult, 'status' | 'summary' | 'detail'> {
   if (!result) return { status: 'error', summary: 'Keine Daten', detail: null };
 
   const r = isObj(result) ? result : {};
+
+  // Upstream signalisiert "nicht anwendbar" als { skipped: "..." } mit HTTP 200
+  // (z.B. mail-config ohne MX, threats ohne API-Keys). NIE als Befund werten —
+  // sonst entsteht ein falsches HIGH/MEDIUM (VEC-413).
+  if (typeof r.skipped === 'string') {
+    return { status: 'pass', summary: 'Nicht anwendbar', detail: result };
+  }
 
   switch (moduleKey) {
     case 'ssl': {
@@ -269,142 +448,156 @@ function deriveStatus(
     }
 
     case 'tls': {
-      // Look for weak protocols (TLS 1.0/1.1, SSL)
-      const protocols: string[] = Array.isArray(r.supportedProtocols)
-        ? (r.supportedProtocols as string[])
-        : [];
-      const weak = protocols.filter(p => /TLSv1\.0|TLSv1\.1|SSLv/i.test(p));
-      if (weak.length > 0) return { status: 'warn', summary: `Veraltete Protokolle: ${weak.join(', ')}`, detail: result };
-      return { status: 'pass', summary: protocols.length > 0 ? protocols[protocols.length - 1] : 'Konfiguration OK', detail: result };
+      // Reale Antwort = `tls-connection` (VEC-413): EIN ausgehandeltes Protokoll
+      // (kein supportedProtocols[]), cipher als Objekt {name,…}, forwardSecrecy,
+      // ocspStapled. Slug in api/lib/liveCheck.ts auf `tls-connection` korrigiert.
+      const proto = asStr(r.protocol);
+      if (!proto) return { status: 'pass', summary: 'Konfiguration OK', detail: result };
+      if (/TLSv?1\.0|TLSv?1\.1|SSLv/i.test(proto)) {
+        return { status: 'warn', summary: `Veraltetes Protokoll: ${proto}`, detail: result };
+      }
+      const cipher = asStr(asObj(r.cipher)?.name);
+      return { status: 'pass', summary: `${proto}${cipher ? ` · ${cipher}` : ''}`, detail: result };
     }
 
     case 'hsts': {
-      const enabled = r.compatible === true || r.isEnabled === true || !!r.hstsHeader;
-      const maxAge = typeof r.maxAge === 'number' ? r.maxAge : 0;
+      const enabled = r.compatible === true || !!asStr(r.hstsHeader);
+      const { maxAge } = parseHsts(asStr(r.hstsHeader));
       return enabled
-        ? { status: 'pass', summary: `Aktiv${maxAge > 0 ? ` · ${Math.round(maxAge / 86400)} Tage` : ''}`, detail: result }
+        ? { status: 'pass', summary: `Aktiv${maxAge ? ` · ${Math.round(maxAge / 86400)} Tage` : ''}`, detail: result }
         : { status: 'warn', summary: 'HSTS nicht aktiv', detail: result };
     }
 
     case 'http-headers': {
-      const missing: string[] = Array.isArray(r.missingHeaders) ? (r.missingHeaders as string[]) : [];
+      // Reale Antwort IST die (lowercased) Header-Map. present/missing aus Keys.
+      const keys = Object.keys(r).map((k) => k.toLowerCase());
+      const missing = SEC_HEADERS.filter((h) => !keys.includes(h));
       if (missing.length >= 4) return { status: 'fail', summary: `${missing.length} wichtige Header fehlen`, detail: result };
       if (missing.length > 0) return { status: 'warn', summary: `${missing.length} Header fehlen`, detail: result };
       return { status: 'pass', summary: 'Sicherheits-Header gesetzt', detail: result };
     }
 
     case 'http-security': {
-      const score = typeof r.score === 'number' ? r.score : null;
-      if (score !== null) {
-        if (score < 50) return { status: 'fail', summary: `Score ${score}/100`, detail: result };
-        if (score < 75) return { status: 'warn', summary: `Score ${score}/100`, detail: result };
-        return { status: 'pass', summary: `Score ${score}/100`, detail: result };
-      }
-      const issues: unknown[] = Array.isArray(r.issues) ? r.issues : [];
-      if (issues.length > 2) return { status: 'warn', summary: `${issues.length} Probleme`, detail: result };
-      return { status: 'pass', summary: 'Features konfiguriert', detail: result };
+      // Reale Antwort = 10 Booleans (Header vorhanden ja/nein).
+      const present = Object.keys(HTTP_SEC_LABELS).filter((k) => r[k] === true).length;
+      const total = Object.keys(HTTP_SEC_LABELS).length;
+      const coreMissing = HTTP_SEC_CORE.filter((k) => r[k] !== true).length;
+      if (coreMissing >= 3) return { status: 'fail', summary: `${present}/${total} Security-Header`, detail: result };
+      if (coreMissing >= 1) return { status: 'warn', summary: `${present}/${total} Security-Header`, detail: result };
+      return { status: 'pass', summary: `${present}/${total} Security-Header`, detail: result };
     }
 
     case 'cookies': {
-      const insecure: unknown[] = Array.isArray(r.insecureCookies)
-        ? r.insecureCookies
-        : Array.isArray(r.unsecureCookies) ? r.unsecureCookies : [];
-      if (insecure.length >= 3) return { status: 'fail', summary: `${insecure.length} unsichere Cookies`, detail: result };
-      if (insecure.length > 0) return { status: 'warn', summary: `${insecure.length} unsichere Cookie${insecure.length > 1 ? 's' : ''}`, detail: result };
-      return { status: 'pass', summary: 'Cookies korrekt gesetzt', detail: result };
+      // Reale Antwort = { headerCookies[], clientCookies[{secure,httpOnly,…}] }.
+      const client = asArr(r.clientCookies).filter(isObj);
+      const insecure = client.filter((c) => c.secure === false);
+      if (insecure.length > 0) {
+        return { status: 'warn', summary: `${insecure.length} Cookie${insecure.length > 1 ? 's' : ''} ohne Secure`, detail: result };
+      }
+      const n = client.length || asArr(r.headerCookies).length;
+      return { status: 'pass', summary: n > 0 ? `${n} Cookie${n > 1 ? 's' : ''}` : 'Keine Cookies', detail: result };
     }
 
     case 'firewall': {
-      const detected = r.hasFirewall === true || r.detected === true || r.firewallDetected === true;
-      const name = typeof r.firewall === 'string' ? r.firewall : typeof r.waf === 'string' ? r.waf : '';
+      // Reale Antwort = { hasWaf, waf }. (Alt: hasFirewall/detected — existierte nie.)
+      const detected = r.hasWaf === true;
+      const name = asStr(r.waf);
       return detected
-        ? { status: 'pass', summary: name || 'WAF erkannt', detail: result }
+        ? { status: 'pass', summary: name ?? 'WAF erkannt', detail: result }
         : { status: 'warn', summary: 'Kein WAF erkannt', detail: result };
     }
 
     case 'ports': {
-      const ports: unknown[] = Array.isArray(r.ports) ? r.ports : Array.isArray(r.openPorts) ? r.openPorts : [];
+      const ports = asArr(r.openPorts).length > 0 ? asArr(r.openPorts) : asArr(r.ports);
       if (ports.length >= 5) return { status: 'warn', summary: `${ports.length} offene Ports`, detail: result };
       if (ports.length > 0) return { status: 'warn', summary: `${ports.length} offene Port${ports.length > 1 ? 's' : ''}`, detail: result };
       return { status: 'pass', summary: 'Keine unerwarteten Ports', detail: result };
     }
 
     case 'dns': {
-      const types: string[] = Array.isArray(r.dns)
-        ? (r.dns as Array<{ type: string }>).map(d => d.type)
-        : [];
-      return { status: 'pass', summary: types.length > 0 ? `${types.length} Records` : 'Records vorhanden', detail: result };
+      const recs = dnsRecords(r);
+      return { status: 'pass', summary: recs.length > 0 ? `${recs.length} Records` : 'Records vorhanden', detail: result };
     }
 
     case 'dnssec': {
-      const enabled = r.isDnssecEnabled === true || r.dnssecEnabled === true || r.valid === true || r.isPresent === true;
+      // Reale Antwort = { DNSKEY:{isFound}, DS:{isFound}, RRSIG:{isFound} }.
+      const found = (k: string) => isObj(r[k]) && (r[k] as ObjLike).isFound === true;
+      const enabled = found('DNSKEY') || found('DS') || found('RRSIG');
       return enabled
         ? { status: 'pass', summary: 'DNSSEC aktiv', detail: result }
         : { status: 'warn', summary: 'DNSSEC nicht aktiv', detail: result };
     }
 
     case 'dns-server': {
-      const servers: unknown[] = Array.isArray(r.dnsServer) ? r.dnsServer : [];
+      // Reale Antwort = { domain, dns:[{address,hostname}] }.
+      const servers = asArr(r.dns);
       return { status: 'pass', summary: servers.length > 0 ? `${servers.length} DNS-Server` : 'OK', detail: result };
     }
 
     case 'txt-records': {
-      const records: unknown[] = Array.isArray(r.txtRecords) ? r.txtRecords : Array.isArray(r.records) ? r.records : [];
-      return { status: 'pass', summary: `${records.length} TXT-Record${records.length !== 1 ? 's' : ''}`, detail: result };
+      // Reale Antwort = flaches Objekt { key: value }. Anzahl = Schlüssel.
+      const n = Object.keys(r).filter((k) => k !== 'error' && k !== 'skipped').length;
+      return { status: 'pass', summary: `${n} TXT-Record${n !== 1 ? 's' : ''}`, detail: result };
     }
 
     case 'mail-config': {
-      const hasSPF = !!(r.spf || r.hasSPF);
-      const hasDKIM = !!(r.dkim || r.hasDKIM);
-      const hasDMARC = !!(r.dmarc || r.hasDMARC);
-      const missing = [!hasSPF && 'SPF', !hasDKIM && 'DKIM', !hasDMARC && 'DMARC'].filter(Boolean) as string[];
-      if (missing.length >= 2) return { status: 'fail', summary: `${missing.join(', ')} fehlt`, detail: result };
-      if (missing.length === 1) return { status: 'warn', summary: `${missing[0]} fehlt`, detail: result };
-      return { status: 'pass', summary: 'SPF, DKIM, DMARC aktiv', detail: result };
+      // VEC-413 Bug #1: aus txtRecords parsen, nicht aus erfundenen Flags.
+      const f = mailFacts(r);
+      if (!f.hasSPF && !f.hasDMARC) return { status: 'fail', summary: 'SPF und DMARC fehlen', detail: result };
+      if (!f.hasSPF) return { status: 'warn', summary: 'SPF fehlt', detail: result };
+      if (!f.hasDMARC) return { status: 'warn', summary: 'DMARC fehlt', detail: result };
+      if (f.dmarcPolicy === 'none') return { status: 'warn', summary: 'DMARC nur im Monitoring (p=none)', detail: result };
+      const note = !f.hasDKIM ? ' · DKIM nicht erkannt' : '';
+      return { status: 'pass', summary: `SPF + DMARC aktiv${f.dmarcPolicy ? ` (p=${f.dmarcPolicy})` : ''}${note}`, detail: result };
     }
 
     case 'security-txt': {
-      const found = r.found === true || r.isPresent === true || r.exists === true || !!r.securityTxt;
+      const found = r.isPresent === true || r.found === true || r.exists === true || !!r.securityTxt;
       return found
         ? { status: 'pass', summary: 'security.txt vorhanden', detail: result }
         : { status: 'warn', summary: 'security.txt fehlt', detail: result };
     }
 
     case 'redirects': {
-      const chain: unknown[] = Array.isArray(r.redirects) ? r.redirects : [];
-      if (chain.length > 3) return { status: 'warn', summary: `${chain.length} Weiterleitungen`, detail: result };
-      return { status: 'pass', summary: chain.length > 0 ? `${chain.length} Weiterleitung${chain.length > 1 ? 'en' : ''}` : 'Keine Weiterleitungen', detail: result };
+      const chain = asArr(r.redirects);
+      if (chain.length > 4) return { status: 'warn', summary: `${chain.length - 1} Weiterleitungen`, detail: result };
+      const hops = Math.max(0, chain.length - 1);
+      return { status: 'pass', summary: hops > 0 ? `${hops} Weiterleitung${hops > 1 ? 'en' : ''}` : 'Keine Weiterleitungen', detail: result };
     }
 
     case 'threats': {
-      const total = typeof r.totalThreats === 'number' ? r.totalThreats : 0;
-      const malicious = r.malicious === true;
-      if (malicious || total > 0) return { status: 'fail', summary: `${total || '?'} Bedrohungen erkannt`, detail: result };
-      return { status: 'pass', summary: 'Keine Bedrohungen', detail: result };
+      // Reale Antwort = { safeBrowsing, urlHaus, phishTank, cloudmersive }.
+      return threatHit(r)
+        ? { status: 'fail', summary: 'Bedrohung erkannt', detail: result }
+        : { status: 'pass', summary: 'Keine Bedrohungen', detail: result };
     }
 
     case 'block-lists': {
-      const listed = r.isListed === true || r.listed === true || (typeof r.listedOn === 'number' && r.listedOn > 0);
-      const count = typeof r.listedOn === 'number' ? r.listedOn : 0;
-      if (listed) return { status: 'fail', summary: `Auf ${count || '?'} Blockliste${count !== 1 ? 'n' : ''}`, detail: result };
-      return { status: 'pass', summary: 'Nicht auf Blocklisten', detail: result };
+      // Reale Antwort = { blocklists:[{server,serverIp,isBlocked}] }.
+      const lists = asArr(r.blocklists).filter(isObj);
+      const blocked = lists.filter((l) => l.isBlocked === true).length;
+      if (blocked > 0) return { status: 'fail', summary: `Auf ${blocked} Resolver${blocked !== 1 ? 'n' : ''} blockiert`, detail: result };
+      return { status: 'pass', summary: 'Nicht blockiert', detail: result };
     }
 
     case 'get-ip': {
-      const ip = typeof r.ip === 'string' ? r.ip : typeof r.ipAddress === 'string' ? r.ipAddress : '';
-      const country = typeof r.country === 'string' ? r.country : '';
-      return { status: 'pass', summary: [ip, country].filter(Boolean).join(' · ') || 'IP-Info verfügbar', detail: result };
+      // Reale Antwort = { ip, family }. (Geo/ASN steckt im separaten location-Modul.)
+      const ip = asStr(r.ip);
+      const family = asNum(r.family);
+      return { status: 'pass', summary: ip ? `${ip}${family ? ` · IPv${family}` : ''}` : 'IP-Info verfügbar', detail: result };
     }
 
     case 'server-status': {
-      const status = typeof r.statusCode === 'number' ? r.statusCode : typeof r.status === 'number' ? r.status : 200;
-      if (status >= 500) return { status: 'fail', summary: `HTTP ${status}`, detail: result };
-      if (status >= 400) return { status: 'warn', summary: `HTTP ${status}`, detail: result };
-      return { status: 'pass', summary: `HTTP ${status} OK`, detail: result };
+      // Reale Antwort = { isUp, responseCode, responseTime, dnsLookupTime }.
+      if (r.isUp === false) return { status: 'fail', summary: 'Nicht erreichbar', detail: result };
+      const code = asNum(r.responseCode) ?? asNum(r.statusCode) ?? 200;
+      if (code >= 500) return { status: 'fail', summary: `HTTP ${code}`, detail: result };
+      if (code >= 400) return { status: 'warn', summary: `HTTP ${code}`, detail: result };
+      return { status: 'pass', summary: `HTTP ${code} OK`, detail: result };
     }
 
     case 'screenshot': {
-      const hasData = !!r.screenshot || !!r.image || !!r.url;
+      const hasData = !!asStr(r.image) || !!asStr(r.screenshot);
       return hasData
         ? { status: 'pass', summary: 'Screenshot erstellt', detail: result }
         : { status: 'warn', summary: 'Screenshot nicht verfügbar', detail: result };
@@ -413,6 +606,335 @@ function deriveStatus(
     default:
       return { status: 'pass', summary: 'OK', detail: result };
   }
+}
+
+// ---------------------------------------------------------------------------
+// Detail-Extraktion (treibt CheckTile progressive disclosure) — VEC-395/399/413
+//
+// Liefert pro Modul strukturierte Detail-Blöcke. Mapping gegen die REALE
+// web-check-2.1.9-Antwort (VEC-413). Defensiv: jedes Feld wird typgeprüft;
+// fehlt/ist ein Feld unerwartet, entfällt lieber der Block als ein Crash.
+// `hiddenCount` bleibt 0 (VEC-399: keine Caps, alle Rohdaten frei sichtbar).
+// ---------------------------------------------------------------------------
+
+function asObj(v: unknown): ObjLike | null {
+  return isObj(v) ? v : null;
+}
+
+type KvItem = { key: string; value: string; badge?: BadgeVariant };
+
+export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCount: number } {
+  const r = asObj(result.detail);
+  const hiddenCount = 0;
+  if (!r) return { detail: [], hiddenCount };
+  // "Nicht anwendbar" (skipped) → kein Detail-Block (Summary trägt die Aussage).
+  if (typeof r.skipped === 'string') return { detail: [], hiddenCount };
+
+  const detail: DetailBlock[] = [];
+
+  switch (result.key) {
+    case 'ssl': {
+      const kv: KvItem[] = [];
+      const issuer = sslCertName(r.issuer, 'O');
+      const subject = sslCertName(r.subject, 'CN');
+      const validFrom = asStr(r.valid_from) ?? asStr(r.validFrom);
+      const validTo = asStr(r.valid_to) ?? asStr(r.validTo) ?? asStr(r.validUntil);
+      const days = sslDaysUntilExpiry(r);
+      const keySize = asNum(r.bits) ?? asNum(r.keySize);
+      const serial = asStr(r.serialNumber);
+      if (issuer) kv.push({ key: 'Aussteller', value: issuer });
+      if (subject) kv.push({ key: 'Domain', value: subject });
+      if (validFrom) kv.push({ key: 'Gültig ab', value: validFrom });
+      if (validTo) kv.push({ key: 'Gültig bis', value: validTo });
+      if (days !== null) kv.push({ key: 'Noch gültig', value: `${days} Tage`, badge: expiryVariant(days) });
+      if (keySize !== undefined) kv.push({ key: 'Schlüssellänge', value: `${keySize} bit` });
+      if (serial) kv.push({ key: 'Seriennummer', value: truncate(serial, 40) });
+      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      const sans = sslSans(r);
+      if (sans.length > 0) {
+        detail.push({ type: 'kv', items: sans.map((s) => ({ key: 'SAN', value: s })), scrollable: sans.length > 8 });
+      }
+      break;
+    }
+
+    case 'tls': {
+      // tls-connection: protocol (string), cipher{name,standardName,version},
+      // alpnProtocol, forwardSecrecy, ocspStapled, ephemeralKey, sessionResumption.
+      const proto = asStr(r.protocol);
+      if (proto) detail.push({ type: 'badge-row', items: [{ label: proto, variant: protoVariant(proto) }] });
+      const kv: KvItem[] = [];
+      const cipher = asObj(r.cipher);
+      const cipherName = asStr(cipher?.name);
+      if (cipherName) kv.push({ key: 'Cipher', value: cipherName });
+      const stdName = asStr(cipher?.standardName);
+      if (stdName && stdName !== cipherName) kv.push({ key: 'Standard-Name', value: stdName });
+      const alpn = asStr(r.alpnProtocol);
+      if (alpn) kv.push({ key: 'ALPN', value: alpn });
+      if (typeof r.forwardSecrecy === 'boolean')
+        kv.push({ key: 'Forward Secrecy', value: yesNo(r.forwardSecrecy), badge: r.forwardSecrecy ? 'ok' : 'warn' });
+      if (typeof r.ocspStapled === 'boolean')
+        kv.push({ key: 'OCSP Stapling', value: yesNo(r.ocspStapled), badge: r.ocspStapled ? 'ok' : 'warn' });
+      const ek = asObj(r.ephemeralKey);
+      const ekName = asStr(ek?.name) ?? asStr(ek?.type);
+      const ekSize = asNum(ek?.size);
+      if (ekName) kv.push({ key: 'Ephemeral Key', value: ekSize ? `${ekName} (${ekSize} bit)` : ekName });
+      if (typeof r.sessionResumption === 'boolean') kv.push({ key: 'Session-Resumption', value: yesNo(r.sessionResumption) });
+      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    case 'hsts': {
+      const enabled = r.compatible === true || !!asStr(r.hstsHeader);
+      const h = parseHsts(asStr(r.hstsHeader));
+      const kv: KvItem[] = [{ key: 'Status', value: enabled ? 'aktiv' : 'inaktiv', badge: enabled ? 'ok' : 'warn' }];
+      if (h.maxAge !== undefined) kv.push({ key: 'Max-Age', value: `${Math.round(h.maxAge / 86400)} Tage` });
+      kv.push({ key: 'includeSubDomains', value: yesNo(h.includeSubDomains) });
+      kv.push({ key: 'Preload', value: yesNo(h.preload) });
+      if (typeof r.compatible === 'boolean')
+        kv.push({ key: 'Preload-Liste-fähig', value: yesNo(r.compatible), badge: r.compatible ? 'ok' : 'neutral' });
+      detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    case 'http-headers': {
+      // r IST die Header-Map. present/missing aus Keys; Server-Header zeigen.
+      const keys = Object.keys(r);
+      const lower = keys.map((k) => k.toLowerCase());
+      const present = SEC_HEADERS.filter((h) => lower.includes(h));
+      const missing = SEC_HEADERS.filter((h) => !lower.includes(h));
+      if (present.length > 0) {
+        detail.push({ type: 'list', items: present.map((h) => ({ text: h, badge: 'ok' as BadgeVariant })), scrollable: present.length > 8 });
+      }
+      if (missing.length > 0) {
+        detail.push({ type: 'list', items: missing.map((h) => ({ text: h, badge: 'fail' as BadgeVariant })), scrollable: missing.length > 8 });
+      }
+      const server = asStr(r.server);
+      if (server) detail.push({ type: 'kv', items: [{ key: 'Server', value: truncate(server, 60) }] });
+      break;
+    }
+
+    case 'http-security': {
+      const items = Object.entries(HTTP_SEC_LABELS).map(([k, label]) => ({
+        text: label,
+        badge: (r[k] === true ? 'ok' : 'fail') as BadgeVariant,
+      }));
+      detail.push({ type: 'list', items, scrollable: items.length > 8 });
+      break;
+    }
+
+    case 'cookies': {
+      const client = asArr(r.clientCookies).filter(isObj);
+      if (client.length > 0) {
+        const items: KvItem[] = client.map((c) => {
+          const name = asStr(c.name) ?? 'Cookie';
+          const flag = (label: string, v: unknown) => `${label} ${v === true ? '✓' : '✗'}`;
+          const same = asStr(c.sameSite);
+          const parts = [flag('Secure', c.secure), flag('HttpOnly', c.httpOnly), same ? `SameSite: ${same}` : null].filter(Boolean) as string[];
+          return { key: name, value: parts.join(' · '), badge: c.secure === false ? ('warn' as BadgeVariant) : undefined };
+        });
+        detail.push({ type: 'kv', items, scrollable: items.length > 8 });
+      } else {
+        const header = asArr(r.headerCookies).filter((c): c is string => typeof c === 'string');
+        if (header.length > 0) {
+          detail.push({ type: 'list', items: header.map((c) => ({ text: truncate(c, 80) })), scrollable: header.length > 8 });
+        }
+      }
+      break;
+    }
+
+    case 'firewall': {
+      const detected = r.hasWaf === true;
+      const name = asStr(r.waf);
+      detail.push({ type: 'kv', items: [{ key: 'WAF erkannt', value: detected ? (name ?? 'ja') : 'nein', badge: detected ? 'ok' : 'warn' }] });
+      break;
+    }
+
+    case 'ports': {
+      const ports = asArr(r.openPorts).length > 0 ? asArr(r.openPorts) : asArr(r.ports);
+      if (ports.length > 0) {
+        const items: KvItem[] = ports.map((p) => {
+          if (typeof p === 'number') return { key: String(p), value: '' };
+          const o = asObj(p);
+          const num = asNum(o?.port) ?? asNum(o?.portNumber);
+          const svc = asStr(o?.service) ?? '';
+          return { key: num !== undefined ? String(num) : '?', value: svc };
+        });
+        detail.push({ type: 'kv', items, scrollable: items.length > 8 });
+      }
+      break;
+    }
+
+    case 'dns': {
+      const recs = dnsRecords(r);
+      if (recs.length > 0) {
+        detail.push({ type: 'kv', items: recs.map((x) => ({ key: x.type, value: x.value })), scrollable: recs.length > 8 });
+      }
+      break;
+    }
+
+    case 'dnssec': {
+      const found = (k: string) => isObj(r[k]) && (r[k] as ObjLike).isFound === true;
+      const dnskey = found('DNSKEY');
+      const ds = found('DS');
+      const rrsig = found('RRSIG');
+      const enabled = dnskey || ds || rrsig;
+      detail.push({
+        type: 'kv',
+        items: [
+          { key: 'DNSSEC aktiv', value: yesNo(enabled), badge: enabled ? 'ok' : 'warn' },
+          { key: 'DNSKEY', value: yesNo(dnskey) },
+          { key: 'DS', value: yesNo(ds) },
+          { key: 'RRSIG (AD)', value: yesNo(rrsig) },
+        ],
+      });
+      break;
+    }
+
+    case 'dns-server': {
+      const servers = asArr(r.dns)
+        .map((s) => {
+          const o = asObj(s);
+          const host = asStr(o?.hostname);
+          const addr = asStr(o?.address);
+          return host ? (addr ? `${host} (${addr})` : host) : addr;
+        })
+        .filter((s): s is string => !!s);
+      if (servers.length > 0) detail.push({ type: 'list', items: servers.map((t) => ({ text: t })) });
+      break;
+    }
+
+    case 'txt-records': {
+      // r = flaches Objekt { key: value } → "key=value" rekonstruieren, SPF zuerst.
+      const recs = Object.entries(r)
+        .filter(([k]) => k !== 'error' && k !== 'skipped')
+        .map(([k, v]) => (typeof v === 'string' && v !== '' ? `${k}=${v}` : k));
+      if (recs.length > 0) {
+        const sorted = [...recs].sort((a, b) => (/^v=spf1/i.test(b) ? 1 : 0) - (/^v=spf1/i.test(a) ? 1 : 0));
+        detail.push({ type: 'list', items: sorted.map((t) => ({ text: truncate(t, 120) })), scrollable: sorted.length > 8 });
+      }
+      break;
+    }
+
+    case 'mail-config': {
+      const f = mailFacts(r);
+      const dmarcBadge: BadgeVariant = !f.hasDMARC ? 'fail' : /reject|quarantine/.test(f.dmarcPolicy ?? '') ? 'ok' : 'warn';
+      const dmarcVal = !f.hasDMARC ? 'nicht konfiguriert' : f.dmarcPolicy ? `p=${f.dmarcPolicy}` : 'konfiguriert';
+      detail.push({
+        type: 'kv',
+        items: [
+          { key: 'SPF', value: f.spf ? truncate(f.spf, 60) : 'nicht konfiguriert', badge: f.hasSPF ? 'ok' : 'warn' },
+          { key: 'DMARC', value: dmarcVal, badge: dmarcBadge },
+          { key: 'DKIM', value: f.hasDKIM ? 'erkannt' : 'nicht erkannt', badge: f.hasDKIM ? 'ok' : 'neutral' },
+          { key: 'BIMI', value: f.hasBIMI ? 'konfiguriert' : 'nicht konfiguriert', badge: f.hasBIMI ? 'ok' : 'neutral' },
+        ],
+      });
+      const mx = asArr(r.mxRecords)
+        .map((m) => {
+          const o = asObj(m);
+          return asStr(o?.exchange);
+        })
+        .filter((s): s is string => !!s);
+      if (mx.length > 0) detail.push({ type: 'list', items: mx.map((t) => ({ text: t })), scrollable: mx.length > 8 });
+      const services = asArr(r.mailServices)
+        .map((s) => asStr(asObj(s)?.provider))
+        .filter((s): s is string => !!s);
+      if (services.length > 0) detail.push({ type: 'kv', items: [{ key: 'Mail-Provider', value: services.join(', ') }] });
+      break;
+    }
+
+    case 'security-txt': {
+      const found = r.isPresent === true || r.found === true || r.exists === true || !!r.securityTxt;
+      const fields = asObj(r.fields) ?? r;
+      // Felder sind RFC-9116-case ("Contact", "Expires") → case-insensitiv lesen.
+      const fieldVal = (name: string): string | undefined => {
+        for (const [k, v] of Object.entries(fields)) {
+          if (k.toLowerCase() === name && typeof v === 'string' && v.trim() !== '') return v;
+        }
+        return undefined;
+      };
+      const kv: KvItem[] = [{ key: 'Gefunden', value: yesNo(found), badge: found ? 'ok' : 'warn' }];
+      const contact = fieldVal('contact');
+      const expires = fieldVal('expires');
+      if (contact) kv.push({ key: 'Contact', value: truncate(contact, 60) });
+      if (expires) kv.push({ key: 'Expires', value: expires });
+      detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    case 'redirects': {
+      const chain = asArr(r.redirects).filter((s): s is string => typeof s === 'string');
+      if (chain.length > 0) {
+        detail.push({ type: 'list', items: chain.map((s) => ({ text: truncate(s, 100) })), scrollable: chain.length > 8 });
+      }
+      break;
+    }
+
+    case 'threats': {
+      const verdict = (label: string, src: unknown): KvItem | null => {
+        const o = asObj(src);
+        if (!o) return null;
+        if (typeof o.skipped === 'string') return { key: label, value: 'nicht geprüft' };
+        if (typeof o.error === 'string') return { key: label, value: 'Quelle nicht erreichbar' };
+        return null;
+      };
+      const items: KvItem[] = [
+        { key: 'Bedrohung', value: threatHit(r) ? 'erkannt' : 'keine', badge: threatHit(r) ? 'fail' : 'ok' },
+      ];
+      for (const [label, key] of [
+        ['Safe Browsing', 'safeBrowsing'],
+        ['URLhaus', 'urlHaus'],
+        ['PhishTank', 'phishTank'],
+        ['Cloudmersive', 'cloudmersive'],
+      ] as const) {
+        const v = verdict(label, r[key]);
+        if (v) items.push(v);
+      }
+      detail.push({ type: 'kv', items });
+      break;
+    }
+
+    case 'block-lists': {
+      const lists = asArr(r.blocklists).filter(isObj);
+      const blocked = lists.filter((l) => l.isBlocked === true);
+      detail.push({
+        type: 'kv',
+        items: [{ key: 'Blockierende Resolver', value: `${blocked.length} / ${lists.length}`, badge: blocked.length > 0 ? 'fail' : 'ok' }],
+      });
+      if (blocked.length > 0) {
+        const names = blocked.map((l) => asStr(l.server)).filter((s): s is string => !!s);
+        if (names.length > 0) detail.push({ type: 'list', items: names.map((t) => ({ text: t, badge: 'fail' as BadgeVariant })) });
+      }
+      break;
+    }
+
+    case 'get-ip': {
+      const ip = asStr(r.ip);
+      const family = asNum(r.family);
+      const kv: KvItem[] = [];
+      if (ip) kv.push({ key: 'IP-Adresse', value: ip });
+      if (family) kv.push({ key: 'IP-Version', value: `IPv${family}` });
+      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    case 'server-status': {
+      const code = asNum(r.responseCode) ?? asNum(r.statusCode) ?? 200;
+      const rt = asNum(r.responseTime);
+      const dnsT = asNum(r.dnsLookupTime);
+      const kv: KvItem[] = [{ key: 'HTTP-Status', value: String(code), badge: statusCodeVariant(code) }];
+      if (r.isUp === false) kv.push({ key: 'Erreichbar', value: 'nein', badge: 'fail' });
+      if (rt !== undefined) kv.push({ key: 'Antwortzeit', value: `${Math.round(rt)} ms` });
+      if (dnsT !== undefined) kv.push({ key: 'DNS-Lookup', value: `${Math.round(dnsT)} ms` });
+      detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    // screenshot: separat als ScreenshotSection gerendert — kein Detail-Block.
+    default:
+      break;
+  }
+
+  return { detail, hiddenCount };
 }
 
 // ---------------------------------------------------------------------------

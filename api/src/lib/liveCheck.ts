@@ -45,7 +45,11 @@ export interface LiveCheckModule {
  */
 export const LIVE_CHECK_MODULES: readonly LiveCheckModule[] = [
   { key: 'ssl', label: 'SSL/TLS-Zertifikat', upstream: 'ssl', group: 'tls' },
-  { key: 'tls', label: 'TLS-Sicherheitskonfiguration', upstream: 'tls', group: 'tls' },
+  // VEC-413: In web-check 2.1.9 existiert KEIN `/api/tls`-Endpoint — nur
+  // `tls-connection` (key-freier TLS-Handshake: Protokoll/Cipher/Forward-Secrecy/
+  // OCSP) und `tls-labs` (externes SSL-Labs, langsam/oft pending). Der alte Slug
+  // `tls` lief ins 404 → Fassade reichte „Nicht verfügbar" durch. → tls-connection.
+  { key: 'tls', label: 'TLS-Sicherheitskonfiguration', upstream: 'tls-connection', group: 'tls' },
   { key: 'hsts', label: 'HSTS', upstream: 'hsts', group: 'tls' },
   { key: 'http-headers', label: 'HTTP-Header', upstream: 'headers', group: 'security' },
   { key: 'http-security', label: 'HTTP-Security-Features', upstream: 'http-security', group: 'security' },
