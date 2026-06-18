@@ -478,9 +478,11 @@ describe('Verification API', () => {
     const AUTH_HEADER = { authorization: 'Bearer mock-jwt-token' };
 
     it('should create order in precheck_running and return target stubs', async () => {
+      // VEC-436: webcheck (free) startet direkt; Perimeter ist seit VEC-436
+      // zahlungspflichtig (Gate-Test liegt in scans_package.test.ts).
       // Order insert
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, status: 'precheck_running', package: 'perimeter', created_at: new Date() }],
+        rows: [{ id: orderId, status: 'precheck_running', package: 'webcheck', created_at: new Date() }],
         command: 'INSERT', rowCount: 1, oid: 0, fields: [],
       });
       // scan_targets insert
@@ -493,7 +495,7 @@ describe('Verification API', () => {
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { package: 'perimeter', targets: [{ raw_input: 'example.com' }] },
+        payload: { package: 'webcheck', targets: [{ raw_input: 'example.com' }] },
       });
       const body = res.json();
 

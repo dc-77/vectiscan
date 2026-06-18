@@ -166,6 +166,20 @@ und im Dashboard unter dem entsprechenden Abo-Paket gruppiert. Das
 Audit-Log enthält `details.linkedToSubscription = true` und
 `details.subscriptionId`.
 
+**Einzelscan-Zahlung (VEC-436):** Ist das Paket ein kostenpflichtiger
+Self-Service-Einzelkauf (Katalog-Flag `oneTimePriceEnvKey`, heute nur
+`perimeter`) und der Customer hat **kein** aktives Abo für dieses Paket, wird
+die Order mit Status `awaiting_payment` (+ `payment_status='unpaid'`) angelegt
+und **kein** Precheck enqueued. Die Antwort enthält dann zusätzlich `checkoutUrl`
++ `checkoutSessionId` (Stripe Checkout `mode=payment`). Der Scan startet erst,
+wenn der Webhook `checkout.session.completed` (`payment_status=paid`) die
+Order auf `precheck_running` setzt und den Precheck enqueued — idempotent +
+atomar (Muster wie Abo, VEC-112). `webcheck` (gratis) und die `sales_assisted`-
+Pakete laufen unverändert ohne Zahlung. Fehlen Stripe-Keys/one-time-Price →
+`503 payment_not_configured` / `503 price_not_configured`; scheitert die
+Session-Erzeugung → `502 checkout_creation_failed` (Order bleibt
+`awaiting_payment`, kein Gratis-Scan).
+
 **201:**
 ```json
 {

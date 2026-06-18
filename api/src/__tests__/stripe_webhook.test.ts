@@ -53,6 +53,11 @@ function installDbMock(
     subStatus?: string;
     expectedPriceId?: string | null;
     subFound?: boolean;
+    // VEC-436: one-time-Order-Pfad.
+    orderStatus?: string;
+    orderPaymentStatus?: string | null;
+    orderFound?: boolean;
+    orderUpdateRowCount?: number;
   } = {},
 ) {
   const seen = opts.seenEventIds ?? new Set<string>();
@@ -61,6 +66,10 @@ function installDbMock(
   const subStatus = opts.subStatus ?? 'pending';
   const expectedPriceId = opts.expectedPriceId ?? null;
   const subFound = opts.subFound ?? true;
+  const orderStatus = opts.orderStatus ?? 'awaiting_payment';
+  const orderPaymentStatus = opts.orderPaymentStatus ?? 'unpaid';
+  const orderFound = opts.orderFound ?? true;
+  const orderUpdateRowCount = opts.orderUpdateRowCount ?? 1;
 
   mockQuery.mockImplementation(async (sql: string, params: unknown[] = []) => {
     if (sql.includes('INSERT INTO stripe_webhook_events')) {
@@ -74,6 +83,17 @@ function installDbMock(
         ? { rowCount: 1, rows: [{ stripe_price_id: expectedPriceId, status: subStatus }] }
         : { rowCount: 0, rows: [] };
     }
+    // VEC-436: Order-State-Lookup im one-time-Webhook.
+    if (sql.includes('SELECT status, payment_status FROM orders')) {
+      return orderFound
+        ? { rowCount: 1, rows: [{ status: orderStatus, payment_status: orderPaymentStatus }] }
+        : { rowCount: 0, rows: [] };
+    }
+    if (sql.includes('UPDATE orders')) {
+      return orderUpdateRowCount > 0
+        ? { rowCount: orderUpdateRowCount, rows: [{ id: params[0] }] }
+        : { rowCount: 0, rows: [] };
+    }
     if (sql.includes('UPDATE subscriptions')) {
       return updateRowCount > 0
         ? { rowCount: updateRowCount, rows: [{ id: params[0] }] }
@@ -82,7 +102,7 @@ function installDbMock(
     if (sql.includes('UPDATE scan_targets')) {
       return { rowCount: claimedRows.length, rows: claimedRows };
     }
-    // ledger subscription_id link / processed_at update / delete / fallback
+    // ledger subscription_id/order_id link / processed_at update / delete / fallback
     return { rowCount: 1, rows: [] };
   });
 }
@@ -388,6 +408,197 @@ describe('POST /api/webhooks/stripe', () => {
     const res = await post(app, '{}', {});
     expect(res.statusCode).toBe(400);
     expect(JSON.parse(res.body)).toMatchObject({ error: 'missing_signature' });
+    await app.close();
+  });
+});
+
+// ── VEC-436: Einzelscan-Kauf (mode=payment) ───────────────────────────────
+function orderStartCalls() {
+  return mockQuery.mock.calls.filter(
+    ([sql]) => String(sql).includes('UPDATE orders') && String(sql).includes("status = 'precheck_running'"),
+  );
+}
+
+describe('POST /api/webhooks/stripe — one-time order (VEC-436)', () => {
+  it('starts the scan (precheck enqueue) on paid one-time checkout.session.completed', async () => {
+    installDbMock();
+    constructEvent.mockReturnValue({
+      id: 'evt_order_paid_1',
+      type: 'checkout.session.completed',
+      data: {
+        object: {
+          id: 'cs_ord_1',
+          payment_status: 'paid',
+          amount_total: 49000,
+          currency: 'eur',
+          metadata: { order_id: 'ord-uuid-1', price_id: 'price_perimeter_onetime', package: 'perimeter' },
+        },
+      },
+    });
+
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(200);
+
+    // order activated with the paid amount + session id
+    const startCall = orderStartCalls()[0];
+    expect(startCall).toBeDefined();
+    expect(startCall![1]).toEqual(expect.arrayContaining(['ord-uuid-1', 49000, 'EUR', 'cs_ord_1']));
+
+    // precheck enqueued exactly once, keyed by orderId (not subscriptionId)
+    expect(mockEnqueue).toHaveBeenCalledTimes(1);
+    expect(mockEnqueue).toHaveBeenCalledWith({ orderId: 'ord-uuid-1', targetIds: ['t1'] });
+
+    // NOT routed through the subscription path
+    expect(mockQuery.mock.calls.some(([sql]) => String(sql).includes('UPDATE subscriptions'))).toBe(false);
+
+    expect(mockAudit).toHaveBeenCalledWith(expect.objectContaining({ action: 'order.payment_confirmed' }));
+    await app.close();
+  });
+
+  it('GATE: does NOT start the scan when payment_status is not paid (deferred SEPA)', async () => {
+    installDbMock();
+    constructEvent.mockReturnValue({
+      id: 'evt_order_unpaid_1',
+      type: 'checkout.session.completed',
+      data: {
+        object: {
+          id: 'cs_ord_unpaid',
+          payment_status: 'unpaid',
+          amount_total: 49000,
+          currency: 'eur',
+          metadata: { order_id: 'ord-uuid-unpaid' },
+        },
+      },
+    });
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(200);
+    expect(orderStartCalls()).toHaveLength(0);
+    expect(mockEnqueue).not.toHaveBeenCalled();
+    await app.close();
+  });
+
+  it('is idempotent: a replayed one-time event does not re-start or re-enqueue', async () => {
+    const seen = new Set<string>();
+    installDbMock({ seenEventIds: seen });
+    constructEvent.mockReturnValue({
+      id: 'evt_order_dup',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_ord_dup', payment_status: 'paid', amount_total: 49000, currency: 'eur', metadata: { order_id: 'ord-uuid-dup' } } },
+    });
+    const app = await buildApp();
+    const first = await post(app, '{}');
+    expect(first.statusCode).toBe(200);
+    expect(mockEnqueue).toHaveBeenCalledTimes(1);
+
+    const second = await post(app, '{}');
+    expect(second.statusCode).toBe(200);
+    expect(JSON.parse(second.body)).toMatchObject({ duplicate: true });
+    expect(mockEnqueue).toHaveBeenCalledTimes(1);
+    expect(orderStartCalls()).toHaveLength(1);
+    await app.close();
+  });
+
+  it('L1: recovers a lost scan — already-paid order with unclaimed targets re-enqueues', async () => {
+    // prior run set payment_status='paid' but crashed before enqueue; the
+    // status UPDATE now matches 0 rows, yet the targets are still unclaimed.
+    installDbMock({ orderUpdateRowCount: 0, orderStatus: 'precheck_running', orderPaymentStatus: 'paid', claimedRows: [{ id: 't9' }] });
+    constructEvent.mockReturnValue({
+      id: 'evt_order_recover',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_ord_rec', payment_status: 'paid', amount_total: 49000, currency: 'eur', metadata: { order_id: 'ord-uuid-rec' } } },
+    });
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(200);
+    expect(mockEnqueue).toHaveBeenCalledTimes(1);
+    expect(mockEnqueue).toHaveBeenCalledWith({ orderId: 'ord-uuid-rec', targetIds: ['t9'] });
+    await app.close();
+  });
+
+  it('does not re-enqueue an unpaid order whose status update matched nothing', async () => {
+    // order never paid (still unpaid) and update matches 0 → no enqueue.
+    installDbMock({ orderUpdateRowCount: 0, orderStatus: 'awaiting_payment', orderPaymentStatus: 'unpaid', claimedRows: [{ id: 't1' }] });
+    constructEvent.mockReturnValue({
+      id: 'evt_order_noop',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_ord_noop', payment_status: 'paid', amount_total: 1, currency: 'eur', metadata: { order_id: 'ord-uuid-noop' } } },
+    });
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(200);
+    expect(mockEnqueue).not.toHaveBeenCalled();
+    await app.close();
+  });
+
+  it('L1: a failing enqueue returns 500 and releases the idempotency claim for retry', async () => {
+    installDbMock();
+    mockEnqueue.mockRejectedValueOnce(new Error('redis down'));
+    constructEvent.mockReturnValue({
+      id: 'evt_order_enqueue_fail',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_ord_fail', payment_status: 'paid', amount_total: 49000, currency: 'eur', metadata: { order_id: 'ord-uuid-fail' } } },
+    });
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(500);
+    const del = mockQuery.mock.calls.find(([sql]) => String(sql).includes('DELETE FROM stripe_webhook_events'));
+    expect(del).toBeDefined();
+    expect(mockAudit).not.toHaveBeenCalledWith(expect.objectContaining({ action: 'order.payment_confirmed' }));
+    await app.close();
+  });
+
+  it('links the idempotency-ledger row to the order id', async () => {
+    installDbMock();
+    constructEvent.mockReturnValue({
+      id: 'evt_order_link',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_ord_link', payment_status: 'paid', amount_total: 49000, currency: 'eur', metadata: { order_id: 'ord-uuid-link' } } },
+    });
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(200);
+    const link = mockQuery.mock.calls.find(
+      ([sql]) => String(sql).includes('UPDATE stripe_webhook_events') && String(sql).includes('order_id = $2'),
+    );
+    expect(link).toBeDefined();
+    expect(link![1]).toEqual(['evt_order_link', 'ord-uuid-link']);
+    await app.close();
+  });
+
+  it('L2: no_payment_required does NOT start a one-time scan by default', async () => {
+    installDbMock();
+    constructEvent.mockReturnValue({
+      id: 'evt_order_free',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_ord_free', payment_status: 'no_payment_required', amount_total: 0, currency: 'eur', metadata: { order_id: 'ord-uuid-free' } } },
+    });
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(200);
+    expect(orderStartCalls()).toHaveLength(0);
+    expect(mockEnqueue).not.toHaveBeenCalled();
+    expect(mockAudit).toHaveBeenCalledWith(expect.objectContaining({ action: 'order.free_activation_blocked' }));
+    await app.close();
+  });
+
+  it('marks payment_status failed and starts no scan on one-time checkout.session.expired', async () => {
+    installDbMock();
+    constructEvent.mockReturnValue({
+      id: 'evt_order_expired',
+      type: 'checkout.session.expired',
+      data: { object: { id: 'cs_ord_exp', status: 'expired', metadata: { order_id: 'ord-uuid-exp' } } },
+    });
+    const app = await buildApp();
+    const res = await post(app, '{}');
+    expect(res.statusCode).toBe(200);
+    expect(mockEnqueue).not.toHaveBeenCalled();
+    const failedCall = mockQuery.mock.calls.find(
+      ([sql]) => String(sql).includes('UPDATE orders') && String(sql).includes('payment_status = $2'),
+    );
+    expect(failedCall).toBeDefined();
+    expect(failedCall![1]).toEqual(['ord-uuid-exp', 'expired']);
     await app.close();
   });
 });

@@ -134,6 +134,13 @@ async function handleCheckoutCompleted(
   request: FastifyRequest,
   eventId: string,
 ): Promise<void> {
+  // VEC-436: Einzelscan-Kauf (mode=payment) wird ueber order_id-Metadata
+  // aufgeloest, nicht ueber subscription_id. Eigene Aktivierungslogik.
+  if (session.metadata?.order_id) {
+    await handleOrderCheckoutCompleted(session, request, eventId);
+    return;
+  }
+
   const subscriptionId = session.metadata?.subscription_id;
   if (!subscriptionId) {
     request.log.warn({ sessionId: session.id }, 'checkout.session.completed ohne subscription_id-Metadata');
@@ -269,12 +276,145 @@ async function handleCheckoutCompleted(
   }
 }
 
+/**
+ * VEC-436: Aktiviert den Einzelscan NUR nach bestaetigter Einmalzahlung.
+ * Spiegelt die VEC-112-Haertung des Abo-Pfades:
+ *   L1 — Order-Aktivierung + Precheck-Enqueue laufen in EINER Transaktion;
+ *        das Enqueue haengt an einem idempotenten Target-Claim
+ *        (scan_targets.precheck_enqueued_at). Bricht es ab, rollt alles
+ *        zurueck → sauberer Stripe-Retry, kein bezahlter Scan ohne Precheck.
+ *   L2 — 'no_payment_required' aktiviert nur bei bewusst freigeschalteter
+ *        Gutschein/Trial-Logik (sonst verweigert + auditiert).
+ *   Idempotenz — WHERE status='awaiting_payment' verhindert Doppel-Start.
+ */
+async function handleOrderCheckoutCompleted(
+  session: Stripe.Checkout.Session,
+  request: FastifyRequest,
+  eventId: string,
+): Promise<void> {
+  const orderId = session.metadata!.order_id as string;
+
+  const paymentStatus = session.payment_status;
+  if (paymentStatus === 'no_payment_required' && !isFreeActivationAllowed()) {
+    request.log.warn(
+      { orderId, sessionId: session.id },
+      'no_payment_required ohne aktivierte Gutschein/Trial-Logik — kostenloser Scan-Start verweigert (VEC-436/L2)',
+    );
+    await audit({
+      action: 'order.free_activation_blocked',
+      orderId,
+      details: { orderId, sessionId: session.id },
+    });
+    return;
+  }
+
+  // Nur starten, wenn die Zahlung tatsaechlich erfolgt ist. Bei verzoegerten
+  // Zahlarten feuert 'completed' zuerst mit payment_status 'unpaid' — die
+  // Order bleibt dann korrekt awaiting_payment bis async_payment_succeeded.
+  if (paymentStatus && paymentStatus !== 'paid' && paymentStatus !== 'no_payment_required') {
+    request.log.info(
+      { orderId, paymentStatus },
+      'Checkout completed aber noch nicht bezahlt — Order bleibt awaiting_payment',
+    );
+    return;
+  }
+
+  const amountCents = session.amount_total ?? 0;
+  const currency = session.currency ? session.currency.toUpperCase() : null;
+
+  let targetIds: string[] = [];
+  let confirmed = false;
+
+  // L1: Aktivierung + Precheck-Enqueue atomar.
+  await withTransaction(async (q: TxQuery) => {
+    const cur = await q<{ status: string; payment_status: string | null }>(
+      'SELECT status, payment_status FROM orders WHERE id = $1',
+      [orderId],
+    );
+    if (cur.rowCount === 0) {
+      request.log.warn({ orderId }, 'Order zum Webhook nicht gefunden — uebersprungen');
+      return;
+    }
+
+    const upd = await q<{ id: string }>(
+      `UPDATE orders
+          SET status = 'precheck_running',
+              payment_status = 'paid',
+              paid_at = NOW(),
+              amount_cents = $2,
+              currency = COALESCE($3, currency),
+              stripe_checkout_session_id = $4,
+              updated_at = NOW()
+        WHERE id = $1 AND status = 'awaiting_payment'
+        RETURNING id`,
+      [orderId, amountCents, currency, session.id],
+    );
+
+    // L1: Enqueue nicht am Update-rowcount aufhaengen — ein frueherer Lauf
+    // koennte aktiviert und vor dem Enqueue abgebrochen sein. Solange die
+    // Order jetzt bezahlt ist, muss der Precheck noch enqueued werden.
+    const paidNow = (upd.rowCount ?? 0) > 0 || cur.rows[0].payment_status === 'paid';
+    if (!paidNow) {
+      request.log.info(
+        { orderId, status: cur.rows[0].status, paymentStatus: cur.rows[0].payment_status },
+        'Order nicht in startbarem Zustand — uebersprungen',
+      );
+      return;
+    }
+
+    // Idempotenz-Ledger-Zeile mit der Order verknuepfen (Traceability).
+    await q('UPDATE stripe_webhook_events SET order_id = $2 WHERE id = $1', [eventId, orderId]);
+
+    // L1: Targets atomar beanspruchen; das Enqueue ist die LETZTE Aktion.
+    const claimed = await q<{ id: string }>(
+      `UPDATE scan_targets
+          SET precheck_enqueued_at = NOW(), updated_at = NOW()
+        WHERE order_id = $1
+          AND status = 'pending_precheck'
+          AND precheck_enqueued_at IS NULL
+        RETURNING id`,
+      [orderId],
+    );
+    targetIds = claimed.rows.map((r) => r.id);
+    if (targetIds.length > 0) {
+      await enqueuePrecheck({ orderId, targetIds });
+    }
+    confirmed = true;
+  });
+
+  if (confirmed) {
+    await audit({
+      action: 'order.payment_confirmed',
+      orderId,
+      details: { orderId, amountCents, sessionId: session.id, targetCount: targetIds.length },
+    });
+  }
+}
+
 /** Markiert das Abo als payment_failed — kein Scan-Kontingent wird frei. */
 async function handlePaymentFailed(
   session: Stripe.Checkout.Session,
   request: FastifyRequest,
   eventId: string,
 ): Promise<void> {
+  // VEC-436: Einzelscan-Order (mode=payment) — kein Scan-Start.
+  if (session.metadata?.order_id) {
+    const orderId = session.metadata.order_id as string;
+    const newPaymentStatus = session.status === 'expired' ? 'expired' : 'failed';
+    await query(
+      `UPDATE orders SET payment_status = $2, updated_at = NOW()
+        WHERE id = $1 AND status = 'awaiting_payment'`,
+      [orderId, newPaymentStatus],
+    );
+    await query('UPDATE stripe_webhook_events SET order_id = $2 WHERE id = $1', [eventId, orderId]);
+    await audit({
+      action: 'order.payment_failed',
+      orderId,
+      details: { orderId, sessionId: session.id, paymentStatus: newPaymentStatus },
+    });
+    return;
+  }
+
   const subscriptionId = session.metadata?.subscription_id;
   if (!subscriptionId) {
     request.log.warn({ sessionId: session.id }, 'Payment-Failed-Event ohne subscription_id-Metadata');

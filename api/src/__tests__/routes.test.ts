@@ -160,9 +160,11 @@ describe('API Routes', () => {
     it('should create order for valid target with auth', async () => {
       const orderId = '550e8400-e29b-41d4-a716-446655440000';
       const targetId = '550e8400-e29b-41d4-a716-446655440001';
+      // VEC-436: webcheck (free) laeuft ohne Zahlung direkt los — Perimeter
+      // ist seit VEC-436 zahlungspflichtig (eigener Test in scans_package).
       // Order insert
       mockQuery.mockResolvedValueOnce({
-        rows: [{ id: orderId, status: 'precheck_running', package: 'perimeter', created_at: new Date() }],
+        rows: [{ id: orderId, status: 'precheck_running', package: 'webcheck', created_at: new Date() }],
         command: 'INSERT', rowCount: 1, oid: 0, fields: [],
       });
       // scan_targets insert
@@ -175,7 +177,7 @@ describe('API Routes', () => {
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { package: 'perimeter', targets: [{ raw_input: 'example.com' }] },
+        payload: { package: 'webcheck', targets: [{ raw_input: 'example.com' }] },
       });
 
       expect(res.statusCode).toBe(201);
@@ -183,7 +185,7 @@ describe('API Routes', () => {
       expect(body.success).toBe(true);
       expect(body.data.id).toBe(orderId);
       expect(body.data.status).toBe('precheck_running');
-      expect(body.data.package).toBe('perimeter');
+      expect(body.data.package).toBe('webcheck');
       expect(body.data.targetCount).toBe(1);
       expect(body.data.targets).toHaveLength(1);
       expect(body.data.targets[0].canonical).toBe('example.com');
@@ -196,7 +198,7 @@ describe('API Routes', () => {
         method: 'POST',
         url: '/api/orders',
         headers: AUTH_HEADER,
-        payload: { package: 'perimeter', targets: [{ raw_input: 'http://example.com' }] },
+        payload: { package: 'webcheck', targets: [{ raw_input: 'http://example.com' }] },
       });
 
       expect(res.statusCode).toBe(400);

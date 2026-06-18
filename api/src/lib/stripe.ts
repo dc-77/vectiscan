@@ -15,6 +15,7 @@
  *   APP_BASE_URL             https://scan.vectigal.tech
  */
 import Stripe from 'stripe';
+import { getPackage } from './catalog.generated.js';
 
 let _stripe: Stripe | null = null;
 
@@ -54,6 +55,28 @@ export function getPriceIdForPackage(pkg: string): string | null {
 }
 
 /**
+ * Ob ein Paket als kostenpflichtiger Self-Service-Einzelkauf (mode=payment)
+ * angeboten wird (VEC-436/D1). Wahrheitsquelle ist der Katalog: nur Pakete
+ * mit `oneTimePriceEnvKey` sind Einzelkauf-pflichtig (heute nur Perimeter).
+ * WebCheck (free) und die sales_assisted-Pakete tragen den Key nicht.
+ */
+export function isOneTimePurchasable(pkg: string): boolean {
+  return Boolean(getPackage(pkg)?.oneTimePriceEnvKey);
+}
+
+/**
+ * Stripe one-time Price-ID fuer den Einzelscan-Kauf eines Pakets (VEC-436).
+ * Liest den im Katalog hinterlegten ENV-Key (z. B. STRIPE_PRICE_PERIMETER_ONETIME),
+ * faellt sonst auf die Namenskonvention STRIPE_PRICE_<PKG>_ONETIME zurueck.
+ * Bewusst KEIN STRIPE_PRICE_DEFAULT-Fallback — die one-time-ID muss strikt
+ * getrennt vom Jahres-Abo sein, sonst wuerde ein Einzelkauf ein Abo abrechnen.
+ */
+export function getOneTimePriceIdForPackage(pkg: string): string | null {
+  const envKey = getPackage(pkg)?.oneTimePriceEnvKey || `STRIPE_PRICE_${pkg.toUpperCase()}_ONETIME`;
+  return process.env[envKey] || null;
+}
+
+/**
  * Ob `payment_status === 'no_payment_required'` ein Abo aktivieren darf
  * (VEC-112/L2). Heute aktiviert Stripe dies nur bei 100%-Coupons/Trials —
  * und genau die sind im aktuellen Checkout NICHT aktiviert (feste line_items,
@@ -74,5 +97,20 @@ export function getCheckoutUrls(): { successUrl: string; cancelUrl: string } {
       process.env.STRIPE_SUCCESS_URL ||
       `${base}/subscriptions?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
     cancelUrl: process.env.STRIPE_CANCEL_URL || `${base}/subscriptions?checkout=cancelled`,
+  };
+}
+
+/**
+ * Erfolgs-/Abbruch-URLs fuer den Einzelscan-Checkout (mode=payment, VEC-436).
+ * Erfolg fuehrt zur Order-Detailseite, wo der Scan-Fortschritt erscheint,
+ * sobald der Webhook die Zahlung bestaetigt und den Precheck enqueued hat.
+ */
+export function getOrderCheckoutUrls(orderId: string): { successUrl: string; cancelUrl: string } {
+  const base = process.env.APP_BASE_URL || 'https://scan.vectigal.tech';
+  return {
+    successUrl:
+      process.env.STRIPE_ORDER_SUCCESS_URL ||
+      `${base}/scan/${orderId}?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
+    cancelUrl: process.env.STRIPE_ORDER_CANCEL_URL || `${base}/scan/new?checkout=cancelled`,
   };
 }

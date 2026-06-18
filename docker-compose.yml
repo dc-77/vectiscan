@@ -108,6 +108,8 @@ services:
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       STRIPE_PRICE_PERIMETER: ${STRIPE_PRICE_PERIMETER:-}
       STRIPE_PRICE_DEFAULT: ${STRIPE_PRICE_DEFAULT:-}
+      # VEC-436: one-time Price-ID fuer den Einzelscan-Kauf (mode=payment).
+      STRIPE_PRICE_PERIMETER_ONETIME: ${STRIPE_PRICE_PERIMETER_ONETIME:-}
       # VEC-301: CRM-Upsert-Vars (Twenty REST). Leer → crm.ts bleibt im Trockenmodus (No-op).
       CRM_WEBHOOK_URL: ${CRM_WEBHOOK_URL:-}
       CRM_API_KEY: ${CRM_API_KEY:-}

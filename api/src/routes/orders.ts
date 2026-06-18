@@ -15,6 +15,14 @@ import {
 } from '../lib/severityCounts.js';
 // VEC-289: kanonischer Paket-Katalog (single source of truth).
 import { PACKAGE_KEYS, getPackage, isPackageKey, type PackageKey } from '../lib/catalog.generated.js';
+// VEC-436: Stripe Einzelscan-Checkout (mode=payment).
+import {
+  isStripeConfigured,
+  getStripe,
+  getOneTimePriceIdForPackage,
+  isOneTimePurchasable,
+  getOrderCheckoutUrls,
+} from '../lib/stripe.js';
 
 // Report-Download-TTL (VEC-180/VEC-197): 30 Tage. Spiegelt den Worter-Default
 // (report-worker/reporter/worker.py: now + 30d Worker-Default) und Migration 034 (DB-DEFAULT).
@@ -131,12 +139,53 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     // F-P0A-006: opt-in Shodan-Pre-Warm fuer One-Off-Orders.
     const preWarmRequested = body.pre_warm_shodan === true;
 
-    // Insert order with precheck_running
+    // VEC-436: Zahlungs-Gate fuer kostenpflichtige Einzelscans (mode=payment).
+    // D1: Nur Pakete mit one-time-Price im Katalog (heute Perimeter) sind
+    // kauf-pflichtig. WebCheck (free) und die sales_assisted-Pakete laufen
+    // wie bisher direkt. Hat der Kunde ein aktives Abo fuer dasselbe Paket,
+    // ist der Einzelscan bereits abgedeckt → keine zweite Zahlung.
+    let mustPay = isOneTimePurchasable(pkg);
+    if (mustPay) {
+      const activeSub = await query(
+        `SELECT 1 FROM subscriptions
+          WHERE customer_id = $1 AND package = $2 AND status = 'active' LIMIT 1`,
+        [customerId, pkg],
+      );
+      if (activeSub.rows.length > 0) mustPay = false;
+    }
+
+    // Vor dem Anlegen pruefen, ob Stripe + one-time-Preis ueberhaupt
+    // konfiguriert sind — sonst saubere 503 statt einer Order, die nie
+    // bezahlt werden kann (kein Gratis-Scan als Fallback, VEC-33-Linie).
+    let oneTimePriceId: string | null = null;
+    if (mustPay) {
+      if (!isStripeConfigured()) {
+        return reply.status(503).send({
+          success: false,
+          error: 'payment_not_configured',
+          message: 'Zahlungsabwicklung ist derzeit nicht verfuegbar. Bitte spaeter erneut versuchen.',
+        });
+      }
+      oneTimePriceId = getOneTimePriceIdForPackage(pkg);
+      if (!oneTimePriceId) {
+        return reply.status(503).send({
+          success: false,
+          error: 'price_not_configured',
+          message: `Fuer den Einzelkauf von "${pkg}" ist kein Preis hinterlegt.`,
+        });
+      }
+    }
+
+    // Bezahl-Orders starten 'awaiting_payment' (Scan erst nach Webhook);
+    // alle anderen wie bisher 'precheck_running'.
+    const initialStatus = mustPay ? 'awaiting_payment' : 'precheck_running';
+    const initialPaymentStatus = mustPay ? 'unpaid' : null;
+
     const orderResult = await query<{ id: string; status: string; package: string; created_at: Date }>(
-      `INSERT INTO orders (customer_id, target_url, package, status, target_count, pre_warm_requested)
-       VALUES ($1, $2, $3, 'precheck_running', $4, $5)
+      `INSERT INTO orders (customer_id, target_url, package, status, target_count, pre_warm_requested, payment_status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING id, status, package, created_at`,
-      [customerId, displayName, pkg, validTargets.length, preWarmRequested],
+      [customerId, displayName, pkg, initialStatus, validTargets.length, preWarmRequested, initialPaymentStatus],
     );
     const order = orderResult.rows[0];
 
@@ -175,11 +224,68 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         targetCount: validTargets.length,
         targets: targetStubs.map(s => s.canonical),
         preWarmShodan: preWarmRequested,
+        requiresPayment: mustPay,
       },
       ip: request.ip,
     });
 
-    // Enqueue pre-check
+    // VEC-436: Bezahl-Pfad — KEIN Precheck-Enqueue. Stripe-Checkout-Session
+    // (mode=payment) erzeugen; der Scan wird erst nach bestaetigter Zahlung
+    // im Webhook (checkout.session.completed) freigeschaltet.
+    if (mustPay) {
+      let checkoutUrl: string | null = null;
+      let checkoutSessionId: string | null = null;
+      try {
+        const { successUrl, cancelUrl } = getOrderCheckoutUrls(order.id);
+        const session = await getStripe().checkout.sessions.create({
+          mode: 'payment',
+          line_items: [{ price: oneTimePriceId!, quantity: 1 }],
+          success_url: successUrl,
+          cancel_url: cancelUrl,
+          client_reference_id: order.id,
+          customer_email: user.email,
+          metadata: { order_id: order.id, price_id: oneTimePriceId!, package: pkg },
+        });
+        checkoutUrl = session.url;
+        checkoutSessionId = session.id;
+        await query(
+          'UPDATE orders SET stripe_checkout_session_id = $1, updated_at = NOW() WHERE id = $2',
+          [session.id, order.id],
+        );
+      } catch (err) {
+        request.log.error({ err, orderId: order.id }, 'Stripe one-time checkout session creation failed');
+        // Order bleibt 'awaiting_payment' und startet nie ohne Zahlung;
+        // der Kunde kann den Kauf neu anstossen.
+        return reply.status(502).send({
+          success: false,
+          error: 'checkout_creation_failed',
+          message: 'Checkout konnte nicht gestartet werden. Bitte erneut versuchen.',
+        });
+      }
+
+      audit({
+        orderId: order.id,
+        action: 'order.checkout_started',
+        details: { package: pkg, priceId: oneTimePriceId, checkoutSessionId },
+        ip: request.ip,
+      });
+
+      return reply.status(201).send({
+        success: true,
+        data: {
+          id: order.id,
+          status: 'awaiting_payment',
+          package: order.package,
+          targetCount: validTargets.length,
+          targets: targetStubs,
+          checkoutUrl,
+          checkoutSessionId,
+          message: 'Order angelegt. Bitte Zahlung via Stripe abschliessen — der Scan startet erst nach bestaetigter Zahlung.',
+        },
+      });
+    }
+
+    // Gratis-/Abo-gedeckter Pfad: Precheck sofort enqueuen.
     await enqueuePrecheck({ orderId: order.id, targetIds });
 
     return reply.status(201).send({

@@ -47,6 +47,7 @@ const MIGRATION_037_PATH = path.join(__dirname, '..', 'migrations', '037_webchec
 const MIGRATION_038_PATH = path.join(__dirname, '..', 'migrations', '038_webcheck_consent_not_given.sql');
 const MIGRATION_039_PATH = path.join(__dirname, '..', 'migrations', '039_user_authorization_consent.sql');
 const MIGRATION_040_PATH = path.join(__dirname, '..', 'migrations', '040_live_check_audit.sql');
+const MIGRATION_041_PATH = path.join(__dirname, '..', 'migrations', '041_order_onetime_payment.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -629,6 +630,27 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 040 FAILED (continuing without it):', err);
+  }
+
+  // Migration 041 (VEC-436): Stripe Einzelscan-Checkout (mode=payment) —
+  // orders.payment_status + orders.stripe_checkout_session_id +
+  // stripe_webhook_events.order_id. Idempotent: nur anwenden, wenn die
+  // payment_status-Spalte noch fehlt.
+  try {
+    const orderPayment041Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'orders' AND column_name = 'payment_status'
+      ) AS exists
+    `);
+    if (!orderPayment041Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 041: order_onetime_payment');
+      const migrationSql = fs.readFileSync(MIGRATION_041_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 041 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 041 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

@@ -67,11 +67,34 @@ jest.mock('../lib/auth', () => ({
 
 jest.mock('../lib/audit', () => ({ audit: jest.fn().mockResolvedValue(undefined) }));
 
+// VEC-436: Stripe-Lib mocken — Perimeter ist zahlungspflichtiger Einzelkauf.
+// isOneTimePurchasable steuert das Zahlungs-Gate; nur Perimeter ist true.
+jest.mock('../lib/stripe', () => ({
+  isStripeConfigured: () => true,
+  getStripe: () => ({
+    checkout: {
+      sessions: {
+        create: jest.fn().mockResolvedValue({
+          id: 'cs_test_perimeter',
+          url: 'https://checkout.stripe.test/cs_test_perimeter',
+        }),
+      },
+    },
+  }),
+  getOneTimePriceIdForPackage: () => 'price_perimeter_onetime',
+  isOneTimePurchasable: (pkg: string) => pkg === 'perimeter',
+  getOrderCheckoutUrls: () => ({
+    successUrl: 'https://app.test/scan/x?checkout=success',
+    cancelUrl: 'https://app.test/scan/new?checkout=cancelled',
+  }),
+}));
+
 import { query } from '../lib/db';
-import { scanQueue } from '../lib/queue';
+import { scanQueue, enqueuePrecheck } from '../lib/queue';
 
 const mockQuery = query as jest.MockedFunction<typeof query>;
 const mockScanQueueAdd = scanQueue.add as jest.MockedFunction<typeof scanQueue.add>;
+const mockEnqueuePrecheck = enqueuePrecheck as jest.MockedFunction<typeof enqueuePrecheck>;
 
 const ORDER_UUID = '550e8400-e29b-41d4-a716-446655440000';
 const TARGET_UUID = '650e8400-e29b-41d4-a716-446655440000';
@@ -116,7 +139,7 @@ describe('Package selection (v2: 6 packages, Multi-Target)', () => {
     await server.close();
   });
 
-  // POST /api/orders Multi-Target-Flow: INSERT orders → INSERT scan_targets
+  // POST /api/orders (Gratis-Pfad): INSERT orders → INSERT scan_targets
   function chainOrderInsert(pkg: string) {
     mockQuery.mockResolvedValueOnce({
       rows: [{ id: ORDER_UUID, status: 'precheck_running', package: pkg, created_at: new Date() }],
@@ -126,6 +149,32 @@ describe('Package selection (v2: 6 packages, Multi-Target)', () => {
       rows: [{ id: TARGET_UUID }],
       command: 'INSERT' as const, rowCount: 1, oid: 0, fields: [],
     });
+  }
+
+  // VEC-436: POST /api/orders (Bezahl-Pfad Perimeter): active-sub-SELECT (leer)
+  // → INSERT orders (awaiting_payment) → INSERT scan_targets → UPDATE session-id.
+  function chainPaidOrderInsert(pkg: string, opts: { activeSub?: boolean } = {}) {
+    // 1. aktives Abo? (leer = keins)
+    mockQuery.mockResolvedValueOnce({
+      rows: opts.activeSub ? [{ '?column?': 1 }] : [],
+      command: 'SELECT' as const, rowCount: opts.activeSub ? 1 : 0, oid: 0, fields: [],
+    });
+    // 2. order insert
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ id: ORDER_UUID, status: opts.activeSub ? 'precheck_running' : 'awaiting_payment', package: pkg, created_at: new Date() }],
+      command: 'INSERT' as const, rowCount: 1, oid: 0, fields: [],
+    });
+    // 3. scan_targets insert
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ id: TARGET_UUID }],
+      command: 'INSERT' as const, rowCount: 1, oid: 0, fields: [],
+    });
+    // 4. UPDATE orders SET stripe_checkout_session_id (nur Bezahl-Pfad)
+    if (!opts.activeSub) {
+      mockQuery.mockResolvedValueOnce({
+        rows: [], command: 'UPDATE' as const, rowCount: 1, oid: 0, fields: [],
+      });
+    }
   }
 
   describe('POST /api/orders with package', () => {
@@ -139,14 +188,48 @@ describe('Package selection (v2: 6 packages, Multi-Target)', () => {
       expect(res.json().data.package).toBe('webcheck');
     });
 
-    it('should accept package=perimeter', async () => {
-      chainOrderInsert('perimeter');
+    // VEC-436: Perimeter ist zahlungspflichtiger Einzelkauf — die Order startet
+    // 'awaiting_payment' + liefert eine checkoutUrl; KEIN Precheck-Enqueue,
+    // bevor die Zahlung im Webhook bestaetigt ist (Gratis-Leak geschlossen).
+    it('should accept package=perimeter but require payment (awaiting_payment + checkoutUrl)', async () => {
+      chainPaidOrderInsert('perimeter');
       const res = await server.inject({
         method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
         payload: { package: 'perimeter', targets: [{ raw_input: 'example.com' }] },
       });
       expect(res.statusCode).toBe(201);
-      expect(res.json().data.package).toBe('perimeter');
+      const body = res.json();
+      expect(body.data.package).toBe('perimeter');
+      expect(body.data.status).toBe('awaiting_payment');
+      expect(body.data.checkoutUrl).toBe('https://checkout.stripe.test/cs_test_perimeter');
+      // GATE: kein Scan vor Zahlung.
+      expect(mockEnqueuePrecheck).not.toHaveBeenCalled();
+    });
+
+    it('VEC-436: perimeter mit aktivem Abo laeuft ohne Zahlung direkt (precheck_running)', async () => {
+      chainPaidOrderInsert('perimeter', { activeSub: true });
+      const res = await server.inject({
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'perimeter', targets: [{ raw_input: 'example.com' }] },
+      });
+      expect(res.statusCode).toBe(201);
+      const body = res.json();
+      expect(body.data.status).toBe('precheck_running');
+      expect(body.data.checkoutUrl).toBeUndefined();
+      expect(mockEnqueuePrecheck).toHaveBeenCalledTimes(1);
+    });
+
+    it('VEC-436: webcheck (free) startet direkt ohne Zahlung (precheck_running + enqueue)', async () => {
+      chainOrderInsert('webcheck');
+      const res = await server.inject({
+        method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
+        payload: { package: 'webcheck', targets: [{ raw_input: 'example.com' }] },
+      });
+      expect(res.statusCode).toBe(201);
+      const body = res.json();
+      expect(body.data.status).toBe('precheck_running');
+      expect(body.data.checkoutUrl).toBeUndefined();
+      expect(mockEnqueuePrecheck).toHaveBeenCalledTimes(1);
     });
 
     it('should accept package=compliance', async () => {
@@ -209,14 +292,15 @@ describe('Package selection (v2: 6 packages, Multi-Target)', () => {
       }
     });
 
-    it('should default to perimeter when no package specified', async () => {
-      chainOrderInsert('perimeter');
+    it('should default to perimeter when no package specified (zahlungspflichtig)', async () => {
+      chainPaidOrderInsert('perimeter');
       const res = await server.inject({
         method: 'POST', url: '/api/orders', headers: AUTH_HEADER,
         payload: { targets: [{ raw_input: 'example.com' }] },
       });
       expect(res.statusCode).toBe(201);
       expect(res.json().data.package).toBe('perimeter');
+      expect(res.json().data.status).toBe('awaiting_payment');
     });
 
     it('should not queue scan job (admin review required first)', async () => {

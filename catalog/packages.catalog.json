@@ -29,6 +29,8 @@
       "priceEur": 1490,
       "priceEnvKey": "NEXT_PUBLIC_PRICE_PERIMETER_EUR",
       "stripePriceEnvKey": "STRIPE_PRICE_PERIMETER",
+      "oneTimePriceEur": 490,
+      "oneTimePriceEnvKey": "STRIPE_PRICE_PERIMETER_ONETIME",
       "maxHosts": 15,
       "topN": 15,
       "tier": "perimeter",

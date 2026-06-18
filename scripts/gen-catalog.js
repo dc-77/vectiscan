@@ -66,8 +66,12 @@ export interface PackageDef {
   priceEur: number | null;
   /** ENV-Key fuer Preis-Override im Frontend (NEXT_PUBLIC_…). */
   priceEnvKey: string;
-  /** ENV-Key fuer die Stripe-Price-ID im Backend. */
+  /** ENV-Key fuer die Stripe-Price-ID im Backend (Jahres-Abo). */
   stripePriceEnvKey: string;
+  /** Einmalpreis EUR fuer den Self-Service-Einzelscan-Kauf (VEC-436). Nur bei self_service-Einzelkauf-Paketen gesetzt. */
+  oneTimePriceEur?: number;
+  /** ENV-Key fuer die Stripe one-time Price-ID des Einzelscan-Kaufs (VEC-436). Praesenz signalisiert "kostenpflichtiger Einzelkauf". */
+  oneTimePriceEnvKey?: string;
   /** Host-Limit fuer den Scan. */
   maxHosts: number;
   /** Top-N Findings im Report (selection.py). */
