@@ -341,3 +341,54 @@ describe('VEC-415 extractDetail — reichere Datenfelder', () => {
     expect(kv.items.find((i) => i.key === 'SOA')?.value).toBe('ns1.x.de (serial: 2026010101)');
   });
 });
+
+// ── VEC-424 Rev4: Tier-C-Markierung (kind:'code') für Fingerprints/Hashes/
+// Cipher/Raw-Header — monospace, horizontal scrollbar, kein Mid-Word-Break. ──
+describe("VEC-424 Rev4 extractDetail — kind:'code' Tier-C", () => {
+  type CodeKvBlock = { type: 'kv'; title?: string; items: { key: string; value: string; kind?: string }[] };
+
+  it("ssl: SHA-256 + Seriennummer als kind:'code', voller Wert ungekürzt", () => {
+    const fp = 'AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99';
+    const real = {
+      subject: { CN: 'securess.de' }, issuer: { O: "Let's Encrypt" },
+      valid_to: 'Dec 31 23:59:59 2099 GMT', isValid: true, authError: null,
+      serialNumber: '04A1B2C3D4E5F60718293A4B5C6D7E8F9012',
+      fingerprint256: fp,
+    };
+    const { detail } = extractDetail(res('ssl', real, 'tls'));
+    const kv = detail.find((d) => d.type === 'kv') as CodeKvBlock;
+    expect(kv.items.find((i) => i.key === 'SHA-256')?.kind).toBe('code');
+    expect(kv.items.find((i) => i.key === 'SHA-256')?.value).toBe(fp); // ungekürzt
+    expect(kv.items.find((i) => i.key === 'Seriennummer')?.kind).toBe('code');
+  });
+
+  it("tls: Cipher + Standard-Name als kind:'code'", () => {
+    const real = {
+      protocol: 'TLSv1.3',
+      cipher: { name: 'TLS_AES_256_GCM_SHA384', standardName: 'TLS_AES_256_GCM_SHA384_STD' },
+    };
+    const { detail } = extractDetail(res('tls', real, 'tls'));
+    const kv = detail.find(
+      (d) => d.type === 'kv' && (d as CodeKvBlock).items.some((i) => i.key === 'Cipher'),
+    ) as CodeKvBlock;
+    expect(kv.items.find((i) => i.key === 'Cipher')?.kind).toBe('code');
+    expect(kv.items.find((i) => i.key === 'Standard-Name')?.kind).toBe('code');
+  });
+
+  it("http-headers: Server + Raw-Header-Dump als kind:'code'", () => {
+    const real = {
+      'strict-transport-security': 'max-age=1',
+      server: 'nginx/1.25.3 (Ubuntu)',
+      'content-type': 'text/html; charset=utf-8',
+      'x-powered-by': 'Next.js',
+    };
+    const { detail } = extractDetail(res('http-headers', real, 'security'));
+    const server = detail.find(
+      (d) => d.type === 'kv' && (d as CodeKvBlock).items.some((i) => i.key === 'Server'),
+    ) as CodeKvBlock;
+    expect(server.items.find((i) => i.key === 'Server')?.kind).toBe('code');
+    expect(server.items.find((i) => i.key === 'Server')?.value).toBe('nginx/1.25.3 (Ubuntu)'); // ungekürzt
+    const dump = detail.find((d) => d.type === 'kv' && (d as CodeKvBlock).title === 'Alle Header') as CodeKvBlock;
+    expect(dump.items.every((i) => i.kind === 'code')).toBe(true);
+  });
+});

@@ -664,7 +664,7 @@ function asObj(v: unknown): ObjLike | null {
   return isObj(v) ? v : null;
 }
 
-type KvItem = { key: string; value: string; badge?: BadgeVariant };
+type KvItem = { key: string; value: string; badge?: BadgeVariant; kind?: 'code' };
 
 export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCount: number } {
   const r = asObj(result.detail);
@@ -691,10 +691,11 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
       if (validTo) kv.push({ key: 'Gültig bis', value: validTo });
       if (days !== null) kv.push({ key: 'Noch gültig', value: `${days} Tage`, badge: expiryVariant(days) });
       if (keySize !== undefined) kv.push({ key: 'Schlüssellänge', value: `${keySize} bit` });
-      if (serial) kv.push({ key: 'Seriennummer', value: truncate(serial, 40) });
-      // VEC-415: SHA-256-Fingerprint (~95 Zeichen → automatisch Long-Layout im Tile).
+      if (serial) kv.push({ key: 'Seriennummer', value: serial, kind: 'code' });
+      // VEC-415: SHA-256-Fingerprint (~95 Zeichen). VEC-424 Rev4: kind:'code' →
+      // monospace, horizontal scrollbar, kein Mid-Word-Break.
       const fp256 = asStr(r.fingerprint256);
-      if (fp256) kv.push({ key: 'SHA-256', value: fp256 });
+      if (fp256) kv.push({ key: 'SHA-256', value: fp256, kind: 'code' });
       if (kv.length > 0) detail.push({ type: 'kv', items: kv });
       // Extended Key Usage als badge-row nach dem KV-Block (VEC-415).
       const eku = asArr(r.ext).filter((e): e is string => typeof e === 'string');
@@ -730,9 +731,10 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
       const kv: KvItem[] = [];
       const cipher = asObj(r.cipher);
       const cipherName = asStr(cipher?.name);
-      if (cipherName) kv.push({ key: 'Cipher', value: cipherName });
+      // VEC-424 Rev4: Cipher-Suites kind:'code' (lange OpenSSL-Namen, kein Umbruch).
+      if (cipherName) kv.push({ key: 'Cipher', value: cipherName, kind: 'code' });
       const stdName = asStr(cipher?.standardName);
-      if (stdName && stdName !== cipherName) kv.push({ key: 'Standard-Name', value: stdName });
+      if (stdName && stdName !== cipherName) kv.push({ key: 'Standard-Name', value: stdName, kind: 'code' });
       const alpn = asStr(r.alpnProtocol);
       if (alpn) kv.push({ key: 'ALPN', value: alpn });
       if (typeof r.forwardSecrecy === 'boolean')
@@ -793,13 +795,14 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
         detail.push({ type: 'list', items: missing.map((h) => ({ text: h, badge: 'fail' as BadgeVariant })), scrollable: missing.length > 8 });
       }
       const server = asStr(r.server);
-      if (server) detail.push({ type: 'kv', items: [{ key: 'Server', value: truncate(server, 60) }] });
+      if (server) detail.push({ type: 'kv', items: [{ key: 'Server', value: server, kind: 'code' }] });
       // VEC-415: vollständiger Header-Dump (alle Nicht-Security-Header, ohne
       // Meta-/bereits-gezeigte Keys), scrollbar bei > 8 Einträgen.
+      // VEC-424 Rev4: Raw-Header-Werte kind:'code' — monospace, kein Wort-Umbruch.
       const SKIP = new Set(['error', 'skipped', 'server', ...SEC_HEADERS]);
-      const otherHeaders = Object.entries(r)
+      const otherHeaders: KvItem[] = Object.entries(r)
         .filter(([k]) => !SKIP.has(k.toLowerCase()))
-        .map(([k, v]) => ({ key: k, value: truncate(String(v), 80) }));
+        .map(([k, v]) => ({ key: k, value: truncate(String(v), 80), kind: 'code' as const }));
       if (otherHeaders.length > 0) {
         detail.push({ type: 'kv', title: 'Alle Header', items: otherHeaders, scrollable: otherHeaders.length > 8 });
       }

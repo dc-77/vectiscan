@@ -246,10 +246,6 @@ export default function LiveCheckResultsPage() {
   // zugehörige Tile gezielt (übersteuert groupAllExpanded) + scrollt sie an.
   const [keyExpanded, setKeyExpanded] = useState<Map<string, boolean>>(new Map());
 
-  // Lokaler Expand-State pro Tile (VEC-415): treibt den Grid-col-span-Wrapper,
-  // damit die aufgeklappte Kachel beide Spalten überspannt.
-  const [tileLocalExpanded, setTileLocalExpanded] = useState<Map<string, boolean>>(new Map());
-
   const onDrilldownSelect = useCallback((key: string) => {
     setKeyExpanded(prev => new Map(prev).set(key, true));
     // Kurze Verzögerung, damit die Tile vor dem Scroll aufgeklappt gerendert ist.
@@ -440,14 +436,11 @@ export default function LiveCheckResultsPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
                 {itemDetails.map(({ result: r, detail, hiddenCount }) => {
-                  // Aufgeklappte Kachel überspannt beide Grid-Spalten (sm+):
-                  // lokaler Toggle ODER gezielter Drilldown ODER "Alle aufklappen".
-                  const isExpanded =
-                    tileLocalExpanded.get(r.key) === true ||
-                    keyExpanded.get(r.key) === true ||
-                    (groupAllExpanded.has(group) ? allExpanded : false);
+                  // VEC-424 Rev4: Kacheln bleiben konstant halbbreit (sm+),
+                  // Detailinhalt klappt nach UNTEN auf — kein Grid-Reflow,
+                  // kein Sprung der Nachbarkacheln (vormals sm:col-span-2).
                   return (
-                    <div key={r.key} className={isExpanded ? 'sm:col-span-2' : ''}>
+                    <div key={r.key}>
                       <CheckTile
                         tileId={r.key}
                         label={r.label}
@@ -459,9 +452,6 @@ export default function LiveCheckResultsPage() {
                           keyExpanded.has(r.key)
                             ? keyExpanded.get(r.key)
                             : groupAllExpanded.has(group) ? allExpanded : undefined
-                        }
-                        onExpandChange={(exp) =>
-                          setTileLocalExpanded(prev => new Map(prev).set(r.key, exp))
                         }
                       />
                     </div>

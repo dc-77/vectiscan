@@ -15,7 +15,12 @@ export type DetailBlock =
       type: 'kv';
       /** Optionales Abschnitts-Label über dem Block (VEC-415) */
       title?: string;
-      items: { key: string; value: string; badge?: BadgeVariant }[];
+      /**
+       * kind: 'code' → Tier-C-Rendering (VEC-424 Rev4): monospace im
+       * horizontal scrollbaren Container ohne Umbruch — für Fingerprints,
+       * Hashes, Cipher-Suites, Raw-Header, wo ein Wort-Umbruch unleserlich wäre.
+       */
+      items: { key: string; value: string; badge?: BadgeVariant; kind?: 'code' }[];
       /** Lange Blöcke (>8 Items) in scrollbaren Container (VEC-399) */
       scrollable?: boolean;
     }
@@ -163,15 +168,31 @@ function DetailBlockView({ block }: { block: DetailBlock }) {
           <ScrollWrap scrollable={block.scrollable}>
             <div className="space-y-1.5">
               {block.items.map((it, i) =>
-                it.value.length > KV_LONG_THRESHOLD ? (
+                // Tier C (VEC-424 Rev4): code-Werte (Fingerprint/Hash/Cipher/
+                // Raw-Header) monospace im horizontal scrollbaren Container,
+                // nie mitten im Wort umbrechen.
+                it.kind === 'code' ? (
                   <div key={i} className="flex flex-col gap-0.5 text-xs">
                     <span className="text-slate-500 flex items-center gap-1.5">
                       {it.key}
                       {it.badge && <Pill variant={it.badge} />}
                     </span>
-                    <span className="font-mono text-slate-200 break-all leading-relaxed">{it.value}</span>
+                    <div className="mt-0.5 overflow-x-auto rounded bg-slate-800/60 px-2 py-1">
+                      <code className="font-mono text-xs text-slate-300 whitespace-nowrap">{it.value}</code>
+                    </div>
+                  </div>
+                ) : it.value.length > KV_LONG_THRESHOLD ? (
+                  // Tier B: lange Werte am Wort-Rand umbrechen (break-words),
+                  // nicht mitten im Wort (vormals break-all).
+                  <div key={i} className="flex flex-col gap-0.5 text-xs">
+                    <span className="text-slate-500 flex items-center gap-1.5">
+                      {it.key}
+                      {it.badge && <Pill variant={it.badge} />}
+                    </span>
+                    <span className="font-mono text-slate-200 break-words leading-relaxed">{it.value}</span>
                   </div>
                 ) : (
+                  // Tier A: kurze Werte einzeilig, truncate.
                   <div key={i} className="flex items-center gap-3 text-xs">
                     <span className="shrink-0 text-slate-500">{it.key}</span>
                     <span className="flex-1 min-w-0 flex items-center justify-end gap-1.5">
