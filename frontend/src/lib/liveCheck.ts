@@ -176,6 +176,76 @@ function isObj(v: unknown): v is ObjLike {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
 }
 
+// ---------------------------------------------------------------------------
+// SSL-Zertifikat — Feld-Normalisierung (VEC-411)
+//
+// Der Upstream `webcheck-core` (Lissy93/web-check 2.1.9, /api/ssl) liefert das
+// ROHE Node-`tls.getPeerCertificate()`-Objekt (ohne `raw`/`issuerCertificate`)
+// plus `isValid` + `authError`:
+//   { subject:{CN,O,…}, issuer:{CN,O,…}, valid_from, valid_to,
+//     subjectaltname:"DNS:a, DNS:b", bits, serialNumber, isValid, authError }
+// Es gibt KEIN `valid`, `daysUntilExpiry`, `issuer`(String), `validTo`,
+// `keySize`, `signatureAlgorithm` oder `altNames`. Der frühere Code las genau
+// diese nicht existenten Felder → jedes Zertifikat wurde als "ungültig"
+// gewertet und die Detail-Karte blieb leer. Diese Helfer mappen beide Shapes
+// (idealisiert UND roh), damit Status + Details korrekt sind.
+// ---------------------------------------------------------------------------
+
+/** Parst ein Node-Zertifikatsdatum ("Feb  1 23:59:59 2026 GMT") → ms oder null. */
+export function sslParseCertDate(v: unknown): number | null {
+  if (typeof v !== 'string') return null;
+  const t = Date.parse(v);
+  return Number.isNaN(t) ? null : t;
+}
+
+/** Verbleibende Gültigkeitstage aus `daysUntilExpiry` ODER `valid_to`/`validTo`. */
+export function sslDaysUntilExpiry(r: ObjLike, now: number = Date.now()): number | null {
+  if (typeof r.daysUntilExpiry === 'number' && !Number.isNaN(r.daysUntilExpiry)) {
+    return r.daysUntilExpiry;
+  }
+  const to = sslParseCertDate(r.valid_to ?? r.validTo ?? r.validUntil);
+  if (to === null) return null;
+  return Math.floor((to - now) / 86_400_000);
+}
+
+/** Cert-Distinguished-Name → Anzeige-String. `prefer` wählt CN- oder O-Vorrang. */
+export function sslCertName(v: unknown, prefer: 'CN' | 'O' = 'CN'): string {
+  if (typeof v === 'string') return v.trim();
+  if (isObj(v)) {
+    const first = prefer === 'O' ? v.O : v.CN;
+    const second = prefer === 'O' ? v.CN : v.O;
+    if (typeof first === 'string' && first.trim()) return first.trim();
+    if (typeof second === 'string' && second.trim()) return second.trim();
+  }
+  return '';
+}
+
+/** Vertrauensstatus: idealisiertes `valid`, reales `isValid`/`authError`. */
+export function sslIsTrusted(r: ObjLike): boolean {
+  if (r.valid === true) return true;
+  if (r.valid === false) return false;
+  if (r.isValid === true) return true;
+  if (r.isValid === false) return false;
+  if (typeof r.authError === 'string' && r.authError.trim() !== '') return false;
+  // Kein explizites Flag: als gültig werten, sobald überhaupt Cert-Daten da sind.
+  return Boolean(r.valid_to || r.subject || r.subjectaltname);
+}
+
+/** SANs aus `altNames`-Array ODER `subjectaltname`-Komma-String ("DNS:a, DNS:b"). */
+export function sslSans(r: ObjLike): string[] {
+  const arr = Array.isArray(r.altNames)
+    ? (r.altNames.filter((x) => typeof x === 'string') as string[])
+    : [];
+  if (arr.length > 0) return arr;
+  if (typeof r.subjectaltname === 'string') {
+    return r.subjectaltname
+      .split(',')
+      .map((s) => s.trim().replace(/^DNS:/i, '').trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
 function deriveStatus(
   moduleKey: string,
   result: unknown,
@@ -186,13 +256,15 @@ function deriveStatus(
 
   switch (moduleKey) {
     case 'ssl': {
-      // Upstream: { valid, daysUntilExpiry, issuer, ... }
-      const expiry = typeof r.daysUntilExpiry === 'number' ? r.daysUntilExpiry : null;
-      const valid = r.valid === true || (expiry !== null && expiry > 0);
-      if (!valid) return { status: 'fail', summary: 'Ungültig oder abgelaufen', detail: result };
+      // Reale web-check 2.1.9-Antwort = rohes getPeerCertificate + isValid/
+      // authError (siehe sslHelfer oben, VEC-411). Defensiv gegen beide Shapes.
+      const trusted = sslIsTrusted(r);
+      const expiry = sslDaysUntilExpiry(r);
+      if (!trusted) return { status: 'fail', summary: 'Ungültig oder nicht vertrauenswürdig', detail: result };
+      if (expiry !== null && expiry < 0) return { status: 'fail', summary: 'Abgelaufen', detail: result };
       if (expiry !== null && expiry < 14) return { status: 'fail', summary: `Läuft in ${expiry} Tagen ab`, detail: result };
       if (expiry !== null && expiry < 30) return { status: 'warn', summary: `Läuft in ${expiry} Tagen ab`, detail: result };
-      const issuer = typeof r.issuer === 'string' ? r.issuer : '';
+      const issuer = sslCertName(r.issuer, 'O');
       return { status: 'pass', summary: `Gültig${expiry !== null ? ` · ${expiry} Tage` : ''}${issuer ? ` · ${issuer}` : ''}`, detail: result };
     }
 

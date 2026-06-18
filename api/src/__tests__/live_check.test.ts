@@ -4,6 +4,7 @@ import {
   getLiveCheckModule,
   normalizeTargetHost,
   checkTarget,
+  toUpstreamTarget,
 } from '../lib/liveCheck';
 import { LiveCheckLimiter, DEFAULT_LIVE_CHECK_LIMITS } from '../lib/liveCheckLimiter';
 import { summarizeAbuse, type LiveCheckAuditRow } from '../lib/liveCheckAbuse';
@@ -29,6 +30,19 @@ describe('Modul-Allowlist (Default-Deny)', () => {
   it('hat eindeutige Keys', () => {
     const keys = LIVE_CHECK_MODULES.map((m) => m.key);
     expect(new Set(keys).size).toBe(keys.length);
+  });
+});
+
+describe('toUpstreamTarget — schema-qualifizierter Upstream-Param (VEC-411)', () => {
+  it('stellt https:// vor einen nackten Hostnamen (sonst wirft new URL upstream)', () => {
+    expect(toUpstreamTarget('securess.de')).toBe('https://securess.de');
+    expect(toUpstreamTarget('bergersysteme.com')).toBe('https://bergersysteme.com');
+    expect(toUpstreamTarget('8.8.8.8')).toBe('https://8.8.8.8');
+  });
+
+  it('ist idempotent für bereits schema-präfigierte Ziele', () => {
+    expect(toUpstreamTarget('https://example.com')).toBe('https://example.com');
+    expect(toUpstreamTarget('http://example.com')).toBe('http://example.com');
   });
 });
 
