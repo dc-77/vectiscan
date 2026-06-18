@@ -13,18 +13,22 @@ export type BadgeVariant = 'ok' | 'warn' | 'fail' | 'neutral';
 export type DetailBlock =
   | {
       type: 'kv';
+      /** Optionales Abschnitts-Label über dem Block (VEC-415) */
+      title?: string;
       items: { key: string; value: string; badge?: BadgeVariant }[];
       /** Lange Blöcke (>8 Items) in scrollbaren Container (VEC-399) */
       scrollable?: boolean;
     }
   | {
       type: 'list';
+      title?: string;
       items: { text: string; badge?: BadgeVariant }[];
       /** Lange Blöcke (>8 Items) in scrollbaren Container (VEC-399) */
       scrollable?: boolean;
     }
   | {
       type: 'badge-row';
+      title?: string;
       items: { label: string; variant: BadgeVariant }[];
     };
 
@@ -42,6 +46,8 @@ interface CheckTileProps {
   forceExpanded?: boolean;
   /** Anchor-id für Severity-Drilldown-Scroll (VEC-399): id="tile-{tileId}" */
   tileId?: string;
+  /** Callback, sobald lokaler Expand-State sich ändert (für Grid-col-span in der Parent-Seite, VEC-415). */
+  onExpandChange?: (expanded: boolean) => void;
   className?: string;
 }
 
@@ -132,49 +138,84 @@ function ScrollWrap({ scrollable, children }: { scrollable?: boolean; children: 
   return <div className="max-h-48 overflow-y-auto pr-1">{children}</div>;
 }
 
+// Optionales Abschnitts-Label über einem Block (VEC-415). Reines <p> innerhalb
+// der bestehenden <section> — kein semantischer Header.
+function BlockTitle({ title }: { title?: string }) {
+  if (!title) return null;
+  return (
+    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-600 mb-1">
+      {title}
+    </p>
+  );
+}
+
+// Lange KV-Werte (>48 Zeichen: SPF, SHA-256-Fingerprint, SANs, SOA) brechen
+// zeilenweise um (2-Zeilen-Layout) statt per truncate abgeschnitten zu werden
+// (VEC-415 Fix B, Längenheuristik ohne DOM-Measurement).
+const KV_LONG_THRESHOLD = 48;
+
 function DetailBlockView({ block }: { block: DetailBlock }) {
   switch (block.type) {
     case 'kv':
       return (
-        <ScrollWrap scrollable={block.scrollable}>
-          <div className="space-y-1.5">
-            {block.items.map((it, i) => (
-              <div key={i} className="flex items-center gap-3 text-xs">
-                <span className="shrink-0 text-slate-500">{it.key}</span>
-                <span className="flex-1 min-w-0 flex items-center justify-end gap-1.5">
-                  <span className="min-w-0 truncate font-mono text-slate-200">{it.value}</span>
-                  {it.badge && <Pill variant={it.badge} />}
-                </span>
-              </div>
-            ))}
-          </div>
-        </ScrollWrap>
+        <div>
+          <BlockTitle title={block.title} />
+          <ScrollWrap scrollable={block.scrollable}>
+            <div className="space-y-1.5">
+              {block.items.map((it, i) =>
+                it.value.length > KV_LONG_THRESHOLD ? (
+                  <div key={i} className="flex flex-col gap-0.5 text-xs">
+                    <span className="text-slate-500 flex items-center gap-1.5">
+                      {it.key}
+                      {it.badge && <Pill variant={it.badge} />}
+                    </span>
+                    <span className="font-mono text-slate-200 break-all leading-relaxed">{it.value}</span>
+                  </div>
+                ) : (
+                  <div key={i} className="flex items-center gap-3 text-xs">
+                    <span className="shrink-0 text-slate-500">{it.key}</span>
+                    <span className="flex-1 min-w-0 flex items-center justify-end gap-1.5">
+                      <span className="min-w-0 truncate font-mono text-slate-200">{it.value}</span>
+                      {it.badge && <Pill variant={it.badge} />}
+                    </span>
+                  </div>
+                ),
+              )}
+            </div>
+          </ScrollWrap>
+        </div>
       );
     case 'list':
       return (
-        <ScrollWrap scrollable={block.scrollable}>
-          <ul className="space-y-1">
-            {block.items.map((it, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-slate-400">
-                {it.badge ? (
-                  <span className={`mt-0.5 shrink-0 ${BADGE_META[it.badge].text}`} aria-hidden>
-                    {BADGE_META[it.badge].glyph || '›'}
-                  </span>
-                ) : (
-                  <span className="mt-0.5 shrink-0 text-slate-600" aria-hidden>›</span>
-                )}
-                <span className="min-w-0 break-words">{it.text}</span>
-              </li>
-            ))}
-          </ul>
-        </ScrollWrap>
+        <div>
+          <BlockTitle title={block.title} />
+          <ScrollWrap scrollable={block.scrollable}>
+            <ul className="space-y-1">
+              {block.items.map((it, i) => (
+                <li key={i} className="flex items-start gap-2 text-xs text-slate-400">
+                  {it.badge ? (
+                    <span className={`mt-0.5 shrink-0 ${BADGE_META[it.badge].text}`} aria-hidden>
+                      {BADGE_META[it.badge].glyph || '›'}
+                    </span>
+                  ) : (
+                    <span className="mt-0.5 shrink-0 text-slate-600" aria-hidden>›</span>
+                  )}
+                  <span className="min-w-0 break-words">{it.text}</span>
+                </li>
+              ))}
+            </ul>
+          </ScrollWrap>
+        </div>
       );
     case 'badge-row':
       return (
-        <div className="flex flex-wrap gap-1.5">
-          {block.items.map((it, i) => (
-            <Pill key={i} variant={it.variant}>{it.label}</Pill>
-          ))}
+        <div>
+          <BlockTitle title={block.title} />
+          <div className="flex flex-wrap gap-1.5">
+            {block.items.map((it, i) => (
+              <Pill key={i} variant={it.variant}>{it.label}</Pill>
+            ))}
+          </div>
         </div>
       );
     default:
@@ -184,7 +225,7 @@ function DetailBlockView({ block }: { block: DetailBlock }) {
 
 export default function CheckTile({
   label, status, summary, detail, detailLines = [], hiddenCount = 0,
-  forceExpanded, tileId, className = '',
+  forceExpanded, tileId, onExpandChange, className = '',
 }: CheckTileProps) {
   const [localExpanded, setLocalExpanded] = useState(false);
   const meta = STATUS_META[status] ?? STATUS_META.error;
@@ -202,6 +243,14 @@ export default function CheckTile({
   const isLoading = status === 'pending' || status === 'running';
   const detailId = `tile-detail-${label}`;
 
+  // Lokalen Expand-State togglen und Parent benachrichtigen (Grid-col-span, VEC-415).
+  const handleToggle = () => {
+    if (!hasDetail) return;
+    const next = !localExpanded;
+    setLocalExpanded(next);
+    onExpandChange?.(next);
+  };
+
   return (
     <div
       id={tileId ? `tile-${tileId}` : undefined}
@@ -211,7 +260,7 @@ export default function CheckTile({
       <button
         type="button"
         className="w-full flex items-start gap-3 p-4 text-left"
-        onClick={() => hasDetail && setLocalExpanded(v => !v)}
+        onClick={handleToggle}
         aria-expanded={hasDetail ? expanded : undefined}
         aria-controls={hasDetail ? detailId : undefined}
         style={{ cursor: hasDetail ? 'pointer' : 'default' }}

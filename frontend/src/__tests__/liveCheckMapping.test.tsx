@@ -251,3 +251,93 @@ describe('VEC-413 deriveStatus — reale web-check-2.1.9-Shapes', () => {
     expect(deriveStatus('ssl', real).status).toBe('pass');
   });
 });
+
+// ── VEC-415: reichere Detail-Blöcke (defensiv, Felder optional) ──────────────
+describe('VEC-415 extractDetail — reichere Datenfelder', () => {
+  type KvBlock = { type: 'kv'; title?: string; items: { key: string; value: string; badge?: string }[] };
+  type ListBlock = { type: 'list'; title?: string; items: { text: string; badge?: string }[] };
+  type BadgeBlock = { type: 'badge-row'; title?: string; items: { label: string; variant: string }[] };
+
+  it('ssl: fingerprint256 + ext → SHA-256-KV + Extended-Key-Usage-Badge-Row', () => {
+    const real = {
+      subject: { CN: 'securess.de' }, issuer: { O: "Let's Encrypt" },
+      valid_to: 'Dec 31 23:59:59 2099 GMT', isValid: true, authError: null,
+      fingerprint256: 'AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99',
+      ext: ['TLS Web Server Authentication', 'TLS Web Client Authentication'],
+    };
+    const { detail } = extractDetail(res('ssl', real, 'tls'));
+    const kv = detail.find((d) => d.type === 'kv') as KvBlock;
+    expect(kv.items.find((i) => i.key === 'SHA-256')?.value).toMatch(/^AA:BB/);
+    const eku = detail.find((d) => d.type === 'badge-row') as BadgeBlock;
+    expect(eku.title).toBe('Extended Key Usage');
+    expect(eku.items.map((i) => i.label)).toContain('TLS Web Server Authentication');
+  });
+
+  it('ssl: ohne fingerprint256/ext → keine zusätzlichen Blöcke (defensiv)', () => {
+    const real = { subject: { CN: 'x.de' }, issuer: { O: 'CA' }, valid_to: 'Dec 31 23:59:59 2099 GMT', isValid: true };
+    const { detail } = extractDetail(res('ssl', real, 'tls'));
+    expect(detail.find((d) => d.type === 'badge-row')).toBeUndefined();
+    const kv = detail.find((d) => d.type === 'kv') as KvBlock;
+    expect(kv.items.find((i) => i.key === 'SHA-256')).toBeUndefined();
+  });
+
+  it('tls: grade + vulnerabilities → Grade-Badge + Schwachstellen-Liste (fail zuerst)', () => {
+    const real = {
+      protocol: 'TLSv1.3',
+      cipher: { name: 'TLS_AES_256_GCM_SHA384' },
+      grade: 'A+',
+      vulnerabilities: { heartbleed: false, poodle: false, robot: true },
+    };
+    expect(deriveStatus('tls', real).summary).toMatch(/Grade A\+/);
+    const { detail } = extractDetail(res('tls', real, 'tls'));
+    const grade = detail.find((d) => d.type === 'kv' && (d as KvBlock).items.some((i) => i.key === 'TLS-Grade')) as KvBlock;
+    expect(grade.items.find((i) => i.key === 'TLS-Grade')?.badge).toBe('ok');
+    const vulns = detail.find((d) => d.type === 'list' && (d as ListBlock).title === 'Schwachstellen-Prüfungen') as ListBlock;
+    expect(vulns.items[0]).toEqual({ text: 'robot', badge: 'fail' }); // verwundbar zuerst
+    expect(vulns.items.find((i) => i.text === 'heartbleed')?.badge).toBe('ok');
+  });
+
+  it('http-headers: Nicht-Security-Header → "Alle Header"-Dump-Block', () => {
+    const real = {
+      'strict-transport-security': 'max-age=1',
+      server: 'nginx',
+      'content-type': 'text/html',
+      'x-powered-by': 'Next.js',
+    };
+    const { detail } = extractDetail(res('http-headers', real, 'security'));
+    const dump = detail.find((d) => d.type === 'kv' && (d as KvBlock).title === 'Alle Header') as KvBlock;
+    expect(dump).toBeTruthy();
+    const keys = dump.items.map((i) => i.key);
+    expect(keys).toContain('content-type');
+    expect(keys).toContain('x-powered-by');
+    expect(keys).not.toContain('strict-transport-security'); // Security-Header ausgeschlossen
+    expect(keys).not.toContain('server'); // separat gezeigt
+  });
+
+  it('get-ip: asn + org → "AS… · Org"-KV', () => {
+    const real = { ip: '1.1.1.1', family: 4, asn: 13335, asOrganization: 'Cloudflare, Inc.' };
+    const { detail } = extractDetail(res('get-ip', real, 'info'));
+    const kv = detail.find((d) => d.type === 'kv') as KvBlock;
+    expect(kv.items.find((i) => i.key === 'ISP / AS')?.value).toBe('AS13335 · Cloudflare, Inc.');
+  });
+
+  it('dns-server: { dns:[{address,hostname}] } → KV Hostname→IP', () => {
+    const real = { dns: [{ address: '1.2.3.4', hostname: 'ns1.example.com' }] };
+    const { detail } = extractDetail(res('dns-server', real, 'dns'));
+    const kv = detail[0] as KvBlock;
+    expect(kv.type).toBe('kv');
+    expect(kv.items[0]).toEqual({ key: 'ns1.example.com', value: '1.2.3.4' });
+  });
+
+  it('dns: MX als "prio exchange", SOA mit serial', () => {
+    const real = {
+      A: ['1.2.3.4'], MX: [{ exchange: 'mail.x.de', priority: 10 }],
+      SOA: { nsname: 'ns1.x.de', serial: 2026010101 },
+      AAAA: [], TXT: [], NS: [], CNAME: [], SRV: [], PTR: [],
+    };
+    const { detail } = extractDetail(res('dns', real, 'dns'));
+    const kv = detail.find((d) => d.type === 'kv') as KvBlock;
+    expect(kv.items.find((i) => i.key === 'MX')?.value).toBe('10 mail.x.de');
+    expect(kv.items.find((i) => i.key === 'SOA')?.value).toBe('ns1.x.de (serial: 2026010101)');
+  });
+});

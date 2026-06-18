@@ -20,7 +20,11 @@ export default function SeverityCounts({ counts }: SeverityCountsProps) {
     .map(({ key, short, alert }) => ({ key, short, alert, count: counts[key] || 0 }))
     .filter(e => e.count > 0);
 
-  if (entries.length === 0) return null;
+  // PASS-Bucket (VEC-415): Anzahl bestandener Checks, neutrale Farbe + ✓-Glyph,
+  // immer als letzter Eintrag.
+  const passCount = counts['PASS'] || 0;
+
+  if (entries.length === 0 && passCount === 0) return null;
 
   return (
     <span className="inline-flex gap-2 font-mono text-xs tabular-nums">
@@ -29,6 +33,15 @@ export default function SeverityCounts({ counts }: SeverityCountsProps) {
           {count}{short}
         </span>
       ))}
+      {passCount > 0 && (
+        <span
+          className="rounded px-1 text-slate-400 bg-slate-700/50"
+          title="Bestandene Checks"
+          aria-label={`${passCount} OK`}
+        >
+          {passCount}✓
+        </span>
+      )}
     </span>
   );
 }

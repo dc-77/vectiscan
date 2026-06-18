@@ -281,6 +281,14 @@ function protoVariant(p: string): BadgeVariant {
   if (/TLSv?1\.1|TLSv?1\.0|SSLv/i.test(p)) return 'fail';
   return 'neutral';
 }
+// TLS-Grade-Badge (VEC-415): A+/A → ok, B → warn, C/D/E/F → fail, sonst neutral.
+function gradeVariant(grade: string): BadgeVariant {
+  const g = grade.trim().toUpperCase();
+  if (/^A\+?$/.test(g)) return 'ok';
+  if (g === 'B') return 'warn';
+  if (/^[CDEF]$/.test(g)) return 'fail';
+  return 'neutral';
+}
 function statusCodeVariant(code: number): BadgeVariant {
   if (code >= 200 && code < 300) return 'ok';
   if (code >= 300 && code < 400) return 'neutral';
@@ -383,13 +391,27 @@ function dnsRecords(r: ObjLike): { type: string; value: string }[] {
   for (const t of DNS_TYPE_ORDER) {
     const v = r[t];
     if (t === 'SOA') {
-      if (isObj(v)) out.push({ type: 'SOA', value: asStr(v.nsname) ?? asStr(v.hostmaster) ?? 'vorhanden' });
+      // VEC-415: kompakt als "${mname} (serial: ${serial})"; Long-Layout greift
+      // automatisch bei > 48 Zeichen.
+      if (isObj(v)) {
+        const mname = asStr(v.nsname) ?? asStr(v.mname) ?? asStr(v.primary);
+        const serial = asNum(v.serial) ?? asStr(v.serial);
+        const value = mname
+          ? (serial !== undefined ? `${mname} (serial: ${serial})` : mname)
+          : (asStr(v.hostmaster) ?? 'vorhanden');
+        out.push({ type: 'SOA', value });
+      }
       continue;
     }
     for (const item of asArr(v)) {
       if (t === 'MX' && isObj(item)) {
-        const ex = asStr(item.exchange);
-        if (ex) out.push({ type: 'MX', value: `${ex} (prio ${asNum(item.priority) ?? '?'})` });
+        // VEC-415: priority + exchange zusammenführen → "10 mail.example.com".
+        const mxPrio = asNum(item.priority) ?? asNum(item.pref);
+        const mxExch = asStr(item.exchange) ?? asStr(item.data);
+        const value = mxPrio !== undefined
+          ? `${mxPrio} ${mxExch ?? ''}`.trim()
+          : (mxExch ?? asStr(item.address) ?? asStr(item.value) ?? '');
+        if (value) out.push({ type: 'MX', value });
       } else if (t === 'TXT') {
         const line = truncate(joinTxt(item), 80);
         if (line) out.push({ type: 'TXT', value: line });
@@ -452,11 +474,16 @@ export function deriveStatus(
       // (kein supportedProtocols[]), cipher als Objekt {name,…}, forwardSecrecy,
       // ocspStapled. Slug in api/lib/liveCheck.ts auf `tls-connection` korrigiert.
       const proto = asStr(r.protocol);
-      if (!proto) return { status: 'pass', summary: 'Konfiguration OK', detail: result };
+      // VEC-415: Grade (sofern vorhanden) führt die Summary an.
+      const grade = asStr(r.grade) ?? asStr(asObj(r.report)?.grade);
+      if (!proto) {
+        return { status: 'pass', summary: grade ? `Grade ${grade}` : 'Konfiguration OK', detail: result };
+      }
       if (/TLSv?1\.0|TLSv?1\.1|SSLv/i.test(proto)) {
         return { status: 'warn', summary: `Veraltetes Protokoll: ${proto}`, detail: result };
       }
       const cipher = asStr(asObj(r.cipher)?.name);
+      if (grade) return { status: 'pass', summary: `Grade ${grade} · ${proto}`, detail: result };
       return { status: 'pass', summary: `${proto}${cipher ? ` · ${cipher}` : ''}`, detail: result };
     }
 
@@ -665,7 +692,19 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
       if (days !== null) kv.push({ key: 'Noch gültig', value: `${days} Tage`, badge: expiryVariant(days) });
       if (keySize !== undefined) kv.push({ key: 'Schlüssellänge', value: `${keySize} bit` });
       if (serial) kv.push({ key: 'Seriennummer', value: truncate(serial, 40) });
+      // VEC-415: SHA-256-Fingerprint (~95 Zeichen → automatisch Long-Layout im Tile).
+      const fp256 = asStr(r.fingerprint256);
+      if (fp256) kv.push({ key: 'SHA-256', value: fp256 });
       if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      // Extended Key Usage als badge-row nach dem KV-Block (VEC-415).
+      const eku = asArr(r.ext).filter((e): e is string => typeof e === 'string');
+      if (eku.length > 0) {
+        detail.push({
+          type: 'badge-row',
+          title: 'Extended Key Usage',
+          items: eku.map((e) => ({ label: e, variant: 'neutral' as BadgeVariant })),
+        });
+      }
       const sans = sslSans(r);
       if (sans.length > 0) {
         detail.push({ type: 'kv', items: sans.map((s) => ({ key: 'SAN', value: s })), scrollable: sans.length > 8 });
@@ -676,8 +715,18 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
     case 'tls': {
       // tls-connection: protocol (string), cipher{name,standardName,version},
       // alpnProtocol, forwardSecrecy, ocspStapled, ephemeralKey, sessionResumption.
+      // VEC-415: Grade + Vulnerability-Checks werden defensiv gemappt — sind sie
+      // (noch) nicht in der Upstream-Antwort, entsteht schlicht kein Block.
+
+      // 1. TLS-Grade als erste Info (sofern vorhanden).
+      const grade = asStr(r.grade) ?? asStr(asObj(r.report)?.grade);
+      if (grade) detail.push({ type: 'kv', items: [{ key: 'TLS-Grade', value: grade, badge: gradeVariant(grade) }] });
+
+      // 2. Protokolle.
       const proto = asStr(r.protocol);
-      if (proto) detail.push({ type: 'badge-row', items: [{ label: proto, variant: protoVariant(proto) }] });
+      if (proto) detail.push({ type: 'badge-row', title: 'Protokolle', items: [{ label: proto, variant: protoVariant(proto) }] });
+
+      // 3. Verbindungsqualität.
       const kv: KvItem[] = [];
       const cipher = asObj(r.cipher);
       const cipherName = asStr(cipher?.name);
@@ -695,7 +744,26 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
       const ekSize = asNum(ek?.size);
       if (ekName) kv.push({ key: 'Ephemeral Key', value: ekSize ? `${ekName} (${ekSize} bit)` : ekName });
       if (typeof r.sessionResumption === 'boolean') kv.push({ key: 'Session-Resumption', value: yesNo(r.sessionResumption) });
-      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      if (kv.length > 0) detail.push({ type: 'kv', title: 'Verbindungsqualität', items: kv });
+
+      // 4. Schwachstellen-Prüfungen (Heartbleed/POODLE/…): true = verwundbar (fail),
+      // false = bestanden (ok). Defensiv über vulnerabilities-Objekt; fehlgeschlagene
+      // zuerst, dann bestanden. Leere Liste → Block weglassen.
+      const vulns = asObj(r.vulnerabilities) ?? asObj(r.vulns);
+      if (vulns) {
+        const checks = Object.entries(vulns)
+          .filter(([, v]) => typeof v === 'boolean')
+          .map(([name, v]) => ({ name, vulnerable: v === true }))
+          .sort((a, b) => Number(b.vulnerable) - Number(a.vulnerable));
+        if (checks.length > 0) {
+          detail.push({
+            type: 'list',
+            title: 'Schwachstellen-Prüfungen',
+            scrollable: true,
+            items: checks.map((c) => ({ text: c.name, badge: (c.vulnerable ? 'fail' : 'ok') as BadgeVariant })),
+          });
+        }
+      }
       break;
     }
 
@@ -726,6 +794,15 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
       }
       const server = asStr(r.server);
       if (server) detail.push({ type: 'kv', items: [{ key: 'Server', value: truncate(server, 60) }] });
+      // VEC-415: vollständiger Header-Dump (alle Nicht-Security-Header, ohne
+      // Meta-/bereits-gezeigte Keys), scrollbar bei > 8 Einträgen.
+      const SKIP = new Set(['error', 'skipped', 'server', ...SEC_HEADERS]);
+      const otherHeaders = Object.entries(r)
+        .filter(([k]) => !SKIP.has(k.toLowerCase()))
+        .map(([k, v]) => ({ key: k, value: truncate(String(v), 80) }));
+      if (otherHeaders.length > 0) {
+        detail.push({ type: 'kv', title: 'Alle Header', items: otherHeaders, scrollable: otherHeaders.length > 8 });
+      }
       break;
     }
 
@@ -807,15 +884,21 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
     }
 
     case 'dns-server': {
-      const servers = asArr(r.dns)
+      // VEC-415: Hostname → IP als KV (statt flacher Liste). Reale 2.1.9-Form ist
+      // { dns:[{ address, hostname }] }; fällt auf String-Servernamen zurück.
+      const items: KvItem[] = asArr(r.dns)
         .map((s) => {
           const o = asObj(s);
-          const host = asStr(o?.hostname);
-          const addr = asStr(o?.address);
-          return host ? (addr ? `${host} (${addr})` : host) : addr;
+          if (o) {
+            const host = asStr(o.hostname) ?? asStr(o.name);
+            const ip = asStr(o.address) ?? asStr(o.ip);
+            if (host && ip && host !== ip) return { key: host, value: ip };
+            return { key: 'Server', value: host ?? ip ?? '' };
+          }
+          return { key: 'Server', value: asStr(s) ?? '' };
         })
-        .filter((s): s is string => !!s);
-      if (servers.length > 0) detail.push({ type: 'list', items: servers.map((t) => ({ text: t })) });
+        .filter((it) => it.value);
+      if (items.length > 0) detail.push({ type: 'kv', items, scrollable: items.length > 8 });
       break;
     }
 
@@ -929,6 +1012,11 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
       const kv: KvItem[] = [];
       if (ip) kv.push({ key: 'IP-Adresse', value: ip });
       if (family) kv.push({ key: 'IP-Version', value: `IPv${family}` });
+      // VEC-415: ASN/ISP separat, sofern vorhanden ("AS12345 · Cloudflare, Inc.").
+      const asnNum = asNum(r.asn) ?? asNum(r.asnNumber);
+      const asnOrg = asStr(r.asOrganization) ?? asStr(r.org) ?? asStr(r.isp);
+      const ispDisplay = [asnNum ? `AS${asnNum}` : null, asnOrg].filter(Boolean).join(' · ');
+      if (ispDisplay) kv.push({ key: 'ISP / AS', value: ispDisplay });
       if (kv.length > 0) detail.push({ type: 'kv', items: kv });
       break;
     }
