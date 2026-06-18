@@ -66,6 +66,11 @@ export const LIVE_CHECK_MODULES: readonly LiveCheckModule[] = [
   { key: 'threats', label: 'Malware / Phishing / Blocklisten', upstream: 'threats', group: 'security' },
   { key: 'block-lists', label: 'Blocklisten-Status', upstream: 'block-lists', group: 'security' },
   { key: 'get-ip', label: 'IP-Information', upstream: 'get-ip', group: 'info' },
+  // VEC-416: get-ip liefert in web-check 2.1.9 NUR { ip, family } — Geo/ASN
+  // (Stadt/Land/Org/Timezone) steckt im separaten `location`-Modul (key-frei:
+  // ipwho.is → ip-api.com → geojs.io → reallyfreegeoip + restcountries).
+  // NEUE externe Upstream-Anbindung → Security-Sign-off (Mitnick) vor Merge.
+  { key: 'location', label: 'Standort & Netzbetreiber (Geo/ASN)', upstream: 'location', group: 'info' },
   { key: 'server-status', label: 'Server-Status', upstream: 'status', group: 'info' },
   { key: 'screenshot', label: 'Screenshot', upstream: 'screenshot', group: 'info' },
 ] as const;

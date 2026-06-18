@@ -20,6 +20,10 @@ describe('Modul-Allowlist (Default-Deny)', () => {
     expect(getLiveCheckModule('mail-config')?.upstream).toBe('mail-config');
   });
 
+  it('schaltet das location-Modul frei (VEC-416, Geo/ASN-Upstream)', () => {
+    expect(getLiveCheckModule('location')).toMatchObject({ upstream: 'location', group: 'info' });
+  });
+
   it('schaltet GPL-/SEO-Module NICHT frei', () => {
     // tech-stack (wappalyzer = GPL, Spike VEC-362) + CO2/Ranking/Social/Sitemap
     for (const denied of ['tech-stack', 'carbon', 'rank', 'social-tags', 'sitemap', 'quality']) {

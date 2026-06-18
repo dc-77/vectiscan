@@ -184,6 +184,57 @@ describe('VEC-413 deriveStatus — reale web-check-2.1.9-Shapes', () => {
     expect(r.summary).toMatch(/203\.0\.113\.7/);
   });
 
+  // ── location (VEC-416): Geo/ASN aus dem separaten location-Modul ──
+  it('location: reale 2.1.9-Shape → pass + Land·Stadt im Summary', () => {
+    const real = {
+      ip: '203.0.113.7',
+      city: 'Frankfurt am Main',
+      region: 'Hesse',
+      region_code: 'HE',
+      country_name: 'Germany',
+      country_code: 'DE',
+      postal: '60313',
+      latitude: 50.1109,
+      longitude: 8.6821,
+      org: 'AS24940 Hetzner Online GmbH',
+      timezone: 'Europe/Berlin',
+    };
+    const r = deriveStatus('location', real);
+    expect(r.status).toBe('pass');
+    expect(r.summary).toBe('Germany · Frankfurt am Main');
+    const { detail } = extractDetail(res('location', real, 'info'));
+    const kv = detail.find((d) => d.type === 'kv') as { items: { key: string; value: string }[] };
+    expect(kv).toBeTruthy();
+    expect(kv.items.find((i) => i.key === 'Land')?.value).toBe('Germany (DE)');
+    expect(kv.items.find((i) => i.key === 'Stadt')?.value).toBe('Frankfurt am Main, Hesse');
+    expect(kv.items.find((i) => i.key === 'Netzbetreiber (ASN/Org)')?.value).toMatch(/Hetzner/);
+    expect(kv.items.find((i) => i.key === 'Zeitzone')?.value).toBe('Europe/Berlin');
+    expect(kv.items.find((i) => i.key === 'Koordinaten')?.value).toBe('50.1109, 8.6821');
+  });
+
+  it('location: Provider-Variante (country/lat/lon, timezone-Objekt, isp) → robust gemappt', () => {
+    // Fallback-Provider (z.B. ipwho.is) liefern abweichende Feldnamen.
+    const variant = {
+      ip: '198.51.100.4',
+      city: 'Paris',
+      country: 'France',
+      country_code: 'FR',
+      isp: 'OVH SAS',
+      timezone: { id: 'Europe/Paris', abbr: 'CET' },
+      lat: 48.8566,
+      lng: 2.3522,
+    };
+    const r = deriveStatus('location', variant);
+    expect(r.status).toBe('pass');
+    expect(r.summary).toBe('France · Paris');
+    const { detail } = extractDetail(res('location', variant, 'info'));
+    const kv = detail.find((d) => d.type === 'kv') as { items: { key: string; value: string }[] };
+    expect(kv.items.find((i) => i.key === 'Land')?.value).toBe('France (FR)');
+    expect(kv.items.find((i) => i.key === 'Netzbetreiber (ASN/Org)')?.value).toBe('OVH SAS');
+    expect(kv.items.find((i) => i.key === 'Zeitzone')?.value).toBe('Europe/Paris');
+    expect(kv.items.find((i) => i.key === 'Koordinaten')?.value).toBe('48.8566, 2.3522');
+  });
+
   // ── server-status: responseCode ──
   it('server-status: { responseCode:200, isUp:true } → pass', () => {
     expect(deriveStatus('server-status', { isUp: true, responseCode: 200, responseTime: 120 }).status).toBe('pass');

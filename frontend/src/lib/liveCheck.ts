@@ -587,6 +587,22 @@ export function deriveStatus(
       return { status: 'pass', summary: ip ? `${ip}${family ? ` · IPv${family}` : ''}` : 'IP-Info verfügbar', detail: result };
     }
 
+    case 'location': {
+      // VEC-416: `location`-Modul (web-check 2.1.9, key-frei via ipwho.is/
+      // ip-api.com/geojs.io/reallyfreegeoip + restcountries). Reale Antwort:
+      // { ip, city, region, country_name, country_code, postal, latitude,
+      //   longitude, org, timezone, ... }. Reines Info-Modul → immer pass.
+      // Defensiv gegen Provider-Varianten (country/lat/lon, timezone als Objekt).
+      const country = asStr(r.country_name) ?? asStr(r.country);
+      const city = asStr(r.city);
+      const parts = [country, city].filter(Boolean);
+      return {
+        status: 'pass',
+        summary: parts.length > 0 ? parts.join(' · ') : 'Standort-Info verfügbar',
+        detail: result,
+      };
+    }
+
     case 'server-status': {
       // Reale Antwort = { isUp, responseCode, responseTime, dnsLookupTime }.
       if (r.isUp === false) return { status: 'fail', summary: 'Nicht erreichbar', detail: result };
@@ -913,6 +929,32 @@ export function extractDetail(result: CheckResult): { detail: DetailBlock[]; hid
       const kv: KvItem[] = [];
       if (ip) kv.push({ key: 'IP-Adresse', value: ip });
       if (family) kv.push({ key: 'IP-Version', value: `IPv${family}` });
+      if (kv.length > 0) detail.push({ type: 'kv', items: kv });
+      break;
+    }
+
+    case 'location': {
+      // VEC-416: Geo/ASN aus dem `location`-Modul. Mapping gegen die reale
+      // 2.1.9-Antwort, defensiv gegen Provider-Varianten (org↔asn/isp,
+      // latitude/longitude↔lat/lon, timezone als String ODER { id }).
+      const kv: KvItem[] = [];
+      const country = asStr(r.country_name) ?? asStr(r.country);
+      const cc = asStr(r.country_code);
+      if (country) kv.push({ key: 'Land', value: cc ? `${country} (${cc})` : country });
+      const city = asStr(r.city);
+      const region = asStr(r.region) ?? asStr(r.region_code);
+      if (city) kv.push({ key: 'Stadt', value: region ? `${city}, ${region}` : city });
+      const postal = asStr(r.postal);
+      if (postal) kv.push({ key: 'PLZ', value: postal });
+      const org = asStr(r.org) ?? asStr(r.asn) ?? asStr(r.isp);
+      if (org) kv.push({ key: 'Netzbetreiber (ASN/Org)', value: truncate(org, 60) });
+      const tz = asStr(r.timezone) ?? asStr(asObj(r.timezone)?.id);
+      if (tz) kv.push({ key: 'Zeitzone', value: tz });
+      const lat = asNum(r.latitude) ?? asNum(r.lat);
+      const lon = asNum(r.longitude) ?? asNum(r.lon) ?? asNum(r.lng);
+      if (lat !== undefined && lon !== undefined) {
+        kv.push({ key: 'Koordinaten', value: `${lat}, ${lon}` });
+      }
       if (kv.length > 0) detail.push({ type: 'kv', items: kv });
       break;
     }
