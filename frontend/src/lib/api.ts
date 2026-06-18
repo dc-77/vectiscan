@@ -295,6 +295,13 @@ export interface OrderWithTargets {
   package: string;
   targetCount: number;
   targets: OrderTargetStub[];
+  // VEC-436: Einmalzahlungs-Pfad (mode=payment). Gesetzt, wenn ein
+  // kostenpflichtiges Paket ohne aktives Abo bestellt wird — die Order
+  // steht dann auf 'awaiting_payment' und muss zuerst via Stripe-Checkout
+  // bezahlt werden. checkoutUrl ist das Ziel des Redirects.
+  checkoutUrl?: string | null;
+  checkoutSessionId?: string | null;
+  message?: string;
 }
 
 export async function validateTargets(targets: TargetEntry[]): Promise<ApiResponse<TargetBatchValidation>> {

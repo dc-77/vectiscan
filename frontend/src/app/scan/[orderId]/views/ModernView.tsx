@@ -53,6 +53,8 @@ interface Props {
   onReject: () => void;
   onExclude: (findingId: string, reason: string) => void;
   onUnexclude: (findingId: string) => void;
+  // VEC-436: Rückkehr aus dem Stripe-Checkout (success_url/cancel_url).
+  checkoutReturn?: 'success' | 'cancelled' | null;
 }
 
 const PKG_LABELS: Record<string, string> = {
@@ -75,7 +77,7 @@ function formatDate(iso: string): string {
 
 export default function ModernView({
   order, findings, aiData, scanResults, admin, view, onViewChange, onApprove, onReject,
-  onExclude, onUnexclude,
+  onExclude, onUnexclude, checkoutReturn,
 }: Props) {
   const orderId = order.id ?? '';
 
@@ -88,13 +90,14 @@ export default function ModernView({
   const isPendingReview = order.status === 'pending_review';
   const isPrecheckRunning = order.status === 'precheck_running';
   const isPendingTargetReview = order.status === 'pending_target_review';
+  const isAwaitingPayment = order.status === 'awaiting_payment';
 
   const pkg = PKG_LABELS[order.package] ?? order.package;
 
   // Scan läuft aktiv (zwischen Freigabe und Report) → ruhige Phasen-Timeline zeigen.
   const isRunning =
     !isDone && !isFailed && !isPendingReview && !isPrecheckRunning && !isPendingTargetReview &&
-    order.status !== 'verification_pending' && order.status !== 'created';
+    !isAwaitingPayment && order.status !== 'verification_pending' && order.status !== 'created';
 
   // Augment findings mit threat_intel-Badge (FindingsViewer erwartet kein
   // direktes Threat-Intel-Slot — wir rendern ein Wrapper-Element rundherum).
@@ -198,6 +201,34 @@ export default function ModernView({
         </div>
 
         {/* ── STATUS-BANNER ───────────────────── */}
+        {/* VEC-436: Einmalscan wartet auf Zahlung (mode=payment). Nach
+            erfolgreichem Stripe-Checkout pollt die Page bis der Webhook
+            den Status auf precheck_running setzt. */}
+        {isAwaitingPayment && (
+          <div className="rounded-lg border border-amber-800/50 bg-amber-950/20 px-4 py-3 text-sm">
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`inline-block h-2 w-2 rounded-full bg-amber-400 ${checkoutReturn === 'cancelled' ? '' : 'animate-pulse'}`} />
+              <span className="text-amber-300 font-medium">
+                {checkoutReturn === 'success' ? 'Zahlung wird bestätigt…' : checkoutReturn === 'cancelled' ? 'Zahlung abgebrochen' : 'Zahlung ausstehend'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-400">
+              {checkoutReturn === 'success'
+                ? 'Danke für deine Zahlung! Sobald sie bestätigt ist, startet der Scan automatisch — dieser Status aktualisiert sich von selbst.'
+                : checkoutReturn === 'cancelled'
+                  ? 'Die Zahlung wurde abgebrochen. Dieser Scan startet erst nach bestätigter Zahlung. Du kannst jederzeit einen neuen Scan starten.'
+                  : 'Dieser Scan startet erst nach bestätigter Zahlung.'}
+            </p>
+            {checkoutReturn === 'cancelled' && (
+              <Link
+                href="/scan/new"
+                className="inline-block mt-2 text-xs text-amber-300 hover:text-amber-200 font-medium px-3 py-1.5 bg-amber-400/10 rounded-lg transition-colors"
+              >
+                Neuen Scan starten
+              </Link>
+            )}
+          </div>
+        )}
         {isPrecheckRunning && (
           <div className="rounded-lg border border-cyan-800/50 bg-cyan-950/20 px-4 py-3 text-sm">
             <div className="flex items-center gap-2 mb-1">

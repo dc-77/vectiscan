@@ -147,6 +147,15 @@ export default function ScanDetailPage() {
   const params = useParams();
   const orderId = params.orderId as string;
 
+  // VEC-436: Rückkehr aus dem Stripe-Checkout. success_url hängt
+  // ?checkout=success an. Aus window.location gelesen (statt useSearchParams),
+  // um keine zusätzliche Suspense-Boundary in dieser großen Page zu erzwingen.
+  const [checkoutReturn, setCheckoutReturn] = useState<'success' | 'cancelled' | null>(null);
+  useEffect(() => {
+    const c = new URLSearchParams(window.location.search).get('checkout');
+    setCheckoutReturn(c === 'success' ? 'success' : c === 'cancelled' ? 'cancelled' : null);
+  }, []);
+
   const [ready, setReady] = useState(false);
   const [admin, setAdmin] = useState(false);
   const [order, setOrder] = useState<OrderStatus | null>(null);
@@ -241,6 +250,16 @@ export default function ScanDetailPage() {
     if (ready) loadData();
   }, [ready, loadData]);
 
+  // VEC-436: Solange die Order auf Zahlung wartet, pollen wir den Status, damit
+  // der Webhook-Übergang awaiting_payment → precheck_running ohne manuellen
+  // Reload sichtbar wird (nach erfolgreichem Stripe-Checkout). Stoppt, sobald
+  // die Order den Zustand verlässt oder die Seite verlassen wird.
+  useEffect(() => {
+    if (!ready || order?.status !== 'awaiting_payment') return;
+    const t = setInterval(() => { loadData(); }, 4000);
+    return () => clearInterval(t);
+  }, [ready, order?.status, loadData]);
+
   // --- Finding exclusion handlers ---
   const handleExclude = useCallback(async (findingId: string, reason: string) => {
     const res = await excludeFinding(orderId, findingId, reason);
@@ -334,6 +353,7 @@ export default function ScanDetailPage() {
   const isPendingReview = order.status === 'pending_review';
   const isPrecheckRunning = order.status === 'precheck_running';
   const isPendingTargetReview = order.status === 'pending_target_review';
+  const isAwaitingPayment = order.status === 'awaiting_payment';
   const showDebugDefault = isFailed && admin;
   const PKG_LABELS: Record<string, string> = {
     webcheck: 'WEBCHECK', perimeter: 'PERIMETER', compliance: 'COMPLIANCE',
@@ -385,6 +405,7 @@ export default function ScanDetailPage() {
         onReject={handleReject}
         onExclude={handleExclude}
         onUnexclude={handleUnexclude}
+        checkoutReturn={checkoutReturn}
       />
     );
   }
@@ -480,6 +501,20 @@ export default function ScanDetailPage() {
           {order.progress.hostsTotal > 0 && <span>{order.progress.hostsTotal} Hosts</span>}
         </div>
 
+        {/* VEC-436: Zahlung ausstehend (Einmalscan, mode=payment) */}
+        {isAwaitingPayment && (
+          <div className="bg-amber-900/20 border border-amber-800/50 rounded-lg px-4 py-3 text-sm space-y-1">
+            <p className="text-amber-300 font-medium">
+              {checkoutReturn === 'success' ? 'Zahlung wird bestätigt…' : checkoutReturn === 'cancelled' ? 'Zahlung abgebrochen' : 'Zahlung ausstehend'}
+            </p>
+            <p className="text-xs text-slate-400">
+              {checkoutReturn === 'success'
+                ? 'Danke! Sobald die Zahlung bestätigt ist, startet der Scan automatisch. Dieser Status aktualisiert sich von selbst.'
+                : 'Dieser Scan startet erst nach bestätigter Zahlung.'}
+            </p>
+          </div>
+        )}
+
         {/* Pre-Check Status Blocks */}
         {isPrecheckRunning && (
           <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg px-4 py-3 text-sm space-y-2">
@@ -514,7 +549,7 @@ export default function ScanDetailPage() {
         )}
 
         {/* Live scan progress bar */}
-        {!isDone && !isFailed && !isPendingReview && !isPrecheckRunning && !isPendingTargetReview && order.status !== 'verification_pending' && (() => {
+        {!isDone && !isFailed && !isPendingReview && !isPrecheckRunning && !isPendingTargetReview && !isAwaitingPayment && order.status !== 'verification_pending' && (() => {
           const phases = [
             { key: 'passive_intel', label: 'Aufklärung' },
             { key: 'dns_recon', label: 'DNS-Analyse' },

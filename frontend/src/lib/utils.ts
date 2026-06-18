@@ -22,6 +22,7 @@ export function formatDuration(minutes: number): string {
 
 /** Internal status → German display label */
 export const STATUS_LABELS: Record<string, string> = {
+  awaiting_payment: 'Wartet auf Zahlung',
   verification_pending: 'Verifizierung',
   created: 'Erstellt',
   queued: 'In Warteschlange',
