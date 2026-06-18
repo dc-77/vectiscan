@@ -25,6 +25,9 @@ import {
   statusScore,
   GROUP_LABELS,
   GROUP_ORDER,
+  sslDaysUntilExpiry,
+  sslCertName,
+  sslSans,
   type CheckModule,
   type CheckResult,
   type CheckGroup,
@@ -241,22 +244,29 @@ function extractDetail(result: CheckResult): { detail: DetailBlock[]; hiddenCoun
 
   switch (result.key) {
     case 'ssl': {
+      // Felder nach realer web-check-2.1.9-Antwort (rohes getPeerCertificate):
+      // subject/issuer = Objekte, valid_from/valid_to = Strings, bits =
+      // Schlüssellänge, subjectaltname = Komma-String. Mapping via sslHelfer
+      // (VEC-411) — alte Feldnamen (validTo/keySize/altNames/issuer-String)
+      // existierten upstream nie → Karte blieb leer.
       const kv: { key: string; value: string; badge?: BadgeVariant }[] = [];
-      const issuer = asStr(r.issuer);
-      const subject = asStr(r.subject);
-      const validTo = asStr(r.validTo) ?? asStr(r.validUntil);
-      const days = asNum(r.daysUntilExpiry);
-      const sigAlgo = asStr(r.signatureAlgorithm) ?? asStr(r.sigalg);
-      const keySize = asNum(r.keySize) ?? asNum(r.bits);
+      const issuer = sslCertName(r.issuer, 'O');
+      const subject = sslCertName(r.subject, 'CN');
+      const validFrom = asStr(r.valid_from) ?? asStr(r.validFrom);
+      const validTo = asStr(r.valid_to) ?? asStr(r.validTo) ?? asStr(r.validUntil);
+      const days = sslDaysUntilExpiry(r);
+      const keySize = asNum(r.bits) ?? asNum(r.keySize);
+      const serial = asStr(r.serialNumber);
       if (issuer) kv.push({ key: 'Aussteller', value: issuer });
       if (subject) kv.push({ key: 'Domain', value: subject });
+      if (validFrom) kv.push({ key: 'Gültig ab', value: validFrom });
       if (validTo) kv.push({ key: 'Gültig bis', value: validTo });
-      if (days !== undefined) kv.push({ key: 'Noch gültig', value: `${days} Tage`, badge: expiryVariant(days) });
-      if (sigAlgo) kv.push({ key: 'Signatur', value: sigAlgo });
+      if (days !== null) kv.push({ key: 'Noch gültig', value: `${days} Tage`, badge: expiryVariant(days) });
       if (keySize !== undefined) kv.push({ key: 'Schlüssellänge', value: `${keySize} bit` });
+      if (serial) kv.push({ key: 'Seriennummer', value: truncate(serial, 40) });
       if (kv.length > 0) detail.push({ type: 'kv', items: kv });
       // Alle SANs — eine Zeile je SAN, scrollbar ab 8 (VEC-399, kein slice)
-      const sans = asArr(r.altNames).filter((s): s is string => typeof s === 'string');
+      const sans = sslSans(r);
       if (sans.length > 0) {
         detail.push({
           type: 'kv',

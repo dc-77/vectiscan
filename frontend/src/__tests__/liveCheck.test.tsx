@@ -11,7 +11,15 @@ jest.mock('@/lib/auth', () => ({
   getToken: () => 'test-token',
 }));
 
-import { runPool, runModule, CLIENT_CONCURRENCY } from '@/lib/liveCheck';
+import {
+  runPool,
+  runModule,
+  CLIENT_CONCURRENCY,
+  sslDaysUntilExpiry,
+  sslCertName,
+  sslSans,
+  sslIsTrusted,
+} from '@/lib/liveCheck';
 
 type Body = Record<string, unknown>;
 function mockRes(status: number, body: Body): Response {
@@ -90,5 +98,58 @@ describe('runModule — Retry-Verhalten (VEC-381)', () => {
     // 1 Erstversuch + MAX_CONCURRENT_RETRIES (4) = 5 Aufrufe.
     expect(fetchMock).toHaveBeenCalledTimes(5);
     expect(r.summary).toBe('Bitte warten (Rate-Limit)');
+  });
+});
+
+describe('SSL-Feld-Normalisierung (VEC-411)', () => {
+  // Reale web-check-2.1.9-/api/ssl-Antwort: rohes getPeerCertificate + isValid.
+  const realCert = {
+    subject: { CN: 'securess.de' },
+    issuer: { C: 'US', O: "Let's Encrypt", CN: 'R11' },
+    valid_from: 'Apr  1 00:00:00 2099 GMT',
+    valid_to: 'Jul  1 23:59:59 2099 GMT',
+    subjectaltname: 'DNS:securess.de, DNS:www.securess.de',
+    bits: 256,
+    serialNumber: '04ABCD',
+    isValid: true,
+    authError: null,
+  };
+
+  it('sslCertName liest CN/O aus dem Distinguished-Name-Objekt', () => {
+    expect(sslCertName(realCert.subject, 'CN')).toBe('securess.de');
+    expect(sslCertName(realCert.issuer, 'O')).toBe("Let's Encrypt");
+    expect(sslCertName('Let’s Encrypt')).toBe('Let’s Encrypt'); // String-Shape
+    expect(sslCertName(undefined)).toBe('');
+  });
+
+  it('sslSans parst subjectaltname-Komma-String und altNames-Array', () => {
+    expect(sslSans(realCert)).toEqual(['securess.de', 'www.securess.de']);
+    expect(sslSans({ altNames: ['a.de', 'b.de'] })).toEqual(['a.de', 'b.de']);
+    expect(sslSans({})).toEqual([]);
+  });
+
+  it('sslDaysUntilExpiry rechnet aus valid_to ODER daysUntilExpiry', () => {
+    const fixed = Date.parse('Jan  1 00:00:00 2099 GMT');
+    expect(sslDaysUntilExpiry(realCert, fixed)).toBeGreaterThan(150);
+    expect(sslDaysUntilExpiry({ daysUntilExpiry: 42 })).toBe(42);
+    expect(sslDaysUntilExpiry({})).toBeNull();
+  });
+
+  it('sslIsTrusted akzeptiert isValid:true und valid:true, lehnt authError ab', () => {
+    expect(sslIsTrusted(realCert)).toBe(true);
+    expect(sslIsTrusted({ valid: true })).toBe(true);
+    expect(sslIsTrusted({ isValid: false })).toBe(false);
+    expect(sslIsTrusted({ authError: 'self signed certificate' })).toBe(false);
+  });
+
+  it('runModule(ssl) wertet ein echtes, gültiges Zertifikat als pass (nicht fail)', async () => {
+    const origFetch = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue(
+      mockRes(200, { success: true, data: { result: realCert } }),
+    ) as unknown as typeof fetch;
+    const r = await runModule('ssl', 'securess.de');
+    global.fetch = origFetch;
+    expect(r.status).toBe('pass');
+    expect(r.summary).toContain("Let's Encrypt");
   });
 });
