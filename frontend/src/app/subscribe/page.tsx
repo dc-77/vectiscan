@@ -48,9 +48,9 @@ const CURATED_FEATURES: Record<string, string[]> = {
   ],
 };
 
-// VEC-290: Alle 5 Pakete aus dem Katalog. WebCheck (free) leitet direkt
-// zu /welcome weiter — kein Subscription-Wizard nötig.
-const WIZARD_PACKAGE_KEYS: PackageKey[] = ['webcheck', 'perimeter', 'compliance', 'supplychain', 'insurance'];
+// VEC-431 (Design Rev 3, VEC-423): WebCheck (free) ist kein Abo-Produkt und
+// erscheint nicht mehr im Subscription-Wizard — 4 Pakete statt 5.
+const WIZARD_PACKAGE_KEYS: PackageKey[] = ['perimeter', 'compliance', 'supplychain', 'insurance'];
 
 const PACKAGES = WIZARD_PACKAGE_KEYS.map((key) => {
   const def = getPackage(key)!;
@@ -59,7 +59,11 @@ const PACKAGES = WIZARD_PACKAGE_KEYS.map((key) => {
     name: def.marketingName,
     subtitle: def.subtitle,
     recommended: def.sellability === 'self_service',
+    // Preis im Stripe-Kontext sichtbar: self_service = Betrag, sales_assisted = null.
+    priceEur: def.priceEur,
     color: def.accentColor,
+    badge: def.badge,
+    badgeColor: def.badgeColor,
     features: CURATED_FEATURES[def.key] ?? def.reportFocus,
   };
 });
@@ -195,40 +199,49 @@ export default function SubscribePage() {
           <div className="bg-red-900/30 border border-red-800 text-red-300 rounded-lg px-4 py-3 text-sm">{error}</div>
         )}
 
-        {/* Step 1: Package Selection */}
+        {/* Step 1: Package Selection — VEC-431 (Design Rev 3): 4 Pakete (kein
+            WebCheck), DS-Tokens analog PackageSelector.tsx, Preis sichtbar. */}
         {step === 1 && (
           <div className="space-y-3">
-            <p className="text-sm text-gray-400">Wählen Sie Ihr Scan-Paket:</p>
+            <p className="text-sm text-[var(--text-muted)]">Wählen Sie Ihr Scan-Paket:</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {PACKAGES.map((pkg) => {
                 const isSelected = selectedPackage === pkg.id;
-                const isFree = pkg.id === 'webcheck';
+                const borderColor = isSelected
+                  ? pkg.color
+                  : pkg.recommended ? `${pkg.color}30` : 'var(--border-muted)';
+                const priceLabel = pkg.priceEur != null
+                  ? `ab ${formatEur(pkg.priceEur)} / Jahr`
+                  : 'Auf Anfrage';
                 return (
                   <button key={pkg.id} onClick={() => setSelectedPackage(pkg.id)}
-                    className={`text-left p-5 rounded-lg border-2 transition-all ${
-                      isSelected
-                        ? 'bg-[#1e293b]'
-                        : 'border-gray-800 bg-[#1e293b] hover:bg-[#253347] hover:border-gray-700'
-                    }`}
-                    style={isSelected ? { borderColor: pkg.color } : undefined}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-sm font-semibold text-white">{pkg.name}</span>
-                      {pkg.recommended && (
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded"
-                          style={{ backgroundColor: `${pkg.color}25`, color: pkg.color }}>
-                          Empfohlen
-                        </span>
-                      )}
-                      {isFree && (
-                        <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-700 text-gray-400">
-                          Kostenlos
-                        </span>
-                      )}
+                    data-testid={`subscribe-package-${pkg.id}`}
+                    className="relative text-left p-5 pt-6 rounded-xl transition-all duration-200 bg-[var(--surface)] hover:bg-[var(--surface-2)] outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--teal)] focus-visible:outline-offset-2"
+                    style={{
+                      borderWidth: '2px',
+                      borderStyle: 'solid',
+                      borderColor,
+                      boxShadow: isSelected ? `0 0 28px ${pkg.color}24` : 'none',
+                    }}>
+                    {pkg.badge && (
+                      <span
+                        className={`absolute -top-2.5 left-4 font-bold px-3 py-0.5 rounded-full ${
+                          pkg.recommended ? 'text-sm px-4' : 'text-xs'
+                        }`}
+                        style={{ backgroundColor: pkg.badgeColor || pkg.color, color: 'var(--slate)' }}>
+                        {pkg.recommended ? `★ ${pkg.badge}` : pkg.badge}
+                      </span>
+                    )}
+                    <div className="flex items-baseline justify-between gap-2 mb-1">
+                      <span className="text-sm font-semibold text-[var(--text)]">{pkg.name}</span>
+                      <span className="text-xs font-medium shrink-0" style={{ color: pkg.color }}>
+                        {priceLabel}
+                      </span>
                     </div>
-                    <p className="text-xs text-gray-500 mb-3">{pkg.subtitle}</p>
+                    <p className="text-xs text-[var(--text-dim)] mb-3">{pkg.subtitle}</p>
                     <ul className="space-y-1.5">
                       {pkg.features.map((f) => (
-                        <li key={f} className="text-xs text-gray-400 flex items-start gap-1.5">
+                        <li key={f} className="text-xs text-[var(--text-muted)] flex items-start gap-1.5">
                           <span className="mt-0.5 w-1 h-1 rounded-full flex-shrink-0" style={{ backgroundColor: pkg.color }} />
                           {f}
                         </li>
@@ -378,21 +391,14 @@ export default function SubscribePage() {
             <div className="flex items-center gap-3">
               {!canAdvance() && step === 2 && <span className="text-xs" style={{ color: '#F59E0B' }}>Mindestens ein gültiges Ziel eingeben</span>}
               {!canAdvance() && step === 3 && <span className="text-xs" style={{ color: '#F59E0B' }}>Mindestens eine E-Mail-Adresse eingeben</span>}
-              {/* WebCheck ist kostenlos und braucht keinen Subscription-Wizard */}
-              {step === 1 && selectedPackage === 'webcheck' ? (
-                <Link href="/welcome"
-                  className="font-medium px-6 py-2.5 rounded-lg transition-colors text-sm text-center"
-                  style={{ backgroundColor: '#38BDF8', color: '#0F172A' }}>
-                  Kostenlos starten
-                </Link>
-              ) : (
-                <button onClick={() => { if (canAdvance()) setStep(step + 1); }}
-                  disabled={!canAdvance()}
-                  className="disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-2.5 rounded-lg transition-colors text-sm"
-                  style={{ backgroundColor: canAdvance() ? '#2DD4BF' : undefined, color: canAdvance() ? '#0F172A' : undefined }}>
-                  Weiter
-                </button>
-              )}
+              {/* VEC-431: WebCheck-Sonderfall (/welcome-Redirect) entfernt — WebCheck
+                  ist nicht mehr Teil des Abo-Wizards. */}
+              <button onClick={() => { if (canAdvance()) setStep(step + 1); }}
+                disabled={!canAdvance()}
+                className="disabled:bg-gray-700 disabled:cursor-not-allowed font-medium px-6 py-2.5 rounded-lg transition-colors text-sm"
+                style={{ backgroundColor: canAdvance() ? '#2DD4BF' : undefined, color: canAdvance() ? '#0F172A' : undefined }}>
+                Weiter
+              </button>
             </div>
           ) : (
             <button onClick={handleSubmit} disabled={submitting}
