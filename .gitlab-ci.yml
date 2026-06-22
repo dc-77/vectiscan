@@ -1053,18 +1053,42 @@ ops-keycloak-provision:
       python3 -c 'import os; d=open(os.environ["SRC"]).read(); d=d.replace("__KEYCLOAK_GRAFANA_SECRET__",os.environ["KEYCLOAK_GRAFANA_SECRET"]).replace("__KEYCLOAK_OAUTH2_PROXY_SECRET__",os.environ["KEYCLOAK_OAUTH2_PROXY_SECRET"]); assert "__KEYCLOAK_" not in d, "Platzhalter nicht ersetzt"; open(os.environ["DST"],"w").write(d); print("Realm-Import gerendert ->", os.environ["DST"])'
     - chmod 600 ${DEPLOY_PATH}/keycloak/import/vectiscan-realm.json
     - echo "=== Import-Datei (kein Secret-Echo) ==="; ls -la ${DEPLOY_PATH}/keycloak/import/
-    # 3) sso-Profil starten (zusaetzlich zu crm). Secrets kommen als exportierte
-    #    CI-Vars in die compose-Interpolation; .env traegt sie fuer Reboots nach.
+    # 3) sso-Profil starten (zusaetzlich zu crm). --import-realm entfernt (Keycloak 26
+    #    schema-strict: Realm-Import via kcadm.sh nach dem Start, nicht beim Start).
     - COMPOSE_PROFILES=crm,sso TAG=${TAG:-latest} docker compose up -d --no-build keycloak-db keycloak
-    - sleep 25
+    # 4) Auf Keycloak-Start warten (bis 3 Min, /health/ready). Keycloak 26 braucht
+    #    60-120s fuer Quarkus-Augmentation (--optimized=false) + JGroups-Timeout.
+    - |
+      echo "=== Warte auf Keycloak /health/ready (bis 3 Min) ==="
+      for i in $(seq 1 18); do
+        STATUS=$(docker exec vectiscan-keycloak-1 curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/health/ready 2>/dev/null || echo ERR)
+        echo "Attempt $i: $STATUS"
+        if [ "$STATUS" = "200" ]; then echo "Keycloak UP!"; break; fi
+        sleep 10
+      done
     - docker compose ps keycloak-db keycloak
-    # 4) Verifikation: Container laeuft + OIDC-Discovery vom Host (Token/JWKS-Pfad)
-    #    UND extern ueber Traefik (Browser-Redirect-Pfad) erreichbar.
+    # 5) Realm via kcadm.sh importieren (gibt im Fehlerfall den echten Grund aus).
+    #    Passwort via Env-Var, nie als Argument (Secrets-Hygiene).
+    - |
+      echo "=== Realm-Import via kcadm ==="
+      docker exec -e KCADM_PW="${KC_BOOTSTRAP_ADMIN_PASSWORD}" vectiscan-keycloak-1 bash -c '
+        /opt/keycloak/bin/kcadm.sh config credentials \
+          --server http://localhost:8080 \
+          --realm master \
+          --user admin \
+          --password "$KCADM_PW" 2>&1 && \
+        /opt/keycloak/bin/kcadm.sh get realms/vectiscan 2>/dev/null | grep -q vectiscan \
+          && echo "Realm vectiscan existiert bereits (IGNORE_EXISTING)" \
+          || /opt/keycloak/bin/kcadm.sh create realms \
+               -f /opt/keycloak/data/import/vectiscan-realm.json 2>&1 \
+          && echo "Realm-Import OK" || echo "Realm-Import FEHLER"
+      '
+    # 6) Verifikation: OIDC-Discovery vom Host
     - 'echo "=== OIDC-Discovery extern (Browser-Pfad) ==="'
     - |
       DISC="https://id.vectigal.tech/realms/vectiscan/.well-known/openid-configuration"
       CODE=$(docker run --rm curlimages/curl:8.8.0 -s -o /dev/null -w '%{http_code}' --max-time 20 "$DISC" 2>/dev/null || echo ERR)
-      echo "GET $DISC -> $CODE (200 erwartet, sobald LE-Cert ausgestellt ist)"
+      echo "GET $DISC -> $CODE (erwartet: 200)"
     - echo "=== FERTIG — naechster Schritt C2/C3 (Grafana-OIDC + oauth2-proxy) ==="
   environment:
     name: production
