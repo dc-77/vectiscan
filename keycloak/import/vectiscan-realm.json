@@ -1,5 +1,4 @@
 {
-  "_comment": "VEC-437 (C1) — Realm-Import fuer die dedizierte VectiScan-Keycloak. Parent VEC-421, Spike VEC-430 (docs/AUTH-SSO-VEC-430-SPIKE.md). Die zwei `secret`-Felder tragen Platzhalter und werden vom CI-Job ops-keycloak-provision aus maskierten Pipeline-Variablen ersetzt, BEVOR die Datei in den Import-Ordner des Containers gelegt wird. KEIN echtes Secret im Repo. Import laeuft beim ersten Start via `--import-realm` (Strategie IGNORE_EXISTING: bestehender Realm wird nicht ueberschrieben).",
   "realm": "vectiscan",
   "enabled": true,
   "displayName": "Vectigal SSO",
