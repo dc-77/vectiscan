@@ -1051,7 +1051,11 @@ ops-keycloak-provision:
       SRC=${CI_PROJECT_DIR}/keycloak/import/vectiscan-realm.json \
       DST=${DEPLOY_PATH}/keycloak/import/vectiscan-realm.json \
       python3 -c 'import os; d=open(os.environ["SRC"]).read(); d=d.replace("__KEYCLOAK_GRAFANA_SECRET__",os.environ["KEYCLOAK_GRAFANA_SECRET"]).replace("__KEYCLOAK_OAUTH2_PROXY_SECRET__",os.environ["KEYCLOAK_OAUTH2_PROXY_SECRET"]); assert "__KEYCLOAK_" not in d, "Platzhalter nicht ersetzt"; open(os.environ["DST"],"w").write(d); print("Realm-Import gerendert ->", os.environ["DST"])'
-    - chmod 600 ${DEPLOY_PATH}/keycloak/import/vectiscan-realm.json
+    # chmod 644 (nicht 600): kcadm.sh laeuft als UID 1000 im Container; 600+root
+    # = AccessDeniedException (Java "File not found"). 644 ist hier korrekt:
+    # docker02 ist internes DMZ-System, der Bind-Mount ist :ro im Container.
+    # Cleanup nach Import (Schritt 5) entfernt die Datei mit den Client-Secrets.
+    - chmod 644 ${DEPLOY_PATH}/keycloak/import/vectiscan-realm.json
     - echo "=== Import-Datei (kein Secret-Echo) ==="; ls -la ${DEPLOY_PATH}/keycloak/import/
     # 3) sso-Profil starten (zusaetzlich zu crm). --import-realm entfernt (Keycloak 26
     #    schema-strict: Realm-Import via kcadm.sh nach dem Start, nicht beim Start).
@@ -1083,6 +1087,9 @@ ops-keycloak-provision:
                -f /opt/keycloak/data/import/vectiscan-realm.json 2>&1 \
           && echo "Realm-Import OK" || echo "Realm-Import FEHLER"
       '
+    # Cleanup: gerenderte Realm-JSON (enthaelt Client-Secrets) nach Import entfernen.
+    # Der :ro Bind-Mount verhindert Loeschen von innen; daher rm auf dem Host.
+    - rm -f ${DEPLOY_PATH}/keycloak/import/vectiscan-realm.json && echo "Realm-Import-Datei bereinigt."
     # 6) Verifikation: OIDC-Discovery vom Host
     - 'echo "=== OIDC-Discovery extern (Browser-Pfad) ==="'
     - |
