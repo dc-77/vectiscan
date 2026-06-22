@@ -994,6 +994,26 @@ ops-traefik-auth:
 #   KC_BOOTSTRAP_ADMIN_USERNAME    (optional, Default `admin`)
 # Details + Verifikation: docs/AUTH-SSO-C1-KEYCLOAK.md
 # =============================================================================
+ops-keycloak-healthcheck:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "web" || $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  script:
+    - cd ${DEPLOY_PATH}
+    - docker compose ps keycloak-db keycloak
+    - echo "=== Keycloak Logs (last 50 lines) ==="
+    - docker logs vectiscan-keycloak-1 --tail 50 2>&1 || echo "Container nicht gefunden"
+    - echo "=== OIDC-Discovery (extern) ==="
+    - |
+      CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 15 "https://id.vectigal.tech/realms/vectiscan/.well-known/openid-configuration" 2>/dev/null || echo ERR)
+      echo "OIDC -> $CODE"
+
 ops-keycloak-provision:
   extends: .ops-base
   needs: []
