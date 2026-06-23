@@ -149,9 +149,9 @@ test-report-worker:
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
 
-# VEC-160 / VEC-143 / VEC-269: Edge admin-guard regression gate (SICHERHEITSKRITISCH).
+# VEC-160 / VEC-143 / VEC-269 / VEC-439: Edge admin-guard regression gate (SICHERHEITSKRITISCH).
 # Fails the pipeline if a public Traefik router gains a Host() that is not also
-# covered by the /admin guard router with internal-auth@file — i.e. an
+# covered by the /admin guard router (oauth2-proxy-redirect@file since VEC-439 C3) — i.e. an
 # unguarded admin surface. Scoped to the self-contained test only (NOT all of
 # tests/, which still has unrelated staleness to reconcile separately).
 test-edge:
@@ -845,32 +845,18 @@ cleanup-prod:
     url: https://scan.vectigal.tech
 
 # =============================================================================
-# VEC-143 — Edge-Auth-Gating: schliesst die internal-only-Flaechen per Basic-Auth.
+# VEC-439 C3 / VEC-442 C6 — SSO-Middleware-Konfig in den Traefik-File-Provider.
 #
-# Root-Cause (VEC-143, bewiesen): die IP-Allowlist `internal-only@file` ist auf
-# vectigal-docker02 wirkungslos. `/etc/docker/daemon.json` hat `iptables:false`
-# -> userland docker-proxy SNAT't jede Quell-IP auf das Bridge-GW 172.18.0.1
-# (in 172.16.0.0/12) -> intern/extern an Traefik ununterscheidbar, 403 feuert nie.
-# Kein X-Forwarded-For -> ipStrategy/trustedIPs unmoeglich.
-#
-# Board-approved Fix (Option C): basicAuth-Middleware `internal-auth`, ADDITIV in
-# den host-eigenen File-Provider (/opt/traefik/config, watch:true) geschrieben;
-# die 4 betroffenen Router (web-admin, api-admin, status, logs) haengen in der
-# docker-compose.yml jetzt an `internal-auth@file` statt `internal-only@file`.
-# Das host-eigene security.yml bleibt unangetastet (kein Shared-Edge-Eingriff).
-#
-# Credential kommt aus der maskierten Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD
-# (Format `user:hash`, apr1/bcrypt). KEIN Secret im Repo. Manuell/API-getriggert,
-# KEIN Image-Build/-Pull (needs:[]). Idempotent.
+# Schreibt traefik/dynamic/vectiscan-auth.yml (oauth2-proxy forwardAuth) in den
+# host-eigenen File-Provider (/opt/traefik/config, watch:true). Kein Credential-
+# Platzhalter mehr — Basic-Auth (internal-auth) wurde in VEC-442 C6 entfernt.
+# Manuell/API-getriggert, KEIN Image-Build/-Pull (needs:[]). Idempotent.
 # =============================================================================
 ops-traefik-auth:
   extends: .ops-base
   needs: []
   variables:
     TRAEFIK_CFG: /opt/traefik/config
-  # Eigene Rules: .ops-base auf main hat (noch) keine api-Source-Regel (der
-  # VEC-155-Fix lebt nur auf fix/vec-121). Daher hier explizit api/web/main
-  # anbieten, damit der Paperclip-Agent den Job per API-Pipeline starten kann.
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
@@ -879,17 +865,9 @@ ops-traefik-auth:
       when: manual
       allow_failure: true
   script:
-    - |
-      if [ -z "${TRAEFIK_INTERNAL_HTPASSWD}" ]; then
-        echo "FATAL: Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD fehlt (Format user:hash)."; exit 1
-      fi
-    # Traefik-Container ermitteln (fuer Netzwerk/Reload-Check). Der File-Provider
-    # liest aus /etc/traefik/config (= Host /opt/traefik/config, READ-ONLY in den
-    # Traefik-Container gemountet). Der Runner (gitlab-runner) darf /opt/traefik/config
-    # NICHT direkt schreiben (root:root) und der Traefik-Mount ist ro. Deshalb wird
-    # ueber einen kurzlebigen Helfer-Container mit eigenem RW-Bind-Mount geschrieben:
-    # der Docker-Daemon laeuft als root, der Bind-Mount persistiert auf den Host,
-    # Traefik (watch:true) laedt die neue Datei hot.
+    # Traefik-Container ermitteln. Der File-Provider liest /etc/traefik/config
+    # (= Host /opt/traefik/config, READ-ONLY im Traefik-Container). Schreiben
+    # erfolgt ueber einen kurzlebigen Helfer-Container mit RW-Bind-Mount.
     - |
       TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
       if [ -z "$TRAEFIK" ]; then echo "FATAL: kein Traefik-Container gefunden."; exit 1; fi
@@ -897,33 +875,21 @@ ops-traefik-auth:
     - TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
     - HELPER=busybox:1.36
     - docker image inspect "$HELPER" >/dev/null 2>&1 || docker pull "$HELPER"
-    # 0) Klartext-Credential host-persistieren (optional), damit Operatoren es per
-    #    `sudo cat /opt/traefik/config/.vectiscan-internal-cred` abholen koennen —
-    #    kein Klartext im Repo/Board (Muster wie .demo_password, VEC-154).
+    # 1) SSO-Middleware-Konfig in den Host-File-Provider schreiben (kein Platzhalter).
     - |
-      if [ -n "${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" ]; then
-        docker run --rm --user 0:0 -e C="${TRAEFIK_INTERNAL_CRED_PLAINTEXT}" \
-          -v "${TRAEFIK_CFG}:/cfg" "$HELPER" \
-          sh -c 'printf "%s\n" "$C" > /cfg/.vectiscan-internal-cred && chmod 600 /cfg/.vectiscan-internal-cred'
-        echo "Klartext-Credential persistiert nach ${TRAEFIK_CFG}/.vectiscan-internal-cred (chmod 600)."
-      else
-        echo "Kein TRAEFIK_INTERNAL_CRED_PLAINTEXT gesetzt — ueberspringe Klartext-Persistierung."
-      fi
-    # 1) basicAuth-Middleware additiv in den Host-File-Provider schreiben.
-    - |
-      RENDERED=$(sed "s#__TRAEFIK_INTERNAL_HTPASSWD__#${TRAEFIK_INTERNAL_HTPASSWD}#" ${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml)
-      docker run --rm --user 0:0 -e C="$RENDERED" \
+      docker run --rm --user 0:0 \
+        -v "${CI_PROJECT_DIR}/traefik/dynamic/vectiscan-auth.yml:/src/vectiscan-auth.yml:ro" \
         -v "${TRAEFIK_CFG}:/cfg" "$HELPER" \
-        sh -c 'printf "%s\n" "$C" > /cfg/vectiscan-auth.yml && chmod 644 /cfg/vectiscan-auth.yml'
+        sh -c 'cp /src/vectiscan-auth.yml /cfg/vectiscan-auth.yml && chmod 644 /cfg/vectiscan-auth.yml'
     - echo "=== vectiscan-auth.yml geschrieben ==="; docker run --rm -v "${TRAEFIK_CFG}:/cfg:ro" "$HELPER" ls -la /cfg/vectiscan-auth.yml || true
     # 2) Traefik (watch:true) laedt hot — warten und Middleware-Existenz pruefen.
     - sleep 6
     - |
       NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
       echo "Traefik=${TRAEFIK} Net=${NET}"
-      echo "--- middleware internal-auth@file ---"
-      docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/middlewares/internal-auth@file" || echo "(middleware-check fehlgeschlagen)"
-    # 3) Aktive-Scan-Guard (analog .deploy-base), dann die 4 Router neu labeln.
+      echo "--- middleware oauth2-proxy-auth@file ---"
+      docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/middlewares/oauth2-proxy-auth@file" || echo "(middleware-check fehlgeschlagen)"
+    # 3) Aktive-Scan-Guard (analog .deploy-base), dann Container neu starten.
     - cd ${DEPLOY_PATH}
     - |
       if [ "${DEPLOY_FORCE:-false}" != "true" ]; then
@@ -938,38 +904,35 @@ ops-traefik-auth:
     - TAG=${TAG:-latest} docker compose up -d --no-deps --no-build frontend api uptime-kuma grafana
     - sleep 10
     - docker compose ps frontend api uptime-kuma grafana
-    # 4) Verifikation: die 4 Router haengen jetzt an internal-auth.
+    # 4) Verifikation: Router-Middleware-Zustand pruefen.
     - |
       TRAEFIK=$(docker ps --format '{{.Names}}' | grep -i traefik | head -1)
       NET=$(docker inspect "$TRAEFIK" --format '{{range $k,$v := .NetworkSettings.Networks}}{{$k}} {{end}}' | awk '{print $1}')
-      for R in vectiscan-web-admin vectiscan-api-admin vectiscan-status vectiscan-logs; do
+      for R in vectiscan-web-admin vectiscan-status vectiscan-logs; do
         echo "--- router ${R}@docker ---"
         docker run --rm --network "$NET" curlimages/curl:8.8.0 -s --max-time 8 "http://${TRAEFIK}:8080/api/http/routers/${R}@docker" | head -c 500; echo
       done
-    # 5) VEC-167 — Live-Smoke: Edge-Gate ist case-INSENSITIV. Sowohl die Original-
-    #    Schreibweise als auch Case-Varianten muessen 401 liefern (nicht 404).
-    #    Nicht-fatal (Job-Verifikation/Evidenz); FAIL wird explizit markiert.
+    # 5) SSO-Smoke: Admin+Status liefern Redirect (302) an Keycloak, nicht mehr 401.
+    #    Grafana (logs) zeigt eigene Login-Seite (200). Public unveraendert (200).
     - |
-      echo "=== VEC-167 Edge-Case-Smoke (extern, Basic-Auth ist IP-unabhaengig) ==="
-      VEC167_FAIL=0
+      echo "=== SSO-Smoke (VEC-442 C6) ==="
+      SMOKE_FAIL=0
       check_code() { # $1=url  $2=erwartet
         CODE=$(docker run --rm curlimages/curl:8.8.0 -s -o /dev/null -w '%{http_code}' --max-time 12 "$1" 2>/dev/null || echo "ERR")
-        if [ "$CODE" = "$2" ]; then echo "PASS  $1 -> $CODE"; else echo "FAIL  $1 -> $CODE (erwartet $2)"; VEC167_FAIL=1; fi
+        if [ "$CODE" = "$2" ]; then echo "PASS  $1 -> $CODE"; else echo "FAIL  $1 -> $CODE (erwartet $2)"; SMOKE_FAIL=1; fi
       }
-      # Edge-Gate (401 erwartet) — Original + Case-Varianten
-      check_code "https://scan.vectigal.tech/admin"                     401
-      check_code "https://scan.vectigal.tech/ADMIN"                     401
-      check_code "https://scan.vectigal.tech/Admin"                     401
+      # SSO-Surfaces: oauth2-proxy -> Keycloak-Redirect (302), Grafana -> eigene Login (200/302)
+      check_code "https://scan.vectigal.tech/admin"   302
+      check_code "https://status.vectigal.tech/"      302
+      check_code "https://logs.vectigal.tech/"        200
+      # API admin: App-JWT (401 JSON), kein Traefik-Gate
       check_code "https://scan-api.vectigal.tech/api/admin/review/queue" 401
-      check_code "https://scan-api.vectigal.tech/api/ADMIN/review/queue" 401
-      check_code "https://scan-api.vectigal.tech/api/Admin/review/queue" 401
-      check_code "https://status.vectigal.tech/"                        401
-      # Oeffentlich (200 erwartet) — darf NICHT mit-gegated werden
-      check_code "https://scan.vectigal.tech/"                          200
-      if [ "$VEC167_FAIL" = "1" ]; then
-        echo "VEC-167-SMOKE: FAIL — Edge-Gate nicht case-insensitiv ODER public mit-gegated. Pruefen/Revert."
+      # Oeffentlich: unveraendert
+      check_code "https://scan.vectigal.tech/"        200
+      if [ "$SMOKE_FAIL" = "1" ]; then
+        echo "SSO-SMOKE: FAIL — Pruefen/Revert."
       else
-        echo "VEC-167-SMOKE: ALLE PASS — Edge-Gate case-insensitiv, public unveraendert."
+        echo "SSO-SMOKE: ALLE PASS."
       fi
     - echo "=== FERTIG ==="
   environment:

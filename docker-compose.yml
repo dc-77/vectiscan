@@ -697,10 +697,9 @@ services:
       #    Client-Secret kommt via .env aus der CI (NIE im Image/Repo); ist es
       #    leer, scheitert nur der "Sign in with Keycloak"-Button — die lokale
       #    GF_SECURITY_ADMIN-Anmeldung bleibt als Fallback erhalten.
-      #    WICHTIG: Basic-Auth (`internal-auth@file`, Traefik-Label unten) bleibt
-      #    bis zur QA-Verifikation (C5/VEC-441) scharf und wird erst im Cutover
-      #    (C6/VEC-442, Hamilton) entfernt. Bis dahin koexistiert beides: der
-      #    Browser sendet weiter Basic-Auth, der OIDC-Callback geht durch.
+      #    Basic-Auth (`internal-auth@file`) wurde in C6/VEC-442 entfernt.
+      #    Grafana erfordert jetzt Login ueber Keycloak-OIDC (Sign-in-Button)
+      #    oder die lokale GF_SECURITY_ADMIN-Fallback-Anmeldung.
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
       GF_AUTH_GENERIC_OAUTH_NAME: Keycloak
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: vectiscan-grafana
@@ -747,7 +746,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.vectiscan-logs.rule=Host(`logs.vectigal.tech`)"
-      - "traefik.http.routers.vectiscan-logs.middlewares=security-headers@file,internal-auth@file"
+      - "traefik.http.routers.vectiscan-logs.middlewares=security-headers@file"
       - "traefik.http.services.vectiscan-logs.loadbalancer.server.port=3000"
     depends_on:
       - loki

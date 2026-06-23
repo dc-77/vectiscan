@@ -1,41 +1,22 @@
-# VEC-143 — Edge-Auth-Gating fuer die internal-only-Flaechen.
+# VEC-439 C3 / VEC-442 C6 — Keycloak-SSO via oauth2-proxy (forwardAuth).
 #
-# Warum: Die IP-Allowlist `internal-only@file` ist auf vectigal-docker02
-# strukturell WIRKUNGSLOS — `/etc/docker/daemon.json` hat `iptables: false`,
-# wodurch der userland docker-proxy jede Quell-IP per SNAT auf das
-# Bridge-Gateway 172.18.0.1 umschreibt. 172.18.0.1 liegt in 172.16.0.0/12,
-# also gilt JEDER Request (intern wie extern) als "intern" und 403 feuert nie.
-# Ein ipStrategy/trustedIPs-Fix ist mangels echter Client-IP / X-Forwarded-For
-# unmoeglich. Board-approved Fix (VEC-143 Option C): Auth-Gating statt IP.
+# Schuetzt status.vectigal.tech (Kuma) und scan.vectigal.tech/admin (Frontend).
+# Grafana (logs.vectigal.tech) nutzt natives OIDC (VEC-438 C2) — kein
+# forwardAuth dort noetig. API /api/admin bleibt App-JWT (VEC-370).
 #
-# Diese Datei wird beim Deploy ADDITIV in den host-eigenen Traefik-
+# Diese Datei wird vom CI-Job `ops-traefik-auth` in den host-eigenen Traefik-
 # File-Provider (`/opt/traefik/config`, directory + watch:true) geschrieben.
-# Sie laesst das host-eigene `security.yml` (security-headers, rate-limit,
-# internal-only) UNANGETASTET — Blast-Radius nur die vectiscan-Router.
+# Kein Credential-Platzhalter mehr (Basic-Auth entfernt in VEC-442 C6).
 #
-# Der Platzhalter __TRAEFIK_INTERNAL_HTPASSWD__ wird vom CI-Job `ops-traefik-auth`
-# aus der maskierten Pipeline-Variable TRAEFIK_INTERNAL_HTPASSWD ersetzt
-# (Format `user:hash`, apr1/bcrypt). KEIN Credential im Repo.
+# Backend-Service `oauth2-proxy` zeigt auf den gleichnamigen Compose-Container
+# (Profil sso, proxy-net). Kette: forwardAuth -> /oauth2/auth. 401 -> Redirect
+# auf /oauth2/sign_in?rd={url} -> Keycloak-Realm `vectiscan`.
+#
+# Rollback-Weg (Sekunden): Router-Label auf Vorg.-Commit zuruecksetzen +
+# `docker compose up -d --no-build frontend uptime-kuma` (watch:true hot-reload).
 http:
   middlewares:
-    internal-auth:
-      basicAuth:
-        realm: "Vectigal Intern"
-        removeHeader: true
-        users:
-          - "__TRAEFIK_INTERNAL_HTPASSWD__"
-
     # VEC-439 C3 — Forward-Auth-SSO via oauth2-proxy (Keycloak-Realm vectiscan).
-    #
-    # Loest die Basic-Auth-Popups (internal-auth, oben) fuer status.vectigal.tech
-    # (Kuma) und scan.vectigal.tech/admin (Frontend) durch echtes SSO ab. Die
-    # internal-auth-Middleware bleibt definiert -> Rollback = Router-Label
-    # zurueck auf internal-auth@file (Two-way-door).
-    #
-    # Backend-Service `oauth2-proxy` (unten) zeigt auf den gleichnamigen Compose-
-    # Container (Profil sso, proxy-net). Host-Traefik erreicht ihn ueber proxy-net
-    # per Docker-DNS. WICHTIG: greift nur, wenn der oauth2-proxy-Container laeuft
-    # (via ops-keycloak-provision gestartet, persistent ueber Default-Deploys).
     #
     # Kette: forwardAuth ruft /oauth2/auth. 401 (nicht eingeloggt) faengt die
     # errors-Middleware ab und leitet auf /oauth2/sign_in?rd={url} -> Keycloak.
