@@ -24,3 +24,49 @@ http:
         removeHeader: true
         users:
           - "__TRAEFIK_INTERNAL_HTPASSWD__"
+
+    # VEC-439 C3 — Forward-Auth-SSO via oauth2-proxy (Keycloak-Realm vectiscan).
+    #
+    # Loest die Basic-Auth-Popups (internal-auth, oben) fuer status.vectigal.tech
+    # (Kuma) und scan.vectigal.tech/admin (Frontend) durch echtes SSO ab. Die
+    # internal-auth-Middleware bleibt definiert -> Rollback = Router-Label
+    # zurueck auf internal-auth@file (Two-way-door).
+    #
+    # Backend-Service `oauth2-proxy` (unten) zeigt auf den gleichnamigen Compose-
+    # Container (Profil sso, proxy-net). Host-Traefik erreicht ihn ueber proxy-net
+    # per Docker-DNS. WICHTIG: greift nur, wenn der oauth2-proxy-Container laeuft
+    # (via ops-keycloak-provision gestartet, persistent ueber Default-Deploys).
+    #
+    # Kette: forwardAuth ruft /oauth2/auth. 401 (nicht eingeloggt) faengt die
+    # errors-Middleware ab und leitet auf /oauth2/sign_in?rd={url} -> Keycloak.
+    # API /api/admin bleibt BEWUSST aussen vor (App-JWT, VEC-370) — kein
+    # forwardAuth dort, sonst bricht SPA-fetch() (302->HTML statt 401-JSON).
+    oauth2-proxy-auth:
+      forwardAuth:
+        address: http://oauth2-proxy:4180/oauth2/auth
+        trustForwardHeader: true
+        authResponseHeaders:
+          - X-Auth-Request-User
+          - X-Auth-Request-Email
+          - X-Auth-Request-Preferred-Username
+          - X-Auth-Request-Groups
+
+    oauth2-proxy-errors:
+      errors:
+        status:
+          - "401"
+        service: oauth2-proxy
+        query: "/oauth2/sign_in?rd={url}"
+
+    oauth2-proxy-redirect:
+      chain:
+        middlewares:
+          - oauth2-proxy-errors
+          - oauth2-proxy-auth
+
+  services:
+    # Backend fuer die errors-Middleware (serviert /oauth2/sign_in aus oauth2-proxy).
+    oauth2-proxy:
+      loadBalancer:
+        servers:
+          - url: http://oauth2-proxy:4180

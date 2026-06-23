@@ -62,7 +62,10 @@ services:
       # VEC-269: gleicher HTTP-01-Resolver wie vectiscan-web (DNS-01/uniteddomains-Key kaputt).
       - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-web-admin.priority=100"
-      - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file,internal-auth@file"
+      # VEC-439 C3: Basic-Auth-Popup -> SSO (oauth2-proxy forwardAuth, Realm vectiscan).
+      # Rollback = zurueck auf internal-auth@file (Middleware bleibt im File-Provider definiert).
+      # /api/admin bleibt App-JWT (VEC-370) — der API-Router traegt KEINE forwardAuth.
+      - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file,oauth2-proxy-redirect@file"
       - "traefik.http.routers.vectiscan-web-admin.service=vectiscan-web"
       - "traefik.http.services.vectiscan-web.loadbalancer.server.port=3000"
     depends_on:
@@ -636,7 +639,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.vectiscan-status.rule=Host(`status.vectigal.tech`)"
-      - "traefik.http.routers.vectiscan-status.middlewares=security-headers@file,internal-auth@file"
+      # VEC-439 C3: Basic-Auth-Popup -> SSO (oauth2-proxy forwardAuth, Realm vectiscan).
+      # Rollback = zurueck auf internal-auth@file. /oauth2/* dieses Hosts -> oauth2-proxy
+      # (Router vectiscan-oauth2-status, Prio 110).
+      - "traefik.http.routers.vectiscan-status.middlewares=security-headers@file,oauth2-proxy-redirect@file"
       - "traefik.http.services.vectiscan-status.loadbalancer.server.port=3001"
     networks:
       - proxy-net
@@ -934,3 +940,74 @@ services:
     networks:
       - proxy-net
       - keycloak-internal
+
+  # ---------------------------------------------------------------------------
+  # VEC-439 C3 — oauth2-proxy: zentrale Forward-Auth-Bruecke gegen den Keycloak-
+  # Realm `vectiscan`. Traefik ruft via `forwardAuth` (oauth2-proxy-redirect@file,
+  # definiert in traefik/dynamic/vectiscan-auth.yml) den /oauth2/auth-Endpoint;
+  # unauthentifizierte Requests werden ueber die errors-Middleware auf
+  # /oauth2/sign_in -> Keycloak umgeleitet. Schuetzt status.vectigal.tech (Kuma)
+  # und scan.vectigal.tech/admin (Frontend). NICHT /api/admin (App-JWT, VEC-370).
+  #
+  # Profil `sso` (wie keycloak): kein Default-Deploy, Aktivierung via
+  # ops-keycloak-provision (COMPOSE_PROFILES=crm,sso). proxy-net = von Traefik
+  # erreichbar + Egress zu https://id.vectigal.tech (oeffentlicher Issuer, wie der
+  # Browser). Multi-Domain: cookie-domain + whitelist-domain `.vectigal.tech` ->
+  # eine SSO-Session fuer status + scan; redirect_url wird pro Host aus den
+  # X-Forwarded-Headern abgeleitet (reverse-proxy=true), beide /oauth2/callback-
+  # URIs sind im Realm registriert.
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.7.1
+    profiles: ["sso"]
+    restart: unless-stopped
+    command:
+      - --http-address=0.0.0.0:4180
+      - --reverse-proxy=true
+      - --provider=oidc
+      - --provider-display-name=Vectigal SSO
+      - --oidc-issuer-url=https://id.vectigal.tech/realms/vectiscan
+      - --client-id=vectiscan-oauth2-proxy
+      - --email-domain=*
+      - --scope=openid profile email groups
+      - --oidc-groups-claim=groups
+      # Realm-Mapper: full.path=false -> Claim-Wert ohne fuehrenden Slash.
+      - --allowed-group=vectiscan-admin
+      - --cookie-domain=.vectigal.tech
+      - --whitelist-domain=.vectigal.tech
+      - --cookie-secure=true
+      - --cookie-samesite=lax
+      - --set-xauthrequest=true
+      - --pass-access-token=false
+      - --skip-provider-button=true
+      # redirect_url bewusst NICHT gesetzt: wird pro Host (status/scan) aus
+      # X-Forwarded-* abgeleitet; beide Callback-URIs sind im Realm registriert.
+    environment:
+      OAUTH2_PROXY_CLIENT_SECRET: ${KEYCLOAK_OAUTH2_PROXY_SECRET:-}
+      OAUTH2_PROXY_COOKIE_SECRET: ${OAUTH2_PROXY_COOKIE_SECRET:-}
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+    labels:
+      - "traefik.enable=true"
+      # Browser-Pfade /oauth2/* (callback, sign_in, start) je Host -> oauth2-proxy.
+      # Hoehere Prioritaet als der Host-Catch-all, damit /oauth2/* nicht in der
+      # App landet. rate-limit schuetzt die Login-Einsprungpunkte.
+      - "traefik.http.routers.vectiscan-oauth2-status.rule=Host(`status.vectigal.tech`) && PathPrefix(`/oauth2/`)"
+      - "traefik.http.routers.vectiscan-oauth2-status.entrypoints=websecure"
+      - "traefik.http.routers.vectiscan-oauth2-status.tls=true"
+      - "traefik.http.routers.vectiscan-oauth2-status.tls.certresolver=letsencrypt-http"
+      - "traefik.http.routers.vectiscan-oauth2-status.priority=110"
+      - "traefik.http.routers.vectiscan-oauth2-status.middlewares=security-headers@file,rate-limit@file"
+      - "traefik.http.routers.vectiscan-oauth2-status.service=vectiscan-oauth2-proxy"
+      - "traefik.http.routers.vectiscan-oauth2-scan.rule=Host(`scan.vectigal.tech`) && PathPrefix(`/oauth2/`)"
+      - "traefik.http.routers.vectiscan-oauth2-scan.entrypoints=websecure"
+      - "traefik.http.routers.vectiscan-oauth2-scan.tls=true"
+      - "traefik.http.routers.vectiscan-oauth2-scan.tls.certresolver=letsencrypt-http"
+      - "traefik.http.routers.vectiscan-oauth2-scan.priority=110"
+      - "traefik.http.routers.vectiscan-oauth2-scan.middlewares=security-headers@file,rate-limit@file"
+      - "traefik.http.routers.vectiscan-oauth2-scan.service=vectiscan-oauth2-proxy"
+      - "traefik.http.services.vectiscan-oauth2-proxy.loadbalancer.server.port=4180"
+    networks:
+      - proxy-net
