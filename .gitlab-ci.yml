@@ -242,6 +242,7 @@ test-edge:
       KC_DB_PASSWORD=${KC_DB_PASSWORD:-}
       KC_BOOTSTRAP_ADMIN_USERNAME=${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD=${KC_BOOTSTRAP_ADMIN_PASSWORD:-}
+      KEYCLOAK_GRAFANA_SECRET=${KEYCLOAK_GRAFANA_SECRET:-}
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
     # ── Deploy-Guard (VEC-217): RESEND_API_KEY ist eine *protected* CI-Var; auf
