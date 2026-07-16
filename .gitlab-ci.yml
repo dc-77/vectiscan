@@ -1242,6 +1242,62 @@ ops-keycloak-create-admin:
     url: https://id.vectigal.tech
 
 # =============================================================================
+# VEC-470/VEC-473 — Keycloak: fehlenden Client-Scope `groups` anlegen + dem
+# Client `vectiscan-oauth2-proxy` als Default-Scope zuweisen. Ursache des
+# Login-Fehlers: oauth2-proxy fordert `scope=openid profile email groups`, der
+# Realm kennt aber keinen Scope `groups` -> Keycloak antwortet `invalid_scope`
+# -> Redirect auf /oauth2/callback?error=invalid_scope -> 403 (kein Login moeglich,
+# daher war der Realm auch leer). Idempotent, Read-check vor Create. Two-way-Door.
+#   KC_BOOTSTRAP_ADMIN_PASSWORD  (maskierte CI-Var)
+# =============================================================================
+ops-keycloak-fix-groups-scope:
+  extends: .ops-base
+  needs: []
+  script:
+    - |
+      if [ -z "${KC_BOOTSTRAP_ADMIN_PASSWORD}" ]; then
+        echo "FATAL: KC_BOOTSTRAP_ADMIN_PASSWORD fehlt (maskierte CI-Var)."; exit 1
+      fi
+    - |
+      docker exec -e KCADM_PW="${KC_BOOTSTRAP_ADMIN_PASSWORD}" \
+        vectiscan-keycloak-1 bash -c '
+        set -e
+        K=/opt/keycloak/bin/kcadm.sh
+        $K config credentials --server http://localhost:8080 --realm master --user admin --password "$KCADM_PW" >/dev/null
+        CLIENT=vectiscan-oauth2-proxy
+        SID=$($K get client-scopes -r vectiscan --fields id,name --format csv --noquotes 2>/dev/null | tr -d "\r" | awk -F, "\$2==\"groups\"{print \$1}" | head -1)
+        if [ -z "$SID" ]; then
+          echo "Client-Scope groups fehlt — lege an..."
+          $K create client-scopes -r vectiscan \
+            -s name=groups -s protocol=openid-connect \
+            -s "attributes.\"include.in.token.scope\"=true" \
+            -s "attributes.\"display.on.consent.screen\"=false" >/dev/null
+          SID=$($K get client-scopes -r vectiscan --fields id,name --format csv --noquotes 2>/dev/null | tr -d "\r" | awk -F, "\$2==\"groups\"{print \$1}" | head -1)
+          echo "Angelegt: scope-id=$SID — fuege Group-Membership-Mapper hinzu..."
+          $K create "client-scopes/$SID/protocol-mappers/models" -r vectiscan \
+            -s name=groups -s protocol=openid-connect -s protocolMapper=oidc-group-membership-mapper \
+            -s "config.\"claim.name\"=groups" -s "config.\"full.path\"=false" \
+            -s "config.\"id.token.claim\"=true" -s "config.\"access.token.claim\"=true" \
+            -s "config.\"userinfo.token.claim\"=true" >/dev/null
+        else
+          echo "Client-Scope groups existiert bereits: scope-id=$SID"
+        fi
+        [ -z "$SID" ] && { echo "FATAL: scope-id nicht ermittelbar."; exit 2; }
+        CID=$($K get clients -r vectiscan -q clientId=$CLIENT --fields id --format csv --noquotes 2>/dev/null | tr -d "\r" | head -1)
+        [ -z "$CID" ] && { echo "FATAL: Client $CLIENT nicht gefunden."; exit 3; }
+        echo "Client $CLIENT id=$CID — weise groups als Default-Scope zu (idempotent)..."
+        $K update "clients/$CID/default-client-scopes/$SID" -r vectiscan >/dev/null 2>&1 || true
+        ASSIGNED=$($K get "clients/$CID/default-client-scopes" -r vectiscan --fields name --format csv --noquotes 2>/dev/null | tr -d "\r" | tr "\n" " ")
+        echo "=== Default-Client-Scopes von $CLIENT: $ASSIGNED ==="
+        echo "$ASSIGNED" | grep -qw groups \
+          && echo "OK: groups-Scope aktiv fuer $CLIENT — invalid_scope behoben, Login moeglich." \
+          || { echo "FEHLER: groups-Scope nach Zuweisung nicht bestaetigt."; exit 4; }
+      '
+  environment:
+    name: production
+    url: https://id.vectigal.tech
+
+# =============================================================================
 # VEC-378 — Admin-Release für QA-WebCheck-Order (Re-Scan VEC-376)
 # Genehmigt Target für Order 46ce8dcc-4236-4c15-895a-ad32586d484a und queued
 # den WebCheck-Scan. Einmaliger Ops-Job; wird per API-Pipeline getriggert.
