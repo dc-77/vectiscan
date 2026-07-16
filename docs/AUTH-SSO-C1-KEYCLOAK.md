@@ -109,3 +109,33 @@ Basic-Auth. Reversibel ohne Rebuild, ohne Daten-Risiko.
   `status` + `/admin`. Nutzt `vectiscan-oauth2-proxy` + `KEYCLOAK_OAUTH2_PROXY_SECRET`.
 - **C5** (Mitnick): Security-Review + Live-QA.
 - **C6** (Hamilton): Cutover Fläche-für-Fläche + Rollback-Drill.
+
+---
+
+## Troubleshooting: „/admin öffnet nicht" trotz erfolgreichem Login (VEC-470)
+
+**Symptom:** Der Board-/Admin-User loggt sich bei Keycloak ein, landet aber danach
+auf einem rohen Fehler (403) statt im Admin-Bereich — `/admin/review` „öffnet nicht".
+
+**Ursache:** oauth2-proxy erzwingt `--allowed-group=vectiscan-admin` (docker-compose).
+Ein eingeloggter User **ohne** diese Gruppenmitgliedschaft bekommt von `/oauth2/auth`
+ein **403**. Die Traefik-`errors`-Middleware (`traefik/dynamic/vectiscan-auth.yml`)
+leitet aber nur **401** auf den Keycloak-Login um — ein 403 wird roh durchgereicht.
+Der Realm-Import legt **keine** User an und `defaultGroups` ist leer, daher muss
+jeder Admin explizit in `vectiscan-admin` aufgenommen werden.
+
+**Diagnose (ohne Login-Session):**
+- Edge-Kette gesund? `curl -sSI https://scan.vectigal.tech/admin/review` → 401 +
+  `Location: …/realms/vectiscan/…` (unauth-Redirect korrekt).
+- App-Schicht gesund? `curl -sS https://scan-api.vectigal.tech/api/admin/review/queue`
+  → `401 {"success":false,"error":"Authentication required"}` (App-JWT, VEC-370).
+- Sind beide grün, liegt der Bruch fast immer an fehlender Gruppenmitgliedschaft.
+
+**Fix (idempotent, ops-owned):** manueller CI-Job `ops-keycloak-grant-admin` mit
+Pipeline-Variable `KC_ADMIN_EMAIL=<user@domain>`. Fügt den existierenden Keycloak-User
+in `vectiscan-admin` ein und verifiziert die Mitgliedschaft. Der User-Account muss
+vorher existieren (1x eingeloggt oder in der Konsole angelegt) — der Job legt keine an.
+
+> Hinweis: `/api/admin` bleibt zusätzlich App-JWT-gegated (VEC-370). Der Edge-Gruppen-
+> Gate ist Defense-in-Depth für die HTML-Shell; die eigentliche Autorisierung der
+> Daten passiert in der App (`useAdminGuard` + `requireAdmin`).

@@ -1091,6 +1091,67 @@ ops-keycloak-provision:
     url: https://id.vectigal.tech
 
 # =============================================================================
+# VEC-470 — Keycloak: einen User idempotent in die Gruppe `vectiscan-admin`
+# aufnehmen. Ohne diese Mitgliedschaft liefert oauth2-proxy (--allowed-group=
+# vectiscan-admin) nach erfolgreichem Keycloak-Login ein *403* auf /admin — die
+# Traefik-errors-Middleware faengt aber nur 401 ab, also sieht der User einen
+# rohen 403 ("Admin-Freigabebereich oeffnet nicht"). Der Realm-Import legt KEINE
+# User an und `defaultGroups` ist leer, daher muss jeder Admin explizit zugewiesen
+# werden. Dieser Job macht das reproduzierbar + idempotent statt Klick im Admin-UI.
+#
+# Voraussetzung:
+#   KC_BOOTSTRAP_ADMIN_PASSWORD  (maskierte CI-Var, wie ops-keycloak-provision)
+#   KC_ADMIN_EMAIL               E-Mail des Ziel-Users (als Pipeline-Variable beim
+#                                manuellen Run setzen). Der User muss im Realm
+#                                bereits existieren (min. 1x eingeloggt / vom Admin
+#                                angelegt) — dieser Job legt KEINE Accounts an.
+# Reversibel (Two-way-Door): Entzug = kcadm delete users/<id>/groups/<gid>.
+# =============================================================================
+ops-keycloak-grant-admin:
+  extends: .ops-base
+  needs: []
+  script:
+    - |
+      if [ -z "${KC_BOOTSTRAP_ADMIN_PASSWORD}" ]; then
+        echo "FATAL: KC_BOOTSTRAP_ADMIN_PASSWORD fehlt (maskierte CI-Var)."; exit 1
+      fi
+      if [ -z "${KC_ADMIN_EMAIL}" ]; then
+        echo "FATAL: KC_ADMIN_EMAIL fehlt. Beim manuellen Run als Pipeline-Variable setzen"
+        echo "       (E-Mail des Users, der Admin-Zugriff bekommen soll)."; exit 1
+      fi
+      echo "Ziel-User: ${KC_ADMIN_EMAIL} -> Gruppe vectiscan-admin (Realm vectiscan)"
+    - |
+      docker exec -e KCADM_PW="${KC_BOOTSTRAP_ADMIN_PASSWORD}" -e EMAIL="${KC_ADMIN_EMAIL}" \
+        vectiscan-keycloak-1 bash -c '
+        set -e
+        K=/opt/keycloak/bin/kcadm.sh
+        $K config credentials --server http://localhost:8080 --realm master --user admin --password "$KCADM_PW" >/dev/null
+        USERID=$($K get users -r vectiscan -q email="$EMAIL" --fields id --format csv --noquotes 2>/dev/null | head -1 | tr -d "\r")
+        if [ -z "$USERID" ]; then
+          echo "FATAL: kein User mit E-Mail $EMAIL im Realm vectiscan gefunden."
+          echo "       Der Account muss zuerst existieren (User loggt sich 1x ein ODER"
+          echo "       Admin legt ihn in der Keycloak-Konsole an). Dieser Job legt keine an."
+          exit 2
+        fi
+        GID=$($K get groups -r vectiscan --fields id,name --format csv --noquotes 2>/dev/null | grep "vectiscan-admin" | head -1 | cut -d, -f1)
+        if [ -z "$GID" ]; then
+          echo "FATAL: Gruppe vectiscan-admin nicht gefunden — Realm nicht provisioniert (ops-keycloak-provision)."
+          exit 3
+        fi
+        echo "User-ID=$USERID Group-ID=$GID — fuege hinzu (idempotent)..."
+        $K update "users/$USERID/groups/$GID" -r vectiscan -s realm=vectiscan -s userId="$USERID" -s groupId="$GID" -n
+        echo "=== Verifikation: Gruppen des Users ==="
+        MEMBER=$($K get "users/$USERID/groups" -r vectiscan --fields name --format csv --noquotes 2>/dev/null | tr -d "\r")
+        echo "$MEMBER"
+        echo "$MEMBER" | grep -q "vectiscan-admin" \
+          && echo "OK: $EMAIL ist jetzt in vectiscan-admin — /admin-Edge-Gate (403) entblockt." \
+          || { echo "FEHLER: Mitgliedschaft nach update nicht bestaetigt."; exit 4; }
+      '
+  environment:
+    name: production
+    url: https://id.vectigal.tech
+
+# =============================================================================
 # VEC-378 — Admin-Release für QA-WebCheck-Order (Re-Scan VEC-376)
 # Genehmigt Target für Order 46ce8dcc-4236-4c15-895a-ad32586d484a und queued
 # den WebCheck-Scan. Einmaliger Ops-Job; wird per API-Pipeline getriggert.
