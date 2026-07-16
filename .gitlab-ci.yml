@@ -1185,6 +1185,63 @@ ops-keycloak-list-users:
     url: https://id.vectigal.tech
 
 # =============================================================================
+# VEC-473/VEC-470 — First-Admin-Bootstrap: Keycloak-User im Realm `vectiscan`
+# ANLEGEN (falls nicht vorhanden), temporaeres Passwort setzen und idempotent
+# in Gruppe `vectiscan-admin` aufnehmen. Grund: Realm-Import seedet KEINE User,
+# `ops-keycloak-grant-admin` fand den Ziel-User daher nicht (Realm leer). Dieser
+# Job schliesst die Luecke fuer den ersten Admin. Two-way-Door (User loeschbar).
+#   KC_BOOTSTRAP_ADMIN_PASSWORD  (maskierte CI-Var, wie ops-keycloak-provision)
+#   KC_ADMIN_EMAIL               E-Mail/Username des Ziel-Admins (Pipeline-Var)
+# Das temporaere Passwort wird IM Job zufaellig erzeugt, 1x geloggt und MUSS beim
+# ersten Login geaendert werden (temporary=true).
+# =============================================================================
+ops-keycloak-create-admin:
+  extends: .ops-base
+  needs: []
+  script:
+    - |
+      if [ -z "${KC_BOOTSTRAP_ADMIN_PASSWORD}" ]; then
+        echo "FATAL: KC_BOOTSTRAP_ADMIN_PASSWORD fehlt (maskierte CI-Var)."; exit 1
+      fi
+      if [ -z "${KC_ADMIN_EMAIL}" ]; then
+        echo "FATAL: KC_ADMIN_EMAIL fehlt (Pipeline-Variable)."; exit 1
+      fi
+      echo "First-Admin-Bootstrap: ${KC_ADMIN_EMAIL} -> Realm vectiscan / Gruppe vectiscan-admin"
+    - |
+      docker exec -e KCADM_PW="${KC_BOOTSTRAP_ADMIN_PASSWORD}" -e EMAIL="${KC_ADMIN_EMAIL}" \
+        vectiscan-keycloak-1 bash -c '
+        set -e
+        K=/opt/keycloak/bin/kcadm.sh
+        $K config credentials --server http://localhost:8080 --realm master --user admin --password "$KCADM_PW" >/dev/null
+        USERID=$($K get users -r vectiscan -q email="$EMAIL" --fields id --format csv --noquotes 2>/dev/null | head -1 | tr -d "\r")
+        if [ -z "$USERID" ]; then
+          echo "User existiert nicht — lege an..."
+          $K create users -r vectiscan -s username="$EMAIL" -s email="$EMAIL" -s enabled=true -s emailVerified=true >/dev/null
+          USERID=$($K get users -r vectiscan -q email="$EMAIL" --fields id --format csv --noquotes 2>/dev/null | head -1 | tr -d "\r")
+          echo "Angelegt: User-ID=$USERID"
+        else
+          echo "User existiert bereits: User-ID=$USERID (kein Re-Create)"
+        fi
+        [ -z "$USERID" ] && { echo "FATAL: User-Anlage fehlgeschlagen."; exit 2; }
+        TMPPW="Vs-$(tr -dc A-Za-z0-9 </dev/urandom | head -c 14)!"
+        $K set-password -r vectiscan --username "$EMAIL" --new-password "$TMPPW" --temporary
+        GID=$($K get groups -r vectiscan --fields id,name --format csv --noquotes 2>/dev/null | grep "vectiscan-admin" | head -1 | cut -d, -f1)
+        [ -z "$GID" ] && { echo "FATAL: Gruppe vectiscan-admin nicht gefunden (Realm nicht provisioniert)."; exit 3; }
+        $K update "users/$USERID/groups/$GID" -r vectiscan -s realm=vectiscan -s userId="$USERID" -s groupId="$GID" -n
+        MEMBER=$($K get "users/$USERID/groups" -r vectiscan --fields name --format csv --noquotes 2>/dev/null | tr -d "\r")
+        echo "=== Verifikation Gruppen: $MEMBER ==="
+        echo "$MEMBER" | grep -q "vectiscan-admin" || { echo "FATAL: Mitgliedschaft nicht bestaetigt."; exit 4; }
+        echo "############################################################"
+        echo "# LOGIN: $EMAIL"
+        echo "# TEMP-PASSWORT (einmalig, beim 1. Login aendern): $TMPPW"
+        echo "############################################################"
+        echo "OK: $EMAIL angelegt + in vectiscan-admin — /admin-Edge-Gate (403) entblockt."
+      '
+  environment:
+    name: production
+    url: https://id.vectigal.tech
+
+# =============================================================================
 # VEC-378 — Admin-Release für QA-WebCheck-Order (Re-Scan VEC-376)
 # Genehmigt Target für Order 46ce8dcc-4236-4c15-895a-ad32586d484a und queued
 # den WebCheck-Scan. Einmaliger Ops-Job; wird per API-Pipeline getriggert.
