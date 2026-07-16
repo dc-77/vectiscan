@@ -1265,24 +1265,33 @@ ops-keycloak-fix-groups-scope:
         K=/opt/keycloak/bin/kcadm.sh
         $K config credentials --server http://localhost:8080 --realm master --user admin --password "$KCADM_PW" >/dev/null
         CLIENT=vectiscan-oauth2-proxy
-        SID=$($K get client-scopes -r vectiscan --fields id,name --format csv --noquotes 2>/dev/null | tr -d "\r" | awk -F, "\$2==\"groups\"{print \$1}" | head -1)
+        # kein awk im Container -> grep/cut. Zeilenformat: <id>,<name>
+        scope_id() { $K get client-scopes -r vectiscan --fields id,name --format csv --noquotes 2>/dev/null | tr -d "\r" | grep ",groups$" | head -1 | cut -d, -f1; }
+        SID=$(scope_id || true)
         if [ -z "$SID" ]; then
           echo "Client-Scope groups fehlt — lege an..."
           $K create client-scopes -r vectiscan \
             -s name=groups -s protocol=openid-connect \
             -s "attributes.\"include.in.token.scope\"=true" \
             -s "attributes.\"display.on.consent.screen\"=false" >/dev/null
-          SID=$($K get client-scopes -r vectiscan --fields id,name --format csv --noquotes 2>/dev/null | tr -d "\r" | awk -F, "\$2==\"groups\"{print \$1}" | head -1)
-          echo "Angelegt: scope-id=$SID — fuege Group-Membership-Mapper hinzu..."
+          SID=$(scope_id || true)
+          echo "Angelegt: scope-id=$SID"
+        else
+          echo "Client-Scope groups existiert bereits: scope-id=$SID"
+        fi
+        [ -z "$SID" ] && { echo "FATAL: scope-id nicht ermittelbar."; exit 2; }
+        # Mapper idempotent sicherstellen
+        HASMAP=$($K get "client-scopes/$SID/protocol-mappers/models" -r vectiscan --fields name --format csv --noquotes 2>/dev/null | tr -d "\r" | grep -c "^groups$" || true)
+        if [ "$HASMAP" = "0" ]; then
+          echo "Group-Membership-Mapper fehlt — lege an..."
           $K create "client-scopes/$SID/protocol-mappers/models" -r vectiscan \
             -s name=groups -s protocol=openid-connect -s protocolMapper=oidc-group-membership-mapper \
             -s "config.\"claim.name\"=groups" -s "config.\"full.path\"=false" \
             -s "config.\"id.token.claim\"=true" -s "config.\"access.token.claim\"=true" \
             -s "config.\"userinfo.token.claim\"=true" >/dev/null
         else
-          echo "Client-Scope groups existiert bereits: scope-id=$SID"
+          echo "Mapper groups existiert bereits."
         fi
-        [ -z "$SID" ] && { echo "FATAL: scope-id nicht ermittelbar."; exit 2; }
         CID=$($K get clients -r vectiscan -q clientId=$CLIENT --fields id --format csv --noquotes 2>/dev/null | tr -d "\r" | head -1)
         [ -z "$CID" ] && { echo "FATAL: Client $CLIENT nicht gefunden."; exit 3; }
         echo "Client $CLIENT id=$CID — weise groups als Default-Scope zu (idempotent)..."
