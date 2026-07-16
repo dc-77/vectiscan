@@ -1152,6 +1152,39 @@ ops-keycloak-grant-admin:
     url: https://id.vectigal.tech
 
 # =============================================================================
+# VEC-473 — Diagnose: Realm-User im Realm `vectiscan` auflisten. Reiner Read-
+# only-Ops-Job, um vor `ops-keycloak-grant-admin` die tatsaechliche E-Mail/
+# Username eines Accounts zu ermitteln (Grant matcht exakt per email). Optional
+# KC_USER_SEARCH als Pipeline-Variable (kcadm `-q search=`), sonst alle User.
+#   KC_BOOTSTRAP_ADMIN_PASSWORD  (maskierte CI-Var, wie ops-keycloak-provision)
+# =============================================================================
+ops-keycloak-list-users:
+  extends: .ops-base
+  needs: []
+  script:
+    - |
+      if [ -z "${KC_BOOTSTRAP_ADMIN_PASSWORD}" ]; then
+        echo "FATAL: KC_BOOTSTRAP_ADMIN_PASSWORD fehlt (maskierte CI-Var)."; exit 1
+      fi
+      echo "Realm vectiscan — User-Liste (Suchbegriff: '${KC_USER_SEARCH:-<alle>}')"
+    - |
+      docker exec -e KCADM_PW="${KC_BOOTSTRAP_ADMIN_PASSWORD}" -e SEARCH="${KC_USER_SEARCH:-}" \
+        vectiscan-keycloak-1 bash -c '
+        set -e
+        K=/opt/keycloak/bin/kcadm.sh
+        $K config credentials --server http://localhost:8080 --realm master --user admin --password "$KCADM_PW" >/dev/null
+        if [ -n "$SEARCH" ]; then
+          $K get users -r vectiscan -q search="$SEARCH" --fields id,username,email,enabled,emailVerified --format csv --noquotes 2>/dev/null
+        else
+          $K get users -r vectiscan --fields id,username,email,enabled,emailVerified --format csv --noquotes 2>/dev/null
+        fi
+        echo "=== Ende User-Liste ==="
+      '
+  environment:
+    name: production
+    url: https://id.vectigal.tech
+
+# =============================================================================
 # VEC-378 — Admin-Release für QA-WebCheck-Order (Re-Scan VEC-376)
 # Genehmigt Target für Order 46ce8dcc-4236-4c15-895a-ad32586d484a und queued
 # den WebCheck-Scan. Einmaliger Ops-Job; wird per API-Pipeline getriggert.
