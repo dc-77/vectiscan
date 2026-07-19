@@ -17,6 +17,28 @@ import structlog
 log = structlog.get_logger()
 
 
+def _demojibake(s: str) -> str:
+    """Repariert Doppel-Encoding (UTF-8-Bytes als Latin-1 interpretiert -> 'Ã¤'
+    statt 'ä', 'Ã¶' statt 'ö', 'Ã' statt 'ß' …). Manche KI-generierten Finding-
+    Titel/Descriptions kommen mojibaked an (echte Umlaute; die meisten Titel nutzen
+    ASCII-Ersatz und sind unauffaellig). ftfy-Kernmechanismus.
+
+    KONSERVATIV: nur anwenden, wenn typische Mojibake-Marker vorhanden sind UND das
+    Re-Decoding sauber gelingt UND die Marker dadurch tatsaechlich abnehmen — sonst
+    Original behalten, um legitime Ã/Â-Zeichen (z. B. franzoesische/portugiesische
+    Namen) nicht zu zerstoeren.
+    """
+    if not s or ("Ã" not in s and "Â" not in s):
+        return s
+    try:
+        repaired = s.encode("latin-1").decode("utf-8")
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return s
+    if (repaired.count("Ã") + repaired.count("Â")) < (s.count("Ã") + s.count("Â")):
+        return repaired
+    return s
+
+
 def _safe(text: str | None) -> str:
     """Escape XML-special characters so ReportLab Paragraph doesn't crash.
 
@@ -25,11 +47,13 @@ def _safe(text: str | None) -> str:
 
     Strips unsupported HTML tags (code, ul, li, ol, p, div, span, pre, h1-h6,
     a, table, tr, td, th) while keeping their text content.
+
+    Repariert ausserdem Doppel-Encoding-Mojibake (Ã¤ -> ä) vor dem Escaping.
     """
     if not text:
         return "—"
     import re
-    s = str(text)
+    s = _demojibake(str(text))
 
     # 1. Convert unsupported tags to text equivalents BEFORE escaping
     # <code>...</code> → bold
