@@ -15,16 +15,18 @@ The admin matcher itself is `PathRegexp((?i)^/admin)` since VEC-167 (case-
 insensitive — `/ADMIN` must not bypass the gate). The tests below therefore
 accept both `PathPrefix` and `PathRegexp` as the path matcher.
 
-Auth architecture split (VEC-370 / VEC-439):
-  - Frontend admin (`/admin`):  protected by Traefik-level auth. Since VEC-439
-    (C3 oauth2-proxy) this is `oauth2-proxy-redirect@file` (SSO via Keycloak),
-    replacing the old `internal-auth@file` HTTP Basic gate.
-  - API admin (`/api/admin`):  protected by app-level JWT `requireAdmin` — correct
-    for a SPA calling the API via fetch() with Bearer tokens. Neither basicAuth
-    nor oauth2-proxy forwardAuth must appear here: both would intercept SPA
-    fetch() calls before the app can handle them. The `/api/admin` routes are
-    fully covered by `admin_edge_invariant.test.ts` and
-    `admin_route_invariant.test.ts` (jest).
+Auth architecture (VEC-370 / VEC-439 / Auth-Konsolidierung Juli 2026):
+  Both admin surfaces are guarded by app-level JWT — NOT by a Traefik-level auth gate.
+  - Frontend admin (`/admin`):  App-JWT via `useAdminGuard`. The oauth2-proxy/Keycloak
+    edge gate (VEC-439 C3) was removed in the July-2026 auth consolidation because it
+    forced a second, separate Keycloak login on top of the app login. The `/admin` HTML
+    shell is a data-less SPA; real authorization happens in the app + `/api/admin`.
+  - API admin (`/api/admin`):  App-JWT `requireAdmin` — correct for a SPA calling the API
+    via fetch() with Bearer tokens. Neither basicAuth nor oauth2-proxy forwardAuth may
+    appear here: both would intercept SPA fetch() calls before the app can handle them.
+  JWT coverage for /api/admin is enforced by `admin_edge_invariant.test.ts` and
+  `admin_route_invariant.test.ts` (jest). Keycloak/oauth2-proxy remain only for the
+  infra tools (Grafana logs., Uptime-Kuma status.).
 
 These tests are intentionally self-contained (no shared conftest, only stdlib +
 PyYAML) so the suite is green today and can gate CI on its own — independent of
@@ -40,10 +42,14 @@ from pathlib import Path
 
 COMPOSE_PATH = Path(__file__).parent.parent / "docker-compose.yml"
 
-# requires_traefik_auth=True  → oauth2-proxy-redirect@file must be present (Frontend admin UI, VEC-439)
-# requires_traefik_auth=False → neither oauth2-proxy-redirect@file nor internal-auth@file present (API; JWT covers it)
+# Auth-Konsolidierung (Juli 2026): Das oauth2-proxy-Edge-Gate vor /admin wurde entfernt
+# (es erzwang eine zweite, separate Keycloak-Anmeldung ueber dem App-Login). Seitdem tragen
+# BEIDE Admin-Router KEIN Traefik-Auth-Gate mehr — die Autorisierung laeuft ausschliesslich
+# ueber App-JWT (Frontend: useAdminGuard; API: requireAdmin). Keycloak/oauth2-proxy schuetzen
+# nur noch die Infra-Tools (Grafana logs., Uptime-Kuma status.).
+# requires_traefik_auth=False → weder oauth2-proxy-redirect@file noch internal-auth@file.
 ADMIN_GUARD_PAIRS = [
-    ("frontend", "vectiscan-web", "vectiscan-web-admin", "/admin", True),
+    ("frontend", "vectiscan-web", "vectiscan-web-admin", "/admin", False),
     ("api", "vectiscan-api", "vectiscan-api-admin", "/api/admin", False),
 ]
 
@@ -115,32 +121,30 @@ def test_admin_rule_group_parenthesized_before_path_matcher(
 def test_admin_router_auth_gate(
     labels_by_service, svc, public_router, admin_router, prefix, requires_traefik_auth
 ):
-    """Admin guard must use the correct auth mechanism and outrank the public router.
+    """Admin routers must NOT carry a Traefik-level auth gate and must outrank the public router.
 
-    Auth split (VEC-370 / VEC-439):
-    - Frontend /admin: oauth2-proxy-redirect@file (SSO via Keycloak, VEC-439 C3).
-    - API /api/admin:  neither internal-auth@file nor oauth2-proxy-redirect@file —
-      auth is handled by app-level JWT requireAdmin. Traefik-level auth breaks
-      SPA fetch() calls (VEC-370). JWT coverage is enforced by
-      admin_edge_invariant.test.ts (jest).
+    Auth-Konsolidierung (Juli 2026): both /admin and /api/admin are guarded by app-level
+    JWT (useAdminGuard / requireAdmin), NOT by internal-auth@file or oauth2-proxy-redirect@file.
+    A Traefik forwardAuth/basicAuth gate on either would break SPA fetch() (VEC-370) or force
+    a second, separate login. The admin router must still exist + outrank the public router so
+    /admin resolves to it (own middleware set, e.g. no rate-limit) rather than the public router.
     """
     labels = labels_by_service[svc]
     admin_mw = labels[f"traefik.http.routers.{admin_router}.middlewares"]
 
     if requires_traefik_auth:
         assert "oauth2-proxy-redirect@file" in admin_mw, (
-            f"{svc}: frontend admin router must enforce oauth2-proxy-redirect@file "
-            f"(SSO gate, VEC-439), got '{admin_mw}'"
+            f"{svc}: admin router must enforce oauth2-proxy-redirect@file (SSO gate), got '{admin_mw}'"
         )
     else:
         assert "internal-auth@file" not in admin_mw, (
-            f"{svc}: API admin router must NOT carry internal-auth@file (breaks SPA Bearer "
-            f"auth — VEC-370). JWT requireAdmin coverage is in admin_edge_invariant.test.ts. "
-            f"Got: '{admin_mw}'"
+            f"{svc}: admin router must NOT carry internal-auth@file (breaks SPA Bearer auth — "
+            f"VEC-370). App-level JWT covers admin auth. Got: '{admin_mw}'"
         )
         assert "oauth2-proxy-redirect@file" not in admin_mw, (
-            f"{svc}: API admin router must NOT carry oauth2-proxy-redirect@file (breaks SPA "
-            f"fetch() — VEC-370). App-level JWT handles /api/admin auth. Got: '{admin_mw}'"
+            f"{svc}: admin router must NOT carry oauth2-proxy-redirect@file. Since the July-2026 "
+            f"auth consolidation /admin uses app-level JWT (useAdminGuard); a Traefik forwardAuth "
+            f"gate would force a second, separate login. Got: '{admin_mw}'"
         )
 
     # Admin router must win path resolution for the admin prefix. Traefik's

@@ -542,7 +542,12 @@ services:
       # Fehlklassifikation) sind gefixt. Defekte blockieren ab jetzt wieder
       # den PDF-Build (Order -> failed), damit ein neuer Frischscan auf
       # heuel.com sauber durchgeht.
-      VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-strict}
+      # Zielbild Juli 2026: 'warn' statt 'strict'. Das Tool hat einen expliziten
+      # Admin-Review-Schritt (pending_review) — der Report soll IMMER erzeugt werden und
+      # dort landen, statt bei EINEM Validation-Defekt hart auf 'failed' zu kippen (dann
+      # gibt es keinen Report und keinen Review). Defekte erscheinen als Warnung im Review;
+      # der Admin entscheidet bei der Freigabe. (Der Code-Default in gate.py ist ohnehin 'warn'.)
+      VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-warn}
       # M6 Cutover-Flag (Doc 02 Master-Plan):
       #   - "v2" (Default seit 2026-05-13): 3-Schichten-Architektur aktiv
       #     (Frontpage / Strategie / Befund-Details + Anhaenge A-F).

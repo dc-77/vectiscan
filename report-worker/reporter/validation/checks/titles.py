@@ -43,8 +43,14 @@ _NUMBER_WITH_UNIT_RE = re.compile(
 )
 # Bare standalone numbers (ohne Einheit dahinter)
 _BARE_NUMBER_RE = re.compile(r"\b\d+\b")
-# Version-Pattern: Zahl mit Punkt (z.B. 2.4.49)
-_VERSION_RE = re.compile(r"\b\d+\.\d+")
+# Version- ODER IP-Pattern: mehrteilige Zahl-mit-Punkt (2.4.49, 3.4.1, 88.99.35.112).
+# WICHTIG: mehr als zwei Segmente muessen VOLLSTAENDIG erfasst werden, sonst bleibt
+# das letzte Segment (".1" aus "3.4.1", ".112" aus einer IP) als vermeintliche
+# Bareword-Number uebrig und flaggt ein voellig legitimes Finding.
+_VERSION_OR_IP_RE = re.compile(r"\b\d+(?:\.\d+)+")
+# Port-Kontext: eine Zahl direkt hinter "Port"/"Ports" (optional mit : oder Klammer)
+# ist ein legitimer Port — auch Nicht-Standard-Ports wie Webmin 10000 oder 8081.
+_PORT_CONTEXT_RE = re.compile(r"\b[Pp]orts?\b[\s:()]*\d+")
 
 
 def _extract_service_hint(finding: dict[str, Any]) -> str:
@@ -97,8 +103,10 @@ def check(
         # Strategy: Title nach _NUMBER_WITH_UNIT_RE Whitelist-Tokens "ausblenden",
         # dann auf reine Zahlen scannen. Bekannte Ports + Versionen sind OK.
         title_for_numbers = _NUMBER_WITH_UNIT_RE.sub("", title)
-        # Ports im Title? Erst Version-Tokens entfernen, dann reine Zahlen.
-        title_no_versions = _VERSION_RE.sub("", title_for_numbers)
+        # Zahlen mit "Port"-Kontext (auch Nicht-Standard-Ports wie 10000) sind legitim.
+        title_for_numbers = _PORT_CONTEXT_RE.sub("", title_for_numbers)
+        # Versionen UND IPs (mehrteilige Zahl.Zahl.Zahl…) vollstaendig entfernen.
+        title_no_versions = _VERSION_OR_IP_RE.sub("", title_for_numbers)
         bare_numbers = _BARE_NUMBER_RE.findall(title_no_versions)
         # Filter: alles was ein Standard-Port ist, ist OK.
         suspicious = [n for n in bare_numbers if n not in _KNOWN_PORTS]
