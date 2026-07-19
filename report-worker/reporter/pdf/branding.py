@@ -168,37 +168,51 @@ PACKAGE_BADGES = {
 # nur WinAnsi/CP1252 ab. Umlaute (ä ö ü ß) rendern damit zwar korrekt, aber non-WinAnsi-
 # Symbole wie ● ✓ ◐ ✗ → (Severity-Dots, Compliance-Haken, KI-Pfeile) fehlen und erscheinen
 # als leere .notdef-Box — vom Kunden als „kaputte Umlaute/Sonderzeichen" gemeldet.
-# Fix: DejaVu (volle Unicode-Abdeckung, frei lizenziert) einbetten. Das Debian-Paket
-# fonts-dejavu-core liefert die TTFs (Dockerfile) unter /usr/share/fonts/truetype/dejavu.
-# Fehlen die Dateien (z.B. lokaler Test ohne apt), fallen wir sauber auf Helvetica zurück.
+# Fix: DejaVu (volle Unicode-Abdeckung, frei lizenziert) einbetten. Die Debian-Pakete
+# fonts-dejavu-core (Regular/Bold/Mono) + fonts-dejavu-extra (Oblique/BoldOblique/Mono-Bold)
+# liefern die TTFs (Dockerfile) unter /usr/share/fonts/truetype/dejavu.
+# ROBUST: es reicht die Regular-Datei — fehlende Varianten (z.B. wenn nur -core installiert
+# ist oder beim lokalen Test) werden auf die naechstbeste vorhandene gemappt, sodass ALLE
+# Font-Namen (VectiSans-Bold/-Oblique/…) immer gueltig registriert sind. Fehlt DejaVu ganz,
+# fallen wir sauber auf Helvetica zurueck.
 import os as _os
 from reportlab.pdfbase import pdfmetrics as _pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont as _TTFont
 
 _DEJAVU_DIR = _os.environ.get("VECTISCAN_FONT_DIR", "/usr/share/fonts/truetype/dejavu")
-_FONT_FILES = {
-    "VectiSans": "DejaVuSans.ttf",
-    "VectiSans-Bold": "DejaVuSans-Bold.ttf",
-    "VectiSans-Oblique": "DejaVuSans-Oblique.ttf",
-    "VectiSans-BoldOblique": "DejaVuSans-BoldOblique.ttf",
-    "VectiMono": "DejaVuSansMono.ttf",
-    "VectiMono-Bold": "DejaVuSansMono-Bold.ttf",
-}
 
 
 def _register_unicode_fonts() -> bool:
-    """Registriert die DejaVu-Familie inkl. Bold/Italic. True = erfolgreich,
-    False = Datei(en) fehlen -> Fallback auf ReportLab-Built-in."""
-    paths = {name: _os.path.join(_DEJAVU_DIR, fn) for name, fn in _FONT_FILES.items()}
-    if not all(_os.path.exists(p) for p in paths.values()):
+    """Registriert die DejaVu-Familie robust. Nur die Regular-Datei ist Pflicht; fehlende
+    Bold/Oblique/Mono-Varianten werden auf die beste vorhandene Datei gemappt, damit jeder
+    Font-Name gueltig ist. True = mind. Regular geladen, False = kein DejaVu -> Helvetica."""
+    def _p(fn):
+        return _os.path.join(_DEJAVU_DIR, fn)
+
+    regular = _p("DejaVuSans.ttf")
+    if not _os.path.exists(regular):
         return False
     try:
-        for name, path in paths.items():
-            _pdfmetrics.registerFont(_TTFont(name, path))
+        _pdfmetrics.registerFont(_TTFont("VectiSans", regular))
+
+        def _reg(name, fn, fallback):
+            """Registriert name mit fn wenn vorhanden, sonst mit fallback-Pfad."""
+            src = _p(fn) if _os.path.exists(_p(fn)) else fallback
+            _pdfmetrics.registerFont(_TTFont(name, src))
+            return src
+
+        bold = _reg("VectiSans-Bold", "DejaVuSans-Bold.ttf", regular)
+        _reg("VectiSans-Oblique", "DejaVuSans-Oblique.ttf", regular)
+        _reg("VectiSans-BoldOblique", "DejaVuSans-BoldOblique.ttf", bold)
         _pdfmetrics.registerFontFamily(
             "VectiSans", normal="VectiSans", bold="VectiSans-Bold",
             italic="VectiSans-Oblique", boldItalic="VectiSans-BoldOblique",
         )
+
+        mono = _p("DejaVuSansMono.ttf")
+        mono_src = mono if _os.path.exists(mono) else regular
+        _pdfmetrics.registerFont(_TTFont("VectiMono", mono_src))
+        _reg("VectiMono-Bold", "DejaVuSansMono-Bold.ttf", mono_src if _os.path.exists(mono) else bold)
         _pdfmetrics.registerFontFamily(
             "VectiMono", normal="VectiMono", bold="VectiMono-Bold",
             italic="VectiMono", boldItalic="VectiMono-Bold",
