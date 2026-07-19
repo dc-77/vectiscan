@@ -349,7 +349,10 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6">
           <Reveal><h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-12" style={{ color: C.offWhite }}>Vom kostenlosen Schnell-Check zum Vollscan.</h2></Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {PACKAGE_CATALOG.map((pkg, i) => {
+            {/* Nur im Kunden-Frontend gelistete Pakete als Karten (listed-Flag, SSoT).
+                Der kostenlose WebCheck bleibt separat ueber die Hero-/Final-CTAs als
+                Lead-Tool erreichbar — er ist hier nur nicht mehr als Paket-Karte. */}
+            {PACKAGE_CATALOG.filter(p => p.listed).map((pkg, i) => {
               const tier = getTier(pkg.key);
               const isWebcheck = pkg.key === 'webcheck';
               const isSelfService = pkg.sellability === 'self_service';

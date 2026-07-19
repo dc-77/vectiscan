@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { getTier, formatEur } from '@/lib/pricing';
-import { PACKAGE_CATALOG, type PackageDef } from '@/lib/catalog.generated';
+import { PACKAGE_CATALOG, type PackageDef, type PackageKey } from '@/lib/catalog.generated';
 
 const C = {
   slate: '#0F172A',
@@ -13,23 +13,25 @@ const C = {
   borderSubtle: 'rgba(30,58,95,0.35)',
 };
 
-// Feature columns for comparison table: [label, webcheck, perimeter, compliance, supplychain, insurance]
-const FEATURES: [string, boolean, boolean, boolean, boolean, boolean][] = [
-  ['E-Mail-Security (SPF/DKIM/DMARC)', true, true, true, true, true],
-  ['SSL/TLS-Konfigurationsanalyse', true, true, true, true, true],
-  ['HTTP-Security-Header-Prüfung', true, true, true, true, true],
-  ['Port-Scanning & Service-Erkennung', false, true, true, true, true],
-  ['Web-Schwachstellen (OWASP ZAP)', false, true, true, true, true],
-  ['DNS-Enumeration & Subdomain-Analyse', false, true, true, true, true],
-  ['KI-Korrelation & FP-Filter', false, true, true, true, true],
-  ['Executive Summary + Maßnahmenplan', false, true, true, true, true],
-  ['Threat Intel (NVD, EPSS, CISA KEV)', false, true, true, true, true],
-  ['NIS2 / §30 BSIG-Mapping', false, false, true, false, false],
-  ['BSI-Grundschutz-Referenzen', false, false, true, false, false],
-  ['ISO 27001 Annex A', false, false, false, true, false],
-  ['Lieferanten-Nachweis-Dokument', false, false, false, true, false],
-  ['Versicherungs-Fragebogen (10 Pkt.)', false, false, false, false, true],
-  ['Risk-Score & Ransomware-Indikator', false, false, false, false, true],
+// Feature-Matrix fuer die Vergleichstabelle. Support pro Paket-Key statt
+// positionsgebundener Tupel, damit die Tabelle sich sauber auf die im Katalog
+// gelisteten Pakete (listed-Flag, SSoT) reduziert — egal welche das sind.
+const FEATURES: { label: string; support: Record<PackageKey, boolean> }[] = [
+  { label: 'E-Mail-Security (SPF/DKIM/DMARC)', support: { webcheck: true, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'SSL/TLS-Konfigurationsanalyse', support: { webcheck: true, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'HTTP-Security-Header-Prüfung', support: { webcheck: true, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'Port-Scanning & Service-Erkennung', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'Web-Schwachstellen (OWASP ZAP)', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'DNS-Enumeration & Subdomain-Analyse', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'KI-Korrelation & FP-Filter', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'Executive Summary + Maßnahmenplan', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'Threat Intel (NVD, EPSS, CISA KEV)', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  { label: 'NIS2 / §30 BSIG-Mapping', support: { webcheck: false, perimeter: false, compliance: true, supplychain: false, insurance: false } },
+  { label: 'BSI-Grundschutz-Referenzen', support: { webcheck: false, perimeter: false, compliance: true, supplychain: false, insurance: false } },
+  { label: 'ISO 27001 Annex A', support: { webcheck: false, perimeter: false, compliance: false, supplychain: true, insurance: false } },
+  { label: 'Lieferanten-Nachweis-Dokument', support: { webcheck: false, perimeter: false, compliance: false, supplychain: true, insurance: false } },
+  { label: 'Versicherungs-Fragebogen (10 Pkt.)', support: { webcheck: false, perimeter: false, compliance: false, supplychain: false, insurance: true } },
+  { label: 'Risk-Score & Ransomware-Indikator', support: { webcheck: false, perimeter: false, compliance: false, supplychain: false, insurance: true } },
 ];
 
 function Check() {
@@ -55,8 +57,11 @@ function priceFor(pkg: PackageDef): { main: string; note: string } {
 }
 
 export default function PricingPage() {
-  const freeAndSelfService = PACKAGE_CATALOG.filter(p => p.sellability !== 'sales_assisted');
-  const salesAssisted = PACKAGE_CATALOG.filter(p => p.sellability === 'sales_assisted');
+  // Nur im Kunden-Frontend gelistete Pakete (listed-Flag, SSoT) anzeigen.
+  // Ausgeblendete Pakete bleiben im Katalog erhalten und jederzeit reaktivierbar.
+  const listedPackages = PACKAGE_CATALOG.filter(p => p.listed);
+  const freeAndSelfService = listedPackages.filter(p => p.sellability !== 'sales_assisted');
+  const salesAssisted = listedPackages.filter(p => p.sellability === 'sales_assisted');
 
   return (
     <main className="flex-1">
@@ -67,7 +72,7 @@ export default function PricingPage() {
             Pakete &amp; Preise
           </h1>
           <p className="text-base max-w-2xl mx-auto" style={{ color: C.muted }}>
-            Fünf Pakete — vom kostenlosen Schnell-Check bis zum Compliance- und Versicherungsnachweis.
+            Vom automatisierten Perimeter-Scan bis zum Nachweis für Ihre Cyberversicherung.
           </p>
         </div>
       </section>
@@ -170,7 +175,7 @@ export default function PricingPage() {
               <thead>
                 <tr style={{ backgroundColor: C.slateLight }}>
                   <th className="text-left py-3 px-5 font-medium" style={{ color: C.muted }}>Funktion</th>
-                  {PACKAGE_CATALOG.map(pkg => (
+                  {listedPackages.map(pkg => (
                     <th key={pkg.key} className="text-center py-3 px-3 font-medium text-xs"
                       style={{ color: pkg.accentColor }}>
                       {pkg.marketingName}
@@ -179,14 +184,14 @@ export default function PricingPage() {
                 </tr>
               </thead>
               <tbody>
-                {FEATURES.map(([label, wc, per, comp, sc, ins], i) => (
+                {FEATURES.map(({ label, support }, i) => (
                   <tr key={label} style={{ backgroundColor: i % 2 === 0 ? C.slate : `${C.slateLight}60` }}>
                     <td className="py-2.5 px-5 text-xs" style={{ color: C.mutedLight }}>{label}</td>
-                    <td className="text-center py-2.5 px-3">{wc ? <Check /> : <Dash />}</td>
-                    <td className="text-center py-2.5 px-3">{per ? <Check /> : <Dash />}</td>
-                    <td className="text-center py-2.5 px-3">{comp ? <Check /> : <Dash />}</td>
-                    <td className="text-center py-2.5 px-3">{sc ? <Check /> : <Dash />}</td>
-                    <td className="text-center py-2.5 px-3">{ins ? <Check /> : <Dash />}</td>
+                    {listedPackages.map(pkg => (
+                      <td key={pkg.key} className="text-center py-2.5 px-3">
+                        {support[pkg.key] ? <Check /> : <Dash />}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>

@@ -51,7 +51,9 @@ def generate_report_v2(report_data, output_path):
     doc._meta = meta
     doc._classification_label = meta.get(
         "classification_label",
-        "KLASSIFIZIERUNG: VERTRAULICH -- NUR FUER AUTORISIERTE EMPFAENGER",
+        # Echte Umlaute + Em-Dash: der fruehere ASCII-Workaround war ein Symptom des
+        # fehlenden Unicode-Fonts, der jetzt in branding.py eingebettet wird.
+        "KLASSIFIZIERUNG: VERTRAULICH — NUR FÜR AUTORISIERTE EMPFÄNGER",
     )
 
     cover_frame = Frame(

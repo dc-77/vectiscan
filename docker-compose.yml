@@ -62,10 +62,14 @@ services:
       # VEC-269: gleicher HTTP-01-Resolver wie vectiscan-web (DNS-01/uniteddomains-Key kaputt).
       - "traefik.http.routers.vectiscan-web-admin.tls.certresolver=letsencrypt-http"
       - "traefik.http.routers.vectiscan-web-admin.priority=100"
-      # VEC-439 C3: Basic-Auth-Popup -> SSO (oauth2-proxy forwardAuth, Realm vectiscan).
-      # Rollback = zurueck auf internal-auth@file (Middleware bleibt im File-Provider definiert).
-      # /api/admin bleibt App-JWT (VEC-370) — der API-Router traegt KEINE forwardAuth.
-      - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file,oauth2-proxy-redirect@file"
+      # Auth-Konsolidierung (Juli 2026): /admin ist eine Next.js-SPA, deren Autorisierung
+      # ausschliesslich ueber das App-JWT laeuft (useAdminGuard + /api/admin requireAdmin,
+      # users.role='admin'). Das vorgeschaltete oauth2-proxy/Keycloak-Edge-Gate war nur
+      # Defense-in-Depth fuer die HTML-Shell und erzwang eine zweite, separate Keycloak-
+      # Anmeldung (inkonsistent -> Doppel-Login). Entfernt: ein einziger App-Login.
+      # Keycloak/oauth2-proxy bleiben fuer die Infra-Tools (Grafana logs., Kuma status.).
+      # Rollback = ',oauth2-proxy-redirect@file' wieder anhaengen (Middleware bleibt im File-Provider).
+      - "traefik.http.routers.vectiscan-web-admin.middlewares=security-headers@file"
       - "traefik.http.routers.vectiscan-web-admin.service=vectiscan-web"
       - "traefik.http.services.vectiscan-web.loadbalancer.server.port=3000"
     depends_on:
@@ -1000,13 +1004,9 @@ services:
       - "traefik.http.routers.vectiscan-oauth2-status.priority=110"
       - "traefik.http.routers.vectiscan-oauth2-status.middlewares=security-headers@file,rate-limit@file"
       - "traefik.http.routers.vectiscan-oauth2-status.service=vectiscan-oauth2-proxy"
-      - "traefik.http.routers.vectiscan-oauth2-scan.rule=Host(`scan.vectigal.tech`) && PathPrefix(`/oauth2/`)"
-      - "traefik.http.routers.vectiscan-oauth2-scan.entrypoints=websecure"
-      - "traefik.http.routers.vectiscan-oauth2-scan.tls=true"
-      - "traefik.http.routers.vectiscan-oauth2-scan.tls.certresolver=letsencrypt-http"
-      - "traefik.http.routers.vectiscan-oauth2-scan.priority=110"
-      - "traefik.http.routers.vectiscan-oauth2-scan.middlewares=security-headers@file,rate-limit@file"
-      - "traefik.http.routers.vectiscan-oauth2-scan.service=vectiscan-oauth2-proxy"
+      # Auth-Konsolidierung (Juli 2026): /oauth2/*-Einsprung auf scan.vectigal.tech
+      # entfernt — das App-Admin (/admin) nutzt kein oauth2-proxy/Keycloak-Gate mehr.
+      # Der status.vectigal.tech-Einsprung (vectiscan-oauth2-status, oben) bleibt fuer Uptime-Kuma.
       - "traefik.http.services.vectiscan-oauth2-proxy.loadbalancer.server.port=4180"
     networks:
       - proxy-net

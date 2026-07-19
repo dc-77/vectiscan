@@ -20,7 +20,9 @@ interface PackageInfo {
   accentColor: string;
 }
 
-const PACKAGES: PackageInfo[] = PACKAGE_CATALOG.map((pkg) => ({
+// Nur im Kunden-Frontend gelistete Pakete anbieten (listed-Flag, SSoT). Nicht
+// gelistete Pakete bleiben im Katalog erhalten, tauchen aber im Wizard nicht auf.
+const PACKAGES: PackageInfo[] = PACKAGE_CATALOG.filter((pkg) => pkg.listed).map((pkg) => ({
   key: pkg.key,
   title: pkg.marketingName,
   subtitle: pkg.subtitle,

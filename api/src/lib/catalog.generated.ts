@@ -15,6 +15,14 @@ export interface PackageDef {
   subtitle: string;
   /** Verkaufsstufe: free = Lead-Magnet, self_service = Stripe-Checkout, sales_assisted = Angebot anfragen. */
   sellability: Sellability;
+  /**
+   * Im Kunden-Verkaufs-/Buchungs-Frontend sichtbar (Pricing-Karten + Vergleich,
+   * Homepage-Pakete, Abo-/Schedule-Wizard, PackageSelector). Reines Anzeige-Flag:
+   * aendert NICHT die technisch akzeptierte Paketmenge (Backend/DB akzeptieren
+   * weiterhin alle Pakete — Admin-„auf Rechnung"-Pfad). Ausgeblendete Pakete
+   * bleiben im Katalog erhalten und sind jederzeit reaktivierbar.
+   */
+  listed: boolean;
   /** Listenpreis EUR/Jahr fuer die Anzeige; null = "auf Anfrage", 0 = kostenlos. */
   priceEur: number | null;
   /** ENV-Key fuer Preis-Override im Frontend (NEXT_PUBLIC_…). */
@@ -55,6 +63,7 @@ export const PACKAGE_CATALOG: readonly PackageDef[] = [
     "marketingName": "WebCheck",
     "subtitle": "SSL, Headers, CMS, E-Mail-Schutz — kompakter Report mit Ampel",
     "sellability": "free",
+    "listed": false,
     "priceEur": 0,
     "priceEnvKey": "NEXT_PUBLIC_PRICE_WEBCHECK_EUR",
     "stripePriceEnvKey": "STRIPE_PRICE_WEBCHECK",
@@ -78,6 +87,7 @@ export const PACKAGE_CATALOG: readonly PackageDef[] = [
     "marketingName": "Perimeter-Scan",
     "subtitle": "Vollständige Angriffsflächen-Analyse mit priorisiertem Maßnahmenplan.",
     "sellability": "self_service",
+    "listed": true,
     "priceEur": 1490,
     "priceEnvKey": "NEXT_PUBLIC_PRICE_PERIMETER_EUR",
     "stripePriceEnvKey": "STRIPE_PRICE_PERIMETER",
@@ -103,6 +113,7 @@ export const PACKAGE_CATALOG: readonly PackageDef[] = [
     "marketingName": "Compliance-Scan",
     "subtitle": "Perimeter-Scan mit NIS2-Compliance-Nachweis.",
     "sellability": "sales_assisted",
+    "listed": false,
     "priceEur": null,
     "priceEnvKey": "NEXT_PUBLIC_PRICE_COMPLIANCE_EUR",
     "stripePriceEnvKey": "STRIPE_PRICE_COMPLIANCE",
@@ -129,6 +140,7 @@ export const PACKAGE_CATALOG: readonly PackageDef[] = [
     "marketingName": "SupplyChain-Scan",
     "subtitle": "Sicherheitsnachweis für NIS2-pflichtige Auftraggeber.",
     "sellability": "sales_assisted",
+    "listed": false,
     "priceEur": null,
     "priceEnvKey": "NEXT_PUBLIC_PRICE_SUPPLYCHAIN_EUR",
     "stripePriceEnvKey": "STRIPE_PRICE_SUPPLYCHAIN",
@@ -154,6 +166,7 @@ export const PACKAGE_CATALOG: readonly PackageDef[] = [
     "marketingName": "Cyberversicherung",
     "subtitle": "Nachweis für Cyberversicherung mit Risikobewertung.",
     "sellability": "sales_assisted",
+    "listed": true,
     "priceEur": null,
     "priceEnvKey": "NEXT_PUBLIC_PRICE_INSURANCE_EUR",
     "stripePriceEnvKey": "STRIPE_PRICE_INSURANCE",

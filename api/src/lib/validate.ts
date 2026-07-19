@@ -195,7 +195,9 @@ export interface TargetBatchValidation {
   errors: string[];
 }
 
-export const MAX_TARGETS_PER_ORDER = 10;
+// Zielbild Juli 2026: Kunde gibt bis zu 5 Domains/Host-IPs (Eingabezeilen) pro
+// Paket/Order ein. Getrennt vom CIDR-Live-Host-Limit (subscriptions.max_hosts).
+export const MAX_TARGETS_PER_ORDER = 5;
 export const MAX_CIDR_PER_ORDER = 1;
 export const MIN_CIDR_PREFIX = 24;
 

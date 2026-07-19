@@ -3,6 +3,19 @@
 Teil des Auth-Overhauls [VEC-421](../docs/AUTH-OVERHAUL-VEC-421.md). Baut auf
 C1 ([VEC-437](AUTH-SSO-C1-KEYCLOAK.md), dedizierte Keycloak-Instanz) auf.
 
+> **UPDATE Juli 2026 — Auth-Konsolidierung:** Das Edge-Gate vor
+> `scan.vectigal.tech/admin` wurde wieder ENTFERNT. `/admin` ist eine Next.js-SPA,
+> deren Autorisierung ohnehin ausschließlich über das App-JWT läuft (`useAdminGuard`
+> + `/api/admin requireAdmin`, `users.role='admin'`); das vorgeschaltete
+> oauth2-proxy/Keycloak-Gate war nur Defense-in-Depth für die HTML-Shell und erzwang
+> eine zweite, separate Keycloak-Anmeldung (Doppel-Login). **Seitdem schützen
+> oauth2-proxy/Keycloak nur noch `status.vectigal.tech` (Uptime-Kuma) und — via
+> nativem OIDC — `logs.vectigal.tech` (Grafana).** Die untenstehende Beschreibung des
+> `scan/admin`-forwardAuth-Flows ist damit historisch. Konkret entfernt:
+> `oauth2-proxy-redirect@file` am Router `vectiscan-web-admin` und der
+> `/oauth2/`-Router `vectiscan-oauth2-scan` (beide `docker-compose.yml`). Rollback =
+> Middleware wieder anhängen (bleibt im File-Provider definiert).
+
 ## Ziel
 
 Die Basic-Auth-Popups (`internal-auth@file`, VEC-143) auf den beiden

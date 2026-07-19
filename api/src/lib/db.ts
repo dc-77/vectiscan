@@ -48,6 +48,7 @@ const MIGRATION_038_PATH = path.join(__dirname, '..', 'migrations', '038_webchec
 const MIGRATION_039_PATH = path.join(__dirname, '..', 'migrations', '039_user_authorization_consent.sql');
 const MIGRATION_040_PATH = path.join(__dirname, '..', 'migrations', '040_live_check_audit.sql');
 const MIGRATION_041_PATH = path.join(__dirname, '..', 'migrations', '041_order_onetime_payment.sql');
+const MIGRATION_042_PATH = path.join(__dirname, '..', 'migrations', '042_target_limit_default.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -651,6 +652,24 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 041 FAILED (continuing without it):', err);
+  }
+
+  // Migration 042: Standard-Target-Limit pro Abo auf 5 senken (Zielbild Juli 2026).
+  // Idempotent ueber den aktuellen Spalten-Default (30 -> 5).
+  try {
+    const maxDomainsDefault042Check = await pool.query(`
+      SELECT column_default FROM information_schema.columns
+      WHERE table_name = 'subscriptions' AND column_name = 'max_domains'
+    `);
+    const curDefault = (maxDomainsDefault042Check.rows[0]?.column_default ?? '').toString().trim();
+    if (curDefault !== '' && curDefault !== '5') {
+      console.log('[initDb] Applying Migration 042: target_limit_default (max_domains -> 5)');
+      const migrationSql = fs.readFileSync(MIGRATION_042_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 042 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 042 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

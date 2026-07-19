@@ -11,7 +11,8 @@ import TargetInput from '@/components/TargetInput';
 // VEC-289: Paket-Identitaet/Name/Untertitel/Farbe aus dem kanonischen Katalog (SSoT).
 import { getPackage, type PackageKey } from '@/lib/catalog.generated';
 
-const MAX_TARGETS = 10;
+// Zielbild Juli 2026: bis zu 5 Domains/Host-IPs pro Paket (analog API MAX_TARGETS_PER_ORDER).
+const MAX_TARGETS = 5;
 
 // Kuratierte Verkaufs-Bullets je Paket (Copy-Domaene, T7/Belfort). Welche Pakete
 // der Wizard anbietet bzw. Name/Untertitel/Preis kommen aus dem Katalog.
@@ -48,9 +49,14 @@ const CURATED_FEATURES: Record<string, string[]> = {
   ],
 };
 
-// VEC-431 (Design Rev 3, VEC-423): WebCheck (free) ist kein Abo-Produkt und
-// erscheint nicht mehr im Subscription-Wizard — 4 Pakete statt 5.
-const WIZARD_PACKAGE_KEYS: PackageKey[] = ['perimeter', 'compliance', 'supplychain', 'insurance'];
+// VEC-431 (Design Rev 3, VEC-423): WebCheck (free) ist kein Abo-Produkt.
+// Zielbild Juli 2026: Fokus auf zwei Start-Pakete — Perimeter-Scan + Cyberversicherung.
+// Compliance/SupplyChain vorerst ausgeblendet (Katalog-Eintraege bleiben erhalten,
+// jederzeit reaktivierbar). Hinweis: Cyberversicherung (insurance) ist im Katalog noch
+// sellability='sales_assisted' (priceEur=null) -> zeigt "Auf Anfrage". Sobald Jahrespreis
+// + STRIPE_PRICE_INSURANCE feststehen, insurance im Katalog auf 'self_service' flippen
+// (packages.catalog.json + gen-catalog.js), dann ist es per Stripe self-service buchbar.
+const WIZARD_PACKAGE_KEYS: PackageKey[] = ['perimeter', 'insurance'];
 
 const PACKAGES = WIZARD_PACKAGE_KEYS.map((key) => {
   const def = getPackage(key)!;

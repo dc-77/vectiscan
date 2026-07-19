@@ -15,7 +15,8 @@ const SCHEDULE_TYPES = [
   { value: 'once', label: 'Einmalig' },
 ];
 
-const PACKAGES = PACKAGE_CATALOG.map((pkg) => ({ value: pkg.key, label: pkg.marketingName }));
+// Nur im Kunden-Frontend gelistete Pakete (listed-Flag, SSoT) als Schedule-Option.
+const PACKAGES = PACKAGE_CATALOG.filter((pkg) => pkg.listed).map((pkg) => ({ value: pkg.key, label: pkg.marketingName }));
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString('de-DE', {

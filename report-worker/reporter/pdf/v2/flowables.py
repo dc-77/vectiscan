@@ -10,7 +10,7 @@ from reportlab.platypus import Flowable
 from reportlab.lib.units import mm
 from reportlab.lib.colors import HexColor
 
-from reporter.pdf.branding import COLORS
+from reporter.pdf.branding import COLORS, FONT_BODY, FONT_HEADING, FONT_ITALIC
 
 
 class AmpelBar(Flowable):
@@ -33,7 +33,7 @@ class AmpelBar(Flowable):
     def draw(self):
         c = self.canv
         # Label links
-        c.setFont("Helvetica", 9)
+        c.setFont(FONT_BODY, 9)
         c.setFillColor(COLORS["text"])
         c.drawString(0, 1 * mm, self.label)
         # Bar rechts
@@ -93,14 +93,14 @@ class HebelBox(Flowable):
         c.setFillColor(COLORS["bg_light"])
         c.rect(0, 0, self.width, self.height, stroke=1, fill=1)
         c.setFillColor(COLORS["text"])
-        c.setFont("Helvetica-Bold", 11)
+        c.setFont(FONT_HEADING, 11)
         c.drawString(4 * mm, self.height - 5 * mm,
                      f"{self.rank}. {self.title[:80]}")
-        c.setFont("Helvetica", 9)
+        c.setFont(FONT_BODY, 9)
         c.setFillColor(COLORS["muted"])
         c.drawString(4 * mm, self.height - 10 * mm,
                      f"-> {self.effect[:120]}")
-        c.setFont("Helvetica-Oblique", 8)
+        c.setFont(FONT_ITALIC, 8)
         c.drawString(4 * mm, 2 * mm,
                      "Adressiert: " + ", ".join(self.finding_ids[:5]))
 
@@ -125,17 +125,17 @@ class KategorieBlock(Flowable):
     def draw(self):
         c = self.canv
         c.setFillColor(COLORS["primary"])
-        c.setFont("Helvetica-Bold", 10)
+        c.setFont(FONT_HEADING, 10)
         c.drawString(0, self.height - 5 * mm,
                      self.category_label.upper())
-        c.setFont("Helvetica", 9)
+        c.setFont(FONT_BODY, 9)
         c.setFillColor(COLORS["muted"])
         c.drawString(0, self.height - 9 * mm,
                      f"{self.count} Befunde -- Schwerpunkt {self.schwerpunkt.upper()}")
         y = self.height - 13 * mm
         c.setFillColor(COLORS["text"])
         for fid, title in self.finding_titles[:8]:
-            c.setFont("Helvetica", 9)
+            c.setFont(FONT_BODY, 9)
             c.drawString(4 * mm, y, f"- {title[:70]}  ({fid})")
             y -= 4 * mm
 
@@ -162,7 +162,7 @@ class PostureIndicator(Flowable):
     def draw(self):
         c = self.canv
         c.setFillColor(COLORS["text"])
-        c.setFont("Helvetica-Bold", 9)
+        c.setFont(FONT_HEADING, 9)
         c.drawString(0, 3 * mm, f"{self.label}:")
         x = 60 * mm
 
@@ -179,7 +179,7 @@ class PostureIndicator(Flowable):
             symbol = {"ok": "✓", "fail": "✗", "warn": "!"}.get(
                 status_lc, "-")
             pill_text = f" {symbol} {sub} "
-            text_w = c.stringWidth(pill_text, "Helvetica-Bold", 8.5)
+            text_w = c.stringWidth(pill_text, FONT_HEADING, 8.5)
             pill_w = text_w + 2 * mm
             pill_h = 5.5 * mm
             pill_y = 1.5 * mm
@@ -190,7 +190,7 @@ class PostureIndicator(Flowable):
                         stroke=0, fill=1)
             # Text in weiss
             c.setFillColor(HexColor("#FFFFFF"))
-            c.setFont("Helvetica-Bold", 8.5)
+            c.setFont(FONT_HEADING, 8.5)
             c.drawString(x + 1 * mm, pill_y + 1.5 * mm, pill_text.strip())
             x += pill_w + 2 * mm
 
@@ -214,7 +214,7 @@ class ServiceCard(Flowable):
     def draw(self):
         c = self.canv
         c.setFillColor(COLORS["text"])
-        c.setFont("Helvetica-Bold", 10)
+        c.setFont(FONT_HEADING, 10)
         c.drawString(0, self.height - 4 * mm, self.host_label)
         x = 0
         y = self.height - 12 * mm
@@ -227,7 +227,7 @@ class ServiceCard(Flowable):
             c.setFillColor(fill_color)
             c.rect(x, y, chip_w, 6 * mm, stroke=1, fill=1)
             c.setFillColor(COLORS["text"])
-            c.setFont("Helvetica", 8)
+            c.setFont(FONT_BODY, 8)
             service_label = (service or "")[:10]
             c.drawString(x + 1 * mm, y + 1.5 * mm, f"{port} {service_label}")
             x += chip_w + 2 * mm
@@ -264,10 +264,10 @@ class FindingHeaderV2(Flowable):
         c.setFillColor(COLORS["primary"])
         c.rect(0, 0, self.width, self.height, stroke=0, fill=1)
         c.setFillColor(COLORS["text_light"])
-        c.setFont("Helvetica-Bold", 11)
+        c.setFont(FONT_HEADING, 11)
         c.drawString(4 * mm, self.height - 6 * mm,
                      f"{self.finding_id}   {self.title[:80]}")
-        c.setFont("Helvetica", 9)
+        c.setFont(FONT_BODY, 9)
         c.drawString(4 * mm, 3 * mm,
                      f"Prioritaet: {self.priority}   |   Risiko: {self.risk}")
         if self.policy_id:

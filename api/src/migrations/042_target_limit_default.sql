@@ -1,0 +1,12 @@
+-- 042: Standard-Target-Limit pro Abo auf 5 senken (Zielbild Juli 2026).
+--
+-- Der Kunde gibt bis zu 5 Domains/Host-IPs pro Paket ein. Beim Anlegen wird das
+-- Limit ohnehin serverseitig ueber validateTargetBatch (MAX_TARGETS_PER_ORDER=5)
+-- durchgesetzt; dieser Spalten-Default haelt das nachtraegliche Hinzufuegen
+-- (POST /api/subscriptions/:id/targets, prueft gegen subscriptions.max_domains)
+-- konsistent. Vorher Default 30 (Migration 012).
+--
+-- Bestehende Abos behalten ihren bisherigen max_domains-Wert (kein Bruch bereits
+-- konfigurierter Target-Sets) — es wird ausschliesslich der Spalten-Default fuer
+-- NEUE Abos geaendert.
+ALTER TABLE subscriptions ALTER COLUMN max_domains SET DEFAULT 5;

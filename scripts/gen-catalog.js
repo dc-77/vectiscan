@@ -62,6 +62,14 @@ export interface PackageDef {
   subtitle: string;
   /** Verkaufsstufe: free = Lead-Magnet, self_service = Stripe-Checkout, sales_assisted = Angebot anfragen. */
   sellability: Sellability;
+  /**
+   * Im Kunden-Verkaufs-/Buchungs-Frontend sichtbar (Pricing-Karten + Vergleich,
+   * Homepage-Pakete, Abo-/Schedule-Wizard, PackageSelector). Reines Anzeige-Flag:
+   * aendert NICHT die technisch akzeptierte Paketmenge (Backend/DB akzeptieren
+   * weiterhin alle Pakete — Admin-„auf Rechnung"-Pfad). Ausgeblendete Pakete
+   * bleiben im Katalog erhalten und sind jederzeit reaktivierbar.
+   */
+  listed: boolean;
   /** Listenpreis EUR/Jahr fuer die Anzeige; null = "auf Anfrage", 0 = kostenlos. */
   priceEur: number | null;
   /** ENV-Key fuer Preis-Override im Frontend (NEXT_PUBLIC_…). */

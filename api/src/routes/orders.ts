@@ -353,7 +353,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       email: row.email,
       package: row.package,
       status: row.status,
-      hasReport: row.has_report === true || row.has_report === 't',
+      // SOLL 9: Fuer Kunden erst nach Freigabe (report_complete/delivered) als
+      // downloadbar melden — Admin sieht Reports in jedem Status.
+      hasReport: (row.has_report === true || row.has_report === 't')
+        && (user.role === 'admin' || row.status === 'report_complete' || row.status === 'delivered'),
       error: row.error_message || null,
       hostsTotal: (row.hosts_total as number) || 0,
       hostsCompleted: (row.hosts_completed as number) || 0,
@@ -567,7 +570,11 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
        FROM reports WHERE order_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [id],
     );
-    const hasReport = reportResult.rows.length > 0;
+    // SOLL 9: Report erst nach Admin-Freigabe als vorhanden/downloadbar an Kunden
+    // melden (Admin sieht ihn in jedem Status). Der PDF-Download selbst ist zusaetzlich
+    // in GET /api/orders/:id/report gegated.
+    const orderReleased = order.status === 'report_complete' || order.status === 'delivered';
+    const hasReport = reportResult.rows.length > 0 && (isAdmin || orderReleased);
     const latestReport = reportResult.rows[0] as Record<string, unknown> | undefined;
 
     const orderPackage = (order.package || 'perimeter') as ScanPackage;
@@ -714,12 +721,27 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     }
 
     // Ownership check
-    const ownerCheck = await query('SELECT customer_id FROM orders WHERE id = $1', [id]);
+    const ownerCheck = await query('SELECT customer_id, status FROM orders WHERE id = $1', [id]);
     if (ownerCheck.rows.length === 0) {
       return reply.status(404).send({ success: false, error: 'Order not found' });
     }
-    if (user.role !== 'admin' && (ownerCheck.rows[0] as Record<string, unknown>).customer_id !== user.customerId) {
+    const ownerRow = ownerCheck.rows[0] as Record<string, unknown>;
+    if (user.role !== 'admin' && ownerRow.customer_id !== user.customerId) {
       return reply.status(403).send({ success: false, error: 'Access denied' });
+    }
+
+    // Freigabe-Gate (SOLL 9): Der Report-DOWNLOAD ist fuer den Kunden erst nach der
+    // Admin-Freigabe erlaubt. Der First-Run-Report existiert bereits im Status
+    // 'pending_review' (mit noch nicht entfernten False Positives) — ohne dieses Gate
+    // koennte der eingeloggte Owner das Vor-Freigabe-PDF via JWT direkt laden. Admin
+    // ausgenommen. Der download_token-Pfad oben ist unberuehrt: der Token wird erst nach
+    // Freigabe per E-Mail verschickt, sein Besitz belegt bereits die Freigabe.
+    if (
+      user.role !== 'admin' &&
+      ownerRow.status !== 'report_complete' &&
+      ownerRow.status !== 'delivered'
+    ) {
+      return reply.status(403).send({ success: false, error: 'Report not yet released' });
     }
 
     let result;

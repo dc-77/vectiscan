@@ -574,6 +574,62 @@ describe('API Routes', () => {
       expect(res.statusCode).toBe(404);
       expect(res.json().error).toBe('Report not yet available');
     });
+
+    it('should deny a customer downloading an UNRELEASED report (SOLL 9 gate)', async () => {
+      // Kunde ist Owner, aber die Order ist noch nicht freigegeben (pending_review) —
+      // der First-Run-Report existiert bereits (mit False Positives), darf aber NICHT
+      // heruntergeladen werden. Das Gate greift vor der Report-Query.
+      mockVerifyJwt.mockReturnValue({
+        sub: 'user-uuid-5678',
+        role: 'customer',
+        customerId: 'cust-uuid-1234',
+        email: 'customer@test.com',
+      } as ReturnType<typeof verifyJwt>);
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ customer_id: 'cust-uuid-1234', status: 'pending_review' }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}/report`,
+        headers: AUTH_HEADER,
+      });
+      expect(res.statusCode).toBe(403);
+      expect(res.json().error).toBe('Report not yet released');
+    });
+
+    it('should allow a customer to download once the report is released', async () => {
+      mockVerifyJwt.mockReturnValue({
+        sub: 'user-uuid-5678',
+        role: 'customer',
+        customerId: 'cust-uuid-1234',
+        email: 'customer@test.com',
+      } as ReturnType<typeof verifyJwt>);
+      // Ownership check: owned + released
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ customer_id: 'cust-uuid-1234', status: 'report_complete' }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      // Report query
+      mockQuery.mockResolvedValueOnce({
+        rows: [{
+          minio_bucket: 'scan-reports',
+          minio_path: `${orderId}.pdf`,
+          file_size_bytes: 245760,
+          created_at: new Date('2026-03-12T15:00:00Z'),
+          target_url: 'example.com',
+        }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}/report`,
+        headers: AUTH_HEADER,
+      });
+      expect(res.statusCode).toBe(200);
+    });
   });
 
   describe('DELETE /api/orders/:id — admin permanent delete', () => {

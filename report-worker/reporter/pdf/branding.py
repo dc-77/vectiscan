@@ -164,12 +164,63 @@ PACKAGE_BADGES = {
 # TYPOGRAPHY
 # ============================================================================
 
-# ReportLab hat nur eingebaute Fonts (Helvetica, Courier, Times).
-# Für Custom Fonts müssten TTF-Dateien registriert werden.
-# Helvetica ist dem System-Sans (Inter/Geist) am nächsten.
-FONT_BODY = "Helvetica"
-FONT_HEADING = "Helvetica-Bold"
-FONT_MONO = "Courier"
+# Font-Strategie: Die eingebauten ReportLab-Type1-Fonts (Helvetica/Courier) decken
+# nur WinAnsi/CP1252 ab. Umlaute (ä ö ü ß) rendern damit zwar korrekt, aber non-WinAnsi-
+# Symbole wie ● ✓ ◐ ✗ → (Severity-Dots, Compliance-Haken, KI-Pfeile) fehlen und erscheinen
+# als leere .notdef-Box — vom Kunden als „kaputte Umlaute/Sonderzeichen" gemeldet.
+# Fix: DejaVu (volle Unicode-Abdeckung, frei lizenziert) einbetten. Das Debian-Paket
+# fonts-dejavu-core liefert die TTFs (Dockerfile) unter /usr/share/fonts/truetype/dejavu.
+# Fehlen die Dateien (z.B. lokaler Test ohne apt), fallen wir sauber auf Helvetica zurück.
+import os as _os
+from reportlab.pdfbase import pdfmetrics as _pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont as _TTFont
+
+_DEJAVU_DIR = _os.environ.get("VECTISCAN_FONT_DIR", "/usr/share/fonts/truetype/dejavu")
+_FONT_FILES = {
+    "VectiSans": "DejaVuSans.ttf",
+    "VectiSans-Bold": "DejaVuSans-Bold.ttf",
+    "VectiSans-Oblique": "DejaVuSans-Oblique.ttf",
+    "VectiSans-BoldOblique": "DejaVuSans-BoldOblique.ttf",
+    "VectiMono": "DejaVuSansMono.ttf",
+    "VectiMono-Bold": "DejaVuSansMono-Bold.ttf",
+}
+
+
+def _register_unicode_fonts() -> bool:
+    """Registriert die DejaVu-Familie inkl. Bold/Italic. True = erfolgreich,
+    False = Datei(en) fehlen -> Fallback auf ReportLab-Built-in."""
+    paths = {name: _os.path.join(_DEJAVU_DIR, fn) for name, fn in _FONT_FILES.items()}
+    if not all(_os.path.exists(p) for p in paths.values()):
+        return False
+    try:
+        for name, path in paths.items():
+            _pdfmetrics.registerFont(_TTFont(name, path))
+        _pdfmetrics.registerFontFamily(
+            "VectiSans", normal="VectiSans", bold="VectiSans-Bold",
+            italic="VectiSans-Oblique", boldItalic="VectiSans-BoldOblique",
+        )
+        _pdfmetrics.registerFontFamily(
+            "VectiMono", normal="VectiMono", bold="VectiMono-Bold",
+            italic="VectiMono", boldItalic="VectiMono-Bold",
+        )
+        return True
+    except Exception:
+        return False
+
+
+UNICODE_FONTS_AVAILABLE = _register_unicode_fonts()
+
+if UNICODE_FONTS_AVAILABLE:
+    FONT_BODY = "VectiSans"
+    FONT_HEADING = "VectiSans-Bold"
+    FONT_ITALIC = "VectiSans-Oblique"
+    FONT_MONO = "VectiMono"
+else:
+    # Fallback (kein DejaVu vorhanden): Built-in Type1. Umlaute ok, Symbole ●✓◐✗→ als Box.
+    FONT_BODY = "Helvetica"
+    FONT_HEADING = "Helvetica-Bold"
+    FONT_ITALIC = "Helvetica-Oblique"
+    FONT_MONO = "Courier"
 
 # Größen
 FONT_SIZE_BODY = 10.5
