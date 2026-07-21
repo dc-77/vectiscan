@@ -196,6 +196,32 @@ def _build_findings_data(claude_output: dict, package: str, report_data: dict | 
     return data
 
 
+def _normalize_excluded_ids(raw: object) -> list[str]:
+    """Finding-IDs aus dem excludedFindings-Payload ziehen.
+
+    Akzeptiert beide Formen, die im Umlauf sind:
+      * ``["VS-2026-004", ...]``                      (Legacy / direkte Jobs)
+      * ``[{"finding_id": "VS-2026-004", "reason": …}]`` (API, orders.ts:1643/1753)
+    """
+    if not isinstance(raw, list):
+        return []
+    ids: list[str] = []
+    for item in raw:
+        if isinstance(item, str):
+            candidate: object = item
+        elif isinstance(item, dict):
+            candidate = (
+                item.get("finding_id")
+                or item.get("findingId")
+                or item.get("id")
+            )
+        else:
+            candidate = None
+        if candidate:
+            ids.append(str(candidate))
+    return ids
+
+
 def _create_report_record(
     conn: psycopg2.extensions.connection,
     order_id: str,
@@ -203,7 +229,7 @@ def _create_report_record(
     file_size_bytes: int,
     findings_data: dict | None = None,
     version: int = 1,
-    excluded_findings: list[str] | None = None,
+    excluded_findings: list | None = None,
     policy_version: str | None = None,
     policy_id_distinct: list[str] | None = None,
     tech_profiles: list[dict] | None = None,
@@ -393,19 +419,69 @@ def _upload_claude_debug(minio_client: Minio, order_id: str, debug_data: dict, w
         log.warning("claude_debug_upload_failed", order_id=order_id, error=str(e))
 
 
+class TruncatedPdfError(RuntimeError):
+    """Das erzeugte PDF ist unvollstaendig — nicht ausliefern."""
+
+
+# Konservative Untergrenze: der kleinste echte Report in Prod liegt bei ~68 KB
+# (WebCheck), ein Perimeter-Report bei 100 KB bis 2,8 MB. Alles unter 20 KB kann
+# kein vollstaendiger Report sein.
+_MIN_PDF_BYTES = 20 * 1024
+
+
+def _assert_pdf_intact(local_path: Path) -> int:
+    """Strukturelle Mindestpruefung des PDFs. Gibt die Dateigroesse zurueck.
+
+    VEC-486: Bis hierher konnte ein unvollstaendiges PDF ungeprueft in MinIO
+    landen, in die DB eingetragen und per E-Mail verschickt werden — es gab
+    nirgends im Repo eine Pruefung des Datei-ENDES (bestehende Tests pruefen nur
+    `%PDF` am Anfang oder `st_size > N`). Ein PDF ohne `startxref`/`%%EOF` ist
+    fuer jeden Reader unlesbar.
+    """
+    size = local_path.stat().st_size
+    if size < _MIN_PDF_BYTES:
+        raise TruncatedPdfError(
+            f"PDF zu klein: {size} Bytes (< {_MIN_PDF_BYTES}) — {local_path.name}",
+        )
+
+    with local_path.open("rb") as fh:
+        if fh.read(5) != b"%PDF-":
+            raise TruncatedPdfError(f"Kein PDF-Header in {local_path.name}")
+        fh.seek(max(0, size - 2048))
+        tail = fh.read()
+
+    if b"startxref" not in tail:
+        raise TruncatedPdfError(f"startxref fehlt im PDF-Ende — {local_path.name}")
+    if not tail.rstrip().endswith(b"%%EOF"):
+        raise TruncatedPdfError(f"%%EOF fehlt am PDF-Ende — {local_path.name}")
+    return size
+
+
 def _upload_report(minio_client: Minio, local_path: Path, minio_path: str) -> int:
-    """Upload the PDF to MinIO and return file size in bytes."""
+    """Upload the PDF to MinIO and return the size MinIO actually stored."""
     # Ensure the bucket exists
     if not minio_client.bucket_exists(REPORTS_BUCKET):
         minio_client.make_bucket(REPORTS_BUCKET)
 
-    file_size = local_path.stat().st_size
+    file_size = _assert_pdf_intact(local_path)
     minio_client.fput_object(
         REPORTS_BUCKET,
         minio_path,
         str(local_path),
         content_type="application/pdf",
     )
+
+    # Die Groesse, die in reports.file_size_bytes landet, muss die des
+    # gespeicherten Objekts sein — nicht die der lokalen Datei.
+    try:
+        stored_size = minio_client.stat_object(REPORTS_BUCKET, minio_path).size
+        if stored_size != file_size:
+            log.warning("upload_size_mismatch", path=minio_path,
+                        local_size=file_size, stored_size=stored_size)
+        file_size = stored_size
+    except Exception as e:  # stat ist best-effort, der Upload selbst hat geklappt
+        log.warning("stat_after_upload_failed", path=minio_path, error=str(e))
+
     log.info("report_uploaded", bucket=REPORTS_BUCKET, path=minio_path, size=file_size)
     return file_size
 
@@ -510,7 +586,23 @@ def process_job(job_data: dict) -> None:
     host_inventory: dict = job_data.get("hostInventory", {})
     tech_profiles: list[dict] = job_data.get("techProfiles", [])
     package: str = job_data.get("package", "perimeter")
-    excluded: list[str] = job_data.get("excludedFindings", job_data.get("excluded_findings", []))
+    # VEC-486: Die API stellt Ausschluesse als Objekte ein
+    # ([{finding_id, reason}, ...] — api/src/routes/orders.ts:1643 und :1753),
+    # der Filter in Schritt 5b vergleicht aber gegen Finding-IDs. Ohne
+    # Normalisierung lief `f["id"] not in excluded` gegen eine Liste von Dicts
+    # und traf nie: Admin-Ausschluesse blieben wirkungslos, der Report ging
+    # trotzdem als report_complete raus. `excluded_raw` behaelt die Begruendungen
+    # fuer die Audit-Spalte reports.excluded_findings.
+    excluded_raw: list = job_data.get(
+        "excludedFindings", job_data.get("excluded_findings", []),
+    ) or []
+    excluded: list[str] = _normalize_excluded_ids(excluded_raw)
+    if excluded_raw and not excluded:
+        log.warning(
+            "excluded_findings_unparsable",
+            order_id=job_data.get("orderId", job_data.get("scanId", "")),
+            raw_sample=str(excluded_raw[:3]),
+        )
     is_approved: bool = job_data.get("approved", False)
 
     work_dir = Path(tempfile.mkdtemp(prefix=f"report-{order_id}-"))
@@ -729,19 +821,34 @@ def process_job(job_data: dict) -> None:
             report_data["severity_counts"] = severity_counts
 
         # -- 5c. Determine PDF version number ---------------------------------
-        version = 1
-        if excluded:
-            # This is a regeneration — find current max version
-            try:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT COALESCE(MAX(version), 0) FROM reports WHERE order_id = %s", (order_id,))
-                    current_max = cur.fetchone()[0]
-                    version = current_max + 1
-            except Exception:
-                version = 2  # Fallback if query fails
-                log.warning("version_query_failed", order_id=order_id, fallback_version=version)
+        # VEC-486: JEDER Lauf bekommt eine eigene Version und damit einen eigenen
+        # MinIO-Key. Frueher wurde nur bei gesetzten Exclusions hochgezaehlt
+        # (`if excluded:`), und weil Approve/Regenerate mit `excludedFindings: []`
+        # einstellen (orders.ts:1766 / :2004), lief der zweite Durchlauf mit
+        # version=1 und ueberschrieb `{order_id}.pdf`. Die bereits per E-Mail
+        # ausgelieferte reports-Zeile behielt ihre alte, kleinere
+        # file_size_bytes -> der Download brach stumm mittendrin ab.
+        version_fallback = False
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT COALESCE(MAX(version), 0) FROM reports WHERE order_id = %s",
+                    (order_id,),
+                )
+                version = cur.fetchone()[0] + 1
+        except Exception:
+            version = 2
+            version_fallback = True
+            log.warning("version_query_failed", order_id=order_id, fallback_version=version)
 
-        minio_pdf_path = f"{order_id}_v{version}.pdf" if version > 1 else f"{order_id}.pdf"
+        if version == 1:
+            minio_pdf_path = f"{order_id}.pdf"
+        elif version_fallback:
+            # Ohne verlaessliche MAX(version) darf der Key nicht geraten werden —
+            # ein kollisionsfreier Name ist wichtiger als eine huebsche Nummer.
+            minio_pdf_path = f"{order_id}_v{version}_{uuid.uuid4().hex[:8]}.pdf"
+        else:
+            minio_pdf_path = f"{order_id}_v{version}.pdf"
 
         # -- 5d. Validation-Gate (M1) ----------------------------------------
         # Phase A aus docs/report-erstellung/01_Fehleranalyse_und_Korrekturplan.md.
@@ -852,7 +959,8 @@ def process_job(job_data: dict) -> None:
         additional_findings = claude_output.get("additional_findings_summary") or None
         report_id, download_token = _create_report_record(
             conn, order_id, minio_pdf_path, file_size, findings_data,
-            version=version, excluded_findings=excluded if excluded else None,
+            # Audit-Spalte behaelt den Roh-Payload inkl. Begruendungen.
+            version=version, excluded_findings=excluded_raw if excluded_raw else None,
             policy_version=policy_version,
             policy_id_distinct=policy_id_distinct,
             tech_profiles=enriched_profiles,
@@ -866,19 +974,25 @@ def process_job(job_data: dict) -> None:
                  tech_profile_count=len(enriched_profiles or []),
                  additional_finding_count=len(additional_findings or []))
 
-        # -- 8b. Mark previous version as superseded --------------------------
+        # -- 8b. Mark previous versions as superseded --------------------------
+        # VEC-486: ALLE aelteren Zeilen der Order abloesen, nicht nur `version - 1`.
+        # Durch den frueheren Versionierungs-Bug existieren Orders mit mehreren
+        # version=1-Zeilen (Prod: bis zu neun), die sonst dauerhaft als "aktuell"
+        # gelten — u.a. fuer den Join in api/src/lib/ws-manager.ts:71.
         if version > 1:
             try:
                 with conn.cursor() as cur:
                     cur.execute(
                         """
                         UPDATE reports SET superseded_by = %s
-                        WHERE order_id = %s AND version = %s
+                        WHERE order_id = %s AND id <> %s AND superseded_by IS NULL
                         """,
-                        (report_id, order_id, version - 1),
+                        (report_id, order_id, report_id),
                     )
+                    superseded_count = cur.rowcount
                 conn.commit()
-                log.info("previous_version_superseded", order_id=order_id, old_version=version - 1)
+                log.info("previous_versions_superseded", order_id=order_id,
+                         count=superseded_count, new_version=version)
             except Exception as e:
                 log.warning("supersede_failed", error=str(e))
 

@@ -20,9 +20,14 @@ jest.mock('../lib/queue', () => ({
 
 jest.mock('../lib/minio', () => {
   const { Readable } = require('stream');
+  // VEC-486: statObject ist die autoritative Groessenquelle in streamReport.
+  // Der Mock muss deshalb zum Body passen — frueher deklarierten die Fixtures
+  // ein file_size_bytes von 245760 fuer einen 16-Byte-Body, und der Test war
+  // trotzdem gruen, weil die Route die DB-Spalte blind uebernahm.
   return {
     minioClient: {
       getObject: jest.fn().mockResolvedValue(Readable.from(Buffer.from('fake-pdf-content'))),
+      statObject: jest.fn().mockResolvedValue({ size: Buffer.byteLength('fake-pdf-content') }),
       removeObject: jest.fn().mockResolvedValue(undefined),
     },
     initBuckets: jest.fn(),
@@ -87,6 +92,7 @@ jest.mock('../lib/email', () => ({
   sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
 }));
 
+import { Readable } from 'stream';
 import { query } from '../lib/db';
 import { scanQueue } from '../lib/queue';
 import { getPresignedUrl } from '../lib/minio';
@@ -725,6 +731,46 @@ describe('API Routes', () => {
 
       expect(res.statusCode).toBe(200);
       expect(res.headers['content-type']).toBe('application/pdf');
+    });
+
+    // VEC-486: Der Prod-Bug. Ein zweiter Report-Lauf ueberschrieb denselben
+    // MinIO-Key, waehrend die per E-Mail ausgelieferte reports-Zeile ihre alte,
+    // kleinere file_size_bytes behielt. streamReport deklarierte diese Zahl als
+    // Content-Length, Node kuerzte den Body stumm darauf — HTTP 200, kein Log,
+    // und der Kunde bekam ein PDF ohne startxref/%%EOF.
+    it('should size the download from the stored object, not the stale DB column', async () => {
+      const stalePdfSize = 243590;   // was in reports.file_size_bytes stand
+      const actualObject = Buffer.from('%PDF-1.4 complete document with trailer %%EOF');
+      (minioClient.statObject as jest.Mock).mockResolvedValueOnce({ size: actualObject.length });
+      (minioClient.getObject as jest.Mock).mockResolvedValueOnce(Readable.from(actualObject));
+
+      mockQuery.mockResolvedValueOnce({
+        rows: [{
+          id: 'report-uuid-old',
+          minio_bucket: 'scan-reports',
+          minio_path: `${orderId}.pdf`,
+          file_size_bytes: stalePdfSize,
+          created_at: new Date('2026-07-20T00:29:17Z'),
+          expires_at: new Date('2027-01-01T00:00:00Z'),
+          version: 1,
+          target_url: 'castenow.de',
+          package: 'perimeter',
+        }],
+        command: 'SELECT', rowCount: 1, oid: 0, fields: [],
+      });
+      mockQuery.mockResolvedValueOnce({ rows: [], command: 'UPDATE', rowCount: 1, oid: 0, fields: [] });
+
+      const res = await server.inject({
+        method: 'GET',
+        url: `/api/orders/${orderId}/report?download_token=valid-token-123`,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.headers['content-length']).toBe(String(actualObject.length));
+      expect(res.headers['content-length']).not.toBe(String(stalePdfSize));
+      // Entscheidend: der Body kommt vollstaendig an.
+      expect(res.rawPayload.length).toBe(actualObject.length);
+      expect(res.rawPayload.toString()).toContain('%%EOF');
     });
 
     it('should reject invalid download_token', async () => {

@@ -56,6 +56,11 @@ class TestProcessJob:
         # Setup mocks
         mock_conn = MagicMock()
         mock_db.return_value = mock_conn
+        # VEC-486: die Versions-Query (SELECT COALESCE(MAX(version), 0)) laeuft
+        # jetzt bei JEDEM Lauf, nicht mehr nur bei gesetzten Exclusions.
+        # Ohne echtes Ergebnis liefert der Cursor-Mock ein MagicMock und
+        # `version + 1` waere kein int mehr.
+        mock_conn.cursor.return_value.__enter__.return_value.fetchone.return_value = (0,)
 
         mock_download.return_value = tmp_path / "rawdata.tar.gz"
 

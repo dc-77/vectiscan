@@ -33,7 +33,7 @@ async function streamReport(reply: FastifyReply, report: Record<string, unknown>
   const bucket = report.minio_bucket as string;
   const objectPath = report.minio_path as string;
   const domain = report.target_url as string;
-  const fileSize = report.file_size_bytes as number;
+  const recordedSize = report.file_size_bytes as number;
   const createdAt = report.created_at as Date;
   const pkg = (report.package as string) || 'perimeter';
   const version = (report.version as number) || 1;
@@ -42,7 +42,29 @@ async function streamReport(reply: FastifyReply, report: Record<string, unknown>
   const timeStr = createdAt.toISOString().slice(11, 16).replace(':', '');
   const fileName = `vectiscan-${domain}-${pkg}-${dateStr}-${timeStr}-v${version}.pdf`;
 
+  // VEC-486: Content-Length MUSS aus dem Objekt kommen, das wir gleich streamen —
+  // NICHT aus reports.file_size_bytes. Die DB-Spalte ist eine Momentaufnahme des
+  // Erzeugungslaufs und driftet, sobald ein zweiter Lauf denselben MinIO-Key
+  // ueberschreibt (report-worker/reporter/worker.py::minio_pdf_path). Bei Drift
+  // schnitt Node den Body stumm auf den zu kleinen Wert ab: HTTP 200, kein Log,
+  // kein Fehler — der Kunde bekam ein PDF ohne startxref/%%EOF. Fastify laesst
+  // ein manuell gesetztes Content-Length bei Stream-Payloads unangetastet
+  // (strictContentLength ist per Default false), es gibt also keinen Schutz
+  // ausser diesem statObject-Call.
+  const stat = await minioClient.statObject(bucket, objectPath);
+  const fileSize = stat.size;
+
+  if (recordedSize !== undefined && recordedSize !== null && recordedSize !== fileSize) {
+    reply.log?.warn(
+      { bucket, objectPath, recordedSize, actualSize: fileSize },
+      'report size drift: reports.file_size_bytes disagrees with the stored object — streaming actual size',
+    );
+  }
+
   const stream = await minioClient.getObject(bucket, objectPath);
+
+  // Ein kuenftiger Laengen-Mismatch soll laut scheitern statt still zu kuerzen.
+  reply.raw.strictContentLength = true;
 
   return reply
     .header('Content-Type', 'application/pdf')

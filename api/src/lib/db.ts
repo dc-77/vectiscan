@@ -49,6 +49,7 @@ const MIGRATION_039_PATH = path.join(__dirname, '..', 'migrations', '039_user_au
 const MIGRATION_040_PATH = path.join(__dirname, '..', 'migrations', '040_live_check_audit.sql');
 const MIGRATION_041_PATH = path.join(__dirname, '..', 'migrations', '041_order_onetime_payment.sql');
 const MIGRATION_042_PATH = path.join(__dirname, '..', 'migrations', '042_target_limit_default.sql');
+const MIGRATION_043_PATH = path.join(__dirname, '..', 'migrations', '043_reports_supersede_duplicate_v1.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -670,6 +671,28 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 042 FAILED (continuing without it):', err);
+  }
+
+  // Migration 043 (VEC-486): Duplikat-Reports abloesen. Durch den frueheren
+  // Versionierungs-Bug tragen mehrere reports-Zeilen derselben Order
+  // superseded_by IS NULL und gelten alle als "aktuell". Idempotent ueber die
+  // Anzahl solcher Orders — laeuft nur, wenn es noch welche gibt.
+  try {
+    const dupCheck = await pool.query(`
+      SELECT COUNT(*) AS cnt FROM (
+        SELECT order_id FROM reports WHERE superseded_by IS NULL
+        GROUP BY order_id HAVING COUNT(*) > 1
+      ) d
+    `);
+    const dupOrders = Number(dupCheck.rows[0]?.cnt ?? 0);
+    if (dupOrders > 0) {
+      console.log(`[initDb] Applying Migration 043: superseding duplicate reports (${dupOrders} orders)`);
+      const migrationSql = fs.readFileSync(MIGRATION_043_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 043 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 043 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

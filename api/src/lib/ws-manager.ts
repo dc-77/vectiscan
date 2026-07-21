@@ -64,11 +64,22 @@ export async function handleReportComplete(orderId: string): Promise<void> {
   try {
     // Load customer email, subscription report_emails, and download token
     const result = await query(
+      // VEC-486: LATERAL + ORDER BY statt eines blanken LEFT JOIN. Solange
+      // mehrere reports-Zeilen einer Order `superseded_by IS NULL` tragen
+      // (Alt-Datenbestand vor Migration 043), lieferte der Join mehrere Treffer
+      // und `rows[0]` war nicht festgelegt — welcher download_token in die
+      // Kunden-Mail ging, hing an der Planwahl von Postgres.
       `SELECT c.email, o.target_url AS domain, o.subscription_id,
               r.download_token, s.report_emails
        FROM orders o
        JOIN customers c ON o.customer_id = c.id
-       LEFT JOIN reports r ON r.order_id = o.id AND r.superseded_by IS NULL
+       LEFT JOIN LATERAL (
+         SELECT download_token
+         FROM reports
+         WHERE order_id = o.id AND superseded_by IS NULL
+         ORDER BY created_at DESC, version DESC, id DESC
+         LIMIT 1
+       ) r ON true
        LEFT JOIN subscriptions s ON s.id = o.subscription_id
        WHERE o.id = $1`,
       [orderId],
