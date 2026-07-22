@@ -178,20 +178,24 @@ def _build_scope_methodology(story, styles, data: dict[str, Any]) -> None:
             f"{model.get('role', '')}",
         )
 
-    # 2.2.2 Filter-Statistik
-    filtered = method.get("filtered_count", 0)
-    selected = method.get("selected_count", 0)
-    rate = method.get("filter_rate_pct", 0.0)
-    if (filtered + selected) > 0:
-        story.append(Spacer(1, 2 * mm))
-        _body(
-            story, styles,
-            f"<b>Korrelation und False-Positive-Filterung:</b> Aus insgesamt "
-            f"<b>{filtered + selected}</b> Tool-Roh-Befunden wurden "
-            f"<b>{selected}</b> validierte Befunde uebernommen "
-            f"(Filterrate: {rate}%). Die ausgefilterten Roh-Befunde sind in "
-            f"Anhang E aufgeschluesselt.",
-        )
+    # 2.2.2 Filter-Statistik — B6 (Strang B): gestrichen. Der Text verwies auf
+    # den ebenfalls gestrichenen Anhang E (dangling ref, Regel 2) und wiederholte
+    # die irrefuehrende "Filterrate: X%"-Aussage (Anhang E behauptete "0.0%",
+    # waehrend real 273/286 validierte Befunde verschwanden). Das C3-Abdeckungs-
+    # kapitel ("Was wurde geprueft") ersetzt die Aussage ehrlich.
+    # filtered = method.get("filtered_count", 0)
+    # selected = method.get("selected_count", 0)
+    # rate = method.get("filter_rate_pct", 0.0)
+    # if (filtered + selected) > 0:
+    #     story.append(Spacer(1, 2 * mm))
+    #     _body(
+    #         story, styles,
+    #         f"<b>Korrelation und False-Positive-Filterung:</b> Aus insgesamt "
+    #         f"<b>{filtered + selected}</b> Tool-Roh-Befunden wurden "
+    #         f"<b>{selected}</b> validierte Befunde uebernommen "
+    #         f"(Filterrate: {rate}%). Die ausgefilterten Roh-Befunde sind in "
+    #         f"Anhang E aufgeschluesselt.",
+    #     )
 
     # 2.3 Was leistet dieser Scan nicht? — kompakt, kein eigener PageBreak
     # davor (haengt direkt an Methodik 2.2 an).
@@ -250,7 +254,8 @@ def _build_tech_stack(story, styles, data: dict[str, Any]) -> None:
             Paragraph("<b>Version</b>", header_style),
             Paragraph("<b>Erkennung</b>", header_style),
             Paragraph("<b>Patch-Status</b>", header_style),
-            Paragraph("<b>Bekannte CVEs</b>", header_style),
+            # B2 (Strang B): Spalte „Bekannte CVEs" gestrichen — Threat-Intel
+            # liefert 0 Treffer (cves_enriched: 0). top_cve-Daten bleiben (Regel 1).
         ]
         rows = [header]
         for r in tbl.get("rows") or []:
@@ -268,30 +273,16 @@ def _build_tech_stack(story, styles, data: dict[str, Any]) -> None:
                 f"<font color='{patch_color}'><b>{patch_label}</b></font>",
                 cell_style,
             )
-            top_cve = r.get("top_cve")
-            if top_cve and top_cve.get("cve_id"):
-                cve_id = top_cve.get("cve_id")
-                epss = top_cve.get("epss_score")
-                kev = top_cve.get("kev")
-                cve_text = cve_id
-                extras = []
-                if epss is not None:
-                    extras.append(f"EPSS {epss:.2f}")
-                if kev:
-                    extras.append("<b>KEV</b>")
-                if extras:
-                    cve_text += " (" + ", ".join(extras) + ")"
-            else:
-                cve_text = "—"
+            # B2 (Strang B): CVE-Spalte gestrichen — top_cve-Daten bleiben in den
+            # row-Dicts (Regel 1), werden nur nicht mehr gerendert.
             rows.append([
                 Paragraph(str(name), cell_style),
                 Paragraph(str(version), cell_style),
                 Paragraph(detection_text, cell_style),
                 patch_para,
-                Paragraph(cve_text, cell_style),
             ])
         table = Table(rows, colWidths=[
-            45 * mm, 25 * mm, 30 * mm, 25 * mm, 45 * mm,
+            55 * mm, 30 * mm, 50 * mm, 35 * mm,  # CVE-Spalte entfernt (B2)
         ], hAlign="LEFT")
         table.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, 0), COLORS["primary"]),

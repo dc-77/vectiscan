@@ -5,7 +5,7 @@
     {
       "key": "webcheck",
       "marketingName": "WebCheck",
-      "subtitle": "SSL, Headers, CMS, E-Mail-Schutz — kompakter Report mit Ampel",
+      "subtitle": "SSL, Headers, CMS, E-Mail-Schutz — kompakter Report mit Gesamtbewertung",
       "sellability": "free",
       "listed": false,
       "priceEur": 0,
@@ -16,7 +16,7 @@
       "tier": "quick",
       "durationShort": "~15–20 Min",
       "durationLong": "~15–20 Minuten",
-      "reportFocus": ["Top-100-Port-Scan", "Mail-Security (SPF/DMARC/DKIM)", "Ampelbewertung"],
+      "reportFocus": ["Top-100-Port-Scan", "Mail-Security (SPF/DMARC/DKIM)", "Gesamtbewertung"],
       "complianceModules": [],
       "badge": null,
       "badgeColor": null,

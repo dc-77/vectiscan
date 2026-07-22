@@ -61,8 +61,11 @@ def build_cover_v2(story, styles, cover_data):
             continue
         label, value = row[0], row[1]
         label_str = str(label or "").lower()
-        if label_str.startswith(("ergebnis", "risiko", "befunde")):
-            continue  # NEW v2: Risk-Indikator nicht auf Cover
+        if label_str.startswith(("ergebnis", "risiko", "befunde", "scoring")):
+            # NEW v2: Risk-Indikator nicht auf Cover; "scoring" (CVSS v3.1) ist
+            # B1 (Strang B) — CVSS-Anzeige gestrichen. cover_meta-Feld bleibt in
+            # den Daten (report_mapper), nur die v2-Cover-Zeile entfaellt.
+            continue
         story.append(Paragraph(
             f"<font color='{LIGHT}' size='10'><b>{label}</b> {value}</font>",
             body_style,

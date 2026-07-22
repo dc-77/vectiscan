@@ -61,7 +61,7 @@ export const PACKAGE_CATALOG: readonly PackageDef[] = [
   {
     "key": "webcheck",
     "marketingName": "WebCheck",
-    "subtitle": "SSL, Headers, CMS, E-Mail-Schutz — kompakter Report mit Ampel",
+    "subtitle": "SSL, Headers, CMS, E-Mail-Schutz — kompakter Report mit Gesamtbewertung",
     "sellability": "free",
     "listed": false,
     "priceEur": 0,
@@ -75,7 +75,7 @@ export const PACKAGE_CATALOG: readonly PackageDef[] = [
     "reportFocus": [
       "Top-100-Port-Scan",
       "Mail-Security (SPF/DMARC/DKIM)",
-      "Ampelbewertung"
+      "Gesamtbewertung"
     ],
     "complianceModules": [],
     "badge": null,

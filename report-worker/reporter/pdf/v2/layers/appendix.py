@@ -1,12 +1,14 @@
-"""Anhaenge A-F + Filter-Anhang (Doc 02 Seite 14+).
+"""Anhaenge (Doc 02 Seite 14+).
 
-  Anhang A.1 - CVSS-Tabelle (alle Befunde mit scale="cvss")
-  Anhang A.2 - VECTISCAN-Hygiene-Skala (scale="hygiene")
-  Anhang B   - Service-Inventar (pro Host)
-  Anhang C   - Eingesetzte Tools + Konfidenz
-  Anhang D   - Compliance-Mapping (NIS2 / BSI / ISO / DSGVO)
-  Anhang E   - Methodische Filterungen (additional_findings + FP-Statistik)
-  Anhang F   - Haftungsausschluss + Wiederholungsempfehlung mit Trigger
+Aktiv gerendert (nach Strang-B-Streichliste, neu durchbuchstabiert):
+  Anhang A - Service-Inventar (pro Host)                    [Funktion _build_appendix_b]
+  Anhang B - Compliance-Mapping (NIS2 / BSI / ISO / DSGVO)  [Funktion _build_appendix_d]
+  Anhang C - Haftungsausschluss + Wiederholungsempfehlung   [Funktion _build_appendix_f]
+
+Nicht mehr gerendert (Strang B — Funktionen bleiben, Regel 1):
+  _build_appendix_a - CVSS-Tabelle (A.1) + Hygiene-Skala (A.2)   [B1]
+  _build_appendix_c - Eingesetzte Tools + Konfidenz             [B5, ersetzt durch C3]
+  _build_appendix_e - Methodische Filterungen + FP-Statistik    [B6, ersetzt durch C3]
 """
 from __future__ import annotations
 
@@ -252,7 +254,8 @@ def _build_appendix_b(story, styles, data: dict[str, Any]) -> None:
     findings = data.get("findings") or []
     f_by_port = _findings_by_port_host(findings)
 
-    _section(story, styles, "ANHANG B - SERVICE-INVENTAR")
+    # Renumber (Strang B): frueher "Anhang B", nach Streichung von A/C/E -> "Anhang A"
+    _section(story, styles, "ANHANG A - SERVICE-INVENTAR")
     story.append(Spacer(1, 3 * mm))
     _body(
         story, styles,
@@ -399,7 +402,8 @@ def _build_appendix_d(story, styles, data: dict[str, Any]) -> None:
     if not findings:
         return
 
-    _section(story, styles, "ANHANG D - COMPLIANCE-MAPPING")
+    # Renumber (Strang B): frueher "Anhang D" -> "Anhang B"
+    _section(story, styles, "ANHANG B - COMPLIANCE-MAPPING")
     story.append(Spacer(1, 3 * mm))
     _body(
         story, styles,
@@ -547,10 +551,11 @@ def _build_appendix_f(story, styles, data: dict[str, Any]) -> None:
     scope = data.get("scope_meta") or {}
     scan_date = scope.get("scan_date") or "?"
 
-    _section(story, styles, "ANHANG F - WIEDERHOLUNGSEMPFEHLUNG &amp; HAFTUNGSAUSSCHLUSS")
+    # Renumber (Strang B): frueher "Anhang F" -> "Anhang C"
+    _section(story, styles, "ANHANG C - WIEDERHOLUNGSEMPFEHLUNG &amp; HAFTUNGSAUSSCHLUSS")
     story.append(Spacer(1, 3 * mm))
 
-    _subsection(story, styles, "F.1 - Wiederholungsempfehlung")
+    _subsection(story, styles, "C.1 - Wiederholungsempfehlung")
     story.append(Spacer(1, 2 * mm))
     _body(
         story, styles,
@@ -564,7 +569,7 @@ def _build_appendix_f(story, styles, data: dict[str, Any]) -> None:
     _body(story, styles, triggers_html)
     story.append(Spacer(1, 4 * mm))
 
-    _subsection(story, styles, "F.2 - Geltungsdauer")
+    _subsection(story, styles, "C.2 - Geltungsdauer")
     story.append(Spacer(1, 2 * mm))
     _body(
         story, styles,
@@ -576,7 +581,7 @@ def _build_appendix_f(story, styles, data: dict[str, Any]) -> None:
     )
     story.append(Spacer(1, 4 * mm))
 
-    _subsection(story, styles, "F.3 - Haftungsausschluss")
+    _subsection(story, styles, "C.3 - Haftungsausschluss")
     story.append(Spacer(1, 2 * mm))
     _body(
         story, styles,
@@ -597,9 +602,19 @@ def build_appendix(story, styles, data: dict[str, Any]) -> None:
     """Rendert alle Anhaenge A-F."""
     data = data or {}
 
-    _build_appendix_a(story, styles, data)
-    _build_appendix_b(story, styles, data)
-    _build_appendix_c(story, styles, data)
-    _build_appendix_d(story, styles, data)
-    _build_appendix_e(story, styles, data)
-    _build_appendix_f(story, styles, data)
+    # Strang B (Streichliste) — Renderer-Aufrufe gestrichen, Funktionen bleiben
+    # (Regel 1: nie Datenfeld/Modul loeschen):
+    #   B1: _build_appendix_a (CVSS-Tabelle A.1 + Hygiene A.2) — irrefuehrende,
+    #       KI-ueberschriebene Scores; Hygiene-Anhang strukturell leer.
+    #   B5: _build_appendix_c (Tool-Liste) — statische Konstante ohne Lauf-Bezug;
+    #       durch das C3-Abdeckungskapitel (coverage.py) ersetzt.
+    #   B6: _build_appendix_e (Filter-Statistik) — "Filterrate 0.0%" irrefuehrend;
+    #       durch C3 ersetzt.
+    # Verbleibende Anhaenge neu durchbuchstabiert: B->A, D->B, F->C (siehe Titel
+    # in den jeweiligen _build_-Funktionen).
+    # _build_appendix_a(story, styles, data)   # B1 gestrichen
+    _build_appendix_b(story, styles, data)     # -> "Anhang A" (Service-Inventar)
+    # _build_appendix_c(story, styles, data)   # B5 gestrichen
+    _build_appendix_d(story, styles, data)     # -> "Anhang B" (Compliance-Mapping)
+    # _build_appendix_e(story, styles, data)   # B6 gestrichen
+    _build_appendix_f(story, styles, data)     # -> "Anhang C" (Wiederholung/Haftung)

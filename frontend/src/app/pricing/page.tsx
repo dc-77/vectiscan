@@ -25,7 +25,9 @@ const FEATURES: { label: string; support: Record<PackageKey, boolean> }[] = [
   { label: 'DNS-Enumeration & Subdomain-Analyse', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
   { label: 'KI-Korrelation & FP-Filter', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
   { label: 'Executive Summary + Maßnahmenplan', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
-  { label: 'Threat Intel (NVD, EPSS, CISA KEV)', support: { webcheck: false, perimeter: true, compliance: true, supplychain: true, insurance: true } },
+  // B2 (Strang B, GF-Entscheidung 21.07.2026): Threat-Intel-Verkaufszusage
+  // gestrichen — in beiden Audit-Scans wirkungslos (cves_enriched: 0). Die
+  // Anreicherung bleibt im Code, wird aber nicht mehr im Report/Verkauf beworben.
   { label: 'NIS2 / §30 BSIG-Mapping', support: { webcheck: false, perimeter: false, compliance: true, supplychain: false, insurance: false } },
   { label: 'BSI-Grundschutz-Referenzen', support: { webcheck: false, perimeter: false, compliance: true, supplychain: false, insurance: false } },
   { label: 'ISO 27001 Annex A', support: { webcheck: false, perimeter: false, compliance: false, supplychain: true, insurance: false } },

@@ -272,9 +272,11 @@ class FindingHeaderV2(Flowable):
         c.setFont(FONT_BODY, 9)
         c.drawString(4 * mm, 3 * mm,
                      f"Prioritaet: {self.priority}   |   Risiko: {self.risk}")
-        if self.policy_id:
-            c.drawRightString(self.width - 4 * mm, 3 * mm,
-                              f"Policy {self.policy_id}")
+        # B7 (Strang B): "Policy <id>"-Anzeige im Header gestrichen — interner
+        # Code ohne Wert fuer den GF-Leser. policy_id-Attribut bleibt (Regel 1).
+        # if self.policy_id:
+        #     c.drawRightString(self.width - 4 * mm, 3 * mm,
+        #                       f"Policy {self.policy_id}")
 
 
 # ====================================================================

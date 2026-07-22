@@ -21,7 +21,7 @@ const CURATED_FEATURES: Record<string, string[]> = {
     'SSL/TLS, HTTP-Header, CMS-Erkennung',
     'E-Mail-Security (SPF/DKIM/DMARC)',
     'Basis-Port-Scan (Top 100)',
-    'Ampelbewertung — sofort einsatzbereit',
+    'Gesamtbewertung — sofort einsatzbereit',
   ],
   perimeter: [
     'Vollständige Angriffsoberflächen-Analyse',

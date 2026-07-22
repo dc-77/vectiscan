@@ -1,14 +1,15 @@
 """Schicht 3 -- Befund-Details (Doc 02 Seite 11+).
 
-Pro Befund: Header (FindingHeaderV2) + 7-Sektionen-Body:
+Pro Befund: Header (FindingHeaderV2) + Body:
 
   WAS               - description
   NACHWEIS          - evidence (mono-style)
-  THREAT INTEL      - CVE-IDs, EPSS, KEV (P2-02 / Phase H)
   GESCHAEFTSAUSWIRKUNG - impact
   EMPFEHLUNG        - recommendation (Maerker mit Prioritaet)
-  VERIFIKATION      - aus verification_templates.py
-  INTERNE REFERENZ  - policy_id + policy_version
+
+Strang B (Streichliste) — nicht mehr gerendert, Helper/Module bleiben (Regel 1):
+  THREAT INTEL (B2), VERIFIKATION (B3), INTERNE REFERENZ/policy_id (B7),
+  CVSS-Inline-Meta (B1).
 """
 from __future__ import annotations
 
@@ -245,11 +246,11 @@ def _render_compliance_inline(
     story, styles, finding: dict[str, Any],
     mappings: dict[str, Any] | None,
 ) -> None:
-    """Optional: kompakte Compliance-Zeile pro Finding (Vorbereitung Anhang D).
+    """Optional: kompakte Compliance-Zeile pro Finding (Vorbereitung Anhang B).
 
     Wenn `report_data["compliance_mappings"][finding_id]` vorhanden ist, zeigen
     wir hier eine 4-Spalten-Inline-Tabelle. Sonst weggelassen — der vollstaendige
-    Anhang D rendert die Tabelle erneut.
+    Anhang B (Compliance-Mapping) rendert die Tabelle erneut.
     """
     if not mappings:
         return
@@ -309,7 +310,11 @@ def _build_single_finding(
     severity = (finding.get("severity") or "INFO").upper()
     priority = _SEV_TO_PRIORITY.get(severity, "Mittelfristig")
     risiko = _SEV_TO_RISIKO.get(severity, "INFO")
-    policy_id = finding.get("policy_id") or ""
+    # B7 (Strang B): policy_id-Anzeige gestrichen — "Policy SP-TLS-001" ist fuer
+    # einen GF bedeutungslos (in 7/25 Faellen SP-FALLBACK). policy_id bleibt als
+    # interner Routing-Schluessel in den Daten (Migration 016 Audit); nur die
+    # PDF-Anzeige entfaellt (Header + INTERNE-REFERENZ-Sektion).
+    # policy_id = finding.get("policy_id") or ""
 
     # Header + Spacer als KeepTogether, damit zumindest Header+WAS auf einer
     # Seite bleiben (Doc 02 Seite 11+: Befund-Block).
@@ -319,7 +324,7 @@ def _build_single_finding(
         title=str(title),
         priority=priority,
         risk=risiko,
-        policy_id=str(policy_id) if policy_id else None,
+        policy_id=None,  # B7 (Strang B): policy_id nicht mehr im Header anzeigen
     ))
     header_group.append(Spacer(1, 4 * mm))
 
@@ -331,12 +336,15 @@ def _build_single_finding(
     meta_bits: list[str] = []
     if affected and affected not in ("—", "", "N/A"):
         meta_bits.append(f"<b>Betroffene Systeme:</b> {affected}")
-    if cvss_vector and cvss_vector not in ("—", "", "N/A"):
-        meta_bits.append(
-            f"<b>CVSS:</b> {cvss_score} ({cvss_vector})"
-            if cvss_score not in (None, "—", "")
-            else f"<b>CVSS-Vektor:</b> {cvss_vector}"
-        )
+    # B1 (Strang B): CVSS-Score/-Vektor-Anzeige gestrichen — irrefuehrend
+    # (KI-ueberschriebene Scores, Severity/Band-Widersprueche). cvss_score/
+    # cvss_vector bleiben in den Daten (selection.py sortiert Top-N danach).
+    # if cvss_vector and cvss_vector not in ("—", "", "N/A"):
+    #     meta_bits.append(
+    #         f"<b>CVSS:</b> {cvss_score} ({cvss_vector})"
+    #         if cvss_score not in (None, "—", "")
+    #         else f"<b>CVSS-Vektor:</b> {cvss_vector}"
+    #     )
     if cwe and cwe not in ("—", "", "N/A"):
         meta_bits.append(f"<b>CWE:</b> {cwe}")
     if meta_bits:
@@ -362,8 +370,10 @@ def _build_single_finding(
     _section_evidence(story, styles, str(evidence_raw))
     story.append(Spacer(1, 2 * mm))
 
-    # THREAT INTELLIGENCE (optional)
-    _render_threat_intel(story, styles, finding)
+    # THREAT INTELLIGENCE — B2 (Strang B): gestrichen (GF-Entscheidung 21.07.2026).
+    # Belegt wirkungslos (cves_enriched: 0 in beiden Audit-Scans). Helper
+    # _render_threat_intel + _normalize_cve_entries bleiben (Regel 1).
+    # _render_threat_intel(story, styles, finding)
 
     # GESCHAEFTSAUSWIRKUNG
     _section_label(story, styles, "GESCHAEFTSAUSWIRKUNG")
@@ -384,34 +394,39 @@ def _build_single_finding(
     _section_body(story, styles, rec_text)
     story.append(Spacer(1, 2 * mm))
 
-    # COMPLIANCE (inline, Anhang D bietet die volle Tabelle)
+    # COMPLIANCE (inline, Anhang B bietet die volle Tabelle)
     _render_compliance_inline(story, styles, finding, compliance_mappings)
 
-    # VERIFIKATION
-    verification_text, is_fallback = get_verification_block(finding, scan_context)
-    _section_label(story, styles, "VERIFIKATION")
-    if is_fallback:
-        _section_body(story, styles,
-                      "<i>Generischer Hinweis (kein spezifischer Befehl hinterlegt):</i>")
-        _section_body(story, styles, verification_text)
-    else:
-        _section_evidence(story, styles, verification_text)
-    story.append(Spacer(1, 2 * mm))
+    # VERIFIKATION — B3 (Strang B): gestrichen. ~70% waren der generische
+    # Fallback ("scannen Sie danach nochmal"), der Rest teils fehlerhaft
+    # (Bash-Syntax, nackte IPs statt vHost). verification_templates.py +
+    # get_verification_block bleiben (Regel 1).
+    # verification_text, is_fallback = get_verification_block(finding, scan_context)
+    # _section_label(story, styles, "VERIFIKATION")
+    # if is_fallback:
+    #     _section_body(story, styles,
+    #                   "<i>Generischer Hinweis (kein spezifischer Befehl hinterlegt):</i>")
+    #     _section_body(story, styles, verification_text)
+    # else:
+    #     _section_evidence(story, styles, verification_text)
+    # story.append(Spacer(1, 2 * mm))
 
-    # INTERNE REFERENZ
-    _section_label(story, styles, "INTERNE REFERENZ")
-    if policy_id:
-        ref_text = (
-            f"Severity-Policy: <b>{policy_id}</b> &middot; "
-            f"Version {policy_version}"
-        )
-    else:
-        ref_text = (
-            f"Severity-Policy: <i>kein policy_id zugeordnet</i> &middot; "
-            f"Version {policy_version}"
-        )
-    _section_body(story, styles, ref_text)
-    story.append(Spacer(1, 6 * mm))
+    # INTERNE REFERENZ — B7 (Strang B): gestrichen. "Policy SP-TLS-001 / Version
+    # ..." ist fuer den GF-Leser bedeutungsloser interner Code; die Provenance
+    # bleibt im Audit-Trail / findings_data. policy_version-Param bleibt (harmlos).
+    # _section_label(story, styles, "INTERNE REFERENZ")
+    # if policy_id:
+    #     ref_text = (
+    #         f"Severity-Policy: <b>{policy_id}</b> &middot; "
+    #         f"Version {policy_version}"
+    #     )
+    # else:
+    #     ref_text = (
+    #         f"Severity-Policy: <i>kein policy_id zugeordnet</i> &middot; "
+    #         f"Version {policy_version}"
+    #     )
+    # _section_body(story, styles, ref_text)
+    story.append(Spacer(1, 6 * mm))  # Befund-Abstand (INTERNE REFERENZ gestrichen)
 
 
 # ====================================================================
@@ -433,11 +448,12 @@ def build_layer3_findings(story, styles, data: dict[str, Any]) -> None:
     story.append(Spacer(1, 3 * mm))
 
     body_style = _body_style(styles)
+    # Regel 2 (Strang B): Intro beschreibt nur die tatsaechlich gerenderten
+    # Sektionen. Threat-Intel (B2), Verifikation (B3) und interne Referenz (B7)
+    # wurden gestrichen und duerfen hier nicht mehr angekuendigt werden.
     story.append(Paragraph(
-        "Pro Befund: Was wurde gefunden, wie wurde es nachgewiesen, welche "
-        "Threat-Intel ist relevant, was bedeutet es geschaeftlich, was ist zu "
-        "tun, wie verifiziert der Admin den Fix, und wo ist die interne "
-        "Referenz im Audit-Trail.",
+        "Pro Befund: Was wurde gefunden, wie wurde es nachgewiesen, was bedeutet "
+        "es geschaeftlich, und was ist zu tun.",
         body_style,
     ))
     story.append(Spacer(1, 4 * mm))

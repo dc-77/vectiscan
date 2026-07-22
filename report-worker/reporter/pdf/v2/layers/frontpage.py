@@ -5,12 +5,13 @@ Wenn der Aggregator noch keine Daten geliefert hat (None), faellt die
 Funktion auf einen Hinweis-Paragraph zurueck, damit Doppel-Render-Tests
 nicht crashen.
 
-Aufbau:
-  1. Risiko-Ampel (5 Kategorien)
+Aufbau (nach Strang-B-Streichliste):
+  1. Seitentitel "Auf einen Blick" (frueher Risiko-Ampel — B4 gestrichen)
   2. Gesamtbewertung
   3. Die drei wichtigsten Hebel (HebelBox-Flowable)
   4. Kontext-Kasten (Datenarten + Geschaeftsbezug, kompakt)
-  5. Compliance-Indikatoren
+  (Compliance-Indikatoren — B4 gestrichen; risk_ampel/AmpelBar bleiben in
+   Daten/Code, nur die Anzeige entfaellt.)
 
 Bewusst KEINE CVSS-Zahlen, KEINE Befund-IDs, KEINE Stundenangaben.
 Doc 02: "Diese Seite ist fuer die Entscheidung 'Muessen wir reagieren? Wie schnell?'"
@@ -52,18 +53,20 @@ def build_layer1_frontpage(story, styles, data):
         story.append(PageBreak())
         return
 
-    # ---- 1. Risiko-Ampel pro Kategorie ------------------------------
+    # ---- 1. Seitentitel ---------------------------------------------
+    # B4 (Strang B): Risiko-Ampel gestrichen — die Kategorien bekamen alle
+    # denselben max(severity)-Wert (keine echte Pruefung gegen DSGVO Art. 32 /
+    # BSI), der Text suggerierte eine Kontrolle, die es nicht gibt, und die Ampel
+    # war in beiden Audit-Reports zeichengleich. layer1['risk_ampel'] + AmpelBar
+    # bleiben in Daten/Code (Regel 1). Neutraler Seitentitel statt Ampel-Header.
     story.append(Paragraph(
-        f"<b>RISIKO-AMPEL &middot; {domain}</b>",
+        f"<b>AUF EINEN BLICK &middot; {domain}</b>",
         section_style,
     ))
     story.append(Spacer(1, 3 * mm))
-    for cat in layer1.get("risk_ampel", []) or []:
-        story.append(AmpelBar(
-            cat.get("label", ""),
-            cat.get("level", ""),
-        ))
-        story.append(Spacer(1, 1.5 * mm))
+    # for cat in layer1.get("risk_ampel", []) or []:
+    #     story.append(AmpelBar(cat.get("label", ""), cat.get("level", "")))
+    #     story.append(Spacer(1, 1.5 * mm))
 
     # ---- 2. Gesamtbewertung -----------------------------------------
     overall = (layer1.get("overall_level") or "MITTEL").upper()
@@ -138,8 +141,13 @@ def build_layer1_frontpage(story, styles, data):
     ))
 
     # ---- 5. Compliance-Indikatoren ----------------------------------
-    indicators = (data or {}).get("compliance_indicators") or []
-    if indicators:
+    # B4 (Strang B): Renderer-Zweig gestrichen — die drei Compliance-Pillen
+    # bekamen alle denselben max(severity)-Wert; es findet KEINE Pruefung gegen
+    # DSGVO Art. 32 / BSI statt, der Text suggerierte eine Kontrolle, die es nicht
+    # gibt. Daten (compliance_indicators) + build_compliance_indicators bleiben
+    # (Regel 1); nur die Anzeige entfaellt.
+    indicators = []  # B4: war (data or {}).get("compliance_indicators") or []
+    if indicators:  # -> immer False: Render-Zweig deaktiviert (nicht geloescht)
         story.append(Spacer(1, 6 * mm))
         story.append(Paragraph(
             "<b>COMPLIANCE-INDIKATOREN</b>",
