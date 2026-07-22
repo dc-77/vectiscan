@@ -192,6 +192,59 @@ class TestThreeStates:
 
 
 # ====================================================================
+# 1b. Finding->Host-Zuordnung ueber freie affected-Strings
+# ====================================================================
+class TestAffectedAttribution:
+    """Regression: der KI-affected-Text kommt in wechselnder Reihenfolge.
+
+    Prod-Beleg (castenow, 22.07.2026): ein Perimeter-Report mit 15 Findings
+    wies im Abdeckungskapitel jeden Host als 'unauffaellig' aus, weil
+    _host_candidates den affected-String 'fqdn (ip:port)' per split(':')[0]
+    zu 'fqdn (ip' zerlegte und weder IP noch FQDN traf. Beide realen Formate
+    muessen den Host als Befund zuordnen.
+    """
+
+    def _inv(self) -> dict:
+        return {"domain": "castenow.de", "hosts": [
+            {"ip": "195.50.179.7", "fqdns": ["rdgw.castenow.de"]},
+        ]}
+
+    def _runs(self) -> list[dict]:
+        return [{"host_ip": "195.50.179.7", "phase": 2, "tool_name": "testssl",
+                 "exit_code": 0, "duration_ms": 90, "status": "ok",
+                 "skip_reason": None}]
+
+    def test_affected_fqdn_then_ip_is_attributed(self):
+        # Frisches Format: "fqdn (ip:port)" — brach vor dem Fix.
+        f = [{"id": "F1", "affected": "rdgw.castenow.de (195.50.179.7:443)",
+              "title": "TLS-Schwaeche"}]
+        cov = build_scan_coverage(self._inv(), self._runs(), {}, f, [], "perimeter")
+        h = cov["hosts"][0]
+        assert h["state"] == STATE_BEFUND
+        assert h["finding_ids"] == ["F1"]
+
+    def test_affected_ip_then_fqdn_is_attributed(self):
+        # Alt-Format: "ip:port (fqdn)" — funktionierte schon vorher.
+        f = [{"id": "F2", "affected": "195.50.179.7:443 (rdgw.castenow.de)",
+              "title": "TLS-Schwaeche"}]
+        cov = build_scan_coverage(self._inv(), self._runs(), {}, f, [], "perimeter")
+        assert cov["hosts"][0]["state"] == STATE_BEFUND
+
+    def test_affected_multi_fqdn_list_is_attributed(self):
+        # Mehrere vHosts hinter einer IP: "ip:port (a, b, c)".
+        f = [{"id": "F3",
+              "affected": "195.50.179.7:443 (owa.castenow.de, rdgw.castenow.de)",
+              "title": "CSP-Schwaeche"}]
+        cov = build_scan_coverage(self._inv(), self._runs(), {}, f, [], "perimeter")
+        assert cov["hosts"][0]["state"] == STATE_BEFUND
+
+    def test_bare_fqdn_affected_is_attributed(self):
+        f = [{"id": "F4", "affected": "rdgw.castenow.de", "title": "X"}]
+        cov = build_scan_coverage(self._inv(), self._runs(), {}, f, [], "perimeter")
+        assert cov["hosts"][0]["state"] == STATE_BEFUND
+
+
+# ====================================================================
 # 2. Grund-Prioritaet
 # ====================================================================
 class TestReasonPriority:

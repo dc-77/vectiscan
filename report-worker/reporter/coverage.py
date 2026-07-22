@@ -174,11 +174,38 @@ def _finding_id(finding: dict[str, Any]) -> str:
     return str(finding.get("external_id") or finding.get("id") or "").strip()
 
 
+# IPv4 + FQDN-Extraktion aus freien affected-Strings. Der von der KI erzeugte
+# affected-Text kommt in wechselnder Reihenfolge — "fqdn (ip:port)",
+# "ip:port (fqdn)", "fqdn:port", "ip", "fqdn a, fqdn b". Ein reines
+# split(":")[0] zerbricht an "fqdn (ip:port)" (liefert "fqdn (ip" statt fqdn
+# ODER ip) und die Finding->Host-Zuordnung schlaegt fehl — der Host erschiene
+# faelschlich als "unauffaellig", obwohl Befunde vorliegen. Deshalb ziehen wir
+# jede IPv4- und FQDN-artige Teilzeichenkette reihenfolgeunabhaengig heraus.
+_IPV4_RE = re.compile(r"\b\d{1,3}(?:\.\d{1,3}){3}\b")
+_FQDN_RE = re.compile(
+    r"\b(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z][a-z0-9-]*[a-z0-9]\b",
+    re.IGNORECASE,
+)
+
+
+def _tokens_from_affected(aff: str) -> set[str]:
+    """Zieht alle Host-Identifier (IPv4 + FQDNs) aus einem affected-String."""
+    out: set[str] = set()
+    for m in _IPV4_RE.findall(aff):
+        out.add(m.lower())
+    for m in _FQDN_RE.findall(aff):
+        out.add(m.lower())
+    return out
+
+
 def _host_candidates(finding: dict[str, Any]) -> set[str]:
     """Host-Bezeichner, auf die ein Finding zeigen kann (ip/fqdn/affected).
 
     Wiederverwendung der Zuordnungslogik aus appendix._findings_by_port_host,
-    aber ReportLab-frei und als Menge normalisierter Kleinbuchstaben.
+    aber ReportLab-frei und als Menge normalisierter Kleinbuchstaben. Der
+    ``affected``-Freitext wird per Regex zerlegt (siehe _tokens_from_affected),
+    damit sowohl "fqdn (ip:port)" als auch "ip:port (fqdn)" korrekt auf Host-IP
+    und -FQDN abgebildet werden.
     """
     out: set[str] = set()
     for k in ("vhost", "fqdn", "host", "host_ip", "ip"):
@@ -187,11 +214,11 @@ def _host_candidates(finding: dict[str, Any]) -> set[str]:
             out.add(str(v).strip().lower())
     aff = finding.get("affected")
     if isinstance(aff, str):
-        out.add(aff.split(":")[0].strip().lower())
+        out |= _tokens_from_affected(aff)
     elif isinstance(aff, list):
         for a in aff:
             if isinstance(a, str):
-                out.add(a.split(":")[0].strip().lower())
+                out |= _tokens_from_affected(a)
     out.discard("")
     return out
 
