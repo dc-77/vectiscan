@@ -2,7 +2,7 @@
 
 Pipeline:
    Cover -> Frontpage (Schicht 1) -> Strategy (Schicht 2) ->
-   Findings (Schicht 3) -> Appendix.
+   Coverage (C3: Was wurde geprueft) -> Findings (Schicht 3) -> Appendix.
 """
 import os
 
@@ -22,6 +22,7 @@ from reporter.generate_report import (
 from reporter.pdf.v2.cover import build_cover_v2
 from reporter.pdf.v2.layers.frontpage import build_layer1_frontpage
 from reporter.pdf.v2.layers.strategy import build_layer2_strategy
+from reporter.pdf.v2.layers.coverage import build_coverage_chapter
 from reporter.pdf.v2.layers.findings import build_layer3_findings
 from reporter.pdf.v2.layers.appendix import build_appendix
 
@@ -80,6 +81,10 @@ def generate_report_v2(report_data, output_path):
     build_cover_v2(story, styles, report_data.get("cover", {}))
     build_layer1_frontpage(story, styles, report_data)
     build_layer2_strategy(story, styles, report_data)
+    # C3: Das Abdeckungskapitel steht bewusst VOR den Befund-Details — die
+    # Aussage "geprueft und unauffaellig / nicht pruefbar (Grund)" rahmt die
+    # nachfolgenden Befunde. No-op, wenn scan_coverage fehlt.
+    build_coverage_chapter(story, styles, report_data)
     build_layer3_findings(story, styles, report_data)
     build_appendix(story, styles, report_data)
 

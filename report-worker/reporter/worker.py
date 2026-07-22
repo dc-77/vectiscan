@@ -152,6 +152,92 @@ def _apply_finding_overrides(
     return applied
 
 
+def _load_tool_runs(conn: Any, order_id: str) -> list[dict]:
+    """Laedt die Tool-Lauf-Zeilen (scan_results) fuer C3-Abdeckungskapitel.
+
+    Autoritative Quelle fuer "welches Tool lief auf welchem Host mit welchem
+    Ergebnis" ist die Tabelle ``scan_results`` — der report-worker liest sie
+    bisher nie (er schreibt nur die ``report_cost``-Zeile). Ein SELECT auf die
+    ohnehin offene Connection (worker.py:629) ist neue Query, keine neue
+    Infrastruktur.
+
+    ZWINGEND OHNE ``raw_output``: die Spalte ist TEXT und traegt pro Zeile
+    potenziell MB an nuclei/testssl-Rohtext. Der Container hat 1 GB RAM-Limit
+    (docker-compose.yml) — ein ``SELECT *`` wuerde ihn kippen.
+
+    ``status``/``skip_reason`` (A7, Migration 044) werden mitselektiert: sie
+    sind die autoritative Skip-Begruendung. Auf Alt-DBs ohne Migration 044
+    faellt der SELECT auf die Legacy-Spalten zurueck (status/skip_reason=None).
+
+    Vollstaendig defensiv (Muster wie ``_apply_finding_overrides``): jeder
+    Fehler -> log.warning + conn.rollback() + Rueckgabe ``[]``. Ein DB-Problem
+    darf den Report niemals kippen — das Kapitel wird dann uebersprungen.
+    """
+    select_with_status = """
+        SELECT host_ip, phase, tool_name, exit_code, duration_ms,
+               status, skip_reason
+          FROM scan_results
+         WHERE order_id = %s
+         ORDER BY phase, tool_name, host_ip
+    """
+    select_legacy = """
+        SELECT host_ip, phase, tool_name, exit_code, duration_ms
+          FROM scan_results
+         WHERE order_id = %s
+         ORDER BY phase, tool_name, host_ip
+    """
+    try:
+        with conn.cursor() as cur:
+            cur.execute(select_with_status, (order_id,))
+            rows = cur.fetchall()
+        return [
+            {
+                "host_ip": r[0],
+                "phase": r[1],
+                "tool_name": r[2],
+                "exit_code": r[3],
+                "duration_ms": r[4],
+                "status": r[5],
+                "skip_reason": r[6],
+            }
+            for r in rows
+        ]
+    except Exception as exc:
+        # Wahrscheinlichster Fall: Migration 044 fehlt (status/skip_reason
+        # noch nicht vorhanden) -> Legacy-SELECT ohne die zwei Spalten.
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        try:
+            with conn.cursor() as cur:
+                cur.execute(select_legacy, (order_id,))
+                rows = cur.fetchall()
+            log.info("tool_runs_loaded_legacy", order_id=order_id,
+                     hint="scan_results ohne status/skip_reason (Migration 044?)")
+            return [
+                {
+                    "host_ip": r[0],
+                    "phase": r[1],
+                    "tool_name": r[2],
+                    "exit_code": r[3],
+                    "duration_ms": r[4],
+                    "status": None,
+                    "skip_reason": None,
+                }
+                for r in rows
+            ]
+        except Exception as exc2:
+            log.warning("tool_runs_load_failed",
+                        order_id=order_id, error=str(exc2),
+                        first_error=str(exc))
+            try:
+                conn.rollback()
+            except Exception:
+                pass
+            return []
+
+
 def _build_findings_data(claude_output: dict, package: str, report_data: dict | None = None) -> dict:
     """Build a JSON-serializable findings_data dict from Claude output."""
     findings = claude_output.get("findings", [])
@@ -192,6 +278,18 @@ def _build_findings_data(claude_output: dict, package: str, report_data: dict | 
     # Compliance / NIS2: attach compliance summary if available
     if package in ("nis2", "compliance") and report_data and report_data.get("nis2"):
         data["nis2_compliance_summary"] = report_data["nis2"].get("compliance_summary")
+
+    # C1 (Phase 1): CVE-/Claims-Guard-Statistik als Audit-Feld nach
+    # reports.findings_data (JSONB) durchreichen. Nur setzen, wenn vorhanden —
+    # so bleiben Fixtures/Reports ohne Pipeline-Lauf byte-identisch. Der
+    # findings_data-Trigger (Migration 018) liest nur findings_data->'findings',
+    # Zusatz-Keys sind unschaedlich.
+    cve_guard_stats = claude_output.get("cve_guard_stats")
+    if cve_guard_stats is not None:
+        data["cve_guard_stats"] = cve_guard_stats
+    claims_guard_stats = claude_output.get("claims_guard_stats")
+    if claims_guard_stats is not None:
+        data["claims_guard_stats"] = claims_guard_stats
 
     return data
 
@@ -683,6 +781,37 @@ def process_job(job_data: dict) -> None:
             )
             log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
             # No QA needed for tlscompliance (no CVSS findings)
+
+            # C1 (Phase 1): tlscompliance umgeht apply_deterministic_pipeline
+            # komplett — der Prompt (SYSTEM_PROMPT_TLSCOMPLIANCE) erlaubt aber
+            # explizit CVE-Nennungen. Damit hier weder CVE- noch Claims-Guard
+            # eine Luecke im Nachweis ist, laeuft der Guard separat (2 Zeilen).
+            # tlscompliance ist NICHT im Kundenkatalog (VEC-284), daher genuegt
+            # dieser schlanke Aufruf statt der vollen Pipeline. Fail-open.
+            try:
+                from reporter.claims_guard import apply_claims_guard
+                from reporter.claims_inventory import build_evidence_inventory
+                _tls_ctx = {
+                    "tech_profiles": effective_profiles,
+                    "host_inventory": effective_inventory,
+                    "host_tool_data": parsed.get("host_tool_data"),
+                    "enrichment": job_data.get("enrichment") or {},
+                }
+                _tls_inv = build_evidence_inventory(
+                    _tls_ctx, host_tool_data=_tls_ctx["host_tool_data"])
+                _tls_stats = apply_claims_guard(
+                    claude_output, inventory=_tls_inv,
+                    enrichment=_tls_ctx["enrichment"],
+                )
+                claude_output["claims_guard_stats"] = _tls_stats
+                claude_output["cve_guard_stats"] = {
+                    "removed_count": _tls_stats["removed_count"],
+                    "distinct_removed": _tls_stats["distinct_removed"],
+                    "allowlist_size": _tls_stats["allowlist_size"],
+                }
+            except Exception as _tls_guard_err:
+                log.warning("tlscompliance_claims_guard_failed",
+                            error=str(_tls_guard_err))
         else:
             claude_output = call_claude(
                 domain=domain,
@@ -792,6 +921,13 @@ def process_job(job_data: dict) -> None:
             "toolVersions": parsed_meta.get("toolVersions", []),
             # Migration 027 (Mai 2026): tech_profiles fuer Per-Host-Tech-Tabelle im PDF.
             "techProfiles": effective_profiles or [],
+            # C3 (Phase 1): Datenkanal fuer das Abdeckungskapitel. scan_meta ist
+            # der einzige Weg, den map_to_report_data/_augment_for_v2 ohne
+            # Signaturaenderung bereits durchreichen. toolRuns = autoritative
+            # scan_results-Zeilen (ohne raw_output); hostStrategy = KI-#1-Entscheid
+            # (Skip-Gruende). Beide fail-open ([]/{}), nie den Report kippend.
+            "toolRuns": _load_tool_runs(conn, order_id),
+            "hostStrategy": parsed.get("host_strategy") or {},
         }
         report_data = map_to_report_data(
             claude_output=claude_output,

@@ -11,7 +11,7 @@ from typing import Any, Callable, Optional
 import structlog
 
 from scanner.cms_fingerprinter import CMSFingerprinter, CMSResult
-from scanner.tools import run_tool
+from scanner.tools import run_tool, record_tool_run
 from scanner.progress import publish_event
 
 log = structlog.get_logger()
@@ -719,10 +719,16 @@ def run_phase1(
 
     phase1_tools = (config or {}).get("phase1_tools", ["nmap", "webtech", "wafw00f", "cms_fingerprint"])
 
-    # Run nmap
-    publish_event(order_id, {"type": "tool_starting", "tool": "nmap", "host": ip})
-    nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports)
-    progress_callback(order_id, "nmap", "complete")
+    # Run nmap — A7: explizit gegated, damit ein Paket ohne nmap eine
+    # skipped-Zeile hinterlaesst statt den Scan stumm trotzdem zu fahren.
+    if "nmap" in phase1_tools:
+        publish_event(order_id, {"type": "tool_starting", "tool": "nmap", "host": ip})
+        nmap_result = run_nmap(ip, scan_dir, order_id, nmap_ports)
+        progress_callback(order_id, "nmap", "complete")
+    else:
+        record_tool_run(order_id, ip, 1, "nmap", "skipped",
+                        reason="not_in_package")
+        nmap_result = {"open_ports": [], "services": []}
 
     # Use the most relevant FQDN for web tools (base domain > www > subdomains > mail)
     # fqdns list is already sorted by relevance from phase0
@@ -744,6 +750,10 @@ def run_phase1(
     webtech_result: list[dict] | dict | None = None
     if "webtech" in phase1_tools:
         publish_event(order_id, {"type": "tool_starting", "tool": "webtech", "host": ip})
+        # A7: Lauf-Status mitfuehren, damit der Grund fuer ein fehlendes
+        # Ergebnis in scan_results steht (bisher nur exit_code 0/1 ohne Grund).
+        webtech_status = "ok"
+        webtech_reason: Optional[str] = None
         if _is_playwright_available():
             try:
                 # Playwright probt primary VHosts (Multi-VHost-Probe).
@@ -773,23 +783,42 @@ def run_phase1(
                     webtech_result = {"tech": tech_list}
             except Exception as e:
                 log.warning("playwright_tech_failed", error=str(e))
+                webtech_status = "failed"
+                webtech_reason = str(e)
         else:
             log.info("playwright_not_available", msg="Falling back to no webtech data")
+            webtech_status = "skipped"
+            webtech_reason = "playwright_unavailable"
         progress_callback(order_id, "webtech", "complete")
 
         # Save webtech result to scan_results
-        from scanner.tools import _save_result
-        _save_result(order_id=order_id, host_ip=ip, phase=1,
-                     tool_name="webtech",
-                     raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False) if webtech_result
-                         else (
-                             f"Keine Tech-Signaturen erkennbar fuer {', '.join(probe_fqdns)} "
-                             "(moderne SPA ohne Server/X-Powered-By/generator-Header und "
-                             "ohne Cookie-/Script-/Header-Pattern-Match). "
-                             "Phase 2 (httpx -tech-detect, nuclei) liefert weitere Signale."
-                         ),
-                     exit_code=0 if webtech_result else 1,
-                     duration_ms=0)
+        if webtech_status == "skipped":
+            # Playwright fehlt komplett — kein Lauf, also auch kein exit_code 1
+            record_tool_run(order_id, ip, 1, "webtech", "skipped",
+                            reason=webtech_reason)
+        else:
+            if webtech_status == "ok" and not webtech_result:
+                # Lief sauber, lieferte aber nichts (typisch fuer SPAs) —
+                # exit_code 1 wie bisher, jetzt aber mit Begruendung.
+                webtech_status = "failed"
+                webtech_reason = "no_tech_signals"
+            record_tool_run(
+                order_id, ip, 1, "webtech", webtech_status,
+                reason=webtech_reason,
+                exit_code=0 if webtech_result else 1,
+                duration_ms=0,
+                raw_output=json.dumps(webtech_result, indent=2, ensure_ascii=False)
+                if webtech_result
+                else (
+                    f"Keine Tech-Signaturen erkennbar fuer {', '.join(probe_fqdns)} "
+                    "(moderne SPA ohne Server/X-Powered-By/generator-Header und "
+                    "ohne Cookie-/Script-/Header-Pattern-Match). "
+                    "Phase 2 (httpx -tech-detect, nuclei) liefert weitere Signale."
+                ),
+            )
+    else:
+        record_tool_run(order_id, ip, 1, "webtech", "skipped",
+                        reason="not_in_package")
 
     # Run wafw00f — pro VHost (Multi-VHost-Probe) parallel via ThreadPool.
     # F-PH1-002: ThreadPoolExecutor(max_workers=5) ueber primary VHosts.
@@ -806,6 +835,8 @@ def run_phase1(
                 return vh, run_wafw00f(vh, ip, host_dir, order_id)
             except Exception as e:
                 log.warning("wafw00f_failed", vhost=vh, error=str(e))
+                record_tool_run(order_id, ip, 1, "wafw00f", "failed",
+                                reason=f"{vh}: {e}")
                 return vh, None
 
         if vhost_fqdns:
@@ -823,6 +854,9 @@ def run_phase1(
                 wafw00f_result = res
                 break
         progress_callback(order_id, "wafw00f", "complete")
+    else:
+        record_tool_run(order_id, ip, 1, "wafw00f", "skipped",
+                        reason="not_in_package")
 
     # wafw00f already saved to scan_results by run_tool() inside run_wafw00f()
 

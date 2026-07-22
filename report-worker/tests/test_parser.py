@@ -19,6 +19,8 @@ from reporter.parser import (
     compute_testssl_status,
     consolidate_findings,
     parse_scan_data,
+    parse_wpscan,
+    _project_host_tool_data,
 )
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -324,3 +326,207 @@ class TestParseScanData:
     def test_missing_inventory_returns_default(self, tmp_path: Path) -> None:
         result = parse_scan_data(str(tmp_path))
         assert result["host_inventory"]["domain"] == "unknown"
+
+
+# ---------------------------------------------------------------------------
+# ADDITIVE Exportfelder (Phase 1 / Fundament):
+# wp_version_status, host_strategy, host_tool_data
+# ---------------------------------------------------------------------------
+
+
+def _nmap_xml_with_ports() -> str:
+    """Minimales nmap-XML mit einem offenen Port inkl. Produkt und Version."""
+    return (
+        '<?xml version="1.0"?><nmaprun><host><ports>'
+        '<port protocol="tcp" portid="443"><state state="open"/>'
+        '<service name="https" product="nginx" version="1.24.0"/>'
+        "</port></ports></host></nmaprun>"
+    )
+
+
+def _build_scan_dir(tmp_path: Path, *, with_strategy: bool = False) -> Path:
+    """Baut ein minimales Scan-Verzeichnis mit genau einem Host auf."""
+    phase0 = tmp_path / "phase0"
+    phase0.mkdir()
+    inventory = {
+        "domain": "beispiel.de",
+        "hosts": [{"ip": "1.2.3.4", "fqdns": ["beispiel.de"]}],
+    }
+    (phase0 / "host_inventory.json").write_text(json.dumps(inventory))
+
+    if with_strategy:
+        strategy = {
+            "hosts": [
+                {
+                    "ip": "1.2.3.4",
+                    "action": "skip",
+                    "reasoning": "Reiner Redirect-Host ohne eigenen Inhalt",
+                    "priority": 3,
+                }
+            ],
+            "strategy_notes": "Nur ein Host relevant",
+        }
+        (phase0 / "host_strategy.json").write_text(
+            json.dumps(strategy, ensure_ascii=False), encoding="utf-8"
+        )
+
+    host_dir = tmp_path / "hosts" / "1.2.3.4"
+    (host_dir / "phase1").mkdir(parents=True)
+    (host_dir / "phase2").mkdir(parents=True)
+    (host_dir / "phase1" / "nmap.xml").write_text(_nmap_xml_with_ports())
+    (host_dir / "phase2" / "wpscan.json").write_text(
+        json.dumps(
+            {
+                "version": {"number": "6.7.1", "status": "latest"},
+                "plugins": {},
+                "themes": {},
+            }
+        )
+    )
+    # Rohtext-Tool, das NICHT in host_tool_data auftauchen darf
+    (host_dir / "phase2" / "nuclei.json").write_text(
+        json.dumps({"info": {"name": "x", "severity": "low"}}) + "\n"
+    )
+    return tmp_path
+
+
+class TestParseWpscanVersionStatus:
+    def test_status_latest_is_exported(self) -> None:
+        result = parse_wpscan({"version": {"number": "6.7.1", "status": "latest"}})
+        assert result["wp_version_status"] == "latest"
+        # Bestehender Consumer-Vertrag bleibt unveraendert
+        assert result["wp_version_vulnerable"] is False
+
+    def test_status_insecure_keeps_boolean(self) -> None:
+        result = parse_wpscan({"version": {"number": "5.0.0", "status": "insecure"}})
+        assert result["wp_version_status"] == "insecure"
+        assert result["wp_version_vulnerable"] is True
+
+    def test_missing_status_is_empty_string(self) -> None:
+        result = parse_wpscan({"version": {"number": "6.7.1"}})
+        assert result["wp_version_status"] == ""
+        assert result["wp_version_vulnerable"] is False
+
+    def test_non_dict_version_does_not_crash(self) -> None:
+        result = parse_wpscan({"version": "6.7.1"})
+        assert result["wp_version_status"] == ""
+        assert result["wp_version_vulnerable"] is False
+
+    def test_consolidate_findings_shows_status(self) -> None:
+        text = consolidate_findings(
+            {
+                "1.2.3.4": {
+                    "fqdns": ["beispiel.de"],
+                    "wpscan": {
+                        "wordpress_version": "6.7.1",
+                        "wp_version_status": "latest",
+                        "plugins_found": 0,
+                    },
+                }
+            },
+            {},
+        )
+        assert "WordPress Version: 6.7.1 (Status laut wpscan: latest)" in text
+
+    def test_consolidate_findings_without_status_unchanged(self) -> None:
+        text = consolidate_findings(
+            {
+                "1.2.3.4": {
+                    "fqdns": ["beispiel.de"],
+                    "wpscan": {"wordpress_version": "6.7.1", "plugins_found": 0},
+                }
+            },
+            {},
+        )
+        assert "WordPress Version: 6.7.1" in text
+        assert "Status laut wpscan" not in text
+
+
+class TestParseScanDataHostStrategy:
+    def test_host_strategy_is_returned(self, tmp_path: Path) -> None:
+        _build_scan_dir(tmp_path, with_strategy=True)
+        result = parse_scan_data(str(tmp_path))
+        assert result["host_strategy"]["hosts"][0]["action"] == "skip"
+        assert "Redirect-Host" in result["host_strategy"]["hosts"][0]["reasoning"]
+
+    def test_missing_host_strategy_defaults_to_empty_dict(self, tmp_path: Path) -> None:
+        _build_scan_dir(tmp_path, with_strategy=False)
+        result = parse_scan_data(str(tmp_path))
+        assert result["host_strategy"] == {}
+
+    def test_broken_host_strategy_defaults_to_empty_dict(self, tmp_path: Path) -> None:
+        _build_scan_dir(tmp_path, with_strategy=False)
+        (tmp_path / "phase0" / "host_strategy.json").write_text("{ kaputt")
+        result = parse_scan_data(str(tmp_path))
+        assert result["host_strategy"] == {}
+
+    def test_non_dict_host_strategy_defaults_to_empty_dict(self, tmp_path: Path) -> None:
+        _build_scan_dir(tmp_path, with_strategy=False)
+        (tmp_path / "phase0" / "host_strategy.json").write_text('["a"]')
+        result = parse_scan_data(str(tmp_path))
+        assert result["host_strategy"] == {}
+
+
+class TestParseScanDataHostToolData:
+    def test_contains_nmap_ports_with_product_and_version(self, tmp_path: Path) -> None:
+        _build_scan_dir(tmp_path)
+        result = parse_scan_data(str(tmp_path))
+        entry = result["host_tool_data"]["1.2.3.4"]
+        port = entry["nmap"]["open_ports"][0]
+        assert port["port"] == 443
+        assert port["product"] == "nginx"
+        assert port["version"] == "1.24.0"
+        assert "os_detection" in entry["nmap"]
+
+    def test_contains_wpscan_version_status(self, tmp_path: Path) -> None:
+        _build_scan_dir(tmp_path)
+        result = parse_scan_data(str(tmp_path))
+        wpscan = result["host_tool_data"]["1.2.3.4"]["wpscan"]
+        assert wpscan["wp_version"] == "6.7.1"
+        assert wpscan["wp_version_status"] == "latest"
+
+    def test_no_raw_text_fields_are_exported(self, tmp_path: Path) -> None:
+        _build_scan_dir(tmp_path)
+        result = parse_scan_data(str(tmp_path))
+        entry = result["host_tool_data"]["1.2.3.4"]
+        assert set(entry.keys()) <= {"nmap", "wpscan"}
+        for verboten in (
+            "nuclei",
+            "nikto",
+            "testssl",
+            "testssl_raw",
+            "headers",
+            "gobuster_dir",
+            "katana",
+            "zap",
+            "screenshots",
+        ):
+            assert verboten not in entry
+        assert set(entry["nmap"].keys()) == {"open_ports", "os_detection"}
+
+    def test_projection_survives_garbage(self) -> None:
+        projected = _project_host_tool_data(
+            {"1.2.3.4": None, "5.6.7.8": {"nmap": "kaputt"}, "9.9.9.9": {}}
+        )
+        assert projected == {}
+
+
+class TestParseScanDataContract:
+    """Vertragstest: alle bisherigen Return-Keys bleiben erhalten."""
+
+    def test_all_expected_keys_present(self, tmp_path: Path) -> None:
+        _build_scan_dir(tmp_path, with_strategy=True)
+        result = parse_scan_data(str(tmp_path))
+        for key in (
+            "host_inventory",
+            "tech_profiles",
+            "consolidated_findings",
+            "host_screenshots",
+            "host_screenshots_per_vhost",
+            "testssl_raw_by_host",
+            "headers_by_host",
+            "meta",
+            "host_strategy",
+            "host_tool_data",
+        ):
+            assert key in result, f"Return-Key {key} fehlt"

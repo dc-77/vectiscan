@@ -2,9 +2,11 @@
 
 import pytest
 from reporter.prompts import (
+    ATOMICITY_PROMPT_BLOCK,
     SYSTEM_PROMPT_BASIC,
     SYSTEM_PROMPT_PROFESSIONAL,
     SYSTEM_PROMPT_NIS2,
+    SYSTEM_PROMPT_TLSCOMPLIANCE,
     get_system_prompt,
 )
 
@@ -21,7 +23,9 @@ class TestSystemPromptBasic:
         assert '"cwe"' in SYSTEM_PROMPT_BASIC
 
     def test_max_findings_instruction(self):
-        assert "5-8 Findings" in SYSTEM_PROMPT_BASIC
+        # C2 (21.07.2026): von "5-8 Findings" angehoben — Atomarisierung
+        # erhoeht die Anzahl zwangslaeufig, die Kappung macht selection.py.
+        assert "10-14 atomare Befunde" in SYSTEM_PROMPT_BASIC
 
     def test_management_language(self):
         assert "Management-tauglich" in SYSTEM_PROMPT_BASIC
@@ -136,3 +140,51 @@ class TestGetSystemPrompt:
     def test_invalid_error_message(self):
         with pytest.raises(ValueError, match="webcheck"):
             get_system_prompt("enterprise")
+
+
+class TestAtomicityBlock:
+    """C2 (21.07.2026) — ein Befund = eine Schwachstellenklasse."""
+
+    NEGATIVE_EXAMPLE = "Veraltetes WordPress und fehlende Security-Header"
+
+    def test_block_is_shared_constant(self):
+        """Geteilte Konstante statt Duplikat — sonst driftet der Text auseinander."""
+        assert "ATOMARITAET" in ATOMICITY_PROMPT_BLOCK
+        assert self.NEGATIVE_EXAMPLE in ATOMICITY_PROMPT_BLOCK
+        assert ATOMICITY_PROMPT_BLOCK in SYSTEM_PROMPT_BASIC
+        assert ATOMICITY_PROMPT_BLOCK in SYSTEM_PROMPT_PROFESSIONAL
+
+    def test_basic_and_professional_contain_rule(self):
+        for prompt in (SYSTEM_PROMPT_BASIC, SYSTEM_PROMPT_PROFESSIONAL):
+            assert "EIN BEFUND = EINE SCHWACHSTELLENKLASSE" in prompt
+            assert self.NEGATIVE_EXAMPLE in prompt
+
+    @pytest.mark.parametrize(
+        "package",
+        ["webcheck", "perimeter", "compliance", "supplychain", "insurance"],
+    )
+    def test_all_customer_packages_inherit_block(self, package):
+        assert ATOMICITY_PROMPT_BLOCK in get_system_prompt(package)
+
+    def test_tlscompliance_untouched(self):
+        """Nicht im Kunden-Katalog (VEC-284), hat eigene Finding-pro-Check-Regel."""
+        assert ATOMICITY_PROMPT_BLOCK not in SYSTEM_PROMPT_TLSCOMPLIANCE
+        assert "Erstelle ein Finding pro FAIL- oder WARN-Check" in SYSTEM_PROMPT_TLSCOMPLIANCE
+
+    def test_block_sits_above_cvss_rules(self):
+        """Der Block gehoert oben zu den Finding-Regeln, nicht unten bei CVSS."""
+        for prompt in (SYSTEM_PROMPT_BASIC, SYSTEM_PROMPT_PROFESSIONAL):
+            assert prompt.index("ATOMARITAET") < prompt.index("OUTPUT-FORMAT")
+
+    def test_shodan_collective_finding_preserved(self):
+        """Regel 1: nichts gestrichen — der gewollte Sammelbefund bleibt Pflicht
+        und ist ausdruecklich als Ausnahme markiert."""
+        for prompt in (SYSTEM_PROMPT_BASIC, SYSTEM_PROMPT_PROFESSIONAL):
+            assert "SHODAN/PASSIVE-INTEL-PFLICHT" in prompt
+            assert "Ausnahme von der Atomaritaets-Regel" in prompt
+        assert "EINZIGE AUSNAHME" in ATOMICITY_PROMPT_BLOCK
+
+    def test_eol_obligation_preserved(self):
+        """EOL-PFLICHT bleibt unveraendert bestehen (additive Aenderung)."""
+        for prompt in (SYSTEM_PROMPT_BASIC, SYSTEM_PROMPT_PROFESSIONAL):
+            assert "EOL-PFLICHT" in prompt

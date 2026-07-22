@@ -50,6 +50,7 @@ const MIGRATION_040_PATH = path.join(__dirname, '..', 'migrations', '040_live_ch
 const MIGRATION_041_PATH = path.join(__dirname, '..', 'migrations', '041_order_onetime_payment.sql');
 const MIGRATION_042_PATH = path.join(__dirname, '..', 'migrations', '042_target_limit_default.sql');
 const MIGRATION_043_PATH = path.join(__dirname, '..', 'migrations', '043_reports_supersede_duplicate_v1.sql');
+const MIGRATION_044_PATH = path.join(__dirname, '..', 'migrations', '044_scan_results_run_status.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -693,6 +694,27 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 043 FAILED (continuing without it):', err);
+  }
+
+  // Migration 044 (A7, Jul 2026): status + skip_reason auf scan_results.
+  // Defensive try/catch wie bei 028: schlaegt die Migration fehl, startet die
+  // API trotzdem — der scan-worker faellt beim SQLSTATE 42703 automatisch auf
+  // den Legacy-INSERT mit 7 Spalten zurueck, es gehen also keine Zeilen verloren.
+  try {
+    const runStatus044Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'scan_results' AND column_name = 'status'
+      ) AS exists
+    `);
+    if (!runStatus044Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 044: scan_results.status + skip_reason');
+      const migrationSql = fs.readFileSync(MIGRATION_044_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 044 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 044 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

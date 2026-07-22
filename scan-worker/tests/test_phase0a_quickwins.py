@@ -78,6 +78,7 @@ def test_phase0a_ip_cap_env_override_caps_below_paket_default(tmp_path):
          patch.object(ph, "SecurityTrailsClient", return_value=st_stub), \
          patch.object(ph, "WhoisClient", return_value=whois_stub), \
          patch.object(ph, "run_all_dns_security", return_value={}), \
+         patch.object(ph, "record_tool_run"), \
          patch.object(ph, "publish_event"):
         config = {
             "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois"],
@@ -119,6 +120,7 @@ def test_phase0a_ip_cap_uses_config_default_when_no_env(tmp_path, monkeypatch):
          patch.object(ph, "SecurityTrailsClient", return_value=st_stub), \
          patch.object(ph, "WhoisClient", return_value=whois_stub), \
          patch.object(ph, "run_all_dns_security", return_value={}), \
+         patch.object(ph, "record_tool_run"), \
          patch.object(ph, "publish_event"):
         config = {
             "phase0a_tools": ["shodan"],
@@ -167,6 +169,7 @@ def test_phase0a_shodan_ip_loop_parallel(tmp_path, monkeypatch):
          patch.object(ph, "SecurityTrailsClient", return_value=st_stub), \
          patch.object(ph, "WhoisClient", return_value=whois_stub), \
          patch.object(ph, "run_all_dns_security", return_value={}), \
+         patch.object(ph, "record_tool_run"), \
          patch.object(ph, "publish_event"):
         config = {
             "phase0a_tools": ["shodan"],
@@ -211,6 +214,7 @@ def test_phase0a_securitytrails_three_calls_parallel(tmp_path, monkeypatch):
          patch.object(ph, "SecurityTrailsClient", return_value=st_stub), \
          patch.object(ph, "WhoisClient", return_value=whois_stub), \
          patch.object(ph, "run_all_dns_security", return_value={}), \
+         patch.object(ph, "record_tool_run"), \
          patch.object(ph, "publish_event"):
         config = {
             "phase0a_tools": ["securitytrails"],

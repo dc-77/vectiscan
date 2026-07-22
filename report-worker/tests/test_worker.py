@@ -248,3 +248,42 @@ class TestCreateReportRecordExpiry:
         # ~30 Tage, grosszuegige Toleranz fuer Laufzeit/CI-Jitter.
         assert timedelta(days=29, hours=23) < delta < timedelta(days=30, minutes=5), \
             f"expires_at muss ~30 Tage in der Zukunft liegen, war {delta}"
+
+
+class TestBuildFindingsDataGuardStats:
+    """C1 (Phase 1): CVE-/Claims-Guard-Stats werden nach findings_data
+    durchgereicht (Defekt 3: cve_guard_stats hatte repo-weit keinen Leser)."""
+
+    def test_build_findings_data_carries_guard_stats(self) -> None:
+        from reporter.worker import _build_findings_data
+
+        claude_output = {
+            "overall_risk": "medium",
+            "overall_description": "d",
+            "findings": [],
+            "recommendations": [],
+            "cve_guard_stats": {"removed_count": 1, "distinct_removed": ["CVE-2099-1"],
+                                "allowlist_size": 5},
+            "claims_guard_stats": {"removed_count": 1, "distinct_removed": ["CVE-2099-1"],
+                                   "allowlist_size": 5, "mode": "enforce",
+                                   "claims_checked": 3,
+                                   "claims_unsupported": {"cve": ["CVE-2099-1"],
+                                                          "version": [], "host": [],
+                                                          "port": []},
+                                   "fields_scanned": []},
+        }
+        data = _build_findings_data(claude_output, package="perimeter")
+        assert data["cve_guard_stats"]["removed_count"] == 1
+        assert data["claims_guard_stats"]["mode"] == "enforce"
+
+    def test_build_findings_data_omits_guard_stats_when_absent(self) -> None:
+        """Ohne Guard-Stats bleibt findings_data byte-identisch (keine Keys)."""
+        from reporter.worker import _build_findings_data
+
+        claude_output = {
+            "overall_risk": "low", "overall_description": "d",
+            "findings": [], "recommendations": [],
+        }
+        data = _build_findings_data(claude_output, package="webcheck")
+        assert "cve_guard_stats" not in data
+        assert "claims_guard_stats" not in data

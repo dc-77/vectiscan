@@ -9,9 +9,23 @@ from typing import Any, Callable, Optional
 import structlog
 
 from scanner.progress import publish_event, publish_tool_output
-from scanner.tools import run_tool, _save_result
+# _save_result bleibt importiert (Rule 1: nichts entfernen; tests/
+# test_phase2_packages.py patcht den Namen); geschrieben wird ueber
+# record_tool_run.
+from scanner.tools import run_tool, _save_result, record_tool_run  # noqa: F401
 
 log = structlog.get_logger()
+
+
+def _record_phase2_status(order_id: str, ip: str, tool_name: str,
+                          status: str, reason: str) -> None:
+    """A7 (Jul 2026): Ergebniszeile fuer ein Phase-2-Tool schreiben.
+
+    Deckt genau die Faelle ab, in denen bisher gar nichts in scan_results
+    landete: Paket-Gating, KI-Skip, fehlende Infrastruktur (ZAP-Daemon),
+    Exceptions. record_tool_run wirft nie — der Scan kann daran nicht kippen.
+    """
+    record_tool_run(order_id, ip, 2, tool_name, status, reason=reason)
 
 SECURITY_HEADERS = [
     "x-frame-options",
@@ -582,6 +596,8 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
         wordlist = FFUF_WORDLISTS.get("vhost", WORDLIST_MAP["common"])
         if not os.path.isfile(wordlist):
             log.warning("ffuf_vhost_wordlist_missing", path=wordlist)
+            _record_phase2_status(order_id, ip, f"ffuf_{mode}", "skipped",
+                                  f"wordlist_missing:{wordlist}")
             return None
 
         target_domain = domain or fqdn
@@ -605,6 +621,8 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
         # Parameter discovery on spider-discovered endpoints
         if not katana_urls:
             log.info("ffuf_param_skipped", ip=ip, reason="no_katana_urls")
+            _record_phase2_status(order_id, ip, f"ffuf_{mode}", "skipped",
+                                  "no_input_urls")
             return None
 
         # Pick first URL with query string or first URL
@@ -620,6 +638,8 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
         wordlist = FFUF_WORDLISTS.get("param", WORDLIST_MAP["common"])
         if not os.path.isfile(wordlist):
             log.warning("ffuf_param_wordlist_missing", path=wordlist)
+            _record_phase2_status(order_id, ip, f"ffuf_{mode}", "skipped",
+                                  f"wordlist_missing:{wordlist}")
             return None
 
         cmd = [
@@ -653,6 +673,8 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
         wordlist = FFUF_WORDLISTS.get("sensitive", WORDLIST_MAP.get("sensitive"))
         if not wordlist or not os.path.isfile(wordlist):
             log.warning("ffuf_sensitive_wordlist_missing", path=wordlist)
+            _record_phase2_status(order_id, ip, f"ffuf_{mode}", "skipped",
+                                  f"wordlist_missing:{wordlist}")
             return None
         cmd = [
             "ffuf",
@@ -676,6 +698,8 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
         ]
     else:
         log.warning("ffuf_unknown_mode", mode=mode)
+        _record_phase2_status(order_id, ip, f"ffuf_{mode}"[:50], "skipped",
+                              f"unknown_mode:{mode}")
         return None
 
     exit_code, duration_ms = run_tool(
@@ -895,6 +919,11 @@ def run_zap_scan(
     if not zap.health_check():
         log.warning("zap_daemon_unavailable", ip=ip, fqdn=fqdn)
         publish_tool_output(order_id, "zap", ip, "ZAP daemon unavailable, skipping")
+        # A7: der Ausfall des ZAP-Daemons muss im Bericht sichtbar sein —
+        # bisher kehrte dieser Pfad ohne eine einzige DB-Zeile zurueck.
+        for _zap_tool in ("zap_spider", "zap_active", "zap"):
+            _record_phase2_status(order_id, ip, _zap_tool, "skipped",
+                                  "zap_daemon_unavailable")
         return result
 
     ac = adaptive_config or {}
@@ -904,6 +933,7 @@ def run_zap_scan(
     target_url = f"https://{fqdn}"
     context_id: int | None = None
     ai_skip = set(ac.get("skip_tools", []))
+    zap_error: str = ""
 
     try:
         # 1. Create isolated context
@@ -932,10 +962,11 @@ def run_zap_scan(
         result["spider_urls"] = spider_urls
         result["tools_run"].append("zap_spider")
         publish_tool_output(order_id, "zap_spider", ip, f"{len(spider_urls)} URLs discovered")
-        _save_result(order_id, ip, 2, "zap_spider",
-                     json.dumps({"urls_found": len(spider_urls), "depth": spider_depth,
-                                 "urls": spider_urls[:50]}, indent=2),
-                     0, spider_duration)
+        record_tool_run(order_id, ip, 2, "zap_spider", "ok",
+                        exit_code=0, duration_ms=spider_duration,
+                        raw_output=json.dumps(
+                            {"urls_found": len(spider_urls), "depth": spider_depth,
+                             "urls": spider_urls[:50]}, indent=2))
         if progress_callback:
             progress_callback(order_id, "zap_spider", "complete")
 
@@ -955,10 +986,13 @@ def run_zap_scan(
             ajax_duration = int(_time.monotonic() * 1000) - ajax_start
             result["tools_run"].append("zap_ajax_spider")
             publish_tool_output(order_id, "zap_ajax_spider", ip, "AJAX crawl complete")
-            _save_result(order_id, ip, 2, "zap_ajax_spider",
-                         json.dumps({"status": "complete" if completed else "timeout",
-                                     "duration_ms": ajax_duration}),
-                         0, ajax_duration)
+            record_tool_run(order_id, ip, 2, "zap_ajax_spider",
+                            "ok" if completed else "timeout",
+                            reason=None if completed else "ajax_spider_timeout",
+                            exit_code=0, duration_ms=ajax_duration,
+                            raw_output=json.dumps(
+                                {"status": "complete" if completed else "timeout",
+                                 "duration_ms": ajax_duration}))
             if progress_callback:
                 progress_callback(order_id, "zap_ajax_spider", "complete")
 
@@ -986,11 +1020,14 @@ def run_zap_scan(
             result["tools_run"].append("zap_active")
             publish_tool_output(order_id, "zap_active", ip, "Active scan complete")
             # Save active scan results to DB (alerts collected later)
-            _save_result(order_id, ip, 2, "zap_active",
-                         json.dumps({"status": "complete" if completed else "timeout",
-                                     "policy": scan_policy, "categories": categories,
-                                     "duration_ms": active_duration}),
-                         0, active_duration)
+            record_tool_run(order_id, ip, 2, "zap_active",
+                            "ok" if completed else "timeout",
+                            reason=None if completed else "active_scan_timeout",
+                            exit_code=0, duration_ms=active_duration,
+                            raw_output=json.dumps(
+                                {"status": "complete" if completed else "timeout",
+                                 "policy": scan_policy, "categories": categories,
+                                 "duration_ms": active_duration}))
             if progress_callback:
                 progress_callback(order_id, "zap_active", "complete")
 
@@ -1024,6 +1061,7 @@ def run_zap_scan(
     except ZapError as e:
         log.error("zap_scan_failed", fqdn=fqdn, ip=ip, error=str(e))
         publish_tool_output(order_id, "zap", ip, f"ZAP error: {e}")
+        zap_error = str(e)
     finally:
         # Always clean up context and policy
         try:
@@ -1039,10 +1077,12 @@ def run_zap_scan(
 
     # Save to DB
     raw_summary = json.dumps(result["alerts"][:50], indent=2)[:50000] if result["alerts"] else "[]"
-    _save_result(
-        order_id=order_id, host_ip=ip, phase=2,
-        tool_name="zap", raw_output=raw_summary,
+    # A7: ein ZapError machte diese Zeile bisher trotzdem zu einem Erfolg.
+    record_tool_run(
+        order_id, ip, 2, "zap", "failed" if zap_error else "ok",
+        reason=zap_error or None,
         exit_code=0, duration_ms=result["duration_ms"],
+        raw_output=raw_summary,
     )
 
     return result
@@ -1128,6 +1168,23 @@ def run_phase2(
     from concurrent.futures import ThreadPoolExecutor, as_completed
     from urllib.parse import urlparse as _urlparse
 
+    # A7: erwartete Tools je Stage-Gruppe. Faellt eine komplette Gruppe per
+    # Exception aus, bekommt jedes Tool der Gruppe eine eigene 'failed'-Zeile
+    # — eine Sammelzeile wuerde die Abdeckungsmatrix luecklos machen.
+    _stage_group_tools: dict[str, list[str]] = {
+        "testssl": ["testssl"],
+        "zap_discovery": ["zap_spider"],
+        "quick": ["header_check", "httpx"],
+        "zap_active": ["zap_active"],
+        "extras": ["ffuf_param", "feroxbuster", "ffuf_sensitive", "wpscan"],
+    }
+
+    def _record_group_failure(group_name: str, error: str) -> None:
+        """Gruppenausfall auf die erwarteten Tools der Gruppe herunterbrechen."""
+        for group_tool in _stage_group_tools.get(group_name, [group_name]):
+            _record_phase2_status(order_id, ip, group_tool, "failed",
+                                  f"group_{group_name}_failed: {error}")
+
     zap_in_tools = phase2_tools is None or any(
         t in (phase2_tools or []) for t in ("zap_spider", "zap_passive", "zap_active")
     )
@@ -1143,11 +1200,16 @@ def run_phase2(
         from scanner.tools.zap_client import ZapClient, ZapError
         r: dict[str, Any] = {"zap_spider_urls": [], "_tools": []}
         if not (has_web and zap_in_tools):
+            _record_phase2_status(order_id, ip, "zap_spider", "skipped",
+                                  "no_web" if not has_web else "not_in_package")
             return r
 
         zap = ZapClient()
         if not zap.health_check():
             log.warning("zap_daemon_unavailable", ip=ip)
+            # A7: ZAP-Ausfall wird protokolliert statt still verschluckt.
+            _record_phase2_status(order_id, ip, "zap_spider", "skipped",
+                                  "zap_daemon_unavailable")
             return r
 
         ac = adaptive_config or {}
@@ -1206,17 +1268,20 @@ def run_phase2(
             r["_zap_context_id"] = context_id
 
             # Save spider results to DB
-            _save_result(order_id, ip, 2, "zap_spider",
-                         json.dumps({"urls_found": len(unique_urls), "fqdns_spidered": len(vhost_fqdns),
-                                     "vhosts": list(vhost_fqdns),
-                                     "urls": unique_urls[:50]}, indent=2),
-                         0, 0)
+            record_tool_run(order_id, ip, 2, "zap_spider", "ok",
+                            exit_code=0, duration_ms=0,
+                            raw_output=json.dumps(
+                                {"urls_found": len(unique_urls),
+                                 "fqdns_spidered": len(vhost_fqdns),
+                                 "vhosts": list(vhost_fqdns),
+                                 "urls": unique_urls[:50]}, indent=2))
             publish_tool_output(order_id, "zap_spider", ip,
                                 f"{len(unique_urls)} URLs from {len(vhost_fqdns)} VHosts")
             progress_callback(order_id, "zap_spider", "complete")
 
         except ZapError as e:
             log.error("zap_discovery_failed", ip=ip, error=str(e))
+            _record_phase2_status(order_id, ip, "zap_spider", "failed", str(e))
         # Note: DON'T clean up context here — Stage 2 needs it for active scan
 
         return r
@@ -1248,6 +1313,9 @@ def run_phase2(
                 count = len(testssl_result)
                 publish_tool_output(order_id, "testssl", ip,
                                     f"{count} SSL/TLS checks completed")
+        else:
+            _record_phase2_status(order_id, ip, "testssl", "skipped",
+                                  "no_ssl" if not has_ssl else "not_in_package")
         return r
 
     def _run_quick_tools_stage1() -> dict[str, Any]:
@@ -1269,14 +1337,20 @@ def run_phase2(
                     score = header_result.get("score", "?/?") if header_result else "failed"
                     publish_tool_output(order_id, "header_check", ip,
                                         f"Security headers ({vh}): {score}")
-                    _save_result(order_id, ip, 2, "header_check",
-                                 json.dumps({"vhost": vh, "result": header_result},
-                                            indent=2, ensure_ascii=False),
-                                 0, 0)
+                    record_tool_run(order_id, ip, 2, "header_check", "ok",
+                                    exit_code=0, duration_ms=0,
+                                    raw_output=json.dumps(
+                                        {"vhost": vh, "result": header_result},
+                                        indent=2, ensure_ascii=False))
                 except Exception as e:
                     log.error("header_check_failed", fqdn=vh, ip=ip, error=str(e))
+                    _record_phase2_status(order_id, ip, "header_check", "failed",
+                                          f"{vh}: {e}")
             r["_tools"].append("header_check")
             progress_callback(order_id, "header_check", "complete")
+        else:
+            _record_phase2_status(order_id, ip, "header_check", "skipped",
+                                  "not_in_package")
         if phase2_tools is None or "httpx" in phase2_tools:
             for vh in vhost_fqdns:
                 try:
@@ -1292,8 +1366,13 @@ def run_phase2(
                         publish_tool_output(order_id, "httpx", ip, f"HTTP probe failed ({vh})")
                 except Exception as e:
                     log.error("httpx_failed", fqdn=vh, ip=ip, error=str(e))
+                    _record_phase2_status(order_id, ip, "httpx", "failed",
+                                          f"{vh}: {e}")
             r["_tools"].append("httpx")
             progress_callback(order_id, "httpx", "complete")
+        else:
+            _record_phase2_status(order_id, ip, "httpx", "skipped",
+                                  "not_in_package")
         return r
 
     log.info("phase2_stage1_start", ip=ip, tools="testssl+zap_spider+quick")
@@ -1317,6 +1396,7 @@ def run_phase2(
                 results["tools_run"].extend(tools)
             except Exception as e:
                 log.error("phase2_stage1_failed", group=group_name, ip=ip, error=str(e))
+                _record_group_failure(group_name, str(e))
 
     # Extract Spider URLs for Stage 2
     spider_urls = results.get("zap_spider_urls", [])
@@ -1341,6 +1421,15 @@ def run_phase2(
                       and (phase2_tools is None or "zap_active" in (phase2_tools or [])))
 
         if not run_active or not zap_context:
+            if is_webcheck:
+                skip_reason = "package_webcheck"
+            elif scan_policy == "passive-only":
+                skip_reason = "passive_only_policy"
+            elif not run_active:
+                skip_reason = "not_in_package"
+            else:
+                skip_reason = "no_zap_context"
+            _record_phase2_status(order_id, ip, "zap_active", "skipped", skip_reason)
             return r
 
         zap = ZapClient()
@@ -1365,15 +1454,19 @@ def run_phase2(
 
             active_duration = int(_time.monotonic() * 1000) - active_start
             r["_tools"].append("zap_active")
-            _save_result(order_id, ip, 2, "zap_active",
-                         json.dumps({"status": "complete" if completed else "timeout",
-                                     "policy": scan_policy, "categories": categories,
-                                     "duration_ms": active_duration}),
-                         0, active_duration)
+            record_tool_run(order_id, ip, 2, "zap_active",
+                            "ok" if completed else "timeout",
+                            reason=None if completed else "active_scan_timeout",
+                            exit_code=0, duration_ms=active_duration,
+                            raw_output=json.dumps(
+                                {"status": "complete" if completed else "timeout",
+                                 "policy": scan_policy, "categories": categories,
+                                 "duration_ms": active_duration}))
             publish_tool_output(order_id, "zap_active", ip, "Active scan complete")
             progress_callback(order_id, "zap_active", "complete")
         except ZapError as e:
             log.error("zap_active_failed", ip=ip, error=str(e))
+            _record_phase2_status(order_id, ip, "zap_active", "failed", str(e))
         finally:
             try:
                 zap.remove_scan_policy(policy_name)
@@ -1402,12 +1495,27 @@ def run_phase2(
                 publish_tool_output(order_id, "ffuf", ip, f"{len(ffuf_result)} params discovered")
             else:
                 publish_tool_output(order_id, "ffuf", ip, "No parameters found")
+        else:
+            # A7: Grund fuer das Auslassen protokollieren (Reihenfolge =
+            # Reihenfolge der Bedingungen oben).
+            if not (phase2_tools is not None and "ffuf" in phase2_tools):
+                ffuf_reason = "not_in_package"
+            elif "ffuf" in ai_skip:
+                ffuf_reason = "ai_skip"
+            elif not has_web:
+                ffuf_reason = "no_web"
+            else:
+                ffuf_reason = "no_api_urls"
+            _record_phase2_status(order_id, ip, "ffuf_param", "skipped", ffuf_reason)
 
         # feroxbuster: recursive directory scan, spider URLs as dedup
         if (phase2_tools is not None and "feroxbuster" in phase2_tools) and "feroxbuster" not in ai_skip and has_web:
             ferox_enabled = True
             if adaptive_config and adaptive_config.get("feroxbuster_enabled") is False:
                 ferox_enabled = False
+            if not ferox_enabled:
+                _record_phase2_status(order_id, ip, "feroxbuster", "skipped",
+                                      "ai_disabled")
             if ferox_enabled:
                 publish_event(order_id, {"type": "tool_starting", "tool": "feroxbuster", "host": ip})
                 spider_paths = {_urlparse(u).path for u in spider_urls if u}
@@ -1422,6 +1530,14 @@ def run_phase2(
                                         f"{len(ferox_result)} paths (recursive, dedup applied)")
                 else:
                     publish_tool_output(order_id, "feroxbuster", ip, "No new paths")
+        else:
+            if not (phase2_tools is not None and "feroxbuster" in phase2_tools):
+                ferox_reason = "not_in_package"
+            elif "feroxbuster" in ai_skip:
+                ferox_reason = "ai_skip"
+            else:
+                ferox_reason = "no_web"
+            _record_phase2_status(order_id, ip, "feroxbuster", "skipped", ferox_reason)
 
         # ffuf sensitive: Sensitive-File-Discovery (.env, .git/, dump.sql, ...)
         # Eigener Run mit raft-small-files.txt Wordlist — typische Pentest-
@@ -1440,6 +1556,14 @@ def run_phase2(
                                     f"{len(sens_result)} sensitive files exposed")
             else:
                 publish_tool_output(order_id, "ffuf_sensitive", ip, "No sensitive files found")
+        else:
+            if not (phase2_tools is not None and "ffuf" in phase2_tools):
+                sens_reason = "not_in_package"
+            elif "ffuf" in ai_skip:
+                sens_reason = "ai_skip"
+            else:
+                sens_reason = "no_web"
+            _record_phase2_status(order_id, ip, "ffuf_sensitive", "skipped", sens_reason)
 
         # wpscan (conditional on WordPress) — use final URL after redirects
         if (phase2_tools is None or "wpscan" in phase2_tools) and cms and cms.lower() == "wordpress":
@@ -1461,6 +1585,12 @@ def run_phase2(
                 publish_tool_output(order_id, "wpscan", ip, f"{vulns} findings, {plugins} plugins")
             else:
                 publish_tool_output(order_id, "wpscan", ip, "WPScan failed")
+        else:
+            if not (phase2_tools is None or "wpscan" in phase2_tools):
+                wpscan_reason = "not_in_package"
+            else:
+                wpscan_reason = "cms_not_wordpress"
+            _record_phase2_status(order_id, ip, "wpscan", "skipped", wpscan_reason)
 
         return r
 
@@ -1482,6 +1612,7 @@ def run_phase2(
                 results["tools_run"].extend(tools)
             except Exception as e:
                 log.error("phase2_stage2_failed", group=group_name, ip=ip, error=str(e))
+                _record_group_failure(group_name, str(e))
 
     # ── Stage 3: Collect ZAP alerts (passive + active) ────────
     if zap_context:
@@ -1543,17 +1674,21 @@ def run_phase2(
                 "top_alerts": [{"name": a.get("name",""), "risk": a.get("risk",""), "url": a.get("url","")[:80]}
                                for a in all_alerts[:20]],
             }
-            _save_result(order_id, ip, 2, "zap",
-                         json.dumps(alert_summary, indent=2),
-                         0, 0)
+            record_tool_run(order_id, ip, 2, "zap", "ok",
+                            exit_code=0, duration_ms=0,
+                            raw_output=json.dumps(alert_summary, indent=2))
         except ZapError as e:
             log.error("zap_alert_collection_failed", ip=ip, error=str(e))
+            _record_phase2_status(order_id, ip, "zap", "failed", str(e))
         finally:
             try:
                 zap = ZapClient()
                 zap.remove_context(zap_context)
             except Exception:
                 pass
+    else:
+        # A7: ohne ZAP-Kontext gab es keine Alert-Sammlung — sichtbar machen.
+        _record_phase2_status(order_id, ip, "zap", "skipped", "no_zap_context")
 
     # Save spider URLs to disk for report-worker
     if spider_urls:

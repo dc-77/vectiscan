@@ -50,7 +50,7 @@ def _save_ai_debug(
 
     Stored as a separate scan_result with tool_name '{tool_name}_debug'.
     """
-    from scanner.tools import _save_result
+    from scanner.tools import record_tool_run
     debug = {
         "system_prompt": system_prompt,
         "user_prompt": user_prompt[:10000],  # Cap user prompt (can be very long)
@@ -58,11 +58,16 @@ def _save_ai_debug(
     }
     if cost:
         debug["cost"] = cost
-    _save_result(
-        order_id=order_id, host_ip=host_ip, phase=phase,
-        tool_name=f"{tool_name}_debug",
-        raw_output=json.dumps(debug, indent=2, ensure_ascii=False)[:50000],
+    # A7: tool_name-Schema '{tool}_debug' und das JSON-Format bleiben
+    # unveraendert — orders.ts:965 und :991 matchen darauf. Neu ist nur der
+    # Status: ein fehlgeschlagener KI-Call ist jetzt als 'failed' erkennbar.
+    ai_error = str((parsed or {}).get("_error") or "")
+    record_tool_run(
+        order_id, host_ip, phase, f"{tool_name}_debug",
+        "failed" if ai_error else "ok",
+        reason=ai_error or None,
         exit_code=0, duration_ms=0,
+        raw_output=json.dumps(debug, indent=2, ensure_ascii=False)[:50000],
     )
 
 
@@ -733,14 +738,13 @@ def plan_phase2_config(
                  reason=rule_result.get("reasoning", ""))
         # Save rule-based config als pseudo-debug fuer Audit
         if order_id:
-            from scanner.tools import _save_result
-            _save_result(
-                order_id=order_id,
-                host_ip=tech_profile.get("ip"),
-                phase=1,
-                tool_name="ai_phase2_config_rule_based",
-                raw_output=json.dumps(rule_result, indent=2, ensure_ascii=False),
+            from scanner.tools import record_tool_run
+            record_tool_run(
+                order_id, tech_profile.get("ip"), 1,
+                "ai_phase2_config_rule_based", "ok",
+                reason=str(rule_result.get("reasoning", ""))[:160] or None,
                 exit_code=0, duration_ms=0,
+                raw_output=json.dumps(rule_result, indent=2, ensure_ascii=False),
             )
         return rule_result
 

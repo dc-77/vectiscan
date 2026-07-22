@@ -43,6 +43,7 @@ def test_dkim_selectors_runs_in_parallel(tmp_path: Path) -> None:
 
     with patch("subprocess.run", side_effect=slow_subprocess), \
          patch.object(phase0, "run_tool", return_value=("", 0, 0.0)), \
+         patch.object(phase0, "record_tool_run"), \
          patch("scanner.passive.mail_security_parsers.check_dmarc_policy",
                return_value={"dmarc_present": False, "raw": None,
                              "p": None, "sp": None, "pct": 100,

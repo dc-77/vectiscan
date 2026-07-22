@@ -87,6 +87,21 @@ function exitBadge(code: number): { label: string; cls: string } {
   return { label: `EXIT ${code}`, cls: 'bg-amber-500/15 text-amber-300 ring-amber-500/30' };
 }
 
+// A7 (Migration 044): status/skipReason kommen aus scan_results. Zeilen aus
+// Scans VOR A7 haben status = null — dann gilt weiterhin die exit_code-Logik.
+const STATUS_BADGES: Record<string, { label: string; cls: string }> = {
+  ok: { label: 'OK', cls: 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/30' },
+  skipped: { label: 'SKIPPED', cls: 'bg-slate-500/15 text-slate-300 ring-slate-500/30' },
+  blocked: { label: 'BLOCKED', cls: 'bg-orange-500/15 text-orange-300 ring-orange-500/30' },
+  timeout: { label: 'TIMEOUT', cls: 'bg-red-500/15 text-red-300 ring-red-500/30' },
+  failed: { label: 'FAILED', cls: 'bg-red-500/15 text-red-300 ring-red-500/30' },
+};
+
+export function statusBadge(r: Pick<ScanResult, 'status' | 'exitCode'>): { label: string; cls: string } {
+  const key = (r.status ?? '').toLowerCase();
+  return STATUS_BADGES[key] ?? exitBadge(r.exitCode);
+}
+
 // Aufruf-Parameter ableiten: wenn das Tool zur Phase-2-Config passt,
 // zeigen wir die relevanten Felder als JSON-Block.
 function relevantConfigForTool(
@@ -208,7 +223,7 @@ export default function ToolTrace({ scanResults, aiConfigs, discoveredHosts }: P
         <ul className="space-y-1.5">
           {visible.map((r) => {
             const isOpen = expandedId === r.id;
-            const exit = exitBadge(r.exitCode);
+            const exit = statusBadge(r);
             const phaseCls = PHASE_BADGE_CLS[r.phase] ?? PHASE_BADGE_CLS[4];
             const fqdn = fqdnFor(r.hostIp, discoveredHosts);
             const cfg = r.hostIp ? aiConfigs?.[r.hostIp] : undefined;
@@ -237,6 +252,14 @@ export default function ToolTrace({ scanResults, aiConfigs, discoveredHosts }: P
                   {fqdn && (
                     <span className="text-slate-500 truncate flex-1 hidden md:inline">{fqdn}</span>
                   )}
+                  {r.skipReason && (
+                    <span
+                      className="text-slate-500 truncate hidden lg:inline max-w-[16rem]"
+                      title={r.skipReason}
+                    >
+                      {r.skipReason}
+                    </span>
+                  )}
                   <span className={`shrink-0 rounded ring-1 px-1.5 py-0.5 font-mono text-[10px] ${exit.cls}`}>
                     {exit.label}
                   </span>
@@ -249,6 +272,14 @@ export default function ToolTrace({ scanResults, aiConfigs, discoveredHosts }: P
 
                 {isOpen && (
                   <div className="border-t border-slate-800 p-3 space-y-3">
+                    {r.skipReason && (
+                      <div>
+                        <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+                          Grund
+                        </div>
+                        <div className="text-[11px] font-mono text-slate-300">{r.skipReason}</div>
+                      </div>
+                    )}
                     {params && (
                       <div>
                         <div className="text-[10px] uppercase tracking-wider text-slate-500 mb-1">

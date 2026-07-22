@@ -258,6 +258,14 @@ def _run_tool_with_optional_vpn(
             )
             if vpn_just_activated:
                 log.info("tool_retry_with_vpn", tool=tool_name, host=host_ip)
+                # A7: der Erst-Versuch bekommt seine eigene Zeile, sonst
+                # verschwindet der geblockte Lauf spurlos aus scan_results.
+                record_tool_run(
+                    order_id, host_ip, phase, tool_name, "blocked",
+                    reason="waf_block_retry_via_vpn",
+                    duration_ms=duration_ms,
+                    raw_output=raw[:50000] if raw else None,
+                )
                 return _run_tool_with_optional_vpn(
                     cmd, timeout, output_path, order_id, host_ip,
                     phase, tool_name, retry_with_vpn=False,
@@ -265,14 +273,12 @@ def _run_tool_with_optional_vpn(
 
         # Save result to scan_results table
         if order_id:
-            _save_result(
-                order_id=order_id,
-                host_ip=host_ip,
-                phase=phase,
-                tool_name=tool_name,
-                raw_output=raw[:50000] if raw else None,
+            record_tool_run(
+                order_id, host_ip, phase, tool_name,
+                classify_exit(tool_name, exit_code),
                 exit_code=exit_code,
                 duration_ms=duration_ms,
+                raw_output=raw[:50000] if raw else None,
             )
 
         return exit_code, duration_ms
@@ -313,20 +319,25 @@ def _run_tool_with_optional_vpn(
             )
             if vpn_just_activated:
                 log.info("tool_retry_with_vpn_after_timeout", tool=tool_name, host=host_ip)
+                # A7: Erst-Versuch protokollieren, bevor der Retry uebernimmt
+                record_tool_run(
+                    order_id, host_ip, phase, tool_name, "blocked",
+                    reason="waf_block_timeout_retry_via_vpn",
+                    duration_ms=duration_ms,
+                    raw_output=raw[:50000],
+                )
                 return _run_tool_with_optional_vpn(
                     cmd, timeout, output_path, order_id, host_ip,
                     phase, tool_name, retry_with_vpn=False,
                 )
 
         if order_id:
-            _save_result(
-                order_id=order_id,
-                host_ip=host_ip,
-                phase=phase,
-                tool_name=tool_name,
-                raw_output=raw[:50000],
+            record_tool_run(
+                order_id, host_ip, phase, tool_name, "timeout",
+                reason=f"timeout_after_{timeout}s",
                 exit_code=-1,
                 duration_ms=duration_ms,
+                raw_output=raw[:50000],
             )
 
         return -1, duration_ms
@@ -344,17 +355,182 @@ def _run_tool_with_optional_vpn(
                 pass
 
         if order_id:
-            _save_result(
-                order_id=order_id,
-                host_ip=host_ip,
-                phase=phase,
-                tool_name=tool_name,
-                raw_output=f"ERROR: {e}",
+            record_tool_run(
+                order_id, host_ip, phase, tool_name, "failed",
+                reason=str(e)[:150],
                 exit_code=-2,
                 duration_ms=duration_ms,
+                raw_output=f"ERROR: {e}",
             )
 
         return -2, duration_ms
+
+
+# ============================================================
+# A7 (Jul 2026): Lauf-Status pro Tool
+# ============================================================
+# Bis A7 war die Bewertung "welcher Exit-Code heisst Erfolg" an jeder
+# Call-Site einzeln hinterlegt (phase0.py:213, phase1.py:338, phase2.py:124
+# usw.). Diese Tabelle ist ab jetzt die SSoT dafuer. Die bestehenden
+# Call-Sites bleiben vorerst unveraendert — sie werden schrittweise
+# hierher umgezogen.
+DEFAULT_OK_EXIT_CODES: tuple[int, ...] = (0,)
+
+TOOL_OK_EXIT_CODES: dict[str, tuple[int, ...]] = {
+    "testssl": (0, 1),          # 1 = Findings vorhanden
+    "wpscan": (0, 4, 5),        # 4 = kein WordPress, 5 = WAF-Block
+    "ffuf": (0, 1),
+    "feroxbuster": (0, 1),
+    "gobuster_dir": (0,),
+    "gobuster_dns": (0,),
+    "httpx": (0,),
+    "nmap": (0,),
+    "wafw00f": (0,),
+    "crtsh": (0,),
+    "subfinder": (0,),
+    "dnsx": (0,),
+}
+
+# Gueltige Werte fuer scan_results.status (Migration 044).
+TOOL_RUN_STATUSES: frozenset = frozenset(
+    {"ok", "failed", "skipped", "timeout", "blocked"}
+)
+
+# Sentinel-Exit-Codes. -3 fuer skipped/blocked ist bewusst negativ: die
+# Live-Feed-Queries (api/src/routes/ws.ts, orders.ts) filtern mit
+# "AND exit_code >= 0" und halten damit ausgelassene Tools automatisch aus
+# dem Terminal-Stream heraus.
+EXIT_CODE_TIMEOUT: int = -1
+EXIT_CODE_ERROR: int = -2
+EXIT_CODE_SKIPPED: int = -3
+
+_STATUS_TO_EXIT_CODE: dict[str, int] = {
+    "ok": 0,
+    "failed": EXIT_CODE_ERROR,
+    "timeout": EXIT_CODE_TIMEOUT,
+    "skipped": EXIT_CODE_SKIPPED,
+    "blocked": EXIT_CODE_SKIPPED,
+}
+
+# tool_name ist VARCHAR(50) (003_mvp_schema.sql:61)
+_TOOL_NAME_MAX_LEN: int = 50
+# skip_reason ist VARCHAR(160) (044_scan_results_run_status.sql)
+_SKIP_REASON_MAX_LEN: int = 160
+
+
+def _normalize_tool_name(tool_name: str) -> str:
+    """Varianten-Namen auf den Basis-Tool-Namen zurueckfuehren.
+
+    Beispiele: 'crtsh_retry2' -> 'crtsh', 'ffuf_sensitive' -> 'ffuf'.
+    Exakter Treffer gewinnt immer (sonst wuerde 'gobuster_dns' faelschlich
+    auf 'gobuster_dir' gemappt).
+    """
+    if not tool_name:
+        return ""
+    if tool_name in TOOL_OK_EXIT_CODES:
+        return tool_name
+    candidates = [k for k in TOOL_OK_EXIT_CODES if tool_name.startswith(k)]
+    if not candidates:
+        return tool_name
+    return max(candidates, key=len)
+
+
+def classify_exit(tool_name: str, exit_code: Optional[int]) -> str:
+    """Exit-Code in einen A7-Status uebersetzen.
+
+    Nie werfend — im Zweifel 'failed', damit ein Klassifizierungsfehler
+    keinen Scan kippt.
+    """
+    try:
+        if exit_code is None:
+            return "failed"
+        if exit_code == EXIT_CODE_TIMEOUT:
+            return "timeout"
+        if exit_code == EXIT_CODE_ERROR:
+            return "failed"
+        if exit_code == EXIT_CODE_SKIPPED:
+            return "skipped"
+        ok_codes = TOOL_OK_EXIT_CODES.get(
+            _normalize_tool_name(tool_name), DEFAULT_OK_EXIT_CODES
+        )
+        return "ok" if exit_code in ok_codes else "failed"
+    except Exception as e:  # pragma: no cover — reiner Sicherheitsnetz-Pfad
+        log.warning("classify_exit_failed", tool=tool_name, error=str(e))
+        return "failed"
+
+
+def record_tool_run(
+    order_id: Optional[str],
+    host_ip: Optional[str],
+    phase: int,
+    tool_name: str,
+    status: str,
+    *,
+    reason: Optional[str] = None,
+    exit_code: Optional[int] = None,
+    duration_ms: int = 0,
+    raw_output: Optional[str] = None,
+) -> None:
+    """Genau eine Ergebniszeile fuer einen Tool-Lauf schreiben (A7).
+
+    Zentrale Einstiegsstelle fuer alle Zustaende — auch fuer die, bei denen
+    ein Tool gar nicht lief ('skipped', 'blocked'). Ohne order_id gibt es
+    keine FK-faehige Zeile, dann passiert nichts.
+
+    Wirft NIEMALS: ein Fehler in der Protokollierung darf einen Scan nicht
+    kippen (Muster wie _save_result unten).
+    """
+    try:
+        if not order_id:
+            return
+
+        clean_status = (status or "").strip().lower()
+        if clean_status not in TOOL_RUN_STATUSES:
+            log.warning(
+                "record_tool_run_unknown_status",
+                tool=tool_name,
+                status=status,
+            )
+            clean_status = "failed"
+
+        if exit_code is None:
+            exit_code = _STATUS_TO_EXIT_CODE.get(clean_status, EXIT_CODE_ERROR)
+
+        clean_reason = reason[:_SKIP_REASON_MAX_LEN] if reason else None
+
+        if raw_output is None and clean_reason:
+            # Damit ToolTrace im Frontend etwas anzuzeigen hat
+            raw_output = f"{clean_status.upper()}: {clean_reason}"
+
+        clean_tool = (tool_name or "unknown")[:_TOOL_NAME_MAX_LEN]
+
+        # WICHTIG: _save_result ueber den Modul-Global aufrufen (kein
+        # from-Import-Alias), damit @patch("scanner.tools._save_result")
+        # in tests/test_tools.py weiterhin greift.
+        _save_result(
+            order_id=order_id,
+            host_ip=host_ip,
+            phase=phase,
+            tool_name=clean_tool,
+            raw_output=raw_output,
+            exit_code=exit_code,
+            duration_ms=duration_ms,
+            status=clean_status,
+            skip_reason=clean_reason,
+        )
+    except Exception as e:
+        log.error("record_tool_run_failed", tool=tool_name, error=str(e))
+
+
+# Rolling-Deploy-Schalter: None = noch unbekannt, True = Migration 044 ist da,
+# False = alter API-Stand ohne status/skip_reason, wir fahren den Legacy-INSERT.
+_HAS_RUN_STATUS_COLUMNS: Optional[bool] = None
+
+_INSERT_WITH_STATUS = """INSERT INTO scan_results (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms, status, skip_reason)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+
+_INSERT_LEGACY = """INSERT INTO scan_results (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)"""
 
 
 def _save_result(
@@ -365,6 +541,9 @@ def _save_result(
     raw_output: Optional[str],
     exit_code: int,
     duration_ms: int,
+    *,
+    status: Optional[str] = None,
+    skip_reason: Optional[str] = None,
 ) -> None:
     """Save tool result to scan_results table.
 
@@ -373,22 +552,56 @@ def _save_result(
     Latencies, ASCII-Banner, Resolver-Reihenfolge — damit identische
     Server-Antworten zu identischen Bytes fuehren und der KI-Cache greifen
     kann (siehe TIEFENANALYSE-RUN-DRIFT-2026-05-02.md).
+
+    A7 (Jul 2026): status/skip_reason sind keyword-only und optional. Fehlen
+    die Spalten in der DB (alter API-Container waehrend Rolling-Deploy,
+    SQLSTATE 42703), faellt der INSERT einmalig auf die 7-Spalten-Variante
+    zurueck und merkt sich das modul-global — ohne diesen Fallback gingen
+    ALLE Tool-Zeilen still verloren, weil Fehler hier geschluckt werden.
     """
+    global _HAS_RUN_STATUS_COLUMNS
     try:
         from scanner.output_normalizer import normalize
         raw_output = normalize(tool_name, raw_output)
     except Exception:
         # Bei Normalisierungs-Fehler nicht crashen — Original speichern
         pass
+    legacy_params = (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms)
     try:
         conn = get_db_connection()
         with conn.cursor() as cur:
-            cur.execute(
-                """INSERT INTO scan_results (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (order_id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms),
-            )
+            if _HAS_RUN_STATUS_COLUMNS is False:
+                cur.execute(_INSERT_LEGACY, legacy_params)
+            else:
+                try:
+                    cur.execute(_INSERT_WITH_STATUS, legacy_params + (status, skip_reason))
+                    _HAS_RUN_STATUS_COLUMNS = True
+                except Exception as col_err:
+                    if not _is_undefined_column(col_err):
+                        raise
+                    # Migration 044 noch nicht angewendet — ab jetzt Legacy
+                    _HAS_RUN_STATUS_COLUMNS = False
+                    log.warning(
+                        "save_result_status_columns_missing",
+                        tool=tool_name,
+                        detail="Migration 044 fehlt, INSERT faellt auf 7 Spalten zurueck",
+                    )
+                    conn.rollback()
+                    with conn.cursor() as retry_cur:
+                        retry_cur.execute(_INSERT_LEGACY, legacy_params)
         conn.commit()
         conn.close()
     except Exception as e:
         log.error("save_result_failed", tool=tool_name, error=str(e))
+
+
+def _is_undefined_column(err: Exception) -> bool:
+    """True wenn der Fehler ein psycopg2 UndefinedColumn (SQLSTATE 42703) ist.
+
+    Bewusst ueber den pgcode-String statt ueber den Exception-Typ, damit die
+    Pruefung auch ohne installiertes psycopg2 (Unit-Tests) funktioniert.
+    """
+    try:
+        return getattr(err, "pgcode", None) == "42703"
+    except Exception:  # pragma: no cover
+        return False

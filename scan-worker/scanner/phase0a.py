@@ -21,8 +21,16 @@ from scanner.passive.otx_client import OTXClient
 from scanner.passive.virustotal_client import VirusTotalClient
 from scanner.passive.dns_security import run_all_dns_security
 from scanner.progress import publish_event
+from scanner.tools import record_tool_run
 
 log = structlog.get_logger()
+
+# A7 (Jul 2026): Soll-Liste der Passive-Intel-Tools. Bis A7 war Phase 0a in
+# scan_results komplett unsichtbar — weder Lauf noch Skip wurden protokolliert.
+PHASE0A_EXPECTED_TOOLS: tuple[str, ...] = (
+    "whois", "shodan", "abuseipdb", "securitytrails",
+    "urlhaus", "greynoise", "otx", "virustotal",
+)
 
 
 def run_phase0a(
@@ -83,6 +91,29 @@ def run_phase0a(
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
+    # --- A7: Ergebniszeile pro Passive-Intel-Tool -----------------------
+    recorded_tools: set[str] = set()
+
+    def _record_passive(tool: str, status: str, reason: str | None = None,
+                        data: Any = None) -> None:
+        """Genau eine scan_results-Zeile pro Tool (erster Aufruf gewinnt).
+
+        Der Guard verhindert Doppelzeilen, wenn ein Tool bereits wegen
+        fehlendem API-Key als 'skipped' vermerkt wurde und die Ergebnis-
+        schleife danach nochmal ueber dasselbe Tool laeuft.
+        """
+        if tool in recorded_tools:
+            return
+        recorded_tools.add(tool)
+        raw: str | None = None
+        if data:
+            try:
+                raw = json.dumps(data, ensure_ascii=False, default=str)[:50000]
+            except Exception:
+                raw = None
+        record_tool_run(order_id, None, 0, tool, status,
+                        reason=reason, raw_output=raw)
+
     # --- Helper functions for parallel execution ---
 
     def _run_whois() -> tuple[str, dict[str, Any] | None]:
@@ -98,6 +129,7 @@ def run_phase0a(
         shodan = ShodanClient()
         if not shodan.available:
             log.info("shodan_skipped", reason="no_api_key")
+            _record_passive("shodan", "skipped", "no_api_key")
             return "shodan", None
         result: dict[str, Any] = {}
         domain_data = shodan.lookup_domain(domain)
@@ -131,6 +163,7 @@ def run_phase0a(
         client = AbuseIPDBClient()
         if not client.available:
             log.info("abuseipdb_skipped", reason="no_api_key")
+            _record_passive("abuseipdb", "skipped", "no_api_key")
             return "abuseipdb", None
         # F-P0A-001 (Option B): IP-Loop parallel via ThreadPoolExecutor.
         abuse_results: dict[str, Any] = {}
@@ -158,6 +191,7 @@ def run_phase0a(
         st = SecurityTrailsClient()
         if not st.available:
             log.info("securitytrails_skipped", reason="no_api_key")
+            _record_passive("securitytrails", "skipped", "no_api_key")
             return "securitytrails", None
         # F-P0A-001 (Option C): drei API-Calls parallel.
         with ThreadPoolExecutor(max_workers=3, thread_name_prefix="securitytrails") as inner:
@@ -275,6 +309,7 @@ def run_phase0a(
         client = VirusTotalClient()
         if not client.available:
             log.info("virustotal_skipped", reason="no_api_key")
+            _record_passive("virustotal", "skipped", "no_api_key")
             return "virustotal", None
         domain_resp = client.lookup_domain(domain)
         if not domain_resp:
@@ -285,6 +320,11 @@ def run_phase0a(
     # --- Run all tools in parallel (Top-Level: ThreadPool importiert oben) ---
     phase0a_timeout = config.get("phase0a_timeout", 120)
     futures: dict[Any, str] = {}
+
+    # A7: nicht gelistete Tools bekommen ihre Zeile, bevor der Pool startet.
+    for passive_tool in PHASE0A_EXPECTED_TOOLS:
+        if passive_tool not in phase0a_tools:
+            _record_passive(passive_tool, "skipped", "not_in_package")
 
     with ThreadPoolExecutor(max_workers=8, thread_name_prefix="phase0a") as pool:
         if "whois" in phase0a_tools:
@@ -316,8 +356,11 @@ def run_phase0a(
                         results.update(data)
                     else:
                         results[key] = data
+                _record_passive(tool_name, "ok",
+                                None if data else "no_data", data)
             except Exception as e:
                 log.error("phase0a_tool_failed", tool=tool_name, error=str(e))
+                _record_passive(tool_name, "failed", str(e))
             if progress_callback:
                 progress_callback(order_id, tool_name, "complete")
 

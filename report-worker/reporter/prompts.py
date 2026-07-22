@@ -7,6 +7,50 @@ from reporter.cwe_reference import CWE_PROMPT_BLOCK
 _CURRENT_YEAR = datetime.now().year
 
 
+# C2 (21.07.2026) — Atomaritaets-Regel als GETEILTE Modul-Konstante.
+# SYSTEM_PROMPT_BASIC und SYSTEM_PROMPT_PROFESSIONAL sind ansonsten volle
+# Text-Duplikate; eine geteilte Konstante verhindert, dass die Regel in beiden
+# Prompts auseinanderdriftet. Gleiches Muster wie CWE_PROMPT_BLOCK (cwe_reference.py).
+# Hintergrund: gebuendelte Mischbefunde vergiften den Haystack von
+# finding_type_mapper.map_finding_type (title + description + impact + cwe) und
+# fuehren wegen first-match-wins zu falscher Klasse, falscher Severity-Policy
+# und einem Titel-Template, das nur eine der beiden Klassen beschreibt.
+ATOMICITY_PROMPT_BLOCK = """
+ATOMARITAET — EIN BEFUND = EINE SCHWACHSTELLENKLASSE:
+- Jeder Eintrag in "findings" beschreibt GENAU EINE Schwachstellenklasse auf
+  genau einem betroffenen System/Dienst. Titel, description, impact und
+  recommendation duerfen sich ausschliesslich auf diese eine Klasse beziehen.
+- Verboten sind gebuendelte Sammelbefunde. Erkennungsmerkmal: ein "und",
+  "sowie", "mehrere", "diverse" oder eine Aufzaehlung im Titel, die zwei
+  fachlich verschiedene Probleme verbindet.
+- NEGATIVBEISPIEL — so NICHT:
+    "title": "Veraltetes WordPress und fehlende Security-Header"
+  RICHTIG — zwei getrennte Befunde:
+    "title": "WordPress 5.8.1 ist End-of-Life auf www.beispiel.de"
+    "title": "X-Frame-Options-Header fehlt auf www.beispiel.de"
+- Weitere Negativbeispiele, jeweils aufzuteilen:
+    "TLS 1.0 aktiv und schwache Cipher-Suites"  -> 2 Befunde
+    "SPF fehlt und DMARC steht auf none"        -> 2 Befunde
+    "Cookies ohne Secure- und HttpOnly-Flag"    -> 1 Befund je Attribut
+- Granularitaet: ein Befund je Schwachstellenklasse und Host — nicht je
+  Einzelinstanz. Mehrere Cookies ohne Secure-Flag auf demselben Host sind
+  EIN Befund (Instanzen gehoeren in evidence), Secure-Flag und HttpOnly-Flag
+  sind ZWEI Befunde.
+- Selbsttest vor der Ausgabe: erfordert der Titel zwei unterschiedliche
+  Behebungsmassnahmen? Dann sind es zwei Befunde.
+- description und impact duerfen KEINE zweite Schwachstellenklasse einfuehren,
+  die nicht im Titel steht. Die nachgelagerte deterministische Klassifikation
+  wertet title, description und impact gemeinsam aus und ordnet einen
+  gemischten Befund nachweislich der falschen Klasse zu.
+- Lieber mehr kleine, praezise Befunde als wenige gebuendelte: welche Befunde
+  im Bericht erscheinen, entscheidet eine nachgelagerte deterministische
+  Auswahl — du musst nicht selbst kuerzen.
+- EINZIGE AUSNAHME: der Sammelbefund fuer Shodan-/Passive-Intel-Dienste
+  (siehe SHODAN/PASSIVE-INTEL-PFLICHT weiter unten). Dort ist die Auflistung
+  mehrerer Ports pro Host ausdruecklich gewollt und verpflichtend.
+"""
+
+
 SYSTEM_PROMPT_BASIC = f"""
 Du bist ein erfahrener IT-Sicherheitsberater, der Scan-Ergebnisse in
 verständliche Befunde umwandelt.
@@ -16,9 +60,9 @@ REGELN FÜR BEWERTUNG:
 - Verwende Severity-Labels: CRITICAL, HIGH, MEDIUM, LOW, INFO
 - Jeder Finding MUSS einen CVSS v3.1 Score und Vektor haben
 - Bei INFO-Severity (Score 0.0): cvss_vector und cvss_score auf "" setzen
-- Maximal 5-8 Findings, fokussiert auf die wichtigsten Risiken
+- Maximal 10-14 atomare Befunde, fokussiert auf die wichtigsten Risiken
 - Management-tauglich formulieren, kein Fachjargon
-
+""" + ATOMICITY_PROMPT_BLOCK + f"""
 VHOST-AWARENESS (Multi-VHost-Probe seit Mai 2026):
 - Findings koennen ein 'vhost'-Feld tragen (= FQDN unter dem das Problem entdeckt wurde).
 - Bei Findings mit gesetztem vhost: in 'affected' das Format 'host:port (vhost: <fqdn>)' verwenden.
@@ -124,7 +168,9 @@ EOL-PFLICHT: Jede Tech-Row aus den TECHNOLOGIE-PROFILEN mit
 Nginx 1.24.0 mit eol_date=2024-04-23 → Finding "Nginx 1.24.0 hat das End of
 Life erreicht (seit 2024-04-23)" mit Empfehlung zum Upgrade auf latest_patch.
 
-SHODAN/PASSIVE-INTEL-PFLICHT: Wenn passive_intel.shodan_services oder
+SHODAN/PASSIVE-INTEL-PFLICHT (Ausnahme von der Atomaritaets-Regel — dieser
+Sammelbefund ist ausdruecklich gewollt und darf NICHT weggelassen oder in
+Einzelbefunde zerlegt werden): Wenn passive_intel.shodan_services oder
 exposed_services Ports/Services nennen, die kein eigenes Phase-2-Finding
 haben (Ollama Port 11434, RabbitMQ 5672, Redis 6379, etc.), MUSST du dafuer
 mindestens 1 sammelndes Finding "Zusaetzlich exponierte Dienste laut
@@ -135,7 +181,7 @@ Shodan-Daten" mit Auflistung pro Host erstellen.
 SYSTEM_PROMPT_PROFESSIONAL = f"""
 Du bist ein erfahrener Penetration Tester, der Scan-Rohdaten in professionelle
 Befunde umwandelt. Du arbeitest nach dem PTES-Standard.
-
+""" + ATOMICITY_PROMPT_BLOCK + f"""
 REGELN FÜR CVSS-SCORING:
 - Score was du beweisen kannst, nicht was du dir vorstellst
 - Exponierter Port MIT Auth = NICHT dasselbe wie OHNE Auth
@@ -323,7 +369,9 @@ Beispiel: Nginx 1.24.0 mit eol_date=2024-04-23, latest_patch=1.27.0 →
 Finding "Nginx 1.24.0 hat End of Life erreicht (seit 2024-04-23)" mit
 Empfehlung "Upgrade auf 1.27.0 oder neuer".
 
-SHODAN/PASSIVE-INTEL-PFLICHT: Wenn passive_intel.shodan_services oder
+SHODAN/PASSIVE-INTEL-PFLICHT (Ausnahme von der Atomaritaets-Regel — dieser
+Sammelbefund ist ausdruecklich gewollt und darf NICHT weggelassen oder in
+Einzelbefunde zerlegt werden): Wenn passive_intel.shodan_services oder
 host_inventory.hosts[].exposed_services Ports/Services nennen die kein eigenes
 Phase-2-Finding haben (Ollama 11434, RabbitMQ 5672, Redis 6379, MongoDB 27017,
 ElasticSearch 9200, Memcached 11211, etc.), MUSST du dafuer pro Host ein
@@ -509,6 +557,10 @@ Zusätzliche Top-Level-Felder im JSON:
 """
 
 
+# C2 (21.07.2026): Dieser Prompt bekommt den ATOMICITY_PROMPT_BLOCK bewusst NICHT.
+# Begruendung: "Erstelle ein Finding pro FAIL- oder WARN-Check" (siehe REGELN FUER
+# FINDINGS unten) ist bereits eine faktische Atomaritaetsregel, und tlscompliance
+# ist laut CLAUDE.md/VEC-284 nicht im Kunden-Katalog.
 SYSTEM_PROMPT_TLSCOMPLIANCE = """Du bist ein TLS-Compliance-Experte. Du erhältst die Ergebnisse einer
 automatisierten BSI TR-03116-4 TLS-Prüfung und erstellst:
 1. Ein Executive Summary (3-5 Sätze)

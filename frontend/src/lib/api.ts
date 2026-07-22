@@ -1095,6 +1095,11 @@ export interface ScanResult {
   rawOutput: string | null;
   exitCode: number;
   durationMs: number;
+  /** A7 (Migration 044): 'ok' | 'failed' | 'skipped' | 'timeout' | 'blocked'.
+   *  null/undefined = Legacy-Zeile vor A7 → Status aus exitCode ableiten. */
+  status?: string | null;
+  /** Grund fuer skipped/failed/blocked, z.B. 'zap_daemon_unavailable'. */
+  skipReason?: string | null;
   createdAt: string;
 }
 

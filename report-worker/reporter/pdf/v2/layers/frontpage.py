@@ -116,10 +116,18 @@ def build_layer1_frontpage(story, styles, data):
         subsec_style,
     ))
     story.append(Spacer(1, 2 * mm))
+    # Regel 2 (Widerspruch C3): frueher stand hier "Geprueft wurde ... N aktive
+    # Hosts" — das behauptete eine Vollpruefung, obwohl das neue Kapitel "Was
+    # wurde geprueft — und was nicht" zeigt, dass ein Teil der identifizierten
+    # Hosts nicht pruefbar war (KI-Skip/Redirect/Limit).  Neutral als
+    # "identifizierte Hosts" formuliert + Querverweis auf das Abdeckungskapitel;
+    # analog strategy.py (C3).
     story.append(Paragraph(
-        f"Geprueft wurde die externe Angriffsflaeche von <b>{domain}</b> "
-        f"({hosts_count} aktive Hosts, {subdomains_count} bekannte Subdomains) "
-        f"am <b>{scan_date}</b>.",
+        f"Betrachtet wurde die externe Angriffsflaeche von <b>{domain}</b> "
+        f"({hosts_count} identifizierte Hosts, {subdomains_count} bekannte "
+        f"Subdomains), Scan-Datum <b>{scan_date}</b>. Welche dieser Hosts "
+        f"tatsaechlich geprueft werden konnten, schluesselt das Kapitel "
+        f"„Was wurde geprueft — und was nicht“ auf.",
         body_style,
     ))
     story.append(Paragraph(

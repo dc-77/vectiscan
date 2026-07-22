@@ -291,21 +291,33 @@ def apply_deterministic_pipeline(claude_output: dict,
         findings_in, sel.additional,
     )
 
-    # 5d. CVE-Referenz-Guard (VEC-377): KI-genannte CVE-IDs gegen die
-    # autoritative NVD/KEV/EPSS-Anreicherung + kuratierte Build-Tabellen
-    # validieren. Nicht auflösbare (halluzinierte) CVE-IDs werden im Text
-    # durch einen neutralen Marker ersetzt — die Vulnerability-Klasse bleibt
-    # erhalten, nur die unbelegte CVE-Referenz wird zurueckgehalten.
-    from reporter.cve_guard import apply_cve_guard
-    cve_stats = apply_cve_guard(
-        claude_output, enrichment=sc.get("enrichment"),
+    # 5d. Claims-Guard (VEC — Phase 1 / C1): erweitert den CVE-Guard (VEC-377)
+    # um (a) die fehlende Feldabdeckung (recommendations/positive_findings/
+    # scope_notes/... — dort stand der belegte "SonicWall … CVE-2024-40766"-
+    # Defekt) und (b) Nicht-CVE-Claim-Typen (Version/EOL enforce bei exaktem
+    # Produkt-Match, Host/Port shadow).  cve_guard.py bleibt die byte-identische
+    # CVE-Autoritaet und wird intern ZUERST ausgefuehrt.
+    # WICHTIG: laeuft NACH dem finding_refs-Pruning (5a) und VOR
+    # map_to_report_data (worker.py) — damit gedroppte Recommendations gar
+    # nicht erst gescrubbt werden und der korrigierte Text ins PDF geht.
+    from reporter.claims_guard import apply_claims_guard
+    from reporter.claims_inventory import build_evidence_inventory
+    inventory = build_evidence_inventory(sc, host_tool_data=sc.get("host_tool_data"))
+    claims_stats = apply_claims_guard(
+        claude_output, inventory=inventory, enrichment=sc.get("enrichment"),
     )
-    claude_output["cve_guard_stats"] = cve_stats
-    if cve_stats["removed_count"]:
+    claude_output["claims_guard_stats"] = claims_stats
+    # Rueckwaertskompatibel: cve_guard_stats behaelt die 3-Key-CVE-Form.
+    claude_output["cve_guard_stats"] = {
+        "removed_count": claims_stats["removed_count"],
+        "distinct_removed": claims_stats["distinct_removed"],
+        "allowlist_size": claims_stats["allowlist_size"],
+    }
+    if claims_stats["removed_count"]:
         log.info("cve_guard_applied",
-                 removed=cve_stats["removed_count"],
-                 distinct=cve_stats["distinct_removed"],
-                 allowlist_size=cve_stats["allowlist_size"])
+                 removed=claims_stats["removed_count"],
+                 distinct=claims_stats["distinct_removed"],
+                 allowlist_size=claims_stats["allowlist_size"])
 
     # Audit-Felder
     claude_output["policy_version"] = POLICY_VERSION

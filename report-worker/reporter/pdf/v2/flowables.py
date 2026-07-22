@@ -6,7 +6,9 @@ Abstaende) kommt in M4/M5.
 """
 from __future__ import annotations
 
-from reportlab.platypus import Flowable
+from typing import Any, Callable
+
+from reportlab.platypus import Flowable, Paragraph, Table, TableStyle
 from reportlab.lib.units import mm
 from reportlab.lib.colors import HexColor
 
@@ -273,3 +275,106 @@ class FindingHeaderV2(Flowable):
         if self.policy_id:
             c.drawRightString(self.width - 4 * mm, 3 * mm,
                               f"Policy {self.policy_id}")
+
+
+# ====================================================================
+# GEMEINSAMER TABELLEN-HELFER (aus appendix.py:42-74 gehoben)
+# ====================================================================
+def data_table(
+    story,
+    styles,
+    header: list[str],
+    rows: list[list[Any]],
+    col_widths: list[float],
+    repeat_header: bool = True,
+) -> None:
+    """Einheitlicher v2-Tabellen-Stil (frueher appendix._table, modul-privat).
+
+    Verhalten byte-identisch zum Original: Paragraph-Wrapping pro Zelle,
+    ``repeatRows=1``, Header-BG COLORS["primary"], Header-Text COLORS["white"],
+    Grid COLORS["light_accent"], FONTSIZE 8, Padding 3. Keine Inline-Hex-Farben
+    — ausschliesslich COLORS. Nach flowables.py gehoben, damit es genau EINEN
+    Tabellen-Stil gibt (appendix._table delegiert hierher).
+    """
+    header_style = styles.get("TableHeader") or styles["BodyText"]
+    cell_style = styles.get("TableCell") or styles["BodyText"]
+
+    table_rows: list[list[Paragraph]] = [
+        [Paragraph(f"<b>{h}</b>", header_style) for h in header],
+    ]
+    for r in rows:
+        rendered_row: list[Paragraph] = []
+        for c in r:
+            if isinstance(c, Paragraph):
+                rendered_row.append(c)
+            else:
+                rendered_row.append(
+                    Paragraph(str(c) if c is not None else "—", cell_style)
+                )
+        table_rows.append(rendered_row)
+
+    t = Table(
+        table_rows, colWidths=col_widths, hAlign="LEFT",
+        repeatRows=1 if repeat_header else 0,
+    )
+    t.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), COLORS["primary"]),
+        ("TEXTCOLOR", (0, 0), (-1, 0), COLORS["white"]),
+        ("GRID", (0, 0), (-1, -1), 0.4, COLORS["light_accent"]),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("FONTSIZE", (0, 0), (-1, -1), 8),
+        ("LEFTPADDING", (0, 0), (-1, -1), 3),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 3),
+        ("TOPPADDING", (0, 0), (-1, -1), 3),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+    ]))
+    story.append(t)
+
+
+def chunked_matrix_tables(
+    label_header: str,
+    row_keys: list[str],
+    row_labels: dict[str, str],
+    col_keys: list[str],
+    col_labels: dict[str, str],
+    cell_renderer: Callable[[str, str], Any],
+    label_width: float = 38 * mm,
+    col_width: float = 22 * mm,
+    max_cols: int = 6,
+) -> list[dict[str, Any]]:
+    """Zerlegt eine Tool-x-Host-Matrix in renderbare Chunks.
+
+    v2 hat KEINEN Ueberbreiten-Mechanismus (kein Landscape/Auto-Shrink/Split);
+    die nutzbare Frame-Breite ist exakt 170mm (generate.py). Diese Funktion
+    teilt die Spalten in Bloecke von hoechstens ``max_cols`` (Default 6), so dass
+    ``label_width + max_cols * col_width`` <= 170mm bleibt (38 + 6*22 = 170).
+
+    Returns eine Liste von Chunk-Deskriptoren, jeweils::
+
+        {"header": [...], "rows": [[...], ...],
+         "col_widths": [...], "range_label": "Hosts 1-6 von N"}
+
+    ``cell_renderer(row_key, col_key)`` liefert den Zellinhalt (str oder
+    Paragraph) — die farbige Aufbereitung bleibt Sache des aufrufenden Layers.
+    """
+    chunks: list[dict[str, Any]] = []
+    total = len(col_keys)
+    if total == 0 or not row_keys:
+        return chunks
+    for start in range(0, total, max_cols):
+        sub_cols = col_keys[start:start + max_cols]
+        header = [label_header] + [col_labels.get(c, c) for c in sub_cols]
+        rows: list[list[Any]] = []
+        for rk in row_keys:
+            row: list[Any] = [row_labels.get(rk, rk)]
+            for ck in sub_cols:
+                row.append(cell_renderer(rk, ck))
+            rows.append(row)
+        widths = [label_width] + [col_width] * len(sub_cols)
+        chunks.append({
+            "header": header,
+            "rows": rows,
+            "col_widths": widths,
+            "range_label": f"Hosts {start + 1}-{start + len(sub_cols)} von {total}",
+        })
+    return chunks

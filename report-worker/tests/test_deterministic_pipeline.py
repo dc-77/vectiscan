@@ -236,3 +236,45 @@ class TestRecommendationRefsPruned:
             r.get("action") == "Allgemeine Hygiene"
             for r in claude_output["recommendations"]
         )
+
+
+class TestClaimsGuardStats:
+    """C1 (Phase 1): apply_claims_guard laeuft in der Pipeline und schreibt
+    sowohl claims_guard_stats als auch (rueckwaertskompatibel) cve_guard_stats."""
+
+    def test_claims_guard_stats_present_after_pipeline(self):
+        claude_output = {"findings": _claude_response_findings()}
+        apply_deterministic_pipeline(
+            claude_output, package="perimeter", domain="beispiel.de",
+        )
+        assert "claims_guard_stats" in claude_output
+        assert "cve_guard_stats" in claude_output
+        cg = claude_output["claims_guard_stats"]
+        # Backwards-compat Keys + neue Keys
+        for key in ("removed_count", "distinct_removed", "allowlist_size",
+                    "claims_checked", "claims_unsupported", "mode"):
+            assert key in cg
+        # cve_guard_stats behaelt die schlanke 3-Key-Form
+        assert set(claude_output["cve_guard_stats"].keys()) == {
+            "removed_count", "distinct_removed", "allowlist_size"}
+
+    def test_hallucinated_cve_in_recommendation_scrubbed_by_pipeline(self):
+        """End-to-End: die SonicWall-CVE wird in der Pipeline aus der
+        Recommendation entfernt (frueher unerreichbar fuer den CVE-Guard)."""
+        from reporter.cve_guard import UNVERIFIED_MARKER
+        claude_output = {
+            "findings": _claude_response_findings(),
+            "recommendations": [{
+                "timeframe": "Sofort",
+                "action": "SonicWall VPN-Firmware aktualisieren (CVE-2024-40766 patchen)",
+                "finding_refs": ["VS-2026-001"],
+                "effort": "1 h",
+            }],
+        }
+        apply_deterministic_pipeline(
+            claude_output, package="perimeter", domain="beispiel.de",
+        )
+        actions = " ".join(r.get("action", "") for r in claude_output["recommendations"])
+        assert "CVE-2024-40766" not in actions
+        assert UNVERIFIED_MARKER in actions
+        assert "SonicWall VPN-Firmware aktualisieren" in actions

@@ -119,11 +119,45 @@ def cache_key(model: str,
         "temperature": temperature,
         "max_tokens": max_tokens,
         "policy_version": POLICY_VERSION,    # aus severity_policy
-        "cache_version": "v1",                # bei Cache-Format-Änderung bumpen
+        "cache_version": CACHE_VERSION,        # bei Cache-Format-/Prompt-Änderung bumpen
     }
     serialized = canonicalize(payload)
     return f"ai_cache:{hashlib.sha256(serialized.encode()).hexdigest()}"
 ```
+
+### 4.1 Drei Key-Modi und das Prompt-Blindspot (Stand 21.07.2026)
+
+`reporter/ai_cache.py::cache_key` baut den Key in drei Modi:
+
+| Modus | Payload | Reagiert auf Prompt-Änderung? |
+|---|---|---|
+| `content_hash` (höchste Prio) | namespace, model, content_hash, policy_version, cache_version | **Ja** — `claude_client.compute_content_hash(system_prompt, …)` nimmt den System-Prompt als erstes Piece auf |
+| `order_scope` | namespace, order_scope, host_scope, model, policy_version, cache_version | **Nein** — bewusst inhaltsunabhängig, damit Re-Scans/`regenerate-report` derselben Order garantiert treffen |
+| `input_hash` (Legacy) | zusätzlich system + messages | Ja (vom Reporter nicht genutzt) |
+
+Der Lookup fällt von `content_hash` auf `order_scope` zurück. **Konsequenz:** Eine
+reine Prompt-Änderung wirkt bei einem frischen Scan sofort, bei einer Order mit
+bereits erzeugtem Report aber **nicht** — der `order_scope`-Key serviert die alte
+Antwort. Jede inhaltliche Prompt-Änderung braucht deshalb einen Hebel:
+
+- **Empfohlen: `CACHE_VERSION`-Bump** in `reporter/ai_cache.py` — chirurgisch,
+  invalidiert nur den AI-Cache.
+- Alternative: `VECTISCAN_POLICY_VERSION` in der Deploy-`.env` bumpen —
+  invalidiert zusätzlich Scan-Worker-KI-1..4 und verschiebt die
+  Severity-Policy-Audit-Semantik (`reports.policy_version`). Nur wählen, wenn
+  die Severity-Policy ohnehin mitgeht.
+
+**Änderungshistorie `CACHE_VERSION`:**
+
+| Version | Datum | Grund |
+|---|---|---|
+| `v1` | initial | — |
+| `v2` | 21.07.2026 | C2 „Atomare Befunde": `ATOMICITY_PROMPT_BLOCK` in `SYSTEM_PROMPT_BASIC` + `SYSTEM_PROMPT_PROFESSIONAL` (letzterer vererbt an compliance/supplychain/insurance), Findings-Obergrenze BASIC von „5-8 Findings" auf „10-14 atomare Befunde" angehoben |
+
+Regressionstests dazu: `report-worker/tests/test_ai_cache_consolidated.py`
+(`test_order_scope_key_is_prompt_independent`,
+`test_order_scope_key_changes_with_cache_version`,
+`test_cache_version_is_v2_after_atomicity_prompt`).
 
 ## 5. Cache-TTL-Strategie
 

@@ -14,10 +14,19 @@ from urllib.parse import urlparse
 
 import structlog
 
-from scanner.tools import run_tool
+from scanner.tools import run_tool, record_tool_run, classify_exit
 from scanner.progress import publish_event
 
 log = structlog.get_logger()
+
+# A7 (Jul 2026): Soll-Liste der Phase-0b-Discovery-Tools. Jedes Tool, das
+# nicht im Paket steht, bekommt trotzdem eine Zeile in scan_results —
+# damit im Bericht steht, WARUM es nicht lief.
+PHASE0B_EXPECTED_TOOLS: tuple[str, ...] = (
+    "crtsh", "certspotter", "subfinder", "gobuster_dns", "axfr", "dnsx",
+)
+# certspotter haengt am selben Gate wie crtsh (siehe run_phase0).
+PHASE0B_TOOL_GATES: dict[str, str] = {"certspotter": "crtsh"}
 
 PHASE0_TIMEOUT = 600  # 10 Minuten Gesamt-Timeout
 MAX_HOSTS = 10
@@ -282,13 +291,13 @@ def run_certspotter(domain: str, scan_dir: str, order_id: str) -> list[str]:
         payload = {"subdomains": subdomains, "error": error}
         with open(output_path, "w") as f:
             json.dump(payload, f, indent=2)
-        from scanner.tools import _save_result
-        _save_result(
-            order_id=order_id, host_ip=None, phase=0,
-            tool_name="certspotter",
-            raw_output=json.dumps(payload, ensure_ascii=False),
+        record_tool_run(
+            order_id, None, 0, "certspotter",
+            "ok" if not error else "failed",
+            reason=error,
             exit_code=0 if not error else 1,
             duration_ms=duration_ms,
+            raw_output=json.dumps(payload, ensure_ascii=False),
         )
     except Exception as e:
         log.warning("certspotter_save_error", error=str(e))
@@ -780,12 +789,12 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
     except Exception as e:
         log.warning("dns_records_save_error", error=str(e))
 
-    run_tool(
-        cmd=["echo", "dns_records_collected"],
-        timeout=5,
-        order_id=order_id,
-        phase=0,
-        tool_name="dns_records",
+    # A7: bisher wurde hier ein `echo` als Pseudo-Tool durch run_tool
+    # geschickt, nur um die DB-Zeile zu erzeugen. Die Zeile bleibt, der
+    # Subprozess entfaellt.
+    record_tool_run(
+        order_id, None, 0, "dns_records", "ok",
+        raw_output=json.dumps(records, ensure_ascii=False)[:50000],
     )
 
     log.info("dns_records_complete", records=records)
@@ -1419,8 +1428,6 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
     Schreibt host['vhosts'] (canonicalized primary + Aliase) und
     host['web_probe'] (Backwards-Compat = vhosts[0]).
     """
-    from scanner.tools import _save_result
-
     # Sammle alle FQDNs (deterministisch sortiert, gecappt pro Host).
     fqdn_to_host: dict[str, dict[str, Any]] = {}
     all_fqdns: list[str] = []
@@ -1438,6 +1445,11 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
 
     # Map: fqdn → probe-Dict (None wenn kein 2xx-3xx-4xx Result)
     probes_by_fqdn: dict[str, dict[str, Any]] = {}
+    # A7: Exit-Code des Batch-Probes bis zur DB-Zeile durchreichen. None =
+    # gar nicht gelaufen (keine FQDNs). Bis A7 wurde hier hartkodiert
+    # exit_code=0 gespeichert — ein komplett fehlgeschlagener Probe sah in
+    # der DB wie ein Erfolg aus.
+    probe_exit_code: Optional[int] = None
 
     if all_fqdns:
         with tempfile.NamedTemporaryFile(
@@ -1494,6 +1506,7 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
                 os.unlink(list_path)
             except OSError:
                 pass
+        probe_exit_code = exit_code
 
         # Diagnostik (PR-G Mai 2026): Bei leerem stdout immer stderr + exit_code
         # loggen — sonst stillschweigender has_web=false fuer alle Hosts.
@@ -1561,12 +1574,20 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
             "vhost_skipped": h.get("vhost_skipped", []),
         } for h in hosts
     }
-    _save_result(
-        order_id=order_id, host_ip=None, phase=0,
-        tool_name="web_probe",
-        raw_output=json.dumps(probe_summary, indent=2, ensure_ascii=False),
-        exit_code=0, duration_ms=0,
-    )
+    probe_raw = json.dumps(probe_summary, indent=2, ensure_ascii=False)
+    if probe_exit_code is None:
+        record_tool_run(order_id, None, 0, "web_probe", "skipped",
+                        reason="no_fqdns_to_probe", raw_output=probe_raw)
+    else:
+        probe_status = classify_exit("web_probe", probe_exit_code)
+        record_tool_run(
+            order_id, None, 0, "web_probe", probe_status,
+            reason=None if probe_status == "ok"
+            else f"httpx_batch_exit_{probe_exit_code}",
+            exit_code=probe_exit_code,
+            duration_ms=0,
+            raw_output=probe_raw,
+        )
 
     web_count = sum(1 for h in hosts if h.get("web_probe", {}).get("has_web"))
     vhost_count = sum(len(h.get("vhosts", [])) for h in hosts)
@@ -1696,6 +1717,18 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
     zone_transfer: dict[str, Any] = {"success": False, "data": {}}
     dns_records: dict[str, Any] = {"spf": None, "dmarc": None, "dkim": False, "dkim_selectors": [], "mx": [], "ns": []}
 
+    # A7: nicht gelistete Discovery-Tools protokollieren, bevor der Pool
+    # startet — sonst fehlen sie in scan_results spurlos.
+    for p0_tool in PHASE0B_EXPECTED_TOOLS:
+        gate = PHASE0B_TOOL_GATES.get(p0_tool, p0_tool)
+        if gate not in phase0_tools:
+            record_tool_run(order_id, None, 0, p0_tool, "skipped",
+                            reason="not_in_package")
+    if "amass" in phase0_tools:
+        # F-P0B-003: amass wurde entfernt, Configs listen es teils noch.
+        record_tool_run(order_id, None, 0, "amass", "skipped",
+                        reason="tool_removed")
+
     discovery_futures: dict[Any, str] = {}
     with ThreadPoolExecutor(max_workers=8, thread_name_prefix="phase0b") as pool:
         # Discovery-Tools laufen IMMER (Snapshot ist nur Seed, nicht Skip).
@@ -1742,6 +1775,8 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                     log.info(f"phase0_{tool_name}_done", found=len(subs))
             except Exception as e:
                 log.error(f"phase0_{tool_name}_error", error=str(e))
+                record_tool_run(order_id, None, 0, tool_name, "failed",
+                                reason=str(e))
 
     # Always include the base domain
     all_subdomains.append(domain)
@@ -1755,6 +1790,11 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
             log.info("phase0_dnsx_done", validated=len(dnsx_results))
         except Exception as e:
             log.error("phase0_dnsx_error", error=str(e))
+            record_tool_run(order_id, None, 0, "dnsx", "failed", reason=str(e))
+    elif "dnsx" in phase0_tools:
+        # Gate war nur das Zeitbudget — als eigener Grund sichtbar machen.
+        record_tool_run(order_id, None, 0, "dnsx", "skipped",
+                        reason="phase0_time_budget_exhausted")
 
     # --- Merge and group ---
     inventory = merge_and_group(

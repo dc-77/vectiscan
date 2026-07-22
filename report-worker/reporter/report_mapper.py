@@ -1831,6 +1831,8 @@ def _augment_for_v2(
       - report_data["befund_landschaft"]    (M4 4d)
       - report_data["compliance_mappings"]  (M5 5c — Anhang D)
       - report_data["additional_findings"]  (M5 5c — Anhang E)
+      - report_data["scan_coverage"]        (C3 — Abdeckungskapitel)
+      - report_data["_host_inventory"]      (C3 — Host-Grundgesamtheit)
     """
     report_data["_renderer_layout"] = "v2"
     report_data["domain"] = (
@@ -1932,6 +1934,29 @@ def _augment_for_v2(
     except Exception as exc:  # pragma: no cover -- defensive
         log.warning("v2_augment_posture_indicators_failed", error=str(exc))
         report_data["posture_indicators"] = None
+
+    # ---- C3 (Phase 1): Abdeckungs-Aggregat "Was wurde geprueft" ----
+    # Datenquelle sind die scan_results-Zeilen (scan_meta["toolRuns"], ohne
+    # raw_output) plus die KI-#1-Host-Strategie (scan_meta["hostStrategy"]).
+    # Fail-open: bei jedem Fehler bleibt scan_coverage=None und der Renderer
+    # ueberspringt das Kapitel — der Report baut trotzdem.
+    try:
+        from reporter.coverage import build_scan_coverage
+        report_data["scan_coverage"] = build_scan_coverage(
+            host_inventory,
+            scan_meta.get("toolRuns") or [],
+            scan_meta.get("hostStrategy") or {},
+            claude_output.get("findings") or [],
+            tech_profiles,
+            package,
+        )
+    except Exception as exc:  # pragma: no cover -- defensive
+        log.warning("v2_augment_scan_coverage_failed", error=str(exc))
+        report_data.setdefault("scan_coverage", None)
+
+    # Host-Inventar durchreichen: behebt den toten Read in strategy.py:112 und
+    # gibt dem Coverage-Layer die Host-Grundgesamtheit (additiv, v1 ignoriert).
+    report_data["_host_inventory"] = host_inventory
 
     # ---- M5 Track 5c: Compliance-Mappings (Anhang D + inline) ------
     try:

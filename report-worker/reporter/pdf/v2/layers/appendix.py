@@ -19,6 +19,7 @@ from reportlab.lib.units import mm
 from reportlab.lib.colors import HexColor
 
 from reporter.pdf.branding import COLORS
+from reporter.pdf.v2.flowables import data_table
 
 
 # ====================================================================
@@ -44,34 +45,10 @@ def _table(
     header: list[str], rows: list[list[Any]],
     col_widths: list[float],
 ) -> None:
-    header_style = styles.get("TableHeader") or styles["BodyText"]
-    cell_style = styles.get("TableCell") or styles["BodyText"]
-
-    table_rows: list[list[Paragraph]] = [
-        [Paragraph(f"<b>{h}</b>", header_style) for h in header],
-    ]
-    for r in rows:
-        rendered_row: list[Paragraph] = []
-        for c in r:
-            if isinstance(c, Paragraph):
-                rendered_row.append(c)
-            else:
-                rendered_row.append(Paragraph(str(c) if c is not None else "—", cell_style))
-        table_rows.append(rendered_row)
-
-    t = Table(table_rows, colWidths=col_widths, hAlign="LEFT", repeatRows=1)
-    t.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), COLORS["primary"]),
-        ("TEXTCOLOR", (0, 0), (-1, 0), COLORS["white"]),
-        ("GRID", (0, 0), (-1, -1), 0.4, COLORS["light_accent"]),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("FONTSIZE", (0, 0), (-1, -1), 8),
-        ("LEFTPADDING", (0, 0), (-1, -1), 3),
-        ("RIGHTPADDING", (0, 0), (-1, -1), 3),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-    ]))
-    story.append(t)
+    # Delegiert an den gehobenen gemeinsamen Helfer (flowables.data_table),
+    # damit es genau EINEN Tabellen-Stil in v2 gibt. Name + Signatur bleiben
+    # unveraendert, damit die bestehenden Anhang-Aufrufer nichts merken.
+    data_table(story, styles, header, rows, col_widths)
 
 
 # ====================================================================

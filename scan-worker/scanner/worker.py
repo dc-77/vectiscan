@@ -41,6 +41,52 @@ log = structlog.get_logger()
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://localhost:5432/vectiscan")
 
+# ---------------------------------------------------------------------------
+# A7 (Jul 2026): Soll-Tools je Phase
+# ---------------------------------------------------------------------------
+# Faellt ein ganzer Host aus (unreachable, Future-Exception), schreiben wir
+# pro erwartetem Tool eine eigene Zeile. Die Config-Namen (z.B. "headers",
+# "ffuf") weichen von den tool_name-Werten in scan_results ab — deshalb die
+# Uebersetzungstabelle.
+PHASE1_FALLBACK_TOOLS: tuple[str, ...] = ("nmap", "webtech", "wafw00f")
+PHASE2_FALLBACK_TOOLS: tuple[str, ...] = (
+    "testssl", "header_check", "httpx", "zap_spider", "zap_active",
+    "ffuf_param", "ffuf_sensitive", "feroxbuster", "wpscan",
+)
+PHASE2_CONFIG_TOOL_NAMES: dict[str, tuple[str, ...]] = {
+    "headers": ("header_check",),
+    "ffuf": ("ffuf_param", "ffuf_sensitive"),
+    "zap_passive": ("zap",),
+}
+
+
+def expected_tools_for_phase(config: dict[str, Any] | None, phase: int) -> list[str]:
+    """Erwartete tool_name-Werte fuer eine Phase (A7, deterministisch sortiert).
+
+    Nie werfend — im Zweifel die Fallback-Liste, damit ein Host-Ausfall
+    trotzdem protokolliert wird.
+    """
+    try:
+        cfg = config or {}
+        if phase == 1:
+            tools = cfg.get("phase1_tools") or list(PHASE1_FALLBACK_TOOLS)
+            # cms_fingerprint schreibt keine eigene scan_results-Zeile
+            return [t for t in tools if t != "cms_fingerprint"]
+        if phase == 2:
+            raw_tools = cfg.get("phase2_tools")
+            if not raw_tools:
+                return list(PHASE2_FALLBACK_TOOLS)
+            names: list[str] = []
+            for t in raw_tools:
+                for mapped in PHASE2_CONFIG_TOOL_NAMES.get(t, (t,)):
+                    if mapped not in names:
+                        names.append(mapped)
+            return names
+        return []
+    except Exception as e:  # pragma: no cover — reines Sicherheitsnetz
+        log.warning("expected_tools_for_phase_failed", phase=phase, error=str(e))
+        return list(PHASE1_FALLBACK_TOOLS if phase == 1 else PHASE2_FALLBACK_TOOLS)
+
 
 class ScanCancelled(Exception):
     """Raised when the order has been cancelled by the user."""
@@ -373,13 +419,22 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
     # ── AI Host Strategy: prioritize and filter hosts ─────
     skip_ai = config.get("skip_ai_decisions", False)
-    from scanner.tools import _save_result
+    # _save_result bleibt importiert (Rule 1: nichts entfernen); geschrieben
+    # wird ab A7 ueber record_tool_run.
+    from scanner.tools import _save_result, record_tool_run  # noqa: F401
 
     if skip_ai:
         # TLS-Compliance: scan ALL hosts, no AI filtering
         scan_hosts = list(hosts)
         strategy = {"hosts": [{"ip": h["ip"], "action": "scan"} for h in hosts]}
         log.info("ai_strategy_skipped", reason="skip_ai_decisions=True", hosts=len(scan_hosts))
+        # A7: auch der bewusste KI-Verzicht bekommt seine Zeile. raw_output
+        # bleibt gueltiges JSON — orders.ts:936 parst diese Zeile.
+        record_tool_run(
+            order_id, None, 0, "ai_host_strategy", "skipped",
+            reason="skip_ai_decisions",
+            raw_output=json.dumps(strategy, indent=2, ensure_ascii=False),
+        )
     else:
         # Enrich host inventory with passive intel for better AI decisions
         # PR-H (Mai 2026): zusaetzlich passive_intel direkt auf host_inventory.hosts
@@ -413,9 +468,10 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         except Exception:
             pass
 
-        _save_result(order_id=order_id, host_ip=None, phase=0,
-                     tool_name="ai_host_strategy", raw_output=strategy_json,
-                     exit_code=0, duration_ms=0)
+        # tool_name + raw_output bleiben byte-identisch (orders.ts:936,
+        # orders.ts:1966 parsen diese Zeile als JSON).
+        record_tool_run(order_id, None, 0, "ai_host_strategy", "ok",
+                        exit_code=0, duration_ms=0, raw_output=strategy_json)
 
         # Build scan list from strategy
         ip_to_host = {h["ip"]: h for h in hosts}
@@ -426,9 +482,14 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
                 entry["_reasoning"] = sh.get("reasoning", "")
                 scan_hosts.append(entry)
             elif sh.get("action") == "skip":
-                _save_result(order_id=order_id, host_ip=sh["ip"], phase=0,
-                             tool_name="ai_host_skip", raw_output=f"SKIP: {sh.get('reasoning', 'Kein Grund angegeben')}",
-                             exit_code=0, duration_ms=0)
+                # raw_output-Format unveraendert (Frontend-Vertrag), exit_code
+                # bleibt 0 damit sich das Filterverhalten nicht aendert.
+                record_tool_run(
+                    order_id, sh["ip"], 0, "ai_host_skip", "skipped",
+                    reason=str(sh.get("reasoning", "Kein Grund angegeben")),
+                    exit_code=0, duration_ms=0,
+                    raw_output=f"SKIP: {sh.get('reasoning', 'Kein Grund angegeben')}",
+                )
                 log.info("host_skipped_by_ai", ip=sh["ip"], reasoning=sh.get("reasoning"))
 
         # Fallback if strategy returned nothing scannable
@@ -460,6 +521,23 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
     tech_profiles: list[dict[str, Any] | None] = [None] * len(scan_hosts)
 
+    # (ip, phase)-Paare, fuer die der Ausfall schon protokolliert wurde.
+    host_outages_recorded: set[tuple[str, int]] = set()
+
+    def _record_host_outage(ip: str, phase: int, status: str, reason: str) -> None:
+        """A7: Host-Ausfall auf die erwarteten Tools der Phase herunterbrechen.
+
+        Bewusst eine Zeile PRO Tool statt einer Sammelzeile — nur so bleibt
+        die Abdeckungsmatrix im Bericht luecklos (Entscheidung 21.07.2026).
+        Der (ip, phase)-Guard verhindert Doppelzeilen, wenn derselbe Host
+        spaeter nochmal als nicht-scannbar auffaellt.
+        """
+        if (ip, phase) in host_outages_recorded:
+            return
+        host_outages_recorded.add((ip, phase))
+        for expected in expected_tools_for_phase(config, phase):
+            record_tool_run(order_id, ip, phase, expected, status, reason=reason)
+
     def _run_phase1_host(idx: int, host: dict[str, Any]) -> tuple[int, dict[str, Any]]:
         ip = host["ip"]
         fqdns = list(host["fqdns"])
@@ -473,6 +551,9 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
         if not _is_host_reachable(ip):
             log.warning("host_unreachable", ip=ip, fqdns=fqdns, order_id=order_id)
+            # A7: der Host faellt aus Phase 1 UND 2 — beides dokumentieren.
+            _record_host_outage(ip, 1, "skipped", "host_unreachable")
+            _record_host_outage(ip, 2, "skipped", "host_unreachable")
             return idx, {"ip": ip, "fqdns": fqdns, "skipped": True, "reason": "unreachable"}
 
         def p1_callback(oid: str, tool: str, status: str, _ip: str = ip) -> None:
@@ -542,6 +623,7 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
                 idx = futures[future]
                 tech_profiles[idx] = {"ip": scan_hosts[idx]["ip"], "skipped": True, "reason": str(e)}
                 log.error("phase1_host_failed", ip=scan_hosts[idx]["ip"], error=str(e))
+                _record_host_outage(scan_hosts[idx]["ip"], 1, "failed", str(e))
             completed_count += 1
             update_progress(order_id, "scan_phase1", "host_done",
                             hosts_completed=completed_count, hosts_total=hosts_total)
@@ -560,6 +642,15 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     if skip_ai:
         log.info("ai_tech_analysis_skipped", reason="skip_ai_decisions=True")
         log.info("ai_phase2_configs_skipped", reason="skip_ai_decisions=True")
+        # A7: beide ausgelassenen KI-Schritte protokollieren. raw_output
+        # bleibt gueltiges JSON, weil orders.ts diese Zeilen parst.
+        record_tool_run(order_id, None, 1, "ai_tech_analysis", "skipped",
+                        reason="skip_ai_decisions", raw_output="{}")
+        for profile in tech_profiles:
+            profile_ip = profile.get("ip") if isinstance(profile, dict) else None
+            record_tool_run(order_id, profile_ip, 1, "ai_phase2_config",
+                            "skipped", reason="skip_ai_decisions",
+                            raw_output="{}")
     else:
         try:
             from scanner.tools.redirect_probe import probe_cms_paths, _is_playwright_available
@@ -640,12 +731,18 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
                     except Exception as e:
                         log.warning("ki3_phase2_config_failed",
                                     ip=ki3_futures[fut], error=str(e))
+                        # A7: der Host bekommt trotzdem eine Zeile — vorher
+                        # verschwand die fehlende KI-3-Config spurlos.
+                        record_tool_run(order_id, ki3_futures[fut], 1,
+                                        "ai_phase2_config", "failed",
+                                        reason=str(e), raw_output="{}")
                         continue
                     adaptive_configs[ip] = adaptive_config
                     adaptive_json = json.dumps(adaptive_config, indent=2, ensure_ascii=False)
-                    _save_result(order_id=order_id, host_ip=ip, phase=1,
-                                 tool_name="ai_phase2_config", raw_output=adaptive_json,
-                                 exit_code=0, duration_ms=0)
+                    # tool_name + raw_output byte-identisch (orders.ts:938)
+                    record_tool_run(order_id, ip, 1, "ai_phase2_config", "ok",
+                                    exit_code=0, duration_ms=0,
+                                    raw_output=adaptive_json)
                     publish_event(order_id, {"type": "ai_config", "ip": ip, "config": adaptive_config})
 
         log.info("ai_phase2_configs_complete", order_id=order_id, configs=len(adaptive_configs))
@@ -754,6 +851,15 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     # ── Phase 2: Deep Scan (parallel, max 3 hosts) ────────
     scannable = [(h, p) for h, p in zip(scan_hosts, tech_profiles) if not p.get("skipped")]
     scannable_total = len(scannable)
+
+    # A7: Hosts, die Phase 1 nicht ueberstanden haben, fallen auch aus
+    # Phase 2 — bisher geschah das komplett stumm.
+    for _h, _p in zip(scan_hosts, tech_profiles):
+        if _p.get("skipped"):
+            _record_host_outage(
+                _h["ip"], 2, "skipped",
+                f"phase1_skipped:{_p.get('reason', 'unknown')}",
+            )
 
     has_zap = any(t in (config.get("phase2_tools") or [])
                   for t in ("zap_spider", "zap_active", "zap_passive"))
@@ -866,6 +972,7 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
                 ip = scannable[idx][0]["ip"]
                 phase2_results[idx] = {"ip": ip, "fqdn": ip, "tools_run": [], "error": str(e)}
                 log.error("phase2_host_failed", ip=ip, error=str(e))
+                _record_host_outage(ip, 2, "failed", str(e))
             p2_completed += 1
             update_progress(order_id, "scan_phase2", "host_done",
                             hosts_completed=p2_completed, hosts_total=scannable_total)
@@ -915,11 +1022,12 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         _save_phase3_data(order_id, phase3_result)
 
         # Save to scan_results for event replay
-        _save_result(order_id=order_id, host_ip=None, phase=3,
-                     tool_name="phase3_correlation",
-                     raw_output=json.dumps(phase3_result.get("phase3_summary", {}),
-                                           indent=2, ensure_ascii=False),
-                     exit_code=0, duration_ms=0)
+        # tool_name + raw_output byte-identisch (orders.ts:1018)
+        record_tool_run(order_id, None, 3, "phase3_correlation", "ok",
+                        exit_code=0, duration_ms=0,
+                        raw_output=json.dumps(
+                            phase3_result.get("phase3_summary", {}),
+                            indent=2, ensure_ascii=False))
 
         publish_event(order_id, {
             "type": "phase3_complete",
@@ -929,6 +1037,13 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         summary = phase3_result.get("phase3_summary", {})
         valid = summary.get("valid_findings", 0) if isinstance(summary, dict) else 0
         log.info("phase3_integrated", order_id=order_id, findings=valid)
+    else:
+        # A7: auch die ausgelassene Phase 3 bekommt ihre Zeile.
+        record_tool_run(
+            order_id, None, 3, "phase3_correlation", "skipped",
+            reason="not_in_package" if not phase3_tools else "no_phase2_results",
+            raw_output="{}",
+        )
 
     _phase_checkpoint("phase3")
 

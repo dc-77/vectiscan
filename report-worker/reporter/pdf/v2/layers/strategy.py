@@ -121,12 +121,18 @@ def _build_scope_methodology(story, styles, data: dict[str, Any]) -> None:
     hosts_count = scope.get("hosts_count", "?")
     subdomains_count = scope.get("subdomains_count", "?")
     scan_date = scope.get("scan_date", "?")
+    # Regel 2 (Widerspruch C3): frueher stand hier "{hosts_count} aktive Hosts"
+    # — das ueberzeichnete den Umfang, weil das neue Abdeckungskapitel zeigt,
+    # dass ein Teil dieser Hosts nicht pruefbar war (KI-Skip/Redirect/Limit).
+    # Neutral als "identifizierte Hosts" formuliert; die tatsaechliche
+    # Pruef-Abdeckung schluesselt das Kapitel "Was wurde geprueft" auf.
     _body(
         story, styles,
         f"Pruefziel: <b>{domain}</b>. Im Rahmen der Reconnaissance wurden "
         f"<b>{subdomains_count} Subdomains</b> identifiziert, davon "
-        f"<b>{hosts_count} aktive Hosts</b> in die aktive Pruefung "
-        f"einbezogen.",
+        f"<b>{hosts_count} identifizierte Hosts</b> in die aktive Pruefung "
+        f"einbezogen. Welche davon tatsaechlich geprueft werden konnten, "
+        f"schluesselt das Kapitel „Was wurde geprueft — und was nicht“ auf.",
     )
     _body(
         story, styles,

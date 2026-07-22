@@ -676,6 +676,14 @@ def parse_wpscan(wpscan_data: dict | None) -> dict[str, Any]:
     return {
         "wordpress_version": wp_version.get("number", "unknown") if isinstance(wp_version, dict) else str(wp_version),
         "wp_version_vulnerable": wp_version.get("status", "") == "insecure" if isinstance(wp_version, dict) else False,
+        # ADDITIV: der Roh-Status von wpscan (latest|outdated|insecure).  Der
+        # Boolean oben reduziert das auf "insecure" und verwirft "latest"/
+        # "outdated" — genau deshalb konnte der Report bisher nicht belegen,
+        # dass eine WordPress-Version aktuell ist.  Consumer von
+        # wp_version_vulnerable bleiben unveraendert.
+        "wp_version_status": (
+            str(wp_version.get("status", "") or "") if isinstance(wp_version, dict) else ""
+        ),
         "plugins_found": len(plugins),
         "vulnerable_plugins": vulnerable_plugins,
         "themes_found": len(themes),
@@ -927,7 +935,13 @@ def consolidate_findings(
         if wpscan:
             lines.append("")
             lines.append("--- WORDPRESS SCAN (wpscan) ---")
-            lines.append(f"  WordPress Version: {wpscan.get('wordpress_version', 'unknown')}")
+            # Status laut wpscan (latest|outdated|insecure) mit ausgeben, damit
+            # die KI eine Versionsaussage ueberhaupt belegen oder widerlegen kann.
+            _wp_status = str(wpscan.get("wp_version_status", "") or "").strip()
+            _wp_line = f"  WordPress Version: {wpscan.get('wordpress_version', 'unknown')}"
+            if _wp_status:
+                _wp_line += f" (Status laut wpscan: {_wp_status})"
+            lines.append(_wp_line)
             if wpscan.get("wp_version_vulnerable"):
                 lines.append("  [WARNING] WordPress version is INSECURE")
             lines.append(f"  Plugins found: {wpscan.get('plugins_found', 0)}")
@@ -1106,6 +1120,53 @@ def consolidate_findings(
 # ---------------------------------------------------------------------------
 
 
+def _project_host_tool_data(
+    host_results: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Schlanke Projektion der Per-Host-Tool-Ergebnisse fuer Consumer.
+
+    ``host_results`` wird in :func:`parse_scan_data` lokal aufgebaut und war
+    bisher nach dem Prompt-Bau weg.  Exportiert werden bewusst NUR die Felder,
+    die eine Port -> Produkt -> Version-Zuordnung tragen (nmap) sowie der
+    WordPress-Versionsstatus.  Rohtext-Felder (nuclei/nikto/testssl/katana/
+    gobuster/screenshots) bleiben ausgeschlossen — der report-worker-Container
+    hat 1 GB RAM-Limit (docker-compose.yml).
+
+    Fail-open: bei unerwarteten Strukturen wird der betroffene Host
+    uebersprungen, niemals eine Exception nach aussen gereicht.
+    """
+    projected: dict[str, dict[str, Any]] = {}
+
+    for ip, data in (host_results or {}).items():
+        try:
+            if not isinstance(data, dict):
+                continue
+
+            entry: dict[str, Any] = {}
+
+            nmap = data.get("nmap")
+            if isinstance(nmap, dict):
+                entry["nmap"] = {
+                    "open_ports": nmap.get("open_ports") or [],
+                    "os_detection": nmap.get("os_detection", ""),
+                }
+
+            wpscan = data.get("wpscan")
+            if isinstance(wpscan, dict):
+                entry["wpscan"] = {
+                    "wp_version": wpscan.get("wordpress_version", ""),
+                    "wp_version_status": wpscan.get("wp_version_status", ""),
+                }
+
+            if entry:
+                projected[ip] = entry
+        except Exception as exc:  # pragma: no cover - reine Absicherung
+            log.warning("host_tool_data_projection_failed", ip=ip, error=str(exc))
+            continue
+
+    return projected
+
+
 def parse_scan_data(scan_dir: str) -> dict[str, Any]:
     """Main entry point: parse all scan data from a scan directory.
 
@@ -1119,6 +1180,8 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
             "host_inventory": dict,
             "tech_profiles": [dict, ...],
             "consolidated_findings": str,   # formatted text for Claude prompt
+            "host_strategy": dict,          # phase0/host_strategy.json ({} wenn fehlt)
+            "host_tool_data": dict,         # {ip: {"nmap": {...}, "wpscan": {...}}}
             "meta": dict,
         }
     """
@@ -1148,6 +1211,17 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
     # Fallback: dns_findings may live inside host_inventory
     if not dns_records and isinstance(host_inventory, dict):
         dns_records = host_inventory.get("dns_findings", {})
+
+    # 3b. Load host_strategy.json from phase0/ (KI #1 Host-Strategie)
+    # Geschrieben in scan-worker/scanner/worker.py:408-413, Felder je Host:
+    # ip / action (scan|skip) / reasoning / priority.  Fehlt beim skip_ai-Pfad
+    # und bei Alt-Scans -> defensiver Default {}.
+    host_strategy = (
+        _read_json(str(scan_path / "phase0" / "host_strategy.json")) or {}
+    )
+    if not isinstance(host_strategy, dict):
+        log.warning("host_strategy_unexpected_type", type=type(host_strategy).__name__)
+        host_strategy = {}
 
     # 4. Parse per-host tool outputs
     hosts_dir = scan_path / "hosts"
@@ -1390,5 +1464,12 @@ def parse_scan_data(scan_dir: str) -> dict[str, Any]:
         "host_screenshots_per_vhost": host_screenshots_per_vhost,
         "testssl_raw_by_host": testssl_raw_by_host,
         "headers_by_host": headers_by_host,
+        # ADDITIV: KI-#1-Host-Strategie (ip/action/reasoning/priority) — einzige
+        # belastbare Quelle fuer "Host nicht geprueft, weil ...".  {} bei
+        # skip_ai-Pfad und Alt-Scans.
+        "host_strategy": host_strategy,
+        # ADDITIV: schlanke Per-Host-Tool-Projektion (nmap-Ports mit Produkt/
+        # Version + WordPress-Versionsstatus).  Bewusst ohne Rohtext-Felder.
+        "host_tool_data": _project_host_tool_data(host_results),
         "meta": meta,
     }

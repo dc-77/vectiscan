@@ -29,6 +29,25 @@ import {
 // Wird als effektiver Ablauf für Legacy-Zeilen ohne gesetztes expires_at genutzt.
 const REPORT_DOWNLOAD_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
+// A7 (Migration 044): SELECT-Varianten fuer den results-Endpoint. Die A7-
+// Variante liest status/skip_reason mit; die Legacy-Variante laesst sie weg und
+// dient als 42703-Fallback, falls Migration 044 beim Boot durchfiel (siehe
+// GET /api/orders/:id/results). Die Spaltenliste bis exit_code/duration_ms/
+// created_at ist in beiden identisch, damit die camelCase-Mappung unveraendert
+// greift (fehlende status/skip_reason -> null).
+const RESULTS_SELECT_A7 =
+  `SELECT id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms,
+          status, skip_reason, created_at
+   FROM scan_results
+   WHERE order_id = $1
+   ORDER BY phase ASC, created_at ASC`;
+const RESULTS_SELECT_LEGACY =
+  `SELECT id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms,
+          created_at
+   FROM scan_results
+   WHERE order_id = $1
+   ORDER BY phase ASC, created_at ASC`;
+
 async function streamReport(reply: FastifyReply, report: Record<string, unknown>) {
   const bucket = report.minio_bucket as string;
   const objectPath = report.minio_path as string;
@@ -826,14 +845,27 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       return reply.status(403).send({ success: false, error: 'Access denied' });
     }
 
-    // Fetch all scan_results for this order
-    const resultsQuery = await query(
-      `SELECT id, host_ip, phase, tool_name, raw_output, exit_code, duration_ms, created_at
-       FROM scan_results
-       WHERE order_id = $1
-       ORDER BY phase ASC, created_at ASC`,
-      [id],
-    );
+    // Fetch all scan_results for this order.
+    // A7 (Migration 044): status/skip_reason sind additiv. db.ts kapselt
+    // Migration 044 in try/catch ("continuing without it") — schlaegt sie beim
+    // Boot fehl, bootet die API OHNE diese Spalten und ein harter SELECT wirft
+    // SQLSTATE 42703 (undefined_column) -> 500 bei JEDEM Aufruf. Defensiv: bei
+    // 42703 einmalig auf eine Variante OHNE die A7-Spalten zurueckfallen; die
+    // camelCase-Mappung unten liefert dann null (wie fuer Legacy-Zeilen).
+    let resultsQuery: Awaited<ReturnType<typeof query>>;
+    try {
+      resultsQuery = await query(RESULTS_SELECT_A7, [id]);
+    } catch (err) {
+      if ((err as { code?: string }).code === '42703') {
+        request.log.warn(
+          { orderId: id },
+          'scan_results.status/skip_reason fehlt (Migration 044 nicht angewendet) — Fallback ohne A7-Spalten',
+        );
+        resultsQuery = await query(RESULTS_SELECT_LEGACY, [id]);
+      } else {
+        throw err;
+      }
+    }
 
     const results = resultsQuery.rows.map((row: Record<string, unknown>) => ({
       id: row.id,
@@ -843,6 +875,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       rawOutput: row.raw_output || null,
       exitCode: row.exit_code,
       durationMs: row.duration_ms,
+      // A7 (Migration 044): NULL = Legacy-Zeile vor A7, der Consumer leitet
+      // den Status dann wie bisher aus exit_code ab.
+      status: (row.status as string | null) ?? null,
+      skipReason: (row.skip_reason as string | null) ?? null,
       createdAt: (row.created_at as Date).toISOString(),
     }));
 
@@ -2016,7 +2052,13 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         package: order.package || 'perimeter',
       };
 
-      if (phase3Data) {
+      // BEFUND 4: Eine phase3_correlation-skip-Zeile traegt raw_output="{}",
+      // JSON.parse("{}") ergibt ein leeres, aber truthy Objekt. Ohne den
+      // Keys-Check wuerde der jobPayload dann enrichment={}/
+      // correlatedFindings=[]/businessImpactScore=0/phase3Summary={} setzen
+      // statt die Felder ungesetzt zu lassen (Vorverhalten bei null). Ein leeres
+      // phase3-Objekt muss wie "nicht vorhanden" behandelt werden.
+      if (phase3Data && Object.keys(phase3Data).length > 0) {
         jobPayload.enrichment = phase3Data.enrichment || {};
         jobPayload.correlatedFindings = phase3Data.correlated_findings || [];
         jobPayload.businessImpactScore = phase3Data.business_impact_score || 0.0;

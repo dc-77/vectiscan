@@ -20,7 +20,12 @@ import structlog
 log = structlog.get_logger()
 
 POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-10.1")
-CACHE_VERSION = "v1"
+# 21.07.2026 (C2, atomare Befunde): Bump v1 -> v2. Der order_scope-Cache-Modus
+# (siehe cache_key unten) ist prompt-unabhaengig und wuerde bei regenerate-report
+# weiterhin die alte, nicht-atomare Claude-Antwort ausliefern. Der Bump invalidiert
+# chirurgisch nur den AI-Cache — im Gegensatz zu VECTISCAN_POLICY_VERSION, das
+# zusaetzlich die Severity-Policy-Audit-Semantik verschieben wuerde.
+CACHE_VERSION = "v2"
 
 AI_PRICING: dict[str, dict[str, float]] = {
     "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},

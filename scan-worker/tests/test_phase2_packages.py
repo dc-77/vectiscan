@@ -38,12 +38,14 @@ class TestPhase2Packages:
     @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.publish_event")
     @patch("scanner.phase2._save_result")
+    @patch("scanner.phase2.record_tool_run")
     @patch("scanner.phase2.run_testssl", return_value=[{"id": "TLS1", "severity": "OK"}])
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
     def test_webcheck_runs_zap_spider_not_active(
         self, mock_httpx,
-        mock_headers, mock_testssl, mock_save, mock_event, mock_publish, tmp_path
+        mock_headers, mock_testssl, mock_record, mock_save, mock_event, mock_publish,
+        tmp_path
     ):
         from scanner.phase2 import run_phase2
 
@@ -78,12 +80,14 @@ class TestPhase2Packages:
     @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.publish_event")
     @patch("scanner.phase2._save_result")
+    @patch("scanner.phase2.record_tool_run")
     @patch("scanner.phase2.run_testssl", return_value=[{"id": "TLS1", "severity": "OK"}])
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
     def test_perimeter_runs_zap_and_deep_scan(
         self, mock_httpx,
-        mock_headers, mock_testssl, mock_save, mock_event, mock_publish, tmp_path
+        mock_headers, mock_testssl, mock_record, mock_save, mock_event, mock_publish,
+        tmp_path
     ):
         from scanner.phase2 import run_phase2
 
@@ -110,12 +114,14 @@ class TestPhase2Packages:
     @patch("scanner.phase2.publish_tool_output")
     @patch("scanner.phase2.publish_event")
     @patch("scanner.phase2._save_result")
+    @patch("scanner.phase2.record_tool_run")
     @patch("scanner.phase2.run_testssl", return_value=[{"id": "TLS1", "severity": "OK"}])
     @patch("scanner.phase2.run_header_check", return_value={"score": "3/7"})
     @patch("scanner.phase2.run_httpx", return_value={"status_code": 200})
     def test_webcheck_tools_run_excludes_legacy(
         self, mock_httpx,
-        mock_headers, mock_testssl, mock_save, mock_event, mock_publish, tmp_path
+        mock_headers, mock_testssl, mock_record, mock_save, mock_event, mock_publish,
+        tmp_path
     ):
         """Verify tools_run list does not contain removed legacy tools."""
         from scanner.phase2 import run_phase2
