@@ -102,7 +102,9 @@ def test_order_scope_key_changes_with_policy_version():
     assert k_a != k_b
 
 
-def test_cache_version_is_v2_after_atomicity_prompt():
-    """Regression: ohne diesen Bump liefert regenerate-report weiterhin die
-    alte, nicht-atomare Antwort aus dem order_scope-Key."""
-    assert CACHE_VERSION == "v2"
+def test_cache_version_is_current():
+    """Regression: jede Prompt-Aenderung braucht einen CACHE_VERSION-Bump, sonst
+    liefert regenerate-report die alte Antwort aus dem order_scope-Key.
+    Bump-Historie: v1->v2 Atomaritaets-Prompt (C2), v2->v3 Stichtag/Datums-Block
+    im Reporter-Prompt (Juli 2026)."""
+    assert CACHE_VERSION == "v3"

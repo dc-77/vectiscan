@@ -31,13 +31,14 @@ interface Props {
   adminView?: boolean;
 }
 
-type Filter = 'all' | 'eol' | 'mega_cve' | 'current';
+type Filter = 'all' | 'eol' | 'mega_cve' | 'current' | 'unbekannt';
 
 const FILTER_LABEL: Record<Filter, string> = {
   all:       'alle',
   eol:       'EOL',
   mega_cve:  'Mega-CVE',
   current:   'aktuell',
+  unbekannt: 'unbekannt',
 };
 
 export function HostTechDrawer({
@@ -51,7 +52,8 @@ export function HostTechDrawer({
     const eol = rows.filter((r) => r.status === 'eol' || r.status === 'minor_eol').length;
     const mega = rows.filter((r) => r.is_mega_cve).length;
     const cur = rows.filter((r) => r.status === 'current' && !r.is_mega_cve).length;
-    return { all: rows.length, eol, mega_cve: mega, current: cur };
+    const unk = rows.filter((r) => r.status === 'unbekannt').length;
+    return { all: rows.length, eol, mega_cve: mega, current: cur, unbekannt: unk };
   }, [techProfile.tech_rows]);
 
   // Gefiltertes Profil — wir mutieren das Profil-Dict damit TechTable die
@@ -65,6 +67,8 @@ export function HostTechDrawer({
       filtered = rows.filter((r) => r.is_mega_cve);
     } else if (filter === 'current') {
       filtered = rows.filter((r) => r.status === 'current' && !r.is_mega_cve);
+    } else if (filter === 'unbekannt') {
+      filtered = rows.filter((r) => r.status === 'unbekannt');
     }
     return { ...techProfile, tech_rows: filtered };
   }, [techProfile, filter]);

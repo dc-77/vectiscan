@@ -5,6 +5,7 @@ import math
 import os
 import re
 import time
+from datetime import date
 from typing import Any
 
 import anthropic
@@ -18,7 +19,7 @@ from reporter.ai_cache import (
     stats_from_cache_entry,
 )
 from reporter.cwe_reference import correct_cwe_mappings
-from reporter.prompts import get_system_prompt
+from reporter.prompts import get_system_prompt, date_awareness_block
 
 # Cache-TTL fuer Reporter-Calls (Spec 03-ai-determinism.md §5: 1 Tag).
 REPORTER_CACHE_TTL_SECONDS = 24 * 3600
@@ -649,6 +650,7 @@ def call_claude(
     package: str = "professional",
     debug_info: dict[str, Any] | None = None,
     order_id: str | None = None,
+    scan_date: str | None = None,
 ) -> dict[str, Any]:
     """Call Claude API to analyze scan data and generate findings.
 
@@ -696,9 +698,14 @@ def call_claude(
         f"HOST-INVENTAR:\n{json.dumps(host_inventory, indent=2)}\n\n"
         f"TECHNOLOGIE-PROFILE (pro Host):\n{json.dumps(tech_profiles, indent=2)}\n\n"
     )
+    # Stichtag in den (nicht-gecachten) variablen Suffix — die KI muss EOL/
+    # Ablauf/Alter gegen das Scan-Datum rechnen, nicht gegen ihr Trainingswissen.
+    # scan_date fehlt (Alt-Aufrufe/Tests) → date.today() (Report-Gen ≈ Scan-Tag).
+    eff_scan_date = (scan_date or date.today().isoformat())[:10]
     variable_suffix = (
-        f"SCAN-ERGEBNISSE:\n{consolidated_findings}\n\n"
-        f"Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS\n"
+        date_awareness_block(eff_scan_date)
+        + f"SCAN-ERGEBNISSE:\n{consolidated_findings}\n\n"
+        + f"Erstelle die Befunde auf Deutsch. Finding-ID-Prefix: VS\n"
     )
     # Backwards-compatible joined prompt (fuer Cache-Key + Debug-Output)
     user_prompt = static_prefix + variable_suffix

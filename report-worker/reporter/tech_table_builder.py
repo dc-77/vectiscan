@@ -386,7 +386,9 @@ def _classify_status(
     """
     info: dict[str, Any] = {"eol_date": "", "latest_patch": "", "cves": [], "vuln_name": ""}
     if not version:
-        return ("current", False, info)
+        # Ohne ausgelesene Version ist KEINE Aktualitaets-Aussage moeglich —
+        # ehrlich als "unbekannt" (grau) statt falsch-gruen "aktuell" (Juli 2026).
+        return ("unbekannt", False, info)
 
     # 1. KNOWN_VULN_BUILDS-Match → Mega-CVE-Flag (orthogonal zu eol/outdated/current)
     is_mega_cve = False
@@ -666,7 +668,7 @@ def build_tech_table_for_host(
             "name": waf,
             "version": "",
             "category": "WAF/Schutz",
-            "status": "current",
+            "status": "unbekannt",  # WAF ohne Version → keine Aktualitaets-Aussage
             "patch_status": "unbekannt",
             "is_mega_cve": False,
             "eol_date": "",
@@ -704,8 +706,10 @@ def build_tech_table_for_host(
             "name": name,
             "version": version,
             "category": f"Exponierter Dienst (Port {port})",
-            "status": "current",  # Shodan kann EOL nicht bewerten
-            "patch_status": _patch_status_from("current", version),
+            # Exponierter Dienst wird NICHT EOL-bewertet (Shodan/Port-Sicht) →
+            # ehrlich "unbekannt" (grau) statt falsch-gruen "aktuell".
+            "status": "unbekannt",
+            "patch_status": "unbekannt",
             "is_mega_cve": False,
             "eol_date": "",
             "latest_patch": "",

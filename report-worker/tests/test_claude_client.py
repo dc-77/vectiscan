@@ -89,6 +89,42 @@ class TestCallClaude:
         assert call_args.kwargs["model"] == "claude-opus-4-7"
         assert call_args.kwargs["max_tokens"] == 32000
 
+    def test_date_awareness_block_content(self) -> None:
+        """Der Stichtag-Block nennt das Datum und verbietet 'naehert sich' fuer
+        bereits abgelaufene Produkte (Root-Cause castenow Exchange 2016)."""
+        from reporter.prompts import date_awareness_block
+        block = date_awareness_block("2026-07-22")
+        assert "2026-07-22" in block
+        assert "STICHTAG" in block
+        assert "VOR dem" in block
+        assert "nähert sich" in block
+
+    def test_injects_scan_date_into_prompt(self, mock_anthropic) -> None:
+        """call_claude spielt das Scan-Datum in den (nicht-gecachten) Prompt."""
+        with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}):
+            call_claude(
+                domain="beispiel.de", host_inventory={}, tech_profiles=[],
+                consolidated_findings="x", scan_date="2026-07-22",
+            )
+        payload = json.dumps(
+            mock_anthropic.messages.create.call_args.kwargs["messages"]
+        )
+        assert "2026-07-22" in payload
+        assert "STICHTAG" in payload
+
+    def test_scan_date_defaults_to_today(self, mock_anthropic) -> None:
+        """Ohne scan_date-Argument faellt der Stichtag auf date.today()."""
+        from datetime import date
+        with patch.dict("os.environ", {"ANTHROPIC_API_KEY": "test-key"}):
+            call_claude(
+                domain="beispiel.de", host_inventory={}, tech_profiles=[],
+                consolidated_findings="x",
+            )
+        payload = json.dumps(
+            mock_anthropic.messages.create.call_args.kwargs["messages"]
+        )
+        assert date.today().isoformat() in payload
+
     def test_missing_api_key_raises(self) -> None:
         with patch.dict("os.environ", {}, clear=True):
             # Remove ANTHROPIC_API_KEY if present

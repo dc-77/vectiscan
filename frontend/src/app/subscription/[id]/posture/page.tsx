@@ -173,7 +173,7 @@ export default function SubscriptionPosturePage({ params }: PageProps) {
                     <span>Erstmals: {new Date(f.firstSeenAt).toLocaleDateString('de-DE')}</span>
                     <span>Zuletzt: {new Date(f.lastSeenAt).toLocaleDateString('de-DE')}</span>
                     {f.resolvedAt && <span className="text-emerald-400">Behoben: {new Date(f.resolvedAt).toLocaleDateString('de-DE')}</span>}
-                    {f.cvssScore && <span>CVSS {f.cvssScore.toFixed(1)}</span>}
+                    {/* CVSS-Anzeige entfernt (konsistent mit Report/Dashboard, B1) */}
                   </div>
                   {f.riskAcceptedReason && (
                     <div className="text-xs text-slate-400 mt-2 italic">

@@ -32,7 +32,7 @@ interface TechRow {
   name: string;
   version: string;
   category: string;
-  status: 'eol' | 'minor_eol' | 'outdated' | 'current';
+  status: 'eol' | 'minor_eol' | 'outdated' | 'current' | 'unbekannt';
   isMegaCve: boolean;
   eolDate: string;
   latestPatch: string;
@@ -48,6 +48,9 @@ const STATUS_STYLE: Record<TechRow['status'], { label: string; cls: string }> = 
   minor_eol: { label: 'Minor-EOL', cls: 'bg-yellow-900/60 text-yellow-200 border-yellow-700' },
   outdated:  { label: 'veraltet',  cls: 'bg-amber-900/60 text-amber-200 border-amber-700' },
   current:   { label: 'aktuell',   cls: 'bg-emerald-900/60 text-emerald-200 border-emerald-700' },
+  // Juli 2026: keine Version ausgelesen bzw. Dienst nicht EOL-bewertet → grau,
+  // NICHT gruen "aktuell" (das waere eine unbelegte Aktualitaets-Aussage).
+  unbekannt: { label: 'unbekannt', cls: 'bg-slate-800/60 text-slate-400 border-slate-700' },
 };
 
 /**
@@ -77,7 +80,7 @@ function buildRowsFromProfile(profile: TechProfile): TechRow[] {
       name,
       version: version || '',
       category,
-      status: 'current',  // Default — Backend liefert ggf. tech_rows[] mit korrektem Status
+      status: version ? 'current' : 'unbekannt',  // ohne Version keine Aktualitaets-Aussage
       isMegaCve: false,
       eolDate: '',
       latestPatch: '',

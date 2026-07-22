@@ -7,6 +7,36 @@ from reporter.cwe_reference import CWE_PROMPT_BLOCK
 _CURRENT_YEAR = datetime.now().year
 
 
+def date_awareness_block(scan_date_iso: str) -> str:
+    """Stichtag-Block fuer den User-Prompt (Juli 2026).
+
+    Zwingt die KI, ALLE zeitbezogenen Aussagen (End-of-Life, Support-Ende,
+    Zertifikats-Ablauf, "veraltet seit", Alter/Rueckstand einer Version) gegen
+    das tatsaechliche Scan-Datum zu rechnen — nicht gegen ihr Trainingswissen.
+
+    Root-Cause (castenow, 22.07.2026): Exchange 2016 mit EOL 14.10.2025 (rund 9
+    Monate in der Vergangenheit) wurde als "naehert sich End-of-Life" + MEDIUM
+    beschrieben, weil dem Modell das aktuelle Datum nie mitgeteilt wurde. Der
+    deterministische eol_detector rechnet bereits gegen das Datum; diese Zeilen
+    ziehen die KI-Freitext-Befunde nach.
+    """
+    return (
+        f"AKTUELLES DATUM — STICHTAG FÜR ALLE ZEITBEZOGENEN AUSSAGEN:\n"
+        f"Der Scan wurde am {scan_date_iso} durchgeführt. Berechne JEDE "
+        f"zeitbezogene Aussage (End-of-Life, Support-Ende, Zertifikats-Ablauf, "
+        f"„veraltet seit\", Alter/Rückstand einer Version) ausschließlich gegen "
+        f"dieses Datum — niemals gegen dein Trainingswissen.\n"
+        f"- Liegt ein EOL-/Support-Ende-/Ablauf-Datum VOR dem {scan_date_iso}, "
+        f"ist das Produkt BEREITS abgelaufen: formuliere „seit <Zeitraum> ohne "
+        f"Sicherheitsupdates\" bzw. „seit <Zeitraum> abgelaufen\" — NICHT "
+        f"„nähert sich End-of-Life\". Bereits-EOL + von außen erreichbar = "
+        f"mindestens HIGH; bei sicherheitskritischen Diensten (Exchange/Mail-"
+        f"Server/Datenbank/Betriebssystem) CRITICAL.\n"
+        f"- Nur wenn das EOL-/Ablauf-Datum NACH dem {scan_date_iso} liegt, ist "
+        f"„nähert sich End-of-Life / läuft in N Tagen ab\" korrekt.\n\n"
+    )
+
+
 # C2 (21.07.2026) — Atomaritaets-Regel als GETEILTE Modul-Konstante.
 # SYSTEM_PROMPT_BASIC und SYSTEM_PROMPT_PROFESSIONAL sind ansonsten volle
 # Text-Duplikate; eine geteilte Konstante verhindert, dass die Regel in beiden
@@ -51,6 +81,24 @@ ATOMARITAET — EIN BEFUND = EINE SCHWACHSTELLENKLASSE:
 """
 
 
+# Juli 2026 — Root-Cause castenow: die KI gab Umlaute als ASCII-Umschrift aus
+# ("regulaeres", "Maerz", "zukuenftige"), weil die Prompt-Beispiele historisch
+# (Font-Workaround) ASCII nutzen. Font/Rendering unterstuetzen laengst UTF-8;
+# diese Regel zwingt echte Umlaute in ALLEN Ausgabefeldern.
+GERMAN_ORTHOGRAPHY_BLOCK = """
+DEUTSCHE RECHTSCHREIBUNG — ECHTE UMLAUTE (verbindlich):
+- Schreibe durchgehend korrektes Deutsch mit echten Umlauten ä, ö, ü, Ä, Ö, Ü, ß
+  in ALLEN Feldern (title, description, impact, recommendation, overall_description,
+  positive_findings, scope_notes, …).
+- Verwende NIEMALS die ASCII-Umschrift ae/oe/ue/ss: schreibe „reguläres" statt
+  „regulaeres", „März" statt „Maerz", „zukünftige" statt „zukuenftige",
+  „Übergangsweise" statt „Uebergangsweise", „außen" statt „aussen",
+  „ausführlich" statt „ausfuehrlich".
+- Rendering (PDF + Dashboard) unterstützt UTF-8/Umlaute vollständig; die
+  ASCII-Umschrift ist ein Altlast-Workaround und wirkt im Kundendokument unprofessionell.
+"""
+
+
 SYSTEM_PROMPT_BASIC = f"""
 Du bist ein erfahrener IT-Sicherheitsberater, der Scan-Ergebnisse in
 verständliche Befunde umwandelt.
@@ -62,7 +110,7 @@ REGELN FÜR BEWERTUNG:
 - Bei INFO-Severity (Score 0.0): cvss_vector und cvss_score auf "" setzen
 - Maximal 10-14 atomare Befunde, fokussiert auf die wichtigsten Risiken
 - Management-tauglich formulieren, kein Fachjargon
-""" + ATOMICITY_PROMPT_BLOCK + f"""
+""" + ATOMICITY_PROMPT_BLOCK + GERMAN_ORTHOGRAPHY_BLOCK + f"""
 VHOST-AWARENESS (Multi-VHost-Probe seit Mai 2026):
 - Findings koennen ein 'vhost'-Feld tragen (= FQDN unter dem das Problem entdeckt wurde).
 - Bei Findings mit gesetztem vhost: in 'affected' das Format 'host:port (vhost: <fqdn>)' verwenden.
@@ -181,7 +229,7 @@ Shodan-Daten" mit Auflistung pro Host erstellen.
 SYSTEM_PROMPT_PROFESSIONAL = f"""
 Du bist ein erfahrener Penetration Tester, der Scan-Rohdaten in professionelle
 Befunde umwandelt. Du arbeitest nach dem PTES-Standard.
-""" + ATOMICITY_PROMPT_BLOCK + f"""
+""" + ATOMICITY_PROMPT_BLOCK + GERMAN_ORTHOGRAPHY_BLOCK + f"""
 REGELN FÜR CVSS-SCORING:
 - Score was du beweisen kannst, nicht was du dir vorstellst
 - Exponierter Port MIT Auth = NICHT dasselbe wie OHNE Auth

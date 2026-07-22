@@ -4,7 +4,6 @@ import { useState } from 'react';
 import type { FindingsData, Finding } from '@/lib/api';
 import SeverityCounts from './SeverityCounts';
 import { reconcileSeverityCounts } from '@/lib/severityCounts';
-import { cvssLabel } from '@/lib/utils';
 
 const SEVERITY_ORDER = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
 
@@ -181,16 +180,9 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
                       FALSE POSITIVE
                     </span>
                   )}
-                  {!isBasic && finding.cvss_score && (() => {
-                    const score = parseFloat(finding.cvss_score);
-                    const label = cvssLabel(score);
-                    return (
-                      <span className="text-xs font-mono font-bold text-slate-300 bg-slate-700/50 px-2 py-0.5 rounded" title={label.urgency ? `${label.text} — ${label.urgency}` : label.text}>
-                        {finding.cvss_score}
-                        <span className="font-sans font-normal text-slate-500 ml-1.5">{label.urgency || label.text}</span>
-                      </span>
-                    );
-                  })()}
+                  {/* CVSS-Score/Urgency entfernt (konsistent mit dem PDF-Report,
+                      B1): Vektor und Score waren inkonsistent (z.B. Score 5.3 bei
+                      Vektor-Wert 7.5). Die Severity-Stufe bleibt oben als {sev}. */}
                   {finding.in_cisa_kev && (
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30" title="CISA Known Exploited Vulnerability">
                       KEV
@@ -225,9 +217,7 @@ export default function FindingsViewer({ data, excludedIds = [], onExclude, onUn
                 <div className="bg-[#0f172a] p-4 space-y-4 border-t border-gray-800/50">
                   {/* Meta line */}
                   <div className="flex items-center gap-3 flex-wrap text-xs text-slate-500">
-                    {!isBasic && finding.cvss_vector && (
-                      <span className="font-mono bg-slate-800 px-2 py-0.5 rounded">{finding.cvss_vector}</span>
-                    )}
+                    {/* CVSS-Vektor entfernt (B1, konsistent mit dem Report) */}
                     {finding.cwe && (
                       <span className="font-mono bg-slate-800 px-2 py-0.5 rounded">{finding.cwe}</span>
                     )}

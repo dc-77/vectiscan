@@ -178,9 +178,19 @@ def apply_deterministic_pipeline(claude_output: dict,
     # Ergebnis wird mit Claude-Output dedupliziert (claude_findings wins
     # fuer bessere Beschreibung; eol_detector setzt _deterministic_source).
     try:
+        from datetime import date as _date
         from reporter.eol_detector import detect_eol_findings, merge_into_claude_findings
         tech_profiles = sc.get("tech_profiles") or sc.get("techProfiles") or []
-        eol_findings = detect_eol_findings(tech_profiles)
+        # Stichtag aus scan_context: days_since gegen das echte Scan-Datum
+        # rechnen statt gegen date.today() (korrekt auch beim Regenerate).
+        _scan_date_obj = None
+        _sd = sc.get("scan_date")
+        if _sd:
+            try:
+                _scan_date_obj = _date.fromisoformat(str(_sd)[:10])
+            except ValueError:
+                _scan_date_obj = None
+        eol_findings = detect_eol_findings(tech_profiles, scan_date=_scan_date_obj)
         if eol_findings:
             findings_in = merge_into_claude_findings(
                 findings_in, eol_findings, tech_profiles=tech_profiles,

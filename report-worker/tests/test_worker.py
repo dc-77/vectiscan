@@ -287,3 +287,26 @@ class TestBuildFindingsDataGuardStats:
         data = _build_findings_data(claude_output, package="webcheck")
         assert "cve_guard_stats" not in data
         assert "claims_guard_stats" not in data
+
+    def test_build_findings_data_demojibakes_dashboard_text(self) -> None:
+        """Dashboard-Umlaute (Juli 2026): mojibaked KI-Text (Ã¤) in findings_data
+        wird fuer die Dashboard-Befundansicht zu echten Umlauten repariert."""
+        from reporter.worker import _build_findings_data
+
+        claude_output = {
+            "overall_risk": "high",
+            "overall_description": "Mehrere Systeme mit erhÃ¶htem Risiko.",
+            "findings": [{
+                "id": "VS-1", "severity": "HIGH",
+                "title": "Exchange Server 2016 auf owa.example.de",
+                "description": "regulÃ¤res End-of-Life am 14. MÃ¤rz erreicht.",
+            }],
+            "positive_findings": [{"title": "TLS ok",
+                                   "description": "Gute AbwÃ¤rtskompatibilitÃ¤t."}],
+        }
+        data = _build_findings_data(claude_output, package="perimeter")
+        desc = data["findings"][0]["description"]
+        assert "reguläres" in desc and "März" in desc
+        assert "Ã" not in desc
+        assert "erhöhtem" in data["overall_description"]
+        assert "Ã" not in data["positive_findings"][0]["description"]

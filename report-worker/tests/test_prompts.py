@@ -43,6 +43,13 @@ class TestSystemPromptBasic:
         assert "Professionell" in SYSTEM_PROMPT_BASIC
         assert "sachlich" in SYSTEM_PROMPT_BASIC
 
+    def test_german_umlaut_rule_in_both_prompts(self):
+        # Juli 2026 (Root-Cause castenow "regulaeres"): echte Umlaute erzwingen,
+        # ASCII-Umschrift ae/oe/ue verbieten — in BASIC und PROFESSIONAL.
+        for p in (SYSTEM_PROMPT_BASIC, SYSTEM_PROMPT_PROFESSIONAL):
+            assert "ECHTE UMLAUTE" in p
+            assert "NIEMALS die ASCII-Umschrift" in p
+
 
 class TestSystemPromptProfessional:
     def test_contains_cvss_vector(self):

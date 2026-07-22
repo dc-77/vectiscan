@@ -274,6 +274,26 @@ def _build_findings_data(claude_output: dict, package: str, report_data: dict | 
         "package": package,
     }
 
+    # Juli 2026 — Dashboard-Umlaute: findings_data ist die Quelle der Dashboard-
+    # Befundansicht und lief (anders als das PDF via report_mapper._safe) bisher
+    # NICHT durch die Mojibake-Reparatur. Falls KI-Ausgabe im Container zu Doppel-
+    # Encoding (Ã¤) mutiert, wird das hier fuer die Dashboard-Textfelder
+    # deterministisch repariert (No-op bei sauberem Text / ASCII-Umschrift).
+    from reporter.report_mapper import _demojibake
+    for _f in data["findings"]:
+        if isinstance(_f, dict):
+            for _k in ("title", "description", "impact", "recommendation",
+                       "evidence", "affected"):
+                if isinstance(_f.get(_k), str):
+                    _f[_k] = _demojibake(_f[_k])
+    for _pf in data["positive_findings"]:
+        if isinstance(_pf, dict):
+            for _k in ("title", "description", "recommendation"):
+                if isinstance(_pf.get(_k), str):
+                    _pf[_k] = _demojibake(_pf[_k])
+    if isinstance(data.get("overall_description"), str):
+        data["overall_description"] = _demojibake(data["overall_description"])
+
     # NIS2: attach compliance summary if available
     # Compliance / NIS2: attach compliance summary if available
     if package in ("nis2", "compliance") and report_data and report_data.get("nis2"):
@@ -753,6 +773,13 @@ def process_job(job_data: dict) -> None:
         effective_profiles = parsed_profiles if parsed_profiles else tech_profiles
         domain = effective_inventory.get("domain", "unknown")
 
+        # Stichtag fuer KI-Freitext + EOL-Detektor: bevorzugt das echte
+        # Scan-Startdatum aus den Scan-Metadaten (parser meta.startedAt),
+        # Fallback heute. So rechnen KI UND deterministischer eol_detector gegen
+        # dasselbe, korrekte Datum — auch beim Regenerate eines alten Reports.
+        _started_at = str((parsed.get("meta", {}) or {}).get("startedAt") or "")
+        scan_date_iso = _started_at[:10] or datetime.now().date().isoformat()
+
         # -- 4. Call Claude API for analysis ----------------------------------
         if package == "tlscompliance":
             # TLS-Compliance: build TR summary as findings text for Haiku
@@ -778,6 +805,7 @@ def process_job(job_data: dict) -> None:
                 package=package,
                 debug_info=claude_debug,
                 order_id=order_id,
+                scan_date=scan_date_iso,
             )
             log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
             # No QA needed for tlscompliance (no CVSS findings)
@@ -821,6 +849,7 @@ def process_job(job_data: dict) -> None:
                 package=package,
                 debug_info=claude_debug,
                 order_id=order_id,
+                scan_date=scan_date_iso,
             )
             log.info("claude_analysis_complete", overall_risk=claude_output.get("overall_risk"))
 
@@ -866,6 +895,7 @@ def process_job(job_data: dict) -> None:
                 "tech_profiles": effective_profiles,
                 "enrichment": enrichment or {},
                 "host_inventory": effective_inventory,
+                "scan_date": scan_date_iso,  # -> detect_eol_findings (date-korrekt)
             }
             apply_deterministic_pipeline(
                 claude_output,

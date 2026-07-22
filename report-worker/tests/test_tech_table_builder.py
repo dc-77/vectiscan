@@ -135,14 +135,29 @@ def test_category_neos_cms(scan_date_2026):
     assert neos["category"] == "CMS"
 
 
-def test_waf_appears_in_table_as_current(scan_date_2026):
+def test_waf_appears_in_table_as_unbekannt(scan_date_2026):
+    # WAF wird erkannt, aber ohne Version + ohne EOL-Bewertung → "unbekannt"
+    # (grau), nicht falsch-gruen "current" (Juli 2026 GF-Feedback).
     profile = {"ip": "1", "fqdns": [], "cms": None, "cms_version": None,
                "server": None, "waf": "Cloudflare", "technologies": []}
     rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
     waf = next((r for r in rows if r["name"] == "Cloudflare"), None)
     assert waf is not None
     assert waf["category"] == "WAF/Schutz"
-    assert waf["status"] == "current"
+    assert waf["status"] == "unbekannt"
+
+
+def test_version_less_tech_is_unbekannt(scan_date_2026):
+    # Ohne ausgelesene Version keine Aktualitaets-Aussage → "unbekannt", nicht
+    # falsch-gruen "current" (Juli 2026 GF-Feedback: kein grünes "aktuell" ohne Version).
+    profile = {"ip": "1", "fqdns": [], "cms": None, "cms_version": None,
+               "server": None, "waf": None,
+               "technologies": [{"name": "jQuery", "version": ""}]}
+    rows = build_tech_table_for_host(profile, scan_date=scan_date_2026)
+    jq = next((r for r in rows if r["name"].lower() == "jquery"), None)
+    assert jq is not None
+    assert jq["status"] == "unbekannt"
+    assert jq["patch_status"] == "unbekannt"
 
 
 # ─── Dedup + Sortierung ──────────────────────────────────────────────────

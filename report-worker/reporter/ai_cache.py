@@ -25,7 +25,7 @@ POLICY_VERSION = os.environ.get("VECTISCAN_POLICY_VERSION", "2026-05-10.1")
 # weiterhin die alte, nicht-atomare Claude-Antwort ausliefern. Der Bump invalidiert
 # chirurgisch nur den AI-Cache — im Gegensatz zu VECTISCAN_POLICY_VERSION, das
 # zusaetzlich die Severity-Policy-Audit-Semantik verschieben wuerde.
-CACHE_VERSION = "v2"
+CACHE_VERSION = "v3"  # v2->v3: Stichtag/Datums-Block im Reporter-Prompt (Juli 2026)
 
 AI_PRICING: dict[str, dict[str, float]] = {
     "claude-haiku-4-5-20251001": {"input": 1.0, "output": 5.0},

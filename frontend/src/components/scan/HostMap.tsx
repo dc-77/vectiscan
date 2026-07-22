@@ -89,7 +89,7 @@ function screenshotKeyFor(
 // Severity-Rang fuer Tech-Summary-Sortierung — eol > minor_eol > outdated > current,
 // is_mega_cve gewinnt bei gleichem Status.
 const STATUS_RANK: Record<TechRow['status'], number> = {
-  eol: 0, minor_eol: 1, outdated: 2, current: 3,
+  eol: 0, minor_eol: 1, outdated: 2, current: 3, unbekannt: 4,
 };
 
 function pickTopTechs(rows: TechRow[] | undefined, limit = 2): TechRow[] {
