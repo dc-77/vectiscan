@@ -19,6 +19,11 @@ RUN groupadd -r vectiscan && useradd -r -g vectiscan -m vectiscan
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
+# Trivy-Fix (CVE-2026-59873): das im node:22-slim gebuendelte globale npm bringt
+# ein verwundbares node-tar mit (DoS via gzip-bomb, fixed in 7.5.19). npm wird zur
+# Laufzeit nicht gebraucht (CMD = node dist/server.js) -> aus dem Runtime-Image
+# entfernen, damit die Datei (und der CRITICAL-Trivy-Fund) verschwindet.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 COPY --from=builder /app/dist ./dist
 COPY src/migrations ./dist/migrations
 # Demo-Seed-Fixtures (VEC-121/PA-6): seed-demo.js liest die JSON-Fixtures zur

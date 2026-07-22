@@ -26,6 +26,10 @@ RUN groupadd -r vectiscan && useradd -r -g vectiscan -m vectiscan
 WORKDIR /app
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+# Trivy-Fix (CVE-2026-59873): gebuendeltes globales npm (verwundbares node-tar,
+# fixed in 7.5.19) aus dem Runtime-Image entfernen — Next.js Standalone laeuft mit
+# `node server.js`, npm wird nie gebraucht.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 USER vectiscan
 EXPOSE 3000
 ENV PORT=3000
