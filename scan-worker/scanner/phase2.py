@@ -27,6 +27,30 @@ def _record_phase2_status(order_id: str, ip: str, tool_name: str,
     """
     record_tool_run(order_id, ip, 2, tool_name, status, reason=reason)
 
+def _cap_timeout_to_budget(base_timeout: int, deadline_monotonic: Optional[float],
+                           min_timeout: int) -> int:
+    """Strang-A Befund 3: Tool-Timeout gegen das Rest-Budget des Scans cappen.
+
+    ``_check_timeout`` (worker.py) kann einen bereits laufenden Subprozess NICHT
+    unterbrechen. Ein Tool mit langem Timeout (wpscan 1200s) kann deshalb das
+    ``total_timeout`` um fast seine gesamte Laufzeit ueberschreiten — unter A3
+    (mehr/langsamere Hosts) besonders relevant. Ist ein Scan-Deadline (monotonic)
+    bekannt, begrenzen wir den Tool-Timeout auf das Restbudget, aber NIE unter
+    ``min_timeout`` (sonst liefe das Tool ohne realistische Ergebnis-Chance).
+    Fail-open: ohne Deadline (None) oder bei Fehler bleibt der Basis-Timeout.
+    """
+    if deadline_monotonic is None:
+        return base_timeout
+    try:
+        import time as _t
+        remaining = int(deadline_monotonic - _t.monotonic())
+        if remaining <= 0:
+            return min_timeout
+        return max(min_timeout, min(base_timeout, remaining))
+    except Exception:
+        return base_timeout
+
+
 SECURITY_HEADERS = [
     "x-frame-options",
     "x-content-type-options",
@@ -350,6 +374,30 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[s
         raw_headers = _fetch(get_cmd)
         log.info("header_check_fallback_get", fqdn=fqdn, bytes=len(raw_headers))
 
+    # A5 (Jul 2026): Kam ueberhaupt eine HTTP-Antwort? curl liefert bei
+    # Verbindungsabbruch/Timeout leeren stdout. Ohne Antwort duerfen wir
+    # KEINEN "0/7"-Score behaupten — das waere ein Falsch-Nullergebnis, das
+    # der Reporter als „alle Security-Header fehlen" fehldeutet. Stattdessen
+    # den reachable:false-Marker setzen (SSoT fuer Strang A): score=None,
+    # keine Header-Zaehlung. Ein echter 403/429 (WAF) IST eine Antwort und
+    # bleibt reachable:true — Blocking behandelt A6 separat.
+    if not raw_headers.strip():
+        analysis_unreachable: dict[str, Any] = {
+            "url": url,
+            "reachable": False,
+            "score": None,
+            "headers": {},
+            "security_headers": {},
+        }
+        try:
+            with open(output_path, "w") as f:
+                json.dump(analysis_unreachable, f, indent=2)
+        except Exception as e:
+            log.error("header_check_save_error", fqdn=fqdn, error=str(e))
+        log.info("header_check_no_response", fqdn=fqdn,
+                 note="keine HTTP-Antwort — reachable:false statt 0/7")
+        return analysis_unreachable
+
     # Parse headers into dict
     headers: dict[str, str] = {}
     for line in raw_headers.splitlines():
@@ -383,6 +431,8 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[s
 
     analysis: dict[str, Any] = {
         "url": url,
+        # A5: echte HTTP-Antwort erhalten — der Score ist belastbar.
+        "reachable": True,
         "headers": headers,
         "security_headers": security_headers,
         "score": score,
@@ -457,10 +507,15 @@ def run_httpx(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict
         return None
 
 
-def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
+def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str,
+               deadline_monotonic: Optional[float] = None) -> Optional[dict[str, Any]]:
     """Run WPScan WordPress vulnerability scanner.
 
     Only called when CMS is detected as WordPress.
+
+    deadline_monotonic (Strang-A Befund 3, optional): monotone Scan-Deadline.
+    Ist sie gesetzt, wird der 1200s-Timeout auf das Restbudget gecappt, damit
+    der letzte Host das total_timeout nicht um bis zu 20 Min sprengt.
     """
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
@@ -500,9 +555,12 @@ def run_wpscan(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dic
         cmd.extend(["--api-token", api_token])
 
     # Timeout: 1200s (20 min) Safety-Cap fuer Plesk/Cloudflare-Sites mit
-    # Rate-Limits. Vollscope-Run typisch 5-15min.
+    # Rate-Limits. Vollscope-Run typisch 5-15min. Strang-A Befund 3: gegen
+    # das Rest-Budget cappen (min. 120s), damit der letzte Host das
+    # total_timeout nicht um fast einen ganzen wpscan-Lauf ueberschreitet.
+    wpscan_timeout = _cap_timeout_to_budget(1200, deadline_monotonic, min_timeout=120)
     exit_code, duration_ms = run_tool(
-        cmd=cmd, timeout=1200, output_path=output_path,
+        cmd=cmd, timeout=wpscan_timeout, output_path=output_path,
         order_id=order_id, host_ip=ip, phase=2, tool_name="wpscan",
     )
 
@@ -729,11 +787,14 @@ def run_ffuf(fqdn: str, ip: str, host_dir: str, order_id: str,
 
 def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
                     adaptive_config: dict[str, Any] | None = None,
-                    known_paths: set[str] | None = None) -> Optional[list[dict[str, Any]]]:
+                    known_paths: set[str] | None = None,
+                    deadline_monotonic: Optional[float] = None) -> Optional[list[dict[str, Any]]]:
     """Run feroxbuster for recursive directory brute-force.
 
     Args:
         known_paths: Paths already found by gobuster/ffuf — used for dedup.
+        deadline_monotonic: Strang-A Befund 3 (optional) — monotone Scan-
+            Deadline; cappt den 240s-Timeout auf das Restbudget (min. 60s).
 
     Returns list of findings or None on failure.
     """
@@ -806,9 +867,13 @@ def run_feroxbuster(fqdn: str, ip: str, host_dir: str, order_id: str,
         "--silent",
     ]
 
+    # Strang-A Befund 3: 240s-Basis-Timeout gegen das Rest-Budget cappen
+    # (min. 60s). feroxbuster bricht via --time-limit 3m ohnehin selbst ab;
+    # der Cap ist die zusaetzliche Budget-Sicherung fuer den letzten Host.
+    ferox_timeout = _cap_timeout_to_budget(240, deadline_monotonic, min_timeout=60)
     exit_code, duration_ms = run_tool(
         cmd=cmd,
-        timeout=240,
+        timeout=ferox_timeout,
         output_path=output_path,
         order_id=order_id,
         host_ip=ip,
@@ -1098,6 +1163,7 @@ def run_phase2(
     config: dict[str, Any] | None = None,
     adaptive_config: dict[str, Any] | None = None,
     vhost_fqdns: list[str] | None = None,
+    deadline_monotonic: float | None = None,
 ) -> dict[str, Any]:
     """Orchestrate Phase 2 (deep scan) for a single host.
 
@@ -1111,6 +1177,9 @@ def run_phase2(
         config: Package configuration dict (optional).
         vhost_fqdns: Liste primary VHosts fuer Multi-VHost-Tools (ZAP-Spider,
             ZAP-AJAX, header_check, httpx). Wenn None → Legacy fqdns[:5].
+        deadline_monotonic: Strang-A Befund 3 (optional) — monotone Scan-
+            Deadline (start + total_timeout). Cappt die langen Tool-Timeouts
+            (wpscan/feroxbuster) auf das Restbudget. None = kein Cap.
 
     Returns:
         Results summary dict. Bei Multi-VHost: results['vhost_results'][fqdn]
@@ -1334,7 +1403,11 @@ def run_phase2(
                     if vh == primary_fqdn:
                         r["headers"] = header_result
                     r["vhost_results"].setdefault(vh, {})["headers"] = header_result
-                    score = header_result.get("score", "?/?") if header_result else "failed"
+                    # A5: reachable:false darf nicht als "0/7" erscheinen.
+                    if header_result and header_result.get("reachable") is False:
+                        score = "keine HTTP-Antwort"
+                    else:
+                        score = header_result.get("score", "?/?") if header_result else "failed"
                     publish_tool_output(order_id, "header_check", ip,
                                         f"Security headers ({vh}): {score}")
                     record_tool_run(order_id, ip, 2, "header_check", "ok",
@@ -1414,6 +1487,13 @@ def run_phase2(
         from scanner.tools.zap_mapper import ZapAlertMapper
         r: dict[str, Any] = {"_tools": []}
 
+        # A6-Circuit-Breaker (Strang-A Befund 2): ist der Host bereits durch ein
+        # ECHTES WAF-Signal geblockt, gar nicht erst gegen die WAF scannen.
+        if _sticky_block:
+            _record_phase2_status(order_id, ip, "zap_active", "blocked",
+                                  f"host_bereits_geblockt:{_sticky_block}")
+            return r
+
         ac = adaptive_config or {}
         scan_policy = ac.get("zap_scan_policy", "standard")
         is_webcheck = (config or {}).get("package") in ("basic", "webcheck")
@@ -1478,6 +1558,17 @@ def run_phase2(
         """Run ffuf param, feroxbuster, wpscan with Spider URLs."""
         r: dict[str, Any] = {"_tools": []}
 
+        # A6-Circuit-Breaker (Strang-A Befund 2): gegen einen bereits (durch ein
+        # echtes WAF-Signal) geblockten Host laufen die teuren Phase-2-Tools
+        # nicht mehr voll bis zum Timeout, sondern werden als "blocked"
+        # protokolliert. Das begrenzt die von A3 erhoehte Budget-Last. fail-open:
+        # ohne Sticky-Verdikt (None) laeuft alles regulaer.
+        if _sticky_block:
+            for _blocked_tool in ("ffuf_param", "feroxbuster", "ffuf_sensitive", "wpscan"):
+                _record_phase2_status(order_id, ip, _blocked_tool, "blocked",
+                                      f"host_bereits_geblockt:{_sticky_block}")
+            return r
+
         # ffuf param: parameter discovery on API-like URLs
         api_urls = [u for u in spider_urls if "?" not in u and
                     any(p in u for p in ("/api/", "/graphql", "/rest/", "/v1/", "/v2/"))]
@@ -1521,7 +1612,8 @@ def run_phase2(
                 spider_paths = {_urlparse(u).path for u in spider_urls if u}
                 ferox_result = run_feroxbuster(primary_fqdn, ip, host_dir, order_id,
                                                adaptive_config=adaptive_config,
-                                               known_paths=spider_paths if spider_paths else None)
+                                               known_paths=spider_paths if spider_paths else None,
+                                               deadline_monotonic=deadline_monotonic)
                 r["feroxbuster"] = ferox_result
                 r["_tools"].append("feroxbuster")
                 progress_callback(order_id, "feroxbuster", "complete")
@@ -1575,7 +1667,8 @@ def run_phase2(
                 wp_fqdn = _up(wp_final).hostname or primary_fqdn
             else:
                 wp_fqdn = primary_fqdn
-            wpscan_result = run_wpscan(wp_fqdn, ip, host_dir, order_id)
+            wpscan_result = run_wpscan(wp_fqdn, ip, host_dir, order_id,
+                                       deadline_monotonic=deadline_monotonic)
             r["wpscan"] = wpscan_result
             r["_tools"].append("wpscan")
             progress_callback(order_id, "wpscan", "complete")
@@ -1593,6 +1686,21 @@ def run_phase2(
             _record_phase2_status(order_id, ip, "wpscan", "skipped", wpscan_reason)
 
         return r
+
+    # A6-Circuit-Breaker (Strang-A Befund 2): Sticky-Block-Verdikt EINMAL vor
+    # Stage 2 abfragen. Ist der Host durch ein echtes WAF-Signal geblockt,
+    # ueberspringen die teuren Tools (ffuf/feroxbuster/wpscan/zap_active) den
+    # Lauf. fail-open: bei jedem Fehler None -> Tools laufen normal.
+    _sticky_block: str | None = None
+    try:
+        from scanner.tools import host_block_verdict
+        _sticky_block = host_block_verdict(order_id, ip)
+    except Exception as _cb_err:
+        log.warning("phase2_circuit_breaker_check_failed", ip=ip, error=str(_cb_err))
+        _sticky_block = None
+    if _sticky_block:
+        log.warning("phase2_circuit_breaker_host_blocked", ip=ip,
+                    order_id=order_id, reason=_sticky_block)
 
     stage2_parallel = should_parallelize_stage2(adaptive_config, tech_profile)
     stage2_workers = 4 if stage2_parallel else 1

@@ -279,6 +279,139 @@ class TestReasonPriority:
 
 
 # ====================================================================
+# 2b. A6 — Blocking (status='blocked') als eigener nicht_pruefbar-Grund
+# ====================================================================
+class TestBlockedHostReason:
+    """Strang A / A6: ein aktiv geblockter Host (WAF/Rate-Limit) darf nicht als
+    'alle Tool-Laeufe fehlgeschlagen' verharmlost werden.  status='blocked' ist
+    der autoritative Kanal (coverage._run_state -> CELL_SKIP); der Grund muss
+    HOHE Prioritaet haben und den Blocking-reason tragen.
+    """
+
+    def _inv(self) -> dict:
+        return {"domain": "x.de", "hosts": [{"ip": "6.6.6.6", "fqdns": ["x.de"]}]}
+
+    def test_blocked_toolrun_is_not_testable(self):
+        runs = [
+            {"host_ip": "6.6.6.6", "phase": 2, "tool_name": "nikto",
+             "exit_code": -3, "duration_ms": 5, "status": "blocked",
+             "skip_reason": "429_burst(3)"},
+        ]
+        cov = build_scan_coverage(self._inv(), runs, {}, [], [], "perimeter")
+        h = cov["hosts"][0]
+        assert h["state"] == STATE_NOT_TESTABLE
+        assert h["reason"] == "aktiv geblockt (WAF/Rate-Limit): 429_burst(3)"
+
+    def test_blocked_wins_over_all_failed(self):
+        # Mischung: ein Tool blocked, ein Tool failed -> Blocking-Grund gewinnt.
+        runs = [
+            {"host_ip": "6.6.6.6", "phase": 2, "tool_name": "nikto",
+             "exit_code": -3, "duration_ms": 5, "status": "blocked",
+             "skip_reason": "403_burst_after_2xx(10)+body_size_drop"},
+            {"host_ip": "6.6.6.6", "phase": 2, "tool_name": "nuclei",
+             "exit_code": -2, "duration_ms": 5, "status": "failed",
+             "skip_reason": None},
+        ]
+        cov = build_scan_coverage(self._inv(), runs, {}, [], [], "perimeter")
+        h = cov["hosts"][0]
+        assert h["state"] == STATE_NOT_TESTABLE
+        assert h["reason"].startswith("aktiv geblockt (WAF/Rate-Limit):")
+        assert "403_burst_after_2xx(10)" in h["reason"]
+
+    def test_blocked_via_host_struct_flag(self):
+        # A6-Kanal 3: host['blocked']=True im Inventar (kein blocked-Toolrun).
+        inv = {"domain": "x.de", "hosts": [
+            {"ip": "6.6.6.7", "fqdns": ["x.de"], "blocked": True,
+             "blocked_reason": "waf_body_marker"},
+        ]}
+        runs = [
+            {"host_ip": "6.6.6.7", "phase": 2, "tool_name": "testssl",
+             "exit_code": -2, "duration_ms": 5, "status": "failed",
+             "skip_reason": None},
+        ]
+        cov = build_scan_coverage(inv, runs, {}, [], [], "perimeter")
+        h = cov["hosts"][0]
+        assert h["state"] == STATE_NOT_TESTABLE
+        assert h["reason"] == "aktiv geblockt (WAF/Rate-Limit): waf_body_marker"
+
+    def test_blocked_without_reason_still_labeled(self):
+        runs = [
+            {"host_ip": "6.6.6.6", "phase": 2, "tool_name": "nikto",
+             "exit_code": -3, "duration_ms": 5, "status": "blocked",
+             "skip_reason": None},
+        ]
+        cov = build_scan_coverage(self._inv(), runs, {}, [], [], "perimeter")
+        assert cov["hosts"][0]["reason"] == "aktiv geblockt (WAF/Rate-Limit)"
+
+    def test_absent_blocked_key_does_not_trigger(self):
+        # Regelkonform: nur host['blocked'] is True zaehlt; Abwesenheit != blocked.
+        inv = {"domain": "x.de", "hosts": [{"ip": "6.6.6.8", "fqdns": ["x.de"]}]}
+        runs = [
+            {"host_ip": "6.6.6.8", "phase": 1, "tool_name": "nmap",
+             "exit_code": -2, "duration_ms": 5, "status": "failed",
+             "skip_reason": None},
+        ]
+        cov = build_scan_coverage(inv, runs, {}, [], [], "perimeter")
+        assert cov["hosts"][0]["reason"] == "alle Tool-Läufe fehlgeschlagen"
+
+
+# ====================================================================
+# 2c. A5 — reachable:false (keine HTTP-Antwort) als nicht_pruefbar-Grund
+# ====================================================================
+class TestReachableFalseReason:
+    """Strang A / A5: ein Host ohne HTTP-Antwort (headers reachable:false) bekommt
+    im C3-Kapitel den konkreten Grund 'keine HTTP-Antwort' statt des pauschalen
+    'alle Tool-Laeufe fehlgeschlagen'.  Erzwingt KEINEN Zustandswechsel.
+    """
+
+    def _inv(self) -> dict:
+        return {"domain": "x.de", "hosts": [{"ip": "7.7.7.7", "fqdns": ["vpn.x.de"]}]}
+
+    def test_reachable_false_yields_http_reason(self):
+        runs = [
+            {"host_ip": "7.7.7.7", "phase": 1, "tool_name": "nmap",
+             "exit_code": -2, "duration_ms": 5, "status": "failed",
+             "skip_reason": None},
+        ]
+        headers = {"7.7.7.7": {"reachable": False, "score": None}}
+        cov = build_scan_coverage(
+            self._inv(), runs, {}, [], [], "perimeter",
+            headers_by_host=headers,
+        )
+        h = cov["hosts"][0]
+        assert h["state"] == STATE_NOT_TESTABLE
+        assert h["reason"] == "keine HTTP-Antwort (Host antwortete nicht)"
+
+    def test_blocked_beats_no_http(self):
+        # Prioritaet: aktiv geblockt schlaegt keine-HTTP-Antwort.
+        runs = [
+            {"host_ip": "7.7.7.7", "phase": 2, "tool_name": "nikto",
+             "exit_code": -3, "duration_ms": 5, "status": "blocked",
+             "skip_reason": "429_burst(3)"},
+        ]
+        headers = {"7.7.7.7": {"reachable": False, "score": None}}
+        cov = build_scan_coverage(
+            self._inv(), runs, {}, [], [], "perimeter",
+            headers_by_host=headers,
+        )
+        assert cov["hosts"][0]["reason"].startswith("aktiv geblockt")
+
+    def test_reachable_true_does_not_add_http_reason(self):
+        # reachable:true -> keine Sonderbehandlung; Standard-Grund bleibt.
+        runs = [
+            {"host_ip": "7.7.7.7", "phase": 1, "tool_name": "nmap",
+             "exit_code": -2, "duration_ms": 5, "status": "failed",
+             "skip_reason": None},
+        ]
+        headers = {"7.7.7.7": {"reachable": True, "score": "3/7"}}
+        cov = build_scan_coverage(
+            self._inv(), runs, {}, [], [], "perimeter",
+            headers_by_host=headers,
+        )
+        assert cov["hosts"][0]["reason"] == "alle Tool-Läufe fehlgeschlagen"
+
+
+# ====================================================================
 # 3. Tool-Name-Filter + Normalisierung
 # ====================================================================
 class TestToolFilter:

@@ -164,6 +164,100 @@ class TestParseHeadersJson:
         assert result["score"] == "0/0"
         assert result["missing"] == []
 
+    # -- A5 (Strang A): reachable:false / score:null --------------------------
+
+    def test_reachable_false_yields_no_missing(self, tmp_path: Path) -> None:
+        """Nicht-Antwort (reachable:false) darf NICHT als '0/7 fehlen' erscheinen."""
+        p = tmp_path / "headers.json"
+        p.write_text(json.dumps({
+            "url": "https://vpn.example.com",
+            "reachable": False,
+            "score": None,
+            "headers": {},
+            "security_headers": {},
+        }))
+        result = parse_headers_json(str(p))
+        assert result["reachable"] is False
+        assert result["score"] is None
+        # Kein Header darf als "fehlend" markiert werden -> kein Falsch-Finding.
+        assert result["missing"] == []
+        assert result["present"] == []
+
+    def test_reachable_true_keeps_numeric_score(self, tmp_path: Path) -> None:
+        """Echte Antwort: reachable:true + numerischer Score bleibt belastbar."""
+        p = tmp_path / "headers.json"
+        p.write_text(json.dumps({
+            "url": "https://www.example.com",
+            "reachable": True,
+            "score": "3/7",
+            "security_headers": {
+                "x-frame-options": {"present": True, "value": "DENY"},
+                "content-security-policy": {"present": True, "value": "default-src"},
+                "x-content-type-options": {"present": True, "value": "nosniff"},
+            },
+        }))
+        result = parse_headers_json(str(p))
+        assert result["reachable"] is True
+        assert result["score"] == "3/7"
+        assert "x-frame-options" in result["present"]
+        assert "strict-transport-security" in result["missing"]
+
+    def test_missing_reachable_flag_is_legacy(self, tmp_path: Path) -> None:
+        """Alt-Datensatz ohne reachable-Flag: numerischer Score wie bisher."""
+        p = tmp_path / "headers.json"
+        p.write_text(json.dumps({
+            "url": "https://legacy.example.com",
+            "security_headers": {
+                "x-frame-options": {"present": True, "value": "DENY"},
+            },
+        }))
+        result = parse_headers_json(str(p))
+        # reachable ist None (Alt-Datensatz) -> Score wird normal berechnet.
+        assert result["reachable"] is None
+        assert result["score"] == "1/7"
+
+
+class TestConsolidateHeadersReachable:
+    """A5: consolidate_findings darf fuer reachable:false keine '0/7'-Zeile schreiben."""
+
+    def test_no_score_line_for_unreachable_host(self) -> None:
+        host_results = {
+            "10.0.0.1": {
+                "fqdns": ["vpn.example.com"],
+                "headers": {
+                    "url": "https://vpn.example.com",
+                    "reachable": False,
+                    "score": None,
+                    "missing": [],
+                    "present": [],
+                },
+            }
+        }
+        text = consolidate_findings(host_results, {})
+        # Keine numerische Score-Zeile, kein "Missing:"-Block -> kein Falsch-Finding.
+        assert "Score:" not in text
+        assert "Missing:" not in text
+        assert "0/7" not in text
+        # Stattdessen expliziter Nicht-pruefbar-Hinweis.
+        assert "keine HTTP-Antwort" in text
+
+    def test_reachable_host_keeps_score_line(self) -> None:
+        host_results = {
+            "10.0.0.2": {
+                "fqdns": ["www.example.com"],
+                "headers": {
+                    "url": "https://www.example.com",
+                    "reachable": True,
+                    "score": "2/7",
+                    "present": ["x-frame-options", "x-content-type-options"],
+                    "missing": ["content-security-policy"],
+                },
+            }
+        }
+        text = consolidate_findings(host_results, {})
+        assert "Score: 2/7" in text
+        assert "Missing:" in text
+
 
 # ---------------------------------------------------------------------------
 # parse_gobuster_dir

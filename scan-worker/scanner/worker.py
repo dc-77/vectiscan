@@ -549,12 +549,15 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
         _check_timeout()
 
-        if not _is_host_reachable(ip):
-            log.warning("host_unreachable", ip=ip, fqdns=fqdns, order_id=order_id)
-            # A7: der Host faellt aus Phase 1 UND 2 — beides dokumentieren.
-            _record_host_outage(ip, 1, "skipped", "host_unreachable")
-            _record_host_outage(ip, 2, "skipped", "host_unreachable")
-            return idx, {"ip": ip, "fqdns": fqdns, "skipped": True, "reason": "unreachable"}
+        # A3 (Jul 2026): Kein TCP-Socket-Vorcheck mehr. nmap laeuft in Phase 1
+        # ohnehin mit `-Pn` (siehe run_nmap) und deckt Reachability selbst ab.
+        # Der fruehere 443/80-Connect-Vorcheck (_is_host_reachable, 5s) hat
+        # VPN-Gateways/PBX/langsame/WAF-droppende Hosts faelschlich pauschal
+        # als "host_unreachable" aus Phase 1+2 geworfen (Ursache der
+        # „N Systeme ohne erreichbare Ports"-Falschaussage). Ist ein Host
+        # wirklich tot, scheitern/timeouten kuenftig die echten Tools und A7
+        # protokolliert DAS mit echtem Grund — statt eines Pauschal-Skips.
+        # Die Funktion _is_host_reachable bleibt bewusst erhalten (Rule 1).
 
         def p1_callback(oid: str, tool: str, status: str, _ip: str = ip) -> None:
             update_progress(oid, "scan_phase1", tool, host=_ip,
@@ -896,7 +899,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         if not pool_enabled:
             result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
                                 adaptive_config=adaptive_configs.get(ip, {}),
-                                vhost_fqdns=host_vhost_fqdns)
+                                vhost_fqdns=host_vhost_fqdns,
+                                deadline_monotonic=start + config["total_timeout"])
             return idx, result
 
         # Pool-Mode: lease a ZAP, run, release — even on error.
@@ -937,7 +941,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
             result = run_phase2(ip, fqdns, tech_profile, scan_dir, order_id, p2_callback, config,
                                 adaptive_config=adaptive_configs.get(ip, {}),
-                                vhost_fqdns=host_vhost_fqdns)
+                                vhost_fqdns=host_vhost_fqdns,
+                                deadline_monotonic=start + config["total_timeout"])
             return idx, result
         finally:
             hb_stop.set()
@@ -994,6 +999,32 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         log.info("tech_enricher_done", order_id=order_id, **enrich_stats)
     except Exception as e:
         log.warning("tech_enricher_failed", order_id=order_id, error=str(e))
+
+    # ── A6: Blocking-Verdikt pro Host ins host_inventory schreiben ──────────
+    # Der BlockDetector (per-Order-Singleton in scanner.tools) hat waehrend
+    # Phase 1+2 alle Tool-Responses gesammelt. Wir stempeln das Sticky-Verdikt
+    # (ueberlebt das 60s-Window) auf die Host-Struktur, damit der report-worker
+    # (C3-Coverage) einen aktiv geblockten Host als „nicht pruefbar (aktiv
+    # geblockt)" statt als Nullergebnis darstellen kann. Der autoritative
+    # Kanal bleibt scan_results.status='blocked' (record_tool_run); dies hier
+    # liefert den Grund-String fuer die Coverage-Begruendung. Fail-open.
+    try:
+        from scanner.tools import get_block_verdicts
+        block_verdicts = get_block_verdicts(order_id)
+        if block_verdicts:
+            blocked_ips = []
+            for h in host_inventory.get("hosts", []):
+                verdict = block_verdicts.get(h.get("ip"))
+                if verdict and verdict.get("blocked"):
+                    h["blocked"] = True
+                    h["blocked_reason"] = verdict.get("reason")
+                    blocked_ips.append(h.get("ip"))
+            if blocked_ips:
+                log.info("host_block_verdicts_stamped", order_id=order_id,
+                         blocked_hosts=blocked_ips)
+                set_discovered_hosts(order_id, host_inventory)
+    except Exception as e:
+        log.warning("block_verdict_stamp_failed", order_id=order_id, error=str(e))
 
     # ── Phase 3: Correlation & Enrichment ──────────────────
     phase3_result: dict[str, Any] = {}

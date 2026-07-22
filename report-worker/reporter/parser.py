@@ -432,8 +432,36 @@ def parse_headers_json(path: str) -> dict[str, Any]:
     if data is None:
         return default
 
+    # A5 (Strang A): Der Scan-Worker markiert eine AUSGEBLIEBENE HTTP-Antwort mit
+    # ``reachable: false`` / ``score: null`` (siehe scan-worker phase2.py::
+    # run_header_check).  Das ist KEIN Nullergebnis — der Host hat schlicht nicht
+    # geantwortet.  Wir duerfen daraus NICHT "0/7 Header fehlen" ableiten, sonst
+    # entsteht ein Falsch-Finding ("alle Security-Header fehlen").  Stattdessen
+    # reichen wir den Zustand strukturiert weiter: score=None, leere
+    # missing/present-Listen und das explizite ``reachable``-Flag.  Konsumenten
+    # (consolidate_findings, tr03116_checker) behandeln reachable===False separat.
+    # Nur ``reachable is False`` ist der Nicht-Antwort-Fall; ein fehlendes/None-
+    # Flag ist ein Alt-Datensatz und wird wie bisher (numerischer Score) behandelt.
+    if data.get("reachable") is False:
+        log.info(
+            "headers_not_reachable",
+            path=path,
+            url=data.get("url", ""),
+            note="keine HTTP-Antwort — kein 0/7-Score, kein Header-Finding",
+        )
+        return {
+            "url": data.get("url", ""),
+            "reachable": False,
+            "score": None,
+            "missing": [],
+            "present": [],
+            "details": data,
+        }
+
     result: dict[str, Any] = {
         "url": data.get("url", ""),
+        # ADDITIV: bei echter Antwort True, bei Alt-Datensaetzen None (=wie bisher).
+        "reachable": data.get("reachable"),
         "details": data,
     }
 
@@ -971,7 +999,19 @@ def consolidate_findings(
 
         # --- 6. Security headers ---
         headers = data.get("headers", {})
-        if headers.get("missing") or headers.get("present"):
+        # A5 (Strang A): Nicht-Antwort != Nullergebnis.  Bei reachable===False hat
+        # der Host keine HTTP-Antwort geliefert — es darf KEINE "0/7"-Zeile in den
+        # Prompt, sonst leitet die KI ein "alle Security-Header fehlen"-Finding ab.
+        # Stattdessen explizit als nicht pruefbar kennzeichnen.
+        if headers.get("reachable") is False:
+            lines.append("")
+            lines.append("--- SECURITY HEADERS ---")
+            if headers.get("url"):
+                lines.append(f"  URL: {headers['url']}")
+            lines.append(
+                "  Header nicht prüfbar (keine HTTP-Antwort) — KEIN Header-Finding"
+            )
+        elif headers.get("missing") or headers.get("present"):
             lines.append("")
             lines.append("--- SECURITY HEADERS ---")
             if headers.get("url"):

@@ -1800,6 +1800,7 @@ def map_to_report_data(
     if _os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower() == "v2":
         _augment_for_v2(
             report_data, claude_output, host_inventory, package, scan_meta,
+            headers_by_host=headers_by_host,
         )
 
     return report_data
@@ -1811,6 +1812,7 @@ def _augment_for_v2(
     host_inventory: dict[str, Any],
     package: str,
     scan_meta: dict[str, Any],
+    headers_by_host: dict[str, dict[str, Any]] | None = None,
 ) -> None:
     """Erweitert report_data um v2-spezifische Felder.
 
@@ -1949,6 +1951,9 @@ def _augment_for_v2(
             claude_output.get("findings") or [],
             tech_profiles,
             package,
+            # A5 (Strang A): reachable:false-Hosts bekommen im C3-Kapitel den
+            # konkreten Grund "keine HTTP-Antwort" statt "alle Laeufe fehlgeschlagen".
+            headers_by_host=headers_by_host,
         )
     except Exception as exc:  # pragma: no cover -- defensive
         log.warning("v2_augment_scan_coverage_failed", error=str(exc))

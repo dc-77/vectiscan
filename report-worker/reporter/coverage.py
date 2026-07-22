@@ -247,6 +247,7 @@ def build_scan_coverage(
     findings: list[dict[str, Any]] | None,
     tech_profiles: list[dict[str, Any]] | None,
     package: str | None,
+    headers_by_host: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any] | None:
     """Aggregiert die Abdeckungs-Sicht fuer das C3-Kapitel.
 
@@ -275,6 +276,7 @@ def build_scan_coverage(
             findings or [],
             tech_profiles or [],
             package or "",
+            headers_by_host or {},
         )
     except Exception as exc:  # pragma: no cover - reine Absicherung
         log.warning("build_scan_coverage_failed", error=str(exc))
@@ -288,6 +290,7 @@ def _build_scan_coverage_impl(
     findings: list[dict[str, Any]],
     tech_profiles: list[dict[str, Any]],
     package: str,
+    headers_by_host: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     # -- Host-Grundgesamtheit: aktive Hosts + Limit-uebersprungene Hosts ----
     inv_hosts = host_inventory.get("hosts") or []
@@ -365,6 +368,11 @@ def _build_scan_coverage_impl(
     host_tools_ok: dict[str, set[str]] = {}
     host_tools_failed: dict[str, set[str]] = {}
     host_ai_skip_reason: dict[str, str] = {}
+    # A6 (Strang A): aktiv geblockte Hosts.  Ein Tool-Lauf mit status='blocked'
+    # (WAF/Rate-Limit, EXIT_CODE_SKIPPED) belegt, dass der Host aktiv abgewehrt
+    # hat — das ist ein eigener Zustand, KEIN "alle Tool-Laeufe fehlgeschlagen".
+    # Wir merken pro Host den ersten belastbaren Blocking-Grund (skip_reason).
+    host_blocked_reason: dict[str, str] = {}
     for r in tool_runs:
         if not isinstance(r, dict):
             continue
@@ -381,6 +389,12 @@ def _build_scan_coverage_impl(
             continue
         if not _is_tool_row(raw_name):
             continue
+        # A6: Blocking phasenunabhaengig erfassen (auch scan-weite/Phase-3-Laeufe),
+        # bevor der Phase-1/2-Filter greift.  Erster Grund pro Host gewinnt.
+        if str(r.get("status") or "").strip().lower() == "blocked":
+            if ip not in host_blocked_reason:
+                br = r.get("skip_reason") or r.get("blocked_reason")
+                host_blocked_reason[ip] = str(br).strip() if br else ""
         try:
             phase = int(r.get("phase")) if r.get("phase") is not None else None
         except (TypeError, ValueError):
@@ -418,6 +432,17 @@ def _build_scan_coverage_impl(
             if keys & cand and fid not in findings_for_host[ip]:
                 findings_for_host[ip].append(fid)
 
+    # -- A5 (Strang A): Hosts ohne HTTP-Antwort (reachable:false) ------------
+    # Der Header-Check-Kanal (headers_by_host, aus parser.parse_headers_json)
+    # markiert ausgebliebene HTTP-Antworten mit reachable===False.  Das liefert
+    # dem nicht_pruefbar-Grund eine konkrete Erklaerung ("keine HTTP-Antwort")
+    # statt des pauschalen "alle Tool-Laeufe fehlgeschlagen".  Erzwingt KEINEN
+    # Zustandswechsel — nur die Begruendung wird praeziser.
+    host_no_http: set[str] = set()
+    for hip, hdrs in (headers_by_host or {}).items():
+        if isinstance(hdrs, dict) and hdrs.get("reachable") is False:
+            host_no_http.add(str(hip).strip())
+
     # -- Host-Zustaende + Begruendung ---------------------------------------
     hosts_out: list[dict[str, Any]] = []
     for he in host_entries:
@@ -451,6 +476,8 @@ def _build_scan_coverage_impl(
                 ip, raw, he, strategy_by_ip, host_ai_skip_reason,
                 host_ran_p12.get(ip, False),
                 has_ok=has_ok, vuln_scan_ok=has_vuln_scan_ok,
+                blocked_reason=_host_blocked_reason(ip, raw, host_blocked_reason),
+                no_http=(ip in host_no_http),
             )
 
         hosts_out.append({
@@ -516,6 +543,30 @@ def _build_scan_coverage_impl(
     return {"hosts": hosts_out, "matrix": matrix, "totals": totals}
 
 
+def _host_blocked_reason(
+    ip: str,
+    raw: dict[str, Any],
+    host_blocked_reason: dict[str, str],
+) -> str | None:
+    """Blocking-Grund eines Hosts aus beiden A6-Kanaelen — oder ``None``.
+
+    Kanaele (siehe Strang-A-Marker-Format des Scan-Workers):
+      1. Host-Struktur: ``host["blocked"] is True`` + ``host["blocked_reason"]``
+         (im host_inventory gestempelt).  Fehlt der Key, ist der Host nicht
+         geblockt (Key ist ABWESEND, nicht ``False``).
+      2. scan_results-Zeilen: ``status='blocked'`` (autoritativ, ueber
+         ``host_blocked_reason`` vorindiziert).
+
+    Rueckgabe: ``None`` wenn nicht geblockt; sonst der Grund-String (ggf. leer,
+    wenn kein Grund protokolliert wurde).  Fail-open: nie werfend.
+    """
+    if raw.get("blocked") is True:
+        return str(raw.get("blocked_reason") or "").strip()
+    if ip in host_blocked_reason:
+        return host_blocked_reason[ip]
+    return None
+
+
 def _reason_for_not_testable(
     ip: str,
     raw: dict[str, Any],
@@ -525,16 +576,28 @@ def _reason_for_not_testable(
     ran_p12: bool,
     has_ok: bool = False,
     vuln_scan_ok: bool = True,
+    blocked_reason: str | None = None,
+    no_http: bool = False,
 ) -> str:
     """Begruendungs-Prioritaet fuer ``nicht_pruefbar``.
 
-    skip_reason (A7) > host_strategy.reasoning > host["_reasoning"]
+    "aktiv geblockt (WAF/Rate-Limit)" (A6, autoritativ — Host hat aktiv
+    abgewehrt) > skip_reason (A7) > host_strategy.reasoning > host["_reasoning"]
     (Redirect-Dedup) > "Host-Limit des Pakets erreicht" (skipped_hosts) >
+    "keine HTTP-Antwort" (A5 reachable:false — Host antwortete nicht) >
     "Schwachstellenpruefung nicht abgeschlossen" (BEFUND 5 — Detektion lief,
     aber kein echter Schwachstellenscan) > "alle Tool-Laeufe fehlgeschlagen" >
     "Grund nicht protokolliert" (Alt-Orders vor A7 — niemals behaupten, es sei
     alles geprueft worden).
+
+    A6/A5 stehen bewusst HOCH: ein aktiv geblockter oder gar nicht antwortender
+    Host darf nie als "alle Tool-Laeufe fehlgeschlagen" verharmlost werden — der
+    Grund liegt beim Ziel (Abwehr/keine Antwort), nicht bei unserem Scanner.
     """
+    # A6: aktiv geblockt — hoechste Prioritaet, klarer Ziel-seitiger Grund.
+    if blocked_reason is not None:
+        base = "aktiv geblockt (WAF/Rate-Limit)"
+        return f"{base}: {blocked_reason}" if blocked_reason else base
     a7 = host_ai_skip_reason.get(ip)
     if a7:
         return a7
@@ -546,6 +609,10 @@ def _reason_for_not_testable(
         return str(reasoning).strip()
     if host_entry.get("limit_skipped"):
         return "Host-Limit des Pakets erreicht"
+    # A5: reachable:false — der Host lieferte keine HTTP-Antwort.  Konkreter als
+    # "alle Tool-Laeufe fehlgeschlagen" und als BEFUND-5-Formulierung.
+    if no_http:
+        return "keine HTTP-Antwort (Host antwortete nicht)"
     # BEFUND 5: erfolgreiche Detektion, aber kein echter Schwachstellenscan.
     # "alle Tool-Laeufe fehlgeschlagen" waere hier falsch (es gab erfolgreiche
     # Laeufe) — der Host ist nur nicht abschliessend geprueft.

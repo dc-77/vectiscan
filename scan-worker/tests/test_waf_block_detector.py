@@ -49,16 +49,34 @@ def test_403_burst_only_after_some_2xx():
     assert not blocked
 
 
-def test_two_signals_combined_block():
+def test_429_burst_blocks_even_with_timeouts():
+    """3x 429 blockt (hard). Timeouts kippen die Entscheidung nicht mehr —
+    Strang-A Befund 1: timeout_burst ist kein Block-Signal mehr, taucht also
+    auch nicht mehr im Reason auf."""
     d = BlockDetector()
-    # 3x 429 + 5x Timeout → beide hard, blockt
     for _ in range(3):
         d.report_response("x.com", 429, 50)
     for _ in range(5):
         d.report_response("x.com", 0, 0, is_timeout=True)
     blocked, reason = d.is_blocked("x.com")
     assert blocked
-    assert "429_burst" in reason and "timeout_burst" in reason
+    assert "429_burst" in reason
+    # timeout_burst darf NICHT mehr als Block-Signal erscheinen
+    assert "timeout_burst" not in reason
+
+
+def test_timeout_burst_only_not_blocked():
+    """Strang-A Befund 1: reine Timeout-Haeufung (>=5, ohne 403/429/Marker)
+    ist KEIN Block. Der Host ist tot/langsam/keine Antwort, nicht 'geblockt'."""
+    d = BlockDetector()
+    for _ in range(8):
+        d.report_response("dead.com", 0, 0, is_timeout=True)
+    blocked, reason = d.is_blocked("dead.com")
+    assert not blocked
+    assert "timeout_burst" not in reason
+    # Auch das Sticky-Verdikt bleibt leer -> kein customer-facing "blocked"
+    assert d.ever_blocked("dead.com")[0] is False
+    assert "dead.com" not in d.verdicts() or d.verdicts()["dead.com"][0] is False
 
 
 def test_two_soft_signals_combined_block():
@@ -156,3 +174,63 @@ def test_per_host_isolation():
         d.report_response("y.com", 429, 100)
     assert d.is_blocked("x.com")[0] is True
     assert d.is_blocked("y.com")[0] is False
+
+
+# ---------------------------------------------------------------------------
+# A6 (Jul 2026): Sticky-Verdikt fuer den Report (ueberlebt Window-Ablauf)
+# ---------------------------------------------------------------------------
+
+def test_ever_blocked_survives_window_expiry(monkeypatch):
+    """Nach Window-Ablauf liefert is_blocked False, ever_blocked aber True."""
+    d = BlockDetector()
+    fake_now = [1000.0]
+    monkeypatch.setattr(
+        "scanner.waf_block_detector.time.monotonic",
+        lambda: fake_now[0],
+    )
+    for _ in range(3):
+        d.report_response("x.com", 429, 100)
+    # is_blocked setzt den Sticky-Marker
+    assert d.is_blocked("x.com")[0] is True
+
+    # 70s spaeter: Window leer -> is_blocked False, aber Sticky bleibt
+    fake_now[0] = 1070.0
+    assert d.is_blocked("x.com")[0] is False
+    ever_blocked, reason = d.ever_blocked("x.com")
+    assert ever_blocked is True
+    assert "429_burst" in reason
+
+
+def test_verdicts_lists_blocked_hosts():
+    d = BlockDetector()
+    for _ in range(3):
+        d.report_response("blocked.com", 429, 100)
+    d.report_response("fine.com", 200, 5000)
+    # Verdikte materialisieren (is_blocked setzt Sticky fuer blocked.com)
+    d.is_blocked("blocked.com")
+    verdicts = d.verdicts()
+    assert verdicts["blocked.com"][0] is True
+    assert "429_burst" in verdicts["blocked.com"][1]
+    assert verdicts["fine.com"][0] is False
+
+
+def test_reset_host_clears_sticky_verdict():
+    d = BlockDetector()
+    for _ in range(3):
+        d.report_response("x.com", 429, 100)
+    assert d.is_blocked("x.com")[0] is True
+    assert d.ever_blocked("x.com")[0] is True
+    d.reset_host("x.com")
+    # Nach VPN-Switch: kein Sticky mehr
+    assert d.ever_blocked("x.com")[0] is False
+    assert "x.com" not in d.verdicts()
+
+
+def test_body_marker_is_sticky_in_verdicts():
+    d = BlockDetector()
+    d.report_response(
+        "x.com", 200, 800,
+        body_excerpt="Sucuri Website Firewall - Access Denied",
+    )
+    d.is_blocked("x.com")  # setzt Sticky
+    assert d.verdicts()["x.com"] == (True, "waf_body_marker")

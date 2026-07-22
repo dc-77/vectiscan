@@ -71,15 +71,16 @@ def _record_response_for_block_detection(
     Heuristik: extrahiere HTTP-Status aus raw_output (curl/httpx haben den
     Code im JSON; ZAP/wpscan/nuclei strukturiert anders). Wenn nicht
     parsbar: Status 0, body_size = len(raw_output).
+
+    A6 (Jul 2026): die ERFASSUNG ist vom VPN-Gate entkoppelt — der Detector
+    laeuft IMMER, auch ohne verfuegbares VPN. Vorher returnte diese Funktion
+    frueh bei `not sw.is_available()`, sodass Blocking ohne VPN gar nicht
+    erfasst wurde. Das automatische VPN-Aktivieren bleibt in
+    _check_block_and_maybe_activate_vpn und dort weiterhin VPN-gated.
     """
     if not order_id or not host_ip:
         return
     try:
-        from scanner.vpn_switch import get_switch
-        # WICHTIG: get_switch nicht initialisieren wenn VPN nicht verfuegbar
-        sw = get_switch(order_id)
-        if not sw.is_available():
-            return
         # Heuristisches Status-Extraction
         status = 0
         body_excerpt = (raw_output or "")[:500]
@@ -113,6 +114,68 @@ def _get_or_create_detector(order_id: str):
     if order_id not in _detectors:
         _detectors[order_id] = BlockDetector()
     return _detectors[order_id]
+
+
+def _host_block_reason(order_id: Optional[str], host_ip: Optional[str]) -> Optional[str]:
+    """A6: Blocking-Grund fuer einen Host, wenn der Detector JETZT blockt.
+
+    Liefert den Reason-String oder None. Fail-open: jeder Fehler ergibt None,
+    damit die Block-Erkennung nie einen Tool-Lauf/Scan kippt.
+    """
+    if not order_id or not host_ip:
+        return None
+    try:
+        det = _detectors.get(order_id)
+        if det is None:
+            return None
+        blocked, reason = det.is_blocked(host_ip)
+        return reason if blocked else None
+    except Exception:
+        return None
+
+
+def get_block_verdicts(order_id: Optional[str]) -> dict:
+    """A6: Sticky-Blocking-Verdikt je Host fuer diese Order.
+
+    Rueckgabe: {host_ip: {"blocked": bool, "reason": str}}. Fail-open -> {}.
+    worker.py stempelt daraus das blocked-Flag ins host_inventory, damit der
+    report-worker (C3-Coverage) den Host als „aktiv geblockt" ausweisen kann.
+    """
+    out: dict = {}
+    try:
+        det = _detectors.get(order_id)
+        if det is None:
+            return out
+        for host, (blocked, reason) in det.verdicts().items():
+            out[host] = {"blocked": bool(blocked), "reason": reason}
+    except Exception:
+        pass
+    return out
+
+
+def host_block_verdict(order_id: Optional[str], host_ip: Optional[str]) -> Optional[str]:
+    """A6-Circuit-Breaker (Strang-A Befund 2): Sticky-Block-Grund fuer EINEN Host.
+
+    Liefert den Reason-String, wenn der Host im bisherigen Scan durch ein
+    ECHTES WAF-Signal (403-burst-after-2xx / 429-burst / WAF-Body-Marker —
+    NICHT bloss Timeouts, siehe Befund 1) geblockt war, sonst None. Nutzt das
+    Sticky-Verdikt (``ever_blocked``), damit auch eine frueher im Scan
+    aufgetretene Blockade zaehlt, deren 60s-Window laengst abgelaufen ist.
+
+    Zweck: ein Pre-Execution-Gate vor den teuren Phase-2-Tools kann so gegen
+    eine erkannte WAF abbrechen, statt bis zum vollen Timeout weiterzulaufen.
+    Fail-open: jeder Fehler ergibt None -> Tools laufen normal.
+    """
+    if not order_id or not host_ip:
+        return None
+    try:
+        det = _detectors.get(order_id)
+        if det is None:
+            return None
+        blocked, reason = det.ever_blocked(host_ip)
+        return reason if blocked else None
+    except Exception:
+        return None
 
 
 def _check_block_and_maybe_activate_vpn(
@@ -271,15 +334,28 @@ def _run_tool_with_optional_vpn(
                     phase, tool_name, retry_with_vpn=False,
                 )
 
-        # Save result to scan_results table
+        # Save result to scan_results table.
+        # A6: Ist der Host laut Detector gerade aktiv geblockt, bekommt dieser
+        # Tool-Lauf status="blocked" statt eines regulaeren ok/failed — sonst
+        # ginge ein WAF-403/429 als normales (Null-)Ergebnis durch. fail-open:
+        # _host_block_reason gibt im Fehlerfall None, dann Regelpfad.
         if order_id:
-            record_tool_run(
-                order_id, host_ip, phase, tool_name,
-                classify_exit(tool_name, exit_code),
-                exit_code=exit_code,
-                duration_ms=duration_ms,
-                raw_output=raw[:50000] if raw else None,
-            )
+            block_reason = _host_block_reason(order_id, host_ip)
+            if block_reason:
+                record_tool_run(
+                    order_id, host_ip, phase, tool_name, "blocked",
+                    reason=block_reason,
+                    duration_ms=duration_ms,
+                    raw_output=raw[:50000] if raw else None,
+                )
+            else:
+                record_tool_run(
+                    order_id, host_ip, phase, tool_name,
+                    classify_exit(tool_name, exit_code),
+                    exit_code=exit_code,
+                    duration_ms=duration_ms,
+                    raw_output=raw[:50000] if raw else None,
+                )
 
         return exit_code, duration_ms
 
@@ -332,13 +408,27 @@ def _run_tool_with_optional_vpn(
                 )
 
         if order_id:
-            record_tool_run(
-                order_id, host_ip, phase, tool_name, "timeout",
-                reason=f"timeout_after_{timeout}s",
-                exit_code=-1,
-                duration_ms=duration_ms,
-                raw_output=raw[:50000],
-            )
+            # A6: liegt fuer den Host ein echtes WAF-Block-Verdikt vor
+            # (403/429-Burst oder Body-Marker — NICHT bloss Timeouts, siehe
+            # waf_block_detector.is_blocked), wird dieser Lauf als "blocked"
+            # statt "timeout"/"failed" protokolliert; das Verdikt hat die
+            # hoehere Aussagekraft. Reine Timeouts bleiben "timeout".
+            block_reason = _host_block_reason(order_id, host_ip)
+            if block_reason:
+                record_tool_run(
+                    order_id, host_ip, phase, tool_name, "blocked",
+                    reason=block_reason,
+                    duration_ms=duration_ms,
+                    raw_output=raw[:50000],
+                )
+            else:
+                record_tool_run(
+                    order_id, host_ip, phase, tool_name, "timeout",
+                    reason=f"timeout_after_{timeout}s",
+                    exit_code=-1,
+                    duration_ms=duration_ms,
+                    raw_output=raw[:50000],
+                )
 
         return -1, duration_ms
 

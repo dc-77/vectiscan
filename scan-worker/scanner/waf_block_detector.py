@@ -10,10 +10,18 @@ aktivieren, sondern nur wenn das Pattern "geblockt" eindeutig ist.
 Heuristik (mind. 2 Signale ODER 1 starker WAF-Marker im Body):
   - >=3 HTTP 429 in 60s
   - >=10 HTTP 403 in 60s (wo vorher 200er kamen)
-  - >=5 Timeouts in 60s
   - 1x CloudFlare-Challenge-Body-Marker
   - 1x Akamai/Imperva/Sucuri-Body-Marker
   - 1x Burst von Mini-Responses (<500 Byte) nachdem vorher 5KB+ kamen
+
+Strang-A Befund 1 (Jul 2026): reine Timeout-Haeufung (>=5 Timeouts) ist
+KEIN eigenstaendiges Block-Signal mehr. Ein bloss langsamer/toter/
+gefilterter Host wurde sonst faelschlich als "aktiv geblockt (WAF/Rate-
+Limit)" gemeldet und verdraengte die ehrlichere Begruendung "keine HTTP-
+Antwort" (A5) bzw. "timeout" (A7). Ein Block-Verdikt (is_blocked True)
+entsteht jetzt NUR bei einem echten HTTP-Block-Signal: 403-burst-after-2xx,
+429-burst oder WAF-Body-Marker. Timeouts werden weiter erfasst (Audit/Log),
+kippen die Entscheidung aber nicht.
 """
 
 from __future__ import annotations
@@ -85,6 +93,12 @@ class BlockDetector:
 
     def __init__(self):
         self._hosts: dict[str, _HostStats] = {}
+        # A6 (Jul 2026): Sticky-Verdikt host -> reason. Das 60s-Sliding-Window
+        # von is_blocked ist am Scan-Ende (60-90 Min) laengst abgelaufen; fuer
+        # den Report brauchen wir aber das Verdikt vom Zeitpunkt der Blockade.
+        # Wird gesetzt, sobald is_blocked einmal True liefert, und ueberlebt
+        # den Window-Ablauf. reset_host (nach VPN-Switch) raeumt es mit auf.
+        self._blocked_reason: dict[str, str] = {}
 
     def report_response(
         self,
@@ -127,6 +141,7 @@ class BlockDetector:
 
         # Hard-Marker = sofort True
         if stats.hard_marker_hit:
+            self._blocked_reason[host] = "waf_body_marker"  # A6: sticky
             return True, "waf_body_marker"
 
         if not stats.events:
@@ -139,11 +154,21 @@ class BlockDetector:
         n_timeout = sum(1 for _, s, _, _ in stats.events if s == -1)
         n_2xx = sum(1 for _, s, _, _ in stats.events if 200 <= s < 300)
 
-        # HARD-SIGNALE: jedes alleine reicht fuer Block-Entscheidung
+        # HARD-SIGNALE: jedes alleine reicht fuer Block-Entscheidung.
+        # Nur ECHTE HTTP-Block-Signale (429/403-nach-2xx/WAF-Body-Marker).
         if n_429 >= _MIN_429_FOR_BLOCK:
             hard_signals.append(f"429_burst({n_429})")
+        # Strang-A Befund 1 (Jul 2026): timeout_burst ist KEIN eigenstaendiges
+        # Block-Signal mehr. Reine Timeout-Haeufung ohne echtes WAF-Signal =
+        # Host tot/langsam/keine Antwort, NICHT "aktiv geblockt" — das deckt
+        # A5 (reachable:false) bzw. A7 (status=timeout) bereits ehrlich ab.
+        # Timeouts werden nur noch fuer den Audit-Trail festgehalten und
+        # machen is_blocked nicht mehr True. (VPN-Auto-Aktivierung allein
+        # wegen Timeouts entfaellt damit bewusst — ein VPN hilft einem toten
+        # Host nicht.)
         if n_timeout >= _MIN_TIMEOUTS_FOR_BLOCK:
-            hard_signals.append(f"timeout_burst({n_timeout})")
+            log.debug("timeout_burst_observed_not_blocking",
+                      host=host, n_timeout=n_timeout)
 
         # WEICHE SIGNALE: brauchen Kombination (mit hard ODER mit anderem soft)
         # 403 nur als Signal wenn auch echte 200er existierten — sonst ist es ein
@@ -162,12 +187,37 @@ class BlockDetector:
         all_signals = hard_signals + signals
         # Block-Entscheidung: 1 Hard ODER 2 weiche
         if hard_signals or len(signals) >= 2:
-            return True, "+".join(all_signals)
+            reason = "+".join(all_signals)
+            self._blocked_reason[host] = reason  # A6: sticky
+            return True, reason
         return False, "below_threshold" if signals else "no_signals"
 
+    def ever_blocked(self, host: str) -> tuple[bool, str]:
+        """A6: Sticky-Verdikt — war der Host irgendwann im Scan geblockt?
+
+        Nutzt zuerst das gemerkte Verdikt (ueberlebt Window-Ablauf), sonst
+        die Live-Heuristik. Fuer den Report am Scan-Ende relevant, wenn das
+        60s-Window der Blockade laengst abgelaufen ist.
+        """
+        reason = self._blocked_reason.get(host)
+        if reason:
+            return True, reason
+        return self.is_blocked(host)
+
+    def verdicts(self) -> dict[str, tuple[bool, str]]:
+        """A6: Sticky-Blocking-Verdikt je bekanntem Host (host -> (blocked, reason))."""
+        hosts = set(self._hosts.keys()) | set(self._blocked_reason.keys())
+        return {h: self.ever_blocked(h) for h in hosts}
+
     def reset_host(self, host: str) -> None:
-        """Cleanup fuer einen Host (z.B. nach erfolgreichem VPN-Switch)."""
+        """Cleanup fuer einen Host (z.B. nach erfolgreichem VPN-Switch).
+
+        Raeumt auch das Sticky-Verdikt (A6): nach einem erfolgreichen
+        VPN-Switch wird der Host neu — ueber das VPN — gescannt und gilt
+        nicht mehr als geblockt.
+        """
         self._hosts.pop(host, None)
+        self._blocked_reason.pop(host, None)
 
     def stats_summary(self) -> dict[str, dict]:
         """Fuer Audit-Trail: was wurde pro Host gemessen."""
