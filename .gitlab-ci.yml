@@ -609,6 +609,52 @@ ops-reset-db-password:
       docker compose logs --tail=15 --no-color api 2>&1 | tail -15 || true
 
 # =============================================================================
+# DB-Auth-Diagnose + Re-Fix (Incident 23.07.2026) — reset-db-password setzte
+# Rolle+.env+Container auf V (48 hex), API bleibt aber im 28P01. Widerspruch:
+# API sendet V (Hex -> kein URL-Decode-Effekt), Rolle=V (ALTER ok), trotzdem
+# Auth-Fehler. Dieser Job verifiziert auf DB-Ebene und behebt ggf. neu:
+#  (1) re-ALTER Rolle auf $DB_PASSWORD, (2) TCP-Auth-Test ueber die NETZWERK-IP
+#  (nicht 127.0.0.1 -> sonst greift die trust-Regel und der Test luegt),
+#  (3) password_encryption + rolpassword-Prefix, (4) SHA-Vergleich API-URL-pw
+#  vs CI-Var, (5) pg_hba host-Regeln, dann Restart. needs: [] -> sofort spielbar.
+# =============================================================================
+ops-diag-dbauth:
+  extends: .ops-base
+  needs: []
+  script:
+    - cd ${DEPLOY_PATH}
+    - |
+      set -eu; set +o pipefail
+      DBU=vectiscan_usr
+      NEWPW="${DB_PASSWORD:-}"
+      [ -n "$NEWPW" ] || { echo "FATAL: CI-Var DB_PASSWORD leer"; exit 1; }
+      echo "== postgres-Container (ALLE, auf Aliase/Orphans pruefen) =="
+      docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Status}}' | grep -iE 'postgres|NAMES' || true
+      docker compose ps postgres --format 'table {{.Name}}\t{{.Status}}' 2>/dev/null || docker compose ps postgres
+      echo "== (1) re-ALTER Rolle auf CI-Var-Wert =="
+      docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U "$DBU" -d postgres -c "ALTER USER \"$DBU\" PASSWORD '$NEWPW';" 2>&1 | tail -1
+      echo "== (2) db-name + API-URL-pw-SHA vs CI-Var-SHA =="
+      CID=$(docker compose ps -q api | head -1)
+      URL=$(docker inspect "$CID" --format '{{range .Config.Env}}{{println .}}{{end}}' | sed -n 's/^DATABASE_URL=//p' | head -1)
+      REST=${URL#postgresql://}; CREDS=${REST%@postgres:5432/*}; APIPW=${CREDS#*:}; DBN=${REST##*/}; DBN=${DBN%%\?*}
+      echo "  db-name=$DBN | api-pw len=${#APIPW} sha=$(printf %s "$APIPW" | sha256sum | cut -c1-12) | civar len=${#NEWPW} sha=$(printf %s "$NEWPW" | sha256sum | cut -c1-12)"
+      echo "== (3) password_encryption + rolpassword-Prefix + rolcanlogin =="
+      docker compose exec -T postgres psql -U "$DBU" -d postgres -tAc "show password_encryption" 2>&1 | head -1
+      docker compose exec -T postgres psql -U "$DBU" -d postgres -tAc "select rolcanlogin::text||' '||left(coalesce(rolpassword,'NULL'),13) from pg_authid where rolname='vectiscan_usr'" 2>&1 | head -1
+      echo "== (4) pg_hba host-Regeln =="
+      docker compose exec -T postgres sh -c 'grep -vE "^#|^[[:space:]]*$" "$PGDATA/pg_hba.conf" 2>/dev/null | grep -iE "^host|^hostssl" | head -12'
+      echo "== (5) TCP-Auth-Test ueber NETZWERK-IP mit CI-Var (echter API-Pfad, scram) =="
+      PGIP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' "$(docker compose ps -q postgres | head -1)" | awk '{print $1}')
+      echo "  postgres netz-ip=$PGIP db=$DBN"
+      docker compose exec -T postgres sh -c 'PGPASSWORD="$1" psql -h "$2" -U vectiscan_usr -d "$3" -tAc "select '\''AUTH_OK '\''||current_user" 2>&1 | head -3' _ "$NEWPW" "$PGIP" "$DBN"
+      echo "== (6) Restart api + Worker =="
+      docker compose restart api scan-worker-1 scan-worker-2 scan-worker-3 precheck-worker-1 precheck-worker-2 report-worker
+      sleep 10
+      docker compose ps --format 'table {{.Name}}\t{{.State}}\t{{.Status}}' | grep -Ei 'api-1|postgres' || true
+      echo "== api-Logs (letzte 12) =="
+      docker compose logs --tail=12 --no-color api 2>&1 | tail -12 || true
+
+# =============================================================================
 # Services-Status — Container-Status + BullMQ-Queue-Tiefen + Worker-Logs.
 # Nur Lesezugriff, kein restart. Ideal um zu sehen warum ein Job haengt.
 # =============================================================================
