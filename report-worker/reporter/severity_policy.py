@@ -1109,6 +1109,28 @@ def extract_context_flags(finding: dict, scan_context: dict) -> dict[str, Any]:
             break
     if primary_tech:
         flags["tech"] = primary_tech
+    else:
+        # Fallback (Juli 2026): KI-Findings tragen oft kein host/host_ip -> kein
+        # tech_profile-Match -> primary_tech leer -> EOL-Findings fielen auf
+        # SP-FALLBACK (KI-Severity, z.B. Exchange 2016 EOL als MEDIUM statt HIGH).
+        # Ohne Profil-Match den kanonischen Tech-Token aus Titel/Description
+        # ableiten, damit die kalibrierten SP-EOL-Regeln greifen (Exchange ->
+        # SP-EOL-001 HIGH, Webserver -> SP-EOL-003 MEDIUM).
+        # WICHTIG: nur flags["tech"] direkt setzen, NICHT primary_tech — sonst
+        # triggert der tech_critical-Block unten (liest primary_tech) via
+        # SP-EOL-005 auch Webserver auf CRITICAL (separate GF-Entscheidung).
+        _blob = (str(finding.get("title", "")) + " "
+                 + str(finding.get("description", ""))).lower()
+        for _kw, _canon in (
+            ("exchange", "exchange"),
+            ("wordpress", "wordpress"),
+            ("nginx", "nginx"),
+            ("apache", "apache"), ("httpd", "apache"),
+            ("microsoft iis", "iis"),
+        ):
+            if _kw in _blob:
+                flags["tech"] = _canon
+                break
     if major_version_behind:
         flags["major_version_behind"] = True
 

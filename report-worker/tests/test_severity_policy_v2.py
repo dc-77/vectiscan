@@ -201,3 +201,37 @@ def test_eol_internet_facing_critical_db():
     f = findings[0]
     assert f.get("policy_id") == "SP-EOL-005"
     assert f.get("severity", "").lower() == "critical"
+
+
+def test_eol_exchange_tech_from_title_is_high_not_fallback():
+    """Juli 2026: KI-EOL-Finding ohne host/tech_profile -> tech aus dem Titel ->
+    SP-EOL-001 HIGH statt SP-FALLBACK MEDIUM. Bewusst KEINE CRITICAL-Eskalation
+    (tech_critical bleibt aus, also kein SP-EOL-005)."""
+    findings = [{
+        "id": "VS-EOL-EXCH",
+        "finding_type": "software_eol",
+        "title": ("Microsoft Exchange Server 2016 CU23 ist End-of-Life seit "
+                  "2025-10-14 auf owa.example.de"),
+        "severity": "medium",
+        "affected": "1.2.3.4:443 (owa.example.de)",
+    }]
+    apply_policy(findings, scan_context={})
+    f = findings[0]
+    assert f.get("policy_id") == "SP-EOL-001"
+    assert f.get("severity", "").lower() == "high"
+
+
+def test_eol_webserver_from_title_stays_medium_no_critical():
+    """Kein Blast-Radius: EOL-Webserver aus dem Titel -> SP-EOL-003 MEDIUM,
+    NICHT via SP-EOL-005 auf CRITICAL gehoben."""
+    findings = [{
+        "id": "VS-EOL-NGINX",
+        "finding_type": "software_eol",
+        "title": "nginx 1.20.0 ist End-of-Life auf www.example.de",
+        "severity": "low",
+        "affected": "1.2.3.4:443 (www.example.de)",
+    }]
+    apply_policy(findings, scan_context={})
+    f = findings[0]
+    assert f.get("policy_id") == "SP-EOL-003"
+    assert f.get("severity", "").lower() == "medium"
