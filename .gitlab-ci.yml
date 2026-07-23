@@ -519,6 +519,46 @@ ops-restart-worker:
     - docker compose logs --tail=30 --no-color ${WORKER} 2>&1 | tail -30 || true
 
 # =============================================================================
+# DB-Passwort-Reconcile (Incident 23.07.2026) — setzt das Passwort der
+# Postgres-Rolle auf den Wert, den der api-Container EFFEKTIV verwendet
+# (aus DATABASE_URL via `docker inspect`, also NACH compose-Interpolation).
+# Grund: Postgres uebernimmt POSTGRES_PASSWORD nur beim Erst-Init des Volumes;
+# driftet der CI-Var/.env-Wert danach, laeuft die API in 28P01 und crasht beim
+# initDb (-> 502 Bad Gateway). Der lokale Trust-Socket (pg_hba: local all all
+# trust) erlaubt das ALTER trotz fehlgeschlagener TCP-Auth. Non-destruktiv,
+# kein Datenverlust. needs: [] -> sofort ausloesbar ohne erneuten Build/Deploy.
+# =============================================================================
+ops-reconcile-db-password:
+  extends: .ops-base
+  needs: []
+  script:
+    - cd ${DEPLOY_PATH}
+    - |
+      set -eu
+      CID=$(docker compose ps -q api | head -1)
+      test -n "$CID" || { echo "FATAL: kein api-Container gefunden"; exit 1; }
+      URL=$(docker inspect "$CID" --format '{{range .Config.Env}}{{println .}}{{end}}' | sed -n 's/^DATABASE_URL=//p' | head -1)
+      test -n "$URL" || { echo "FATAL: keine DATABASE_URL im api-Container"; exit 1; }
+      REST=${URL#postgresql://}
+      CREDS=${REST%@postgres:5432/*}
+      DBU=${CREDS%%:*}
+      DBP=${CREDS#*:}
+      test -n "$DBP" || { echo "FATAL: leeres Passwort aus DATABASE_URL geparst"; exit 1; }
+      echo "Effektiver Wert aus Container: role=$DBU passlen=${#DBP}"
+      ENVP=$(sed -n 's/^DB_PASSWORD=//p' .env | head -1 || true)
+      if [ "$ENVP" != "$DBP" ]; then
+        echo "HINWEIS: .env-Literal != effektiver Container-Wert (compose-Interpolation) — Container-Wert ist massgeblich."
+      fi
+      ESC=$(printf '%s' "$DBP" | sed "s/'/''/g")
+      docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U "$DBU" -d postgres -c "ALTER USER \"$DBU\" PASSWORD '$ESC';"
+      echo ">>> Postgres-Rolle '$DBU' auf effektiven Container-Wert gesetzt."
+      docker compose restart api scan-worker-1 scan-worker-2 scan-worker-3 precheck-worker-1 precheck-worker-2 report-worker
+      sleep 8
+      docker compose ps --format 'table {{.Name}}\t{{.State}}\t{{.Status}}' | grep -Ei 'api|worker|postgres' || true
+      echo "=== api-Logs (letzte 20 Zeilen) ==="
+      docker compose logs --tail=20 --no-color api 2>&1 | tail -20 || true
+
+# =============================================================================
 # Services-Status — Container-Status + BullMQ-Queue-Tiefen + Worker-Logs.
 # Nur Lesezugriff, kein restart. Ideal um zu sehen warum ein Job haengt.
 # =============================================================================
