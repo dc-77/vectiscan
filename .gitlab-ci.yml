@@ -561,14 +561,15 @@ ops-reconcile-db-password:
 # =============================================================================
 # DB-Passwort-Reset (Incident 23.07.2026, robust) — der reine Reconcile oben
 # griff nicht: der aus DATABASE_URL geparste Wert entspricht nicht 1:1 dem, was
-# der pg-Treiber sendet (compose-Interpolation / URL-Decode eines Sonderzeichens).
-# Dieser Job setzt stattdessen ein FRISCHES, encoding-sicheres Passwort (nur
-# [A-Za-z0-9]) konsistent auf: (1) Postgres-Rolle, (2) .env, (3) frisch
-# rekreierte DB-abhaengige Container. Der Klartext landet NUR in
-# ${DEPLOY_PATH}/.db_password.new (chmod 600) fuer den Operator — NIE im CI-Log
-# (Zeilen in `- |`-Bloecken werden von GitLab nicht einzeln geechoed).
-# DANACH: CI-Variable DB_PASSWORD im GitLab-UI auf denselben Wert setzen, sonst
-# re-breakt der naechste deploy-auto. needs: [] -> sofort spielbar.
+# der pg-Treiber sendet (er URL-decodiert eine %XX-Sequenz im alten Passwort;
+# DIAG bestaetigte: .env-pw == container-url-pw, also KEIN compose-Mangling).
+# Dieser Job nimmt das Passwort aus der CI-Variable DB_PASSWORD (die zuvor per
+# API auf einen frischen, encoding-sicheren [A-Za-z0-9]-Wert gesetzt wurde) und
+# setzt es konsistent auf: (1) Postgres-Rolle, (2) .env, (3) frisch rekreierte
+# DB-abhaengige Container. Weil CI-Var == .env == Rolle, ist das redeploy-fest
+# (der naechste deploy-auto schreibt denselben Wert). DB_PASSWORD ist masked ->
+# taucht auch bei versehentlichem Echo nicht im Log auf. needs: [] -> sofort
+# spielbar.
 # =============================================================================
 ops-reset-db-password:
   extends: .ops-base
@@ -586,9 +587,11 @@ ops-reset-db-password:
       REST=${URL#postgresql://}; CREDS=${REST%@postgres:5432/*}; URLPW=${CREDS#*:}
       if [ "$ENVPW" = "$URLPW" ]; then SAME=ja; else SAME=NEIN; fi
       echo "DIAG: .env-pw len=${#ENVPW} | container-url-pw len=${#URLPW} | identisch=$SAME"
-      # --- Frisches, encoding-sicheres Passwort (openssl -> keine Pipe, garantiert [0-9a-f]) ---
-      NEWPW=$(openssl rand -hex 24)
-      [ -n "$NEWPW" ] && [ ${#NEWPW} -ge 24 ] || { echo "FATAL: Passwort-Generierung fehlgeschlagen"; exit 1; }
+      # --- Passwort aus der (frisch via API gesetzten, sauberen) CI-Variable DB_PASSWORD ---
+      NEWPW="${DB_PASSWORD:-}"
+      [ -n "$NEWPW" ] || { echo "FATAL: CI-Variable DB_PASSWORD ist leer"; exit 1; }
+      case "$NEWPW" in *[!A-Za-z0-9]*) echo "WARN: DB_PASSWORD enthaelt Sonderzeichen (encoding-Risiko)";; esac
+      echo "Quelle: CI-Variable DB_PASSWORD, len=${#NEWPW}"
       # 1) Postgres-Rolle setzen (lokaler Trust-Socket umgeht die kaputte TCP-Auth)
       docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U "$DBU" -d postgres -c "ALTER USER \"$DBU\" PASSWORD '$NEWPW';"
       echo "OK: Postgres-Rolle $DBU neu gesetzt."
@@ -598,11 +601,7 @@ ops-reset-db-password:
       printf 'DB_PASSWORD=%s\n' "$NEWPW" >> .env.tmp
       mv .env.tmp .env
       echo "OK: .env DB_PASSWORD ersetzt (Backup .env.bak.dbfix.*)."
-      # 3) Klartext NUR fuer den Operator, nicht ins Log
-      ( umask 077; printf '%s\n' "$NEWPW" > "${DEPLOY_PATH}/.db_password.new" )
-      chmod 600 "${DEPLOY_PATH}/.db_password.new" || true
-      echo "OK: Klartext in ${DEPLOY_PATH}/.db_password.new (chmod 600)."
-      # 4) DB-abhaengige Services frisch rekreieren (lesen .env neu, saubere URL)
+      # 3) DB-abhaengige Services frisch rekreieren (lesen .env neu, saubere URL)
       docker compose up -d --no-deps --force-recreate api scan-worker-1 scan-worker-2 scan-worker-3 precheck-worker-1 precheck-worker-2 report-worker
       sleep 14
       docker compose ps --format 'table {{.Name}}\t{{.State}}\t{{.Status}}' | grep -Ei 'api|worker|postgres' || true
