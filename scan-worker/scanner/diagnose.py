@@ -22,6 +22,8 @@ import sys
 import time
 from typing import Any
 
+from scanner.preflight import REQUIRED_WORDLISTS
+
 # Tool definitions: (name, version_cmd, test_cmd_fn)
 # version_cmd: command to check version/availability
 # test_cmd_fn: optional function that returns a quick test command
@@ -195,18 +197,11 @@ def check_environment() -> dict[str, Any]:
         else:
             env_checks[var] = "NOT SET"
 
-    # Check wordlists
-    wordlists = {
-        "common": "/usr/share/wordlists/common.txt",
-        "subdomains": "/usr/share/wordlists/subdomains-top5000.txt",
-        "wordpress": "/usr/share/wordlists/wordpress.txt",
-        "api": "/usr/share/wordlists/api-endpoints.txt",
-        "seclists/common": "/usr/share/wordlists/seclists/Discovery/Web-Content/common.txt",
-        "seclists/params": "/usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt",
-    }
-
+    # Check wordlists. Quelle ist scanner/preflight.py, damit hier keine zweite,
+    # handgepflegte Pfadliste entsteht (S0a: genau diese Doppelpflege hat die
+    # fehlende raft-small-files.txt zwei Releases lang verdeckt).
     wl_checks: dict[str, str] = {}
-    for name, path in wordlists.items():
+    for name, path in REQUIRED_WORDLISTS.items():
         if os.path.isfile(path):
             size = os.path.getsize(path)
             lines = sum(1 for _ in open(path))

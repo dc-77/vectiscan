@@ -78,6 +78,13 @@ class TestPerimeter:
         assert "securitytrails" in config["phase0a_tools"]
         assert "whois" in config["phase0a_tools"]
 
+    def test_phase0a_without_virustotal(self):
+        """S0a (Entscheidung DC): VirusTotal laeuft ohne Key und ohne Vertrag
+        nicht mit. Der Client bleibt im Code, die Tool-Liste nennt ihn nicht,
+        damit kein Report-Anhang ein Werkzeug auffuehrt, das nie laeuft."""
+        for package in ("perimeter", "compliance", "supplychain", "insurance"):
+            assert "virustotal" not in get_config(package)["phase0a_tools"], package
+
     def test_phase0b_full_dns(self):
         config = get_config("perimeter")
         # F-P0B-003 (2026-05-07): amass v5 entfernt — Hard-Cap-Bottleneck +

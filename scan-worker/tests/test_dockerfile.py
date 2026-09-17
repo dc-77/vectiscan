@@ -61,6 +61,27 @@ def test_wordlists() -> None:
     assert "common.txt" in content
 
 
+def test_every_referenced_wordlist_is_in_image() -> None:
+    """S0a: jede von den Scan-Phasen erwartete Wordlist muss im Image landen.
+
+    F-PH2-001 stellte phase2 auf raft-small-files.txt um, das Dockerfile blieb
+    auf raft-medium-files.txt. ffuf_sensitive wurde dadurch in 42 Produktions-
+    scans stillschweigend uebersprungen. Dieser Test haette das gefangen.
+    """
+    from scanner.preflight import REQUIRED_WORDLISTS
+
+    content = _read_dockerfile()
+    missing = sorted(
+        f"{name} -> {path}"
+        for name, path in REQUIRED_WORDLISTS.items()
+        if path not in content
+    )
+    assert not missing, (
+        "Wordlist wird im Code referenziert, aber nicht ins Image gelegt: "
+        + "; ".join(missing)
+    )
+
+
 def test_entrypoint() -> None:
     """Entrypoint must invoke scanner module via python3."""
     content = _read_dockerfile()

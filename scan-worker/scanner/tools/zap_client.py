@@ -38,7 +38,36 @@ def get_thread_zap_id() -> str | None:
 
 
 class ZapError(Exception):
-    """Raised when a ZAP API call fails or times out."""
+    """Raised when a ZAP API call fails or times out.
+
+    S0a: traegt zusaetzlich den Endpunkt und die Parameter der
+    fehlgeschlagenen Anfrage. Ohne diese Angaben war in 42 Produktionsscans
+    nicht zu erkennen, welcher der ZAP-Aufrufe (Kontext, Policy, Spider,
+    Active Scan) "does_not_exist" geliefert hat -- Vorarbeit fuer S0b
+    (spec/07 Abschnitt 4).
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        endpoint: str | None = None,
+        params: dict[str, Any] | None = None,
+        zap_id: str | None = None,
+    ):
+        self.endpoint = endpoint
+        self.params = dict(params) if params else {}
+        self.zap_id = zap_id
+        detail = []
+        if endpoint:
+            detail.append(f"endpoint={endpoint}")
+        if self.params:
+            detail.append(f"params={self.params}")
+        if zap_id:
+            detail.append(f"zap={zap_id}")
+        if detail:
+            message = f"{message} [{', '.join(detail)}]"
+        super().__init__(message)
 
 
 class ZapClient:
@@ -74,6 +103,9 @@ class ZapClient:
     def _get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """GET request to ZAP API. Returns parsed JSON response."""
         url = f"{self.base_url}{path}"
+        # S0a: Kontext fuer jede ZapError -- welcher Endpunkt, welche Parameter,
+        # welche Pool-Instanz. Ohne das ist "does_not_exist" nicht zuordenbar.
+        ctx = {"endpoint": path, "params": params, "zap_id": self.zap_id}
         try:
             resp = self.session.get(
                 url, params=params or {},
@@ -82,13 +114,13 @@ class ZapClient:
             resp.raise_for_status()
             return resp.json()
         except requests.ConnectionError as e:
-            raise ZapError(f"ZAP unreachable at {self.base_url}: {e}") from e
+            raise ZapError(f"ZAP unreachable at {self.base_url}: {e}", **ctx) from e
         except requests.Timeout as e:
-            raise ZapError(f"ZAP request timed out: {path}") from e
+            raise ZapError("ZAP request timed out", **ctx) from e
         except requests.HTTPError as e:
-            raise ZapError(f"ZAP API error {resp.status_code}: {resp.text[:200]}") from e
+            raise ZapError(f"ZAP API error {resp.status_code}: {resp.text[:200]}", **ctx) from e
         except ValueError as e:
-            raise ZapError(f"ZAP returned invalid JSON: {path}") from e
+            raise ZapError("ZAP returned invalid JSON", **ctx) from e
 
     # ------------------------------------------------------------------
     # Health
@@ -134,7 +166,8 @@ class ZapClient:
             self._get("/JSON/context/action/removeContext/", {"contextName": context_name})
             log.info("zap_context_removed", name=context_name)
         except ZapError as e:
-            log.warning("zap_context_remove_failed", name=context_name, error=str(e))
+            log.warning("zap_context_remove_failed", name=context_name,
+                        endpoint=e.endpoint, error=str(e))
 
     def get_context_list(self) -> list[str]:
         """List all context names that currently exist on the ZAP daemon."""
@@ -164,7 +197,7 @@ class ZapClient:
         try:
             contexts = self.get_context_list()
         except ZapError as e:
-            log.warning("zap_context_list_failed", error=str(e))
+            log.warning("zap_context_list_failed", endpoint=e.endpoint, error=str(e))
             return 0
         for ctx_name in contexts:
             if not ctx_name.startswith("ctx-"):
@@ -402,7 +435,7 @@ class ZapClient:
             log.info("zap_rate_configured", req_per_sec=req_per_sec,
                      threads=threads, delay_ms=delay_ms)
         except ZapError as e:
-            log.warning("zap_rate_config_failed", error=str(e))
+            log.warning("zap_rate_config_failed", endpoint=e.endpoint, error=str(e))
 
     # ------------------------------------------------------------------
     # Alerts
@@ -459,7 +492,8 @@ class ZapClient:
                 status = status_fn()
                 last_status = status
             except ZapError as e:
-                log.warning("zap_poll_error", tool=tool_name, error=str(e))
+                log.warning("zap_poll_error", tool=tool_name, endpoint=e.endpoint,
+                            error=str(e))
                 return False
 
             if status == stop_value:
