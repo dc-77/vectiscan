@@ -65,8 +65,13 @@ ROLES: dict[str, tuple[list[str], str]] = {
     ),
     "f77ccff2-fc7a-4488-a9ba-540a42a25056": (
         ["drift", "coverage"],
-        "castenow.de 19.07. bis 22.07.2026; fast drei Tage Laufzeit, die Timeouts "
-        "oder Blockaden muessen im Abdeckungskapitel sichtbar werden",
+        "castenow.de. Der Auftrag laeuft in der API vom 19.07. bis 22.07.2026, der "
+        "Scan selbst aber nur 46 Minuten (meta.json im Tar: 19.07. 23:40 bis 20.07. "
+        "00:26). Die drei Tage liegen zwischen Scanende und Auftragsabschluss, also "
+        "in Bericht und Freigabe, nicht im Scan. Als Coverage-Fixture taugt der Lauf "
+        "trotzdem: von neun Hosts haben nur einer ffuf_param und wpscan, sechs zap "
+        "und sieben feroxbuster. Genau diese Luecken muessen im Abdeckungskapitel "
+        "stehen",
     ),
     "45bb234c-d556-4a80-9c78-3ce221ea28a6": (
         ["negative"],

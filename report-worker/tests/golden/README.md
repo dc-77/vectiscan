@@ -22,8 +22,13 @@ Datenmodell mit der Soll-Liste.
 - `golden` Referenzlauf fuer den Vergleich mit der Soll-Liste
 - `drift` Wiederholungslauf; gleiche Fakten muessen dieselbe Ergebnisliste ergeben
 - `negative` traegt Eintraege aus `negative.json`
-- `coverage` Lauf mit auffaelliger Laufzeit; die Abdeckungsluecken muessen im Bericht sichtbar werden
-  (`f77ccff2`, castenow.de, Start 19.07. bis Ende 22.07.2026)
+- `coverage` Lauf mit Werkzeugluecken ueber die Hosts; sie muessen im Abdeckungskapitel stehen
+  (`f77ccff2`, castenow.de: neun Hosts, davon nur einer mit ffuf_param und wpscan, sechs mit zap,
+  sieben mit feroxbuster)
+
+Zur Laufzeit dieses Auftrags: die API zeigt 19.07. bis 22.07.2026, `meta.json` im Tar aber
+19.07. 23:40 bis 20.07. 00:26. Die drei Tage liegen zwischen Scanende und Auftragsabschluss,
+also in Bericht und Freigabe, nicht im Scan. Fuer Laufzeitfragen gilt `meta.json`.
 
 ## Anonymisierung
 
@@ -48,12 +53,25 @@ python3 scripts/golden/build-expected-junkerwerk.py --source <pfad>/report-proto
 # 3 Negativ-Fixtures (arbeitet auf dem eingecheckten Snapshot)
 python3 scripts/golden/build-negative-fixtures.py
 
-# 4 Roh-Tars: Pipeline auf dem Branch ausloesen, Job ops-export-golden-tars
-#   starten, Artefakt golden-tars/ entpacken nach tars/
+# 4 Roh-Tars: API-Pipeline auf dem Branch ausloesen, die zehn Matrix-Jobs
+#   ops-export-golden-tars starten, die Artefakte golden-tars/ nach tars/ entpacken.
+#   Ein Auftrag je Job, weil der Artefakt-Upload dieser GitLab-Instanz schon bei
+#   wenigen hundert Kilobyte mit 413 abbricht. Dieselbe Grenze trifft git push
+#   ueber HTTPS; der Branch geht ueber SSH raus.
 
 # 5 Manifest neu schreiben (liest tars/ und negative.json)
 python3 scripts/golden/build-manifest.py
 ```
+
+## Tests
+
+`report-worker/tests/test_golden_fixtures.py`. Der Smoke-Test entpackt jedes Tar,
+loest das Scan-Verzeichnis wie `reporter/worker.py` auf und ruft
+`parse_scan_data`. Unter Windows werden `0bf16342` und `2572eebc` uebersprungen:
+sie fuehren Hosts unter IPv6-Adressen, und der Doppelpunkt ist dort kein
+zulaessiges Pfadzeichen. Vollstaendig laeuft der Test unter Linux, also im
+CI-Job `test-report-worker`, der sich auf einer API-Pipeline manuell starten
+laesst.
 
 ## Bekannte Abweichungen
 
