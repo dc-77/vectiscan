@@ -76,6 +76,9 @@ services:
   # der scan-worker in Produktion zap-1..zap-4 sieht.
   runner:
     image: python:3.12-slim
+    # Profil, damit "up -d" nur die Infrastruktur hochfaehrt. Der Laeufer
+    # wird per "run --rm runner" gestartet und beendet sich danach.
+    profiles: ["test"]
     working_dir: /app
     volumes:
       - ../..:/app:ro
