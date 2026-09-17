@@ -76,6 +76,11 @@ export default function PricingPage() {
           <p className="text-base max-w-2xl mx-auto" style={{ color: C.muted }}>
             Vom automatisierten Perimeter-Scan bis zum Nachweis für Ihre Cyberversicherung.
           </p>
+          <p className="text-sm max-w-2xl mx-auto mt-4" style={{ color: C.muted }}>
+            Jedes Paket ist eine automatisierte externe Schwachstellenanalyse, angelehnt an die
+            Prüfphasen Aufklärung, Schwachstellenanalyse und Bericht. Kein Penetrationstest:
+            geprüft wird ohne Zugangsdaten von außen, ohne Ausnutzung gefundener Schwächen.
+          </p>
         </div>
       </section>
 

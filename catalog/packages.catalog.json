@@ -38,7 +38,7 @@
       "tier": "perimeter",
       "durationShort": "~60–90 Min",
       "durationLong": "~60–90 Minuten",
-      "reportFocus": ["PTES-konformer Report", "Executive Summary", "Priorisierte Maßnahmen"],
+      "reportFocus": ["Managementtauglicher Prüfbericht", "Executive Summary", "Priorisierte Maßnahmen"],
       "complianceModules": [],
       "badge": "Empfohlen",
       "badgeColor": "#38BDF8",

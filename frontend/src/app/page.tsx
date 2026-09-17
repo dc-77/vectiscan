@@ -252,7 +252,7 @@ export default function LandingPage() {
         <HeroShield containerRef={heroRef} />
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
           <p className="text-xs sm:text-sm uppercase tracking-[0.25em] mb-4 sm:mb-6 font-medium" style={{ color: C.teal }}>
-            Automatisierte Schwachstellen-Scans nach PTES
+            Automatisierte externe Schwachstellenanalyse
           </p>
           <h1 className="text-[2rem] sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight mb-4 sm:mb-5" style={{ color: C.offWhite }}>
             Kennen Sie Ihre<br />
@@ -280,7 +280,7 @@ export default function LandingPage() {
       {/* ── TRUST BAR ─────────────────────────────── */}
       <div className="border-t border-b py-4 relative z-10" style={{ borderColor: 'rgba(45,212,191,0.08)' }}>
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-2 px-4">
-          {['BSI-Grundschutz-Mapping', 'PTES-konform', 'DSGVO-konform', 'Hosting in DE'].map((t, i) =>
+          {['BSI-Grundschutz-Mapping', 'Externe Schwachstellenanalyse', 'DSGVO-konform', 'Hosting in DE'].map((t, i) =>
             <TrustBadge key={t} text={t} delay={i * 1000} />)}
         </div>
       </div>
@@ -313,12 +313,12 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6">
           <Reveal>
             <h2 className="text-[1.4rem] sm:text-2xl md:text-3xl font-semibold text-center mb-4" style={{ color: C.offWhite }}>Automatisierte Perimeter-Analyse.<br className="hidden sm:block" />Regelmäßig. Zuverlässig.</h2>
-            <p className="text-sm text-center max-w-2xl mx-auto mb-12" style={{ color: C.muted }}>VectiScan kombiniert etablierte Open-Source-Scanner mit KI-gestützter Analyse zu einem vollautomatisierten Perimeter-Assessment.</p>
+            <p className="text-sm text-center max-w-2xl mx-auto mb-12" style={{ color: C.muted }}>VectiScan kombiniert etablierte Open-Source-Scanner mit werkzeuggestützter, regelbasierter Auswertung zu einem vollautomatisierten Perimeter-Assessment.</p>
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { icon: I.target, title: 'Perimeter-Analyse', text: 'Port-Scanning, DNS-Enumeration, Web-Schwachstellen, SSL/TLS-Prüfung — über 20 spezialisierte Scanner analysieren Ihre externe Angriffsoberfläche.' },
-              { icon: I.brain, title: 'KI-gestützte Bewertung', text: 'Intelligente Korrelation über Tool-Grenzen hinweg. False-Positive-Filterung und kontextbezogene Risikobewertung.' },
+              { icon: I.brain, title: 'Regelbasierte Bewertung', text: 'Korrelation über Werkzeuggrenzen hinweg, deterministischer False-Positive-Filter, Einstufung nach fester Severity-Policy.' },
               { icon: I.file, title: 'Professionelle Reports', text: 'Executive Summary für die Geschäftsleitung, technische Details für Ihr IT-Team, priorisierter Maßnahmenplan mit konkreten Handlungsempfehlungen.' },
               { icon: I.refresh, title: 'Automatische Wiederholung', text: 'Wöchentliche, monatliche oder quartalsweise Scans — Sie definieren den Rhythmus, wir liefern zuverlässig aktuelle Ergebnisse.' },
               { icon: I.shield, title: 'Compliance-Nachweise', text: 'Mappings auf NIS2 (§30 BSIG), BSI-Grundschutz, ISO 27001 und Cyberversicherungs-Anforderungen — direkt im Report.' },
@@ -416,7 +416,7 @@ export default function LandingPage() {
             {[
               { stat: 'Jeder Report', label: 'wird vor Zustellung manuell geprüft — keine automatischen Fehlalarme.' },
               { stat: '~15 Min', label: 'bis zum WebCheck-Ergebnis Ihrer Domain.' },
-              { stat: '20+ Scanner', label: 'kombiniert mit KI-gestützter Korrelation.' },
+              { stat: '20+ Scanner', label: 'kombiniert mit regelbasierter Korrelation.' },
             ].map(s => (
               <div key={s.stat} className="p-5 rounded-2xl text-center h-full" style={{ backgroundColor: C.slateLight, border: '1px solid rgba(45,212,191,0.06)' }}>
                 <p className="text-xl font-semibold mb-1" style={{ color: C.teal }}>{s.stat}</p>
@@ -440,7 +440,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-[10px] text-center uppercase tracking-widest mb-6" style={{ color: C.muted }}>Standards &amp; Technologie</p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-3">
-            {['OWASP ZAP', 'Nmap', 'Nuclei', 'testssl.sh', 'Claude AI', 'PTES', 'BSI TR-03116-4'].map(t =>
+            {['OWASP ZAP', 'Nmap', 'Nuclei', 'testssl.sh', 'Claude AI', 'BSI TR-03116-4'].map(t =>
               <span key={t} className="text-xs font-light" style={{ color: `${C.muted}90` }}>{t}</span>)}
           </div>
           <p className="text-center mt-6 text-xs font-light" style={{ color: C.muted }}>Made in Germany — Entwicklung und Hosting in Deutschland</p>

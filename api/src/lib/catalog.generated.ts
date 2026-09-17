@@ -99,7 +99,7 @@ export const PACKAGE_CATALOG: readonly PackageDef[] = [
     "durationShort": "~60–90 Min",
     "durationLong": "~60–90 Minuten",
     "reportFocus": [
-      "PTES-konformer Report",
+      "Managementtauglicher Prüfbericht",
       "Executive Summary",
       "Priorisierte Maßnahmen"
     ],

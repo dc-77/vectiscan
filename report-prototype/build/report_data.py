@@ -183,10 +183,10 @@ DATA = {
             {"v": "15", "l": "Befunde im Bericht"},
         ],
         "standard_note": (
-            "Einordnung: automatisierte externe Schwachstellenanalyse, kein Penetrationstest. Von den "
-            "PTES-Phasen sind Aufklärung, Schwachstellenanalyse und Berichterstattung abgedeckt; Threat "
-            "Modeling, Exploitation und Post-Exploitation finden nicht statt (BSI-Klassifikation: Black-Box, "
-            "von außen, vorsichtig, automatisiert)."
+            "Einordnung: automatisierte externe Schwachstellenanalyse, angelehnt an die Prüfphasen "
+            "Aufklärung, Schwachstellenanalyse und Bericht. Kein Penetrationstest: Bedrohungsmodellierung, "
+            "Ausnutzung gefundener Schwächen und weiterführende Zugriffe finden nicht statt "
+            "(BSI-Klassifikation: Black-Box, von außen, vorsichtig, automatisiert)."
         ),
         "ai_note": (
             "Sprachmodelle steuern die Priorisierung der Hosts, die Konfiguration der Tiefenprüfung und die "

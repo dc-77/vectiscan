@@ -145,7 +145,7 @@ def _make_test_report_data(package=None):
         "cover_meta": [
             ["Ziel:", "test.example.com (1 Host)"],
             ["Datum:", "14. März 2026"],
-            ["Methodik:", "PTES (automatisiert)"],
+            ["Methodik:", "Externe Schwachstellenanalyse (automatisiert)"],
             ["Scoring:", "CVSS v3.1"],
             ["Klassifizierung:", "Vertraulich"],
             ["Befunde:", "1 High, 1 Info"],

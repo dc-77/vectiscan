@@ -341,8 +341,7 @@ _TOOL_CONFIDENCE: dict[str, str] = {
     "testssl.sh":          "sehr hoch (autoritative TLS-Analyse)",
     "ZAP Spider":          "mittel",
     "ZAP Ajax Spider":     "mittel",
-    "ZAP Active Scan":     "mittel-hoch",
-    "ffuf":                "mittel",
+    # S0a: "ZAP Active Scan" und "ffuf" stehen bis S0b nicht mehr in SCAN_TOOLS.
     "feroxbuster":         "mittel",
     "wpscan":              "hoch (CVE-Datenbank-Match)",
     "NVD/EPSS/KEV":        "hoch (autoritative Threat-Intel)",
