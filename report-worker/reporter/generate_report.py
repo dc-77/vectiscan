@@ -829,7 +829,7 @@ def build_audit_trail(story, styles, audit_data):
         [Paragraph("Scan-Dauer", cell_label),
          Paragraph(str(audit_data.get("duration", "\u2014")), cell_value)],
         [Paragraph("Methodik", cell_label),
-         Paragraph("PTES (automatisiert)", cell_value)],
+         Paragraph("Externe Schwachstellenanalyse (automatisiert)", cell_value)],
         [Paragraph("Scoring-System", cell_label),
          Paragraph("CVSS v3.1", cell_value)],
         [Paragraph("Gescannte Hosts", cell_label),
@@ -1139,7 +1139,7 @@ def build_supply_chain_page(story, styles, supply_chain_data, scan_meta):
         [Paragraph("Positive Befunde", cell_label),
          Paragraph(str(supply_chain_data.get("positive_count", 0)), cell_value)],
         [Paragraph("Methodik", cell_label),
-         Paragraph("PTES / CVSS v3.1", cell_value)],
+         Paragraph("Externe Schwachstellenanalyse / CVSS v3.1", cell_value)],
     ]
 
     col_widths = [55 * mm, 115 * mm]
@@ -1936,7 +1936,7 @@ if __name__ == "__main__":
             "cover_meta": [
                 ["Target:", "example.com (192.168.1.1)"],
                 ["Date:", "11 March 2026"],
-                ["Methodology:", "PTES"],
+                ["Methodology:", "External vulnerability assessment (automated)"],
                 ["Scoring:", "CVSS v3.1"],
                 ["Classification:", "Confidential"],
                 ["Findings:", "2 (1 High, 1 Informational)"],

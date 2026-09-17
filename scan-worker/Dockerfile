@@ -138,7 +138,11 @@ RUN pip3 install --no-cache-dir --break-system-packages wafw00f
 # ── 5. Wordlists ───────────────────────────────────────────────────
 # SecLists Industriestandard fuer Web-Discovery + Pentesting:
 #   common.txt              ~4.6k   Standard-Web-Pfade
-#   raft-medium-files.txt   ~17.5k  Sensitive-Files (.env, .git, backup.zip, dump.sql, ...)
+#   raft-small-files.txt    ~10k    Sensitive-Files (.env, .git, backup.zip, dump.sql, ...)
+#                                   S0a: von phase2.WORDLIST_MAP/FFUF_WORDLISTS erwartet.
+#                                   F-PH2-001 stellte den Code auf small um, das Image blieb
+#                                   auf medium -> ffuf_sensitive wurde immer uebersprungen.
+#   raft-medium-files.txt   ~17.5k  Vorgaenger, bleibt fuer Ad-hoc-Laeufe im Image
 #   subdomains-top1m-5000   5k      DNS-Bruteforce
 #   burp-parameter-names    6.5k    HTTP-Parameter-Discovery
 #   CMS/wp-plugins.fuzz     ~4k     WordPress-Plugin-Pfade
@@ -155,6 +159,10 @@ RUN mkdir -p /usr/share/wordlists /usr/share/wordlists/seclists/Discovery/Web-Co
       -o /usr/share/wordlists/raft-medium-files.txt && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-medium-files.txt \
       -o /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-files.txt && \
+    curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-small-files.txt \
+      -o /usr/share/wordlists/raft-small-files.txt && \
+    curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/raft-small-files.txt \
+      -o /usr/share/wordlists/seclists/Discovery/Web-Content/raft-small-files.txt && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/DNS/subdomains-top1million-5000.txt \
       -o /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt && \
     curl -fsSL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/burp-parameter-names.txt \
@@ -166,6 +174,24 @@ RUN mkdir -p /usr/share/wordlists /usr/share/wordlists/seclists/Discovery/Web-Co
 COPY wordlists/wordpress.txt /usr/share/wordlists/wordpress.txt
 COPY wordlists/api-endpoints.txt /usr/share/wordlists/api-endpoints.txt
 COPY wordlists/cms-common.txt /usr/share/wordlists/cms-common.txt
+
+# S0a Build-Gate: ein stiller curl-Fehler oben hat frueher erst zur Laufzeit
+# als "wordlist_missing"-Skip gewirkt (ffuf_sensitive: 0 Treffer in 42 Scans).
+# Jede Datei, die scanner/preflight.py beim Start erwartet, muss hier existieren
+# und nicht leer sein -- sonst bricht der Build statt spaeter der Scan.
+RUN set -eu; for f in \
+      /usr/share/wordlists/common.txt \
+      /usr/share/wordlists/wordpress.txt \
+      /usr/share/wordlists/api-endpoints.txt \
+      /usr/share/wordlists/cms-common.txt \
+      /usr/share/wordlists/raft-small-files.txt \
+      /usr/share/wordlists/subdomains-top5000.txt \
+      /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt \
+      /usr/share/wordlists/seclists/Discovery/Web-Content/raft-small-files.txt \
+      /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt \
+      /usr/share/wordlists/seclists/Discovery/Web-Content/CMS/wp-plugins.fuzz.txt \
+      /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt; \
+    do test -s "$f" || { echo "Wordlist fehlt oder ist leer: $f" >&2; exit 1; }; done
 
 # F-P0B-004 (2026-05-07): Merged DNS-Bruteforce-Wordlist fuer gobuster_dns
 # Quellen (alle deduplikat-gemerged via `sort -u`):
@@ -182,7 +208,8 @@ RUN mkdir -p /opt/wordlists \
  && curl -fsSL https://raw.githubusercontent.com/n0kovo/n0kovo_subdomains/main/n0kovo_subdomains_small.txt \
       -o /tmp/n0kovo.txt \
  && cat /tmp/seclists.txt /tmp/bitquark.txt /tmp/n0kovo.txt | sort -u > /opt/wordlists/dns-merged-30k.txt \
- && rm /tmp/seclists.txt /tmp/bitquark.txt /tmp/n0kovo.txt
+ && rm /tmp/seclists.txt /tmp/bitquark.txt /tmp/n0kovo.txt \
+ && test -s /opt/wordlists/dns-merged-30k.txt
 
 # ── 6. Scanner code ────────────────────────────────────────────────
 WORKDIR /opt/scanner

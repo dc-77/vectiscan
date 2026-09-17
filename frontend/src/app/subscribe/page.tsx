@@ -26,7 +26,7 @@ const CURATED_FEATURES: Record<string, string[]> = {
   perimeter: [
     'Vollständige Angriffsoberflächen-Analyse',
     'Port-Scanning, Web-Schwachstellen, DNS, E-Mail-Security',
-    'PTES-konformer Report mit Executive Summary',
+    'Managementtauglicher Prüfbericht mit Executive Summary',
     'Priorisierter Maßnahmenplan mit Zeitrahmen',
   ],
   compliance: [

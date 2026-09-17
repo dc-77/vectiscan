@@ -340,3 +340,64 @@ class TestCleanupStaleContexts:
             count = zap.cleanup_stale_contexts(active_context_names=set())
         assert count == 1
         assert deleted == ["ctx-aaaa-1_1_1_1"]
+
+
+# ---------------------------------------------------------------------------
+# S0a: Fehlerkontext (Endpunkt + Parameter)
+# ---------------------------------------------------------------------------
+
+class TestZapErrorContext:
+    """Jede ZapError muss sagen, welcher Aufruf fehlgeschlagen ist.
+
+    In 42 Produktionsscans lieferte zap_active 26-mal ZAP-API 400
+    "does_not_exist", ohne dass aus dem Log hervorging, ob Kontext, Policy,
+    Spider oder Active Scan betroffen war (spec/07 Abschnitt 4).
+    """
+
+    PATH = "/JSON/ascan/action/scan/"
+    PARAMS = {"url": "https://example.com", "scanPolicyName": "vectiscan"}
+
+    def _raise_via_get(self, zap, side_effect):
+        with patch.object(zap.session, "get", side_effect=side_effect):
+            with pytest.raises(ZapError) as excinfo:
+                zap._get(self.PATH, self.PARAMS)
+        return excinfo.value
+
+    def test_connection_error_carries_endpoint_and_params(self, zap):
+        err = self._raise_via_get(zap, requests.ConnectionError("refused"))
+        assert err.endpoint == self.PATH
+        assert err.params == self.PARAMS
+        assert self.PATH in str(err)
+
+    def test_timeout_carries_endpoint(self, zap):
+        err = self._raise_via_get(zap, requests.Timeout("timed out"))
+        assert err.endpoint == self.PATH
+        assert err.params == self.PARAMS
+
+    def test_invalid_json_carries_endpoint(self, zap):
+        resp = MagicMock(status_code=200)
+        resp.raise_for_status = lambda: None
+        resp.json = MagicMock(side_effect=ValueError("no json"))
+        with patch.object(zap.session, "get", return_value=resp):
+            with pytest.raises(ZapError) as excinfo:
+                zap._get(self.PATH, self.PARAMS)
+        assert excinfo.value.endpoint == self.PATH
+
+    def test_http_error_carries_endpoint_and_zap_id(self):
+        client = ZapClient(base_url="http://zap-2:8090", zap_id="zap-2")
+        resp = MagicMock(status_code=400, text='{"code":"does_not_exist"}')
+        resp.raise_for_status = MagicMock(side_effect=requests.HTTPError("400"))
+        with patch.object(client.session, "get", return_value=resp):
+            with pytest.raises(ZapError) as excinfo:
+                client._get(self.PATH, self.PARAMS)
+        err = excinfo.value
+        assert err.endpoint == self.PATH
+        assert err.zap_id == "zap-2"
+        assert "does_not_exist" in str(err)
+        assert "zap=zap-2" in str(err)
+
+    def test_message_only_error_has_empty_context(self):
+        err = ZapError("unreachable")
+        assert err.endpoint is None
+        assert err.params == {}
+        assert str(err) == "unreachable"
