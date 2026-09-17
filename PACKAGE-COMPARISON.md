@@ -42,7 +42,7 @@
 1. Cover (mit "Professional"-Badge)
 2. Inhaltsverzeichnis (mit Finding-Untereinträgen)
 3. Zusammenfassung
-4. Umfang & Methodik (PTES, drei Phasen)
+4. Umfang & Methodik (externe Schwachstellenanalyse, drei Phasen)
 5. Befunde (mit CVSS-Vektor, CWE, Evidence, Impact)
 6. Maßnahmenplan (mit Befund-Ref. + Aufwand)
 7. Anhang A: CVSS-Referenz

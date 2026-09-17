@@ -155,7 +155,7 @@ Pfade nur in POSIX-Form (Git Bash). Details: Memory `reference_gitlab_api.md`.
 | Paket | Eigenschaft |
 |---|---|
 | WebCheck | Schnellscan (~15–20 Min), Website + Mail-Security, max 3 Hosts |
-| Perimeter | Vollscan (~60–90 Min), alle Tools, max 15 Hosts, PTES-konform |
+| Perimeter | Vollscan (~60–90 Min), alle Tools, max 15 Hosts, externe Schwachstellenanalyse |
 | Compliance | Perimeter + §30 BSIG, BSI-Grundschutz-Refs, Audit-Trail |
 | SupplyChain | Perimeter + ISO 27001 Annex A, Auftraggeber-Nachweis |
 | Insurance | Perimeter + Versicherungs-Fragebogen, Ransomware-Indikator |
@@ -203,7 +203,7 @@ Branding-Farben aus `reporter/pdf/branding.py` — nicht hardcoden.
 - `MONITORING.md` — Monitoring/Logging/Alerting-Runbook (Uptime-Kuma,
   Loki+Promtail, Grafana, Resend-Alerts) — A5/VEC-85
 - `OFFSITE-BACKUP-EVAL.md` — Off-Site-Backup-Bewertung + Empfehlung
-- `references/report_structure.md` — PDF-Layout
+- `docs/archive/report_structure.md` — PDF-Layout des Legacy-v1-Renderers (Historie)
 - `docs/CRM-KEY-ROTATION.md` — Twenty-CRM Key-Rotation-Runbook (VEC-398).
   **Policy: API-Only, kein Direkt-DB-Zugriff/Schema-Poking auf Twenty.**
   Lead-Sync via REST (`api/src/lib/crm.ts`). Key-Rotation = Token manuell in

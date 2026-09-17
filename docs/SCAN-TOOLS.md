@@ -600,7 +600,7 @@ Order-Score: gewichteter Durchschnitt der Top-5-Findings
 | Paket | Prompt | Besonderheiten |
 |-------|--------|----------------|
 | WebCheck | SYSTEM_PROMPT_WEBCHECK | Einfache Sprache, max 5–8 Findings, Ampelsystem |
-| Perimeter | SYSTEM_PROMPT_PERIMETER | PTES-konform, EPSS-Kontext, Evidence |
+| Perimeter | SYSTEM_PROMPT_PERIMETER | Externe Schwachstellenanalyse, EPSS-Kontext, Evidence |
 | Compliance | SYSTEM_PROMPT_COMPLIANCE | + §30 BSIG, BSI-Grundschutz, NIST CSF, Audit-Trail |
 | SupplyChain | SYSTEM_PROMPT_SUPPLYCHAIN | + ISO 27001 Annex A, Lieferketten-1-Seiter |
 | Insurance | SYSTEM_PROMPT_INSURANCE | + Versicherungsfragebogen, Ransomware-Indikator |

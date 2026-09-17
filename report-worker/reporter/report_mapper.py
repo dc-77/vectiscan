@@ -112,8 +112,10 @@ SCAN_TOOLS = [
     {"tool": "testssl.sh", "description": "SSL/TLS-Konfigurationsanalyse", "phase": "Phase 2"},
     {"tool": "ZAP Spider", "description": "Web-Crawling und Sitemap-Erstellung", "phase": "Phase 2"},
     {"tool": "ZAP Ajax Spider", "description": "JavaScript-basiertes Web-Crawling", "phase": "Phase 2"},
-    {"tool": "ZAP Active Scan", "description": "Automatisierte Schwachstellenprüfung", "phase": "Phase 2"},
-    {"tool": "ffuf", "description": "Web-Fuzzing und Parameter-Discovery", "phase": "Phase 2"},
+    # S0a: "ZAP Active Scan" und "ffuf" sind hier bewusst NICHT gelistet.
+    # zap_active hat in 42 Produktionsscans nie ein Ergebnis geliefert (ZAP-API
+    # "does_not_exist"), ffuf_sensitive wurde wegen fehlender Wordlist immer
+    # uebersprungen. Wieder aufnehmen, sobald S0b gemerged und verifiziert ist.
     {"tool": "feroxbuster", "description": "Rekursive Directory-Enumeration", "phase": "Phase 2"},
     {"tool": "wpscan", "description": "WordPress-Schwachstellen-Scanner", "phase": "Phase 2"},
     {"tool": "NVD/EPSS/KEV", "description": "Threat-Intelligence-Enrichment (NIST, FIRST, CISA)", "phase": "Phase 3"},
@@ -518,22 +520,25 @@ def _build_scope(
         {
             "title": "2.2&nbsp;&nbsp;&nbsp;Methodik",
             "paragraphs": [
-                "Die Prüfung wurde als automatisierter Security-Scan nach dem "
-                "PTES-Standard (Penetration Testing Execution Standard) durchgeführt. "
-                "Der Scan umfasste vier Phasen:",
+                "Die Prüfung wurde als automatisierte externe Schwachstellenanalyse "
+                "durchgeführt, angelehnt an die Prüfphasen Aufklärung, "
+                "Schwachstellenanalyse und Bericht. Sie ist kein Penetrationstest: "
+                "es wird ohne Zugangsdaten von außen geprüft und keine gefundene "
+                "Schwäche ausgenutzt. Der Scan umfasste vier Phasen:",
                 "<b>Phase 0 — Reconnaissance:</b> Passive Intelligence (Shodan, AbuseIPDB, WHOIS), "
                 "DNS-Enumeration (subfinder, gobuster, dnsx, crt.sh, certspotter) und Web-Probe (httpx). "
-                "KI-gestützte Host-Strategie bestimmt Scan-Prioritäten.",
+                "Ein Sprachmodell priorisiert die Hosts; die Bewertung der Befunde "
+                "erfolgt später werkzeuggestützt und regelbasiert.",
                 "<b>Phase 1 — Technologie-Erkennung:</b> Port-Scanning (nmap), "
                 "Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) "
-                "pro Host. KI-gestützte Tool-Konfiguration passt Phase-2-Parameter adaptiv an.",
+                "pro Host. Ein Sprachmodell konfiguriert die Tiefenprüfung je Host.",
                 "<b>Phase 2 — Tiefer Scan:</b> SSL/TLS-Analyse (testssl.sh), "
-                "Schwachstellen-Scan (ZAP Active Scan), Directory-Enumeration "
-                "(ffuf, feroxbuster), HTTP-Header-Prüfung "
+                "Web-Crawling (ZAP Spider), Directory-Enumeration "
+                "(feroxbuster), HTTP-Header-Prüfung "
                 "und WordPress-Scan (wpscan) pro Host.",
                 "<b>Phase 3 — Korrelation &amp; Enrichment:</b> Cross-Tool-Korrelation, "
                 "False-Positive-Filterung, Threat-Intelligence-Anreicherung (NVD, EPSS, CISA KEV) "
-                "und KI-gestützte Priorisierung.",
+                "und werkzeuggestützte, regelbasierte Priorisierung.",
                 f"Die Prüfung wurde am <b>{scan_date}</b> durchgeführt. "
                 "Die Bewertung erfolgt nach CVSS v3.1.",
             ],
@@ -1038,7 +1043,7 @@ def map_professional_report(
                 ["Ziel:", f"{domain} ({hosts_count} Hosts)"],
                 ["Datum:", scan_date],
                 ["Paket:", "PerimeterScan"],
-                ["Methodik:", "PTES (automatisiert)"],
+                ["Methodik:", "Externe Schwachstellenanalyse (automatisiert)"],
                 ["Scoring:", "CVSS v3.1"],
                 ["Klassifizierung:", "Vertraulich"],
                 ["Befunde:", finding_summary],

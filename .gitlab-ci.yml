@@ -23,6 +23,24 @@ stages:
   - ops
 
 # =============================================================================
+# WORKFLOW — welche Pipelines ueberhaupt entstehen
+# =============================================================================
+# S0a: Session-Branches (worktree-*) bekamen bisher gar keine CI. build/scan/
+# test/deploy sind auf main, develop und source=web beschraenkt, und es gab
+# weder merge_request_event-Regeln noch einen workflow-Block -- ein Push auf
+# einen Feature-Branch erzeugte deshalb keine Pipeline, und ein Merge Request
+# zeigte head_pipeline=null. Tests liefen erst NACH dem Merge auf main.
+#
+# Die einzige Regel hier unterdrueckt das doppelte Branch-Pipeline neben der
+# MR-Pipeline. Alles andere (merge_request_event, web, api, schedule, Push
+# ohne offenen MR) bleibt unveraendert zugelassen.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - when: always
+
+# =============================================================================
 # BUILD STAGE — Build & push Docker images for all four services
 # =============================================================================
 
@@ -48,12 +66,13 @@ stages:
         docker push ${BASE_IMAGE}/${SERVICE}:latest
         echo "OK: :latest aktualisiert (main)."
       else
-        echo "SKIP: :latest-Push auf Branch '${CI_COMMIT_BRANCH}' uebersprungen (nur main aktualisiert den mutable Tag)."
+        echo "SKIP: :latest-Push auf Ref '${CI_COMMIT_BRANCH:-${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME:-unbekannt}}' uebersprungen (nur main aktualisiert den mutable Tag)."
       fi
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 build-frontend:
   extends: .build-base
@@ -82,6 +101,17 @@ build-report-worker:
 .trivy-base:
   stage: scan
   tags: [vectigal]
+  before_script:
+    # S0a: eigener Trivy-Cache je Job. Die drei Trivy-Jobs laufen parallel auf
+    # demselben Shell-Runner und teilten sich ~/.cache/trivy. Beim faelligen
+    # DB-Update (113 MB) rannten sie in "Failed to acquire cache or database
+    # lock" -- trivy-api ist daran in Pipeline 3049 gestorben, ohne einen
+    # einzigen Befund zu melden.
+    # Bewusst NICHT unter ${CI_PROJECT_DIR}: der Runner raeumt untrackte
+    # Verzeichnisse im Build-Dir vor jedem Job weg ("Loesche golden-tars/"),
+    # der Cache waere jedes Mal leer und jeder Job laedt die DB neu.
+    - export TRIVY_CACHE_DIR="${HOME}/.cache/trivy/${CI_JOB_NAME}"
+    - mkdir -p "${TRIVY_CACHE_DIR}"
   script:
     - trivy image --exit-code 1 --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
   allow_failure: true
@@ -89,6 +119,7 @@ build-report-worker:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 trivy-frontend:
   extends: .trivy-base
@@ -126,6 +157,7 @@ test-api:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 test-scan-worker:
   stage: test
@@ -137,6 +169,7 @@ test-scan-worker:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 test-report-worker:
   stage: test
@@ -148,9 +181,11 @@ test-report-worker:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     # S0c: der Golden-Smoke-Test braucht Linux, weil zwei Tars
-    # IPv6-Hostverzeichnisse mit Doppelpunkt enthalten. Per API-Pipeline
-    # manuell startbar, ohne dass dafuer ein Build laufen muss.
+    # IPv6-Hostverzeichnisse mit Doppelpunkt enthalten. Die MR-Pipeline deckt
+    # das ab, zieht aber die Build-Jobs mit; ueber eine API-Pipeline laeuft der
+    # Job allein und manuell.
     - if: $CI_PIPELINE_SOURCE == "api"
       when: manual
       allow_failure: true
@@ -172,6 +207,7 @@ test-edge:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 # =============================================================================
 # DEPLOY STAGE — Rolling deploy, manual deploy, and rollback

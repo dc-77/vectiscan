@@ -19,6 +19,7 @@ import socket as _socket
 import psycopg2
 
 from scanner.packages import get_config
+from scanner.preflight import check_wordlists
 from scanner.phase0 import run_phase0
 from scanner.phase1 import run_phase1
 from scanner.phase2 import run_phase2
@@ -1321,6 +1322,13 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
 def main() -> None:
     """Entry point for the scan worker."""
     log.info("scan_worker_started")
+
+    # S0a: Wordlists sind Image-Inhalt, keine Laufzeitabhaengigkeit. Fehlt eine,
+    # ist das Image kaputt und der Worker darf gar nicht erst Jobs annehmen --
+    # sonst faellt es nur als stiller "wordlist_missing"-Skip im Scan auf.
+    # Bewusst vor allem anderen und bewusst nicht fail-open wie prewarm_buckets()
+    # und zap_pool.init_zap_pool() weiter unten (siehe scanner/preflight.py).
+    check_wordlists()
 
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
     redis_client = redis.from_url(redis_url)

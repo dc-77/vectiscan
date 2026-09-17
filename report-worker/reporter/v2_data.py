@@ -165,24 +165,24 @@ def build_methodology_stats(
             "name": "Phase 0 - Reconnaissance",
             "description": (
                 "Passive Intelligence (Shodan, AbuseIPDB, WHOIS), "
-                "Subdomain-Discovery (subfinder, amass, crt.sh, certspotter) "
-                "und Web-Probe (httpx). KI-gestuetzte Host-Strategie "
-                "priorisiert die Tiefe pro Host."
+                "Subdomain-Discovery (subfinder, crt.sh, certspotter) "
+                "und Web-Probe (httpx). Ein Sprachmodell priorisiert "
+                "die Tiefe pro Host."
             ),
         },
         {
             "name": "Phase 1 - Technologie-Erkennung",
             "description": (
                 "Port-Scanning (nmap), Web-Tech-Identifikation "
-                "(webtech, wafw00f) pro Host. KI-gestuetzte CMS-Korrektur "
-                "und Phase-2-Tool-Konfiguration."
+                "(webtech, wafw00f) pro Host. Ein Sprachmodell korrigiert die "
+                "CMS-Erkennung und konfiguriert die Tiefenpruefung."
             ),
         },
         {
             "name": "Phase 2 - Tiefer Scan",
             "description": (
-                "TLS-Analyse (testssl.sh), Schwachstellen-Scan (nuclei + ZAP), "
-                "Directory-Enumeration (ffuf, feroxbuster), Header-Pruefung, "
+                "TLS-Analyse (testssl.sh), Web-Crawling (ZAP Spider), "
+                "Directory-Enumeration (feroxbuster), Header-Pruefung, "
                 "WordPress-Scan (wpscan). Multi-VHost-Probe wenn mehrere "
                 "Hostnamen auf eine IP zeigen."
             ),
@@ -192,8 +192,9 @@ def build_methodology_stats(
             "description": (
                 "Cross-Tool-Korrelation, False-Positive-Filterung, "
                 "Anreicherung aus NVD / EPSS / CISA-KEV / ExploitDB. "
-                "KI-gestuetzter Confidence-Boost, deterministische "
-                "Severity-Policy schreibt die finale Bewertung."
+                "Ein Sprachmodell hebt allenfalls die Konfidenz korrelierter "
+                "Befunde an; die deterministische Severity-Policy schreibt "
+                "die finale Bewertung."
             ),
         },
     ]
