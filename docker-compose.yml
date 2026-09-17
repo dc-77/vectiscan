@@ -281,8 +281,16 @@ services:
     networks:
       - vectiscan-internal
 
+  # S0b: feste ZAP-Version statt des rollenden Tags "zap-stable". Welche
+  # Active-Scan-Regeln installiert sind, haengt am Add-on-Satz des Images;
+  # eine unbekannte Scanner-ID laesst ZAP die ganze Scan-Policy ablehnen.
+  # Mit einem rollenden Tag aendert sich das ohne Deploy und ohne Spur im
+  # Bericht. Hochziehen: ZAP_VERSION setzen, Integrationstest
+  # scan-worker/tests/integration fahren, dann den Default hier anheben.
+  # api.incerrordetails=true: ohne das liefert ZAP nur {"code":"does_not_exist"}
+  # ohne Angabe, welcher Parameter gemeint war.
   zap-1:
-    image: zaproxy/zap-stable
+    image: zaproxy/zap-stable:${ZAP_VERSION:-2.17.0}
     restart: unless-stopped
     command: >
       zap.sh -daemon
@@ -291,6 +299,7 @@ services:
       -config api.disablekey=true
       -config api.addrs.addr.name=.*
       -config api.addrs.addr.regex=true
+      -config api.incerrordetails=true
       -config scanner.maxScanDurationInMins=12
       -config ajaxSpider.maxDuration=4
       -config connection.timeoutInSecs=20
@@ -396,7 +405,7 @@ services:
       - vectiscan-internal
 
   zap-2:
-    image: zaproxy/zap-stable
+    image: zaproxy/zap-stable:${ZAP_VERSION:-2.17.0}
     restart: unless-stopped
     command: >
       zap.sh -daemon
@@ -405,6 +414,7 @@ services:
       -config api.disablekey=true
       -config api.addrs.addr.name=.*
       -config api.addrs.addr.regex=true
+      -config api.incerrordetails=true
       -config scanner.maxScanDurationInMins=12
       -config ajaxSpider.maxDuration=4
       -config connection.timeoutInSecs=20
@@ -425,7 +435,7 @@ services:
   # Pool-Expansion: zap-3 + zap-4 treten dem ZAP-Pool bei. Erst nach
   # ZAP_POOL_ENABLED=true auf den Workern werden sie genutzt.
   zap-3:
-    image: zaproxy/zap-stable
+    image: zaproxy/zap-stable:${ZAP_VERSION:-2.17.0}
     restart: unless-stopped
     command: >
       zap.sh -daemon
@@ -434,6 +444,7 @@ services:
       -config api.disablekey=true
       -config api.addrs.addr.name=.*
       -config api.addrs.addr.regex=true
+      -config api.incerrordetails=true
       -config scanner.maxScanDurationInMins=12
       -config ajaxSpider.maxDuration=4
       -config connection.timeoutInSecs=20
@@ -452,7 +463,7 @@ services:
       - vectiscan-internal
 
   zap-4:
-    image: zaproxy/zap-stable
+    image: zaproxy/zap-stable:${ZAP_VERSION:-2.17.0}
     restart: unless-stopped
     command: >
       zap.sh -daemon
@@ -461,6 +472,7 @@ services:
       -config api.disablekey=true
       -config api.addrs.addr.name=.*
       -config api.addrs.addr.regex=true
+      -config api.incerrordetails=true
       -config scanner.maxScanDurationInMins=12
       -config ajaxSpider.maxDuration=4
       -config connection.timeoutInSecs=20

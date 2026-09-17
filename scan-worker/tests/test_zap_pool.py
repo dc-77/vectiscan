@@ -191,7 +191,8 @@ class TestAcquireRelease:
         assert result is not None
         zap_id, lease_value = result
         assert zap_id in {"zap-1", "zap-2", "zap-3", "zap-4"}
-        assert lease_value.startswith("order-A:1.2.3.4:worker-1:")
+        # S0b: Trennzeichen ist "|", weil IPv6-Adressen selbst ":" enthalten.
+        assert lease_value.startswith("order-A|1.2.3.4|worker-1|")
 
     def test_stats_incremented(self, pool_of_four):
         zap_pool.acquire_zap(pool_of_four, "order-A", "1.2.3.4", "w1")

@@ -1,0 +1,125 @@
+# ZAP-Integrationsumgebung fuer S0b (Reproduktion und Regressionstest).
+#
+# Zwei ZAP-Daemons plus Redis, damit der Pool aus scanner/zap_pool.py echt
+# arbeitet und die Hypothese "Kontext in Instanz A, Scan in Instanz B"
+# reproduzierbar ist. Das Ziel ist ein eigener Container, es wird nie gegen
+# fremde Hosts gescannt.
+#
+# Start:
+#   docker compose -f scan-worker/tests/integration/docker-compose.zap-it.yml up -d
+#   docker compose -f scan-worker/tests/integration/docker-compose.zap-it.yml \
+#       run --rm runner
+#   docker compose -f scan-worker/tests/integration/docker-compose.zap-it.yml down -v
+#
+# Die Tests laufen im Compose-Netz, nicht auf dem Host. Grund: ZAP bedient
+# seine API nur, wenn Host-Header und eigener Listener zusammenpassen. Vom
+# Host aus (localhost:18090 gegen Listener :8090) haelt ZAP die Anfrage fuer
+# eine Proxy-Anfrage und antwortet 502. Im Netz heisst die Instanz
+# zap-a:8090, genau wie in Produktion zap-1:8090. Die veroeffentlichten
+# Ports bleiben fuer manuelle Abfragen erhalten, brauchen dann aber einen
+# passenden Host-Header (curl -H "Host: zap-a:8090").
+name: vectiscan-zap-it
+
+services:
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - "16379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Testziel: absichtlich angreifbar, nur in diesem Netz erreichbar.
+  target:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ./target_app.py:/app/target_app.py:ro
+    command: ["python", "/app/target_app.py"]
+    environment:
+      PORT: "8080"
+    ports:
+      - "18080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8080/')\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Flags identisch zur Produktion (docker-compose.yml), damit der Test das
+  # Verhalten der Produktionsinstanzen abbildet.
+  zap-a:
+    image: zaproxy/zap-stable:${ZAP_VERSION:-2.17.0}
+    command: >
+      zap.sh -daemon
+      -port 8090
+      -host 0.0.0.0
+      -config api.disablekey=true
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config api.incerrordetails=true
+      -config scanner.maxScanDurationInMins=12
+      -config ajaxSpider.maxDuration=4
+      -config connection.timeoutInSecs=20
+    ports:
+      - "18090:8090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/JSON/core/view/version/"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 40s
+
+  # Testlaeufer im Netz: sieht zap-a/zap-b unter ihren Containernamen, so wie
+  # der scan-worker in Produktion zap-1..zap-4 sieht.
+  runner:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ../..:/app:ro
+    environment:
+      ZAP_IT: "1"
+      ZAP_IT_A_URL: http://zap-a:8090
+      ZAP_IT_B_URL: http://zap-b:8090
+      ZAP_IT_REDIS_URL: redis://redis:6379
+      ZAP_IT_TARGET_URL: http://target:8080
+      PYTHONPATH: /app
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    command:
+      - sh
+      - -c
+      - pip install --quiet --root-user-action=ignore -r tests/integration/requirements-it.txt
+        && python -m pytest tests/integration -v -p no:cacheprovider
+    depends_on:
+      zap-a:
+        condition: service_healthy
+      zap-b:
+        condition: service_healthy
+      target:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  zap-b:
+    image: zaproxy/zap-stable:${ZAP_VERSION:-2.17.0}
+    command: >
+      zap.sh -daemon
+      -port 8090
+      -host 0.0.0.0
+      -config api.disablekey=true
+      -config api.addrs.addr.name=.*
+      -config api.addrs.addr.regex=true
+      -config api.incerrordetails=true
+      -config scanner.maxScanDurationInMins=12
+      -config ajaxSpider.maxDuration=4
+      -config connection.timeoutInSecs=20
+    ports:
+      - "18091:8090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/JSON/core/view/version/"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 40s

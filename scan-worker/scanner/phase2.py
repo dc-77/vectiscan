@@ -969,6 +969,7 @@ def run_zap_scan(
 
     from scanner.tools.zap_client import ZapClient, ZapError
     from scanner.tools.zap_mapper import ZapAlertMapper
+    from scanner.zap_pool import build_context_name, build_policy_name
 
     zap = ZapClient()
     result: dict[str, Any] = {
@@ -993,8 +994,9 @@ def run_zap_scan(
 
     ac = adaptive_config or {}
     phase2_dir = f"{host_dir}/phase2"
-    context_name = f"ctx-{order_id[:8]}-{ip.replace('.', '_')}"
-    policy_name = f"policy-{order_id[:8]}-{ip.replace('.', '_')}"
+    # S0b: gemeinsame Namensbildung mit run_phase2 und der Pool-Bereinigung.
+    context_name = build_context_name(order_id, ip)
+    policy_name = build_policy_name(order_id, ip)
     target_url = f"https://{fqdn}"
     context_id: int | None = None
     ai_skip = set(ac.get("skip_tools", []))
@@ -1237,6 +1239,23 @@ def run_phase2(
     from concurrent.futures import ThreadPoolExecutor, as_completed
     from urllib.parse import urlparse as _urlparse
 
+    from scanner.tools.zap_client import get_thread_zap_id as _get_thread_zap_id
+    from scanner.tools.zap_client import set_thread_zap_id as _set_thread_zap_id
+
+    # S0b: Instanz-Affinitaet. worker.py setzt die geleaste ZAP-Instanz als
+    # Thread-Local, aber die ZAP-Arbeit laeuft in verschachtelten
+    # ThreadPoolExecutors (p2s1/p2s2), und neue Threads erben keine
+    # Thread-Locals. Dort lief ZapClient() deshalb auf den statischen
+    # ZAP_BASE_URL statt auf die geleaste Instanz: Kontext und Policy landeten
+    # auf einem anderen Daemon als der Active Scan. Der Wert wird hier einmal
+    # eingesammelt, explizit an jede ZapClient-Erzeugung weitergereicht und
+    # zusaetzlich per Executor-Initializer in die Stage-Threads gesetzt.
+    _zap_target = _get_thread_zap_id()
+
+    def _zap_client() -> Any:
+        from scanner.tools.zap_client import ZapClient
+        return ZapClient(zap_id=_zap_target)
+
     # A7: erwartete Tools je Stage-Gruppe. Faellt eine komplette Gruppe per
     # Exception aus, bekommt jedes Tool der Gruppe eine eigene 'failed'-Zeile
     # — eine Sammelzeile wuerde die Abdeckungsmatrix luecklos machen.
@@ -1266,14 +1285,15 @@ def run_phase2(
         """ZAP Spider on ALL FQDNs (not just primary). No active scan yet."""
         import re as _re
         import time as _time
-        from scanner.tools.zap_client import ZapClient, ZapError
+        from scanner.tools.zap_client import ZapError
+        from scanner.zap_pool import build_context_name
         r: dict[str, Any] = {"zap_spider_urls": [], "_tools": []}
         if not (has_web and zap_in_tools):
             _record_phase2_status(order_id, ip, "zap_spider", "skipped",
                                   "no_web" if not has_web else "not_in_package")
             return r
 
-        zap = ZapClient()
+        zap = _zap_client()
         if not zap.health_check():
             log.warning("zap_daemon_unavailable", ip=ip)
             # A7: ZAP-Ausfall wird protokolliert statt still verschluckt.
@@ -1283,12 +1303,17 @@ def run_phase2(
 
         ac = adaptive_config or {}
         all_spider_urls: list[str] = []
-        context_name = f"ctx-{order_id[:8]}-{ip.replace('.', '_')}"
+        context_name = build_context_name(order_id, ip)
+        # S0b: Der Active Scan in Stage 2 zielte auf primary_fqdn (fqdns[0]),
+        # der Kontext deckte aber nur vhost_fqdns ab (VHosts mit 200er
+        # Antwort). Waren beide verschieden, antwortete ZAP
+        # "url_not_in_context". primary_fqdn kommt deshalb mit in den Kontext.
+        context_fqdns = list(dict.fromkeys(list(vhost_fqdns) + [primary_fqdn]))
 
         try:
             context_id = zap.create_context(context_name)
             # Include ALL primary VHosts in context scope (Multi-VHost-Probe)
-            for fqdn_item in vhost_fqdns:
+            for fqdn_item in context_fqdns:
                 zap.include_in_context(context_name, f".*{_re.escape(fqdn_item)}.*")
 
             zap.configure_rate_limit(
@@ -1299,6 +1324,10 @@ def run_phase2(
 
             # Spider each primary VHost
             spider_depth = ac.get("zap_spider_max_depth", 5)
+            # S0b: welcher VHost wirklich Knoten im Site-Tree erzeugt hat.
+            # Stage 2 waehlt daraus das Ziel des Active Scans, statt blind
+            # primary_fqdn zu nehmen (Ursache von "url_not_found").
+            spidered: list[str] = []
             for fqdn_item in vhost_fqdns:
                 publish_event(order_id, {"type": "tool_starting", "tool": "zap_spider", "host": ip})
                 spider_start = int(_time.monotonic() * 1000)
@@ -1312,6 +1341,8 @@ def run_phase2(
                 urls = zap.spider_results(spider_id)
                 spider_duration = int(_time.monotonic() * 1000) - spider_start
                 all_spider_urls.extend(urls)
+                if urls:
+                    spidered.append(fqdn_item)
                 log.info("zap_spider_fqdn_complete", fqdn=fqdn_item, urls=len(urls),
                          duration_ms=spider_duration)
 
@@ -1335,6 +1366,8 @@ def run_phase2(
             r["_tools"].append("zap_spider")
             r["_zap_context"] = context_name
             r["_zap_context_id"] = context_id
+            r["_zap_spidered_fqdns"] = spidered
+            r["_zap_context_fqdns"] = context_fqdns
 
             # Save spider results to DB
             record_tool_run(order_id, ip, 2, "zap_spider", "ok",
@@ -1448,8 +1481,11 @@ def run_phase2(
                                   "not_in_package")
         return r
 
-    log.info("phase2_stage1_start", ip=ip, tools="testssl+zap_spider+quick")
-    with ThreadPoolExecutor(max_workers=3, thread_name_prefix="p2s1") as pool:
+    log.info("phase2_stage1_start", ip=ip, tools="testssl+zap_spider+quick",
+             zap_id=_zap_target)
+    with ThreadPoolExecutor(max_workers=3, thread_name_prefix="p2s1",
+                            initializer=_set_thread_zap_id,
+                            initargs=(_zap_target,)) as pool:
         s1_futures = {
             pool.submit(_run_testssl_group): "testssl",
             pool.submit(_run_zap_discovery): "zap_discovery",
@@ -1475,7 +1511,10 @@ def run_phase2(
     spider_urls = results.get("zap_spider_urls", [])
     zap_context = results.pop("_zap_context", None)
     zap_context_id = results.pop("_zap_context_id", None)
-    log.info("phase2_stage1_complete", ip=ip, spider_urls=len(spider_urls))
+    zap_spidered_fqdns = results.pop("_zap_spidered_fqdns", []) or []
+    zap_context_fqdns = results.pop("_zap_context_fqdns", []) or []
+    log.info("phase2_stage1_complete", ip=ip, spider_urls=len(spider_urls),
+             spidered_fqdns=zap_spidered_fqdns)
 
     # ── Stage 2: Deep Scan (parallel, Spider URLs as input) ───
     # ZAP Active, ffuf, feroxbuster, wpscan — all receive spider URLs
@@ -1483,8 +1522,8 @@ def run_phase2(
     def _run_zap_active_stage2() -> dict[str, Any]:
         """ZAP Active Scan using the context from Stage 1."""
         import time as _time
-        from scanner.tools.zap_client import ZapClient, ZapError
-        from scanner.tools.zap_mapper import ZapAlertMapper
+        from scanner.tools.zap_client import ZapError
+        from scanner.zap_pool import build_policy_name
         r: dict[str, Any] = {"_tools": []}
 
         # A6-Circuit-Breaker (Strang-A Befund 2): ist der Host bereits durch ein
@@ -1512,16 +1551,54 @@ def run_phase2(
             _record_phase2_status(order_id, ip, "zap_active", "skipped", skip_reason)
             return r
 
-        zap = ZapClient()
-        policy_name = f"policy-{order_id[:8]}-{ip.replace('.', '_')}"
+        # S0b: derselbe Daemon wie Kontext und Spider aus Stage 1.
+        zap = _zap_client()
+        policy_name = build_policy_name(order_id, ip)
+
+        # S0b: Ziel des Active Scans ist ein VHost, den der Spider wirklich
+        # erfasst hat. primary_fqdn (= fqdns[0]) kam nur dann zum Zug, wenn er
+        # auch im Kontext steht. Andernfalls antwortete ZAP "url_not_found"
+        # bzw. "url_not_in_context".
+        if primary_fqdn in zap_spidered_fqdns:
+            target_fqdn = primary_fqdn
+        elif zap_spidered_fqdns:
+            target_fqdn = zap_spidered_fqdns[0]
+        elif primary_fqdn in zap_context_fqdns:
+            target_fqdn = primary_fqdn
+        else:
+            _record_phase2_status(order_id, ip, "zap_active", "skipped",
+                                  "no_spidered_vhost_in_context")
+            return r
+        target_url = f"https://{target_fqdn}"
 
         try:
             publish_event(order_id, {"type": "tool_starting", "tool": "zap_active", "host": ip})
             active_start = int(_time.monotonic() * 1000)
-            categories = ac.get("zap_active_categories", ["sqli", "xss", "lfi", "ssrf", "cmdi"])
-            zap.create_scan_policy(policy_name, categories, scan_policy)
 
-            target_url = f"https://{primary_fqdn}"
+            # Der Kontext aus Stage 1 muss auf dieser Instanz noch existieren.
+            if not zap.context_exists(zap_context):
+                _record_phase2_status(order_id, ip, "zap_active", "failed",
+                                      f"zap_context_missing:{zap_context}")
+                return r
+
+            categories = ac.get("zap_active_categories", ["sqli", "xss", "lfi", "ssrf", "cmdi"])
+            enabled_ids = zap.create_scan_policy(policy_name, categories, scan_policy)
+            dropped_ids = list(zap.last_dropped_scanner_ids)
+            if not enabled_ids:
+                _record_phase2_status(
+                    order_id, ip, "zap_active", "skipped",
+                    f"no_active_rules_available:{','.join(categories) or 'none'}")
+                return r
+
+            # Site-Tree fuellen, falls der Spider fuer dieses Ziel nichts
+            # hinterlassen hat. Ohne Knoten antwortet ascan mit url_not_found.
+            if target_fqdn not in zap_spidered_fqdns:
+                try:
+                    zap.access_url(target_url)
+                except ZapError as access_err:
+                    log.warning("zap_access_url_failed", url=target_url,
+                                endpoint=access_err.endpoint, error=str(access_err))
+
             scan_id = zap.start_active_scan(target_url, context_id=zap_context_id,
                                             scan_policy=policy_name)
             completed = zap.poll_until_complete(
@@ -1541,11 +1618,15 @@ def run_phase2(
                             raw_output=json.dumps(
                                 {"status": "complete" if completed else "timeout",
                                  "policy": scan_policy, "categories": categories,
+                                 "target": target_url,
+                                 "enabled_scanners": sorted(enabled_ids),
+                                 "dropped_scanners": dropped_ids,
                                  "duration_ms": active_duration}))
             publish_tool_output(order_id, "zap_active", ip, "Active scan complete")
             progress_callback(order_id, "zap_active", "complete")
         except ZapError as e:
-            log.error("zap_active_failed", ip=ip, error=str(e))
+            log.error("zap_active_failed", ip=ip, endpoint=e.endpoint,
+                      zap_code=e.zap_code, error=str(e))
             _record_phase2_status(order_id, ip, "zap_active", "failed", str(e))
         finally:
             try:
@@ -1706,7 +1787,9 @@ def run_phase2(
     stage2_workers = 4 if stage2_parallel else 1
     log.info("phase2_stage2_start", ip=ip, spider_urls=len(spider_urls),
              parallel=stage2_parallel, reason="waf_safe" if not stage2_parallel else "default")
-    with ThreadPoolExecutor(max_workers=stage2_workers, thread_name_prefix="p2s2") as pool:
+    with ThreadPoolExecutor(max_workers=stage2_workers, thread_name_prefix="p2s2",
+                            initializer=_set_thread_zap_id,
+                            initargs=(_zap_target,)) as pool:
         s2_futures = {
             pool.submit(_run_zap_active_stage2): "zap_active",
             pool.submit(_run_deep_scan_extras): "extras",
@@ -1724,10 +1807,10 @@ def run_phase2(
 
     # ── Stage 3: Collect ZAP alerts (passive + active) ────────
     if zap_context:
-        from scanner.tools.zap_client import ZapClient, ZapError
+        from scanner.tools.zap_client import ZapError
         from scanner.tools.zap_mapper import ZapAlertMapper
         try:
-            zap = ZapClient()
+            zap = _zap_client()
             log.info("zap_waiting_for_passive", ip=ip)
             zap.wait_for_passive_scan(timeout=30)
 
@@ -1790,8 +1873,7 @@ def run_phase2(
             _record_phase2_status(order_id, ip, "zap", "failed", str(e))
         finally:
             try:
-                zap = ZapClient()
-                zap.remove_context(zap_context)
+                _zap_client().remove_context(zap_context)
             except Exception:
                 pass
     else:

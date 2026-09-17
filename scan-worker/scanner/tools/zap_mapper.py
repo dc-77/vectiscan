@@ -107,9 +107,30 @@ _PASSIVE_RANGES = [(10000, 19999), (90000, 99999)]
 # Active scanner plugin ID ranges
 _ACTIVE_RANGES = [(0, 9999), (20000, 49999)]
 
+# S0b: aktive Scan-Regeln im 9xxxx-Bereich. Die Bereichsregel oben zaehlt
+# 90000-99999 pauschal zu den passiven Regeln, dort liegen aber unter anderem
+# Remote OS Command Injection (90020) und XXE (90023) -- genau die Kategorien,
+# die KI #3 als "cmdi" und "xxe" anfordert. Active-Scan-Treffer wurden dadurch
+# als zap_passive etikettiert, also als Beobachtung statt als aktiver Nachweis.
+_ACTIVE_9XXXX_IDS = {
+    90019,  # Server Side Code Injection
+    90020,  # Remote OS Command Injection
+    90021,  # XPath Injection
+    90023,  # XML External Entity Attack
+    90024,  # Generic Padding Oracle
+    90025,  # Expression Language Injection
+    90026,  # SOAP Action Spoofing
+    90028,  # Insecure HTTP Method
+    90034,  # Cloud Metadata Potentially Exposed
+    90035,  # Server Side Template Injection
+    90036,  # Server Side Template Injection (Blind)
+}
+
 
 def _is_passive(plugin_id: int) -> bool:
     """Check if a plugin ID belongs to the passive scanner."""
+    if plugin_id in _ACTIVE_9XXXX_IDS:
+        return False
     return any(lo <= plugin_id <= hi for lo, hi in _PASSIVE_RANGES)
 
 
