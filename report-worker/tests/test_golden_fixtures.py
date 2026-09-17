@@ -50,6 +50,17 @@ def test_orders_txt_deckt_sich_mit_manifest(manifest):
     assert listed == [order["order_id"] for order in manifest["orders"]]
 
 
+def test_ci_matrix_deckt_sich_mit_orders_txt():
+    """Der Export-Job fuehrt seine Auftraege als parallel:matrix, weil der
+    Artefakt-Upload nur kleine Archive annimmt. Beide Listen muessen gleich sein."""
+    ci_file = Path(__file__).parents[2] / ".gitlab-ci.yml"
+    yaml = pytest.importorskip("yaml", reason="PyYAML nicht installiert")
+    config = yaml.safe_load(ci_file.read_text(encoding="utf-8"))
+    matrix = config["ops-export-golden-tars"]["parallel"]["matrix"][0]["GOLDEN_ORDER"]
+    listed = (GOLDEN / "orders.txt").read_text(encoding="utf-8").split()
+    assert sorted(matrix) == sorted(listed)
+
+
 def test_api_snapshot_je_auftrag_vorhanden(manifest):
     for order in manifest["orders"]:
         assert order["api_snapshot"], f"API-Snapshot fehlt fuer {order['order_id']}"

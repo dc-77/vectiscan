@@ -65,7 +65,7 @@ mc_exec() { docker compose exec -T minio mc "$@" </dev/null; }
 minio_sh() { docker compose exec -T minio "$@" </dev/null; }
 
 mkdir -p "$OUT_DIR"
-REPORT="$OUT_DIR/export-report.txt"
+REPORT="$OUT_DIR/export-report${GOLDEN_ORDER:+-$GOLDEN_ORDER}.txt"
 : > "$REPORT"
 
 log "MinIO-Alias setzen"
@@ -75,7 +75,14 @@ mc_exec rm --recursive --force "$CONTAINER_TMP" >/dev/null 2>&1 || true
 minio_sh mkdir -p "$CONTAINER_TMP"
 
 # Auftragsliste vorab einlesen, damit die Schleife nicht von stdin haengt.
-mapfile -t ORDERS < "$ORDERS_FILE"
+# GOLDEN_ORDER schraenkt auf einen Auftrag ein. Der CI-Job nutzt das ueber
+# parallel:matrix, weil der Artefakt-Upload dieser GitLab-Instanz schon bei
+# wenigen hundert Kilobyte mit 413 abbricht; ein Auftrag je Job bleibt darunter.
+if [[ -n "${GOLDEN_ORDER:-}" ]]; then
+    ORDERS=("$GOLDEN_ORDER")
+else
+    mapfile -t ORDERS < "$ORDERS_FILE"
+fi
 
 ok=0
 missing=0
