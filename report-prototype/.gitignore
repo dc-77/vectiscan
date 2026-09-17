@@ -1,0 +1,4 @@
+# Kundendaten und Zugangsdaten bleiben lokal
+input/
+out/
+*.creds
