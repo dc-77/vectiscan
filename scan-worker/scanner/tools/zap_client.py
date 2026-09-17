@@ -406,11 +406,13 @@ class ZapClient:
     # Active scan category → ZAP scanner IDs (groups)
     # See: https://www.zaproxy.org/docs/alerts/
     CATEGORY_SCANNER_IDS: dict[str, list[int]] = {
+        # 40024 (SQLi SQLite) fehlt in zaproxy/zap-stable:2.17.0. Die
+        # Kategorie bleibt nutzbar, sie deckt dann fuenf statt sechs Regeln ab.
         "sqli": [40018, 40019, 40020, 40021, 40022, 40024],
         "xss": [40012, 40014, 40016, 40017],
         "lfi": [6, 40009],        # Path Traversal + SSRF overlap
         "rfi": [7],               # Remote File Inclusion
-        "ssrf": [40046],          # Server Side Request Forgery
+        "ssrf": [40046],          # Server Side Request Forgery, siehe CATEGORIES_UNAVAILABLE
         "cmdi": [90020],          # Remote OS Command Injection
         "xxe": [90023],           # XML External Entity
         "crlf": [40003],          # CRLF Injection
@@ -424,6 +426,32 @@ class ZapClient:
         "headerinjection": [40003],
         "defaultlogin": [],
     }
+
+    # S0b: Kategorien, die der gepinnte ZAP nicht bedienen kann, mit Grund.
+    # Die IDs bleiben oben stehen, damit ein spaeteres Image sie wieder
+    # aktiviert, aber nach aussen (KI-Prompt, Regelkonfiguration, Doku,
+    # Methodikseite) darf keine dieser Kategorien als Zusage auftauchen.
+    # Wiedervorlage bei der Paketdefinition in S7.
+    #
+    # Entscheidung DC (17.09.2026): kein Add-on nachziehen. SSRF-Tests und
+    # SQLite-SQL-Injection gegen fremde Produktionssysteme sind ohnehin an
+    # der Grenze dessen, was ein automatisierter Aussenscan tun sollte.
+    CATEGORIES_UNAVAILABLE: dict[str, str] = {
+        "ssrf": "Regel 40046 nicht in zaproxy/zap-stable:2.17.0",
+    }
+
+    @classmethod
+    def offered_categories(cls) -> list[str]:
+        """Kategorien, die angeboten werden duerfen, alphabetisch.
+
+        Leere Kategorien und die als nicht verfuegbar markierten fallen raus.
+        Das ist die Liste, gegen die sich Regelkonfiguration, KI-Prompt und
+        Doku messen lassen muessen.
+        """
+        return sorted(
+            name for name, ids in cls.CATEGORY_SCANNER_IDS.items()
+            if ids and name not in cls.CATEGORIES_UNAVAILABLE
+        )
 
     # Forbidden categories — NEVER enable these
     FORBIDDEN_SCANNERS: set[int] = {
@@ -476,8 +504,21 @@ class ZapClient:
         wurde.
         """
         requested: set[int] = set()
+        unknown_names: list[str] = []
         for cat in categories or []:
-            requested.update(self.CATEGORY_SCANNER_IDS.get(cat, []))
+            if cat not in self.CATEGORY_SCANNER_IDS:
+                # S0b: Kategorienamen sind zwischen Regelkonfiguration,
+                # KI-Prompt und diesem Katalog auseinandergelaufen
+                # ("path_traversal" statt "pathtraversal", "auth_bypass" ohne
+                # jede Entsprechung). Solche Namen liefen bisher still ins
+                # Leere. Der Drift-Test test_zap_categories_drift haelt das
+                # fest, hier wird der Einzelfall wenigstens sichtbar.
+                unknown_names.append(cat)
+                continue
+            requested.update(self.CATEGORY_SCANNER_IDS[cat])
+        if unknown_names:
+            log.warning("zap_unknown_categories", categories=unknown_names,
+                        zap_id=self.zap_id)
         requested -= self.FORBIDDEN_SCANNERS
         if not requested:
             return set(), set()

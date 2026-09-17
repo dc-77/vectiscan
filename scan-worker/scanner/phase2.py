@@ -1374,7 +1374,7 @@ def run_phase2(
                                       f"zap_context_missing:{zap_context}")
                 return r
 
-            categories = ac.get("zap_active_categories", ["sqli", "xss", "lfi", "ssrf", "cmdi"])
+            categories = ac.get("zap_active_categories", ["sqli", "xss", "lfi", "cmdi"])
             enabled_ids = zap.create_scan_policy(policy_name, categories, scan_policy)
             dropped_ids = list(zap.last_dropped_scanner_ids)
             if not enabled_ids:
