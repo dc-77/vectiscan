@@ -251,3 +251,38 @@ class TestContextUndSiteTree:
         path, params = mock_get.call_args[0]
         assert path == "/JSON/core/action/accessUrl/"
         assert params["url"] == "https://example.com"
+
+
+# ---------------------------------------------------------------------------
+# S0b-Nachtrag: Active-Scan-Poll-Timeout konfigurierbar und ueber ZAP-Cap
+# ---------------------------------------------------------------------------
+
+class TestActiveScanTimeout:
+    """Der Poll-Timeout muss ueber ZAPs maxScanDurationInMins (720s) liegen.
+
+    Sonst gibt der Poll auf, bevor ZAPs eigenes Limit den Scan sauber beendet,
+    und ein erfolgreicher Lauf wird als 'timeout' verworfen. Lokal verifiziert
+    (ZAP 2.17.0): beim Cap meldet ascan/view/status 100, poll_until_complete
+    greift.
+    """
+
+    def test_default_liegt_ueber_zap_cap(self, monkeypatch):
+        from scanner.phase2 import _zap_active_scan_timeout
+        monkeypatch.delenv("ZAP_ACTIVE_SCAN_TIMEOUT_SEC", raising=False)
+        # ZAP-Cap in docker-compose: maxScanDurationInMins=12 -> 720s
+        assert _zap_active_scan_timeout() > 720
+
+    def test_env_uebersteuert(self, monkeypatch):
+        from scanner.phase2 import _zap_active_scan_timeout
+        monkeypatch.setenv("ZAP_ACTIVE_SCAN_TIMEOUT_SEC", "1200")
+        assert _zap_active_scan_timeout() == 1200
+
+    def test_ungueltig_faellt_auf_default(self, monkeypatch):
+        from scanner.phase2 import _zap_active_scan_timeout
+        monkeypatch.setenv("ZAP_ACTIVE_SCAN_TIMEOUT_SEC", "abc")
+        assert _zap_active_scan_timeout() == 900
+
+    def test_untergrenze(self, monkeypatch):
+        from scanner.phase2 import _zap_active_scan_timeout
+        monkeypatch.setenv("ZAP_ACTIVE_SCAN_TIMEOUT_SEC", "5")
+        assert _zap_active_scan_timeout() == 60

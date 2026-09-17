@@ -17,6 +17,30 @@ from scanner.tools import run_tool, _save_result, record_tool_run  # noqa: F401
 log = structlog.get_logger()
 
 
+def _zap_active_scan_timeout() -> int:
+    """Poll-Timeout fuer den ZAP Active Scan in Sekunden.
+
+    S0b-Nachtrag: der frueher fest verdrahtete Wert 600 lag UNTER ZAPs
+    eigenem Scan-Cap ``scanner.maxScanDurationInMins`` (docker-compose: 12 Min
+    = 720 s). Damit gab unser Poll auf, bevor ZAPs Limit den Scan sauber
+    beenden konnte, und ein an sich erfolgreicher Lauf wurde als ``timeout``
+    verworfen. Lokal verifiziert (ZAP 2.17.0): beim Cap beendet ZAP den Scan
+    und ``ascan/view/status`` meldet 100 -> ``poll_until_complete`` greift.
+
+    Der Poll muss also ueber dem ZAP-Cap liegen. Default 900 s = 720 s Cap
+    plus Reserve fuer das letzte Poll-Intervall und die Alert-Sammlung.
+    Ueber ``ZAP_ACTIVE_SCAN_TIMEOUT_SEC`` ohne Rebuild uebersteuerbar; wer den
+    ZAP-Cap hochsetzt, muss diesen Wert entsprechend nachziehen.
+    """
+    raw = os.environ.get("ZAP_ACTIVE_SCAN_TIMEOUT_SEC", "900")
+    try:
+        val = int(raw)
+    except ValueError:
+        log.warning("zap_active_timeout_invalid", value=raw, fallback=900)
+        return 900
+    return max(60, val)
+
+
 def _record_phase2_status(order_id: str, ip: str, tool_name: str,
                           status: str, reason: str) -> None:
     """A7 (Jul 2026): Ergebniszeile fuer ein Phase-2-Tool schreiben.
@@ -1396,7 +1420,7 @@ def run_phase2(
                                             scan_policy=policy_name)
             completed = zap.poll_until_complete(
                 lambda: zap.active_scan_status(scan_id),
-                timeout=600, interval=10, stop_value=100,
+                timeout=_zap_active_scan_timeout(), interval=10, stop_value=100,
                 order_id=order_id, tool_name="zap_active",
             )
             if not completed:
