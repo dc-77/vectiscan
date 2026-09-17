@@ -15,6 +15,16 @@ Redis-Key-Konventionen (alle Prefix ``zap:``):
 
 Dieser Modul haengt von ``redis-py`` ab und von ``zap_client.safe_name_part``
 (gemeinsame Namensbildung fuer Kontexte, siehe S0b). Tests setzen fakeredis ein.
+
+Stand 17.09.2026: **in Produktion ist der Pool aus.** ``ZAP_POOL_ENABLED``
+steht in ``/opt/apps/vectiscan/.env`` nicht drin, damit greift der
+Compose-Default ``false``. Jeder Worker spricht fest mit einem Daemon ueber
+``ZAP_BASE_URL`` (scan-worker-1 mit zap-1, -2 mit zap-2, -3 mit zap-3),
+``zap-4`` laeuft ungenutzt mit. Der Code hier ist also vorbereitet, nicht
+aktiv. Wer ihn einschaltet, braucht die Affinitaets-Korrektur aus S0b in
+``phase2.run_phase2``: bis dahin setzte ``worker.py`` die geleaste Instanz nur
+als Thread-Local, und die verschachtelten Stage-Executors haben davon nichts
+mitbekommen -- Lease und tatsaechliche Verbindung waeren auseinandergelaufen.
 """
 
 from __future__ import annotations
