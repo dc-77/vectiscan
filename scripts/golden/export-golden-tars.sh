@@ -27,7 +27,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STRIPPER="$SCRIPT_DIR/strip-screenshots.py"
 BUCKET="scan-rawdata"
 ALIAS="golden"
-CONTAINER_TMP="/tmp/golden-export"
+# Je Lauf ein eigenes Verzeichnis im minio-Container: die Matrix-Jobs laufen
+# parallel und wuerden sich sonst gegenseitig die Dateien wegraeumen.
+CONTAINER_TMP="/tmp/golden-export-${CI_JOB_ID:-$$}"
 MAX_BYTES=$((5 * 1024 * 1024))
 
 log() { printf '[golden] %s\n' "$*"; }
