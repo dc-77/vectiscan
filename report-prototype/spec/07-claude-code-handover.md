@@ -58,6 +58,8 @@ Erwartete Gesamtdauer bei einer Session am Tag: vier bis fünf Wochen bis S6. Bi
 
 **zap_active (0 von 42; 26× `does_not_exist`, 2× `url_not_found`, 1× `url_not_in_context`, 1× `illegal_parameter`)**: Ablauf in `phase2.py:1483-1552`: Policy anlegen (`create_scan_policy`), `start_active_scan(url, context_id, scan_policy)`, pollen. `does_not_exist` liefert ZAP, wenn die angegebene Policy oder der Kontext in *dieser* ZAP-Instanz nicht existiert. Wahrscheinlichste Ursache angesichts des ZAP-Pools (`zap_pool.py`, mehrere Daemons): Kontext und Policy werden in einer Instanz angelegt, der Active-Scan-Aufruf trifft eine andere, oder der Kontext des Spiders ist beim Active Scan schon abgeräumt. `url_not_found` bedeutet leerer Spider-Baum, `url_not_in_context` ein Include-Muster, das die Ziel-URL nicht deckt. Die Fehlermeldung nennt heute nicht, welcher Endpunkt fehlschlug (`ZapError` trägt nur die ZAP-Antwort). Vorgehen in S0b: (1) `ZapError` um Endpunkt und Parameter ergänzen, (2) einen Scan gegen ein eigenes Ziel mit ZAP-Logs reproduzieren, (3) Instanz-Affinität für Kontext, Policy und Scan sicherstellen (dieselbe Pool-Verbindung für alle drei Schritte), (4) `addScanPolicy` idempotent machen (`already_exists` abfangen), (5) Test, der einen vollständigen Spider-plus-Active-Lauf gegen einen lokalen Testcontainer fährt. Bis der Fix produktiv ist: „ZAP Active Scan" von der Methodikseite nehmen.
 
+**Ergebnis S0b (17.09.2026, reproduziert gegen ZAP 2.17.0 mit eigenem Testziel).** Die oben vermutete Instanz-Affinität ist *nicht* die Ursache. Ein erzwungener Split (Kontext und Policy auf Instanz A, Active Scan auf Instanz B) liefert `context_not_found`, nicht `does_not_exist`. Die tatsächliche Ursache liegt eine Stufe früher, in `create_scan_policy`: `enableScanners` bekommt die fest verdrahteten Scanner-IDs aus `CATEGORY_SCANNER_IDS`, und zwei davon sind im Image gar nicht installiert (`40024` SQL Injection SQLite in der Kategorie `sqli`, `40046` SSRF in der Kategorie `ssrf`; beide liegen in Add-ons, die `zaproxy/zap-stable` nicht mitbringt). ZAP lehnt den gesamten Aufruf dann mit `{"code":"does_not_exist","message":"Does Not Exist","detail":"IDs: [40024]"}` ab. In Produktion steht `api.incerrordetails` auf dem Vorgabewert `false`, deshalb fehlt das Feld `detail` und übrig bleibt exakt der Text aus den 42 Scans. Weil `sqli` in jeder Kategorie-Liste steht (Default wie KI #3), scheiterte der Active Scan sofort und mit `durationMs 0`, noch bevor ein einziger Request an das Ziel ging. Zwei IDs im Katalog (`10010`, `10054`) waren zusätzlich passive Regeln, die in einer Active-Scan-Policy nie existieren können. Fix: angeforderte IDs gegen `ascan/view/scanners` schneiden, unbekannte in die Abdeckung schreiben statt an ZAP zu schicken; `addScanPolicy` idempotent; ZAP-Version gepinnt, weil der Regelsatz am Image hängt. Die Instanz-Affinität wurde trotzdem repariert (Thread-Local erreichte die Stage-Threads nicht), ebenso `url_not_found`/`url_not_in_context` (Scanziel war `fqdns[0]` statt eines gespiderten VHosts) und `illegal_parameter` (Doppelpunkte in IPv6-Policy-Namen).
+
 ## 5. Startprompts
 
 Alle Prompts setzen voraus: Repo `vectiscan`, Arbeitsordner `report-prototype/` mit `spec/04` bis `spec/07`, `build/catalog_sim.py`, `build/report_data.py`, `build/template.html.j2`, `input/_all/` (API-Snapshot, gitignored). Jede Session beginnt im Plan-Modus; DC prüft den Plan, dann Umsetzung.
@@ -309,6 +311,7 @@ für Junkerwerk; Export validiert gegen ein JSON-Schema.
 Verifiziert gegen die aktuelle Dokumentation (code.claude.com/docs), Stand 17.09.2026:
 
 - Modell: `claude --model opus` oder in der Session `/model opus`; Aliasse `opus`, `fable`, `best` (Fable wo verfügbar, sonst Opus), `opus[1m]` für großes Kontextfenster. Vorgabe DC: mindestens Opus in jeder Session, Fable für die Spezialfälle S0b (Fehlersuche im ZAP-Pool), S1 (Schema-Entwurf), S2-Engine und S6 (Umschaltung mit Löschungen). Kein Sonnet, auch nicht für Subagents.
+- Fable-Schutzfilter: Bei Inhalten rund um Active Scans, Angriffskategorien (SQLi, XSS, LFI, SSRF) und Scan-Policies schlägt Fables Filter breit an und bietet den Wechsel auf Opus an. In S0b ist das am 17.09. passiert; Antwort „Switch automatically" (per `/config` änderbar). Sessions, die solche Inhalte laufend berühren (S0b, später ZAP-Policy-Arbeit), praktisch auf Opus planen; S1, S2, S6 bleiben Fable.
 - Effort: `claude --effort high` (Werte `low`, `medium`, `high`, `xhigh`, `max`). Standard `high`; `xhigh` für S0b, S1, S2-Engine, S6. Max-Abo, also keine Kostenbremse; `max` nur, wenn eine Session sichtbar an Denktiefe scheitert. Ob `--effort` über die Session hinaus gespeichert wird, ist nicht dokumentiert; bei jedem Start mitgeben.
 - Plan-Modus: `claude --permission-mode plan` beim Start oder Shift+Tab in der Session. Jede Session beginnt so.
 - Worktree je Session: `claude --worktree s1-facts --model fable --effort xhigh --permission-mode plan "<Startprompt>"`. Legt `.claude/worktrees/s1-facts/` auf Branch `worktree-s1-facts` an; `.claude/worktrees/` in `.gitignore`.
@@ -329,3 +332,78 @@ Verifiziert gegen die aktuelle Dokumentation (code.claude.com/docs), Stand 17.09
 ## 8. Geklärt am 17.09.2026
 
 Alle vier Vorfragen sind entschieden und in Abschnitt 1 eingetragen (VirusTotal ohne; Kürzel optional mit Fallback wie heute; Kundenkontext optional bei Beauftragung plus Web-Recherche plus Admin-Review; Junkerwerk-Fixtures freigegeben). Start mit S0a, S0b, S0c ist möglich.
+
+## 9. Startcheckliste (Stand der Prüfung 17.09.2026, Repo auf DCs Rechner)
+
+Befund:
+
+- Repo `vectiscan`, Branch `main`, letzter Commit 23.07.2026. Arbeitsbaum sauber bis auf `.claude/settings.local.json` (lokale Freigaben) und den untracked Ordner `report-prototype/`. Die 545 „geänderten" Dateien, die ein Linux-Git zeigt, sind Zeilenenden (CRLF) und Dateimodus, keine Inhalte.
+- Zwei Remotes: `github` (dc-77/vectiscan) und `gitlab` (git-extern.bergersysteme.com, CI/CD mit Rolling Deploy nach `/opt/apps/vectiscan` auf dem Host `vectigal-docker02`). Die GitLab-Remote-URL enthält ein persönliches Zugriffstoken im Klartext. Das Token sollte rotiert und die URL ohne Token gesetzt werden (Git Credential Manager übernimmt die Anmeldung).
+- Claude Code ist im Repo bereits genutzt worden (Freigaben für git, ssh vectigal-docker02, python, gitlab-api.sh). Läuft unter Git Bash.
+- Kein lokales `.env`; Produktionsgeheimnisse (DB, MinIO, API-Keys) liegen auf `vectigal-docker02` unter `/opt/apps/vectiscan/.env`. S0c holt die Roh-Tars per `ssh vectigal-docker02` aus MinIO; S0b reproduziert den ZAP-Fehler entweder lokal mit `docker-compose.dev.yml` oder auf dem Host.
+- `report-prototype/.gitignore` schließt `input/` (18 MB Kundendaten), `out/` und `*.creds` aus. `build/assets/` (200 KB Screenshots Junkerwerk, freigegeben) wird eingecheckt.
+- Startprompts liegen als Dateien unter `report-prototype/spec/prompts/S0a.md` bis `S7.md` (Vorspann bereits enthalten). Regeln und Subagent liegen unter `report-prototype/claude-config/` und müssen einmal nach `.claude/` kopiert werden.
+
+Vorbereitung, einmalig, in Git Bash im Repo:
+
+```bash
+cd /c/BS-Consulting/Projekte/Coding/vectiscan
+
+# 1. Claude Code aktuell? (Alias fable braucht eine aktuelle Version)
+claude --version && claude update
+
+# 2. Regeln und Subagent aktivieren, Worktrees ignorieren
+mkdir -p .claude/rules .claude/agents
+cp report-prototype/claude-config/rules/report-v3.md .claude/rules/
+cp report-prototype/claude-config/agents/check-author.md .claude/agents/
+grep -q '^.claude/worktrees/' .gitignore || printf '\n.claude/worktrees/\n' >> .gitignore
+
+# 3. Prototyp und Specs einchecken, damit jeder Worktree sie sieht
+git add report-prototype .claude/rules .claude/agents .gitignore
+git commit -m "report-prototype: Prototyp Junkerwerk, Specs 00-07, Katalog-Simulation, Claude-Code-Regeln"
+git push gitlab main
+
+# 4. GitLab-Token aus der Remote-URL nehmen (danach Token in GitLab rotieren)
+git remote set-url gitlab https://git-extern.bergersysteme.com/vectigal/vectiscan.git
+```
+
+Start der ersten drei Sessions, je ein Terminal (Git Bash), Plan-Modus, Plan freigeben:
+
+```bash
+claude --worktree s0a-claims   --model opus  --effort high  --permission-mode plan \
+  "Lies report-prototype/spec/prompts/S0a.md und arbeite den Auftrag ab."
+
+claude --worktree s0b-zap      --model fable --effort xhigh --permission-mode plan \
+  "Lies report-prototype/spec/prompts/S0b.md und arbeite den Auftrag ab."
+
+claude --worktree s0c-fixtures --model opus  --effort high  --permission-mode plan \
+  "Lies report-prototype/spec/prompts/S0c.md und arbeite den Auftrag ab."
+```
+
+Danach, in dieser Reihenfolge, jeweils nach Merge der Vorgänger:
+
+```bash
+claude --worktree s1-facts    --model fable --effort xhigh --permission-mode plan "Lies report-prototype/spec/prompts/S1.md und arbeite den Auftrag ab."
+claude --worktree s2-catalog  --model fable --effort xhigh --permission-mode plan "Lies report-prototype/spec/prompts/S2.md und arbeite den Auftrag ab."
+claude --worktree s4-renderer --model opus  --effort high  --permission-mode plan "Lies report-prototype/spec/prompts/S4.md und arbeite den Auftrag ab."   # parallel zu S2
+claude --worktree s3-textdata --model opus  --effort high  --permission-mode plan "Lies report-prototype/spec/prompts/S3.md und arbeite den Auftrag ab."
+claude --worktree s5-gate     --model opus  --effort high  --permission-mode plan "Lies report-prototype/spec/prompts/S5.md und arbeite den Auftrag ab."   # parallel zu S3
+claude --worktree s6-cutover  --model fable --effort xhigh --permission-mode plan "Lies report-prototype/spec/prompts/S6.md und arbeite den Auftrag ab."
+claude --worktree s7-packages --model opus  --effort high  --permission-mode plan "Lies report-prototype/spec/prompts/S7.md und arbeite den Auftrag ab."
+```
+
+Status 17.09. abends: S0a fertig (drei Commits auf `worktree-s0a-claims`, 960 + 732 Tests grün; Nachträge: `.env.template` strict auskommentiert, Nuclei-Badge Homepage entfernt, „Claude AI"-Badge bleibt, Persona „Sicherheitsanalyst", Ticket für `validation/tests/test_checks.py` außerhalb der testpaths → S5). S0b neu gestartet auf Opus 5 wegen Fable-Filter, Reproduktion lokal in Docker Desktop mit zwei ZAP-Instanzen und Pool. S0c läuft: Tars per manuellem GitLab-Job `ops-export-golden-tars` (Order-IDs als CI-Variable, Artefakt 1 Tag), castenow alle drei Läufe (Referenz `4e6b6883`), Screenshots immer entfernt mit Manifest.
+
+Befund CI/Deploy (17.09., S0a-Session): `main` hatte seit dem 23.07. keine laufende Pipeline; MR-Pipelines waren nie konfiguriert (nur main, develop, web). Erste Pipeline seit Juli (3049, ausgelöst durch den Prototyp-Push) rot: `deploy-auto` scheitert am Pull `minio/minio:latest` (Docker Hub, einziges mutables Tag im Compose); `trivy-frontend` meldet zwei CRITICAL in next 15.5.12 (Fix 15.5.24); `trivy-api` scheitert am geteilten Trivy-Cache-Lock; `after_script` prune läuft in den Timeout (kosmetisch); `trivy-scan-worker` ist auf `when: never`. Produktion unverändert. Maßnahmen in MR !69: MR-Pipelines aktiviert (workflow-Block), MinIO-Image gepinnt, next gebumpt, Trivy-Cache je Job; Issues für Prune-Timeout und trivy-scan-worker. Lehre: Ohne MR-Pipelines und ohne Deploy seit Juli war jede Aussage über den Zustand von `main` ungeprüft; das erklärt auch, warum drei tote Werkzeuge 42 Scans lang unbemerkt blieben.
+
+S0c fertig (17.09.): `report-worker/tests/golden/` mit 10 Tars (1,7 MB, ohne Screenshots, sha256 im Manifest), API-Snapshot 39 Orders (15 MB Text, bewusst unkomprimiert), `expected/junkerwerk.json`, `negative.json` (36 Einträge, 31 Befunde; MariaDB-Muster verbietet die Versionsableitung, nicht den Befund), Smoke-Test 997 grün. Nebenbefunde: GitLab-Instanz lehnt HTTP-Bodies über etwa 1 MB mit 413 ab (Push per SSH, Artefakt-Export als parallel:matrix je Order); IPv6-Hostverzeichnisse sind unter Windows nicht anlegbar (Hinweis für S1: Host-Slug statt IP als Verzeichnisname); f77ccff2 lief 46 Minuten, die drei Tage lagen zwischen Scanende und Freigabe. Merge-Reihenfolge: erst !69 (S0a, CI-Regeln), dann S0c per `git merge main` aktualisieren (kein Rebase: Session-Branches, die zwischendurch main eingemerged haben, werden gemerged, die Historie soll die Sessions abbilden, nicht linear sein), ein Konflikt in `.gitlab-ci.yml` (test-report-worker: S0a-Zeile zuerst, api-Regel darunter), MR erst danach, weil die MR-Pipeline die CI-Datei des Quellbranches nutzt.
+
+S0b fertig (17.09., Commit 7d02167 auf `worktree-s0b-zap`, enthält S0a per Merge): Ursache siehe Abschnitt 4 „Ergebnis S0b". Tests scan-worker 778, report-worker 965, Integration 4 (zwei ZAP-Daemons, Pool, Testziel), Live-Lauf 35 Alerts, 3 aktiv, pluginId überlebt Tar und Parser. Entscheidungen DC: Staging-Nachweis nach Deploy gegen eigenes Ziel, erst dann „ZAP Active Scan" zurück auf die Methodikseite (Aufgabe S3); `run_zap_scan` (toter Code) löschen, eigener Commit; Kategorie `ssrf` bleibt leer, 40024/40046 nicht nachziehen, in Katalogdefinition als „nicht verfügbar in ZAP 2.17.0" markieren, Wiedervorlage S7; `ZAP_POOL_ENABLED` in Produktion prüfen und hier eintragen. MR für S0b erst nach Merge von !69 und `git merge main`.
+
+Stand 17.09. abends: !69 (S0a) gemerged als `fc23b11`, !70 (S0c) gemerged als `5e8dda0` nach vollständig grüner MR-Pipeline 3060 (11 Jobs, erster Merge über den neuen Weg). 133 Fixture-Dateien unter `report-worker/tests/golden/`. S0b wartet auf `git merge main` und MR. Pipeline 3059 auf `main` mit erstem `deploy-auto` seit Juli (MinIO per Digest von quay.io, Container wird ersetzt, Volume bleibt) zum Zeitpunkt der Notiz noch offen. S1 kann starten, sobald 3059 grün ist.
+
+S0b: MR !71 (fünf Commits, 28 Dateien) mit grüner Pipeline 3062 (11 Jobs; scan-worker 798 passed, 5 skipped, Integrationstests werden auf dem Runner sauber übersprungen). `ZAP_POOL_ENABLED` in Produktion nicht gesetzt, Compose-Default `false`: Pool nie aktiv, Worker-zu-ZAP fest 1:1, `zap-4` (1 CPU, 1,5 GB) ohne Aufgabe. Damit ist die fehlende Scanner-ID 40024 die einzige Erklärung für die 42 Fehlschläge; der Affinitätsfix ist in Produktion inaktiv, aber Voraussetzung für das Einschalten des Pools (Docstring in `zap_pool.py`). Vor dem Merge `ZAP_VERSION=2.17.0` in die Produktions-.env (dokumentiert den Pin, identisch zum Default). Abnahme S0b: nach deploy-auto ein Perimeter-Scan gegen ein eigenes Ziel mit `zap_active status=ok` und Alerts mit pluginId im Tar. Danach als eigener Schritt `ZAP_POOL_ENABLED=true`, Worker-Neustart, zweiter Scan. Nebenbefund: kein `trivy-scan-worker`-Job (Issue #6), ausgerechnet das Image mit den Scan-Werkzeugen bleibt ungescannt.
+
+Abschluss S0b (18.09., abgenommen): MR !71 (S0b-Reparatur) und MR !72 (Poll-Timeout `ZAP_ACTIVE_SCAN_TIMEOUT_SEC=900`, auch als CI-Variable angelegt) gemerged, Deploy 3065 live, Scan-Worker auf `8173f48d`, ZAP auf 2.17.0 gepinnt. Nachweislauf Order `14272c00` gegen `dortmund-beach.com`: `zap_active status=ok`, volle Alert-Liste (1269), alter `does_not_exist` weg, ID-Filter greift (40024 gedroppt), Order sauber bis `pending_review`, 27,7 min. Zielwahl: `dortmund-beach.com` ist ein von DC freigegebenes externes Ziel außerhalb der geteilten Traefik-Instanz, also kein Rate-Limit; damit sind der zunächst erwogene Test-Hostname am Frontend-Service und jeder Umbau an `rate-limit@file` verworfen, `dortmund-beach.com` ist das Standardziel für künftige Scanner-Nachweise. Dokumentiert offen, kein Handlungsbedarf: Cap-Tiefe (`maxScanDurationInMins`, aktuell rund 12 min erreichbar) ist eine Produktentscheidung, in S1 wieder aufgreifen, sobald im Katalog steht, welche Prüfungen an ZAP Active hängen; Empfehlung Claude bei moderatem Cap belassen, die Kernbefunde kommen aus nmap, testssl und ffuf. Methodikseite „ZAP Active Scan" zurücknehmen mit Datum 18.09.2026 (Aufgabe in `spec/prompts/S3.md`). `ffuf_sensitive` läuft (S0a greift), timeoutet aber bei 180 s, eigenes Budget-Thema, nicht S0b. Exakter pluginId-Count nur per SSH/MinIO aus dem Roh-Tar abrufbar, end-to-end im Integrationstest belegt. Pool-Test (`ZAP_POOL_ENABLED=true`) ist kein Pflichtschritt mehr: die Instanz-Affinität ist in !71 abgeräumt und der Nachweis lief mit einer Instanz sauber; das Einschalten des Pools ist eine reine Durchsatzfrage, verschoben nach S3/S7.
+
+Merge je Session: im Worktree `git push gitlab worktree-<name>`, Merge Request in GitLab (MR-Pipeline mit Build, Trivy und Tests seit S0a), nach Merge `git pull` auf `main`, Worktree beim Beenden von Claude Code löschen lassen. Hat sich `main` während der Session bewegt: `git merge main` im Worktree, kein Rebase. Nur Testsuite ohne Build: Pipeline mit Quelle api (Regel aus S0c).

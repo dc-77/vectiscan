@@ -84,12 +84,12 @@ Die Regeln sind nicht getunt. Ein Katalog mit Fixtures je Regel würde die verbl
 
 ## 3. Falschbefunde in ausgelieferten Reports
 
-Beim Abgleich der KI-Befunde mit den Rohdaten fallen systematische Fehler auf, die mit Regeln über Fakten nicht entstehen können. 35 von 390 Befunden (9 %) sind belegbar falsch oder defekt, verteilt über 12 Kunden:
+Beim Abgleich der KI-Befunde mit den Rohdaten fallen systematische Fehler auf, die mit Regeln über Fakten nicht entstehen können. 36 von 390 Befunden (9 %) sind belegbar falsch oder defekt, verteilt über 12 Kunden (Zahl nach Fixture-Bau in S0c; zuvor 35):
 
 | Muster | Befunde | Kunden | Ursache |
 |---|---|---|---|
 | „SPF-Record fehlt", SPF vorhanden | 7 | 7 | Titel-Template SP-DNS-004 über DKIM-Inhalt; `dns_findings.spf` wird nicht geprüft |
-| „MySQL/MariaDB 5.5", real MariaDB 10.x, HIGH | 5 | 5 | Banner „5.5.5-10.11.x-MariaDB" ohne Präfix-Strip |
+| „MySQL/MariaDB 5.5", real MariaDB 10.x, HIGH | 6 | 5 | Banner „5.5.5-10.11.x-MariaDB" ohne Präfix-Strip. Korrektur S0c: Der Befundtext ist in diesen Läufen korrekt, der Fehler sitzt in der Versionsableitung (Tech-Tabelle, EOL). Das Negativ-Fixture verbietet die Ableitung, nicht den Befund; sechs Einträge, weil der hu-Lauf dasselbe Banner trägt. trunk-immobilien.de hat echtes MariaDB 5.5.68 und ist deshalb kein Falschbefund |
 | Policy „URLhaus-Kompromittierung" auf FTP/RDP/Plesk/Kubernetes, CRITICAL | 6 | 4 | Type-Mapper-Fehltreffer, Severity aus falscher Policy |
 | POP3/IMAP „Klartext", STARTTLS vorhanden | 4 | 4 | Capabilities nicht ausgewertet |
 | FTP „Klartext", TLS erzwungen, einmal CRITICAL | 2 | 1 | „requires SSL" ignoriert |
@@ -140,3 +140,33 @@ Pflegerhythmus: wöchentlich die Liste „Beobachtungen ohne Regel" über alle S
 - M7 Golden-Files: die 35 Falschbefunde aus Abschnitt 3 werden Negativ-Fixtures, die Wiederholungsläufe von securess.de und heuel.com werden Drift-Fixtures.
 - M5 Coverage: in den 10 jüngeren Läufen `zap_active_failed` 30-mal, `ffuf` 82-mal übersprungen (Wordlist fehlt), `vhost_unreachable` 18-mal. Das steht heute in keinem Report.
 - M6 Gate: zusätzlicher Check „unverarbeitete Beobachtungen > N".
+
+## 7. Werkzeugabdeckung über alle 36 Scans
+
+Status je Tool-Run aus `results.json` (Läufe vor Juli ohne `status`-Feld, dort aus dem Rohtext abgeleitet). Spalte „Katalog" sagt, ob der Entwurfskatalog die Ausgabe heute liest, und welche Prüfungen sonst daraus entstünden.
+
+| Phase | Tool | ok | leer | übersprungen | fehlgeschlagen | Häufigster Grund | Katalog |
+|---|---|---|---|---|---|---|---|
+| 0 | dns_records, dnsx, web_probe, certspotter | 36 | 0 | 0 | 0 | | ja (DNS/Mail, Scope) |
+| 0 | subfinder, crtsh | 35 | 1 | 0 | 0 | | Scope; CT-Logs als Prüfung „Zertifikate für unbekannte Hosts" |
+| 0 | gobuster_dns | 28 | 0 | 0 | 0 | | Scope |
+| 0 | shodan, abuseipdb, dns_security | 14 | 0 | 0 | 0 | erst seit Juli | ja (Passivports, DNSSEC/CAA/MTA-STS); IP-Reputation als Prüfung |
+| 0 | greynoise, otx, securitytrails, whois, urlhaus | 7 | 0 | 7 | 0 | not_in_package | urlhaus ja; whois als Prüfung „Domain-Ablauf"; Rest Reputation |
+| 0 | virustotal | 0 | 0 | 14 | 0 | no_api_key | nie gelaufen |
+| 0 | ai_host_strategy | 36 | | | | | Protokoll |
+| 1 | nmap | 133 | 0 | 1 | 0 | host_unreachable | ja (Dienste, Ports, TLS-Zwang, Capabilities) |
+| 1 | wafw00f | 255 | 0 | 1 | 0 | | Prüfung „WAF vorhanden" (positiv) und Coverage |
+| 1 | webtech | 123 | 0 | 1 | 10 | no_tech_signals | Inventar, EOL-Eingang |
+| 1 | ai_phase2_config | 133 | | | | | Protokoll |
+| 2 | header_check | 252 | 0 | 1 | 0 | | ja (Header, X-FEServer, PHP-Version) |
+| 2 | httpx | 237 | 15 | 1 | 0 | | ja (Titel, Tech, Zertifikat) |
+| 2 | testssl | 55 | 0 | 10 | 5 | no_ssl, connect | ja (Protokolle, Cipher, Zertifikat, Schwachstellen) |
+| 2 | zap (passiv), zap_spider | 70 | 0 | 11 | 2 | no_zap_context | ja (Alerts); Spider als URL-Inventar |
+| 2 | zap_active | 0 | 0 | 12 | 30 | ZAP API 400 does_not_exist | nie erfolgreich gelaufen |
+| 2 | feroxbuster | 56 | 0 | 17 | 0 | ai_skip | Prüfung „sensible Pfade erreichbar" (.git, .env, Backups, Admin) |
+| 2 | ffuf_param | 10 | 0 | 40 | 0 | no_api_urls | dito |
+| 2 | ffuf_sensitive | 0 | 0 | 42 | 0 | wordlist_missing | nie gelaufen |
+| 2 | wpscan | 11 | 0 | 40 | 0 | cms_not_wordpress | ja (Plugins, Core, Nutzer) |
+| 3 | phase3_correlation | 36 | 0 | 0 | 0 | | CVE-Anreicherung als Prüfung „bekannte CVE in erkannter Version" |
+
+Drei Werkzeuge haben in keinem der 36 Scans ein Ergebnis geliefert: `zap_active` (30 Fehlschläge, 12 Skips), `ffuf_sensitive` (Wordlist fehlt im Image), `virustotal` (kein Key). Die Methodik-Seite jedes ausgelieferten Reports nennt „Schwachstellen-Scan (ZAP Active Scan)" und „Directory-Enumeration (ffuf)". Im Prüfkatalog-Modell erschienen diese als „nicht prüfbar" mit Grund in jedem Report, was der schnellste Weg ist, sie zu reparieren.
