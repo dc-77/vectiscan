@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """S0c Schritt 2: Soll-Listen des Junkerwerk-Prototyps als Golden-Fixture.
 
-Quelle ist report-prototype/out/report-data.json, der Dump von
-report-prototype/build/report_data.py (kuratierte Datenbasis des Prototyps,
-Stand 17.09.2026). Ergebnis ist
+Quelle ist report-prototype/build/report_data.py, die kuratierte Datenbasis des
+Prototyps (Stand 17.09.2026). Alternativ nimmt --source den JSON-Dump
+report-prototype/out/report-data.json, der aber gitignored ist. Ergebnis ist
 report-worker/tests/golden/expected/junkerwerk.json mit den 15 Befunden und
 8 Positivbefunden, je mit id, family, scale, level, affected.
 
@@ -21,19 +21,19 @@ Zwei Felder gibt es in der Quelle nicht und werden hier vergeben:
    bestandene Pruefung keine Einstufung traegt.
 
 Aufruf:
-    python3 scripts/golden/build-expected-junkerwerk.py \
-        --source ../../../report-prototype/out/report-data.json
+    python3 scripts/golden/build-expected-junkerwerk.py
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import runpy
 import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_SOURCE = REPO_ROOT / "report-prototype" / "out" / "report-data.json"
+DEFAULT_SOURCE = REPO_ROOT / "report-prototype" / "build" / "report_data.py"
 DEFAULT_DEST = REPO_ROOT / "report-worker" / "tests" / "golden" / "expected" / "junkerwerk.json"
 
 # Befund-ID -> Familien. Erster Eintrag ist die primaere Familie.
@@ -83,7 +83,11 @@ def main() -> int:
         print(f"Quelle fehlt: {source}", file=sys.stderr)
         return 2
 
-    data = json.loads(source.read_text(encoding="utf-8"))
+    if source.suffix == ".py":
+        # report_data.py ist reine Daten: ein Modul mit der Konstante DATA.
+        data = runpy.run_path(str(source))["DATA"]
+    else:
+        data = json.loads(source.read_text(encoding="utf-8"))
     src_findings = data["findings"]
     src_positives = data["positives"]
 

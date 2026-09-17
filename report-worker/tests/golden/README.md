@@ -44,11 +44,12 @@ also in Bericht und Freigabe, nicht im Scan. Fuer Laufzeitfragen gilt `meta.json
 ## Regenerieren
 
 ```
-# 1 API-Snapshot (Quelle liegt nur im Haupt-Checkout, gitignored)
+# 1 API-Snapshot. report-prototype/input/ ist gitignored, der Ordner liegt nur
+#   lokal; neu ziehen mit report-prototype/scripts/fetch-all-orders.sh
 python3 scripts/golden/build-api-snapshot.py --source <pfad>/report-prototype/input/_all
 
-# 2 Soll-Liste Junkerwerk
-python3 scripts/golden/build-expected-junkerwerk.py --source <pfad>/report-prototype/out/report-data.json
+# 2 Soll-Liste Junkerwerk (liest report-prototype/build/report_data.py im Repo)
+python3 scripts/golden/build-expected-junkerwerk.py
 
 # 3 Negativ-Fixtures (arbeitet auf dem eingecheckten Snapshot)
 python3 scripts/golden/build-negative-fixtures.py
