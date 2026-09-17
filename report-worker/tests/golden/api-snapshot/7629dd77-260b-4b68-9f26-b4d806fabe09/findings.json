@@ -1,0 +1,2362 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 2,
+   "high": 1,
+   "info": 2,
+   "low": 4,
+   "medium": 3
+  },
+  "business_impact_score": "8.8",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "_title_template_incomplete": true,
+    "affected": "45.157.234.103:3389 (secumetrix.de), 45.157.232.12:3389 (dev.secumetrix.de)",
+    "business_impact_score": 10,
+    "cvss_score": "10.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+    "cwe": "CWE-284",
+    "description": "Microsoft Remote Desktop Protocol (RDP, Port 3389/tcp) ist auf beiden Windows-Hosts (Produktion und Dev) direkt aus dem Internet erreichbar. RDP gehoert zu den am haeufigsten ausgenutzten Diensten fuer Initial-Access (BlueKeep CVE-2019-0708, DejaBlue, Brute-Force, Ransomware-Erstinfektion). Eine oeffentliche Exposition widerspricht zudem expliziten Empfehlungen des BSI-Grundschutz und der CISA.",
+    "evidence": "$ nmap -p 3389 45.157.234.103 45.157.232.12\n45.157.234.103: 3389/tcp open ms-wbt-server\n45.157.232.12: 3389/tcp open ms-wbt-server",
+    "external_id": "VS-2026-001",
+    "finding_type": "urlhaus_compromise_detected",
+    "id": "VS-2026-001",
+    "impact": "Direkte Brute-Force-Angriffe gegen Administrator-Konten, Ausnutzung bekannter und neuer RDP-Schwachstellen, Initial-Access fuer Ransomware-Operatoren. Bei erfolgreichem Login sofortige Kompromittierung des Hosts mit voller Privilegien-Eskalation.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-URLHAUS-001",
+    "recommendation": "<b>Sofort (24-48h):</b> Port 3389 am Perimeter blocken; Remote-Administration ausschliesslich ueber VPN, Azure Bastion oder Zero-Trust-Proxy (z.B. Cloudflare Access).\n<b>Mittelfristig:</b> Network Level Authentication (NLA) erzwingen; Account-Lockout-Policy + fail2ban-aequivalente Loesung; Multi-Factor-Authentication fuer RDP-Logins (Duo, Microsoft MFA); RDP-Patchstand monatlich pruefen.",
+    "severity": "CRITICAL",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "critical",
+     "policy_id": "SP-URLHAUS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "URLhaus listet Host als aktiv compromised — Malware-Distribution, Phishing oder C2",
+     "rule_references": [
+      "URLhaus",
+      "MITRE ATT&CK T1583.001"
+     ],
+     "tool_severities": {
+      "claude_extraction": "critical"
+     }
+    },
+    "title": "RDP-Dienst (Port 3389) oeffentlich erreichbar auf 45.157.234.103 und 45.157.232.12",
+    "title_vars": {
+     "host": "45.157.234.103, 45.157.232.12",
+     "port": "3389",
+     "tech": "RDP"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "173.249.44.221 (apitest.secumetrix.de, cloudscanner.secumetrix.de) — nginx 1.24.0",
+    "business_impact_score": 9.8,
+    "cvss_score": "9.8",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-1104",
+    "description": "Der Reverse-Proxy nginx auf der API-Plattform laeuft in Version 1.24.0. Diese Version ist seit 2024-04-23 als End-of-Life eingestuft (kein offizieller Support, keine Security-Patches mehr). Aktuelle Mainline-Version ist 1.27.x. Auf Port 8088 laeuft sogar parallel bereits nginx 1.27.5 — die Hauptinstanz wurde also nicht mitgezogen.",
+    "evidence": "$ nmap -sV 173.249.44.221\n80/tcp   open  http  nginx 1.24.0\n443/tcp  open  http  nginx 1.24.0\n8088/tcp open  http  nginx 1.27.5",
+    "external_id": "VS-2026-002",
+    "finding_type": "software_eol",
+    "id": "VS-2026-002",
+    "impact": "Bekannte und zukuenftig entdeckte Schwachstellen in nginx 1.24.x werden nicht mehr gepatcht. Da der Server zentraler TLS-Terminierungspunkt und Reverse-Proxy fuer die API ist, betrifft jede ungepatchte Luecke unmittelbar die Vertraulichkeit/Integritaet aller dahinterliegenden Dienste.",
+    "original_claude_id": "VS-2026-008",
+    "policy_id": "SP-EOL-005",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Upgrade auf nginx 1.27.x oder neuer (gleicher Stand wie Port 8088); Konfiguration zuvor sichern und Test-Reload pruefen.\n<b>Mittelfristig:</b> Automatisiertes Patch-Management (unattended-upgrades fuer Ubuntu, nginx-Packages aus offiziellem Repository); regelmaessiges EOL-Monitoring eingesetzter Komponenten.",
+    "severity": "CRITICAL",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech_critical": true
+     },
+     "policy_decision": "critical",
+     "policy_id": "SP-EOL-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "EOL-Software + Internet-facing + sicherheitskritisches Produkt (DB/Mailserver/Webserver/OS) - akkumulierte unpatched CVEs, oft mit Public-Exploits. Direkter Initialvektor.",
+     "rule_references": [
+      "CWE-1104",
+      "CISA-KEV"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Nginx 1.24.0 EOL (End of Life) auf 173.249.44.221",
+    "title_vars": {
+     "host": "173.249.44.221",
+     "tech": "nginx",
+     "version": "1.24.0"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "45.157.234.103:3306 (secumetrix.de)",
+    "business_impact_score": 8.1,
+    "cvss_score": "8.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-284",
+    "description": "Zusaetzlich zum MS SQL Server ist auch ein MySQL-Dienst auf Port 3306/tcp auf dem Produktivserver oeffentlich erreichbar. Die parallele Existenz von zwei Datenbankservern auf einem Webserver ist ungewoehnlich und deutet auf eine vermischte Anwendungsarchitektur hin (vermutlich WordPress -> MySQL, App -> MS SQL). Beide DB-Ports sind direkt im Internet sichtbar.",
+    "evidence": "$ nmap -sV -p 3306 45.157.234.103\n3306/tcp open  mysql  MySQL",
+    "external_id": "VS-2026-003",
+    "finding_type": "database_port_exposed",
+    "id": "VS-2026-003",
+    "impact": "Bei erfolgreicher Brute-Force- oder CVE-Ausnutzung kompromittierter MySQL-Zugriff erlaubt Lese-/Schreibzugriff auf die WordPress-Datenbank inkl. Hashes der Admin-Konten und vollstaendiger Inhalte. Indirekt ermoeglicht dies langfristige Backdoor-Persistenz im WordPress-Setup.",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-DB-001",
+    "recommendation": "<b>Sofort (24-48h):</b> Port 3306/tcp am Perimeter blocken; MySQL ausschliesslich auf 127.0.0.1 binden (bind-address in my.cnf) wenn nur lokal genutzt.\n<b>Mittelfristig:</b> WordPress-DB-User auf das Minimum-Privileg-Prinzip beschraenken; require_secure_transport=ON; mysql_native_password durch caching_sha2_password ersetzen.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-DB-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Datenbank-Port (3306/5432/1433/1521/27017/6379/...) oeffentlich erreichbar - Bei erfolgreicher Authentifizierung (Brute-Force, Default-Creds, leaked-Creds) vollstaendiger Zugriff auf gespeicherte Daten. AC:H weil Authentifizierung weiterhin Pflicht.",
+     "rule_references": [
+      "CWE-200",
+      "CWE-284",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Datenbank-Port 3306 oeffentlich erreichbar auf 45.157.234.103",
+    "title_vars": {
+     "host": "45.157.234.103",
+     "port": "3306",
+     "tech": "MySQL"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "1"
+    ],
+    "affected": "https://app.secumetrix.de und https://dev.secumetrix.de",
+    "business_impact_score": 5.4,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-1104",
+    "description": "ZAP identifiziert mehrere verwundbare JavaScript-Bibliotheken auf der Anwendungs-Frontend-Schicht. Konkret laden beide Anwendungen jQuery 3.4.1 (2019, mehrere bekannte XSS-CVEs in Selektor-/HTML-Parsing-Bereich) sowie aeltere DataTables- und Chart.js-Versionen. Bootstrap wird in einer eigenen Build-Variante ('bootstrap1.min.css/js') geladen, deren Patchstand nicht erkennbar ist.",
+    "evidence": "ZAP Alert: Vulnerable JS Library (6x) — CWE-1395\nURL: https://app.secumetrix.de/Assets/vendors/chartlist/Chart.min\nURL: https://app.secumetrix.de/Assets/vendors/datatable/js/jquery\nGeladene Skripte: jquery-3.4.1.min.js, Chart.min.js, jquery.dataTables.min.js",
+    "external_id": "VS-2026-005",
+    "finding_type": "js_library_vulnerable",
+    "id": "VS-2026-005",
+    "impact": "Bekannte clientseitige XSS- und Prototype-Pollution-Schwachstellen in alten jQuery/DataTables-Versionen koennen bei vorhandenen Reflective-/Stored-XSS-Vektoren in der Anwendung zur vollstaendigen Uebernahme der Benutzersession fuehren, insbesondere weil das Login-Cookie ohne HttpOnly gesetzt wird (siehe separates Finding).",
+    "original_claude_id": "VS-2026-009",
+    "policy_id": "SP-JS-001",
+    "recommendation": "<b>Kurzfristig (Tage-Wochen):</b> jQuery auf 3.7.x aktualisieren; DataTables auf neueste 1.13.x/2.x; Chart.js auf aktuelle 4.x.\n<b>Mittelfristig:</b> Automatisierte Dependency-Updates (Dependabot, Renovate) in CI-Pipeline; npm/SCA-Scan in Build integrieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-JS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Eingebundene JavaScript-Bibliothek (jQuery, Bootstrap, AngularJS, …) mit bekannten Vulnerabilities — DOM-XSS / Prototype-Pollution typische Vektoren",
+     "rule_references": [
+      "CWE-1104",
+      "CWE-79",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "JavaScript-Bibliothek jQuery 3.4.1, Bootstrap 1, weitere mit Schwachstelle auf app.secumetrix.de",
+    "title_vars": {
+     "host": "app.secumetrix.de",
+     "library": "jQuery 3.4.1, Bootstrap 1, weitere"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "1",
+     "7",
+     "0",
+     "7"
+    ],
+    "_title_template_missing": true,
+    "affected": "https://app.secumetrix.de, https://dev.secumetrix.de, https://cloudscanner.secumetrix.de",
+    "business_impact_score": 5,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Auf den Login-/Anwendungs-Hosts fehlen wesentliche Security-Header. Auf app.secumetrix.de und dev.secumetrix.de ist nur X-Frame-Options gesetzt (1/7), auf cloudscanner.secumetrix.de fehlen alle 7 Header (0/7). Es fehlen u.a. Strict-Transport-Security (HSTS), Content-Security-Policy, X-Content-Type-Options, Referrer-Policy und Permissions-Policy. Zusaetzlich zeigt die WordPress-Seite secumetrix.de in ZAP eine CSP-Policy mit Wildcards und 'unsafe-inline' im Login-Bereich.",
+    "evidence": "Security Headers Scan:\nhttps://app.secumetrix.de       1/7  (nur X-Frame-Options)\nhttps://dev.secumetrix.de       1/7  (nur X-Frame-Options)\nhttps://cloudscanner.secumetrix.de  0/7\nZAP: Content Security Policy (CSP) Header Not Set (231x)\nZAP: CSP: Wildcard Directive (5x), CSP: script-src unsafe-inline (5x)",
+    "external_id": "VS-2026-004",
+    "finding_type": "csp_unsafe_inline",
+    "id": "VS-2026-004",
+    "impact": "Fehlende HSTS-Header ermoeglichen SSL-Stripping-Angriffe in Man-in-the-Middle-Szenarien. Fehlende CSP erhoeht die Auswirkungen vorhandener XSS-Vektoren erheblich (keine Inline-Script-Restriktion). Fehlendes X-Content-Type-Options ermoeglicht MIME-Sniffing-basierte Angriffe.",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Auf IIS/ASP.NET via web.config alle relevanten Header setzen: <code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code>, <code>X-Content-Type-Options: nosniff</code>, <code>Referrer-Policy: strict-origin-when-cross-origin</code>, <code>Permissions-Policy</code>.\n<b>Mittelfristig:</b> CSP schrittweise einfuehren (zunaechst CSP-Report-Only), inline-Scripts auslagern, nonce-basierte CSP fuer dynamische Inhalte einsetzen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='csp_unsafe_inline' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Schwere Defizite bei Security-Headern auf app.secumetrix.de und dev.secumetrix.de (1/7) und cloudscanner.secumetrix.de (0/7)",
+    "title_vars": {
+     "host": "app.secumetrix.de, dev.secumetrix.de, cloudscanner.secumetrix.de"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "45.157.234.103:21 (secumetrix.de)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Auf dem Produktivserver ist ein Microsoft FTP-Dienst (Port 21) erreichbar. FTP uebertraegt im Standardmodus Credentials und Daten unverschluesselt. Selbst bei aktiviertem FTPS bleibt FTP gegenueber modernen Protokollen (SFTP, WebDAV/HTTPS, S3) deutlich angreifbarer und unnoetig komplex (zusaetzliche Daten-Ports).",
+    "evidence": "$ nmap -sV -p 21 45.157.234.103\n21/tcp open  ftp  Microsoft ftpd",
+    "external_id": "VS-2026-006",
+    "id": "VS-2026-006",
+    "impact": "Brute-Force-Angriffe gegen FTP-Konten; bei nicht aktiviertem FTPS Klartext-Uebertragung von Anmeldedaten; potenzieller Datei-Upload mit Webshell-Risiko, wenn FTP-Verzeichnis von IIS ausgeliefert wird.",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Sofort:</b> Pruefen, ob FTP aktiv genutzt wird — falls nicht, Dienst stoppen und Port schliessen.\n<b>Mittelfristig:</b> FTP durch SFTP (OpenSSH) oder HTTPS-Upload ersetzen; falls FTP zwingend noetig, FTPS mit gueltigem Zertifikat erzwingen und Zugriff per IP-Allowlist beschraenken.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Microsoft FTP-Dienst (Port 21) oeffentlich erreichbar auf 45.157.234.103",
+    "title_vars": {
+     "host": "45.157.234.103",
+     "port": "21",
+     "tech": "Microsoft ftpd"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "45.157.234.103:1433 (secumetrix.de)",
+    "business_impact_score": 7.5,
+    "cvss_score": "7.5",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Der Microsoft SQL Server 2022 (Version 16.00.1000.00 RC0+) ist auf dem Produktivserver 45.157.234.103 auf Port 1433/tcp aus dem Internet erreichbar. Datenbankdienste duerfen niemals direkt ueber das oeffentliche Internet exponiert sein — selbst mit Authentisierung erhoeht die Erreichbarkeit das Brute-Force-, CVE- und Information-Disclosure-Risiko erheblich. Zusaetzlich deutet die Version 'RC0+' auf einen sehr fruehen (Release-Candidate-) Patchstand hin.",
+    "evidence": "$ nmap -sV -p 1433 45.157.234.103\n1433/tcp open  ms-sql-s  Microsoft SQL Server 2022 16.00.1000.00; RC0+",
+    "external_id": "VS-2026-007",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-007",
+    "impact": "Angreifer koennen Credential-Stuffing-, Brute-Force- und CVE-spezifische Angriffe direkt auf den DB-Server durchfuehren. Im Erfolgsfall droht vollstaendige Kompromittierung der Datenbank inklusive Kunden- und Authentisierungsdaten der angebundenen Anwendung (app.secumetrix.de).",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Sofort (24-48h):</b> Port 1433/tcp am Perimeter-Firewall/Cloud-Security-Group sperren; Zugriff ausschliesslich ueber VPN, Bastion-Host oder explizite IP-Allowlist erlauben.\n<b>Mittelfristig:</b> SQL Server auf finalen Release-Patchstand (nicht RC) aktualisieren; Audit aller SQL-Logins; Encryption-at-Rest und 'Force Encryption' fuer alle Verbindungen aktivieren; Defender for SQL aktivieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf 45.157.234.103",
+    "title_vars": {
+     "host": "45.157.234.103",
+     "port": "1433",
+     "tech": "Microsoft SQL Server 2022"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://secumetrix.de (WordPress 6.9.4 mit Elementor Pro, MetForm, WP Social, etc.)",
+    "business_impact_score": 2.5,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-352",
+    "description": "Die WordPress-Installation auf secumetrix.de zeigt im ZAP-Scan zahlreiche Schwaechen: fehlende CSP (231 Vorkommen), fehlendes Anti-Clickjacking (122 Vorkommen), fehlende Anti-CSRF-Tokens auf Formularen (148 Vorkommen), fehlende SRI auf externen Scripts (578 Vorkommen) sowie Cookies ohne SameSite-Attribut und ohne HttpOnly. Zusaetzlich werden Server-Version und X-Powered-By in jedem Response geleakt.",
+    "evidence": "ZAP Alerts (Auszug):\n  [MEDIUM] Missing Anti-clickjacking Header (122x) — CWE-1021\n  [MEDIUM] CSP Header Not Set (231x)\n  [MEDIUM] Absence of Anti-CSRF Tokens (148x)\n  [MEDIUM] Sub Resource Integrity Attribute Missing (578x)\n  [LOW] Cookie No HttpOnly Flag (3x) — /wp-comments-post.php\n  [LOW] Cookie without SameSite Attribute (9x) — /wp-login.php\n  Server: Microsoft-IIS/10.0\n  X-Powered-By: PHP/8.3.31, ASP.NET",
+    "external_id": "VS-2026-008",
+    "finding_type": "sri_missing",
+    "id": "VS-2026-008",
+    "impact": "Fehlende CSRF-Tokens auf nicht durch WordPress geschuetzten Formularen erlauben Forced-Action-Angriffe auf authentifizierte Sessions. Fehlende SRI macht das Frontend anfaellig fuer kompromittierte externe Skripte (Supply-Chain-Risiko ueber augurs.app-Cross-Domain-Inhalte, die geladen werden). Cookie-Schwaechen erhoehen XSS-Auswirkungen.",
+    "original_claude_id": "VS-2026-011",
+    "policy_id": "SP-SRI-001",
+    "recommendation": "<b>Kurzfristig:</b> WordPress-Security-Plugin (Wordfence, Solid Security) installieren; Standard-WordPress-Cookies via PHP-Filter mit HttpOnly+SameSite=Lax setzen; X-Frame-Options ueber IIS web.config setzen.\n<b>Mittelfristig:</b> CSP via WP-Plugin oder Web-Server-Modul einfuehren; SRI fuer alle externen Skripte aktivieren; Cross-Domain-Asset-Loads (secumetrix.augurs.app) eliminieren — alle Assets vom eigenen Origin ausliefern.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech_critical": true
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-SRI-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Externe JavaScript-/Stylesheet-Ressourcen ohne Subresource-Integrity-Hash eingebunden — kompromittierter CDN kann beliebigen Code ausliefern; Risiko abh. von CDN-Reputation",
+     "rule_references": [
+      "CWE-353",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Subresource-Integrity (SRI) fehlt auf secumetrix.de",
+    "title_vars": {
+     "host": "secumetrix.de",
+     "tech": "WordPress 6.9.4"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "DNS-Zone secumetrix.de",
+    "business_impact_score": 2.5,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Die E-Mail-Authentisierungs-Konfiguration ist unvollstaendig: (1) Es ist kein DKIM-Selektor konfiguriert; (2) DMARC ist nur auf 'p=quarantine' gesetzt — gespoofte Mails werden nicht abgelehnt; (3) SPF nutzt '~all' (Softfail) statt '-all' (Hardfail).",
+    "evidence": "SPF:   v=spf1 include:_smtp.udag.de ~all\nDMARC: v=DMARC1; p=quarantine;\nDKIM:  nicht konfiguriert",
+    "external_id": "VS-2026-009",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-009",
+    "impact": "E-Mail-Spoofing der Domain secumetrix.de ist deutlich erleichtert. Angreifer koennen ueberzeugende Phishing-Mails an Kunden, Partner oder interne Empfaenger senden. Mails mit gefaelschtem Absender werden bei vielen Empfaengern nur in den Spam-Ordner geleitet (Quarantine), nicht abgelehnt.",
+    "original_claude_id": "VS-2026-013",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "<b>Kurzfristig:</b> DKIM-Schluessel beim Mailprovider (udag.de) aktivieren und DNS-Record veroeffentlichen; SPF auf '-all' setzen sobald DKIM und DMARC stabil laufen.\n<b>Mittelfristig:</b> DMARC-Policy schrittweise auf 'p=reject' anheben (zuerst pct=25, dann 50, 100); DMARC-Reporting (rua/ruf) konfigurieren und auswerten.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer secumetrix.de",
+    "title_vars": {
+     "domain": "secumetrix.de",
+     "p_value": "quarantine"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "alle Hosts (Microsoft-IIS/10.0, PHP/8.3.31, ASP.NET 4.0.30319, X-AspNetMvc-Version 5.2, nginx/1.24.0)",
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Alle Web-Hosts geben detaillierte Versionsinformationen in HTTP-Response-Headern preis. ZAP meldet 587 Vorkommen fuer Server-Header-Leak und 587 fuer X-Powered-By auf der Hauptdomain.",
+    "evidence": "Response-Header secumetrix.de:\n  Server: Microsoft-IIS/10.0\n  X-Powered-By: PHP/8.3.31, ASP.NET\nResponse-Header app.secumetrix.de:\n  X-AspNet-Version: 4.0.30319\n  X-AspNetMvc-Version: 5.2\nResponse-Header apitest.secumetrix.de:\n  Server: nginx/1.24.0 (Ubuntu)",
+    "external_id": "VS-2026-010",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-010",
+    "impact": "Erleichterte Aufklaerung fuer Angreifer: bekannte CVEs koennen zielgerichtet ausgewaehlt werden, Versionsspezifische Exploits ohne weitere Probe-Anfragen identifiziert.",
+    "original_claude_id": "VS-2026-014",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig:</b> IIS: 'X-Powered-By' und 'Server' Header via web.config / URL Rewrite Module entfernen; ASP.NET: <code>enableVersionHeader=\"false\"</code>; nginx: <code>server_tokens off;</code> in nginx.conf.\n<b>Mittelfristig:</b> Konsequente Banner-Suppression in Hardening-Checkliste fuer Server-Bereitstellung aufnehmen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech_critical": true
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf secumetrix.de, app.secumetrix.de, dev.secumetrix.de, apitest.secumetrix.de",
+    "title_vars": {
+     "host": "secumetrix.de, app.secumetrix.de, dev.secumetrix.de, apitest.secumetrix.de"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "https://app.secumetrix.de",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-614",
+    "description": "ZAP meldet auf der ASP.NET-Anwendung app.secumetrix.de Cookies ohne Secure-Flag. In Kombination mit fehlendem HSTS kann ein Cookie theoretisch ueber eine unverschluesselte HTTP-Verbindung an einen Angreifer im selben Netzwerk uebertragen werden. Da es sich um die Login-Anwendung handelt, betrifft dies potenziell Session-Cookies.",
+    "evidence": "ZAP Alert: Cookie Without Secure Flag (2x) — CWE-614\nURL: https://app.secumetrix.de\nZAP Alert: X-AspNet-Version Response Header (10x) — verraet ASP.NET 4.0.30319",
+    "external_id": "VS-2026-011",
+    "finding_type": "cookie_no_secure",
+    "id": "VS-2026-011",
+    "impact": "Session-Hijacking in MITM-Szenarien (oeffentliches WLAN, kompromittierte Router). Bei Diebstahl des Session-Cookies vollstaendige Uebernahme des authentifizierten Benutzerkontos.",
+    "original_claude_id": "VS-2026-012",
+    "policy_id": "SP-COOK-004",
+    "recommendation": "<b>Kurzfristig (Tage):</b> In ASP.NET web.config <code>&lt;httpCookies requireSSL=\"true\" httpOnlyCookies=\"true\"/&gt;</code> und <code>&lt;forms requireSSL=\"true\"/&gt;</code> setzen; ASP.NET-Version-Header via <code>&lt;httpRuntime enableVersionHeader=\"false\"/&gt;</code> deaktivieren.\n<b>Mittelfristig:</b> SameSite=Strict fuer Auth-Cookies; HSTS-Header auf gesamter App-Domain aktivieren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-COOK-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Tracking-Cookie ohne Secure - kein Auth-Risiko",
+     "rule_references": [
+      "CWE-614"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Session-Cookie ASP.NET Session ohne Secure-Flag auf app.secumetrix.de",
+    "title_vars": {
+     "cookie_name": "ASP.NET Session",
+     "host": "app.secumetrix.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "alle Web-Hosts (https://secumetrix.de, https://app.secumetrix.de, https://dev.secumetrix.de, https://apitest.secumetrix.de)",
+    "business_impact_score": 0.5,
+    "cvss_score": "4.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Strict-Transport-Security-Header (HSTS) ist auf keinem der Hosts gesetzt. ZAP meldet 493 fehlende HSTS-Vorkommen auf der Hauptdomain und 9 auf apitest.secumetrix.de.",
+    "evidence": "ZAP Alert: Strict-Transport-Security Header Not Set (493x) — secumetrix.de\nZAP Alert: Strict-Transport-Security Header Not Set (9x) — apitest.secumetrix.de\nSecurity Headers Score: 1/7 oder 0/7 auf allen Hosts",
+    "external_id": "VS-2026-012",
+    "finding_type": "hsts_missing",
+    "id": "VS-2026-012",
+    "impact": "Ohne HSTS koennen Browser die erste Verbindung ueber unverschluesseltes HTTP aufbauen, bevor der Redirect auf HTTPS erfolgt. Dieses Fenster ermoeglicht SSL-Stripping-Angriffe (sslstrip2) in Man-in-the-Middle-Szenarien.",
+    "original_claude_id": "VS-2026-015",
+    "policy_id": "SP-HDR-001",
+    "recommendation": "<b>Kurzfristig:</b> HSTS-Header mit <code>Strict-Transport-Security: max-age=31536000; includeSubDomains</code> auf allen Hosts setzen.\n<b>Mittelfristig:</b> Nach erfolgreicher HSTS-Aktivierung Aufnahme in die HSTS-Preload-Liste (hstspreload.org) erwaegen — erfordert Stabilitaet von HTTPS auf allen Subdomains.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne Session - HSTS-Fehlen ist Hardening-Issue, kein praktisches Risiko",
+     "rule_references": [
+      "CWE-523",
+      "OWASP2025-A02"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "HSTS-Header fehlt auf secumetrix.de, app.secumetrix.de, dev.secumetrix.de, apitest.secumetrix.de",
+    "title_vars": {
+     "host": "secumetrix.de, app.secumetrix.de, dev.secumetrix.de, apitest.secumetrix.de"
+    }
+   }
+  ],
+  "overall_description": "Die Scan-Ergebnisse fuer secumetrix.de zeigen eine erheblich exponierte Angriffsflaeche ueber drei Produktiv- und Entwicklungs-Hosts hinweg. Auf 45.157.234.103 (secumetrix.de, app.secumetrix.de) sind zehn Ports offen erreichbar, darunter besonders kritisch FTP (21), Microsoft SQL Server 2022 (1433), MySQL (3306) und RDP (3389) — eine Kombination, die fuer einen produktiv betriebenen Webserver mit WordPress-Frontend und ASP.NET-Login-Anwendung nicht akzeptabel ist. Hinzu kommen ungewoehnliche Zusatzdienste auf 5000, 8000 (uvicorn), 8002 und 9000 (nginx 1.29.1), die auf eine vermischte Multi-Service-Konfiguration hindeuten. Der zweite Host 173.249.44.221 (apitest, cloudscanner.secumetrix.de) hostet die API-Plattform inkl. oeffentlich erreichbarer Swagger-UI-Dokumentation und nutzt einen EOL-Stand von nginx (1.24.0, End of Life seit 2024-04-23). Der Entwicklungshost 45.157.232.12 (dev.secumetrix.de) zeigt das gleiche kritische Muster wie der Produktivhost: MS SQL 17 (Preview), MySQL und RDP auf der oeffentlichen IP.\n\nDie konkreten Risikoschwerpunkte sind: (1) DB-Ports (MS-SQL 1433 und MySQL 3306) auf beiden Windows-Hosts oeffentlich erreichbar — das ist die hoechste Prioritaet; (2) RDP (3389) auf zwei Hosts oeffentlich exponiert mit unmittelbarem Brute-Force- und BlueKeep-Klassenrisiko; (3) Microsoft FTP auf dem Hauptserver ohne erkennbaren Mehrwert; (4) WordPress 6.9.4 als CMS auf dem Hauptauftritt mit ueber 4900 ZAP-Alerts inklusive verwundbarer JS-Bibliotheken, fehlender CSP, fehlender Anti-CSRF-Tokens und fehlender SRI; (5) eine zweite Login-Anwendung auf app.secumetrix.de mit nur 1 von 7 Security-Headern und Cookies ohne Secure/HttpOnly/SameSite-Flags; (6) die Swagger-UI-API-Dokumentation oeffentlich erreichbar ohne Zugriffsschutz, was Endpunkte und Parameter offenlegt; (7) DNS-Konfiguration unvollstaendig (kein DKIM, DMARC nur auf 'quarantine', SPF mit Softfail ~all).\n\nIn der Gesamtbewertung wird die kritische Stufe vorrangig durch die exponierten DB- und RDP-Ports auf zwei Hosts getrieben — dies stellt selbst bei korrekter Authentisierung einen schweren Reifegradmangel dar und widerspricht jeder PCI-, BSI-Grundschutz- oder ISO-27001-Erwartung an Netzwerksegmentierung. Die positive Beobachtung ist die saubere Konfiguration der Swagger-Komponente selbst (vollstaendige Security-Header inkl. CSP, X-Frame-Options DENY, Rate Limiting), die zeigt, dass das Cloud-Scanner-API-Team grundsaetzlich Security-Best-Practices anwenden kann. Auf den Windows-Hosts fehlt diese Reife jedoch komplett. Behebung der DB- und RDP-Exposition sollte binnen 24-48 Stunden erfolgen, der EOL-nginx und die WordPress-Schwaechen binnen 1-2 Wochen.",
+  "overall_risk": "CRITICAL",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-COOK-004",
+   "SP-DB-001",
+   "SP-DISC-001",
+   "SP-DNS-005",
+   "SP-EOL-005",
+   "SP-FALLBACK",
+   "SP-HDR-001",
+   "SP-JS-001",
+   "SP-SRI-001",
+   "SP-URLHAUS-001"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die DNS-Zone secumetrix.de erlaubt keinen AXFR Zone Transfer, was die Aufklaerung interner Subdomain-Strukturen erschwert. SPF und DMARC sind grundsaetzlich vorhanden — die noch bestehenden Luecken (kein DKIM, DMARC=quarantine, SPF=Softfail) sind separate Findings, aber das Fundament der E-Mail-Authentisierung ist gelegt.",
+    "title": "DNS-Grundkonfiguration vorhanden, kein Zone Transfer moeglich"
+   },
+   {
+    "description": "Die Subdomain-Enumeration hat keine herrenlosen CNAME-Eintraege auf externe Cloud-Dienste gefunden — somit besteht aktuell kein Risiko fuer Subdomain-Takeover-Angriffe.",
+    "title": "Keine dangling CNAMEs erkannt"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Datenbank-Ports (1433/MS-SQL, 3306/MySQL) auf 45.157.234.103 und 45.157.232.12 am Perimeter-Firewall sperren; Zugriff nur ueber VPN/Bastion.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-007",
+     "VS-2026-003"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "RDP (Port 3389) auf beiden Windows-Hosts blocken; Remote-Administration ueber VPN oder Cloud-Bastion (Azure Bastion, Cloudflare Access) realisieren; NLA + MFA aktivieren.",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "FTP-Dienst deaktivieren oder durch SFTP ersetzen; nicht benoetigte Zusatzports (5000, 8000, 8002, 9000) am Firewall blocken oder Dienste an 127.0.0.1 binden.",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Nginx auf 173.249.44.221 von 1.24.0 (EOL) auf 1.27.x aktualisieren; automatische Sicherheits-Updates konfigurieren.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Vollstaendige Security-Header auf allen Web-Hosts ergaenzen (HSTS, CSP, X-Content-Type-Options, Referrer-Policy, Permissions-Policy); Cookie-Flags Secure/HttpOnly/SameSite setzen; ASP.NET-/IIS-Versionsbanner entfernen.",
+    "effort": "1-2 Tage",
+    "finding_refs": [
+     "VS-2026-004",
+     "VS-2026-011",
+     "VS-2026-010",
+     "VS-2026-012"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "DKIM beim Mailprovider (udag.de) aktivieren; DMARC schrittweise auf p=reject anheben; DMARC-Reporting konfigurieren.",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-009"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "JavaScript-Bibliotheken (jQuery, DataTables, Chart.js) auf aktuelle Versionen aktualisieren; Dependency-Scanner in CI integrieren.",
+    "effort": "1-2 Tage",
+    "finding_refs": [
+     "VS-2026-005"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "WordPress-Haerten: Security-Plugin (Wordfence/Solid Security), SRI fuer externe Skripte, CSP einfuehren, Cross-Domain-Asset-Loads (augurs.app) eliminieren.",
+    "effort": "2-3 Tage",
+    "finding_refs": [
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 2,
+   "HIGH": 1,
+   "INFO": 2,
+   "LOW": 4,
+   "MEDIUM": 3
+  },
+  "tech_profiles": [
+   {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "WordPress",
+     "confidence": 0.95,
+     "details": {
+      "meta_generator": "WordPress 6.9.4",
+      "raw": {
+       "name": "WordPress",
+       "version": "6.9.4"
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "meta_tag",
+      "webtech"
+     ],
+     "version": "6.9.4"
+    },
+    "cms_version": "6.9.4",
+    "fqdns": [
+     "secumetrix.de",
+     "*.secumetrix.de",
+     "app.secumetrix.de"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "45.157.234.103",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     21,
+     80,
+     443,
+     1433,
+     3306,
+     3389,
+     5000,
+     8000,
+     8002,
+     9000
+    ],
+    "primary_vhost": "secumetrix.de",
+    "redirect_data": {
+     "app.secumetrix.de": {
+      "error": null,
+      "final_domain": "app.secumetrix.de",
+      "final_url": "https://app.secumetrix.de/",
+      "is_cross_domain": false,
+      "page_title": "Log in",
+      "redirect_chain": [
+       "https://app.secumetrix.de/",
+       "https://app.secumetrix.de/Assets/css/bootstrap1.min.css",
+       "https://app.secumetrix.de/Assets/vendors/themefy_icon/themify-icons.css",
+       "https://app.secumetrix.de/Assets/vendors/niceselect/css/nice-select.css",
+       "https://app.secumetrix.de/Assets/vendors/owl_carousel/css/owl.carousel.css",
+       "https://app.secumetrix.de/Assets/vendors/gijgo/gijgo.min.css",
+       "https://app.secumetrix.de/Assets/vendors/font_awesome/css/all.min.css",
+       "https://app.secumetrix.de/Assets/vendors/tagsinput/tagsinput.css",
+       "https://app.secumetrix.de/Assets/vendors/datepicker/date-picker.css",
+       "https://app.secumetrix.de/Assets/vendors/vectormap-home/vectormap-2.0.2.css",
+       "https://app.secumetrix.de/Assets/vendors/scroll/scrollable.css",
+       "https://app.secumetrix.de/Assets/vendors/datatable/css/responsive.dataTables.min.css",
+       "https://app.secumetrix.de/Assets/vendors/datatable/css/buttons.dataTables.min.css",
+       "https://app.secumetrix.de/Assets/vendors/text_editor/summernote-bs4.css",
+       "https://app.secumetrix.de/Assets/vendors/morris/morris.css",
+       "https://app.secumetrix.de/Assets/vendors/material_icon/material-icons.css",
+       "https://app.secumetrix.de/Assets/css/metisMenu.css",
+       "https://app.secumetrix.de/Assets/css/style1.css",
+       "https://app.secumetrix.de/Assets/css/colors/default.css",
+       "https://app.secumetrix.de/Assets/css/custom-style.css",
+       "https://app.secumetrix.de/Content/src/styles/loader.css",
+       "https://app.secumetrix.de/Assets/css/main_new.css",
+       "https://app.secumetrix.de/Scripts/modernizr-2.8.3.js",
+       "https://app.secumetrix.de/Content/src/images/secumetrix-logo.png",
+       "https://app.secumetrix.de/Assets/js/heatmap.js",
+       "https://app.secumetrix.de/Assets/js/angular.min.js",
+       "https://app.secumetrix.de/Assets/js/solid-gauge.js",
+       "https://app.secumetrix.de/Assets/js/exporting.js",
+       "https://app.secumetrix.de/Assets/js/offline-exporting.js",
+       "https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap",
+       "https://app.secumetrix.de/Assets/js/map.js",
+       "https://app.secumetrix.de/Assets/js/highcharts-more.js",
+       "https://app.secumetrix.de/assets/img/Secumatrix_logo.png",
+       "https://app.secumetrix.de/Assets/js/accessibility.js",
+       "https://app.secumetrix.de/Assets/js/highstock.js",
+       "https://app.secumetrix.de/Scripts/jquery-3.4.1.min.js",
+       "https://app.secumetrix.de/Assets/js/CommonJs.js?v=202605112022152995113",
+       "https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400&amp;display=swap",
+       "https://app.secumetrix.de/Assets/js/bootstrap1.min.js",
+       "https://app.secumetrix.de/Assets/js/popper1.min.js",
+       "https://app.secumetrix.de/Assets/js/metisMenu.js",
+       "https://app.secumetrix.de/Assets/vendors/count_up/jquery.waypoints.min.js",
+       "https://app.secumetrix.de/Assets/vendors/count_up/jquery.counterup.min.js",
+       "https://app.secumetrix.de/Assets/vendors/niceselect/js/jquery.nice-select.min.js",
+       "https://app.secumetrix.de/Assets/vendors/chartlist/Chart.min.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/buttons.flash.min.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/jquery.dataTables.min.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/jszip.min.js",
+       "https://app.secumetrix.de/Assets/vendors/datepicker/datepicker.custom.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/buttons.html5.min.js",
+       "https://app.secumetrix.de/Assets/vendors/chartjs/roundedBar.min.js",
+       "https://app.secumetrix.de/Assets/vendors/tagsinput/tagsinput.js",
+       "https://app.secumetrix.de/Assets/vendors/datepicker/datepicker.en.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/dataTables.responsive.min.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/dataTables.buttons.min.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/buttons.print.min.js",
+       "https://app.secumetrix.de/Assets/vendors/owl_carousel/js/owl.carousel.min.js",
+       "https://app.secumetrix.de/Assets/vendors/datepicker/datepicker.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/pdfmake.min.js",
+       "https://app.secumetrix.de/Assets/vendors/font_awesome/webfonts/fa-solid-900.woff2",
+       "https://fonts.gstatic.com/s/mulish/v18/1Ptvg83HX_SGhgqk3wot.woff2",
+       "https://app.secumetrix.de/Assets/vendors/progressbar/jquery.barfiller.js",
+       "https://app.secumetrix.de/Assets/vendors/datatable/js/vfs_fonts.js",
+       "https://app.secumetrix.de/Assets/vendors/text_editor/summernote-bs4.js",
+       "https://app.secumetrix.de/Assets/js/chart.min.js",
+       "https://app.secumetrix.de/Scripts/jquery.validate.unobtrusive.js",
+       "https://app.secumetrix.de/Scripts/jquery.validate.js",
+       "https://app.secumetrix.de/Assets/js/custom.js",
+       "https://app.secumetrix.de/Assets/vendors/apex_chart/apex-chart2.js"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store",
+       "content-length": "25269",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 11 May 2026 18:22:15 GMT",
+       "expires": "-1",
+       "pragma": "no-cache",
+       "server": "Microsoft-IIS/10.0",
+       "vary": "Accept-Encoding",
+       "x-aspnet-version": "4.0.30319",
+       "x-aspnetmvc-version": "5.2",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-7629dd77-260b-4b68-9f26-b4d806fabe09/hosts/45.157.234.103/phase2/screenshot_app.secumetrix.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "crm_body_bg",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "width=device-width, initial-scale=1, shrink-to-fit=no",
+         "name": "viewport"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "",
+         "name": "description"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://app.secumetrix.de/Scripts/modernizr-2.8.3.js",
+        "https://app.secumetrix.de/Assets/js/angular.min.js",
+        "https://app.secumetrix.de/Assets/js/highstock.js",
+        "https://app.secumetrix.de/Assets/js/heatmap.js",
+        "https://app.secumetrix.de/Assets/js/highcharts-more.js",
+        "https://app.secumetrix.de/Assets/js/map.js",
+        "https://app.secumetrix.de/Assets/js/solid-gauge.js",
+        "https://app.secumetrix.de/Assets/js/exporting.js",
+        "https://app.secumetrix.de/Assets/js/offline-exporting.js",
+        "https://app.secumetrix.de/Assets/js/accessibility.js",
+        "https://app.secumetrix.de/Scripts/jquery-3.4.1.min.js",
+        "https://app.secumetrix.de/Assets/js/CommonJs.js?v=202605112022152995113",
+        "https://app.secumetrix.de/Assets/js/popper1.min.js",
+        "https://app.secumetrix.de/Assets/js/bootstrap1.min.js",
+        "https://app.secumetrix.de/Assets/js/metisMenu.js",
+        "https://app.secumetrix.de/Assets/vendors/count_up/jquery.waypoints.min.js",
+        "https://app.secumetrix.de/Assets/vendors/chartlist/Chart.min.js",
+        "https://app.secumetrix.de/Assets/vendors/count_up/jquery.counterup.min.js",
+        "https://app.secumetrix.de/Assets/vendors/niceselect/js/jquery.nice-select.min.js",
+        "https://app.secumetrix.de/Assets/vendors/owl_carousel/js/owl.carousel.min.js"
+       ],
+       "stylesheets": [
+        "https://app.secumetrix.de/Assets/css/bootstrap1.min.css",
+        "https://app.secumetrix.de/Assets/vendors/themefy_icon/themify-icons.css",
+        "https://app.secumetrix.de/Assets/vendors/niceselect/css/nice-select.css",
+        "https://app.secumetrix.de/Assets/vendors/owl_carousel/css/owl.carousel.css",
+        "https://app.secumetrix.de/Assets/vendors/gijgo/gijgo.min.css",
+        "https://app.secumetrix.de/Assets/vendors/font_awesome/css/all.min.css",
+        "https://app.secumetrix.de/Assets/vendors/tagsinput/tagsinput.css",
+        "https://app.secumetrix.de/Assets/vendors/datepicker/date-picker.css",
+        "https://app.secumetrix.de/Assets/vendors/vectormap-home/vectormap-2.0.2.css",
+        "https://app.secumetrix.de/Assets/vendors/scroll/scrollable.css",
+        "https://app.secumetrix.de/Assets/vendors/datatable/css/responsive.dataTables.min.css",
+        "https://app.secumetrix.de/Assets/vendors/datatable/css/buttons.dataTables.min.css",
+        "https://app.secumetrix.de/Assets/vendors/text_editor/summernote-bs4.css",
+        "https://app.secumetrix.de/Assets/vendors/morris/morris.css",
+        "https://app.secumetrix.de/Assets/vendors/material_icon/material-icons.css",
+        "https://app.secumetrix.de/Assets/css/metisMenu.css",
+        "https://app.secumetrix.de/Assets/css/style1.css",
+        "https://app.secumetrix.de/Assets/css/colors/default.css",
+        "https://app.secumetrix.de/Assets/css/custom-style.css",
+        "https://app.secumetrix.de/Content/src/styles/loader.css"
+       ],
+       "title": "Log in"
+      }
+     },
+     "secumetrix.de": {
+      "error": null,
+      "final_domain": "secumetrix.de",
+      "final_url": "https://secumetrix.de/",
+      "is_cross_domain": false,
+      "page_title": "Secumetrix",
+      "redirect_chain": [
+       "https://secumetrix.de/",
+       "https://secumetrix.de/wp-content/plugins/gutenkit-blocks-addon/build/gutenkit/frontend-common.css?ver=a28538744097629e283d",
+       "https://secumetrix.de/wp-content/plugins/popup-builder-block/build/popup/global.css?ver=2.1.2",
+       "https://secumetrix.de/wp-content/plugins/metform/public/assets/lib/cute-alert/style.css?ver=4.0.6",
+       "https://secumetrix.de/wp-content/plugins/wp-social/assets/css/frontend.css?ver=3.1.2",
+       "https://secumetrix.de/wp-content/plugins/wp-social/assets/css/font-icon.css?ver=3.1.2",
+       "https://secumetrix.de/wp-content/plugins/popup-builder-block/build/compatibility/frontend.css?ver=3d448a7df93bfa355643",
+       "https://secumetrix.de/wp-content/plugins/metform/public/assets/css/text-editor.css?ver=4.0.6",
+       "https://secumetrix.de/wp-content/plugins/wp-ultimate-review/assets/public/css/content-page.css?ver=2.3.6",
+       "https://secumetrix.de/wp-includes/css/dashicons.min.css?ver=6.9.4",
+       "https://secumetrix.de/wp-content/themes/hello-elementor/assets/css/reset.css?ver=3.4.4",
+       "https://secumetrix.de/wp-content/themes/hello-elementor/assets/css/theme.css?ver=3.4.4",
+       "https://secumetrix.de/wp-content/themes/hello-elementor/assets/css/header-footer.css?ver=3.4.4",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/uploads/elementor/css/post-523.css?ver=1773284771",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/widget-nav-menu.min.css?ver=3.31.2",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/modules/sticky.min.css?ver=3.31.2",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-heading.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/modules/motion-fx.min.css?ver=3.31.2",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInLeft.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/widget-form.min.css?ver=3.31.2",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-divider.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInRight.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/animations/styles/e-animation-pop.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-social-icons.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.17",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/conditionals/apple-webkit.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-includes/js/mediaelement/wp-mediaelement.min.css?ver=6.9.4",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/animations/styles/bounceInDown.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-video.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/conditionals/e-swiper.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/swiper/v8/css/swiper.min.css?ver=8.4.5",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-counter.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInUp.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-icon-box.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/widget-gallery.min.css?ver=3.31.2",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/e-gallery/css/e-gallery.min.css?ver=1.2.0",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/animations/styles/fadeInDown.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/conditionals/transitions.min.css?ver=3.31.2",
+       "https://secumetrix.augurs.app/wp-content/uploads/elementor/google-fonts/css/roboto.css?ver=1756286304",
+       "https://secumetrix.augurs.app/wp-content/uploads/elementor/google-fonts/css/heebo.css?ver=1756989785",
+       "https://secumetrix.augurs.app/wp-content/uploads/elementor/google-fonts/css/manrope.css?ver=1756989782",
+       "https://secumetrix.augurs.app/wp-content/uploads/elementor/google-fonts/css/robotoslab.css?ver=1756286276",
+       "https://secumetrix.augurs.app/wp-content/uploads/elementor/google-fonts/css/worksans.css?ver=1756989781",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/animations/styles/slideInRight.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/animations/styles/slideInLeft.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/widget-testimonial-carousel.min.css?ver=3.31.2",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/widget-carousel-module-base.min.css?ver=3.31.2",
+       "https://secumetrix.de/wp-content/uploads/elementor/css/post-190.css?ver=1778160967",
+       "https://secumetrix.de/wp-content/uploads/elementor/css/post-179.css?ver=1777903630",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/font-awesome/css/all.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/uploads/elementor/css/post-175.css?ver=1778131190",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/font-awesome/css/v4-shims.min.css?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementskit-lite/widgets/init/assets/css/widget-styles.css?ver=3.7.2",
+       "https://secumetrix.de/wp-content/plugins/elementskit-lite/widgets/init/assets/css/responsive.css?ver=3.7.2",
+       "https://secumetrix.de/wp-content/plugins/elementskit-lite/modules/elementskit-icon-pack/assets/css/ekiticons.css?ver=3.7.2",
+       "https://secumetrix.de/wp-content/plugins/skyboot-custom-icons-for-elementor/assets/css/elegant.css?ver=1.1.0",
+       "https://secumetrix.de/wp-content/plugins/skyboot-custom-icons-for-elementor/assets/css/themify.css?ver=1.1.0",
+       "https://secumetrix.de/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+       "https://secumetrix.de/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+       "https://secumetrix.de/wp-content/plugins/wp-social/assets/js/social-front.js?ver=6.9.4",
+       "https://secumetrix.de/wp-content/plugins/wp-social/assets/js/front-main.js?ver=3.1.2",
+       "https://secumetrix.de/wp-content/plugins/wp-ultimate-review/assets/public/script/content-page.js?ver=2.3.6",
+       "https://secumetrix.de/wp-content/uploads/2026/04/test-2.jpg",
+       "https://secumetrix.de/wp-content/uploads/2025/09/logo-white.png",
+       "https://secumetrix.de/wp-content/uploads/2026/04/Bild-Bericht.jpg",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/font-awesome/js/v4-shims.min.js?ver=3.31.3",
+       "https://secumetrix.augurs.app/wp-content/uploads/2025/09/colorful-abstract-textured-background-1.jpg",
+       "https://secumetrix.augurs.app/wp-content/uploads/2025/10/final-.jpg",
+       "https://secumetrix.de/wp-content/plugins/metform/public/assets/lib/cute-alert/cute-alert.js?ver=4.0.6",
+       "https://secumetrix.de/wp-content/themes/hello-elementor/assets/js/hello-frontend.js?ver=3.4.4",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.31.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.31.3",
+       "https://secumetrix.de/wp-includes/js/jquery/ui/core.min.js?ver=1.13.3",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.31.3",
+       "https://secumetrix.augurs.app/wp-content/uploads/2025/09/2.jpg",
+       "https://secumetrix.de/wp-content/uploads/2025/10/final-1.jpg",
+       "https://secumetrix.augurs.app/wp-content/uploads/2025/09/ux-designer-designing-designers-web-brand-phone-smartphone-layout-geek-business-prototype-internet.jpg",
+       "https://secumetrix.de/wp-content/uploads/2025/09/BG1.png",
+       "https://secumetrix.de/wp-content/uploads/2025/09/ux-designer-designing-designers-web-brand-phone-smartphone-layout-geek-business-prototype-internet.jpg",
+       "https://secumetrix.de/wp-includes/js/mediaelement/mediaelement-and-player.min.js?ver=4.2.17",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/lib/sticky/jquery.sticky.min.js?ver=3.31.2",
+       "https://secumetrix.de/wp-includes/js/mediaelement/mediaelement-migrate.min.js?ver=6.9.4",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/lib/smartmenus/jquery.smartmenus.min.js?ver=1.2.1",
+       "https://secumetrix.de/wp-content/plugins/skyboot-custom-icons-for-elementor/assets/fonts/themify.woff?-fvbane",
+       "https://secumetrix.de/wp-includes/js/mediaelement/wp-mediaelement.min.js?ver=6.9.4",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/jquery-numerator/jquery-numerator.min.js?ver=0.2.1",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/e-gallery/js/e-gallery.min.js?ver=1.2.0",
+       "https://secumetrix.de/wp-content/plugins/elementskit-lite/widgets/init/assets/js/widget-scripts.js?ver=3.7.2",
+       "https://secumetrix.de/wp-content/plugins/elementskit-lite/libs/framework/assets/js/frontend-script.js?ver=3.7.2",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js?ver=3.31.2",
+       "https://secumetrix.de/wp-includes/js/dist/hooks.min.js?ver=dd5603f07f9220ed27f1",
+       "https://secumetrix.de/wp-includes/js/dist/i18n.min.js?ver=c26c3dc7bed366793375",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/js/frontend.min.js?ver=3.31.2",
+       "https://secumetrix.de/wp-content/plugins/elementskit-lite/widgets/init/assets/js/animate-circle.min.js?ver=3.7.2",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/js/elements-handlers.min.js?ver=3.31.2",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5",
+       "https://secumetrix.de/wp-content/plugins/skyboot-custom-icons-for-elementor/assets/fonts/ElegantIcons.woff",
+       "https://secumetrix.de/wp-content/plugins/elementskit-lite/widgets/init/assets/js/elementor.js?ver=3.7.2",
+       "https://secumetrix.augurs.app/wp-content/uploads/2025/09/with-clarity-and-vision-comes-success.jpg",
+       "https://secumetrix.augurs.app/wp-content/uploads/2026/05/cyber-shield-protection-of-digital-system.mp4",
+       "https://secumetrix.de/wp-content/plugins/elementskit-lite/modules/elementskit-icon-pack/assets/fonts/elementskit.woff?itek3h",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/js/shared-frontend-handlers.4c8abccc3e268b0767b2.bundle.min.js",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/js/section-frontend-handlers.d85ab872da118940910d.bundle.min.js",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/js/text-editor.abc8f59c62f2820dc25a.bundle.min.js",
+       "blob:https://secumetrix.de/9f3ad666-8496-4631-a308-2e6842c4c451",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/js/video.87291d1f5076f8939c18.bundle.min.js",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/js/nav-menu.a23fbd67486c5bedf26c.bundle.min.js",
+       "https://secumetrix.de/wp-content/plugins/elementor/assets/js/counter.12335f45aaa79d244f24.bundle.min.js",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/js/gallery.1628df47530ab42dafba.bundle.min.js",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/js/form.5fb35271b8ba3fb1e7d6.bundle.min.js",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/js/carousel.3620fca501cb18163600.bundle.min.js",
+       "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/js/popup.f7b15b2ca565b152bf98.bundle.min.js",
+       "https://secumetrix.de/wp-content/uploads/2025/09/Mastercard.png",
+       "https://secumetrix.de/wp-content/uploads/2025/09/Visa.png",
+       "https://secumetrix.de/wp-content/uploads/2025/09/Maestro.png",
+       "https://secumetrix.de/wp-content/uploads/2025/09/Paypal.png",
+       "https://secumetrix.de/wp-content/uploads/2025/09/JCB.png",
+       "https://secumetrix.de/wp-includes/js/wp-emoji-release.min.js?ver=6.9.4",
+       "https://secumetrix.augurs.app/wp-content/uploads/2026/05/cyber-shield-protection-of-digital-system.mp4",
+       "https://secumetrix.augurs.app/wp-content/uploads/2026/05/cyber-shield-protection-of-digital-system.mp4"
+      ],
+      "response_headers": {
+       "connection": "close",
+       "content-length": "190487",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Mon, 11 May 2026 18:22:09 GMT",
+       "link": "<https://secumetrix.de/wp-json/>; rel=\"https://api.w.org/\"\n<https://secumetrix.de/wp-json/wp/v2/pages/190>; rel=\"alternate\"; title=\"JSON\"; type=\"application/json\"\n<https://secumetrix.de/>; rel=shortlink",
+       "server": "Microsoft-IIS/10.0",
+       "x-powered-by": "PHP/8.3.31\nASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-7629dd77-260b-4b68-9f26-b4d806fabe09/hosts/45.157.234.103/phase2/screenshot_secumetrix.de.png",
+      "status_code": 206,
+      "tech_info": {
+       "body_classes": "home wp-singular page-template page-template-elementor_header_footer page page-id-190 wp-custom-logo wp-embed-responsive wp-theme-hello-elementor gutenkit gutenkit-frontend ally-default hello-elementor-default elementor-default elementor-template-full-width elementor-kit-523 elementor-page elementor-page-190 e--ua-blink e--ua-webkit",
+       "cookies": "",
+       "generator": "WordPress 6.9.4",
+       "html_lang": "en-US",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "noindex, nofollow",
+         "name": "robots"
+        },
+        {
+         "content": "WordPress 6.9.4",
+         "name": "generator"
+        },
+        {
+         "content": "Elementor 3.31.3; features: e_font_icon_svg, additional_custom_breakpoints, e_element_cache; settings: css_print_method-external, google_font-enabled, font_display-swap",
+         "name": "generator"
+        },
+        {
+         "content": "https://secumetrix.de/wp-content/uploads/2025/09/cropped-FEB-270x270.png",
+         "name": "msapplication-TileImage"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://secumetrix.de/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+        "https://secumetrix.de/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+        "https://secumetrix.de/wp-content/plugins/wp-social/assets/js/front-main.js?ver=3.1.2",
+        "https://secumetrix.de/wp-content/plugins/wp-social/assets/js/social-front.js?ver=6.9.4",
+        "https://secumetrix.de/wp-content/plugins/wp-ultimate-review/assets/public/script/content-page.js?ver=2.3.6",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/font-awesome/js/v4-shims.min.js?ver=3.31.3",
+        "https://secumetrix.de/wp-includes/js/wp-emoji-release.min.js?ver=6.9.4",
+        "https://secumetrix.de/wp-content/plugins/metform/public/assets/lib/cute-alert/cute-alert.js?ver=4.0.6",
+        "https://secumetrix.de/wp-content/themes/hello-elementor/assets/js/hello-frontend.js?ver=3.4.4",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.31.3",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.31.3",
+        "https://secumetrix.de/wp-includes/js/jquery/ui/core.min.js?ver=1.13.3",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.31.3",
+        "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/lib/smartmenus/jquery.smartmenus.min.js?ver=1.2.1",
+        "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/lib/sticky/jquery.sticky.min.js?ver=3.31.2",
+        "https://secumetrix.de/wp-includes/js/mediaelement/mediaelement-and-player.min.js?ver=4.2.17",
+        "https://secumetrix.de/wp-includes/js/mediaelement/mediaelement-migrate.min.js?ver=6.9.4",
+        "https://secumetrix.de/wp-includes/js/mediaelement/wp-mediaelement.min.js?ver=6.9.4",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js?ver=8.4.5",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/lib/jquery-numerator/jquery-numerator.min.js?ver=0.2.1"
+       ],
+       "stylesheets": [
+        "https://secumetrix.de/wp-content/plugins/gutenkit-blocks-addon/build/gutenkit/frontend-common.css?ver=a28538744097629e283d",
+        "https://secumetrix.de/wp-content/plugins/popup-builder-block/build/popup/global.css?ver=2.1.2",
+        "https://secumetrix.de/wp-content/plugins/wp-social/assets/css/frontend.css?ver=3.1.2",
+        "https://secumetrix.de/wp-content/plugins/wp-social/assets/css/font-icon.css?ver=3.1.2",
+        "https://secumetrix.de/wp-content/plugins/popup-builder-block/build/compatibility/frontend.css?ver=3d448a7df93bfa355643",
+        "https://secumetrix.de/wp-content/plugins/metform/public/assets/lib/cute-alert/style.css?ver=4.0.6",
+        "https://secumetrix.de/wp-content/plugins/metform/public/assets/css/text-editor.css?ver=4.0.6",
+        "https://secumetrix.de/wp-content/plugins/wp-ultimate-review/assets/public/css/content-page.css?ver=2.3.6",
+        "https://secumetrix.de/wp-includes/css/dashicons.min.css?ver=6.9.4",
+        "https://secumetrix.de/wp-content/themes/hello-elementor/assets/css/reset.css?ver=3.4.4",
+        "https://secumetrix.de/wp-content/themes/hello-elementor/assets/css/theme.css?ver=3.4.4",
+        "https://secumetrix.de/wp-content/themes/hello-elementor/assets/css/header-footer.css?ver=3.4.4",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.31.3",
+        "https://secumetrix.de/wp-content/uploads/elementor/css/post-523.css?ver=1773284771",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-image.min.css?ver=3.31.3",
+        "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/widget-nav-menu.min.css?ver=3.31.2",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-icon-list.min.css?ver=3.31.3",
+        "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/modules/sticky.min.css?ver=3.31.2",
+        "https://secumetrix.de/wp-content/plugins/elementor-pro/assets/css/modules/motion-fx.min.css?ver=3.31.2",
+        "https://secumetrix.de/wp-content/plugins/elementor/assets/css/widget-heading.min.css?ver=3.31.3"
+       ],
+       "title": "Secumetrix"
+      }
+     }
+    },
+    "server": "Microsoft HTTPAPI httpd/2.0",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "WordPress",
+      "patch_status": "aktuell",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "6.9.4",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MySQL",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "OS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Windows Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "4.0.30319",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Chart.js",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "DataTables",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Highcharts",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "JSZip",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "metisMenu",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ASP.NET",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "4.0.30319",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ftpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft SQL Server 2022",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "16.00.1000.00; RC0+",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Modernizr",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OWL Carousel",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "uvicorn",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sprache",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "8.3.31",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft-IIS",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "1.29.1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Bootstrap",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "(Version unbekannt)",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Microsoft ftpd",
+      "version": ""
+     },
+     {
+      "name": "Microsoft HTTPAPI httpd",
+      "version": "2.0"
+     },
+     {
+      "name": "Microsoft SQL Server 2022",
+      "version": "16.00.1000.00; RC0+"
+     },
+     {
+      "name": "MySQL",
+      "version": ""
+     },
+     {
+      "name": "uvicorn",
+      "version": ""
+     },
+     {
+      "name": "nginx",
+      "version": "1.29.1"
+     },
+     {
+      "name": "WordPress",
+      "version": "6.9.4"
+     },
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "PHP/8.3.31\nASP.NET",
+      "version": ""
+     },
+     {
+      "name": "ASP.NET",
+      "version": "4.0.30319"
+     },
+     {
+      "name": "Bootstrap",
+      "version": "1"
+     },
+     {
+      "name": "Chart.js",
+      "version": ""
+     },
+     {
+      "name": "DataTables",
+      "version": ""
+     },
+     {
+      "name": "Highcharts",
+      "version": ""
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "JSZip",
+      "version": ""
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": "4.0.30319"
+     },
+     {
+      "name": "Modernizr",
+      "version": ""
+     },
+     {
+      "name": "OWL Carousel",
+      "version": ""
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "metisMenu",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "app.secumetrix.de": {
+      "cms": "WordPress",
+      "cms_confidence": 0.8,
+      "cms_version": "6.9.4",
+      "waf": null
+     },
+     "secumetrix.de": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": "6.9.4",
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "secumetrix.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "apitest.secumetrix.de",
+     "cloudscanner-api.secumetrix.de",
+     "cloudscanner.secumetrix.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "173.249.44.221",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     22,
+     80,
+     443,
+     5000,
+     8088
+    ],
+    "primary_vhost": "apitest.secumetrix.de",
+    "redirect_data": {
+     "apitest.secumetrix.de": {
+      "error": null,
+      "final_domain": "apitest.secumetrix.de",
+      "final_url": "https://apitest.secumetrix.de/swagger/index.html",
+      "is_cross_domain": false,
+      "page_title": "Swagger UI",
+      "redirect_chain": [
+       "https://apitest.secumetrix.de/swagger/index.html",
+       "https://apitest.secumetrix.de/swagger/index.js",
+       "https://apitest.secumetrix.de/swagger/swagger-ui.css",
+       "https://apitest.secumetrix.de/swagger/index.css",
+       "https://apitest.secumetrix.de/swagger/swagger-ui-standalone-preset.js",
+       "https://apitest.secumetrix.de/swagger/swagger-ui-bundle.js",
+       "https://apitest.secumetrix.de/swagger/v1/swagger.json"
+      ],
+      "response_headers": {
+       "content-encoding": "gzip",
+       "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'",
+       "content-type": "text/html;charset=utf-8",
+       "date": "Mon, 11 May 2026 18:21:09 GMT",
+       "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "nginx/1.24.0 (Ubuntu)",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "DENY",
+       "x-ratelimit-limit-hour": "1000",
+       "x-ratelimit-limit-minute": "60",
+       "x-ratelimit-remaining-hour": "981",
+       "x-ratelimit-remaining-minute": "59",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-7629dd77-260b-4b68-9f26-b4d806fabe09/hosts/173.249.44.221/phase2/screenshot_apitest.secumetrix.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [
+        "https://apitest.secumetrix.de/swagger/swagger-ui-bundle.js",
+        "https://apitest.secumetrix.de/swagger/swagger-ui-standalone-preset.js",
+        "https://apitest.secumetrix.de/swagger/index.js"
+       ],
+       "stylesheets": [
+        "https://apitest.secumetrix.de/swagger/swagger-ui.css",
+        "https://apitest.secumetrix.de/swagger/index.css"
+       ],
+       "title": "Swagger UI"
+      }
+     },
+     "cloudscanner.secumetrix.de": {
+      "error": "Page.goto: Timeout 10000ms exceeded.\nCall log:\n  - navigating to \"http://cloudscanner.secumetrix.de/\", waiting until \"networkidle\"\n",
+      "final_domain": "cloudscanner.secumetrix.de",
+      "final_url": "https://cloudscanner.secumetrix.de/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": "nginx/1.24.0",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "2024-04-23",
+      "is_mega_cve": false,
+      "latest_patch": "1.24.0",
+      "name": "Nginx",
+      "patch_status": "eol",
+      "source": "server_banner",
+      "status": "eol",
+      "top_cve": null,
+      "version": "1.24.0",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.6p1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Ubuntu",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "OpenSSH",
+      "version": "9.6p1 Ubuntu 3ubuntu13.16"
+     },
+     {
+      "name": "nginx",
+      "version": "1.24.0"
+     },
+     {
+      "name": "Ubuntu",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "apitest.secumetrix.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "cloudscanner.secumetrix.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "apitest.secumetrix.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "dev.secumetrix.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "45.157.232.12",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443,
+     1433,
+     3306,
+     3389,
+     8000,
+     8002
+    ],
+    "primary_vhost": "dev.secumetrix.de",
+    "redirect_data": {
+     "dev.secumetrix.de": {
+      "error": null,
+      "final_domain": "dev.secumetrix.de",
+      "final_url": "https://dev.secumetrix.de/",
+      "is_cross_domain": false,
+      "page_title": "Log in",
+      "redirect_chain": [
+       "https://dev.secumetrix.de/",
+       "https://dev.secumetrix.de/Assets/vendors/tagsinput/tagsinput.css",
+       "https://dev.secumetrix.de/Assets/vendors/owl_carousel/css/owl.carousel.css",
+       "https://dev.secumetrix.de/Assets/vendors/vectormap-home/vectormap-2.0.2.css",
+       "https://dev.secumetrix.de/Assets/vendors/niceselect/css/nice-select.css",
+       "https://dev.secumetrix.de/Assets/vendors/datepicker/date-picker.css",
+       "https://dev.secumetrix.de/Assets/vendors/themefy_icon/themify-icons.css",
+       "https://dev.secumetrix.de/Assets/vendors/gijgo/gijgo.min.css",
+       "https://dev.secumetrix.de/Assets/vendors/font_awesome/css/all.min.css",
+       "https://dev.secumetrix.de/Assets/css/bootstrap1.min.css",
+       "https://dev.secumetrix.de/Assets/vendors/morris/morris.css",
+       "https://dev.secumetrix.de/Assets/css/colors/default.css",
+       "https://dev.secumetrix.de/Assets/css/metisMenu.css",
+       "https://dev.secumetrix.de/Assets/vendors/scroll/scrollable.css",
+       "https://dev.secumetrix.de/Content/src/styles/loader.css",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/css/responsive.dataTables.min.css",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/css/buttons.dataTables.min.css",
+       "https://dev.secumetrix.de/Content/src/images/secumetrix-logo.png",
+       "https://dev.secumetrix.de/Assets/js/solid-gauge.js",
+       "https://dev.secumetrix.de/Assets/css/custom-style.css",
+       "https://dev.secumetrix.de/Assets/js/offline-exporting.js",
+       "https://dev.secumetrix.de/Assets/vendors/text_editor/summernote-bs4.css",
+       "https://dev.secumetrix.de/Assets/css/main_new.css",
+       "https://dev.secumetrix.de/Assets/js/heatmap.js",
+       "https://dev.secumetrix.de/Assets/vendors/material_icon/material-icons.css",
+       "https://dev.secumetrix.de/Assets/css/style1.css",
+       "https://dev.secumetrix.de/Scripts/modernizr-2.8.3.js",
+       "https://dev.secumetrix.de/assets/img/Secumatrix_logo.png",
+       "https://dev.secumetrix.de/Assets/js/angular.min.js",
+       "https://dev.secumetrix.de/Assets/js/highcharts-more.js",
+       "https://dev.secumetrix.de/Assets/js/exporting.js",
+       "https://dev.secumetrix.de/Assets/js/accessibility.js",
+       "https://dev.secumetrix.de/Assets/js/map.js",
+       "https://dev.secumetrix.de/Assets/js/highstock.js",
+       "https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap",
+       "https://dev.secumetrix.de/Scripts/jquery-3.4.1.min.js",
+       "https://dev.secumetrix.de/Assets/js/CommonJs.js?v=202605112021221265224",
+       "https://dev.secumetrix.de/Assets/js/popper1.min.js",
+       "https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400&amp;display=swap",
+       "https://dev.secumetrix.de/Assets/js/metisMenu.js",
+       "https://dev.secumetrix.de/Assets/js/bootstrap1.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datepicker/datepicker.custom.js",
+       "https://dev.secumetrix.de/Assets/vendors/progressbar/jquery.barfiller.js",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/buttons.print.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datepicker/datepicker.en.js",
+       "https://dev.secumetrix.de/Assets/vendors/count_up/jquery.counterup.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/chartjs/roundedBar.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/niceselect/js/jquery.nice-select.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/dataTables.responsive.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/dataTables.buttons.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/count_up/jquery.waypoints.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/buttons.flash.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/buttons.html5.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datepicker/datepicker.js",
+       "https://dev.secumetrix.de/Assets/vendors/owl_carousel/js/owl.carousel.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/jquery.dataTables.min.js",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/jszip.min.js",
+       "https://dev.secumetrix.de/Assets/js/chart.min.js",
+       "https://dev.secumetrix.de/Assets/js/custom.js",
+       "https://dev.secumetrix.de/Assets/vendors/tagsinput/tagsinput.js",
+       "https://dev.secumetrix.de/Assets/vendors/chartlist/Chart.min.js",
+       "https://dev.secumetrix.de/Scripts/jquery.validate.unobtrusive.js",
+       "https://dev.secumetrix.de/Scripts/jquery.validate.js",
+       "https://dev.secumetrix.de/Assets/vendors/text_editor/summernote-bs4.js",
+       "https://dev.secumetrix.de/Assets/vendors/apex_chart/apex-chart2.js",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/vfs_fonts.js",
+       "https://dev.secumetrix.de/Assets/vendors/font_awesome/webfonts/fa-solid-900.woff2",
+       "https://dev.secumetrix.de/Assets/vendors/datatable/js/pdfmake.min.js",
+       "https://fonts.gstatic.com/s/mulish/v18/1Ptvg83HX_SGhgqk3wot.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store",
+       "content-encoding": "gzip",
+       "content-length": "7331",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 11 May 2026 18:21:22 GMT",
+       "expires": "-1",
+       "pragma": "no-cache",
+       "server": "Microsoft-IIS/10.0",
+       "vary": "Accept-Encoding,Accept-Encoding",
+       "x-aspnet-version": "4.0.30319",
+       "x-aspnetmvc-version": "5.2",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-7629dd77-260b-4b68-9f26-b4d806fabe09/hosts/45.157.232.12/phase2/screenshot_dev.secumetrix.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "crm_body_bg",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "width=device-width, initial-scale=1, shrink-to-fit=no",
+         "name": "viewport"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "",
+         "name": "description"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://dev.secumetrix.de/Scripts/modernizr-2.8.3.js",
+        "https://dev.secumetrix.de/Assets/js/angular.min.js",
+        "https://dev.secumetrix.de/Assets/js/highstock.js",
+        "https://dev.secumetrix.de/Assets/js/heatmap.js",
+        "https://dev.secumetrix.de/Assets/js/highcharts-more.js",
+        "https://dev.secumetrix.de/Assets/js/map.js",
+        "https://dev.secumetrix.de/Assets/js/solid-gauge.js",
+        "https://dev.secumetrix.de/Assets/js/exporting.js",
+        "https://dev.secumetrix.de/Assets/js/offline-exporting.js",
+        "https://dev.secumetrix.de/Assets/js/accessibility.js",
+        "https://dev.secumetrix.de/Scripts/jquery-3.4.1.min.js",
+        "https://dev.secumetrix.de/Assets/js/CommonJs.js?v=202605112021221265224",
+        "https://dev.secumetrix.de/Assets/js/popper1.min.js",
+        "https://dev.secumetrix.de/Assets/js/bootstrap1.min.js",
+        "https://dev.secumetrix.de/Assets/js/metisMenu.js",
+        "https://dev.secumetrix.de/Assets/vendors/count_up/jquery.waypoints.min.js",
+        "https://dev.secumetrix.de/Assets/vendors/chartlist/Chart.min.js",
+        "https://dev.secumetrix.de/Assets/vendors/count_up/jquery.counterup.min.js",
+        "https://dev.secumetrix.de/Assets/vendors/niceselect/js/jquery.nice-select.min.js",
+        "https://dev.secumetrix.de/Assets/vendors/owl_carousel/js/owl.carousel.min.js"
+       ],
+       "stylesheets": [
+        "https://dev.secumetrix.de/Assets/css/bootstrap1.min.css",
+        "https://dev.secumetrix.de/Assets/vendors/themefy_icon/themify-icons.css",
+        "https://dev.secumetrix.de/Assets/vendors/niceselect/css/nice-select.css",
+        "https://dev.secumetrix.de/Assets/vendors/owl_carousel/css/owl.carousel.css",
+        "https://dev.secumetrix.de/Assets/vendors/gijgo/gijgo.min.css",
+        "https://dev.secumetrix.de/Assets/vendors/font_awesome/css/all.min.css",
+        "https://dev.secumetrix.de/Assets/vendors/tagsinput/tagsinput.css",
+        "https://dev.secumetrix.de/Assets/vendors/datepicker/date-picker.css",
+        "https://dev.secumetrix.de/Assets/vendors/vectormap-home/vectormap-2.0.2.css",
+        "https://dev.secumetrix.de/Assets/vendors/scroll/scrollable.css",
+        "https://dev.secumetrix.de/Assets/vendors/datatable/css/responsive.dataTables.min.css",
+        "https://dev.secumetrix.de/Assets/vendors/datatable/css/buttons.dataTables.min.css",
+        "https://dev.secumetrix.de/Assets/vendors/text_editor/summernote-bs4.css",
+        "https://dev.secumetrix.de/Assets/vendors/morris/morris.css",
+        "https://dev.secumetrix.de/Assets/vendors/material_icon/material-icons.css",
+        "https://dev.secumetrix.de/Assets/css/metisMenu.css",
+        "https://dev.secumetrix.de/Assets/css/style1.css",
+        "https://dev.secumetrix.de/Assets/css/colors/default.css",
+        "https://dev.secumetrix.de/Assets/css/custom-style.css",
+        "https://dev.secumetrix.de/Content/src/styles/loader.css"
+       ],
+       "title": "Log in"
+      }
+     }
+    },
+    "server": "Microsoft HTTPAPI httpd/2.0",
+    "tech_rows": [
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MySQL",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "OS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Windows Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "4.0.30319",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Chart.js",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "DataTables",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Highcharts",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "JSZip",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "metisMenu",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ASP.NET",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "4.0.30319",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft SQL Server",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "17.00.1000.00",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Modernizr",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OWL Carousel",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "uvicorn",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft-IIS",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Bootstrap",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "(Version unbekannt)",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Microsoft HTTPAPI httpd",
+      "version": "2.0"
+     },
+     {
+      "name": "Microsoft SQL Server",
+      "version": "17.00.1000.00"
+     },
+     {
+      "name": "MySQL",
+      "version": ""
+     },
+     {
+      "name": "uvicorn",
+      "version": ""
+     },
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "ASP.NET",
+      "version": "4.0.30319"
+     },
+     {
+      "name": "Bootstrap",
+      "version": "1"
+     },
+     {
+      "name": "Chart.js",
+      "version": ""
+     },
+     {
+      "name": "DataTables",
+      "version": ""
+     },
+     {
+      "name": "Highcharts",
+      "version": ""
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "JSZip",
+      "version": ""
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": "4.0.30319"
+     },
+     {
+      "name": "Modernizr",
+      "version": ""
+     },
+     {
+      "name": "OWL Carousel",
+      "version": ""
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "metisMenu",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "dev.secumetrix.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "dev.secumetrix.de"
+   }
+  ]
+ },
+ "success": true
+}

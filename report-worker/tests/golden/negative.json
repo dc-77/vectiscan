@@ -1,0 +1,668 @@
+{
+ "source": "report-prototype/spec/06-katalog-simulation.md Abschnitt 3",
+ "hinweis": "Jeder Eintrag verbietet eine Aussage: kein Check des Pruefkatalogs darf fuer diesen Auftrag die unter verbotene_aussage genannte Behauptung erzeugen. `titel` ist der Titel des ausgelieferten Befundes, an dem der Defekt haengt. Ein Befund kann auf mehrere Muster passen, deshalb ist die Zahl der Eintraege groesser als die Zahl der betroffenen Befunde.",
+ "hinweis_mariadb": "Bei NEG-MARIADB-55 sitzt der Defekt in der Versionsableitung (eol_detector, tech_table_builder, spec/02 Ursache 1), nicht im Befundtext: die Texte dieser Laeufe zitieren das Banner korrekt. Nicht gelistet ist trunk-immobilien.de (45bb234c), dessen Banner MySQL 5.5.68-MariaDB kein Kompatibilitaetspraefix traegt, also tatsaechlich MariaDB 5.5.68 meldet.",
+ "count": 36,
+ "count_distinct_findings": 31,
+ "patterns": [
+  {
+   "id": "NEG-SPF-MISSING",
+   "muster": "SPF-Record fehlt, SPF ist vorhanden",
+   "soll_befunde": 7,
+   "soll_kunden": 7,
+   "ist_befunde": 7,
+   "ist_kunden": 7
+  },
+  {
+   "id": "NEG-MARIADB-55",
+   "muster": "MySQL/MariaDB 5.5, real MariaDB 10.x, HIGH",
+   "soll_befunde": 5,
+   "soll_kunden": 5,
+   "ist_befunde": 6,
+   "ist_kunden": 6
+  },
+  {
+   "id": "NEG-URLHAUS-POLICY",
+   "muster": "Policy URLhaus-Kompromittierung auf FTP/RDP/Plesk/Kubernetes",
+   "soll_befunde": 6,
+   "soll_kunden": 4,
+   "ist_befunde": 6,
+   "ist_kunden": 4
+  },
+  {
+   "id": "NEG-MAIL-PLAINTEXT",
+   "muster": "POP3/IMAP Klartext, STARTTLS vorhanden",
+   "soll_befunde": 4,
+   "soll_kunden": 4,
+   "ist_befunde": 4,
+   "ist_kunden": 4
+  },
+  {
+   "id": "NEG-FTP-PLAINTEXT",
+   "muster": "FTP Klartext, TLS erzwungen, einmal CRITICAL",
+   "soll_befunde": 2,
+   "soll_kunden": 1,
+   "ist_befunde": 2,
+   "ist_kunden": 1
+  },
+  {
+   "id": "NEG-WEBSERVER-EOL",
+   "muster": "Nginx 1.24 EOL, Apache 2.4.41 EOL ohne Herstellerbasis",
+   "soll_befunde": 3,
+   "soll_kunden": 3,
+   "ist_befunde": 3,
+   "ist_kunden": 3
+  },
+  {
+   "id": "NEG-EXCHANGE-2016",
+   "muster": "Exchange 2016, real Exchange SE",
+   "soll_befunde": 1,
+   "soll_kunden": 1,
+   "ist_befunde": 1,
+   "ist_kunden": 1
+  },
+  {
+   "id": "NEG-TITLE-PLACEHOLDER",
+   "muster": "Platzhalter {host} oder [Hinweis: ...] im Titel",
+   "soll_befunde": 5,
+   "soll_kunden": 3,
+   "ist_befunde": 5,
+   "ist_kunden": 3
+  },
+  {
+   "id": "NEG-WP-PLUGIN-VERSION",
+   "muster": "WordPress-Plugin 27, 27 ist eine Theme-Version",
+   "soll_befunde": 2,
+   "soll_kunden": 1,
+   "ist_befunde": 2,
+   "ist_kunden": 1
+  }
+ ],
+ "abweichungen": [
+  {
+   "pattern": "NEG-MARIADB-55",
+   "soll": "5 Befunde / 5 Kunden",
+   "ist": "6 Befunde / 6 Kunden",
+   "geprueft": true,
+   "begruendung": "spec/06 nennt 5 Befunde in 5 Kunden. Die faktenbasierte Erkennung findet 6: der Lauf a6df9d9d (junkerwerk.hu) traegt dasselbe Banner und denselben Datenbankbefund, sein Befundtext nennt die Zahl 5.5 nur nicht. Der zusaetzliche Eintrag ist belegt und bleibt drin."
+  }
+ ],
+ "entries": [
+  {
+   "pattern": "NEG-EXCHANGE-2016",
+   "order": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
+   "domain": "multi-target (2)",
+   "finding_id": "VS-2026-001",
+   "titel": "Microsoft Exchange 2016 ist End-of-Life auf mail.junkerwerk.de [Hinweis: exchange wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]",
+   "severity": "HIGH",
+   "policy_id": "SP-EOL-001",
+   "verbotene_aussage": "Exchange 2016 ist End-of-Life",
+   "grund": "Build 15.2.x ist Exchange 2019 oder Subscription Edition; 2016 ist 15.1.x. Der Build wird nicht gegen die Produktfamilie geprueft",
+   "widerlegt_durch": {
+    "fakt": "software.build",
+    "wert": "15.2.2562; X-FEServer mail.junkerwerk.de: EXCHANGE-SE; outlook.junkerwerk.de: EXCHANGE-SE; autodiscover.junkerwerk.de: EXCHANGE-SE",
+    "quelle": "results.json toolName=nmap und header_check X-FEServer"
+   }
+  },
+  {
+   "pattern": "NEG-FTP-PLAINTEXT",
+   "order": "5b07c87f-6c59-4ca6-8d53-00013a576398",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-001",
+   "titel": "FTP-Dienst (Klartext-Protokoll) auf Produktionsserver exponiert",
+   "severity": "CRITICAL",
+   "policy_id": "SP-URLHAUS-001",
+   "verbotene_aussage": "FTP uebertraegt Zugangsdaten im Klartext",
+   "grund": "nmap meldet requires SSL: der Dienst erzwingt TLS vor der Anmeldung, es gibt keine Klartext-Anmeldung",
+   "widerlegt_durch": {
+    "fakt": "service.tls_required",
+    "wert": "21/tcp   open  ftp           syn-ack ProFTPD (requires SSL)",
+    "quelle": "results.json toolName=nmap, Port 21"
+   }
+  },
+  {
+   "pattern": "NEG-FTP-PLAINTEXT",
+   "order": "ae8d1d70-7925-4e3c-84de-3113f3e57b60",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-002",
+   "titel": "Übermäßige Port-Exposition auf Partnerportal 212.227.60.78 (12 offene Ports, u.a. FTP, POP3/IMAP im Klartext, Plesk-Admin)",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "FTP uebertraegt Zugangsdaten im Klartext",
+   "grund": "nmap meldet requires SSL: der Dienst erzwingt TLS vor der Anmeldung, es gibt keine Klartext-Anmeldung",
+   "widerlegt_durch": {
+    "fakt": "service.tls_required",
+    "wert": "21/tcp   open  ftp           syn-ack ProFTPD (requires SSL)",
+    "quelle": "results.json toolName=nmap, Port 21"
+   }
+  },
+  {
+   "pattern": "NEG-MAIL-PLAINTEXT",
+   "order": "2572eebc-6135-40e6-b1d2-e9dfccc20ae6",
+   "domain": "junkerwerk.de",
+   "finding_id": "VS-2026-006",
+   "titel": "Mail-Ports (IMAP 143, POP3 110) im Klartext exponiert auf 188.40.3.130",
+   "severity": "LOW",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "POP3/IMAP uebertraegt im Klartext",
+   "grund": "nmap-Capabilities nicht ausgewertet: STLS bzw. STARTTLS wird angeboten, die Anmeldung ohne TLS ist gesperrt",
+   "widerlegt_durch": {
+    "fakt": "service.starttls",
+    "wert": "|_pop3-capabilities: TOP SASL PIPELINING UIDL STLS RESP-CODES CAPA AUTH-RESP-CODE | |_imap-capabilities: listed have post-login OK LOGIN-REFERRALS more capabilities Pre-login ENABLE ID LITERAL+ IDLE SASL-IR IMAP4rev1 LOGINDISABLEDA0001 STARTTLS",
+    "quelle": "results.json toolName=nmap, pop3-capabilities / imap-capabilities"
+   }
+  },
+  {
+   "pattern": "NEG-MAIL-PLAINTEXT",
+   "order": "aaf75444-5af8-46a6-a90b-016e85db918d",
+   "domain": "heuel.com",
+   "finding_id": "VS-2026-001",
+   "titel": "Mail-Dienste auf Nicht-MX-Server mit Klartext-Protokollen exponiert",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "POP3/IMAP uebertraegt im Klartext",
+   "grund": "nmap-Capabilities nicht ausgewertet: STLS bzw. STARTTLS wird angeboten, die Anmeldung ohne TLS ist gesperrt",
+   "widerlegt_durch": {
+    "fakt": "service.starttls",
+    "wert": "|_pop3-capabilities: SASL TOP PIPELINING AUTH-RESP-CODE RESP-CODES UIDL STLS CAPA | |_imap-capabilities: ENABLE post-login more have LOGIN-REFERRALS ID STARTTLS SASL-IR IDLE capabilities IMAP4rev1 listed OK LOGINDISABLEDA0001 Pre-login LITERAL+",
+    "quelle": "results.json toolName=nmap, pop3-capabilities / imap-capabilities"
+   }
+  },
+  {
+   "pattern": "NEG-MAIL-PLAINTEXT",
+   "order": "ae8d1d70-7925-4e3c-84de-3113f3e57b60",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-002",
+   "titel": "Übermäßige Port-Exposition auf Partnerportal 212.227.60.78 (12 offene Ports, u.a. FTP, POP3/IMAP im Klartext, Plesk-Admin)",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "POP3/IMAP uebertraegt im Klartext",
+   "grund": "nmap-Capabilities nicht ausgewertet: STLS bzw. STARTTLS wird angeboten, die Anmeldung ohne TLS ist gesperrt",
+   "widerlegt_durch": {
+    "fakt": "service.starttls",
+    "wert": "|_pop3-capabilities: TOP AUTH-RESP-CODE USER CAPA RESP-CODES PIPELINING UIDL SASL(PLAIN LOGIN CRAM-MD5) STLS APOP | |_imap-capabilities: STARTTLS OK LOGIN-REFERRALS have LITERAL+ AUTH=CRAM-MD5A0001 more listed IMAP4rev1 SASL-IR AUTH=LOGIN post-login capabilities IDLE ENABLE ID Pre-login AUTH=PLAIN",
+    "quelle": "results.json toolName=nmap, pop3-capabilities / imap-capabilities"
+   }
+  },
+  {
+   "pattern": "NEG-MAIL-PLAINTEXT",
+   "order": "b9759695-b031-4e1c-bac0-778abe9dfc77",
+   "domain": "bergersysteme.com",
+   "finding_id": "VS-2026-001",
+   "titel": "Unverschlüsselte Klartext-Maildienste POP3/IMAP auf bergersysteme.com",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "POP3/IMAP uebertraegt im Klartext",
+   "grund": "nmap-Capabilities nicht ausgewertet: STLS bzw. STARTTLS wird angeboten, die Anmeldung ohne TLS ist gesperrt",
+   "widerlegt_durch": {
+    "fakt": "service.starttls",
+    "wert": "|_pop3-capabilities: STLS APOP UIDL USER SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) TOP AUTH-RESP-CODE CAPA PIPELINING RESP-CODES | |_imap-capabilities: ID IDLE AUTH=LOGIN SASL-IR ENABLE AUTH=DIGEST-MD5 AUTH=PLAIN listed STARTTLS capabilities more have IMAP4rev1 AUTH=CRAM-MD5A0001 Pre-login OK LOGIN-REFERRALS post-login LITERAL+",
+    "quelle": "results.json toolName=nmap, pop3-capabilities / imap-capabilities"
+   }
+  },
+  {
+   "pattern": "NEG-MARIADB-55",
+   "order": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
+   "domain": "multi-target (2)",
+   "finding_id": "VS-2026-003",
+   "titel": "Datenbank-Port 3306 oeffentlich erreichbar auf junkerwerk.de",
+   "severity": "HIGH",
+   "policy_id": "SP-DB-001",
+   "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
+   "grund": "Banner 5.5.5-<version>-MariaDB ohne Praefix-Strip: 5.5.5 ist die Protokoll-Kompatibilitaetsangabe, die Produktversion steht dahinter. Der Befundtext dieses Laufs zitiert das Banner korrekt; falsch wird es in Tech-Tabelle und EOL-Ableitung",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+    "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-MARIADB-55",
+   "order": "2572eebc-6135-40e6-b1d2-e9dfccc20ae6",
+   "domain": "junkerwerk.de",
+   "finding_id": "VS-2026-001",
+   "titel": "Datenbank-Port 3306 oeffentlich erreichbar auf 188.40.3.130",
+   "severity": "HIGH",
+   "policy_id": "SP-DB-001",
+   "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
+   "grund": "Banner 5.5.5-<version>-MariaDB ohne Praefix-Strip: 5.5.5 ist die Protokoll-Kompatibilitaetsangabe, die Produktversion steht dahinter. Der Befundtext dieses Laufs zitiert das Banner korrekt; falsch wird es in Tech-Tabelle und EOL-Ableitung",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+    "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-MARIADB-55",
+   "order": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87",
+   "domain": "multi-target (3)",
+   "finding_id": "VS-2026-002",
+   "titel": "Datenbank-Port 3306 oeffentlich erreichbar auf lumbeck-wolter.de",
+   "severity": "HIGH",
+   "policy_id": "SP-DB-001",
+   "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
+   "grund": "Banner 5.5.5-<version>-MariaDB ohne Praefix-Strip: 5.5.5 ist die Protokoll-Kompatibilitaetsangabe, die Produktversion steht dahinter. Der Befundtext dieses Laufs zitiert das Banner korrekt; falsch wird es in Tech-Tabelle und EOL-Ableitung",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+    "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-MARIADB-55",
+   "order": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff",
+   "domain": "mc-2europe.com",
+   "finding_id": "VS-2026-002",
+   "titel": "Datenbank-Port 3306 oeffentlich erreichbar auf 144.76.255.130",
+   "severity": "HIGH",
+   "policy_id": "SP-DB-001",
+   "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
+   "grund": "Banner 5.5.5-<version>-MariaDB ohne Praefix-Strip: 5.5.5 ist die Protokoll-Kompatibilitaetsangabe, die Produktversion steht dahinter. Der Befundtext dieses Laufs zitiert das Banner korrekt; falsch wird es in Tech-Tabelle und EOL-Ableitung",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "5.5.5-10.11.18-MariaDB-deb12",
+    "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-MARIADB-55",
+   "order": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108",
+   "domain": "junkerwerk.hu",
+   "finding_id": "VS-2026-002",
+   "titel": "Datenbank-Port 5432 oeffentlich erreichbar auf 188.40.3.130",
+   "severity": "HIGH",
+   "policy_id": "SP-DB-001",
+   "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
+   "grund": "Banner 5.5.5-<version>-MariaDB ohne Praefix-Strip: 5.5.5 ist die Protokoll-Kompatibilitaetsangabe, die Produktversion steht dahinter. Der Befundtext dieses Laufs zitiert das Banner korrekt; falsch wird es in Tech-Tabelle und EOL-Ableitung",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+    "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-MARIADB-55",
+   "order": "fb13a98f-22c6-4d17-875c-eeeb14643beb",
+   "domain": "krause-computer.de",
+   "finding_id": "VS-2026-001",
+   "titel": "Datenbank-Port 3306 oeffentlich erreichbar auf krause-computer.de",
+   "severity": "HIGH",
+   "policy_id": "SP-DB-001",
+   "verbotene_aussage": "MySQL 5.5 als Produkt oder EOL-Befund fuer 3306 (real MariaDB 10.11)",
+   "grund": "Banner 5.5.5-<version>-MariaDB ohne Praefix-Strip: 5.5.5 ist die Protokoll-Kompatibilitaetsangabe, die Produktversion steht dahinter. Der Befundtext dieses Laufs zitiert das Banner korrekt; falsch wird es in Tech-Tabelle und EOL-Ableitung",
+   "widerlegt_durch": {
+    "fakt": "service.version_raw",
+    "wert": "5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log",
+    "quelle": "results.json toolName=nmap, Port 3306"
+   }
+  },
+  {
+   "pattern": "NEG-SPF-MISSING",
+   "order": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
+   "domain": "multi-target (2)",
+   "finding_id": "VS-2026-006",
+   "titel": "SPF-Record fehlt fuer junkerwerk.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-DNS-004",
+   "verbotene_aussage": "SPF-Record fehlt",
+   "grund": "Titel-Template SP-DNS-004 ueber DKIM-Inhalt; dns_findings.spf wird nicht geprueft",
+   "widerlegt_durch": {
+    "fakt": "dns.spf",
+    "wert": "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all",
+    "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
+   }
+  },
+  {
+   "pattern": "NEG-SPF-MISSING",
+   "order": "0fc35ae8-6133-4487-99e5-0200e1300c06",
+   "domain": "cyber-fuchs.de",
+   "finding_id": "VS-2026-005",
+   "titel": "SPF-Record fehlt fuer cyber-fuchs.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-DNS-004",
+   "verbotene_aussage": "SPF-Record fehlt",
+   "grund": "Titel-Template SP-DNS-004 ueber DKIM-Inhalt; dns_findings.spf wird nicht geprueft",
+   "widerlegt_durch": {
+    "fakt": "dns.spf",
+    "wert": "v=spf1 mx -all",
+    "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
+   }
+  },
+  {
+   "pattern": "NEG-SPF-MISSING",
+   "order": "2572eebc-6135-40e6-b1d2-e9dfccc20ae6",
+   "domain": "junkerwerk.de",
+   "finding_id": "VS-2026-004",
+   "titel": "SPF-Record fehlt fuer junkerwerk.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-DNS-004",
+   "verbotene_aussage": "SPF-Record fehlt",
+   "grund": "Titel-Template SP-DNS-004 ueber DKIM-Inhalt; dns_findings.spf wird nicht geprueft",
+   "widerlegt_durch": {
+    "fakt": "dns.spf",
+    "wert": "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all",
+    "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
+   }
+  },
+  {
+   "pattern": "NEG-SPF-MISSING",
+   "order": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
+   "domain": "trunk-immobilien.de",
+   "finding_id": "VS-2026-009",
+   "titel": "SPF-Record fehlt fuer trunk-immobilien.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-DNS-004",
+   "verbotene_aussage": "SPF-Record fehlt",
+   "grund": "Titel-Template SP-DNS-004 ueber DKIM-Inhalt; dns_findings.spf wird nicht geprueft",
+   "widerlegt_durch": {
+    "fakt": "dns.spf",
+    "wert": "v=spf1 mx -all",
+    "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
+   }
+  },
+  {
+   "pattern": "NEG-SPF-MISSING",
+   "order": "62c1e866-1eae-451a-8b52-7bff591aad31",
+   "domain": "huendgen-entsorgung.de",
+   "finding_id": "VS-2026-004",
+   "titel": "SPF-Record fehlt fuer huendgen-entsorgung.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-DNS-004",
+   "verbotene_aussage": "SPF-Record fehlt",
+   "grund": "Titel-Template SP-DNS-004 ueber DKIM-Inhalt; dns_findings.spf wird nicht geprueft",
+   "widerlegt_durch": {
+    "fakt": "dns.spf",
+    "wert": "v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all",
+    "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
+   }
+  },
+  {
+   "pattern": "NEG-SPF-MISSING",
+   "order": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87",
+   "domain": "multi-target (3)",
+   "finding_id": "VS-2026-008",
+   "titel": "SPF-Record fehlt fuer lumbeck-wolter.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-DNS-004",
+   "verbotene_aussage": "SPF-Record fehlt",
+   "grund": "Titel-Template SP-DNS-004 ueber DKIM-Inhalt; dns_findings.spf wird nicht geprueft",
+   "widerlegt_durch": {
+    "fakt": "dns.spf",
+    "wert": "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all",
+    "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
+   }
+  },
+  {
+   "pattern": "NEG-SPF-MISSING",
+   "order": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff",
+   "domain": "mc-2europe.com",
+   "finding_id": "VS-2026-004",
+   "titel": "SPF-Record fehlt fuer mc-2europe.com",
+   "severity": "MEDIUM",
+   "policy_id": "SP-DNS-004",
+   "verbotene_aussage": "SPF-Record fehlt",
+   "grund": "Titel-Template SP-DNS-004 ueber DKIM-Inhalt; dns_findings.spf wird nicht geprueft",
+   "widerlegt_durch": {
+    "fakt": "dns.spf",
+    "wert": "v=spf1 mx a ip4:62.159.230.43 ip4:144.76.255.130 include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-eu.emailsignatures365.com ~all",
+    "quelle": "order.json data.progress.discoveredHosts.dns_findings.spf"
+   }
+  },
+  {
+   "pattern": "NEG-TITLE-PLACEHOLDER",
+   "order": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
+   "domain": "multi-target (2)",
+   "finding_id": "VS-2026-001",
+   "titel": "Microsoft Exchange 2016 ist End-of-Life auf mail.junkerwerk.de [Hinweis: exchange wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]",
+   "severity": "HIGH",
+   "policy_id": "SP-EOL-001",
+   "verbotene_aussage": "Titel mit Platzhalter oder internem Hinweis",
+   "grund": "Template-Variable nicht ersetzt oder interner Prompt-Hinweis durchgereicht; der Text geht so in den Kundenreport",
+   "widerlegt_durch": {
+    "fakt": "finding.title_vars",
+    "wert": "{\"host\": \"mail.junkerwerk.de\", \"tech\": \"Microsoft Exchange\", \"version\": \"2016\"}",
+    "quelle": "findings.json title_vars gegen title"
+   }
+  },
+  {
+   "pattern": "NEG-TITLE-PLACEHOLDER",
+   "order": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87",
+   "domain": "multi-target (3)",
+   "finding_id": "VS-2026-006",
+   "titel": "Apache 2.4.41 (End-of-Life) auf smtp.lumbeck-wolter.de und smtp4abas [Hinweis: apache wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "Titel mit Platzhalter oder internem Hinweis",
+   "grund": "Template-Variable nicht ersetzt oder interner Prompt-Hinweis durchgereicht; der Text geht so in den Kundenreport",
+   "widerlegt_durch": {
+    "fakt": "finding.title_vars",
+    "wert": "{\"host\": \"smtp.lumbeck-wolter.de\", \"tech\": \"Apache\", \"version\": \"2.4.41\"}",
+    "quelle": "findings.json title_vars gegen title"
+   }
+  },
+  {
+   "pattern": "NEG-TITLE-PLACEHOLDER",
+   "order": "b9e4aa6f-945e-4ed0-889e-4c6ec0ccc1ed",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-001",
+   "titel": "FTP-Dienst (ProFTPD) öffentlich erreichbar auf {host}",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "Titel mit Platzhalter oder internem Hinweis",
+   "grund": "Template-Variable nicht ersetzt oder interner Prompt-Hinweis durchgereicht; der Text geht so in den Kundenreport",
+   "widerlegt_durch": {
+    "fakt": "finding.title_vars",
+    "wert": "{\"host\": \"connect.securess.de\", \"port\": \"21\", \"tech\": \"ProFTPD\"}",
+    "quelle": "findings.json title_vars gegen title"
+   }
+  },
+  {
+   "pattern": "NEG-TITLE-PLACEHOLDER",
+   "order": "b9e4aa6f-945e-4ed0-889e-4c6ec0ccc1ed",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-003",
+   "titel": "Plesk-Administrationsoberfläche öffentlich erreichbar auf {host}:{port}",
+   "severity": "CRITICAL",
+   "policy_id": "SP-URLHAUS-001",
+   "verbotene_aussage": "Titel mit Platzhalter oder internem Hinweis",
+   "grund": "Template-Variable nicht ersetzt oder interner Prompt-Hinweis durchgereicht; der Text geht so in den Kundenreport",
+   "widerlegt_durch": {
+    "fakt": "finding.title_vars",
+    "wert": "{\"host\": \"connect.securess.de\", \"port\": \"8443\", \"tech\": \"Plesk\"}",
+    "quelle": "findings.json title_vars gegen title"
+   }
+  },
+  {
+   "pattern": "NEG-TITLE-PLACEHOLDER",
+   "order": "b9e4aa6f-945e-4ed0-889e-4c6ec0ccc1ed",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-009",
+   "titel": "Roundcube-Webmail über drei Hostnamen erreichbar auf {host}",
+   "severity": "LOW",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "Titel mit Platzhalter oder internem Hinweis",
+   "grund": "Template-Variable nicht ersetzt oder interner Prompt-Hinweis durchgereicht; der Text geht so in den Kundenreport",
+   "widerlegt_durch": {
+    "fakt": "finding.title_vars",
+    "wert": "{\"host\": \"85.22.47.39\", \"tech\": \"Roundcube\"}",
+    "quelle": "findings.json title_vars gegen title"
+   }
+  },
+  {
+   "pattern": "NEG-URLHAUS-POLICY",
+   "order": "0eba83d1-6f64-4ee4-a73e-b6d2e79c2f57",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-002",
+   "titel": "Plesk-Administrationspanel öffentlich erreichbar auf connect.securess.de",
+   "severity": "CRITICAL",
+   "policy_id": "SP-URLHAUS-001",
+   "verbotene_aussage": "Kompromittierung laut Malware-Feed",
+   "grund": "Type-Mapper-Fehltreffer: finding_type urlhaus_compromise_detected per Regex auf einen Expositionsbefund; Severity stammt aus der falschen Policy",
+   "widerlegt_durch": {
+    "fakt": "finding_type_source",
+    "wert": "urlhaus_compromise_detected via regex; kein URLhaus-Treffer in results.json",
+    "quelle": "findings.json finding_type / _finding_type_source"
+   }
+  },
+  {
+   "pattern": "NEG-URLHAUS-POLICY",
+   "order": "5b07c87f-6c59-4ca6-8d53-00013a576398",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-001",
+   "titel": "FTP-Dienst (Klartext-Protokoll) auf Produktionsserver exponiert",
+   "severity": "CRITICAL",
+   "policy_id": "SP-URLHAUS-001",
+   "verbotene_aussage": "Kompromittierung laut Malware-Feed",
+   "grund": "Type-Mapper-Fehltreffer: finding_type urlhaus_compromise_detected per Regex auf einen Expositionsbefund; Severity stammt aus der falschen Policy",
+   "widerlegt_durch": {
+    "fakt": "finding_type_source",
+    "wert": "urlhaus_compromise_detected via regex; kein URLhaus-Treffer in results.json",
+    "quelle": "findings.json finding_type / _finding_type_source"
+   }
+  },
+  {
+   "pattern": "NEG-URLHAUS-POLICY",
+   "order": "7629dd77-260b-4b68-9f26-b4d806fabe09",
+   "domain": "secumetrix.de",
+   "finding_id": "VS-2026-001",
+   "titel": "RDP-Dienst (Port 3389) oeffentlich erreichbar auf 45.157.234.103 und 45.157.232.12",
+   "severity": "CRITICAL",
+   "policy_id": "SP-URLHAUS-001",
+   "verbotene_aussage": "Kompromittierung laut Malware-Feed",
+   "grund": "Type-Mapper-Fehltreffer: finding_type urlhaus_compromise_detected per Regex auf einen Expositionsbefund; Severity stammt aus der falschen Policy",
+   "widerlegt_durch": {
+    "fakt": "finding_type_source",
+    "wert": "urlhaus_compromise_detected via regex; kein URLhaus-Treffer in results.json",
+    "quelle": "findings.json finding_type / _finding_type_source"
+   }
+  },
+  {
+   "pattern": "NEG-URLHAUS-POLICY",
+   "order": "ac5dd342-8586-4cc5-91a5-c33f673a3a38",
+   "domain": "rankingcoach.com",
+   "finding_id": "VS-2026-001",
+   "titel": "Kubernetes Dashboard und Swagger-API oeffentlich aufloesbar (k8s.rankingcoach.com)",
+   "severity": "CRITICAL",
+   "policy_id": "SP-URLHAUS-001",
+   "verbotene_aussage": "Kompromittierung laut Malware-Feed",
+   "grund": "Type-Mapper-Fehltreffer: finding_type urlhaus_compromise_detected per Regex auf einen Expositionsbefund; Severity stammt aus der falschen Policy",
+   "widerlegt_durch": {
+    "fakt": "finding_type_source",
+    "wert": "urlhaus_compromise_detected via regex; kein URLhaus-Treffer in results.json",
+    "quelle": "findings.json finding_type / _finding_type_source"
+   }
+  },
+  {
+   "pattern": "NEG-URLHAUS-POLICY",
+   "order": "b9e4aa6f-945e-4ed0-889e-4c6ec0ccc1ed",
+   "domain": "securess.de",
+   "finding_id": "VS-2026-003",
+   "titel": "Plesk-Administrationsoberfläche öffentlich erreichbar auf {host}:{port}",
+   "severity": "CRITICAL",
+   "policy_id": "SP-URLHAUS-001",
+   "verbotene_aussage": "Kompromittierung laut Malware-Feed",
+   "grund": "Type-Mapper-Fehltreffer: finding_type urlhaus_compromise_detected per Regex auf einen Expositionsbefund; Severity stammt aus der falschen Policy",
+   "widerlegt_durch": {
+    "fakt": "finding_type_source",
+    "wert": "urlhaus_compromise_detected via regex; kein URLhaus-Treffer in results.json",
+    "quelle": "findings.json finding_type / _finding_type_source"
+   }
+  },
+  {
+   "pattern": "NEG-URLHAUS-POLICY",
+   "order": "dd322907-b1e5-4081-8fee-1f1e56e48212",
+   "domain": "heuel.com",
+   "finding_id": "VS-2026-002",
+   "titel": "FTP-Dienst (Port 21) öffentlich erreichbar auf 20.79.218.75",
+   "severity": "CRITICAL",
+   "policy_id": "SP-URLHAUS-001",
+   "verbotene_aussage": "Kompromittierung laut Malware-Feed",
+   "grund": "Type-Mapper-Fehltreffer: finding_type urlhaus_compromise_detected per Regex auf einen Expositionsbefund; Severity stammt aus der falschen Policy",
+   "widerlegt_durch": {
+    "fakt": "finding_type_source",
+    "wert": "urlhaus_compromise_detected via regex; kein URLhaus-Treffer in results.json",
+    "quelle": "findings.json finding_type / _finding_type_source"
+   }
+  },
+  {
+   "pattern": "NEG-WEBSERVER-EOL",
+   "order": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87",
+   "domain": "multi-target (3)",
+   "finding_id": "VS-2026-006",
+   "titel": "Apache 2.4.41 (End-of-Life) auf smtp.lumbeck-wolter.de und smtp4abas [Hinweis: apache wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "Version 2.4.41 ist End-of-Life",
+   "grund": "EOL-Behauptung ohne Herstellerbasis: fuer diese Version gibt es keinen Herstellertermin, die Aussage stammt aus dem Modell",
+   "widerlegt_durch": {
+    "fakt": "software.eol",
+    "wert": "Version 2.4.41 ohne Herstellertermin im EOL-Feed",
+    "quelle": "findings.json title/description gegen endoflife.date"
+   }
+  },
+  {
+   "pattern": "NEG-WEBSERVER-EOL",
+   "order": "7629dd77-260b-4b68-9f26-b4d806fabe09",
+   "domain": "secumetrix.de",
+   "finding_id": "VS-2026-002",
+   "titel": "Nginx 1.24.0 EOL (End of Life) auf 173.249.44.221",
+   "severity": "CRITICAL",
+   "policy_id": "SP-EOL-005",
+   "verbotene_aussage": "Version 1.24.0 ist End-of-Life",
+   "grund": "EOL-Behauptung ohne Herstellerbasis: fuer diese Version gibt es keinen Herstellertermin, die Aussage stammt aus dem Modell",
+   "widerlegt_durch": {
+    "fakt": "software.eol",
+    "wert": "Version 1.24.0 ohne Herstellertermin im EOL-Feed",
+    "quelle": "findings.json title/description gegen endoflife.date"
+   }
+  },
+  {
+   "pattern": "NEG-WEBSERVER-EOL",
+   "order": "ac5dd342-8586-4cc5-91a5-c33f673a3a38",
+   "domain": "rankingcoach.com",
+   "finding_id": "VS-2026-005",
+   "titel": "Nginx 1.24.0 (EOL seit 2024-04) auf jimdo.rankingcoach.com",
+   "severity": "MEDIUM",
+   "policy_id": "SP-FALLBACK",
+   "verbotene_aussage": "Version 1.24.0 ist End-of-Life",
+   "grund": "EOL-Behauptung ohne Herstellerbasis: fuer diese Version gibt es keinen Herstellertermin, die Aussage stammt aus dem Modell",
+   "widerlegt_durch": {
+    "fakt": "software.eol",
+    "wert": "Version 1.24.0 ohne Herstellertermin im EOL-Feed",
+    "quelle": "findings.json title/description gegen endoflife.date"
+   }
+  },
+  {
+   "pattern": "NEG-WP-PLUGIN-VERSION",
+   "order": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
+   "domain": "trunk-immobilien.de",
+   "finding_id": "VS-2026-003",
+   "titel": "WordPress-Plugin 27 mit bekannter Schwachstelle auf www.trunk-immobilien.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-WP-001",
+   "verbotene_aussage": "WordPress-Plugin 27 mit bekannter Schwachstelle",
+   "grund": "Smart-Var-Fallback greift die Zahl 27 aus einer Versionsangabe und setzt sie als Plugin-Namen ein",
+   "widerlegt_durch": {
+    "fakt": "tech.theme_version",
+    "wert": "Betheme 27.2 (Theme-Version, kein Plugin-Name)",
+    "quelle": "findings.json evidence (webtech/wpscan)"
+   }
+  },
+  {
+   "pattern": "NEG-WP-PLUGIN-VERSION",
+   "order": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
+   "domain": "trunk-immobilien.de",
+   "finding_id": "VS-2026-004",
+   "titel": "WordPress-Plugin 27 mit bekannter Schwachstelle auf dev.trunk-immobilien.de",
+   "severity": "MEDIUM",
+   "policy_id": "SP-WP-001",
+   "verbotene_aussage": "WordPress-Plugin 27 mit bekannter Schwachstelle",
+   "grund": "Smart-Var-Fallback greift die Zahl 27 aus einer Versionsangabe und setzt sie als Plugin-Namen ein",
+   "widerlegt_durch": {
+    "fakt": "tech.theme_version",
+    "wert": "Betheme 27.2 (Theme-Version, kein Plugin-Name)",
+    "quelle": "findings.json evidence (webtech/wpscan)"
+   }
+  }
+ ]
+}

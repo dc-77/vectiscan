@@ -1,0 +1,1163 @@
+{
+ "data": {
+  "businessImpactScore": 5.8,
+  "correlationCount": 49,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "securess.de",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-07-20T00:33:54.464Z",
+  "hasReport": true,
+  "id": "ae8d1d70-7925-4e3c-84de-3113f3e57b60",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "reject",
+     "pct": 100,
+     "raw": "v=DMARC1; p=reject; rua=mailto:administrator@securess.de; ruf=mailto:administrator@securess.de;",
+     "rua": [
+      "mailto:administrator@securess.de"
+     ],
+     "ruf": [
+      "mailto:administrator@securess.de"
+     ],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/securess.de",
+     "domain": "securess.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/securess.de"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.securess.de",
+    "apache01.securess.de",
+    "autodiscover.securess.de",
+    "connect.securess.de",
+    "eset.securess.de",
+    "ftp.securess.de",
+    "imap.securess.de",
+    "intern.securess.de",
+    "itsupport.securess.de",
+    "login-kundenportal.securess.de",
+    "mailcleaner.securess.de",
+    "mailin.securess.de",
+    "mailout.securess.de",
+    "mailstore.securess.de",
+    "mx1.securess.de",
+    "openotp.securess.de",
+    "owa.securess.de",
+    "partner.securess.de",
+    "portal.securess.de",
+    "rdgw-2016.securess.de",
+    "rdgw.securess.de",
+    "sma.securess.de",
+    "ssi.securess.de",
+    "starface.securess.de",
+    "training.securess.de",
+    "vermittler.securess.de",
+    "vos.securess.de",
+    "vpn01.securess.de",
+    "web02.securess.de",
+    "web05.securess.de",
+    "webmail.securess.de",
+    "wg.securess.de",
+    "www.securess.de",
+    "www3.securess.de"
+   ],
+   "securitytrails": {
+    "dns_history": [
+     {
+      "first_seen": "2023-10-16",
+      "last_seen": "2026-07-19",
+      "type": "a",
+      "values": [
+       "85.22.47.41"
+      ]
+     },
+     {
+      "first_seen": "2022-04-06",
+      "last_seen": "2023-10-16",
+      "type": "a",
+      "values": [
+       "104.151.19.233"
+      ]
+     },
+     {
+      "first_seen": "2018-12-20",
+      "last_seen": "2022-04-06",
+      "type": "a",
+      "values": [
+       "213.148.149.42"
+      ]
+     },
+     {
+      "first_seen": "2018-08-02",
+      "last_seen": "2018-12-19",
+      "type": "a",
+      "values": [
+       "213.148.149.42"
+      ]
+     },
+     {
+      "first_seen": "2018-01-22",
+      "last_seen": "2018-08-01",
+      "type": "a",
+      "values": [
+       "213.148.149.42"
+      ]
+     },
+     {
+      "first_seen": "2017-09-29",
+      "last_seen": "2018-01-22",
+      "type": "a",
+      "values": [
+       "213.148.149.37"
+      ]
+     }
+    ],
+    "domain": {
+     "a_records": [
+      "85.22.47.41"
+     ],
+     "alexa_rank": null,
+     "domain": "securess.de",
+     "hostname": "securess.de",
+     "mx_records": [
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns_records": [
+      "ns2a.dodns.net",
+      "ns1a.dodns.net"
+     ],
+     "txt_records": [
+      "v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all",
+      "swisssign-check=GCUOCgTrAwxkj1omoqR40kQDlQQ",
+      "google-site-verification=U3IOkpP0AUAkRYbjCJsqVjNTuQTThTLXXZfTlJQ2voU"
+     ]
+    },
+    "subdomains": [
+     "www.securess.de",
+     "webmail.securess.de",
+     "mailstore.securess.de",
+     "login-kundenportal.securess.de",
+     "ftp.securess.de",
+     "owa.securess.de",
+     "connect.securess.de",
+     "rdgw-2016.securess.de",
+     "vermittler.securess.de",
+     "vos.securess.de",
+     "mailout.securess.de",
+     "wg.securess.de",
+     "ssi.securess.de",
+     "mailcleaner.securess.de",
+     "mx1.securess.de",
+     "itsupport.securess.de",
+     "starface.securess.de",
+     "web02.securess.de",
+     "mailin.securess.de",
+     "sma.securess.de",
+     "vpn01.securess.de",
+     "training.securess.de",
+     "web05.securess.de",
+     "eset.securess.de",
+     "autodiscover.securess.de",
+     "portal.securess.de",
+     "openotp.securess.de",
+     "apache01.securess.de",
+     "rdgw.securess.de",
+     "www3.securess.de",
+     "partner.securess.de",
+     "imap.securess.de",
+     "intern.securess.de"
+    ]
+   },
+   "shodan_domain": {
+    "domain": "securess.de",
+    "records": [
+     {
+      "last_seen": "2026-07-19T00:30:11.512000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "85.22.47.41"
+     },
+     {
+      "last_seen": "2026-07-14T15:48:25.278000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-14T15:48:25.278000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-14T15:48:25.278000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-14T15:48:25.278000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-14T15:45:05.336000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1a.dodns.net"
+     },
+     {
+      "last_seen": "2026-07-14T15:45:05.336000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns2a.dodns.net"
+     },
+     {
+      "last_seen": "2026-07-14T15:51:55.655000",
+      "options": {
+       "expires": 3600000,
+       "hostmaster": "hostmaster.securess.de",
+       "minttl": 172800,
+       "refresh": 86400,
+       "retry": 10800,
+       "serial": 2024051333,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1.securess.de"
+     },
+     {
+      "last_seen": "2026-07-14T15:49:59.444000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=U3IOkpP0AUAkRYbjCJsqVjNTuQTThTLXXZfTlJQ2voU"
+     },
+     {
+      "last_seen": "2026-07-14T15:49:59.444000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "swisssign-check=GCUOCgTrAwxkj1omoqR40kQDlQQ"
+     },
+     {
+      "last_seen": "2026-07-14T15:49:59.444000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all"
+     },
+     {
+      "last_seen": "2026-07-14T15:49:59.431000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1; p=reject; rua=mailto:administrator@securess.de; ruf=mailto:administrator@securess.de;"
+     },
+     {
+      "last_seen": "2026-07-19T00:30:11.596000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "autodiscover",
+      "type": "CNAME",
+      "value": "owa.securess.de"
+     },
+     {
+      "last_seen": "2026-07-19T00:30:11.555000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "connect",
+      "type": "A",
+      "value": "212.227.60.78"
+     },
+     {
+      "last_seen": "2026-07-19T00:30:11.580000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "mailin",
+      "type": "A",
+      "value": "85.22.47.39"
+     },
+     {
+      "last_seen": "2026-07-19T14:05:17.108000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "owa",
+      "type": "A",
+      "value": "85.22.47.43"
+     },
+     {
+      "last_seen": "2026-07-19T00:30:11.547000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "partner",
+      "type": "A",
+      "value": "212.227.60.78"
+     },
+     {
+      "last_seen": "2026-07-19T00:30:11.580000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "portal",
+      "type": "A",
+      "value": "85.22.47.40"
+     },
+     {
+      "last_seen": "2026-07-19T00:30:11.605000",
+      "options": {
+       "ttl": 299
+      },
+      "subdomain": "vermittler",
+      "type": "A",
+      "value": "212.227.60.78"
+     },
+     {
+      "last_seen": "2026-07-19T00:30:11.512000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "webmail",
+      "type": "A",
+      "value": "85.22.47.39"
+     },
+     {
+      "last_seen": "2026-07-19T00:30:11.580000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "85.22.47.41"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "autodiscover",
+     "connect",
+     "mailin",
+     "owa",
+     "partner",
+     "portal",
+     "vermittler",
+     "webmail",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 58,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 2,
+      "crtsh": 0,
+      "gobuster_dns": 23,
+      "phase0a_passive": 34,
+      "subfinder": 10
+     },
+     "tools_with_zero_results": [
+      "crtsh"
+     ],
+     "total_subdomains": 58
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": "v=DMARC1; p=reject; rua=mailto:administrator@securess.de; ruf=mailto:administrator@securess.de;",
+     "mx": [
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx04.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns2a.dodns.net",
+      "ns1a.dodns.net"
+     ],
+     "spf": "v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all",
+     "zone_transfer": false
+    },
+    "domain": "securess.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain securess.de + www.securess.de; kritische Perimeter-Hosts trotz has_web=false (Port 80/443 in Shodan bekannt, Web-Probe möglicherweise unzuverlässig).",
+      "fqdns": [
+       "securess.de",
+       "www.securess.de",
+       "ftp.securess.de"
+      ],
+      "ip": "85.22.47.41",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-47-41.ip.dokom21.de",
+      "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__securess.de.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "securess.de",
+        "is_primary": true,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx/1.22.1",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "www.securess.de",
+        "is_primary": false,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__www.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx/1.22.1",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "ftp.securess.de",
+        "is_primary": false,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__ftp.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx/1.22.1",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Mailserver-Cluster (mx1, imap, webmail, mailcleaner); DMARC/SPF korrekt konfiguriert, aber Mailserver müssen gescannt werden (Port-Scan + testssl).",
+      "fqdns": [
+       "mailcleaner.securess.de",
+       "mailin.securess.de",
+       "mailout.securess.de",
+       "mailstore.securess.de",
+       "mx1.securess.de",
+       "imap.securess.de",
+       "webmail.securess.de"
+      ],
+      "ip": "85.22.47.39",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-47-39.ip.dokom21.de",
+      "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailcleaner.securess.de.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "mailcleaner.securess.de",
+        "is_primary": true,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailcleaner.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Roundcube auf Apache httpd/2.4.67",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "mailin.securess.de",
+        "is_primary": false,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailin.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Roundcube auf Apache httpd/2.4.67",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "mailout.securess.de",
+        "is_primary": false,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailout.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Roundcube auf Apache httpd/2.4.67",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "mx1.securess.de",
+        "is_primary": false,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mx1.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Roundcube auf Apache httpd/2.4.67",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Partner-/Connect-Portal mit Apache httpd auf 80/443 + Postfix SMTP + SSH; exponierte Management-Ports (22, 25, 465, 8443) und Mail-Services erfordern Sicherheitsprüfung.",
+      "fqdns": [
+       "connect.securess.de",
+       "partner.securess.de",
+       "vermittler.securess.de"
+      ],
+      "ip": "212.227.60.78",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        18018,
+        995,
+        106,
+        8880,
+        110,
+        143,
+        80,
+        465,
+        21,
+        22,
+        8443,
+        25,
+        443
+       ],
+       "shodan_services": {
+        "22": "OpenSSH 9.6p1 Ubuntu 3ubuntu13.16",
+        "25": "Postfix smtpd",
+        "443": "Apache httpd",
+        "465": "Postfix smtpd",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__connect.securess.de.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "connect.securess.de",
+        "is_primary": true,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__connect.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "TYPO3 auf Apache httpd",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "partner.securess.de",
+        "is_primary": false,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__partner.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "TYPO3 auf Apache httpd",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "vermittler.securess.de",
+        "is_primary": false,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__vermittler.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "TYPO3 auf Apache httpd",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Portal + SSI Subdomains deuten auf Web-Anwendungen hin; trotz has_web=false scannen (Port-Scan + testssl zur Verifizierung).",
+      "fqdns": [
+       "apache01.securess.de",
+       "portal.securess.de",
+       "ssi.securess.de"
+      ],
+      "ip": "85.22.47.40",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "ESET + OpenOTP (Security-Tools) auf Port 443 mit Apache; Sicherheits-relevante Systeme erfordern Scan.",
+      "fqdns": [
+       "eset.securess.de",
+       "openotp.securess.de"
+      ],
+      "ip": "85.22.47.38",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-47-38.ip.dokom21.de",
+      "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__eset.securess.de.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "eset.securess.de",
+        "is_primary": true,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__eset.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Apache httpd",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "openotp.securess.de",
+        "is_primary": false,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__openotp.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Apache httpd",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "fqdns": [
+       "owa.securess.de",
+       "autodiscover.securess.de"
+      ],
+      "ip": "85.22.47.43",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {
+        "443": "Outlook Web App"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Kundenportal-Login (login-kundenportal.securess.de) mit Port 80/443; kritische Web-Anwendung für Perimeter-Scan.",
+      "fqdns": [
+       "login-kundenportal.securess.de"
+      ],
+      "ip": "51.116.154.224",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/51.116.154.224__login-kundenportal.securess.de.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "login-kundenportal.securess.de",
+        "is_primary": true,
+        "screenshot_minio_key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/51.116.154.224__login-kundenportal.securess.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Webseite",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "VPN-Gateway (vpn01.securess.de); kritische Infrastruktur erfordert Port-Scan + testssl zur Sicherheitsverifizierung.",
+      "fqdns": [
+       "vpn01.securess.de"
+      ],
+      "ip": "85.22.47.36",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "STARFACE PBX (VoIP-System) auf Port 5060 + HTTP/HTTPS; spezialisiertes System mit bekanntem Service erfordert Sicherheitsprüfung.",
+      "fqdns": [
+       "starface.securess.de"
+      ],
+      "ip": "85.22.47.42",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443,
+        5060
+       ],
+       "shodan_services": {
+        "5060": "STARFACE PBX"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-47-42.ip.dokom21.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "SMA-Host (wahrscheinlich Monitoring/Management); ohne Shodan-Daten, aber als benannter Host scannen (Port-Scan).",
+      "fqdns": [
+       "sma.securess.de"
+      ],
+      "ip": "85.22.47.45",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-47-45.ip.dokom21.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "RD Gateway mit Microsoft IIS 10.0 auf Port 443; Remote-Access-Gateway ist kritische Infrastruktur und erfordert vollständigen Sicherheitsscan.",
+      "fqdns": [
+       "rdgw.securess.de"
+      ],
+      "ip": "85.22.47.46",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {
+        "443": "Microsoft IIS httpd 10.0"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "RD Gateway 2016 (Legacy-System); ältere RDP-Gateway-Version erfordert Sicherheitsprüfung (Port-Scan + testssl).",
+      "fqdns": [
+       "rdgw-2016.securess.de"
+      ],
+      "ip": "85.22.47.47",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-47-47.ip.dokom21.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 12,
+   "hostsTotal": 12,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 1,
+   "INFO": 4,
+   "LOW": 3,
+   "MEDIUM": 4
+  },
+  "startedAt": "2026-07-19T21:05:03.446Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 2,
+   "errors": [
+    {
+     "check": "tech_table",
+     "detail": {
+      "blacklisted_token": "httpapi",
+      "host_ip": "85.22.47.46",
+      "tech_name": "Microsoft HTTPAPI httpd"
+     },
+     "finding_id": null,
+     "message": "Tech-Tabelle enthaelt Kernel-/Internal-Detection: 'Microsoft HTTPAPI httpd'",
+     "severity": "error"
+    },
+    {
+     "check": "tech_table",
+     "detail": {
+      "blacklisted_token": "httpapi",
+      "host_ip": "85.22.47.46",
+      "tech_name": "Microsoft HTTPAPI httpd"
+     },
+     "finding_id": null,
+     "message": "Tech-Tabelle enthaelt Kernel-/Internal-Detection: 'Microsoft HTTPAPI httpd'",
+     "severity": "error"
+    }
+   ],
+   "level": "warn",
+   "passed": false,
+   "warning_count": 6,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "03116"
+      ],
+      "title": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf rdgw.securess.de"
+     },
+     "finding_id": "VS-2026-001",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['03116']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "03116",
+       "4"
+      ],
+      "title": "Veraltete 3DES/IDEA Cipher-Suites auf eset.securess.de / openotp.securess.de (BSI TR-03116-4 Verstoß)"
+     },
+     "finding_id": "VS-2026-003",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['03116', '4']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "12"
+      ],
+      "title": "Übermäßige Port-Exposition auf Partnerportal 212.227.60.78 (12 offene Ports, u.a. FTP, POP3/IMAP im Klartext, Plesk-Admin)"
+     },
+     "finding_id": "VS-2026-002",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['12']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "2016"
+      ],
+      "title": "Zusätzliche, im Scan nicht adressierte Management-Dienste: STARFACE PBX (SIP 5060), OWA, RD-Gateway 2016, VPN-Gateway"
+     },
+     "finding_id": "VS-2026-004",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['2016']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "8460"
+      ],
+      "title": "TLS-RPT (RFC 8460) fehlt fuer securess.de"
+     },
+     "finding_id": "VS-2026-006",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['8460']",
+     "severity": "warning"
+    },
+    {
+     "check": "cvss",
+     "detail": {
+      "computed": 7.3,
+      "cvss_score": 5.3,
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L"
+     },
+     "finding_id": "VS-2026-002",
+     "message": "CVSS-Score 5.3 weicht von Vektor-berechnetem Base-Score 7.3 ab — Admin-Review (Override-UI)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

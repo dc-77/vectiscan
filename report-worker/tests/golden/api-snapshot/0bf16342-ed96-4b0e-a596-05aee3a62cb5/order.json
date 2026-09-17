@@ -1,0 +1,811 @@
+{
+ "data": {
+  "businessImpactScore": 5,
+  "correlationCount": 127,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "multi-target (2)",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-08-31T14:41:05.242Z",
+  "hasReport": true,
+  "id": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": false,
+     "fo": null,
+     "issues": [],
+     "p": null,
+     "pct": 100,
+     "raw": null,
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/junkerwerk.de",
+     "domain": "junkerwerk.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/junkerwerk.de"
+    }
+   },
+   "passive_subdomains": [
+    "autodiscover.junkerwerk.de",
+    "chat.junkerwerk.de",
+    "cloud.junkerwerk.de",
+    "mail.junkerwerk.de",
+    "nachhaltigkeit.junkerwerk.de",
+    "openotp.junkerwerk.de",
+    "outlook.junkerwerk.de",
+    "rdgw-2016.junkerwerk.de",
+    "rdgw.junkerwerk.de",
+    "team.junkerwerk.de",
+    "ticket.junkerwerk.de",
+    "www.junkerwerk.de"
+   ],
+   "securitytrails": {
+    "dns_history": [
+     {
+      "first_seen": "2025-08-07",
+      "last_seen": "2026-08-31",
+      "type": "a",
+      "values": [
+       "188.40.3.130"
+      ]
+     },
+     {
+      "first_seen": "2017-09-29",
+      "last_seen": "2025-08-07",
+      "type": "a",
+      "values": [
+       "81.169.140.206"
+      ]
+     }
+    ],
+    "domain": {
+     "a_records": [
+      "188.40.3.130"
+     ],
+     "alexa_rank": null,
+     "domain": "junkerwerk.de",
+     "hostname": "junkerwerk.de",
+     "mx_records": [
+      "junkerwerk-solingen.de"
+     ],
+     "ns_records": [
+      "ns.udag.org",
+      "ns.udag.net",
+      "ns.udag.de"
+     ],
+     "txt_records": [
+      "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all"
+     ]
+    },
+    "subdomains": [
+     "cloud.junkerwerk.de",
+     "mail.junkerwerk.de",
+     "www.junkerwerk.de",
+     "rdgw-2016.junkerwerk.de",
+     "chat.junkerwerk.de",
+     "outlook.junkerwerk.de",
+     "nachhaltigkeit.junkerwerk.de",
+     "team.junkerwerk.de",
+     "openotp.junkerwerk.de",
+     "ticket.junkerwerk.de",
+     "autodiscover.junkerwerk.de",
+     "rdgw.junkerwerk.de"
+    ]
+   },
+   "shodan_domain": {
+    "domain": "junkerwerk.de",
+    "records": [
+     {
+      "last_seen": "2026-08-26T18:17:50.331000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "188.40.3.130"
+     },
+     {
+      "last_seen": "2026-08-26T11:35:43.556000",
+      "options": {
+       "priority": 10,
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-26T11:35:43.556000",
+      "options": {
+       "priority": 20,
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-26T11:35:43.556000",
+      "options": {
+       "priority": 30,
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-26T11:35:43.556000",
+      "options": {
+       "priority": 40,
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-26T11:35:05.107000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.de"
+     },
+     {
+      "last_seen": "2026-08-26T11:35:05.107000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.net"
+     },
+     {
+      "last_seen": "2026-08-26T11:35:05.107000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.org"
+     },
+     {
+      "last_seen": "2026-08-26T11:36:36.316000",
+      "options": {
+       "expires": 604800,
+       "hostmaster": "hostmaster.united-domains.de",
+       "minttl": 3600,
+       "refresh": 10800,
+       "retry": 3600,
+       "serial": 2025050677,
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns.udag.de"
+     },
+     {
+      "last_seen": "2026-08-26T11:38:25.632000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all"
+     },
+     {
+      "last_seen": "2026-08-26T18:17:50.345000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "autodiscover",
+      "type": "CNAME",
+      "value": "outlook.junkerwerk.de"
+     },
+     {
+      "last_seen": "2026-08-26T18:17:50.331000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "cloud",
+      "type": "A",
+      "value": "217.243.248.29"
+     },
+     {
+      "last_seen": "2026-08-26T18:17:50.145000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "nachhaltigkeit",
+      "type": "A",
+      "value": "188.40.3.130"
+     },
+     {
+      "last_seen": "2026-08-27T23:58:15.261000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "nachhaltigkeit",
+      "type": "AAAA",
+      "value": "2a01:4f8:d0a:3124::2"
+     },
+     {
+      "last_seen": "2026-08-26T18:17:50.345000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "outlook",
+      "type": "A",
+      "value": "217.243.248.28"
+     },
+     {
+      "last_seen": "2026-08-26T18:17:50.363000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "team",
+      "type": "A",
+      "value": "217.243.248.29"
+     },
+     {
+      "last_seen": "2026-08-26T18:17:50.363000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "188.40.3.130"
+     }
+    ],
+    "subdomains": [
+     "autodiscover",
+     "cloud",
+     "nachhaltigkeit",
+     "outlook",
+     "team",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 16,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 3,
+      "crtsh": 0,
+      "gobuster_dns": 3,
+      "phase0a_passive": 12,
+      "subfinder": 4
+     },
+     "tools_with_zero_results": [
+      "crtsh"
+     ],
+     "total_subdomains": 16
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": null,
+     "mx": [
+      "mx01.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx04.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns.udag.org",
+      "ns.udag.net",
+      "ns.udag.de"
+     ],
+     "spf": "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all",
+     "zone_transfer": false
+    },
+    "domain": "junkerwerk.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain junkerwerk.de mit primärem VHost www.junkerwerk.de (200, produktive Website). Zusätzlich nachhaltigkeit.junkerwerk.de mit 403-Status (primärer VHost, nicht skip). Exposed Datenbank-Ports (3306 MariaDB, 5432 PostgreSQL) und FTP (21) aus Shodan → kritisch für Perimeter-Scan.",
+      "fqdns": [
+       "junkerwerk.de",
+       "www.junkerwerk.de",
+       "nachhaltigkeit.junkerwerk.de"
+      ],
+      "ip": "188.40.3.130",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        3306,
+        587,
+        110,
+        143,
+        80,
+        21,
+        5432,
+        443
+       ],
+       "shodan_services": {
+        "3306": "MariaDB 10.11.18-MariaDB-0+deb12u1",
+        "443": "Apache httpd",
+        "5432": "PostgreSQL 9.6.0 or later",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "dedi2230.your-server.de",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "junkerwerk.de",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "2434c244a701938f40ebac3af041260fbb42fc056d2c4c3c380800fd7ec76781",
+        "final_url": "https://www.junkerwerk.de",
+        "fqdn": "www.junkerwerk.de",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Unternehmenswebsite für Schaumstoffverarbeitung mit Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Home  - Junkerwerk - Schaumstoffverarbeitung"
+       },
+       {
+        "aliases": [],
+        "body_hash": "1c7411fd3cf1caddd079022a5352368555fcb0b5417edcd5ff49ef2b38940de9",
+        "final_url": "https://nachhaltigkeit.junkerwerk.de",
+        "fqdn": "nachhaltigkeit.junkerwerk.de",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 403 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 403,
+        "title": "403 Forbidden"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.junkerwerk.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Home  - Junkerwerk - Schaumstoffverarbeitung",
+       "web_fqdn": "www.junkerwerk.de"
+      }
+     },
+     {
+      "_reasoning": "Cloud/RDP-Gateway mit IIS 10.0 (cloud.junkerwerk.de, 200). Vier FQDNs (cloud, rdgw, rdgw-2016, team) alle auf gleichen Content → Management-kritischer Host. Ports 443 und 8443 mit IIS.",
+      "fqdns": [
+       "cloud.junkerwerk.de",
+       "rdgw-2016.junkerwerk.de",
+       "rdgw.junkerwerk.de",
+       "team.junkerwerk.de"
+      ],
+      "ip": "217.243.248.29",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443,
+        8443
+       ],
+       "shodan_services": {
+        "443": "Microsoft IIS httpd 10.0",
+        "8443": "Microsoft IIS httpd 10.0"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.29__cloud.junkerwerk.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "rdgw-2016.junkerwerk.de",
+          "reason": "body-hash-dup",
+          "status": 200
+         },
+         {
+          "fqdn": "rdgw.junkerwerk.de",
+          "reason": "body-hash-dup",
+          "status": 200
+         },
+         {
+          "fqdn": "team.junkerwerk.de",
+          "reason": "body-hash-dup",
+          "status": 200
+         }
+        ],
+        "body_hash": "557b5e9015b4963a130c7039e077b3ec0306d401b6ee13d631721d5d969d2917",
+        "final_url": "https://cloud.junkerwerk.de",
+        "fqdn": "cloud.junkerwerk.de",
+        "is_primary": true,
+        "screenshot_minio_key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.29__cloud.junkerwerk.de.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "Default-Page von Microsoft IIS httpd/10.0 — keine produktive Anwendung",
+         "is_real_content": false
+        },
+        "status": 200,
+        "title": "IIS Windows Server"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://cloud.junkerwerk.de",
+       "has_web": true,
+       "status": 200,
+       "title": "IIS Windows Server",
+       "web_fqdn": "cloud.junkerwerk.de"
+      }
+     },
+     {
+      "_reasoning": "Exchange/Outlook-Mailserver (mail.junkerwerk.de, outlook.junkerwerk.de, autodiscover.junkerwerk.de alle 200). Drei primäre VHosts mit unterschiedlichen Body-Hashes → echte Mailserver-Instanzen. SonicWall auf Port 4433 erkannt. DMARC fehlt (nur SPF vorhanden) → Mailserver-Scan notwendig.",
+      "fqdns": [
+       "outlook.junkerwerk.de",
+       "autodiscover.junkerwerk.de",
+       "mail.junkerwerk.de"
+      ],
+      "ip": "217.243.248.28",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        25,
+        4433
+       ],
+       "shodan_services": {
+        "4433": "SonicWall"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "junkerwerk-solingen.de",
+      "screenshot_minio_key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__mail.junkerwerk.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "cec01d121c42a98915a96794761c7a45cec8fd525ad176178b1a50c4d63ddc58",
+        "final_url": "https://mail.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.junkerwerk.de%2fowa%2f&reason=0",
+        "fqdn": "mail.junkerwerk.de",
+        "is_primary": true,
+        "screenshot_minio_key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__mail.junkerwerk.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Exchange 2016 Mailserver für Unternehmenskommunikation.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       },
+       {
+        "aliases": [],
+        "body_hash": "06ba3eb59b7465221a30c273cd94360619f7ebd014aed96ee5f76a77c014c5a4",
+        "final_url": "https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0",
+        "fqdn": "outlook.junkerwerk.de",
+        "is_primary": true,
+        "screenshot_minio_key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__outlook.junkerwerk.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Exchange 2016 Webzugriff auf Unternehmenspostfächer.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       },
+       {
+        "aliases": [],
+        "body_hash": "ac1bdc68ee9f81dbdc5b90fa5bdd03c3c19ea0f9f7ab62b39a3a4ac7bb29fb0a",
+        "final_url": "https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0",
+        "fqdn": "autodiscover.junkerwerk.de",
+        "is_primary": true,
+        "screenshot_minio_key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__autodiscover.junkerwerk.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Exchange 2016 Autodiscovery-Service für E-Mail-Konfiguration.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://mail.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.junkerwerk.de%2fowa%2f&reason=0",
+       "has_web": true,
+       "status": 200,
+       "title": "Outlook",
+       "web_fqdn": "mail.junkerwerk.de"
+      }
+     },
+     {
+      "_reasoning": "ticket.junkerwerk.de ohne Web-Content (has_web=false) → Port-Scan mit nmap + testssl ausreichend zur Identifikation des Service.",
+      "fqdns": [
+       "ticket.junkerwerk.de"
+      ],
+      "ip": "217.243.248.27",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "OpenOTP Web Applications Portal (openotp.junkerwerk.de, 200) mit produktivem Content. Exim SMTP 4.96 auf Port 25 und Apache auf 443 → kritische Authentifizierungs-/Portal-Infrastruktur.",
+      "fqdns": [
+       "openotp.junkerwerk.de"
+      ],
+      "ip": "217.243.248.30",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        25,
+        443
+       ],
+       "shodan_services": {
+        "25": "Exim smtpd 4.96",
+        "443": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.30__openotp.junkerwerk.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "66de10c312faf09835072ee2758f02bc5355fb8ebfff736e9cffe5f556b20ba4",
+        "final_url": "https://openotp.junkerwerk.de",
+        "fqdn": "openotp.junkerwerk.de",
+        "is_primary": true,
+        "screenshot_minio_key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.30__openotp.junkerwerk.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Web-Anwendungsportal mit Apache httpd für Unternehmensanwendungen.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://openotp.junkerwerk.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal",
+       "web_fqdn": "openotp.junkerwerk.de"
+      }
+     },
+     {
+      "_reasoning": "IPv6-Host mit nachhaltigkeit.junkerwerk.de (403-Status, primärer VHost). Gleiche rDNS wie 188.40.3.130 (dedi2230.your-server.de) → wahrscheinlich gleicher Server, aber IPv6-Stack separat scannen. 403 ist kein Skip-Grund (primärer VHost mit Status).",
+      "fqdns": [
+       "nachhaltigkeit.junkerwerk.de"
+      ],
+      "ip": "2a01:4f8:d0a:3124::2",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "dedi2230.your-server.de",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "1c7411fd3cf1caddd079022a5352368555fcb0b5417edcd5ff49ef2b38940de9",
+        "final_url": "https://nachhaltigkeit.junkerwerk.de",
+        "fqdn": "nachhaltigkeit.junkerwerk.de",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 403 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 403,
+        "title": "403 Forbidden"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://nachhaltigkeit.junkerwerk.de",
+       "has_web": true,
+       "status": 403,
+       "title": "403 Forbidden",
+       "web_fqdn": "nachhaltigkeit.junkerwerk.de"
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 6,
+   "hostsTotal": 6,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 3,
+   "INFO": 4,
+   "LOW": 3,
+   "MEDIUM": 4
+  },
+  "startedAt": "2026-08-31T14:10:43.837Z",
+  "status": "pending_review",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 1,
+   "errors": [
+    {
+     "check": "titles",
+     "detail": {
+      "duplicate_title": "anti-csrf-token fehlt auf login-formular openotp.junkerwerk.de",
+      "finding_ids": [
+       "VS-2026-012",
+       "VS-2026-014"
+      ]
+     },
+     "finding_id": null,
+     "message": "2 Findings teilen denselben Title",
+     "severity": "error"
+    }
+   ],
+   "level": "warn",
+   "passed": false,
+   "warning_count": 3,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "2016"
+      ],
+      "title": "Microsoft Exchange 2016 ist End-of-Life auf mail.junkerwerk.de [Hinweis: exchange wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]"
+     },
+     "finding_id": "VS-2026-001",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['2016']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "03116"
+      ],
+      "title": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf cloud.junkerwerk.de"
+     },
+     "finding_id": "VS-2026-002",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['03116']",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "DKIM",
+      "title": "SPF-Record fehlt fuer junkerwerk.de",
+      "title_token": "SPF"
+     },
+     "finding_id": "VS-2026-006",
+     "message": "Title nennt SPF, Body beschreibt DKIM (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

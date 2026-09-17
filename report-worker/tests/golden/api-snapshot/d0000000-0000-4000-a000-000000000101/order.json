@@ -1,0 +1,48 @@
+{
+ "data": {
+  "businessImpactScore": null,
+  "correlationCount": 0,
+  "customerId": "d0000000-0000-4000-a000-000000000001",
+  "domain": "demo-shop.vectiscan-demo.test",
+  "error": null,
+  "estimatedDuration": "~15–20 Minuten",
+  "finishedAt": "2026-05-18T09:20:00.000Z",
+  "hasReport": true,
+  "id": "d0000000-0000-4000-a000-000000000101",
+  "isRescan": false,
+  "overallRisk": "MEDIUM",
+  "package": "webcheck",
+  "passiveIntelSummary": null,
+  "progress": {
+   "currentHost": null,
+   "currentTool": null,
+   "discoveredHosts": [
+    {
+     "fqdns": [
+      "demo-shop.vectiscan-demo.test",
+      "www.demo-shop.vectiscan-demo.test"
+     ],
+     "ip": "203.0.113.10",
+     "status": "scanned"
+    }
+   ],
+   "hostsCompleted": 1,
+   "hostsTotal": 1,
+   "lastCompletedTool": null,
+   "phase": null,
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 0,
+   "LOW": 2,
+   "MEDIUM": 4
+  },
+  "startedAt": "2026-05-18T08:50:00.000Z",
+  "status": "report_complete",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}

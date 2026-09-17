@@ -440,7 +440,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-6">
           <p className="text-[10px] text-center uppercase tracking-widest mb-6" style={{ color: C.muted }}>Standards &amp; Technologie</p>
           <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-8 gap-y-3">
-            {['OWASP ZAP', 'Nmap', 'Nuclei', 'testssl.sh', 'Claude AI', 'BSI TR-03116-4'].map(t =>
+            {['OWASP ZAP', 'Nmap', 'testssl.sh', 'Claude AI', 'BSI TR-03116-4'].map(t =>
               <span key={t} className="text-xs font-light" style={{ color: `${C.muted}90` }}>{t}</span>)}
           </div>
           <p className="text-center mt-6 text-xs font-light" style={{ color: C.muted }}>Made in Germany — Entwicklung und Hosting in Deutschland</p>

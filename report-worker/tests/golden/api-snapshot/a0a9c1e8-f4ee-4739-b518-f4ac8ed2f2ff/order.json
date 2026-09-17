@@ -1,0 +1,659 @@
+{
+ "data": {
+  "businessImpactScore": 5.5,
+  "correlationCount": 132,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "mc-2europe.com",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-07-16T16:33:27.693Z",
+  "hasReport": true,
+  "id": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": false,
+     "fo": null,
+     "issues": [],
+     "p": null,
+     "pct": 100,
+     "raw": null,
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/mc-2europe.com",
+     "domain": "mc-2europe.com",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/mc-2europe.com"
+    }
+   },
+   "passive_subdomains": [
+    "kunden.mc-2europe.com",
+    "mail.mc-2europe.com",
+    "nextcloud.mc-2europe.com",
+    "work4all.mc-2europe.com",
+    "www.mc-2europe.com",
+    "www.messe.mc-2europe.com"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "mc-2europe.com",
+    "records": [
+     {
+      "last_seen": "2026-06-18T11:48:02.546000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "144.76.255.130"
+     },
+     {
+      "last_seen": "2026-06-18T09:18:37.346000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-06-18T09:18:37.346000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-06-18T09:18:37.346000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-06-18T09:18:37.346000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-06-18T09:17:26.820000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1a.dodns.net"
+     },
+     {
+      "last_seen": "2026-06-18T09:17:26.820000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns2a.dodns.net"
+     },
+     {
+      "last_seen": "2026-06-18T09:19:59.684000",
+      "options": {
+       "expires": 3600000,
+       "hostmaster": "hostmaster.mc-2europe.com",
+       "minttl": 172800,
+       "refresh": 86400,
+       "retry": 10800,
+       "serial": 2024061512,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1.mc-2europe.com"
+     },
+     {
+      "last_seen": "2026-06-18T09:18:18.382000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=ms41402925"
+     },
+     {
+      "last_seen": "2026-06-18T09:18:18.382000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "facebook-domain-verification=xbw4hsu09wl6kqkcr1fsw695cigfua"
+     },
+     {
+      "last_seen": "2026-06-18T09:18:18.382000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 mx a ip4:62.159.230.43 ip4:144.76.255.130 include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-eu.emailsignatures365.com ~all"
+     },
+     {
+      "last_seen": "2026-06-18T11:48:02.517000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "kunden",
+      "type": "A",
+      "value": "62.159.230.44"
+     },
+     {
+      "last_seen": "2026-06-18T11:48:02.550000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "mail",
+      "type": "A",
+      "value": "62.159.230.43"
+     },
+     {
+      "last_seen": "2026-06-18T11:48:02.546000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "nextcloud",
+      "type": "A",
+      "value": "62.159.230.44"
+     },
+     {
+      "last_seen": "2026-06-18T11:48:02.517000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "work4all",
+      "type": "A",
+      "value": "62.159.230.44"
+     },
+     {
+      "last_seen": "2026-06-18T11:48:02.517000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "144.76.255.130"
+     },
+     {
+      "last_seen": "2026-06-18T11:48:02.575000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "www.messe",
+      "type": "CNAME",
+      "value": "cdn.webflow.com"
+     }
+    ],
+    "subdomains": [
+     "kunden",
+     "mail",
+     "nextcloud",
+     "work4all",
+     "www",
+     "www.messe"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 12,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 3,
+      "crtsh": 1,
+      "gobuster_dns": 5,
+      "phase0a_passive": 6,
+      "subfinder": 5
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 12
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": null,
+     "mx": [
+      "mx02.hornetsecurity.com",
+      "mx01.hornetsecurity.com",
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns1a.dodns.net",
+      "ns2a.dodns.net"
+     ],
+     "spf": "v=spf1 mx a ip4:62.159.230.43 ip4:144.76.255.130 include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-eu.emailsignatures365.com ~all",
+     "zone_transfer": false
+    },
+    "domain": "mc-2europe.com",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain mit primärem Web-Content (200, CMS), exponierte Management-Ports (FTP 21, SSH 22, MySQL 3306) und Mail-Services (SMTP, IMAP, POP3) aus Shodan → kritische Infrastruktur, höchste Priorität.",
+      "fqdns": [
+       "mc-2europe.com",
+       "www.mc-2europe.com"
+      ],
+      "ip": "144.76.255.130",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        8081,
+        3306,
+        587,
+        110,
+        143,
+        80,
+        465,
+        21,
+        22,
+        25,
+        443
+       ],
+       "shodan_services": {
+        "21": "Pure-FTPd",
+        "22": "OpenSSH 9.2p1 Debian 2+deb12u10",
+        "25": "Postfix smtpd",
+        "3306": "MariaDB 10.11.17-MariaDB-deb12",
+        "443": "nginx",
+        "465": "Postfix smtpd",
+        "587": "Postfix smtpd",
+        "80": "nginx",
+        "8081": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "k56w51.meinserver.io",
+      "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/144.76.255.130__www.mc-2europe.com.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "mc-2europe.com",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "0fef46b0ae617aa115c7e74e81aece54ab10524a2e649ead72318dd1d97c2c1e",
+        "final_url": "https://www.mc-2europe.com/de",
+        "fqdn": "www.mc-2europe.com",
+        "is_primary": true,
+        "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/144.76.255.130__www.mc-2europe.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Brand-Experience-Lösungsanbieter mit nginx-Webserver.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Brand Experience Solutions – MC² Europe GmbH"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.mc-2europe.com/de",
+       "has_web": true,
+       "status": 200,
+       "title": "Brand Experience Solutions – MC² Europe GmbH",
+       "web_fqdn": "www.mc-2europe.com"
+      }
+     },
+     {
+      "_reasoning": "Nextcloud-Instanzen (kunden.mc-2europe.com, nextcloud.mc-2europe.com) mit Login-Seiten (200) → geschäftskritische Collaboration-Plattform, höchste Priorität.",
+      "fqdns": [
+       "kunden.mc-2europe.com",
+       "nextcloud.mc-2europe.com",
+       "work4all.mc-2europe.com"
+      ],
+      "ip": "62.159.230.44",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {
+        "443": "Nextcloud",
+        "80": "Apache httpd 2.4.66"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/62.159.230.44__kunden.mc-2europe.com.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "f7ae439fd876ac320f2bb1586c012791641384b2fe0c6192cc537b106e7490ce",
+        "final_url": "https://kunden.mc-2europe.com/index.php/login",
+        "fqdn": "kunden.mc-2europe.com",
+        "is_primary": true,
+        "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/62.159.230.44__kunden.mc-2europe.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Nextcloud-Dateifreigabe auf Apache httpd für MC² Europe.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Anmelden – MC² Europe cloud"
+       },
+       {
+        "aliases": [
+         {
+          "fqdn": "work4all.mc-2europe.com",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "cf8c6f86b6651bb06005e45a17aa20045c2f02ab9704f577373308bd0f02d266",
+        "final_url": "https://nextcloud.mc-2europe.com/index.php/login",
+        "fqdn": "nextcloud.mc-2europe.com",
+        "is_primary": true,
+        "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/62.159.230.44__nextcloud.mc-2europe.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Nextcloud-Dateifreigabe auf Apache httpd für MC² Europe.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Anmelden – MC² Europe cloud"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://kunden.mc-2europe.com/index.php/login",
+       "has_web": true,
+       "status": 200,
+       "title": "Anmelden – MC² Europe cloud",
+       "web_fqdn": "kunden.mc-2europe.com"
+      }
+     },
+     {
+      "_reasoning": "CloudFlare-Edge mit 404-Response und erhöhtem AbuseIPDB-Score (40) → mögliche WAF/Proxy-Konfiguration, scannen mit niedriger Priorität zur Überprüfung der Sicherheitsstellung.",
+      "fqdns": [
+       "www.messe.mc-2europe.com"
+      ],
+      "ip": "198.202.211.1",
+      "passive_intel": {
+       "abuseipdb_score": 40,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        8080,
+        2082,
+        2083,
+        2052,
+        2053,
+        2086,
+        2087,
+        2095,
+        80,
+        8880,
+        8443,
+        443
+       ],
+       "shodan_services": {
+        "443": "CloudFlare",
+        "80": "CloudFlare",
+        "8443": "CloudFlare"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/198.202.211.1__www.messe.mc-2europe.com.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "90c032f35272ba1a7aa93027ab635e6610d4f24cf9e53c0624d00f065d7c7e7d",
+        "final_url": "https://www.messe.mc-2europe.com",
+        "fqdn": "www.messe.mc-2europe.com",
+        "is_primary": true,
+        "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/198.202.211.1__www.messe.mc-2europe.com.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 404 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 404,
+        "title": "404 - Page not found"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.messe.mc-2europe.com",
+       "has_web": true,
+       "status": 404,
+       "title": "404 - Page not found",
+       "web_fqdn": "www.messe.mc-2europe.com"
+      }
+     },
+     {
+      "_reasoning": "Microsoft Exchange/Outlook Web App (200) mit SMTP-Service → Mailserver mit Web-Interface, scannen zur Überprüfung auf bekannte Exchange-Schwachstellen und fehlender DMARC.",
+      "fqdns": [
+       "mail.mc-2europe.com"
+      ],
+      "ip": "62.159.230.43",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        25,
+        443,
+        8443
+       ],
+       "shodan_services": {
+        "25": "Microsoft Exchange smtpd",
+        "443": "Outlook Web App",
+        "8443": "Microsoft IIS httpd 10.0"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "mail.profair.de",
+      "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/62.159.230.43__mail.mc-2europe.com.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "3dc407dcdf18d094132490487f11ae10d724113c9609c4c3ea50a67152770a5f",
+        "final_url": "https://mail.mc-2europe.com/owa/auth/logon.aspx?url=https%3a%2f%2fmail.mc-2europe.com%2fowa%2f&reason=0",
+        "fqdn": "mail.mc-2europe.com",
+        "is_primary": true,
+        "screenshot_minio_key": "a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/62.159.230.43__mail.mc-2europe.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Exchange-Mailserver auf Microsoft IIS httpd/10.0.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://mail.mc-2europe.com/owa/auth/logon.aspx?url=https%3a%2f%2fmail.mc-2europe.com%2fowa%2f&reason=0",
+       "has_web": true,
+       "status": 200,
+       "title": "Outlook",
+       "web_fqdn": "mail.mc-2europe.com"
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 4,
+   "hostsTotal": 4,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 2,
+   "INFO": 2,
+   "LOW": 5,
+   "MEDIUM": 3
+  },
+  "startedAt": "2026-06-18T20:36:44.242Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "strict",
+   "passed": true,
+   "warning_count": 4,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "03116"
+      ],
+      "title": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf kunden.mc-2europe.com"
+     },
+     "finding_id": "VS-2026-001",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['03116']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "8460"
+      ],
+      "title": "TLS-RPT (RFC 8460) fehlt fuer mc-2europe.com"
+     },
+     "finding_id": "VS-2026-009",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['8460']",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "finding_version": "10.11.18",
+      "software": "MariaDB",
+      "tech_version": "10.11.17-MariaDB-deb12"
+     },
+     "finding_id": "VS-2026-002",
+     "message": "Versionskonflikt MariaDB: Finding nennt 10.11.18, Tech-Tabelle hat 10.11.17-MariaDB-deb12",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "DKIM",
+      "title": "SPF-Record fehlt fuer mc-2europe.com",
+      "title_token": "SPF"
+     },
+     "finding_id": "VS-2026-004",
+     "message": "Title nennt SPF, Body beschreibt DKIM (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

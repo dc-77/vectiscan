@@ -1,0 +1,379 @@
+{
+ "source": "report-prototype/build/report_data.py (Stand 17.09.2026)",
+ "report_id": "VS-JW-2026-0831",
+ "customer": "Junkerwerk Linder GmbH & Co. KG",
+ "domains": [
+  "junkerwerk.de",
+  "junkerwerk.hu"
+ ],
+ "package": "perimeter",
+ "order_ids": [
+  "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
+  "2572eebc-6135-40e6-b1d2-e9dfccc20ae6",
+  "a6df9d9d-eccd-49d1-8dd3-b00a5e005108"
+ ],
+ "hinweis_family": "family und families stammen aus dem Vokabular von report-prototype/build/catalog_sim.py apply_rules; Namen ohne Vorbild dort sind im Generator markiert. affected der Positivbefunde ist null, weil die Quelle keines fuehrt.",
+ "hinweis_positive_ids": "Positivbefunde tragen in report_data.py keine ID. VS-2026-P01 bis P08 in Quellreihenfolge vergeben.",
+ "findings": [
+  {
+   "id": "VS-2026-001",
+   "family": "db_exposed",
+   "families": [
+    "db_exposed"
+   ],
+   "cat": "A",
+   "scale": "exposure",
+   "level": "kritisch",
+   "affected": "188.40.3.130 (junkerwerk.de, junkerwerk.hu), Ports 3306 und 5432",
+   "status": "rot",
+   "urgency": "Unverzüglich",
+   "title": "Datenbankdienste MariaDB (3306) und PostgreSQL (5432) auf dem Webserver aus dem Internet erreichbar",
+   "source": "aktiv (nmap), bestätigt durch Shodan",
+   "policy": "SP-DB-001"
+  },
+  {
+   "id": "VS-2026-002",
+   "family": "admin_service_exposed",
+   "families": [
+    "admin_service_exposed"
+   ],
+   "cat": "A",
+   "scale": "hygiene",
+   "level": "hoch",
+   "affected": "217.243.248.28, Port 4433",
+   "status": "gelb",
+   "urgency": "In Kürze",
+   "title": "SonicWall-Webinterface auf Port 4433 des Exchange-Anschlusses laut Passivquelle erreichbar",
+   "source": "passiv (Shodan, 30.08.2026); vom Scanner nicht erreichbar, Port außerhalb der geprüften Top-1000",
+   "policy": "manuell (Passivquelle)"
+  },
+  {
+   "id": "VS-2026-003",
+   "family": "default_page_exposed",
+   "families": [
+    "default_page_exposed"
+   ],
+   "cat": "A",
+   "scale": "hygiene",
+   "level": "mittel",
+   "affected": "217.243.248.29 (cloud., team., rdgw., rdgw-2016.junkerwerk.de), Ports 443 und 8443",
+   "status": "gelb",
+   "urgency": "In Kürze",
+   "title": "Windows-Server hinter cloud/team/rdgw/rdgw-2016.junkerwerk.de exponiert IIS-Standardseite auf 443 und 8443",
+   "source": "aktiv (nmap, httpx, feroxbuster, Shodan)",
+   "policy": "manuell"
+  },
+  {
+   "id": "VS-2026-004",
+   "family": "software_eol",
+   "families": [
+    "software_eol"
+   ],
+   "cat": "B",
+   "scale": "hygiene",
+   "level": "mittel",
+   "affected": "217.243.248.30 (archiv.junkerwerk.de, gleicher Host wie openotp.junkerwerk.de), Port 25",
+   "status": "gelb",
+   "urgency": "In Kürze",
+   "title": "SMTP-Dienst Exim 4.96 auf archiv.junkerwerk.de laut Passivquelle erreichbar, Version ohne aktuelle Herstellerpflege",
+   "source": "passiv (Shodan, 30.08.2026); Port 25 war vom Scanner aus gefiltert",
+   "policy": "SP-EOL-001 (Passivquelle)"
+  },
+  {
+   "id": "VS-2026-005",
+   "family": "legacy_protocols_present",
+   "families": [
+    "legacy_protocols_present"
+   ],
+   "cat": "A",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "affected": "188.40.3.130, Ports 21, 110, 143",
+   "status": "blau",
+   "urgency": "Strategisch",
+   "title": "Altprotokolle FTP, POP3 und IMAP auf dem Webserver erreichbar (jeweils mit TLS-Zwang)",
+   "source": "aktiv (nmap)",
+   "policy": "manuell"
+  },
+  {
+   "id": "VS-2026-006",
+   "family": "software_lifecycle_review",
+   "families": [
+    "software_lifecycle_review"
+   ],
+   "cat": "B",
+   "scale": "hygiene",
+   "level": "mittel",
+   "affected": "217.243.248.29 (rdgw-2016.junkerwerk.de), 217.243.248.28 (Exchange Server SE)",
+   "status": "blau",
+   "urgency": "Strategisch",
+   "title": "Lifecycle-Prüfung: Windows Server 2016 (Hinweis aus Hostname) und Exchange-Updatestand",
+   "source": "Ableitung aus Hostname und OWA-Build; Versionen nicht direkt messbar",
+   "policy": "manuell"
+  },
+  {
+   "id": "VS-2026-007",
+   "family": "dmarc_missing",
+   "families": [
+    "dmarc_missing",
+    "spf_softfail"
+   ],
+   "cat": "C",
+   "scale": "hygiene",
+   "level": "hoch",
+   "affected": "DNS-Zonen junkerwerk.de und junkerwerk.hu",
+   "status": "gelb",
+   "urgency": "In Kürze",
+   "title": "DMARC-Richtlinie fehlt für junkerwerk.de und junkerwerk.hu; SPF endet mit Softfail",
+   "source": "aktiv (DNS-Abfragen), bestätigt durch SecurityTrails und Shodan",
+   "policy": "SP-DNS-004 / SP-DNS-005"
+  },
+  {
+   "id": "VS-2026-008",
+   "family": "mta_sts_missing",
+   "families": [
+    "mta_sts_missing",
+    "tls_rpt_missing",
+    "dane_missing"
+   ],
+   "cat": "C",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "affected": "DNS-Zonen junkerwerk.de und junkerwerk.hu (MX: Hornetsecurity)",
+   "status": "blau",
+   "urgency": "Strategisch",
+   "title": "Keine Durchsetzung der Transportverschlüsselung für eingehende E-Mail (MTA-STS, TLS-RPT, DANE fehlen)",
+   "source": "aktiv (DNS-Abfragen)",
+   "policy": "SP-DNS-008"
+  },
+  {
+   "id": "VS-2026-009",
+   "family": "tls_weak_ciphers",
+   "families": [
+    "tls_weak_ciphers",
+    "tls_no_13",
+    "hsts_short",
+    "http_compression"
+   ],
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "mittel",
+   "affected": "openotp.junkerwerk.de und openotp.junkerwerk.hu (217.243.248.30), Port 443",
+   "status": "gelb",
+   "urgency": "In Kürze",
+   "title": "TLS-Konfiguration des Zwei-Faktor-Portals: 3DES-Cipher, kein TLS 1.3, HSTS nur einen Tag, HTTP-Kompression aktiv",
+   "source": "aktiv (testssl.sh, httpx)",
+   "policy": "SP-TLS-002 / SP-HDR-004"
+  },
+  {
+   "id": "VS-2026-010",
+   "family": "cert_hostname_mismatch",
+   "families": [
+    "cert_hostname_mismatch"
+   ],
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "hoch",
+   "affected": "openotp.junkerwerk.hu (CNAME auf openotp.junkerwerk.de, 217.243.248.30)",
+   "status": "gelb",
+   "urgency": "In Kürze",
+   "title": "Zertifikat passt nicht zum Hostnamen openotp.junkerwerk.hu",
+   "source": "aktiv (httpx, testssl.sh, Lauf 3)",
+   "policy": "SP-TLS-004"
+  },
+  {
+   "id": "VS-2026-011",
+   "family": "csp_weak",
+   "families": [
+    "csp_weak",
+    "header_duplicate",
+    "csrf_token_missing"
+   ],
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "mittel",
+   "affected": "openotp.junkerwerk.de und openotp.junkerwerk.hu, u. a. /openid/login_uid.php, /selfdesk/",
+   "status": "gelb",
+   "urgency": "Mittelfristig",
+   "title": "Content-Security-Policy des Zwei-Faktor-Portals erlaubt Inline-Skripte; doppelte Header; Login-Formular ohne Anti-CSRF-Token",
+   "source": "aktiv (Header-Prüfung, OWASP ZAP passiv)",
+   "policy": "SP-CSP-001 / SP-CSRF-001"
+  },
+  {
+   "id": "VS-2026-012",
+   "family": "tls_legacy_protocols",
+   "families": [
+    "tls_legacy_protocols",
+    "tls_no_fallback_protection"
+   ],
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "mittel",
+   "affected": "217.243.248.29 (cloud., team., rdgw., rdgw-2016.junkerwerk.de), Ports 443 und 8443",
+   "status": "gelb",
+   "urgency": "Mittelfristig",
+   "title": "Veraltete Protokolle TLS 1.0 und 1.1 auf dem RD-Gateway-Host, kein Downgrade-Schutz",
+   "source": "aktiv (testssl.sh)",
+   "policy": "SP-TLS-001"
+  },
+  {
+   "id": "VS-2026-013",
+   "family": "security_headers_incomplete",
+   "families": [
+    "security_headers_incomplete"
+   ],
+   "cat": "D",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "affected": "mail., outlook., autodiscover.junkerwerk.de (217.243.248.28); cloud.junkerwerk.de (217.243.248.29)",
+   "status": "blau",
+   "urgency": "Mittelfristig",
+   "title": "Sicherheits-Header auf Outlook Web App und IIS-Server nicht gesetzt",
+   "source": "aktiv (Header-Prüfung, OWASP ZAP passiv)",
+   "policy": "SP-HDR-001"
+  },
+  {
+   "id": "VS-2026-014",
+   "family": "banner_version_disclosure",
+   "families": [
+    "banner_version_disclosure",
+    "http_trace_enabled"
+   ],
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "affected": "217.243.248.28 (X-FEServer, Server), 217.243.248.29 (Server, X-Powered-By, TRACE), 217.243.248.30 (Exim-Banner), 188.40.3.130 (Dienst-Banner)",
+   "status": "blau",
+   "urgency": "Mittelfristig",
+   "title": "Versions- und Systeminformationen in Antwort-Headern und Bannern; HTTP TRACE aktiv",
+   "source": "aktiv (Header-Prüfung, nmap), Shodan",
+   "policy": "SP-DISC-001"
+  },
+  {
+   "id": "VS-2026-015",
+   "family": "dnssec_missing",
+   "families": [
+    "dnssec_missing",
+    "caa_missing"
+   ],
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "affected": "junkerwerk.de, junkerwerk.hu (Nameserver united-domains)",
+   "status": "blau",
+   "urgency": "Strategisch",
+   "title": "DNS-Zonen ohne DNSSEC-Signatur und ohne CAA-Record",
+   "source": "aktiv (DNS-Abfragen)",
+   "policy": "SP-DNS-001"
+  }
+ ],
+ "positives": [
+  {
+   "id": "VS-2026-P01",
+   "family": "rdp_not_exposed",
+   "families": [
+    "rdp_not_exposed",
+    "smb_not_exposed"
+   ],
+   "cat": "A",
+   "scale": null,
+   "level": null,
+   "affected": null,
+   "title": "Kein direkt exponiertes RDP (3389) oder SMB (445) auf den geprüften Hosts",
+   "evidence": "ticket.junkerwerk.de (217.243.248.27) zeigt keinerlei erreichbare Dienste."
+  },
+  {
+   "id": "VS-2026-P02",
+   "family": "mail_tls_enforced",
+   "families": [
+    "mail_tls_enforced"
+   ],
+   "cat": "A",
+   "scale": null,
+   "level": null,
+   "affected": null,
+   "title": "FTP-, POP3-, IMAP- und SMTP-Dienste des Webservers erzwingen TLS vor der Anmeldung",
+   "evidence": "FTP verlangt AUTH TLS, IMAP sperrt LOGIN vor STARTTLS, SMTP bietet AUTH erst nach STARTTLS an."
+  },
+  {
+   "id": "VS-2026-P03",
+   "family": "software_supported",
+   "families": [
+    "software_supported"
+   ],
+   "cat": "B",
+   "scale": null,
+   "level": null,
+   "affected": null,
+   "title": "Exchange Server Subscription Edition im Einsatz",
+   "evidence": "Der sichtbare Build 15.2.2562 gehört zur aktuellen Produktlinie; kein Exchange 2016/2019 mehr im Perimeter."
+  },
+  {
+   "id": "VS-2026-P04",
+   "family": "spf_present",
+   "families": [
+    "spf_present",
+    "dkim_present"
+   ],
+   "cat": "C",
+   "scale": null,
+   "level": null,
+   "affected": null,
+   "title": "SPF und DKIM für beide Domains vorhanden, eingehende Mail über Hornetsecurity gefiltert",
+   "evidence": "Damit fehlt für vollständige Absender-Authentizität nur noch DMARC."
+  },
+  {
+   "id": "VS-2026-P05",
+   "family": "dns_no_zone_transfer",
+   "families": [
+    "dns_no_zone_transfer",
+    "dns_no_dangling"
+   ],
+   "cat": "C",
+   "scale": null,
+   "level": null,
+   "affected": null,
+   "title": "Kein Zonentransfer möglich, keine verwaisten CNAME-Einträge",
+   "evidence": "Kein Subdomain-Takeover-Risiko erkennbar."
+  },
+  {
+   "id": "VS-2026-P06",
+   "family": "cert_valid_chain",
+   "families": [
+    "cert_valid_chain"
+   ],
+   "cat": "D",
+   "scale": null,
+   "level": null,
+   "affected": null,
+   "title": "Alle HTTPS-Dienste mit gültigen, korrekt verketteten Zertifikaten",
+   "evidence": "Sectigo-Wildcard *.junkerwerk.de (RSA 4096, gültig bis 11.12.2026) und Hetzner-Zertifikat (gültig bis 02.11.2026), OCSP Stapling aktiv."
+  },
+  {
+   "id": "VS-2026-P07",
+   "family": "tls_modern",
+   "families": [
+    "tls_modern"
+   ],
+   "cat": "D",
+   "scale": null,
+   "level": null,
+   "affected": null,
+   "title": "Outlook Web App nur mit TLS 1.2 und 1.3, Forward Secrecy",
+   "evidence": "Keine veralteten Protokolle auf dem Exchange-Server."
+  },
+  {
+   "id": "VS-2026-P08",
+   "family": "reputation_clean",
+   "families": [
+    "reputation_clean"
+   ],
+   "cat": "E",
+   "scale": null,
+   "level": null,
+   "affected": null,
+   "title": "Keine Einträge in Reputations- und Threat-Intelligence-Quellen",
+   "evidence": "AbuseIPDB 0/100 für alle sechs Adressen, keine OTX-Pulses, kein URLhaus-Treffer."
+  }
+ ]
+}

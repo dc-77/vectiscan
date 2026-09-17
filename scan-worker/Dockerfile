@@ -208,7 +208,7 @@ RUN mkdir -p /opt/wordlists \
  && curl -fsSL https://raw.githubusercontent.com/n0kovo/n0kovo_subdomains/main/n0kovo_subdomains_small.txt \
       -o /tmp/n0kovo.txt \
  && cat /tmp/seclists.txt /tmp/bitquark.txt /tmp/n0kovo.txt | sort -u > /opt/wordlists/dns-merged-30k.txt \
- && rm /tmp/seclists.txt /tmp/bitquark.txt /tmp/n0kovo.txt
+ && rm /tmp/seclists.txt /tmp/bitquark.txt /tmp/n0kovo.txt \
  && test -s /opt/wordlists/dns-merged-30k.txt
 
 # ── 6. Scanner code ────────────────────────────────────────────────

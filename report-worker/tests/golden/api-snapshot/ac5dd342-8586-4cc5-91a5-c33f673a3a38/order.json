@@ -1,0 +1,2856 @@
+{
+ "data": {
+  "businessImpactScore": 3,
+  "correlationCount": 31,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "rankingcoach.com",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-05-28T12:22:43.829Z",
+  "hasReport": true,
+  "id": "ac5dd342-8586-4cc5-91a5-c33f673a3a38",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": true,
+     "issues": [],
+     "logo_url": "https://vmc.digicert.com/cbb46704-1b72-40ec-8281-73f83f32ba12.svg",
+     "vmc_url": "https://vmc.digicert.com/cbb46704-1b72-40ec-8281-73f83f32ba12.pem"
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": "1",
+     "issues": [],
+     "p": "reject",
+     "pct": 100,
+     "raw": "v=DMARC1; p=reject; rua=mailto:mkoedacp@ag.eu.dmarcadvisor.com; ruf=mailto:mkoedacp@fr.eu.dmarcadvisor.com; fo=1",
+     "rua": [
+      "mailto:mkoedacp@ag.eu.dmarcadvisor.com"
+     ],
+     "ruf": [
+      "mailto:mkoedacp@fr.eu.dmarcadvisor.com"
+     ],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/rankingcoach.com",
+     "domain": "rankingcoach.com",
+     "pulse_count": 3,
+     "pulses": [
+      {
+       "id": "69fc1b9d02d8ebe162913b74",
+       "modified": "2026-05-07T05:03:23.418000",
+       "name": "Credit: OctoSeek -2yrs ago [Zombie.A • Bayrob in fake malware information website.]",
+       "tags": [
+        "ukraine",
+        "referrer",
+        "deploys fake",
+        "uue files",
+        "fsociety",
+        "target colombia",
+        "judiciary",
+        "financial"
+       ]
+      },
+      {
+       "id": "6683aae863ba601bac1a28b5",
+       "modified": "2024-08-01T06:03:26.298000",
+       "name": "Zombie.A • Bayrob in fake malware information website.",
+       "tags": [
+        "ukraine",
+        "referrer",
+        "deploys fake",
+        "uue files",
+        "fsociety",
+        "target colombia",
+        "judiciary",
+        "financial"
+       ]
+      },
+      {
+       "id": "6261cdbea0bb54792ef9ac53",
+       "modified": "2022-05-21T00:03:44.725000",
+       "name": "1and1.com - malware hosting and creation",
+       "tags": [
+        "noclickid",
+        "error",
+        "aborted",
+        "xmlhttprequest",
+        "typeof e",
+        "cx bus",
+        "genesys telecom",
+        "labs"
+       ]
+      }
+     ],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/rankingcoach.com"
+    }
+   },
+   "passive_subdomains": [
+    "*.rankingcoach.com",
+    "_dmarc.rankingcoach.com",
+    "admin.cms.rankingcoach.com",
+    "admin.cmstest.rankingcoach.com",
+    "api1.rankingcoach.com",
+    "assets.rankingcoach.com",
+    "beyondseo.rankingcoach.com",
+    "blog.rankingcoach.com",
+    "cfdist011.rankingcoach.com",
+    "cfdist013.rankingcoach.com",
+    "cfdist014.rankingcoach.com",
+    "cfdist015.rankingcoach.com",
+    "cfdist016.rankingcoach.com",
+    "cfdist017.rankingcoach.com",
+    "cfdist019.rankingcoach.com",
+    "cfdist021.rankingcoach.com",
+    "cfdist022.rankingcoach.com",
+    "cfdist023.rankingcoach.com",
+    "cfdist024.rankingcoach.com",
+    "cfdist029.rankingcoach.com",
+    "cfdist030.rankingcoach.com",
+    "cfdist031.rankingcoach.com",
+    "cfdist033.rankingcoach.com",
+    "cfdist035.rankingcoach.com",
+    "cfdist036.rankingcoach.com",
+    "cfdist037.rankingcoach.com",
+    "cfdist041.rankingcoach.com",
+    "cfdist042.rankingcoach.com",
+    "cfdist044.rankingcoach.com",
+    "cfdist046.rankingcoach.com",
+    "cfdist047.rankingcoach.com",
+    "cfdist048.rankingcoach.com",
+    "cfdist049.rankingcoach.com",
+    "cfdist050.rankingcoach.com",
+    "cfdist051.rankingcoach.com",
+    "cfdist052.rankingcoach.com",
+    "cfdist056.rankingcoach.com",
+    "cfdist057.rankingcoach.com",
+    "cfdist059.rankingcoach.com",
+    "cfdist063.rankingcoach.com",
+    "cfdist064.rankingcoach.com",
+    "cfdist065.rankingcoach.com",
+    "cfdist066.rankingcoach.com",
+    "cfdist068.rankingcoach.com",
+    "cfdist61.rankingcoach.com",
+    "cfdist62.rankingcoach.com",
+    "cfidst067.rankingcoach.com",
+    "cforigin.rankingcoach.com",
+    "commercesummit.rankingcoach.com",
+    "concrete5.cms.rankingcoach.com",
+    "confluence.rankingcoach.com",
+    "contao-en.cms.rankingcoach.com",
+    "contao-en.cmstest.rankingcoach.com",
+    "cpanel-tests.rankingcoach.com",
+    "dan.dev.rankingcoach.com",
+    "dashboard.k8s.rankingcoach.com",
+    "dev.rankingcoach.com",
+    "dmexco.rankingcoach.com",
+    "doc.rankingcoach.com",
+    "eca.dev.rankingcoach.com",
+    "events.rankingcoach.com",
+    "galera1.rankingcoach.com",
+    "gambio-en.cmstest.rankingcoach.com",
+    "go.rankingcoach.com",
+    "grow.rankingcoach.com",
+    "help.rankingcoach.com",
+    "help.strato.rankingcoach.com",
+    "hosters.rankingcoach.com",
+    "jimdo.rankingcoach.com",
+    "joomla-en.cms.rankingcoach.com",
+    "joomla-en.cmstest.rankingcoach.com",
+    "joomla3de.cms.rankingcoach.com",
+    "joomla4de.cms.rankingcoach.com",
+    "joomla4en.cms.rankingcoach.com",
+    "k8s.rankingcoach.com",
+    "knowledge.rankingcoach.com",
+    "lb2-eu.rankingcoach.com",
+    "magento-en.cmstest.rankingcoach.com",
+    "media.rankingcoach.com",
+    "mentorship.rankingcoach.com",
+    "mon.rankingcoach.com",
+    "ns1cdn.rankingcoach.com",
+    "ns3cdn.rankingcoach.com",
+    "ollama.rankingcoach.com",
+    "opencart-en.cmstest.rankingcoach.com",
+    "oxsummit.rankingcoach.com",
+    "phpmyadmin.cms.rankingcoach.com",
+    "prestashop-en.cmstest.rankingcoach.com",
+    "prestashopen.cms.rankingcoach.com",
+    "quiz.rankingcoach.com",
+    "rc-api-dev.rankingcoach.com",
+    "rc-api.rankingcoach.com",
+    "scale.rankingcoach.com",
+    "shopware-en.cmstest.rankingcoach.com",
+    "shopware6-de.cms.rankingcoach.com",
+    "shopware6-en.cms.rankingcoach.com",
+    "strato.rankingcoach.com",
+    "swagger.k8s.rankingcoach.com",
+    "testing.rankingcoach.com",
+    "typo-en.cmstest.rankingcoach.com",
+    "typo3en.cms.rankingcoach.com",
+    "vault.rankingcoach.com",
+    "vhost1.agent0-node-01.rankingcoach.com",
+    "vhost2.agent0-node-01.rankingcoach.com",
+    "vhost3.agent0-node-01.rankingcoach.com",
+    "web03.rankingcoach.com",
+    "whdusa.rankingcoach.com",
+    "wix.rankingcoach.com",
+    "wordpress-de.cms.rankingcoach.com",
+    "wordpress-de.cmstest.rankingcoach.com",
+    "wordpress-en.cms.rankingcoach.com",
+    "wordpress-en.cmstest.rankingcoach.com",
+    "wordpress-gr.cms.rankingcoach.com",
+    "wordpress-it.cms.rankingcoach.com",
+    "wordpress-it.cmstest.rankingcoach.com",
+    "wordpressde.cms.rankingcoach.com",
+    "wordpressen.cms.rankingcoach.com",
+    "wordpresses.cms.rankingcoach.com",
+    "wordpressfr.cms.rankingcoach.com",
+    "wordpressgr.cms.rankingcoach.com",
+    "wordpressit.cms.rankingcoach.com",
+    "wordpressnl.cms.rankingcoach.com",
+    "wordpresspt.cms.rankingcoach.com",
+    "workshop.rankingcoach.com",
+    "www.rankingcoach.com",
+    "www2.rankingcoach.com"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "rankingcoach.com",
+    "records": [
+     {
+      "last_seen": "2026-05-28T10:13:01.786000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-23T10:18:22.627000",
+      "options": {
+       "ttl": 3575
+      },
+      "subdomain": "",
+      "type": "AAAA",
+      "value": "2a01:4f8:150:10c1::2"
+     },
+     {
+      "last_seen": "2026-05-20T19:45:14.488000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "alt1.aspmx.l.google.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:45:14.488000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "alt2.aspmx.l.google.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:45:14.488000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "aspmx.l.google.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:45:14.487000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "aspmx2.googlemail.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:45:14.487000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "aspmx3.googlemail.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:43:08.265000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1cdn.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:43:08.265000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns2cdn.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:43:08.265000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns3cdn.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:45:34.431000",
+      "options": {
+       "expires": 2419200,
+       "hostmaster": "hostmaster.rankingcoach.com",
+       "minttl": 60,
+       "refresh": 3600,
+       "retry": 3600,
+       "serial": 2026051802,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1cdn.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:33:25.599000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=ms49493808"
+     },
+     {
+      "last_seen": "2026-05-20T19:33:25.599000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "apple-domain-verification=5nOZgDmZjNWJJBEF8MU76EYQjcwym2Z9y3o_PCYw7lM"
+     },
+     {
+      "last_seen": "2026-05-20T19:33:25.599000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "atlassian-domain-verification=UGGFrBpaiUOriJVGuuTxz3Lscr6UApaFBvIrtvSBGLtv6lRhYDzIJfQBv33tvMjI"
+     },
+     {
+      "last_seen": "2026-05-20T19:33:25.599000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "atlassian-sending-domain-verification=46e3edcd-3f3b-4629-8e98-55e940a31b7a"
+     },
+     {
+      "last_seen": "2026-05-20T19:33:25.599000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=TDyeT9A8D4w9PTZvf7TIlD3oXoUX4U6Dfc-D4LR3VDE"
+     },
+     {
+      "last_seen": "2026-05-20T19:33:25.599000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=iHTRR0KpecXn8JDD2eIUGSH5gPSfSEe88o6tEIpO8nM"
+     },
+     {
+      "last_seen": "2026-05-20T19:33:25.599000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=lO-C_6FIkDPCyxe2rDyeA0HWewikE03XhEHW0EKZDlY"
+     },
+     {
+      "last_seen": "2026-05-20T19:33:25.599000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 ip4:34.211.27.214 ip4:54.246.203.105 ip4:176.9.16.197/32 ip4:176.9.20.43/32 ip4:80.190.128.128/25 include:_spf.google.com include:sparkpostmail.com include:_spf.sparkpostmail.com include:servers.mcsv.net include:8411010.spf07.hubspotemail.net -all"
+     },
+     {
+      "last_seen": "2026-05-20T19:39:01.817000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "*",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.355000",
+      "options": {
+       "ttl": 3422
+      },
+      "subdomain": "_dmarc",
+      "type": "CNAME",
+      "value": "dmarc.rankingcoach.com.eu-mkoedacp.e1.dmarcmanager.app"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.349000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "admin.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.985000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "admin.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.951000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "api1",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.621000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "assets",
+      "type": "CNAME",
+      "value": "d2wx54mw6wxq14.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.879000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "beyondseo",
+      "type": "CNAME",
+      "value": "6bbe6b3756a642e99e4397200ab656ea.unbouncepages.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.510000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "blog",
+      "type": "CNAME",
+      "value": "8411010.group10.sites.hubspot.net"
+     },
+     {
+      "last_seen": "2026-05-27T00:01:18.296000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist011",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-01T08:15:00.981000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist013",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-28T09:09:08.704000",
+      "options": {
+       "ttl": 3507
+      },
+      "subdomain": "cfdist013",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-20T18:59:50.053000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist014",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-27T04:05:59.154000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist014",
+      "type": "CNAME",
+      "value": "d20zdl355ncxhi.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-23T07:05:43.535000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist015",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-27T17:32:58.664000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist015",
+      "type": "CNAME",
+      "value": "d1etpf4e450gwx.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-25T22:08:06.461000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist016",
+      "type": "CNAME",
+      "value": "d2cszykeg96e0o.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T15:06:55.753000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist017",
+      "type": "CNAME",
+      "value": "d3dbcm4nvx6yic.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-26T14:23:40.180000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist019",
+      "type": "CNAME",
+      "value": "d3pvueojmygm0l.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-26T09:09:00.175000",
+      "options": {
+       "ttl": 3350
+      },
+      "subdomain": "cfdist021",
+      "type": "CNAME",
+      "value": "d3nw8d3b4jxdtc.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-09T00:17:36.865000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist022",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-28T03:43:11.936000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist022",
+      "type": "CNAME",
+      "value": "d2tzpgxvqy6df.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T08:58:13.625000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist023",
+      "type": "CNAME",
+      "value": "d2ms5jo0jwzwb2.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T09:05:49.400000",
+      "options": {
+       "ttl": 3599
+      },
+      "subdomain": "cfdist024",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.384000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist029",
+      "type": "CNAME",
+      "value": "d23m3gfadsrfw4.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-26T06:29:14.383000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist030",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-27T05:23:44.198000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist031",
+      "type": "CNAME",
+      "value": "d38dnvs4fp0p8.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.391000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist033",
+      "type": "CNAME",
+      "value": "d2ekta6fp5xtb.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T11:10:55.515000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist035",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.929000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist036",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-10T14:33:58.750000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist037",
+      "type": "AAAA",
+      "value": "2a01:4f8:150:10c1::2"
+     },
+     {
+      "last_seen": "2026-05-26T13:48:02.843000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist037",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-26T13:41:12.591000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist041",
+      "type": "CNAME",
+      "value": "d1rflnugiru2un.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T17:52:10.655000",
+      "options": {
+       "ttl": 3523
+      },
+      "subdomain": "cfdist042",
+      "type": "CNAME",
+      "value": "d38zyjij9gdqvx.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-14T09:38:42.362000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist044",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-26T13:41:12.591000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist044",
+      "type": "CNAME",
+      "value": "d3rsg788uvn5s4.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T17:52:10.871000",
+      "options": {
+       "ttl": 3522
+      },
+      "subdomain": "cfdist046",
+      "type": "CNAME",
+      "value": "ddviudwv1j4zo.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T17:52:10.279000",
+      "options": {
+       "ttl": 3524
+      },
+      "subdomain": "cfdist047",
+      "type": "CNAME",
+      "value": "d3a12d3c5i012o.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T16:55:51.312000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist048",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-27T17:52:11.646000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist049",
+      "type": "CNAME",
+      "value": "dylu2m8g3elxq.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.707000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist050",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-27T17:52:10.655000",
+      "options": {
+       "ttl": 3523
+      },
+      "subdomain": "cfdist051",
+      "type": "CNAME",
+      "value": "d2x3y7690mzbk2.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-15T17:05:03.356000",
+      "options": {
+       "ttl": 3598
+      },
+      "subdomain": "cfdist052",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-26T19:16:28.393000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist052",
+      "type": "CNAME",
+      "value": "d2683o3co6kd1n.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T01:51:48.833000",
+      "options": {
+       "ttl": 3510
+      },
+      "subdomain": "cfdist056",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-27T20:17:09.029000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist057",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-25T10:52:11.717000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist059",
+      "type": "CNAME",
+      "value": "djcxdiefrtxvv.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-17T13:59:05.321000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist063",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-27T17:52:10.871000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist063",
+      "type": "CNAME",
+      "value": "d3cpth9ik0u6lj.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-27T17:52:10.655000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist064",
+      "type": "CNAME",
+      "value": "d3on0fr9s66d7z.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-28T03:21:45.306000",
+      "options": {
+       "ttl": 3553
+      },
+      "subdomain": "cfdist065",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-27T00:00:54.548000",
+      "options": {
+       "ttl": 3599
+      },
+      "subdomain": "cfdist066",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-21T00:31:42.866000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist068",
+      "type": "CNAME",
+      "value": "cforigin.rankingcoach.com"
+     },
+     {
+      "last_seen": "2026-05-25T15:42:14.941000",
+      "options": {
+       "ttl": 3599
+      },
+      "subdomain": "cfdist61",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-28T05:50:53.864000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfdist62",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-25T09:08:01.335000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cfidst067",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-28T09:07:35.845000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cforigin",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-28T09:09:08.704000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cforigin",
+      "type": "AAAA",
+      "value": "2a01:4f8:150:10c1::2"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.139000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "commercesummit",
+      "type": "CNAME",
+      "value": "unbouncepages.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.724000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "concrete5.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.217000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "confluence",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.120000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "contao-en.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.879000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "contao-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.985000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cpanel-tests",
+      "type": "A",
+      "value": "54.217.236.241"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.690000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "dan.dev",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.151000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "dashboard.k8s",
+      "type": "A",
+      "value": "116.202.3.75"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:28.120000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "dev",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.567000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "dmexco",
+      "type": "CNAME",
+      "value": "unbouncepages.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.489000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "doc",
+      "type": "CNAME",
+      "value": "ssl.redocly.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.120000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "eca.dev",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.678000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "events",
+      "type": "CNAME",
+      "value": "unbouncepages.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.310000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "galera1",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.778000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "gambio-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.297000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "go",
+      "type": "CNAME",
+      "value": "8411010.group10.sites.hubspot.net"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.302000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "grow",
+      "type": "A",
+      "value": "185.158.133.1"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.967000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "help",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:28.469000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "help.strato",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.711000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "hosters",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.061000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "jimdo",
+      "type": "A",
+      "value": "128.140.80.215"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.828000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "joomla-en.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.139000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "joomla-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.336000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "joomla3de.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.773000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "joomla4de.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.888000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "joomla4en.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.687000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "k8s",
+      "type": "A",
+      "value": "116.202.3.75"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.986000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "knowledge",
+      "type": "CNAME",
+      "value": "8411010.group10.sites.hubspot.net"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.159000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "lb2-eu",
+      "type": "A",
+      "value": "176.9.16.197"
+     },
+     {
+      "last_seen": "2026-05-20T19:37:23.568000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "lb2-eu",
+      "type": "AAAA",
+      "value": "2a01:4f8:150:10c1::2"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.919000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "magento-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.930000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "media",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.253000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "mentorship",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.725000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "mon",
+      "type": "A",
+      "value": "65.21.151.197"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.195000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "ns1cdn",
+      "type": "A",
+      "value": "176.9.16.197"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.165000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "ns3cdn",
+      "type": "A",
+      "value": "135.181.161.180"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.406000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "ollama",
+      "type": "A",
+      "value": "86.120.61.26"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.538000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "opencart-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.971000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "oxsummit",
+      "type": "CNAME",
+      "value": "unbouncepages.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.879000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "phpmyadmin.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.951000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "prestashop-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.707000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "prestashopen.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.125000",
+      "options": {
+       "ttl": 3599
+      },
+      "subdomain": "quiz",
+      "type": "CNAME",
+      "value": "cname-ssl.outgrow.co"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.263000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "rc-api",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.624000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "rc-api-dev",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.296000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "scale",
+      "type": "CNAME",
+      "value": "c25c9ac0-9cf5-4f38-bfd4-0c7149a3cba7.unbouncepages.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.829000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "shopware-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.159000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "shopware6-de.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.252000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "shopware6-en.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.333000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "strato",
+      "type": "CNAME",
+      "value": "d202epnhp2kopp.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.252000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "swagger.k8s",
+      "type": "A",
+      "value": "116.202.3.75"
+     },
+     {
+      "last_seen": "2026-05-28T09:05:47.720000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "testing",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.140000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "typo-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.209000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "typo3en.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.039000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "vault",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.819000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "vhost1.agent0-node-01",
+      "type": "A",
+      "value": "35.242.218.7"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.622000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "vhost2.agent0-node-01",
+      "type": "A",
+      "value": "35.242.218.7"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.765000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "vhost3.agent0-node-01",
+      "type": "A",
+      "value": "35.242.218.7"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.403000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "web03",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.499000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "whdusa",
+      "type": "CNAME",
+      "value": "unbouncepages.com"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.189000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wix",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.931000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpress-de.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.429000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpress-de.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.751000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpress-en.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.994000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpress-en.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.951000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpress-gr.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.765000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpress-it.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.111000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpress-it.cmstest",
+      "type": "A",
+      "value": "176.9.21.52"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.745000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpressde.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.940000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpressen.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.861000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpresses.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.741000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpressfr.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:28.974000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpressgr.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.283000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpressit.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:27.305000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpressnl.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.898000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "wordpresspt.cms",
+      "type": "A",
+      "value": "138.201.92.68"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.652000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "workshop",
+      "type": "CNAME",
+      "value": "unbouncepages.com"
+     },
+     {
+      "last_seen": "2026-05-26T15:20:02.268000",
+      "options": {
+       "ttl": 3520
+      },
+      "subdomain": "www",
+      "type": "CNAME",
+      "value": "djzkhodxmxaf.cloudfront.net"
+     },
+     {
+      "last_seen": "2026-05-20T19:36:26.741000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "www2",
+      "type": "A",
+      "value": "176.9.21.52"
+     }
+    ],
+    "subdomains": [
+     "*",
+     "_dmarc",
+     "admin.cms",
+     "admin.cmstest",
+     "api1",
+     "assets",
+     "beyondseo",
+     "blog",
+     "cfdist011",
+     "cfdist013",
+     "cfdist014",
+     "cfdist015",
+     "cfdist016",
+     "cfdist017",
+     "cfdist019",
+     "cfdist021",
+     "cfdist022",
+     "cfdist023",
+     "cfdist024",
+     "cfdist029",
+     "cfdist030",
+     "cfdist031",
+     "cfdist033",
+     "cfdist035",
+     "cfdist036",
+     "cfdist037",
+     "cfdist041",
+     "cfdist042",
+     "cfdist044",
+     "cfdist046",
+     "cfdist047",
+     "cfdist048",
+     "cfdist049",
+     "cfdist050",
+     "cfdist051",
+     "cfdist052",
+     "cfdist056",
+     "cfdist057",
+     "cfdist059",
+     "cfdist063",
+     "cfdist064",
+     "cfdist065",
+     "cfdist066",
+     "cfdist068",
+     "cfdist61",
+     "cfdist62",
+     "cfidst067",
+     "cforigin",
+     "commercesummit",
+     "concrete5.cms",
+     "confluence",
+     "contao-en.cms",
+     "contao-en.cmstest",
+     "cpanel-tests",
+     "dan.dev",
+     "dashboard.k8s",
+     "dev",
+     "dmexco",
+     "doc",
+     "eca.dev",
+     "events",
+     "galera1",
+     "gambio-en.cmstest",
+     "go",
+     "grow",
+     "help",
+     "help.strato",
+     "hosters",
+     "jimdo",
+     "joomla-en.cms",
+     "joomla-en.cmstest",
+     "joomla3de.cms",
+     "joomla4de.cms",
+     "joomla4en.cms",
+     "k8s",
+     "knowledge",
+     "lb2-eu",
+     "magento-en.cmstest",
+     "media",
+     "mentorship",
+     "mon",
+     "ns1cdn",
+     "ns3cdn",
+     "ollama",
+     "opencart-en.cmstest",
+     "oxsummit",
+     "phpmyadmin.cms",
+     "prestashop-en.cmstest",
+     "prestashopen.cms",
+     "quiz",
+     "rc-api",
+     "rc-api-dev",
+     "scale",
+     "shopware-en.cmstest",
+     "shopware6-de.cms",
+     "shopware6-en.cms",
+     "strato",
+     "swagger.k8s",
+     "testing",
+     "typo-en.cmstest",
+     "typo3en.cms",
+     "vault",
+     "vhost1.agent0-node-01",
+     "vhost2.agent0-node-01",
+     "vhost3.agent0-node-01",
+     "web03",
+     "whdusa",
+     "wix",
+     "wordpress-de.cms",
+     "wordpress-de.cmstest",
+     "wordpress-en.cms",
+     "wordpress-en.cmstest",
+     "wordpress-gr.cms",
+     "wordpress-it.cms",
+     "wordpress-it.cmstest",
+     "wordpressde.cms",
+     "wordpressen.cms",
+     "wordpresses.cms",
+     "wordpressfr.cms",
+     "wordpressgr.cms",
+     "wordpressit.cms",
+     "wordpressnl.cms",
+     "wordpresspt.cms",
+     "workshop",
+     "www",
+     "www2"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 320,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 23,
+      "crtsh": 107,
+      "gobuster_dns": 130,
+      "phase0a_passive": 126,
+      "subfinder": 50
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 320
+    },
+    "dns_findings": {
+     "dangling_cnames": [
+      {
+       "cname_target": "dmarc.rankingcoach.com.eu-mkoedacp.e1.dmarcmanager.app",
+       "fqdn": "_dmarc.rankingcoach.com",
+       "reason": "Verwaister DNS-Eintrag (Ziel: dmarc.rankingcoach.com.eu-mkoedacp.e1.dmarcmanager.app)",
+       "takeover_risk": "low"
+      }
+     ],
+     "dkim": true,
+     "dmarc": "v=DMARC1; p=reject; rua=mailto:mkoedacp@ag.eu.dmarcadvisor.com; ruf=mailto:mkoedacp@fr.eu.dmarcadvisor.com; fo=1",
+     "mx": [
+      "ASPMX3.GOOGLEMAIL.com",
+      "ALT1.ASPMX.L.GOOGLE.com",
+      "ASPMX2.GOOGLEMAIL.com",
+      "ALT2.ASPMX.L.GOOGLE.com",
+      "ASPMX.L.GOOGLE.com"
+     ],
+     "ns": [
+      "ns3cdn.rankingcoach.com",
+      "ns2cdn.rankingcoach.com",
+      "ns1cdn.rankingcoach.com"
+     ],
+     "spf": "v=spf1 ip4:34.211.27.214 ip4:54.246.203.105 ip4:176.9.16.197/32 ip4:176.9.20.43/32 ip4:80.190.128.128/25 include:_spf.google.com include:sparkpostmail.com include:_spf.sparkpostmail.com include:servers.mcsv.net include:8411010.spf07.hubspotemail.net -all",
+     "zone_transfer": false
+    },
+    "domain": "rankingcoach.com",
+    "hosts": [
+     {
+      "_reasoning": "Primary production host with rankingcoach.com and www.rankingcoach.com; contains 130+ FQDNs including critical infrastructure (API, dev, admin, CMS test, Atlassian, BigData, Cassandra, CDN distribution nodes); nginx on 80/443; web_probe shows no HTTP content but Shodan confirms ports open — likely behind WAF or requires specific headers; must scan for security posture.",
+      "fqdns": [
+       "rankingcoach.com",
+       "www.rankingcoach.com",
+       "*.rankingcoach.com",
+       "acc-srv.rankingcoach.com",
+       "acu.dev.rankingcoach.com",
+       "admin.cmstest.rankingcoach.com",
+       "ahu.dev.rankingcoach.com",
+       "ami.dev.rankingcoach.com",
+       "amu.dev.rankingcoach.com",
+       "api-dev.rankingcoach.com",
+       "api03.rankingcoach.com",
+       "api1.rankingcoach.com",
+       "api2.rankingcoach.com",
+       "api5.rankingcoach.com",
+       "apu.dev.rankingcoach.com",
+       "asg.dev.rankingcoach.com",
+       "atlassian-01.rankingcoach.com",
+       "bbt.dev.rankingcoach.com",
+       "bi01.rankingcoach.com",
+       "bi02.rankingcoach.com",
+       "bigdata01.rankingcoach.com",
+       "bigdata02.rankingcoach.com",
+       "bigdata03.rankingcoach.com",
+       "bigdata04.rankingcoach.com",
+       "bigdata05.rankingcoach.com",
+       "bigdata06.rankingcoach.com",
+       "bsu.dev.rankingcoach.com",
+       "bty.dev.rankingcoach.com",
+       "cassa01.rankingcoach.com",
+       "cassa02.rankingcoach.com",
+       "cassa03.rankingcoach.com",
+       "cassa04.rankingcoach.com",
+       "cassa05.rankingcoach.com",
+       "cassa06.rankingcoach.com",
+       "cassa07.rankingcoach.com",
+       "cassa08.rankingcoach.com",
+       "cassa11.rankingcoach.com",
+       "cfdist011.rankingcoach.com",
+       "cfdist013.rankingcoach.com",
+       "cfdist014.rankingcoach.com",
+       "cfdist015.rankingcoach.com",
+       "cfdist016.rankingcoach.com",
+       "cfdist017.rankingcoach.com",
+       "cfdist018.rankingcoach.com",
+       "cfdist019.rankingcoach.com",
+       "cfdist021.rankingcoach.com",
+       "cfdist022.rankingcoach.com",
+       "cfdist023.rankingcoach.com",
+       "cfdist024.rankingcoach.com",
+       "cfdist029.rankingcoach.com",
+       "cfdist030.rankingcoach.com",
+       "cfdist031.rankingcoach.com",
+       "cfdist033.rankingcoach.com",
+       "cfdist035.rankingcoach.com",
+       "cfdist036.rankingcoach.com",
+       "cfdist037.rankingcoach.com",
+       "cfdist041.rankingcoach.com",
+       "cfdist042.rankingcoach.com",
+       "cfdist044.rankingcoach.com",
+       "cfdist046.rankingcoach.com",
+       "cfdist047.rankingcoach.com",
+       "cfdist048.rankingcoach.com",
+       "cfdist049.rankingcoach.com",
+       "cfdist050.rankingcoach.com",
+       "cfdist051.rankingcoach.com",
+       "cfdist052.rankingcoach.com",
+       "cfdist056.rankingcoach.com",
+       "cfdist057.rankingcoach.com",
+       "cfdist059.rankingcoach.com",
+       "cfdist063.rankingcoach.com",
+       "cfdist064.rankingcoach.com",
+       "cfdist065.rankingcoach.com",
+       "cfdist066.rankingcoach.com",
+       "cfdist068.rankingcoach.com",
+       "cfdist61.rankingcoach.com",
+       "cfdist62.rankingcoach.com",
+       "cfidst067.rankingcoach.com",
+       "cforigin.rankingcoach.com",
+       "confluence.rankingcoach.com",
+       "contao-en.cmstest.rankingcoach.com",
+       "csu.dev.rankingcoach.com",
+       "dan.dev.rankingcoach.com",
+       "dev.rankingcoach.com",
+       "dpu.dev.rankingcoach.com",
+       "dsa.dev.rankingcoach.com",
+       "eca.dev.rankingcoach.com",
+       "eka.dev.rankingcoach.com",
+       "galera1.rankingcoach.com",
+       "gambio-en.cmstest.rankingcoach.com",
+       "gbo.dev.rankingcoach.com",
+       "help.rankingcoach.com",
+       "help.strato.rankingcoach.com",
+       "hosters.rankingcoach.com",
+       "ivs.dev.rankingcoach.com",
+       "joomla-en.cmstest.rankingcoach.com",
+       "k8s-staging.rankingcoach.com",
+       "magento-en.cmstest.rankingcoach.com",
+       "mbt.dev.rankingcoach.com",
+       "media.rankingcoach.com",
+       "mentorship.rankingcoach.com",
+       "mgn.dev.rankingcoach.com",
+       "opencart-en.cmstest.rankingcoach.com",
+       "prestashop-en.cmstest.rankingcoach.com",
+       "rc-api-dev.rankingcoach.com",
+       "rc-api.rankingcoach.com",
+       "rft.dev.rankingcoach.com",
+       "shopware-en.cmstest.rankingcoach.com",
+       "strato.rankingcoach.com",
+       "testing.rankingcoach.com",
+       "typo-en.cmstest.rankingcoach.com",
+       "vault.rankingcoach.com",
+       "web03.rankingcoach.com",
+       "wix.rankingcoach.com",
+       "wordpress-de.cmstest.rankingcoach.com",
+       "wordpress-en.cmstest.rankingcoach.com",
+       "wordpress-it.cmstest.rankingcoach.com",
+       "www2.rankingcoach.com"
+      ],
+      "ip": "176.9.21.52",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {
+        "443": "nginx",
+        "80": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "rankingcoach.com",
+      "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.21.52__rankingcoach.com.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "rankingcoach.com",
+        "is_primary": true,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.21.52__rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "www.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.21.52__www.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "acc-srv.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.21.52__acc-srv.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "acu.dev.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.21.52__acu.dev.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "IPv6 load balancer (ip6-lb2-eu) hosting rankingcoach.com, www.rankingcoach.com and 30+ CDN distribution nodes; nginx on 80/443; secondary to primary but critical for availability and CDN security.",
+      "fqdns": [
+       "rankingcoach.com",
+       "www.rankingcoach.com",
+       "cfdist011.rankingcoach.com",
+       "cfdist014.rankingcoach.com",
+       "cfdist015.rankingcoach.com",
+       "cfdist016.rankingcoach.com",
+       "cfdist017.rankingcoach.com",
+       "cfdist019.rankingcoach.com",
+       "cfdist021.rankingcoach.com",
+       "cfdist023.rankingcoach.com",
+       "cfdist024.rankingcoach.com",
+       "cfdist029.rankingcoach.com",
+       "cfdist031.rankingcoach.com",
+       "cfdist033.rankingcoach.com",
+       "cfdist037.rankingcoach.com",
+       "cfdist041.rankingcoach.com",
+       "cfdist042.rankingcoach.com",
+       "cfdist044.rankingcoach.com",
+       "cfdist046.rankingcoach.com",
+       "cfdist047.rankingcoach.com",
+       "cfdist048.rankingcoach.com",
+       "cfdist049.rankingcoach.com",
+       "cfdist051.rankingcoach.com",
+       "cfdist052.rankingcoach.com",
+       "cfdist059.rankingcoach.com",
+       "cfdist063.rankingcoach.com",
+       "cfdist064.rankingcoach.com",
+       "cfdist065.rankingcoach.com",
+       "cfdist066.rankingcoach.com",
+       "cforigin.rankingcoach.com",
+       "strato.rankingcoach.com"
+      ],
+      "ip": "2a01:4f8:150:10c1::2",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {
+        "443": "nginx",
+        "80": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "ip6-lb2-eu.rankingcoach.com",
+      "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.21.52__rankingcoach.com.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "rankingcoach.com",
+        "is_primary": true,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.21.52__rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Webseite",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "www.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.21.52__www.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Webseite",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "CMS testing infrastructure (cms.rankingcoach.com) with 27 VHosts including WordPress, Joomla, Shopware, Magento, Contao, Prestashop, TYPO3, Concrete5; nginx 1.17.6 (outdated, EOL since 2019); phpmyadmin exposed; critical security risk.",
+      "fqdns": [
+       "admin.cms.rankingcoach.com",
+       "cms.rankingcoach.com",
+       "concrete5.cms.rankingcoach.com",
+       "contao-en.cms.rankingcoach.com",
+       "joomla-en.cms.rankingcoach.com",
+       "joomla3de.cms.rankingcoach.com",
+       "joomla4.cms.rankingcoach.com",
+       "joomla4de.cms.rankingcoach.com",
+       "joomla4en.cms.rankingcoach.com",
+       "joomlaen.cms.rankingcoach.com",
+       "phpmyadmin.cms.rankingcoach.com",
+       "prestashopen.cms.rankingcoach.com",
+       "shopware6-de.cms.rankingcoach.com",
+       "shopware6-en.cms.rankingcoach.com",
+       "typo3en.cms.rankingcoach.com",
+       "wordpress-de.cms.rankingcoach.com",
+       "wordpress-en.cms.rankingcoach.com",
+       "wordpress-gr.cms.rankingcoach.com",
+       "wordpress-it.cms.rankingcoach.com",
+       "wordpressde.cms.rankingcoach.com",
+       "wordpressen.cms.rankingcoach.com",
+       "wordpresses.cms.rankingcoach.com",
+       "wordpressfr.cms.rankingcoach.com",
+       "wordpressgr.cms.rankingcoach.com",
+       "wordpressit.cms.rankingcoach.com",
+       "wordpressnl.cms.rankingcoach.com",
+       "wordpresspt.cms.rankingcoach.com"
+      ],
+      "ip": "138.201.92.68",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {
+        "443": "nginx 1.17.6",
+        "80": "nginx 1.17.6"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "cms.rankingcoach.com",
+      "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/138.201.92.68__admin.cms.rankingcoach.com.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "admin.cms.rankingcoach.com",
+        "is_primary": true,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/138.201.92.68__admin.cms.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx/1.17.6",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "cms.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/138.201.92.68__cms.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx/1.17.6",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "concrete5.cms.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/138.201.92.68__concrete5.cms.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx/1.17.6",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "contao-en.cms.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/138.201.92.68__contao-en.cms.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx/1.17.6",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "joomla-en.cms.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/138.201.92.68__joomla-en.cms.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx/1.17.6",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "fqdns": [
+       "beyondseo.rankingcoach.com",
+       "commercesummit.rankingcoach.com",
+       "dmexco.rankingcoach.com",
+       "events.rankingcoach.com",
+       "oxsummit.rankingcoach.com",
+       "scale.rankingcoach.com",
+       "whdusa.rankingcoach.com",
+       "workshop.rankingcoach.com"
+      ],
+      "ip": "104.18.34.21",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        2096,
+        2082,
+        2083,
+        2052,
+        2053,
+        2086,
+        2087,
+        6443,
+        2095,
+        80,
+        8880,
+        8080,
+        8443,
+        443
+       ],
+       "shodan_services": {
+        "443": "CloudFlare",
+        "8443": "CloudFlare"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Kubernetes cluster infrastructure (k8s.rankingcoach.com, dashboard.k8s, swagger.k8s); internal management interfaces with high attack surface; must assess security controls.",
+      "fqdns": [
+       "dashboard.k8s.rankingcoach.com",
+       "k8s.rankingcoach.com",
+       "swagger.k8s.rankingcoach.com"
+      ],
+      "ip": "116.202.3.75",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "tlsrpt_present": false
+      },
+      "rdns": "k8s.rankingcoach.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "fqdns": [
+       "blog.rankingcoach.com",
+       "go.rankingcoach.com",
+       "knowledge.rankingcoach.com"
+      ],
+      "ip": "199.60.103.225",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        2096,
+        2082,
+        2083,
+        2052,
+        2053,
+        2086,
+        2087,
+        6443,
+        2095,
+        80,
+        8880,
+        8080,
+        8443,
+        443
+       ],
+       "shodan_services": {
+        "443": "CloudFlare",
+        "8443": "CloudFlare"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Google Cloud infrastructure (agent0-node-01) with 3 vhost entries; internal agent/node infrastructure; assess for exposure and misconfiguration.",
+      "fqdns": [
+       "vhost1.agent0-node-01.rankingcoach.com",
+       "vhost2.agent0-node-01.rankingcoach.com",
+       "vhost3.agent0-node-01.rankingcoach.com"
+      ],
+      "ip": "35.242.218.7",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "tlsrpt_present": false
+      },
+      "rdns": "7.218.242.35.bc.googleusercontent.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Load balancer (lb2-eu) and CDN nameserver (ns1cdn); nginx on 80/443 and DNS on 53; critical infrastructure for availability and DNS security.",
+      "fqdns": [
+       "lb2-eu.rankingcoach.com",
+       "ns1cdn.rankingcoach.com"
+      ],
+      "ip": "176.9.16.197",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        80,
+        443,
+        53
+       ],
+       "shodan_services": {
+        "443": "nginx",
+        "80": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "lb2-eu.rankingcoach.com",
+      "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.16.197__lb2-eu.rankingcoach.com.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "lb2-eu.rankingcoach.com",
+        "is_primary": true,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.16.197__lb2-eu.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "ns1cdn.rankingcoach.com",
+        "is_primary": false,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/176.9.16.197__ns1cdn.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Jimdo integration host with FTP (Pure-FTPd) and SSH (OpenSSH 9.6p1) exposed; file transfer and remote access services present security risk; assess for unauthorized access.",
+      "fqdns": [
+       "jimdo.rankingcoach.com"
+      ],
+      "ip": "128.140.80.215",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        80,
+        443,
+        21,
+        22
+       ],
+       "shodan_services": {
+        "21": "Pure-FTPd",
+        "22": "OpenSSH 9.6p1 Ubuntu 3ubuntu13.16"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "static.215.80.140.128.clients.your-server.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "fqdns": [
+       "assets.rankingcoach.com"
+      ],
+      "ip": "13.224.68.108",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        80
+       ],
+       "shodan_services": {
+        "80": "CloudFront httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "server-13-224-68-108.ham50.r.cloudfront.net",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Backup DNS/CDN nameserver (ns3cdn, rc-backup-02); nginx on 80/443 and DNS on 53; critical for DNS resilience and backup infrastructure security.",
+      "fqdns": [
+       "ns3cdn.rankingcoach.com"
+      ],
+      "ip": "135.181.161.180",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "shodan_ports": [
+        80,
+        443,
+        53
+       ],
+       "shodan_services": {
+        "443": "nginx",
+        "80": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "rc-backup-02.rankingcoach.com",
+      "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/135.181.161.180__ns3cdn.rankingcoach.com.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "ns3cdn.rankingcoach.com",
+        "is_primary": true,
+        "screenshot_minio_key": "ac5dd342-8586-4cc5-91a5-c33f673a3a38/135.181.161.180__ns3cdn.rankingcoach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "API staging server (api-staging-server.rankingcoach.com); staging infrastructure with potential exposure of development/test credentials and API endpoints.",
+      "fqdns": [
+       "api-staging-server.rankingcoach.com"
+      ],
+      "ip": "157.90.134.177",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "tlsrpt_present": false
+      },
+      "rdns": "api-staging-server.rankingcoach.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Production API node (api01.rankingcoach.com); critical API infrastructure serving customer requests; assess for vulnerabilities and misconfigurations.",
+      "fqdns": [
+       "api01.rankingcoach.com"
+      ],
+      "ip": "176.9.118.221",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "tlsrpt_present": false
+      },
+      "rdns": "api01.rankingcoach.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Internship/QA infrastructure (internship.rankingcoach.com, qa01 RDNS); testing environment with potential for exposure of sensitive data or development tools.",
+      "fqdns": [
+       "internship.rankingcoach.com"
+      ],
+      "ip": "176.9.17.144",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "tlsrpt_present": false
+      },
+      "rdns": "qa01.rankingcoach.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Backup infrastructure (backup.rankingcoach.com); backup systems often overlooked in security; assess for proper access controls and encryption.",
+      "fqdns": [
+       "backup.rankingcoach.com"
+      ],
+      "ip": "176.9.20.43",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 3,
+       "tlsrpt_present": false
+      },
+      "rdns": "backup.rankingcoach.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": [
+     {
+      "fqdns": [
+       "api02.rankingcoach.com"
+      ],
+      "ip": "176.9.22.111",
+      "rdns": "api02.rankingcoach.com"
+     },
+     {
+      "fqdns": [
+       "apps-db-03.rankingcoach.com"
+      ],
+      "ip": "176.9.38.61",
+      "rdns": "apps-db-03.rankingcoach.com"
+     },
+     {
+      "fqdns": [
+       "quiz.rankingcoach.com"
+      ],
+      "ip": "18.233.21.215",
+      "rdns": "ec2-18-233-21-215.compute-1.amazonaws.com"
+     },
+     {
+      "fqdns": [
+       "grow.rankingcoach.com"
+      ],
+      "ip": "185.158.133.1",
+      "rdns": "lovable-app-cd-1-4.p.l5e.io"
+     },
+     {
+      "fqdns": [
+       "doc.rankingcoach.com"
+      ],
+      "ip": "3.216.238.236",
+      "rdns": "ec2-3-216-238-236.compute-1.amazonaws.com"
+     },
+     {
+      "fqdns": [
+       "api-staging.rankingcoach.com"
+      ],
+      "ip": "46.4.207.221",
+      "rdns": "static.221.207.4.46.clients.your-server.de"
+     },
+     {
+      "fqdns": [
+       "cpanel-tests.rankingcoach.com"
+      ],
+      "ip": "54.217.236.241",
+      "rdns": "ec2-54-217-236-241.eu-west-1.compute.amazonaws.com"
+     },
+     {
+      "fqdns": [
+       "mon.rankingcoach.com"
+      ],
+      "ip": "65.21.151.197",
+      "rdns": "mon.rankingcoach.com"
+     },
+     {
+      "fqdns": [
+       "ollama.rankingcoach.com"
+      ],
+      "ip": "86.120.61.26",
+      "rdns": "static-86-120-61-26.rdsnet.ro"
+     },
+     {
+      "fqdns": [
+       "apps-db-02.rankingcoach.com"
+      ],
+      "ip": "88.198.92.122",
+      "rdns": "apps-db-02.rankingcoach.com"
+     }
+    ]
+   },
+   "hostsCompleted": 15,
+   "hostsTotal": 15,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 1,
+   "HIGH": 1,
+   "INFO": 1,
+   "LOW": 2,
+   "MEDIUM": 4
+  },
+  "startedAt": "2026-05-28T10:44:54.669Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "strict",
+   "passed": true,
+   "warning_count": 5,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "0",
+       "2024",
+       "04"
+      ],
+      "title": "Nginx 1.24.0 (EOL seit 2024-04) auf jimdo.rankingcoach.com"
+     },
+     "finding_id": "VS-2026-005",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['0', '2024', '04']",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "finding_version": "1.24.0",
+      "software": "nginx",
+      "tech_version": "1.17.6"
+     },
+     "finding_id": "VS-2026-005",
+     "message": "Versionskonflikt nginx: Finding nennt 1.24.0, Tech-Tabelle hat 1.17.6",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "finding_version": "1.24.0",
+      "software": "nginx",
+      "tech_version": "1.17.6"
+     },
+     "finding_id": "VS-2026-005",
+     "message": "Versionskonflikt nginx: Finding nennt 1.24.0, Tech-Tabelle hat 1.17.6",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "finding_version": "1.24.0",
+      "software": "Nginx",
+      "tech_version": "1.17.6"
+     },
+     "finding_id": "VS-2026-005",
+     "message": "Versionskonflikt Nginx: Finding nennt 1.24.0, Tech-Tabelle hat 1.17.6",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "finding_version": "1.17.6",
+      "software": "Nginx",
+      "tech_version": "1.24.0"
+     },
+     "finding_id": "VS-2026-007",
+     "message": "Versionskonflikt Nginx: Finding nennt 1.17.6, Tech-Tabelle hat 1.24.0",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

@@ -1,0 +1,293 @@
+{
+ "data": {
+  "businessImpactScore": 3,
+  "correlationCount": 7,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "trunk-immobilien.de",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-05-11T10:20:44.702Z",
+  "hasReport": true,
+  "id": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "none",
+     "pct": 100,
+     "raw": "v=DMARC1;p=none;pct=100;aspf=r;adkim=r;",
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/trunk-immobilien.de",
+     "domain": "trunk-immobilien.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/trunk-immobilien.de"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.trunk-immobilien.de",
+    "dev.trunk-immobilien.de",
+    "ftp.trunk-immobilien.de",
+    "webmail.trunk-immobilien.de",
+    "www.trunk-immobilien.de"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "trunk-immobilien.de",
+    "records": [
+     {
+      "last_seen": "2026-05-10T06:58:30.107000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "5.199.141.24"
+     },
+     {
+      "last_seen": "2026-05-10T07:07:35.965000",
+      "options": {
+       "priority": 10,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx.publishsoft.de"
+     },
+     {
+      "last_seen": "2026-05-10T07:06:45.530000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.publishsoft.de"
+     },
+     {
+      "last_seen": "2026-05-10T07:06:45.530000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns2.publishsoft.de"
+     },
+     {
+      "last_seen": "2026-05-10T07:08:39.957000",
+      "options": {
+       "expires": 2592000,
+       "hostmaster": "administrator.publishsoft.de",
+       "minttl": 300,
+       "refresh": 28800,
+       "retry": 14400,
+       "serial": 2022042102,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns.publishsoft.de"
+     },
+     {
+      "last_seen": "2026-05-10T07:01:47.574000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 mx -all"
+     },
+     {
+      "last_seen": "2026-05-10T07:01:47.468000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1;p=none;pct=100;aspf=r;adkim=r;"
+     },
+     {
+      "last_seen": "2026-05-10T06:58:32.711000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "dev",
+      "type": "A",
+      "value": "5.199.141.24"
+     },
+     {
+      "last_seen": "2026-05-10T06:58:29.986000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "ftp",
+      "type": "A",
+      "value": "5.199.141.24"
+     },
+     {
+      "last_seen": "2026-05-10T06:58:30.380000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "webmail",
+      "type": "A",
+      "value": "5.199.141.24"
+     },
+     {
+      "last_seen": "2026-05-10T06:58:30.156000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "5.199.141.24"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "dev",
+     "ftp",
+     "webmail",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 8,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 3,
+      "crtsh": 0,
+      "gobuster_dns": 2,
+      "phase0a_passive": 5,
+      "subfinder": 4
+     },
+     "tools_with_zero_results": [
+      "crtsh"
+     ],
+     "total_subdomains": 8
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": false,
+     "dmarc": "v=DMARC1;p=none;pct=100;aspf=r;adkim=r;",
+     "mx": [
+      "mx.publishsoft.de"
+     ],
+     "ns": [
+      "ns2.publishsoft.de",
+      "ns.publishsoft.de"
+     ],
+     "spf": "v=spf1 mx -all",
+     "zone_transfer": false
+    },
+    "domain": "trunk-immobilien.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain trunk-immobilien.de mit mehreren kritischen Findings: veraltete OpenSSH 7.4 und MariaDB 5.5.68 aus Shodan (Priorität 1), exponierte Management-Ports (22, 3306, 21), Mail-Infrastruktur (Postfix) mit schwacher DMARC-Policy (p=none), fehlende DKIM und DNSSEC. Trotz has_web=false müssen alle Services gescannt werden (nmap + testssl + Mail-Checks).",
+      "fqdns": [
+       "trunk-immobilien.de",
+       "www.trunk-immobilien.de",
+       "dev.trunk-immobilien.de",
+       "ftp.trunk-immobilien.de",
+       "webmail.trunk-immobilien.de"
+      ],
+      "ip": "5.199.141.24",
+      "rdns": "home4.publishsoft.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 1,
+   "hostsTotal": 1,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 1,
+   "INFO": 1,
+   "LOW": 3,
+   "MEDIUM": 4
+  },
+  "startedAt": "2026-05-10T22:25:04.579Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}

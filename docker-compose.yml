@@ -620,7 +620,22 @@ services:
       - vectiscan-internal
 
   minio:
-    image: minio/minio:latest
+    # S0a: Docker Hub liefert den MinIO-Namensraum nicht mehr aus. Ein Pull von
+    # minio/minio:latest scheitert seit dem Deploy vom 17.09.2026 mit
+    # "pull access denied ... repository does not exist"; minio/minio und
+    # minio/mc antworten beide mit 404, grafana/grafana als Gegenprobe mit 200.
+    # Es ist also kein Rate-Limit und kein abgelaufenes Login, sondern der
+    # Wegfall des Repositories. Distribution laeuft ueber quay.io weiter.
+    #
+    # Pin per Digest statt per Tag, damit der naechste Deploy exakt das Image
+    # weiterverwendet, das auf vectigal-docker02 laeuft, und kein ungeplantes
+    # MinIO-Upgrade wird. Der Digest ist auf quay.io byte-identisch zu dem, den
+    # Docker Hub ausgeliefert hat (per Registry-API geprueft), und entspricht
+    # RELEASE.2025-09-07T16-13-09Z -- der laufenden Version.
+    #
+    # Achtung bei Updates: Community-Releases sind seit September 2025
+    # eingestellt, das ist der letzte. Ablaeuft-Thema, siehe Issue.
+    image: quay.io/minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
