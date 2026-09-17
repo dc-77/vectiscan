@@ -143,11 +143,17 @@ test-report-worker:
   tags: [vectigal]
   image: python:3.12-slim
   script:
-    - cd report-worker && python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt pytest && pytest
+    - cd report-worker && python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt pytest pyyaml && pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    # S0c: der Golden-Smoke-Test braucht Linux, weil zwei Tars
+    # IPv6-Hostverzeichnisse mit Doppelpunkt enthalten. Per API-Pipeline
+    # manuell startbar, ohne dass dafuer ein Build laufen muss.
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
 
 # VEC-160 / VEC-143 / VEC-269 / VEC-439: Edge admin-guard regression gate (SICHERHEITSKRITISCH).
 # Fails the pipeline if a public Traefik router gains a Host() that is not also
