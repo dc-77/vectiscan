@@ -156,8 +156,10 @@ def _build_scope_methodology(story, styles, data: dict[str, Any]) -> None:
     story.append(Spacer(1, 2 * mm))
     _body(
         story, styles,
-        "Die Pruefung lief als automatisierter Scan nach dem PTES-Standard "
-        "(Penetration Testing Execution Standard). Sie umfasst vier Phasen:",
+        "Die Pruefung lief als automatisierte externe Schwachstellenanalyse, "
+        "angelehnt an die Pruefphasen Aufklaerung, Schwachstellenanalyse und "
+        "Bericht. Sie ist kein Penetrationstest: geprueft wird ohne Zugangsdaten "
+        "von aussen, gefundene Schwaechen werden nicht ausgenutzt. Vier Phasen:",
     )
     for phase in method.get("phases") or []:
         _body(

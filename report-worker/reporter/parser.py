@@ -398,6 +398,15 @@ def parse_zap_alerts_json(path: str) -> list[dict[str, Any]]:
             "confidence": a.get("confidence", ""),
             "method": a.get("method", ""),
             "param": a.get("param", ""),
+            # S0b: pluginId ist der stabile Schluessel einer ZAP-Regel und
+            # damit die Anknuepfung fuer den Pruefkatalog (spec/06 Abschnitt 4:
+            # rund 150 Alert-Typen mit festen IDs). Bisher wurde er beim Parsen
+            # verworfen, der Reporter konnte einen Alert also nur ueber seinen
+            # Anzeigenamen zuordnen.
+            "pluginId": str(a.get("pluginId", "")),
+            "alertRef": str(a.get("alertRef", a.get("pluginId", ""))),
+            "riskcode": str(a.get("riskcode", "")),
+            "sourceid": str(a.get("sourceid", "")),
         })
 
     alerts.sort(key=lambda x: _SEVERITY_ORDER.get(x.get("severity", "info"), 3))

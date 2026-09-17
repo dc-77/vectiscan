@@ -1,0 +1,8 @@
+# Nur was der Testlaeufer im Compose-Netz braucht. Der scan-worker selbst
+# bringt diese Pakete ueber requirements.txt mit; hier laeuft aber ein
+# nacktes python:3.12-slim, damit der Integrationstest kein 15-Minuten-Build
+# des Scanner-Images voraussetzt.
+requests
+redis
+structlog
+pytest

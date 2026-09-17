@@ -1,0 +1,248 @@
+{
+ "beschreibung": "Golden-Fixtures fuer den Report-Umbau (spec/05 bis 07, Session S0c). Dateinamen tragen nur Auftrags-UUIDs, also keine Kundennamen. Domains bleiben in den Daten stehen, weil die Fakten sonst wertlos sind. Screenshots sind aus allen Tars entfernt (spec/07 Abschnitt 1).",
+ "api_snapshot_orders": 39,
+ "tars_erwartet": 10,
+ "tars_vorhanden": 10,
+ "orders": [
+  {
+   "order_id": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
+   "domains": [
+    "trunk-immobilien.de"
+   ],
+   "package": "perimeter",
+   "created": "2026-05-10T22:24:40.599Z",
+   "started": "2026-05-10T22:25:04.579Z",
+   "finished": "2026-05-11T10:20:44.702Z",
+   "roles": [
+    "negative"
+   ],
+   "note": "trunk-immobilien.de, traegt allein fuenf Eintraege aus negative.json",
+   "negative_entries": 3,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 26039,
+    "sha256": "55e84c5260994b8002f81f6729bf38537cb1f19713197a3e0835369076a0e6ce",
+    "members": 35,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "176db198-fa4a-4520-bf18-43cbc02a229d",
+   "domains": [
+    "heuel.com"
+   ],
+   "package": "perimeter",
+   "created": "2026-05-21T23:49:54.448Z",
+   "started": "2026-05-21T23:50:35.478Z",
+   "finished": "2026-05-22T07:33:06.467Z",
+   "roles": [
+    "drift"
+   ],
+   "note": "heuel.com, juengster von sechs Laeufen",
+   "negative_entries": 0,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 378769,
+    "sha256": "f77a8097b2f929eef155eca020854b1f9172260bf9ddc821a658fe1addcd13f9",
+    "members": 63,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "fb13a98f-22c6-4d17-875c-eeeb14643beb",
+   "domains": [
+    "krause-computer.de"
+   ],
+   "package": "perimeter",
+   "created": "2026-05-26T12:21:01.343Z",
+   "started": "2026-05-26T12:21:13.620Z",
+   "finished": "2026-05-26T12:56:53.177Z",
+   "roles": [
+    "negative"
+   ],
+   "note": "krause-computer.de",
+   "negative_entries": 1,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 46150,
+    "sha256": "13927cc037d2e4aa0bfc19e9317fee4e869d872913415cbaca971f4a4b1c9fd9",
+    "members": 52,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "ae8d1d70-7925-4e3c-84de-3113f3e57b60",
+   "domains": [
+    "securess.de"
+   ],
+   "package": "perimeter",
+   "created": "2026-07-19T21:02:08.007Z",
+   "started": "2026-07-19T21:05:03.446Z",
+   "finished": "2026-07-20T00:33:54.464Z",
+   "roles": [
+    "drift",
+    "negative"
+   ],
+   "note": "securess.de 19.07.2026, juengster von acht Laeufen",
+   "negative_entries": 2,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 90231,
+    "sha256": "4311a67e28741817baa3df4371d4010b5fc32955266c2bd961b14cb013173884",
+    "members": 85,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "f77ccff2-fc7a-4488-a9ba-540a42a25056",
+   "domains": [
+    "castenow.de"
+   ],
+   "package": "perimeter",
+   "created": "2026-07-19T23:39:47.635Z",
+   "started": "2026-07-19T23:40:06.096Z",
+   "finished": "2026-07-22T20:48:24.654Z",
+   "roles": [
+    "drift",
+    "coverage"
+   ],
+   "note": "castenow.de. Der Auftrag laeuft in der API vom 19.07. bis 22.07.2026, der Scan selbst aber nur 46 Minuten (meta.json im Tar: 19.07. 23:40 bis 20.07. 00:26). Die drei Tage liegen zwischen Scanende und Auftragsabschluss, also in Bericht und Freigabe, nicht im Scan. Als Coverage-Fixture taugt der Lauf trotzdem: von neun Hosts haben nur einer ffuf_param und wpscan, sechs zap und sieben feroxbuster. Genau diese Luecken muessen im Abdeckungskapitel stehen",
+   "negative_entries": 0,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 276201,
+    "sha256": "f296172c020c765b5c4d317df682044612369404cc111c1cb2aef82f68367f11",
+    "members": 137,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "4e6b6883-a6c8-4204-8b13-b37f907322ca",
+   "domains": [
+    "castenow.de"
+   ],
+   "package": "perimeter",
+   "created": "2026-07-22T08:08:44.365Z",
+   "started": "2026-07-22T08:10:02.316Z",
+   "finished": "2026-07-22T20:48:12.673Z",
+   "roles": [
+    "golden",
+    "drift"
+   ],
+   "note": "castenow.de 22.07.2026 08:08, Referenzlauf; reichste Infrastruktur (Exchange, Nextcloud, Bitwarden, Icecast), spec/06 Abschnitt 2.1",
+   "negative_entries": 0,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 373769,
+    "sha256": "ce18b5fd8faf702f40bc47a4081b6f18781bf2e97241787616097c150a2e873b",
+    "members": 142,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "2d2d4f39-0816-46a0-ba96-4d36b248a86c",
+   "domains": [
+    "castenow.de"
+   ],
+   "package": "perimeter",
+   "created": "2026-07-22T15:45:45.369Z",
+   "started": "2026-07-22T15:46:28.819Z",
+   "finished": "2026-08-31T10:55:08.279Z",
+   "roles": [
+    "drift"
+   ],
+   "note": "castenow.de 22.07.2026 15:45, zweiter Lauf am selben Tag",
+   "negative_entries": 0,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 298912,
+    "sha256": "bf618a5c4a350fc4bfe0e7660bfc287730a1e44fa8450dd4471e0d855764a7a1",
+    "members": 147,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
+   "domains": [
+    "junkerwerk.de",
+    "junkerwerk.hu"
+   ],
+   "package": "perimeter",
+   "created": "2026-08-31T14:10:12.700Z",
+   "started": "2026-08-31T14:10:43.837Z",
+   "finished": "2026-08-31T14:41:05.242Z",
+   "roles": [
+    "golden",
+    "drift",
+    "negative"
+   ],
+   "note": "Junkerwerk Lauf 1, beide Domains; Soll-Liste in expected/junkerwerk.json",
+   "negative_entries": 4,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 104628,
+    "sha256": "cf2d1228dc3f141cf80bae3eda7d8ab62e43afe4834178ab623b913eeed8a09c",
+    "members": 97,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "2572eebc-6135-40e6-b1d2-e9dfccc20ae6",
+   "domains": [
+    "junkerwerk.de"
+   ],
+   "package": "perimeter",
+   "created": "2026-08-31T14:26:10.143Z",
+   "started": "2026-08-31T14:27:22.401Z",
+   "finished": "2026-08-31T14:56:47.175Z",
+   "roles": [
+    "golden",
+    "drift",
+    "negative"
+   ],
+   "note": "Junkerwerk Lauf 2, junkerwerk.de",
+   "negative_entries": 3,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 65368,
+    "sha256": "7087899baa525c4f6db99e89d21dda13966626429851ebc48048b539c60db541",
+    "members": 90,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108",
+   "domains": [
+    "junkerwerk.hu"
+   ],
+   "package": "perimeter",
+   "created": "2026-08-31T14:26:28.588Z",
+   "started": "2026-08-31T14:27:27.791Z",
+   "finished": "2026-08-31T14:41:55.093Z",
+   "roles": [
+    "golden",
+    "drift",
+    "negative"
+   ],
+   "note": "Junkerwerk Lauf 3, junkerwerk.hu",
+   "negative_entries": 1,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 46700,
+    "sha256": "2a1280731eebfda54ef9ca3c56fbcf034d7cd5a99f25d53435756d63ed1903c8",
+    "members": 47,
+    "images": 0
+   }
+  }
+ ]
+}

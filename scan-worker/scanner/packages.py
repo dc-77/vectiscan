@@ -12,12 +12,17 @@ from typing import Any
 # Perimeter+ base config (shared by perimeter, compliance, supplychain, insurance)
 # ---------------------------------------------------------------------------
 _PERIMETER_BASE: dict[str, Any] = {
-    # F-P0A-003: Threat-Intel-Clients (URLhaus/GreyNoise/OTX/VirusTotal)
-    # ergaenzen die bestehenden Shodan/AbuseIPDB/SecurityTrails/WHOIS-Quellen.
-    # URLhaus/GreyNoise/OTX laufen ohne API-Key (Free-Tier), VT braucht einen
-    # Key, ueberspringt sich aber sauber wenn keiner gesetzt ist.
+    # F-P0A-003: Threat-Intel-Clients (URLhaus/GreyNoise/OTX) ergaenzen die
+    # bestehenden Shodan/AbuseIPDB/SecurityTrails/WHOIS-Quellen; alle drei
+    # laufen ohne API-Key (Free-Tier).
+    # S0a (Entscheidung DC, spec/07 Abschnitt 1): VirusTotal laeuft vorerst
+    # nicht mit. Kein Key, kein Vertrag -- die kostenlose VT-API ist laut
+    # Nutzungsbedingungen nicht fuer kommerzielle Produkte gedacht. Reputation
+    # deckt URLhaus/AbuseIPDB/GreyNoise/OTX bereits ab. Der Client bleibt unter
+    # scanner/passive/virustotal_client.py im Code und ist durch Aufnahme in
+    # diese Liste jederzeit wieder aktivierbar.
     "phase0a_tools": ["shodan", "abuseipdb", "securitytrails", "whois",
-                      "urlhaus", "greynoise", "otx", "virustotal"],
+                      "urlhaus", "greynoise", "otx"],
     "phase0a_timeout": 120,       # 2 Minuten
     # F-P0A-005: Cap fuer Shodan/AbuseIPDB IP-Loops (war hardcoded 15).
     # ENV-Override `PHASE0A_IP_CAP` ueberschreibt diesen Wert (Premium-Tier).
@@ -78,7 +83,7 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
 
     # ------------------------------------------------------------------
     # PerimeterScan — "Wie sieht unsere Angriffsfläche aus?"
-    # Vollscan, alle Tools, max 15 Hosts, PTES-konformer Report
+    # Vollscan, alle Tools, max 15 Hosts, externe Schwachstellenanalyse
     # ------------------------------------------------------------------
     "perimeter": {**_PERIMETER_BASE},
 

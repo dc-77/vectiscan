@@ -357,7 +357,14 @@ ZAP-Konfiguration:
 - `zap_scan_policy`: passive-only / waf-safe / standard / aggressive
 - `zap_spider_max_depth`: 3–7 (SPA: 6–7, statisch: 3)
 - `zap_ajax_spider_enabled`: true bei React/Vue/Angular/Next/Nuxt/Shopware 6
-- `zap_active_categories`: sqli, xss, lfi, rfi, ssrf, cmdi, xxe, crlf
+- `zap_active_categories`: sqli, xss, lfi, rfi, cmdi, xxe, crlf.
+  `ssrf` ist seit S0b nicht verfügbar: die ZAP-Regel 40046 fehlt in
+  `zaproxy/zap-stable:2.17.0`. Ebenso fehlt 40024 (SQLi SQLite), `sqli`
+  deckt dadurch fünf statt sechs Regeln ab. Kein Add-on nachziehen
+  (Entscheidung DC), Wiedervorlage bei der Paketdefinition in S7.
+  Maßgeblich ist `ZapClient.CATEGORY_SCANNER_IDS` plus
+  `CATEGORIES_UNAVAILABLE`; Abweichungen fängt
+  `scan-worker/tests/test_zap_categories_drift.py`.
 - `zap_rate_req_per_sec` / `zap_threads` / `zap_spider_delay_ms`: WAF →
   15/2/800, ohne WAF → 80/5/0
 
@@ -372,7 +379,7 @@ Antwortformat:
   "zap_scan_policy": "standard",
   "zap_spider_max_depth": 5,
   "zap_ajax_spider_enabled": true,
-  "zap_active_categories": ["sqli", "xss", "lfi", "ssrf"],
+  "zap_active_categories": ["sqli", "xss", "lfi", "cmdi"],
   "zap_rate_req_per_sec": 80,
   "zap_threads": 5,
   "zap_spider_delay_ms": 0,
@@ -431,7 +438,21 @@ httpx -u <fqdn> -json -o <output> -status-code -title -tech-detect \
   crlf (40003)
 - **Verbotene Scanner:** 40032 (DoS), 30001/30002 (Buffer Overflow),
   40033/40034 (Fuzzer)
-- Timeout 600 s
+- **Nicht im Image vorhanden** (S0b, `zaproxy/zap-stable:2.17.0`): 40046
+  (SSRF) und 40024 (SQLi SQLite). Angeforderte IDs werden zur Laufzeit gegen
+  `GET /JSON/ascan/view/scanners/` geschnitten; unbekannte IDs werden
+  verworfen und protokolliert, statt sie an ZAP zu schicken. Ohne diesen
+  Schnitt lehnt ZAP den gesamten `enableScanners`-Aufruf ab
+  (`does_not_exist`) und der Active Scan fällt komplett aus — das war die
+  Ursache dafür, dass `zap_active` in 42 Produktionsscans nie ein Ergebnis
+  lieferte.
+- Poll-Timeout: `ZAP_ACTIVE_SCAN_TIMEOUT_SEC` (Default 900 s). Muss ueber
+  ZAPs eigenem Scan-Cap `scanner.maxScanDurationInMins` (docker-compose: 12 Min
+  = 720 s) liegen. Frueher fest 600 s und damit UNTER dem ZAP-Cap: der Poll
+  gab auf, bevor ZAP den Scan sauber beendete, und ein an sich erfolgreicher
+  Lauf wurde als `timeout` verworfen (S0b-Nachtrag). Beim Cap beendet ZAP den
+  Scan und meldet `status=100`; der Poll greift dann. Wer den ZAP-Cap
+  hochsetzt, muss diesen Wert nachziehen.
 
 #### ffuf (nur Perimeter+)
 3 Modi (KI-adaptiv):
@@ -600,7 +621,7 @@ Order-Score: gewichteter Durchschnitt der Top-5-Findings
 | Paket | Prompt | Besonderheiten |
 |-------|--------|----------------|
 | WebCheck | SYSTEM_PROMPT_WEBCHECK | Einfache Sprache, max 5–8 Findings, Ampelsystem |
-| Perimeter | SYSTEM_PROMPT_PERIMETER | PTES-konform, EPSS-Kontext, Evidence |
+| Perimeter | SYSTEM_PROMPT_PERIMETER | Externe Schwachstellenanalyse, EPSS-Kontext, Evidence |
 | Compliance | SYSTEM_PROMPT_COMPLIANCE | + §30 BSIG, BSI-Grundschutz, NIST CSF, Audit-Trail |
 | SupplyChain | SYSTEM_PROMPT_SUPPLYCHAIN | + ISO 27001 Annex A, Lieferketten-1-Seiter |
 | Insurance | SYSTEM_PROMPT_INSURANCE | + Versicherungsfragebogen, Ransomware-Indikator |

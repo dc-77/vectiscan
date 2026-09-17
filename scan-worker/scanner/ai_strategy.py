@@ -660,13 +660,15 @@ ZAP-KONFIGURATION (OWASP ZAP Daemon):
   - "xss" — Cross-Site Scripting (reflected + stored)
   - "lfi" — Local File Inclusion / Path Traversal
   - "rfi" — Remote File Inclusion
-  - "ssrf" — Server-Side Request Forgery
   - "cmdi" — Command Injection
   - "xxe" — XML External Entity
   - "crlf" — CRLF Injection
+  Nur diese Namen sind zulässig. Andere Werte werden verworfen.
+  "ssrf" steht bewusst nicht zur Wahl: die zugehörige ZAP-Regel ist im
+  eingesetzten Image nicht enthalten (S0b).
   Bei PHP-Servern: sqli, xss, lfi, rfi, cmdi
   Bei Java/Spring/Tomcat: sqli, xss, lfi, xxe, cmdi
-  Bei Node.js/Express: xss, ssrf, cmdi, crlf
+  Bei Node.js/Express: xss, cmdi, crlf
   Bei statischen Seiten: nur xss
 - zap_rate_req_per_sec: 15–80 (Default: 80). Bei WAF: 15. Ohne WAF: 80.
 - zap_threads: 2–5 (Default: 5). Bei WAF: 2. Ohne WAF: 5.
@@ -704,7 +706,7 @@ PHASE2_CONFIG_SCHEMA = """{
   "zap_scan_policy": "standard",
   "zap_spider_max_depth": 5,
   "zap_ajax_spider_enabled": true,
-  "zap_active_categories": ["sqli", "xss", "lfi", "ssrf"],
+  "zap_active_categories": ["sqli", "xss", "lfi", "cmdi"],
   "zap_rate_req_per_sec": 80,
   "zap_threads": 5,
   "zap_spider_delay_ms": 0,
@@ -712,6 +714,30 @@ PHASE2_CONFIG_SCHEMA = """{
   "skip_tools": [],
   "reasoning": "Kurze Begründung der Konfiguration"
 }"""
+
+
+def _filter_zap_categories(config: dict[str, Any], ip: str | None = None) -> None:
+    """Nur Kategorien stehen lassen, die ZapClient wirklich anbietet.
+
+    S0b: Weder die KI-Antwort noch die Regel-Engine sind die Autoritaet fuer
+    Kategorienamen. Bei der KI kommt dazu, dass der Cache-Key nicht am
+    System-Prompt haengt (ai_cache.cache_key, Modus content_hash und
+    order_scope): eine zwischengespeicherte Antwort kann Kategorien nennen,
+    die es nicht mehr gibt oder nie gab ("ssrf" ohne Regel im Image,
+    "path_traversal" statt "pathtraversal", "auth_bypass"). Solche Namen
+    liefen bisher still ins Leere und versprachen eine Pruefung, die nie lief.
+    """
+    raw = config.get("zap_active_categories")
+    if not isinstance(raw, list):
+        return
+    from scanner.tools.zap_client import ZapClient
+    erlaubt = set(ZapClient.offered_categories())
+    gefiltert = [c for c in raw if c in erlaubt]
+    verworfen = [c for c in raw if c not in erlaubt]
+    if verworfen:
+        log.warning("zap_categories_dropped", ip=ip, dropped=verworfen,
+                    kept=gefiltert)
+    config["zap_active_categories"] = gefiltert
 
 
 def plan_phase2_config(
@@ -733,6 +759,7 @@ def plan_phase2_config(
         tech_profile, package, host_inventory.get("domain", ""),
     )
     if rule_result is not None:
+        _filter_zap_categories(rule_result, tech_profile.get("ip"))
         log.info("phase2_config_rule_based",
                  ip=tech_profile.get("ip"),
                  reason=rule_result.get("reasoning", ""))
@@ -810,7 +837,7 @@ Antwort im Format:
             "zap_scan_policy": "standard",
             "zap_spider_max_depth": 5,
             "zap_ajax_spider_enabled": False,
-            "zap_active_categories": ["sqli", "xss", "lfi", "ssrf", "cmdi"],
+            "zap_active_categories": ["sqli", "xss", "lfi", "cmdi"],  # S0b: ssrf raus, Regel fehlt im Image
             "zap_rate_req_per_sec": 80,
             "zap_threads": 5,
             "zap_spider_delay_ms": 0,
@@ -818,6 +845,8 @@ Antwort im Format:
             "skip_tools": [],
             "reasoning": f"Fallback — {reason}",
         }
+
+    _filter_zap_categories(result, tech_profile.get("ip"))
 
     log.info("ai_phase2_config_complete",
              ip=tech_profile.get("ip"),

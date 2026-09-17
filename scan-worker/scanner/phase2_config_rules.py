@@ -16,9 +16,15 @@ from __future__ import annotations
 from typing import Any, Optional
 
 # Default-Sets pro Profil
-_CATEGORIES_FULL = ["sqli", "xss", "lfi", "ssrf", "cmdi", "path_traversal"]
+# S0b: Die Namen muessen in ZapClient.CATEGORY_SCANNER_IDS stehen und duerfen
+# nicht als nicht verfuegbar markiert sein, sonst versprechen sie eine Pruefung,
+# die nie laeuft. Frueher standen hier "path_traversal" (heisst dort
+# "pathtraversal"), "auth_bypass" (gibt es nicht) und "ssrf" (Regel 40046 fehlt
+# im gepinnten Image) -- alle drei liefen still ins Leere.
+# Bewacht von tests/test_zap_categories_drift.py. Wiedervorlage S7.
+_CATEGORIES_FULL = ["sqli", "xss", "lfi", "cmdi", "pathtraversal"]
 _CATEGORIES_WAF_SAFE = ["sqli", "xss", "lfi"]
-_CATEGORIES_API = ["sqli", "ssrf", "cmdi", "auth_bypass"]
+_CATEGORIES_API = ["sqli", "cmdi", "xxe"]
 
 # F-KI3-002: Hosted-CMS / Website-Builder — Server-Konfig nicht aenderbar,
 # Active-Scans erzeugen 403/429. Nur passive Checks + minimale XSS-Suche.

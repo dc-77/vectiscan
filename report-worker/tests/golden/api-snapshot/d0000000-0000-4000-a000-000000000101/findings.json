@@ -1,0 +1,207 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 0,
+   "low": 2,
+   "medium": 4
+  },
+  "business_impact_score": null,
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "affected": "https://demo-shop.vectiscan-demo.test (Port 443)",
+    "cvss_score": "5.9",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-327",
+    "description": "Der Webserver akzeptiert weiterhin TLS-1.0- und TLS-1.1-Verbindungen. Beide Protokolle gelten als veraltet (PCI-DSS-Deprecation, BSI TR-02102-2) und sind anfällig für bekannte Angriffe wie BEAST und POODLE-Varianten.",
+    "evidence": "testssl.sh: TLS 1.0 offered (deprecated), TLS 1.1 offered (deprecated), TLS 1.2 offered, TLS 1.3 offered.",
+    "id": "WC-01",
+    "impact": "Clients, die ausschließlich veraltete Protokolle nutzen, können zu unsicheren Verbindungen gezwungen werden. Erhöhtes Risiko für das Mitlesen sensibler Bestelldaten in Teilnetzen.",
+    "policy_id": "SP-TLS-001",
+    "recommendation": "TLS 1.0 und 1.1 deaktivieren, ausschließlich TLS 1.2 und 1.3 mit modernen Cipher-Suites anbieten.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "policy_decision": "MEDIUM",
+     "policy_id": "SP-TLS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Severity deterministisch durch Policy SP-TLS-001 (Version 2026-06-01.1) festgelegt.",
+     "rule_references": [
+      "SP-TLS-001"
+     ]
+    },
+    "title": "Veraltete TLS-Protokolle (TLS 1.0 / 1.1) aktiv"
+   },
+   {
+    "affected": "HTTP-Antworten aller Seiten",
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Wichtige Sicherheits-Header fehlen: Strict-Transport-Security (HSTS), Content-Security-Policy (CSP) und X-Content-Type-Options. Ohne HSTS sind SSL-Stripping-Angriffe möglich; ohne CSP steigt das Risiko erfolgreicher XSS-Angriffe.",
+    "evidence": "curl -I: keine Header 'Strict-Transport-Security', 'Content-Security-Policy', 'X-Content-Type-Options' vorhanden.",
+    "id": "WC-02",
+    "impact": "Erhöhte Anfälligkeit für SSL-Stripping, Clickjacking und Cross-Site-Scripting, insbesondere im Checkout-Bereich.",
+    "policy_id": "SP-HDR-001",
+    "recommendation": "HSTS (max-age >= 31536000; includeSubDomains), eine restriktive CSP sowie X-Content-Type-Options: nosniff setzen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "policy_decision": "MEDIUM",
+     "policy_id": "SP-HDR-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Severity deterministisch durch Policy SP-HDR-001 (Version 2026-06-01.1) festgelegt.",
+     "rule_references": [
+      "SP-HDR-001"
+     ]
+    },
+    "title": "Fehlende Security-Header (HSTS, CSP, X-Content-Type-Options)"
+   },
+   {
+    "affected": "_dmarc.demo-shop.vectiscan-demo.test (DNS)",
+    "cvss_score": "5.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain ist kein DMARC-Record veröffentlicht. Damit fehlt die übergeordnete Richtlinie zur Behandlung von E-Mails, die SPF/DKIM nicht bestehen.",
+    "evidence": "DNS-TXT-Abfrage für _dmarc.demo-shop.vectiscan-demo.test liefert NXDOMAIN.",
+    "id": "WC-03",
+    "impact": "Angreifer können im Namen der Domain Phishing-Mails versenden (Spoofing der Absenderadresse), ohne dass empfangende Server diese zuverlässig ablehnen.",
+    "policy_id": "SP-DNS-002",
+    "recommendation": "DMARC-Record schrittweise einführen: zunächst p=none mit Reporting, nach Auswertung auf p=quarantine bzw. p=reject erhöhen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "policy_decision": "MEDIUM",
+     "policy_id": "SP-DNS-002",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Severity deterministisch durch Policy SP-DNS-002 (Version 2026-06-01.1) festgelegt.",
+     "rule_references": [
+      "SP-DNS-002"
+     ]
+    },
+    "title": "Kein DMARC-Record vorhanden"
+   },
+   {
+    "affected": "demo-shop.vectiscan-demo.test (DNS TXT)",
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der SPF-Record endet mit ~all (Softfail) statt -all (Hardfail). Mails von nicht autorisierten Servern werden dadurch nur als 'verdächtig' markiert, nicht abgelehnt.",
+    "evidence": "v=spf1 include:_spf.example-mailer.test ~all",
+    "id": "WC-04",
+    "impact": "Geringerer Schutz vor Domain-Spoofing; in Kombination mit fehlendem DMARC wird Phishing erleichtert.",
+    "policy_id": "SP-DNS-003",
+    "recommendation": "Nach Verifikation aller legitimen Versandquellen auf -all (Hardfail) umstellen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "policy_decision": "MEDIUM",
+     "policy_id": "SP-DNS-003",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Severity deterministisch durch Policy SP-DNS-003 (Version 2026-06-01.1) festgelegt.",
+     "rule_references": [
+      "SP-DNS-003"
+     ]
+    },
+    "title": "SPF-Record mit zu lockerem Softfail (~all)"
+   },
+   {
+    "affected": "Set-Cookie: SHOP_SESSION",
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-614",
+    "description": "Das Session-Cookie wird ohne Secure-Flag gesetzt und kann theoretisch über eine unverschlüsselte Verbindung übertragen werden.",
+    "evidence": "Set-Cookie: SHOP_SESSION=...; Path=/; HttpOnly (kein 'Secure').",
+    "id": "WC-05",
+    "impact": "Bei einem erzwungenen HTTP-Downgrade könnte das Cookie abgegriffen werden.",
+    "policy_id": "SP-COOK-001",
+    "recommendation": "Secure- und SameSite-Attribute für alle Session-Cookies setzen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "policy_decision": "LOW",
+     "policy_id": "SP-COOK-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Severity deterministisch durch Policy SP-COOK-001 (Version 2026-06-01.1) festgelegt.",
+     "rule_references": [
+      "SP-COOK-001"
+     ]
+    },
+    "title": "Session-Cookie ohne Secure-Flag"
+   },
+   {
+    "affected": "/assets/js/jquery.min.js",
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-1104",
+    "description": "Die eingebundene jQuery-Version 1.12.4 ist veraltet und enthält bekannte XSS-Schwachstellen (CVE-2020-11022, CVE-2020-11023).",
+    "evidence": "Statische Analyse der eingebundenen Skripte: jQuery v1.12.4.",
+    "id": "WC-06",
+    "impact": "Erhöhtes Restrisiko für DOM-basiertes XSS bei unsachgemäßer Verwendung der Bibliothek.",
+    "policy_id": "SP-JS-001",
+    "recommendation": "Auf eine aktuelle jQuery-Version (>= 3.7) aktualisieren oder die Abhängigkeit entfernen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "policy_decision": "LOW",
+     "policy_id": "SP-JS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Severity deterministisch durch Policy SP-JS-001 (Version 2026-06-01.1) festgelegt.",
+     "rule_references": [
+      "SP-JS-001"
+     ]
+    },
+    "title": "Veraltete JavaScript-Bibliothek (jQuery 1.12.4)"
+   }
+  ],
+  "overall_description": "Der WebCheck-Schnellscan des Online-Shops zeigt eine grundsätzlich solide Konfiguration mit mehreren mittelschweren Schwächen in der Transport- und E-Mail-Sicherheit. Es wurden keine kritischen, unmittelbar ausnutzbaren Schwachstellen gefunden. Die identifizierten Punkte erhöhen jedoch das Risiko für Phishing im Namen der Domain sowie für Man-in-the-Middle-Angriffe gegen veraltete TLS-Clients und sollten zeitnah behoben werden.",
+  "overall_risk": "MEDIUM",
+  "package": "webcheck",
+  "policy_id_distinct": [
+   "SP-COOK-001",
+   "SP-DNS-002",
+   "SP-DNS-003",
+   "SP-HDR-001",
+   "SP-JS-001",
+   "SP-TLS-001"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Der Server bietet moderne TLS-1.3-Verbindungen mit Forward Secrecy an.",
+    "title": "TLS 1.3 unterstützt"
+   },
+   {
+    "description": "Alle HTTP-Anfragen werden serverseitig auf HTTPS umgeleitet.",
+    "title": "HTTP-zu-HTTPS-Weiterleitung aktiv"
+   },
+   {
+    "description": "Ausgehende Mails sind mit einem gültigen DKIM-Schlüssel signiert.",
+    "title": "DKIM korrekt konfiguriert"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "DMARC-Record (p=none mit Reporting) veröffentlichen und SPF auf -all vorbereiten.",
+    "effort": "Niedrig",
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "TLS 1.0/1.1 deaktivieren und vollständigen Security-Header-Satz (HSTS, CSP, nosniff) ausrollen.",
+    "effort": "Mittel",
+    "timeframe": "30 Tage"
+   },
+   {
+    "action": "Frontend-Abhängigkeiten aktualisieren (jQuery) und Cookie-Attribute härten.",
+    "effort": "Mittel",
+    "timeframe": "90 Tage"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 0,
+   "LOW": 2,
+   "MEDIUM": 4
+  },
+  "tech_profiles": []
+ },
+ "success": true
+}

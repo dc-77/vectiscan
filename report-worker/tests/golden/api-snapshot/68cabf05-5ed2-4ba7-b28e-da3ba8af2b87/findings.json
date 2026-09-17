@@ -1,0 +1,2863 @@
+{
+ "data": {
+  "additional_findings": [
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.176.107:443 (rdgw.lumbeck-wolter.de)",
+    "affected_hosts": [
+     "85.22.176.107:443 (rdgw.lumbeck-wolter.de)"
+    ],
+    "business_impact_score": 2.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Remote-Desktop-Gateway rdgw.lumbeck-wolter.de (IIS 10.0) liefert 0 von 7 Security-Headern und zeigt zusätzlich die unangepasste IIS-Default-Page als Startseite. Server- und X-Powered-By-Header verraten die eingesetzte IIS-Version und ASP.NET.",
+    "evidence": "URL: https://rdgw.lumbeck-wolter.de\nScore: 0/7\nMissing: strict-transport-security, content-security-policy, x-frame-options, x-content-type-options, x-xss-protection, referrer-policy, permissions-policy\n\nZAP:\n[LOW] Server Leaks Version Information via 'Server' HTTP Response Header Field (4x)\n[LOW] Server Leaks Information via 'X-Powered-By' HTTP Response Header Field(s) (4x)",
+    "finding_type": "private_ip_disclosure",
+    "id": "VS-2026-007",
+    "impact": "Fehlende HSTS erlaubt theoretisch Downgrade-Angriffe. Die exponierte IIS-Version macht das gezielte Suchen nach passenden CVEs einfacher. Für einen RDP-Gateway ist die HTTP-Startseite üblicherweise nur die Ausgangsseite für die eigentliche RDP-Session, aber sie sollte trotzdem gehärtet sein.",
+    "policy_id": "SP-DISC-009",
+    "recommendation": "<b>Kurzfristig:</b> IIS-Default-Page (iisstart.html) durch leere Response oder Redirect auf das eigentliche RDG-Portal ersetzen. Über 'URL Rewrite' oder 'HTTP Response Headers' im IIS-Manager Security-Header setzen (HSTS, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy).\n<b>Mittelfristig:</b> Server-Version-Header entfernen (URLScan/RemoveServerHeader-Modul) und X-Powered-By in web.config deaktivieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-009",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Private IP-Adressen (RFC1918 10.x, 172.16-31.x, 192.168.x) in HTTP-Antworten / Headers / Errorpages sichtbar — interne Netzwerk-Topologie wird Angreifern preisgegeben",
+     "rule_references": [
+      "CWE-200",
+      "CWE-204"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Fehlende Security-Header auf rdgw.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "rdgw.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "DNS-Zone lumbeck-wolter.de",
+    "affected_hosts": [
+     "DNS-Zone lumbeck-wolter.de"
+    ],
+    "business_impact_score": 2.5,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-345",
+    "description": "Für die Domain lumbeck-wolter.de ist DNSSEC nicht aktiviert. Ohne DNSSEC können DNS-Antworten für die Zone theoretisch manipuliert werden (Cache-Poisoning), ohne dass der Empfänger dies durch Signaturprüfung erkennen kann.",
+    "evidence": "passive_intel: dnssec_signed: false\nNS: ns1119.ui-dns.org/.com/.biz/.de (IONOS)",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-018",
+    "impact": "DNS-Spoofing würde es Angreifern ermöglichen, Mail-Verkehr umzuleiten oder falsche Web-Adressen auszuliefern. Praktisch ist der Angriff aufwändig und erfordert entweder Kontrolle über Recursive Resolver oder Kaminsky-artige Angriffe.",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "<b>Kurzfristig:</b> DNSSEC beim Registrar/Nameserver-Provider IONOS aktivieren (üblicherweise Ein-Klick-Aktivierung). DS-Record wird automatisch beim Registrar hinterlegt.\n<b>Mittelfristig:</b> Regelmäßige Validierung mit dnsviz.net oder Verisign DNSSEC Debugger.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "DNSSEC für lumbeck-wolter.de nicht aktiviert",
+    "title_vars": {
+     "domain": "lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "116.202.77.64:443 (www.lumbeck-wolter.de)",
+    "affected_hosts": [
+     "116.202.77.64:443 (www.lumbeck-wolter.de)"
+    ],
+    "business_impact_score": 0.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Hauptwebsite www.lumbeck-wolter.de liefert 0 von 7 empfohlenen Security-Headern aus. Es fehlen Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy und Permissions-Policy.",
+    "evidence": "Security-Header-Scan:\nURL: https://www.lumbeck-wolter.de\nScore: 0/7\nMissing: strict-transport-security, content-security-policy, x-frame-options, x-content-type-options, x-xss-protection, referrer-policy, permissions-policy",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-006",
+    "impact": "Ohne HSTS bleibt die Website theoretisch anfällig für Downgrade-Angriffe auf HTTP. Ohne X-Frame-Options/CSP-frame-ancestors ist Clickjacking möglich. Fehlendes X-Content-Type-Options ermöglicht MIME-Sniffing. Für eine reine Präsentationswebsite ohne Login/Formulare bleibt der Impact begrenzt.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (2 Wochen):</b> Apache-Konfiguration erweitern: 'Header always set Strict-Transport-Security \"max-age=31536000; includeSubDomains\"', 'Header always set X-Content-Type-Options nosniff', 'Header always set X-Frame-Options SAMEORIGIN', 'Header always set Referrer-Policy strict-origin-when-cross-origin'.\n<b>Mittelfristig:</b> CSP schrittweise aufbauen (zunächst Report-Only, dann Enforce).",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Fehlende Security-Header auf www.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "www.lumbeck-wolter.de"
+    }
+   }
+  ],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 3,
+   "info": 4,
+   "low": 1,
+   "medium": 6
+  },
+  "business_impact_score": "7.3",
+  "claims_guard_stats": {
+   "allowlist_size": 107,
+   "claims_checked": 617,
+   "claims_unsupported": {
+    "cve": [
+     "CVE-2021-40438",
+     "CVE-2021-44790",
+     "CVE-2022-22720",
+     "CVE-2024-53704"
+    ],
+    "host": [
+     "asp.net",
+     "dnsviz.net",
+     "fonts.googleapis.com",
+     "fonts.gstatic.com",
+     "iprs.de",
+     "maps.googleapis.com",
+     "maps.gstatic.com",
+     "mx01-mx04.hornetsecurity.com",
+     "my.cnf",
+     "ns1119.ui-dns.org",
+     "spf.mailjet.com",
+     "testssl.sh",
+     "unpkg.com",
+     "web.config",
+     "www.google.com",
+     "www.gstatic.com"
+    ],
+    "port": [],
+    "version": [
+     "apache"
+    ]
+   },
+   "distinct_removed": [
+    "CVE-2021-40438",
+    "CVE-2021-44790",
+    "CVE-2022-22720",
+    "CVE-2024-53704"
+   ],
+   "fields_scanned": [
+    "additional_findings_summary[].affected",
+    "additional_findings_summary[].description",
+    "additional_findings_summary[].evidence",
+    "additional_findings_summary[].impact",
+    "additional_findings_summary[].recommendation",
+    "additional_findings_summary[].title",
+    "findings[].affected",
+    "findings[].description",
+    "findings[].evidence",
+    "findings[].impact",
+    "findings[].recommendation",
+    "findings[].title",
+    "overall_description",
+    "positive_findings[].description",
+    "positive_findings[].title",
+    "recommendations[].action"
+   ],
+   "mode": "enforce",
+   "removed_count": 4
+  },
+  "cve_guard_stats": {
+   "allowlist_size": 107,
+   "distinct_removed": [
+    "CVE-2021-40438",
+    "CVE-2021-44790",
+    "CVE-2022-22720",
+    "CVE-2024-53704"
+   ],
+   "removed_count": 4
+  },
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "03116"
+    ],
+    "affected": "85.22.176.107:443 (rdgw.lumbeck-wolter.de)",
+    "business_impact_score": 9.1,
+    "cvss_score": "9.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+    "cwe": "CWE-757",
+    "description": "Der RDP-Gateway unterstützt TLS_FALLBACK_SCSV (RFC 7507) nicht. Damit fehlt der Downgrade-Schutz gegen aktive MITM-Angreifer, die eine Verbindung zu einer älteren TLS-Version herabsetzen könnten. Zusätzlich meldet testssl BEAST-anfällige CBC-Cipher unter TLS 1.0.",
+    "evidence": "testssl.sh:\n[MEDIUM] fallback_SCSV: NOT supported\n[MEDIUM] BEAST_CBC_TLS1: ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-SHA AES128-SHA\n[MEDIUM] overall_grade: B",
+    "external_id": "VS-2026-001",
+    "finding_type": "tls_below_tr03116_minimum",
+    "id": "VS-2026-001",
+    "impact": "Ein aktiver MITM-Angreifer könnte die TLS-Verbindung auf TLS 1.0 herabsetzen und dort BEAST-Angriffe versuchen. In der Praxis erfordert das eine bereits kompromittierte Netzwerkposition.",
+    "original_claude_id": "VS-2026-011",
+    "policy_id": "SP-TLS-001",
+    "recommendation": "<b>Kurzfristig:</b> IIS-TLS-Konfiguration prüfen und TLS 1.0/1.1 komplett deaktivieren (Registry-Keys unter HKLM\\SYSTEM\\CurrentControlSet\\Control\\SecurityProviders\\SCHANNEL\\Protocols oder via IIS Crypto Tool).\n<b>Mittelfristig:</b> Nur TLS 1.2 und TLS 1.3 mit modernen Cipher-Suites zulassen. Siehe auch: BSI TR-03116-4 Compliance-Prüfung in diesem Bericht.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-TLS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "TLS-Version unter BSI TR-03116-4 Minimum - Compliance-Verstoss",
+     "rule_references": [
+      "BSI-TR-03116-4",
+      "CWE-326"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf rdgw.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "rdgw.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "116.202.77.64:3306 (lumbeck-wolter.de)",
+    "business_impact_score": 8.1,
+    "cvss_score": "8.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-284",
+    "description": "Der Datenbankport 3306/tcp mit MariaDB 10.11.18-MariaDB-0+deb12u1 ist von öffentlichen IP-Adressen aus erreichbar. Datenbank-Dienste sollten grundsätzlich nur intern oder über VPN/SSH-Tunnel zugänglich sein. Selbst bei aktivierter Authentifizierung erweitert die Exposition die Angriffsfläche massiv (Credential-Brute-Force, Enumeration von User-Accounts, potenzielle 0-Day-Exploits).",
+    "evidence": "$ nmap -sV -p3306 116.202.77.64\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nShodan: '3306: MariaDB 10.11.18-MariaDB-0+deb12u1'",
+    "external_id": "VS-2026-002",
+    "finding_type": "database_port_exposed",
+    "id": "VS-2026-002",
+    "impact": "Ein Angreifer kann Brute-Force-Angriffe gegen DB-Accounts fahren, Server-Informationen ausleiten und bei Bekanntwerden einer Authentifizierungs-Schwachstelle direkt kompromittieren. Bei erfolgreichem Zugriff sind alle in der DB gespeicherten Daten (Kundendaten, Konfigurationen) exponiert.",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-DB-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Firewall-Regel setzen, die 3306/tcp auf öffentliche IPs blockiert. Zugriff nur über SSH-Tunnel oder VPN erlauben.\n<b>Mittelfristig:</b> MariaDB an localhost oder ein internes Netz binden (bind-address in my.cnf). Regelmäßige Prüfung mit externen Port-Scans.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-DB-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Datenbank-Port (3306/5432/1433/1521/27017/6379/...) oeffentlich erreichbar - Bei erfolgreicher Authentifizierung (Brute-Force, Default-Creds, leaked-Creds) vollstaendiger Zugriff auf gespeicherte Daten. AC:H weil Authentifizierung weiterhin Pflicht.",
+     "rule_references": [
+      "CWE-200",
+      "CWE-284",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Datenbank-Port 3306 oeffentlich erreichbar auf lumbeck-wolter.de",
+    "title_vars": {
+     "host": "lumbeck-wolter.de",
+     "port": "3306",
+     "tech": "MariaDB 10.11.18"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.176.106:443 (vpn.lumbeck-wolter.de)",
+    "business_impact_score": 7.5,
+    "cvss_score": "7.5",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+    "cwe": "CWE-295",
+    "description": "Das TLS-Zertifikat des SonicWall SSL-VPN-Portals ist seit dem 15.12.2025 23:59 abgelaufen. Zusätzlich ist die Zertifikatskette unvollständig (chain of trust failed). testssl.sh vergibt in Summe die Note T (Trust-Fehler).",
+    "evidence": "testssl.sh:\n[CRITICAL] cert_chain_of_trust: failed (chain incomplete).\n[CRITICAL] cert_expirationStatus: expired\n[CRITICAL] cert_notAfter: 2025-12-15 23:59\n[CRITICAL] overall_grade: T",
+    "external_id": "VS-2026-003",
+    "finding_type": "tls_certificate_expired",
+    "id": "VS-2026-003",
+    "impact": "VPN-Nutzer sehen Zertifikatswarnungen und werden zur Gewöhnung an das 'Trotzdem fortfahren' erzogen — dies erleichtert MITM-Angriffe, weil Nutzer echte Warnungen nicht mehr von falschen unterscheiden. Bei striktem Client-Zwang (z.B. NetExtender/MobileConnect mit aktivierter Zertifikatsprüfung) funktioniert das VPN nicht mehr, was Business-Impact bedeutet.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-TLS-004",
+    "recommendation": "<b>Sofort (24-48 h):</b> Neues Zertifikat ausstellen (z.B. Let's Encrypt oder kommerzielle CA) und auf der SonicWall-Appliance einspielen. Komplette Zertifikatskette (inkl. Intermediate) hochladen.\n<b>Mittelfristig:</b> Automatisches Renewal via ACME einrichten und ein Monitoring (z.B. Uptime-Kuma, cert-manager, oder SonicWall-internes Alerting) auf Restlaufzeit < 30 Tage konfigurieren.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-TLS-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "TLS-Zertifikat abgelaufen - Browser-Warnung, User akzeptieren = MitM",
+     "rule_references": [
+      "CWE-298",
+      "CWE-295"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "TLS-Zertifikat abgelaufen auf vpn.lumbeck-wolter.de",
+    "title_vars": {
+     "days": "abgelaufen",
+     "host": "vpn.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "85.22.176.108:443 (eset.lumbeck-wolter.de, omd, openotp)",
+    "business_impact_score": 5.9,
+    "cvss_score": "5.9",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-326",
+    "description": "Der TLS-Endpoint des Web-Applications-Portals bietet 3DES-basierte Cipher-Suites unter TLS 1.2 an: TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA, TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA und TLS_RSA_WITH_3DES_EDE_CBC_SHA. 3DES ist durch die effektive 64-Bit-Blockgröße für Sweet32-Angriffe angreifbar und wird von BSI TR-03116-4 sowie IETF (RFC 8996) für neue Verbindungen verboten.",
+    "evidence": "testssl.sh:\n[MEDIUM] cipherlist_3DES_IDEA: offered\n[MEDIUM] TLSv1.2 xc012 ECDHE-RSA-DES-CBC3-SHA ECDH 253 3DES 168\n[MEDIUM] TLSv1.2 x16   EDH-RSA-DES-CBC3-SHA   DH 4096  3DES 168\n[MEDIUM] TLSv1.2 x0a   DES-CBC3-SHA           RSA      3DES 168",
+    "external_id": "VS-2026-004",
+    "finding_type": "software_eol",
+    "id": "VS-2026-004",
+    "impact": "Auf einem authentisierten Portal (OpenID/OTP/Passwortreset) ermöglicht die Verfügbarkeit schwacher Cipher-Suites theoretisch Sweet32-Angriffe gegen langlebige Sessions. Praktisch relevanter ist die Compliance-Lage: Verstoß gegen BSI TR-03116-4, PCI-DSS 4.0 und moderne Auditor-Anforderungen.",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> 3DES-Cipher in der Apache-SSLCipherSuite-Direktive entfernen. Empfohlene Konfiguration (Mozilla Intermediate): 'SSLCipherSuite ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:...' (kein 3DES, kein RC4, kein CBC ohne AEAD).\n<b>Mittelfristig:</b> TLS 1.3 aktivieren, TLS 1.0/1.1 vollständig deaktivieren. Siehe auch: BSI TR-03116-4 Compliance-Prüfung in diesem Bericht.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Veraltete 3DES-Cipher-Suites aktiv auf eset.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "eset.lumbeck-wolter.de",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "217.160.231.158:443 (ftp.lumbeck-wolter.de)",
+    "business_impact_score": 5.9,
+    "cvss_score": "5.9",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-326",
+    "description": "Der HTTPS-Endpoint ftp.lumbeck-wolter.de bietet weder TLS 1.2 an noch Cipher-Suites mit Forward Secrecy. testssl.sh vergibt overall_grade C. Zusätzlich meldet der Scan Handshake-Probleme (secure_renego OpenSSL handshake didn't succeed).",
+    "evidence": "testssl.sh:\n[MEDIUM] TLS1_2: not offered\n[MEDIUM] cipherlist_STRONG_FS: not offered\n[MEDIUM] FS: No ciphers supporting Forward Secrecy offered\n[MEDIUM] overall_grade: C",
+    "external_id": "VS-2026-005",
+    "finding_type": "tls_weak_cipher_suites",
+    "id": "VS-2026-005",
+    "impact": "Ohne TLS 1.2/1.3 und ohne Forward Secrecy sind aufgezeichnete Sitzungen bei Kompromittierung des Server-Keys nachträglich entschlüsselbar. Verstoß gegen BSI TR-03116-4 und PCI-DSS.",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-TLS-002",
+    "recommendation": "<b>Kurzfristig:</b> TLS-Konfiguration auf dem Webserver (nginx/Apache) auf mindestens TLS 1.2 mit ECDHE-basierten Cipher-Suites erweitern (Mozilla Intermediate Profile).\n<b>Mittelfristig:</b> TLS 1.3 aktivieren, TLS 1.0/1.1 komplett deaktivieren. Siehe auch: BSI TR-03116-4 Compliance-Prüfung in diesem Bericht.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-TLS-002",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Schwache Cipher-Suiten verfuegbar - Man-in-the-Middle-Angriffe moeglich",
+     "rule_references": [
+      "CWE-327",
+      "CWE-326"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Schwache TLS-Cipher-Suites auf ftp.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "ftp.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "89.21.55.4:443 (smtp.lumbeck-wolter.de, smtp4abas.lumbeck-wolter.de)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-1104",
+    "description": "Die Hosts smtp.lumbeck-wolter.de und smtp4abas.lumbeck-wolter.de betreiben Apache 2.4.41 (ausgeliefert mit Ubuntu 20.04 im August 2019). Seit dieser Version wurden zahlreiche Apache-CVEs behoben (u.a. nicht verifizierte CVE-Referenz SSRF via mod_proxy, nicht verifizierte CVE-Referenz mod_lua Buffer Overflow, nicht verifizierte CVE-Referenz Request-Smuggling, CVE-2023-25690 mod_proxy HTTP Smuggling). Aktuelle stabile Version ist 2.4.63.",
+    "evidence": "$ curl -sI https://smtp.lumbeck-wolter.de\nServer: Apache/2.4.41 (Ubuntu)\n\n$ curl -sI https://smtp4abas.lumbeck-wolter.de\nServer: Apache/2.4.41 (Ubuntu)",
+    "external_id": "VS-2026-006",
+    "finding_type": "software_eol",
+    "id": "VS-2026-006",
+    "impact": "Mehrere HIGH-CVEs in Apache 2.4.41 sind seit Jahren bekannt und werden von automatisierten Scannern ausgenutzt. Da die Hosts auch Postfix-SMTP betreiben und mit ABAS-Integration verbunden sind, wäre ein SSRF- oder Request-Smuggling-Angriff mit erweiterten Auswirkungen möglich.",
+    "original_claude_id": "VS-2026-008",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Ubuntu 20.04 auf 22.04/24.04 upgraden oder Apache aus dem Ubuntu-Security-Repository patchen (apt install --only-upgrade apache2). Aktuelle Apache-Version prüfen: 2.4.63 oder neuer.\n<b>Mittelfristig:</b> Regelmäßiges Patch-Management etablieren, idealerweise mit unattended-upgrades für Security-Updates.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Apache 2.4.41 (End-of-Life) auf smtp.lumbeck-wolter.de und smtp4abas [Hinweis: apache wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]",
+    "title_vars": {
+     "host": "smtp.lumbeck-wolter.de",
+     "tech": "Apache",
+     "version": "2.4.41"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "116.202.77.64 (lumbeck-wolter.de)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Neben den bereits gemeldeten Datenbank-Ports exponiert der Host 116.202.77.64 einen kompletten Mailstack (25/smtp, 110/pop3, 143/imap, 465/smtps, 587/submission, 993/imaps, 995/pop3s), FTP auf Port 21 (ProFTPD), sowie zwei SSH-Instanzen: Port 22 mit ProFTPD mod_sftp (SFTP-Subsystem) und Port 222 mit OpenSSH 9.2p1. Für einen reinen Webserver ist diese Multifunktions-Rolle sicherheitstechnisch problematisch (Konsolidierung von Angriffsflächen). FTP auf Port 21 ist zusätzlich ein Klartext-Protokoll — falls aktiv genutzt.",
+    "evidence": "$ nmap -sV 116.202.77.64\n21/tcp   open ftp    ProFTPD\n22/tcp   open ssh    ProFTPD mod_sftp\n25/tcp   open smtp\n110/tcp  open pop3   Courier pop3d\n143/tcp  open imap   Dovecot imapd\n222/tcp  open ssh    OpenSSH 9.2p1\n465/tcp  open smtp\n587/tcp  open smtp\n993/tcp  open imaps\n995/tcp  open pop3s",
+    "external_id": "VS-2026-007",
+    "id": "VS-2026-007",
+    "impact": "Jeder exponierte Dienst ist eine eigene Angriffsfläche mit eigenen CVE-Historien (Dovecot, Courier, ProFTPD, OpenSSH). Ein Kompromiss eines Dienstes bedeutet vollen Server-Zugriff, weil alle Rollen auf demselben Host laufen. FTP auf Port 21 verwendet Klartext-Credentials, falls kein FTPS erzwungen ist.",
+    "original_claude_id": "VS-2026-016",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> Prüfen welche Ports produktiv benötigt werden. FTP (21) deaktivieren, wenn SFTP über Port 22 verfügbar ist. Falls FTP benötigt: FTPS erzwingen und Klartext-Login sperren.\n<b>Mittelfristig:</b> Rollen-Trennung: separater Mailserver, separater Web-Host. Falls dies nicht möglich, mindestens fail2ban auf allen Diensten aktivieren und pro-Dienst-Firewall-Regeln definieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Zusätzliche exponierte Management-Ports auf 116.202.77.64 (FTP, SMTP, IMAP, POP3, zweiter SSH)",
+    "title_vars": {
+     "host": "lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "DNS-Zone lumbeck-wolter.de",
+    "business_impact_score": 4.7,
+    "cvss_score": "4.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain lumbeck-wolter.de ist trotz vorhandenem SPF und DKIM kein DMARC-Record (_dmarc.lumbeck-wolter.de TXT) hinterlegt. Damit gibt es keine Durchsetzungsrichtlinie, wie empfangende Mailserver mit SPF-/DKIM-Fehlern umgehen sollen. Zusätzlich fehlt ein DMARC-Reporting, das Spoofing-Versuche sichtbar machen würde.",
+    "evidence": "DNS-Query: _dmarc.lumbeck-wolter.de TXT → keine Antwort\nSPF vorhanden: v=spf1 include:spf.mailjet.com mx ... ~all\nDKIM: True\nDMARC: null",
+    "external_id": "VS-2026-008",
+    "finding_type": "spf_missing",
+    "id": "VS-2026-008",
+    "impact": "Ohne DMARC können Angreifer Mails im Namen von @lumbeck-wolter.de versenden (Phishing gegen Kunden, Lieferanten, Mitarbeiter). Die vorhandenen Hornetsecurity-MX-Server schützen nur eingehende Mails; ausgehend fehlt die Sender-Reputation, die von empfangenden Providern durch DMARC-Enforcement bereitgestellt würde.",
+    "original_claude_id": "VS-2026-004",
+    "policy_id": "SP-DNS-004",
+    "recommendation": "<b>Kurzfristig (Woche):</b> DMARC-Record im Monitoring-Modus setzen: '_dmarc.lumbeck-wolter.de TXT v=DMARC1; p=none; rua=mailto:dmarc@lumbeck-wolter.de; ruf=mailto:dmarc@lumbeck-wolter.de; adkim=r; aspf=r; pct=100'.\n<b>Mittelfristig (4-8 Wochen):</b> Reports auswerten (Tools wie Postmark DMARC Digests, dmarcian, Hornetsecurity DMARC-Manager). Nach Bestätigung, dass alle legitimen Sender SPF-/DKIM-aligned sind, Policy schrittweise auf 'p=quarantine' und schließlich 'p=reject' anheben.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-DNS-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "SPF fehlt fuer Mail-Domain - Spoofing-Schutz fehlt",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "SPF-Record fehlt fuer lumbeck-wolter.de",
+    "title_vars": {
+     "domain": "lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "85.22.176.108:443 (eset.lumbeck-wolter.de)",
+    "business_impact_score": 5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Content-Security-Policy auf eset.lumbeck-wolter.de enthält 'unsafe-inline' und 'unsafe-eval' für script-src und style-src. Zusätzlich fehlt ein Fallback für einige Direktiven (fetch-directives). Damit wird der wesentliche XSS-Schutz einer CSP faktisch neutralisiert.",
+    "evidence": "Response-Header:\ncontent-security-policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com unpkg.com\n\nZAP:\n[MEDIUM] CSP: Failure to Define Directive with No Fallback (9x)\n[MEDIUM] CSP: script-src unsafe-inline (9x)\n[MEDIUM] CSP: style-src unsafe-inline (9x)",
+    "external_id": "VS-2026-009",
+    "finding_type": "csp_unsafe_inline",
+    "id": "VS-2026-009",
+    "impact": "Falls eine Reflected- oder Stored-XSS-Schwachstelle im OpenID-/Selfdesk-/OTP-Portal existiert oder in Zukunft entsteht, würde die CSP diese nicht blockieren. Auf einem Portal mit OTP-/OpenID-Funktionen bedeutet ein XSS potenzielle Session-Übernahme.",
+    "original_claude_id": "VS-2026-012",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> Inline-Scripts durch externe Dateien oder Nonce-basierte Freigabe ersetzen. unsafe-inline und unsafe-eval schrittweise entfernen.\n<b>Mittelfristig:</b> CSP mit strict-dynamic + nonce implementieren. Fehlende Direktiven (script-src, style-src, img-src, connect-src, font-src) explizit setzen anstatt sich auf default-src zu verlassen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='csp_unsafe_inline' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "CSP mit unsicheren Direktiven auf eset.lumbeck-wolter.de",
+    "title_vars": {
+     "directive": "unsafe-inline",
+     "host": "eset.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "89.21.55.4:443 (smtp.lumbeck-wolter.de, smtp4abas.lumbeck-wolter.de)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-548",
+    "description": "Die HTTP-Root-Verzeichnisse beider Vhosts liefern eine Apache-typische 'Index of /'-Auflistung inkl. Icons-Verzeichnis. Es ist unklar, ob dieser Webserver überhaupt einen produktiven Zweck hat oder nur ein Nebenprodukt der Postfix-Installation ist.",
+    "evidence": "$ curl -sI https://smtp.lumbeck-wolter.de\nTitle: Index of /\nServer: Apache/2.4.41 (Ubuntu)\n\nZAP:\nURL: https://smtp.lumbeck-wolter.de/?C=M;O=A (Sort-Order zeigt aktive DirIndex)",
+    "external_id": "VS-2026-010",
+    "finding_type": "directory_listing_enabled",
+    "id": "VS-2026-010",
+    "impact": "Directory Listing verrät Struktur und Namen von Dateien/Verzeichnissen, die Angreifern bei der Enumeration von Konfigurationsdateien, Backups oder ungeschützten Ressourcen helfen können. Ohne konkreten Inhalt ist der direkte Impact gering.",
+    "original_claude_id": "VS-2026-009",
+    "policy_id": "SP-DISC-005",
+    "recommendation": "<b>Kurzfristig:</b> In der Apache-Konfiguration 'Options -Indexes' setzen, um Directory Listing zu deaktivieren. Falls die Website nicht produktiv benötigt wird, den Vhost oder den gesamten Webserver auf diesem Host abschalten.\n<b>Mittelfristig:</b> Klare Trennung von Mailserver- und Webserver-Rolle, ggf. Webserver ganz entfernen wenn ohne Funktion.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Directory-Listing aktiv - File-Discovery erleichtert",
+     "rule_references": [
+      "CWE-548"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Directory-Listing aktiv auf smtp.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "smtp.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "https://eset.lumbeck-wolter.de/openid/login_uid.php",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-352",
+    "description": "ZAP meldet auf dem Login-Endpoint /openid/login_uid.php das Fehlen von Anti-CSRF-Tokens. Login-Formulare selbst sind CSRF-technisch weniger kritisch (Login-CSRF), aber die anderen POST-Endpoints des OpenID-/Selfdesk-Portals sollten strikt geprüft werden.",
+    "evidence": "ZAP:\n[MEDIUM] Absence of Anti-CSRF Tokens (2x)\nURL: https://eset.lumbeck-wolter.de/openid/login_uid.php\nCWE: 352",
+    "external_id": "VS-2026-011",
+    "finding_type": "csrf_token_missing",
+    "id": "VS-2026-011",
+    "impact": "Ohne CSRF-Schutz könnten authentifizierte Nutzer durch präparierte externe Seiten zu ungewollten Aktionen (Passwort-Reset, Attribut-Änderungen) verleitet werden.",
+    "original_claude_id": "VS-2026-013",
+    "policy_id": "SP-CSRF-001",
+    "recommendation": "<b>Kurzfristig:</b> Prüfen, ob RCDevs OpenOTP/OpenID-Portal-Version aktuell ist und ob die installierte Version bereits CSRF-Token unterstützt. Ggf. Konfigurations-Flag setzen.\n<b>Mittelfristig:</b> Alle state-ändernden POST-Endpoints mit Synchronizer-Token- oder Double-Submit-Cookie-Pattern absichern.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": true,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSRF-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Form ist GET-only oder ohne State-Change - kein CSRF-Vektor",
+     "rule_references": [
+      "CWE-352"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Anti-CSRF-Token fehlt auf Login-Formular eset.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "eset.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.176.108:443 (eset.lumbeck-wolter.de), 85.22.176.106:443 (vpn.lumbeck-wolter.de)",
+    "business_impact_score": 4.2,
+    "cvss_score": "4.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "",
+    "description": "testssl.sh meldet auf beiden HTTPS-Endpoints eine potenzielle BREACH-Anfälligkeit durch aktive gzip/deflate-HTTP-Kompression. BREACH kann bei Vorhandensein von Reflected-Content und statischen Secrets in Response-Bodies Teile geheimer Werte extrahieren.",
+    "evidence": "testssl.sh eset:\n[MEDIUM] BREACH: potentially VULNERABLE, gzip HTTP compression detected\n\ntestssl.sh vpn:\n[MEDIUM] BREACH: potentially VULNERABLE, gzip deflate compress br HTTP compression detected",
+    "external_id": "VS-2026-012",
+    "finding_type": "csrf_token_missing",
+    "id": "VS-2026-012",
+    "impact": "Bei bestehendem Reflected-Content in authentifizierten Antworten könnten Angreifer über wiederholte adaptive Requests Session-Tokens oder CSRF-Tokens rekonstruieren. Praktische Ausnutzung ist aufwändig und erfordert MITM-Position.",
+    "original_claude_id": "VS-2026-015",
+    "policy_id": "SP-CSRF-001",
+    "recommendation": "<b>Kurzfristig:</b> Prüfen ob HTTP-Kompression auf sensiblen Endpoints (Login, API-Antworten mit Tokens) deaktiviert werden kann.\n<b>Mittelfristig:</b> Random-Padding in Response-Bodies für authentifizierte Antworten einbauen; Referer-basierte Anfragen prüfen und Cross-Origin-Requests strikt blockieren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSRF-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Form ist GET-only oder ohne State-Change - kein CSRF-Vektor",
+     "rule_references": [
+      "CWE-352"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Anti-CSRF-Token fehlt auf Login-Formular eset.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "eset.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "85.22.176.108:443 (eset.lumbeck-wolter.de)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Server sendet den X-Frame-Options-Header zweimal mit inkonsistenten Werten ('sameorigin' und 'SAMEORIGIN'). Analog werden Cache-Control-Header mehrfach gesetzt. Verschiedene Browser handhaben doppelte Header unterschiedlich (RFC-widrig); manche verwerfen dann den Schutz.",
+    "evidence": "testssl.sh:\n[MEDIUM] X-Frame-Options_multiple: Multiple X-Frame-Options headers. Using first header: sameorigin\n[MEDIUM] Cache-Control_multiple: Multiple Cache-Control headers\n\nZAP: [MEDIUM] Multiple X-Frame-Options Header Entries (7x)",
+    "external_id": "VS-2026-014",
+    "finding_type": "xfo_missing",
+    "id": "VS-2026-014",
+    "impact": "Inkonsistente Header können browser-abhängig den Clickjacking-Schutz aushebeln. Der Fehler weist meist auf einen doppelten Konfigurations-Layer hin (Apache + Applikation setzen beide den Header).",
+    "original_claude_id": "VS-2026-014",
+    "policy_id": "SP-HDR-006",
+    "recommendation": "<b>Kurzfristig:</b> Prüfen, wo der Header gesetzt wird (Apache mod_headers vs. RCDevs-PHP-Code) und einen der beiden entfernen. Empfohlener Wert: 'X-Frame-Options: SAMEORIGIN' oder besser via CSP: 'frame-ancestors self'.\n<b>Mittelfristig:</b> Header-Set-Logik konsolidieren, um Konfigurations-Drift zu vermeiden.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-006",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Clickjacking-Schutz fehlt, aber keine Session-Pages - theoretisches Risiko",
+     "rule_references": [
+      "CWE-1021"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "X-Frame-Options-Header fehlt auf eset.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "eset.lumbeck-wolter.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.176.106:443 (vpn.lumbeck-wolter.de)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Security-Header-Scan meldet 0/7 auf dem Login-Portal-Root, obwohl testssl bereits einen HSTS-Header sieht (max-age=31536000; includeSubDomains). Zusätzlich fehlt HSTS auf den API-Endpoints /api/sonicos/is-sslvpn-enabled und /api/sonicos/ui-info. Timestamp Disclosure (Unix-Zeitstempel) tritt in statischen Assets auf.",
+    "evidence": "URL: https://vpn.lumbeck-wolter.de\nScore: 0/7\nMissing: strict-transport-security, content-security-policy, x-frame-options, ...\n\nZAP:\n[LOW] Strict-Transport-Security Header Not Set (2x)\n  URL: https://vpn.lumbeck-wolter.de/api/sonicos/is-sslvpn-enabled\n[LOW] Timestamp Disclosure - Unix (200x)",
+    "external_id": "VS-2026-013",
+    "finding_type": "hsts_no_includesubdomains",
+    "id": "VS-2026-013",
+    "impact": "Da es sich um eine SonicWall-Appliance handelt sind viele Header-Einstellungen produktseitig gesetzt oder gar nicht änderbar. Der Impact ist begrenzt, aber die Inkonsistenz (Root hat HSTS, API-Endpoints nicht) sollte adressiert werden.",
+    "original_claude_id": "VS-2026-019",
+    "policy_id": "SP-HDR-003",
+    "recommendation": "<b>Kurzfristig:</b> In der SonicWall-Verwaltung prüfen ob HTTP-Response-Header (insbesondere HSTS für /api/) über Custom-Rules gesetzt werden können.\n<b>Mittelfristig:</b> Firmware der SonicWall-Appliance aktuell halten (Version prüfen — SonicWall SMA/NSA sind regelmäßiges Ziel von CVEs wie nicht verifizierte CVE-Referenz).",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-003",
+     "policy_version": "2026-06-01.1",
+     "rationale": "HSTS aktiviert aber Subdomains nicht eingeschlossen - Hardening",
+     "rule_references": [
+      "CWE-523"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "HSTS-Header ohne includeSubDomains auf vpn.lumbeck-wolter.de",
+    "title_vars": {
+     "host": "vpn.lumbeck-wolter.de"
+    }
+   }
+  ],
+  "overall_description": "Die Domain lumbeck-wolter.de verteilt sich auf acht Hosts unterschiedlicher Provider (Hetzner, dokom21, iprs, ionos, Microsoft/Outlook) mit sehr heterogener Sicherheitsreife. Der zentrale Webserver 116.202.77.64 (lumbeck-wolter.de, www) exponiert 14 offene Ports gleichzeitig — neben Web (80/443) auch FTP (ProFTPD), zwei SSH-Instanzen (Standardport 22 mit ProFTPD mod_sftp und OpenSSH 9.2p1 auf 222), einen vollständigen Mailstack (25, 110, 143, 465, 587, 993, 995 mit Courier/Dovecot) sowie zwei Datenbank-Ports öffentlich (MariaDB 10.11.18 auf 3306 und PostgreSQL auf 5432). Diese Datenbank-Exposition ist der gravierendste Befund des Scans und stellt einen klaren Verstoß gegen die Netzwerksegmentierungspflicht dar. Auf dem VPN-Endpunkt 85.22.176.106 (vpn.lumbeck-wolter.de, SonicWall SSL-VPN) ist zudem das TLS-Zertifikat seit dem 15.12.2025 abgelaufen und die Zertifikatskette unvollständig — das führt zu Zertifikatswarnungen für alle VPN-Nutzer und schwächt die Vertrauenskette.\n\nWeitere signifikante Risikobereiche: Auf dem Web-Applications-Portal eset.lumbeck-wolter.de (mit OpenID/OTP-Login) sind noch veraltete 3DES-Cipher-Suites (TLS_RSA_WITH_3DES_EDE_CBC_SHA u.a.) aktiviert, was gegen BSI TR-03116-4 verstößt. Der RDP-Gateway rdgw.lumbeck-wolter.de (IIS 10.0 auf 443 und 4443) zeigt eine unangepasste IIS-Default-Page, fehlende Security-Header, fehlende HSTS-Konfiguration, kein TLS_FALLBACK_SCSV und BEAST-anfällige CBC-Cipher unter TLS 1.0/1.1. Der Mailserver-Host 89.21.55.4 (smtp/smtp4abas) läuft auf einem End-of-Life Apache 2.4.41 (Ubuntu 20.04 default, seit April 2025 nicht mehr im Standard-Support) und zeigt eine offene Directory-Listing-Seite. Auf DNS-Ebene fehlt DMARC vollständig — trotz SPF und DKIM ist damit keine Durchsetzungsrichtlinie für die vier Hornetsecurity-MX-Server hinterlegt, was Spoofing-Angriffe erleichtert. DNSSEC ist ebenfalls nicht aktiv.\n\nPositiv ist die insgesamt hohe Header-Reife auf eset.lumbeck-wolter.de (6/7), der Einsatz einer professionellen SonicWall-VPN-Appliance, die Verwendung des Hornetsecurity-Mailgateway-Verbundes sowie die vorhandene DKIM- und SPF-Konfiguration. Aufgrund der exponierten Datenbanken und des abgelaufenen VPN-Zertifikats wird das Gesamtrisiko auf HIGH eingestuft; nach Behebung dieser beiden Blocker sinkt es voraussichtlich auf MEDIUM. [Hinweis: apache wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]",
+  "overall_risk": "HIGH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-CSRF-001",
+   "SP-DB-001",
+   "SP-DISC-005",
+   "SP-DISC-009",
+   "SP-DNS-001",
+   "SP-DNS-004",
+   "SP-FALLBACK",
+   "SP-HDR-003",
+   "SP-HDR-006",
+   "SP-TLS-001",
+   "SP-TLS-002",
+   "SP-TLS-004"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Alle vier MX-Server verweisen auf mx01-mx04.hornetsecurity.com. Der Einsatz eines spezialisierten Anti-Spam-/Anti-Malware-Gateways vor der eigenen Infrastruktur entkoppelt Mail-Empfang von der internen Zustellung und blockiert einen Großteil aller Phishing- und Malware-Mails bereits an der Perimeter-Grenze.",
+    "title": "Professioneller Mail-Gateway-Verbund mit Hornetsecurity"
+   },
+   {
+    "description": "Die SPF-Konfiguration enthält alle relevanten Sender-Systeme (Mailjet, IONOS, iprs.de, Microsoft 365, emailsignatures365, Hornetsecurity) und schließt mit ~all ab. Zusammen mit dem vorhandenen DKIM-Record ist die grundlegende E-Mail-Authentifizierung solide aufgebaut — es fehlt nur noch der DMARC-Record zur Durchsetzung.",
+    "title": "SPF-Record mit vollständiger Sender-Liste und Softfail"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "TLS-Zertifikat für vpn.lumbeck-wolter.de erneuern und komplette Kette einspielen",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-003"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "Firewall-Regeln zur Sperrung von 3306/tcp und 5432/tcp auf 116.202.77.64 einrichten",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "DMARC-Record im Monitoring-Modus (p=none) einrichten und Reporting-Adresse konfigurieren",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-008"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "TLS-Konfiguration auf eset.lumbeck-wolter.de und rdgw.lumbeck-wolter.de härten (3DES entfernen, TLS 1.0/1.1 deaktivieren, TLS_FALLBACK_SCSV aktivieren)",
+    "effort": "4-6 h",
+    "finding_refs": [
+     "VS-2026-004",
+     "VS-2026-001"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "TLS-Konfiguration auf ftp.lumbeck-wolter.de auf TLS 1.2+ mit Forward Secrecy bringen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-005"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Security-Header auf allen produktiven Webseiten (www, rdgw, smtp/smtp4abas, vpn) systematisch nachziehen",
+    "effort": "1-2 Tage",
+    "finding_refs": [
+     "VS-2026-013"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Apache-Update auf 89.21.55.4 (smtp/smtp4abas) durchführen oder Ubuntu-Version aktualisieren",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Directory Listing auf smtp-Hosts deaktivieren oder Vhost stilllegen",
+    "effort": "1 h",
+    "finding_refs": [
+     "VS-2026-010"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "CSP auf eset. entschärfen (unsafe-inline/unsafe-eval abbauen, fehlende Direktiven explizit setzen)",
+    "effort": "1-2 Tage",
+    "finding_refs": [
+     "VS-2026-009",
+     "VS-2026-014"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Anti-CSRF-Tokens in RCDevs-OpenID-Portal aktivieren/prüfen",
+    "effort": "4 h",
+    "finding_refs": [
+     "VS-2026-011"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Rollen-Trennung auf 116.202.77.64 planen (Mail, Web, DB, FTP separieren)",
+    "effort": "1-2 Wochen (Projekt)",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "BREACH-Mitigation prüfen: HTTP-Kompression für Login/API-Antworten deaktivieren",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-012"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 3,
+   "INFO": 4,
+   "LOW": 1,
+   "MEDIUM": 6
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "3306",
+      "service": "MariaDB 10.11.18-MariaDB-0+deb12u1"
+     },
+     {
+      "port": "5432",
+      "service": "PostgreSQL 9.6.0 or later"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "587",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "465",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     },
+     {
+      "port": "25",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "www.lumbeck-wolter.de",
+     "lumbeck-wolter.de"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "116.202.77.64",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     25,
+     80,
+     110,
+     143,
+     222,
+     443,
+     465,
+     587,
+     993,
+     995,
+     3306,
+     5432
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      3306,
+      587,
+      110,
+      143,
+      80,
+      465,
+      21,
+      5432,
+      25,
+      443
+     ],
+     "shodan_services": {
+      "3306": "MariaDB 10.11.18-MariaDB-0+deb12u1",
+      "443": "Apache httpd",
+      "5432": "PostgreSQL 9.6.0 or later",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.lumbeck-wolter.de",
+    "redirect_data": {
+     "www.lumbeck-wolter.de": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://www.lumbeck-wolter.de/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "www.lumbeck-wolter.de",
+      "final_url": "https://www.lumbeck-wolter.de/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2018-12-31",
+      "is_mega_cve": false,
+      "latest_patch": "5.5.63",
+      "name": "MySQL",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2021-11-11",
+      "is_mega_cve": false,
+      "latest_patch": "9.6.24",
+      "name": "PostgreSQL DB",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "9.6.0 or later",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 25",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 3306)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MariaDB",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.11.18-MariaDB-0+deb12u1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 465)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 465",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 5432)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PostgreSQL 9.6.0 or later",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 587",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.2p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Courier pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD mod_sftp",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD",
+      "version": ""
+     },
+     {
+      "name": "ProFTPD mod_sftp",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Courier pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.2p1"
+     },
+     {
+      "name": "MySQL",
+      "version": "5.5.5-10.11.18-MariaDB-0+deb12u1"
+     },
+     {
+      "name": "PostgreSQL DB",
+      "version": "9.6.0 or later"
+     }
+    ],
+    "vhost_results": {
+     "www.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "www.lumbeck-wolter.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "8444",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "eset.lumbeck-wolter.de",
+     "omd.lumbeck-wolter.de",
+     "openotp.lumbeck-wolter.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "85.22.176.108",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      443,
+      8444
+     ],
+     "shodan_services": {
+      "443": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "eset.lumbeck-wolter.de",
+    "redirect_data": {
+     "eset.lumbeck-wolter.de": {
+      "error": null,
+      "final_domain": "eset.lumbeck-wolter.de",
+      "final_url": "https://eset.lumbeck-wolter.de/",
+      "is_cross_domain": false,
+      "page_title": "Lumbeck & Wolter GmbH & Co. KG Web Applications Portal",
+      "redirect_chain": [
+       "https://eset.lumbeck-wolter.de/",
+       "https://eset.lumbeck-wolter.de/style.css",
+       "https://eset.lumbeck-wolter.de/jquery-ui.css",
+       "https://eset.lumbeck-wolter.de/themes/default.css",
+       "https://eset.lumbeck-wolter.de/fonts.css",
+       "https://eset.lumbeck-wolter.de/icon.php?webapp=openid",
+       "https://eset.lumbeck-wolter.de/icon.php?webapp=selfdesk",
+       "https://eset.lumbeck-wolter.de/icon.php?webapp=selfreg",
+       "https://eset.lumbeck-wolter.de/icon.php?webapp=pwreset",
+       "https://eset.lumbeck-wolter.de/images/arrow.png"
+      ],
+      "response_headers": {
+       "cache-control": "no-store, no-cache, must-revalidate\npost-check=0, pre-check=0",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "929",
+       "content-security-policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:     www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com unpkg.com",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Sun, 19 Jul 2026 21:11:27 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "referrer-policy": "origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=31536000; includeSubDomains",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "sameorigin\nSAMEORIGIN",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/hosts/85.22.176.108/phase2/screenshot_eset.lumbeck-wolter.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "boxed",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width,initial-scale=1,shrink-to-fit=no",
+         "name": "viewport"
+        },
+        {
+         "content": "IE=edge",
+         "name": "X-UA-Compatible"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [
+        "https://eset.lumbeck-wolter.de/style.css",
+        "https://eset.lumbeck-wolter.de/jquery-ui.css",
+        "https://eset.lumbeck-wolter.de/fonts.css",
+        "https://eset.lumbeck-wolter.de/themes/default.css"
+       ],
+       "title": "Lumbeck & Wolter GmbH & Co. KG Web Applications Portal"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8444)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8444",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "eset.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "eset.lumbeck-wolter.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "4443",
+      "service": ""
+     },
+     {
+      "port": "443",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "rdgw.lumbeck-wolter.de",
+     "rdgw-2019.lumbeck-wolter.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "85.22.176.107",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443,
+     4443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      4443,
+      443
+     ],
+     "shodan_services": {},
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "rdgw.lumbeck-wolter.de",
+    "redirect_data": {
+     "rdgw.lumbeck-wolter.de": {
+      "error": null,
+      "final_domain": "rdgw.lumbeck-wolter.de",
+      "final_url": "https://rdgw.lumbeck-wolter.de/",
+      "is_cross_domain": false,
+      "page_title": "IIS Windows Server",
+      "redirect_chain": [
+       "https://rdgw.lumbeck-wolter.de/",
+       "https://rdgw.lumbeck-wolter.de/iisstart.png"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "content-length": "703",
+       "content-type": "text/html",
+       "date": "Sun, 19 Jul 2026 21:11:33 GMT",
+       "etag": "\"587359652e1dc1:0\"",
+       "last-modified": "Wed, 30 Jul 2025 08:46:09 GMT",
+       "server": "Microsoft-IIS/10.0",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/hosts/85.22.176.107/phase2/screenshot_rdgw.lumbeck-wolter.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=iso-8859-1",
+         "name": "Content-Type"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "IIS Windows Server"
+      }
+     }
+    },
+    "server": "Microsoft IIS httpd/10.0",
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 4443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 4443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "OS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Windows Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft IIS",
+      "patch_status": "aktuell",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Microsoft IIS httpd",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "rdgw.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "rdgw.lumbeck-wolter.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "25",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "80",
+      "service": "Apache httpd 2.4.41"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd 2.4.41"
+     },
+     {
+      "port": "587",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "smtp.lumbeck-wolter.de",
+     "smtp4abas.lumbeck-wolter.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": true,
+    "ip": "89.21.55.4",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      587,
+      110,
+      143,
+      80,
+      21,
+      25,
+      443
+     ],
+     "shodan_services": {
+      "25": "Postfix smtpd",
+      "443": "Apache httpd 2.4.41",
+      "587": "Postfix smtpd",
+      "80": "Apache httpd 2.4.41"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "smtp.lumbeck-wolter.de",
+    "redirect_data": {
+     "smtp.lumbeck-wolter.de": {
+      "error": null,
+      "final_domain": "smtp.lumbeck-wolter.de",
+      "final_url": "https://smtp.lumbeck-wolter.de/",
+      "is_cross_domain": false,
+      "page_title": "Index of /",
+      "redirect_chain": [
+       "https://smtp.lumbeck-wolter.de/",
+       "https://smtp.lumbeck-wolter.de/icons/blank.gif"
+      ],
+      "response_headers": {
+       "connection": "close",
+       "content-encoding": "gzip",
+       "content-length": "341",
+       "content-type": "text/html;charset=UTF-8",
+       "date": "Sun, 19 Jul 2026 21:16:23 GMT",
+       "server": "Apache/2.4.41 (Ubuntu)",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/hosts/89.21.55.4/phase2/screenshot_smtp.lumbeck-wolter.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Index of /"
+      }
+     },
+     "smtp4abas.lumbeck-wolter.de": {
+      "error": null,
+      "final_domain": "smtp4abas.lumbeck-wolter.de",
+      "final_url": "https://smtp4abas.lumbeck-wolter.de/",
+      "is_cross_domain": false,
+      "page_title": "Index of /",
+      "redirect_chain": [
+       "https://smtp4abas.lumbeck-wolter.de/",
+       "https://smtp4abas.lumbeck-wolter.de/icons/blank.gif"
+      ],
+      "response_headers": {
+       "connection": "close",
+       "content-encoding": "gzip",
+       "content-length": "344",
+       "content-type": "text/html;charset=UTF-8",
+       "date": "Sun, 19 Jul 2026 21:16:29 GMT",
+       "server": "Apache/2.4.41 (Ubuntu)",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/hosts/89.21.55.4/phase2/screenshot_smtp4abas.lumbeck-wolter.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Index of /"
+      }
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [
+       "CVE-2024-38475"
+      ],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": true,
+      "latest_patch": "",
+      "name": "Apache",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": {
+       "cve_id": "CVE-2024-38475",
+       "epss_score": null,
+       "kev": false
+      },
+      "version": "2.4.41",
+      "vuln_name": "Apache HTTP Server Improper Escaping of Output Vulnerability"
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "2.4.41",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "2.4.41",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Ubuntu",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Apache",
+      "version": "2.4.41 (Ubuntu)"
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": "2.4.41"
+     },
+     {
+      "name": "Ubuntu",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "smtp.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "smtp4abas.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "smtp.lumbeck-wolter.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "22",
+      "service": "OpenSSH 8.4p1"
+     },
+     {
+      "port": "80",
+      "service": ""
+     },
+     {
+      "port": "443",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "ftp.lumbeck-wolter.de"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "217.160.231.158",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     21,
+     22,
+     80,
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443,
+      21,
+      22
+     ],
+     "shodan_services": {
+      "22": "OpenSSH 8.4p1"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "ftp.lumbeck-wolter.de",
+    "redirect_data": {
+     "ftp.lumbeck-wolter.de": {
+      "error": null,
+      "final_domain": "ftp.lumbeck-wolter.de",
+      "final_url": "http://ftp.lumbeck-wolter.de/",
+      "is_cross_domain": false,
+      "page_title": "403 Forbidden",
+      "redirect_chain": [
+       "http://ftp.lumbeck-wolter.de/"
+      ],
+      "response_headers": {
+       "connection": "keep-alive",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=iso-8859-1",
+       "date": "Sun, 19 Jul 2026 21:12:37 GMT",
+       "server": "Apache",
+       "transfer-encoding": "chunked",
+       "x-ws-origin": "available",
+       "x-ws-ratelimit-limit": "1000",
+       "x-ws-ratelimit-remaining": "999"
+      },
+      "screenshot_path": "/tmp/scan-68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/hosts/217.160.231.158/phase2/screenshot_ftp.lumbeck-wolter.de.png",
+      "status_code": 403,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "403 Forbidden"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 22)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "8.4p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 80",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "8.4p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD or KnFTPD",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD or KnFTPD",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "8.4p1"
+     },
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "ftp.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "ftp.lumbeck-wolter.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "vpn.lumbeck-wolter.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "85.22.176.106",
+    "is_spa": true,
+    "mail_services": false,
+    "open_ports": [
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      443
+     ],
+     "shodan_services": {},
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "vpn.lumbeck-wolter.de",
+    "redirect_data": {
+     "vpn.lumbeck-wolter.de": {
+      "error": null,
+      "final_domain": "vpn.lumbeck-wolter.de",
+      "final_url": "https://vpn.lumbeck-wolter.de/#/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [
+       "https://vpn.lumbeck-wolter.de/",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/878.720499a9426b7a2199f1.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/sslvpnPortal.b6744adff875ac92bb02.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/715.9fbef4c6ceca3f33c0e3.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/totp.937c17af069719f87729.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/sslvpnPortal.39ed76d505d466a55926.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/login-login.5e8b920369dd3fd07490.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/update-pw.da3702c2a2271b1ee906.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/challenge.16a57f1bc8a425a5c1c6.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/logout.81a8b9416f2f2d5055f9.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/otp.af6290eaf2f210dfd593.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/152.9610473749e91afd0a94.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/878.5c174cacd909340921d9.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/login-login.5e8b920369dd3fd07490.css",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/update-pw.f63c841000f1c09afab2.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/challenge.96274d5fd1d1d4167d69.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/login-login.21fe5504a6eaf005e3c7.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/otp.30751064219cbd0aa078.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/584.6a3f219792e7c2aad14c.js",
+       "https://vpn.lumbeck-wolter.de/api/sonicos/ui-info",
+       "https://vpn.lumbeck-wolter.de/api/sonicos/is-sslvpn-enabled",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/static/login/cloud-gray.png",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/static/login/login_leftpanel.svg",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/fonts/nunito-sans-v5-latin_latin-ext-300.c4b50ab.woff2",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/fonts/nunito-sans-v5-latin_latin-ext-regular.d72a236.woff2",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/logout.4e5508fefdf5f1210a8d.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/fonts/nunito-sans-v5-latin_latin-ext-600.b7db28b.woff2",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/totp.a6e3c40157784c415df5.js",
+       "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/fonts/SonicWallIconFont.6cb2f44.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "no-store, max-age=0",
+       "content-encoding": "gzip",
+       "content-security-policy": "frame-src 'self' https://www.sonicwall.com/ https://securitynews.sonicwall.com/sonicwall-news/ https://blog.sonicwall.com/; default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: ws: wss:;",
+       "content-type": "text/html; charset=UTF-8;",
+       "permissions-policy": "microphone=()",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Web Server",
+       "strict-transport-security": "max-age=31536000; includeSubDomains",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/hosts/85.22.176.106/phase2/screenshot_vpn.lumbeck-wolter.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/878.5c174cacd909340921d9.js",
+        "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/715.9fbef4c6ceca3f33c0e3.js",
+        "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/152.9610473749e91afd0a94.js",
+        "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/js/sslvpnPortal.39ed76d505d466a55926.js"
+       ],
+       "stylesheets": [
+        "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/878.720499a9426b7a2199f1.css",
+        "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/sslvpnPortal.b6744adff875ac92bb02.css",
+        "https://vpn.lumbeck-wolter.de/sonicui/7/sslvpn-portal/static/css/login-login.5e8b920369dd3fd07490.css"
+       ],
+       "title": ""
+      }
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Web Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Web Server",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "vpn.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "vpn.lumbeck-wolter.de"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "wireguard-vpn.lumbeck-wolter.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": false,
+    "ip": "89.21.55.83",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "wireguard-vpn.lumbeck-wolter.de",
+    "redirect_data": {
+     "wireguard-vpn.lumbeck-wolter.de": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://wireguard-vpn.lumbeck-wolter.de/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "wireguard-vpn.lumbeck-wolter.de",
+      "final_url": "https://wireguard-vpn.lumbeck-wolter.de/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": null,
+    "tech_rows": [],
+    "technologies": [],
+    "vhost_results": {
+     "wireguard-vpn.lumbeck-wolter.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}

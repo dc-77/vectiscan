@@ -1,0 +1,7 @@
+# Golden-Fixtures (S0c, report-worker/tests/golden/).
+# Die Roh-Tars sind Binaerdaten: kein Diff, keine Zeilenendenkonvertierung,
+# kein Merge-Versuch. Die JSON-Fixtures bleiben Text mit LF, damit Aenderungen
+# an Soll-Listen und Negativ-Fixtures im Diff lesbar sind.
+report-worker/tests/golden/tars/** binary
+report-worker/tests/golden/**/*.json text eol=lf
+report-worker/tests/golden/orders.txt text eol=lf

@@ -1,0 +1,766 @@
+{
+ "data": {
+  "businessImpactScore": 2.9,
+  "correlationCount": 15,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "krause-computer.de",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-05-26T12:56:53.177Z",
+  "hasReport": true,
+  "id": "fb13a98f-22c6-4d17-875c-eeeb14643beb",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "reject",
+     "pct": 100,
+     "raw": "v=DMARC1; p=reject; adkim=r; aspf=r",
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/krause-computer.de",
+     "domain": "krause-computer.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/krause-computer.de"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.krause-computer.de",
+    "filebrowser.krause-computer.de",
+    "jitsi.krause-computer.de",
+    "mx.krause-computer.de",
+    "navidrome.krause-computer.de",
+    "nextcloud.krause-computer.de",
+    "nospamproxy.krause-computer.de",
+    "rustdesk.krause-computer.de",
+    "transmission.krause-computer.de",
+    "www.krause-computer.de",
+    "youtube.krause-computer.de"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "krause-computer.de",
+    "records": [
+     {
+      "last_seen": "2026-05-20T11:04:57.239000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "85.13.167.158"
+     },
+     {
+      "last_seen": "2026-05-20T06:16:36.895000",
+      "options": {
+       "priority": 50,
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "krause.skclient.de"
+     },
+     {
+      "last_seen": "2026-05-20T06:16:36.895000",
+      "options": {
+       "priority": 0,
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mail.krause-computer.de"
+     },
+     {
+      "last_seen": "2026-05-20T06:16:36.895000",
+      "options": {
+       "priority": 80,
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx.krause-computer.de"
+     },
+     {
+      "last_seen": "2026-05-20T06:16:36.895000",
+      "options": {
+       "priority": 10,
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "nospamproxy.krause-computer.de"
+     },
+     {
+      "last_seen": "2026-05-20T06:16:36.895000",
+      "options": {
+       "priority": 70,
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "w020687e.kasserver.com"
+     },
+     {
+      "last_seen": "2026-05-20T06:15:37.857000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns5.kasserver.com"
+     },
+     {
+      "last_seen": "2026-05-20T06:15:37.857000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns6.kasserver.com"
+     },
+     {
+      "last_seen": "2026-05-20T06:17:39.250000",
+      "options": {
+       "expires": 1209600,
+       "hostmaster": "hostmaster.kasserver.com",
+       "minttl": 7200,
+       "refresh": 28800,
+       "retry": 7200,
+       "serial": 2604220434,
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns5.kasserver.com"
+     },
+     {
+      "last_seen": "2026-05-20T06:11:33.502000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all"
+     },
+     {
+      "last_seen": "2026-05-20T06:11:32.544000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1; p=reject; adkim=r; aspf=r"
+     },
+     {
+      "last_seen": "2026-05-20T11:04:59.005000",
+      "options": {
+       "ttl": 7198
+      },
+      "subdomain": "filebrowser",
+      "type": "CNAME",
+      "value": "krause.skclient.de"
+     },
+     {
+      "last_seen": "2026-05-26T11:30:13.096000",
+      "options": {
+       "ttl": 7116
+      },
+      "subdomain": "jitsi",
+      "type": "CNAME",
+      "value": "mx.krause-computer.de"
+     },
+     {
+      "last_seen": "2026-05-26T11:28:49.357000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "mx",
+      "type": "A",
+      "value": "37.114.55.171"
+     },
+     {
+      "last_seen": "2026-05-20T11:05:00.370000",
+      "options": {
+       "ttl": 7196
+      },
+      "subdomain": "navidrome",
+      "type": "CNAME",
+      "value": "krause.skclient.de"
+     },
+     {
+      "last_seen": "2026-05-20T11:04:58.544000",
+      "options": {
+       "ttl": 7199
+      },
+      "subdomain": "nextcloud",
+      "type": "CNAME",
+      "value": "krause.skclient.de"
+     },
+     {
+      "last_seen": "2026-05-20T11:04:57.748000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "nospamproxy",
+      "type": "A",
+      "value": "37.114.55.171"
+     },
+     {
+      "last_seen": "2026-05-20T11:04:57.143000",
+      "options": {
+       "ttl": 7199
+      },
+      "subdomain": "rustdesk",
+      "type": "CNAME",
+      "value": "mx.krause-computer.de"
+     },
+     {
+      "last_seen": "2026-05-20T11:04:57.720000",
+      "options": {
+       "ttl": 7199
+      },
+      "subdomain": "transmission",
+      "type": "CNAME",
+      "value": "krause.skclient.de"
+     },
+     {
+      "last_seen": "2026-05-20T11:04:57.549000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "85.13.167.158"
+     },
+     {
+      "last_seen": "2026-05-20T11:04:58.671000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "youtube",
+      "type": "CNAME",
+      "value": "krause.skclient.de"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "filebrowser",
+     "jitsi",
+     "mx",
+     "navidrome",
+     "nextcloud",
+     "nospamproxy",
+     "rustdesk",
+     "transmission",
+     "www",
+     "youtube"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 15,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 8,
+      "crtsh": 0,
+      "gobuster_dns": 3,
+      "phase0a_passive": 11,
+      "subfinder": 8
+     },
+     "tools_with_zero_results": [
+      "crtsh"
+     ],
+     "total_subdomains": 15
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": false,
+     "dmarc": "v=DMARC1; p=reject; adkim=r; aspf=r",
+     "mx": [
+      "krause.skclient.de",
+      "mx.krause-computer.de",
+      "mail.krause-computer.de",
+      "w020687e.kasserver.com",
+      "nospamproxy.krause-computer.de"
+     ],
+     "ns": [
+      "ns5.kasserver.com",
+      "ns6.kasserver.com"
+     ],
+     "spf": "v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all",
+     "zone_transfer": false
+    },
+    "domain": "krause-computer.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain krause-computer.de mit Mailserver-Ports (25, 587, 993, 995) und Web-Ports (80, 443); Apache httpd vorhanden; DMARC reject konfiguriert aber DKIM fehlt — Web- und Mail-Sicherheit muss überprüft werden.",
+      "fqdns": [
+       "krause-computer.de",
+       "www.krause-computer.de"
+      ],
+      "ip": "85.13.167.158",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        587,
+        143,
+        80,
+        465,
+        22,
+        25,
+        443
+       ],
+       "shodan_services": {
+        "22": "OpenSSH 9.6p1 Ubuntu 3ubuntu13.16",
+        "443": "Apache httpd",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "dd55420.kasserver.com",
+      "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__krause-computer.de.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "krause-computer.de",
+        "is_primary": true,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Joomla auf Apache httpd",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "www.krause-computer.de",
+        "is_primary": false,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/85.13.167.158__www.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Joomla auf Apache httpd",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Mehrere Service-Subdomains (nextcloud, filebrowser, navidrome, transmission, youtube) deuten auf gehostete Anwendungen hin; nur Port 443 in Shodan sichtbar, aber web_probe zeigt has_web=false — Port-Scan + testssl erforderlich zur Verifizierung.",
+      "fqdns": [
+       "filebrowser.krause-computer.de",
+       "navidrome.krause-computer.de",
+       "nextcloud.krause-computer.de",
+       "transmission.krause-computer.de",
+       "youtube.krause-computer.de"
+      ],
+      "ip": "87.79.190.79",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "xdsl-87-79-190-79.nc.de",
+      "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__filebrowser.krause-computer.de.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "filebrowser.krause-computer.de",
+        "is_primary": true,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__filebrowser.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "navidrome.krause-computer.de",
+        "is_primary": false,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__navidrome.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "nextcloud.krause-computer.de",
+        "is_primary": false,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__nextcloud.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "youtube.krause-computer.de",
+        "is_primary": false,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/87.79.190.79__youtube.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "MX-Host (mx.krause-computer.de) mit Jitsi, RustDesk und NoSpamProxy; exponierte Management-Ports (22, 3128) und Mail-Ports (25, 26); nginx auf 80/443; kritische Infrastruktur für Mail und Collaboration — vollständiger Sicherheits-Scan notwendig.",
+      "fqdns": [
+       "jitsi.krause-computer.de",
+       "nospamproxy.krause-computer.de",
+       "rustdesk.krause-computer.de",
+       "mx.krause-computer.de"
+      ],
+      "ip": "37.114.55.171",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "reject",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        3478,
+        111,
+        80,
+        22,
+        3128,
+        25,
+        26,
+        443
+       ],
+       "shodan_services": {
+        "22": "OpenSSH 10.0p2 Debian 7+deb13u2",
+        "443": "nginx",
+        "80": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "mx.krause-computer.de",
+      "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__jitsi.krause-computer.de.png",
+      "vhosts": [
+       {
+        "_synthetic": true,
+        "fqdn": "jitsi.krause-computer.de",
+        "is_primary": true,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__jitsi.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "nospamproxy.krause-computer.de",
+        "is_primary": false,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__nospamproxy.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "rustdesk.krause-computer.de",
+        "is_primary": false,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__rustdesk.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       },
+       {
+        "_synthetic": true,
+        "fqdn": "mx.krause-computer.de",
+        "is_primary": false,
+        "screenshot_minio_key": "fb13a98f-22c6-4d17-875c-eeeb14643beb/37.114.55.171__mx.krause-computer.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "nginx",
+         "is_real_content": true
+        }
+       }
+      ],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 3,
+   "hostsTotal": 3,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 2,
+   "INFO": 2,
+   "LOW": 5,
+   "MEDIUM": 3
+  },
+  "startedAt": "2026-05-26T12:21:13.620Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "strict",
+   "passed": true,
+   "warning_count": 8,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "139",
+       "445"
+      ],
+      "title": "SMB/Samba-Dienste (Port 139, 445) öffentlich erreichbar auf krause-computer.de"
+     },
+     "finding_id": "VS-2026-002",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['139', '445']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "3128"
+      ],
+      "title": "Proxmox VE REST API (Port 3128) öffentlich erreichbar auf 37.114.55.171"
+     },
+     "finding_id": "VS-2026-003",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['3128']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "111"
+      ],
+      "title": "rpcbind-Dienst (Port 111) öffentlich erreichbar auf 37.114.55.171"
+     },
+     "finding_id": "VS-2026-004",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['111']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "26"
+      ],
+      "title": "Postfix-SMTP-Dienst auf nicht-standardisiertem Port 26 zusätzlich zu Port 25"
+     },
+     "finding_id": "VS-2026-010",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['26']",
+     "severity": "warning"
+    },
+    {
+     "check": "cvss",
+     "detail": {
+      "computed": 7.3,
+      "cvss_score": 5.3,
+      "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L"
+     },
+     "finding_id": "VS-2026-003",
+     "message": "CVSS-Score 5.3 weicht von Vektor-berechnetem Base-Score 7.3 ab — Admin-Review (Override-UI)",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_keywords_sample": [
+       "acceptor",
+       "aktiv",
+       "angriffe",
+       "antwortet",
+       "ausnutzung",
+       "authentifizierung",
+       "beschränken",
+       "brute"
+      ],
+      "title": "Server-Banner mit Versions-Info auf krause-computer.de",
+      "title_keywords": [
+       "banner",
+       "computer",
+       "info",
+       "krause",
+       "versions"
+      ]
+     },
+     "finding_id": "VS-2026-006",
+     "message": "Title und Body teilen kein gemeinsames Schluesselwort — moeglicherweise sehr generischer Title",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "SPF",
+      "title": "DKIM-Record fehlt fuer krause-computer.de",
+      "title_token": "DKIM"
+     },
+     "finding_id": "VS-2026-007",
+     "message": "Title nennt DKIM, Body beschreibt SPF (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_keywords_sample": [
+       "3ubuntu13",
+       "accounts",
+       "aktiv",
+       "aktivieren",
+       "aktuell",
+       "angriffe",
+       "ausschließlich",
+       "authenticator"
+      ],
+      "title": "Server-Banner mit Versions-Info auf 37.114.55.171, 87.79.190.79",
+      "title_keywords": [
+       "banner",
+       "info",
+       "versions"
+      ]
+     },
+     "finding_id": "VS-2026-009",
+     "message": "Title und Body teilen kein gemeinsames Schluesselwort — moeglicherweise sehr generischer Title",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

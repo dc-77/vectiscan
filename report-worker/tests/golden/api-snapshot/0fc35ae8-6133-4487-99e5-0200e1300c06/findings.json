@@ -1,0 +1,487 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 1,
+   "info": 1,
+   "low": 3,
+   "medium": 3
+  },
+  "business_impact_score": "6.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "affected": "185.155.194.22:443 (austausch.cyber-fuchs.de)",
+    "business_impact_score": 7.5,
+    "cvss_score": "7.5",
+    "cvss_vector": "AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Die Startseite von austausch.cyber-fuchs.de zeigt die vollständige Ausgabe der PHP-Funktion phpinfo() an. Diese legt umfangreiche Serverinformationen offen, darunter die installierte PHP-Version, geladene Module, Dateisystempfade, Umgebungsvariablen und die vollständige Serverkonfiguration. Die Seite ist ohne Authentifizierung erreichbar.",
+    "evidence": "$ curl -sI https://austausch.cyber-fuchs.de/\nHTTP/1.1 200 OK\nContent-Type: text/html; charset=UTF-8\nServer: Apache\n\n$ httpx -title https://austausch.cyber-fuchs.de/\nhttps://austausch.cyber-fuchs.de/ [200] [phpinfo()]",
+    "finding_type": "phpinfo_exposed",
+    "id": "VS-2026-002",
+    "impact": "Ein Angreifer erhält detaillierte Einblicke in die Systemkonfiguration, darunter installierte PHP-Erweiterungen, Dateipfade, deaktivierte Funktionen und möglicherweise in Umgebungsvariablen gespeicherte Zugangsdaten. Diese Informationen erleichtern die gezielte Vorbereitung weiterführender Angriffe erheblich.",
+    "policy_id": "SP-DISC-004",
+    "recommendation": "<b>Sofort (24-48 Stunden):</b> Die phpinfo()-Datei vom Webserver entfernen oder den Zugriff per .htaccess bzw. Apache-VHost-Konfiguration auf interne IP-Adressen beschränken.\n<b>Kurzfristig:</b> Prüfen, ob weitere Diagnose- oder Testdateien (info.php, test.php, adminer.php) auf dem Server vorhanden sind und diese ebenfalls entfernen.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-DISC-004",
+     "policy_version": "2026-05-10.1",
+     "rationale": "phpinfo() exposed - komplette Server-Konfiguration, Pfade, Versionen",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": ".git-Verzeichnis oeffentlich erreichbar auf austausch.cyber-fuchs.de",
+    "title_vars": {
+     "host": "austausch.cyber-fuchs.de",
+     "tech": "PHP"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "185.155.193.50:443 (cyber-fuchs.de)",
+    "business_impact_score": 5.4,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:L/A:N",
+    "cwe": "CWE-1104",
+    "description": "Sechs WordPress-Plugins sind erheblich veraltet und weisen insgesamt über 30 öffentlich dokumentierte Schwachstellen auf. Die kritischsten Befunde betreffen das Plugin Download Monitor (4.8.6, aktuell 5.1.x+) mit authentifizierter SQL-Injection (CVE-2026-39486, Contributor+), Local File Inclusion (CVE-2025-47439, Contributor+) sowie unauthentifiziertem IDOR (CVE-2026-3124). WPBakery Page Builder (6.8.0, aktuell 8.x+) enthält authentifizierte Local File Inclusion (CVE-2024-5709, Author+) und zahlreiche Stored-XSS-Schwachstellen. Auch Contact Form 7 (5.7.7), Complianz GDPR (7.2.0), WP Carousel Free (2.7.3) und hCaptcha (4.15.0) sind betroffen.",
+    "evidence": "$ wpscan --url https://cyber-fuchs.de\n\n[!] Plugin: download-monitor (Version: 4.8.6)\n  - Download Monitor < 5.1.9 - Contributor+ SQL Injection (CVE-2026-39486)\n  - Download Monitor < 5.0.23 - Contributor+ Local File Inclusion (CVE-2025-47439)\n  - Download Monitor < 5.1.8 - Unauthenticated IDOR (CVE-2026-3124)\n  - Download Monitor < 5.1.10 - Author+ Arbitrary File Download (CVE-2026-39489)\n  + 6 weitere CVEs\n\n[!] Plugin: js_composer (Version: 6.8.0)\n  - WPBakery < 7.8 - Author+ Local File Inclusion (CVE-2024-5709)\n  - WPBakery < 7.8 - Author+ Stored XSS (CVE-2024-5708)\n  + 12 weitere CVEs\n\n[!] Plugin: contact-form-7 (Version: 5.7.7)\n  - Contact Form 7 < 5.8.4 - Editor+ Arbitrary File Upload (CVE-2023-6449)\n  - Contact Form 7 < 5.9.5 - Unauthenticated Open Redirect (CVE-2024-4704)\n  + 2 weitere CVEs\n\n[!] Plugin: complianz-gdpr (Version: 7.2.0)\n  - Complianz < 7.4.6 - Unauthenticated Private Post Content Disclosure (CVE-2026-4019)\n  + 2 weitere CVEs\n\n[i] WAF: Wordfence erkannt",
+    "finding_type": "wordpress_plugin_vulnerability",
+    "id": "VS-2026-001",
+    "impact": "Die SQL-Injection-Schwachstelle ermöglicht einem Angreifer mit Contributor-Rechten das Auslesen der gesamten WordPress-Datenbank einschließlich Benutzerpasswörtern und potenziell personenbezogener Daten. Die Local-File-Inclusion-Schwachstellen können zum Lesen sensibler Konfigurationsdateien (wp-config.php) und potenziell zur Remote Code Execution führen. Das unauthentifizierte IDOR und die Content Disclosure in Complianz erfordern keine Anmeldung und sind direkt ausnutzbar. Die Wordfence-WAF bietet teilweisen Schutz, kann jedoch durch gezielte Payloads umgangen werden.",
+    "policy_id": "SP-WP-001",
+    "recommendation": "<b>Sofort (24-48 Stunden):</b> Alle sechs betroffenen Plugins auf die jeweils aktuelle Version aktualisieren: Download Monitor ≥ 5.1.11, WPBakery ≥ 8.7, Contact Form 7 ≥ 6.0.6, Complianz ≥ 7.4.6, WP Carousel ≥ 2.7.11, hCaptcha ≥ 4.23.0.\n<b>Kurzfristig (Woche 1):</b> Bestehende Contributor- und Author-Accounts prüfen und nicht benötigte Rollen entfernen. WordPress-Auto-Updates für Plugins aktivieren.\n<b>Mittelfristig:</b> Regelmäßigen Plugin-Update-Prozess etablieren und monatliche Schwachstellen-Scans durchführen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-WP-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "WordPress-Plugin/Theme-Schwachstelle - typischerweise XSS, Object Injection oder Auth-Bypass. Schweregrad haengt von Plugin-Aktivitaet, Auth-Voraussetzungen und Patch-Stand ab; Default MEDIUM, Boost via KEV/EPSS bei zugeordnetem CVE.",
+     "rule_references": [
+      "CWE-1395",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "WordPress-Plugin download-monitor, js_composer mit bekannter Schwachstelle auf cyber-fuchs.de",
+    "title_vars": {
+     "host": "cyber-fuchs.de",
+     "plugin": "download-monitor, js_composer",
+     "tech": "WordPress Plugins"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "185.155.194.22:21 (austausch.cyber-fuchs.de)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Auf austausch.cyber-fuchs.de ist ein Pure-FTPd-Dienst auf Port 21 öffentlich erreichbar. FTP überträgt Zugangsdaten und Dateiinhalte standardmäßig im Klartext. Selbst bei konfiguriertem FTPS (FTP über TLS) bleibt die initiale Verbindungsaushandlung potenziell unverschlüsselt, und der Hostname 'austausch' legt eine Nutzung zum Dateiaustausch nahe.",
+    "evidence": "$ nmap -sV -p21 185.155.194.22\n21/tcp open ftp Pure-FTPd",
+    "id": "VS-2026-004",
+    "impact": "Zugangsdaten und übertragene Dateien können bei fehlendem oder fehlerhaft konfiguriertem TLS durch Man-in-the-Middle-Angriffe im Netzwerk mitgelesen werden. FTP-Dienste sind zudem ein häufiges Ziel für Brute-Force-Angriffe auf Benutzerkonten.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Woche 1):</b> Prüfen, ob FTPS (explizites TLS) konfiguriert ist, und unverschlüsselte FTP-Verbindungen serverseitig deaktivieren. Zugriff per Firewall auf bekannte IP-Adressen beschränken.\n<b>Mittelfristig:</b> Migration auf SFTP (über SSH) prüfen, da dies eine sicherere Alternative darstellt und keinen zusätzlichen Port erfordert. Falls FTP nicht mehr benötigt wird, den Dienst vollständig deaktivieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst (Pure-FTPd) auf austausch.cyber-fuchs.de exponiert",
+    "title_vars": {
+     "host": "austausch.cyber-fuchs.de",
+     "port": "21",
+     "tech": "Pure-FTPd"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "cyber-fuchs.de (DNS)",
+    "business_impact_score": 4.7,
+    "cvss_score": "4.7",
+    "cvss_vector": "AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain cyber-fuchs.de ist kein DMARC-Record (_dmarc.cyber-fuchs.de) konfiguriert. DMARC definiert, wie empfangende Mailserver mit E-Mails umgehen sollen, die SPF- und/oder DKIM-Prüfungen nicht bestehen. Ohne DMARC gibt es keine Richtlinie zur Ablehnung gefälschter E-Mails, und der Domaininhaber erhält keine Berichte über Missbrauchsversuche.",
+    "evidence": "$ dig TXT _dmarc.cyber-fuchs.de +short\n(keine Antwort)\n\n$ dig TXT cyber-fuchs.de +short\n\"v=spf1 mx -all\"",
+    "finding_type": "spf_missing",
+    "id": "VS-2026-005",
+    "impact": "Angreifer können E-Mails im Namen von cyber-fuchs.de versenden, ohne dass empfangende Mailserver eine klare Handlungsanweisung zur Ablehnung erhalten. Dies erhöht das Risiko für gezielte Phishing-Angriffe gegen Kunden und Geschäftspartner. Der vorhandene SPF-Record mit Hardfail (-all) bietet teilweisen Schutz, wird jedoch ohne DMARC von vielen Mailservern weniger strikt durchgesetzt.",
+    "policy_id": "SP-DNS-004",
+    "recommendation": "<b>Kurzfristig (Woche 1):</b> DMARC-Record einrichten, zunächst im Monitoring-Modus: _dmarc.cyber-fuchs.de TXT \"v=DMARC1; p=none; rua=mailto:dmarc@cyber-fuchs.de\"\n<b>Mittelfristig (Monat 1-2):</b> Nach Auswertung der DMARC-Reports die Policy schrittweise auf p=quarantine und dann p=reject verschärfen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-DNS-004",
+     "policy_version": "2026-05-10.1",
+     "rationale": "SPF fehlt fuer Mail-Domain - Spoofing-Schutz fehlt",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "SPF-Record fehlt fuer cyber-fuchs.de",
+    "title_vars": {
+     "domain": "cyber-fuchs.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "185.155.194.22:22 (austausch.cyber-fuchs.de)",
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-1104",
+    "description": "Auf austausch.cyber-fuchs.de läuft OpenSSH 7.6p1 Ubuntu 4ubuntu0.7, was auf Ubuntu 18.04 LTS hindeutet. Ubuntu 18.04 hat im April 2023 das End-of-Life erreicht und erhält keine regulären Sicherheitsupdates mehr. OpenSSH 7.6p1 enthält mehrere bekannte Schwachstellen in dieser Versionsklasse, darunter Probleme mit der Schlüsselvalidierung und User-Enumeration.",
+    "evidence": "$ nmap -sV -p22 185.155.194.22\n22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.7 (Ubuntu Linux; protocol 2.0)\n\nVergleich: Haupthost 185.155.193.50 nutzt OpenSSH 9.6p1 (Ubuntu 24.04)",
+    "finding_type": "user_enumeration",
+    "id": "VS-2026-003",
+    "impact": "Ein End-of-Life-Betriebssystem erhält keine Sicherheitspatches mehr. Neu entdeckte Schwachstellen in OpenSSH, dem Linux-Kernel oder anderen Systemkomponenten bleiben dauerhaft ungepatcht. Dies erhöht das Risiko erfolgreicher Angriffe auf den SSH-Dienst und das Gesamtsystem kontinuierlich.",
+    "policy_id": "SP-ENUM-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> SSH-Zugriff auf bekannte IP-Adressen per Firewall einschränken. Passwort-Authentifizierung deaktivieren und ausschließlich Key-basierte Anmeldung erlauben.\n<b>Mittelfristig (Monat 1):</b> Migration auf ein unterstütztes Betriebssystem (Ubuntu 22.04 LTS oder 24.04 LTS) planen und umsetzen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-ENUM-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Benutzer-Enumeration moeglich - Username-Listen ableitbar, Vorbereitung fuer Credential-Stuffing/Brute-Force",
+     "rule_references": [
+      "CWE-203",
+      "CWE-200"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "User-Enumeration moeglich auf austausch.cyber-fuchs.de",
+    "title_vars": {
+     "host": "austausch.cyber-fuchs.de",
+     "tech": "OpenSSH 7.6p1",
+     "version": "7.6p1"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "cyber-fuchs.de (DNS)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain cyber-fuchs.de ist kein DKIM-Record (DomainKeys Identified Mail) konfiguriert. DKIM ermöglicht die kryptographische Signierung ausgehender E-Mails und erlaubt Empfängerservern die Verifizierung, dass eine E-Mail tatsächlich vom autorisierten Mailserver stammt und nicht manipuliert wurde.",
+    "evidence": "$ dig TXT default._domainkey.cyber-fuchs.de +short\n(keine Antwort)\n\nMX-Record: mx01.rohwerder.net",
+    "finding_type": "dkim_missing",
+    "id": "VS-2026-006",
+    "impact": "Ohne DKIM-Signaturen fehlt eine wesentliche Komponente der E-Mail-Authentifizierung. Empfangende Server können die Integrität und Herkunft von E-Mails nicht kryptographisch verifizieren. In Kombination mit dem fehlenden DMARC-Record ist die E-Mail-Authentifizierung der Domain unvollständig, was das Spoofing-Risiko erhöht.",
+    "policy_id": "SP-DNS-008",
+    "recommendation": "<b>Kurzfristig (Woche 1-2):</b> DKIM beim Mailserver-Provider (rohwerder.net) aktivieren und den öffentlichen DKIM-Schlüssel als TXT-Record in der DNS-Zone hinterlegen.\n<b>Mittelfristig:</b> DKIM-Signierung für alle ausgehenden E-Mails sicherstellen und die Funktionsfähigkeit mit Tools wie mail-tester.com oder mxtoolbox.com verifizieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-008",
+     "policy_version": "2026-05-10.1",
+     "rationale": "DKIM-Signierung fehlt - Mail-Authentifizierung schwaecher",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DKIM-Record fehlt fuer cyber-fuchs.de",
+    "title_vars": {
+     "domain": "cyber-fuchs.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "185.155.193.50 (cyber-fuchs.de), 185.155.194.22 (austausch.cyber-fuchs.de)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "",
+    "cwe": "CWE-200",
+    "description": "Die Apache-Webserver beider Hosts geben im Server-Response-Header die exakte Version und das Betriebssystem preis ('Apache/2.4.58 (Ubuntu)'). Dies ist ein geringfügiger Informationsabfluss, der Angreifern die Zielaufklärung erleichtert, aber allein kein ausnutzbares Risiko darstellt.",
+    "evidence": "$ curl -sI https://cyber-fuchs.de/ | grep -i server\nServer: Apache/2.4.58 (Ubuntu)\n\n$ curl -sI https://austausch.cyber-fuchs.de/ | grep -i server\nServer: Apache",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-009",
+    "impact": "Reine Informationsoffenlegung ohne direktes Ausnutzungspotenzial. Die Angabe erleichtert lediglich die passive Aufklärung.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Empfohlen:</b> In der Apache-Konfiguration 'ServerTokens Prod' und 'ServerSignature Off' setzen, um die Versionsangabe zu unterdrücken.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf cyber-fuchs.de",
+    "title_vars": {
+     "host": "cyber-fuchs.de",
+     "tech": "Apache 2.4.58"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "185.155.193.50 (continentale.cyber-fuchs.de), 185.155.194.22 (bgv.austausch.cyber-fuchs.de)",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Subdomains continentale.cyber-fuchs.de und bgv.austausch.cyber-fuchs.de liefern keine Security-Header aus (0 von 7 geprüften Headern). Es fehlen Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy und Permissions-Policy. Die Hauptdomain cyber-fuchs.de liefert hingegen 5 von 7 Headern korrekt aus — Content-Security-Policy und Permissions-Policy fehlen jedoch auch dort.",
+    "evidence": "$ curl -sI https://continentale.cyber-fuchs.de/ | grep -iE 'strict|csp|x-frame|x-content|x-xss|referrer|permissions'\n(keine Treffer — 0/7 Header)\n\n$ curl -sI https://bgv.austausch.cyber-fuchs.de/ | grep -iE 'strict|csp|x-frame|x-content|x-xss|referrer|permissions'\n(keine Treffer — 0/7 Header)\n\n$ curl -sI https://cyber-fuchs.de/ | grep -iE 'strict|x-frame|x-content|x-xss|referrer'\nstrict-transport-security: max-age=31536000; includeSubDomains; preload\nx-content-type-options: nosniff\nx-frame-options: SAMEORIGIN\nx-xss-protection: 1; mode=block\nreferrer-policy: no-referrer-when-downgrade",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-007",
+    "impact": "Besucher der betroffenen Subdomains sind anfälliger für Clickjacking-Angriffe (fehlendes X-Frame-Options), MIME-Type-Sniffing (fehlendes X-Content-Type-Options) und SSL-Stripping (fehlendes HSTS). Da es sich bei den Subdomains um Login-Portale für Versicherungskunden handelt (BGV, Continentale), ist das Risiko für Endanwender erhöht.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Woche 1):</b> Security-Header in der Apache-Konfiguration der betroffenen VHosts ergänzen. Die Konfiguration der Hauptdomain kann als Vorlage dienen.\n<b>Mittelfristig:</b> Eine zentrale Apache-Include-Datei für Security-Header erstellen und in alle VHost-Konfigurationen einbinden. Content-Security-Policy und Permissions-Policy auch für die Hauptdomain konfigurieren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf continentale.cyber-fuchs.de",
+    "title_vars": {
+     "domain": "cyber-fuchs.de",
+     "host": "continentale.cyber-fuchs.de"
+    }
+   }
+  ],
+  "overall_description": "Die Infrastruktur von cyber-fuchs.de weist mehrere erhebliche Schwachstellen auf. Auf dem Hauptsystem sind sechs WordPress-Plugins mit insgesamt über 30 bekannten Schwachstellen stark veraltet, darunter SQL-Injection und Local File Inclusion. Auf dem zweiten Host (austausch.cyber-fuchs.de) ist eine phpinfo()-Seite öffentlich zugänglich, ein FTP-Dienst exponiert und das Betriebssystem End-of-Life. Die E-Mail-Sicherheit ist durch fehlende DMARC- und DKIM-Konfiguration unvollständig.",
+  "overall_risk": "HIGH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-DISC-001",
+   "SP-DISC-004",
+   "SP-DNS-004",
+   "SP-DNS-008",
+   "SP-ENUM-001",
+   "SP-FALLBACK",
+   "SP-WP-001"
+  ],
+  "policy_version": "2026-05-10.1",
+  "positive_findings": [
+   {
+    "description": "Der SPF-Record von cyber-fuchs.de verwendet die strikteste Policy (-all), wodurch empfangende Mailserver E-Mails von nicht autorisierten Absendern klar ablehnen können. Die Konfiguration 'v=spf1 mx -all' beschränkt den Versand auf die im MX-Record definierten Server und ist damit schlank und wirksam.",
+    "title": "SPF-Record mit striktem Hardfail korrekt konfiguriert"
+   },
+   {
+    "description": "Für cyber-fuchs.de ist Strict-Transport-Security mit einem langen max-age (31536000 Sekunden), includeSubDomains und der preload-Direktive konfiguriert. Dies erzwingt HTTPS-Verbindungen browserseitig und schützt vor SSL-Stripping-Angriffen. Die includeSubDomains-Direktive erstreckt den Schutz auf alle Subdomains.",
+    "title": "HSTS mit Preload-Direktive auf der Hauptdomain aktiv"
+   },
+   {
+    "description": "Auf der WordPress-Installation ist die Wordfence WAF aktiv, die bekannte Angriffsmuster wie SQL-Injection, Cross-Site-Scripting und Brute-Force-Versuche erkennt und blockiert. In Kombination mit hCaptcha auf Formularen bietet dies eine zusätzliche Verteidigungsschicht, die das Ausnutzen der identifizierten Plugin-Schwachstellen deutlich erschwert.",
+    "title": "Wordfence Web Application Firewall aktiv"
+   },
+   {
+    "description": "Anfragen an die Hauptdomain werden zuverlässig auf HTTPS umgeleitet. In Verbindung mit der HSTS-Konfiguration wird sichergestellt, dass keine unverschlüsselten Verbindungen zur Hauptseite bestehen bleiben.",
+    "title": "HTTP-zu-HTTPS-Weiterleitung funktionsfähig"
+   },
+   {
+    "description": "Die autoritativen Nameserver (ns.udag.org, ns.udag.net, ns.udag.de) lehnen Zone-Transfer-Anfragen (AXFR) korrekt ab. Damit wird verhindert, dass Angreifer die vollständige DNS-Zonendatei mit allen Einträgen und Subdomains abrufen können.",
+    "title": "DNS-Zone-Transfer korrekt unterbunden"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Alle sechs veralteten WordPress-Plugins auf die jeweils aktuelle Version aktualisieren, insbesondere Download Monitor und WPBakery Page Builder aufgrund der SQL-Injection- und LFI-Schwachstellen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "phpinfo()-Datei auf austausch.cyber-fuchs.de entfernen und prüfen, ob weitere Diagnose-Skripte öffentlich erreichbar sind",
+    "effort": "0,5 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "SSH-Zugriff auf austausch.cyber-fuchs.de per Firewall auf bekannte IP-Adressen einschränken und FTP-Dienst absichern (FTPS erzwingen oder auf SFTP umstellen)",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-003",
+     "VS-2026-004"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "DMARC-Record im Monitoring-Modus einrichten und DKIM beim Mailserver-Provider aktivieren",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-005",
+     "VS-2026-006"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Security-Header für alle Subdomains konfigurieren — zentrale Apache-Include-Datei erstellen und in alle VHosts einbinden",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Migration von austausch.cyber-fuchs.de auf ein unterstütztes Betriebssystem (Ubuntu 22.04/24.04 LTS) planen und durchführen",
+    "effort": "8-16 h",
+    "finding_refs": [
+     "VS-2026-003",
+     "VS-2026-004"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 1,
+   "INFO": 1,
+   "LOW": 3,
+   "MEDIUM": 3
+  },
+  "tech_profiles": []
+ },
+ "success": true
+}

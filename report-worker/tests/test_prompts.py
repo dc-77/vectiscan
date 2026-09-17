@@ -70,8 +70,11 @@ class TestSystemPromptProfessional:
     def test_contains_output_format(self):
         assert "OUTPUT-FORMAT" in SYSTEM_PROMPT_PROFESSIONAL
 
-    def test_contains_ptes(self):
-        assert "PTES" in SYSTEM_PROMPT_PROFESSIONAL
+    def test_contains_method_framing(self):
+        """S0a: keine PTES-Zusage, dafuer die Einordnung als externe Analyse."""
+        assert "PTES" not in SYSTEM_PROMPT_PROFESSIONAL
+        assert "externe" in SYSTEM_PROMPT_PROFESSIONAL
+        assert "kein Penetrationstest" in SYSTEM_PROMPT_PROFESSIONAL
 
 
 class TestSystemPromptNis2:
@@ -107,7 +110,7 @@ class TestSystemPromptNis2:
     def test_includes_professional_content(self):
         """NIS2 prompt should include all professional prompt content."""
         assert "CVSS-SCORING" in SYSTEM_PROMPT_NIS2
-        assert "PTES" in SYSTEM_PROMPT_NIS2
+        assert "kein Penetrationstest" in SYSTEM_PROMPT_NIS2
 
 
 class TestGetSystemPrompt:

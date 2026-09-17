@@ -1,0 +1,2569 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 2,
+   "info": 2,
+   "low": 5,
+   "medium": 3
+  },
+  "business_impact_score": "5.5",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "03116"
+    ],
+    "affected": "https://kunden.mc-2europe.com, https://nextcloud.mc-2europe.com (62.159.230.44:443)",
+    "business_impact_score": 9.1,
+    "cvss_score": "9.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
+    "cwe": "CWE-326",
+    "description": "testssl.sh meldet BEAST-anfaellige CBC-Cipher-Suites (ECDHE-RSA-AES256-SHA, DHE-RSA-AES256-SHA, AES256-SHA, CAMELLIA256-SHA usw.) auf TLS 1.0/1.1 sowie ein Gesamturteil von B. BEAST betrifft alte TLS-1.0-CBC-Cipher; moderne Browser mitigieren das clientseitig, aber die Serverseite sollte diese Cipher nicht mehr anbieten.",
+    "evidence": "testssl.sh:\n[MEDIUM] BEAST_CBC_TLS1: ECDHE-RSA-AES256-SHA DHE-RSA-AES256-SHA DHE-RSA-CAMELLIA256-SHA AES256-SHA CAMELLIA256-SHA ECDHE-RSA-AES128-SHA DHE-RSA-AES128-SHA DHE-RSA-CAMELLIA128-SHA AES128-SHA CAMELLIA128-SHA\n[MEDIUM] overall_grade: B",
+    "external_id": "VS-2026-001",
+    "finding_type": "tls_below_tr03116_minimum",
+    "id": "VS-2026-001",
+    "impact": "In sehr spezifischen Angriffs-Szenarien (MitM mit JavaScript-Injektion beim Client) koennten Sitzungs-Cookies durch BEAST abgeleitet werden. Praktisch ist das Risiko gering, aber es entspricht nicht mehr dem Stand der Technik und blockiert eine A-Bewertung bei Compliance-Audits.",
+    "original_claude_id": "VS-2026-007",
+    "policy_id": "SP-TLS-001",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> TLS 1.0 und TLS 1.1 in der Apache-SSL-Konfiguration deaktivieren (<code>SSLProtocol -all +TLSv1.2 +TLSv1.3</code>). Cipher-Suite auf Mozilla-'intermediate' oder 'modern' setzen — nur AEAD-Cipher (GCM, ChaCha20-Poly1305) zulassen.\n<b>Mittelfristig:</b> Regelmaessige TLS-Ueberpruefung mit testssl.sh oder Qualys SSL Labs (Ziel: Grade A+). Siehe auch: BSI TR-03116-4 Compliance-Pruefung in diesem Bericht.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-TLS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "TLS-Version unter BSI TR-03116-4 Minimum - Compliance-Verstoss",
+     "rule_references": [
+      "BSI-TR-03116-4",
+      "CWE-326"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf kunden.mc-2europe.com",
+    "title_vars": {
+     "host": "kunden.mc-2europe.com",
+     "tech": "Apache 2.4.66"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "144.76.255.130:3306 (mc-2europe.com)",
+    "business_impact_score": 8.1,
+    "cvss_score": "8.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-284",
+    "description": "Der MariaDB-Datenbank-Port 3306 ist ueber das oeffentliche Internet erreichbar (Banner: MariaDB 10.11.18-MariaDB-deb12). Datenbank-Ports sollten grundsaetzlich nicht direkt aus dem Internet exponiert sein, sondern nur ueber lokale Sockets bzw. private Netze zugaenglich sein.",
+    "evidence": "$ nmap -sV -p 3306 144.76.255.130\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-deb12\n\nShodan-Banner: MariaDB 10.11.17-MariaDB-deb12",
+    "external_id": "VS-2026-002",
+    "finding_type": "database_port_exposed",
+    "id": "VS-2026-002",
+    "impact": "Angreifer koennen Brute-Force- oder Credential-Stuffing-Angriffe gegen Datenbank-Accounts durchfuehren. Bei entdeckten Zero-Days im MySQL-Protokollstack oder schwachen Passwoertern ist eine direkte Kompromittierung der gesamten Anwendungsdatenbank moeglich. Zusaetzlich ist die exakte Version aus dem Banner ablesbar und erleichtert die gezielte Suche nach Exploits.",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-DB-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Port 3306 per Firewall (iptables/nftables) auf localhost oder ein privates VPN/VLAN beschraenken. Falls externer Zugriff wirklich benoetigt wird, ausschliesslich per SSH-Tunnel oder Wireguard.\n<b>Mittelfristig:</b> Datenbank auf separaten Host verschieben (Segmentierung Web/DB), MariaDB auf aktuellsten 10.11.x-Patch aktualisieren, starke Passwoerter erzwingen und require_secure_transport aktivieren.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-DB-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Datenbank-Port (3306/5432/1433/1521/27017/6379/...) oeffentlich erreichbar - Bei erfolgreicher Authentifizierung (Brute-Force, Default-Creds, leaked-Creds) vollstaendiger Zugriff auf gespeicherte Daten. AC:H weil Authentifizierung weiterhin Pflicht.",
+     "rule_references": [
+      "CWE-200",
+      "CWE-284",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Datenbank-Port 3306 oeffentlich erreichbar auf 144.76.255.130",
+    "title_vars": {
+     "host": "144.76.255.130",
+     "port": "3306",
+     "tech": "MariaDB 10.11.18",
+     "version": "10.11.18"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "144.76.255.130:21 (mc-2europe.com)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Auf Port 21 ist Pure-FTPd aktiv. FTP uebertraegt Zugangsdaten und Daten standardmaessig im Klartext. Es ist nicht ersichtlich, ob explizit FTPS (AUTH TLS) erzwungen wird.",
+    "evidence": "$ nmap -sV -p 21 144.76.255.130\n21/tcp open ftp Pure-FTPd\nShodan bestaetigt: Pure-FTPd",
+    "external_id": "VS-2026-003",
+    "id": "VS-2026-003",
+    "impact": "Wenn Clients FTP ohne TLS verwenden, koennen Zugangsdaten passiv abgefangen werden (z.B. in oeffentlichen WLANs oder auf kompromittierten Netzwerkpfaden). FTP hat auch grundsaetzliche Protokollnachteile (aktive/passive Ports, NAT-Probleme).",
+    "original_claude_id": "VS-2026-004",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Pure-FTPd auf explicit FTPS oder implicit FTPS umkonfigurieren und in der Server-Konfiguration <code>TLS 2</code> (mandatory) setzen. Alternativ Migration auf SFTP (ueber SSH, Port 22).\n<b>Mittelfristig:</b> FTP komplett abschalten und ausschliesslich SFTP oder WebDAV/Nextcloud fuer Datentransfers verwenden.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Klartext-Dienst (Pure-FTPd) auf 144.76.255.130 exponiert",
+    "title_vars": {
+     "host": "144.76.255.130",
+     "port": "21",
+     "tech": "Pure-FTPd"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "mc-2europe.com (DNS-Zone)",
+    "business_impact_score": 4.7,
+    "cvss_score": "4.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Fuer die Domain mc-2europe.com ist kein DMARC-TXT-Record unter _dmarc.mc-2europe.com hinterlegt. Zwar sind SPF und DKIM vorhanden, aber ohne DMARC-Policy fehlt die Durchsetzung — empfangende Mailserver haben keine Anweisung, wie sie mit E-Mails umgehen sollen, die SPF/DKIM nicht bestehen.",
+    "evidence": "$ dig +short TXT _dmarc.mc-2europe.com\n(kein Ergebnis)\n\nSPF vorhanden: v=spf1 mx a ip4:62.159.230.43 ip4:144.76.255.130 include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-eu.emailsignatures365.com ~all\nDKIM vorhanden: True",
+    "external_id": "VS-2026-004",
+    "finding_type": "spf_missing",
+    "id": "VS-2026-004",
+    "impact": "Angreifer koennen im Namen der Domain mc-2europe.com Phishing-E-Mails versenden (Domain-Spoofing). Empfangende Mailserver werden Spoof-Nachrichten mangels DMARC-Policy nicht konsistent als Betrug erkennen. Reputations- und Marken-Schaden durch missbraeuchliche E-Mails ist wahrscheinlich.",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-DNS-004",
+    "recommendation": "<b>Kurzfristig (Tage):</b> DMARC-Record im Beobachtungsmodus veroeffentlichen: <code>v=DMARC1; p=none; rua=mailto:dmarc@mc-2europe.com; ruf=mailto:dmarc@mc-2europe.com; fo=1</code>. Reports 4-6 Wochen auswerten (z.B. via dmarcian oder Postmark).\n<b>Mittelfristig:</b> Nach Auswertung Policy auf <code>quarantine</code> und schliesslich <code>reject</code> hochstufen. Zusaetzlich BIMI und MTA-STS ergaenzen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-DNS-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "SPF fehlt fuer Mail-Domain - Spoofing-Schutz fehlt",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "SPF-Record fehlt fuer mc-2europe.com",
+    "title_vars": {
+     "domain": "mc-2europe.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "https://kunden.mc-2europe.com, https://nextcloud.mc-2europe.com",
+    "business_impact_score": 5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Nextcloud-CSP enthaelt style-src 'unsafe-inline', mehrere Wildcard-Direktiven (frame-src *, img-src *, media-src *, connect-src *) und fehlende Fallback-Direktiven. ZAP hat 39x style-src unsafe-inline, 10x Wildcard-Direktiven und 10x fehlende Fallbacks gemeldet.",
+    "evidence": "content-security-policy: default-src 'self'; script-src 'self' 'nonce-...'; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';\n\nZAP-Alerts:\n- CSP: style-src unsafe-inline (39x)\n- CSP: Wildcard Directive (10x)\n- CSP: Failure to Define Directive with No Fallback (10x)",
+    "external_id": "VS-2026-005",
+    "finding_type": "csp_unsafe_inline",
+    "id": "VS-2026-005",
+    "impact": "Die Wildcards und unsafe-inline schwaechen den XSS-Schutz erheblich. Bei einer Sicherheitsluecke in einer Nextcloud-App koennte injizierter Style- oder Frame-Code Session-Cookies oder Login-Credentials abgreifen. Die CSP-Konfiguration entspricht nicht dem Nextcloud-Security-Hardening-Guide.",
+    "original_claude_id": "VS-2026-006",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Nextcloud-Version pruefen (aktuell ist 30.x/31.x) und ggf. auf aktuelle stabile Version aktualisieren — neuere Versionen liefern eine strengere Default-CSP. Wildcards durch konkrete Domains ersetzen.\n<b>Mittelfristig:</b> Custom-CSP ueber config/config.php restriktiver setzen, keine 'unsafe-inline' fuer style-src (Nextcloud unterstuetzt Nonces auch fuer Styles ab v27+). Regelmaessiges Audit mit dem Nextcloud Security Scan durchfuehren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='csp_unsafe_inline' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Nextcloud CSP mit 'unsafe-inline' und Wildcard-Direktiven",
+    "title_vars": {
+     "host": "nextcloud.mc-2europe.com",
+     "tech": "Nextcloud"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://mail.mc-2europe.com (62.159.230.43)",
+    "business_impact_score": 2.5,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Der Exchange-Server offenbart im Response-Header und in URL-Pfaden die Build-Nummer 15.2.1544 (Exchange 2019). Zusaetzlich fehlen fast alle Security-Header (0/7), die CSP wird nicht gesetzt oder enthaelt Wildcards, HSTS fehlt, X-Content-Type-Options fehlt, X-AspNet-Version wird ausgeliefert.",
+    "evidence": "URL: https://mail.mc-2europe.com/owa/auth/15.2.1544/themes/resources/segoeui-regular.ttf\nServer: Microsoft-IIS/10.0\nX-AspNet-Version: 4.0.30319\nX-Powered-By: ASP.NET\n\nSecurity Headers: 0/7\nZAP: CSP Header Not Set (owa/auth/logon.aspx), X-Content-Type-Options Header Missing",
+    "external_id": "VS-2026-006",
+    "finding_type": "csp_wildcard_source",
+    "id": "VS-2026-006",
+    "impact": "Angreifer koennen anhand der Build-Nummer 15.2.1544 den genauen CU-Stand ermitteln und gezielt nach passenden Exchange-CVEs suchen. Exchange war in den letzten Jahren Ziel mehrerer schwerwiegender Angriffsketten (ProxyLogon, ProxyShell, ProxyNotShell). Fehlende Security-Header erhoehen zusaetzlich das Risiko von Clickjacking und XSS im OWA-Kontext.",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-CSP-005",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Pruefen ob 15.2.1544 dem aktuellen Exchange 2019 CU/SU-Stand entspricht und ggf. neueste Sicherheitsupdates einspielen (Microsoft veroeffentlicht monatlich SUs). Build-Version aus URL-Pfad entfernen (Reverse-Proxy oder IIS-Rewrite).\n<b>Mittelfristig:</b> HSTS-Header, X-Content-Type-Options und eine restriktive CSP fuer /owa/ einfuehren. X-AspNet-Version und X-Powered-By ueber web.config unterdruecken. Erwaegen, OWA hinter einen Reverse-Proxy (z.B. mit ModSecurity/CrowdSec) zu stellen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-CSP-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Wildcard `*` in CSP source-list schwaecht Whitelisting",
+     "rule_references": [
+      "CWE-693"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "CSP enthaelt Wildcard-Quelle auf mail.mc-2europe.com",
+    "title_vars": {
+     "host": "mail.mc-2europe.com",
+     "tech": "Exchange 2019",
+     "version": "15.2.1544"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://kunden.mc-2europe.com, https://nextcloud.mc-2europe.com",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-1104",
+    "description": "Der Server-Header offenbart die exakte Apache-Version (2.4.66). Die Nextcloud-Version selbst konnte extern nicht ermittelt werden (gutes Zeichen). Apache 2.4.66 wurde am 2025-07-10 veroeffentlicht und ist zum Scan-Zeitpunkt bereits mindestens 11 Monate alt; aktuelle Version ist zu pruefen.",
+    "evidence": "Server: Apache/2.4.66 (Debian)\nZAP: Server Leaks Version Information via 'Server' HTTP Response Header Field (86x)",
+    "external_id": "VS-2026-007",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-007",
+    "impact": "Angreifer koennen gezielt nach CVEs fuer Apache 2.4.66 und aeltere 2.4.x-Versionen suchen. Bekannte Apache-Schwachstellen (z.B. mod_rewrite, mod_proxy) koennen in aelteren Builds ausnutzbar sein.",
+    "original_claude_id": "VS-2026-008",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Server-Token reduzieren: <code>ServerTokens Prod</code> und <code>ServerSignature Off</code> in der Apache-Konfiguration. Debian-Sicherheitsupdates einspielen (apt update && apt upgrade).\n<b>Mittelfristig:</b> Pruefen ob Apache 2.4.66 durch neueres Debian-Package abloesbar ist, oder auf Debian 13/Trixie migrieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf nextcloud.mc-2europe.com",
+    "title_vars": {
+     "host": "nextcloud.mc-2europe.com",
+     "tech": "Apache",
+     "version": "2.4.66"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "mc-2europe.com (DNS-Zone)",
+    "business_impact_score": 2.5,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-345",
+    "description": "Die DNS-Zone mc-2europe.com ist nicht mit DNSSEC signiert. Nameserver ns1a.dodns.net / ns2a.dodns.net.",
+    "evidence": "passive_intel.dnssec_signed: false\nNS: ns1a.dodns.net, ns2a.dodns.net",
+    "external_id": "VS-2026-008",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-008",
+    "impact": "Ohne DNSSEC koennen DNS-Antworten theoretisch manipuliert werden (Cache-Poisoning, Man-in-the-Middle in nicht vertrauenswuerdigen Resolvern). Zusammen mit fehlendem DMARC-Enforcement steigt das Risiko fuer E-Mail-Spoofing.",
+    "original_claude_id": "VS-2026-014",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "<b>Kurzfristig (Monate):</b> DNSSEC beim DNS-Provider (dodns.net) aktivieren und DS-Records beim Registrar hinterlegen.\n<b>Mittelfristig:</b> TLSA-Records (DANE) fuer die Mail-Server MX-Endpunkte ergaenzen, sobald DNSSEC aktiv ist. TLS-RPT (_smtp._tls.mc-2europe.com) ergaenzen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "DNSSEC fehlt fuer mc-2europe.com",
+    "title_vars": {
+     "domain": "mc-2europe.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "8460"
+    ],
+    "affected": "mc-2europe.com (Mail)",
+    "business_impact_score": 2.5,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-319",
+    "description": "Es ist kein MTA-STS-Record (_mta-sts.mc-2europe.com) und kein TLS-RPT-Record (_smtp._tls.mc-2europe.com) hinterlegt. Damit koennen einliefernde Mailserver nicht garantieren, dass TLS zwingend verwendet wird, und es gibt keine Reporting-Kanaele fuer TLS-Fehler.",
+    "evidence": "passive_intel.tlsrpt_present: false\nDNS-Abfrage TXT _mta-sts.mc-2europe.com: NXDOMAIN",
+    "external_id": "VS-2026-009",
+    "finding_type": "tls_rpt_missing",
+    "id": "VS-2026-009",
+    "impact": "STARTTLS-Downgrade-Angriffe auf E-Mail-Zustellung sind ohne MTA-STS moeglich. Ohne TLS-RPT bekommt die Domain keine Reports ueber fehlgeschlagene TLS-Verbindungen.",
+    "original_claude_id": "VS-2026-015",
+    "policy_id": "SP-DNS-011",
+    "recommendation": "<b>Kurzfristig (Monate):</b> MTA-STS-Policy veroeffentlichen: TXT-Record <code>v=STSv1; id=YYYYMMDDNN</code> auf _mta-sts.mc-2europe.com, dazu HTTPS-Policy-Datei auf https://mta-sts.mc-2europe.com/.well-known/mta-sts.txt.\n<b>Mittelfristig:</b> TLS-RPT ergaenzen: <code>v=TLSRPTv1; rua=mailto:tls-reports@mc-2europe.com</code>.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-011",
+     "policy_version": "2026-06-01.1",
+     "rationale": "TLS-RPT (RFC 8460) fehlt - keine TLS-Reporting-Adresse fuer fehlgeschlagene SMTP-TLS-Verbindungen",
+     "rule_references": [
+      "RFC-8460"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "TLS-RPT (RFC 8460) fehlt fuer mc-2europe.com",
+    "title_vars": {
+     "domain": "mc-2europe.com"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "https://www.messe.mc-2europe.com",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "",
+    "description": "testssl.sh meldet, dass HTTP-Kompression (gzip, br) aktiv ist und BREACH-Angriffe theoretisch moeglich waeren. BREACH benoetigt allerdings ein Nutzergeheimnis im HTML-Body und aktiven MitM — auf einer statischen 404-Seite ist das Risiko sehr gering.",
+    "evidence": "testssl.sh: BREACH: potentially VULNERABLE, gzip br HTTP compression detected - only supplied '/' tested",
+    "external_id": "VS-2026-010",
+    "id": "VS-2026-010",
+    "impact": "Theoretisches Risiko: Wenn die Subdomain spaeter dynamische Inhalte mit Session-Tokens ausliefert, koennten Angreifer via Chosen-Plaintext-Angriff auf komprimierten Response Sitzungs-Cookies extrahieren. Praktisch aktuell irrelevant (statische 404-Seite).",
+    "original_claude_id": "VS-2026-012",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Monate):</b> Falls die Subdomain wieder aktiviert wird, HTTP-Kompression fuer Response-Bodies mit sensitiven Daten deaktivieren oder CSRF-Tokens mit zufaelligem Padding versehen.\n<b>Mittelfristig:</b> Wenn die Subdomain nicht aktiv genutzt wird (siehe VS-2026-011), erledigt sich das Thema durch Entfernen des Eintrags.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "BREACH-anfaellige Kompression (gzip/br) auf messe.mc-2europe.com",
+    "title_vars": {
+     "host": "www.messe.mc-2europe.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://www.mc-2europe.com",
+    "business_impact_score": 0.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Hauptseite www.mc-2europe.com liefert keinerlei sicherheitsrelevante HTTP-Header aus. Alle sieben von uns geprueften Header (HSTS, CSP, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy) fehlen.",
+    "evidence": "Security Headers Score: 0/7\nMissing: strict-transport-security, content-security-policy, x-frame-options, x-content-type-options, x-xss-protection, referrer-policy, permissions-policy",
+    "external_id": "VS-2026-011",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-011",
+    "impact": "Ohne HSTS koennen SSL-Stripping-Angriffe erfolgreich sein. Ohne CSP und X-Frame-Options sind Clickjacking- und XSS-Angriffe deutlich einfacher. Ohne X-Content-Type-Options koennen Browser MIME-Sniffing durchfuehren und dabei falsche Content-Types interpretieren.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Basis-Header in nginx ergaenzen: <code>Strict-Transport-Security \"max-age=31536000; includeSubDomains\"</code>, <code>X-Content-Type-Options nosniff</code>, <code>X-Frame-Options SAMEORIGIN</code>, <code>Referrer-Policy strict-origin-when-cross-origin</code>.\n<b>Mittelfristig:</b> CSP schrittweise einfuehren (zuerst Report-Only, dann Enforce). Permissions-Policy nur die tatsaechlich benoetigten Features freigeben. Ziel: securityheaders.com Grade A.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf www.mc-2europe.com",
+    "title_vars": {
+     "host": "www.mc-2europe.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://mail.mc-2europe.com",
+    "business_impact_score": 4.2,
+    "cvss_score": "4.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der OWA-Endpunkt liefert nur X-Frame-Options aus (SAMEORIGIN, immerhin), aber keine HSTS, keine CSP, kein X-Content-Type-Options und keine Referrer-Policy. Zusaetzlich werden X-AspNet-Version und X-Powered-By ausgeliefert.",
+    "evidence": "Security Headers: 0/7\nZAP: Strict-Transport-Security Header Not Set (2x), X-Content-Type-Options Header Missing (2x), X-AspNet-Version Response Header, Server Leaks Information via X-Powered-By",
+    "external_id": "VS-2026-012",
+    "finding_type": "xfo_missing",
+    "id": "VS-2026-012",
+    "impact": "OWA-Login ist ein sensibles Ziel — ohne HSTS ist SSL-Stripping moeglich, ohne CSP sind XSS-Injections leichter, X-AspNet-Version verraet den .NET-Framework-Stand.",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-HDR-006",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> IIS/Exchange Reverse-Proxy so konfigurieren, dass HSTS (<code>max-age=31536000; includeSubDomains</code>), X-Content-Type-Options: nosniff und Referrer-Policy: strict-origin ausgeliefert werden. X-AspNet-Version und X-Powered-By ueber IIS URL-Rewrite oder web.config unterdruecken.\n<b>Mittelfristig:</b> CSP fuer /owa/ nach Microsoft-Empfehlung einfuehren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-006",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Clickjacking-Schutz fehlt, aber keine Session-Pages - theoretisches Risiko",
+     "rule_references": [
+      "CWE-1021"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "X-Frame-Options-Header fehlt auf mail.mc-2europe.com",
+    "title_vars": {
+     "host": "mail.mc-2europe.com"
+    }
+   }
+  ],
+  "overall_description": "Die Angriffsflaeche der mc-2europe.com-Infrastruktur verteilt sich auf vier Hosts mit unterschiedlichen Rollen und einem sehr breiten Dienste-Spektrum: Der Hauptserver 144.76.255.130 (k56w51.meinserver.io) hostet die Corporate-Website (Laravel-basiert, nginx) und laeuft gleichzeitig als kombinierter Mail-/FTP-/Datenbank-Server mit 13 offenen Ports. Auf 62.159.230.44 laufen zwei Nextcloud-Instanzen (kunden.mc-2europe.com, nextcloud.mc-2europe.com) hinter Apache 2.4.66. Auf 62.159.230.43 ist ein Microsoft Exchange 2019 mit Outlook Web App (Build 15.2.1544) exponiert. Der vierte Host 198.202.211.1 liefert einen 404-Fehler hinter Cloudflare (Webflow-Landing). Alle vier Hosts weisen relevante Schwachstellen auf; keine der aktuellen Feststellungen ist als CRITICAL einzustufen, aber die Summe der Befunde ergibt ein HIGH-Gesamtrisiko.\n\nDie kritischsten Risikobereiche sind: (1) Auf 144.76.255.130 ist MariaDB 10.11.18 auf Port 3306 oeffentlich erreichbar — laut Shodan zusaetzlich Port 8081 (nginx, Zweck unklar), FTP 21 (Klartext) und ein vollstaendiger Mail-Stack (Postfix, Dovecot POP3/IMAP) neben der Web-Anwendung; das Kollokieren von Web+DB+Mail+FTP auf einem Host widerspricht dem Prinzip der Netzwerksegmentierung. (2) Die Hauptdomain mc-2europe.com hat KEINEN DMARC-Record — SPF und DKIM sind zwar vorhanden, aber ohne DMARC ist die Durchsetzung nicht wirksam, Phishing im Namen der Domain bleibt moeglich. (3) Der Exchange-Server mail.mc-2europe.com meldet sich mit voller Build-Nummer (15.2.1544) und exponiert /owa/ mit fehlender CSP und fehlendem HSTS — bei bekannten Exchange-CVE-Ketten (ProxyLogon/ProxyShell/ProxyNotShell) ist die Versionsoffenlegung problematisch, und der aktuellste 2019-CU-Patch-Stand muss extern verifiziert werden. (4) Nextcloud auf Apache 2.4.66 hat zwar eine gute Security-Header-Basis (5/7) und HSTS, aber CSP-Schwaechen ('unsafe-inline', Wildcards) und BEAST-anfaellige CBC-Cipher-Suites in TLS 1.0/1.1. (5) Die Webflow-Subdomain messe.mc-2europe.com laeuft im 404-Zustand und sollte entweder produktiv genutzt oder aus dem DNS entfernt werden.\n\nDNSSEC ist auf keiner Zone signiert, TLS-RPT fehlt komplett. Die Compliance-Reife ist mittel: Nextcloud zeigt eine gepflegte Konfiguration, der Hauptserver und der Exchange-Server hingegen entsprechen nicht dem BSI-Grundschutz-Niveau (fehlende Header, klartext-FTP, exponierte DB, keine Segmentierung). Ohne DMARC-Enforcement, ohne DNSSEC und mit gemischter Kollokation ist eine kurzfristige Haerte­verbesserung dringend empfohlen.",
+  "overall_risk": "HIGH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-CSP-005",
+   "SP-DB-001",
+   "SP-DISC-001",
+   "SP-DNS-001",
+   "SP-DNS-004",
+   "SP-DNS-011",
+   "SP-FALLBACK",
+   "SP-HDR-006",
+   "SP-TLS-001"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die Domain mc-2europe.com verfuegt ueber einen wohlformulierten SPF-Record, der alle relevanten Sender abdeckt (Hornetsecurity, Outlook, EmailSignatures365 sowie die eigenen Server-IPs). DKIM-Signaturen sind vorhanden. Es fehlt lediglich der DMARC-Record fuer die Durchsetzung — siehe VS-2026-002.",
+    "title": "SPF und DKIM korrekt konfiguriert"
+   },
+   {
+    "description": "Die Subdomain www.messe.mc-2europe.com laeuft hinter Cloudflare (WAF, HTTP/3, DDoS-Schutz). Auch wenn der Endpunkt aktuell einen 404 liefert, ist das Netzwerk-Frontend gut abgeschirmt.",
+    "title": "Cloudflare-Schutz auf messe.mc-2europe.com"
+   },
+   {
+    "description": "OpenSSH 9.2p1 Debian 2+deb12u10 auf 144.76.255.130 ist der aktuelle stabile Debian-12-Build inklusive der bekannten regreSSHion-Fixes (u10 wurde nach CVE-2024-6387 gepflegt). Das entspricht dem Stand der Technik fuer Debian Bookworm.",
+    "title": "OpenSSH auf aktuellem Debian-12-Stand"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "MariaDB-Port 3306 per Firewall auf localhost/VPN einschraenken",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "DMARC-Record im Beobachtungsmodus veroeffentlichen (p=none mit rua)",
+    "effort": "1 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Exchange-CU/SU-Stand pruefen und ggf. aktuellstes Sicherheitsupdate einspielen",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Security-Header (HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy) auf allen Web-Endpunkten (www, mail) ergaenzen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-011",
+     "VS-2026-012"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "TLS 1.0/1.1 auf Nextcloud-Apache deaktivieren, Cipher-Suite auf Mozilla-intermediate setzen",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "FTP auf explizites FTPS umstellen oder komplett durch SFTP ersetzen",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-003"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Nextcloud-CSP haerten (Wildcards und unsafe-inline reduzieren)",
+    "effort": "4-6 h",
+    "finding_refs": [
+     "VS-2026-005"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Server-Version-Header unterdruecken (ServerTokens Prod, X-AspNet-Version/X-Powered-By deaktivieren)",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-006",
+     "VS-2026-007"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "DNSSEC beim DNS-Provider aktivieren, DS-Records beim Registrar hinterlegen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 1-3"
+   },
+   {
+    "action": "MTA-STS und TLS-RPT fuer die Mail-Domain veroeffentlichen",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-009"
+    ],
+    "timeframe": "Monat 1-3"
+   },
+   {
+    "action": "Klaeren, ob messe.mc-2europe.com aktiv genutzt wird — sonst DNS-Eintrag entfernen",
+    "effort": "1 h",
+    "finding_refs": [
+     "VS-2026-010"
+    ],
+    "timeframe": "Monat 1-3"
+   },
+   {
+    "action": "DMARC-Policy von p=none auf p=quarantine und schliesslich p=reject hochstufen (nach Report-Auswertung)",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Monat 2-3"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 2,
+   "INFO": 2,
+   "LOW": 5,
+   "MEDIUM": 3
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "21",
+      "service": "Pure-FTPd"
+     },
+     {
+      "port": "22",
+      "service": "OpenSSH 9.2p1 Debian 2+deb12u10"
+     },
+     {
+      "port": "25",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "80",
+      "service": "nginx"
+     },
+     {
+      "port": "443",
+      "service": "nginx"
+     },
+     {
+      "port": "465",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "587",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "3306",
+      "service": "MariaDB 10.11.17-MariaDB-deb12"
+     },
+     {
+      "port": "8081",
+      "service": "nginx"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "www.mc-2europe.com",
+     "mc-2europe.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "144.76.255.130",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     25,
+     80,
+     110,
+     143,
+     443,
+     465,
+     587,
+     993,
+     995,
+     3306,
+     8081
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      8081,
+      3306,
+      587,
+      110,
+      143,
+      80,
+      465,
+      21,
+      22,
+      25,
+      443
+     ],
+     "shodan_services": {
+      "21": "Pure-FTPd",
+      "22": "OpenSSH 9.2p1 Debian 2+deb12u10",
+      "25": "Postfix smtpd",
+      "3306": "MariaDB 10.11.17-MariaDB-deb12",
+      "443": "nginx",
+      "465": "Postfix smtpd",
+      "587": "Postfix smtpd",
+      "80": "nginx",
+      "8081": "nginx"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.mc-2europe.com",
+    "redirect_data": {
+     "www.mc-2europe.com": {
+      "error": null,
+      "final_domain": "www.mc-2europe.com",
+      "final_url": "https://www.mc-2europe.com/de",
+      "is_cross_domain": false,
+      "page_title": "Brand Experience Solutions – MC² Europe GmbH",
+      "redirect_chain": [
+       "https://www.mc-2europe.com/de",
+       "https://www.mc-2europe.com/frontend/css/bootstrap.css?id=34f3f15695dfafbc5dc3",
+       "https://www.mc-2europe.com/frontend/css/styles.css?id=5e96ad1941027229cf7e",
+       "https://www.mc-2europe.com/frontend/images/brand.svg",
+       "https://www.mc-2europe.com/media/2025/6/4/39879cc96986d7c90469b246f6e88227/cache/20250521-mc2-vossloh-058_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2024/10/15/6cc71852785fc213c0524564d63fbc0f/cache/ka-db-42593-original_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2024/7/9/7d66dc87a6ee4bb48d5b43ddc2fff151/cache/mueller-martini-drupa-2024-3-web_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2023/11/3/a0a3e1c9c15b867d45fe74c93e690978/cache/automechanika-pilkington-1_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2024/3/15/d76f0f2a2855f3f8db71f310dacc5a23/cache/mc2-pferd-vollmer116_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2025/10/27/d7968d450cc0afc6d96bfe78a928faa1/cache/20250212-mc2-schleupen-077_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2023/11/3/cbb7bc449d8ba797730de82bbd39f3bc/cache/huettenes-albertus-ha-gifa-23-10-1_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2023/11/3/a1195487c03ece7f852ab4278339c220/cache/db-schenker-cargo-6698_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2024/12/19/a32f1951db46d69b8206a7459213e018/cache/mc2-yamaha-intermot-vollmer-227_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2024/10/15/d91ceb88706a18bdc705d4f8aef11362/cache/ka-rps-42147_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2024/7/9/453fa8e0f6b496bfe7b87c229e8f8cfb/cache/kb-drupa-2024-12-web_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2023/11/3/84ff07103c5c7376b1ec11099e3156e2/cache/ehrt-hmi2022-01_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2023/11/3/c499a0d1ca6aa2033da268c119c850d9/cache/omron-hmi2022-01_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2023/11/3/a63640e9729d580803e1d75fc935c1cf/cache/mc2-referenz-keuco-ish2019-02-web_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2023/11/3/305b4427c7e7dc5260634023bbd6f4a5/cache/mc2-europe-k2022-hennecke-01_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2025/10/20/911484deda68cc3ca0e9e16d8ff59818/cache/db285202_992_832x580.webp",
+       "https://www.mc-2europe.com/media/2023/11/7/5303d97ee19dcf9eeb704f9063ce91fd/cirvle.svg",
+       "https://www.mc-2europe.com/media/2023/11/7/4239890bf16f53719e0ff358f132bc60/x.svg",
+       "https://www.mc-2europe.com/media/2023/11/7/7ff4259aa0c591507e26306e1a6d59c6/lines.svg",
+       "https://www.mc-2europe.com/media/2023/11/8/3939cbe1afaf776c9a81d780331328a9/graphic2.svg",
+       "https://www.mc-2europe.com/media/2023/11/8/12887e1326a83cc670be1d270c4d02a5/graphic1.svg",
+       "https://www.mc-2europe.com/media/2023/11/8/b74fe7e3a7188bef661f1d97b7d98a5b/x3.svg",
+       "https://www.mc-2europe.com/media/2023/11/8/29d8867323ce3407713b82d033dc784f/tree.png",
+       "https://www.mc-2europe.com/frontend/js/bootstrap.js",
+       "https://www.mc-2europe.com/frontend/js/core.js",
+       "https://www.mc-2europe.com/frontend/js/custom/gsap/gsap.min.js",
+       "https://www.mc-2europe.com/frontend/js/custom/gsap/ScrollTrigger.min.js",
+       "https://www.mc-2europe.com/frontend/fonts/weissenhofgrotesk-bold-webfont.woff2",
+       "https://www.mc-2europe.com/frontend/fonts/weissenhofgrotesk-regular-webfont.woff2",
+       "https://www.mc-2europe.com/frontend/fonts/weissenhofgrotesk-light-webfont.woff2",
+       "https://www.mc-2europe.com/frontend/fonts/Poppins-Bold.woff2",
+       "https://www.mc-2europe.com/frontend/fonts/weissenhofgrotesk-medium-webfont.woff2",
+       "https://matomo.dxm.space/matomo.js",
+       "https://matomo.dxm.space/plugins/HeatmapSessionRecording/configs.php?idsite=13&trackerid=Zz23Ys&url=https%3A%2F%2Fwww.mc-2europe.com%2Fde",
+       "https://matomo.dxm.space/matomo.php?action_name=Brand%20Experience%20Solutions%20%E2%80%93%20MC%C2%B2%20Europe%20GmbH&idsite=13&rec=1&r=895253&h=20&m=41&s=42&url=https%3A%2F%2Fwww.mc-2europe.com%2Fde&_id=&_idn=1&send_image=0&_refts=0&pv_id=6nJobH&pf_net=4042&pf_srv=237&pf_tfr=1&pf_dm1=216&uadata=%7B%22formFactors%22%3A%5B%22Desktop%22%5D%2C%22fullVersionList%22%3A%5B%7B%22brand%22%3A%22Chromium%22%2C%22version%22%3A%22148.0.7778.96%22%7D%2C%7B%22brand%22%3A%22HeadlessChrome%22%2C%22version%22%3A%22148.0.7778.96%22%7D%2C%7B%22brand%22%3A%22Not%2FA)Brand%22%2C%22version%22%3A%2299.0.0.0%22%7D%5D%2C%22mobile%22%3Afalse%2C%22model%22%3A%22%22%2C%22platform%22%3A%22Linux%22%2C%22platformVersion%22%3A%22%22%7D&cookie=1&res=1280x720"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, private",
+       "content-encoding": "br",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Thu, 18 Jun 2026 20:41:42 GMT",
+       "etag": "W/\"a1768a1397b15009e5e6bf9ac0cd13f5\"",
+       "server": "nginx",
+       "vary": "Accept-Encoding",
+       "version": "20260511120903"
+      },
+      "screenshot_path": "/tmp/scan-a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/hosts/144.76.255.130/phase2/screenshot_www.mc-2europe.com.png",
+      "status_code": 204,
+      "tech_info": {
+       "body_classes": "intro-animation index scrolling-header page-top ready",
+       "cookies": "XSRF-TOKEN=eyJpdiI6IjdPY2hBKzRFYy8wNG1kZXJldTBNZkE9PSIsInZhbHVlIjoicVZPb0xqMDMvVDVwbThuNG9jSlJDVlYyN1d6UnliOFcrRVE0b0VCbVJSZlZDSXZuZ0lOTXMvK2JsMFFiTXozNWR4Z0JreTljbUU0bzFHZFVPaWlONDhYVHp6aXNId0FnUVZZNHdFc3Y5NW1CVS9rUXFtYjVRdERLRnExbVdpZnciLCJtYWMiOiIyNDMwMjRkNTM1NDBlZTEwZTJmZGMxNjcyMWJhNzE3M2YyNGQ3YjUyOTNkMjIyODM2MDg1MGQwYjE3MDVjYTE3IiwidGFnIjoiIn0%3D",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0, shrink-to-fit=no",
+         "name": "viewport"
+        },
+        {
+         "content": "MC² Europe: Ihr Partner für unvergessliche Livekommunikation und Markenerlebnisse. Maßgeschneiderte Lösungen in Beratung, Kreation und Produktion.",
+         "name": "description"
+        },
+        {
+         "content": "#ffffff",
+         "name": "msapplication-TileColor"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://matomo.dxm.space/matomo.js",
+        "https://matomo.dxm.space/plugins/HeatmapSessionRecording/configs.php?idsite=13&trackerid=Zz23Ys&url=https%3A%2F%2Fwww.mc-2europe.com%2Fde",
+        "https://www.mc-2europe.com/frontend/js/bootstrap.js",
+        "https://www.mc-2europe.com/frontend/js/core.js",
+        "https://www.mc-2europe.com/frontend/js/custom/gsap/gsap.min.js",
+        "https://www.mc-2europe.com/frontend/js/custom/gsap/ScrollTrigger.min.js"
+       ],
+       "stylesheets": [
+        "https://www.mc-2europe.com/frontend/css/bootstrap.css?id=34f3f15695dfafbc5dc3",
+        "https://www.mc-2europe.com/frontend/css/styles.css?id=5e96ad1941027229cf7e"
+       ],
+       "title": "Brand Experience Solutions – MC² Europe GmbH"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2018-12-31",
+      "is_mega_cve": false,
+      "latest_patch": "5.5.63",
+      "name": "MySQL",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "5.5.5-10.11.18-MariaDB-deb12",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Pure-FTPd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 22)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH 9.2p1 Debian",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "2+deb12u10",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 3306)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MariaDB",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.11.17-MariaDB-deb12",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 465)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8081)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Framework",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Laravel/Angular (XSRF)",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.2p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Pure-FTPd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "WAF/Schutz",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "WAF-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Generic",
+      "patch_status": "unbekannt",
+      "source": "waf_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Pure-FTPd",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.2p1 Debian 2+deb12u10"
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "MySQL",
+      "version": "5.5.5-10.11.18-MariaDB-deb12"
+     },
+     {
+      "name": "Laravel/Angular (XSRF)",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "www.mc-2europe.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": "Generic"
+     }
+    },
+    "waf": "Generic",
+    "web_fqdn": "www.mc-2europe.com"
+   },
+   {
+    "cms": "Nextcloud",
+    "cms_confidence": 0.95,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd 2.4.66"
+     },
+     {
+      "port": "443",
+      "service": "Nextcloud"
+     }
+    ],
+    "fqdns": [
+     "kunden.mc-2europe.com",
+     "nextcloud.mc-2europe.com",
+     "work4all.mc-2europe.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "62.159.230.44",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443
+     ],
+     "shodan_services": {
+      "443": "Nextcloud",
+      "80": "Apache httpd 2.4.66"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "kunden.mc-2europe.com",
+    "redirect_data": {
+     "kunden.mc-2europe.com": {
+      "error": null,
+      "final_domain": "kunden.mc-2europe.com",
+      "final_url": "https://kunden.mc-2europe.com/index.php/login",
+      "is_cross_domain": false,
+      "page_title": "Login – MC² Europe cloud",
+      "redirect_chain": [
+       "https://kunden.mc-2europe.com/index.php/login",
+       "https://kunden.mc-2europe.com/apps/theming/css/default.css?v=6ff0b9ff-30",
+       "https://kunden.mc-2europe.com/core/css/guest.css?v=cddbe99e-30",
+       "https://kunden.mc-2europe.com/core/css/server.css?v=cddbe99e-30",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/default.css?plain=1&v=a9b0069e",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/light.css?plain=1&v=a9b0069e",
+       "https://kunden.mc-2europe.com/dist/icons.css",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/dark.css?plain=0&v=a9b0069e",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/light.css?plain=0&v=a9b0069e",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/dark-highcontrast.css?plain=0&v=a9b0069e",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/light-highcontrast.css?plain=0&v=a9b0069e",
+       "https://kunden.mc-2europe.com/apps/theming/js/theming.js?v=cddbe99e-30",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/opendyslexic.css?plain=0&v=a9b0069e",
+       "https://kunden.mc-2europe.com/dist/core-login.js?v=cddbe99e-30",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/light-highcontrast.css?plain=1&v=a9b0069e",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/dark.css?plain=1&v=a9b0069e",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/theme/dark-highcontrast.css?plain=1&v=a9b0069e",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/image/background?v=30",
+       "https://kunden.mc-2europe.com/index.php/apps/theming/image/logo?v=30",
+       "https://kunden.mc-2europe.com/dist/core-main.js?v=cddbe99e-30",
+       "https://kunden.mc-2europe.com/dist/core-common.js?v=cddbe99e-30",
+       "https://kunden.mc-2europe.com/core/img/loading-dark.gif"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store, must-revalidate",
+       "connection": "Upgrade, Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "6535",
+       "content-security-policy": "default-src 'none';base-uri 'none';manifest-src 'self';script-src 'nonce-X/GxaccjIg55vxR6th/RgQcCqVWgqMkwVE9i9nRysns=';script-src-elem 'strict-dynamic' 'nonce-X/GxaccjIg55vxR6th/RgQcCqVWgqMkwVE9i9nRysns=';style-src 'self' 'unsafe-inline';img-src 'self' data: blob: https://*.tile.openstreetmap.org;font-src 'self' data:;connect-src 'self';media-src 'self';frame-src 'self';frame-ancestors 'self';form-action 'self'",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Thu, 18 Jun 2026 20:41:38 GMT",
+       "feature-policy": "autoplay 'self';camera 'none';fullscreen 'self';geolocation 'none';microphone 'none';payment 'none'",
+       "keep-alive": "timeout=5, max=100",
+       "referrer-policy": "same-origin",
+       "server": "Apache/2.4.66 (Debian)",
+       "strict-transport-security": "max-age=15552000; includeSubDomains",
+       "upgrade": "h2",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-permitted-cross-domain-policies": "none",
+       "x-request-id": "6n56Ol3ElmvBYWRL2Lbe",
+       "x-robots-tag": "noindex, nofollow"
+      },
+      "screenshot_path": "/tmp/scan-a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/hosts/62.159.230.44/phase2/screenshot_kunden.mc-2europe.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "",
+         "name": "csp-nonce"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, minimum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "app-id=1125420102",
+         "name": "apple-itunes-app"
+        },
+        {
+         "content": "#000000",
+         "name": "theme-color"
+        },
+        {
+         "content": "same-origin",
+         "name": "referrer"
+        },
+        {
+         "content": "light dark",
+         "name": "color-scheme"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://kunden.mc-2europe.com/dist/core-common.js?v=cddbe99e-30",
+        "https://kunden.mc-2europe.com/dist/core-main.js?v=cddbe99e-30",
+        "https://kunden.mc-2europe.com/dist/core-login.js?v=cddbe99e-30",
+        "https://kunden.mc-2europe.com/apps/theming/js/theming.js?v=cddbe99e-30"
+       ],
+       "stylesheets": [
+        "https://kunden.mc-2europe.com/core/css/server.css?v=cddbe99e-30",
+        "https://kunden.mc-2europe.com/apps/theming/css/default.css?v=6ff0b9ff-30",
+        "https://kunden.mc-2europe.com/core/css/guest.css?v=cddbe99e-30",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/default.css?plain=1&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/light.css?plain=1&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/dark.css?plain=1&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/light-highcontrast.css?plain=1&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/dark-highcontrast.css?plain=1&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/light.css?plain=0&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/dark.css?plain=0&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/light-highcontrast.css?plain=0&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/dark-highcontrast.css?plain=0&v=a9b0069e",
+        "https://kunden.mc-2europe.com/index.php/apps/theming/theme/opendyslexic.css?plain=0&v=a9b0069e"
+       ],
+       "title": "Login – MC² Europe cloud"
+      }
+     },
+     "nextcloud.mc-2europe.com": {
+      "error": null,
+      "final_domain": "nextcloud.mc-2europe.com",
+      "final_url": "https://nextcloud.mc-2europe.com/index.php/login",
+      "is_cross_domain": false,
+      "page_title": "Login – MC² Europe cloud",
+      "redirect_chain": [
+       "https://nextcloud.mc-2europe.com/",
+       "https://nextcloud.mc-2europe.com/index.php/login",
+       "https://nextcloud.mc-2europe.com/core/css/guest.css?v=cddbe99e-30",
+       "https://nextcloud.mc-2europe.com/apps/theming/css/default.css?v=6ff0b9ff-30",
+       "https://nextcloud.mc-2europe.com/core/css/server.css?v=cddbe99e-30",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/light.css?plain=0&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/light.css?plain=1&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/dist/icons.css",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/default.css?plain=1&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/dark.css?plain=0&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/dark-highcontrast.css?plain=0&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/apps/theming/js/theming.js?v=cddbe99e-30",
+       "https://nextcloud.mc-2europe.com/dist/core-login.js?v=cddbe99e-30",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/opendyslexic.css?plain=0&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/light-highcontrast.css?plain=0&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/light-highcontrast.css?plain=1&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/dark.css?plain=1&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/dark-highcontrast.css?plain=1&v=a9b0069e",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/image/background?v=30",
+       "https://nextcloud.mc-2europe.com/index.php/apps/theming/image/logo?v=30",
+       "https://nextcloud.mc-2europe.com/dist/core-main.js?v=cddbe99e-30",
+       "https://nextcloud.mc-2europe.com/dist/core-common.js?v=cddbe99e-30",
+       "https://nextcloud.mc-2europe.com/core/img/loading-dark.gif"
+      ],
+      "response_headers": {
+       "connection": "Upgrade, Keep-Alive",
+       "content-length": "0",
+       "content-security-policy": "default-src 'self'; script-src 'self' 'nonce-sGsPAOX1gqa4fWJaiQY56bjOhOop69y+BWHv8d8kZn0='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Thu, 18 Jun 2026 20:41:45 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "location": "https://nextcloud.mc-2europe.com/index.php/login",
+       "referrer-policy": "no-referrer",
+       "server": "Apache/2.4.66 (Debian)",
+       "strict-transport-security": "max-age=15552000; includeSubDomains",
+       "upgrade": "h2",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-permitted-cross-domain-policies": "none",
+       "x-robots-tag": "noindex, nofollow"
+      },
+      "screenshot_path": "/tmp/scan-a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/hosts/62.159.230.44/phase2/screenshot_nextcloud.mc-2europe.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "",
+         "name": "csp-nonce"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, minimum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "app-id=1125420102",
+         "name": "apple-itunes-app"
+        },
+        {
+         "content": "#000000",
+         "name": "theme-color"
+        },
+        {
+         "content": "same-origin",
+         "name": "referrer"
+        },
+        {
+         "content": "light dark",
+         "name": "color-scheme"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://nextcloud.mc-2europe.com/dist/core-common.js?v=cddbe99e-30",
+        "https://nextcloud.mc-2europe.com/dist/core-main.js?v=cddbe99e-30",
+        "https://nextcloud.mc-2europe.com/dist/core-login.js?v=cddbe99e-30",
+        "https://nextcloud.mc-2europe.com/apps/theming/js/theming.js?v=cddbe99e-30"
+       ],
+       "stylesheets": [
+        "https://nextcloud.mc-2europe.com/core/css/server.css?v=cddbe99e-30",
+        "https://nextcloud.mc-2europe.com/apps/theming/css/default.css?v=6ff0b9ff-30",
+        "https://nextcloud.mc-2europe.com/core/css/guest.css?v=cddbe99e-30",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/default.css?plain=1&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/light.css?plain=1&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/dark.css?plain=1&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/light-highcontrast.css?plain=1&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/dark-highcontrast.css?plain=1&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/light.css?plain=0&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/dark.css?plain=0&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/light-highcontrast.css?plain=0&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/dark-highcontrast.css?plain=0&v=a9b0069e",
+        "https://nextcloud.mc-2europe.com/index.php/apps/theming/theme/opendyslexic.css?plain=0&v=a9b0069e"
+       ],
+       "title": "Login – MC² Europe cloud"
+      }
+     }
+    },
+    "server": "Apache httpd/2.4.66",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nextcloud",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "2.4.66",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Debian",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nextcloud",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sprache",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "aktuell",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "2.4.66",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Apache httpd",
+      "version": "2.4.66"
+     },
+     {
+      "name": "Apache",
+      "version": "2.4.66 (Debian)"
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": "2.4.66"
+     },
+     {
+      "name": "Debian",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "Nextcloud",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "kunden.mc-2europe.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "nextcloud.mc-2europe.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "kunden.mc-2europe.com"
+   },
+   {
+    "cms": "Webflow",
+    "cms_confidence": 0.92,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "443",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "8443",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "8080",
+      "service": ""
+     },
+     {
+      "port": "2082",
+      "service": ""
+     },
+     {
+      "port": "2083",
+      "service": ""
+     },
+     {
+      "port": "2052",
+      "service": ""
+     },
+     {
+      "port": "2053",
+      "service": ""
+     },
+     {
+      "port": "2086",
+      "service": ""
+     },
+     {
+      "port": "2087",
+      "service": ""
+     },
+     {
+      "port": "2095",
+      "service": ""
+     },
+     {
+      "port": "8880",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "www.messe.mc-2europe.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "198.202.211.1",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443,
+     8080,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 40,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      8080,
+      2082,
+      2083,
+      2052,
+      2053,
+      2086,
+      2087,
+      2095,
+      80,
+      8880,
+      8443,
+      443
+     ],
+     "shodan_services": {
+      "443": "CloudFlare",
+      "80": "CloudFlare",
+      "8443": "CloudFlare"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.messe.mc-2europe.com",
+    "redirect_data": {
+     "www.messe.mc-2europe.com": {
+      "error": null,
+      "final_domain": "www.messe.mc-2europe.com",
+      "final_url": "https://www.messe.mc-2europe.com/",
+      "is_cross_domain": false,
+      "page_title": "404 - Page not found",
+      "redirect_chain": [
+       "https://www.messe.mc-2europe.com/",
+       "https://app-assets.website-files.com/css/webflow-https-errors.webflow.css",
+       "https://app-assets.website-files.com/fonts/Graphik-Regular-Web.5a0c1a002e.woff2",
+       "https://app-assets.website-files.com/fonts/Graphik-Medium-Web.abf6e1188f.woff2"
+      ],
+      "response_headers": {
+       "alt-svc": "h3=\":443\"; ma=86400",
+       "cache-control": "public, max-age=432000",
+       "cf-cache-status": "MISS",
+       "cf-ray": "a0dd1f503da0f962-DUS",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Thu, 18 Jun 2026 20:42:45 GMT",
+       "etag": "W/\"6a31dc22-38a\"",
+       "server": "cloudflare",
+       "surrogate-key": "www.messe.mc-2europe.com 404req",
+       "vary": "accept-encoding",
+       "x-wf-region": "us-east-1"
+      },
+      "screenshot_path": "/tmp/scan-a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/hosts/198.202.211.1/phase2/screenshot_www.messe.mc-2europe.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "The page you are looking for doesn't exist or has been moved.",
+         "name": "description"
+        },
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [
+        "https://app-assets.website-files.com/css/webflow-https-errors.webflow.css"
+       ],
+       "title": "404 - Page not found"
+      }
+     }
+    },
+    "server": "Cloudflare http proxy",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.92,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Webflow",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2052)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2052",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2053)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2053",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2082)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2082",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2083)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2083",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2086)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2086",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2087)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2087",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2095)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2095",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8080)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8080",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8880)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8880",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "cloudflare",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare Http Proxy",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "HTTP",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "3",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Cloudflare http proxy",
+      "version": ""
+     },
+     {
+      "name": "cloudflare",
+      "version": ""
+     },
+     {
+      "name": "HTTP/3",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "www.messe.mc-2europe.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": "Cloudflare"
+     }
+    },
+    "waf": "Cloudflare",
+    "web_fqdn": "www.messe.mc-2europe.com"
+   },
+   {
+    "cms": "Exchange",
+    "cms_confidence": 0.98,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "25",
+      "service": "Microsoft Exchange smtpd"
+     },
+     {
+      "port": "443",
+      "service": "Outlook Web App"
+     },
+     {
+      "port": "8443",
+      "service": "Microsoft IIS httpd 10.0"
+     }
+    ],
+    "fqdns": [
+     "mail.mc-2europe.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "62.159.230.43",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     25,
+     443,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      25,
+      443,
+      8443
+     ],
+     "shodan_services": {
+      "25": "Microsoft Exchange smtpd",
+      "443": "Outlook Web App",
+      "8443": "Microsoft IIS httpd 10.0"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "mail.mc-2europe.com",
+    "redirect_data": {
+     "mail.mc-2europe.com": {
+      "error": null,
+      "final_domain": "mail.mc-2europe.com",
+      "final_url": "https://mail.mc-2europe.com/owa/auth/logon.aspx?url=https%3a%2f%2fmail.mc-2europe.com%2fowa%2f&reason=0",
+      "is_cross_domain": false,
+      "page_title": "Outlook",
+      "redirect_chain": [
+       "https://mail.mc-2europe.com/owa/auth/logon.aspx?url=https%3a%2f%2fmail.mc-2europe.com%2fowa%2f&reason=0",
+       "https://mail.mc-2europe.com/owa/auth/15.2.1544/themes/resources/segoeui-regular.ttf"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store",
+       "content-length": "58726",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Thu, 18 Jun 2026 20:41:59 GMT",
+       "expires": "-1",
+       "pragma": "no-cache",
+       "request-id": "9ba1e4df-21cd-4ea2-9eae-e1cb3c1c18d0",
+       "server": "Microsoft-IIS/10.0",
+       "x-aspnet-version": "4.0.30319",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-a0a9c1e8-f4ee-4739-b518-f4ac8ed2f2ff/hosts/62.159.230.43/phase2/screenshot_mail.mc-2europe.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "signInBg",
+       "cookies": "cookieTest=1",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "IE=10",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "text/html; CHARSET=utf-8",
+         "name": "Content-Type"
+        },
+        {
+         "content": "NOINDEX, NOFOLLOW",
+         "name": "Robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Outlook"
+      }
+     }
+    },
+    "server": "Microsoft IIS httpd/10.0",
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft Exchange smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Outlook Web App",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft IIS httpd",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     },
+     {
+      "category": "Mail",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft Exchange",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "15.2",
+      "vuln_name": ""
+     },
+     {
+      "category": "OS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Windows Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ASP.NET",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "4.0.30319",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Outlook Web App",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "15.2.1544",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft IIS",
+      "patch_status": "aktuell",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Microsoft Exchange 2010 smtpd",
+      "version": ""
+     },
+     {
+      "name": "Microsoft IIS httpd",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "Microsoft Exchange",
+      "version": "2019"
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": "4.0.30319"
+     },
+     {
+      "name": "Outlook Web App",
+      "version": "15.2.1544"
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "mail.mc-2europe.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "mail.mc-2europe.com"
+   }
+  ]
+ },
+ "success": true
+}

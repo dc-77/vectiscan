@@ -27,9 +27,6 @@ vectiscan/
 │   ├── review-todo.md                     ← Offene Punkte aus alten Plänen
 │   └── brand.html                         ← Visuelle Brand-Referenz
 │
-├── references/
-│   └── report_structure.md                ← PDF-Layout-Referenz
-│
 ├── frontend/
 │   ├── Dockerfile
 │   ├── package.json

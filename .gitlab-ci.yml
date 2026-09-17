@@ -23,6 +23,24 @@ stages:
   - ops
 
 # =============================================================================
+# WORKFLOW — welche Pipelines ueberhaupt entstehen
+# =============================================================================
+# S0a: Session-Branches (worktree-*) bekamen bisher gar keine CI. build/scan/
+# test/deploy sind auf main, develop und source=web beschraenkt, und es gab
+# weder merge_request_event-Regeln noch einen workflow-Block -- ein Push auf
+# einen Feature-Branch erzeugte deshalb keine Pipeline, und ein Merge Request
+# zeigte head_pipeline=null. Tests liefen erst NACH dem Merge auf main.
+#
+# Die einzige Regel hier unterdrueckt das doppelte Branch-Pipeline neben der
+# MR-Pipeline. Alles andere (merge_request_event, web, api, schedule, Push
+# ohne offenen MR) bleibt unveraendert zugelassen.
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    - when: always
+
+# =============================================================================
 # BUILD STAGE — Build & push Docker images for all four services
 # =============================================================================
 
@@ -48,12 +66,13 @@ stages:
         docker push ${BASE_IMAGE}/${SERVICE}:latest
         echo "OK: :latest aktualisiert (main)."
       else
-        echo "SKIP: :latest-Push auf Branch '${CI_COMMIT_BRANCH}' uebersprungen (nur main aktualisiert den mutable Tag)."
+        echo "SKIP: :latest-Push auf Ref '${CI_COMMIT_BRANCH:-${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME:-unbekannt}}' uebersprungen (nur main aktualisiert den mutable Tag)."
       fi
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 build-frontend:
   extends: .build-base
@@ -82,6 +101,17 @@ build-report-worker:
 .trivy-base:
   stage: scan
   tags: [vectigal]
+  before_script:
+    # S0a: eigener Trivy-Cache je Job. Die drei Trivy-Jobs laufen parallel auf
+    # demselben Shell-Runner und teilten sich ~/.cache/trivy. Beim faelligen
+    # DB-Update (113 MB) rannten sie in "Failed to acquire cache or database
+    # lock" -- trivy-api ist daran in Pipeline 3049 gestorben, ohne einen
+    # einzigen Befund zu melden.
+    # Bewusst NICHT unter ${CI_PROJECT_DIR}: der Runner raeumt untrackte
+    # Verzeichnisse im Build-Dir vor jedem Job weg ("Loesche golden-tars/"),
+    # der Cache waere jedes Mal leer und jeder Job laedt die DB neu.
+    - export TRIVY_CACHE_DIR="${HOME}/.cache/trivy/${CI_JOB_NAME}"
+    - mkdir -p "${TRIVY_CACHE_DIR}"
   script:
     - trivy image --exit-code 1 --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
   allow_failure: true
@@ -89,6 +119,7 @@ build-report-worker:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 trivy-frontend:
   extends: .trivy-base
@@ -126,6 +157,7 @@ test-api:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 test-scan-worker:
   stage: test
@@ -137,17 +169,26 @@ test-scan-worker:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 test-report-worker:
   stage: test
   tags: [vectigal]
   image: python:3.12-slim
   script:
-    - cd report-worker && python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt pytest && pytest
+    - cd report-worker && python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt pytest pyyaml && pytest
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # S0c: der Golden-Smoke-Test braucht Linux, weil zwei Tars
+    # IPv6-Hostverzeichnisse mit Doppelpunkt enthalten. Die MR-Pipeline deckt
+    # das ab, zieht aber die Build-Jobs mit; ueber eine API-Pipeline laeuft der
+    # Job allein und manuell.
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
 
 # VEC-160 / VEC-143 / VEC-269 / VEC-439: Edge admin-guard regression gate (SICHERHEITSKRITISCH).
 # Fails the pipeline if a public Traefik router gains a Host() that is not also
@@ -166,6 +207,7 @@ test-edge:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 # =============================================================================
 # DEPLOY STAGE — Rolling deploy, manual deploy, and rollback
@@ -830,6 +872,60 @@ ops-baseline-snapshot:
     - cat ${CI_PROJECT_DIR}/scripts/ops-baseline-snapshot.sql | docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -X 2>&1 | tee ${CI_PROJECT_DIR}/baseline-snapshot.txt
     - echo "=== Snapshot saved als job artifact baseline-snapshot.txt (30d retention) ==="
     - echo "=== Download via GitLab-UI Job-Page -> Browse Artifacts ==="
+
+# =============================================================================
+# OPS-EXPORT-GOLDEN-TARS (S0c) — Roh-Tars der Golden-Auftraege aus MinIO holen
+# =============================================================================
+# MinIO haengt ohne Port-Mapping und ohne Traefik-Router allein im Netz
+# vectiscan-internal, und die API liefert keine Rohdaten. Dieser Runner laeuft
+# auf docker02 und ist damit der einzige Weg an scan-rawdata/<orderId>.tar.gz.
+#
+# Der Job ist gegenueber MinIO lesend (mc stat, mc cp aus dem Bucket heraus).
+# Screenshots werden entfernt, bevor ein Tar den Server verlaesst
+# (spec/07 Abschnitt 1). Fehlende Objekte melden, nicht abbrechen: aeltere
+# Laeufe koennen von cleanup-prod geraeumt sein.
+#
+# Ein Auftrag je Job (parallel:matrix): der Artefakt-Upload dieser
+# GitLab-Instanz bricht schon bei wenigen hundert Kilobyte mit 413 ab, ein
+# gemeinsames Archiv aller zehn Tars (rund 1,7 MB) geht nicht durch. Die Liste
+# hier muss zu report-worker/tests/golden/orders.txt passen;
+# tests/test_golden_fixtures.py prueft das.
+#
+# Nutzung: Pipeline auf dem Session-Branch per API ausloesen, dann die
+# Matrix-Jobs starten und golden-tars/ je Job herunterladen.
+# =============================================================================
+ops-export-golden-tars:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  parallel:
+    matrix:
+      - GOLDEN_ORDER:
+          - "45bb234c-d556-4a80-9c78-3ce221ea28a6"
+          - "176db198-fa4a-4520-bf18-43cbc02a229d"
+          - "fb13a98f-22c6-4d17-875c-eeeb14643beb"
+          - "ae8d1d70-7925-4e3c-84de-3113f3e57b60"
+          - "f77ccff2-fc7a-4488-a9ba-540a42a25056"
+          - "4e6b6883-a6c8-4204-8b13-b37f907322ca"
+          - "2d2d4f39-0816-46a0-ba96-4d36b248a86c"
+          - "0bf16342-ed96-4b0e-a596-05aee3a62cb5"
+          - "2572eebc-6135-40e6-b1d2-e9dfccc20ae6"
+          - "a6df9d9d-eccd-49d1-8dd3-b00a5e005108"
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - golden-tars/
+  script:
+    - bash ${CI_PROJECT_DIR}/scripts/golden/export-golden-tars.sh
+        ${CI_PROJECT_DIR}/report-worker/tests/golden/orders.txt
+        ${CI_PROJECT_DIR}/golden-tars
+        ${DEPLOY_PATH}
 
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
 rollback:

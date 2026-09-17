@@ -696,4 +696,4 @@ dokumentiert, **wo wir der KI heute schon nicht mehr trauen**:
 - Determinismus-Block (Spec): `docs/deterministic/`
 - API-Spec: `docs/API-SPEC.md`
 - DB-Schema: `docs/DB-SCHEMA.sql`
-- Report-Layout: `references/report_structure.md`
+- Report-Layout (Legacy v1, Historie): `docs/archive/report_structure.md`

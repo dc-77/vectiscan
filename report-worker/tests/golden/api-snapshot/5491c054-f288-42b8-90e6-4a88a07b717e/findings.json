@@ -1,0 +1,675 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 1,
+   "low": 4,
+   "medium": 1
+  },
+  "business_impact_score": "3.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_title_template_missing": true,
+    "affected": "88.99.35.112:21 (dortmund-beach.com)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Auf Port 21 ist ein Pure-FTPd-Dienst öffentlich aus dem Internet erreichbar. FTP überträgt Zugangsdaten und Daten grundsätzlich im Klartext, sofern keine explizite FTPS-Verbindung erzwungen wird. Es konnte nicht verifiziert werden, ob TLS-Erzwingung (FTPS) aktiv ist.",
+    "evidence": "$ nmap -sV 88.99.35.112\n21/tcp  open  ftp  Pure-FTPd",
+    "id": "VS-2026-001",
+    "impact": "Angreifer im Netzwerkpfad können bei Klartext-FTP-Verbindungen Zugangsdaten und übertragene Dateien mitlesen. Kompromittierte FTP-Zugänge ermöglichen das Verändern von Webinhalten oder das Einschleusen von Schadsoftware.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Woche 1):</b> Prüfen, ob FTPS (TLS-Erzwingung) in Pure-FTPd aktiviert ist (TLS-Modus 2 = erzwungen). Klartext-FTP-Verbindungen deaktivieren.\n<b>Mittelfristig:</b> FTP vollständig durch SFTP (über SSH auf Port 30000) ersetzen und Port 21 per Firewall schließen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst (Pure-FTPd) auf Port 21 öffentlich erreichbar",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "port": "21",
+     "tech": "Pure-FTPd"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com (DNS TXT-Record _dmarc.dortmund-beach.com)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der DMARC-Record der Domain ist auf `p=none` konfiguriert. Diese Policy weist empfangende Mailserver lediglich an, Berichte zu senden, aber keine E-Mails abzulehnen oder unter Quarantäne zu stellen. Spoofing-E-Mails im Namen von dortmund-beach.com werden somit nicht blockiert.",
+    "evidence": "$ dig TXT _dmarc.dortmund-beach.com\nv=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de;",
+    "finding_type": "dmarc_p_none",
+    "id": "VS-2026-005",
+    "impact": "Angreifer können ungehindert E-Mails im Namen von dortmund-beach.com versenden. Dies erleichtert Phishing-Angriffe gegen Kunden, Partner und Mitarbeiter, die den gefälschten Absender für legitim halten.",
+    "policy_id": "SP-DNS-007",
+    "recommendation": "<b>Kurzfristig (Woche 1-2):</b> DMARC-Berichte (rua) auswerten und sicherstellen, dass alle legitimen Mailquellen korrekt in SPF und DKIM erfasst sind.\n<b>Mittelfristig (Monat 1):</b> Policy schrittweise auf `p=quarantine` und dann auf `p=reject` anheben, um Spoofing aktiv zu unterbinden.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-007",
+     "policy_version": "2026-05-10.1",
+     "rationale": "DMARC mit p=none - nur Monitoring, keine Durchsetzung",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DMARC-Policy auf 'none' statt 'quarantine' oder 'reject' fuer dortmund-beach.com",
+    "title_vars": {
+     "domain": "dortmund-beach.com",
+     "host": "dortmund-beach.com",
+     "p_value": "none"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com (DNS)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain dortmund-beach.com konnte kein DKIM-Eintrag (DomainKeys Identified Mail) ermittelt werden. DKIM signiert ausgehende E-Mails kryptografisch und ermöglicht empfangenden Servern die Verifizierung, dass eine E-Mail tatsächlich vom angegebenen Absender stammt und nicht manipuliert wurde. Ohne DKIM fehlt diese Integritätsprüfung vollständig.",
+    "evidence": "DKIM-Lookup: Kein DKIM-Record für gängige Selektoren (default, mail, dkim, selector1, selector2) gefunden.",
+    "finding_type": "dkim_missing",
+    "id": "VS-2026-006",
+    "impact": "Die E-Mail-Authentifizierung ist geschwächt, da nur SPF zur Absendervalidierung beiträgt. E-Mails der Domain haben eine höhere Wahrscheinlichkeit, in Spam-Ordnern zu landen. Zudem kann DMARC ohne DKIM-Alignment nicht zuverlässig prüfen, ob E-Mails authentisch sind.",
+    "policy_id": "SP-DNS-008",
+    "recommendation": "<b>Kurzfristig (Woche 1-2):</b> DKIM in Postfix konfigurieren (z. B. mit OpenDKIM). RSA-Schlüsselpaar mit mindestens 2048 Bit generieren und den Public Key als DNS TXT-Record veröffentlichen.\n<b>Mittelfristig:</b> DKIM-Signierung für alle ausgehenden Domains und Subdomains sicherstellen. Anschließend DMARC-Policy verschärfen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-008",
+     "policy_version": "2026-05-10.1",
+     "rationale": "DKIM-Signierung fehlt - Mail-Authentifizierung schwaecher",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DKIM-Record fehlt fuer dortmund-beach.com",
+    "title_vars": {
+     "domain": "dortmund-beach.com",
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com (DNS TXT-Record)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der SPF-Record verwendet den Qualifier `~all` (Softfail) anstelle von `-all` (Hardfail). Bei einem Softfail werden E-Mails von nicht autorisierten Quellen zwar markiert, aber typischerweise trotzdem zugestellt. Dies schwächt den Schutz gegen E-Mail-Spoofing.",
+    "evidence": "$ dig TXT dortmund-beach.com\nv=spf1 a mx ip4:78.46.161.114 ~all",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-007",
+    "impact": "Gefälschte E-Mails im Namen der Domain werden trotz SPF-Prüfung häufig zugestellt, da empfangende Server Softfails in der Regel toleranter behandeln als Hardfails. Der Schutzeffekt von SPF wird dadurch eingeschränkt.",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "<b>Empfohlen (Monat 1):</b> Nach Verifizierung, dass alle legitimen Mailquellen im SPF-Record erfasst sind (aktuell: `a`, `mx`, IP 78.46.161.114), den Qualifier auf `-all` (Hardfail) ändern: `v=spf1 a mx ip4:78.46.161.114 -all`.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-05-10.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer dortmund-beach.com",
+    "title_vars": {
+     "domain": "dortmund-beach.com",
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://pflege.dortmund-beach.com",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Die Subdomain pflege.dortmund-beach.com zeigt eine froxlor-Standardseite mit dem Titel „froxlor - Domain not configured\". Dies offenbart, dass froxlor als Hosting-Panel eingesetzt wird. In Kombination mit dem Apache-Server-Banner (Version 2.4.66) und dem Reverse-DNS-Eintrag (vsrv2.spacekoeln.de) erhält ein Angreifer wertvolle Informationen über die Serverinfrastruktur.",
+    "evidence": "$ curl -s https://pflege.dortmund-beach.com/\nTitle: froxlor - Domain not configured\nServer: Apache/2.4.66 (Debian)\nReverse DNS: vsrv2.spacekoeln.de",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-009",
+    "impact": "Die offengelegten Informationen ermöglichen einem Angreifer gezieltes Reconnaissance: Die froxlor-Version kann auf bekannte Schwachstellen geprüft, der Apache auf versionspezifische Exploits untersucht und der Hosting-Provider für Social Engineering genutzt werden.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig (Woche 1):</b> Nicht konfigurierte Subdomains per DNS entfernen oder den vHost so konfigurieren, dass eine neutrale Fehlerseite ohne Softwarehinweise angezeigt wird.\n<b>Mittelfristig:</b> Apache-Server-Token auf `Prod` setzen (`ServerTokens Prod`), um Versionsinformationen zu unterdrücken.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf pflege.dortmund-beach.com",
+    "title_vars": {
+     "host": "pflege.dortmund-beach.com",
+     "tech": "froxlor"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://pflege.dortmund-beach.com",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die finale Seite auf pflege.dortmund-beach.com liefert keine der empfohlenen Security-Header aus (0 von 7). Es fehlen Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy und Permissions-Policy. Hinweis: Die Redirect-Response enthält teilweise Header (CSP, X-Frame-Options, X-Content-Type-Options), jedoch nicht die finale Seite (notice.html).",
+    "evidence": "Security-Header-Scan für https://pflege.dortmund-beach.com:\nScore: 0/7\nFehlend: strict-transport-security, content-security-policy, x-frame-options,\n         x-content-type-options, x-xss-protection, referrer-policy, permissions-policy",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-008",
+    "impact": "Ohne Strict-Transport-Security können Downgrade-Angriffe auf HTTP erfolgen. Fehlende X-Frame-Options ermöglichen Clickjacking. Ohne Content-Security-Policy ist die Abwehr von XSS-Angriffen eingeschränkt. Da die Hauptdomain derzeit nicht erreichbar ist, konnte nur diese Subdomain geprüft werden.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Woche 1-2):</b> Security-Header in der Apache-Konfiguration global setzen, sodass sie auf allen vHosts wirksam sind — einschließlich der Default-Seiten:\n```\nHeader always set Strict-Transport-Security \"max-age=31536000; includeSubDomains\"\nHeader always set X-Frame-Options \"DENY\"\nHeader always set X-Content-Type-Options \"nosniff\"\nHeader always set Referrer-Policy \"strict-origin-when-cross-origin\"\nHeader always set Permissions-Policy \"geolocation=(), camera=(), microphone=()\"\n```\n<b>Mittelfristig:</b> Content-Security-Policy für die WordPress-Hauptseite angepasst definieren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf pflege.dortmund-beach.com",
+    "title_vars": {
+     "host": "pflege.dortmund-beach.com"
+    }
+   }
+  ],
+  "overall_description": "Der Server unter 88.99.35.112 weist eine erhebliche Angriffsfläche mit 12 offenen Ports auf, darunter FTP, mehrere Mail-Dienste und ein Admin-Panel. Die DNS-Sicherheitskonfiguration ist unzureichend — DMARC ohne Enforcement, kein DKIM und SPF nur mit Softfail. Die Hauptdomain dortmund-beach.com ist derzeit nicht erreichbar (Timeout), was eine vollständige Prüfung der Webanwendung verhindert hat. Es wurden keine kritischen Schwachstellen mit direktem unautorisiertem Zugriff nachgewiesen, jedoch ergibt die Kombination mehrerer mittlerer Befunde ein erhöhtes Gesamtrisiko.",
+  "overall_risk": "MEDIUM",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-DISC-001",
+   "SP-DNS-005",
+   "SP-DNS-007",
+   "SP-DNS-008",
+   "SP-FALLBACK"
+  ],
+  "policy_version": "2026-05-10.1",
+  "positive_findings": [
+   {
+    "description": "Der SSH-Dienst (OpenSSH 8.4p1) wurde auf Port 30000 statt dem Standardport 22 konfiguriert. Dies reduziert automatisierte Brute-Force-Angriffe durch Botnets erheblich, da diese typischerweise nur Port 22 scannen.",
+    "title": "SSH auf nicht-standardisiertem Port konfiguriert"
+   },
+   {
+    "description": "Neben den Klartext-Ports sind auch die verschlüsselten Varianten IMAPS (993), POP3S (995) sowie SMTPS (465) und Submission (587) aktiv. Damit stehen sichere Übertragungswege für E-Mail-Clients zur Verfügung, die bei korrekter Konfiguration bevorzugt genutzt werden.",
+    "title": "Verschlüsselte Mail-Alternativen verfügbar"
+   },
+   {
+    "description": "AXFR-Anfragen an die autoritativen Nameserver (x/y/z.ns.joker.com) werden korrekt abgelehnt. Damit ist sichergestellt, dass die vollständige DNS-Zone nicht durch Dritte abgerufen werden kann.",
+    "title": "DNS Zone Transfer nicht möglich"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Klartext-Mail-Ports (110, 143) in Dovecot deaktivieren oder STARTTLS erzwingen; Pure-FTPd auf TLS-Modus 2 konfigurieren oder durch SFTP ersetzen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "DKIM in Postfix/OpenDKIM einrichten, DNS-Record veröffentlichen und DMARC-Berichte auswerten",
+    "effort": "3-5 h",
+    "finding_refs": [
+     "VS-2026-005",
+     "VS-2026-006"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Nicht konfigurierte Subdomain pflege.dortmund-beach.com bereinigen, Apache ServerTokens auf Prod setzen und Security-Header global in der Apache-Konfiguration hinterlegen",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-008",
+     "VS-2026-009"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "DMARC-Policy schrittweise auf quarantine und anschließend reject anheben; SPF-Qualifier von ~all auf -all umstellen",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-005",
+     "VS-2026-007"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 1,
+   "LOW": 4,
+   "MEDIUM": 1
+  },
+  "tech_profiles": [
+   {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "WordPress",
+     "confidence": 0.9,
+     "details": {
+      "meta_generator": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface."
+     },
+     "detection_methods": [
+      "meta_tag"
+     ],
+     "version": null
+    },
+    "cms_version": "6.5.8",
+    "fqdns": [
+     "dortmund-beach.com",
+     "www.dortmund-beach.com",
+     "*.dortmund-beach.com",
+     "pflege.dortmund-beach.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "88.99.35.112",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     25,
+     80,
+     110,
+     143,
+     443,
+     465,
+     587,
+     993,
+     995,
+     10000,
+     30000
+    ],
+    "primary_vhost": "dortmund-beach.com",
+    "redirect_data": {
+     "*.dortmund-beach.com": {
+      "error": "Page.goto: net::ERR_NAME_NOT_RESOLVED at http://*.dortmund-beach.com/\nCall log:\n  - navigating to \"http://*.dortmund-beach.com/\", waiting until \"networkidle\"\n",
+      "final_domain": "*.dortmund-beach.com",
+      "final_url": "https://*.dortmund-beach.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "dortmund-beach.com": {
+      "error": "Page.goto: Timeout 10000ms exceeded.\nCall log:\n  - navigating to \"http://dortmund-beach.com/\", waiting until \"networkidle\"\n",
+      "final_domain": "dortmund-beach.com",
+      "final_url": "https://dortmund-beach.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "pflege.dortmund-beach.com": {
+      "error": null,
+      "final_domain": "pflege.dortmund-beach.com",
+      "final_url": "https://pflege.dortmund-beach.com/notice.html",
+      "is_cross_domain": false,
+      "page_title": "froxlor - Domain not configured",
+      "redirect_chain": [
+       "https://pflege.dortmund-beach.com/",
+       "https://pflege.dortmund-beach.com/notice.html"
+      ],
+      "response_headers": {
+       "cache-control": "no-store, no-cache, must-revalidate",
+       "connection": "Keep-Alive",
+       "content-length": "0",
+       "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'self'; frame-src 'self'; frame-ancestors 'self';",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 13:12:41 GMT",
+       "expires": "Sat, 09 May 2026 13:12:41 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "last-modified": "Sat, 09 May 2026 13:12:41 GMT",
+       "location": "notice.html",
+       "pragma": "no-cache",
+       "server": "Apache/2.4.66 (Debian)",
+       "x-content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'self'; frame-src 'self'; frame-ancestors 'self';",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "DENY",
+       "x-webkit-csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'self'; frame-src 'self'; frame-ancestors 'self';"
+      },
+      "screenshot_path": "/tmp/scan-5491c054-f288-42b8-90e6-4a88a07b717e/hosts/88.99.35.112/phase2/screenshot_pflege.dortmund-beach.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "noindex, nofollow",
+         "name": "robots"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "froxlor - Domain not configured"
+      }
+     },
+     "www.dortmund-beach.com": {
+      "error": "Page.goto: Timeout 10000ms exceeded.\nCall log:\n  - navigating to \"http://www.dortmund-beach.com/\", waiting until \"networkidle\"\n",
+      "final_domain": "www.dortmund-beach.com",
+      "final_url": "https://www.dortmund-beach.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": "Apache httpd/2.4.66",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "cves": [],
+      "eol_date": "2024-07-16",
+      "is_mega_cve": false,
+      "latest_patch": "6.5.8",
+      "name": "WordPress",
+      "source": "cms_fingerprint",
+      "status": "minor_eol",
+      "version": "6.5.8",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "8.4p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Debian",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot pop3d",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Pure-FTPd",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "source": "server_banner",
+      "status": "current",
+      "version": "2.4.66",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Pure-FTPd",
+      "version": ""
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": "2.4.66"
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "8.4p1 Debian 5+deb11u5"
+     },
+     {
+      "name": "Apache",
+      "version": "2.4.66 (Debian)"
+     },
+     {
+      "name": "WordPress",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": "2.4.66"
+     },
+     {
+      "name": "Debian",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "*.dortmund-beach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "dortmund-beach.com": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9,
+      "cms_version": null,
+      "waf": null
+     },
+     "pflege.dortmund-beach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "www.dortmund-beach.com": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}

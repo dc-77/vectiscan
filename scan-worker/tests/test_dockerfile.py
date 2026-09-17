@@ -24,6 +24,33 @@ def _read_dockerfile() -> str:
     return DOCKERFILE.read_text()
 
 
+INSTRUCTIONS = {
+    "FROM", "RUN", "CMD", "LABEL", "MAINTAINER", "EXPOSE", "ENV", "ADD", "COPY",
+    "ENTRYPOINT", "VOLUME", "USER", "WORKDIR", "ARG", "ONBUILD", "STOPSIGNAL",
+    "HEALTHCHECK", "SHELL",
+}
+
+
+def _instruction_starts(content: str) -> list[tuple[int, str]]:
+    """(Zeilennummer, Zeile) je Zeile, die eine neue Instruktion beginnt.
+
+    Fortsetzungszeilen (vorige Zeile endet auf Backslash) und Kommentare
+    zaehlen nicht. Docker entfernt Kommentarzeilen innerhalb einer
+    Fortsetzung, ohne die Fortsetzung zu beenden -- das bildet der Parser
+    hier nach.
+    """
+    starts: list[tuple[int, str]] = []
+    continuing = False
+    for no, raw in enumerate(content.splitlines(), start=1):
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if not continuing:
+            starts.append((no, line))
+        continuing = line.endswith("\\")
+    return starts
+
+
 def test_dockerfile_syntax() -> None:
     """Dockerfile must start with FROM and contain required directives."""
     content = _read_dockerfile()
@@ -38,6 +65,25 @@ def test_dockerfile_syntax() -> None:
     assert "USER" in directives_found, "Dockerfile must set a USER"
     assert "ENTRYPOINT" in directives_found, "Dockerfile must define an ENTRYPOINT"
     assert "WORKDIR" in directives_found, "Dockerfile must set WORKDIR"
+
+
+def test_no_orphaned_continuation_lines() -> None:
+    """Jede Instruktionszeile muss mit einem Dockerfile-Schluesselwort beginnen.
+
+    S0a: Beim Anhaengen einer `&& test -s ...`-Zeile an einen RUN-Block fehlte
+    der Continuation-Backslash der Vorzeile. Das Ergebnis war
+    `dockerfile parse error: unknown instruction: &&` -- gefunden erst im
+    CI-Build, also 15 Minuten spaeter. Dieser Test findet es in einer Sekunde.
+    """
+    bad = [
+        f"Zeile {no}: {line[:70]}"
+        for no, line in _instruction_starts(_read_dockerfile())
+        if line.split(None, 1)[0].upper() not in INSTRUCTIONS
+    ]
+    assert not bad, (
+        "Zeile beginnt keine gueltige Instruktion -- fehlt in der Vorzeile ein "
+        "Backslash? " + "; ".join(bad)
+    )
 
 
 def test_non_root_user() -> None:
@@ -59,6 +105,27 @@ def test_wordlists() -> None:
     content = _read_dockerfile()
     assert "subdomains-top5000.txt" in content
     assert "common.txt" in content
+
+
+def test_every_referenced_wordlist_is_in_image() -> None:
+    """S0a: jede von den Scan-Phasen erwartete Wordlist muss im Image landen.
+
+    F-PH2-001 stellte phase2 auf raft-small-files.txt um, das Dockerfile blieb
+    auf raft-medium-files.txt. ffuf_sensitive wurde dadurch in 42 Produktions-
+    scans stillschweigend uebersprungen. Dieser Test haette das gefangen.
+    """
+    from scanner.preflight import REQUIRED_WORDLISTS
+
+    content = _read_dockerfile()
+    missing = sorted(
+        f"{name} -> {path}"
+        for name, path in REQUIRED_WORDLISTS.items()
+        if path not in content
+    )
+    assert not missing, (
+        "Wordlist wird im Code referenziert, aber nicht ins Image gelegt: "
+        + "; ".join(missing)
+    )
 
 
 def test_entrypoint() -> None:

@@ -13,7 +13,18 @@ Redis-Key-Konventionen (alle Prefix ``zap:``):
     zap:stats:lease_wait_ms  LIST (getrimmt auf 100 Eintraege)
     zap:stats:expired_leases INTEGER
 
-Dieser Modul haengt nur von ``redis-py`` ab. Tests setzen fakeredis ein.
+Dieser Modul haengt von ``redis-py`` ab und von ``zap_client.safe_name_part``
+(gemeinsame Namensbildung fuer Kontexte, siehe S0b). Tests setzen fakeredis ein.
+
+Stand 17.09.2026: **in Produktion ist der Pool aus.** ``ZAP_POOL_ENABLED``
+steht in ``/opt/apps/vectiscan/.env`` nicht drin, damit greift der
+Compose-Default ``false``. Jeder Worker spricht fest mit einem Daemon ueber
+``ZAP_BASE_URL`` (scan-worker-1 mit zap-1, -2 mit zap-2, -3 mit zap-3),
+``zap-4`` laeuft ungenutzt mit. Der Code hier ist also vorbereitet, nicht
+aktiv. Wer ihn einschaltet, braucht die Affinitaets-Korrektur aus S0b in
+``phase2.run_phase2``: bis dahin setzte ``worker.py`` die geleaste Instanz nur
+als Thread-Local, und die verschachtelten Stage-Executors haben davon nichts
+mitbekommen -- Lease und tatsaechliche Verbindung waeren auseinandergelaufen.
 """
 
 from __future__ import annotations
@@ -23,6 +34,8 @@ import time
 from typing import Any, Iterable, Optional
 
 import structlog
+
+from scanner.tools.zap_client import safe_name_part
 
 log = structlog.get_logger()
 
@@ -59,6 +72,21 @@ else
   return 0
 end
 """
+
+
+def build_context_name(order_id: str, host_ip: str) -> str:
+    """Context-Name eines Host-Scans: ``ctx-<order8>-<ip>``.
+
+    S0b: eine Quelle fuer ``phase2`` und die Pool-Bereinigung. Solange beide
+    den Namen getrennt bildeten, konnte die Bereinigung bei IPv6-Hosts einen
+    laufenden Kontext fuer fremd halten und loeschen.
+    """
+    return f"ctx-{order_id[:8]}-{safe_name_part(host_ip)}"
+
+
+def build_policy_name(order_id: str, host_ip: str) -> str:
+    """Policy-Name eines Host-Scans: ``policy-<order8>-<ip>``."""
+    return f"policy-{order_id[:8]}-{safe_name_part(host_ip)}"
 
 
 def get_pool_members() -> list[str]:
@@ -99,9 +127,35 @@ def init_zap_pool(redis_client: Any, members: Optional[Iterable[str]] = None) ->
     return int(size)
 
 
+LEASE_FIELD_SEP = "|"
+
+
 def _build_lease_value(order_id: str, host_ip: str, worker_id: str) -> str:
-    """Ein eindeutiger Lease-Value pro Acquire-Versuch."""
-    return f"{order_id}:{host_ip}:{worker_id}:{int(time.time() * 1000)}"
+    """Ein eindeutiger Lease-Value pro Acquire-Versuch.
+
+    S0b: Die Felder waren frueher durch ``:`` getrennt und wurden in
+    ``get_all_active_context_names`` per ``split(":", 3)`` wieder zerlegt.
+    Eine IPv6-Adresse enthaelt selbst Doppelpunkte, dadurch kam dort nur das
+    erste Hextet an und der rekonstruierte Kontextname passte nicht zu dem,
+    den ``phase2`` angelegt hat. ``cleanup_stale_contexts`` hielt den
+    laufenden Kontext dann fuer verwaist und loeschte ihn mitten im Scan.
+    Das Trennzeichen ist deshalb ``|``, das in keinem der Felder vorkommt.
+    """
+    return LEASE_FIELD_SEP.join(
+        [order_id, host_ip, worker_id, str(int(time.time() * 1000))]
+    )
+
+
+def _split_lease_value(value: str) -> list[str]:
+    """Lease-Value zerlegen, altes ``:``-Format eingeschlossen.
+
+    Waehrend eines rollenden Deploys liegen beide Formate gleichzeitig in
+    Redis. Das alte wird weiter gelesen, damit die Bereinigung keine
+    laufenden Kontexte anderer Worker loescht.
+    """
+    if LEASE_FIELD_SEP in value:
+        return value.split(LEASE_FIELD_SEP, 3)
+    return value.split(":", 3)
 
 
 def acquire_zap(
@@ -188,12 +242,11 @@ def get_all_active_context_names(redis_client: Any) -> set[str]:
             continue
         if isinstance(val, bytes):
             val = val.decode(errors="replace")
-        parts = val.split(":", 3)
+        parts = _split_lease_value(val)
         if len(parts) < 2:
             continue
         order_id, host_ip = parts[0], parts[1]
-        ctx_name = f"ctx-{order_id[:8]}-{host_ip.replace('.', '_')}"
-        active.add(ctx_name)
+        active.add(build_context_name(order_id, host_ip))
     return active
 
 

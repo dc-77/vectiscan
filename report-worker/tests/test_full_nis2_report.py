@@ -23,7 +23,7 @@ def _full_nis2_report_data():
             "cover_meta": [
                 ["Ziel:", "test.com (3 Hosts)"],
                 ["Datum:", "14.03.2026"],
-                ["Methodik:", "PTES (automatisiert)"],
+                ["Methodik:", "Externe Schwachstellenanalyse (automatisiert)"],
                 ["Scoring:", "CVSS v3.1"],
                 ["Klassifizierung:", "Vertraulich"],
                 ["Befunde:", "1 HIGH, 1 INFO"],

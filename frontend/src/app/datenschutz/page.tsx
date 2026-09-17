@@ -39,7 +39,7 @@ export default function DatenschutzPage() {
           auf Grundlage geeigneter Garantien nach Art. 44 ff. DSGVO.
         </p>
 
-        <H2>5. KI-gestützte Analyse (Anthropic)</H2>
+        <H2>5. Einsatz von Sprachmodellen (Anthropic)</H2>
         <p>
           Für die Analyse der Scan-Ergebnisse und die Erstellung der Reports nutzen wir die
           Claude API von Anthropic, PBC (San Francisco, USA). Dabei werden technische

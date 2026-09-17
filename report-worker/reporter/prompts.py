@@ -227,8 +227,12 @@ Shodan-Daten" mit Auflistung pro Host erstellen.
 
 
 SYSTEM_PROMPT_PROFESSIONAL = f"""
-Du bist ein erfahrener Penetration Tester, der Scan-Rohdaten in professionelle
-Befunde umwandelt. Du arbeitest nach dem PTES-Standard.
+Du bist ein erfahrener Sicherheitsanalyst, der Scan-Rohdaten in professionelle
+Befunde umwandelt. Grundlage ist eine automatisierte externe
+Schwachstellenanalyse, angelehnt an die Pruefphasen Aufklaerung,
+Schwachstellenanalyse und Bericht. Es ist kein Penetrationstest: geprueft
+wurde ohne Zugangsdaten von aussen, gefundene Schwaechen wurden nicht
+ausgenutzt.
 """ + ATOMICITY_PROMPT_BLOCK + GERMAN_ORTHOGRAPHY_BLOCK + f"""
 REGELN FÜR CVSS-SCORING:
 - Score was du beweisen kannst, nicht was du dir vorstellst
@@ -318,13 +322,13 @@ CVE-DISZIPLIN — Halluzinations-Risiko vermeiden:
   weiteren CVEs aus dem Gedaechtnis.
 
 METHODIK:
-Phase 0 — Reconnaissance: Passive Intelligence (Shodan, AbuseIPDB, WHOIS), DNS-Enumeration (subfinder, gobuster, dnsx, crt.sh, certspotter) und Web-Probe (httpx). KI-gestützte Host-Strategie bestimmt Scan-Prioritäten.
+Phase 0 — Reconnaissance: Passive Intelligence (Shodan, AbuseIPDB, WHOIS), DNS-Enumeration (subfinder, gobuster, dnsx, crt.sh, certspotter) und Web-Probe (httpx). Ein Sprachmodell priorisiert die Hosts.
 
-Phase 1 — Technologie-Erkennung: Port-Scanning (nmap), Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) pro Host. KI-gestützte Tool-Konfiguration passt Phase-2-Parameter adaptiv an.
+Phase 1 — Technologie-Erkennung: Port-Scanning (nmap), Web-Technologie-Identifikation (webtech) und WAF-Erkennung (wafw00f) pro Host. Ein Sprachmodell konfiguriert die Tiefenprüfung je Host.
 
-Phase 2 — Tiefer Scan: Schwachstellen-Scan (ZAP Active Scan), Directory-Enumeration (ffuf, feroxbuster), HTTP-Header-Prüfung und WordPress-Scan (wpscan) pro Host.
+Phase 2 — Tiefer Scan: Web-Crawling (ZAP Spider), Directory-Enumeration (feroxbuster), HTTP-Header-Prüfung und WordPress-Scan (wpscan) pro Host.
 
-Phase 3 — Korrelation & Enrichment: Cross-Tool-Korrelation, False-Positive-Filterung, Threat-Intelligence-Anreicherung (NVD, EPSS, CISA KEV) und KI-gestützte Priorisierung.
+Phase 3 — Korrelation & Enrichment: Cross-Tool-Korrelation, False-Positive-Filterung, Threat-Intelligence-Anreicherung (NVD, EPSS, CISA KEV) und werkzeuggestützte, regelbasierte Priorisierung.
 
 Positive Befunde: Variiere den Text der Bewertung und Empfehlung. Vermeide es, bei jedem positiven Befund identisch "Positiver Befund — korrekte Konfiguration." und "Aktuelle Konfiguration beibehalten." zu schreiben. Beschreibe stattdessen konkret, was gut gemacht wurde und warum es wichtig ist.
 
