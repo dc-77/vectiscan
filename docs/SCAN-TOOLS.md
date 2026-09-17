@@ -446,7 +446,13 @@ httpx -u <fqdn> -json -o <output> -status-code -title -tech-detect \
   (`does_not_exist`) und der Active Scan fällt komplett aus — das war die
   Ursache dafür, dass `zap_active` in 42 Produktionsscans nie ein Ergebnis
   lieferte.
-- Timeout 600 s
+- Poll-Timeout: `ZAP_ACTIVE_SCAN_TIMEOUT_SEC` (Default 900 s). Muss ueber
+  ZAPs eigenem Scan-Cap `scanner.maxScanDurationInMins` (docker-compose: 12 Min
+  = 720 s) liegen. Frueher fest 600 s und damit UNTER dem ZAP-Cap: der Poll
+  gab auf, bevor ZAP den Scan sauber beendete, und ein an sich erfolgreicher
+  Lauf wurde als `timeout` verworfen (S0b-Nachtrag). Beim Cap beendet ZAP den
+  Scan und meldet `status=100`; der Poll greift dann. Wer den ZAP-Cap
+  hochsetzt, muss diesen Wert nachziehen.
 
 #### ffuf (nur Perimeter+)
 3 Modi (KI-adaptiv):
