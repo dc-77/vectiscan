@@ -74,6 +74,20 @@ zulaessiges Pfadzeichen. Vollstaendig laeuft der Test unter Linux, also im
 CI-Job `test-report-worker`, der sich auf einer API-Pipeline manuell starten
 laesst.
 
+## Hinweis fuer S1: Hostverzeichnisse nicht nach IP benennen
+
+Im Tar liegen Hosts unter `hosts/<ip>/`. Bei IPv6 enthaelt der Name Doppelpunkte
+(`hosts/2a01:4f8:d0a:3124::2/`), und unter Windows ist der Doppelpunkt in Pfaden
+nicht zulaessig. Deshalb laesst sich ein solches Tar dort nicht entpacken; die
+beiden betroffenen Junkerwerk-Laeufe werden im Smoke-Test uebersprungen.
+
+Der Faktenbuilder darf diesen Namen nicht uebernehmen. Wo er selbst
+Verzeichnisse oder Dateien je Host anlegt, braucht er einen Slug: Doppelpunkt
+durch Bindestrich ersetzen oder die Adresse hashen. Die IP bleibt als Feld im
+Datensatz stehen, sie ist nur kein Pfadbestandteil. Lesen aus dem Tar ist
+unproblematisch, solange nicht auf die Platte entpackt wird: `tarfile` liefert
+Mitglieder unabhaengig davon, ob ihr Name ein gueltiger Windows-Pfad waere.
+
 ## Bekannte Abweichungen
 
 - `expected/junkerwerk.json` fuehrt `family` und `families`. Das Feld gibt es in
