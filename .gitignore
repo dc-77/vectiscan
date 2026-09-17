@@ -23,3 +23,5 @@ redesign/
 /live-terminal-*.png
 /vectiscan-*.pdf
 
+
+.claude/worktrees/
