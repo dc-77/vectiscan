@@ -2,7 +2,7 @@
  "beschreibung": "Golden-Fixtures fuer den Report-Umbau (spec/05 bis 07, Session S0c). Dateinamen tragen nur Auftrags-UUIDs, also keine Kundennamen. Domains bleiben in den Daten stehen, weil die Fakten sonst wertlos sind. Screenshots sind aus allen Tars entfernt (spec/07 Abschnitt 1).",
  "api_snapshot_orders": 39,
  "tars_erwartet": 10,
- "tars_vorhanden": 0,
+ "tars_vorhanden": 10,
  "orders": [
   {
    "order_id": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
@@ -20,8 +20,11 @@
    "negative_entries": 3,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 26039,
+    "sha256": "55e84c5260994b8002f81f6729bf38537cb1f19713197a3e0835369076a0e6ce",
+    "members": 35,
+    "images": 0
    }
   },
   {
@@ -40,8 +43,11 @@
    "negative_entries": 0,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 378769,
+    "sha256": "f77a8097b2f929eef155eca020854b1f9172260bf9ddc821a658fe1addcd13f9",
+    "members": 63,
+    "images": 0
    }
   },
   {
@@ -60,8 +66,11 @@
    "negative_entries": 1,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 46150,
+    "sha256": "13927cc037d2e4aa0bfc19e9317fee4e869d872913415cbaca971f4a4b1c9fd9",
+    "members": 52,
+    "images": 0
    }
   },
   {
@@ -81,8 +90,11 @@
    "negative_entries": 2,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 90231,
+    "sha256": "4311a67e28741817baa3df4371d4010b5fc32955266c2bd961b14cb013173884",
+    "members": 85,
+    "images": 0
    }
   },
   {
@@ -102,8 +114,11 @@
    "negative_entries": 0,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 276201,
+    "sha256": "f296172c020c765b5c4d317df682044612369404cc111c1cb2aef82f68367f11",
+    "members": 137,
+    "images": 0
    }
   },
   {
@@ -123,8 +138,11 @@
    "negative_entries": 0,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 373769,
+    "sha256": "ce18b5fd8faf702f40bc47a4081b6f18781bf2e97241787616097c150a2e873b",
+    "members": 142,
+    "images": 0
    }
   },
   {
@@ -143,8 +161,11 @@
    "negative_entries": 0,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 298912,
+    "sha256": "bf618a5c4a350fc4bfe0e7660bfc287730a1e44fa8450dd4471e0d855764a7a1",
+    "members": 147,
+    "images": 0
    }
   },
   {
@@ -166,8 +187,11 @@
    "negative_entries": 4,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 104628,
+    "sha256": "cf2d1228dc3f141cf80bae3eda7d8ab62e43afe4834178ab623b913eeed8a09c",
+    "members": 97,
+    "images": 0
    }
   },
   {
@@ -188,8 +212,11 @@
    "negative_entries": 3,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 65368,
+    "sha256": "7087899baa525c4f6db99e89d21dda13966626429851ebc48048b539c60db541",
+    "members": 90,
+    "images": 0
    }
   },
   {
@@ -210,8 +237,11 @@
    "negative_entries": 1,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 46700,
+    "sha256": "2a1280731eebfda54ef9ca3c56fbcf034d7cd5a99f25d53435756d63ed1903c8",
+    "members": 47,
+    "images": 0
    }
   }
  ]

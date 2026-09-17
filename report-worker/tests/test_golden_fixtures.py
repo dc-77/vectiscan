@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import tarfile
 from pathlib import Path
 
@@ -112,6 +113,11 @@ def test_parse_scan_data_smoke(order, tmp_path):
     extract_dir = tmp_path / "scan-data"
     extract_dir.mkdir()
     with tarfile.open(path, "r:gz") as tar:
+        # Hosts liegen unter hosts/<ip>/. Bei IPv6 enthaelt der Name Doppelpunkte,
+        # die Windows in Pfaden nicht zulaesst. Auf Linux, also auch im CI-Job
+        # test-report-worker, laeuft der Test vollstaendig.
+        if os.name == "nt" and any(":" in m.name for m in tar.getmembers()):
+            pytest.skip("IPv6-Hostverzeichnis im Tar, unter Windows kein zulaessiger Pfadname")
         tar.extractall(path=extract_dir)  # noqa: S202
 
     # Aufloesung wie reporter/worker.py: das Tar traegt <orderId>/ als Wurzel.
