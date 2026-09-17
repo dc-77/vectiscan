@@ -59,7 +59,10 @@ MINIO_URL="${MINIO_ENDPOINT_URL:-http://minio:9000}"
 : "${MINIO_ACCESS_KEY:?MINIO_ACCESS_KEY fehlt in .env}"
 : "${MINIO_SECRET_KEY:?MINIO_SECRET_KEY fehlt in .env}"
 
-mc_exec() { docker compose exec -T minio mc "$@"; }
+# Alle docker-Aufrufe lesen stdin. Ohne </dev/null wuerde der erste Aufruf die
+# restliche Auftragsliste aus der Schleife schlucken.
+mc_exec() { docker compose exec -T minio mc "$@" </dev/null; }
+minio_sh() { docker compose exec -T minio "$@" </dev/null; }
 
 mkdir -p "$OUT_DIR"
 REPORT="$OUT_DIR/export-report.txt"
@@ -69,13 +72,16 @@ log "MinIO-Alias setzen"
 mc_exec alias set "$ALIAS" "$MINIO_URL" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY" >/dev/null
 
 mc_exec rm --recursive --force "$CONTAINER_TMP" >/dev/null 2>&1 || true
-docker compose exec -T minio mkdir -p "$CONTAINER_TMP"
+minio_sh mkdir -p "$CONTAINER_TMP"
+
+# Auftragsliste vorab einlesen, damit die Schleife nicht von stdin haengt.
+mapfile -t ORDERS < "$ORDERS_FILE"
 
 ok=0
 missing=0
 oversize=0
 
-while IFS= read -r order || [[ -n "$order" ]]; do
+for order in "${ORDERS[@]}"; do
     order="$(printf '%s' "$order" | tr -d '[:space:]')"
     [[ -z "$order" ]] && continue
     object="$ALIAS/$BUCKET/$order.tar.gz"
@@ -89,7 +95,7 @@ while IFS= read -r order || [[ -n "$order" ]]; do
 
     mc_exec cp --quiet "$object" "$CONTAINER_TMP/$order.tar.gz" >/dev/null
     raw="$OUT_DIR/$order.raw.tar.gz"
-    docker compose cp "minio:$CONTAINER_TMP/$order.tar.gz" "$raw" >/dev/null
+    docker compose cp "minio:$CONTAINER_TMP/$order.tar.gz" "$raw" >/dev/null </dev/null
     mc_exec rm --force "$CONTAINER_TMP/$order.tar.gz" >/dev/null 2>&1 || true
 
     before=$(stat -c %s "$raw")
@@ -108,9 +114,9 @@ while IFS= read -r order || [[ -n "$order" ]]; do
     printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$order" "$state" "$before" "$after" "$images" "$sum" >> "$REPORT"
     log "$order: $before -> $after Bytes, $images Bilder entfernt"
     ok=$((ok + 1))
-done < "$ORDERS_FILE"
+done
 
-docker compose exec -T minio rm -rf "$CONTAINER_TMP" >/dev/null 2>&1 || true
+minio_sh rm -rf "$CONTAINER_TMP" >/dev/null 2>&1 || true
 
 log "Fertig: $ok exportiert, $missing fehlend, $oversize ueber der Groessengrenze"
 log "Spalten in export-report.txt: order, status, bytes_vorher, bytes_nachher, bilder, sha256"
