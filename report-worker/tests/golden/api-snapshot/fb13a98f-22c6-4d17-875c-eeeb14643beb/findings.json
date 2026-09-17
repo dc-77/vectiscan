@@ -1,0 +1,2692 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 2,
+   "info": 2,
+   "low": 5,
+   "medium": 3
+  },
+  "business_impact_score": "2.9",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.13.167.158:3306 (krause-computer.de)",
+    "business_impact_score": 8.1,
+    "cvss_score": "8.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-284",
+    "description": "Auf 85.13.167.158 ist der MariaDB-Datenbankdienst (Version 10.11.14) über Port 3306 öffentlich aus dem Internet erreichbar. Datenbankdienste sollten ausschließlich aus dem internen Netzwerk oder über einen verschlüsselten Tunnel (SSH, VPN) ansprechbar sein. Eine direkte Exposition vergrößert die Angriffsfläche für Brute-Force-Angriffe, Authentifizierungs-Schwachstellen und potenzielle Zero-Day-Exploits.",
+    "evidence": "$ nmap -sV -p 3306 85.13.167.158\n3306/tcp open mysql MySQL 5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log",
+    "external_id": "VS-2026-001",
+    "finding_type": "database_port_exposed",
+    "id": "VS-2026-001",
+    "impact": "Angreifer können Brute-Force-Angriffe auf Datenbankkonten durchführen, bekannte CVEs in MariaDB-Versionen ausnutzen oder gezielte Angriffe auf den Datenbankdienst starten. Bei erfolgreichem Zugriff sind alle Webanwendungsdaten kompromittiert (Kundendaten, Authentifizierungs-Hashes, Konfigurationen).",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-DB-001",
+    "recommendation": "<b>Sofort (Tag 1-3):</b> Firewall-Regel implementieren, die Port 3306 auf localhost/127.0.0.1 oder das interne Netzwerk beschränkt. Bei kasserver.com Shared-Hosting den Provider zur korrekten Bindung kontaktieren.\n<b>Mittelfristig:</b> MariaDB in 'bind-address = 127.0.0.1' konfigurieren und alle Webapps lokal anbinden. SSL/TLS für DB-Verbindungen erzwingen.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-DB-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Datenbank-Port (3306/5432/1433/1521/27017/6379/...) oeffentlich erreichbar - Bei erfolgreicher Authentifizierung (Brute-Force, Default-Creds, leaked-Creds) vollstaendiger Zugriff auf gespeicherte Daten. AC:H weil Authentifizierung weiterhin Pflicht.",
+     "rule_references": [
+      "CWE-200",
+      "CWE-284",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Datenbank-Port 3306 oeffentlich erreichbar auf krause-computer.de",
+    "title_vars": {
+     "host": "krause-computer.de",
+     "ip": "85.13.167.158",
+     "port": "3306",
+     "tech": "MariaDB 10.11.14"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "139",
+     "445"
+    ],
+    "_title_template_missing": true,
+    "affected": "85.13.167.158:139, 85.13.167.158:445",
+    "business_impact_score": 7.5,
+    "cvss_score": "7.5",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Die Samba-Ports 139 (NetBIOS Session Service) und 445 (SMB) sind auf 85.13.167.158 öffentlich aus dem Internet erreichbar. Die identifizierte Samba-Version 4.6.2 ist deutlich veraltet (Release 2017) und enthält zahlreiche bekannte Sicherheitslücken wie SambaCry (CVE-2017-7494) sowie diverse CVEs in der jüngeren Vergangenheit. SMB-Dienste haben im öffentlichen Internet nichts verloren.",
+    "evidence": "$ nmap -sV -p 139,445 85.13.167.158\n139/tcp open netbios-ssn Samba smbd 4.6.2\n445/tcp open netbios-ssn Samba smbd 4.6.2",
+    "external_id": "VS-2026-002",
+    "finding_type": "software_eol",
+    "id": "VS-2026-002",
+    "impact": "Angreifer können Remote-Code-Execution-Schwachstellen wie SambaCry ausnutzen, Datei-Shares enumerieren, Brute-Force-Angriffe auf SMB-Konten durchführen oder Daten exfiltrieren. Bei aktivem unauthenticated-Zugriff besteht die Gefahr vollständiger Systemkompromittierung.",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Sofort:</b> Ports 139 und 445 per Firewall vom öffentlichen Internet blockieren. Samba ausschließlich im internen Netz oder über VPN bereitstellen.\n<b>Mittelfristig:</b> Samba auf aktuelle Version (4.20.x) aktualisieren. SMBv1 deaktivieren. Falls Datei-Sharing über Internet erforderlich: Nextcloud nutzen statt SMB.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "SMB/Samba-Dienste (Port 139, 445) öffentlich erreichbar auf krause-computer.de",
+    "title_vars": {
+     "host": "krause-computer.de",
+     "ip": "85.13.167.158",
+     "port": "139,445",
+     "tech": "Samba 4.6.2"
+    }
+   },
+   {
+    "_qa_cap_applied": true,
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "3128"
+    ],
+    "_title_template_missing": true,
+    "affected": "37.114.55.171:3128",
+    "business_impact_score": 7.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L",
+    "cwe": "CWE-284",
+    "description": "Auf dem Mail-/Collaboration-Host 37.114.55.171 ist die Proxmox Virtual Environment REST API auf Port 3128 öffentlich erreichbar. Proxmox VE ist die Virtualisierungs-Management-Schicht, mit Zugriff lassen sich VMs starten/stoppen, Snapshots erstellen, neue VMs erzeugen und im schlimmsten Fall Hostsystem-Operationen ausführen. Die Management-API gehört nie ins öffentliche Internet.",
+    "evidence": "$ nmap -sV -p 3128 37.114.55.171\n3128/tcp open http Proxmox Virtual Environment REST API 3.0",
+    "external_id": "VS-2026-003",
+    "id": "VS-2026-003",
+    "impact": "Bei Bekanntwerden von Anmeldedaten, Default Credentials oder API-Schwachstellen droht Komplettkompromittierung der gesamten Virtualisierungsumgebung mit allen darauf laufenden VMs (Mail, Jitsi, RustDesk, NoSpamProxy). Auch ohne Login-Erfolg sind Brute-Force-Angriffe und Information Disclosure möglich.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Sofort:</b> Port 3128 per iptables/nftables auf interne Admin-IPs beschränken oder hinter ein VPN legen. Falls Remote-Admin erforderlich: WireGuard/OpenVPN-Tunnel verwenden.\n<b>Mittelfristig:</b> Zwei-Faktor-Authentifizierung in Proxmox aktivieren, fail2ban für die Web-UI einrichten, regelmäßige Updates der Proxmox-Pakete einplanen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Proxmox VE REST API (Port 3128) öffentlich erreichbar auf 37.114.55.171",
+    "title_vars": {
+     "host": "37.114.55.171",
+     "port": "3128",
+     "tech": "Proxmox VE REST API 3.0"
+    }
+   },
+   {
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "111"
+    ],
+    "_title_template_missing": true,
+    "affected": "37.114.55.171:111",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Auf 37.114.55.171 ist rpcbind (Portmapper) auf Port 111 öffentlich erreichbar. rpcbind dient zur Auflösung von RPC-Diensten und kann Informationen über laufende RPC-Services preisgeben. Zudem wurde rpcbind in der Vergangenheit für Amplification-DDoS-Angriffe missbraucht.",
+    "evidence": "$ nmap -sV -p 111 37.114.55.171\n111/tcp open rpcbind 2-4",
+    "external_id": "VS-2026-004",
+    "id": "VS-2026-004",
+    "impact": "Information Disclosure über laufende RPC-Dienste; Missbrauch als Reflektor für UDP-basierte DDoS-Amplification-Angriffe; mögliche Ausnutzung von NFS-Schwachstellen, falls NFS-Dienste aktiv sind.",
+    "original_claude_id": "VS-2026-004",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Port 111 per Firewall blockieren, falls keine externen NFS-Mounts benötigt werden. Falls rpcbind nicht aktiv genutzt: Dienst deaktivieren (`systemctl disable --now rpcbind`).\n<b>Mittelfristig:</b> /etc/hosts.allow und /etc/hosts.deny zur Zugriffskontrolle nutzen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "rpcbind-Dienst (Port 111) öffentlich erreichbar auf 37.114.55.171",
+    "title_vars": {
+     "host": "37.114.55.171",
+     "port": "111",
+     "tech": "rpcbind 2-4"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "nospamproxy.krause-computer.de, rustdesk.krause-computer.de, mx.krause-computer.de (alle auf 37.114.55.171:443)",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Die Subdomains nospamproxy.krause-computer.de, rustdesk.krause-computer.de und mx.krause-computer.de liefern bei HTTPS-Aufruf identische Inhalte: die Jitsi-Meet-Welcome-Page. Dies ist ein klares Indiz dafür, dass nginx als Catch-All-vHost konfiguriert ist und alle Subdomains auf den Jitsi-Default-Backend routet — die eigentlich gewünschten Dienste (NoSpamProxy-Admin-UI, RustDesk-Server, Mail-UI) werden nicht ausgeliefert.",
+    "evidence": "GET https://nospamproxy.krause-computer.de/ → Title: Jitsi Meet\nGET https://rustdesk.krause-computer.de/ → Title: Jitsi Meet\nGET https://mx.krause-computer.de/ → Title: Jitsi Meet\nAlle drei zeigen identische redirect_chain wie jitsi.krause-computer.de.",
+    "external_id": "VS-2026-005",
+    "id": "VS-2026-005",
+    "impact": "Funktionaler Bug: Erwartete Web-UIs sind nicht erreichbar. Falls die DNS-Einträge versehentlich öffentlich annonciert wurden, könnte ein Angreifer durch korrekte Konfiguration vorgesehene Login-Seiten enttarnen. Information Disclosure über vorhandene Subdomain-Infrastruktur.",
+    "original_claude_id": "VS-2026-009",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> nginx-vHost-Konfiguration prüfen: server_name-Direktiven pro Subdomain einrichten oder default_server auf 'return 444' (Verbindung schließen) setzen.\n<b>Mittelfristig:</b> Subdomains die nicht aktiv genutzt werden aus DNS entfernen. Falls aktiv: Reverse-Proxy korrekt konfigurieren (z.B. nospamproxy → interner NoSpamProxy-Server, rustdesk → RustDesk hbbs/hbbr).",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Reverse-Proxy-Fehlkonfiguration: nospamproxy/rustdesk/mx liefern Jitsi-Welcome-Page",
+    "title_vars": {
+     "host": "nospamproxy.krause-computer.de, rustdesk.krause-computer.de, mx.krause-computer.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.13.167.158:21",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Auf 85.13.167.158 antwortet ein Nagios NSCA-Dienst (Nagios Service Check Acceptor) auf dem klassischen FTP-Port 21. NSCA wird für passive Monitoring-Checks verwendet und sollte nicht öffentlich erreichbar sein. Ältere NSCA-Versionen hatten Buffer-Overflow-Schwachstellen.",
+    "evidence": "$ nmap -sV -p 21 85.13.167.158\n21/tcp open nagios-nsca Nagios NSCA",
+    "external_id": "VS-2026-006",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-006",
+    "impact": "Information Disclosure über Monitoring-Infrastruktur; potenzielle Ausnutzung historischer NSCA-Schwachstellen; Brute-Force-Angriffe auf NSCA-Authentifizierung (falls aktiv).",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig:</b> Port 21 per Firewall auf Monitoring-Quell-IPs beschränken. Verschlüsselung im NSCA-Konfig (encryption_method=14/AES) sicherstellen.\n<b>Mittelfristig:</b> Falls Monitoring obsolet ist: NSCA-Dienst deaktivieren. Falls aktiv: auf Nagios Core Plus/Icinga2 mit TLS umstellen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf krause-computer.de",
+    "title_vars": {
+     "host": "krause-computer.de",
+     "ip": "85.13.167.158",
+     "port": "21",
+     "tech": "Nagios NSCA"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "krause-computer.de (DNS)",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain krause-computer.de konnte kein DKIM-DNS-Record gefunden werden. DKIM (DomainKeys Identified Mail) ergänzt SPF und DMARC durch kryptografische Signaturen ausgehender E-Mails und ist Bestandteil moderner E-Mail-Authentifizierungs-Standards. Bei aktiver DMARC-Policy `p=reject` ohne DKIM kann die Authentifizierungskette brechen, wenn SPF z.B. durch Weiterleitungen invalidiert wird.",
+    "evidence": "DNS-Abfrage default._domainkey.krause-computer.de und weitere gängige Selektoren: keine Antwort.\nDMARC: v=DMARC1; p=reject; adkim=r; aspf=r\nSPF: v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all",
+    "external_id": "VS-2026-007",
+    "finding_type": "dkim_missing",
+    "id": "VS-2026-007",
+    "impact": "Schwächung der E-Mail-Authentifizierung: Bei E-Mail-Forwarding bricht SPF-Validierung; ohne DKIM keine Signatur-Fallback; erhöhtes Risiko, dass legitime E-Mails als Spam markiert werden; geringeres Vertrauen empfangender Mailserver in die Sender-Identität.",
+    "original_claude_id": "VS-2026-006",
+    "policy_id": "SP-DNS-008",
+    "recommendation": "<b>Kurzfristig (Tage):</b> DKIM-Schlüsselpaar (mind. 2048 Bit) im Mailserver (Postfix/OpenDKIM auf 37.114.55.171) konfigurieren und als TXT-Record (default._domainkey.krause-computer.de) im DNS hinterlegen.\n<b>Mittelfristig:</b> TLS-RPT (TXT-Record _smtp._tls.krause-computer.de) und MTA-STS (TXT/HTTPS-Policy) ergänzen für vollständige Mail-Sicherheit. DNSSEC für die Zone aktivieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-008",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DKIM-Signierung fehlt - Mail-Authentifizierung schwaecher",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DKIM-Record fehlt fuer krause-computer.de",
+    "title_vars": {
+     "domain": "krause-computer.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "krause-computer.de (DNS-Zone)",
+    "business_impact_score": 4.2,
+    "cvss_score": "4.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-345",
+    "description": "Die Zone krause-computer.de ist nicht mit DNSSEC signiert. DNSSEC schützt vor DNS-Spoofing- und Cache-Poisoning-Angriffen, indem es DNS-Antworten kryptografisch signiert. Ohne DNSSEC können Angreifer mit MITM-Position oder Resolver-Schwachstellen DNS-Antworten manipulieren.",
+    "evidence": "DNS-Abfrage: Keine RRSIG/DNSKEY-Records vorhanden für krause-computer.de.\npassive_intel.dnssec_signed = false",
+    "external_id": "VS-2026-008",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-008",
+    "impact": "Angreifer mit DNS-Manipulationsmöglichkeit (z.B. WLAN-MITM, kompromittierter Resolver) könnten DNS-Antworten fälschen und Nutzer auf falsche IPs umleiten — bei HTTPS abgeschwächt durch TLS-Zertifikatsprüfung, bei E-Mail-Lookup (MX) jedoch wirksam.",
+    "original_claude_id": "VS-2026-011",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> DNSSEC beim Registrar (kasserver.com / NS5/NS6) aktivieren. Bei Domain-Provider die DS-Records hinterlegen.\n<b>Mittelfristig:</b> TLS-RPT-Record (_smtp._tls.krause-computer.de) ergänzen, der Reporting über fehlgeschlagene TLS-Verbindungen liefert.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DNSSEC fehlt fuer krause-computer.de",
+    "title_vars": {
+     "domain": "krause-computer.de"
+    }
+   },
+   {
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "26"
+    ],
+    "_title_template_missing": true,
+    "affected": "37.114.55.171:26",
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Auf 37.114.55.171 läuft ein zusätzlicher SMTP-Dienst auf Port 26 parallel zum Standard-Port 25. Port 26 ist eine bekannte Alternative für SMTP-Submission, kann aber Verwirrung bei Konfigurationen stiften und stellt eine zusätzliche Angriffsfläche dar, falls die Konfiguration nicht identisch zu Port 25 ist (z.B. fehlende TLS-Erzwingung oder Relay-Beschränkungen).",
+    "evidence": "$ nmap -sV -p 25,26 37.114.55.171\n25/tcp open smtp Postfix smtpd\n26/tcp open smtp",
+    "external_id": "VS-2026-010",
+    "id": "VS-2026-010",
+    "impact": "Falls Port 26 anders konfiguriert ist als Port 25 (z.B. ohne SMTP-AUTH-Pflicht oder ohne SMTP-Submission-TLS), könnte ein Angreifer den Server als offenes Relay missbrauchen oder über schwächere Authentifizierungsanforderungen einbrechen.",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> Prüfen, ob Port 26 tatsächlich benötigt wird. Falls ja: Konfiguration mit Port 25 abgleichen (TLS-Pflicht, SMTP-AUTH).\n<b>Mittelfristig:</b> Auf Standard-Ports (25 für Server-zu-Server, 587 für Submission, 465 für SMTPS) reduzieren. Port 26 deaktivieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Postfix-SMTP-Dienst auf nicht-standardisiertem Port 26 zusätzlich zu Port 25",
+    "title_vars": {
+     "host": "37.114.55.171",
+     "port": "26",
+     "tech": "Postfix smtpd"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "37.114.55.171:22, 37.114.55.171:987, 87.79.190.79:987, 85.13.167.158:22",
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Auf mehreren Hosts sind SSH-Dienste erreichbar (Port 22 und/oder 987). Die OpenSSH-Versionen sind aktuell (9.6p1 Ubuntu, 10.0p2 Debian) und nicht durch bekannte kritische CVEs betroffen. Es konnte nicht verifiziert werden, ob fail2ban aktiv und Passwort-Authentifizierung deaktiviert ist.",
+    "evidence": "$ nmap -sV\n85.13.167.158:22 OpenSSH 9.6p1 Ubuntu 3ubuntu13.16\n37.114.55.171:22 OpenSSH 10.0p2 Debian 7+deb13u4\n37.114.55.171:987 OpenSSH 10.0p2 Debian 7+deb13u2\n87.79.190.79:987 OpenSSH 10.0p2 Debian 7+deb13u4",
+    "external_id": "VS-2026-009",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-009",
+    "impact": "Ohne fail2ban und mit Passwort-Authentifizierung sind Brute-Force-Angriffe auf SSH-Accounts möglich. Bei modernen OpenSSH-Versionen sind die direkten Exploit-Risiken gering.",
+    "original_claude_id": "VS-2026-012",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig:</b> Prüfen, ob `PasswordAuthentication no` und `PermitRootLogin no` in /etc/ssh/sshd_config gesetzt sind. fail2ban oder sshguard installieren und aktivieren.\n<b>Mittelfristig:</b> SSH ausschließlich per Public-Key-Authentifizierung erlauben; 2FA über TOTP/PAM-google-authenticator hinzufügen für besonders sensible Hosts (Proxmox).",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf 37.114.55.171, 87.79.190.79",
+    "title_vars": {
+     "host": "37.114.55.171, 87.79.190.79",
+     "port": "22, 987"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "https://www.krause-computer.de",
+    "business_impact_score": 0.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Joomla-Website www.krause-computer.de liefert keinen Content-Security-Policy-Header aus. CSP ist eine wirksame Schutzmaßnahme gegen Cross-Site Scripting (XSS) und Data-Exfiltration-Angriffe. Die anderen Standard-Header (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy) sind korrekt gesetzt — 4/7 Header vorhanden.",
+    "evidence": "GET https://www.krause-computer.de/\nVorhanden: strict-transport-security, x-frame-options, x-content-type-options, referrer-policy\nFehlend: content-security-policy, permissions-policy",
+    "external_id": "VS-2026-011",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-011",
+    "impact": "Ohne CSP können erfolgreiche XSS-Angriffe (z.B. über Joomla-Plugins oder Komponenten) unkontrolliert beliebigen JavaScript-Code aus externen Quellen nachladen und Sitzungsdaten exfiltrieren.",
+    "original_claude_id": "VS-2026-007",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> CSP zunächst im Report-Only-Modus aktivieren (`Content-Security-Policy-Report-Only`), Konflikte mit Joomla-Plugins identifizieren.\n<b>Mittelfristig:</b> Strikte CSP mit `default-src 'self'`, nonce-basierten Script-Sources und Permissions-Policy ausrollen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf www.krause-computer.de",
+    "title_vars": {
+     "directive": "content-security-policy",
+     "host": "www.krause-computer.de"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "https://www.krause-computer.de",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-693",
+    "description": "Der HSTS-Header auf www.krause-computer.de hat `max-age=600000` (≈ 7 Tage). Best-Practice empfiehlt mindestens 31536000 Sekunden (12 Monate) und idealerweise `includeSubDomains; preload` für HSTS Preload List.",
+    "evidence": "Response-Header: strict-transport-security: max-age=600000\n(Zum Vergleich: nextcloud.krause-computer.de nutzt max-age=63072000; includeSubdomains; preload)",
+    "external_id": "VS-2026-012",
+    "finding_type": "hsts_short_maxage",
+    "id": "VS-2026-012",
+    "impact": "Bei einer einmaligen MITM-Position kann ein Angreifer einen Nutzer nach 7 Tagen wieder per HTTP-Downgrade angreifen, da der Browser dann die HSTS-Pinning-Information vergessen hat.",
+    "original_claude_id": "VS-2026-013",
+    "policy_id": "SP-HDR-004",
+    "recommendation": "<b>Kurzfristig:</b> In der Apache-Konfiguration HSTS auf `max-age=63072000; includeSubDomains; preload` setzen.\n<b>Mittelfristig:</b> Nach 2-3 Monaten stabiler HTTPS-Konfiguration die Domain auf hstspreload.org einreichen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "HSTS max-age < 6 Monate - Best-Practice-Verstoss ohne praktisches Risiko",
+     "rule_references": [
+      "CWE-523"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "HSTS max-age unter 6 Monaten auf www.krause-computer.de",
+    "title_vars": {
+     "host": "www.krause-computer.de"
+    }
+   }
+  ],
+  "overall_description": "Die Sicherheitsanalyse umfasst die Domain krause-computer.de mit drei Hosts auf unterschiedlichen IP-Adressen und einer breit gefächerten Service-Landschaft. Der Primärhost 85.13.167.158 (Shared-Hosting bei kasserver.com) betreibt eine Joomla-Website auf Apache mit gleichzeitiger Bereitstellung umfangreicher Mail-Dienste (SMTP 25/465/587, POP3/IMAP 110/143/993/995), Datenbank (MySQL/MariaDB 10.11.14 auf Port 3306) sowie SMB/Samba 4.6.2 (Port 139/445). Der zweite Host 87.79.190.79 (DSL-Anschluss xdsl-87-79-190-79.nc.de) hostet selbst-betriebene Webanwendungen (Nextcloud, FileBrowser, Navidrome 0.58.5, yt-dlp Web UI, Transmission) hinter nginx. Der dritte Host 37.114.55.171 (mx.krause-computer.de) fungiert als Mail-/Collaboration-Plattform mit Jitsi Meet, NoSpamProxy und RustDesk-Subdomains; auffällig ist hier die öffentliche Erreichbarkeit der Proxmox-VE-REST-API auf Port 3128 sowie zweier Postfix-SMTP-Dienste (25, 26) und rpcbind (Port 111).\n\nDie wesentlichen Risiken konzentrieren sich auf 85.13.167.158: Hier sind sowohl der MariaDB-Port 3306 als auch SMB-Ports 139/445 öffentlich erreichbar — beides Dienste, die ausschließlich intern bereitgestellt werden sollten. Zusätzlich läuft Port 21 (Nagios NSCA) ungeschützt. Die Joomla-Version ist nicht ermittelbar (Version absichtlich versteckt), allerdings fehlt die Content Security Policy auf der Website (4/7 Security-Headern). Auf 37.114.55.171 ist die Proxmox-Management-API auf Port 3128 öffentlich erreichbar — ein hohes Risiko, da Proxmox die Virtualisierungsschicht administriert. Außerdem ist rpcbind (Port 111) exponiert. Die Subdomains nospamproxy/rustdesk/mx zeigen alle dieselbe Jitsi-Default-Welcome-Page — ein Indiz für einen Reverse-Proxy-Konfigurationsfehler, der dazu führt, dass die eigentlich beworbenen Dienste (NoSpamProxy, RustDesk) gar nicht ausgeliefert werden. Auf 87.79.190.79 fehlen sämtliche Security-Header auf youtube.krause-computer.de (0/7), während nextcloud.krause-computer.de vorbildlich konfiguriert ist.\n\nIm DNS-Bereich ist die Mail-Authentifizierung mit SPF (-all/hardfail) und DMARC (p=reject) solide aufgesetzt, allerdings fehlt DKIM vollständig — dies schwächt die Signaturkette ausgehender E-Mails. DNSSEC und TLS-RPT sind nicht aktiviert. Die Gesamtbewertung ist HIGH aufgrund der exponierten Management-Dienste (MariaDB, SMB, Proxmox-API, rpcbind) und der fehlenden DKIM-Konfiguration; positiv hervorzuheben sind die korrekte DMARC-Reject-Policy, das HSTS-Deployment auf den meisten Hosts und die Nextcloud-Security-Header-Konfiguration.",
+  "overall_risk": "HIGH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-DB-001",
+   "SP-DISC-001",
+   "SP-DNS-001",
+   "SP-DNS-008",
+   "SP-FALLBACK",
+   "SP-HDR-004"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die DMARC-Policy ist mit p=reject und pct=100 vorbildlich streng konfiguriert. Dies verhindert E-Mail-Spoofing und Phishing-Versuche im Namen von krause-computer.de zuverlässig — empfangende Mailserver werden gefälschte Mails ablehnen.",
+    "title": "DMARC-Policy auf reject mit 100% Coverage"
+   },
+   {
+    "description": "Der SPF-Record endet mit -all (Hardfail), was unbefugte Absender konsequent abweist. Die zentralen Mailserver mx.krause-computer.de und w020687e.kasserver.com sind sauber als autorisierte Sender deklariert.",
+    "title": "Strikte SPF-Policy mit Hardfail (-all)"
+   },
+   {
+    "description": "Alle erreichbaren SSH-Dienste laufen unter OpenSSH 9.6p1 (Ubuntu) bzw. 10.0p2 (Debian) — beides aktuelle Versionen ohne bekannte kritische Schwachstellen. Insbesondere ist OpenSSH 9.6+ nicht von regreSSHion (CVE-2024-6387) betroffen.",
+    "title": "Aktuelle OpenSSH-Versionen auf allen Hosts"
+   },
+   {
+    "description": "Die DNS-Server ns5.kasserver.com und ns6.kasserver.com erlauben keine Zone-Transfers an Dritte — die DNS-Zone kann nicht vollständig enumeriert werden, was die Reconnaissance-Möglichkeiten für Angreifer einschränkt.",
+    "title": "Kein Zone-Transfer (AXFR) möglich"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "MariaDB (Port 3306) und Samba (Ports 139/445) auf 85.13.167.158 per Firewall vom öffentlichen Internet abschotten",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-001",
+     "VS-2026-002"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "Proxmox VE REST API (Port 3128) und rpcbind (Port 111) auf 37.114.55.171 per Firewall auf Admin-IPs beschränken oder VPN-only machen",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-003",
+     "VS-2026-004"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "DKIM-Schlüsselpaar generieren und im DNS für default._domainkey.krause-computer.de hinterlegen, OpenDKIM in Postfix einbinden",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Nagios NSCA Port 21 auf Monitoring-Quell-IPs beschränken oder Dienst deaktivieren",
+    "effort": "30 min",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Reverse-Proxy-Konfiguration auf 37.114.55.171 korrigieren: korrekte server_name-Routings für nospamproxy/rustdesk/mx einrichten oder Default-vHost auf 444 setzen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-005"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Security-Header auf youtube.krause-computer.de und www.krause-computer.de ergänzen (CSP, HSTS-Verlängerung, X-Frame-Options, etc.); CSP zunächst im Report-Only-Modus",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-011",
+     "VS-2026-012"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "DNSSEC für krause-computer.de beim Registrar aktivieren und TLS-RPT/MTA-STS ergänzen",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-008",
+     "VS-2026-007"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "SSH-Konfiguration härten (PasswordAuthentication no, fail2ban, 2FA für Admin-Zugänge); Postfix-Port 26 evaluieren und ggf. deaktivieren",
+    "effort": "3-5 h",
+    "finding_refs": [
+     "VS-2026-010",
+     "VS-2026-009"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 2,
+   "INFO": 2,
+   "LOW": 5,
+   "MEDIUM": 3
+  },
+  "tech_profiles": [
+   {
+    "cms": "Joomla",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "Joomla",
+     "confidence": 0.9,
+     "details": {
+      "meta_generator": "Joomla! - Open Source Content Management"
+     },
+     "detection_methods": [
+      "meta_tag"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "22",
+      "service": "OpenSSH 9.6p1 Ubuntu 3ubuntu13.16"
+     },
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "587",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "465",
+      "service": ""
+     },
+     {
+      "port": "25",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "krause-computer.de",
+     "www.krause-computer.de"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "85.13.167.158",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     25,
+     80,
+     110,
+     139,
+     143,
+     443,
+     445,
+     465,
+     587,
+     993,
+     995,
+     3306
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "reject",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      587,
+      143,
+      80,
+      465,
+      22,
+      25,
+      443
+     ],
+     "shodan_services": {
+      "22": "OpenSSH 9.6p1 Ubuntu 3ubuntu13.16",
+      "443": "Apache httpd",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "krause-computer.de",
+    "redirect_data": {
+     "krause-computer.de": {
+      "error": null,
+      "final_domain": "krause-computer.de",
+      "final_url": "https://krause-computer.de/",
+      "is_cross_domain": false,
+      "page_title": "Computer-Service Krause – Ihr kompetenter IT-Partner",
+      "redirect_chain": [
+       "https://krause-computer.de/",
+       "https://krause-computer.de/media/system/js/core.min.js?a3d8f8",
+       "https://krause-computer.de/media/system/js/messages.min.js?9a4811",
+       "https://krause-computer.de/cache/astroid/css/47366622c844c83e647f88fec2c80b60.css?39b334",
+       "https://krause-computer.de/cache/astroid/js/de86ee157710b9144cb30257f6ec54ef.js?39b334",
+       "https://krause-computer.de/images/auto.jpg",
+       "https://www.krause-computer.de/images/grafiken/krause_computer_logo.png"
+      ],
+      "response_headers": {
+       "cache-control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "cross-origin-opener-policy": "same-origin",
+       "date": "Tue, 26 May 2026 12:27:53 GMT",
+       "expires": "Wed, 17 Aug 2005 00:00:00 GMT",
+       "last-modified": "Tue, 26 May 2026 12:27:53 GMT",
+       "pragma": "no-cache",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=600000",
+       "vary": "Accept-Encoding,User-Agent",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/85.13.167.158/phase2/screenshot_krause-computer.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "site astroid-framework com-content view-article layout-default itemid-101 guest-user astroid-header-horizontal-center uebersicht-alias tp-style-10 de-DE ltr astroid-device-xl",
+       "cookies": "",
+       "generator": "Joomla! - Open Source Content Management",
+       "html_lang": "de-de",
+       "meta_tags": [
+        {
+         "content": "IE=edge",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "true",
+         "name": "HandheldFriendly"
+        },
+        {
+         "content": "YES",
+         "name": "mobile-web-app-capable"
+        },
+        {
+         "content": "Mit umfassender Expertise ist Krause Computer Ihr erfahrener IT-Service und Telefonanlagen Spezialist für Unternehmen in Dormagen und Umgebung.",
+         "name": "description"
+        },
+        {
+         "content": "Joomla! - Open Source Content Management",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://krause-computer.de/media/system/js/core.min.js?a3d8f8",
+        "https://krause-computer.de/media/system/js/messages.min.js?9a4811",
+        "https://krause-computer.de/cache/astroid/js/de86ee157710b9144cb30257f6ec54ef.js?39b334"
+       ],
+       "stylesheets": [
+        "https://krause-computer.de/cache/astroid/css/47366622c844c83e647f88fec2c80b60.css?39b334"
+       ],
+       "title": "Computer-Service Krause – Ihr kompetenter IT-Partner"
+      }
+     },
+     "www.krause-computer.de": {
+      "error": null,
+      "final_domain": "www.krause-computer.de",
+      "final_url": "https://www.krause-computer.de/",
+      "is_cross_domain": false,
+      "page_title": "Computer-Service Krause – Ihr kompetenter IT-Partner",
+      "redirect_chain": [
+       "https://www.krause-computer.de/",
+       "https://www.krause-computer.de/images/grafiken/krause_computer_logo.png",
+       "https://www.krause-computer.de/media/system/js/messages.min.js?9a4811",
+       "https://www.krause-computer.de/media/system/js/core.min.js?a3d8f8",
+       "https://www.krause-computer.de/cache/astroid/css/47366622c844c83e647f88fec2c80b60.css?39b334",
+       "https://www.krause-computer.de/cache/astroid/js/de86ee157710b9144cb30257f6ec54ef.js?39b334",
+       "https://www.krause-computer.de/images/auto.jpg"
+      ],
+      "response_headers": {
+       "cache-control": "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "cross-origin-opener-policy": "same-origin",
+       "date": "Tue, 26 May 2026 12:28:03 GMT",
+       "expires": "Wed, 17 Aug 2005 00:00:00 GMT",
+       "last-modified": "Tue, 26 May 2026 12:28:03 GMT",
+       "pragma": "no-cache",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=600000",
+       "vary": "Accept-Encoding,User-Agent",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/85.13.167.158/phase2/screenshot_www.krause-computer.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "site astroid-framework com-content view-article layout-default itemid-101 guest-user astroid-header-horizontal-center uebersicht-alias tp-style-10 de-DE ltr astroid-device-xl",
+       "cookies": "",
+       "generator": "Joomla! - Open Source Content Management",
+       "html_lang": "de-de",
+       "meta_tags": [
+        {
+         "content": "IE=edge",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "true",
+         "name": "HandheldFriendly"
+        },
+        {
+         "content": "YES",
+         "name": "mobile-web-app-capable"
+        },
+        {
+         "content": "Mit umfassender Expertise ist Krause Computer Ihr erfahrener IT-Service und Telefonanlagen Spezialist für Unternehmen in Dormagen und Umgebung.",
+         "name": "description"
+        },
+        {
+         "content": "Joomla! - Open Source Content Management",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.krause-computer.de/media/system/js/core.min.js?a3d8f8",
+        "https://www.krause-computer.de/media/system/js/messages.min.js?9a4811",
+        "https://www.krause-computer.de/cache/astroid/js/de86ee157710b9144cb30257f6ec54ef.js?39b334"
+       ],
+       "stylesheets": [
+        "https://www.krause-computer.de/cache/astroid/css/47366622c844c83e647f88fec2c80b60.css?39b334"
+       ],
+       "title": "Computer-Service Krause – Ihr kompetenter IT-Partner"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2018-12-31",
+      "is_mega_cve": false,
+      "latest_patch": "5.5.63",
+      "name": "MySQL",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Joomla",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "CMS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Joomla! - Open Source Content Management",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 22)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH 9.6p1 Ubuntu",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "3ubuntu13.16",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 25",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 465)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 465",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 587",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.6p1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nagios NSCA",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Samba smbd",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "4.6.2",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sprache",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "WAF/Schutz",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "WAF-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Generic",
+      "patch_status": "unbekannt",
+      "source": "waf_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Nagios NSCA",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.6p1 Ubuntu 3ubuntu13.16"
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Samba smbd",
+      "version": "4.6.2"
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "MySQL",
+      "version": "5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log"
+     },
+     {
+      "name": "Joomla! - Open Source Content Management",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Joomla",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "krause-computer.de": {
+      "cms": "Joomla",
+      "cms_confidence": 0.9,
+      "cms_version": null,
+      "waf": "Generic"
+     },
+     "www.krause-computer.de": {
+      "cms": "Joomla",
+      "cms_confidence": 0.9,
+      "cms_version": null,
+      "waf": "Generic"
+     }
+    },
+    "waf": "Generic",
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "filebrowser.krause-computer.de",
+     "navidrome.krause-computer.de",
+     "nextcloud.krause-computer.de",
+     "transmission.krause-computer.de",
+     "youtube.krause-computer.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "87.79.190.79",
+    "is_spa": true,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443,
+     987
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "reject",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      443
+     ],
+     "shodan_services": {},
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "filebrowser.krause-computer.de",
+    "redirect_data": {
+     "filebrowser.krause-computer.de": {
+      "error": null,
+      "final_domain": "filebrowser.krause-computer.de",
+      "final_url": "https://filebrowser.krause-computer.de/login?redirect=/files/",
+      "is_cross_domain": false,
+      "page_title": "Login - File Browser",
+      "redirect_chain": [
+       "https://filebrowser.krause-computer.de/",
+       "https://filebrowser.krause-computer.de/static/assets/index-CKkaX9A2.css",
+       "https://filebrowser.krause-computer.de/static/assets/rolldown-runtime-BM3Ffeng.js",
+       "https://filebrowser.krause-computer.de/static/assets/index-Dktrh_HG.js",
+       "https://filebrowser.krause-computer.de/static/assets/dayjs-CzkqPyy2.js",
+       "https://filebrowser.krause-computer.de/static/assets/i18n-BqM_c4p8.js",
+       "https://filebrowser.krause-computer.de/static/img/logo.svg",
+       "https://filebrowser.krause-computer.de/static/assets/normal-latin-44DxGZCZ.woff2",
+       "https://filebrowser.krause-computer.de/static/assets/bold-latin-CiQBian2.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store, must-revalidate",
+       "connection": "keep-alive",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Tue, 26 May 2026 12:26:54 GMT",
+       "server": "nginx",
+       "transfer-encoding": "chunked",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/87.79.190.79/phase2/screenshot_filebrowser.krause-computer.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "IE=edge",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "width=device-width, initial-scale=1, user-scalable=no",
+         "name": "viewport"
+        },
+        {
+         "content": "noindex,nofollow",
+         "name": "robots"
+        },
+        {
+         "content": "File Browser",
+         "name": "apple-mobile-web-app-title"
+        },
+        {
+         "content": "#2979ff",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://filebrowser.krause-computer.de/static/assets/index-Dktrh_HG.js",
+        "https://filebrowser.krause-computer.de/static/assets/polyfills-legacy-RfepiOmM.js"
+       ],
+       "stylesheets": [
+        "https://filebrowser.krause-computer.de/static/assets/index-CKkaX9A2.css"
+       ],
+       "title": "Login - File Browser"
+      }
+     },
+     "navidrome.krause-computer.de": {
+      "error": null,
+      "final_domain": "navidrome.krause-computer.de",
+      "final_url": "https://navidrome.krause-computer.de/app/#/login",
+      "is_cross_domain": false,
+      "page_title": "Navidrome",
+      "redirect_chain": [
+       "https://navidrome.krause-computer.de/",
+       "https://navidrome.krause-computer.de/app/",
+       "https://navidrome.krause-computer.de/app/assets/index-CPoDGfcr.css",
+       "https://navidrome.krause-computer.de/app/assets/index-DEuRB98q.js",
+       "https://navidrome.krause-computer.de/app/assets/android-icon-192x192-D_ka5daf.png",
+       "https://navidrome.krause-computer.de/app/assets/workbox-window.prod.es5-B9K5rw8f.js",
+       "https://navidrome.krause-computer.de/backgrounds"
+      ],
+      "response_headers": {
+       "connection": "keep-alive",
+       "content-encoding": "gzip",
+       "content-length": "52",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Tue, 26 May 2026 12:27:01 GMT",
+       "location": "/app/",
+       "permissions-policy": "autoplay=(), camera=(), microphone=(), usb=()",
+       "referrer-policy": "same-origin",
+       "server": "nginx",
+       "vary": "Origin\nAccept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "DENY"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/87.79.190.79/phase2/screenshot_navidrome.krause-computer.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "Navidrome Music Server - v0.58.5 (131c0c56)",
+         "name": "description"
+        },
+        {
+         "content": "#da532c",
+         "name": "msapplication-TileColor"
+        },
+        {
+         "content": "#90caf9",
+         "name": "theme-color"
+        },
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://navidrome.krause-computer.de/app/assets/index-DEuRB98q.js"
+       ],
+       "stylesheets": [
+        "https://navidrome.krause-computer.de/app/assets/index-CPoDGfcr.css"
+       ],
+       "title": "Navidrome"
+      }
+     },
+     "nextcloud.krause-computer.de": {
+      "error": null,
+      "final_domain": "nextcloud.krause-computer.de",
+      "final_url": "https://nextcloud.krause-computer.de/login",
+      "is_cross_domain": false,
+      "page_title": "Login – Nextcloud",
+      "redirect_chain": [
+       "https://nextcloud.krause-computer.de/",
+       "https://nextcloud.krause-computer.de/login",
+       "https://nextcloud.krause-computer.de/core/css/server.css?v=3f1d590e-0",
+       "https://nextcloud.krause-computer.de/apps/theming/css/default.css?v=03cce12b-0",
+       "https://nextcloud.krause-computer.de/core/css/guest.css?v=3f1d590e-0",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/default.css?plain=1&v=5709f51e",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/light.css?plain=0&v=5709f51e",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/light.css?plain=1&v=5709f51e",
+       "https://nextcloud.krause-computer.de/dist/icons.css",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/dark.css?plain=0&v=5709f51e",
+       "https://nextcloud.krause-computer.de/dist/theming-theming.mjs?v=3f1d590e-0",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/light-highcontrast.css?plain=0&v=5709f51e",
+       "https://nextcloud.krause-computer.de/dist/index-BgmsSgl5.chunk.mjs",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/dark-highcontrast.css?plain=0&v=5709f51e",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/opendyslexic.css?plain=0&v=5709f51e",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/dark.css?plain=1&v=5709f51e",
+       "https://nextcloud.krause-computer.de/dist/core-main.js?v=3f1d590e-0",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/dark-highcontrast.css?plain=1&v=5709f51e",
+       "https://nextcloud.krause-computer.de/dist/core-login.js?v=3f1d590e-0",
+       "https://nextcloud.krause-computer.de/apps/theming/img/background/jo-myoung-hee-fluid.webp",
+       "https://nextcloud.krause-computer.de/core/img/logo/logo.svg",
+       "https://nextcloud.krause-computer.de/apps/theming/theme/light-highcontrast.css?plain=1&v=5709f51e",
+       "https://nextcloud.krause-computer.de/dist/core-common.js?v=3f1d590e-0",
+       "https://nextcloud.krause-computer.de/core/img/loading-dark.gif"
+      ],
+      "response_headers": {
+       "connection": "keep-alive",
+       "content-security-policy": "default-src 'self'; script-src 'self' 'nonce-VHNnMxQQ72KH6CA4gWRiWbR+gqe2j94aHFq597At8cw='; style-src 'self' 'unsafe-inline'; frame-src *; img-src * data: blob:; font-src 'self' data:; media-src *; connect-src *; object-src 'none'; base-uri 'self';",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Tue, 26 May 2026 12:27:08 GMT",
+       "location": "https://nextcloud.krause-computer.de/login",
+       "permissions-policy": "interest-cohort=()",
+       "referrer-policy": "no-referrer",
+       "server": "nginx",
+       "strict-transport-security": "max-age=63072000; includeSubdomains; preload;",
+       "transfer-encoding": "chunked",
+       "x-content-type-options": "nosniff",
+       "x-download-options": "noopen",
+       "x-frame-options": "SAMEORIGIN",
+       "x-permitted-cross-domain-policies": "none",
+       "x-robots-tag": "none\nnoindex, nofollow",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/87.79.190.79/phase2/screenshot_nextcloud.krause-computer.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "",
+         "name": "csp-nonce"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, minimum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "app-id=1125420102",
+         "name": "apple-itunes-app"
+        },
+        {
+         "content": "#00679e",
+         "name": "theme-color"
+        },
+        {
+         "content": "same-origin",
+         "name": "referrer"
+        },
+        {
+         "content": "light dark",
+         "name": "color-scheme"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://nextcloud.krause-computer.de/dist/core-common.js?v=3f1d590e-0",
+        "https://nextcloud.krause-computer.de/dist/core-main.js?v=3f1d590e-0",
+        "https://nextcloud.krause-computer.de/dist/core-login.js?v=3f1d590e-0",
+        "https://nextcloud.krause-computer.de/dist/theming-theming.mjs?v=3f1d590e-0"
+       ],
+       "stylesheets": [
+        "https://nextcloud.krause-computer.de/core/css/server.css?v=3f1d590e-0",
+        "https://nextcloud.krause-computer.de/apps/theming/css/default.css?v=03cce12b-0",
+        "https://nextcloud.krause-computer.de/core/css/guest.css?v=3f1d590e-0",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/default.css?plain=1&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/light.css?plain=1&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/dark.css?plain=1&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/light-highcontrast.css?plain=1&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/dark-highcontrast.css?plain=1&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/light.css?plain=0&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/dark.css?plain=0&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/light-highcontrast.css?plain=0&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/dark-highcontrast.css?plain=0&v=5709f51e",
+        "https://nextcloud.krause-computer.de/apps/theming/theme/opendyslexic.css?plain=0&v=5709f51e"
+       ],
+       "title": "Login – Nextcloud"
+      }
+     },
+     "transmission.krause-computer.de": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://transmission.krause-computer.de/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "transmission.krause-computer.de",
+      "final_url": "https://transmission.krause-computer.de/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "youtube.krause-computer.de": {
+      "error": null,
+      "final_domain": "youtube.krause-computer.de",
+      "final_url": "https://youtube.krause-computer.de/#/error",
+      "is_cross_domain": false,
+      "page_title": "yt-dlp Web UI",
+      "redirect_chain": [
+       "https://youtube.krause-computer.de/",
+       "https://youtube.krause-computer.de/assets/index-Eu4xkdHq.css",
+       "https://youtube.krause-computer.de/assets/index-GIJrAaaH.js",
+       "https://youtube.krause-computer.de/assets/Home-Bxn8imTz.js",
+       "https://youtube.krause-computer.de/assets/roboto-latin-400-normal-mTIRXP6Y.woff2",
+       "https://youtube.krause-computer.de/assets/roboto-latin-500-normal-Dxdx3aXO.woff2",
+       "https://youtube.krause-computer.de/assets/SaveAlt-BPC8CsNU.js",
+       "https://youtube.krause-computer.de/assets/Delete-COsdIYMl.js",
+       "https://youtube.krause-computer.de/assets/Stack-DXJj5Ge9.js",
+       "https://youtube.krause-computer.de/assets/MenuList-DbFQO6XY.js",
+       "https://youtube.krause-computer.de/assets/LoadingBackdrop-CKeetkzO.js",
+       "https://youtube.krause-computer.de/assets/Close-CTkublrI.js",
+       "https://youtube.krause-computer.de/assets/Button-BpQHlXWz.js",
+       "https://youtube.krause-computer.de/assets/Tooltip-BboxJkr7.js",
+       "https://youtube.krause-computer.de/assets/TextField-DLnji2HX.js",
+       "https://youtube.krause-computer.de/assets/Grid-Z6WBTT1B.js",
+       "https://youtube.krause-computer.de/assets/ExtraDownloadOptions-DdtvkAdn.js",
+       "https://youtube.krause-computer.de/assets/SpeedDialIcon-BJVll5Z2.js",
+       "https://youtube.krause-computer.de/assets/InputAdornment-CwLptkTg.js",
+       "https://youtube.krause-computer.de/assets/MenuItem-Cg-b9i6j.js",
+       "https://youtube.krause-computer.de/assets/DeleteForever-DSAG8KMj.js",
+       "https://youtube.krause-computer.de/rpc/http",
+       "https://youtube.krause-computer.de/assets/Checkbox-DtXKWXZa.js",
+       "https://youtube.krause-computer.de/assets/Select-7c5zN-zK.js",
+       "https://youtube.krause-computer.de/api/v1/version",
+       "https://youtube.krause-computer.de/assets/ErrorBoundary-C171IF9E.js"
+      ],
+      "response_headers": {
+       "connection": "keep-alive",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Tue, 26 May 2026 12:27:55 GMT",
+       "server": "nginx",
+       "transfer-encoding": "chunked",
+       "vary": "Origin"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/87.79.190.79/phase2/screenshot_youtube.krause-computer.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "IE=edge",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://youtube.krause-computer.de/assets/index-GIJrAaaH.js"
+       ],
+       "stylesheets": [
+        "https://youtube.krause-computer.de/assets/index-Eu4xkdHq.css"
+       ],
+       "title": "yt-dlp Web UI"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0p2",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "10.0p2 Debian 7+deb13u4"
+     }
+    ],
+    "vhost_results": {
+     "filebrowser.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "navidrome.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "nextcloud.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "transmission.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "youtube.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "22",
+      "service": "OpenSSH 10.0p2 Debian 7+deb13u2"
+     },
+     {
+      "port": "80",
+      "service": "nginx"
+     },
+     {
+      "port": "443",
+      "service": "nginx"
+     },
+     {
+      "port": "3478",
+      "service": ""
+     },
+     {
+      "port": "111",
+      "service": ""
+     },
+     {
+      "port": "3128",
+      "service": ""
+     },
+     {
+      "port": "25",
+      "service": ""
+     },
+     {
+      "port": "26",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "jitsi.krause-computer.de",
+     "nospamproxy.krause-computer.de",
+     "rustdesk.krause-computer.de",
+     "mx.krause-computer.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "37.114.55.171",
+    "is_spa": true,
+    "mail_services": true,
+    "open_ports": [
+     22,
+     25,
+     26,
+     80,
+     111,
+     443,
+     987,
+     3128
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "reject",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      3478,
+      111,
+      80,
+      22,
+      3128,
+      25,
+      26,
+      443
+     ],
+     "shodan_services": {
+      "22": "OpenSSH 10.0p2 Debian 7+deb13u2",
+      "443": "nginx",
+      "80": "nginx"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "jitsi.krause-computer.de",
+    "redirect_data": {
+     "jitsi.krause-computer.de": {
+      "error": null,
+      "final_domain": "jitsi.krause-computer.de",
+      "final_url": "https://jitsi.krause-computer.de/",
+      "is_cross_domain": false,
+      "page_title": "Jitsi Meet",
+      "redirect_chain": [
+       "https://jitsi.krause-computer.de/",
+       "https://jitsi.krause-computer.de/css/all.css?v=9139",
+       "https://jitsi.krause-computer.de/libs/lib-jitsi-meet.min.js?v=9139",
+       "https://jitsi.krause-computer.de/libs/app.bundle.min.js?v=9139",
+       "https://jitsi.krause-computer.de/libs/excalidraw-assets/vendor-75e22c20f1d603abdfc9.js",
+       "https://jitsi.krause-computer.de/libs/olm.wasm",
+       "https://jitsi.krause-computer.de/images/welcome-background.png",
+       "https://jitsi.krause-computer.de/images/watermark.svg",
+       "https://jitsi.krause-computer.de/images/app-store-badge.png",
+       "https://jitsi.krause-computer.de/images/google-play-badge.png",
+       "https://jitsi.krause-computer.de/images/f-droid-badge.png",
+       "https://jitsi.krause-computer.de/sounds/incomingMessage.mp3",
+       "https://jitsi.krause-computer.de/sounds/e2eeOff.mp3",
+       "https://jitsi.krause-computer.de/sounds/e2eeOn.mp3",
+       "https://jitsi.krause-computer.de/sounds/asked-unmute.mp3",
+       "https://jitsi.krause-computer.de/sounds/joined.mp3",
+       "https://jitsi.krause-computer.de/sounds/left.mp3",
+       "https://jitsi.krause-computer.de/sounds/knock.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-love.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-raised-hand.mp3",
+       "https://jitsi.krause-computer.de/sounds/liveStreamingOff.mp3",
+       "https://jitsi.krause-computer.de/sounds/liveStreamingOn.mp3",
+       "https://jitsi.krause-computer.de/sounds/recordingOff.mp3",
+       "https://jitsi.krause-computer.de/sounds/recordingOn.mp3",
+       "https://jitsi.krause-computer.de/sounds/rejected.mp3",
+       "https://jitsi.krause-computer.de/sounds/outgoingRinging.mp3",
+       "https://jitsi.krause-computer.de/sounds/outgoingStart.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://jitsi.krause-computer.de/sounds/rejected.mp3",
+       "https://jitsi.krause-computer.de/sounds/talkWhileMuted.mp3",
+       "https://jitsi.krause-computer.de/sounds/noisyAudioInput.mp3",
+       "https://jitsi.krause-computer.de/sounds/noAudioSignal.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-love.mp3",
+       "https://jitsi.krause-computer.de/sounds/reactions-love.mp3"
+      ],
+      "response_headers": {
+       "content-encoding": "gzip",
+       "content-type": "text/html",
+       "date": "Tue, 26 May 2026 12:26:54 GMT",
+       "server": "nginx",
+       "strict-transport-security": "max-age=63072000",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/37.114.55.171/phase2/screenshot_jitsi.krause-computer.de.png",
+      "status_code": 206,
+      "tech_info": {
+       "body_classes": "welcome-page",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html;charset=utf-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#2A3A4B",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://jitsi.krause-computer.de/libs/lib-jitsi-meet.min.js?v=9139",
+        "https://jitsi.krause-computer.de/libs/app.bundle.min.js?v=9139"
+       ],
+       "stylesheets": [
+        "https://jitsi.krause-computer.de/css/all.css?v=9139"
+       ],
+       "title": "Jitsi Meet"
+      }
+     },
+     "mx.krause-computer.de": {
+      "error": null,
+      "final_domain": "mx.krause-computer.de",
+      "final_url": "https://mx.krause-computer.de/",
+      "is_cross_domain": false,
+      "page_title": "Jitsi Meet",
+      "redirect_chain": [
+       "https://mx.krause-computer.de/",
+       "https://mx.krause-computer.de/css/all.css?v=9139",
+       "https://mx.krause-computer.de/libs/lib-jitsi-meet.min.js?v=9139",
+       "https://mx.krause-computer.de/libs/app.bundle.min.js?v=9139",
+       "https://mx.krause-computer.de/libs/excalidraw-assets/vendor-75e22c20f1d603abdfc9.js",
+       "https://mx.krause-computer.de/libs/olm.wasm",
+       "https://mx.krause-computer.de/images/welcome-background.png",
+       "https://mx.krause-computer.de/images/watermark.svg",
+       "https://mx.krause-computer.de/images/app-store-badge.png",
+       "https://mx.krause-computer.de/images/google-play-badge.png",
+       "https://mx.krause-computer.de/images/f-droid-badge.png",
+       "https://mx.krause-computer.de/sounds/incomingMessage.mp3",
+       "https://mx.krause-computer.de/sounds/e2eeOff.mp3",
+       "https://mx.krause-computer.de/sounds/e2eeOn.mp3",
+       "https://mx.krause-computer.de/sounds/asked-unmute.mp3",
+       "https://mx.krause-computer.de/sounds/joined.mp3",
+       "https://mx.krause-computer.de/sounds/left.mp3",
+       "https://mx.krause-computer.de/sounds/knock.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-love.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-raised-hand.mp3",
+       "https://mx.krause-computer.de/sounds/liveStreamingOff.mp3",
+       "https://mx.krause-computer.de/sounds/liveStreamingOn.mp3",
+       "https://mx.krause-computer.de/sounds/recordingOff.mp3",
+       "https://mx.krause-computer.de/sounds/recordingOn.mp3",
+       "https://mx.krause-computer.de/sounds/rejected.mp3",
+       "https://mx.krause-computer.de/sounds/outgoingRinging.mp3",
+       "https://mx.krause-computer.de/sounds/outgoingStart.mp3",
+       "https://mx.krause-computer.de/sounds/talkWhileMuted.mp3",
+       "https://mx.krause-computer.de/sounds/noisyAudioInput.mp3",
+       "https://mx.krause-computer.de/sounds/noAudioSignal.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-love.mp3",
+       "https://mx.krause-computer.de/sounds/rejected.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://mx.krause-computer.de/sounds/reactions-love.mp3"
+      ],
+      "response_headers": {
+       "content-encoding": "gzip",
+       "content-type": "text/html",
+       "date": "Tue, 26 May 2026 12:27:16 GMT",
+       "server": "nginx",
+       "strict-transport-security": "max-age=63072000",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/37.114.55.171/phase2/screenshot_mx.krause-computer.de.png",
+      "status_code": 206,
+      "tech_info": {
+       "body_classes": "welcome-page",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html;charset=utf-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#2A3A4B",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://mx.krause-computer.de/libs/lib-jitsi-meet.min.js?v=9139",
+        "https://mx.krause-computer.de/libs/app.bundle.min.js?v=9139"
+       ],
+       "stylesheets": [
+        "https://mx.krause-computer.de/css/all.css?v=9139"
+       ],
+       "title": "Jitsi Meet"
+      }
+     },
+     "nospamproxy.krause-computer.de": {
+      "error": null,
+      "final_domain": "nospamproxy.krause-computer.de",
+      "final_url": "https://nospamproxy.krause-computer.de/",
+      "is_cross_domain": false,
+      "page_title": "Jitsi Meet",
+      "redirect_chain": [
+       "https://nospamproxy.krause-computer.de/",
+       "https://nospamproxy.krause-computer.de/css/all.css?v=9139",
+       "https://nospamproxy.krause-computer.de/libs/lib-jitsi-meet.min.js?v=9139",
+       "https://nospamproxy.krause-computer.de/libs/app.bundle.min.js?v=9139",
+       "https://nospamproxy.krause-computer.de/libs/excalidraw-assets/vendor-75e22c20f1d603abdfc9.js",
+       "https://nospamproxy.krause-computer.de/images/welcome-background.png",
+       "https://nospamproxy.krause-computer.de/libs/olm.wasm",
+       "https://nospamproxy.krause-computer.de/images/watermark.svg",
+       "https://nospamproxy.krause-computer.de/images/app-store-badge.png",
+       "https://nospamproxy.krause-computer.de/images/google-play-badge.png",
+       "https://nospamproxy.krause-computer.de/images/f-droid-badge.png",
+       "https://nospamproxy.krause-computer.de/sounds/incomingMessage.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/e2eeOff.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/e2eeOn.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/asked-unmute.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/joined.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/left.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/knock.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-love.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-raised-hand.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/liveStreamingOff.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/liveStreamingOn.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/recordingOff.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/recordingOn.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/rejected.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/outgoingRinging.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/outgoingStart.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/talkWhileMuted.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/noisyAudioInput.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/noAudioSignal.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-love.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/rejected.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://nospamproxy.krause-computer.de/sounds/reactions-love.mp3"
+      ],
+      "response_headers": {
+       "content-encoding": "gzip",
+       "content-type": "text/html",
+       "date": "Tue, 26 May 2026 12:27:02 GMT",
+       "server": "nginx",
+       "strict-transport-security": "max-age=63072000",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/37.114.55.171/phase2/screenshot_nospamproxy.krause-computer.de.png",
+      "status_code": 206,
+      "tech_info": {
+       "body_classes": "welcome-page",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html;charset=utf-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#2A3A4B",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://nospamproxy.krause-computer.de/libs/lib-jitsi-meet.min.js?v=9139",
+        "https://nospamproxy.krause-computer.de/libs/app.bundle.min.js?v=9139"
+       ],
+       "stylesheets": [
+        "https://nospamproxy.krause-computer.de/css/all.css?v=9139"
+       ],
+       "title": "Jitsi Meet"
+      }
+     },
+     "rustdesk.krause-computer.de": {
+      "error": null,
+      "final_domain": "rustdesk.krause-computer.de",
+      "final_url": "https://rustdesk.krause-computer.de/",
+      "is_cross_domain": false,
+      "page_title": "Jitsi Meet",
+      "redirect_chain": [
+       "https://rustdesk.krause-computer.de/",
+       "https://rustdesk.krause-computer.de/css/all.css?v=9139",
+       "https://rustdesk.krause-computer.de/libs/lib-jitsi-meet.min.js?v=9139",
+       "https://rustdesk.krause-computer.de/libs/app.bundle.min.js?v=9139",
+       "https://rustdesk.krause-computer.de/libs/excalidraw-assets/vendor-75e22c20f1d603abdfc9.js",
+       "https://rustdesk.krause-computer.de/images/welcome-background.png",
+       "https://rustdesk.krause-computer.de/libs/olm.wasm",
+       "https://rustdesk.krause-computer.de/images/watermark.svg",
+       "https://rustdesk.krause-computer.de/images/app-store-badge.png",
+       "https://rustdesk.krause-computer.de/images/google-play-badge.png",
+       "https://rustdesk.krause-computer.de/images/f-droid-badge.png",
+       "https://rustdesk.krause-computer.de/sounds/incomingMessage.mp3",
+       "https://rustdesk.krause-computer.de/sounds/e2eeOff.mp3",
+       "https://rustdesk.krause-computer.de/sounds/e2eeOn.mp3",
+       "https://rustdesk.krause-computer.de/sounds/asked-unmute.mp3",
+       "https://rustdesk.krause-computer.de/sounds/joined.mp3",
+       "https://rustdesk.krause-computer.de/sounds/left.mp3",
+       "https://rustdesk.krause-computer.de/sounds/knock.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-love.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-raised-hand.mp3",
+       "https://rustdesk.krause-computer.de/sounds/liveStreamingOff.mp3",
+       "https://rustdesk.krause-computer.de/sounds/liveStreamingOn.mp3",
+       "https://rustdesk.krause-computer.de/sounds/recordingOff.mp3",
+       "https://rustdesk.krause-computer.de/sounds/recordingOn.mp3",
+       "https://rustdesk.krause-computer.de/sounds/rejected.mp3",
+       "https://rustdesk.krause-computer.de/sounds/outgoingRinging.mp3",
+       "https://rustdesk.krause-computer.de/sounds/outgoingStart.mp3",
+       "https://rustdesk.krause-computer.de/sounds/talkWhileMuted.mp3",
+       "https://rustdesk.krause-computer.de/sounds/noisyAudioInput.mp3",
+       "https://rustdesk.krause-computer.de/sounds/noAudioSignal.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-thumbs-up.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-applause.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-laughter.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-love.mp3",
+       "https://rustdesk.krause-computer.de/sounds/rejected.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-surprise.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-boo.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-crickets.mp3",
+       "https://rustdesk.krause-computer.de/sounds/reactions-love.mp3"
+      ],
+      "response_headers": {
+       "content-encoding": "gzip",
+       "content-type": "text/html",
+       "date": "Tue, 26 May 2026 12:27:09 GMT",
+       "server": "nginx",
+       "strict-transport-security": "max-age=63072000",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-fb13a98f-22c6-4d17-875c-eeeb14643beb/hosts/37.114.55.171/phase2/screenshot_rustdesk.krause-computer.de.png",
+      "status_code": 206,
+      "tech_info": {
+       "body_classes": "welcome-page",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html;charset=utf-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#2A3A4B",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://rustdesk.krause-computer.de/libs/lib-jitsi-meet.min.js?v=9139",
+        "https://rustdesk.krause-computer.de/libs/app.bundle.min.js?v=9139"
+       ],
+       "stylesheets": [
+        "https://rustdesk.krause-computer.de/css/all.css?v=9139"
+       ],
+       "title": "Jitsi Meet"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 111)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 111",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 22)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH 10.0p2 Debian",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "7+deb13u2",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 25",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 26)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 26",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 3128)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 3128",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 3478)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 3478",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0p2",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Jitsi",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Proxmox Virtual Environment REST API",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "3.0",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "OpenSSH",
+      "version": "10.0p2 Debian 7+deb13u4"
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "Proxmox Virtual Environment REST API",
+      "version": "3.0"
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "Jitsi",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "jitsi.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "mx.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "nospamproxy.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "rustdesk.krause-computer.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}

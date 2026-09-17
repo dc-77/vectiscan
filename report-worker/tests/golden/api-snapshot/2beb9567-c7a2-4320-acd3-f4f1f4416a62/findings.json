@@ -1,0 +1,1474 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 1,
+   "info": 2,
+   "low": 6,
+   "medium": 1
+  },
+  "business_impact_score": "4.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "2016"
+    ],
+    "_title_template_missing": true,
+    "affected": "85.22.47.43:443 (owa.securess.de, autodiscover.securess.de)",
+    "business_impact_score": 8.2,
+    "cvss_score": "8.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N",
+    "cwe": "CWE-1104",
+    "description": "Auf den Hosts owa.securess.de und autodiscover.securess.de wird Microsoft Exchange Server 2016 (Outlook Web App Build 15.1.2507) öffentlich über das Internet betrieben. Exchange Server 2016 hat den von Microsoft definierten Extended Support am 14. Oktober 2025 erreicht und erhält seitdem keine Sicherheitsupdates mehr. Vergangene Exchange-Versionen waren regelmäßig Ziel kritischer Remote-Code-Execution-Schwachstellen (z. B. ProxyShell, ProxyNotShell, CVE-2024-21410); neu auftretende Schwachstellen werden für Exchange 2016 nicht mehr gepatcht.",
+    "evidence": "$ curl -sI https://owa.securess.de/owa/\nServer: Microsoft-IIS/10.0\nX-Powered-By: ASP.NET\nX-AspNet-Version: 4.0.30319\nLocation: /owa/auth/logon.aspx\n\n$ technology detection\nOutlook Web App: 15.1.2507  (Exchange 2016 CU23, End of Life)\nX-FEServer: EXCHANGE-2016",
+    "external_id": "VS-2026-001",
+    "finding_type": "software_eol",
+    "id": "VS-2026-001",
+    "impact": "Ohne Sicherheitsupdates ist das System dauerhaft anfällig für neu entdeckte Exchange-Schwachstellen. Bei erfolgreicher Ausnutzung können Angreifer Mailpostfächer auslesen, NTLM-Hashes erbeuten, Authentifizierungs-Token weiterverwenden (Auth Relay) und im schlimmsten Fall Code im Kontext des Exchange-Dienstkontos ausführen – ein bekannter Vektor für Active-Directory-Kompromittierungen.",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Public Exposure einschränken (z. B. VPN- oder Reverse-Proxy-Vorschaltung mit Pre-Authentication, IP-Allowlisting für Admin-Pfade /ecp, /PowerShell, /Autodiscover). Microsoft Exchange Health Checker ausführen und CU/SU-Stand dokumentieren.\n<b>Mittelfristig (Wochen):</b> Migration auf Exchange Server SE oder Microsoft 365 Exchange Online einleiten. Bis dahin Exchange Emergency Mitigation Service (EEMS) sicherstellen und Hornetsecurity (bereits als MX vorgeschaltet) als zusätzliche Filterebene konfigurieren.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Microsoft Exchange Server 2016 (Build 15.1.2507) hat End of Life erreicht",
+    "title_vars": {
+     "host": "owa.securess.de",
+     "tech": "Microsoft Exchange",
+     "version": "2016 (15.1.2507)"
+    }
+   },
+   {
+    "_qa_cap_applied": true,
+    "_title_template_missing": true,
+    "affected": "212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) – Ports 21/FTP, 110/POP3, 143/IMAP",
+    "business_impact_score": 7.5,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Der Multi-Service-Host 212.227.60.78, der die Subdomains connect.securess.de, partner.securess.de und vermittler.securess.de hostet, bietet laut Shodan-Daten FTP (Port 21), POP3 (Port 110) und IMAP (Port 143) als Klartext-Protokolle öffentlich an. Diese Protokolle übertragen Authentifizierungsdaten standardmäßig unverschlüsselt und sind nicht mehr zeitgemäß. Auch wenn STARTTLS optional unterstützt sein kann, ist die opportunistische Verschlüsselung nicht garantiert und für MitM-Angriffe (z. B. STRIPTLS) anfällig.",
+    "evidence": "Shodan-Inventar 212.227.60.78:\n  21/tcp   – FTP\n  22/tcp   – OpenSSH 9.6p1 Ubuntu 3ubuntu13.16\n  25/tcp   – Postfix smtpd\n  80/tcp   – Apache httpd\n  110/tcp  – POP3 (Klartext)\n  143/tcp  – IMAP (Klartext)\n  443/tcp  – Apache httpd\n  465/tcp  – Postfix smtpd (SMTPS)\n  995/tcp  – POP3S\n  8443/tcp – HTTPS\n  8880/tcp – unbekannt\n  18018/tcp – Crow 1.0 (HTTP-Framework)",
+    "external_id": "VS-2026-002",
+    "id": "VS-2026-002",
+    "impact": "Ein Angreifer im selben Netzwerksegment (öffentliches WLAN, kompromittierte Router) kann Benutzernamen, Passwörter und gesamte Mail-Inhalte mitschneiden. Da diese Subdomains laut Naming (connect, partner, vermittler) für Partner-/Vermittler-Zugriffe genutzt werden, ist von höherer Wahrscheinlichkeit der Nutzung über mobile/unsichere Netze auszugehen. Erbeutete Zugangsdaten ermöglichen Mailbox-Übernahmen und Phishing aus vertrauenswürdigen Konten.",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> FTP (Port 21) abschalten oder durch SFTP/SCP (über Port 22) ersetzen. Klartext-POP3 (110) und IMAP (143) deaktivieren oder per Firewall-Regel auf interne Netze beschränken.\n<b>Mittelfristig:</b> Implicit-TLS-Varianten POP3S (995) und IMAPS (993) als einzige Mail-Abrufprotokolle erzwingen; STARTTLS bei verbleibenden Diensten per Server-Konfiguration verpflichtend machen (z. B. Dovecot `disable_plaintext_auth = yes`). MTA-STS-Policy publizieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Klartext-Mail- und FTP-Dienste öffentlich erreichbar auf 212.227.60.78",
+    "title_vars": {
+     "host": "connect.securess.de",
+     "port": "21,110,143"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "212.227.60.78:18018",
+    "business_impact_score": 7.3,
+    "cvss_score": "7.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L",
+    "cwe": "CWE-284",
+    "description": "Auf dem Host 212.227.60.78 (connect/partner/vermittler.securess.de) ist auf Port 18018 das C++-HTTP-Microframework Crow in Version 1.0 öffentlich erreichbar. Crow wird typischerweise für interne API-Services oder Custom-Backend-Anwendungen eingesetzt; eine direkte Internet-Exposition auf einem nicht-standardisierten Port deutet auf einen ungeplanten oder unzureichend geschützten Management- bzw. Anwendungs-Endpunkt hin. Crow 1.0 ist eine ältere Version – aktuelle Releases tragen Sicherheits- und Stabilitätsfixes.",
+    "evidence": "Shodan: 212.227.60.78\n  18018/tcp open  Crow 1.0\n  8880/tcp  open  (unbekannt)\n  8443/tcp  open  (HTTPS)",
+    "external_id": "VS-2026-003",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-003",
+    "impact": "Custom-Backend-Services auf hohen Ports umgehen häufig zentrale Sicherheitsmaßnahmen (WAF, Reverse-Proxy-Auth, Logging) und sind ein typisches Einfallstor für Information Disclosure, Authentifizierungs-Bypass oder unautorisierten API-Zugriff. Ohne Kenntnis des konkreten Use-Cases ist das Risiko-Niveau erhöht, weil Wartung, Patch-Strategie und Authentifizierungslage nicht transparent sind.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig:</b> Geschäftsbedarf des Ports klären – wenn kein externer Zugriff erforderlich, per Firewall auf interne IPs beschränken. Authentifizierungs-Status manuell prüfen.\n<b>Mittelfristig:</b> Bei produktiver Notwendigkeit hinter Reverse-Proxy (nginx/HAProxy) mit zentralem TLS, Authentifizierung und Rate-Limiting stellen. Crow auf aktuelle Version aktualisieren, Logging und Monitoring aufsetzen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf connect.securess.de",
+    "title_vars": {
+     "host": "connect.securess.de",
+     "port": "18018",
+     "tech": "Crow 1.0"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "85.22.47.39 (Backend hinter nginx 1.29.5)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-1104",
+    "description": "Der Webmail-Host meldet im Backend Apache httpd in Version 2.4.66. Diese Versionsnummer entspricht keinem offiziellen Upstream-Release der Apache Software Foundation – aktuelle Versionen liegen im Bereich 2.4.62 bzw. 2.4.63. Dies deutet auf ein Distributions- oder Vendor-Build (z. B. RHEL/CentOS-Backport) oder eine intern modifizierte Version hin. Ohne Kenntnis des konkreten Patch-Stands ist unklar, welche CVEs gefixt sind.",
+    "evidence": "nmap -sV 85.22.47.39\n  443/tcp open  http  Apache httpd 2.4.66\n\nhttpx-Probe (Frontend): Server: nginx/1.29.5\nX-Powered-By: PHP/8.4.20",
+    "external_id": "VS-2026-004",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-004",
+    "impact": "Mehrere bekannte CVEs in dieser Versions-Klasse betreffen mod_rewrite, mod_proxy und HTTP/2-Implementierungen. Ohne klare Versions-Provenienz kann das Risiko nicht abschließend bewertet werden – ein Vulnerability-Management auf Basis der Banner-Version ist nicht möglich.",
+    "original_claude_id": "VS-2026-006",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig:</b> Patch-Stand des Apache-Builds verifizieren (Distribution/Paketversion dokumentieren), CVE-Liste gegen das Vendor-Build abgleichen.\n<b>Mittelfristig:</b> Server-Tokens reduzieren (`ServerTokens Prod`, `ServerSignature Off`), so dass keine Backend-Versionen leaken. Alternativ Backend-Direktzugriff komplett unterbinden – nur nginx-Frontend bedient Requests.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech_critical": true
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf webmail.securess.de",
+    "title_vars": {
+     "host": "webmail.securess.de",
+     "tech": "Apache httpd",
+     "version": "2.4.66"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "securess.de (Zone bei ns1a.dodns.net / ns2a.dodns.net)",
+    "business_impact_score": 4.8,
+    "cvss_score": "4.8",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-345",
+    "description": "Die DNS-Zone securess.de ist nicht DNSSEC-signiert (`dnssec_signed: false`). Zusätzlich fehlt ein TLS-RPT-Record (RFC 8460), der Reporting-Endpunkte für TLS-Probleme im SMTP-Verkehr publizieren würde. Da bereits SPF, DMARC (p=reject, 100%) und DKIM eingesetzt werden, ist die Mail-Authentifizierung grundsätzlich auf hohem Niveau – die Resilienz gegen DNS-Cache-Poisoning und das operative Monitoring der Mail-TLS-Verbindungen bleiben jedoch eingeschränkt.",
+    "evidence": "passive_intel:\n  dnssec_signed: false\n  tlsrpt_present: false\n\nDNS:\n  NS: ns1a.dodns.net, ns2a.dodns.net\n  DMARC: v=DMARC1; p=reject; rua=mailto:administrator@securess.de; ruf=mailto:administrator@securess.de\n  SPF: v=spf1 a mx ip4:85.22.47.37 include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all\n  DKIM: vorhanden",
+    "external_id": "VS-2026-005",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-005",
+    "impact": "Ohne DNSSEC kann ein Angreifer mit Zugriff auf den DNS-Pfad MX-, SPF- oder DMARC-Records modifizieren – die DMARC-Policy alleine erkennt das nicht. Ohne TLS-RPT erfährt der Domain-Betreiber nicht, wenn andere Mailserver beim Aufbau einer TLS-Verbindung zu mx*.hornetsecurity.com scheitern (z. B. wegen Zertifikatsfehlern oder Downgrade-Angriffen).",
+    "original_claude_id": "VS-2026-008",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "<b>Mittelfristig (Wochen):</b> Beim DNS-Provider DNSSEC-Signierung aktivieren und DS-Records bei der DENIC veröffentlichen. TLS-RPT-Record publizieren: `_smtp._tls.securess.de TXT \"v=TLSRPTv1; rua=mailto:administrator@securess.de\"`. Zusätzlich MTA-STS-Policy einführen (`_mta-sts.securess.de` und HTTPS-Policy unter `mta-sts.securess.de`).",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DNSSEC fehlt fuer securess.de",
+    "title_vars": {
+     "domain": "securess.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.47.43 (owa.securess.de, autodiscover.securess.de)",
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Der ZAP-Scan zeigt 8 Vorkommen von 'Application Error Disclosure' auf den OWA-Endpunkten sowie 2 Vorkommen des `X-AspNet-Version: 4.0.30319`-Headers und 28 Vorkommen des `X-Powered-By: ASP.NET`. In Kombination ergeben diese Informationen ein vollständiges Bild der eingesetzten Microsoft-Stack-Versionen (Exchange 2016 Build 15.1.2507, ASP.NET 4.0.30319, IIS 10.0).",
+    "evidence": "ZAP [LOW] Application Error Disclosure (8x) – owa.securess.de/owa/auth/15.1.2507/themes/\nZAP [LOW] X-AspNet-Version Response Header (2x)\n\nResponse-Header owa.securess.de:\n  Server: Microsoft-IIS/10.0\n  X-AspNet-Version: 4.0.30319\n  X-Powered-By: ASP.NET\n  X-FEServer: EXCHANGE-2016",
+    "external_id": "VS-2026-006",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-006",
+    "impact": "Versions-Banner erleichtern gezielte Schwachstellensuche und Exploit-Auswahl. In Kombination mit dem EOL-Status (Finding VS-2026-001) ist die Information für Angreifer besonders wertvoll, da sie genau die Build-Nummer 15.1.2507 für CVE-Recherchen liefert.",
+    "original_claude_id": "VS-2026-007",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig:</b> In IIS-Konfiguration `removeServerHeader=\"true\"` setzen und benutzerdefinierten Server-Header entfernen. Für ASP.NET in `web.config` den X-Powered-By- und X-AspNet-Version-Header entfernen (`<httpProtocol><customHeaders><remove name=\"X-Powered-By\"/></customHeaders></httpProtocol>` und `enableVersionHeader=\"false\"`).\n<b>Mittelfristig:</b> Custom Error Pages für IIS konfigurieren, sodass keine internen Pfade oder Stacktraces an externe Clients gehen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf owa.securess.de",
+    "title_vars": {
+     "host": "owa.securess.de"
+    }
+   },
+   {
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "8880"
+    ],
+    "_title_template_missing": true,
+    "affected": "212.227.60.78 (Ports 8443, 8880)",
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Auf 212.227.60.78 sind neben den dokumentierten Mail- und Web-Diensten weitere Ports öffentlich erreichbar, deren Geschäftszweck aus den Scan-Daten nicht hervorgeht: 8443/tcp (zweiter HTTPS-Listener) und 8880/tcp (unbekannter Dienst, häufig Webmin/cPanel/CDN-Management). Eine klare Inventarisierung und Härtungsstrategie ist auf diesem Host nicht erkennbar.",
+    "evidence": "Shodan-Ports 212.227.60.78: 21, 22, 25, 80, 110, 143, 443, 465, 995, 8443, 8880, 18018",
+    "external_id": "VS-2026-007",
+    "id": "VS-2026-007",
+    "impact": "Nicht-standardisierte Ports werden in regulärem Monitoring oft übersehen und sind beliebte Ziele automatisierter Scanner und Brute-Force-Tools. Eine fehlende Zweck-Klärung erhöht das Risiko von Schatten-IT.",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Mittelfristig:</b> Asset-Inventar des Hosts erstellen, jeden offenen Port einem dokumentierten Service zuordnen. Nicht-benötigte Ports per Firewall (iptables/nftables, Cloud-Security-Group) schließen. Verbleibende Dienste auf aktuelle Versionen patchen und mit Authentifizierung absichern.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Zusätzliche exponierte Management-/Service-Ports auf 212.227.60.78 (8443, 8880, 8443)",
+    "title_vars": {
+     "host": "212.227.60.78"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "securess.de (TXT-Record)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der SPF-Record endet mit `~all` (Softfail) statt `-all` (Hardfail). Auch wenn DMARC mit p=reject viele Mail-Provider zur Ablehnung zwingt, signalisiert Softfail anderen Validatoren, dass Mail von nicht-autorisierten Quellen nur als 'verdächtig' markiert, aber nicht zwingend abgelehnt werden soll.",
+    "evidence": "DNS TXT: v=spf1 a mx ip4:85.22.47.37 include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all",
+    "external_id": "VS-2026-008",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-008",
+    "impact": "Softfail erleichtert Spoofing-Versuche auf Mailsystemen, die DMARC nicht oder schlecht implementieren. Da p=reject im DMARC zwar das Hauptkriterium ist, bietet ein klarer SPF-Hardfail eine zusätzliche Verteidigungsebene und reduziert Reputationsrisiken.",
+    "original_claude_id": "VS-2026-009",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "<b>Mittelfristig:</b> Nach Verifikation, dass alle legitimen Sender (Outlook 365, Hornetsecurity, plan.io, softfair) korrekt in den Include-Mechanismen abgedeckt sind, den Record auf `-all` umstellen. Die Umstellung sollte über ein DMARC-Aggregat-Reporting (rua) flankiert werden, um Auswirkungen zu beobachten.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer securess.de",
+    "title_vars": {
+     "domain": "securess.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.47.39:443 (mailin.securess.de, mailout.securess.de, webmail.securess.de)",
+    "business_impact_score": 6.1,
+    "cvss_score": "6.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+    "cwe": "CWE-1004",
+    "description": "Der ZAP-Scan zeigt auf dem Roundcube-Webmail-Cluster konsistent fehlende Cookie-Sicherheitsflags: Cookies werden ohne `HttpOnly` (15 Vorkommen), ohne `Secure` (18 Vorkommen) und ohne `SameSite`-Attribut (18 Vorkommen) gesetzt. Roundcube verwaltet die Webmail-Session über Cookies (sichtbar u. a. `SERVERID=webmail-03`); ein vollständiger Schutz dieser Cookies ist für die Vertraulichkeit der E-Mail-Sitzung essenziell.",
+    "evidence": "ZAP-Befunde:\n  [LOW] Cookie No HttpOnly Flag (15x) – mailin.securess.de\n  [LOW] Cookie Without Secure Flag (18x) – mailin.securess.de\n  [LOW] Cookie without SameSite Attribute (18x) – mailin.securess.de\n\nResponse-Header (mailin.securess.de):\n  Set-Cookie: SERVERID=webmail-03  (kein Secure, HttpOnly, SameSite)",
+    "external_id": "VS-2026-009",
+    "finding_type": "cookie_no_secure",
+    "id": "VS-2026-009",
+    "impact": "Session-Cookies ohne `HttpOnly` sind über JavaScript (XSS) auslesbar und damit anfällig für Session-Hijacking; ohne `Secure` können sie über ungesicherte HTTP-Anfragen abgegriffen werden; ohne `SameSite` sind CSRF-Angriffe auf authentifizierte Webmail-Aktionen möglich. Da Webmail vollständigen Mailzugriff inkl. Versand erlaubt, ist das Schadenspotenzial eines übernommenen Cookies hoch (Datenabfluss, Identitätsmissbrauch).",
+    "original_claude_id": "VS-2026-004",
+    "policy_id": "SP-COOK-004",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Roundcube-Konfiguration `$config['session_samesite'] = 'Strict';` setzen und in der PHP- bzw. Webserver-Konfiguration `session.cookie_secure = 1`, `session.cookie_httponly = 1` erzwingen. Im nginx-Reverse-Proxy zusätzlich `proxy_cookie_flags ~ secure httponly samesite=strict;` setzen.\n<b>Mittelfristig:</b> Cookie-Set-Regeln zentral im Reverse-Proxy verankern und im CI-Test automatisiert prüfen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-COOK-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Tracking-Cookie ohne Secure - kein Auth-Risiko",
+     "rule_references": [
+      "CWE-614"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Session-Cookie SERVERID ohne Secure-Flag auf webmail.securess.de",
+    "title_vars": {
+     "cookie_name": "SERVERID",
+     "host": "webmail.securess.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.47.43 (owa.securess.de: 0/7), 85.22.47.39 (webmail.securess.de: 1/7)",
+    "business_impact_score": 0.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Web-Frontends für die Mail-Infrastruktur weisen massive Lücken bei Sicherheits-Headern auf: OWA/Autodiscover erreicht 0 von 7 Score-Punkten (es fehlen HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy und Permissions-Policy), Webmail erreicht 1 von 7 (nur X-Frame-Options vorhanden). Besonders kritisch ist das Fehlen von Strict-Transport-Security auf den Authentifizierungsseiten – ein TLS-Downgrade-Angriff bzw. SSLstrip wird so nicht aktiv durch den Browser-Cache verhindert.",
+    "evidence": "owa.securess.de (Score 0/7):\n  Missing: strict-transport-security, content-security-policy, x-frame-options,\n           x-content-type-options, x-xss-protection, referrer-policy, permissions-policy\n\nwebmail.securess.de (Score 1/7):\n  Present: x-frame-options\n  Missing: strict-transport-security, content-security-policy, x-content-type-options,\n           x-xss-protection, referrer-policy, permissions-policy\n\nZAP: [MEDIUM] Content Security Policy (CSP) Header Not Set (42x mailin, 2x owa)\nZAP: [LOW] Strict-Transport-Security Header Not Set (75x mailin, 12x owa)",
+    "external_id": "VS-2026-010",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-010",
+    "impact": "Fehlendes HSTS ermöglicht TLS-Downgrade beim Erstkontakt und SSL-Stripping in unsicheren Netzen. Fehlendes CSP erschwert die Abwehr von XSS bei Schwachstellen in Roundcube oder OWA. Fehlendes X-Content-Type-Options erlaubt MIME-Sniffing-Angriffe. Insgesamt erhöht sich der Schadenseffekt jeder zukünftigen Web-Schwachstelle deutlich.",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Auf nginx (Webmail) und IIS (OWA) die zentralen Security-Header setzen:\n - `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload`\n - `X-Content-Type-Options: nosniff`\n - `Referrer-Policy: strict-origin-when-cross-origin`\n - `Permissions-Policy: geolocation=(), camera=(), microphone=()`\n<b>Mittelfristig:</b> CSP iterativ einführen (zuerst `Content-Security-Policy-Report-Only` mit Reporting-Endpunkt), Inline-Skripte in Roundcube/OWA-Themes durch Hash/Nonce kapseln, dann Enforcement aktivieren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf owa.securess.de",
+    "title_vars": {
+     "host": "owa.securess.de"
+    }
+   }
+  ],
+  "overall_description": "Die Scan-Analyse der Domain securess.de umfasst sieben aktive Hosts mit heterogener Infrastruktur: einen Webauftritt (85.22.47.41, nginx 1.22.1), einen Multi-Service-Host (212.227.60.78) mit zwölf exponierten Ports inklusive FTP, SMTP, IMAP/POP3, einem Crow-1.0-HTTP-Service auf Port 18018 und OpenSSH 9.6p1, einen Webmail-Cluster (85.22.47.39) mit Roundcube auf Apache 2.4.66 hinter nginx 1.29.5, ein Exchange-2016-Frontend (85.22.47.43) mit OWA und Autodiscover, einen dedizierten MX-Server (85.22.47.37) sowie ein Portal (85.22.47.40). Die DNS-Konfiguration ist mit SPF, DMARC p=reject und DKIM grundsätzlich solide, allerdings ohne DNSSEC und ohne TLS-RPT. Auf dem Host 212.227.60.78 sind zahlreiche Management- und Mail-Dienste öffentlich erreichbar, ohne dass das Scoping eine Web-Phase auslösen konnte; insbesondere FTP (Port 21), SMTP-Submission (587 fehlt jedoch, dafür 465), POP3/IMAP im Klartext (110, 143) und ein Crow-1.0-Webframework auf Port 18018 stellen kritische Risiken dar.\n\nKonkrete Risikobereiche: (1) Exchange 2016 (Build 15.1.2507) auf owa.securess.de ist End of Life seit Oktober 2025 – Microsoft liefert keine Sicherheitsupdates mehr, mehrere kritische CVEs (ProxyShell, ProxyNotShell, CVE-2024-21410) betreffen historisch Versionen dieser Klasse; das System ist gleichzeitig öffentlich zugänglich und hat keine Security-Header (0/7). (2) Auf 212.227.60.78 sind FTP (21), POP3 (110), IMAP (143) im Klartext erreichbar und ein nicht-standardisiertes Crow-Webframework auf Port 18018 – diese Kombination weist auf einen Multi-Tenant-Mail-/Vermittler-Host hin, der ohne klare Härtungsstrategie betrieben wird. (3) Der Webmail-Host 85.22.47.39 zeigt eine Diskrepanz zwischen dem nginx-1.29.5-Frontend und einem dahinterliegenden Apache 2.4.66 – Apache 2.4.66 entspricht keiner offiziellen Upstream-Version (aktuell ist 2.4.62/2.4.63), was auf ein vendorspezifisches Build hindeutet, dessen Patch-Stand unklar ist. (4) Security-Header sind auf allen Web-Frontends unzureichend: Webmail 1/7, OWA 0/7 – insbesondere fehlt HSTS auf Authentifizierungsseiten. (5) Cookies auf dem Roundcube-Webmail tragen weder HttpOnly, Secure noch SameSite – ein erhebliches Session-Hijacking-Risiko bei aktiver Mail-Nutzung.\n\nDie DNS-Hygiene ist überdurchschnittlich (DMARC p=reject mit 100% Enforcement, DKIM aktiv, SPF mit klar definierten Includes), jedoch fehlt DNSSEC-Signierung sowie TLS-RPT-Reporting. Die Compliance-Reife des Mail-Setups ist somit gemischt: Outbound-Anti-Spoofing ist vorbildlich umgesetzt, die Infrastruktur-Härtung hinkt jedoch nach. Empfohlene Priorität liegt auf einer Exchange-2016-Migration, der Schließung bzw. Härtung der exponierten Klartext-Mail-Protokolle auf 212.227.60.78 sowie der Einführung vollständiger Security-Header und sicherer Cookie-Flags auf allen Webfrontends.",
+  "overall_risk": "HIGH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-COOK-004",
+   "SP-CSP-001",
+   "SP-DISC-001",
+   "SP-DNS-001",
+   "SP-DNS-005",
+   "SP-FALLBACK"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die vier MX-Einträge (mx01..mx04.hornetsecurity.com) zeigen, dass eingehende Mails über einen spezialisierten Anti-Spam/Anti-Malware-Provider geleitet werden. Dies entlastet die eigene Infrastruktur und reduziert die Angriffsfläche gegen Mail-basierte Bedrohungen (Phishing, Ransomware-Anhänge) erheblich.",
+    "title": "Hornetsecurity als vorgeschalteter Mail-Filter im MX-Setup"
+   },
+   {
+    "description": "Der Test auf AXFR-Zone-Transfer war erfolglos (verweigert), und es wurden keine verwaisten CNAME-Einträge gefunden, die Subdomain-Takeover ermöglichen würden. Die DNS-Hygiene ist in diesen Punkten sauber umgesetzt.",
+    "title": "Keine Zone-Transfer-Schwachstelle, keine Dangling-CNAMEs"
+   },
+   {
+    "description": "Der SSH-Daemon auf dem Mail/Service-Host nutzt OpenSSH 9.6p1 mit aktuellem Ubuntu-Patch-Stand (3ubuntu13.16). Diese Version ist nicht von CVE-2024-6387 (regreSSHion-Range 8.5p1–9.7p1) betroffen, da Ubuntu den Backport-Fix eingespielt hat – die Patch-Disziplin auf dem Host wirkt für SSH grundsätzlich gepflegt.",
+    "title": "OpenSSH 9.6p1 auf aktueller Ubuntu-Version (3ubuntu13.16) auf 212.227.60.78"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Migrationsplan für Exchange Server 2016 aufsetzen (Migration zu Exchange SE oder Microsoft 365), bis dahin OWA/ECP per Reverse-Proxy mit Pre-Authentication absichern und Exchange-Admin-Pfade per IP-Allowlist einschränken.",
+    "effort": "16-40 h Planung + Migrationsprojekt",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "Klartext-Mail-Protokolle (POP3/110, IMAP/143) und FTP (21) auf 212.227.60.78 deaktivieren oder per Firewall auf interne Netze beschränken. Crow-Service auf Port 18018 prüfen und ggf. abschalten.",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-002",
+     "VS-2026-003"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Security-Header und Cookie-Flags auf Webmail (nginx) und OWA (IIS) implementieren: HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy sowie Secure/HttpOnly/SameSite für alle Cookies.",
+    "effort": "4-6 h",
+    "finding_refs": [
+     "VS-2026-009",
+     "VS-2026-010"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Versions- und Powered-By-Header auf IIS/OWA (X-AspNet-Version, X-Powered-By, Server) entfernen; Application Errors mit Custom Error Pages abfangen.",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Apache-Build-Provenienz auf 85.22.47.39 dokumentieren, Patch-Stand verifizieren, Banner-Leak unterdrücken.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "DNSSEC für securess.de aktivieren, TLS-RPT- und MTA-STS-Records publizieren, SPF von ~all auf -all umstellen (nach DMARC-Report-Verifikation).",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-005",
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Asset-Inventar für 212.227.60.78 erstellen, jeden offenen Port einem dokumentierten Service zuordnen, nicht-benötigte Ports (8443, 8880) schließen.",
+    "effort": "3-5 h",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 1,
+   "INFO": 2,
+   "LOW": 6,
+   "MEDIUM": 1
+  },
+  "tech_profiles": [
+   {
+    "cms": "Roundcube",
+    "cms_confidence": 0.92,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "nginx 1.29.5"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "587",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "mailin.securess.de",
+     "mailout.securess.de",
+     "webmail.securess.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "85.22.47.39",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     25,
+     443,
+     465,
+     587,
+     993
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "reject",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      587,
+      443
+     ],
+     "shodan_services": {
+      "443": "nginx 1.29.5"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "mailin.securess.de",
+    "redirect_data": {
+     "mailin.securess.de": {
+      "error": null,
+      "final_domain": "mailin.securess.de",
+      "final_url": "https://mailin.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
+      "redirect_chain": [
+       "https://mailin.securess.de/",
+       "https://mailin.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+       "https://mailin.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727",
+       "https://mailin.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+       "https://mailin.securess.de/program/js/common.min.js?s=1774777727",
+       "https://mailin.securess.de/program/js/jstz.min.js?s=1774777730",
+       "https://mailin.securess.de/securess-logo.png?s=1749651799",
+       "https://mailin.securess.de/program/js/jquery.min.js?s=1774777730",
+       "https://mailin.securess.de/program/js/app.min.js?s=1774777727",
+       "https://mailin.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+       "https://mailin.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+       "https://mailin.securess.de/skins/elastic/ui.min.js?s=1774777728",
+       "https://mailin.securess.de/skins/elastic/fonts/roboto-v29-regular.woff2",
+       "https://mailin.securess.de/skins/elastic/fonts/fa-solid-900.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0",
+       "content-encoding": "gzip",
+       "content-language": "en",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Thu, 21 May 2026 23:56:22 GMT",
+       "expires": "Thu, 21 May 2026 23:56:22 GMT",
+       "last-modified": "Thu, 21 May 2026 23:56:22 GMT",
+       "pragma": "no-cache",
+       "server": "nginx/1.29.5",
+       "transfer-encoding": "chunked",
+       "vary": "Accept-Encoding",
+       "x-frame-options": "sameorigin",
+       "x-powered-by": "PHP/8.4.20"
+      },
+      "screenshot_path": "/tmp/scan-2beb9567-c7a2-4320-acd3-f4f1f4416a62/hosts/85.22.47.39/phase2/screenshot_mailin.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "task-login action-none",
+       "cookies": "SERVERID=webmail-03",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=UTF-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "theme-color"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "msapplication-navbutton-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://mailin.securess.de/program/js/jquery.min.js?s=1774777730",
+        "https://mailin.securess.de/program/js/common.min.js?s=1774777727",
+        "https://mailin.securess.de/program/js/app.min.js?s=1774777727",
+        "https://mailin.securess.de/program/js/jstz.min.js?s=1774777730",
+        "https://mailin.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+        "https://mailin.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+        "https://mailin.securess.de/skins/elastic/ui.min.js?s=1774777728"
+       ],
+       "stylesheets": [
+        "https://mailin.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+        "https://mailin.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+        "https://mailin.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727"
+       ],
+       "title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
+      }
+     },
+     "mailout.securess.de": {
+      "error": null,
+      "final_domain": "mailout.securess.de",
+      "final_url": "https://mailout.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
+      "redirect_chain": [
+       "https://mailout.securess.de/",
+       "https://mailout.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+       "https://mailout.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727",
+       "https://mailout.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+       "https://mailout.securess.de/program/js/common.min.js?s=1774777727",
+       "https://mailout.securess.de/program/js/jstz.min.js?s=1774777730",
+       "https://mailout.securess.de/securess-logo.png?s=1749651799",
+       "https://mailout.securess.de/program/js/jquery.min.js?s=1774777730",
+       "https://mailout.securess.de/program/js/app.min.js?s=1774777727",
+       "https://mailout.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+       "https://mailout.securess.de/skins/elastic/ui.min.js?s=1774777728",
+       "https://mailout.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+       "https://mailout.securess.de/skins/elastic/fonts/fa-solid-900.woff2",
+       "https://mailout.securess.de/skins/elastic/fonts/roboto-v29-regular.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0",
+       "content-encoding": "gzip",
+       "content-language": "en",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Thu, 21 May 2026 23:56:28 GMT",
+       "expires": "Thu, 21 May 2026 23:56:28 GMT",
+       "last-modified": "Thu, 21 May 2026 23:56:28 GMT",
+       "pragma": "no-cache",
+       "server": "nginx/1.29.5",
+       "transfer-encoding": "chunked",
+       "vary": "Accept-Encoding",
+       "x-frame-options": "sameorigin",
+       "x-powered-by": "PHP/8.4.20"
+      },
+      "screenshot_path": "/tmp/scan-2beb9567-c7a2-4320-acd3-f4f1f4416a62/hosts/85.22.47.39/phase2/screenshot_mailout.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "task-login action-none",
+       "cookies": "SERVERID=webmail-03",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=UTF-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "theme-color"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "msapplication-navbutton-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://mailout.securess.de/program/js/jquery.min.js?s=1774777730",
+        "https://mailout.securess.de/program/js/common.min.js?s=1774777727",
+        "https://mailout.securess.de/program/js/app.min.js?s=1774777727",
+        "https://mailout.securess.de/program/js/jstz.min.js?s=1774777730",
+        "https://mailout.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+        "https://mailout.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+        "https://mailout.securess.de/skins/elastic/ui.min.js?s=1774777728"
+       ],
+       "stylesheets": [
+        "https://mailout.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+        "https://mailout.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+        "https://mailout.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727"
+       ],
+       "title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
+      }
+     },
+     "webmail.securess.de": {
+      "error": null,
+      "final_domain": "webmail.securess.de",
+      "final_url": "https://webmail.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
+      "redirect_chain": [
+       "https://webmail.securess.de/",
+       "https://webmail.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+       "https://webmail.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727",
+       "https://webmail.securess.de/program/js/jstz.min.js?s=1774777730",
+       "https://webmail.securess.de/program/js/common.min.js?s=1774777727",
+       "https://webmail.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+       "https://webmail.securess.de/securess-logo.png?s=1749651799",
+       "https://webmail.securess.de/program/js/jquery.min.js?s=1774777730",
+       "https://webmail.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+       "https://webmail.securess.de/program/js/app.min.js?s=1774777727",
+       "https://webmail.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+       "https://webmail.securess.de/skins/elastic/ui.min.js?s=1774777728",
+       "https://webmail.securess.de/skins/elastic/fonts/fa-solid-900.woff2",
+       "https://webmail.securess.de/skins/elastic/fonts/roboto-v29-regular.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0",
+       "content-encoding": "gzip",
+       "content-language": "en",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Thu, 21 May 2026 23:56:34 GMT",
+       "expires": "Thu, 21 May 2026 23:56:34 GMT",
+       "last-modified": "Thu, 21 May 2026 23:56:34 GMT",
+       "pragma": "no-cache",
+       "server": "nginx/1.29.5",
+       "transfer-encoding": "chunked",
+       "vary": "Accept-Encoding",
+       "x-frame-options": "sameorigin",
+       "x-powered-by": "PHP/8.4.20"
+      },
+      "screenshot_path": "/tmp/scan-2beb9567-c7a2-4320-acd3-f4f1f4416a62/hosts/85.22.47.39/phase2/screenshot_webmail.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "task-login action-none",
+       "cookies": "SERVERID=webmail-03",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=UTF-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "theme-color"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "msapplication-navbutton-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://webmail.securess.de/program/js/jquery.min.js?s=1774777730",
+        "https://webmail.securess.de/program/js/common.min.js?s=1774777727",
+        "https://webmail.securess.de/program/js/app.min.js?s=1774777727",
+        "https://webmail.securess.de/program/js/jstz.min.js?s=1774777730",
+        "https://webmail.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+        "https://webmail.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+        "https://webmail.securess.de/skins/elastic/ui.min.js?s=1774777728"
+       ],
+       "stylesheets": [
+        "https://webmail.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+        "https://webmail.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+        "https://webmail.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727"
+       ],
+       "title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
+      }
+     }
+    },
+    "server": "Apache httpd/2.4.66",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "1.29.5",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 587",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Bootstrap",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery UI",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": 0.92,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Roundcube",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sprache",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "8.4.20",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "aktuell",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "2.4.66",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "1.29.5",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": "2.4.66"
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "nginx",
+      "version": "1.29.5"
+     },
+     {
+      "name": "PHP",
+      "version": "8.4.20"
+     },
+     {
+      "name": "Bootstrap",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery UI",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "mailin.securess.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "mailout.securess.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "webmail.securess.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "mailin.securess.de"
+   },
+   {
+    "cms": "Exchange",
+    "cms_confidence": 0.98,
+    "cms_details": {},
+    "cms_version": "2016",
+    "fqdns": [
+     "owa.securess.de",
+     "autodiscover.securess.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "85.22.47.43",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "reject",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "owa.securess.de",
+    "redirect_data": {
+     "autodiscover.securess.de": {
+      "error": null,
+      "final_domain": "autodiscover.securess.de",
+      "final_url": "https://autodiscover.securess.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.securess.de%2fowa%2f&reason=0",
+      "is_cross_domain": false,
+      "page_title": "Outlook",
+      "redirect_chain": [
+       "https://autodiscover.securess.de/",
+       "https://autodiscover.securess.de/owa/",
+       "https://autodiscover.securess.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.securess.de%2fowa%2f&reason=0",
+       "https://autodiscover.securess.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache",
+       "content-length": "0",
+       "date": "Thu, 21 May 2026 23:56:01 GMT",
+       "location": "https://autodiscover.securess.de/owa/",
+       "pragma": "no-cache",
+       "server": "Microsoft-IIS/10.0",
+       "x-feserver": "EXCHANGE-2016",
+       "x-requestid": "00ea3a63-dc08-413d-9497-4c15b4469e52"
+      },
+      "screenshot_path": "/tmp/scan-2beb9567-c7a2-4320-acd3-f4f1f4416a62/hosts/85.22.47.43/phase2/screenshot_autodiscover.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "signInBg",
+       "cookies": "cookieTest=1",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "IE=10",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "text/html; CHARSET=utf-8",
+         "name": "Content-Type"
+        },
+        {
+         "content": "NOINDEX, NOFOLLOW",
+         "name": "Robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Outlook"
+      }
+     },
+     "owa.securess.de": {
+      "error": null,
+      "final_domain": "owa.securess.de",
+      "final_url": "https://owa.securess.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.securess.de%2fowa%2f&reason=0",
+      "is_cross_domain": false,
+      "page_title": "Outlook",
+      "redirect_chain": [
+       "https://owa.securess.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.securess.de%2fowa%2f&reason=0",
+       "https://owa.securess.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store",
+       "content-length": "58722",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Thu, 21 May 2026 23:55:55 GMT",
+       "expires": "-1",
+       "pragma": "no-cache",
+       "request-id": "79882ee1-0b1c-48ea-ab81-c7b295e7bf31",
+       "server": "Microsoft-IIS/10.0",
+       "x-aspnet-version": "4.0.30319",
+       "x-frame-options": "SAMEORIGIN",
+       "x-powered-by": "ASP.NET"
+      },
+      "screenshot_path": "/tmp/scan-2beb9567-c7a2-4320-acd3-f4f1f4416a62/hosts/85.22.47.43/phase2/screenshot_owa.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "signInBg",
+       "cookies": "cookieTest=1",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "IE=10",
+         "name": "X-UA-Compatible"
+        },
+        {
+         "content": "text/html; CHARSET=utf-8",
+         "name": "Content-Type"
+        },
+        {
+         "content": "NOINDEX, NOFOLLOW",
+         "name": "Robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Outlook"
+      }
+     }
+    },
+    "server": "Microsoft IIS httpd/10.0",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Mail",
+      "confidence": 0.98,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Exchange",
+      "patch_status": "aktuell",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "2016",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "OS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Windows Server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ASP.NET",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft ASP.NET",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "4.0.30319",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Outlook Web App",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "15.1.2507",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Microsoft IIS",
+      "patch_status": "aktuell",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "10.0",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Microsoft IIS httpd",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft-IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "ASP.NET",
+      "version": ""
+     },
+     {
+      "name": "Microsoft Exchange",
+      "version": "2016"
+     },
+     {
+      "name": "IIS",
+      "version": "10.0"
+     },
+     {
+      "name": "Microsoft ASP.NET",
+      "version": "4.0.30319"
+     },
+     {
+      "name": "Outlook Web App",
+      "version": "15.1.2507"
+     },
+     {
+      "name": "Windows Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "autodiscover.securess.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "owa.securess.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "owa.securess.de"
+   }
+  ]
+ },
+ "success": true
+}

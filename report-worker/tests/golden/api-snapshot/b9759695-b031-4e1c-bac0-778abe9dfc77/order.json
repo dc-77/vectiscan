@@ -1,0 +1,747 @@
+{
+ "data": {
+  "businessImpactScore": 6,
+  "correlationCount": 100,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "bergersysteme.com",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-07-16T16:39:30.628Z",
+  "hasReport": true,
+  "id": "b9759695-b031-4e1c-bac0-778abe9dfc77",
+  "isRescan": false,
+  "overallRisk": "MEDIUM",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "none",
+     "pct": 100,
+     "raw": "v=DMARC1; p=none; pct=100; rua=mailto:a.jg23hj7j@reports.hornetdmarc.com,mailto:dmarc@bergersysteme.com",
+     "rua": [
+      "mailto:a.jg23hj7j@reports.hornetdmarc.com",
+      "mailto:dmarc@bergersysteme.com"
+     ],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/bergersysteme.com",
+     "domain": "bergersysteme.com",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/bergersysteme.com"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.bergersysteme.com",
+    "autodiscover.bergersysteme.com",
+    "bstasks.bergersysteme.com",
+    "cdn.bergersysteme.com",
+    "ftp.bergersysteme.com",
+    "mail.bergersysteme.com",
+    "owa.bergersysteme.com",
+    "ticket.bergersysteme.com",
+    "www.bergersysteme.com"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "bergersysteme.com",
+    "records": [
+     {
+      "last_seen": "2026-06-17T11:36:53.140000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "92.205.224.174"
+     },
+     {
+      "last_seen": "2026-06-18T02:33:20.850000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "AAAA",
+      "value": "2a00:1169:118:23d0::"
+     },
+     {
+      "last_seen": "2026-06-09T15:04:39.843000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-06-09T15:04:39.843000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-06-09T15:04:39.843000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-06-09T15:04:39.843000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-06-09T15:03:44.153000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1a.dodns.net"
+     },
+     {
+      "last_seen": "2026-06-09T15:03:44.153000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns2a.dodns.net"
+     },
+     {
+      "last_seen": "2026-06-09T15:05:03.462000",
+      "options": {
+       "expires": 3600000,
+       "hostmaster": "hostmaster.bergersysteme.com",
+       "minttl": 172800,
+       "refresh": 86400,
+       "retry": 7200,
+       "serial": 2024073055,
+       "ttl": 60
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1.bergersysteme.com"
+     },
+     {
+      "last_seen": "2026-06-09T15:07:44.560000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "3LG6vZ/PivWRIe8DvklG1TFfyAT3qVVqeL1Ka9NHdE6RXsk6IHOq3SFajmIDJvdqv/wi0ZtHslqOkqF9w31WTg=="
+     },
+     {
+      "last_seen": "2026-06-09T15:07:44.560000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "apple-domain-verification=wfRpOKrl2oCC1XcX"
+     },
+     {
+      "last_seen": "2026-06-09T15:07:44.560000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "figma-domain-verification=03273e984b1bef1f51ddc91af6929d319b5de018b1e61bd3020c11a8da664d85-1767098280"
+     },
+     {
+      "last_seen": "2026-06-09T15:07:44.560000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=44yvkdzolcdbB0iM3bLDF_ah23VzdpWoXh5eyRdtABk"
+     },
+     {
+      "last_seen": "2026-06-09T15:07:44.560000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 a:mail.bergersysteme.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com"
+     },
+     {
+      "last_seen": "2026-06-09T15:07:44.601000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "_dmarc",
+      "type": "CNAME",
+      "value": "bergersysteme.com.dmarc.hornetdmarc.com"
+     },
+     {
+      "last_seen": "2026-06-17T11:36:53.160000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "autodiscover",
+      "type": "CNAME",
+      "value": "owa.bergersysteme.com"
+     },
+     {
+      "last_seen": "2026-06-17T11:36:53.140000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "bstasks",
+      "type": "A",
+      "value": "62.217.52.162"
+     },
+     {
+      "last_seen": "2026-06-17T11:36:53.160000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cdn",
+      "type": "A",
+      "value": "92.205.224.174"
+     },
+     {
+      "last_seen": "2026-06-18T02:33:20.808000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "cdn",
+      "type": "AAAA",
+      "value": "2a00:1169:118:23d0::"
+     },
+     {
+      "last_seen": "2026-06-17T11:36:53.155000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "ftp",
+      "type": "A",
+      "value": "92.205.224.174"
+     },
+     {
+      "last_seen": "2026-06-18T02:33:20.874000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "ftp",
+      "type": "AAAA",
+      "value": "2a00:1169:118:23d0::"
+     },
+     {
+      "last_seen": "2026-06-17T11:36:53.190000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "mail",
+      "type": "A",
+      "value": "62.217.52.166"
+     },
+     {
+      "last_seen": "2026-06-17T11:36:53.160000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "owa",
+      "type": "A",
+      "value": "62.217.52.166"
+     },
+     {
+      "last_seen": "2026-06-17T11:36:53.145000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "ticket",
+      "type": "A",
+      "value": "62.217.52.162"
+     },
+     {
+      "last_seen": "2026-06-17T11:36:53.166000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "www",
+      "type": "CNAME",
+      "value": "cdn.webflow.com"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "autodiscover",
+     "bstasks",
+     "cdn",
+     "ftp",
+     "mail",
+     "owa",
+     "ticket",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 80,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 4,
+      "crtsh": 0,
+      "gobuster_dns": 68,
+      "phase0a_passive": 9,
+      "subfinder": 8
+     },
+     "tools_with_zero_results": [
+      "crtsh"
+     ],
+     "total_subdomains": 80
+    },
+    "dns_findings": {
+     "dangling_cnames": [
+      {
+       "cname_target": "bergersysteme.com.dmarc.hornetdmarc.com",
+       "fqdn": "_dmarc.bergersysteme.com",
+       "reason": "Verwaister DNS-Eintrag (Ziel: bergersysteme.com.dmarc.hornetdmarc.com)",
+       "takeover_risk": "low"
+      }
+     ],
+     "dkim": true,
+     "dmarc": "v=DMARC1; p=none; pct=100; rua=mailto:a.jg23hj7j@reports.hornetdmarc.com,mailto:dmarc@bergersysteme.com",
+     "mx": [
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx01.hornetsecurity.com",
+      "mx02.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns1a.dodns.net",
+      "ns2a.dodns.net"
+     ],
+     "spf": "v=spf1 a:mail.bergersysteme.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com",
+     "zone_transfer": false
+    },
+    "domain": "bergersysteme.com",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain bergersysteme.com mit primary VHost (200, echte Web-App), ftp.bergersysteme.com (403 primary), plus Mailserver-Ports (25, 110, 143, 993, 995) und Management-Ports (22, 8443) aus Shodan → kritische Infrastruktur trotz Redirect zur www-Version.",
+      "fqdns": [
+       "bergersysteme.com",
+       "cdn.bergersysteme.com",
+       "ftp.bergersysteme.com"
+      ],
+      "ip": "92.205.224.174",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        110,
+        143,
+        80,
+        8880,
+        21,
+        22,
+        8443,
+        25,
+        443,
+        53
+       ],
+       "shodan_services": {
+        "22": "OpenSSH 9.9",
+        "25": "Postfix smtpd",
+        "443": "nginx",
+        "80": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "174.224.205.92.host.secureserver.net",
+      "screenshot_minio_key": "b9759695-b031-4e1c-bac0-778abe9dfc77/92.205.224.174__bergersysteme.com.png",
+      "status": "skipped",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "cdn.bergersysteme.com",
+          "reason": "body-hash-dup",
+          "status": 200
+         }
+        ],
+        "body_hash": "c55ef0474bc583e2e67f17bef8e0e5313300e466dd6b9429ff0c1c0b8c410115",
+        "final_url": "https://www.bergersysteme.com/",
+        "fqdn": "bergersysteme.com",
+        "is_primary": true,
+        "screenshot_minio_key": "b9759695-b031-4e1c-bac0-778abe9dfc77/92.205.224.174__bergersysteme.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Berger Systeme präsentiert Unternehmensdienstleistungen mit Webflow auf nginx.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Berger Systeme"
+       },
+       {
+        "aliases": [],
+        "body_hash": "57559551c35735c4acd1ede5a7d3df31a3f9b55acc087fdbb0811813b13d63d3",
+        "final_url": "https://ftp.bergersysteme.com",
+        "fqdn": "ftp.bergersysteme.com",
+        "is_primary": true,
+        "screenshot_minio_key": "b9759695-b031-4e1c-bac0-778abe9dfc77/92.205.224.174__ftp.bergersysteme.com.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 403 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 403,
+        "title": "403 Forbidden"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.bergersysteme.com/",
+       "has_web": true,
+       "status": 200,
+       "title": "Berger Systeme",
+       "web_fqdn": "bergersysteme.com"
+      }
+     },
+     {
+      "_reasoning": "www.bergersysteme.com mit 200-Status und echtem Content (Berger Systeme), Cloudflare-Backend mit AbuseIPDB-Score 40 → Hauptwebseite, muss gescannt werden.",
+      "fqdns": [
+       "www.bergersysteme.com"
+      ],
+      "ip": "198.202.211.1",
+      "passive_intel": {
+       "abuseipdb_score": 40,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        8080,
+        2082,
+        2083,
+        2052,
+        2053,
+        2086,
+        2087,
+        2095,
+        80,
+        8880,
+        8443,
+        443
+       ],
+       "shodan_services": {
+        "443": "CloudFlare",
+        "80": "CloudFlare",
+        "8443": "CloudFlare"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "b9759695-b031-4e1c-bac0-778abe9dfc77/198.202.211.1__www.bergersysteme.com.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "c55ef0474bc583e2e67f17bef8e0e5313300e466dd6b9429ff0c1c0b8c410115",
+        "final_url": "https://www.bergersysteme.com",
+        "fqdn": "www.bergersysteme.com",
+        "is_primary": true,
+        "screenshot_minio_key": "b9759695-b031-4e1c-bac0-778abe9dfc77/198.202.211.1__www.bergersysteme.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Berger Systeme nutzt Webflow auf Cloudflare HTTP Proxy für Webpräsenz.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Berger Systeme"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.bergersysteme.com",
+       "has_web": true,
+       "status": 200,
+       "title": "Berger Systeme",
+       "web_fqdn": "www.bergersysteme.com"
+      }
+     },
+     {
+      "_reasoning": "Mailserver (owa.bergersysteme.com, mail.bergersysteme.com, autodiscover) mit IIS 10.0 auf Port 443 und SMTP (25), fehlende SPF/DMARC-Enforcement (p=none) → Mailserver-Scan erforderlich, niedrigere Priorität da autodiscover-Subdomain.",
+      "fqdns": [
+       "owa.bergersysteme.com",
+       "autodiscover.bergersysteme.com",
+       "mail.bergersysteme.com"
+      ],
+      "ip": "62.217.52.166",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        25,
+        443
+       ],
+       "shodan_services": {
+        "443": "Microsoft IIS httpd 10.0"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "mail.bergersysteme.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "bstasks.bergersysteme.com und ticket.bergersysteme.com mit Apache auf 80/443, has_web=false aber Shodan zeigt aktive Services → Port-Scan + testssl zur Überprüfung von Anwendungen erforderlich.",
+      "fqdns": [
+       "bstasks.bergersysteme.com",
+       "ticket.bergersysteme.com"
+      ],
+      "ip": "62.217.52.162",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "bitwarden.bergersysteme.com (Passwort-Manager) mit nginx auf 443, has_web=false aber kritische Anwendung → Port-Scan + testssl erforderlich, niedrigere Priorität da kein Web-Probe-Content.",
+      "fqdns": [
+       "bitwarden.bergersysteme.com"
+      ],
+      "ip": "62.217.52.171",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {
+        "443": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "mail2.bergersysteme.com mit SonicWall auf 443 und SMTP (25) → Sekundärer Mailserver/Appliance, Port-Scan + testssl zur Überprüfung der Sicherheitskonfiguration.",
+      "fqdns": [
+       "mail2.bergersysteme.com"
+      ],
+      "ip": "79.140.188.181",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        25,
+        443
+       ],
+       "shodan_services": {
+        "443": "SonicWall"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "mail2.bergersysteme.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 6,
+   "hostsTotal": 6,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 3,
+   "LOW": 6,
+   "MEDIUM": 2
+  },
+  "startedAt": "2026-06-18T20:34:18.635Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "strict",
+   "passed": true,
+   "warning_count": 2,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "8460"
+      ],
+      "title": "TLS-RPT (RFC 8460) fehlt fuer bergersysteme.com"
+     },
+     "finding_id": "VS-2026-008",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['8460']",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "SPF",
+      "title": "DMARC-Policy auf 'none' statt 'quarantine' oder 'reject' fuer bergersysteme.com",
+      "title_token": "DMARC"
+     },
+     "finding_id": "VS-2026-003",
+     "message": "Title nennt DMARC, Body beschreibt SPF (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

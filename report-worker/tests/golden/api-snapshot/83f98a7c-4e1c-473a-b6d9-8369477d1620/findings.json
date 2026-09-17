@@ -1,0 +1,1994 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 3,
+   "low": 3,
+   "medium": 6
+  },
+  "business_impact_score": "6.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_title_template_missing": true,
+    "affected": "https://ose.heuel.com/webmodule-ee/login.seam",
+    "business_impact_score": 6.5,
+    "cvss_score": "6.5",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Die JSF/Seam-basierte Anwendung auf ose.heuel.com nutzt URL-Rewriting zur Session-Übertragung. Die jsessionid erscheint sowohl im URL-Pfad (;jsessionid=...) als auch im Referer-Header. Dadurch können Session-IDs in Server-Logs, Browser-History, Proxy-Logs und beim Klick auf externe Links durch Referer-Übertragung an Dritte gelangen.",
+    "evidence": "ZAP-Alerts:\n[MEDIUM] Session ID in URL Rewrite (35x) - CWE-598\n  URL: https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01\n[MEDIUM] Referer Exposes Session ID (5x) - CWE-598",
+    "external_id": "VS-2026-001",
+    "id": "VS-2026-001",
+    "impact": "Erbeutete Session-IDs ermöglichen Session-Hijacking nach erfolgreicher Authentifizierung. Insbesondere bei Login-Endpunkten kritisch, da der Wechsel zwischen unauthentifiziertem und authentifiziertem Zustand betroffen ist.",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> JSF/Seam so konfigurieren, dass Sessions ausschließlich per Cookie übertragen werden (disable URL session tracking, web.xml: <tracking-mode>COOKIE</tracking-mode>).\n<b>Mittelfristig:</b> Session-Cookies mit Secure, HttpOnly und SameSite=Strict versehen; Referer-Policy 'no-referrer' oder 'strict-origin' setzen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": true,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Session-ID in URL und Referer-Header bei ose.heuel.com/webmodule-ee/login.seam",
+    "title_vars": {
+     "host": "ose.heuel.com",
+     "tech": "JSF/Seam"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://ose.heuel.com/webmodule-ee/javax.faces.resource/jquery/...",
+    "business_impact_score": 5.4,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-1104",
+    "description": "ZAP meldet auf ose.heuel.com eine 'Vulnerable JS Library' (3 Treffer) im PrimeFaces-Resource-Pfad. Die genaue Version wurde durch den Scan nicht eindeutig identifiziert, aber das verwendete javax.faces.resource-Bundle deutet auf eine PrimeFaces-Version mit eingebetteter jQuery hin, die typischerweise mehrere Jahre alt ist.",
+    "evidence": "ZAP-Alert:\n[MEDIUM] Vulnerable JS Library (3x) - CWE-1395\n  URL: https://ose.heuel.com/webmodule-ee/javax.faces.resource/jquery/jquery.js.xhtml",
+    "external_id": "VS-2026-003",
+    "finding_type": "js_library_vulnerable",
+    "id": "VS-2026-003",
+    "impact": "Veraltete jQuery-/PrimeFaces-Versionen enthalten bekannte XSS-Schwachstellen (z.B. CVE-Familien in jQuery < 3.5). Bei Treffern in Eingabefeldern oder Output-Rendern könnten Angreifer Skripte einschleusen.",
+    "original_claude_id": "VS-2026-006",
+    "policy_id": "SP-JS-001",
+    "recommendation": "<b>Kurzfristig:</b> Konkrete Version von PrimeFaces/jQuery prüfen und gegen aktuelle CVE-Listen abgleichen.\n<b>Mittelfristig:</b> Anwendungs-Stack (JSF/PrimeFaces) auf aktuell unterstützte Versionen aktualisieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-JS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Eingebundene JavaScript-Bibliothek (jQuery, Bootstrap, AngularJS, …) mit bekannten Vulnerabilities — DOM-XSS / Prototype-Pollution typische Vektoren",
+     "rule_references": [
+      "CWE-1104",
+      "CWE-79",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "JavaScript-Bibliothek jQuery (PrimeFaces) mit Schwachstelle auf ose.heuel.com",
+    "title_vars": {
+     "host": "ose.heuel.com",
+     "library": "jQuery (PrimeFaces)"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "ose.heuel.com (CORS-Misconfig), www.heuel.com (fehlende SRI)",
+    "business_impact_score": 5.4,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-829",
+    "description": "Auf ose.heuel.com meldet ZAP 62 Treffer 'Cross-Domain Misconfiguration' — Hinweis auf zu permissive CORS-Header. Auf www.heuel.com fehlt bei externen JavaScript-Quellen das Subresource-Integrity-Attribut (6 Treffer 'SRI Missing'); zudem werden Cross-Domain JavaScript-Quellen eingebunden (6 Treffer 'Cross-Domain JavaScript Source File Inclusion').",
+    "evidence": "ZAP ose.heuel.com:\n[MEDIUM] Cross-Domain Misconfiguration (62x) - CWE-264\n\nZAP www.heuel.com:\n[MEDIUM] Sub Resource Integrity Attribute Missing (6x) - CWE-345\n[LOW] Cross-Domain JavaScript Source File Inclusion (6x) - CWE-829",
+    "external_id": "VS-2026-002",
+    "finding_type": "cors_misconfiguration",
+    "id": "VS-2026-002",
+    "impact": "Ohne SRI können kompromittierte CDN-Skripte unbemerkt geladen werden (Supply-Chain-Risiko). Eine zu offene CORS-Policy auf ose.heuel.com kann Cross-Origin-Datenabfragen durch fremde Webseiten ermöglichen.",
+    "original_claude_id": "VS-2026-007",
+    "policy_id": "SP-CORS-001",
+    "recommendation": "<b>Kurzfristig:</b> Access-Control-Allow-Origin auf ose.heuel.com auf konkrete Origins beschränken (kein '*'), insbesondere bei authentifizierten Endpunkten.\n<b>Mittelfristig:</b> Externe Skripte auf www.heuel.com mit integrity='sha384-...' und crossorigin='anonymous' versehen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-CORS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "CORS / Cross-Domain-Fehlkonfiguration (z.B. wildcard Access-Control-Allow-Origin, fehlerhafte Preflight-Logik) ermoeglicht Cross-Origin-Datenzugriff mit Auth-Cookies",
+     "rule_references": [
+      "CWE-942",
+      "CWE-346",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "CORS-Misconfiguration auf ose.heuel.com",
+    "title_vars": {
+     "host": "ose.heuel.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "20.79.218.75:21 (ose.heuel.com, edi.heuel.com, mail.heuel.com)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Auf dem Application-Host 20.79.218.75 ist der FTP-Dienst auf Port 21 öffentlich erreichbar. FTP überträgt Authentifizierungs-Credentials und Daten standardmäßig im Klartext, wodurch Mitlesen im Netzwerkpfad möglich ist. Ob FTPS/explicit TLS konfiguriert ist, konnte aus dem Scan nicht zweifelsfrei bestätigt werden.",
+    "evidence": "$ nmap -sV 20.79.218.75\n21/tcp  open  ftp\n22/tcp  open  ssh   FortiSSH\n443/tcp open  http  Apache httpd\n8443/tcp open  https-alt\n\nShodan: Port 21 bestätigt exponiert.",
+    "external_id": "VS-2026-004",
+    "finding_type": "software_eol",
+    "id": "VS-2026-004",
+    "impact": "Bei unverschlüsseltem FTP-Login könnten Zugangsdaten und übertragene Dateien (z.B. EDI-Daten) von Angreifern mitgelesen oder manipuliert werden. Auch bei aktiviertem FTPS bleibt der Dienst eine veraltete Angriffsfläche mit historisch zahlreichen Schwachstellen.",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> FTP-Dienst nur über VPN/IP-Whitelist verfügbar machen oder vollständig durch SFTP (über SSH/22) ablösen.\n<b>Mittelfristig:</b> EDI-Datenübertragungen auf moderne Protokolle (SFTP, AS2, HTTPS-API) umstellen und FTP-Port deaktivieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst (Port 21) öffentlich erreichbar auf 20.79.218.75 (Klartext-Protokoll)",
+    "title_vars": {
+     "host": "20.79.218.75",
+     "port": "21",
+     "tech": "FTP"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "213.133.104.51 (dl.heuel.com, webportal.heuel.com)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Auf dem Hetzner-Mailserver 213.133.104.51 sind laut Shodan elf Ports öffentlich erreichbar: 21 (FTP), 22 (SSH), 25 (SMTP), 80/443 (Apache), 110/995 (POP3/POP3S), 143/993 (IMAP/IMAPS), 465/587 (SMTPS/Submission). Während Mail-Ports betriebsnotwendig sind, sollten FTP (21) und ggf. der öffentliche SSH-Zugang restriktiver behandelt werden.",
+    "evidence": "Shodan ports: [21, 22, 25, 80, 110, 143, 443, 465, 587, 993, 995]\nshodan_services: {80: 'Apache httpd', 443: 'Apache httpd'}",
+    "external_id": "VS-2026-005",
+    "id": "VS-2026-005",
+    "impact": "Jeder zusätzlich exponierte Dienst erweitert die Angriffsfläche. FTP überträgt Credentials im Klartext; ein öffentlich erreichbarer SSH-Server ohne IP-Whitelisting ist anfällig für Brute-Force-Versuche.",
+    "original_claude_id": "VS-2026-011",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> FTP (21) deaktivieren oder per Firewall auf interne IPs/VPN beschränken. SSH (22) auf Key-Auth umstellen (falls nicht geschehen), fail2ban aktivieren oder Zugriff per IP-Whitelist.\n<b>Mittelfristig:</b> Klare Trennung zwischen Mailserver (nur SMTP/IMAP/POP3) und Management-Diensten (separate Subnetze, VPN-only).",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Zusätzliche Management-/Mailserver-Ports laut Shodan auf 213.133.104.51 exponiert",
+    "title_vars": {
+     "host": "213.133.104.51"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "https://www.heuel.com (217.72.203.132)",
+    "business_impact_score": 5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Content-Security-Policy auf www.heuel.com ist gesetzt, aber zu permissiv: 'default-src self https://*', 'script-src self unsafe-inline unsafe-eval https://*', 'style-src self unsafe-inline https://*'. Wildcards für https:// erlauben Skripte/Stylesheets von beliebigen HTTPS-Domains, und 'unsafe-inline' sowie 'unsafe-eval' machen den XSS-Schutzeffekt der CSP weitgehend wirkungslos. ZAP meldet 269x 'Wildcard Directive', 269x 'script-src unsafe-inline', 269x 'script-src unsafe-eval'.",
+    "evidence": "Response Header:\ncontent-security-policy: default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; ...\n\nZAP:\n[MEDIUM] CSP: Wildcard Directive (269x)\n[MEDIUM] CSP: script-src unsafe-inline (269x)\n[MEDIUM] CSP: script-src unsafe-eval (269x)",
+    "external_id": "VS-2026-006",
+    "finding_type": "csp_unsafe_inline",
+    "id": "VS-2026-006",
+    "impact": "Die CSP bietet kaum Schutz gegen XSS-Angriffe, da Inline-Skripte erlaubt sind und externe Skripte von jeder HTTPS-Quelle nachgeladen werden dürfen. Bei einer ausgenutzten XSS-Lücke in der NEOS-Anwendung würden moderne Browser den Angriff nicht durch CSP blockieren.",
+    "original_claude_id": "VS-2026-004",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> CSP enger fassen — Wildcards durch konkrete Origins ersetzen (z.B. CDN-Hosts namentlich nennen), 'unsafe-eval' entfernen.\n<b>Mittelfristig:</b> Inline-Skripte durch Nonces oder Hashes ersetzen, sodass 'unsafe-inline' entfallen kann. CSP zunächst im Report-Only-Modus testen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='csp_unsafe_inline' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Permissive CSP auf www.heuel.com (Wildcards, unsafe-inline, unsafe-eval)",
+    "title_vars": {
+     "directive": "script-src",
+     "host": "www.heuel.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "DNS-Zone heuel.com (_dmarc.heuel.com)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Die DMARC-Policy für heuel.com steht auf 'quarantine' mit pct=100. Damit werden gefälschte E-Mails von empfangenden Mailservern lediglich in den Spam-Ordner sortiert, nicht aber hart abgewiesen. SPF (mit ~all, Softfail) und DKIM sind konfiguriert.",
+    "evidence": "$ dig +short TXT _dmarc.heuel.com\n\"v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com\"\n\nSPF endet mit ~all (Softfail).",
+    "external_id": "VS-2026-009",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-009",
+    "impact": "Spoofing-Mails mit Absenderdomain @heuel.com werden bei korrekt konfigurierten Empfängern in den Spam-Ordner geleitet, aber nicht abgewiesen. Empfänger ohne strenge DMARC-Auswertung könnten diese Mails dennoch zustellen. Phishing-Risiko gegen Geschäftspartner besteht.",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "<b>Kurzfristig:</b> DMARC-Reports (rua) über 2–4 Wochen prüfen, ob alle legitimen Mailflüsse SPF/DKIM-aligned sind.\n<b>Mittelfristig:</b> Schrittweise Migration von p=quarantine → p=reject (pct schrittweise erhöhen). Zusätzlich SPF auf -all (Hardfail) umstellen, sobald alle Sender erfasst sind.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer heuel.com",
+    "title_vars": {
+     "domain": "heuel.com",
+     "p_value": "quarantine"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://ose.heuel.com/webmodule-ee, https://ose.heuel.com/robots.txt",
+    "business_impact_score": 2.5,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "ZAP meldet auf ose.heuel.com drei Treffer 'Private IP Disclosure'. Damit wird eine interne IP-Adresse über HTTP-Antworten (z.B. Header, Body, robots.txt) sichtbar gemacht. Zusätzlich werden über 'In Page Banner Information Leak' Servermetadaten preisgegeben.",
+    "evidence": "ZAP:\n[LOW] Private IP Disclosure (3x) - CWE-497\n  URL: https://ose.heuel.com/webmodule-ee\n  URL: https://ose.heuel.com/robots.txt\n[LOW] In Page Banner Information Leak (2x)",
+    "external_id": "VS-2026-007",
+    "finding_type": "private_ip_disclosure",
+    "id": "VS-2026-007",
+    "impact": "Interne IP-Adressen unterstützen Angreifer bei der Aufklärung der internen Netzwerktopologie und können bei späteren Angriffen (z.B. SSRF, gezielte Lateral Movement-Pfade) verwertet werden. Eigenständig kein hohes Risiko.",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-DISC-009",
+    "recommendation": "<b>Kurzfristig:</b> Server-Antworten und robots.txt prüfen, interne IPs entfernen.\n<b>Mittelfristig:</b> Reverse-Proxy/Apache so konfigurieren, dass keine internen Hostnamen oder Adressen in Header/Body durchgereicht werden.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-009",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Private IP-Adressen (RFC1918 10.x, 172.16-31.x, 192.168.x) in HTTP-Antworten / Headers / Errorpages sichtbar — interne Netzwerk-Topologie wird Angreifern preisgegeben",
+     "rule_references": [
+      "CWE-200",
+      "CWE-204"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Private IP-Adresse intern im Response auf ose.heuel.com",
+    "title_vars": {
+     "host": "ose.heuel.com",
+     "private_ip": "intern"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "DNS-Zone heuel.com",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Die DNS-Zone heuel.com ist nicht DNSSEC-signiert (dnssec_signed=false). Ebenfalls fehlt ein TLS-RPT-Record für die E-Mail-Domain. Ohne diese Mechanismen ist die Authentizität der DNS-Antworten nicht kryptografisch gesichert, und SMTP-TLS-Fehler beim Mailempfang werden nicht automatisch an die Domain-Inhaberin reportet.",
+    "evidence": "passive_intel:\n  dnssec_signed: false\n  tlsrpt_present: false",
+    "external_id": "VS-2026-008",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-008",
+    "impact": "Ohne DNSSEC sind DNS-Spoofing- und Cache-Poisoning-Angriffe gegen die Auflösung von MX-, SPF- und DMARC-Records grundsätzlich möglich. Fehlendes TLS-RPT verhindert das Erkennen von TLS-Downgrade-Versuchen im Mailverkehr.",
+    "original_claude_id": "VS-2026-012",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "<b>Kurzfristig:</b> TLS-RPT-Record anlegen ('v=TLSRPTv1; rua=mailto:tls-rpt@heuel.com') und MTA-STS-Policy bereitstellen.\n<b>Mittelfristig:</b> DNSSEC mit dem DNS-Provider aktivieren (Schlüssel-Rollover beachten).",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "DNSSEC fehlt fuer heuel.com",
+    "title_vars": {
+     "domain": "heuel.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://www.heuel.com/transport-suche.html, https://www.heuel.com/neos/login, https://ose.heuel.com/webmodule-ee/login.seam",
+    "business_impact_score": 5.4,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-352",
+    "description": "ZAP meldet auf www.heuel.com (9 Treffer) und ose.heuel.com (18 Treffer) Formulare ohne erkennbare Anti-CSRF-Tokens. Betroffen sind unter anderem Login-Seiten (neos/login, webmodule-ee/login.seam) und Formulare wie 'transport-suche.html'.",
+    "evidence": "ZAP:\n[MEDIUM] Absence of Anti-CSRF Tokens (9x) - www.heuel.com\n  URL: https://www.heuel.com/transport-suche.html\n  URL: https://www.heuel.com/neos/login\n[MEDIUM] Absence of Anti-CSRF Tokens (18x) - ose.heuel.com\n  URL: https://ose.heuel.com/webmodule-ee/login.seam",
+    "external_id": "VS-2026-010",
+    "finding_type": "csrf_token_missing",
+    "id": "VS-2026-010",
+    "impact": "Ohne CSRF-Schutz könnten authentifizierte Anwender durch präparierte Links/Webseiten zu ungewollten Aktionen auf der Anwendung verleitet werden (z.B. Datenänderungen, Login-CSRF mit Angreifer-Credentials).",
+    "original_claude_id": "VS-2026-008",
+    "policy_id": "SP-CSRF-001",
+    "recommendation": "<b>Kurzfristig:</b> NEOS-Backend (neos/login) und Seam-Anwendung mit Framework-eigenen CSRF-Tokens absichern (Neos: __csrfToken; JSF: ViewState mit jakarta.faces.ViewState-Validierung).\n<b>Mittelfristig:</b> SameSite=Strict für Session-Cookies setzen, sodass auch Cross-Site-Submits zusätzlich abgewehrt werden.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": true,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSRF-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Form ist GET-only oder ohne State-Change - kein CSRF-Vektor",
+     "rule_references": [
+      "CWE-352"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Anti-CSRF-Token fehlt auf Login-Formular heuel.com",
+    "title_vars": {
+     "host": "heuel.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://ose.heuel.com, https://edi.heuel.com (20.79.218.75)",
+    "business_impact_score": 0.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Application-Host 20.79.218.75 liefert keine der sieben empfohlenen Security-Header (Score 0/7). Es fehlen: Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy und Permissions-Policy. Auch ZAP meldet entsprechende Lücken (Missing Anti-clickjacking Header, CSP fehlt, X-Content-Type-Options fehlt, HSTS fehlt, Cross-Domain Misconfiguration).",
+    "evidence": "Security Headers Scan https://edi.heuel.com:\n  Score: 0/7\n  Missing: strict-transport-security, content-security-policy, x-frame-options, x-content-type-options, x-xss-protection, referrer-policy, permissions-policy\n\nZAP:\n[MEDIUM] Content Security Policy (CSP) Header Not Set (23x)\n[MEDIUM] Missing Anti-clickjacking Header (11x)\n[LOW] Strict-Transport-Security Header Not Set (69x)\n[LOW] X-Content-Type-Options Header Missing (57x)",
+    "external_id": "VS-2026-011",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-011",
+    "impact": "Ohne HSTS sind Downgrade-Angriffe möglich. Ohne X-Frame-Options/CSP frame-ancestors ist Clickjacking gegen das Login-Portal möglich. Ohne X-Content-Type-Options drohen MIME-Sniffing-Angriffe. Insgesamt erhöht das fehlende Header-Set die Wahrscheinlichkeit erfolgreicher clientseitiger Angriffe.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig:</b> Apache-Konfiguration anpassen und folgende Header setzen: Strict-Transport-Security 'max-age=31536000; includeSubDomains', X-Frame-Options 'SAMEORIGIN', X-Content-Type-Options 'nosniff', Referrer-Policy 'no-referrer', Permissions-Policy.\n<b>Mittelfristig:</b> CSP für die Seam-Anwendung schrittweise einführen (zunächst Report-Only).",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf ose.heuel.com",
+    "title_vars": {
+     "host": "ose.heuel.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://www.heuel.com/neos/, https://ose.heuel.com/webmodule-ee/login.seam",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-614",
+    "description": "Cookies werden auf beiden Hosts ohne Secure-Flag, teilweise auch ohne HttpOnly und ohne SameSite-Attribut gesetzt. Auf www.heuel.com 188 Treffer 'Cookie Without Secure Flag', auf ose.heuel.com zusätzlich 'Cookie No HttpOnly Flag' und 'Cookie without SameSite Attribute'.",
+    "evidence": "ZAP www.heuel.com:\n[LOW] Cookie Without Secure Flag (188x) - CWE-614\nZAP ose.heuel.com:\n[LOW] Cookie No HttpOnly Flag (1x) - CWE-1004\n[LOW] Cookie without SameSite Attribute (1x) - CWE-1275\n[LOW] Cookie Without Secure Flag (1x) - CWE-614",
+    "external_id": "VS-2026-012",
+    "finding_type": "csrf_token_missing",
+    "id": "VS-2026-012",
+    "impact": "Cookies ohne Secure-Flag könnten bei einem Downgrade-Angriff oder versehentlichem HTTP-Aufruf im Klartext übertragen werden. Ohne HttpOnly sind sie via JavaScript (z.B. XSS) auslesbar. Ohne SameSite erhöht sich das CSRF-Risiko.",
+    "original_claude_id": "VS-2026-009",
+    "policy_id": "SP-CSRF-001",
+    "recommendation": "<b>Kurzfristig:</b> Alle Session- und Auth-Cookies mit den Flags 'Secure; HttpOnly; SameSite=Lax' (für Login: Strict) ausstatten.\n<b>Mittelfristig:</b> Auch Tracking- und Funktions-Cookies prüfen und konsistent absichern.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": true,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSRF-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Form ist GET-only oder ohne State-Change - kein CSRF-Vektor",
+     "rule_references": [
+      "CWE-352"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Anti-CSRF-Token fehlt auf Login-Formular www.heuel.com",
+    "title_vars": {
+     "cookie_name": "Session",
+     "host": "www.heuel.com"
+    }
+   }
+  ],
+  "overall_description": "Die Sicherheitsbewertung der Domain heuel.com umfasst sechs Hosts mit unterschiedlicher Funktion: den primären Webauftritt www.heuel.com (217.72.203.132, nginx + NEOS CMS), einen Application-Host mit OSE/EDI-Portal (20.79.218.75, Apache mit Java-Anwendung 'webmodule-ee' auf Basis von JSF/PrimeFaces), Mailserver bei Hornetsecurity sowie weitere Mail- und Webportal-Hosts (195.225.241.75, 213.133.104.51, 2a01:4f8:d0a:2757::2) und einen Cloudflare-fronted VHost online.heuel.com (104.16.10.6). Insgesamt wurden 24 Subdomains entdeckt, davon mehrere mit produktiven Anwendungen. Der Hauptauftritt www.heuel.com weist eine sehr gute Security-Header-Abdeckung auf (7/7), die jedoch durch zu permissive CSP-Direktiven (Wildcard https://*, unsafe-inline, unsafe-eval) deutlich abgeschwächt wird.\n\nDie konkreten Risikobereiche konzentrieren sich auf den Application-Host 20.79.218.75: Hier ist der FTP-Dienst auf Port 21 öffentlich erreichbar (Klartext-Protokoll), zusätzlich SSH (FortiSSH) auf Port 22 und ein zweiter HTTPS-Dienst auf Port 8443. Das öffentlich zugängliche Login-Portal ose.heuel.com/webmodule-ee/login.seam exponiert Session-IDs über URL-Rewriting (jsessionid in URL) und im Referer-Header, fehlen sämtliche Security-Header (0/7), verwendet eine veraltete JavaScript-Bibliothek (PrimeFaces/jQuery) und legt eine private interne IP-Adresse offen. Auf dem Mailserver-Host 213.133.104.51 sind laut Shodan elf Ports exponiert (FTP 21, SSH 22, SMTP 25, POP3 110/995, IMAP 143/993, Submission 465/587, HTTP 80/443) — die Mail-Dienste sind erforderlich, FTP sollte jedoch geprüft werden. Auf DNS-Ebene besteht die wesentliche Schwäche in der DMARC-Policy 'quarantine' (statt 'reject'), wodurch Spoofing-Mails nicht hart abgewiesen werden; SPF und DKIM sind korrekt konfiguriert, DNSSEC und MTA-STS/TLS-RPT fehlen jedoch.\n\nIm Ergebnis ergibt sich ein HIGH-Risiko: Der primäre Webauftritt ist solide aufgesetzt, aber die exponierte Java-Anwendung ose.heuel.com und der FTP-Dienst sind die wesentlichen Angriffsflächen. Compliance-seitig sind moderne Schutzmechanismen (DMARC reject, DNSSEC, MTA-STS, strenge CSP, FTP-Ablösung) noch nicht umgesetzt. Eine schrittweise Härtung im Bereich Application-Host und E-Mail-Authentifizierung wird empfohlen.",
+  "overall_risk": "MEDIUM",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CORS-001",
+   "SP-CSP-001",
+   "SP-CSRF-001",
+   "SP-DISC-009",
+   "SP-DNS-001",
+   "SP-DNS-005",
+   "SP-FALLBACK",
+   "SP-JS-001"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die Domain heuel.com verfügt über einen SPF-Record mit konkreter IP-Liste und allen relevanten Drittanbietern (Outlook, Hornetsecurity, SendGrid, Samanage) sowie über aktive DKIM-Signaturen. Damit ist die technische Basis der E-Mail-Authentifizierung solide aufgesetzt; verbleibender Härtungsschritt ist die DMARC-Verschärfung.",
+    "title": "Korrekte SPF- und DKIM-Konfiguration mit Hornetsecurity"
+   },
+   {
+    "description": "Der Edge-Host online.heuel.com nutzt Cloudflare als WAF inkl. Bot-Management und Challenge-Page (HTTP 403 'Just a moment...'). Damit besteht eine zusätzliche Schutzebene gegen automatisierte Angriffe und volumetrische Bedrohungen vor dem Origin-Server.",
+    "title": "Cloudflare-Schutz und Bot-Management für online.heuel.com"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "FTP-Dienst auf 20.79.218.75 deaktivieren oder per Firewall/VPN einschränken; alternativ auf SFTP umstellen.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-004",
+     "VS-2026-005"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Security-Header-Set auf ose.heuel.com/edi.heuel.com via Apache-Konfiguration ausrollen (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy).",
+    "effort": "4-6 h",
+    "finding_refs": [
+     "VS-2026-011"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "JSF/Seam-Konfiguration auf Cookie-only Session-Tracking umstellen, jsessionid aus URLs entfernen.",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Cookies-Flags (Secure, HttpOnly, SameSite) auf allen Hosts vereinheitlichen.",
+    "effort": "3-5 h",
+    "finding_refs": [
+     "VS-2026-012"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "CSP von www.heuel.com strenger fassen — Wildcards entfernen, unsafe-eval streichen, Nonces/Hashes einführen.",
+    "effort": "1-2 Tage",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "DMARC-Reports auswerten und Policy schrittweise auf p=reject heben; SPF auf -all anpassen; MTA-STS und TLS-RPT einrichten; DNSSEC mit Provider aktivieren.",
+    "effort": "1-2 Tage",
+    "finding_refs": [
+     "VS-2026-009",
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "JSF/PrimeFaces-Stack auf ose.heuel.com auf aktuell unterstützte Version aktualisieren, jQuery-Version ablösen.",
+    "effort": "2-5 Tage (Test, Deployment)",
+    "finding_refs": [
+     "VS-2026-003"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "CORS-Header auf ose.heuel.com einschränken und SRI-Attribute für externe Skripte auf www.heuel.com einführen.",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Anti-CSRF-Mechanismen auf allen Login- und Formularseiten verifizieren und durchsetzen.",
+    "effort": "1-2 Tage",
+    "finding_refs": [
+     "VS-2026-010"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Information-Disclosure auf ose.heuel.com bereinigen (private IPs aus Responses/robots.txt entfernen).",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 3,
+   "LOW": 3,
+   "MEDIUM": 6
+  },
+  "tech_profiles": [
+   {
+    "cms": "NEOS",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "NEOS",
+     "confidence": 0.95,
+     "details": {
+      "body_match": "/_Resources/Static/Packages/",
+      "header": "x-flow-powered",
+      "value": "Flow Neos"
+     },
+     "detection_methods": [
+      "body_reference",
+      "response_header"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": ""
+     },
+     {
+      "port": "443",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "www.heuel.com",
+     "heuel.com",
+     "jobs.heuel.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "217.72.203.132",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "quarantine",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443
+     ],
+     "shodan_services": {},
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.heuel.com",
+    "redirect_data": {
+     "www.heuel.com": {
+      "error": null,
+      "final_domain": "www.heuel.com",
+      "final_url": "https://www.heuel.com/",
+      "is_cross_domain": false,
+      "page_title": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+      "redirect_chain": [
+       "https://www.heuel.com/",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=da379094",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=4fd767fa",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ButtonBar.css?bust=c311de43",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/TeaserMenu.css?bust=1ae306bd",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SequentialGrid.css?bust=2099f61b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/CardVerticalTeaser.css?bust=7128e739",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LightboxTrigger.css?bust=4ad06a01",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FaqListing.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Accordion.css?bust=28b77295",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Footer.TypeFlex.css?bust=c4067bc1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FooterBreadcrumb.css?bust=12a336d1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/IconBar.css?bust=4df8529e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Menu.css?bust=2a21a5b6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LegalMenu.css?bust=b345b6c5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ScrollToTopTrigger.css?bust=4839182b",
+       "https://www.heuel.com/_res/dfebda3fbed2761d0ec1c9548deb4189b35ca652/logo_heuel.svg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Image.js?bust=2f6004f6",
+       "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+       "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=5b31fd64",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Section.js?bust=609c4dc4",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Accordion.js?bust=88f44fa6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/ScrollToTopTrigger.js?bust=6adec41c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SearchBar.js?bust=cc60d0df",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/MenuToggle.js?bust=f3bb915e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-300.woff2?bust=fa308c21",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-700.woff2?bust=d881c829",
+       "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AnimatedCounter.css?bust=38aa7a56",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-regular.woff2?bust=fa9aa47b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/GLightbox.css?bust=9b875a42",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelWrapper.css?bust=4804a5fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelTrigger.css?bust=3bdf6d8e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1779038210720",
+       "https://www.heuel.com/api/kd-gdpr-cc/kd_gdpr_cc_676df6a203d43365a936fc9048561dd5e9310c80.js",
+       "https://www.heuel.com/_res/26fcdd84ec87cb3049908a45d82ca566aa5a623c/Heuel-Logistics-Fuhrpark-LKW-Sonnenaufgang-1920x1280.jpg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+       "https://www.heuel.com/_res/afb02e6d75fa02f9b282319c914c9061dead77a5/Einzugsgebiet-HEUEL-04.gif",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Icons/Nebula/caret-right.svg?bust=ab1e34ba",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnimatedCounter.js?bust=17f62f36",
+       "https://www.heuel.com/api/kd-gdpr-cc?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde"
+      ],
+      "response_headers": {
+       "content-encoding": "br",
+       "content-security-policy": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
+       "content-type": "text/html;charset=UTF-8",
+       "date": "Thu, 21 May 2026 20:08:51 GMT",
+       "permissions-policy": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geolocation=(self), gyroscope=(self), keyboard-map=(self), magnetometer=(self), microphone=(self), midi=(self), navigation-override=(self), payment=(self), picture-in-picture=(self), publickey-credentials-get=(self), screen-wake-lock=(self), sync-xhr=(self), usb=(self), web-share=(self), xr-spatial-tracking=(self)",
+       "referrer-policy": "no-referrer-when-downgrade",
+       "strict-transport-security": "max-age=31536000;",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-flow-powered": "Flow Neos",
+       "x-frame-options": "SAMEORIGIN",
+       "x-xss-protection": "1"
+      },
+      "screenshot_path": "/tmp/scan-83f98a7c-4e1c-473a-b6d9-8369477d1620/hosts/217.72.203.132/phase2/screenshot_www.heuel.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "grid-layout--full sticky-button--size--xl uppercase--header-menu uppercase--nav-elements",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "HEUEL LOGISTICS ist Ihre Spedition für LKW-Landverkehr, Stückgut, Teilpartien (LTL) und Komplettladungen (FTL) – zuverlässig seit über 100 Jahren.",
+         "name": "description"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        },
+        {
+         "content": "summary",
+         "name": "twitter:card"
+        },
+        {
+         "content": "Spedition für Stückguttransporte,  LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+         "name": "twitter:title"
+        },
+        {
+         "content": "HEUEL LOGISTICS ist Ihre Spedition für LKW-Landverkehr, Stückgut, Teilpartien (LTL) und Komplettladungen (FTL) – zuverlässig seit über 100 Jahren.",
+         "name": "twitter:description"
+        },
+        {
+         "content": "https://www.heuel.com/",
+         "name": "twitter:url"
+        },
+        {
+         "content": "https://www.heuel.com/_res/03ca330113611b5131fc3b7e11cc828013e99b0e/Heuel-Logistics-Fuhrpark-Sonnenaufgang-5200x5199-600x600.jpg",
+         "name": "twitter:image"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnimatedCounter.js?bust=17f62f36",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=5b31fd64",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+        "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc"
+       ],
+       "stylesheets": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=da379094",
+        "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+        "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=4fd767fa",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ButtonBar.css?bust=c311de43"
+       ],
+       "title": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "NEOS",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 80",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "NEOS",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "Neos CMS",
+      "version": ""
+     },
+     {
+      "name": "Neos Flow",
+      "version": "neos"
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "www.heuel.com": {
+      "cms": "NEOS",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "www.heuel.com"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "21",
+      "service": ""
+     },
+     {
+      "port": "8443",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "ose.heuel.com",
+     "edi.heuel.com",
+     "mail.heuel.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "20.79.218.75",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     21,
+     22,
+     80,
+     443,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "quarantine",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      80,
+      443,
+      21,
+      8443
+     ],
+     "shodan_services": {
+      "443": "Apache httpd",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "ose.heuel.com",
+    "redirect_data": {
+     "edi.heuel.com": {
+      "error": null,
+      "final_domain": "edi.heuel.com",
+      "final_url": "https://edi.heuel.com/",
+      "is_cross_domain": false,
+      "page_title": "403 Forbidden",
+      "redirect_chain": [
+       "https://edi.heuel.com/"
+      ],
+      "response_headers": {
+       "connection": "Keep-Alive",
+       "content-length": "199",
+       "content-type": "text/html; charset=iso-8859-1",
+       "date": "Thu, 21 May 2026 20:09:23 GMT",
+       "keep-alive": "timeout=15, max=100",
+       "server": "Apache"
+      },
+      "screenshot_path": "/tmp/scan-83f98a7c-4e1c-473a-b6d9-8369477d1620/hosts/20.79.218.75/phase2/screenshot_edi.heuel.com.png",
+      "status_code": 403,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "403 Forbidden"
+      }
+     },
+     "ose.heuel.com": {
+      "error": null,
+      "final_domain": "ose.heuel.com",
+      "final_url": "https://ose.heuel.com/",
+      "is_cross_domain": false,
+      "page_title": "Redirector",
+      "redirect_chain": [
+       "https://ose.heuel.com/"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "136",
+       "content-type": "text/html; charset=ISO-8859-1",
+       "date": "Thu, 21 May 2026 20:09:18 GMT",
+       "etag": "\"97-5e331555c605e-gzip\"",
+       "keep-alive": "timeout=15, max=100",
+       "last-modified": "Thu, 07 Jul 2022 06:38:28 GMT",
+       "server": "Apache",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-83f98a7c-4e1c-473a-b6d9-8369477d1620/hosts/20.79.218.75/phase2/screenshot_ose.heuel.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "1; URL=/webmodule-ee/",
+         "name": "refresh"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Redirector"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "FortiSSH",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "FortiSSH",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "edi.heuel.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "ose.heuel.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "ose.heuel.com"
+   },
+   {
+    "cms": "NEOS",
+    "cms_confidence": 0.95,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "443",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "8443",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "2096",
+      "service": ""
+     },
+     {
+      "port": "2082",
+      "service": ""
+     },
+     {
+      "port": "2083",
+      "service": ""
+     },
+     {
+      "port": "2052",
+      "service": ""
+     },
+     {
+      "port": "2053",
+      "service": ""
+     },
+     {
+      "port": "2086",
+      "service": ""
+     },
+     {
+      "port": "2087",
+      "service": ""
+     },
+     {
+      "port": "6443",
+      "service": ""
+     },
+     {
+      "port": "2095",
+      "service": ""
+     },
+     {
+      "port": "80",
+      "service": ""
+     },
+     {
+      "port": "8880",
+      "service": ""
+     },
+     {
+      "port": "8080",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "online.heuel.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "104.16.10.6",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443,
+     8080,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "quarantine",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      2096,
+      2082,
+      2083,
+      2052,
+      2053,
+      2086,
+      2087,
+      6443,
+      2095,
+      80,
+      8880,
+      8080,
+      8443,
+      443
+     ],
+     "shodan_services": {
+      "443": "CloudFlare",
+      "8443": "CloudFlare"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "online.heuel.com",
+    "redirect_data": {
+     "online.heuel.com": {
+      "error": null,
+      "final_domain": "www.heuel.com",
+      "final_url": "https://www.heuel.com/",
+      "is_cross_domain": true,
+      "page_title": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+      "redirect_chain": [
+       "https://www.heuel.com/",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=da379094",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=4fd767fa",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ButtonBar.css?bust=c311de43",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SequentialGrid.css?bust=2099f61b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FaqListing.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LightboxTrigger.css?bust=4ad06a01",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/TeaserMenu.css?bust=1ae306bd",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/CardVerticalTeaser.css?bust=7128e739",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Accordion.css?bust=28b77295",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Footer.TypeFlex.css?bust=c4067bc1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FooterBreadcrumb.css?bust=12a336d1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/IconBar.css?bust=4df8529e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Menu.css?bust=2a21a5b6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LegalMenu.css?bust=b345b6c5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ScrollToTopTrigger.css?bust=4839182b",
+       "https://www.heuel.com/_res/dfebda3fbed2761d0ec1c9548deb4189b35ca652/logo_heuel.svg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Image.js?bust=2f6004f6",
+       "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+       "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=5b31fd64",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Accordion.js?bust=88f44fa6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/ScrollToTopTrigger.js?bust=6adec41c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SearchBar.js?bust=cc60d0df",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/MenuToggle.js?bust=f3bb915e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Section.js?bust=609c4dc4",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-300.woff2?bust=fa308c21",
+       "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-700.woff2?bust=d881c829",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-regular.woff2?bust=fa9aa47b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AnimatedCounter.css?bust=38aa7a56",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/GLightbox.css?bust=9b875a42",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelWrapper.css?bust=4804a5fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelTrigger.css?bust=3bdf6d8e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1779038210720",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1779038210720",
+       "https://www.heuel.com/api/kd-gdpr-cc/kd_gdpr_cc_676df6a203d43365a936fc9048561dd5e9310c80.js",
+       "https://www.heuel.com/_res/26fcdd84ec87cb3049908a45d82ca566aa5a623c/Heuel-Logistics-Fuhrpark-LKW-Sonnenaufgang-1920x1280.jpg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+       "https://www.heuel.com/_res/afb02e6d75fa02f9b282319c914c9061dead77a5/Einzugsgebiet-HEUEL-04.gif",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Icons/Nebula/caret-right.svg?bust=ab1e34ba",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnimatedCounter.js?bust=17f62f36",
+       "https://www.heuel.com/api/kd-gdpr-cc?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde"
+      ],
+      "response_headers": {
+       "content-encoding": "br",
+       "content-security-policy": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
+       "content-type": "text/html;charset=UTF-8",
+       "date": "Thu, 21 May 2026 20:09:05 GMT",
+       "permissions-policy": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geolocation=(self), gyroscope=(self), keyboard-map=(self), magnetometer=(self), microphone=(self), midi=(self), navigation-override=(self), payment=(self), picture-in-picture=(self), publickey-credentials-get=(self), screen-wake-lock=(self), sync-xhr=(self), usb=(self), web-share=(self), xr-spatial-tracking=(self)",
+       "referrer-policy": "no-referrer-when-downgrade",
+       "strict-transport-security": "max-age=31536000;",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-flow-powered": "Flow Neos",
+       "x-frame-options": "SAMEORIGIN",
+       "x-xss-protection": "1"
+      },
+      "screenshot_path": "/tmp/scan-83f98a7c-4e1c-473a-b6d9-8369477d1620/hosts/104.16.10.6/phase2/screenshot_online.heuel.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "grid-layout--full sticky-button--size--xl uppercase--header-menu uppercase--nav-elements",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "HEUEL LOGISTICS ist Ihre Spedition für LKW-Landverkehr, Stückgut, Teilpartien (LTL) und Komplettladungen (FTL) – zuverlässig seit über 100 Jahren.",
+         "name": "description"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        },
+        {
+         "content": "summary",
+         "name": "twitter:card"
+        },
+        {
+         "content": "Spedition für Stückguttransporte,  LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+         "name": "twitter:title"
+        },
+        {
+         "content": "HEUEL LOGISTICS ist Ihre Spedition für LKW-Landverkehr, Stückgut, Teilpartien (LTL) und Komplettladungen (FTL) – zuverlässig seit über 100 Jahren.",
+         "name": "twitter:description"
+        },
+        {
+         "content": "https://www.heuel.com/",
+         "name": "twitter:url"
+        },
+        {
+         "content": "https://www.heuel.com/_res/03ca330113611b5131fc3b7e11cc828013e99b0e/Heuel-Logistics-Fuhrpark-Sonnenaufgang-5200x5199-600x600.jpg",
+         "name": "twitter:image"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1779038210720",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnimatedCounter.js?bust=17f62f36",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=5b31fd64",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+        "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc"
+       ],
+       "stylesheets": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=da379094",
+        "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+        "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=4fd767fa",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ButtonBar.css?bust=c311de43"
+       ],
+       "title": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
+      }
+     }
+    },
+    "server": "Cloudflare http proxy",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "NEOS",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2052)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2052",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2053)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2053",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2082)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2082",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2083)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2083",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2086)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2086",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2087)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2087",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2095)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2095",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2096)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2096",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 6443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 6443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 80",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8080)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8080",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8880)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8880",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare Bot Management",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare Http Proxy",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Cloudflare http proxy",
+      "version": ""
+     },
+     {
+      "name": "Cloudflare",
+      "version": ""
+     },
+     {
+      "name": "Cloudflare Bot Management",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "online.heuel.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": "Cloudflare"
+     }
+    },
+    "waf": "Cloudflare",
+    "web_fqdn": "online.heuel.com"
+   }
+  ]
+ },
+ "success": true
+}

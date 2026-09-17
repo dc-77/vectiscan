@@ -1,0 +1,957 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 1,
+   "low": 2,
+   "medium": 3
+  },
+  "business_impact_score": "0.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com:443 – BeTheme 27.4.5",
+    "business_impact_score": 8.8,
+    "cvss_score": "8.8",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-284",
+    "description": "Das eingesetzte BeTheme in Version 27.4.5 ist von mehreren schwerwiegenden Schwachstellen betroffen. Besonders kritisch ist eine Arbitrary File Upload Schwachstelle (ab Author-Rechten), die zur Remote Code Execution führen kann, sowie eine Arbitrary File Deletion Schwachstelle (ab Contributor-Rechten). Darüber hinaus existieren mehrere Stored-XSS-Schwachstellen und eine PHP Object Injection. Die aktuelle Version ist weit hinter dem Patchstand (28.4.1) zurück.",
+    "external_id": "VS-2026-001",
+    "finding_type": "wordpress_plugin_vulnerability",
+    "id": "VS-2026-001",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-WP-001",
+    "recommendation": "BeTheme umgehend auf Version 28.4.1 oder höher aktualisieren; Behebung innerhalb von 24–48 Stunden priorisieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-WP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "WordPress-Plugin/Theme-Schwachstelle - typischerweise XSS, Object Injection oder Auth-Bypass. Schweregrad haengt von Plugin-Aktivitaet, Auth-Voraussetzungen und Patch-Stand ab; Default MEDIUM, Boost via KEV/EPSS bei zugeordnetem CVE.",
+     "rule_references": [
+      "CWE-1395",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "WordPress-Plugin in mit bekannter Schwachstelle auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "port": "443",
+     "tech": "BeTheme 27.4.5"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_incomplete": true,
+    "affected": "dortmund-beach.com:443 – Complianz 7.1.0, Slider Revolution 6.7.11",
+    "business_impact_score": 7.5,
+    "cvss_score": "7.5",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Das Complianz-Plugin (Version 7.1.0) enthält eine Schwachstelle (nicht verifizierte CVE-Referenz), die es nicht angemeldeten Angreifern erlaubt, Inhalte privater WordPress-Beiträge auszulesen. Das Slider Revolution Plugin (Version 6.7.11) ist anfällig für Arbitrary File Read durch Nutzer mit Contributor-Rechten (nicht verifizierte CVE-Referenz, nicht verifizierte CVE-Referenz), wodurch potenziell sensible Serverdateien wie Konfigurationsdateien ausgelesen werden können. Beide Plugins sind weit hinter dem aktuellen Patchstand zurück.",
+    "external_id": "VS-2026-002",
+    "finding_type": "wordpress_plugin_vulnerability",
+    "id": "VS-2026-002",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-WP-001",
+    "recommendation": "Complianz auf Version 7.4.6 oder höher und Slider Revolution auf Version 6.7.38 oder höher aktualisieren; Behebung innerhalb weniger Tage.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-WP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "WordPress-Plugin/Theme-Schwachstelle - typischerweise XSS, Object Injection oder Auth-Bypass. Schweregrad haengt von Plugin-Aktivitaet, Auth-Voraussetzungen und Patch-Stand ab; Default MEDIUM, Boost via KEV/EPSS bei zugeordnetem CVE.",
+     "rule_references": [
+      "CWE-1395",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Kritische WordPress-Plugin-Schwachstellen: Unauthentifizierter Datenzugriff und Arbitrary File Read (Complianz, Slider Revolution)",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "port": "443",
+     "tech": "Complianz 7.1.0, Slider Revolution 6.7.11"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "88.99.35.112:21 (Pure-FTPd)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Auf dem Server ist ein FTP-Dienst (Pure-FTPd) auf Port 21 öffentlich erreichbar. FTP überträgt Benutzernamen, Passwörter und Dateiinhalte unverschlüsselt im Klartext, sodass ein Angreifer im Netzwerkpfad Zugangsdaten abfangen kann. Für einen Webserver, auf dem WordPress-Dateien verwaltet werden, stellt dies ein erhöhtes Risiko dar.",
+    "external_id": "VS-2026-003",
+    "id": "VS-2026-003",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "FTP-Dienst deaktivieren und durch SFTP (SSH-basiert) ersetzen; falls FTP zwingend benötigt wird, ausschließlich FTPS (explizit oder implizit) mit erzwungener TLS-Verschlüsselung betreiben.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst (Port 21) mit Klartextübertragung öffentlich erreichbar",
+    "title_vars": {
+     "host": "88.99.35.112",
+     "port": "21",
+     "tech": "Pure-FTPd"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "dortmund-beach.com:443 – /wp-json/wp/v2/users/1, /author/badmin/",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Der WordPress-Benutzername 'badmin' ist über die öffentlich zugängliche REST-API (/wp-json/wp/v2/users/1) sowie über das Autorenarchiv (/author/badmin/) abrufbar. Kenntnis eines gültigen Benutzernamens erleichtert gezielte Brute-Force- oder Credential-Stuffing-Angriffe auf das WordPress-Login erheblich.",
+    "external_id": "VS-2026-004",
+    "finding_type": "wordpress_user_enumeration",
+    "id": "VS-2026-004",
+    "original_claude_id": "VS-2026-007",
+    "policy_id": "SP-WP-002",
+    "recommendation": "REST-API-Benutzerendpunkt für nicht angemeldete Nutzer deaktivieren, Autorenarchiv ausblenden und einen Login-Schutz (z. B. Zwei-Faktor-Authentifizierung oder IP-basierte Ratenbegrenzung) einrichten.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": true,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-WP-002",
+     "policy_version": "2026-06-01.1",
+     "rationale": "WordPress-Login + User-Enumeration oeffentlich erreichbar - erleichtert Brute-Force gegen bekannte Username-Listen, aber kein direkter Zugriff",
+     "rule_references": [
+      "CWE-200",
+      "CWE-203"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "WordPress-User-Enumeration moeglich auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "DNS: dortmund-beach.com (DMARC, DKIM)",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Die DMARC-Richtlinie ist auf 'p=none' konfiguriert, was bedeutet, dass gefälschte E-Mails im Namen von dortmund-beach.com zugestellt werden, ohne dass Empfänger-Mailserver eingreifen. Zusätzlich fehlt ein DKIM-Eintrag vollständig, sodass E-Mails nicht kryptografisch signiert werden. Der SPF-Eintrag verwendet '~all' (SoftFail) statt des strikteren '-all'. Diese Kombination ermöglicht Phishing-Angriffe unter dem Namen der Domain.",
+    "external_id": "VS-2026-005",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-005",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "DKIM-Schlüssel für den Mailserver einrichten, DMARC-Richtlinie schrittweise auf 'p=quarantine' und dann 'p=reject' anheben sowie SPF auf '-all' umstellen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer dortmund-beach.com",
+    "title_vars": {
+     "domain": "dortmund-beach.com",
+     "p_value": "none"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com:443",
+    "business_impact_score": 0.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der HSTS-Header ist zwar gesetzt, jedoch mit 'max-age=0', was ihn faktisch deaktiviert und Browser anweist, die HTTPS-Erzwingung aufzuheben. Gleichzeitig fehlen fünf weitere wichtige Sicherheits-Header vollständig: Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy und Permissions-Policy. Dies erhöht das Risiko für Clickjacking, MIME-Sniffing und Cross-Site-Scripting-Angriffe.",
+    "external_id": "VS-2026-006",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-006",
+    "original_claude_id": "VS-2026-006",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "HSTS auf mindestens 'max-age=31536000; includeSubDomains' setzen und die fehlenden Security-Header in der Apache-Konfiguration ergänzen (z. B. via mod_headers).",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "port": "443"
+    }
+   }
+  ],
+  "overall_description": "Die Infrastruktur von dortmund-beach.com besteht aus einem einzelnen Server (88.99.35.112, Reverse-DNS: vsrv2.spacekoeln.de), der als kombinierter Web- und Mail-Server betrieben wird. Die Website basiert auf WordPress (Version 6.5.8) mit Apache 2.4.66 auf Debian, ergänzt durch mehrere Plugins (Slider Revolution 6.7.11, Complianz 7.1.0, Burst Statistics 1.7.1) und das BeTheme-Theme (27.4.5). Zusätzlich zur Web-Präsenz sind auf demselben Server umfangreiche Mail-Dienste (Postfix, Dovecot) sowie ein FTP-Dienst (Pure-FTPd) und ein Webmin-ähnliches Verwaltungsinterface auf Port 10000 öffentlich erreichbar.\n\nDie größten Risikobereiche konzentrieren sich auf drei Bereiche: Erstens weist das WordPress-System auf dortmund-beach.com eine erhebliche Anzahl ungepatchter Plugin- und Theme-Schwachstellen auf, darunter eine unauthentifizierte Offenlegung privater Inhalte (nicht verifizierte CVE-Referenz in Complianz) sowie mehrere Arbitrary-File-Read-Schwachstellen im Slider Revolution Plugin, die ab Contributor-Rechten ausnutzbar sind. Über die WP-REST-API ist zudem der Benutzername 'badmin' öffentlich abrufbar, was Brute-Force-Angriffe erleichtert. Zweitens ist der FTP-Dienst auf Port 21 aktiv und überträgt Zugangsdaten im Klartext, während Port 10000 (Webmin/Verwaltungsoberfläche) ohne erkennbaren Zugriffsschutz öffentlich erreichbar ist. Drittens ist die E-Mail-Sicherheit unzureichend: DMARC ist auf 'p=none' gesetzt (keine Schutzwirkung), DKIM fehlt vollständig, und der SPF-Eintrag verwendet '~all' (SoftFail) statt '-all'. Dies ermöglicht Domain-Spoofing und den Versand gefälschter E-Mails im Namen von dortmund-beach.com.",
+  "overall_risk": "MEDIUM",
+  "package": "webcheck",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-DNS-005",
+   "SP-FALLBACK",
+   "SP-WP-001",
+   "SP-WP-002"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die Website setzt das Complianz-Plugin für Cookie-Consent und DSGVO-Konformität ein. Ein Cookie-Banner ist aktiv und unterscheidet zwischen funktionalen, statistischen und Marketing-Cookies – ein Zeichen für Bewusstsein gegenüber datenschutzrechtlichen Anforderungen.",
+    "title": "GDPR-Consent-Management implementiert"
+   },
+   {
+    "description": "Der DNS-Server verweigert Zone-Transfer-Anfragen von externen Hosts, sodass die vollständige DNS-Zonendatei nicht öffentlich auslesbar ist. Zudem wurden keine verwaisten CNAME-Einträge gefunden, die für Subdomain-Takeover-Angriffe missbraucht werden könnten.",
+    "title": "Kein DNS-Zone-Transfer möglich und keine Dangling CNAMEs"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "BeTheme auf Version 28.4.1+ aktualisieren (kritische RCE-Schwachstelle via File Upload)",
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "Complianz auf 7.4.6+ und Slider Revolution auf 6.7.38+ aktualisieren (unauthentifizierter Datenzugriff und File Read)",
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "HSTS-Header korrigieren (max-age=31536000) und fehlende Security-Header (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy) ergänzen",
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "FTP-Dienst (Port 21) deaktivieren und durch SFTP ersetzen; Zugriff auf Port 10000 per Firewall auf Admin-IPs beschränken",
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "DKIM einrichten, DMARC auf 'p=quarantine' anheben und SPF auf '-all' umstellen",
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 1,
+   "LOW": 2,
+   "MEDIUM": 3
+  },
+  "tech_profiles": [
+   {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "WordPress",
+     "confidence": 0.95,
+     "details": {
+      "meta_generator": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+      "raw": {
+       "name": "WordPress",
+       "version": ""
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "meta_tag",
+      "webtech"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "fqdns": [
+     "dortmund-beach.com",
+     "www.dortmund-beach.com",
+     "pflege.dortmund-beach.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "88.99.35.112",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     25,
+     80,
+     110,
+     143,
+     443,
+     465,
+     587,
+     993,
+     995,
+     10000
+    ],
+    "passive_intel": {
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "otx_pulse_count": 0,
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "dortmund-beach.com",
+    "redirect_data": {
+     "dortmund-beach.com": {
+      "error": null,
+      "final_domain": "dortmund-beach.com",
+      "final_url": "https://dortmund-beach.com/",
+      "is_cross_domain": false,
+      "page_title": "Dortmund Beach Design | Webdesign | Corporate Design",
+      "redirect_chain": [
+       "https://dortmund-beach.com/",
+       "https://dortmund-beach.com/wp-content/cache/wpfc-minified/7ubk1iuu/9mjyk.css",
+       "https://dortmund-beach.com/wp-content/themes/betheme-child/style.css?ver=6858e88174e609ac00d8a83f4c146a3b",
+       "https://dortmund-beach.com/wp-content/uploads/2021/12/dortmundbeach-logo-2zeilig@2x.png",
+       "https://dortmund-beach.com/wp-content/uploads/2021/12/dortmund-beach-logo-tilde@2x.png",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/assets/dummy.png",
+       "https://dortmund-beach.com/wp-content/cache/wpfc-minified/mbb4a78c/63tkw.css",
+       "https://dortmund-beach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+       "https://dortmund-beach.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.2",
+       "https://dortmund-beach.com/wp-includes/js/jquery/ui/tabs.min.js?ver=1.13.2",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/debouncedresize.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/menu.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/magnificpopup.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/visible.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/enllax.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/assets/animations/animations.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/parallax/translate3d.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/helpers/timeme/timeme.min.js?ver=1.6.1",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/assets/js/build/burst.min.js?ver=1.6.1",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-500-latin.woff2",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-500italic-latin.woff2",
+       "https://dortmund-beach.com/wp-content/themes/betheme/fonts/mfn/icons.woff2?11083851",
+       "https://dortmund-beach.com/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.min.js?ver=1718879508",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/scripts.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-700-latin.woff2",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rbtools.min.js?ver=6.7.11",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rs6.min.js?ver=6.7.11",
+       "https://dortmund-beach.com/wp-content/uploads/complianz/css/banner-1-optin.css?v=15",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "https://i.vimeocdn.com/video/1357114649-1646339a0c1a11bb529068c3cd5afe2e9391456acc5dad70744a314e58c75d7a-d_640",
+       "https://player.vimeo.com/api/player.js",
+       "https://player.vimeo.com/video/669941546?loop=1&autoplay=1&title=0&byline=0&portrait=0&background=1&player_id=iframe41714",
+       "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileLoad",
+       "https://challenges.cloudflare.com/turnstile/v0/g/8fc8ed1d8752/api.js",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/turnstile/f/ov2/av0/rch/76p9x/0x4AAAAAAAbaszMygKLnGbeo/auto/fbE/new/normal?lang=auto",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/cmg/1",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/flow/ov1/638928713:1781132721:P6Yfr4xkiWX7IiNbYRCtyTtQGdB_aYB2a_GAX4yWcEw/a09c1fb16e41c7ee/oKdxI5LSbEvs.tPjweUm32PHVaNK4GJ2q8fWubO8HT0-1781133806-1.2.1.1-u4s.GeUpMslCY8QT9Y8rJhwe5i66fdek0Rj3Kmj9xMckBMnfp5P8iZrKYwcwwoBF",
+       "blob:https://challenges.cloudflare.com/5ae0c503-55be-407b-9805-7e4ab9892540",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/d/a09c1fb16e41c7ee/1781133806806/ZqN1TWGz7Mp_XXi",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/pat/a09c1fb16e41c7ee/1781133806806/a715b8c67dc26bf841d7f3753d4cf3489325309006fa97b3a21f184d487d5445/R29CH4h1Yap6YzZ",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-1-latin.woff2",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "blob:https://challenges.cloudflare.com/5ae0c503-55be-407b-9805-7e4ab9892540",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/flow/ov1/638928713:1781132721:P6Yfr4xkiWX7IiNbYRCtyTtQGdB_aYB2a_GAX4yWcEw/a09c1fb16e41c7ee/oKdxI5LSbEvs.tPjweUm32PHVaNK4GJ2q8fWubO8HT0-1781133806-1.2.1.1-u4s.GeUpMslCY8QT9Y8rJhwe5i66fdek0Rj3Kmj9xMckBMnfp5P8iZrKYwcwwoBF"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "14053",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Wed, 10 Jun 2026 23:23:25 GMT",
+       "expires": "Mon, 29 Oct 1923 20:30:00 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "last-modified": "Thu, 20 Jun 2024 10:51:53 GMT",
+       "pragma": "no-cache",
+       "server": "Apache/2.4.66 (Debian)",
+       "strict-transport-security": "max-age=0",
+       "vary": "User-Agent,Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-46ce8dcc-4236-4c15-895a-ad32586d484a/hosts/88.99.35.112/phase2/screenshot_dortmund-beach.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "home page-template-default page page-id-124 woocommerce-block-theme-has-button-styles template-slider color-custom content-brightness-light input-brightness-light style-simple button-animation-fade layout-full-width if-zoom hide-love no-shadows header-simple header-empty header-fw sticky-header sticky-tb-color ab-hide menu-link-color subheader-both-left footer-copy-center responsive-overflow-x-mobile mobile-tb-center mobile-side-slide mobile-mini-mr-ll mobile-header-mini mobile-icon-user-ss mobile-icon-wishlist-ss mobile-icon-search-ss mobile-icon-wpml-ss mobile-icon-action-ss be-page-124 be-reg-2745 rs-safari cmplz-marketing cmplz-statistics cmplz-preferences cmplz-functional cmplz-eu cmplz-optin",
+       "cookies": "burst_uid=d81174e4820bdbb165a6c29d25beacbb; cmplz_consented_services=; cmplz_policy_id=16; cmplz_marketing=allow; cmplz_statistics=allow; cmplz_preferences=allow; cmplz_functional=allow; cmplz_banner-status=dismissed",
+       "generator": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+       "html_lang": "de-DE",
+       "meta_tags": [
+        {
+         "content": "Das passende Design für ihre Marke. Wir helfen ihnen ihre Marke zu visualisieren.",
+         "name": "description"
+        },
+        {
+         "content": "max-image-preview:large",
+         "name": "robots"
+        },
+        {
+         "content": "telephone=no",
+         "name": "format-detection"
+        },
+        {
+         "content": "width=device-width, initial-scale=1, maximum-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        },
+        {
+         "content": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://player.vimeo.com/api/player.js",
+        "https://www.googletagmanager.com/gtag/js?id=UA-4628890-1",
+        "https://dortmund-beach.com/wp-content/plugins/burst-statistics/helpers/timeme/timeme.min.js?ver=1.6.1",
+        "https://dortmund-beach.com/wp-content/plugins/burst-statistics/assets/js/build/burst.min.js?ver=1.6.1",
+        "https://dortmund-beach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+        "https://dortmund-beach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+        "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rbtools.min.js?ver=6.7.11",
+        "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rs6.min.js?ver=6.7.11",
+        "https://dortmund-beach.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.2",
+        "https://dortmund-beach.com/wp-includes/js/jquery/ui/tabs.min.js?ver=1.13.2",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/debouncedresize.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/magnificpopup.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/menu.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/visible.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/assets/animations/animations.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/enllax.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/parallax/translate3d.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/scripts.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.min.js?ver=1718879508"
+       ],
+       "stylesheets": [
+        "https://dortmund-beach.com/wp-content/cache/wpfc-minified/7ubk1iuu/9mjyk.css",
+        "https://dortmund-beach.com/wp-content/themes/betheme-child/style.css?ver=6858e88174e609ac00d8a83f4c146a3b",
+        "https://dortmund-beach.com/wp-content/uploads/complianz/css/banner-1-optin.css?v=15",
+        "https://dortmund-beach.com/wp-content/cache/wpfc-minified/mbb4a78c/63tkw.css"
+       ],
+       "title": "Dortmund Beach Design | Webdesign | Corporate Design"
+      }
+     }
+    },
+    "server": "Apache httpd/2.4.66",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "WordPress",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MySQL",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "BeTheme",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "27.4.5",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Burst",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Complianz",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Debian",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Analytics",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Tag Manager",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery Migrate",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "3.4.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Pure-FTPd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Slider Revolution",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "6.7.11",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "aktuell",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "2.4.66",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Pure-FTPd",
+      "version": ""
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": "2.4.66"
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": "2.4.66 (Debian)"
+     },
+     {
+      "name": "Google Tag Manager",
+      "version": ""
+     },
+     {
+      "name": "WordPress",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": "2.4.66"
+     },
+     {
+      "name": "BeTheme",
+      "version": "27.4.5"
+     },
+     {
+      "name": "Burst",
+      "version": ""
+     },
+     {
+      "name": "Complianz",
+      "version": ""
+     },
+     {
+      "name": "Debian",
+      "version": ""
+     },
+     {
+      "name": "Google Analytics",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "MySQL",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     },
+     {
+      "name": "Slider Revolution",
+      "version": "6.7.11"
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery Migrate",
+      "version": "3.4.1"
+     }
+    ],
+    "vhost_results": {
+     "dortmund-beach.com": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "dortmund-beach.com"
+   }
+  ]
+ },
+ "success": true
+}

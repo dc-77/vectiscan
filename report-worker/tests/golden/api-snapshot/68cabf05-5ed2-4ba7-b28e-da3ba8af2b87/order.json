@@ -1,0 +1,884 @@
+{
+ "data": {
+  "businessImpactScore": 7.3,
+  "correlationCount": 137,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "multi-target (3)",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-07-22T20:30:32.013Z",
+  "hasReport": true,
+  "id": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": false,
+     "fo": null,
+     "issues": [],
+     "p": null,
+     "pct": 100,
+     "raw": null,
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/lumbeck-wolter.de",
+     "domain": "lumbeck-wolter.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/lumbeck-wolter.de"
+    }
+   },
+   "passive_subdomains": [
+    "autodiscover.lumbeck-wolter.de",
+    "eset.lumbeck-wolter.de",
+    "ftp.lumbeck-wolter.de",
+    "newsletter.lumbeck-wolter.de",
+    "omd.lumbeck-wolter.de",
+    "openotp.lumbeck-wolter.de",
+    "rdgw-2019.lumbeck-wolter.de",
+    "rdgw.lumbeck-wolter.de",
+    "smtp.lumbeck-wolter.de",
+    "smtp4abas.lumbeck-wolter.de",
+    "vpn.lumbeck-wolter.de",
+    "wireguard-vpn.lumbeck-wolter.de",
+    "www.lumbeck-wolter.de"
+   ],
+   "securitytrails": {
+    "dns_history": [
+     {
+      "first_seen": "2023-08-24",
+      "last_seen": "2026-07-19",
+      "type": "a",
+      "values": [
+       "116.202.77.64"
+      ]
+     },
+     {
+      "first_seen": "2018-05-24",
+      "last_seen": "2023-08-24",
+      "type": "a",
+      "values": [
+       "217.160.0.98"
+      ]
+     },
+     {
+      "first_seen": "2017-10-02",
+      "last_seen": "2018-05-24",
+      "type": "a",
+      "values": [
+       "217.160.231.158"
+      ]
+     },
+     {
+      "first_seen": "2017-06-04",
+      "last_seen": "2017-10-01",
+      "type": "a",
+      "values": [
+       "217.160.231.158"
+      ]
+     },
+     {
+      "first_seen": "2017-05-26",
+      "last_seen": "2017-06-03",
+      "type": "a",
+      "values": [
+       "217.160.231.158"
+      ]
+     }
+    ],
+    "domain": {
+     "a_records": [
+      "116.202.77.64"
+     ],
+     "alexa_rank": null,
+     "domain": "lumbeck-wolter.de",
+     "hostname": "lumbeck-wolter.de",
+     "mx_records": [
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns_records": [
+      "ns1119.ui-dns.org",
+      "ns1119.ui-dns.de",
+      "ns1119.ui-dns.com",
+      "ns1119.ui-dns.biz"
+     ],
+     "txt_records": [
+      "v=verifydomain MS=8061464",
+      "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all"
+     ]
+    },
+    "subdomains": [
+     "omd.lumbeck-wolter.de",
+     "ftp.lumbeck-wolter.de",
+     "openotp.lumbeck-wolter.de",
+     "rdgw-2019.lumbeck-wolter.de",
+     "autodiscover.lumbeck-wolter.de",
+     "wireguard-vpn.lumbeck-wolter.de",
+     "newsletter.lumbeck-wolter.de",
+     "eset.lumbeck-wolter.de",
+     "smtp4abas.lumbeck-wolter.de",
+     "vpn.lumbeck-wolter.de",
+     "smtp.lumbeck-wolter.de",
+     "rdgw.lumbeck-wolter.de",
+     "www.lumbeck-wolter.de"
+    ]
+   },
+   "shodan_domain": {
+    "domain": "lumbeck-wolter.de",
+    "records": [
+     {
+      "last_seen": "2026-07-19T06:57:02.879000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "116.202.77.64"
+     },
+     {
+      "last_seen": "2026-07-17T06:11:22.029000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "",
+      "type": "AAAA",
+      "value": "2a01:4f8:d0a:668b::2"
+     },
+     {
+      "last_seen": "2026-07-17T03:51:55.031000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-17T03:51:55.031000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-17T03:51:55.031000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-17T03:51:55.031000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-17T03:50:59.140000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1119.ui-dns.biz"
+     },
+     {
+      "last_seen": "2026-07-17T03:50:59.140000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1119.ui-dns.com"
+     },
+     {
+      "last_seen": "2026-07-17T03:50:59.140000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1119.ui-dns.de"
+     },
+     {
+      "last_seen": "2026-07-17T03:50:59.140000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1119.ui-dns.org"
+     },
+     {
+      "last_seen": "2026-07-17T03:52:29.646000",
+      "options": {
+       "expires": 604800,
+       "hostmaster": "hostmaster.1und1.de",
+       "minttl": 300,
+       "refresh": 28800,
+       "retry": 7200,
+       "serial": 2016041957,
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1119.ui-dns.de"
+     },
+     {
+      "last_seen": "2026-07-17T03:47:40.539000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all"
+     },
+     {
+      "last_seen": "2026-07-17T03:47:40.539000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=verifydomain MS=8061464"
+     },
+     {
+      "last_seen": "2026-07-19T06:57:02.977000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "116.202.77.64"
+     },
+     {
+      "last_seen": "2026-07-17T06:11:22.052000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "www",
+      "type": "AAAA",
+      "value": "2a01:4f8:d0a:668b::2"
+     }
+    ],
+    "subdomains": [
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 17,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 2,
+      "crtsh": 1,
+      "gobuster_dns": 3,
+      "phase0a_passive": 13,
+      "subfinder": 1
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 17
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": null,
+     "mx": [
+      "mx03.hornetsecurity.com",
+      "mx04.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns1119.ui-dns.org",
+      "ns1119.ui-dns.com",
+      "ns1119.ui-dns.biz",
+      "ns1119.ui-dns.de"
+     ],
+     "spf": "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all",
+     "zone_transfer": false
+    },
+    "domain": "lumbeck-wolter.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain lumbeck-wolter.de mit www-Alias, produktive Website (200 OK, aussagekräftiger Title). Mehrere exponierte Ports (FTP, Mail, Datenbanken) aus Shodan → hohes Angriffsflächenpotenzial.",
+      "fqdns": [
+       "lumbeck-wolter.de",
+       "www.lumbeck-wolter.de"
+      ],
+      "ip": "116.202.77.64",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        3306,
+        587,
+        110,
+        143,
+        80,
+        465,
+        21,
+        5432,
+        25,
+        443
+       ],
+       "shodan_services": {
+        "3306": "MariaDB 10.11.18-MariaDB-0+deb12u1",
+        "443": "Apache httpd",
+        "5432": "PostgreSQL 9.6.0 or later",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "dedi5705.your-server.de",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "lumbeck-wolter.de",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "70c0799ec70ed823ff855fc048ce2e11ee57556277e715520f52be7755947869",
+        "final_url": "https://www.lumbeck-wolter.de",
+        "fqdn": "www.lumbeck-wolter.de",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Unternehmenswebsite von Lumbeck & Wolter, gehostet auf Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Lumbeck & Wolter - Lumbeck & Wolter"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.lumbeck-wolter.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Lumbeck & Wolter - Lumbeck & Wolter",
+       "web_fqdn": "www.lumbeck-wolter.de"
+      }
+     },
+     {
+      "_reasoning": "Web Applications Portal mit Authentifizierung (eset.lumbeck-wolter.de, omd, openotp als Aliase). Kritische Infrastruktur für Unternehmensanwendungen → höchste Priorität.",
+      "fqdns": [
+       "eset.lumbeck-wolter.de",
+       "omd.lumbeck-wolter.de",
+       "openotp.lumbeck-wolter.de"
+      ],
+      "ip": "85.22.176.108",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443,
+        8444
+       ],
+       "shodan_services": {
+        "443": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-176-108.ip.dokom21.de",
+      "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/85.22.176.108__eset.lumbeck-wolter.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "omd.lumbeck-wolter.de",
+          "reason": "body-hash-dup",
+          "status": 200
+         },
+         {
+          "fqdn": "openotp.lumbeck-wolter.de",
+          "reason": "body-hash-dup",
+          "status": 200
+         }
+        ],
+        "body_hash": "153d8379ee22785c16b3c61d2f2823a1432e854ab0b3408c8bc3aed358f8ebc0",
+        "final_url": "https://eset.lumbeck-wolter.de",
+        "fqdn": "eset.lumbeck-wolter.de",
+        "is_primary": true,
+        "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/85.22.176.108__eset.lumbeck-wolter.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Web-Anwendungsportal der Lumbeck & Wolter GmbH auf Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Lumbeck & Wolter GmbH & Co. KG Web Applications Portal"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://eset.lumbeck-wolter.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Lumbeck & Wolter GmbH & Co. KG Web Applications Portal",
+       "web_fqdn": "eset.lumbeck-wolter.de"
+      }
+     },
+     {
+      "_reasoning": "RDP Gateway (rdgw.lumbeck-wolter.de) mit IIS, Port 4443 exponiert. Remote-Access-Infrastruktur ist kritisches Angriffsziel → höchste Priorität.",
+      "fqdns": [
+       "rdgw-2019.lumbeck-wolter.de",
+       "rdgw.lumbeck-wolter.de"
+      ],
+      "ip": "85.22.176.107",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        4443,
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-176-107.ip.dokom21.de",
+      "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/85.22.176.107__rdgw.lumbeck-wolter.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "557b5e9015b4963a130c7039e077b3ec0306d401b6ee13d631721d5d969d2917",
+        "final_url": "https://rdgw.lumbeck-wolter.de",
+        "fqdn": "rdgw.lumbeck-wolter.de",
+        "is_primary": true,
+        "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/85.22.176.107__rdgw.lumbeck-wolter.de.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "Default-Page von Microsoft IIS httpd/10.0 — keine produktive Anwendung",
+         "is_real_content": false
+        },
+        "status": 200,
+        "title": "IIS Windows Server"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://rdgw.lumbeck-wolter.de",
+       "has_web": true,
+       "status": 200,
+       "title": "IIS Windows Server",
+       "web_fqdn": "rdgw.lumbeck-wolter.de"
+      }
+     },
+     {
+      "_reasoning": "Mailserver mit Web-Interface (smtp.lumbeck-wolter.de, smtp4abas als separate VHost). Postfix + Apache exponiert, SMTP/IMAP/POP3 offen → scannen trotz generischem 'Index of /' Title.",
+      "fqdns": [
+       "smtp4abas.lumbeck-wolter.de",
+       "smtp.lumbeck-wolter.de"
+      ],
+      "ip": "89.21.55.4",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        587,
+        110,
+        143,
+        80,
+        21,
+        25,
+        443
+       ],
+       "shodan_services": {
+        "25": "Postfix smtpd",
+        "443": "Apache httpd 2.4.41",
+        "587": "Postfix smtpd",
+        "80": "Apache httpd 2.4.41"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "ipr-4.iprs.de",
+      "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/89.21.55.4__smtp.lumbeck-wolter.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "23c198bcd38516e3da08098ccd441df88e2aff3347f218d479ffe389a3ad75f0",
+        "final_url": "https://smtp.lumbeck-wolter.de",
+        "fqdn": "smtp.lumbeck-wolter.de",
+        "is_primary": true,
+        "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/89.21.55.4__smtp.lumbeck-wolter.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "SMTP-Server mit Verzeichnisauflistung, Zweck unklar.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Index of /"
+       },
+       {
+        "aliases": [],
+        "body_hash": "14ffdfa28506e359b683189a2c6e658c61fa841059102c21a88e6772505722d0",
+        "final_url": "https://smtp4abas.lumbeck-wolter.de",
+        "fqdn": "smtp4abas.lumbeck-wolter.de",
+        "is_primary": true,
+        "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/89.21.55.4__smtp4abas.lumbeck-wolter.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "SMTP-Server für ABAS-Integration mit Verzeichnisauflistung.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Index of /"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://smtp.lumbeck-wolter.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Index of /",
+       "web_fqdn": "smtp.lumbeck-wolter.de"
+      }
+     },
+     {
+      "_reasoning": "FTP-Host mit 403 Forbidden (legitimer Status), SSH und FTP exponiert. Management-Ports (22, 21) sind Angriffsvektoren → scannen.",
+      "fqdns": [
+       "ftp.lumbeck-wolter.de"
+      ],
+      "ip": "217.160.231.158",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443,
+        21,
+        22
+       ],
+       "shodan_services": {
+        "22": "OpenSSH 8.4p1"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "clienthosting.eu",
+      "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/217.160.231.158__ftp.lumbeck-wolter.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "415ff807abb2fd49ce840d67bf14cb4d647e78afa9ab115c2b2dd8c8614928dd",
+        "final_url": "http://ftp.lumbeck-wolter.de",
+        "fqdn": "ftp.lumbeck-wolter.de",
+        "is_primary": true,
+        "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/217.160.231.158__ftp.lumbeck-wolter.de.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 403 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 403,
+        "title": "403 Forbidden"
+       }
+      ],
+      "web_probe": {
+       "final_url": "http://ftp.lumbeck-wolter.de",
+       "has_web": true,
+       "status": 403,
+       "title": "403 Forbidden",
+       "web_fqdn": "ftp.lumbeck-wolter.de"
+      }
+     },
+     {
+      "_reasoning": "VPN-Endpoint (vpn.lumbeck-wolter.de) mit 200 OK, leerer Title deutet auf Appliance hin. Kritische Infrastruktur für Remote-Access → scannen.",
+      "fqdns": [
+       "vpn.lumbeck-wolter.de"
+      ],
+      "ip": "85.22.176.106",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "85-22-176-106.ip.dokom21.de",
+      "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/85.22.176.106__vpn.lumbeck-wolter.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "67b37cc8b21ff51641b1f49e0349f38112842e8e9a13e05093c45dd2a4cecf6c",
+        "final_url": "https://vpn.lumbeck-wolter.de",
+        "fqdn": "vpn.lumbeck-wolter.de",
+        "is_primary": true,
+        "screenshot_minio_key": "68cabf05-5ed2-4ba7-b28e-da3ba8af2b87/85.22.176.106__vpn.lumbeck-wolter.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Webseite",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": ""
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://vpn.lumbeck-wolter.de",
+       "has_web": true,
+       "status": 200,
+       "title": "",
+       "web_fqdn": "vpn.lumbeck-wolter.de"
+      }
+     },
+     {
+      "_reasoning": "WireGuard VPN Host ohne Web-Probe (has_web=false). Port-Scan + testssl reichen zur Überprüfung der VPN-Infrastruktur.",
+      "fqdns": [
+       "wireguard-vpn.lumbeck-wolter.de"
+      ],
+      "ip": "89.21.55.83",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "wireguard.cpr.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "fqdns": [
+       "autodiscover.lumbeck-wolter.de"
+      ],
+      "ip": "40.99.150.120",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 8,
+   "hostsTotal": 8,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 3,
+   "INFO": 4,
+   "LOW": 1,
+   "MEDIUM": 6
+  },
+  "startedAt": "2026-07-19T21:06:30.090Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 1,
+   "errors": [
+    {
+     "check": "titles",
+     "detail": {
+      "duplicate_title": "anti-csrf-token fehlt auf login-formular eset.lumbeck-wolter.de",
+      "finding_ids": [
+       "VS-2026-011",
+       "VS-2026-012"
+      ]
+     },
+     "finding_id": null,
+     "message": "2 Findings teilen denselben Title",
+     "severity": "error"
+    }
+   ],
+   "level": "warn",
+   "passed": false,
+   "warning_count": 5,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "03116"
+      ],
+      "title": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf rdgw.lumbeck-wolter.de"
+     },
+     "finding_id": "VS-2026-001",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['03116']",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "SFTP",
+      "title": "Zusätzliche exponierte Management-Ports auf 116.202.77.64 (FTP, SMTP, IMAP, POP3, zweiter SSH)",
+      "title_token": "FTP"
+     },
+     "finding_id": "VS-2026-007",
+     "message": "Title nennt FTP, Body beschreibt SFTP (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "finding_version": "9.2",
+      "software": "OpenSSH",
+      "tech_version": "8.4p1"
+     },
+     "finding_id": "VS-2026-007",
+     "message": "Versionskonflikt OpenSSH: Finding nennt 9.2, Tech-Tabelle hat 8.4p1",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "finding_version": "9.2",
+      "software": "OpenSSH",
+      "tech_version": "8.4p1"
+     },
+     "finding_id": "VS-2026-007",
+     "message": "Versionskonflikt OpenSSH: Finding nennt 9.2, Tech-Tabelle hat 8.4p1",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "DKIM",
+      "title": "SPF-Record fehlt fuer lumbeck-wolter.de",
+      "title_token": "SPF"
+     },
+     "finding_id": "VS-2026-008",
+     "message": "Title nennt SPF, Body beschreibt DKIM (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

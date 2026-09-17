@@ -1,0 +1,715 @@
+{
+ "data": {
+  "businessImpactScore": 6,
+  "correlationCount": 360,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "huendgen-entsorgung.de",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-08-31T11:17:16.450Z",
+  "hasReport": true,
+  "id": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3",
+  "isRescan": false,
+  "overallRisk": "MEDIUM",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": "1",
+     "issues": [],
+     "p": "quarantine",
+     "pct": 100,
+     "raw": "v=DMARC1; p=quarantine; fo=1",
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/huendgen-entsorgung.de",
+     "domain": "huendgen-entsorgung.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/huendgen-entsorgung.de"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.huendgen-entsorgung.de",
+    "autodiscover.exchange.huendgen-entsorgung.de",
+    "autodiscover.huendgen-entsorgung.de",
+    "autodiscover.shop.huendgen-entsorgung.de",
+    "exchange.huendgen-entsorgung.de",
+    "ftp.huendgen-entsorgung.de",
+    "ftp.mail.huendgen-entsorgung.de",
+    "mail.huendgen-entsorgung.de",
+    "openotp.huendgen-entsorgung.de",
+    "shop.huendgen-entsorgung.de",
+    "vpn.huendgen-entsorgung.de",
+    "www.exchange.huendgen-entsorgung.de",
+    "www.huendgen-entsorgung.de",
+    "www.mail.huendgen-entsorgung.de",
+    "www.shop.huendgen-entsorgung.de"
+   ],
+   "securitytrails": {
+    "dns_history": [
+     {
+      "first_seen": "2025-08-03",
+      "last_seen": "2026-08-31",
+      "type": "a",
+      "values": [
+       "18.197.248.23",
+       "52.59.120.70"
+      ]
+     },
+     {
+      "first_seen": "2024-04-02",
+      "last_seen": "2025-08-03",
+      "type": "a",
+      "values": [
+       "83.138.60.10"
+      ]
+     },
+     {
+      "first_seen": "2018-12-20",
+      "last_seen": "2024-04-02",
+      "type": "a",
+      "values": [
+       "87.79.4.40"
+      ]
+     },
+     {
+      "first_seen": "2017-05-26",
+      "last_seen": "2018-12-19",
+      "type": "a",
+      "values": [
+       "87.79.4.40"
+      ]
+     }
+    ],
+    "domain": {
+     "a_records": [
+      "18.197.248.23",
+      "52.59.120.70"
+     ],
+     "alexa_rank": null,
+     "domain": "huendgen-entsorgung.de",
+     "hostname": "huendgen-entsorgung.de",
+     "mx_records": [
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns_records": [
+      "ns1029.ui-dns.org",
+      "ns1029.ui-dns.de",
+      "ns1029.ui-dns.com",
+      "ns1029.ui-dns.biz"
+     ],
+     "txt_records": [
+      "v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all",
+      "MS=ms28442953"
+     ]
+    },
+    "subdomains": [
+     "autodiscover.huendgen-entsorgung.de",
+     "openotp.huendgen-entsorgung.de",
+     "autodiscover.shop.huendgen-entsorgung.de",
+     "autodiscover.exchange.huendgen-entsorgung.de",
+     "ftp.mail.huendgen-entsorgung.de",
+     "www.exchange.huendgen-entsorgung.de",
+     "ftp.huendgen-entsorgung.de",
+     "vpn.huendgen-entsorgung.de",
+     "www.shop.huendgen-entsorgung.de",
+     "www.huendgen-entsorgung.de",
+     "www.mail.huendgen-entsorgung.de",
+     "exchange.huendgen-entsorgung.de",
+     "shop.huendgen-entsorgung.de",
+     "mail.huendgen-entsorgung.de"
+    ]
+   },
+   "shodan_domain": {
+    "domain": "huendgen-entsorgung.de",
+    "records": [
+     {
+      "last_seen": "2026-08-29T09:59:36.414000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "18.197.248.23"
+     },
+     {
+      "last_seen": "2026-08-29T09:59:36.414000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "52.59.120.70"
+     },
+     {
+      "last_seen": "2026-08-26T13:26:41.445000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-26T13:26:41.445000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-26T13:26:41.445000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-26T13:26:41.445000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-26T13:25:50.320000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1029.ui-dns.biz"
+     },
+     {
+      "last_seen": "2026-08-26T13:25:50.320000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1029.ui-dns.com"
+     },
+     {
+      "last_seen": "2026-08-26T13:25:50.320000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1029.ui-dns.de"
+     },
+     {
+      "last_seen": "2026-08-26T13:25:50.320000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1029.ui-dns.org"
+     },
+     {
+      "last_seen": "2026-08-26T13:27:20.749000",
+      "options": {
+       "expires": 604800,
+       "hostmaster": "hostmaster.kundenserver.de",
+       "minttl": 300,
+       "refresh": 28800,
+       "retry": 7200,
+       "serial": 2017051760,
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1029.ui-dns.biz"
+     },
+     {
+      "last_seen": "2026-08-26T13:24:19.786000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=ms28442953"
+     },
+     {
+      "last_seen": "2026-08-26T13:24:19.786000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all"
+     },
+     {
+      "last_seen": "2026-08-26T13:24:19.786000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1; p=quarantine; fo=1"
+     },
+     {
+      "last_seen": "2026-08-29T09:59:36.414000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "exchange",
+      "type": "A",
+      "value": "80.90.145.166"
+     },
+     {
+      "last_seen": "2026-08-29T09:59:36.419000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "www",
+      "type": "CNAME",
+      "value": "s.eu-multiscreensite.com"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "exchange",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 19,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 2,
+      "crtsh": 0,
+      "gobuster_dns": 3,
+      "phase0a_passive": 15,
+      "subfinder": 2
+     },
+     "tools_with_zero_results": [
+      "crtsh"
+     ],
+     "total_subdomains": 19
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": "v=DMARC1; p=quarantine; fo=1",
+     "mx": [
+      "mx02.hornetsecurity.com",
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns1029.ui-dns.com",
+      "ns1029.ui-dns.biz",
+      "ns1029.ui-dns.de",
+      "ns1029.ui-dns.org"
+     ],
+     "spf": "v=spf1 include:_spf.kundenserver.de include:spf.hornetsecurity.com include:spf.vizito.be +ip4:88.99.140.109 +ip4:157.90.214.107 -all",
+     "zone_transfer": false
+    },
+    "domain": "huendgen-entsorgung.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain mit primärem Web-VHost (200, aussagekräftiger Title), nginx auf 80/443/8443/8444, niedriges Abuse-Score — Standard-Web-Scan mit allen Tools.",
+      "fqdns": [
+       "huendgen-entsorgung.de",
+       "www.huendgen-entsorgung.de"
+      ],
+      "ip": "18.197.248.23",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443,
+        8444,
+        8443
+       ],
+       "shodan_services": {
+        "443": "nginx",
+        "80": "nginx",
+        "8443": "nginx",
+        "8444": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "eu-staticip.multiscreensite.com",
+      "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/18.197.248.23__www.huendgen-entsorgung.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "huendgen-entsorgung.de",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "5ec8f0920722b764df25fda03c2ea4384f0a60b345c13348b6f2b42a96ee8417",
+        "final_url": "https://www.huendgen-entsorgung.de",
+        "fqdn": "www.huendgen-entsorgung.de",
+        "is_primary": true,
+        "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/18.197.248.23__www.huendgen-entsorgung.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Containerdienst und Wertstoffhof für Entsorgung, betrieben mit nginx.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.huendgen-entsorgung.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Containerdienst & Wertstoffhof | Hündgen Entsorgung Swisttal / Bonn",
+       "web_fqdn": "www.huendgen-entsorgung.de"
+      }
+     },
+     {
+      "_reasoning": "Exchange/OWA-Server mit 4 primären VHosts (vpn, mail, openotp, exchange alle 200 OWA-Login), kritische Infrastruktur — Vollscan erforderlich trotz Management-Fokus.",
+      "fqdns": [
+       "openotp.huendgen-entsorgung.de",
+       "vpn.huendgen-entsorgung.de",
+       "exchange.huendgen-entsorgung.de",
+       "mail.huendgen-entsorgung.de"
+      ],
+      "ip": "80.90.145.166",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        444
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "gw-huendgen.bn-online.net",
+      "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/80.90.145.166__vpn.huendgen-entsorgung.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "d25d74aa5eb7cdda5ff4d5336d729dbf311954315b251409162d3382ff1be31a",
+        "final_url": "https://vpn.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fvpn.huendgen-entsorgung.de%2fowa%2f&reason=0",
+        "fqdn": "vpn.huendgen-entsorgung.de",
+        "is_primary": true,
+        "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/80.90.145.166__vpn.huendgen-entsorgung.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Outlook-Zugang über Exchange 2019 auf Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       },
+       {
+        "aliases": [],
+        "body_hash": "aaed7e440dcd13cf212a208ff7504bb186501e1f17c0a4846421773af69d35df",
+        "final_url": "https://mail.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.huendgen-entsorgung.de%2fowa%2f&reason=0",
+        "fqdn": "mail.huendgen-entsorgung.de",
+        "is_primary": true,
+        "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/80.90.145.166__mail.huendgen-entsorgung.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Outlook-Zugang über Exchange 2019 auf Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       },
+       {
+        "aliases": [],
+        "body_hash": "02ad3e6b1c5133da37a7253c479b535228183b5851bf5f714b87cd9da76100ed",
+        "final_url": "https://openotp.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fopenotp.huendgen-entsorgung.de%2fowa%2f&reason=0",
+        "fqdn": "openotp.huendgen-entsorgung.de",
+        "is_primary": true,
+        "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/80.90.145.166__openotp.huendgen-entsorgung.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Outlook-Zugang über Exchange 2019 auf Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       },
+       {
+        "aliases": [],
+        "body_hash": "9e5526f743025bc138b90bfde0965abb80a54b8de9ead61f30235f9df05694cd",
+        "final_url": "https://exchange.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fexchange.huendgen-entsorgung.de%2fowa%2f&reason=0",
+        "fqdn": "exchange.huendgen-entsorgung.de",
+        "is_primary": true,
+        "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/80.90.145.166__exchange.huendgen-entsorgung.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Outlook-Zugang über Exchange 2019 auf Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://vpn.huendgen-entsorgung.de/owa/auth/logon.aspx?url=https%3a%2f%2fvpn.huendgen-entsorgung.de%2fowa%2f&reason=0",
+       "has_web": true,
+       "status": 200,
+       "title": "Outlook",
+       "web_fqdn": "vpn.huendgen-entsorgung.de"
+      }
+     },
+     {
+      "_reasoning": "FTP-Mail-Host mit 403-Status (primärer VHost), aber Shodan zeigt SSH 8.4p1 + FTP/SSH/HTTP/HTTPS offen — Port-Scan + testssl zur Überprüfung der Infrastruktur notwendig.",
+      "fqdns": [
+       "ftp.mail.huendgen-entsorgung.de"
+      ],
+      "ip": "217.160.231.238",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443,
+        21,
+        22
+       ],
+       "shodan_services": {
+        "22": "OpenSSH 8.4p1",
+        "443": "nginx"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "clienthosting.eu",
+      "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/217.160.231.238__ftp.mail.huendgen-entsorgung.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "415ff807abb2fd49ce840d67bf14cb4d647e78afa9ab115c2b2dd8c8614928dd",
+        "final_url": "http://ftp.mail.huendgen-entsorgung.de",
+        "fqdn": "ftp.mail.huendgen-entsorgung.de",
+        "is_primary": true,
+        "screenshot_minio_key": "5b89aaba-f199-4b3e-9912-4c34b3a5c8d3/217.160.231.238__ftp.mail.huendgen-entsorgung.de.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 403 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 403,
+        "title": "403 Forbidden"
+       }
+      ],
+      "web_probe": {
+       "final_url": "http://ftp.mail.huendgen-entsorgung.de",
+       "has_web": true,
+       "status": 403,
+       "title": "403 Forbidden",
+       "web_fqdn": "ftp.mail.huendgen-entsorgung.de"
+      }
+     },
+     {
+      "_reasoning": "FTP-Host ohne Web-Content (has_web=false) — Port-Scan + testssl reichen zur Überprüfung der FTP/SSH-Services aus.",
+      "fqdns": [
+       "ftp.huendgen-entsorgung.de"
+      ],
+      "ip": "87.79.4.40",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "quarantine",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 4,
+   "hostsTotal": 4,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 2,
+   "LOW": 6,
+   "MEDIUM": 3
+  },
+  "startedAt": "2026-08-31T10:58:23.370Z",
+  "status": "pending_review",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "warn",
+   "passed": true,
+   "warning_count": 4,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "1000",
+       "1001",
+       "1002"
+      ],
+      "title": "Zusätzliche Management-Ports 444, 1000, 1001, 1002 öffentlich erreichbar auf Exchange-Host 80.90.145.166"
+     },
+     "finding_id": "VS-2026-002",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['1000', '1001', '1002']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "2019"
+      ],
+      "title": "Microsoft Exchange 2019 (Build 15.2.1748) öffentlich erreichbar mit fehlenden Security-Headern auf 80.90.145.166"
+     },
+     "finding_id": "VS-2026-004",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['2019']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "8460"
+      ],
+      "title": "TLS-RPT (RFC 8460) fehlt fuer huendgen-entsorgung.de"
+     },
+     "finding_id": "VS-2026-009",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['8460']",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "DKIM",
+      "title": "SPF-Policy auf softfail (~all) statt -all fuer huendgen-entsorgung.de",
+      "title_token": "SPF"
+     },
+     "finding_id": "VS-2026-007",
+     "message": "Title nennt SPF, Body beschreibt DKIM (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

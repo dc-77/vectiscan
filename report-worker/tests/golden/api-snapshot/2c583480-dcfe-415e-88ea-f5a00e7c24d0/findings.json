@@ -1,0 +1,436 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 2,
+   "low": 4,
+   "medium": 1
+  },
+  "business_impact_score": "3.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_title_template_missing": true,
+    "affected": "212.227.60.78:21 (connect.securess.de)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Auf dem Server 212.227.60.78 ist ein ProFTPD-Dienst auf Port 21 öffentlich erreichbar. FTP überträgt Authentifizierungsdaten und Dateiinhalte standardmäßig im Klartext, sofern nicht explizit FTPS (FTP over TLS) erzwungen wird. Das Vorhandensein eines FTP-Dienstes auf einem produktiven Webserver erhöht die Angriffsfläche erheblich.",
+    "evidence": "$ nmap -sV 212.227.60.78\n21/tcp  open  ftp  ProFTPD",
+    "id": "VS-2026-001",
+    "impact": "Angreifer könnten durch Sniffing im Netzwerkpfad FTP-Zugangsdaten abfangen. Kompromittierte FTP-Zugänge ermöglichen das Hochladen manipulierter Dateien auf den Webserver, was zu Defacement oder Malware-Verteilung führen kann.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Woche 1):</b> FTP durch SFTP (SSH File Transfer Protocol) ersetzen und Port 21 in der Firewall blockieren. Falls FTP zwingend benötigt wird, FTPS mit erzwungener TLS-Verschlüsselung konfigurieren.\n<b>Mittelfristig:</b> Dateitransfer-Workflows auf SFTP oder SCP umstellen und ProFTPD vollständig deinstallieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst (ProFTPD) öffentlich erreichbar auf connect.securess.de",
+    "title_vars": {
+     "host": "connect.securess.de",
+     "port": "21",
+     "tech": "ProFTPD"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "85.22.47.39:443 (mailin.securess.de, mailout.securess.de, webmail.securess.de)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-284",
+    "description": "Das identische Roundcube-Webmail-Interface ist über drei Subdomains erreichbar: webmail.securess.de, mailin.securess.de und mailout.securess.de. Die Hostnamen mailin und mailout deuten auf MTA-Funktionen hin und sollten keine Webmail-Oberfläche ausliefern. Jede zusätzliche öffentliche Login-Seite erhöht die Angriffsfläche für Credential-Stuffing und Brute-Force-Angriffe.",
+    "evidence": "Alle drei Subdomains liefern identischen Inhalt:\n$ curl -sI https://mailin.securess.de → 200 'Securess - WebMail (N3)'\n$ curl -sI https://mailout.securess.de → 200 'Securess - WebMail (N3)'\n$ curl -sI https://webmail.securess.de → 200 'Securess - WebMail (N3)'\n\nCookie: SERVERID=webmail-03",
+    "id": "VS-2026-007",
+    "impact": "Dreifache Angriffsfläche für Brute-Force-Angriffe auf E-Mail-Konten. Die MTA-Hostnamen (mailin/mailout) verraten zusätzlich die interne Infrastruktur-Benennung.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Monat 1):</b> mailin.securess.de und mailout.securess.de so konfigurieren, dass sie kein Webmail-Interface ausliefern. Eine Weiterleitung auf webmail.securess.de oder eine Sperrseite einrichten.\n<b>Mittelfristig:</b> Webmail-Zugang nur über webmail.securess.de bereitstellen und Rate-Limiting sowie Fail2Ban für den Login-Endpunkt konfigurieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Webmail-Interface über drei Subdomains exponiert",
+    "title_vars": {
+     "host": "webmail.securess.de",
+     "tech": "Roundcube"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "securess.de (DNS TXT-Record)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der SPF-Record der Domain endet mit '~all' (Softfail) statt '-all' (Hardfail). Bei Softfail werden E-Mails von nicht autorisierten Servern lediglich markiert, aber nicht zwingend abgelehnt. In Kombination mit der vorhandenen DMARC-Policy 'reject' wird die Wirkung teilweise kompensiert, dennoch ist ein konsistenter SPF-Hardfail die empfohlene Konfiguration.",
+    "evidence": "$ dig TXT securess.de +short\n\"v=spf1 a mx ip4:85.22.47.37 include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all\"",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-008",
+    "impact": "Empfangende Mailserver ohne DMARC-Auswertung könnten gefälschte E-Mails im Namen von securess.de trotz SPF-Prüfung zustellen. Das Phishing-Risiko für Geschäftspartner und Kunden ist geringfügig erhöht.",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "<b>Kurzfristig (Monat 1):</b> SPF-Qualifier von '~all' auf '-all' ändern. Vorab sicherstellen, dass alle legitimen Versandwege im SPF-Record erfasst sind (aktuell: eigener MX, plan.io, Office 365, Hornetsecurity, Softfair).\n<b>Mittelfristig:</b> SPF-Record regelmäßig auf veraltete Include-Einträge prüfen und das DNS-Lookup-Limit (max. 10) überwachen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-05-10.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer securess.de",
+    "title_vars": {
+     "domain": "securess.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "212.227.60.78 (partner.securess.de, vermittler.securess.de)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Die Subdomains partner.securess.de und vermittler.securess.de sind per DNS auf 212.227.60.78 aufgelöst und liefern eine TYPO3-Fehlerseite ('Page Not Found') mit dem Body-Class 'typo3-error-page'. Obwohl keine Inhalte konfiguriert sind, geben die Antworten Informationen über die eingesetzte Technologie preis (TYPO3, Apache, PHP/8.3.30, PleskLin).",
+    "evidence": "$ curl -sI https://partner.securess.de\nHTTP/1.1 404\nServer: Apache\nX-Powered-By: PHP/8.3.30\\nPleskLin\n\n$ curl -sI https://vermittler.securess.de\nHTTP/1.1 404\nServer: Apache\nX-Powered-By: PHP/8.3.30\\nPleskLin\n\nBody-Class: typo3-error-page",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-009",
+    "impact": "Angreifer erhalten unnötige Informationen über die Serverkonfiguration. Die Subdomains könnten für Social-Engineering-Angriffe missbraucht werden, indem sie als vermeintlich legitime Securess-Portale erscheinen.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig (Monat 1):</b> DNS-Records für nicht genutzte Subdomains entfernen oder auf die Hauptdomain weiterleiten. Falls die Subdomains künftig genutzt werden sollen, eine aussagekräftige Wartungsseite einrichten.\n<b>Mittelfristig:</b> X-Powered-By-Header serverseitig unterdrücken (Plesk-Einstellungen oder Apache-Konfiguration: Header unset X-Powered-By).",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf partner.securess.de",
+    "title_vars": {
+     "host": "partner.securess.de",
+     "tech": "TYPO3"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.47.41 (nginx/1.22.1), 212.227.60.78 (Apache, PHP/8.3.30, PleskLin), 85.22.47.39 (nginx/1.29.5, PHP/8.4.20)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "",
+    "cwe": "CWE-200",
+    "description": "Mehrere Server geben detaillierte Versionsinformationen in HTTP-Headern preis. Besonders auffällig ist der X-Powered-By-Header auf 212.227.60.78, der neben der PHP-Version auch die Hosting-Plattform ('PleskLin') offenlegt. Diese Informationen erleichtern einem Angreifer die gezielte Suche nach versionsspezifischen Schwachstellen.",
+    "evidence": "85.22.47.41:\n  Server: nginx/1.22.1\n\n212.227.60.78:\n  Server: Apache\n  X-Powered-By: PHP/8.3.30\\nPleskLin\n\n85.22.47.39:\n  Server: nginx/1.29.5\n  X-Powered-By: PHP/8.4.20",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-010",
+    "impact": "Reine Informationsoffenlegung ohne direkte Ausnutzbarkeit. Die veröffentlichten Versionen (PHP 8.3.30, PHP 8.4.20, nginx 1.22.1, nginx 1.29.5) sind aktuell und weisen keine bekannten kritischen Schwachstellen auf. Das Risiko beschränkt sich auf die erleichterte Aufklärung durch Angreifer.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Empfohlen (Monat 1-3):</b> Server-Banner minimieren:\n• nginx: server_tokens off;\n• Apache: ServerTokens Prod / ServerSignature Off\n• PHP: expose_php = Off in php.ini\n• Plesk: X-Powered-By-Header in den Plesk-Domaineinstellungen deaktivieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf securess.de",
+    "title_vars": {
+     "host": "securess.de",
+     "tech": "nginx/1.22.1, PHP/8.3.30, PHP/8.4.20"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.47.41:443 (www.securess.de)",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Hauptwebseite www.securess.de liefert keinen einzigen der empfohlenen Security Header aus. Es fehlen Strict-Transport-Security (HSTS), Content-Security-Policy (CSP), X-Frame-Options, X-Content-Type-Options, Referrer-Policy und Permissions-Policy. Obwohl NinjaFirewall als WAF aktiv ist, bieten fehlende Header keinen browserseitigen Schutz gegen Clickjacking, MIME-Sniffing oder Content-Injection.",
+    "evidence": "$ curl -sI https://www.securess.de | grep -iE '(strict|content-security|x-frame|x-content|referrer|permissions)'\n[keine Treffer]\n\nVorhandene Header:\nServer: nginx/1.22.1\nCache-Control: no-cache, no-store, must-revalidate",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-004",
+    "impact": "Ohne HSTS sind Downgrade-Angriffe auf HTTP möglich. Fehlende CSP und X-Frame-Options erhöhen das Risiko von Clickjacking und Cross-Site-Scripting. Besucher der öffentlichen Unternehmenswebseite sind unzureichend geschützt.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Woche 1-2):</b> Folgende Header in der nginx-Konfiguration ergänzen:\n• Strict-Transport-Security: max-age=63072000; includeSubDomains\n• X-Frame-Options: DENY\n• X-Content-Type-Options: nosniff\n• Referrer-Policy: strict-origin-when-cross-origin\n<b>Mittelfristig:</b> Content-Security-Policy und Permissions-Policy erstellen und testen. Siehe auch: BSI TR-03116-4 Compliance-Prüfung in diesem Bericht.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf www.securess.de",
+    "title_vars": {
+     "host": "www.securess.de",
+     "tech": "WordPress 6.8.5"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.47.39:443 (webmail.securess.de, mailin.securess.de, mailout.securess.de)",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Das Roundcube-Webmail-Interface setzt lediglich X-Frame-Options (sameorigin). Insbesondere fehlt HSTS, was bei einem E-Mail-Login-Portal kritisch ist. Auch Content-Security-Policy, X-Content-Type-Options und Referrer-Policy sind nicht konfiguriert. Alle drei Subdomains (webmail, mailin, mailout) liefern dasselbe Interface mit identischen Header-Defiziten.",
+    "evidence": "$ curl -sI https://webmail.securess.de\nX-Frame-Options: sameorigin ✓\nX-Powered-By: PHP/8.4.20\nServer: nginx/1.29.5\nStrict-Transport-Security: [fehlt]\nContent-Security-Policy: [fehlt]\nX-Content-Type-Options: [fehlt]",
+    "finding_type": "xfo_missing",
+    "id": "VS-2026-006",
+    "impact": "Ohne HSTS können Benutzer durch Man-in-the-Middle-Angriffe auf eine HTTP-Version der Webmail-Oberfläche umgeleitet werden. E-Mail-Zugangsdaten könnten so abgefangen werden. Fehlende CSP erhöht die Anfälligkeit für XSS in der Roundcube-Oberfläche.",
+    "policy_id": "SP-HDR-006",
+    "recommendation": "<b>Kurzfristig (Woche 1):</b> HSTS-Header in der nginx-Konfiguration für den Webmail-Server setzen: Strict-Transport-Security: max-age=63072000; includeSubDomains. X-Content-Type-Options: nosniff ergänzen.\n<b>Mittelfristig:</b> Roundcube-spezifische CSP konfigurieren und prüfen, ob mailin.securess.de und mailout.securess.de das Webmail-Interface ausliefern müssen (siehe VS-2026-007).",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-006",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Clickjacking-Schutz fehlt, aber keine Session-Pages - theoretisches Risiko",
+     "rule_references": [
+      "CWE-1021"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "X-Frame-Options-Header fehlt auf webmail.securess.de",
+    "title_vars": {
+     "host": "webmail.securess.de",
+     "tech": "Roundcube"
+    }
+   }
+  ],
+  "overall_description": "Die Infrastruktur von securess.de weist eine mittlere Gesamtgefährdungslage auf. Der Hosting-Server (212.227.60.78) zeigt mit 12 offenen Ports — darunter FTP, unverschlüsselte Mail-Protokolle und das Plesk-Administrationspanel — eine deutlich erweiterte Angriffsfläche. Positiv hervorzuheben sind die aktuelle WordPress-Version mit WAF-Schutz, die vollständige E-Mail-Authentifizierung (SPF, DKIM, DMARC reject) sowie die Nutzung von Hornetsecurity als vorgeschalteten Mail-Gateway.",
+  "overall_risk": "MEDIUM",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-DISC-001",
+   "SP-DNS-005",
+   "SP-FALLBACK",
+   "SP-HDR-006"
+  ],
+  "policy_version": "2026-05-10.1",
+  "positive_findings": [
+   {
+    "description": "Die Domain securess.de nutzt eine strikte DMARC-Policy (p=reject) mit konfigurierten Reporting-Adressen (rua/ruf). Dies stellt die höchste Schutzstufe gegen E-Mail-Spoofing dar und weist empfangende Mailserver an, nicht authentifizierte E-Mails konsequent abzulehnen.",
+    "title": "DMARC-Policy auf 'reject' konfiguriert"
+   },
+   {
+    "description": "Die Hauptwebseite betreibt WordPress 6.8.5 (aktuelle Version) und wird durch NinjaFirewall als Web Application Firewall geschützt. Der WAF blockiert erkennbar automatisierte Scanner-Zugriffe, was die Resilienz gegen automatisierte Angriffe deutlich erhöht.",
+    "title": "Aktuelle WordPress-Version mit Web Application Firewall"
+   },
+   {
+    "description": "Alle identifizierten PHP-Installationen (8.3.30 und 8.4.20) und OpenSSH-Versionen (9.2p1 und 9.6p1) befinden sich auf aktuellem Patch-Stand. Dies zeugt von einem funktionierenden Patch-Management-Prozess für Kernkomponenten.",
+    "title": "Aktuelle PHP- und OpenSSH-Versionen im Einsatz"
+   },
+   {
+    "description": "Die Nameserver ns1a.dodns.net und ns2a.dodns.net lehnen Zone-Transfer-Anfragen (AXFR) korrekt ab. Eine vollständige Enumeration der DNS-Zone durch unbefugte Dritte ist somit nicht möglich.",
+    "title": "DNS-Zone-Transfer korrekt unterbunden"
+   },
+   {
+    "description": "Das Geschäftsportal connect.securess.de setzt HSTS mit einem hohen max-age-Wert (63.072.000 Sekunden / 2 Jahre) und includeSubDomains-Direktive. Dies erzwingt zuverlässig verschlüsselte Verbindungen und schützt vor Protokoll-Downgrade-Angriffen auf dieses Login-Portal.",
+    "title": "HSTS auf connect.securess.de korrekt konfiguriert"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "FTP-Dienst (Port 21) auf 212.227.60.78 deaktivieren oder durch SFTP ersetzen. Port 21 in der Firewall blockieren.",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Security Header auf www.securess.de implementieren: HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy in der nginx-Konfiguration.",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Fehlende Security Header (CSP, X-Frame-Options, Referrer-Policy) auf connect.securess.de und webmail.securess.de ergänzen. HSTS auf webmail.securess.de hinzufügen.",
+    "effort": "3-4 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Webmail-Interface nur über webmail.securess.de bereitstellen. mailin.securess.de und mailout.securess.de auf Redirect oder Sperrseite umkonfigurieren.",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "SPF-Record von '~all' auf '-all' ändern nach Verifikation aller legitimen Versandwege.",
+    "effort": "1 h",
+    "finding_refs": [
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Nicht genutzte DNS-Einträge für partner.securess.de und vermittler.securess.de entfernen oder auf die Hauptdomain weiterleiten.",
+    "effort": "1 h",
+    "finding_refs": [
+     "VS-2026-009"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Server-Banner und X-Powered-By-Header auf allen Hosts unterdrücken (nginx: server_tokens off; Apache: ServerTokens Prod; PHP: expose_php=Off).",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-010"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 2,
+   "LOW": 4,
+   "MEDIUM": 1
+  },
+  "tech_profiles": []
+ },
+ "success": true
+}

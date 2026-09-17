@@ -1,0 +1,468 @@
+{
+ "data": {
+  "businessImpactScore": 6.5,
+  "correlationCount": 57,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "junkerwerk.hu",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-08-31T14:41:55.093Z",
+  "hasReport": true,
+  "id": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": false,
+     "fo": null,
+     "issues": [],
+     "p": null,
+     "pct": 100,
+     "raw": null,
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/junkerwerk.hu",
+     "domain": "junkerwerk.hu",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/junkerwerk.hu"
+    }
+   },
+   "passive_subdomains": [
+    "openotp.junkerwerk.hu",
+    "www.junkerwerk.hu"
+   ],
+   "securitytrails": {
+    "dns_history": [
+     {
+      "first_seen": "2025-10-09",
+      "last_seen": "2026-08-31",
+      "type": "a",
+      "values": [
+       "188.40.3.130"
+      ]
+     },
+     {
+      "first_seen": "2020-10-19",
+      "last_seen": "2025-10-09",
+      "type": "a",
+      "values": [
+       "81.169.140.206"
+      ]
+     },
+     {
+      "first_seen": "2017-09-29",
+      "last_seen": "2020-10-18",
+      "type": "a",
+      "values": [
+       "81.169.140.206"
+      ]
+     }
+    ],
+    "domain": {
+     "a_records": [
+      "188.40.3.130"
+     ],
+     "alexa_rank": null,
+     "domain": "junkerwerk.hu",
+     "hostname": "junkerwerk.hu",
+     "mx_records": [
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns_records": [
+      "ns.udag.org",
+      "ns.udag.net",
+      "ns.udag.de"
+     ],
+     "txt_records": [
+      "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all",
+      "MS=ms59194931"
+     ]
+    },
+    "subdomains": [
+     "www.junkerwerk.hu",
+     "openotp.junkerwerk.hu"
+    ]
+   },
+   "shodan_domain": {
+    "domain": "junkerwerk.hu",
+    "records": [
+     {
+      "last_seen": "2026-08-29T21:59:44.982000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "188.40.3.130"
+     },
+     {
+      "last_seen": "2026-08-28T15:36:31.553000",
+      "options": {
+       "priority": 10,
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-28T15:36:31.553000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-28T15:36:31.553000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-28T15:36:31.553000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-08-28T15:35:41.447000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.de"
+     },
+     {
+      "last_seen": "2026-08-28T15:35:41.447000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.net"
+     },
+     {
+      "last_seen": "2026-08-28T15:35:41.447000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.org"
+     },
+     {
+      "last_seen": "2026-08-28T15:36:58.511000",
+      "options": {
+       "expires": 604800,
+       "hostmaster": "hostmaster.united-domains.de",
+       "minttl": 3600,
+       "refresh": 10800,
+       "retry": 3600,
+       "serial": 2025050660,
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns.udag.de"
+     },
+     {
+      "last_seen": "2026-08-28T15:29:17.843000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=ms59194931"
+     },
+     {
+      "last_seen": "2026-08-28T15:29:17.843000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all"
+     },
+     {
+      "last_seen": "2026-08-29T21:59:44.954000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "188.40.3.130"
+     }
+    ],
+    "subdomains": [
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 3,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 2,
+      "crtsh": 0,
+      "gobuster_dns": 0,
+      "phase0a_passive": 2,
+      "subfinder": 1
+     },
+     "tools_with_zero_results": [
+      "crtsh",
+      "gobuster_dns"
+     ],
+     "total_subdomains": 3
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": null,
+     "mx": [
+      "mx01.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx04.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns.udag.de",
+      "ns.udag.org",
+      "ns.udag.net"
+     ],
+     "spf": "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all",
+     "zone_transfer": false
+    },
+    "domain": "junkerwerk.hu",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain junkerwerk.hu mit Basisdomain + www-Subdomain; trotz has_web=false zeigt Shodan exponierte Ports (3306 MariaDB, 5432 PostgreSQL, 587 SMTP, 21 FTP) und veraltete PostgreSQL 9.6.0 → kritische Infrastruktur mit bekannten Schwachstellen.",
+      "fqdns": [
+       "junkerwerk.hu",
+       "www.junkerwerk.hu"
+      ],
+      "ip": "188.40.3.130",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        3306,
+        587,
+        110,
+        143,
+        80,
+        21,
+        5432,
+        443
+       ],
+       "shodan_services": {
+        "3306": "MariaDB 10.11.18-MariaDB-0+deb12u1",
+        "443": "Apache httpd",
+        "5432": "PostgreSQL 9.6.0 or later",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "dedi2230.your-server.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Subdomain openotp.junkerwerk.hu mit primary VHost (Status 200, echte Web-Anwendung 'Web Applications Portal'); Shodan zeigt Exim SMTP 4.96 auf Port 25 → Web-Scan + Mail-Sicherheit erforderlich.",
+      "fqdns": [
+       "openotp.junkerwerk.hu"
+      ],
+      "ip": "217.243.248.30",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        25,
+        443
+       ],
+       "shodan_services": {
+        "25": "Exim smtpd 4.96",
+        "443": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108/217.243.248.30__openotp.junkerwerk.hu.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "66de10c312faf09835072ee2758f02bc5355fb8ebfff736e9cffe5f556b20ba4",
+        "final_url": "https://openotp.junkerwerk.hu",
+        "fqdn": "openotp.junkerwerk.hu",
+        "is_primary": true,
+        "screenshot_minio_key": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108/217.243.248.30__openotp.junkerwerk.hu.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal mit Apache httpd für Unternehmensanwendungen.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://openotp.junkerwerk.hu",
+       "has_web": true,
+       "status": 200,
+       "title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal",
+       "web_fqdn": "openotp.junkerwerk.hu"
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 2,
+   "hostsTotal": 2,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 3,
+   "INFO": 3,
+   "LOW": 3,
+   "MEDIUM": 3
+  },
+  "startedAt": "2026-08-31T14:27:27.791Z",
+  "status": "pending_review",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 1,
+   "errors": [
+    {
+     "check": "titles",
+     "detail": {
+      "duplicate_title": "anti-csrf-token fehlt auf login-formular openotp.junkerwerk.hu",
+      "finding_ids": [
+       "VS-2026-010",
+       "VS-2026-011"
+      ]
+     },
+     "finding_id": null,
+     "message": "2 Findings teilen denselben Title",
+     "severity": "error"
+    }
+   ],
+   "level": "warn",
+   "passed": false,
+   "warning_count": 1,
+   "warnings": [
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "DKIM",
+      "title": "SPF-Policy auf softfail (~all) statt -all fuer junkerwerk.hu",
+      "title_token": "SPF"
+     },
+     "finding_id": "VS-2026-007",
+     "message": "Title nennt SPF, Body beschreibt DKIM (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

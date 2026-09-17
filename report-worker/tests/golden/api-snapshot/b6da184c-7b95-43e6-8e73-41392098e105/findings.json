@@ -1,0 +1,2530 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 2,
+   "low": 3,
+   "medium": 2
+  },
+  "business_impact_score": "3.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "138.201.92.68:443 (admin.cms.rankingcoach.com)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Die Portainer-Instanz zur Container-Verwaltung ist unter admin.cms.rankingcoach.com öffentlich über das Internet erreichbar. Portainer ist ein webbasiertes Management-Tool für Docker/Kubernetes-Umgebungen. Die Login-Seite ist ohne Einschränkung zugänglich. Der Last-Modified-Header (18. Feb 2020) deutet auf eine seit über sechs Jahren nicht aktualisierte Portainer-Version hin.",
+    "evidence": "$ curl -sI https://admin.cms.rankingcoach.com\nHTTP/2 200\nserver: nginx/1.17.6\nlast-modified: Tue, 18 Feb 2020 01:03:34 GMT\nstrict-transport-security: max-age=31536000\nx-content-type-options: nosniff\n\nPage Title: Portainer\nMeta Author: Portainer.io\nRedirect: https://admin.cms.rankingcoach.com/#/auth\nAPI-Endpunkte erreichbar: /api/settings/public, /api/status, /api/users/admin/check",
+    "finding_type": "software_eol",
+    "id": "VS-2026-001",
+    "impact": "Angreifer können die Portainer-Version und verfügbare API-Endpunkte identifizieren. Bei einer veralteten Portainer-Version können bekannte Schwachstellen ausgenutzt werden, um Zugriff auf die Container-Infrastruktur zu erlangen. Selbst mit Authentifizierung offenbart die öffentliche Erreichbarkeit unnötig Informationen über die Infrastruktur.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Zugriff auf admin.cms.rankingcoach.com per IP-Whitelist oder VPN einschränken. Mindestens eine zusätzliche Authentifizierungsebene (z.B. nginx basic auth oder Client-Zertifikate) vorschalten.\n<b>Mittelfristig:</b> Portainer auf die aktuelle Version aktualisieren. Management-Interfaces grundsätzlich nur über VPN oder interne Netzwerke zugänglich machen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Portainer Container-Management öffentlich erreichbar auf admin.cms.rankingcoach.com",
+    "title_vars": {
+     "host": "admin.cms.rankingcoach.com",
+     "port": "443",
+     "tech": "Portainer"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "128.140.80.215:21 (jimdo.rankingcoach.com)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Auf dem Host jimdo.rankingcoach.com ist ein Pure-FTPd-Dienst auf Port 21 öffentlich erreichbar. FTP überträgt Anmeldeinformationen und Daten standardmäßig im Klartext. Selbst bei Verwendung von FTPS (FTP über TLS) bleibt die initiale Verbindungsaufnahme oft unverschlüsselt und der Dienst bietet eine zusätzliche Angriffsfläche.",
+    "evidence": "$ nmap -sV 128.140.80.215 -p 21\n21/tcp open ftp Pure-FTPd",
+    "id": "VS-2026-004",
+    "impact": "Bei einer Klartextübertragung können Anmeldeinformationen durch Man-in-the-Middle-Angriffe abgefangen werden. Der exponierte FTP-Dienst erweitert die Angriffsfläche und kann Ziel von Brute-Force-Angriffen werden.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Prüfen, ob der FTP-Dienst aktiv benötigt wird. Falls ja, Zugriff per Firewall auf bekannte IP-Adressen einschränken.\n<b>Mittelfristig:</b> FTP durch SFTP (SSH File Transfer Protocol) oder SCP ersetzen. Falls FTP zwingend benötigt wird, FTPS mit erzwungener TLS-Verschlüsselung konfigurieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst (Pure-FTPd) öffentlich exponiert auf jimdo.rankingcoach.com",
+    "title_vars": {
+     "host": "jimdo.rankingcoach.com",
+     "port": "21",
+     "tech": "Pure-FTPd"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_incomplete": true,
+    "affected": "rankingcoach.com (DNS-Zone, primär 176.9.21.52)",
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Über 100 Subdomains von rankingcoach.com sind öffentlich auflösbar, viele davon zeigen auf dieselbe IP-Adresse (176.9.21.52). Die Subdomain-Namensgebung offenbart detaillierte Informationen über die interne Infrastruktur: Datenbank-Cluster (galera1, cassa01-08), Big-Data-Systeme (bigdata01-06), Entwicklungsumgebungen (*.dev, api-dev, rc-api-dev), Kubernetes (k8s-staging, dashboard.k8s), Kollaborationstools (confluence, atlassian-01), Secrets-Management (vault) sowie diverse CMS-Testinstanzen.",
+    "evidence": "DNS-Enumeration (Auszug):\ngalera1.rankingcoach.com → 176.9.21.52 (Galera DB Cluster)\ncassa01-08.rankingcoach.com → 176.9.21.52 (Cassandra DB Cluster)\nbigdata01-06.rankingcoach.com → 176.9.21.52\nvault.rankingcoach.com → 176.9.21.52 (Secret Management)\nconfluence.rankingcoach.com → 176.9.21.52\natlassian-01.rankingcoach.com → 176.9.21.52\nk8s-staging.rankingcoach.com → 176.9.21.52\napi-staging-server.rankingcoach.com → 157.90.134.177\ndashboard.k8s.rankingcoach.com → 116.202.3.75\n\nSkipped Hosts (erreichbar):\napps-db-02.rankingcoach.com → 88.198.92.122\napps-db-03.rankingcoach.com → 176.9.38.61\nollama.rankingcoach.com → 86.120.61.26 (AI/LLM Service)\nmon.rankingcoach.com → 65.21.151.197 (Monitoring)",
+    "finding_type": "private_ip_disclosure",
+    "id": "VS-2026-006",
+    "impact": "Die offengelegten Subdomain-Namen ermöglichen Angreifern, ein detailliertes Bild der internen Infrastruktur zu erstellen (Datenbank-Technologien, Cluster-Größen, Entwicklungswerkzeuge). Dies erleichtert die Planung gezielter Angriffe erheblich.",
+    "policy_id": "SP-DISC-009",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Nicht mehr benötigte DNS-Einträge (insbesondere für abgeschaltete Dienste und alte cfdist/cassa-Einträge) bereinigen.\n<b>Mittelfristig:</b> Interne Dienste über ein Split-DNS-Konzept nur intern auflösbar machen. Wildcard-Zertifikat-basierte Subdomains auf dedizierte interne DNS-Zonen migrieren. DNS-Einträge im Rahmen eines regelmäßigen Reviews auf Aktualität prüfen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-009",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Private IP-Adressen (RFC1918 10.x, 172.16-31.x, 192.168.x) in HTTP-Antworten / Headers / Errorpages sichtbar — interne Netzwerk-Topologie wird Angreifern preisgegeben",
+     "rule_references": [
+      "CWE-200",
+      "CWE-204"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Übermäßige Subdomain-Exposition offenbart interne Infrastruktur von rankingcoach.com",
+    "title_vars": {
+     "domain": "rankingcoach.com",
+     "host": "rankingcoach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "138.201.92.68:80/443 (cms.rankingcoach.com, admin.cms.rankingcoach.com, phpmyadmin.cms.rankingcoach.com und 24 weitere Subdomains)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-1104",
+    "description": "Der Webserver auf 138.201.92.68 verwendet nginx Version 1.17.6, eine Mainline-Version aus November 2019. Diese Version ist über sechs Jahre alt und wird nicht mehr mit Sicherheitsupdates versorgt. Mehrere bekannte Schwachstellen existieren in dieser Versionsreihe, darunter DNS-Resolver-Schwachstellen und Speicherkorruptionsprobleme in späteren Patch-Zyklen.",
+    "evidence": "$ nmap -sV 138.201.92.68 -p 80,443\n80/tcp  open http nginx 1.17.6\n443/tcp open http nginx 1.17.6\n\nHTTP-Response-Header:\nserver: nginx/1.17.6",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-002",
+    "impact": "Veraltete Webserver-Software kann bekannte, öffentlich dokumentierte Schwachstellen enthalten, die von Angreifern ausgenutzt werden könnten. Die Versionsinformation im Server-Header erleichtert zudem die gezielte Suche nach passenden Exploits.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Nginx auf die aktuelle stabile Version (1.28.x oder neuer) aktualisieren. Den Server-Header konfigurieren, um keine Versionsinformation preiszugeben (server_tokens off).\n<b>Mittelfristig:</b> Einen regelmäßigen Patch-Zyklus für alle Webserver-Komponenten etablieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf cms.rankingcoach.com",
+    "title_vars": {
+     "host": "cms.rankingcoach.com",
+     "tech": "nginx",
+     "version": "1.17.6"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "176.9.21.52 (www.rankingcoach.com), 176.9.16.197 (lb2-eu.rankingcoach.com), 128.140.80.215 (jimdo.rankingcoach.com — PHP/8.3.30)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "",
+    "cwe": "CWE-200",
+    "description": "Die HTTP-Antwort-Header mehrerer Hosts enthalten den X-Powered-By-Header, der die exakte PHP-Version preisgibt. Auf dem Hauptserver und dem Loadbalancer wird PHP 8.0.30 offengelegt, auf jimdo.rankingcoach.com PHP 8.3.30.",
+    "evidence": "$ curl -sI https://www.rankingcoach.com | grep -i x-powered\nx-powered-by: PHP/8.0.30\n\n$ curl -sI https://jimdo.rankingcoach.com | grep -i x-powered\nx-powered-by: PHP/8.3.30",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-007",
+    "impact": "Die Offenlegung der exakten PHP-Version erleichtert Angreifern die gezielte Suche nach versionsspezifischen Schwachstellen. In Kombination mit der EOL-Version 8.0 auf dem Hauptserver ist dies besonders relevant.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig (Stunden):</b> In der php.ini aller Server expose_php = Off setzen und die PHP-Prozesse bzw. den Webserver neu laden.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf rankingcoach.com",
+    "title_vars": {
+     "host": "rankingcoach.com",
+     "tech": "PHP/8.0.30"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "176.9.21.52 (www.rankingcoach.com), 138.201.92.68 (cms.rankingcoach.com), 128.140.80.215 (jimdo.rankingcoach.com), 176.9.16.197 (lb2-eu.rankingcoach.com), 135.181.161.180 (ns3cdn.rankingcoach.com)",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Über alle geprüften Hosts hinweg fehlen wesentliche HTTP-Security-Header. Während HSTS auf der Hauptdomain (www.rankingcoach.com) und der Portainer-Instanz korrekt gesetzt ist, fehlen auf allen Hosts Content-Security-Policy (CSP), X-Frame-Options, Referrer-Policy und Permissions-Policy. Auf jimdo.rankingcoach.com und ns3cdn.rankingcoach.com fehlen sämtliche sieben geprüften Security-Header (0/7).",
+    "evidence": "Security-Header-Prüfung je Host:\n\nhttps://jimdo.rankingcoach.com: 0/7\n  Fehlend: HSTS, CSP, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy\n\nhttps://www.rankingcoach.com:\n  Vorhanden: strict-transport-security: max-age=31536000\n  Fehlend: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy\n\nhttps://ns3cdn.rankingcoach.com: 0/7\nhttps://ns1cdn.rankingcoach.com: 0/7",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-005",
+    "impact": "Fehlende Security-Header erhöhen das Risiko von Clickjacking-Angriffen (fehlende X-Frame-Options), Cross-Site-Scripting (fehlende CSP) und MIME-Type-Sniffing (fehlende X-Content-Type-Options). Insbesondere das Fehlen einer Content-Security-Policy auf einer Anwendung mit zahlreichen eingebundenen Drittanbieter-Skripten (Google Tag Manager, YouTube, Bing, Clarity) ist relevant.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Woche 1):</b> X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN und Referrer-Policy: strict-origin-when-cross-origin auf allen Hosts setzen.\n<b>Mittelfristig (2-4 Wochen):</b> Eine Content-Security-Policy entwickeln, die die eingebundenen Drittanbieter-Quellen (Google, YouTube, Bing, Cookiebot, Clarity) erlaubt und alle anderen blockiert. Permissions-Policy konfigurieren, um nicht benötigte Browser-APIs zu deaktivieren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf rankingcoach.com",
+    "title_vars": {
+     "host": "rankingcoach.com"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "138.201.92.68 (phpmyadmin.cms.rankingcoach.com)",
+    "business_impact_score": 0.5,
+    "cvss_score": "",
+    "cvss_vector": "",
+    "cwe": "CWE-284",
+    "description": "Der DNS-Eintrag phpmyadmin.cms.rankingcoach.com existiert und zeigt auf den CMS-Server (138.201.92.68). Der Dienst antwortet aktuell mit HTTP 503 (Service Temporarily Unavailable) und ist daher nicht aktiv erreichbar. Dennoch deutet der DNS-Eintrag darauf hin, dass phpMyAdmin auf diesem Server betrieben wurde oder wird.",
+    "evidence": "$ dig phpmyadmin.cms.rankingcoach.com +short\n138.201.92.68\n\n$ curl -sI https://phpmyadmin.cms.rankingcoach.com\nHTTP/1.1 503 Service Temporarily Unavailable\nserver: nginx/1.17.6",
+    "id": "VS-2026-008",
+    "impact": "Der DNS-Eintrag offenbart, dass Datenbank-Management-Tools auf diesem Server eingerichtet sind. Sollte der Dienst reaktiviert werden, wäre phpMyAdmin ohne weitere Schutzmaßnahmen öffentlich erreichbar.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> Den DNS-Eintrag entfernen, falls phpMyAdmin nicht mehr benötigt wird. Falls der Dienst benötigt wird, sicherstellen, dass er nur über VPN oder IP-Whitelist zugänglich ist.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "phpmyadmin.cms.rankingcoach.com als DNS-Eintrag vorhanden",
+    "title_vars": {
+     "host": "phpmyadmin.cms.rankingcoach.com",
+     "tech": "phpMyAdmin"
+    }
+   }
+  ],
+  "overall_description": "Die Infrastruktur von rankingcoach.com weist mehrere mittelschwere Sicherheitsbefunde auf: Eine öffentlich erreichbare Portainer-Container-Management-Oberfläche, eine erheblich veraltete nginx-Version (1.17.6 aus 2019), eine End-of-Life-PHP-Version (8.0) sowie ein exponierter FTP-Dienst. Die DNS-Sicherheitskonfiguration (SPF, DMARC, DKIM) ist hingegen vorbildlich umgesetzt. Kritische Schwachstellen mit unmittelbarem Ausnutzungsrisiko wurden nicht identifiziert.",
+  "overall_risk": "MEDIUM",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-DISC-001",
+   "SP-DISC-009",
+   "SP-FALLBACK"
+  ],
+  "policy_version": "2026-05-10.1",
+  "positive_findings": [
+   {
+    "description": "Die Domain rankingcoach.com verfügt über eine umfassende E-Mail-Authentifizierung: SPF mit striktem -all (Hardfail), DMARC mit p=reject inklusive forensischer Reporting-Adressen (fo=1) sowie aktives DKIM. Diese Kombination stellt den bestmöglichen Schutz gegen E-Mail-Spoofing und Phishing im Namen der Domain dar.",
+    "title": "Vorbildliche E-Mail-Sicherheitskonfiguration (SPF, DMARC, DKIM)"
+   },
+   {
+    "description": "Die autoritativen Nameserver (ns1cdn, ns2cdn, ns3cdn.rankingcoach.com) lehnen Zone-Transfer-Anfragen korrekt ab. Trotz der großen Anzahl an Subdomains kann die vollständige DNS-Zone nicht über AXFR exfiltriert werden.",
+    "title": "DNS Zone Transfer (AXFR) korrekt unterbunden"
+   },
+   {
+    "description": "Die WordPress-Installation auf jimdo.rankingcoach.com verwendet die aktuelle Version 6.9.4. Zusammen mit einer modernen PHP 8.3-Version und dem Einsatz von Cookiebot für die Cookie-Einwilligung zeigt dieser Host ein gutes Wartungsniveau.",
+    "title": "Aktuelle WordPress-Version auf jimdo.rankingcoach.com"
+   },
+   {
+    "description": "Alle geprüften Hosts leiten HTTP-Anfragen korrekt auf HTTPS um. Die Hauptdomain rankingcoach.com wird zudem sauber über www.rankingcoach.com auf die lokalisierte Version (/de-de) weitergeleitet, ohne unsichere Zwischenschritte.",
+    "title": "HTTPS-Erzwingung mit korrekten Redirects"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Portainer-Zugriff auf admin.cms.rankingcoach.com per IP-Whitelist oder VPN einschränken und Portainer auf aktuelle Version aktualisieren",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "X-Powered-By-Header auf allen Servern deaktivieren (expose_php = Off) und nginx-Versionsinformation unterdrücken (server_tokens off)",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-007",
+     "VS-2026-002"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "nginx auf 138.201.92.68 von Version 1.17.6 auf aktuelle stabile Version aktualisieren",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Basis-Security-Header (X-Content-Type-Options, X-Frame-Options, Referrer-Policy) auf allen Hosts konfigurieren",
+    "effort": "4-6 h",
+    "finding_refs": [
+     "VS-2026-005"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "FTP-Dienst auf jimdo.rankingcoach.com prüfen und Zugriff per Firewall einschränken oder durch SFTP ersetzen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Content-Security-Policy für www.rankingcoach.com und jimdo.rankingcoach.com entwickeln und ausrollen",
+    "effort": "8-12 h",
+    "finding_refs": [
+     "VS-2026-005"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "DNS-Hygiene durchführen: Nicht mehr benötigte Subdomains entfernen, phpmyadmin.cms-Eintrag prüfen, Split-DNS für interne Dienste evaluieren",
+    "effort": "8-16 h",
+    "finding_refs": [
+     "VS-2026-006",
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 2,
+   "LOW": 3,
+   "MEDIUM": 2
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "rankingcoach.com",
+     "www.rankingcoach.com",
+     "*.rankingcoach.com",
+     "acc-srv.rankingcoach.com",
+     "acu.dev.rankingcoach.com",
+     "admin.cmstest.rankingcoach.com",
+     "ahu.dev.rankingcoach.com",
+     "ami.dev.rankingcoach.com",
+     "amu.dev.rankingcoach.com",
+     "api-dev.rankingcoach.com",
+     "api03.rankingcoach.com",
+     "api1.rankingcoach.com",
+     "api2.rankingcoach.com",
+     "api5.rankingcoach.com",
+     "apu.dev.rankingcoach.com",
+     "asg.dev.rankingcoach.com",
+     "atlassian-01.rankingcoach.com",
+     "bbt.dev.rankingcoach.com",
+     "bi01.rankingcoach.com",
+     "bi02.rankingcoach.com",
+     "bigdata01.rankingcoach.com",
+     "bigdata02.rankingcoach.com",
+     "bigdata03.rankingcoach.com",
+     "bigdata04.rankingcoach.com",
+     "bigdata05.rankingcoach.com",
+     "bigdata06.rankingcoach.com",
+     "bsu.dev.rankingcoach.com",
+     "bty.dev.rankingcoach.com",
+     "cassa01.rankingcoach.com",
+     "cassa02.rankingcoach.com",
+     "cassa03.rankingcoach.com",
+     "cassa04.rankingcoach.com",
+     "cassa05.rankingcoach.com",
+     "cassa06.rankingcoach.com",
+     "cassa07.rankingcoach.com",
+     "cassa08.rankingcoach.com",
+     "cassa11.rankingcoach.com",
+     "cfdist011.rankingcoach.com",
+     "cfdist013.rankingcoach.com",
+     "cfdist014.rankingcoach.com",
+     "cfdist015.rankingcoach.com",
+     "cfdist016.rankingcoach.com",
+     "cfdist017.rankingcoach.com",
+     "cfdist018.rankingcoach.com",
+     "cfdist019.rankingcoach.com",
+     "cfdist021.rankingcoach.com",
+     "cfdist022.rankingcoach.com",
+     "cfdist023.rankingcoach.com",
+     "cfdist024.rankingcoach.com",
+     "cfdist029.rankingcoach.com",
+     "cfdist030.rankingcoach.com",
+     "cfdist031.rankingcoach.com",
+     "cfdist033.rankingcoach.com",
+     "cfdist035.rankingcoach.com",
+     "cfdist036.rankingcoach.com",
+     "cfdist037.rankingcoach.com",
+     "cfdist041.rankingcoach.com",
+     "cfdist042.rankingcoach.com",
+     "cfdist044.rankingcoach.com",
+     "cfdist046.rankingcoach.com",
+     "cfdist047.rankingcoach.com",
+     "cfdist048.rankingcoach.com",
+     "cfdist049.rankingcoach.com",
+     "cfdist050.rankingcoach.com",
+     "cfdist051.rankingcoach.com",
+     "cfdist052.rankingcoach.com",
+     "cfdist056.rankingcoach.com",
+     "cfdist057.rankingcoach.com",
+     "cfdist059.rankingcoach.com",
+     "cfdist063.rankingcoach.com",
+     "cfdist064.rankingcoach.com",
+     "cfdist065.rankingcoach.com",
+     "cfdist066.rankingcoach.com",
+     "cfdist068.rankingcoach.com",
+     "cfdist61.rankingcoach.com",
+     "cfdist62.rankingcoach.com",
+     "cfidst067.rankingcoach.com",
+     "cforigin.rankingcoach.com",
+     "confluence.rankingcoach.com",
+     "contao-en.cmstest.rankingcoach.com",
+     "csu.dev.rankingcoach.com",
+     "dan.dev.rankingcoach.com",
+     "dev.rankingcoach.com",
+     "dpu.dev.rankingcoach.com",
+     "dsa.dev.rankingcoach.com",
+     "eca.dev.rankingcoach.com",
+     "eka.dev.rankingcoach.com",
+     "galera1.rankingcoach.com",
+     "gambio-en.cmstest.rankingcoach.com",
+     "gbo.dev.rankingcoach.com",
+     "help.rankingcoach.com",
+     "help.strato.rankingcoach.com",
+     "hosters.rankingcoach.com",
+     "ivs.dev.rankingcoach.com",
+     "joomla-en.cmstest.rankingcoach.com",
+     "k8s-staging.rankingcoach.com",
+     "magento-en.cmstest.rankingcoach.com",
+     "mbt.dev.rankingcoach.com",
+     "media.rankingcoach.com",
+     "mentorship.rankingcoach.com",
+     "mgn.dev.rankingcoach.com",
+     "opencart-en.cmstest.rankingcoach.com",
+     "prestashop-en.cmstest.rankingcoach.com",
+     "rc-api-dev.rankingcoach.com",
+     "rc-api.rankingcoach.com",
+     "rft.dev.rankingcoach.com",
+     "shopware-en.cmstest.rankingcoach.com",
+     "strato.rankingcoach.com",
+     "testing.rankingcoach.com",
+     "typo-en.cmstest.rankingcoach.com",
+     "vault.rankingcoach.com",
+     "web03.rankingcoach.com",
+     "wix.rankingcoach.com",
+     "wordpress-de.cmstest.rankingcoach.com",
+     "wordpress-en.cmstest.rankingcoach.com",
+     "wordpress-it.cmstest.rankingcoach.com",
+     "www2.rankingcoach.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "176.9.21.52",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443
+    ],
+    "primary_vhost": "rankingcoach.com",
+    "redirect_data": {
+     "*.rankingcoach.com": {
+      "error": "Page.goto: net::ERR_NAME_NOT_RESOLVED at http://*.rankingcoach.com/\nCall log:\n  - navigating to \"http://*.rankingcoach.com/\", waiting until \"networkidle\"\n",
+      "final_domain": "*.rankingcoach.com",
+      "final_url": "https://*.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "acc-srv.rankingcoach.com": {
+      "error": "Page.goto: Timeout 10000ms exceeded.\nCall log:\n  - navigating to \"http://acc-srv.rankingcoach.com/\", waiting until \"networkidle\"\n",
+      "final_domain": "acc-srv.rankingcoach.com",
+      "final_url": "https://acc-srv.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "acu.dev.rankingcoach.com": {
+      "error": null,
+      "final_domain": "acu.dev.rankingcoach.com",
+      "final_url": "https://acu.dev.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "403 Forbidden",
+      "redirect_chain": [
+       "https://acu.dev.rankingcoach.com/"
+      ],
+      "response_headers": {
+       "content-encoding": "gzip",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 20:35:41 GMT",
+       "server": "nginx"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/176.9.21.52/phase2/screenshot_acu.dev.rankingcoach.com.png",
+      "status_code": 403,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "403 Forbidden"
+      }
+     },
+     "rankingcoach.com": {
+      "error": null,
+      "final_domain": "www.rankingcoach.com",
+      "final_url": "https://www.rankingcoach.com/de-de",
+      "is_cross_domain": true,
+      "page_title": "rankingCoach: Die Online Marketing App für kleine Unternehmen",
+      "redirect_chain": [
+       "https://rankingcoach.com/",
+       "https://www.rankingcoach.com/",
+       "https://www.rankingcoach.com/de-de",
+       "https://www.rankingcoach.com/integrum/css/public/pages/home.min.css?version=1778154149577",
+       "https://www.rankingcoach.com/scripts/fix-mootools-array-from.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/css/fonts/rc-icons/rc-icons-regular.woff",
+       "https://www.rankingcoach.com/scripts/vendor/stripeGradientAnimation.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-ai.gif",
+       "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.css?version=1778154149577?version=1778154149577",
+       "https://www.gstatic.com/partners/badge/images/2023/PartnerBadgeClickable.svg",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=mobile_reputation/mobile_reputation",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=graphics-browser-anorganic",
+       "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577",
+       "https://www.rankingcoach.com/scripts/vendor/videojs-youtube.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.js?version=1778154149577",
+       "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500;1,700&display=swap",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-twitter.svg",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=mobile_reputation%2Fmobile_reputation",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=graphics-browser-anorganic",
+       "https://www.rankingcoach.com/integrum/img/public/images/logo/rC-logo-color-medium-anniversary.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-local-marketing.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/sbo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-binoculars.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-seo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-social-media.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-google-ga.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/awp.svg",
+       "https://www.rankingcoach.com/integrum/img/public/flags/square/de.png",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-reputation-management.svg",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://www.rankingcoach.com/integrum/img/public/images/laureal_left.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/laureal_right.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/logo/inv-rC-logo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-facebook.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-instagram.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-linkedin.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-youtube.svg",
+       "https://www.googletagmanager.com/gtm.js?id=GTM-WMVJTV",
+       "https://www.rankingcoach.com/jump/scripts/vendor/scripts.lottie-vendor.min.js?version=1778154149577",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMaxKUBGEe.woff2",
+       "https://www.rankingcoach.com/jump/scripts/mootools.min.js?version=1778154149577",
+       "https://assets.reviews.io/img/all-global-assets/logo/reviewsio-logo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/play_button.svg",
+       "https://www.youtube.com/iframe_api",
+       "https://www.rankingcoach.com/integrum/scripts/scripts.public-es5.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015_1@2x.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015@2x.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015_2@2x.jpg",
+       "https://img.youtube.com/vi/yYFgF5voBto/maxresdefault.jpg",
+       "https://www.rankingcoach.com/yYFgF5voBto",
+       "https://www.rankingcoach.com/integrum/img/public/images/gallery-controls-next.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/gallery-controls-previous.svg",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO5CnqEu92Fr1Mu53ZEC9_Vu3r1gIhOszmkBnka.woff2",
+       "https://www.rankingcoach.com/de-de/translations/index",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-ads.svg",
+       "https://assets.rankingcoach.com/animations/integrum/v2/mobile_reputation/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/header_embed_browser/data.json",
+       "https://www.youtube.com/s/player/8fb635c2/www-widgetapi.vflset/www-widgetapi.js",
+       "https://www.googletagmanager.com/gtag/js?id=G-MKD984JS1X&cx=c&gtm=4e6562",
+       "https://www.youtube-nocookie.com/embed/yYFgF5voBto?controls=0&modestbranding=1&rel=0&showinfo=0&loop=1&autohide=1&fs=0&hl=de&playsinline=0&enablejsapi=1&origin=https%3A%2F%2Fwww.rankingcoach.com&widgetid=2&forigin=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&aoriginsup=1&vf=1",
+       "https://www.youtube-nocookie.com/embed/yYFgF5voBto?controls=0&modestbranding=1&rel=0&showinfo=0&loop=1&autohide=1&fs=0&hl=de&playsinline=1&enablejsapi=1&origin=https%3A%2F%2Fwww.rankingcoach.com&widgetid=1&forigin=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&aoriginsup=1&vf=1",
+       "https://www.googletagmanager.com/gtag/js?id=AW-804162534&cx=c&gtm=4e6562",
+       "https://bat.bing.com/bat.js",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/www-player.css",
+       "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.xtyqfmz4Ntg.L.W.O/am=AAAAIA/d=0/br=1/rs=AGKMywGmZONZZpPcNuFiwzhlprY6cpfnWQ",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/www-player.css",
+       "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.xtyqfmz4Ntg.L.W.O/am=AAAAIA/d=0/br=1/rs=AGKMywGmZONZZpPcNuFiwzhlprY6cpfnWQ",
+       "https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://www.google.de/ads/ga-audiences?v=1&t=sr&slf_rd=1&_r=4&tid=G-MKD984JS1X&cid=2066718870.1778358911&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&rcb=12&aip=1&dma=1&dma_cps=a&gcd=13l3lPl2l1l1&npa=1&frm=0&tag_exp=0~115938465~115938469~118463261~118494634~118719170&z=1177383116",
+       "https://stats.g.doubleclick.net/g/collect?v=2&tid=G-MKD984JS1X&cid=2066718870.1778358911&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&rcb=12&aip=1&dma=1&dma_cps=a&gcd=13l3lPl2l1l1&npa=1&frm=0&tag_exp=0~115938465~115938469~118463261~118494634~118719170",
+       "https://region1.analytics.google.com/g/collect?v=2&tid=G-MKD984JS1X&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&_p=1778358909027&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&ecid=192102203&_eu=AAAAAGAC&are=1&cid=2066718870.1778358911&ec_mode=a&frm=0&pscdl=noapi&rcb=12&sr=1280x720&uaa=x86&uab=64&uafvl=HeadlessChrome%3B147.0.7727.15%7CNot.A%252FBrand%3B8.0.0.0%7CChromium%3B147.0.7727.15&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=0~115938465~115938469~118463261~118494634~118719170&sid=1778358911&sct=1&seg=0&dl=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&dt=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&en=page_view&_fv=1&_nsi=1&_ss=1&tfd=6809",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=root,base",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=root,base",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/base.js",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/base.js",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/exm=base,root/ed=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=r78Drb",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/exm=base,root/ed=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=r78Drb",
+       "https://i.ytimg.com/vi/yYFgF5voBto/default.jpg?sqp=-oaymwEkCHgQWvKriqkDGvABAfgB_gmAAtAFigIMCAAQARhlIFooUzAP&rs=AOn4CLC71fA_y-ZuYNJ_ll0OZ9FiMDInWg",
+       "https://www.youtube-nocookie.com/youtubei/v1/player?prettyPrint=false",
+       "https://i.ytimg.com/vi/yYFgF5voBto/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgWihTMA8=&rs=AOn4CLBpy1Ml4Gi-9EfyA2VwWwfl_CO8DA",
+       "https://www.youtube-nocookie.com/youtubei/v1/embedded_player?prettyPrint=false"
+      ],
+      "response_headers": {
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 20:35:08 GMT",
+       "location": "https://www.rankingcoach.com/",
+       "server": "nginx",
+       "strict-transport-security": "max-age=31536000",
+       "x-cache-status": "HIT",
+       "x-powered-by": "PHP/8.0.30"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/176.9.21.52/phase2/screenshot_rankingcoach.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1, maximum-scale=5",
+         "name": "viewport"
+        },
+        {
+         "content": "Einfach überall gefunden werden! Mit rankingCoach bringst du dein Unternehmen einfach ganz nach oben. Nimm dein Online Marketing selbst in die Hand!",
+         "name": "description"
+        },
+        {
+         "content": "91kt5hbyb901v0i7ie0sy6ltrau8n8",
+         "name": "facebook-domain-verification"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://bat.bing.com/bat.js",
+        "https://www.googletagmanager.com/gtag/js?id=G-MKD984JS1X&cx=c&gtm=4e6562",
+        "https://www.googletagmanager.com/gtag/js?id=AW-804162534&cx=c&gtm=4e6562",
+        "https://www.youtube.com/s/player/8fb635c2/www-widgetapi.vflset/www-widgetapi.js",
+        "https://www.youtube.com/iframe_api",
+        "https://www.googletagmanager.com/gtm.js?id=GTM-WMVJTV",
+        "https://www.rankingcoach.com/scripts/fix-mootools-array-from.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/jump/scripts/vendor/scripts.lottie-vendor.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/jump/scripts/mootools.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/scripts/scripts.public-es5.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/de-de/translations/index",
+        "https://www.rankingcoach.com/scripts/vendor/stripeGradientAnimation.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/videojs-youtube.min.js?version=1778154149577"
+       ],
+       "stylesheets": [
+        "https://www.rankingcoach.com/integrum/css/public/pages/home.min.css?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.css?version=1778154149577?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577"
+       ],
+       "title": "rankingCoach: Die Online Marketing App für kleine Unternehmen"
+      }
+     },
+     "www.rankingcoach.com": {
+      "error": null,
+      "final_domain": "www.rankingcoach.com",
+      "final_url": "https://www.rankingcoach.com/de-de",
+      "is_cross_domain": false,
+      "page_title": "rankingCoach: Die Online Marketing App für kleine Unternehmen",
+      "redirect_chain": [
+       "https://www.rankingcoach.com/",
+       "https://www.rankingcoach.com/de-de",
+       "https://www.rankingcoach.com/integrum/css/public/pages/home.min.css?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/css/fonts/rc-icons/rc-icons-regular.woff",
+       "https://www.rankingcoach.com/scripts/fix-mootools-array-from.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/scripts/vendor/stripeGradientAnimation.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-ai.gif",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=mobile_reputation/mobile_reputation",
+       "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.css?version=1778154149577?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-twitter.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-local-marketing.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-google-ga.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-seo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-reputation-management.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-social-media.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-binoculars.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/sbo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/awp.svg",
+       "https://www.rankingcoach.com/integrum/img/public/flags/square/de.png",
+       "https://www.rankingcoach.com/integrum/img/public/images/laureal_left.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/laureal_right.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/logo/inv-rC-logo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-facebook.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-instagram.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-linkedin.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-youtube.svg",
+       "https://www.rankingcoach.com/scripts/vendor/videojs-youtube.min.js?version=1778154149577",
+       "https://www.gstatic.com/partners/badge/images/2023/PartnerBadgeClickable.svg",
+       "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500;1,700&display=swap",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=graphics-browser-anorganic",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=mobile_reputation%2Fmobile_reputation",
+       "https://www.rankingcoach.com/integrum/img/public/images/logo/rC-logo-color-medium-anniversary.svg",
+       "https://www.rankingcoach.com/jump/scripts/vendor/scripts.lottie-vendor.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/jump/scripts/mootools.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.js?version=1778154149577",
+       "https://www.googletagmanager.com/gtm.js?id=GTM-WMVJTV",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=graphics-browser-anorganic",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://www.rankingcoach.com/integrum/scripts/scripts.public-es5.min.js?version=1778154149577",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMaxKUBGEe.woff2",
+       "https://assets.reviews.io/img/all-global-assets/logo/reviewsio-logo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/play_button.svg",
+       "https://www.rankingcoach.com/yYFgF5voBto",
+       "https://www.youtube.com/iframe_api",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015_1@2x.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015@2x.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015_2@2x.jpg",
+       "https://www.rankingcoach.com/yYFgF5voBto",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO5CnqEu92Fr1Mu53ZEC9_Vu3r1gIhOszmkBnka.woff2",
+       "https://img.youtube.com/vi/yYFgF5voBto/maxresdefault.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/gallery-controls-previous.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/gallery-controls-next.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-ads.svg",
+       "https://assets.rankingcoach.com/animations/integrum/v2/mobile_reputation/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/header_embed_browser/data.json",
+       "https://www.rankingcoach.com/de-de/translations/index",
+       "https://www.googletagmanager.com/gtag/js?id=AW-804162534&cx=c&gtm=4e6562",
+       "https://www.googletagmanager.com/gtag/js?id=G-MKD984JS1X&cx=c&gtm=4e6562",
+       "https://bat.bing.com/bat.js",
+       "https://www.youtube.com/s/player/8fb635c2/www-widgetapi.vflset/www-widgetapi.js",
+       "https://www.google.com/ccm/collect?rcb=13&frm=0&en=page_view&dl=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&scrsrc=www.googletagmanager.com&rnd=1155745872.1778358915&dt=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&auid=1834046459.1778358915&navt=n&npa=1&gtm=45be6562v9179050689z86878457za20gzb6878457zd6878457xec&gcd=13l3l3l2l1l1&dma_cps=a&dma=1&tag_exp=0~115938465~115938469~118463261~118494634&apve=1&apvf=f&apvc=1&tids=AW-804162534&tid=AW-804162534&tft=1778358914978&tfd=2268",
+       "https://www.google.de/ads/ga-audiences?v=1&t=sr&slf_rd=1&_r=4&tid=G-MKD984JS1X&cid=1493076864.1778358915&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&rcb=10&aip=1&dma=1&dma_cps=a&gcd=13l3lPl2l1l1&npa=1&frm=0&tag_exp=0~115938465~115938468~118463262&z=542334064",
+       "https://region1.analytics.google.com/g/collect?v=2&tid=G-MKD984JS1X&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&_p=1778358913001&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&ecid=1099375146&_eu=AAAAAGAC&are=1&cid=1493076864.1778358915&ec_mode=a&frm=0&pscdl=noapi&rcb=10&sr=1280x720&uaa=x86&uab=64&uafvl=HeadlessChrome%3B147.0.7727.15%7CNot.A%252FBrand%3B8.0.0.0%7CChromium%3B147.0.7727.15&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=0~115938465~115938468~118463262&sid=1778358915&sct=1&seg=0&dl=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&dt=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&en=page_view&_fv=1&_nsi=1&_ss=1&tfd=2428",
+       "https://stats.g.doubleclick.net/g/collect?v=2&tid=G-MKD984JS1X&cid=1493076864.1778358915&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&rcb=10&aip=1&dma=1&dma_cps=a&gcd=13l3lPl2l1l1&npa=1&frm=0&tag_exp=0~115938465~115938468~118463262",
+       "https://bat.bing.com/p/action/151010209.js",
+       "https://www.clarity.ms/tag/uet/151010209",
+       "https://www.youtube-nocookie.com/embed/yYFgF5voBto?controls=0&modestbranding=1&rel=0&showinfo=0&loop=1&autohide=1&fs=0&hl=de&playsinline=0&enablejsapi=1&origin=https%3A%2F%2Fwww.rankingcoach.com&widgetid=2&forigin=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&aoriginsup=1&vf=1",
+       "https://bat.bing.net/action/0?ti=151010209&tm=gtm002&Ver=2&mid=88f6ca0a-7f4a-4d5f-aab2-e7062ebb0b5c&bo=2&pi=0&lg=en-US&sw=1280&sh=720&sc=24&nwd=1&tl=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&p=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&r=&lt=707&evt=pageLoad&sv=2&asc=D&cdb=AQAY&rn=83671",
+       "https://bat.bing.net/actionp/0?ti=151010209&tm=gtm002&Ver=2&mid=88f6ca0a-7f4a-4d5f-aab2-e7062ebb0b5c&bo=1&evt=consent&src=enforced&cdb=AQAY&asc=D",
+       "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.xtyqfmz4Ntg.L.W.O/am=AAAAIA/d=0/br=1/rs=AGKMywGmZONZZpPcNuFiwzhlprY6cpfnWQ",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/www-player.css",
+       "https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://www.youtube-nocookie.com/embed/yYFgF5voBto?controls=0&modestbranding=1&rel=0&showinfo=0&loop=1&autohide=1&fs=0&hl=de&playsinline=1&enablejsapi=1&origin=https%3A%2F%2Fwww.rankingcoach.com&widgetid=1&forigin=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&aoriginsup=1&vf=1",
+       "https://scripts.clarity.ms/0.8.62/clarity.js",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/www-player.css",
+       "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.xtyqfmz4Ntg.L.W.O/am=AAAAIA/d=0/br=1/rs=AGKMywGmZONZZpPcNuFiwzhlprY6cpfnWQ",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=root,base",
+       "https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/base.js",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=root,base",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/base.js",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/exm=base,root/ed=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=r78Drb",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/exm=base,root/ed=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=r78Drb"
+      ],
+      "response_headers": {
+       "access-control-allow-credentials": "true",
+       "access-control-allow-headers": "Authorization, Referer, User-Agent, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method, Access-Control-Request-Headers, JwtSource",
+       "access-control-allow-methods": "HEAD, GET, POST, PUT, PATCH, DELETE, OPTIONS",
+       "access-control-allow-origin": "www.rankingcoach.com",
+       "cache-control": "no-cache",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Sat, 09 May 2026 20:35:12 GMT",
+       "location": "https://www.rankingcoach.com/de-de",
+       "referer": "https://www.rankingcoach.com/1",
+       "server": "nginx",
+       "strict-transport-security": "max-age=31536000",
+       "x-cache-status": "MISS",
+       "x-powered-by": "PHP/8.0.30",
+       "x-robots-tag": "noindex"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/176.9.21.52/phase2/screenshot_www.rankingcoach.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "_gcl_au=1.1.1834046459.1778358915; _ga_MKD984JS1X=GS2.1.s1778358915$o1$g0$t1778358915$j60$l0$h1099375146; _ga=GA1.1.1493076864.1778358915",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1, maximum-scale=5",
+         "name": "viewport"
+        },
+        {
+         "content": "Einfach überall gefunden werden! Mit rankingCoach bringst du dein Unternehmen einfach ganz nach oben. Nimm dein Online Marketing selbst in die Hand!",
+         "name": "description"
+        },
+        {
+         "content": "91kt5hbyb901v0i7ie0sy6ltrau8n8",
+         "name": "facebook-domain-verification"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.youtube.com/s/player/8fb635c2/www-widgetapi.vflset/www-widgetapi.js",
+        "https://bat.bing.com/bat.js",
+        "https://www.googletagmanager.com/gtag/js?id=G-MKD984JS1X&cx=c&gtm=4e6562",
+        "https://www.googletagmanager.com/gtag/js?id=AW-804162534&cx=c&gtm=4e6562",
+        "https://www.youtube.com/iframe_api",
+        "https://www.googletagmanager.com/gtm.js?id=GTM-WMVJTV",
+        "https://www.rankingcoach.com/scripts/fix-mootools-array-from.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/jump/scripts/vendor/scripts.lottie-vendor.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/jump/scripts/mootools.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/scripts/scripts.public-es5.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/de-de/translations/index",
+        "https://www.rankingcoach.com/scripts/vendor/stripeGradientAnimation.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/videojs-youtube.min.js?version=1778154149577"
+       ],
+       "stylesheets": [
+        "https://www.rankingcoach.com/integrum/css/public/pages/home.min.css?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.css?version=1778154149577?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577"
+       ],
+       "title": "rankingCoach: Die Online Marketing App für kleine Unternehmen"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "cves": [
+       "CVE-2024-4577"
+      ],
+      "eol_date": "2023-11-26",
+      "is_mega_cve": true,
+      "latest_patch": "",
+      "name": "PHP",
+      "source": "tech_detect",
+      "status": "minor_eol",
+      "version": "8.0.30",
+      "vuln_name": "PHP-CGI OS Command Injection Vulnerability"
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Analytics",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Tag Manager",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "source": "server_banner",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": "8.0.30"
+     },
+     {
+      "name": "Google Tag Manager",
+      "version": ""
+     },
+     {
+      "name": "Google Analytics",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "*.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "acc-srv.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "acu.dev.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "www.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "admin.cms.rankingcoach.com",
+     "cms.rankingcoach.com",
+     "concrete5.cms.rankingcoach.com",
+     "contao-en.cms.rankingcoach.com",
+     "joomla-en.cms.rankingcoach.com",
+     "joomla3de.cms.rankingcoach.com",
+     "joomla4.cms.rankingcoach.com",
+     "joomla4de.cms.rankingcoach.com",
+     "joomla4en.cms.rankingcoach.com",
+     "joomlaen.cms.rankingcoach.com",
+     "phpmyadmin.cms.rankingcoach.com",
+     "prestashopen.cms.rankingcoach.com",
+     "shopware6-de.cms.rankingcoach.com",
+     "shopware6-en.cms.rankingcoach.com",
+     "typo3en.cms.rankingcoach.com",
+     "wordpress-de.cms.rankingcoach.com",
+     "wordpress-en.cms.rankingcoach.com",
+     "wordpress-gr.cms.rankingcoach.com",
+     "wordpress-it.cms.rankingcoach.com",
+     "wordpressde.cms.rankingcoach.com",
+     "wordpressen.cms.rankingcoach.com",
+     "wordpresses.cms.rankingcoach.com",
+     "wordpressfr.cms.rankingcoach.com",
+     "wordpressgr.cms.rankingcoach.com",
+     "wordpressit.cms.rankingcoach.com",
+     "wordpressnl.cms.rankingcoach.com",
+     "wordpresspt.cms.rankingcoach.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "138.201.92.68",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443
+    ],
+    "primary_vhost": "admin.cms.rankingcoach.com",
+    "redirect_data": {
+     "admin.cms.rankingcoach.com": {
+      "error": null,
+      "final_domain": "admin.cms.rankingcoach.com",
+      "final_url": "https://admin.cms.rankingcoach.com/#/auth",
+      "is_cross_domain": false,
+      "page_title": "Portainer",
+      "redirect_chain": [
+       "https://admin.cms.rankingcoach.com/",
+       "https://admin.cms.rankingcoach.com/vendor.1.css",
+       "https://admin.cms.rankingcoach.com/main.60d3d42a85af1781a5ac.css",
+       "https://admin.cms.rankingcoach.com/5da83cfb4883a59354abeff852cb7394.png",
+       "https://admin.cms.rankingcoach.com/44d537ab79f921fde5a28b2c1636f397.woff2",
+       "https://admin.cms.rankingcoach.com/main.60d3d42a85af1781a5ac.js",
+       "https://admin.cms.rankingcoach.com/vendor.60d3d42a85af1781a5ac.js",
+       "https://admin.cms.rankingcoach.com/api/settings/public",
+       "https://admin.cms.rankingcoach.com/api/status",
+       "https://admin.cms.rankingcoach.com/api/settings/public",
+       "https://www.google-analytics.com/analytics.js",
+       "https://admin.cms.rankingcoach.com/api/users/admin/check",
+       "https://www.google-analytics.com/j/collect?v=1&_v=j102&aip=1&a=582253016&t=pageview&_s=1&dl=https%3A%2F%2Fadmin.cms.rankingcoach.com%2F&dp=%2Fauth&ul=en-us&dt=Portainer&sr=1280x720&vp=1280x720&_u=YEBAAEABAAAAACAAI~&jid=1503280804&gjid=2074231410&cid=2028653687.1778358909&tid=UA-84944922-2&_gid=1985972950.1778358909&_r=1&_slc=1&z=1611680920",
+       "https://www.googletagmanager.com/gtag/js?id=G-4NJG4BH26D&cx=c&_slc=1",
+       "https://region1.google-analytics.com/g/collect?v=2&tid=G-4NJG4BH26D&gtm=45je6562v9119783600za20g&_p=1778358908986&gcd=13l3l3l2l2l1&npa=0&dma_cps=a&dma=1&_eu=ABAI&are=1&cid=2028653687.1778358909&frm=0&pscdl=noapi&rcb=0&sr=1280x720&uaa=x86&uab=64&uafvl=HeadlessChrome%3B147.0.7727.15%7CNot.A%252FBrand%3B8.0.0.0%7CChromium%3B147.0.7727.15&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&_s=1&tag_exp=0~115938466~115938468~118463262~118719170&dl=https%3A%2F%2Fadmin.cms.rankingcoach.com%2F&dp=%2Fauth&dt=Portainer&sid=1778358909&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&tfd=4962"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "no-cache, no-store, must-revalidate",
+       "content-length": "23032",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Sat, 09 May 2026 20:35:08 GMT",
+       "last-modified": "Tue, 18 Feb 2020 01:03:34 GMT",
+       "server": "nginx/1.17.6",
+       "strict-transport-security": "max-age=31536000",
+       "x-content-type-options": "nosniff",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/138.201.92.68/phase2/screenshot_admin.cms.rankingcoach.com.png",
+      "status_code": 204,
+      "tech_info": {
+       "body_classes": "ng-scope",
+       "cookies": "portainer.LOGIN_STATE_UUID=a983643d-5f7c-47c2-83d9-12722690f148; _ga=GA1.2.2028653687.1778358909; _gid=GA1.2.1985972950.1778358909; _gat=1; _ga_4NJG4BH26D=GS2.2.s1778358909$o1$g0$t1778358909$j60$l0$h0",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "",
+         "name": "description"
+        },
+        {
+         "content": "Portainer.io",
+         "name": "author"
+        },
+        {
+         "content": "4806ce9049e1e082dd3da4063ceb0eea.xml",
+         "name": "msapplication-config"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.googletagmanager.com/gtag/js?id=G-4NJG4BH26D&cx=c&_slc=1",
+        "https://www.google-analytics.com/analytics.js",
+        "https://admin.cms.rankingcoach.com/vendor.60d3d42a85af1781a5ac.js",
+        "https://admin.cms.rankingcoach.com/main.60d3d42a85af1781a5ac.js"
+       ],
+       "stylesheets": [
+        "https://admin.cms.rankingcoach.com/vendor.1.css",
+        "https://admin.cms.rankingcoach.com/main.60d3d42a85af1781a5ac.css"
+       ],
+       "title": "Portainer"
+      }
+     },
+     "cms.rankingcoach.com": {
+      "error": null,
+      "final_domain": "cms.rankingcoach.com",
+      "final_url": "https://cms.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "503 Service Temporarily Unavailable",
+      "redirect_chain": [
+       "https://cms.rankingcoach.com/"
+      ],
+      "response_headers": {
+       "content-length": "599",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 20:35:13 GMT",
+       "server": "nginx/1.17.6"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/138.201.92.68/phase2/screenshot_cms.rankingcoach.com.png",
+      "status_code": 503,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "503 Service Temporarily Unavailable"
+      }
+     },
+     "concrete5.cms.rankingcoach.com": {
+      "error": null,
+      "final_domain": "concrete5.cms.rankingcoach.com",
+      "final_url": "https://concrete5.cms.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "503 Service Temporarily Unavailable",
+      "redirect_chain": [
+       "https://concrete5.cms.rankingcoach.com/"
+      ],
+      "response_headers": {
+       "content-length": "599",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 20:35:18 GMT",
+       "server": "nginx/1.17.6"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/138.201.92.68/phase2/screenshot_concrete5.cms.rankingcoach.com.png",
+      "status_code": 503,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "503 Service Temporarily Unavailable"
+      }
+     },
+     "contao-en.cms.rankingcoach.com": {
+      "error": null,
+      "final_domain": "contao-en.cms.rankingcoach.com",
+      "final_url": "https://contao-en.cms.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "503 Service Temporarily Unavailable",
+      "redirect_chain": [
+       "https://contao-en.cms.rankingcoach.com/"
+      ],
+      "response_headers": {
+       "content-length": "599",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 20:35:23 GMT",
+       "server": "nginx/1.17.6"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/138.201.92.68/phase2/screenshot_contao-en.cms.rankingcoach.com.png",
+      "status_code": 503,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "503 Service Temporarily Unavailable"
+      }
+     },
+     "joomla-en.cms.rankingcoach.com": {
+      "error": null,
+      "final_domain": "joomla-en.cms.rankingcoach.com",
+      "final_url": "https://joomla-en.cms.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "503 Service Temporarily Unavailable",
+      "redirect_chain": [
+       "https://joomla-en.cms.rankingcoach.com/"
+      ],
+      "response_headers": {
+       "content-length": "599",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 20:35:28 GMT",
+       "server": "nginx/1.17.6"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/138.201.92.68/phase2/screenshot_joomla-en.cms.rankingcoach.com.png",
+      "status_code": 503,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "503 Service Temporarily Unavailable"
+      }
+     }
+    },
+    "server": "nginx/1.17.6",
+    "tech_rows": [
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Analytics",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Tag Manager",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "source": "server_banner",
+      "status": "current",
+      "version": "1.17.6",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": "1.17.6"
+     },
+     {
+      "name": "Google Analytics",
+      "version": ""
+     },
+     {
+      "name": "Google Tag Manager",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "admin.cms.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "cms.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "concrete5.cms.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "contao-en.cms.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "joomla-en.cms.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "lb2-eu.rankingcoach.com",
+     "ns1cdn.rankingcoach.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "176.9.16.197",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     53,
+     80,
+     443
+    ],
+    "primary_vhost": "lb2-eu.rankingcoach.com",
+    "redirect_data": {
+     "lb2-eu.rankingcoach.com": {
+      "error": null,
+      "final_domain": "www.rankingcoach.com",
+      "final_url": "https://www.rankingcoach.com/de-de",
+      "is_cross_domain": true,
+      "page_title": "rankingCoach: Die Online Marketing App für kleine Unternehmen",
+      "redirect_chain": [
+       "https://lb2-eu.rankingcoach.com/",
+       "https://www.rankingcoach.com/",
+       "https://www.rankingcoach.com/de-de",
+       "https://www.rankingcoach.com/integrum/css/public/pages/home.min.css?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/css/fonts/rc-icons/rc-icons-regular.woff",
+       "https://www.rankingcoach.com/scripts/fix-mootools-array-from.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/scripts/vendor/stripeGradientAnimation.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-ai.gif",
+       "https://www.gstatic.com/partners/badge/images/2023/PartnerBadgeClickable.svg",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=mobile_reputation/mobile_reputation",
+       "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.css?version=1778154149577?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-twitter.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-local-marketing.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-google-ga.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-seo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-reputation-management.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-social-media.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-binoculars.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/sbo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/awp.svg",
+       "https://www.rankingcoach.com/integrum/img/public/flags/square/de.png",
+       "https://www.rankingcoach.com/integrum/img/public/images/laureal_left.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/laureal_right.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/logo/inv-rC-logo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-facebook.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-instagram.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-linkedin.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-youtube.svg",
+       "https://www.rankingcoach.com/scripts/vendor/videojs-youtube.min.js?version=1778154149577",
+       "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500;1,700&display=swap",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=graphics-browser-anorganic",
+       "https://www.rankingcoach.com/integrum/img/public/images/logo/rC-logo-color-medium-anniversary.svg",
+       "https://www.rankingcoach.com/jump/scripts/vendor/scripts.lottie-vendor.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/jump/scripts/mootools.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=mobile_reputation%2Fmobile_reputation",
+       "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=graphics-browser-anorganic",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://www.googletagmanager.com/gtm.js?id=GTM-WMVJTV",
+       "https://www.rankingcoach.com/integrum/scripts/scripts.public-es5.min.js?version=1778154149577",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMaxKUBGEe.woff2",
+       "https://assets.reviews.io/img/all-global-assets/logo/reviewsio-logo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/play_button.svg",
+       "https://www.rankingcoach.com/yYFgF5voBto",
+       "https://www.youtube.com/iframe_api",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015_1@2x.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015@2x.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015_2@2x.jpg",
+       "https://www.rankingcoach.com/yYFgF5voBto",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO5CnqEu92Fr1Mu53ZEC9_Vu3r1gIhOszmkBnka.woff2",
+       "https://www.rankingcoach.com/integrum/img/public/images/gallery-controls-previous.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/gallery-controls-next.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-ads.svg",
+       "https://img.youtube.com/vi/yYFgF5voBto/maxresdefault.jpg",
+       "https://www.rankingcoach.com/de-de/translations/index",
+       "https://bat.bing.com/bat.js",
+       "https://www.googletagmanager.com/gtag/js?id=AW-804162534&cx=c&gtm=4e6562",
+       "https://www.googletagmanager.com/gtag/js?id=G-MKD984JS1X&cx=c&gtm=4e6562",
+       "https://www.youtube.com/s/player/8fb635c2/www-widgetapi.vflset/www-widgetapi.js",
+       "https://bat.bing.com/p/action/151010209.js",
+       "https://www.google.com/ccm/collect?rcb=15&frm=0&en=page_view&dl=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&scrsrc=www.googletagmanager.com&rnd=1354690712.1778358928&dt=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&auid=758341767.1778358928&navt=n&npa=1&gtm=45be6562v9179050689z86878457za20gzb6878457zd6878457xec&gcd=13l3l3l2l1l1&dma_cps=a&dma=1&tag_exp=0~115938465~115938469~118463262~118719172&apve=1&apvf=f&apvc=1&tids=AW-804162534&tid=AW-804162534&tft=1778358928166&tfd=5195",
+       "https://www.youtube-nocookie.com/embed/yYFgF5voBto?controls=0&modestbranding=1&rel=0&showinfo=0&loop=1&autohide=1&fs=0&hl=de&playsinline=1&enablejsapi=1&origin=https%3A%2F%2Fwww.rankingcoach.com&widgetid=1&forigin=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&aoriginsup=1&vf=1",
+       "https://www.youtube-nocookie.com/embed/yYFgF5voBto?controls=0&modestbranding=1&rel=0&showinfo=0&loop=1&autohide=1&fs=0&hl=de&playsinline=0&enablejsapi=1&origin=https%3A%2F%2Fwww.rankingcoach.com&widgetid=2&forigin=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&aoriginsup=1&vf=1",
+       "https://www.google.de/ads/ga-audiences?v=1&t=sr&slf_rd=1&_r=4&tid=G-MKD984JS1X&cid=616354479.1778358928&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&rcb=17&aip=1&dma=1&dma_cps=a&gcd=13l3lPl2l1l1&npa=1&frm=0&tag_exp=0~115616986~115938465~115938469~118463261~118719171&z=1843675046",
+       "https://stats.g.doubleclick.net/g/collect?v=2&tid=G-MKD984JS1X&cid=616354479.1778358928&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&rcb=17&aip=1&dma=1&dma_cps=a&gcd=13l3lPl2l1l1&npa=1&frm=0&tag_exp=0~115616986~115938465~115938469~118463261~118719171",
+       "https://region1.analytics.google.com/g/collect?v=2&tid=G-MKD984JS1X&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&_p=1778358927318&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&ecid=388587435&_eu=AAAAAGAC&are=1&cid=616354479.1778358928&ec_mode=a&frm=0&pscdl=noapi&rcb=17&sr=1280x720&uaa=x86&uab=64&uafvl=HeadlessChrome%3B147.0.7727.15%7CNot.A%252FBrand%3B8.0.0.0%7CChromium%3B147.0.7727.15&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=0~115616986~115938465~115938469~118463261~118719171&sid=1778358928&sct=1&seg=0&dl=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&dt=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&en=page_view&_fv=1&_nsi=1&_ss=1&tfd=5367",
+       "https://www.clarity.ms/tag/uet/151010209",
+       "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.xtyqfmz4Ntg.L.W.O/am=AAAAIA/d=0/br=1/rs=AGKMywGmZONZZpPcNuFiwzhlprY6cpfnWQ",
+       "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.xtyqfmz4Ntg.L.W.O/am=AAAAIA/d=0/br=1/rs=AGKMywGmZONZZpPcNuFiwzhlprY6cpfnWQ",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/www-player.css",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/www-player.css",
+       "https://bat.bing.net/action/0?ti=151010209&tm=gtm002&Ver=2&mid=ff120cbd-8295-4802-9116-d15c9e6d203f&bo=2&pi=0&lg=en-US&sw=1280&sh=720&sc=24&nwd=1&tl=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&p=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&r=&lt=4749&evt=pageLoad&sv=2&asc=D&cdb=AQAY&rn=786234",
+       "https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://bat.bing.net/actionp/0?ti=151010209&tm=gtm002&Ver=2&mid=ff120cbd-8295-4802-9116-d15c9e6d203f&bo=1&evt=consent&src=enforced&cdb=AQAY&asc=D",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=root,base",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=root,base",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/base.js",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/base.js",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/exm=base,root/ed=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=r78Drb",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/exm=base,root/ed=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=r78Drb",
+       "https://www.google.com/js/th/GKHPdbjXdAzLptBtk5NastbDkUFAkaEKXg3Jazyf5I0.js",
+       "https://www.google.com/js/th/GKHPdbjXdAzLptBtk5NastbDkUFAkaEKXg3Jazyf5I0.js",
+       "https://i.ytimg.com/vi/yYFgF5voBto/default.jpg?sqp=-oaymwEkCHgQWvKriqkDGvABAfgB_gmAAtAFigIMCAAQARhlIFooUzAP&rs=AOn4CLC71fA_y-ZuYNJ_ll0OZ9FiMDInWg",
+       "https://i.ytimg.com/vi/yYFgF5voBto/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgWihTMA8=&rs=AOn4CLBpy1Ml4Gi-9EfyA2VwWwfl_CO8DA",
+       "https://www.youtube-nocookie.com/youtubei/v1/embedded_player?prettyPrint=false",
+       "https://scripts.clarity.ms/0.8.62/clarity.js",
+       "https://www.youtube-nocookie.com/youtubei/v1/player?prettyPrint=false",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/captions.js",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380529&ei=kZr_abesL4nL6dsPtOWciQk&ip=62.217.52.174&id=o-ABlljx-Thx65vHnJ8ROPFr0PAqjGPZDd6Sj7-omPIAQZ&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=278&met=1778358929%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-i5heen7s&ms=au%2Conr&mv=m&mvi=5&pl=22&rms=au%2Cau&pcm2=yes&initcwndbps=2603750&spc=96Xrv1kQY58F1EzTNbmrX3wFJM1gUtA9GH4avUEdmTsPlmqK1T2FQ742YqdBDieH_b_shA&svpuc=1&ns=W-PHCJpytQGtb4iH01ySP70V&sabr=1&rqh=1&mt=1778358541&fvip=5&keepalive=yes&fexp=51565116%2C51565682&c=WEB_EMBEDDED_PLAYER&n=uQ6HRtyaYEgvqQ&sparams=expire%2Cei%2Cip%2Cid%2Csource%2Crequiressl%2Cxpc%2Cpcm2%2Cspc%2Csvpuc%2Cns%2Csabr%2Crqh&sig=AHEqNM4wRQIgJkGQFz0aa3Vv-SJjMn4L0xg02qqADor0C5kTu2SDLmgCIQCRaFYnWStDeourvR7H9CY2zMeIhzOggB_cPWFlmq8kWw%3D%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRAIgYMx7cRejYryQw04pIHSWUU9Ym6HlA4ttvWrN0N05Y9oCIFToHaMPP2JdP6FWeOBd1BCkR0DccrT2q3ZlhJbFbmRS&cpn=rd88u-JRsPYJOZ34&cver=2.20260508.01.00&rn=1&alr=yes",
+       "https://www.youtube-nocookie.com/api/stats/qoe?fmt=136&afmt=251&cpn=rd88u-JRsPYJOZ34&el=embedded&ns=yt&fexp=v1%2C24004644%2C494890%2C26510701%2C53408%2C34656%2C106030%2C18644%2C117689%2C9252%2C3479%2C13030%2C23206%2C35403%2C65299%2C15105%2C20831%2C4228%2C4174%2C30447%2C18705%2C21437%2C4571%2C11038%2C1978%2C15426%2C661%2C6621%2C2783%2C23826%2C9500%2C1840%2C22474%2C11771%2C11470%2C13160%2C453%2C21067%2C10985%2C24046%2C3305%2C1354%2C952%2C2754%2C12774%2C8149%2C1206%2C2193%2C1626%2C8030%2C10591%2C13175%2C288%2C1548%2C2823%2C6692%2C11839%2C3861%2C1286%2C3221%2C2259%2C171%2C2411%2C1170%2C3%2C368%2C490%2C1681%2C644%2C2629%2C2314%2C3774%2C2827%2C21%2C2118%2C13661&cl=910468478&seq=1&docid=yYFgF5voBto&ei=kZr_abesL4nL6dsPtOWciQk&event=streamingstats&plid=AAZRaHRLNzPQjhNk&cbr=HeadlessChrome&cbrver=147.0.7727.15&c=WEB_EMBEDDED_PLAYER&cver=2.20260508.01.00&cplayer=UNIPLAYER&cos=X11&cplatform=DESKTOP&vps=0.000:N,0.254:B,0.644:N,0.918:N&cat=streaming,sabr,rqs2&bat=0.254:1:1,0.644:1:1,0.918:1:1&vis=0.254:0&cmt=0.254:0.000,0.644:0.000,0.918:0.000&bh=0.254:0.000,0.644:0.000,0.918:0.000&bwe=0.644:589824,0.918:589824&afs=0.914:251::i:fl.-22.79;vg.0;nm.4;sms.2:CAEoAQ&vfs=0.918:136:136::a:sms.2:CAEoAQ&view=0.918:1280:720&bwm=0.918:2097152:0.279&qclc=ChByZDg4dS1KUnNQWUpPWjM0EAE",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=anorganic_search/anorganic_search",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=/listings_reputation_management/listings_reputation_management",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=anorganic_search%2Fanorganic_search",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=%2Flistings_reputation_management%2Flistings_reputation_management",
+       "https://www.youtube-nocookie.com/youtubei/v1/next?prettyPrint=false",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=organic_search/organic_search",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=cms_support/cms_support",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=organic_search%2Forganic_search",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=listings_sync_directories/listings_sync_directories",
+       "https://www.youtube-nocookie.com/generate_204?kpBwBw",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=cms_support%2Fcms_support",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=listings_sync_directories%2Flistings_sync_directories",
+       "https://www.youtube-nocookie.com/generate_204?e0P3Ug",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380529&ei=kZr_abesL4nL6dsPtOWciQk&ip=62.217.52.174&id=o-ABlljx-Thx65vHnJ8ROPFr0PAqjGPZDd6Sj7-omPIAQZ&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=278&met=1778358929%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-i5heen7s&ms=au%2Conr&mv=m&mvi=5&pl=22&rms=au%2Cau&pcm2=yes&initcwndbps=2603750&spc=96Xrv1kQY58F1EzTNbmrX3wFJM1gUtA9GH4avUEdmTsPlmqK1T2FQ742YqdBDieH_b_shA&svpuc=1&ns=W-PHCJpytQGtb4iH01ySP70V&sabr=1&rqh=1&mt=1778358541&fvip=5&keepalive=yes&fexp=51565116%2C51565682&c=WEB_EMBEDDED_PLAYER&n=uQ6HRtyaYEgvqQ&sparams=expire%2Cei%2Cip%2Cid%2Csource%2Crequiressl%2Cxpc%2Cpcm2%2Cspc%2Csvpuc%2Cns%2Csabr%2Crqh&sig=AHEqNM4wRQIgJkGQFz0aa3Vv-SJjMn4L0xg02qqADor0C5kTu2SDLmgCIQCRaFYnWStDeourvR7H9CY2zMeIhzOggB_cPWFlmq8kWw%3D%3D&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRAIgYMx7cRejYryQw04pIHSWUU9Ym6HlA4ttvWrN0N05Y9oCIFToHaMPP2JdP6FWeOBd1BCkR0DccrT2q3ZlhJbFbmRS&cpn=rd88u-JRsPYJOZ34&cver=2.20260508.01.00&rn=2&alr=yes",
+       "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+       "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+       "https://n.clarity.ms/collect",
+       "https://assets.rankingcoach.com/animations/integrum/v2/organic_search/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/mobile_reputation/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/listings_sync_directories/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/header_embed_browser/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/listings_reputation_management/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/cms_support/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/anorganic_search/data.json",
+       "https://www.youtube-nocookie.com/youtubei/v1/log_event?alt=json",
+       "https://www.youtube-nocookie.com/youtubei/v1/log_event?alt=json",
+       "https://n.clarity.ms/collect"
+      ],
+      "response_headers": {
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 20:35:27 GMT",
+       "location": "https://www.rankingcoach.com/",
+       "server": "nginx",
+       "strict-transport-security": "max-age=31536000",
+       "x-cache-status": "EXPIRED",
+       "x-powered-by": "PHP/8.0.30"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/176.9.16.197/phase2/screenshot_lb2-eu.rankingcoach.com.png",
+      "status_code": 204,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "_gcl_au=1.1.758341767.1778358928; _ga_MKD984JS1X=GS2.1.s1778358928$o1$g0$t1778358928$j60$l0$h388587435; _ga=GA1.1.616354479.1778358928",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1, maximum-scale=5",
+         "name": "viewport"
+        },
+        {
+         "content": "Einfach überall gefunden werden! Mit rankingCoach bringst du dein Unternehmen einfach ganz nach oben. Nimm dein Online Marketing selbst in die Hand!",
+         "name": "description"
+        },
+        {
+         "content": "91kt5hbyb901v0i7ie0sy6ltrau8n8",
+         "name": "facebook-domain-verification"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://scripts.clarity.ms/0.8.62/clarity.js",
+        "https://www.clarity.ms/tag/uet/151010209",
+        "https://www.youtube.com/s/player/8fb635c2/www-widgetapi.vflset/www-widgetapi.js",
+        "https://bat.bing.com/bat.js",
+        "https://www.googletagmanager.com/gtag/js?id=G-MKD984JS1X&cx=c&gtm=4e6562",
+        "https://www.googletagmanager.com/gtag/js?id=AW-804162534&cx=c&gtm=4e6562",
+        "https://www.youtube.com/iframe_api",
+        "https://www.googletagmanager.com/gtm.js?id=GTM-WMVJTV",
+        "https://www.rankingcoach.com/scripts/fix-mootools-array-from.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/jump/scripts/vendor/scripts.lottie-vendor.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/jump/scripts/mootools.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/scripts/scripts.public-es5.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/de-de/translations/index",
+        "https://bat.bing.com/p/action/151010209.js",
+        "https://www.rankingcoach.com/scripts/vendor/stripeGradientAnimation.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/videojs-youtube.min.js?version=1778154149577"
+       ],
+       "stylesheets": [
+        "https://www.rankingcoach.com/integrum/css/public/pages/home.min.css?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.css?version=1778154149577?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577"
+       ],
+       "title": "rankingCoach: Die Online Marketing App für kleine Unternehmen"
+      }
+     },
+     "ns1cdn.rankingcoach.com": {
+      "error": null,
+      "final_domain": "www.rankingcoach.com",
+      "final_url": "https://www.rankingcoach.com/de-de",
+      "is_cross_domain": true,
+      "page_title": "rankingCoach: Die Online Marketing App für kleine Unternehmen",
+      "redirect_chain": [
+       "https://ns1cdn.rankingcoach.com/",
+       "https://www.rankingcoach.com/",
+       "https://www.rankingcoach.com/de-de",
+       "https://www.rankingcoach.com/integrum/css/public/pages/home.min.css?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/css/fonts/rc-icons/rc-icons-regular.woff",
+       "https://www.rankingcoach.com/scripts/fix-mootools-array-from.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/scripts/vendor/stripeGradientAnimation.min.js?version=1778154149577",
+       "https://www.gstatic.com/partners/badge/images/2023/PartnerBadgeClickable.svg",
+       "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.css?version=1778154149577?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577",
+       "https://www.rankingcoach.com/scripts/vendor/videojs-youtube.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-twitter.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-ai.gif",
+       "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.js?version=1778154149577",
+       "https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500;1,700&display=swap",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-local-marketing.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-google-ga.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-seo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-reputation-management.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-social-media.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-binoculars.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/sbo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/awp.svg",
+       "https://www.rankingcoach.com/integrum/img/public/flags/square/de.png",
+       "https://www.rankingcoach.com/integrum/img/public/images/laureal_left.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/laureal_right.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/logo/inv-rC-logo.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-facebook.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-instagram.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-linkedin.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/footer-social-media-icons/icon-youtube.svg",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=mobile_reputation/mobile_reputation",
+       "https://www.rankingcoach.com/jump/scripts/vendor/scripts.lottie-vendor.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/jump/scripts/mootools.min.js?version=1778154149577",
+       "https://www.googletagmanager.com/gtm.js?id=GTM-WMVJTV",
+       "https://www.rankingcoach.com/integrum/img/public/images/logo/rC-logo-color-medium-anniversary.svg",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=graphics-browser-anorganic",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=mobile_reputation%2Fmobile_reputation",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=graphics-browser-anorganic",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMaxKUBGEe.woff2",
+       "https://assets.reviews.io/img/all-global-assets/logo/reviewsio-logo.svg",
+       "https://www.rankingcoach.com/integrum/scripts/scripts.public-es5.min.js?version=1778154149577",
+       "https://www.rankingcoach.com/integrum/img/public/images/play_button.svg",
+       "https://www.rankingcoach.com/yYFgF5voBto",
+       "https://www.youtube.com/iframe_api",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015_1@2x.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015@2x.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/Rectangle_1015_2@2x.jpg",
+       "https://fonts.gstatic.com/s/roboto/v51/KFO5CnqEu92Fr1Mu53ZEC9_Vu3r1gIhOszmkBnka.woff2",
+       "https://img.youtube.com/vi/yYFgF5voBto/maxresdefault.jpg",
+       "https://www.rankingcoach.com/integrum/img/public/images/gallery-controls-previous.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/gallery-controls-next.svg",
+       "https://www.rankingcoach.com/integrum/img/public/images/icon-ads.svg",
+       "https://www.rankingcoach.com/de-de/translations/index",
+       "https://bat.bing.com/bat.js",
+       "https://www.googletagmanager.com/gtag/js?id=G-MKD984JS1X&cx=c&gtm=4e6562",
+       "https://www.googletagmanager.com/gtag/js?id=AW-804162534&cx=c&gtm=4e6562",
+       "https://www.youtube.com/s/player/8fb635c2/www-widgetapi.vflset/www-widgetapi.js",
+       "https://bat.bing.com/p/action/151010209.js",
+       "https://www.google.de/ads/ga-audiences?v=1&t=sr&slf_rd=1&_r=4&tid=G-MKD984JS1X&cid=537610059.1778358939&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&rcb=14&aip=1&dma=1&dma_cps=a&gcd=13l3lPl2l1l1&npa=1&frm=0&tag_exp=0~115938465~115938469~118463262&z=388465596",
+       "https://region1.analytics.google.com/g/collect?v=2&tid=G-MKD984JS1X&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&_p=1778358938024&_gaz=1&gcd=13l3lPl2l1l1&npa=1&dma_cps=a&dma=1&ecid=1555407945&_eu=AAAAAGAC&are=1&cid=537610059.1778358939&ec_mode=a&frm=0&pscdl=noapi&rcb=14&sr=1280x720&uaa=x86&uab=64&uafvl=HeadlessChrome%3B147.0.7727.15%7CNot.A%252FBrand%3B8.0.0.0%7CChromium%3B147.0.7727.15&uam=&uamb=0&uap=Linux&uapv=&uaw=0&ul=en-us&gaf=2&_s=1&tag_exp=0~115938465~115938469~118463262&sid=1778358939&sct=1&seg=0&dl=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&dt=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&en=page_view&_fv=1&_nsi=1&_ss=1&tfd=5507",
+       "https://stats.g.doubleclick.net/g/collect?v=2&tid=G-MKD984JS1X&cid=537610059.1778358939&gtm=45je6562v9118129177z86878457za20gzb6878457zd6878457&rcb=14&aip=1&dma=1&dma_cps=a&gcd=13l3lPl2l1l1&npa=1&frm=0&tag_exp=0~115938465~115938469~118463262",
+       "https://www.google.com/ccm/collect?rcb=10&frm=0&en=page_view&dl=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&scrsrc=www.googletagmanager.com&rnd=1645615062.1778358939&dt=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&auid=1522912529.1778358939&navt=n&npa=1&gtm=45be6562v9179050689z86878457za20gzb6878457zd6878457xec&gcd=13l3l3l2l1l1&dma_cps=a&dma=1&tag_exp=0~115616985~115938465~115938469~118463262~118719172&apve=1&apvf=f&apvc=1&tids=AW-804162534&tid=AW-804162534&tft=1778358939247&tfd=5577",
+       "https://bat.bing.net/actionp/0?ti=151010209&tm=gtm002&Ver=2&mid=a7ffd2ab-b0f3-4820-bdf0-1945c2da2a29&bo=1&evt=consent&src=enforced&cdb=AQAY&asc=D",
+       "https://www.clarity.ms/tag/uet/151010209",
+       "https://www.youtube-nocookie.com/embed/yYFgF5voBto?controls=0&modestbranding=1&rel=0&showinfo=0&loop=1&autohide=1&fs=0&hl=de&playsinline=1&enablejsapi=1&origin=https%3A%2F%2Fwww.rankingcoach.com&widgetid=1&forigin=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&aoriginsup=1&vf=1",
+       "https://bat.bing.net/action/0?ti=151010209&tm=gtm002&Ver=2&mid=a7ffd2ab-b0f3-4820-bdf0-1945c2da2a29&bo=2&pi=0&lg=en-US&sw=1280&sh=720&sc=24&nwd=1&tl=rankingCoach%3A%20Die%20Online%20Marketing%20App%20f%C3%BCr%20kleine%20Unternehmen&p=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&r=&lt=4745&evt=pageLoad&sv=2&asc=D&cdb=AQAY&rn=531140",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/www-player.css",
+       "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.xtyqfmz4Ntg.L.W.O/am=AAAAIA/d=0/br=1/rs=AGKMywGmZONZZpPcNuFiwzhlprY6cpfnWQ",
+       "https://www.youtube-nocookie.com/embed/yYFgF5voBto?controls=0&modestbranding=1&rel=0&showinfo=0&loop=1&autohide=1&fs=0&hl=de&playsinline=0&enablejsapi=1&origin=https%3A%2F%2Fwww.rankingcoach.com&widgetid=2&forigin=https%3A%2F%2Fwww.rankingcoach.com%2Fde-de&aoriginsup=1&vf=1",
+       "https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/www-player.css",
+       "https://www.youtube.com/s/_/ytembeds/_/ss/k=ytembeds.base.xtyqfmz4Ntg.L.W.O/am=AAAAIA/d=0/br=1/rs=AGKMywGmZONZZpPcNuFiwzhlprY6cpfnWQ",
+       "https://scripts.clarity.ms/0.8.62/clarity.js",
+       "https://fonts.gstatic.com/s/roboto/v48/KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=root,base",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=root,base",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/base.js",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/base.js",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/exm=base,root/ed=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=r78Drb",
+       "https://www.youtube.com/s/_/ytembeds/_/js/k=ytembeds.base.en_US.xzcSOk8ggsw.es5.O/am=AAAAIA/d=1/exm=base,root/ed=1/br=1/rs=AGKMywEaKh3Q5GyN5lNq6twnMKS0l-BYvg/m=r78Drb",
+       "https://i.ytimg.com/vi/yYFgF5voBto/default.jpg?sqp=-oaymwEkCHgQWvKriqkDGvABAfgB_gmAAtAFigIMCAAQARhlIFooUzAP&rs=AOn4CLC71fA_y-ZuYNJ_ll0OZ9FiMDInWg",
+       "https://www.youtube-nocookie.com/youtubei/v1/embedded_player?prettyPrint=false",
+       "https://www.youtube-nocookie.com/youtubei/v1/player?prettyPrint=false",
+       "https://i.ytimg.com/vi/yYFgF5voBto/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgWihTMA8=&rs=AOn4CLBpy1Ml4Gi-9EfyA2VwWwfl_CO8DA",
+       "https://www.youtube-nocookie.com/api/stats/qoe?fmt=136&cpn=vi9L8876uaKlFr18&el=embedded&ns=yt&fexp=v1%2C24004644%2C494888%2C26510703%2C53408%2C34656%2C106030%2C18644%2C117689%2C9252%2C3479%2C13030%2C23206%2C35402%2C65300%2C15105%2C25059%2C4174%2C30446%2C18706%2C21437%2C4571%2C5238%2C5800%2C1978%2C11423%2C1686%2C2316%2C662%2C6621%2C2783%2C23826%2C9500%2C1840%2C22474%2C11771%2C11471%2C10930%2C2229%2C453%2C21067%2C10985%2C24046%2C3305%2C1352%2C954%2C2754%2C12775%2C9350%2C2197%2C1626%2C6436%2C1594%2C10591%2C13175%2C289%2C11062%2C11839%2C218%2C3642%2C1286%2C2031%2C1191%2C2430%2C2412%2C1169%2C3%2C368%2C2172%2C642%2C2630%2C2314%2C3775%2C2828%2C20%2C541%2C1576%2C80523&cl=910468478&seq=1&docid=yYFgF5voBto&ei=nJr_adGyDJf4xN8Pm4LskAg&event=streamingstats&plid=AAZRaHTqNP7nNGAH&cbr=HeadlessChrome&cbrver=147.0.7727.15&c=WEB_EMBEDDED_PLAYER&cver=2.20260508.01.00&cplayer=UNIPLAYER&cos=X11&cplatform=DESKTOP&vps=0.000:N,0.284:B,0.491:B,0.491:B&ctmp=dttg:t.0;dtt.1;gl.0&cat=streaming&cmt=0.284:0.000,0.491:0.000&vfs=0.491:136:136::r:sms.0&view=0.491:1280:720&bwe=0.491:629146&bat=0.491:1:1&vis=0.491:0&bh=0.491:0.000&qclc=ChB2aTlMODg3NnVhS2xGcjE4EAE",
+       "https://www.youtube-nocookie.com/s/player/8fb635c2/player_embed.vflset/de_DE/captions.js",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380540&ei=nJr_adGyDJf4xN8Pm4LskAg&ip=62.217.52.174&id=o-ADu5kMJRvTDxl0PNjID-2DKn4M791Y8agxIUvW0bvsqa&itag=136&aitags=134%2C136%2C137%2C160%2C243&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=298&met=1778358940%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-2oi5h5-5j&ms=au%2Conr&mv=m&mvi=5&pcm2cms=yes&pl=22&rms=au%2Cau&initcwndbps=2603750&bui=AbKmrwoiZN_411zUnPt9sVjkcolOS1NuOCqttPvrosGGt5hFEDfV3Rv_YUXrGTZmVKaPFIMoqF7gzcYC&spc=96Xrv03sgwa-fjp6KNN2Cm00v-zs3mdRt1VhJEV1XF3HE2Sy2DhkWmL32C37DSNp7mayUg&vprv=1&svpuc=1&mime=video%2Fmp4&ns=PeLCsMPogPqYajVnfEUaIU0V&rqh=1&gir=yes&clen=9962832&dur=91.549&lmt=1646661516281607&mt=1778358541&fvip=3&keepalive=yes&fexp=51565115%2C51565682&c=WEB_EMBEDDED_PLAYER&sefc=1&txp=5432434&n=SwYT54SYUNHZrA&sparams=expire%2Cei%2Cip%2Cid%2Caitags%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AHEqNM4wRAIgYx0Q3BL5YVPlxiSuaEmprRDyX9RWVpi5CMbNRL2mmkYCIDuksa8WJEz2A5Ilg3mjxv3APKDMzsCcJWrq2K77L3_B&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRgIhAPhURLeeVx3twVr9W_meIeuNYLyPEdDHIycHzH8uPfFtAiEAqS-BgWbbm7NxL0gdUADQEvDH_Lnmv7_6r0nbVZrajUs%3D&alr=yes&cpn=vi9L8876uaKlFr18&cver=2.20260508.01.00&range=0-262564&rn=1&rbuf=0&pot=IgiCmYOY62YYAg==&ump=1&srfvp=1",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380540&ei=nJr_adGyDJf4xN8Pm4LskAg&ip=62.217.52.174&id=o-ADu5kMJRvTDxl0PNjID-2DKn4M791Y8agxIUvW0bvsqa&itag=251&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=298&met=1778358940%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-2oi5h5-5j&ms=au%2Conr&mv=m&mvi=5&pcm2cms=yes&pl=22&rms=au%2Cau&initcwndbps=2603750&bui=AbKmrwoiZN_411zUnPt9sVjkcolOS1NuOCqttPvrosGGt5hFEDfV3Rv_YUXrGTZmVKaPFIMoqF7gzcYC&spc=96Xrv03sgwa-fjp6KNN2Cm00v-zs3mdRt1VhJEV1XF3HE2Sy2DhkWmL32C37DSNp7mayUg&vprv=1&svpuc=1&mime=audio%2Fwebm&ns=PeLCsMPogPqYajVnfEUaIU0V&rqh=1&gir=yes&clen=1443985&dur=91.581&lmt=1646661265698609&mt=1778358541&fvip=3&keepalive=yes&fexp=51565115%2C51565682&c=WEB_EMBEDDED_PLAYER&sefc=1&txp=5432434&n=SwYT54SYUNHZrA&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AHEqNM4wRAIgcKtG1cWEDQxJ3srTFbkafJaaAUMlRUIadwowG6WWDa4CIHlPo5puYJZ_CkJK3xhaGKP1hoF6DV93gzlzFo6hzZYD&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRgIhAPhURLeeVx3twVr9W_meIeuNYLyPEdDHIycHzH8uPfFtAiEAqS-BgWbbm7NxL0gdUADQEvDH_Lnmv7_6r0nbVZrajUs%3D&alr=yes&cpn=vi9L8876uaKlFr18&cver=2.20260508.01.00&range=0-65968&rn=2&rbuf=0&pot=IgiCmYOY62YYAg==&ump=1&srfvp=1",
+       "https://www.google.com/js/th/GKHPdbjXdAzLptBtk5NastbDkUFAkaEKXg3Jazyf5I0.js",
+       "https://www.google.com/js/th/GKHPdbjXdAzLptBtk5NastbDkUFAkaEKXg3Jazyf5I0.js",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380540&ei=nJr_adGyDJf4xN8Pm4LskAg&ip=62.217.52.174&id=o-ADu5kMJRvTDxl0PNjID-2DKn4M791Y8agxIUvW0bvsqa&itag=136&aitags=134%2C136%2C137%2C160%2C243&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=298&met=1778358940%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-2oi5h5-5j&ms=au%2Conr&mv=m&mvi=5&pcm2cms=yes&pl=22&rms=au%2Cau&initcwndbps=2603750&bui=AbKmrwoiZN_411zUnPt9sVjkcolOS1NuOCqttPvrosGGt5hFEDfV3Rv_YUXrGTZmVKaPFIMoqF7gzcYC&spc=96Xrv03sgwa-fjp6KNN2Cm00v-zs3mdRt1VhJEV1XF3HE2Sy2DhkWmL32C37DSNp7mayUg&vprv=1&svpuc=1&mime=video%2Fmp4&ns=PeLCsMPogPqYajVnfEUaIU0V&rqh=1&gir=yes&clen=9962832&dur=91.549&lmt=1646661516281607&mt=1778358541&fvip=3&keepalive=yes&fexp=51565115%2C51565682&c=WEB_EMBEDDED_PLAYER&sefc=1&txp=5432434&n=SwYT54SYUNHZrA&sparams=expire%2Cei%2Cip%2Cid%2Caitags%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AHEqNM4wRAIgYx0Q3BL5YVPlxiSuaEmprRDyX9RWVpi5CMbNRL2mmkYCIDuksa8WJEz2A5Ilg3mjxv3APKDMzsCcJWrq2K77L3_B&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRgIhAPhURLeeVx3twVr9W_meIeuNYLyPEdDHIycHzH8uPfFtAiEAqS-BgWbbm7NxL0gdUADQEvDH_Lnmv7_6r0nbVZrajUs%3D&alr=yes&cpn=vi9L8876uaKlFr18&cver=2.20260508.01.00&range=262565-524142&rn=3&rbuf=2038&pot=IgiCmYOY62YYAg==&ump=1&srfvp=1",
+       "https://www.youtube-nocookie.com/youtubei/v1/next?prettyPrint=false",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380540&ei=nJr_adGyDJf4xN8Pm4LskAg&ip=62.217.52.174&id=o-ADu5kMJRvTDxl0PNjID-2DKn4M791Y8agxIUvW0bvsqa&itag=136&aitags=134%2C136%2C137%2C160%2C243&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=298&met=1778358940%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-2oi5h5-5j&ms=au%2Conr&mv=m&mvi=5&pcm2cms=yes&pl=22&rms=au%2Cau&initcwndbps=2603750&bui=AbKmrwoiZN_411zUnPt9sVjkcolOS1NuOCqttPvrosGGt5hFEDfV3Rv_YUXrGTZmVKaPFIMoqF7gzcYC&spc=96Xrv03sgwa-fjp6KNN2Cm00v-zs3mdRt1VhJEV1XF3HE2Sy2DhkWmL32C37DSNp7mayUg&vprv=1&svpuc=1&mime=video%2Fmp4&ns=PeLCsMPogPqYajVnfEUaIU0V&rqh=1&gir=yes&clen=9962832&dur=91.549&lmt=1646661516281607&mt=1778358541&fvip=3&keepalive=yes&fexp=51565115%2C51565682&c=WEB_EMBEDDED_PLAYER&sefc=1&txp=5432434&n=SwYT54SYUNHZrA&sparams=expire%2Cei%2Cip%2Cid%2Caitags%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AHEqNM4wRAIgYx0Q3BL5YVPlxiSuaEmprRDyX9RWVpi5CMbNRL2mmkYCIDuksa8WJEz2A5Ilg3mjxv3APKDMzsCcJWrq2K77L3_B&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRgIhAPhURLeeVx3twVr9W_meIeuNYLyPEdDHIycHzH8uPfFtAiEAqS-BgWbbm7NxL0gdUADQEvDH_Lnmv7_6r0nbVZrajUs%3D&alr=yes&cpn=vi9L8876uaKlFr18&cver=2.20260508.01.00&range=524143-812478&rn=4&rbuf=4076&pot=IgiCmYOY62YYAg==&ump=1&srfvp=1",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380540&ei=nJr_adGyDJf4xN8Pm4LskAg&ip=62.217.52.174&id=o-ADu5kMJRvTDxl0PNjID-2DKn4M791Y8agxIUvW0bvsqa&itag=251&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=298&met=1778358940%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-2oi5h5-5j&ms=au%2Conr&mv=m&mvi=5&pcm2cms=yes&pl=22&rms=au%2Cau&initcwndbps=2603750&bui=AbKmrwoiZN_411zUnPt9sVjkcolOS1NuOCqttPvrosGGt5hFEDfV3Rv_YUXrGTZmVKaPFIMoqF7gzcYC&spc=96Xrv03sgwa-fjp6KNN2Cm00v-zs3mdRt1VhJEV1XF3HE2Sy2DhkWmL32C37DSNp7mayUg&vprv=1&svpuc=1&mime=audio%2Fwebm&ns=PeLCsMPogPqYajVnfEUaIU0V&rqh=1&gir=yes&clen=1443985&dur=91.581&lmt=1646661265698609&mt=1778358541&fvip=3&keepalive=yes&fexp=51565115%2C51565682&c=WEB_EMBEDDED_PLAYER&sefc=1&txp=5432434&n=SwYT54SYUNHZrA&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AHEqNM4wRAIgcKtG1cWEDQxJ3srTFbkafJaaAUMlRUIadwowG6WWDa4CIHlPo5puYJZ_CkJK3xhaGKP1hoF6DV93gzlzFo6hzZYD&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRgIhAPhURLeeVx3twVr9W_meIeuNYLyPEdDHIycHzH8uPfFtAiEAqS-BgWbbm7NxL0gdUADQEvDH_Lnmv7_6r0nbVZrajUs%3D&alr=yes&cpn=vi9L8876uaKlFr18&cver=2.20260508.01.00&range=65969-136100&rn=5&rbuf=4211&pot=IgiCmYOY62YYAg==&ump=1&srfvp=1",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380540&ei=nJr_adGyDJf4xN8Pm4LskAg&ip=62.217.52.174&id=o-ADu5kMJRvTDxl0PNjID-2DKn4M791Y8agxIUvW0bvsqa&itag=251&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=298&met=1778358940%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-2oi5h5-5j&ms=au%2Conr&mv=m&mvi=5&pcm2cms=yes&pl=22&rms=au%2Cau&initcwndbps=2603750&bui=AbKmrwoiZN_411zUnPt9sVjkcolOS1NuOCqttPvrosGGt5hFEDfV3Rv_YUXrGTZmVKaPFIMoqF7gzcYC&spc=96Xrv03sgwa-fjp6KNN2Cm00v-zs3mdRt1VhJEV1XF3HE2Sy2DhkWmL32C37DSNp7mayUg&vprv=1&svpuc=1&mime=audio%2Fwebm&ns=PeLCsMPogPqYajVnfEUaIU0V&rqh=1&gir=yes&clen=1443985&dur=91.581&lmt=1646661265698609&mt=1778358541&fvip=3&keepalive=yes&fexp=51565115%2C51565682&c=WEB_EMBEDDED_PLAYER&sefc=1&txp=5432434&n=SwYT54SYUNHZrA&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AHEqNM4wRAIgcKtG1cWEDQxJ3srTFbkafJaaAUMlRUIadwowG6WWDa4CIHlPo5puYJZ_CkJK3xhaGKP1hoF6DV93gzlzFo6hzZYD&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRgIhAPhURLeeVx3twVr9W_meIeuNYLyPEdDHIycHzH8uPfFtAiEAqS-BgWbbm7NxL0gdUADQEvDH_Lnmv7_6r0nbVZrajUs%3D&alr=yes&cpn=vi9L8876uaKlFr18&cver=2.20260508.01.00&range=136101-281282&rn=6&rbuf=8717&pot=IgiCmYOY62YYAg==&ump=1&srfvp=1",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380540&ei=nJr_adGyDJf4xN8Pm4LskAg&ip=62.217.52.174&id=o-ADu5kMJRvTDxl0PNjID-2DKn4M791Y8agxIUvW0bvsqa&itag=136&aitags=134%2C136%2C137%2C160%2C243&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=298&met=1778358940%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-2oi5h5-5j&ms=au%2Conr&mv=m&mvi=5&pcm2cms=yes&pl=22&rms=au%2Cau&initcwndbps=2603750&bui=AbKmrwoiZN_411zUnPt9sVjkcolOS1NuOCqttPvrosGGt5hFEDfV3Rv_YUXrGTZmVKaPFIMoqF7gzcYC&spc=96Xrv03sgwa-fjp6KNN2Cm00v-zs3mdRt1VhJEV1XF3HE2Sy2DhkWmL32C37DSNp7mayUg&vprv=1&svpuc=1&mime=video%2Fmp4&ns=PeLCsMPogPqYajVnfEUaIU0V&rqh=1&gir=yes&clen=9962832&dur=91.549&lmt=1646661516281607&mt=1778358541&fvip=3&keepalive=yes&fexp=51565115%2C51565682&c=WEB_EMBEDDED_PLAYER&sefc=1&txp=5432434&n=SwYT54SYUNHZrA&sparams=expire%2Cei%2Cip%2Cid%2Caitags%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AHEqNM4wRAIgYx0Q3BL5YVPlxiSuaEmprRDyX9RWVpi5CMbNRL2mmkYCIDuksa8WJEz2A5Ilg3mjxv3APKDMzsCcJWrq2K77L3_B&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRgIhAPhURLeeVx3twVr9W_meIeuNYLyPEdDHIycHzH8uPfFtAiEAqS-BgWbbm7NxL0gdUADQEvDH_Lnmv7_6r0nbVZrajUs%3D&alr=yes&cpn=vi9L8876uaKlFr18&cver=2.20260508.01.00&range=812479-1557721&rn=7&rbuf=8884&pot=IgiCmYOY62YYAg==&ump=1&srfvp=1",
+       "https://www.youtube-nocookie.com/generate_204?1FMurQ",
+       "https://www.youtube-nocookie.com/generate_204?CEI9gg",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=cms_support/cms_support",
+       "https://n.clarity.ms/collect",
+       "https://rr5---sn-8xgn5uxa-quhl.googlevideo.com/videoplayback?expire=1778380540&ei=nJr_adGyDJf4xN8Pm4LskAg&ip=62.217.52.174&id=o-ADu5kMJRvTDxl0PNjID-2DKn4M791Y8agxIUvW0bvsqa&itag=136&aitags=134%2C136%2C137%2C160%2C243&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&cps=298&met=1778358940%2C&mh=MJ&mm=31%2C26&mn=sn-8xgn5uxa-quhl%2Csn-2oi5h5-5j&ms=au%2Conr&mv=m&mvi=5&pcm2cms=yes&pl=22&rms=au%2Cau&initcwndbps=2603750&bui=AbKmrwoiZN_411zUnPt9sVjkcolOS1NuOCqttPvrosGGt5hFEDfV3Rv_YUXrGTZmVKaPFIMoqF7gzcYC&spc=96Xrv03sgwa-fjp6KNN2Cm00v-zs3mdRt1VhJEV1XF3HE2Sy2DhkWmL32C37DSNp7mayUg&vprv=1&svpuc=1&mime=video%2Fmp4&ns=PeLCsMPogPqYajVnfEUaIU0V&rqh=1&gir=yes&clen=9962832&dur=91.549&lmt=1646661516281607&mt=1778358541&fvip=3&keepalive=yes&fexp=51565115%2C51565682&c=WEB_EMBEDDED_PLAYER&sefc=1&txp=5432434&n=SwYT54SYUNHZrA&sparams=expire%2Cei%2Cip%2Cid%2Caitags%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cdur%2Clmt&sig=AHEqNM4wRAIgYx0Q3BL5YVPlxiSuaEmprRDyX9RWVpi5CMbNRL2mmkYCIDuksa8WJEz2A5Ilg3mjxv3APKDMzsCcJWrq2K77L3_B&lsparams=cps%2Cmet%2Cmh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpcm2cms%2Cpl%2Crms%2Cinitcwndbps&lsig=APaTxxMwRgIhAPhURLeeVx3twVr9W_meIeuNYLyPEdDHIycHzH8uPfFtAiEAqS-BgWbbm7NxL0gdUADQEvDH_Lnmv7_6r0nbVZrajUs%3D&alr=yes&cpn=vi9L8876uaKlFr18&cver=2.20260508.01.00&range=1557722-3230624&rn=8&rbuf=14890&pot=IgiCmYOY62YYAg==&ump=1&srfvp=1",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=cms_support%2Fcms_support",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=/listings_reputation_management/listings_reputation_management",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=organic_search/organic_search",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=%2Flistings_reputation_management%2Flistings_reputation_management",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=organic_search%2Forganic_search",
+       "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+       "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=listings_sync_directories/listings_sync_directories",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=listings_sync_directories%2Flistings_sync_directories",
+       "https://n.clarity.ms/collect",
+       "https://www.rankingcoach.com/index/animationplaceholder?placeholder=anorganic_search/anorganic_search",
+       "https://www.rankingcoach.com/de-de/index/animationplaceholder?placeholder=anorganic_search%2Fanorganic_search",
+       "https://assets.rankingcoach.com/animations/integrum/v2/cms_support/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/header_embed_browser/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/mobile_reputation/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/anorganic_search/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/listings_reputation_management/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/listings_sync_directories/data.json",
+       "https://assets.rankingcoach.com/animations/integrum/v2/organic_search/data.json",
+       "https://www.youtube-nocookie.com/youtubei/v1/log_event?alt=json",
+       "https://www.youtube-nocookie.com/youtubei/v1/log_event?alt=json",
+       "https://n.clarity.ms/collect"
+      ],
+      "response_headers": {
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 20:35:37 GMT",
+       "location": "https://www.rankingcoach.com/",
+       "server": "nginx",
+       "strict-transport-security": "max-age=31536000",
+       "x-cache-status": "EXPIRED",
+       "x-powered-by": "PHP/8.0.30"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/176.9.16.197/phase2/screenshot_ns1cdn.rankingcoach.com.png",
+      "status_code": 204,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "_ga_MKD984JS1X=GS2.1.s1778358939$o1$g0$t1778358939$j60$l0$h1555407945; _ga=GA1.1.537610059.1778358939; _gcl_au=1.1.1522912529.1778358939",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1, maximum-scale=5",
+         "name": "viewport"
+        },
+        {
+         "content": "Einfach überall gefunden werden! Mit rankingCoach bringst du dein Unternehmen einfach ganz nach oben. Nimm dein Online Marketing selbst in die Hand!",
+         "name": "description"
+        },
+        {
+         "content": "91kt5hbyb901v0i7ie0sy6ltrau8n8",
+         "name": "facebook-domain-verification"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://scripts.clarity.ms/0.8.62/clarity.js",
+        "https://www.clarity.ms/tag/uet/151010209",
+        "https://www.youtube.com/s/player/8fb635c2/www-widgetapi.vflset/www-widgetapi.js",
+        "https://bat.bing.com/bat.js",
+        "https://www.googletagmanager.com/gtag/js?id=G-MKD984JS1X&cx=c&gtm=4e6562",
+        "https://www.googletagmanager.com/gtag/js?id=AW-804162534&cx=c&gtm=4e6562",
+        "https://www.youtube.com/iframe_api",
+        "https://www.googletagmanager.com/gtm.js?id=GTM-WMVJTV",
+        "https://www.rankingcoach.com/scripts/fix-mootools-array-from.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/jump/scripts/vendor/scripts.lottie-vendor.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/jump/scripts/mootools.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/scripts/scripts.public-es5.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/de-de/translations/index",
+        "https://bat.bing.com/p/action/151010209.js",
+        "https://www.rankingcoach.com/scripts/vendor/stripeGradientAnimation.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.js?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/videojs-youtube.min.js?version=1778154149577"
+       ],
+       "stylesheets": [
+        "https://www.rankingcoach.com/integrum/css/public/pages/home.min.css?version=1778154149577",
+        "https://www.rankingcoach.com/scripts/vendor/video-7.17.0.min.css?version=1778154149577?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577",
+        "https://www.rankingcoach.com/integrum/css/public/pages/subscriptions_modal.min.css?version=1778154149577?version=1778154149577"
+       ],
+       "title": "rankingCoach: Die Online Marketing App für kleine Unternehmen"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "cves": [
+       "CVE-2024-4577"
+      ],
+      "eol_date": "2023-11-26",
+      "is_mega_cve": true,
+      "latest_patch": "",
+      "name": "PHP",
+      "source": "tech_detect",
+      "status": "minor_eol",
+      "version": "8.0.30",
+      "vuln_name": "PHP-CGI OS Command Injection Vulnerability"
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Analytics",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Tag Manager",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "HSTS",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MooTools",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "source": "server_banner",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": "8.0.30"
+     },
+     {
+      "name": "Google Analytics",
+      "version": ""
+     },
+     {
+      "name": "Google Tag Manager",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "MooTools",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "lb2-eu.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "ns1cdn.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "WordPress",
+     "confidence": 0.95,
+     "details": {
+      "meta_generator": "WordPress 6.9.4",
+      "raw": {
+       "name": "WordPress",
+       "version": "6.9.4"
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "meta_tag",
+      "webtech"
+     ],
+     "version": "6.9.4"
+    },
+    "cms_version": "6.9.4",
+    "fqdns": [
+     "jimdo.rankingcoach.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "128.140.80.215",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     21,
+     80,
+     443
+    ],
+    "primary_vhost": "jimdo.rankingcoach.com",
+    "redirect_data": {
+     "jimdo.rankingcoach.com": {
+      "error": null,
+      "final_domain": "jimdo.rankingcoach.com",
+      "final_url": "https://jimdo.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "Steigere deinen Online-Erfolg mit KI",
+      "redirect_chain": [
+       "https://jimdo.rankingcoach.com/",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricks-advanced-themer/assets/css/bricks-advanced-themer.css?ver=1730324183",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricksforge/assets/css/style.css?ver=2.2.7",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricks-extended-learndash-addon-premium/assets/css/frontend.css?ver=1.0.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/legacy/templates/learndash_quiz_front.min.css?ver=4.18.0.1",
+       "https://jimdo.rankingcoach.com/wp-includes/css/dashicons.min.css?ver=6.9.4",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/src/assets/dist/css/styles.css?ver=4.18.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/assets/css/jquery.dropdown.min.css?ver=4.18.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/legacy/templates/learndash_lesson_video.min.css?ver=4.18.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/src/assets/dist/css/admin-bar/styles.css?ver=4.18.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/themes/bricks/assets/css/frontend.min.css?ver=1730324367",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/ld30/assets/css/learndash.min.css?ver=4.18.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/lib/noty/noty.css?ver=2.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/dist/css/styles.min.css?ver=2.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-modal.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/jquery-ui/jquery-ui.min.css?ver=1.13.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.css?ver=1.0.0a",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.css?ver=2.6.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/select2/select2.min.css?ver=4.0.13",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-fileupload.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.css?ver=1.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.min.css?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.date.min.css?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/default.time.min.css?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/fonticons-ii.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/legacy/fonticons/fonticons-fa.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-fontawesome.min.css?ver=6.5.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/common.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-responsive.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-styles.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.css?ver=1.6.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-profile.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-account.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-misc.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-old-default.min.css?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/core-framework/assets/public/css/core_framework.css?ver=1730324252",
+       "https://jimdo.rankingcoach.com/wp-content/themes/bricks/assets/css/libs/splide.min.css?ver=1730324367",
+       "https://jimdo.rankingcoach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/handl-utm-grabber-v3/js/handl-utm-grabber.js?ver=6.9.4",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/handl-utm-grabber-v3/js/js.cookie.js?ver=6.9.4",
+       "https://jimdo.rankingcoach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricksextras/includes/js/interactions.min.js?ver=1.5.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricks-extended-learndash-addon-premium/assets/js/frontend.min.js?ver=1.0.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-course-grid/assets/js/elementor.js?ver=2.0.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-gdpr.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/analyticswp/Lib/analyticswp.min.js?ver=1.10.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/lib/noty/noty.min.js?ver=2.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/themes/bricks/assets/js/bricks.min.js?ver=1730324367",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/ld30/assets/js/learndash.js?ver=4.18.0.1",
+       "https://jimdo.rankingcoach.com/wp-includes/js/wp-util.min.js?ver=6.9.4",
+       "https://jimdo.rankingcoach.com/wp-includes/js/dist/hooks.min.js?ver=dd5603f07f9220ed27f1",
+       "https://jimdo.rankingcoach.com/wp-includes/js/dist/i18n.min.js?ver=c26c3dc7bed366793375",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.min.js?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.date.min.js?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.time.min.js?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/translations/de_DE.min.js?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/common.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/common-frontend.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.js?ver=1.6.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-modal.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-includes/js/underscore.min.js?ver=1.13.7",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.js?ver=1.0.0a",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/dist/js/scripts.min.js?ver=2.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.js?ver=1.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/jquery-form/jquery-form.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/fileupload/fileupload.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-functions.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-responsive.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-profile.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-account.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-scripts.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/select2/i18n/de.js?ver=4.0.13",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.js?ver=2.6.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-conditional.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/themes/bricks/assets/js/libs/splide.min.js?ver=4.1.4",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricksextras/components/assets/js/lotties.min.js?ver=1.0.5",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricksextras/components/assets/js/lottielight.min.js?ver=5.9.6",
+       "https://consent.cookiebot.com/uc.js",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/select2/select2.full.min.js?ver=4.0.13",
+       "https://www.googletagmanager.com/gtag/js?id=G-4DXNQ7D9LP",
+       "https://consentcdn.cookiebot.com/consentconfig/d8d1b2aa-285d-45b5-9fa4-537237d92cf4/jimdo.rankingcoach.com/configuration.js",
+       "https://consentcdn.cookiebot.com/consentconfig/d8d1b2aa-285d-45b5-9fa4-537237d92cf4/settings.json",
+       "https://consentcdn.cookiebot.com/sdk/bc-v4.min.html",
+       "https://consent.cookiebot.com/d8d1b2aa-285d-45b5-9fa4-537237d92cf4/cc.js?renew=false&referer=jimdo.rankingcoach.com&dnt=false&init=false&culture=DE",
+       "https://jimdo.rankingcoach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+       "https://jimdo.rankingcoach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/handl-utm-grabber-v3/js/js.cookie.js?ver=6.9.4",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/handl-utm-grabber-v3/js/handl-utm-grabber.js?ver=6.9.4",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-gdpr.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/themes/bricks/assets/js/bricks.min.js?ver=1730324367",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricksextras/includes/js/interactions.min.js?ver=1.5.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricks-extended-learndash-addon-premium/assets/js/frontend.min.js?ver=1.0.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-course-grid/assets/js/elementor.js?ver=2.0.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/analyticswp/Lib/analyticswp.min.js?ver=1.10.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/ld30/assets/js/learndash.js?ver=4.18.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/lib/noty/noty.min.js?ver=2.0.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/dist/js/scripts.min.js?ver=2.0.1",
+       "https://jimdo.rankingcoach.com/wp-includes/js/underscore.min.js?ver=1.13.7",
+       "https://jimdo.rankingcoach.com/wp-includes/js/wp-util.min.js?ver=6.9.4",
+       "https://jimdo.rankingcoach.com/wp-includes/js/dist/hooks.min.js?ver=dd5603f07f9220ed27f1",
+       "https://jimdo.rankingcoach.com/wp-includes/js/dist/i18n.min.js?ver=c26c3dc7bed366793375",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.js?ver=1.0.0a",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.js?ver=1.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.min.js?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.date.min.js?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/picker.time.min.js?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/pickadate/translations/de_DE.min.js?ver=3.6.2",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/common.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/cropper/cropper.min.js?ver=1.6.1",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/common-frontend.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-modal.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/jquery-form/jquery-form.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/fileupload/fileupload.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-functions.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-responsive.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-conditional.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/select2/select2.full.min.js?ver=4.0.13",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/select2/i18n/de.js?ver=4.0.13",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.js?ver=2.6.0",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-scripts.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-profile.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-account.min.js?ver=2.8.9",
+       "https://jimdo.rankingcoach.com/wp-content/themes/bricks/assets/js/libs/splide.min.js?ver=4.1.4",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricksextras/components/assets/js/lottielight.min.js?ver=5.9.6",
+       "https://jimdo.rankingcoach.com/wp-content/plugins/bricksextras/components/assets/js/lotties.min.js?ver=1.0.5"
+      ],
+      "response_headers": {
+       "alt-svc": "h3=\":443\"; ma=2592000, h3-29=\":443\"; ma=2592000, h3-Q050=\":443\"; ma=2592000, h3-Q046=\":443\"; ma=2592000, h3-Q043=\":443\"; ma=2592000, quic=\":443\"; ma=2592000; v=\"43,46\"",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 20:39:35 GMT",
+       "link": "<https://jimdo.rankingcoach.com/wp-json/>; rel=\"https://api.w.org/\"\n<https://jimdo.rankingcoach.com/wp-json/wp/v2/pages/577>; rel=\"alternate\"; title=\"JSON\"; type=\"application/json\"\n<https://jimdo.rankingcoach.com/>; rel=shortlink",
+       "server": "LiteSpeed",
+       "vary": "Accept-Encoding",
+       "x-powered-by": "PHP/8.3.30"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/128.140.80.215/phase2/screenshot_jimdo.rankingcoach.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "home wp-singular page-template-default page page-id-577 wp-custom-logo wp-theme-bricks utm-out brx-body bricks-is-frontend wp-embed-responsive",
+       "cookies": "HandLtestDomainNameServer=HandLtestDomainValueServer; handl_landing_page=https%3A%2F%2Fjimdo.rankingcoach.com%2F; handl_ip=62.217.52.174; handl_url_base=https%3A%2F%2Fjimdo.rankingcoach.com%2F; handl_url=https%3A%2F%2Fjimdo.rankingcoach.com%2F; user_agent=Mozilla%2F5.0%20%28X11%3B%20Linux%20x86_64%29%20AppleWebKit%2F537.36%20%28KHTML%2C%20like%20Gecko%29%20HeadlessChrome%2F147.0.7727.15%20Safari%2F537.36; HandLtestDomainName=HandLtestDomainValue",
+       "generator": "WordPress 6.9.4",
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "Steigere deinen Online-Erfolg mit KI",
+         "name": "dc.title"
+        },
+        {
+         "content": "Maximiere deinen Website-Traffic und steigere deine Umsätze mit dem leistungsstarken SEO-Tool von Jimdo und rankingCoach.",
+         "name": "dc.description"
+        },
+        {
+         "content": "https://jimdo.rankingcoach.com/",
+         "name": "dc.relation"
+        },
+        {
+         "content": "https://jimdo.rankingcoach.com/",
+         "name": "dc.source"
+        },
+        {
+         "content": "de_DE",
+         "name": "dc.language"
+        },
+        {
+         "content": "Maximiere deinen Website-Traffic und steigere deine Umsätze mit dem leistungsstarken SEO-Tool von Jimdo und rankingCoach.",
+         "name": "description"
+        },
+        {
+         "content": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1",
+         "name": "robots"
+        },
+        {
+         "content": "summary",
+         "name": "twitter:card"
+        },
+        {
+         "content": "",
+         "name": "twitter:site"
+        },
+        {
+         "content": "",
+         "name": "twitter:creator"
+        },
+        {
+         "content": "Steigere deinen Online-Erfolg mit KI",
+         "name": "twitter:title"
+        },
+        {
+         "content": "Maximiere deinen Website-Traffic und steigere deine Umsätze mit dem leistungsstarken SEO-Tool von Jimdo und rankingCoach.",
+         "name": "twitter:description"
+        },
+        {
+         "content": "WordPress 6.9.4",
+         "name": "generator"
+        },
+        {
+         "content": "https://jimdo.rankingcoach.com/wp-content/uploads/2024/06/favicon-32x32-1.webp",
+         "name": "msapplication-TileImage"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://consent.cookiebot.com/d8d1b2aa-285d-45b5-9fa4-537237d92cf4/cc.js?renew=false&referer=jimdo.rankingcoach.com&dnt=false&init=false&culture=DE",
+        "https://consentcdn.cookiebot.com/consentconfig/d8d1b2aa-285d-45b5-9fa4-537237d92cf4/jimdo.rankingcoach.com/configuration.js",
+        "https://consent.cookiebot.com/uc.js",
+        "https://jimdo.rankingcoach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+        "https://jimdo.rankingcoach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/handl-utm-grabber-v3/js/js.cookie.js?ver=6.9.4",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/handl-utm-grabber-v3/js/handl-utm-grabber.js?ver=6.9.4",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/js/um-gdpr.min.js?ver=2.8.9",
+        "https://www.googletagmanager.com/gtag/js?id=G-4DXNQ7D9LP",
+        "https://jimdo.rankingcoach.com/wp-content/themes/bricks/assets/js/bricks.min.js?ver=1730324367",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/bricksextras/includes/js/interactions.min.js?ver=1.5.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/bricks-extended-learndash-addon-premium/assets/js/frontend.min.js?ver=1.0.0",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-course-grid/assets/js/elementor.js?ver=2.0.9",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/analyticswp/Lib/analyticswp.min.js?ver=1.10.0",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/ld30/assets/js/learndash.js?ver=4.18.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/lib/noty/noty.min.js?ver=2.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/dist/js/scripts.min.js?ver=2.0.1",
+        "https://jimdo.rankingcoach.com/wp-includes/js/underscore.min.js?ver=1.13.7",
+        "https://jimdo.rankingcoach.com/wp-includes/js/wp-util.min.js?ver=6.9.4",
+        "https://jimdo.rankingcoach.com/wp-includes/js/dist/hooks.min.js?ver=dd5603f07f9220ed27f1"
+       ],
+       "stylesheets": [
+        "https://jimdo.rankingcoach.com/wp-content/plugins/bricks-advanced-themer/assets/css/bricks-advanced-themer.css?ver=1730324183",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/bricksforge/assets/css/style.css?ver=2.2.7",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/bricks-extended-learndash-addon-premium/assets/css/frontend.css?ver=1.0.0",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/legacy/templates/learndash_quiz_front.min.css?ver=4.18.0.1",
+        "https://jimdo.rankingcoach.com/wp-includes/css/dashicons.min.css?ver=6.9.4",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/src/assets/dist/css/styles.css?ver=4.18.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/assets/css/jquery.dropdown.min.css?ver=4.18.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/legacy/templates/learndash_lesson_video.min.css?ver=4.18.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/src/assets/dist/css/admin-bar/styles.css?ver=4.18.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/themes/bricks/assets/css/frontend.min.css?ver=1730324367",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/sfwd-lms/themes/ld30/assets/css/learndash.min.css?ver=4.18.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/lib/noty/noty.css?ver=2.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/learndash-achievements/dist/css/styles.min.css?ver=2.0.1",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-modal.min.css?ver=2.8.9",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/jquery-ui/jquery-ui.min.css?ver=1.13.2",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/tipsy/tipsy.min.css?ver=1.0.0a",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/raty/um-raty.min.css?ver=2.6.0",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/select2/select2.min.css?ver=4.0.13",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/css/um-fileupload.min.css?ver=2.8.9",
+        "https://jimdo.rankingcoach.com/wp-content/plugins/ultimate-member/assets/libs/um-confirm/um-confirm.min.css?ver=1.0"
+       ],
+       "title": "Steigere deinen Online-Erfolg mit KI"
+      }
+     }
+    },
+    "server": "LiteSpeed",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "WordPress",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "version": "6.9.4",
+      "vuln_name": ""
+     },
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MySQL",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Bricks",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cookiebot",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Analytics",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Tag Manager",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "HTTP",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "3",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery Migrate",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "3.4.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Litespeed",
+      "source": "server_banner",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Pure-FTPd",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Underscore.js",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "1.13.7",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "8.3.30",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Pure-FTPd",
+      "version": ""
+     },
+     {
+      "name": "LiteSpeed",
+      "version": ""
+     },
+     {
+      "name": "WordPress",
+      "version": "6.9.4"
+     },
+     {
+      "name": "PHP",
+      "version": "8.3.30"
+     },
+     {
+      "name": "Google Tag Manager",
+      "version": ""
+     },
+     {
+      "name": "Bricks",
+      "version": ""
+     },
+     {
+      "name": "Cookiebot",
+      "version": ""
+     },
+     {
+      "name": "Google Analytics",
+      "version": ""
+     },
+     {
+      "name": "HTTP/3",
+      "version": ""
+     },
+     {
+      "name": "MySQL",
+      "version": ""
+     },
+     {
+      "name": "Underscore.js",
+      "version": "1.13.7"
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery Migrate",
+      "version": "3.4.1"
+     }
+    ],
+    "vhost_results": {
+     "jimdo.rankingcoach.com": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": "6.9.4",
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "ns3cdn.rankingcoach.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "135.181.161.180",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     53,
+     80,
+     443
+    ],
+    "primary_vhost": "ns3cdn.rankingcoach.com",
+    "redirect_data": {
+     "ns3cdn.rankingcoach.com": {
+      "error": null,
+      "final_domain": "ns3cdn.rankingcoach.com",
+      "final_url": "https://ns3cdn.rankingcoach.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [
+       "https://ns3cdn.rankingcoach.com/",
+       "https://ns3cdn.rankingcoach.com/Server-Maintenance.svg"
+      ],
+      "response_headers": {
+       "content-length": "572",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 20:37:17 GMT",
+       "etag": "\"603eaecd-23c\"",
+       "server": "nginx"
+      },
+      "screenshot_path": "/tmp/scan-b6da184c-7b95-43e6-8e73-41392098e105/hosts/135.181.161.180/phase2/screenshot_ns3cdn.rankingcoach.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": ""
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "source": "server_banner",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "ns3cdn.rankingcoach.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}

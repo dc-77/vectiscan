@@ -1,0 +1,1092 @@
+{
+ "data": {
+  "businessImpactScore": 7.5,
+  "correlationCount": 481,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "castenow.de",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-07-22T20:48:12.673Z",
+  "hasReport": true,
+  "id": "4e6b6883-a6c8-4204-8b13-b37f907322ca",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": true,
+     "issuers": [
+      "sectigo.com",
+      "letsencrypt.org",
+      "amazonaws.com",
+      "sectigo.com"
+     ],
+     "records": [
+      "0 issue \"sectigo.com\"",
+      "0 issue \"letsencrypt.org\"",
+      "0 issue \"amazonaws.com\"",
+      "0 issuewild \"sectigo.com\""
+     ]
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "none",
+     "pct": 100,
+     "raw": "v=DMARC1; p=none; rua=mailto:dmarc@castenow.de",
+     "rua": [
+      "mailto:dmarc@castenow.de"
+     ],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/castenow.de",
+     "domain": "castenow.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/castenow.de"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.castenow.de",
+    "adfs.castenow.de",
+    "autodiscover.castenow.de",
+    "bitwarden.castenow.de",
+    "eset.castenow.de",
+    "filetransfer.castenow.de",
+    "forti-vpn.castenow.de",
+    "mail.castenow.de",
+    "mail2.castenow.de",
+    "mailstore.castenow.de",
+    "mdm.castenow.de",
+    "media.castenow.de",
+    "nextcloud.castenow.de",
+    "openotp.castenow.de",
+    "owa.castenow.de",
+    "rdgw.castenow.de",
+    "ubb-wiki.castenow.de",
+    "umfrage.castenow.de",
+    "vpn.castenow.de",
+    "www.castenow.de"
+   ],
+   "securitytrails": {
+    "dns_history": [
+     {
+      "first_seen": "2026-05-08",
+      "last_seen": "2026-07-22",
+      "type": "a",
+      "values": [
+       "159.69.143.80"
+      ]
+     },
+     {
+      "first_seen": "2020-12-18",
+      "last_seen": "2026-05-05",
+      "type": "a",
+      "values": [
+       "159.69.143.80"
+      ]
+     },
+     {
+      "first_seen": "2017-05-26",
+      "last_seen": "2020-12-18",
+      "type": "a",
+      "values": [
+       "176.28.22.146"
+      ]
+     }
+    ],
+    "domain": {
+     "a_records": [
+      "159.69.143.80"
+     ],
+     "alexa_rank": null,
+     "domain": "castenow.de",
+     "hostname": "castenow.de",
+     "mx_records": [
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns_records": [
+      "ns2a.dodns.net",
+      "ns1a.dodns.net"
+     ],
+     "txt_records": [
+      "v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all",
+      "miro-verification=5669550664b38c8dd8adbf7ec194fef871f22989",
+      "google-site-verification=XBMADx3NY1tExujZ9wMWrLySGlgOvQgLzY9GCqoZPuU",
+      "google-site-verification=L_Oh5-0tFBr8ohEjHCMpvTifSSntqnZuaqO7YIkz9k0",
+      "figma-domain-verification=19b71f481aafb134e8ed9bd600215c34bb42437da103fd52a181e5bad1e1bb68-1764258816",
+      "bw=IvQUPm2zFtKput9AGaPDkeydl9MUGXifbBV2gIyL6naZ",
+      "MS=ms46197635"
+     ]
+    },
+    "subdomains": [
+     "umfrage.castenow.de",
+     "www.castenow.de",
+     "nextcloud.castenow.de",
+     "bitwarden.castenow.de",
+     "mail.castenow.de",
+     "mail2.castenow.de",
+     "rdgw.castenow.de",
+     "mailstore.castenow.de",
+     "mdm.castenow.de",
+     "filetransfer.castenow.de",
+     "eset.castenow.de",
+     "forti-vpn.castenow.de",
+     "ubb-wiki.castenow.de",
+     "media.castenow.de",
+     "autodiscover.castenow.de",
+     "adfs.castenow.de",
+     "vpn.castenow.de",
+     "owa.castenow.de",
+     "openotp.castenow.de"
+    ]
+   },
+   "shodan_domain": {
+    "domain": "castenow.de",
+    "records": [
+     {
+      "last_seen": "2026-07-22T03:33:57.528000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "159.69.143.80"
+     },
+     {
+      "last_seen": "2026-07-22T03:36:55.910000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-22T03:36:55.910000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-22T03:36:55.910000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-22T03:36:55.910000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-07-22T03:36:03.798000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1a.dodns.net"
+     },
+     {
+      "last_seen": "2026-07-22T03:36:03.798000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns2a.dodns.net"
+     },
+     {
+      "last_seen": "2026-07-22T03:37:39.914000",
+      "options": {
+       "expires": 3600000,
+       "hostmaster": "hostmaster.castenow.de",
+       "minttl": 172800,
+       "refresh": 86400,
+       "retry": 7200,
+       "serial": 2024031918,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1.castenow.de"
+     },
+     {
+      "last_seen": "2026-07-22T03:40:04.201000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=ms46197635"
+     },
+     {
+      "last_seen": "2026-07-22T03:40:04.201000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "bw=IvQUPm2zFtKput9AGaPDkeydl9MUGXifbBV2gIyL6naZ"
+     },
+     {
+      "last_seen": "2026-07-22T03:40:04.201000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "figma-domain-verification=19b71f481aafb134e8ed9bd600215c34bb42437da103fd52a181e5bad1e1bb68-1764258816"
+     },
+     {
+      "last_seen": "2026-07-22T03:40:04.201000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=L_Oh5-0tFBr8ohEjHCMpvTifSSntqnZuaqO7YIkz9k0"
+     },
+     {
+      "last_seen": "2026-07-22T03:40:04.201000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=XBMADx3NY1tExujZ9wMWrLySGlgOvQgLzY9GCqoZPuU"
+     },
+     {
+      "last_seen": "2026-07-22T03:40:04.201000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "miro-verification=5669550664b38c8dd8adbf7ec194fef871f22989"
+     },
+     {
+      "last_seen": "2026-07-22T03:40:04.201000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all"
+     },
+     {
+      "last_seen": "2026-07-22T03:40:04.214000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1; p=none; rua=mailto:dmarc@castenow.de"
+     },
+     {
+      "last_seen": "2026-07-22T03:33:57.514000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "mail",
+      "type": "A",
+      "value": "195.50.179.4"
+     },
+     {
+      "last_seen": "2026-07-22T03:33:57.542000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "owa",
+      "type": "A",
+      "value": "195.50.179.4"
+     },
+     {
+      "last_seen": "2026-07-22T03:33:57.522000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "ubb-wiki",
+      "type": "A",
+      "value": "92.205.163.53"
+     },
+     {
+      "last_seen": "2026-07-22T03:33:57.570000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "umfrage",
+      "type": "CNAME",
+      "value": "umfrage-castenow-de.umfrageonline.com"
+     },
+     {
+      "last_seen": "2026-07-22T03:33:57.535000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "159.69.143.80"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "mail",
+     "owa",
+     "ubb-wiki",
+     "umfrage",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 33,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 4,
+      "crtsh": 6,
+      "gobuster_dns": 12,
+      "phase0a_passive": 20,
+      "subfinder": 6
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 33
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": "v=DMARC1; p=none; rua=mailto:dmarc@castenow.de",
+     "mx": [
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx01.hornetsecurity.com",
+      "mx04.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns2a.dodns.net",
+      "ns1a.dodns.net"
+     ],
+     "spf": "v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all",
+     "zone_transfer": false
+    },
+    "domain": "castenow.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain castenow.de mit www-Subdomain, produktive Webanwendung (Employer Branding Agentur), höchste Priorität.",
+      "fqdns": [
+       "castenow.de",
+       "www.castenow.de"
+      ],
+      "ip": "159.69.143.80",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80,
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "yak.planwerk6.de",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/159.69.143.80__www.castenow.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "castenow.de",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "89ba94524643c97e3eda7a00125d7e7f9b9b29825cbfee0f482a2a50101ada79",
+        "final_url": "https://www.castenow.de",
+        "fqdn": "www.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/159.69.143.80__www.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Employer-Branding-Agentur mit Drupal-11-Website auf Apache-Webserver.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.castenow.de",
+       "has_web": true,
+       "status": 200,
+       "title": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW",
+       "web_fqdn": "www.castenow.de"
+      }
+     },
+     {
+      "_reasoning": "Exchange/Outlook-Mailserver mit mehreren OWA-Vhosts (owa, mail, mail2, autodiscover), alle mit 200-Status; SMTP auf Port 25 exponiert; scannen trotz Mail-Fokus wegen Web-Interface.",
+      "fqdns": [
+       "mail2.castenow.de",
+       "owa.castenow.de",
+       "autodiscover.castenow.de",
+       "mail.castenow.de"
+      ],
+      "ip": "195.50.179.4",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        25,
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.4__owa.castenow.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "32f05182fa87a65408888efd0bad86c912fb0d504701dfb5d2189ce88f53ffe2",
+        "final_url": "https://owa.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.castenow.de%2fowa%2f&reason=0",
+        "fqdn": "owa.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.4__owa.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Microsoft-Outlook-Webzugriff auf IIS-10.0-Server für E-Mail-Verwaltung.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       },
+       {
+        "aliases": [],
+        "body_hash": "b8bccd809105faf44e3e3e330d3306a52bdcc497e69cda6f508cb23ede207863",
+        "final_url": "https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0",
+        "fqdn": "mail.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.4__mail.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Microsoft-Outlook-Webzugriff auf IIS-10.0-Server für E-Mail-Verwaltung.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       },
+       {
+        "aliases": [],
+        "body_hash": "c68721c143ec674606bcc158a3d7d6bf99b730ed40046e8ee050cf78a4bcf776",
+        "final_url": "https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0",
+        "fqdn": "mail2.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.4__mail2.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Microsoft-Outlook-Webzugriff auf IIS-10.0-Server für E-Mail-Verwaltung.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       },
+       {
+        "aliases": [],
+        "body_hash": "d9859d28175a3fea10082d865982575492fded6f3c863272dd62c02aaa8b3490",
+        "final_url": "https://autodiscover.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.castenow.de%2fowa%2f&reason=0",
+        "fqdn": "autodiscover.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.4__autodiscover.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Microsoft-Outlook-Autodiscover-Service auf IIS-10.0-Server.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Outlook"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://owa.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.castenow.de%2fowa%2f&reason=0",
+       "has_web": true,
+       "status": 200,
+       "title": "Outlook",
+       "web_fqdn": "owa.castenow.de"
+      }
+     },
+     {
+      "_reasoning": "Nextcloud-Instanz (Dateifreigabe/Collaboration), produktive Web-Anwendung mit Login-Interface; mailstore.castenow.de ist Alias/Parking.",
+      "fqdns": [
+       "mailstore.castenow.de",
+       "nextcloud.castenow.de"
+      ],
+      "ip": "195.50.179.5",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.5__nextcloud.castenow.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "59d56c6d890398d7cd35b73d589d1d8943442b3e9e7870545f82ddf3aa5f6567",
+        "final_url": "https://nextcloud.castenow.de/login",
+        "fqdn": "nextcloud.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.5__nextcloud.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Nextcloud-Dateiverwaltung und Collaboration-Plattform auf Apache-Webserver.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Anmelden – Nextcloud"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://nextcloud.castenow.de/login",
+       "has_web": true,
+       "status": 200,
+       "title": "Anmelden – Nextcloud",
+       "web_fqdn": "nextcloud.castenow.de"
+      }
+     },
+     {
+      "_reasoning": "VPN-Gateway (vpn.castenow.de) mit 200-Status und HTTPS, kritische Infrastruktur für Remote-Zugang; leerer Title ist kein Skip-Grund.",
+      "fqdns": [
+       "vpn.castenow.de"
+      ],
+      "ip": "195.50.179.2",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.2__vpn.castenow.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "7604047d8453b25fabd157052f6f581694109a0532a5576fa4683af545d95a6d",
+        "final_url": "https://vpn.castenow.de",
+        "fqdn": "vpn.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.2__vpn.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Web Server",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": ""
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://vpn.castenow.de",
+       "has_web": true,
+       "status": 200,
+       "title": "",
+       "web_fqdn": "vpn.castenow.de"
+      }
+     },
+     {
+      "_reasoning": "Bitwarden Password Manager, kritische Sicherheitsanwendung mit Web-Interface; hohe Priorität für Credential-Storage.",
+      "fqdns": [
+       "bitwarden.castenow.de"
+      ],
+      "ip": "195.50.179.6",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.6__bitwarden.castenow.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "cbf4735996ad45e3cb11a2d86ad78c3377b46d840d3e776c7d5c667f74728bad",
+        "final_url": "https://bitwarden.castenow.de",
+        "fqdn": "bitwarden.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.6__bitwarden.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Bitwarden-Passwortmanager und digitaler Tresor auf nginx-Webserver.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Bitwarden Web vault"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://bitwarden.castenow.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Bitwarden Web vault",
+       "web_fqdn": "bitwarden.castenow.de"
+      }
+     },
+     {
+      "_reasoning": "RD Gateway (rdgw.castenow.de) mit IIS Windows Server, Remote-Desktop-Zugang; kritische Infrastruktur trotz generischem Title.",
+      "fqdns": [
+       "rdgw.castenow.de"
+      ],
+      "ip": "195.50.179.7",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.7__rdgw.castenow.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "557b5e9015b4963a130c7039e077b3ec0306d401b6ee13d631721d5d969d2917",
+        "final_url": "https://rdgw.castenow.de",
+        "fqdn": "rdgw.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.7__rdgw.castenow.de.png",
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "Default-Page von Microsoft IIS httpd/10.0 — keine produktive Anwendung",
+         "is_real_content": false
+        },
+        "status": 200,
+        "title": "IIS Windows Server"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://rdgw.castenow.de",
+       "has_web": true,
+       "status": 200,
+       "title": "IIS Windows Server",
+       "web_fqdn": "rdgw.castenow.de"
+      }
+     },
+     {
+      "_reasoning": "OpenOTP Web Applications Portal (Multi-Faktor-Authentifizierung), kritische Sicherheitskomponente mit produktivem Content.",
+      "fqdns": [
+       "openotp.castenow.de"
+      ],
+      "ip": "195.50.179.9",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        443
+       ],
+       "shodan_services": {
+        "443": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.9__openotp.castenow.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "0c0df7bc7e4838fc0c50d67731d42f48232797cd9d84b777f0710c47c1c9ba52",
+        "final_url": "https://openotp.castenow.de",
+        "fqdn": "openotp.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/195.50.179.9__openotp.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Castenow-Webportal für Anwendungen auf Apache-Webserver.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Castenow GmbH Web Applications Portal"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://openotp.castenow.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Castenow GmbH Web Applications Portal",
+       "web_fqdn": "openotp.castenow.de"
+      }
+     },
+     {
+      "_reasoning": "Forti-VPN (FortiGate VPN Gateway), kein Web-Content (has_web=false); Port-Scan + testssl für VPN-Appliance erforderlich.",
+      "fqdns": [
+       "forti-vpn.castenow.de"
+      ],
+      "ip": "213.23.169.167",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "[AUTO-OVERRIDE] Host hat Live-Web-Content auf VHost umfrage.castenow.de (HTTP 200) — KI-Skip verworfen. Original: CloudFront CDN-Edge-Node; umfrage.castenow.de redirects zu www.castenow.de (bereits auf 159.69.143.80 gescannt); out-of-scope CDN-Infrastruktur.",
+      "fqdns": [
+       "umfrage.castenow.de"
+      ],
+      "ip": "54.230.172.14",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        80
+       ],
+       "shodan_services": {},
+       "tlsrpt_present": false
+      },
+      "rdns": "server-54-230-172-14.dus51.r.cloudfront.net",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/54.230.172.14__umfrage.castenow.de.png",
+      "status": "skipped",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "ec115b0e7f0e01ec02d0795e7fc902d69b9b4a3914f8258d5c0753f164b3b23a",
+        "final_url": "https://www.castenow.de/",
+        "fqdn": "umfrage.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/54.230.172.14__umfrage.castenow.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Umfrage-Plattform mit Drupal-11-Website auf CloudFront-CDN.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.castenow.de/",
+       "has_web": true,
+       "status": 200,
+       "title": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW",
+       "web_fqdn": "umfrage.castenow.de"
+      }
+     },
+     {
+      "_reasoning": "Externe Hosting-IP (GoDaddy) mit ubb-wiki.castenow.de (CMS Login), produktive Web-Anwendung; Shodan zeigt viele exponierte Ports (21 FTP, 25/465/587 SMTP, 53 DNS, 8000-8880); veraltete Postfix-Services → Priorität 1.",
+      "fqdns": [
+       "ubb-wiki.castenow.de"
+      ],
+      "ip": "92.205.163.53",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        8000,
+        993,
+        995,
+        8800,
+        8001,
+        106,
+        587,
+        110,
+        143,
+        80,
+        465,
+        21,
+        8880,
+        8443,
+        25,
+        443,
+        53
+       ],
+       "shodan_services": {
+        "25": "Postfix smtpd",
+        "465": "Postfix smtpd",
+        "587": "Postfix smtpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "53.163.205.92.host.secureserver.net",
+      "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/92.205.163.53__ubb-wiki.castenow.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "fc73117dbaf055b4209a5e95a98ad12b75daf070eb38f56934e935b0ce36bc1c",
+        "final_url": "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
+        "fqdn": "ubb-wiki.castenow.de",
+        "is_primary": true,
+        "screenshot_minio_key": "4e6b6883-a6c8-4204-8b13-b37f907322ca/92.205.163.53__ubb-wiki.castenow.de.png",
+        "site_summary": {
+         "classification": "login_only",
+         "confidence": 0.9,
+         "description": "Login-Seite (WordPress 7.0.2 auf nginx)",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Login – My CMS"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
+       "has_web": true,
+       "status": 200,
+       "title": "Login – My CMS",
+       "web_fqdn": "ubb-wiki.castenow.de"
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 10,
+   "hostsTotal": 10,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 2,
+   "INFO": 5,
+   "LOW": 3,
+   "MEDIUM": 5
+  },
+  "startedAt": "2026-07-22T08:10:02.316Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "warn",
+   "passed": true,
+   "warning_count": 4,
+   "warnings": [
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "03116"
+      ],
+      "title": "TLS-Konfiguration unter TR-03116-Mindestanforderung auf rdgw.castenow.de"
+     },
+     "finding_id": "VS-2026-001",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['03116']",
+     "severity": "warning"
+    },
+    {
+     "check": "titles",
+     "detail": {
+      "suspicious_numbers": [
+       "8001",
+       "8800"
+      ],
+      "title": "Zusaetzliche Management-/Mail-Dienste ohne dedizierten Scan auf ubb-wiki.castenow.de (Ports 8000, 8001, 8443, 8800)"
+     },
+     "finding_id": "VS-2026-006",
+     "message": "Bareword-Number(s) im Title ohne Port/Version-Kontext: ['8001', '8800']",
+     "severity": "warning"
+    },
+    {
+     "check": "cvss",
+     "detail": {
+      "computed": 7.4,
+      "cvss_score": 5.3,
+      "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N"
+     },
+     "finding_id": "VS-2026-003",
+     "message": "CVSS-Score 5.3 weicht von Vektor-berechnetem Base-Score 7.4 ab — Admin-Review (Override-UI)",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_keywords_sample": [
+       "abgleichen",
+       "aktivieren",
+       "aktualisieren",
+       "aktuelle",
+       "also",
+       "automatische",
+       "bekannt",
+       "beta"
+      ],
+      "title": "Server-Banner mit Versions-Info auf ubb-wiki.castenow.de",
+      "title_keywords": [
+       "banner",
+       "castenow",
+       "info",
+       "versions",
+       "wiki"
+      ]
+     },
+     "finding_id": "VS-2026-008",
+     "message": "Title und Body teilen kein gemeinsames Schluesselwort — moeglicherweise sehr generischer Title",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

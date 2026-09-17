@@ -1,0 +1,61 @@
+{
+ "data": {
+  "businessImpactScore": null,
+  "correlationCount": 0,
+  "customerId": "d0000000-0000-4000-a000-000000000001",
+  "domain": "demo-stadtwerke.vectiscan-demo.test",
+  "error": null,
+  "estimatedDuration": "~65–95 Minuten",
+  "finishedAt": "2026-05-26T11:40:00.000Z",
+  "hasReport": true,
+  "id": "d0000000-0000-4000-a000-000000000103",
+  "isRescan": false,
+  "overallRisk": "CRITICAL",
+  "package": "compliance",
+  "passiveIntelSummary": null,
+  "progress": {
+   "currentHost": null,
+   "currentTool": null,
+   "discoveredHosts": [
+    {
+     "fqdns": [
+      "vpn.demo-stadtwerke.vectiscan-demo.test"
+     ],
+     "ip": "203.0.113.30",
+     "status": "scanned"
+    },
+    {
+     "fqdns": [
+      "www.demo-stadtwerke.vectiscan-demo.test"
+     ],
+     "ip": "203.0.113.31",
+     "status": "scanned"
+    },
+    {
+     "fqdns": [
+      "fs.demo-stadtwerke.vectiscan-demo.test"
+     ],
+     "ip": "203.0.113.32",
+     "status": "scanned"
+    }
+   ],
+   "hostsCompleted": 3,
+   "hostsTotal": 3,
+   "lastCompletedTool": null,
+   "phase": null,
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 1,
+   "HIGH": 4,
+   "INFO": 0,
+   "LOW": 2,
+   "MEDIUM": 4
+  },
+  "startedAt": "2026-05-26T11:10:00.000Z",
+  "status": "report_complete",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}
