@@ -101,6 +101,17 @@ build-report-worker:
 .trivy-base:
   stage: scan
   tags: [vectigal]
+  before_script:
+    # S0a: eigener Trivy-Cache je Job. Die drei Trivy-Jobs laufen parallel auf
+    # demselben Shell-Runner und teilten sich ~/.cache/trivy. Beim faelligen
+    # DB-Update (113 MB) rannten sie in "Failed to acquire cache or database
+    # lock" -- trivy-api ist daran in Pipeline 3049 gestorben, ohne einen
+    # einzigen Befund zu melden.
+    # Bewusst NICHT unter ${CI_PROJECT_DIR}: der Runner raeumt untrackte
+    # Verzeichnisse im Build-Dir vor jedem Job weg ("Loesche golden-tars/"),
+    # der Cache waere jedes Mal leer und jeder Job laedt die DB neu.
+    - export TRIVY_CACHE_DIR="${HOME}/.cache/trivy/${CI_JOB_NAME}"
+    - mkdir -p "${TRIVY_CACHE_DIR}"
   script:
     - trivy image --exit-code 1 --severity CRITICAL --ignore-unfixed ${BASE_IMAGE}/${SERVICE}:${CI_COMMIT_SHORT_SHA}
   allow_failure: true
