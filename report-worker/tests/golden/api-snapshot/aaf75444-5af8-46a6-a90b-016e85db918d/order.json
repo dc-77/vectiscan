@@ -1,0 +1,583 @@
+{
+ "data": {
+  "businessImpactScore": 2.5,
+  "correlationCount": 16,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "heuel.com",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-05-09T20:23:48.154Z",
+  "hasReport": true,
+  "id": "aaf75444-5af8-46a6-a90b-016e85db918d",
+  "isRescan": false,
+  "overallRisk": "MEDIUM",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "quarantine",
+     "pct": 100,
+     "raw": "v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com",
+     "rua": [
+      "mailto:dmarcrua@heuel.com"
+     ],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/heuel.com",
+     "domain": "heuel.com",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/heuel.com"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.heuel.com",
+    "dl.heuel.com",
+    "edi.heuel.com",
+    "jobs.heuel.com",
+    "mail.heuel.com",
+    "mails.heuel.com",
+    "online.heuel.com",
+    "ose.heuel.com",
+    "smtp.heuel.com",
+    "webportal.heuel.com",
+    "www.heuel.com"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "heuel.com",
+    "records": [
+     {
+      "last_seen": "2026-05-08T21:08:54.189000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "217.72.203.132"
+     },
+     {
+      "last_seen": "2026-05-04T11:26:50.206000",
+      "options": {
+       "priority": 10,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-05-04T11:26:50.206000",
+      "options": {
+       "priority": 20,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-05-04T11:26:50.206000",
+      "options": {
+       "priority": 30,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-05-04T11:26:50.206000",
+      "options": {
+       "priority": 40,
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-05-04T11:21:56.281000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.second-ns.com"
+     },
+     {
+      "last_seen": "2026-05-04T11:21:56.281000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1.your-server.de"
+     },
+     {
+      "last_seen": "2026-05-04T11:21:56.281000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns3.second-ns.de"
+     },
+     {
+      "last_seen": "2026-05-04T11:27:01.320000",
+      "options": {
+       "expires": 3600000,
+       "hostmaster": "postmaster.your-server.de",
+       "minttl": 7200,
+       "refresh": 86400,
+       "retry": 1800,
+       "serial": 2026032507,
+       "ttl": 7200
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1.your-server.de"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=7596C8AEEA14348B00B41FC0FE5146AC550E5613"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "MS=ms67921799"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "_globalsign-domain-verification=DjwpbI_kEmRMGz7btGf2L4madxJt-I4kHwgk56MvA0"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "anthropic-domain-verification-h1jvxc=rOfxf5MAHdTdvKSvxYnQHfukm"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "apple-domain-verification=pR99BviNsYRZmQGK"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "asv=a235691dbbc98a5ce9705f6fb9610bc8"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "e7c4410a0de34e09afb5f9ec1892da66"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "facebook-domain-verification=mgv9h34g1smnc9y8btaojp3u7vfuiy"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=ZjVwGnApyXYFP1sVzHeieeJVTO3gAK7pSG6qHm-5i20"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "openai-domain-verification=dv-rFDjbrgUmni90Jvx5Pxcb6vH"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.280000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com include:_spf.samanage.com include:spf-de.emailsignatures365.com ~all"
+     },
+     {
+      "last_seen": "2026-05-04T11:16:41.070000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:54.189000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "dl",
+      "type": "A",
+      "value": "213.133.104.51"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:54.834000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "edi",
+      "type": "A",
+      "value": "20.79.218.75"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:54.273000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "jobs",
+      "type": "A",
+      "value": "217.72.203.132"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:53.935000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "mail",
+      "type": "A",
+      "value": "20.79.218.75"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:54.777000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "mails",
+      "type": "A",
+      "value": "195.225.241.75"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:54.602000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "online",
+      "type": "CNAME",
+      "value": "connect.funnelcockpit.com"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:54.101000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "ose",
+      "type": "A",
+      "value": "20.79.218.75"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:54.059000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "smtp",
+      "type": "A",
+      "value": "195.225.241.75"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:53.851000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "webportal",
+      "type": "A",
+      "value": "213.133.104.51"
+     },
+     {
+      "last_seen": "2026-05-08T21:09:47.272000",
+      "options": {
+       "ttl": 7200
+      },
+      "subdomain": "webportal",
+      "type": "AAAA",
+      "value": "2a01:4f8:d0a:2757::2"
+     },
+     {
+      "last_seen": "2026-05-08T21:08:54.964000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "217.72.203.132"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "dl",
+     "edi",
+     "jobs",
+     "mail",
+     "mails",
+     "online",
+     "ose",
+     "smtp",
+     "webportal",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 18,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 7,
+      "crtsh": 10,
+      "gobuster_dns": 4,
+      "phase0a_passive": 11,
+      "subfinder": 8
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 18
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": "v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com",
+     "mx": [
+      "mx03.hornetsecurity.com",
+      "mx04.hornetsecurity.com",
+      "mx01.hornetsecurity.com",
+      "mx02.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns3.second-ns.de",
+      "ns.second-ns.com",
+      "ns1.your-server.de"
+     ],
+     "spf": "v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com include:_spf.samanage.com \" \"include:spf-de.emailsignatures365.com ~all",
+     "zone_transfer": false
+    },
+    "domain": "heuel.com",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain heuel.com und www.heuel.com müssen gescannt werden; has_web=false aber Ports 80/443 offen laut Shodan → Port-Scan + testssl erforderlich.",
+      "fqdns": [
+       "heuel.com",
+       "www.heuel.com",
+       "jobs.heuel.com"
+      ],
+      "ip": "217.72.203.132",
+      "rdns": "ip217-72-203-132.pbiaas.com",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Enthält edi.heuel.com und ose.heuel.com (Web-Anwendungen) + mail.heuel.com; Apache auf 80/443 aktiv laut Shodan; hat_web=false aber Services vorhanden → vollständiger Scan erforderlich.",
+      "fqdns": [
+       "edi.heuel.com",
+       "ose.heuel.com",
+       "mail.heuel.com"
+      ],
+      "ip": "20.79.218.75",
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Mailserver (mails.heuel.com, smtp.heuel.com); keine Shodan-Ports gelistet aber MX-Rolle → Scan mit niedriger Priorität zur Überprüfung von Mail-Security.",
+      "fqdns": [
+       "mails.heuel.com",
+       "smtp.heuel.com"
+      ],
+      "ip": "195.225.241.75",
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Enthält dl.heuel.com und webportal.heuel.com (Web-Anwendungen); Shodan zeigt umfangreiche offene Ports (FTP, SSH, SMTP, IMAP, POP3, Management-Ports 21, 22, 25, 465, 587, 993, 995) + Apache → kritische Infrastruktur mit hohem Expositionsrisiko.",
+      "fqdns": [
+       "dl.heuel.com",
+       "webportal.heuel.com"
+      ],
+      "ip": "213.133.104.51",
+      "rdns": "www51.your-server.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "online.heuel.com auf Cloudflare-IP (104.16.x.x); Shodan zeigt cPanel/WHM-Ports (2082, 2083, 2086, 2087, 2095, 2096) + CloudFlare auf 8443 → WAF-geschützt aber Management-Ports exponiert, Scan mit niedriger Priorität.",
+      "fqdns": [
+       "online.heuel.com"
+      ],
+      "ip": "104.16.10.6",
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "IPv6-Adresse für webportal.heuel.com (Duplikat zu 213.133.104.51 IPv4); Apache auf 80/443 aktiv laut Shodan → Scan zur IPv6-Abdeckung mit normaler Priorität.",
+      "fqdns": [
+       "webportal.heuel.com"
+      ],
+      "ip": "2a01:4f8:d0a:2757::2",
+      "rdns": "www51.your-server.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 6,
+   "hostsTotal": 6,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 3,
+   "LOW": 3,
+   "MEDIUM": 2
+  },
+  "startedAt": "2026-05-09T13:05:02.735Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}

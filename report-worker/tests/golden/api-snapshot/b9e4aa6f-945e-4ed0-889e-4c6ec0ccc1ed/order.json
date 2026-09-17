@@ -1,0 +1,492 @@
+{
+ "data": {
+  "businessImpactScore": 3,
+  "correlationCount": 18,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "securess.de",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-05-09T20:24:06.970Z",
+  "hasReport": true,
+  "id": "b9e4aa6f-945e-4ed0-889e-4c6ec0ccc1ed",
+  "isRescan": false,
+  "overallRisk": "MEDIUM",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "reject",
+     "pct": 100,
+     "raw": "v=DMARC1; p=reject; rua=mailto:administrator@securess.de; ruf=mailto:administrator@securess.de;",
+     "rua": [
+      "mailto:administrator@securess.de"
+     ],
+     "ruf": [
+      "mailto:administrator@securess.de"
+     ],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/securess.de",
+     "domain": "securess.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/securess.de"
+    }
+   },
+   "passive_subdomains": [
+    "_dmarc.securess.de",
+    "autodiscover.securess.de",
+    "connect.securess.de",
+    "mailin.securess.de",
+    "owa.securess.de",
+    "partner.securess.de",
+    "portal.securess.de",
+    "vermittler.securess.de",
+    "webmail.securess.de",
+    "www.securess.de"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "securess.de",
+    "records": [
+     {
+      "last_seen": "2026-05-07T08:00:14.475000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "85.22.47.41"
+     },
+     {
+      "last_seen": "2026-05-07T08:24:31.804000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-05-07T08:24:31.804000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-05-07T08:24:31.804000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-05-07T08:24:31.804000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-05-07T08:24:17.482000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1a.dodns.net"
+     },
+     {
+      "last_seen": "2026-05-07T08:24:17.482000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns2a.dodns.net"
+     },
+     {
+      "last_seen": "2026-05-07T08:34:55.345000",
+      "options": {
+       "expires": 3600000,
+       "hostmaster": "hostmaster.securess.de",
+       "minttl": 172800,
+       "refresh": 86400,
+       "retry": 10800,
+       "serial": 2024051330,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1.securess.de"
+     },
+     {
+      "last_seen": "2026-05-07T08:07:57.178000",
+      "options": {
+       "ttl": 0
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "google-site-verification=U3IOkpP0AUAkRYbjCJsqVjNTuQTThTLXXZfTlJQ2voU"
+     },
+     {
+      "last_seen": "2026-04-11T06:16:24.151000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "swisssign-check=4MRvdG766Z6jz1fe_4_bPKxYJcA"
+     },
+     {
+      "last_seen": "2026-05-07T08:07:57.178000",
+      "options": {
+       "ttl": 0
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "swisssign-check=GCUOCgTrAwxkj1omoqR40kQDlQQ"
+     },
+     {
+      "last_seen": "2026-05-07T08:07:57.178000",
+      "options": {
+       "ttl": 0
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 a mx ip4:85.22.47.37 include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all"
+     },
+     {
+      "last_seen": "2026-05-07T08:07:58.575000",
+      "options": {
+       "ttl": 3299
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1; p=reject; rua=mailto:administrator@securess.de; ruf=mailto:administrator@securess.de;"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:15.064000",
+      "options": {
+       "ttl": 3599
+      },
+      "subdomain": "autodiscover",
+      "type": "CNAME",
+      "value": "owa.securess.de"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:14.336000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "connect",
+      "type": "A",
+      "value": "212.227.60.78"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:16.747000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "mailin",
+      "type": "A",
+      "value": "85.22.47.39"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:14.757000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "owa",
+      "type": "A",
+      "value": "85.22.47.43"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:14.475000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "partner",
+      "type": "A",
+      "value": "212.227.60.78"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:14.321000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "portal",
+      "type": "A",
+      "value": "85.22.47.40"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:14.333000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "vermittler",
+      "type": "A",
+      "value": "212.227.60.78"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:14.788000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "webmail",
+      "type": "A",
+      "value": "85.22.47.39"
+     },
+     {
+      "last_seen": "2026-05-07T08:00:14.740000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "85.22.47.41"
+     }
+    ],
+    "subdomains": [
+     "_dmarc",
+     "autodiscover",
+     "connect",
+     "mailin",
+     "owa",
+     "partner",
+     "portal",
+     "vermittler",
+     "webmail",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 0,
+     "snapshot_age_minutes": 46,
+     "snapshot_seed_count": 19,
+     "snapshot_seeded": true,
+     "tool_counts": {
+      "certspotter": 2,
+      "crtsh": 9,
+      "gobuster_dns": 2,
+      "phase0a_passive": 10,
+      "snapshot": 19,
+      "subfinder": 12
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 19
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": "v=DMARC1; p=reject; rua=mailto:administrator@securess.de; ruf=mailto:administrator@securess.de;",
+     "mx": [
+      "mx01.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx04.hornetsecurity.com",
+      "mx03.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns1a.dodns.net",
+      "ns2a.dodns.net"
+     ],
+     "spf": "v=spf1 a mx ip4:85.22.47.37 include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all",
+     "zone_transfer": false
+    },
+    "domain": "securess.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain securess.de + www.securess.de mit nginx 1.22.1 auf Port 443; trotz has_web=false müssen Web-Ports gescannt werden (Port-Scan + testssl). Shodan zeigt SSH 9.2p1 (aktuell), saubere Reputation.",
+      "fqdns": [
+       "securess.de",
+       "www.securess.de"
+      ],
+      "ip": "85.22.47.41",
+      "rdns": "85-22-47-41.ip.dokom21.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Multi-Service-Host (connect/partner/vermittler.securess.de) mit Mail-Ports (25, 465, 587, 993, 995) + Web-Ports (80, 443) + SSH + FTP; exponierte Management-Ports (8880, 8443) + Postfix SMTP → vollständiger Security-Scan erforderlich.",
+      "fqdns": [
+       "connect.securess.de",
+       "partner.securess.de",
+       "vermittler.securess.de"
+      ],
+      "ip": "212.227.60.78",
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Mail-Host (mailin/mailout/webmail.securess.de) mit nginx 1.29.5 auf Port 443 + IMAP/IMAPS/Submission; webmail deutet auf Web-Interface hin → scannen trotz has_web=false (Port-Scan + testssl + Web-Probe).",
+      "fqdns": [
+       "mailin.securess.de",
+       "mailout.securess.de",
+       "webmail.securess.de"
+      ],
+      "ip": "85.22.47.39",
+      "rdns": "85-22-47-39.ip.dokom21.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "fqdns": [
+       "owa.securess.de",
+       "autodiscover.securess.de"
+      ],
+      "ip": "85.22.47.43",
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Primärer MX-Host (mx1.securess.de) für die Domain; auch ohne Shodan-Ports-Daten müssen Mail-Server gescannt werden (SMTP/TLS-Konfiguration, Zertifikate). Saubere Reputation (AbuseIPDB=0).",
+      "fqdns": [
+       "mx1.securess.de"
+      ],
+      "ip": "85.22.47.37",
+      "rdns": "mx1.securess.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "Portal.securess.de mit Port 80 (HTTP) in Shodan; trotz has_web=false → Port-Scan + testssl + Web-Probe erforderlich (könnte Redirect oder Parking sein, aber Portal-Name deutet auf Anwendung hin).",
+      "fqdns": [
+       "portal.securess.de"
+      ],
+      "ip": "85.22.47.40",
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 6,
+   "hostsTotal": 6,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 1,
+   "HIGH": 0,
+   "INFO": 1,
+   "LOW": 3,
+   "MEDIUM": 1
+  },
+  "startedAt": "2026-05-09T15:25:56.203Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}

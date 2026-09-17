@@ -1,0 +1,461 @@
+{
+ "data": {
+  "businessImpactScore": 8.8,
+  "correlationCount": 2185,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "secumetrix.de",
+  "error": "Validation-Gate STRICT: 14 Defekte",
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-05-14T21:28:50.121Z",
+  "hasReport": true,
+  "id": "7629dd77-260b-4b68-9f26-b4d806fabe09",
+  "isRescan": false,
+  "overallRisk": "CRITICAL",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "quarantine",
+     "pct": 100,
+     "raw": "v=DMARC1; p=quarantine;",
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/secumetrix.de",
+     "domain": "secumetrix.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/secumetrix.de"
+    }
+   },
+   "passive_subdomains": [
+    "*.secumetrix.de",
+    "_dmarc.secumetrix.de",
+    "apitest.secumetrix.de",
+    "app.secumetrix.de",
+    "cloudscanner-api.secumetrix.de",
+    "cloudscanner.secumetrix.de",
+    "dev.secumetrix.de"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "secumetrix.de",
+    "records": [
+     {
+      "last_seen": "2026-05-08T15:50:48.986000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "45.157.234.103"
+     },
+     {
+      "last_seen": "2026-04-29T07:21:57.634000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx00.udag.de"
+     },
+     {
+      "last_seen": "2026-04-29T07:21:57.635000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.udag.de"
+     },
+     {
+      "last_seen": "2026-04-29T07:20:38.794000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.de"
+     },
+     {
+      "last_seen": "2026-04-29T07:20:38.794000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.net"
+     },
+     {
+      "last_seen": "2026-04-29T07:20:38.794000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.org"
+     },
+     {
+      "last_seen": "2026-04-29T07:23:27.356000",
+      "options": {
+       "expires": 604800,
+       "hostmaster": "hostmaster.united-domains.de",
+       "minttl": 3600,
+       "refresh": 10800,
+       "retry": 3600,
+       "serial": 2024121555,
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns.udag.de"
+     },
+     {
+      "last_seen": "2026-04-29T07:14:12.864000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 include:_smtp.udag.de ~all"
+     },
+     {
+      "last_seen": "2026-04-29T07:16:49.946000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "*",
+      "type": "A",
+      "value": "45.157.234.103"
+     },
+     {
+      "last_seen": "2026-04-29T07:14:12.985000",
+      "options": {
+       "ttl": 3598
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1; p=quarantine;"
+     },
+     {
+      "last_seen": "2026-05-08T15:50:49.984000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "apitest",
+      "type": "A",
+      "value": "173.249.44.221"
+     },
+     {
+      "last_seen": "2026-05-08T15:50:49.040000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "app",
+      "type": "A",
+      "value": "45.157.234.103"
+     },
+     {
+      "last_seen": "2026-05-08T15:50:49.056000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "cloudscanner",
+      "type": "A",
+      "value": "173.249.44.221"
+     },
+     {
+      "last_seen": "2026-05-08T15:50:49.186000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "cloudscanner-api",
+      "type": "A",
+      "value": "173.249.44.221"
+     },
+     {
+      "last_seen": "2026-05-08T15:50:49.333000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "dev",
+      "type": "A",
+      "value": "45.157.232.12"
+     }
+    ],
+    "subdomains": [
+     "*",
+     "_dmarc",
+     "apitest",
+     "app",
+     "cloudscanner",
+     "cloudscanner-api",
+     "dev"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 0,
+     "snapshot_age_minutes": 465,
+     "snapshot_seed_count": 12,
+     "snapshot_seeded": true,
+     "tool_counts": {
+      "certspotter": 6,
+      "crtsh": 5,
+      "gobuster_dns": 4,
+      "phase0a_passive": 7,
+      "snapshot": 12,
+      "subfinder": 5
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 12
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": false,
+     "dmarc": "v=DMARC1; p=quarantine;",
+     "mx": [
+      "mx00.udag.de",
+      "mx01.udag.de"
+     ],
+     "ns": [
+      "ns.udag.de",
+      "ns.udag.net",
+      "ns.udag.org"
+     ],
+     "spf": "v=spf1 include:_smtp.udag.de ~all",
+     "zone_transfer": false
+    },
+    "domain": "secumetrix.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain secumetrix.de mit Status 200 + Login-App (app.secumetrix.de). Passive Intel zeigt kritische Exposition: RDP (3389), MS-SQL 2022, MySQL, FTP, multiple HTTP-Ports (8000, 8080, 8502, 8503), Ollama 0.21.2 — hohe Angriffsfläche trotz AbuseIPDB=0. Muss vollständig gescannt werden.",
+      "fqdns": [
+       "secumetrix.de",
+       "*.secumetrix.de",
+       "app.secumetrix.de"
+      ],
+      "ip": "45.157.234.103",
+      "rdns": "103.234.157.45.dataforest.net",
+      "screenshot_minio_key": "7629dd77-260b-4b68-9f26-b4d806fabe09/45.157.234.103__secumetrix.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "d8d2f0d2aa07e0d32abe4a68d03862d9e099c682a4f17776ea0611bba2292ad1",
+        "final_url": "https://secumetrix.de",
+        "fqdn": "secumetrix.de",
+        "is_primary": true,
+        "screenshot_minio_key": "7629dd77-260b-4b68-9f26-b4d806fabe09/45.157.234.103__secumetrix.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "WordPress-basierte Website auf Microsoft HTTPAPI für Unternehmensdarstellung.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Secumetrix"
+       },
+       {
+        "aliases": [],
+        "body_hash": "aa48aee9fee3e9762d23e4926aa7612984ff32e37ff2c5949eb0880f7199f514",
+        "final_url": "https://app.secumetrix.de",
+        "fqdn": "app.secumetrix.de",
+        "is_primary": true,
+        "screenshot_minio_key": "7629dd77-260b-4b68-9f26-b4d806fabe09/45.157.234.103__app.secumetrix.de.png",
+        "site_summary": {
+         "classification": "login_only",
+         "confidence": 0.9,
+         "description": "Login-Seite (WordPress 6.9.4 auf Microsoft HTTPAPI httpd/2.0)",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Log in"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://secumetrix.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Secumetrix",
+       "web_fqdn": "secumetrix.de"
+      }
+     },
+     {
+      "_reasoning": "Zwei primary VHosts mit echtem Content: Swagger UI (API-Dokumentation) + Cloud Scanner App. Passive Intel zeigt exponierte Services: RabbitMQ 3.13.7, Redis 7.4.6, SSH 9.6p1 — typische Microservice-Infrastruktur mit Sicherheitsrisiken. Muss vollständig gescannt werden.",
+      "fqdns": [
+       "apitest.secumetrix.de",
+       "cloudscanner-api.secumetrix.de",
+       "cloudscanner.secumetrix.de"
+      ],
+      "ip": "173.249.44.221",
+      "rdns": "vmd181662.contaboserver.net",
+      "screenshot_minio_key": "7629dd77-260b-4b68-9f26-b4d806fabe09/173.249.44.221__apitest.secumetrix.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "cloudscanner-api.secumetrix.de",
+          "reason": "body-hash-dup",
+          "status": 200
+         }
+        ],
+        "body_hash": "0dad8f350030a959d8d52640e9439e91fe5f5069cc512dbd932ee6995237eef0",
+        "final_url": "https://apitest.secumetrix.de/swagger/index.html",
+        "fqdn": "apitest.secumetrix.de",
+        "is_primary": true,
+        "screenshot_minio_key": "7629dd77-260b-4b68-9f26-b4d806fabe09/173.249.44.221__apitest.secumetrix.de.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Swagger UI API-Dokumentation und Testplattform auf nginx.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Swagger UI"
+       },
+       {
+        "aliases": [],
+        "body_hash": "dd26380408280cffde66906922f0f3098bf8fafcc3fa747e381a326ae6be641e",
+        "final_url": "https://cloudscanner.secumetrix.de",
+        "fqdn": "cloudscanner.secumetrix.de",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Cloud-Scanning-Tool zur Sicherheitsanalyse von Cloud-Infrastrukturen auf nginx.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Cloud Scanner"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://apitest.secumetrix.de/swagger/index.html",
+       "has_web": true,
+       "status": 200,
+       "title": "Swagger UI",
+       "web_fqdn": "apitest.secumetrix.de"
+      }
+     },
+     {
+      "_reasoning": "Dev-Umgebung (dev.secumetrix.de) mit Login-Interface und Status 200. Passive Intel zeigt RDP (3389), MS-SQL 2025, MySQL, multiple Ports — typische Dev-Infrastruktur mit hohem Risiko. Muss gescannt werden.",
+      "fqdns": [
+       "dev.secumetrix.de"
+      ],
+      "ip": "45.157.232.12",
+      "rdns": "12.232.157.45.dataforest.net",
+      "screenshot_minio_key": "7629dd77-260b-4b68-9f26-b4d806fabe09/45.157.232.12__dev.secumetrix.de.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "b409443f22d4ece4c1ba3651465fc38c40f1cd7e4be0372d621481b4736e11dc",
+        "final_url": "https://dev.secumetrix.de",
+        "fqdn": "dev.secumetrix.de",
+        "is_primary": true,
+        "screenshot_minio_key": "7629dd77-260b-4b68-9f26-b4d806fabe09/45.157.232.12__dev.secumetrix.de.png",
+        "site_summary": {
+         "classification": "login_only",
+         "confidence": 0.9,
+         "description": "Login-Seite (Microsoft HTTPAPI httpd/2.0)",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Log in"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://dev.secumetrix.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Log in",
+       "web_fqdn": "dev.secumetrix.de"
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 3,
+   "hostsTotal": 3,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 2,
+   "HIGH": 1,
+   "INFO": 2,
+   "LOW": 4,
+   "MEDIUM": 3
+  },
+  "startedAt": "2026-05-11T18:15:11.435Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}

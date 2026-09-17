@@ -1,0 +1,1450 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 3,
+   "info": 3,
+   "low": 3,
+   "medium": 3
+  },
+  "business_impact_score": "6.5",
+  "claims_guard_stats": {
+   "allowlist_size": 107,
+   "claims_checked": 193,
+   "claims_unsupported": {
+    "cve": [
+     "CVE-2013-3587",
+     "CVE-2016-2183",
+     "CVE-2024-6387"
+    ],
+    "host": [
+     "217.243.248.28",
+     "fonts.googleapis.com",
+     "fonts.gstatic.com",
+     "hstspreload.org",
+     "maps.googleapis.com",
+     "maps.gstatic.com",
+     "mx01.hornetsecurity.com",
+     "mx02.hornetsecurity.com",
+     "mx03.hornetsecurity.com",
+     "mx04.hornetsecurity.com",
+     "ns.udag",
+     "postgresql.org",
+     "spf.hornetsecurity.com",
+     "spf.protection.outlook.com",
+     "testssl.sh",
+     "www.google.com",
+     "www.gstatic.com"
+    ],
+    "port": [],
+    "version": []
+   },
+   "distinct_removed": [
+    "CVE-2013-3587",
+    "CVE-2016-2183",
+    "CVE-2024-6387"
+   ],
+   "fields_scanned": [
+    "findings[].affected",
+    "findings[].description",
+    "findings[].evidence",
+    "findings[].impact",
+    "findings[].recommendation",
+    "findings[].title",
+    "overall_description",
+    "positive_findings[].description",
+    "positive_findings[].title",
+    "recommendations[].action"
+   ],
+   "mode": "enforce",
+   "removed_count": 7
+  },
+  "cve_guard_stats": {
+   "allowlist_size": 107,
+   "distinct_removed": [
+    "CVE-2013-3587",
+    "CVE-2016-2183",
+    "CVE-2024-6387"
+   ],
+   "removed_count": 7
+  },
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "affected": "188.40.3.130:5432 (junkerwerk.hu)",
+    "business_impact_score": 8.1,
+    "cvss_score": "8.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-284",
+    "description": "Der PostgreSQL-Dienst auf Port 5432 wird laut Shodan-Fingerprint als 'PostgreSQL 9.6.0 or later' identifiziert. PostgreSQL 9.6 hat am 11.11.2021 End-of-Life erreicht und erhält seit knapp 5 Jahren keine Sicherheitsupdates mehr. In diesem Zeitraum wurden zahlreiche CVEs in nachfolgenden PostgreSQL-Versionen behoben, die in 9.6 ungepatcht bleiben. Zusätzlich ist der Dienst direkt aus dem Internet erreichbar, ohne erkennbare Firewall- oder VPN-Vorschaltung.",
+    "evidence": "$ nmap -sV -p 5432 188.40.3.130\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later\n\nShodan-Service-Fingerprint:\n\"5432\": \"PostgreSQL 9.6.0 or later\"\n\nPostgreSQL 9.6 EOL: 2021-11-11 (Quelle: postgresql.org/support/versioning)",
+    "external_id": "VS-2026-002",
+    "finding_type": "database_port_exposed",
+    "id": "VS-2026-002",
+    "impact": "Ein Angreifer kann bekannte Schwachstellen aus fast 5 Jahren PostgreSQL-Entwicklung ausnutzen, um unautorisierten Datenbankzugriff zu erlangen, sensible Daten zu exfiltrieren oder in Kombination mit weiteren Schwächen Remote Code Execution auf dem Datenbank-Host zu erzielen. Die öffentliche Erreichbarkeit ermöglicht zudem Brute-Force-Angriffe auf Datenbank-Zugangsdaten.",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-DB-001",
+    "recommendation": "<b>Sofort (24-48h):</b> Port 5432 mittels Firewall-Regel auf vertrauenswürdige Quell-IPs beschränken oder komplett aus dem Internet ausblenden. Datenbankzugriff ausschließlich über VPN/SSH-Tunnel ermöglichen.\n<b>Kurzfristig (Tage):</b> Upgrade auf eine aktuell unterstützte PostgreSQL-Version (mindestens 14, empfohlen 16). Datenbank-Backups vor Upgrade verifizieren.\n<b>Mittelfristig:</b> Datenbank-Zugangsprotokollierung aktivieren, starke Passwort-Policy und ggf. Zertifikats-basierte Authentifizierung einführen.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-DB-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Datenbank-Port (3306/5432/1433/1521/27017/6379/...) oeffentlich erreichbar - Bei erfolgreicher Authentifizierung (Brute-Force, Default-Creds, leaked-Creds) vollstaendiger Zugriff auf gespeicherte Daten. AC:H weil Authentifizierung weiterhin Pflicht.",
+     "rule_references": [
+      "CWE-200",
+      "CWE-284",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Datenbank-Port 5432 oeffentlich erreichbar auf 188.40.3.130",
+    "title_vars": {
+     "host": "188.40.3.130",
+     "port": "5432",
+     "tech": "PostgreSQL 9.6",
+     "version": "9.6"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "188.40.3.130:222 (junkerwerk.hu)",
+    "business_impact_score": 8.1,
+    "cvss_score": "8.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-364",
+    "description": "Auf dem alternativen SSH-Port 222 antwortet OpenSSH in der Version 9.2p1. Diese Version liegt im Anfälligkeitsbereich von nicht verifizierte CVE-Referenz ('regreSSHion'), einer Race-Condition im SIGALRM-Handler des Signal-Handling, die theoretisch pre-authenticated Remote Code Execution als root ermöglicht (Debian-Backports haben teilweise gepatcht, dies muss aber verifiziert werden). Der Angriff ist zwar aufwendig (Stunden bis Tage Brute-Force), bei ungepatchten Systemen aber real ausnutzbar.",
+    "evidence": "$ nmap -sV -p 222 188.40.3.130\n222/tcp open ssh OpenSSH 9.2p1\n\nnicht verifizierte CVE-Referenz (regreSSHion) betrifft OpenSSH 8.5p1 bis 9.7p1 auf glibc-Systemen (Debian 12 = glibc 2.36).",
+    "external_id": "VS-2026-001",
+    "finding_type": "cve_finding",
+    "id": "VS-2026-001",
+    "impact": "Bei erfolgreicher Ausnutzung erhält ein Angreifer Root-Zugriff auf den Host, was vollständige Kompromittierung aller Dienste (Web, Datenbanken, Mail) und aller gespeicherten Daten bedeutet. Auch wenn der Exploit rechenintensiv ist, existieren mittlerweile öffentliche Proof-of-Concept-Implementierungen.",
+    "original_claude_id": "VS-2026-008",
+    "policy_id": "SP-CVE-004",
+    "recommendation": "<b>Sofort (24-48h):</b> Prüfen, ob der aktuelle Debian-Backport-Patch für nicht verifizierte CVE-Referenz installiert ist (`apt list --installed | grep openssh`, Version 1:9.2p1-2+deb12u3 oder neuer). Falls nicht: sofortiges Sicherheits-Update einspielen.\n<b>Kurzfristig:</b> SSH-Zugriff per Firewall auf vertrauenswürdige Quell-IPs beschränken. LoginGraceTime auf 0 setzen als Sofortmaßnahme.\n<b>Mittelfristig:</b> Upgrade auf OpenSSH ≥ 9.8p1 (nicht mehr betroffen). Fail2ban aktivieren, SSH-Key-Authentifizierung erzwingen, Passwort-Auth deaktivieren.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-CVE-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "CVE-Standard-Mapping aus NVD-CVSS 8.1",
+     "rule_references": [
+      "NVD"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Schwachstelle in OpenSSH 9.2p1 auf 188.40.3.130",
+    "title_vars": {
+     "host": "188.40.3.130",
+     "port": "222",
+     "tech": "OpenSSH 9.2p1",
+     "version": "9.2p1"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "217.243.248.30:443 (openotp.junkerwerk.hu)",
+    "business_impact_score": 7.4,
+    "cvss_score": "7.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N",
+    "cwe": "CWE-295",
+    "description": "Die testssl.sh-Analyse meldet, dass das ausgelieferte TLS-Zertifikat nicht zur abgefragten URI passt, wenn kein SNI verwendet wird ('certificate does not match supplied URI (same w/o SNI)'). Dies deutet auf eine fehlerhafte Zertifikats-Konfiguration hin, bei der Non-SNI-Clients oder Direkt-IP-Zugriffe ein falsches Standard-Zertifikat erhalten. Ohne korrekte Zertifikats-Bindung ist die Authentizität der Verbindung nicht durchgängig gewährleistet.",
+    "evidence": "testssl.sh Ausgabe:\n[HIGH] cert_trust: certificate does not match supplied URI (same w/o SNI)\n[CRITICAL] overall_grade: M",
+    "external_id": "VS-2026-003",
+    "id": "VS-2026-003",
+    "impact": "Clients ohne SNI-Unterstützung oder bei automatischen Prüfungen erhalten Zertifikats-Warnungen, was Benutzer daran gewöhnt, TLS-Warnungen zu ignorieren. Dies erleichtert Man-in-the-Middle-Angriffe. Für Sicherheitsdienste wie OpenOTP, bei denen Zwei-Faktor-Anmeldungen und Passwort-Resets stattfinden, ist die Zertifikats-Vertrauenskette essenziell.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Apache-Konfiguration prüfen und ein gültiges Zertifikat für openotp.junkerwerk.hu als Standard-VirtualHost hinterlegen. Alternativ Non-SNI-Zugriffe explizit ablehnen.\n<b>Mittelfristig:</b> Automatisierte Zertifikats-Verwaltung (z.B. via ACME/Let's Encrypt) einrichten, um Konfigurations-Drift zu vermeiden. Zertifikats-Monitoring aktivieren.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "TLS-Zertifikat auf openotp.junkerwerk.hu passt nicht zum Hostnamen (SNI-Mismatch)",
+    "title_vars": {
+     "host": "openotp.junkerwerk.hu",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "217.243.248.30:443 (openotp.junkerwerk.hu)",
+    "business_impact_score": 5,
+    "cvss_score": "6.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Content-Security-Policy-Header enthält für default-src die Direktiven 'unsafe-inline' und 'unsafe-eval', die die Wirksamkeit von CSP gegen XSS-Angriffe erheblich untergraben. Zudem sind bestimmte spezifische Direktiven (script-src, style-src, object-src, base-uri, frame-ancestors, form-action) nicht explizit gesetzt, sodass sie auf default-src zurückfallen, der wiederum unsafe-inline erlaubt. ZAP identifiziert dies auf mehreren Endpunkten (pwreset, openid, selfdesk, selfreg).",
+    "evidence": "Response-Header:\ncontent-security-policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com\n\nZAP-Alerts:\n[MEDIUM] CSP: Failure to Define Directive with No Fallback (8x)\n[MEDIUM] CSP: script-src unsafe-inline (8x)\n[MEDIUM] CSP: style-src unsafe-inline (8x)",
+    "external_id": "VS-2026-004",
+    "finding_type": "csp_unsafe_inline",
+    "id": "VS-2026-004",
+    "impact": "Bei einer XSS-Schwachstelle im Portal (z.B. reflektierte oder DOM-basierte XSS) kann Angreifer-Code direkt inline im Browser des Opfers ausgeführt werden. Da das Portal Passwort-Reset- und OTP-Login-Funktionen anbietet, würde ein XSS-Exploit Diebstahl von Zugangsdaten und Umgehung von 2FA ermöglichen.",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Inline-Skripte und Inline-Styles refaktorieren und in externe Dateien auslagern. CSP anpassen: `default-src 'self'; script-src 'self' 'nonce-{random}'; style-src 'self' 'nonce-{random}'; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'`.\n<b>Mittelfristig:</b> Nonce- oder Hash-basierte CSP einführen für unvermeidbare Inline-Anteile. CSP-Report-URI aktivieren für Monitoring.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='csp_unsafe_inline' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy auf openotp.junkerwerk.hu nutzt 'unsafe-inline' für script-src und style-src",
+    "title_vars": {
+     "directive": "script-src/style-src unsafe-inline",
+     "host": "openotp.junkerwerk.hu"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "217.243.248.30:443 (openotp.junkerwerk.hu)",
+    "business_impact_score": 5.9,
+    "cvss_score": "5.9",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-327",
+    "description": "Der TLS-Endpunkt bietet mehrere veraltete Cipher-Suites basierend auf 3DES (Triple-DES) und IDEA an. Konkret betroffen: TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA (xc012), TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA (x16) und TLS_RSA_WITH_3DES_EDE_CBC_SHA (x0a). 3DES gilt aufgrund der Sweet32-Angriffe (nicht verifizierte CVE-Referenz) als unsicher und wurde von NIST offiziell zurückgezogen (SP 800-131A). Auch die BSI TR-02102-2 verbietet 3DES-Cipher.",
+    "evidence": "testssl.sh Ausgabe:\n[MEDIUM] cipherlist_3DES_IDEA: offered\n[MEDIUM] cipher-tls1_2_xc012: TLSv1.2  ECDHE-RSA-DES-CBC3-SHA  3DES 168\n[MEDIUM] cipher-tls1_2_x16:   TLSv1.2  EDH-RSA-DES-CBC3-SHA    3DES 168\n[MEDIUM] cipher-tls1_2_x0a:   TLSv1.2  DES-CBC3-SHA            3DES 168",
+    "external_id": "VS-2026-005",
+    "finding_type": "software_eol",
+    "id": "VS-2026-005",
+    "impact": "Angreifer mit Zugriff auf den Netzwerkverkehr können bei ausreichend Sitzungsdauer über Sweet32-Kollisionsangriffe Klartext-Fragmente aus verschlüsselten Verbindungen extrahieren. Für ein Authentifizierungs-Portal, das langlebige Session-Cookies überträgt, ist dieses Risiko relevant. Zusätzlich verletzt die Konfiguration Compliance-Anforderungen (BSI TR-03116-4, PCI DSS 4.0).",
+    "original_claude_id": "VS-2026-004",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> In der Apache-SSL-Konfiguration (mod_ssl) die Cipher-Suite-Liste anpassen: 3DES- und IDEA-Cipher explizit ausschließen (`SSLCipherSuite HIGH:!aNULL:!MD5:!3DES:!IDEA:!RC4`).\n<b>Mittelfristig:</b> Konfiguration an Mozilla 'Intermediate' oder 'Modern' TLS-Profil ausrichten, TLS 1.0/1.1 deaktivieren, ausschließlich AEAD-Cipher (AES-GCM, ChaCha20-Poly1305) zulassen. Siehe auch BSI TR-03116-4 Compliance-Prüfung in diesem Bericht.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Veraltete 3DES-Cipher-Suites auf openotp.junkerwerk.hu (Port 443) aktiviert",
+    "title_vars": {
+     "host": "openotp.junkerwerk.hu",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "_title_template_missing": true,
+    "affected": "217.243.248.30:25 (openotp.junkerwerk.hu)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Laut Shodan-Fingerprint läuft auf openotp.junkerwerk.hu Port 25 ein Exim-SMTP-Server in Version 4.96. Exim 4.96 wurde am 6. Mai 2022 released; aktuelle Version ist 4.98.x. Es existieren mehrere bekannte CVEs in älteren 4.9x-Versionen. Der Betrieb eines SMTP-Servers auf einem OTP-Portal-Host ist zudem architektonisch fragwürdig, da MX-Records auf Hornetsecurity zeigen und dieser Server nicht als offizieller Mail-Empfänger fungiert.",
+    "evidence": "Shodan:\n\"25\": \"Exim smtpd 4.96\"\n\nMX-Records für junkerwerk.hu:\nmx01.hornetsecurity.com\nmx02.hornetsecurity.com\nmx03.hornetsecurity.com\nmx04.hornetsecurity.com\n(kein Verweis auf openotp.junkerwerk.hu)",
+    "external_id": "VS-2026-006",
+    "finding_type": "software_eol",
+    "id": "VS-2026-006",
+    "impact": "Angreifer können bekannte Exim-Schwachstellen (mehrere CVEs in 4.9x-Serie) für Remote Code Execution oder Mail-Relay-Missbrauch nutzen. Ein kompromittierter SMTP-Server auf dem OTP-Portal-Host kann für Phishing im Namen der Domain oder als Sprungbrett für weitere Angriffe missbraucht werden.",
+    "original_claude_id": "VS-2026-014",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Prüfen, ob Exim auf Port 25 zwingend erforderlich ist. Falls nicht, Dienst deaktivieren oder auf localhost binden. Falls doch benötigt: Update auf aktuelle Exim-Version (≥ 4.98) einspielen.\n<b>Mittelfristig:</b> Port 25 per Firewall auf vertrauenswürdige Quellen beschränken (z.B. nur Hornetsecurity-IPs). Mail-Relay-Konfiguration prüfen, Open-Relay ausschließen (SMTP-AUTH erzwingen).",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Exim SMTP 4.96 auf openotp.junkerwerk.hu (Port 25) exponiert",
+    "title_vars": {
+     "host": "openotp.junkerwerk.hu",
+     "port": "25",
+     "tech": "Exim 4.96"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "junkerwerk.hu (Domain-DNS)",
+    "business_impact_score": 2.5,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Die DNS-Zone der Domain junkerwerk.hu enthält keinen DMARC-Record (_dmarc.junkerwerk.hu). SPF (v=spf1 ~all) und DKIM sind konfiguriert, ohne DMARC-Enforcement bleibt der Schutz gegen E-Mail-Spoofing jedoch unvollständig, da empfangende Mailserver keine explizite Policy erhalten, wie mit fehlgeschlagenen SPF/DKIM-Prüfungen umzugehen ist.",
+    "evidence": "DNS-Query:\n$ dig +short TXT _dmarc.junkerwerk.hu\n(kein Ergebnis)\n\nSPF-Record vorhanden:\nv=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all\nDKIM: True",
+    "external_id": "VS-2026-007",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-007",
+    "impact": "Ohne DMARC-Policy können Angreifer E-Mails im Namen von @junkerwerk.hu versenden, ohne dass empfangende Mailserver diese verlässlich als Spoofing erkennen. Dies begünstigt Phishing-, CEO-Fraud- und Business-Email-Compromise-Angriffe gegen Kunden, Partner und Mitarbeitende. Auch die Reputation der Absender-Domain leidet.",
+    "original_claude_id": "VS-2026-007",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "<b>Kurzfristig (Tage):</b> DMARC-Record im Monitoring-Modus veröffentlichen: `_dmarc.junkerwerk.hu TXT \"v=DMARC1; p=none; rua=mailto:dmarc@junkerwerk.hu; ruf=mailto:dmarc@junkerwerk.hu; adkim=s; aspf=s\"`.\n<b>Mittelfristig (4-8 Wochen):</b> Nach Auswertung der Aggregate-Reports schrittweise auf `p=quarantine` und schließlich `p=reject` erhöhen. Legitime Mail-Sender (Hornetsecurity, Outlook, interne Systeme) auf vollständige DKIM-Signaturen prüfen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer junkerwerk.hu",
+    "title_vars": {
+     "domain": "junkerwerk.hu"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "junkerwerk.hu (Domain-DNS)",
+    "business_impact_score": 2.5,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-345",
+    "description": "Die Domain junkerwerk.hu ist nicht mit DNSSEC signiert (dnssec_signed=false laut passive Intel). DNSSEC schützt DNS-Antworten vor Cache-Poisoning und Man-in-the-Middle-Manipulation.",
+    "evidence": "Passive Intel:\ndnssec_signed: false\n\n$ dig +dnssec junkerwerk.hu\n(keine RRSIG-Records)",
+    "external_id": "VS-2026-008",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-008",
+    "impact": "Ohne DNSSEC können Angreifer in Man-in-the-Middle-Positionen oder durch Cache-Poisoning-Angriffe manipulierte DNS-Antworten liefern (z.B. Weiterleitung von openotp.junkerwerk.hu auf einen Phishing-Server). Die Integrität der Namensauflösung ist nicht kryptografisch abgesichert.",
+    "original_claude_id": "VS-2026-013",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "<b>Mittelfristig (1-3 Monate):</b> DNSSEC über den DNS-Provider (united-domains, ns.udag.*) aktivieren. Signaturschlüssel (KSK/ZSK) generieren, DS-Record beim Registrar hinterlegen. Rollover-Prozess dokumentieren.\n<b>Ergänzend:</b> TLSRPT-Record (SMTP TLS Reporting) und MTA-STS erwägen für weitere E-Mail-Sicherheit.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "DNSSEC fehlt fuer junkerwerk.hu",
+    "title_vars": {
+     "domain": "junkerwerk.hu"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "217.243.248.30:443 (openotp.junkerwerk.hu)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-1021",
+    "description": "Der HTTP-Response-Header 'X-Frame-Options' wird mehrfach mit unterschiedlichen bzw. gleichen Werten gesetzt ('sameorigin\\nSAMEORIGIN'). Browser interpretieren doppelte Header uneinheitlich — einige nehmen den ersten, andere ignorieren beide. Zusätzlich sind auch Cache-Control-Header doppelt gesetzt.",
+    "evidence": "Response-Header:\nx-frame-options: sameorigin\\nSAMEORIGIN\ncache-control: no-store, no-cache, must-revalidate\\npost-check=0, pre-check=0\n\ntestssl.sh:\n[MEDIUM] X-Frame-Options_multiple\n[MEDIUM] Cache-Control_multiple\n\nZAP: Multiple X-Frame-Options Header Entries (6x)",
+    "external_id": "VS-2026-009",
+    "id": "VS-2026-009",
+    "impact": "In Browsern, die doppelte X-Frame-Options-Header ignorieren, ist die Seite in Frames einbettbar, was Clickjacking-Angriffe ermöglicht. Für Login-Seiten kann dies zu Klick-Highjacking mit UI-Redressing führen.",
+    "original_claude_id": "VS-2026-012",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Apache-Konfiguration überprüfen, um doppelte Header zu vermeiden. Verwendung von `Header always set X-Frame-Options SAMEORIGIN` (statt `add`) und Entfernen redundanter Konfiguration aus Applikations-Code (PHP-Header).\n<b>Mittelfristig:</b> Migration zu modernem `Content-Security-Policy: frame-ancestors 'self'` statt X-Frame-Options.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Mehrfache X-Frame-Options-Header auf openotp.junkerwerk.hu",
+    "title_vars": {
+     "host": "openotp.junkerwerk.hu"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "217.243.248.30:443 (openotp.junkerwerk.hu)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N",
+    "cwe": "",
+    "description": "testssl.sh meldet, dass der Dienst gzip-Kompression innerhalb der HTTPS-Antwort verwendet. In Verbindung mit reflektierten benutzergesteuerten Werten in der Response ermöglicht dies BREACH-Angriffe (Browser Reconnaissance and Exfiltration via Adaptive Compression of Hypertext, nicht verifizierte CVE-Referenz), bei denen Angreifer schrittweise Session-Cookies oder CSRF-Tokens aus verschlüsselten Antworten extrahieren können.",
+    "evidence": "testssl.sh Ausgabe:\n[MEDIUM] BREACH: potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested\n\nResponse-Header:\ncontent-encoding: gzip",
+    "external_id": "VS-2026-010",
+    "finding_type": "csrf_token_missing",
+    "id": "VS-2026-010",
+    "impact": "Ein Angreifer mit Möglichkeit zur Injektion von Werten in HTTP-Requests (z.B. per XSS oder benachbarter Origin) kann durch statistische Analyse der Antwortgröße Session-Tokens rekonstruieren. Für ein OTP-Portal, das Passwort-Reset und Login handhabt, ist der Impact auf Vertraulichkeit hoch.",
+    "original_claude_id": "VS-2026-006",
+    "policy_id": "SP-CSRF-001",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> HTTP-Kompression für Response-Bodies deaktivieren, die sicherheitsrelevante Tokens (Session-Cookies, CSRF-Tokens) enthalten. Alternativ CSRF-Tokens pro Request randomisieren (Random-Masking).\n<b>Mittelfristig:</b> Content-Type-basierte selektive Kompression (nur statische Assets komprimieren, keine dynamischen HTML-Seiten mit sensiblen Daten). Length-Hiding-Mechanismen aktivieren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSRF-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Form ist GET-only oder ohne State-Change - kein CSRF-Vektor",
+     "rule_references": [
+      "CWE-352"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Anti-CSRF-Token fehlt auf Login-Formular openotp.junkerwerk.hu",
+    "title_vars": {
+     "host": "openotp.junkerwerk.hu",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "217.243.248.30:443 (openotp.junkerwerk.hu)",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der HTTP-Response-Header 'Strict-Transport-Security' ist mit max-age=86400 (1 Tag) gesetzt. Best Practices und BSI TR-03116-4 empfehlen mindestens max-age=15552000 (180 Tage), typischerweise 31536000 (1 Jahr). Bei so kurzer Gültigkeit kann ein Angreifer nach einem Tag ohne Nutzerbesuch wieder SSL-Stripping-Angriffe durchführen.",
+    "evidence": "testssl.sh Ausgabe:\n[MEDIUM] HSTS_time: max-age too short. 1 days (=86400 seconds) < 15552000 seconds\n\nAktueller Response-Header:\nstrict-transport-security: max-age=86400",
+    "external_id": "VS-2026-012",
+    "finding_type": "hsts_short_maxage",
+    "id": "VS-2026-012",
+    "impact": "Nutzer, die die Seite länger als 24 Stunden nicht besuchen, verlieren den HSTS-Schutz. Ein Angreifer in einer Man-in-the-Middle-Position (öffentliches WLAN, kompromittierter Router) kann dann SSL-Stripping durchführen und die Verbindung auf HTTP degradieren, um Zugangsdaten oder OTP-Codes abzugreifen.",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-HDR-004",
+    "recommendation": "<b>Kurzfristig (Tage):</b> HSTS-Header auf mindestens `max-age=31536000; includeSubDomains` erhöhen. In Apache: `Header always set Strict-Transport-Security \"max-age=31536000; includeSubDomains\"`.\n<b>Mittelfristig:</b> Nach erfolgreicher Erprobung Aufnahme in die HSTS-Preload-Liste (hstspreload.org) prüfen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "HSTS max-age < 6 Monate - Best-Practice-Verstoss ohne praktisches Risiko",
+     "rule_references": [
+      "CWE-523"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "HSTS max-age unter 6 Monaten auf openotp.junkerwerk.hu",
+    "title_vars": {
+     "host": "openotp.junkerwerk.hu",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "217.243.248.30:443 (https://openotp.junkerwerk.hu/openid/login_uid.php)",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-352",
+    "description": "Der OWASP ZAP Active Scan meldet fehlende Anti-CSRF-Tokens auf dem Login-Formular unter /openid/login_uid.php. Für einen Authentifizierungs-Endpunkt ist der Schutz gegen Cross-Site Request Forgery essenziell, um Login-CSRF-Angriffe (Anmeldung mit Angreifer-Konto zwecks Aktions-Tracking) und ggf. Session-Fixation zu verhindern.",
+    "evidence": "ZAP Alert:\n[MEDIUM] Absence of Anti-CSRF Tokens (1x)\nCWE: 352\nURL: https://openotp.junkerwerk.hu/openid/login_uid.php",
+    "external_id": "VS-2026-011",
+    "finding_type": "csrf_token_missing",
+    "id": "VS-2026-011",
+    "impact": "Ein Angreifer kann Nutzer über präparierte Websites dazu bringen, unbewusst Login-Requests abzusenden. Bei Login-CSRF kann dies genutzt werden, um Opfer mit Angreifer-Konten anzumelden und deren Aktivitäten (Suchen, Uploads) mitzulesen. Auf einem OpenOTP-Portal ist die Session-Integrität besonders sicherheitsrelevant.",
+    "original_claude_id": "VS-2026-011",
+    "policy_id": "SP-CSRF-001",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Anti-CSRF-Token pro Login-Request generieren und serverseitig validieren (Synchronizer-Token-Pattern). Bei RCDevs OpenOTP: Herstellersupport für aktuelle Version mit CSRF-Schutz kontaktieren.\n<b>Mittelfristig:</b> SameSite=Strict für alle Session-Cookies setzen. Referrer-Prüfung als Defense-in-Depth ergänzen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": true,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSRF-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Form ist GET-only oder ohne State-Change - kein CSRF-Vektor",
+     "rule_references": [
+      "CWE-352"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Anti-CSRF-Token fehlt auf Login-Formular openotp.junkerwerk.hu",
+    "title_vars": {
+     "host": "openotp.junkerwerk.hu"
+    }
+   }
+  ],
+  "overall_description": "Die Sicherheitsbewertung der Domain junkerwerk.hu offenbart erhebliche Angriffsflächen auf zwei zentralen Systemen. Der Hauptserver 188.40.3.130 (dedi2230.your-server.de) exponiert insgesamt 11 offene Ports gegenüber dem Internet, darunter sicherheitserhöhte Dienste wie MariaDB (Port 3306), PostgreSQL 9.6 (Port 5432, seit November 2021 End-of-Life), FTP via ProFTPD (Port 21), sowie mehrere Mail-Protokolle (POP3/110, IMAP/143, SMTP/465, SMTP/587, IMAPS/993, POP3S/995). Besonders die Exposition der Datenbank-Ports und die Verwendung einer seit über 4 Jahren nicht mehr gepflegten PostgreSQL-Version 9.6 stellen ein akutes Sicherheitsrisiko dar. Zusätzlich läuft OpenSSH 9.2p1 auf dem alternativen Port 222 — eine Version, die potenziell für regreSSHion (nicht verifizierte CVE-Referenz) anfällig ist. Ein aktiver Webdienst konnte auf dem Haupthost trotz offener Ports 80/443 (laut Shodan) nicht erfolgreich getestet werden (Timeout), sodass keine TLS- oder Header-Prüfung möglich war.\n\nDer zweite Host 217.243.248.30 (openotp.junkerwerk.hu) betreibt ein Web Applications Portal (vermutlich RCDevs OpenOTP) auf Apache HTTPD über Port 443 und ist zusätzlich als Mail-Relay via Exim 4.96 auf Port 25 erreichbar. Die TLS-Konfiguration erhält von testssl.sh die Gesamtnote 'M' aufgrund mehrerer schwerwiegender Mängel: Das TLS-Zertifikat passt nicht zum abgefragten Hostnamen (SNI-Mismatch), veraltete 3DES-Cipher-Suites (TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA, TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA, TLS_RSA_WITH_3DES_EDE_CBC_SHA) sind weiterhin aktiviert, HSTS ist mit nur 1 Tag Gültigkeit deutlich zu kurz konfiguriert, und der Dienst ist potenziell für BREACH-Angriffe (GZIP-Komprimierung über HTTPS) anfällig. Die ZAP-Analyse identifiziert zudem mehrfache Content-Security-Policy-Schwächen mit 'unsafe-inline' bzw. fehlender Definition, doppelte X-Frame-Options-Header sowie fehlende Anti-CSRF-Tokens auf dem OpenID-Login-Endpunkt.\n\nAuf DNS-Ebene fehlt ein DMARC-Record vollständig, was E-Mail-Spoofing gegen die Domain erleichtert, obwohl SPF und DKIM korrekt konfiguriert sind. DNSSEC ist nicht aktiviert. Die Gesamtreife des Sicherheitsstands ist inkonsistent: Während Mail-Infrastruktur (Hornetsecurity) und teilweise Web-Header sinnvoll gestaltet sind, offenbart der Hauptserver eine typische Legacy-Shared-Hosting-Konfiguration mit umfassender Dienst-Exposition ohne Firewall-Segmentierung.",
+  "overall_risk": "HIGH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSRF-001",
+   "SP-CVE-004",
+   "SP-DB-001",
+   "SP-DNS-001",
+   "SP-DNS-005",
+   "SP-FALLBACK",
+   "SP-HDR-004"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die Domain junkerwerk.hu hat einen sauber strukturierten SPF-Record, der sowohl den eigenen A/MX-Record, die dedizierte Sender-IP 217.243.248.28, Microsoft Outlook und Hornetsecurity autorisiert und mit ~all (Softfail) endet. Zusätzlich ist DKIM aktiv. Diese beiden Bausteine bilden zusammen mit einem noch zu ergänzenden DMARC-Record eine solide E-Mail-Authentifizierung.",
+    "title": "SPF und DKIM korrekt konfiguriert"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Datenbank-Ports 3306 (MariaDB) und 5432 (PostgreSQL 9.6 EOL) per Provider-Firewall (Hetzner Cloud Firewall) für Internet-Zugriffe sperren. Zugriff ausschließlich über VPN oder SSH-Tunnel erlauben.",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "OpenSSH-Patch-Status für nicht verifizierte CVE-Referenz (regreSSHion) auf 188.40.3.130 verifizieren; ggf. sofortiges apt-Update einspielen und SSH-Zugriff auf Admin-IPs beschränken.",
+    "effort": "1 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "PostgreSQL 9.6 auf aktuell unterstützte Version (mindestens 14, empfohlen 16) migrieren. Backup vor Migration verifizieren, Testlauf in Staging-Umgebung.",
+    "effort": "8-16 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "TLS-Zertifikat für openotp.junkerwerk.hu korrekt als Standard-VirtualHost in Apache hinterlegen; 3DES/IDEA-Cipher-Suites in SSLCipherSuite ausschließen; HSTS-max-age auf mindestens 31536000 erhöhen.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-003",
+     "VS-2026-005",
+     "VS-2026-012"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "DMARC-Record im Monitoring-Modus (p=none) für junkerwerk.hu veröffentlichen und Aggregate-Reports auswerten; nach 4-8 Wochen auf p=quarantine bzw. p=reject eskalieren.",
+    "effort": "1 h + 4-8 Wochen Monitoring",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Doppelte HTTP-Header (X-Frame-Options, Cache-Control) auf openotp.junkerwerk.hu bereinigen: Konsolidierung in Apache-Konfiguration statt gemischte Setzung aus PHP-Applikation und Apache.",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-009"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Prüfen ob Exim SMTP Port 25 auf openotp.junkerwerk.hu benötigt wird; falls nicht: Dienst deaktivieren. Falls doch: Upgrade auf aktuelle Exim-Version und Firewall-Beschränkung.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Content-Security-Policy auf openotp.junkerwerk.hu härten: Inline-Skripte/Styles auslagern, Nonce-basierte CSP einführen, unsafe-inline/unsafe-eval entfernen.",
+    "effort": "16-24 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Anti-CSRF-Tokens für Login-Endpunkte des OpenOTP-Portals implementieren; RCDevs-Herstellersupport für aktuelle Version mit integriertem CSRF-Schutz kontaktieren.",
+    "effort": "8-12 h",
+    "finding_refs": [
+     "VS-2026-011"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "BREACH-Angriffs-Härtung: HTTP-Kompression für dynamische Antworten mit sensiblen Tokens deaktivieren oder CSRF-Tokens per Random-Masking absichern.",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-010"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "DNSSEC-Aktivierung für junkerwerk.hu über united-domains DNS-Provider; DS-Record beim Registrar hinterlegen, Rollover-Prozess dokumentieren.",
+    "effort": "3-5 h",
+    "finding_refs": [
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 3,
+   "INFO": 3,
+   "LOW": 3,
+   "MEDIUM": 3
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     },
+     {
+      "port": "3306",
+      "service": "MariaDB 10.11.18-MariaDB-0+deb12u1"
+     },
+     {
+      "port": "5432",
+      "service": "PostgreSQL 9.6.0 or later"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "587",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "junkerwerk.hu",
+     "www.junkerwerk.hu"
+    ],
+    "ftp_service": true,
+    "has_ssl": false,
+    "has_web": false,
+    "ip": "188.40.3.130",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     110,
+     143,
+     222,
+     465,
+     587,
+     993,
+     995,
+     3306,
+     5432
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      3306,
+      587,
+      110,
+      143,
+      80,
+      21,
+      5432,
+      443
+     ],
+     "shodan_services": {
+      "3306": "MariaDB 10.11.18-MariaDB-0+deb12u1",
+      "443": "Apache httpd",
+      "5432": "PostgreSQL 9.6.0 or later",
+      "80": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "junkerwerk.hu",
+    "redirect_data": {
+     "junkerwerk.hu": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://junkerwerk.hu/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "junkerwerk.hu",
+      "final_url": "https://junkerwerk.hu/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     },
+     "www.junkerwerk.hu": {
+      "error": "Page.goto: Timeout 20000ms exceeded.\nCall log:\n  - navigating to \"http://www.junkerwerk.hu/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "www.junkerwerk.hu",
+      "final_url": "https://www.junkerwerk.hu/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": null,
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2018-12-31",
+      "is_mega_cve": false,
+      "latest_patch": "5.5.63",
+      "name": "MySQL",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "2021-11-11",
+      "is_mega_cve": false,
+      "latest_patch": "9.6.24",
+      "name": "PostgreSQL DB",
+      "patch_status": "eol",
+      "source": "tech_detect",
+      "status": "eol",
+      "top_cve": null,
+      "version": "9.6.0 or later",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.2p1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 3306)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MariaDB",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "10.11.18-MariaDB-0+deb12u1",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 5432)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PostgreSQL 9.6.0 or later",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 587",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Courier pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD mod_sftp",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD",
+      "version": ""
+     },
+     {
+      "name": "ProFTPD mod_sftp",
+      "version": ""
+     },
+     {
+      "name": "Courier pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.2p1"
+     },
+     {
+      "name": "MySQL",
+      "version": "5.5.5-10.11.18-MariaDB-0+deb12u1"
+     },
+     {
+      "name": "PostgreSQL DB",
+      "version": "9.6.0 or later"
+     }
+    ],
+    "vhost_results": {
+     "junkerwerk.hu": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "www.junkerwerk.hu": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "25",
+      "service": "Exim smtpd 4.96"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd"
+     }
+    ],
+    "fqdns": [
+     "openotp.junkerwerk.hu"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "217.243.248.30",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      25,
+      443
+     ],
+     "shodan_services": {
+      "25": "Exim smtpd 4.96",
+      "443": "Apache httpd"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "openotp.junkerwerk.hu",
+    "redirect_data": {
+     "openotp.junkerwerk.hu": {
+      "error": null,
+      "final_domain": "openotp.junkerwerk.hu",
+      "final_url": "https://openotp.junkerwerk.hu/",
+      "is_cross_domain": false,
+      "page_title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal",
+      "redirect_chain": [
+       "https://openotp.junkerwerk.hu/",
+       "https://openotp.junkerwerk.hu/style.css",
+       "https://openotp.junkerwerk.hu/jquery-ui.css",
+       "https://openotp.junkerwerk.hu/fonts.css",
+       "https://openotp.junkerwerk.hu/themes/default.css",
+       "https://openotp.junkerwerk.hu/icon.php?webapp=pwreset",
+       "https://openotp.junkerwerk.hu/images/arrow.png",
+       "https://openotp.junkerwerk.hu/icon.php?webapp=openid",
+       "https://openotp.junkerwerk.hu/icon.php?webapp=selfdesk",
+       "https://openotp.junkerwerk.hu/icon.php?webapp=selfreg"
+      ],
+      "response_headers": {
+       "cache-control": "no-store, no-cache, must-revalidate\npost-check=0, pre-check=0",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "924",
+       "content-security-policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:     www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Mon, 31 Aug 2026 14:32:17 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "referrer-policy": "origin-when-cross-origin",
+       "server": "Apache",
+       "strict-transport-security": "max-age=86400",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "sameorigin\nSAMEORIGIN",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-a6df9d9d-eccd-49d1-8dd3-b00a5e005108/hosts/217.243.248.30/phase2/screenshot_openotp.junkerwerk.hu.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "boxed",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width,initial-scale=1,shrink-to-fit=no",
+         "name": "viewport"
+        },
+        {
+         "content": "IE=edge",
+         "name": "X-UA-Compatible"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [
+        "https://openotp.junkerwerk.hu/style.css",
+        "https://openotp.junkerwerk.hu/jquery-ui.css",
+        "https://openotp.junkerwerk.hu/fonts.css",
+        "https://openotp.junkerwerk.hu/themes/default.css"
+       ],
+       "title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Exim smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "4.96",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "openotp.junkerwerk.hu": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "openotp.junkerwerk.hu"
+   }
+  ]
+ },
+ "success": true
+}

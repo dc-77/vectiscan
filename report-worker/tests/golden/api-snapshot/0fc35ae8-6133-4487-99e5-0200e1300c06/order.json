@@ -1,0 +1,437 @@
+{
+ "data": {
+  "businessImpactScore": 6,
+  "correlationCount": 15,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "cyber-fuchs.de",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-05-09T12:37:17.131Z",
+  "hasReport": true,
+  "id": "0fc35ae8-6133-4487-99e5-0200e1300c06",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": false,
+     "fo": null,
+     "issues": [],
+     "p": null,
+     "pct": 100,
+     "raw": null,
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/cyber-fuchs.de",
+     "domain": "cyber-fuchs.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/cyber-fuchs.de"
+    }
+   },
+   "passive_subdomains": [
+    "*.cyber-fuchs.de",
+    "austausch.cyber-fuchs.de",
+    "bgv.austausch.cyber-fuchs.de",
+    "bgv.cyber-fuchs.de",
+    "continentale.cyber-fuchs.de",
+    "haspa.cyber-fuchs.de",
+    "helvetia.cyber-fuchs.de",
+    "mannheimer.cyber-fuchs.de",
+    "neu.cyber-fuchs.de",
+    "provinzial.cyber-fuchs.de",
+    "staging.cyber-fuchs.de",
+    "vgh.cyber-fuchs.de",
+    "vhv.cyber-fuchs.de",
+    "www.cyber-fuchs.de",
+    "www.neu.cyber-fuchs.de"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "cyber-fuchs.de",
+    "records": [
+     {
+      "last_seen": "2026-05-08T15:25:24.050000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-07T03:41:10.837000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.rohwerder.net"
+     },
+     {
+      "last_seen": "2026-05-07T03:38:58.718000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.de"
+     },
+     {
+      "last_seen": "2026-05-07T03:38:58.718000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.net"
+     },
+     {
+      "last_seen": "2026-05-07T03:38:58.718000",
+      "options": {
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns.udag.org"
+     },
+     {
+      "last_seen": "2026-05-07T03:42:05.877000",
+      "options": {
+       "expires": 604800,
+       "hostmaster": "hostmaster.united-domains.de",
+       "minttl": 3600,
+       "refresh": 10800,
+       "retry": 3600,
+       "serial": 2024112227,
+       "ttl": 21600
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns.udag.de"
+     },
+     {
+      "last_seen": "2026-05-07T03:38:42.370000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 mx -all"
+     },
+     {
+      "last_seen": "2026-05-07T03:44:17.041000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "*",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.984000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "austausch",
+      "type": "A",
+      "value": "185.155.194.22"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.186000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "bgv",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.394000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "bgv.austausch",
+      "type": "A",
+      "value": "185.155.194.22"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.177000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "continentale",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.651000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "haspa",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.091000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "helvetia",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.205000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "mannheimer",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.167000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "neu",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.498000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "provinzial",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:24.295000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "staging",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.344000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "vgh",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.873000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "vhv",
+      "type": "A",
+      "value": "185.155.193.50"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.351000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "www",
+      "type": "CNAME",
+      "value": "cyber-fuchs.de"
+     },
+     {
+      "last_seen": "2026-05-08T15:25:23.906000",
+      "options": {
+       "ttl": 600
+      },
+      "subdomain": "www.neu",
+      "type": "A",
+      "value": "185.155.193.50"
+     }
+    ],
+    "subdomains": [
+     "*",
+     "austausch",
+     "bgv",
+     "bgv.austausch",
+     "continentale",
+     "haspa",
+     "helvetia",
+     "mannheimer",
+     "neu",
+     "provinzial",
+     "staging",
+     "vgh",
+     "vhv",
+     "www",
+     "www.neu"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 17,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 12,
+      "crtsh": 1,
+      "gobuster_dns": 1,
+      "phase0a_passive": 15,
+      "subfinder": 13
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 17
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": false,
+     "dmarc": null,
+     "mx": [
+      "mx01.rohwerder.net"
+     ],
+     "ns": [
+      "ns.udag.org",
+      "ns.udag.net",
+      "ns.udag.de"
+     ],
+     "spf": "v=spf1 mx -all",
+     "zone_transfer": false
+    },
+    "domain": "cyber-fuchs.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain cyber-fuchs.de mit Wildcard und mehreren Subdomains (Staging, neu, Versicherungs-Partner); has_web=false aber Ports 80/443 offen mit Apache → Web-Scan erforderlich; vhosts leer deutet auf Probe-Fehler hin, nicht auf Irrelevanz.",
+      "fqdns": [
+       "cyber-fuchs.de",
+       "www.cyber-fuchs.de",
+       "*.cyber-fuchs.de",
+       "bgv.cyber-fuchs.de",
+       "continentale.cyber-fuchs.de",
+       "haspa.cyber-fuchs.de",
+       "helvetia.cyber-fuchs.de",
+       "mannheimer.cyber-fuchs.de",
+       "neu.cyber-fuchs.de",
+       "provinzial.cyber-fuchs.de",
+       "staging.cyber-fuchs.de",
+       "vgh.cyber-fuchs.de",
+       "vhv.cyber-fuchs.de",
+       "www.neu.cyber-fuchs.de"
+      ],
+      "ip": "185.155.193.50",
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     },
+     {
+      "_reasoning": "austausch.cyber-fuchs.de mit FTP (Port 21) und veralteter OpenSSH 7.6p1 (EOL) → Sicherheitsrisiko; has_web=false aber Ports 80/443/21/22 offen → Port-Scan + testssl erforderlich; möglicher Mail-Exchange-Host (rdns: rohwerder-isp.de).",
+      "fqdns": [
+       "austausch.cyber-fuchs.de",
+       "bgv.austausch.cyber-fuchs.de"
+      ],
+      "ip": "185.155.194.22",
+      "rdns": "hosting05.rohwerder-isp.de",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 2,
+   "hostsTotal": 2,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 1,
+   "INFO": 1,
+   "LOW": 3,
+   "MEDIUM": 3
+  },
+  "startedAt": "2026-05-09T10:41:25.718Z",
+  "status": "delivered",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}

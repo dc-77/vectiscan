@@ -1,0 +1,61 @@
+{
+ "data": {
+  "businessImpactScore": null,
+  "correlationCount": 0,
+  "customerId": "d0000000-0000-4000-a000-000000000001",
+  "domain": "demo-corp.vectiscan-demo.test",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-05-21T14:05:00.000Z",
+  "hasReport": true,
+  "id": "d0000000-0000-4000-a000-000000000102",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": null,
+  "progress": {
+   "currentHost": null,
+   "currentTool": null,
+   "discoveredHosts": [
+    {
+     "fqdns": [
+      "www.demo-corp.vectiscan-demo.test"
+     ],
+     "ip": "203.0.113.20",
+     "status": "scanned"
+    },
+    {
+     "fqdns": [
+      "portal.demo-corp.vectiscan-demo.test"
+     ],
+     "ip": "203.0.113.21",
+     "status": "scanned"
+    },
+    {
+     "fqdns": [
+      "gw.demo-corp.vectiscan-demo.test"
+     ],
+     "ip": "203.0.113.22",
+     "status": "scanned"
+    }
+   ],
+   "hostsCompleted": 3,
+   "hostsTotal": 3,
+   "lastCompletedTool": null,
+   "phase": null,
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 1,
+   "HIGH": 3,
+   "INFO": 0,
+   "LOW": 2,
+   "MEDIUM": 4
+  },
+  "startedAt": "2026-05-21T13:35:00.000Z",
+  "status": "report_complete",
+  "subscriptionId": null,
+  "validationWarnings": null
+ },
+ "success": true
+}

@@ -1,0 +1,1846 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 3,
+   "low": 6,
+   "medium": 2
+  },
+  "business_impact_score": "6.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_title_template_missing": true,
+    "affected": "92.205.224.174:110 (POP3), 92.205.224.174:143 (IMAP)",
+    "business_impact_score": 5.9,
+    "cvss_score": "5.9",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Der Mailserver 92.205.224.174 bietet neben den TLS-Varianten POP3S (995) und IMAPS (993) auch die unverschlüsselten Klartext-Protokolle POP3 (110) und IMAP (143) an. Ohne obligatorische STARTTLS-Erzwingung können Client-Verbindungen mit Zugangsdaten im Klartext transportiert werden.",
+    "evidence": "$ nmap -sV -p 110,143 92.205.224.174\n110/tcp open pop3 Dovecot pop3d\n143/tcp open imap Dovecot imapd",
+    "external_id": "VS-2026-001",
+    "id": "VS-2026-001",
+    "impact": "Bei Man-in-the-Middle-Angriffen im Netzwerkpfad oder bei fehlerhaft konfigurierten Clients können Benutzernamen und Passwörter mitgelesen und E-Mail-Konten übernommen werden.",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Woche 1-2:</b> Klartext-POP3 (110) und IMAP (143) deaktivieren oder STARTTLS-Zwang (<code>disable_plaintext_auth=yes</code>, <code>ssl=required</code> in Dovecot) durchsetzen.\n<b>Mittelfristig:</b> Nur POP3S (995) und IMAPS (993) freigeben, Kundenkommunikation entsprechend informieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Unverschlüsselte Klartext-Maildienste POP3/IMAP auf bergersysteme.com",
+    "title_vars": {
+     "host": "bergersysteme.com",
+     "port": "110/143"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "92.205.224.174:21 (ftp.bergersysteme.com)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Der Host 92.205.224.174 betreibt einen ProFTPD-Dienst auf Port 21. FTP überträgt Zugangsdaten und Nutzdaten standardmäßig unverschlüsselt. Ob FTPS/TLS-Aushandlung erzwungen wird, ist aus den Scandaten nicht ableitbar.",
+    "evidence": "$ nmap -sV -p 21 92.205.224.174\n21/tcp open ftp ProFTPD\n\nShodan-Bestätigung: Port 21 aktiv.",
+    "external_id": "VS-2026-002",
+    "id": "VS-2026-002",
+    "impact": "Bei unverschlüsselten FTP-Zugriffen können Angreifer im gleichen Netzwerksegment (z.B. offenes WLAN) FTP-Zugangsdaten und übertragene Dateien mitlesen. Kompromittierte FTP-Accounts eignen sich zur Ablage von Webshells auf dem Webserver.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Woche 1:</b> Prüfung, ob FTP tatsächlich benötigt wird; falls ja, Migration auf SFTP (via SSH Port 22) oder Erzwingung von FTPS mit TLS.\n<b>Mittelfristig:</b> FTP-Port 21 in der Firewall schließen und alle Deployment-Workflows auf SFTP umstellen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Unverschlüsseltes FTP (ProFTPD) auf bergersysteme.com",
+    "title_vars": {
+     "host": "bergersysteme.com",
+     "port": "21",
+     "tech": "ProFTPD"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "bergersysteme.com (DNS)",
+    "business_impact_score": 2.5,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der DMARC-Eintrag der Domain bergersysteme.com ist mit 'p=none; pct=100' konfiguriert. Damit werden zwar Reports generiert und an hornetdmarc.com sowie dmarc@bergersysteme.com gesendet, jedoch keine Enforcement-Aktion (Quarantäne oder Reject) durch empfangende Mailserver ausgelöst. Gefälschte E-Mails im Namen der Domain werden nur passiv beobachtet.",
+    "evidence": "$ dig TXT _dmarc.bergersysteme.com\nv=DMARC1; p=none; pct=100; rua=mailto:a.jg23hj7j@reports.hornetdmarc.com,mailto:dmarc@bergersysteme.com",
+    "external_id": "VS-2026-003",
+    "finding_type": "dmarc_p_none",
+    "id": "VS-2026-003",
+    "impact": "Angreifer können ohne signifikante Hürde E-Mails im Namen von bergersysteme.com versenden (Business Email Compromise, Phishing gegen Kunden, Lieferanten und Mitarbeiter). Da SPF und DKIM zwar konfiguriert sind, aber ohne DMARC-Enforcement nicht durchgesetzt werden, entsteht Reputations- und Betrugsrisiko.",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-DNS-007",
+    "recommendation": "<b>Woche 1-2:</b> DMARC-Reports auswerten und legitime Sendequellen identifizieren.\n<b>Monat 1:</b> Übergang zu <code>p=quarantine; pct=25</code>, schrittweise Erhöhung.\n<b>Monat 2-3:</b> Endstufe <code>p=reject; pct=100</code> aktivieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-007",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DMARC mit p=none - nur Monitoring, keine Durchsetzung",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DMARC-Policy auf 'none' statt 'quarantine' oder 'reject' fuer bergersysteme.com",
+    "title_vars": {
+     "domain": "bergersysteme.com",
+     "p_value": "none"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "198.202.211.1:443 (www.bergersysteme.com)",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-295",
+    "description": "testssl.sh meldet für zwei Host-Zertifikate auf www.bergersysteme.com einen Ablaufzeitpunkt von 2026-08-01, verbleibende Restlaufzeit 43 Tage. Das Zertifikat wird über Cloudflare bereitgestellt und wird üblicherweise automatisch erneuert – eine Überwachung ist dennoch angezeigt.",
+    "evidence": "testssl.sh:\ncert_expirationStatus <hostCert#1>: expires < 60 days (43)\ncert_notAfter <hostCert#1>: 2026-08-01 03:44\ncert_expirationStatus <hostCert#2>: expires < 60 days (43)\ncert_notAfter <hostCert#2>: 2026-08-01 03:45",
+    "external_id": "VS-2026-005",
+    "finding_type": "tls_certificate_expiring_30d",
+    "id": "VS-2026-005",
+    "impact": "Bei ausbleibender automatischer Erneuerung würde das Zertifikat ablaufen und Browser-Warnungen sowie API-Verbindungsabbrüche verursachen. Reputations- und Verfügbarkeitsrisiko.",
+    "original_claude_id": "VS-2026-004",
+    "policy_id": "SP-TLS-005",
+    "recommendation": "<b>Woche 1:</b> Prüfen, ob die automatische Zertifikatserneuerung bei Cloudflare/Webflow aktiv ist.\n<b>Kontinuierlich:</b> Monitoring der Zertifikatslaufzeit (z.B. via crt.sh-Watch oder Uptime-Monitor mit Cert-Check) einrichten – Alarm bei < 30 Tagen Restlaufzeit.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-TLS-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "TLS-Zertifikat laeuft in <30 Tagen ab - Erneuerung erforderlich",
+     "rule_references": [
+      "CWE-298"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "TLS-Zertifikat laeuft in 43 Tagen ab auf www.bergersysteme.com",
+    "title_vars": {
+     "days": "43",
+     "host": "www.bergersysteme.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://www.bergersysteme.com",
+    "business_impact_score": 2.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Webauftritt liefert nur den HSTS-Header (Strict-Transport-Security) aus. Es fehlen Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy und Permissions-Policy. ZAP bestätigt zusätzlich fehlende SRI-Attribute an eingebundenen externen Skripten (jQuery, Webflow-CDN).",
+    "evidence": "SecurityHeaders Score: 1/7\nPresent: strict-transport-security\nMissing: content-security-policy, x-frame-options, x-content-type-options, x-xss-protection, referrer-policy, permissions-policy\n\nZAP: CSP Header Not Set (6x), Missing Anti-clickjacking Header (5x), SRI Missing (11x)",
+    "external_id": "VS-2026-004",
+    "finding_type": "sri_missing",
+    "id": "VS-2026-004",
+    "impact": "Ohne CSP und X-Frame-Options steigt das Risiko für Clickjacking und XSS-basierte Datenabgriffe. Ohne SRI besteht Risiko bei kompromittierten Drittanbieter-CDNs (Webflow, Cloudfront/jQuery).",
+    "original_claude_id": "VS-2026-006",
+    "policy_id": "SP-SRI-001",
+    "recommendation": "<b>Woche 1-2:</b> Über Cloudflare Transform Rules folgende Header setzen: <code>Content-Security-Policy</code>, <code>X-Frame-Options: SAMEORIGIN</code>, <code>X-Content-Type-Options: nosniff</code>, <code>Referrer-Policy: strict-origin-when-cross-origin</code>, <code>Permissions-Policy</code>.\n<b>Monat 1:</b> Subresource Integrity (SRI) für alle extern eingebundenen Skripte/Stylesheets ergänzen, insbesondere jQuery und Webflow-Bundles.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-SRI-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Externe JavaScript-/Stylesheet-Ressourcen ohne Subresource-Integrity-Hash eingebunden — kompromittierter CDN kann beliebigen Code ausliefern; Risiko abh. von CDN-Reputation",
+     "rule_references": [
+      "CWE-353",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Subresource-Integrity (SRI) fehlt auf www.bergersysteme.com",
+    "title_vars": {
+     "host": "www.bergersysteme.com"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "bergersysteme.com (DNS-Zone)",
+    "business_impact_score": 2.5,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-345",
+    "description": "Die DNS-Zone bergersysteme.com ist nicht mit DNSSEC signiert (dnssec_signed=false). DNS-Antworten können bei fehlerhafter Netzwerkintegrität manipuliert werden (Cache Poisoning).",
+    "evidence": "passive_intel.dnssec_signed = false\nNS: ns1a.dodns.net, ns2a.dodns.net",
+    "external_id": "VS-2026-006",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-006",
+    "impact": "Ein Angreifer könnte DNS-Antworten fälschen und Traffic auf falsche Mailserver oder Web-Origins umleiten. In Kombination mit dem fehlenden DMARC-Enforcement erhöht sich das Phishing-Risiko.",
+    "original_claude_id": "VS-2026-011",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "<b>Monat 2-3:</b> DNSSEC bei dodns.net aktivieren, DS-Records im Registrar hinterlegen und Validierung über delv/dnsviz prüfen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "DNSSEC fehlt fuer bergersysteme.com",
+    "title_vars": {
+     "domain": "bergersysteme.com"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "_dmarc.bergersysteme.com → bergersysteme.com.dmarc.hornetdmarc.com",
+    "business_impact_score": 2.5,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der DMARC-Record wird über einen CNAME auf hornetdmarc.com delegiert. Der Auto-Scan markiert diesen Eintrag als 'dangling' mit niedrigem Übernahmerisiko. HornetSecurity/HornetDMARC ist ein etablierter Dienst; sollte die Delegation jedoch aufgekündigt werden ohne den Eintrag zu entfernen, wäre theoretisches Subdomain-Takeover möglich.",
+    "evidence": "dns_findings.dangling_cnames: _dmarc.bergersysteme.com → bergersysteme.com.dmarc.hornetdmarc.com (takeover_risk: low)",
+    "external_id": "VS-2026-007",
+    "id": "VS-2026-007",
+    "impact": "Niedriges Risiko einer Übernahme-Angriffsfläche, sofern das Konto bei hornetdmarc.com aktiv bleibt.",
+    "original_claude_id": "VS-2026-012",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Monat 1-3:</b> Regelmäßig prüfen, ob der HornetDMARC-Vertrag aktiv ist und das CNAME-Ziel aufgelöst wird. Bei Anbieterwechsel den CNAME sofort entfernen oder aktualisieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Verwaister DNS-Eintrag _dmarc.bergersysteme.com (dangling CNAME, low risk)",
+    "title_vars": {
+     "host": "_dmarc.bergersysteme.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_degraded": true,
+    "_title_suspicious_tokens": [
+     "8460"
+    ],
+    "affected": "bergersysteme.com (DNS)",
+    "business_impact_score": 2.5,
+    "cvss_score": "2.5",
+    "cvss_vector": "",
+    "cwe": "",
+    "description": "Für die Domain ist kein TLSRPT-Record (SMTP TLS Reporting, RFC 8460) hinterlegt. TLSRPT ermöglicht Reports über gescheiterte TLS-Handshakes bei eingehendem Mailverkehr.",
+    "evidence": "passive_intel.tlsrpt_present = false",
+    "external_id": "VS-2026-008",
+    "finding_type": "tls_rpt_missing",
+    "id": "VS-2026-008",
+    "impact": "Kein direkter Sicherheitsimpact – aber verminderte Beobachtbarkeit bei TLS-Downgrade-Angriffen auf den Mailserver.",
+    "original_claude_id": "VS-2026-015",
+    "policy_id": "SP-DNS-011",
+    "recommendation": "<b>Optional (Monat 2-3):</b> TLSRPT-Record hinzufügen: <code>_smtp._tls.bergersysteme.com. IN TXT \"v=TLSRPTv1; rua=mailto:tls-reports@bergersysteme.com\"</code>. Ergänzend MTA-STS-Policy erwägen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-011",
+     "policy_version": "2026-06-01.1",
+     "rationale": "TLS-RPT (RFC 8460) fehlt - keine TLS-Reporting-Adresse fuer fehlgeschlagene SMTP-TLS-Verbindungen",
+     "rule_references": [
+      "RFC-8460"
+     ],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "TLS-RPT (RFC 8460) fehlt fuer bergersysteme.com",
+    "title_vars": {
+     "domain": "bergersysteme.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://bergersysteme.com, https://bergersysteme.com/sitemap.xml",
+    "business_impact_score": 0.5,
+    "cvss_score": "4.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-319",
+    "description": "ZAP meldet, dass auf der apex-Domain bergersysteme.com (nicht www) sowie auf zugehörigen Ressourcen wie sitemap.xml der Strict-Transport-Security-Header fehlt. Der Redirect zu www.bergersysteme.com trägt HSTS, aber die erste Anfrage auf die apex-Domain nicht.",
+    "evidence": "ZAP: Strict-Transport-Security Header Not Set (8x auf https://bergersysteme.com/*)",
+    "external_id": "VS-2026-009",
+    "finding_type": "hsts_missing",
+    "id": "VS-2026-009",
+    "impact": "Beim erstmaligen Besuch über HTTP kann ein MitM-Angreifer die Umleitung zu HTTPS unterdrücken (SSL-Stripping), bevor der Browser den HSTS-Pin von www speichert.",
+    "original_claude_id": "VS-2026-009",
+    "policy_id": "SP-HDR-001",
+    "recommendation": "<b>Woche 2-4:</b> HSTS auch auf der apex-Domain setzen (<code>Strict-Transport-Security: max-age=31536000; includeSubDomains; preload</code>) und HSTS-Preload beantragen.\n<b>Mittelfristig:</b> Konsistente Header-Auslieferung über Cloudflare Page Rules für Apex und alle Subdomains.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne Session - HSTS-Fehlen ist Hardening-Issue, kein praktisches Risiko",
+     "rule_references": [
+      "CWE-523",
+      "OWASP2025-A02"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "HSTS-Header fehlt auf bergersysteme.com",
+    "title_vars": {
+     "host": "bergersysteme.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "198.202.211.1:443 (www.bergersysteme.com)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "",
+    "description": "testssl.sh meldet, dass sowohl gzip- als auch Brotli-Kompression auf HTTPS-Antworten aktiv sind. BREACH (Browser Reconnaissance and Exfiltration via Adaptive Compression of Hypertext) ist theoretisch möglich, sofern sensible, vom Angreifer teilweise steuerbare Daten (z.B. CSRF-Tokens) in komprimierten HTTPS-Antworten enthalten sind.",
+    "evidence": "testssl.sh:\nBREACH: potentially VULNERABLE, gzip br HTTP compression detected - only supplied '/' tested",
+    "external_id": "VS-2026-010",
+    "finding_type": "csrf_token_missing",
+    "id": "VS-2026-010",
+    "impact": "Für eine reine Webflow-Marketingseite ohne Login/Session-Tokens ist der praktische Impact gering. Bei künftiger Einführung authentifizierter Bereiche würde sich das Risiko erhöhen.",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-CSRF-001",
+    "recommendation": "<b>Monat 1-3:</b> Bei sensitiven Seiten HTTP-Kompression selektiv deaktivieren oder Anti-CSRF-Tokens per Request randomisieren.\n<b>Mittelfristig:</b> Cloudflare-Feature 'Rocket Loader' und Kompressionsverhalten dokumentieren; keine Session-Cookies auf komprimierten Endpunkten.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSRF-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Form ist GET-only oder ohne State-Change - kein CSRF-Vektor",
+     "rule_references": [
+      "CWE-352"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Anti-CSRF-Token fehlt auf Login-Formular www.bergersysteme.com",
+    "title_vars": {
+     "host": "www.bergersysteme.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://ftp.bergersysteme.com",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die 403-Fehlerseite unter https://ftp.bergersysteme.com liefert keinerlei Security-Header aus (Score 0/7) und leakt zusätzlich den X-Powered-By-Header. Da die Seite aktuell nur eine statische Fehlerseite darstellt, ist der Impact begrenzt, jedoch signalisiert die Konfiguration eine unvollständige Härtung des Reverse-Proxy.",
+    "evidence": "SecurityHeaders Score: 0/7 (alle 7 Header fehlen)\nZAP: 'Server Leaks Information via X-Powered-By HTTP Response Header Field(s)' auf https://ftp.bergersysteme.com/error_docs/styles.css",
+    "external_id": "VS-2026-011",
+    "finding_type": "xfo_missing",
+    "id": "VS-2026-011",
+    "impact": "Falls hinter dem 403 künftig eine echte Anwendung bereitgestellt wird (Webmail, FTP-Verwaltung), fehlen wesentliche Schutzmechanismen gegen Clickjacking, MIME-Sniffing und XSS. Der X-Powered-By-Header erleichtert Fingerprinting.",
+    "original_claude_id": "VS-2026-007",
+    "policy_id": "SP-HDR-006",
+    "recommendation": "<b>Woche 2-4:</b> Auf der nginx-Instanz einen Standard-Header-Satz global setzen (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy).\n<b>Kurzfristig:</b> X-Powered-By in nginx/upstream-Anwendungen deaktivieren (<code>proxy_hide_header X-Powered-By;</code>).",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-006",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Clickjacking-Schutz fehlt, aber keine Session-Pages - theoretisches Risiko",
+     "rule_references": [
+      "CWE-1021"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "X-Frame-Options-Header fehlt auf ftp.bergersysteme.com",
+    "title_vars": {
+     "host": "ftp.bergersysteme.com"
+    }
+   }
+  ],
+  "overall_description": "Die Sicherheitsanalyse der Domain bergersysteme.com umfasst sechs unterschiedliche Hosts mit heterogener Infrastruktur: einen Hosting-Server bei GoDaddy (92.205.224.174) mit Web-, Mail- und FTP-Diensten (Webflow-Präsenz via CDN), die Cloudflare-fronted Hauptseite www.bergersysteme.com (198.202.211.1), einen Microsoft Exchange/OWA-Server (62.217.52.166), Apache-Anwendungen für Ticketing und Aufgabenverwaltung (bstasks/ticket, 62.217.52.162), einen Bitwarden-Passwortmanager (62.217.52.171) sowie einen sekundären Mailserver hinter einer SonicWall-Appliance (79.140.188.181). Der Web-Auftritt selbst ist über Webflow ausgeliefert und durch Cloudflare geschützt, was einen soliden Basisschutz bietet.\n\nKonkrete Risikobereiche: Auf dem GoDaddy-Server 92.205.224.174 sind zwölf Ports offen, darunter unverschlüsseltes FTP (ProFTPD auf Port 21), Klartext-POP3 (110) und IMAP (143) neben den TLS-Varianten, ein offener DNS-Resolver (53) und das Plesk-Panel auf Port 8443 (sw-cp-server) – eine übermäßige Angriffsfläche für einen Web-/Mailhost. Auf dem Cloudflare-Host www.bergersysteme.com (198.202.211.1) meldet AbuseIPDB einen Reputationsscore von 40, was auf gemeldete Missbrauchsfälle hindeutet; zusätzlich läuft die TLS-Zertifikatslaufzeit in 43 Tagen ab (Ablauf 2026-08-01), und BREACH-Angriffe sind potenziell möglich (aktivierte HTTP-Kompression). Die DMARC-Policy steht domänenweit auf 'p=none' ohne Enforcement, was E-Mail-Spoofing ermöglicht; DNSSEC und TLSRPT sind nicht aktiviert. Security-Header sind auf beiden Web-Hosts unvollständig: 0/7 auf ftp.bergersysteme.com, 1/7 auf www.bergersysteme.com. ZAP meldet 146 Alerts zu fehlenden CSP-, X-Frame- und SRI-Headern sowie zu Cookies ohne SameSite-Strict. Ein verwaister CNAME-Eintrag (_dmarc → hornetdmarc.com) besteht mit geringem Übernahmerisiko.\n\nDie Compliance-Reife ist gemischt: E-Mail-Authentifizierung (SPF, DKIM) ist zwar konfiguriert, aber ohne DMARC-Enforcement wirkungslos. Die TLS-Grundkonfiguration ist akzeptabel (HSTS auf www vorhanden), Härtungsmaßnahmen wie CSP, umfassende Header-Sätze und die Reduktion exponierter Verwaltungsdienste stehen jedoch aus. Empfohlen wird eine mittelfristige Härtung der Mail- und FTP-Dienste, DMARC-Reject und ein systematisches Security-Header-Regelwerk.",
+  "overall_risk": "MEDIUM",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSRF-001",
+   "SP-DNS-001",
+   "SP-DNS-007",
+   "SP-DNS-011",
+   "SP-FALLBACK",
+   "SP-HDR-001",
+   "SP-HDR-006",
+   "SP-SRI-001",
+   "SP-TLS-005"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die Domain bergersysteme.com verfügt über einen strukturierten SPF-Eintrag mit Redirect auf hornetdmarc.com und aktiviertes DKIM-Signing. Die grundlegende E-Mail-Authentifizierung ist damit vorhanden – lediglich das DMARC-Enforcement fehlt noch (siehe VS-2026-001).",
+    "title": "SPF und DKIM konfiguriert"
+   },
+   {
+    "description": "Der Webauftritt wird komplett über Webflow ausgeliefert – kein selbst betriebenes CMS, keine Datenbank, keine PHP-Runtime. Damit entfallen typische Angriffsvektoren wie CMS-Plugin-Schwachstellen, veraltete Framework-Versionen und Deserialisierungsfehler.",
+    "title": "Webflow-CMS als managed SaaS reduziert Angriffsfläche"
+   },
+   {
+    "description": "Neben den Klartext-Varianten stellt der Mailserver auch verschlüsselte Endpunkte für SMTPS (465), IMAPS (993) und POP3S (995) bereit. Nach Deaktivierung der Klartext-Ports (siehe VS-2026-002) ist eine vollständig verschlüsselte Kommunikation möglich.",
+    "title": "Verschlüsselte Mail-Ports (465, 993, 995) verfügbar"
+   },
+   {
+    "description": "OpenSSH 9.9 (2024/2025 Release) und die eingesetzten nginx-, Dovecot- und Postfix-Instanzen zeigen keine offensichtlichen ‚End of Life'-Indikatoren oder KEV-Matches. Der Software-Aktualitätsstand ist zufriedenstellend.",
+    "title": "Keine bekannten CVEs für installierte Software-Versionen"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Klartext-Mail-Ports (110/143) und ggf. FTP (21) deaktivieren oder STARTTLS erzwingen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-001",
+     "VS-2026-002"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Automatische Zertifikatserneuerung bei Cloudflare/Webflow verifizieren und Cert-Monitoring einrichten",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-005"
+    ],
+    "timeframe": "Woche 2"
+   },
+   {
+    "action": "Security-Header über Cloudflare Transform Rules einheitlich setzen (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy)",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-004",
+     "VS-2026-011",
+     "VS-2026-009"
+    ],
+    "timeframe": "Woche 2-4"
+   },
+   {
+    "action": "DMARC-Reports auswerten und Migration zu p=quarantine (pct=25) einleiten, ggf. Roadmap zu p=reject",
+    "effort": "6-12 h (Monitoring über mehrere Wochen)",
+    "finding_refs": [
+     "VS-2026-003"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "DNSSEC für bergersysteme.com aktivieren und DS-Records im Registrar hinterlegen",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Monat 2-3"
+   },
+   {
+    "action": "Sub Resource Integrity (SRI) für alle externen CDN-Skripte/Stylesheets ergänzen",
+    "effort": "3-5 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Monat 2-3"
+   },
+   {
+    "action": "TLSRPT- und MTA-STS-Records für erweitertes Mail-TLS-Monitoring hinzufügen",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 2-3"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 3,
+   "LOW": 6,
+   "MEDIUM": 2
+  },
+  "tech_profiles": [
+   {
+    "cms": "Webflow",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "Webflow",
+     "confidence": 0.95,
+     "details": {
+      "body_match": "<html[^>]*\\bdata-wf-page=",
+      "raw": {
+       "name": "Webflow",
+       "version": ""
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "body_reference",
+      "webtech"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "22",
+      "service": "OpenSSH 9.9"
+     },
+     {
+      "port": "25",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "80",
+      "service": "nginx"
+     },
+     {
+      "port": "443",
+      "service": "nginx"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     },
+     {
+      "port": "8880",
+      "service": ""
+     },
+     {
+      "port": "21",
+      "service": ""
+     },
+     {
+      "port": "8443",
+      "service": ""
+     },
+     {
+      "port": "53",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "bergersysteme.com",
+     "cdn.bergersysteme.com",
+     "ftp.bergersysteme.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "92.205.224.174",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     25,
+     53,
+     80,
+     110,
+     143,
+     443,
+     465,
+     993,
+     995,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      110,
+      143,
+      80,
+      8880,
+      21,
+      22,
+      8443,
+      25,
+      443,
+      53
+     ],
+     "shodan_services": {
+      "22": "OpenSSH 9.9",
+      "25": "Postfix smtpd",
+      "443": "nginx",
+      "80": "nginx"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "bergersysteme.com",
+    "redirect_data": {
+     "bergersysteme.com": {
+      "error": null,
+      "final_domain": "www.bergersysteme.com",
+      "final_url": "https://www.bergersysteme.com/",
+      "is_cross_domain": true,
+      "page_title": "Berger Systeme",
+      "redirect_chain": [
+       "https://www.bergersysteme.com/",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.979fb607c.min.css",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646208fc205824415cf6e119_GettyImages-603592096-bearb.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646205dec700566da5676a2e_BS_2000px_72pdi__DSF6683.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.fdff24a4f.js",
+       "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e254a84f15fc8051084e9_bergerit.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072af5298344b5a90be2_Sprechblase.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a4cbd41d88154c721_Lampe.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a28899e4fde56557c_Rakete.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a28899e4fde565538_Icon%20Zahnrad.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a24cfd1204ee25cf2_Icon%20Lampe%20positiv.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646b805c91f6fd0734fff423_BS_2000px_72pdi__DSF6694.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646cf95e2f00862c6902e349_GoogleMaps.png",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072aac9ca1c34832dda3_Icon%20Zahnrad%20positiv.svg",
+       "https://uploads-ssl.webflow.com/645bb79068f5e873d3dfa654/645df2bca16406e90e214f6b_Barlow-Medium.ttf",
+       "https://uploads-ssl.webflow.com/645bb79068f5e873d3dfa654/645def80edf75725c5f47e2e_Barlow-Light.ttf"
+      ],
+      "response_headers": {
+       "age": "67445",
+       "alt-svc": "h3=\":443\"; ma=86400",
+       "cf-cache-status": "HIT",
+       "cf-ray": "a0dd1844cbc34e54-DUS",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Thu, 18 Jun 2026 20:37:56 GMT",
+       "last-modified": "Thu, 18 Jun 2026 11:40:33 GMT",
+       "server": "cloudflare",
+       "strict-transport-security": "max-age=31536000",
+       "surrogate-control": "max-age=432000",
+       "surrogate-key": "www.bergersysteme.com 645bb79068f5e873d3dfa654 pageId:645bb79068f5e85922dfa655 64674ae3ee79240403fe049f",
+       "vary": "accept-encoding",
+       "x-lambda-id": "2f3910d3-0e25-4436-9755-db780c03c91f",
+       "x-wf-region": "us-east-1"
+      },
+      "screenshot_path": "/tmp/scan-b9759695-b031-4e1c-bac0-778abe9dfc77/hosts/92.205.224.174/phase2/screenshot_bergersysteme.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "body",
+       "cookies": "",
+       "generator": "Webflow",
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "Webflow",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.fdff24a4f.js"
+       ],
+       "stylesheets": [
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.979fb607c.min.css"
+       ],
+       "title": "Berger Systeme"
+      }
+     },
+     "ftp.bergersysteme.com": {
+      "error": null,
+      "final_domain": "ftp.bergersysteme.com",
+      "final_url": "https://ftp.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "403 Forbidden",
+      "redirect_chain": [
+       "https://ftp.bergersysteme.com/",
+       "https://ftp.bergersysteme.com/error_docs/styles.css",
+       "https://ftp.bergersysteme.com/error_docs/server.svg"
+      ],
+      "response_headers": {
+       "content-encoding": "br",
+       "content-type": "text/html",
+       "date": "Thu, 18 Jun 2026 20:38:03 GMT",
+       "etag": "W/\"31b-621c390da1c2b\"",
+       "last-modified": "Tue, 10 Sep 2024 13:08:12 GMT",
+       "server": "nginx"
+      },
+      "screenshot_path": "/tmp/scan-b9759695-b031-4e1c-bac0-778abe9dfc77/hosts/92.205.224.174/phase2/screenshot_ftp.bergersysteme.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "ie=edge",
+         "name": "x-ua-compatible"
+        },
+        {
+         "content": "width=device-width, initial-scale=1, shrink-to-fit=no",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [
+        "https://ftp.bergersysteme.com/error_docs/styles.css"
+       ],
+       "title": "403 Forbidden"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Webflow",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 21",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 22)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.9",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 53)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 53",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8443",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 8880)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8880",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "9.9",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "cloudflare",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "sw-cp-server",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.9"
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "sw-cp-server",
+      "version": ""
+     },
+     {
+      "name": "Webflow",
+      "version": ""
+     },
+     {
+      "name": "cloudflare",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "bergersysteme.com": {
+      "cms": "Webflow",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": "Cloudflare"
+     },
+     "ftp.bergersysteme.com": {
+      "cms": "Webflow",
+      "cms_confidence": 0.8,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": "Cloudflare",
+    "web_fqdn": "bergersysteme.com"
+   },
+   {
+    "cms": "Webflow",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "Webflow",
+     "confidence": 0.95,
+     "details": {
+      "body_match": "<html[^>]*\\bdata-wf-page=",
+      "raw": {
+       "name": "Webflow",
+       "version": ""
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "body_reference",
+      "webtech"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "exposed_services": [
+     {
+      "port": "80",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "443",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "8443",
+      "service": "CloudFlare"
+     },
+     {
+      "port": "8080",
+      "service": ""
+     },
+     {
+      "port": "2082",
+      "service": ""
+     },
+     {
+      "port": "2083",
+      "service": ""
+     },
+     {
+      "port": "2052",
+      "service": ""
+     },
+     {
+      "port": "2053",
+      "service": ""
+     },
+     {
+      "port": "2086",
+      "service": ""
+     },
+     {
+      "port": "2087",
+      "service": ""
+     },
+     {
+      "port": "2095",
+      "service": ""
+     },
+     {
+      "port": "8880",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "www.bergersysteme.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "198.202.211.1",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443,
+     8080,
+     8443
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 40,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      8080,
+      2082,
+      2083,
+      2052,
+      2053,
+      2086,
+      2087,
+      2095,
+      80,
+      8880,
+      8443,
+      443
+     ],
+     "shodan_services": {
+      "443": "CloudFlare",
+      "80": "CloudFlare",
+      "8443": "CloudFlare"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "www.bergersysteme.com",
+    "redirect_data": {
+     "www.bergersysteme.com": {
+      "error": null,
+      "final_domain": "www.bergersysteme.com",
+      "final_url": "https://www.bergersysteme.com/",
+      "is_cross_domain": false,
+      "page_title": "Berger Systeme",
+      "redirect_chain": [
+       "https://www.bergersysteme.com/",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.979fb607c.min.css",
+       "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.fdff24a4f.js",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646208fc205824415cf6e119_GettyImages-603592096-bearb.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646205dec700566da5676a2e_BS_2000px_72pdi__DSF6683.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646cf95e2f00862c6902e349_GoogleMaps.png",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/646b805c91f6fd0734fff423_BS_2000px_72pdi__DSF6694.jpg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a28899e4fde56557c_Rakete.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a4cbd41d88154c721_Lampe.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072af5298344b5a90be2_Sprechblase.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072aac9ca1c34832dda3_Icon%20Zahnrad%20positiv.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e254a84f15fc8051084e9_bergerit.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a24cfd1204ee25cf2_Icon%20Lampe%20positiv.svg",
+       "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/645e072a28899e4fde565538_Icon%20Zahnrad.svg",
+       "https://uploads-ssl.webflow.com/645bb79068f5e873d3dfa654/645def80edf75725c5f47e2e_Barlow-Light.ttf",
+       "https://uploads-ssl.webflow.com/645bb79068f5e873d3dfa654/645df2bca16406e90e214f6b_Barlow-Medium.ttf"
+      ],
+      "response_headers": {
+       "age": "67436",
+       "alt-svc": "h3=\":443\"; ma=86400",
+       "cf-cache-status": "HIT",
+       "cf-ray": "a0dd180d3fe6cf59-DUS",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Thu, 18 Jun 2026 20:37:47 GMT",
+       "last-modified": "Thu, 18 Jun 2026 11:40:33 GMT",
+       "server": "cloudflare",
+       "strict-transport-security": "max-age=31536000",
+       "surrogate-control": "max-age=432000",
+       "surrogate-key": "www.bergersysteme.com 645bb79068f5e873d3dfa654 pageId:645bb79068f5e85922dfa655 64674ae3ee79240403fe049f",
+       "vary": "accept-encoding",
+       "x-lambda-id": "2f3910d3-0e25-4436-9755-db780c03c91f",
+       "x-wf-region": "us-east-1"
+      },
+      "screenshot_path": "/tmp/scan-b9759695-b031-4e1c-bac0-778abe9dfc77/hosts/198.202.211.1/phase2/screenshot_www.bergersysteme.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "body",
+       "cookies": "",
+       "generator": "Webflow",
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "Webflow",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=645bb79068f5e873d3dfa654",
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/js/webflow.fdff24a4f.js"
+       ],
+       "stylesheets": [
+        "https://cdn.prod.website-files.com/645bb79068f5e873d3dfa654/css/berger-systeme.webflow.979fb607c.min.css"
+       ],
+       "title": "Berger Systeme"
+      }
+     }
+    },
+    "server": "Cloudflare http proxy",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Webflow",
+      "patch_status": "unbekannt",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2052)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2052",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2053)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2053",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2082)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2082",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2083)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2083",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2086)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2086",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2087)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2087",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 2095)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 2095",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8080)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8080",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "CloudFlare",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 8880)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 8880",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "cloudflare",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare Http Proxy",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "HTTP",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "3",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Cloudflare http proxy",
+      "version": ""
+     },
+     {
+      "name": "cloudflare",
+      "version": ""
+     },
+     {
+      "name": "Webflow",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "HTTP/3",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "www.bergersysteme.com": {
+      "cms": "Webflow",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": "Cloudflare"
+     }
+    },
+    "waf": "Cloudflare",
+    "web_fqdn": "www.bergersysteme.com"
+   }
+  ]
+ },
+ "success": true
+}

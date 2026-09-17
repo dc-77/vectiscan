@@ -1,0 +1,1484 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 2,
+   "low": 5,
+   "medium": 1
+  },
+  "business_impact_score": "2.5",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_title_template_missing": true,
+    "affected": "20.79.218.75:21 (edi.heuel.com)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Auf dem Host 20.79.218.75 ist ein FTP-Dienst auf Port 21 öffentlich erreichbar. FTP überträgt Zugangsdaten und Daten standardmäßig im Klartext. Es konnte nicht festgestellt werden, ob FTPS (FTP über TLS) erzwungen wird. Der Dienst ist im Kontext eines mutmaßlichen EDI-Systems (Electronic Data Interchange) besonders sensibel, da hier Geschäftsdaten ausgetauscht werden.",
+    "evidence": "$ nmap -sV 20.79.218.75\n21/tcp open ftp\n\nSubdomain: edi.heuel.com → deutet auf EDI-Datenaustausch hin",
+    "id": "VS-2026-002",
+    "impact": "Bei unverschlüsseltem FTP können Zugangsdaten und übertragene Geschäftsdaten (EDI-Transaktionen, Lieferscheine, Rechnungen) im Netzwerkverkehr mitgelesen werden. Zusätzlich erweitert der exponierte FTP-Dienst die Angriffsfläche für Brute-Force- und Exploit-Angriffe.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Sicherstellen, dass ausschließlich FTPS (Implicit oder Explicit TLS) akzeptiert wird und Klartext-FTP blockiert ist. Zugriff auf bekannte Partner-IP-Adressen per Firewall-Regel beschränken.\n<b>Mittelfristig:</b> Migration zu SFTP (SSH File Transfer Protocol) oder einer API-basierten EDI-Lösung prüfen, um das Risiko von Klartextübertragung vollständig zu eliminieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst öffentlich erreichbar auf edi.heuel.com",
+    "title_vars": {
+     "host": "edi.heuel.com",
+     "ip": "20.79.218.75",
+     "port": "21",
+     "tech": "FTP"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "217.72.203.132:443 (www.heuel.com, heuel.com, jobs.heuel.com)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Content-Security-Policy der Hauptwebsite verwendet in nahezu allen Direktiven den Wildcard-Wert 'https://*', der das Laden von Ressourcen von beliebigen HTTPS-Quellen erlaubt. Zusätzlich sind 'unsafe-inline' und 'unsafe-eval' in der script-src-Direktive gesetzt. Diese Kombination hebt den Schutz gegen Cross-Site-Scripting (XSS), den eine CSP bieten soll, weitgehend auf.",
+    "evidence": "Content-Security-Policy:\n  default-src 'self' https://*;\n  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*;\n  style-src 'self' 'unsafe-inline' https://*;\n  img-src 'self' data: blob: https://*;\n  connect-src 'self' webpack: https://*;\n\nProblematisch:\n- 'unsafe-inline' erlaubt beliebige Inline-Scripts\n- 'unsafe-eval' erlaubt eval(), Function() etc.\n- https://* erlaubt Scripts von jeder HTTPS-Domain",
+    "finding_type": "csp_wildcard_source",
+    "id": "VS-2026-004",
+    "impact": "Die CSP bietet in der aktuellen Konfiguration keinen effektiven Schutz gegen XSS-Angriffe. Ein Angreifer, der eine XSS-Schwachstelle findet, kann Inline-Scripts ausführen und Ressourcen von beliebigen externen Quellen nachladen, ohne durch die CSP eingeschränkt zu werden.",
+    "policy_id": "SP-CSP-005",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> 'unsafe-eval' aus der script-src entfernen und prüfen, ob die Anwendung ohne diese Direktive funktioniert. 'https://*' durch explizite Domänenliste ersetzen (z. B. 'https://d10zminp1cyta8.cloudfront.net https://cdnjs.cloudflare.com https://career.recruitee.com').\n<b>Mittelfristig:</b> 'unsafe-inline' durch Nonce- oder Hash-basierte Script-Freigabe ersetzen. CSP im Report-Only-Modus testen, bevor restriktivere Regeln produktiv geschaltet werden.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-CSP-005",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Wildcard `*` in CSP source-list schwaecht Whitelisting",
+     "rule_references": [
+      "CWE-693"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "CSP enthaelt Wildcard-Quelle auf www.heuel.com",
+    "title_vars": {
+     "directive": "script-src",
+     "host": "www.heuel.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "heuel.com (DNS TXT Record _dmarc.heuel.com)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der DMARC-Record für heuel.com verwendet die Policy 'quarantine' statt 'reject'. Bei 'quarantine' werden E-Mails, die die DMARC-Prüfung nicht bestehen, in den Spam-Ordner des Empfängers verschoben, anstatt vollständig abgewiesen zu werden. Dies bietet nur teilweisen Schutz gegen E-Mail-Spoofing.",
+    "evidence": "$ dig TXT _dmarc.heuel.com\nv=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com\n\nPositiv: pct=100 (vollständige Anwendung)\nPositiv: rua-Reporting konfiguriert\nVerbesserungspotenzial: p=quarantine → p=reject",
+    "finding_type": "dmarc_pct_partial",
+    "id": "VS-2026-005",
+    "impact": "Gefälschte E-Mails im Namen von @heuel.com werden bei empfangenden Mailservern zwar als Spam markiert, aber nicht vollständig blockiert. Empfänger könnten Spoofing-Mails dennoch im Spam-Ordner finden und irrtümlich als legitim einstufen.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Empfohlen (Monat 1):</b> Nach Analyse der DMARC-Aggregate-Reports (rua) sicherstellen, dass alle legitimen E-Mail-Quellen korrekt in SPF und DKIM eingebunden sind. Anschließend die Policy schrittweise auf 'p=reject' anheben.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='dmarc_pct_partial' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "DMARC-Policy 'quarantine' statt 'reject' für heuel.com",
+    "title_vars": {
+     "domain": "heuel.com",
+     "p_value": "quarantine"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "heuel.com (DNS TXT Record)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der SPF-Record für heuel.com endet mit '~all' (Softfail) statt '-all' (Hardfail). Bei Softfail werden E-Mails von nicht autorisierten Servern zwar markiert, aber nicht abgewiesen. Der SPF-Record enthält zahlreiche autorisierte Quellen (Outlook, Hornetsecurity, CRSend, Samanage, EmailSignatures365), was auf eine komplexe E-Mail-Infrastruktur hindeutet.",
+    "evidence": "$ dig TXT heuel.com\nv=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179\n  ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97\n  ip6:2a01:4f8:10a:22a2::2\n  include:spf.protection.outlook.com\n  include:spf.hornetsecurity.com\n  include:spf.crsend.com\n  include:_spf.samanage.com\n  include:spf-de.emailsignatures365.com ~all\n\nHinweis: 6 IP-Einträge + 5 includes = hohe Komplexität",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-006",
+    "impact": "E-Mails von nicht autorisierten Absendern werden bei Softfail nur markiert statt abgelehnt. In Kombination mit der DMARC-Policy 'quarantine' ergibt sich ein konsistentes, aber nicht vollständig striktes Enforcement der E-Mail-Authentifizierung.",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "<b>Empfohlen (Monat 1-2):</b> Nach Abschluss der DMARC-Report-Analyse (siehe VS-2026-005) den SPF-Qualifier von '~all' auf '-all' umstellen. Vorher sicherstellen, dass alle legitimen Mailquellen im SPF-Record erfasst sind. Die hohe Anzahl an Includes (5) sollte auf Notwendigkeit geprüft werden, um den SPF-Record schlank zu halten und DNS-Lookup-Limits (max. 10) nicht zu erreichen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-05-10.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer heuel.com",
+    "title_vars": {
+     "domain": "heuel.com"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "20.79.218.75:22, :8443 (edi.heuel.com, ose.heuel.com, mail.heuel.com)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Der Host 20.79.218.75 exponiert neben den Web-Ports (80, 443) auch einen SSH-Dienst mit FortiSSH-Banner auf Port 22 sowie einen alternativen HTTPS-Port 8443. Die FortiSSH-Kennung weist auf ein Fortinet-Gerät (z. B. FortiGate) hin. Port 8443 wird bei Fortinet-Produkten typischerweise als Web-Management-Interface verwendet. Beide Ports sind aus dem Internet erreichbar.",
+    "evidence": "$ nmap -sV 20.79.218.75\n22/tcp   open  ssh        FortiSSH\n8443/tcp open  https-alt\n\nZusätzlich offene Ports: 21/ftp, 80/http, 443/http\nHosts: edi.heuel.com, ose.heuel.com, mail.heuel.com",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-001",
+    "impact": "Öffentlich erreichbare Verwaltungsschnittstellen vergrößern die Angriffsfläche erheblich. Ein Angreifer könnte Brute-Force-Angriffe gegen die SSH- oder Web-Management-Authentifizierung durchführen. Bei bekannten Schwachstellen in Fortinet-Produkten (die regelmäßig veröffentlicht werden) könnte ein direkter Zugriff auf das Netzwerkgerät möglich sein.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Zugriff auf Port 22 (SSH) und Port 8443 (Management) auf bekannte Administrator-IP-Adressen beschränken, z. B. über Firewall-ACLs oder Fortinet Trusted Hosts.\n<b>Mittelfristig:</b> Management-Zugriff ausschließlich über VPN bereitstellen. Firmware des Fortinet-Geräts auf aktuellem Patch-Stand halten, da Fortinet-Produkte regelmäßig von kritischen Schwachstellen betroffen sind.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf edi.heuel.com",
+    "title_vars": {
+     "host": "edi.heuel.com",
+     "ip": "20.79.218.75",
+     "port": "8443",
+     "tech": "FortiSSH"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "217.72.203.132:443 (www.heuel.com)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "",
+    "cwe": "CWE-200",
+    "description": "Der Webserver liefert den benutzerdefinierten HTTP-Header 'X-Flow-Powered: Flow Neos' aus, der die verwendete CMS-Technologie (Neos CMS auf Basis des Flow-Frameworks) offenlegt. Zusätzlich sind die URL-Pfadmuster (/_Resources/Static/Packages/7S.Nebula/) mit dem Neos-Paketschema konsistent. Diese Information allein stellt kein direktes Risiko dar, erleichtert jedoch gezielte Angriffe.",
+    "evidence": "$ curl -I https://www.heuel.com\nX-Flow-Powered: Flow Neos\n\nURL-Muster: /_Resources/Static/Packages/7S.Nebula/\n→ Identifiziert Neos CMS mit 7S.Nebula Theme-Paket",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-008",
+    "impact": "Die Kenntnis der eingesetzten CMS-Technologie ermöglicht es Angreifern, gezielt nach bekannten Schwachstellen in Neos CMS und dem Flow-Framework zu suchen. Dies ist eine geringfügige Informationspreisgabe ohne direkte Ausnutzbarkeit.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Empfohlen (Monat 1-3):</b> Den X-Flow-Powered Header in der Neos/Flow-Konfiguration oder via nginx-Regel entfernen: 'proxy_hide_header X-Flow-Powered;' bzw. 'more_clear_headers X-Flow-Powered;'. Die URL-Struktur der Static-Resources lässt sich hingegen nicht ohne Weiteres ändern.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf www.heuel.com",
+    "title_vars": {
+     "host": "www.heuel.com",
+     "tech": "Neos CMS"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "20.79.218.75:443 (mail.heuel.com, edi.heuel.com)",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Apache-Webserver auf 20.79.218.75 liefert keine der empfohlenen Security Headers aus. Obwohl die Hosts derzeit mit HTTP 403 antworten, fehlen sämtliche sieben geprüften Header: Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy und Permissions-Policy.",
+    "evidence": "$ curl -I https://mail.heuel.com\nHTTP/1.1 403 Forbidden\nServer: Apache\nContent-Type: text/html; charset=iso-8859-1\n\nKeine Security Headers vorhanden (0/7).\n\nVergleich: www.heuel.com liefert 7/7 Security Headers.",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-003",
+    "impact": "Sollten unter diesen Hostnamen künftig Inhalte ausgeliefert werden (z. B. Webmail-Oberfläche unter mail.heuel.com), wären Nutzer ohne HSTS-Schutz anfällig für Downgrade-Angriffe und ohne CSP/X-Frame-Options für Clickjacking und XSS.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Grundlegende Security Headers in der Apache-Konfiguration ergänzen, mindestens: Strict-Transport-Security, X-Content-Type-Options und X-Frame-Options.\n<b>Mittelfristig:</b> Vollständiges Header-Set analog zur Hauptwebsite (www.heuel.com) implementieren, einschließlich CSP und Permissions-Policy.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf mail.heuel.com",
+    "title_vars": {
+     "host": "mail.heuel.com",
+     "ip": "20.79.218.75"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "104.16.10.6:443 (online.heuel.com)",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Subdomain online.heuel.com fehlt der Strict-Transport-Security-Header (HSTS). Obwohl der Host hinter Cloudflare mit aktivem Bot Management betrieben wird und 5 von 7 geprüften Security Headern gesetzt sind, ist HSTS nicht konfiguriert. Ohne HSTS könnten Erstverbindungen über HTTP erfolgen und für Downgrade-Angriffe anfällig sein.",
+    "evidence": "$ curl -I https://online.heuel.com\nServer: cloudflare\n\nVorhandene Header (5/7):\n✓ Content-Security-Policy\n✓ X-Frame-Options\n✓ X-Content-Type-Options\n✓ Referrer-Policy\n✓ Permissions-Policy\n\nFehlend:\n✗ Strict-Transport-Security\n✗ X-XSS-Protection (veraltet, geringes Risiko)",
+    "finding_type": "hsts_missing",
+    "id": "VS-2026-007",
+    "impact": "Ohne HSTS können Nutzer bei der Erstverbindung auf eine unverschlüsselte HTTP-Variante umgeleitet werden (SSL-Stripping). Das Risiko wird durch den Einsatz von Cloudflare gemindert, da Cloudflare standardmäßig HTTPS erzwingt. Dennoch bietet HSTS eine zusätzliche clientseitige Schutzschicht.",
+    "policy_id": "SP-HDR-001",
+    "recommendation": "<b>Empfohlen (Wochen):</b> HSTS in der Cloudflare-Konfiguration für online.heuel.com aktivieren (Cloudflare Dashboard → SSL/TLS → Edge Certificates → Enable HSTS). Empfohlener Wert: max-age=31536000; includeSubDomains.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Statische Seite ohne Session - HSTS-Fehlen ist Hardening-Issue, kein praktisches Risiko",
+     "rule_references": [
+      "CWE-523",
+      "OWASP2025-A02"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "HSTS-Header fehlt auf online.heuel.com",
+    "title_vars": {
+     "host": "online.heuel.com"
+    }
+   }
+  ],
+  "overall_description": "Die Hauptwebsite von heuel.com weist eine solide Security-Header-Konfiguration auf, jedoch mit einer übermäßig permissiven Content-Security-Policy. Der Host 20.79.218.75 (edi/ose/mail.heuel.com) exponiert mehrere Dienste einschließlich FTP und Fortinet-Verwaltungsschnittstellen ohne erkennbare Zugriffsbeschränkung. Die E-Mail-Authentifizierung ist grundlegend vorhanden, könnte aber durch striktere DMARC- und SPF-Konfiguration gehärtet werden.",
+  "overall_risk": "MEDIUM",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-CSP-005",
+   "SP-DISC-001",
+   "SP-DNS-005",
+   "SP-FALLBACK",
+   "SP-HDR-001"
+  ],
+  "policy_version": "2026-05-10.1",
+  "positive_findings": [
+   {
+    "description": "Für heuel.com ist DKIM (DomainKeys Identified Mail) aktiv konfiguriert. In Kombination mit dem vorhandenen SPF-Record und DMARC-Reporting bildet dies eine solide Basis für die E-Mail-Authentifizierung, die Domain-Spoofing deutlich erschwert.",
+    "title": "DKIM-Authentifizierung korrekt konfiguriert"
+   },
+   {
+    "description": "Alle geprüften Subdomains der Hauptwebsite (heuel.com, jobs.heuel.com) leiten korrekt per HTTPS auf www.heuel.com weiter. HSTS ist mit einem max-age von einem Jahr (31536000 Sekunden) aktiviert, was wiederholte Besucher zuverlässig vor Downgrade-Angriffen schützt.",
+    "title": "Konsequente HTTPS-Durchsetzung mit Redirect auf www.heuel.com"
+   },
+   {
+    "description": "Die Subdomain online.heuel.com wird durch Cloudflare mit aktivem Bot Management geschützt. Dies bietet DDoS-Mitigation, automatische Bot-Erkennung und eine zusätzliche Schutzschicht vor automatisierten Angriffen, bevor Anfragen den Origin-Server erreichen.",
+    "title": "Cloudflare WAF und Bot Management auf online.heuel.com"
+   },
+   {
+    "description": "Die autoritativen Nameserver (ns1.your-server.de, ns.second-ns.com, ns3.second-ns.de) verweigern Zone-Transfer-Anfragen (AXFR) korrekt. Dadurch kann ein Angreifer die vollständige DNS-Zone nicht automatisiert abrufen, was die Enumeration interner Hostnamen und Infrastrukturdetails verhindert.",
+    "title": "DNS Zone Transfer korrekt unterbunden"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Zugriff auf Fortinet-Verwaltungsports (SSH/22, HTTPS/8443) auf 20.79.218.75 per Firewall-ACL oder Trusted Hosts auf bekannte Administrator-IPs beschränken",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "FTP-Dienst auf Port 21 absichern: FTPS erzwingen, Klartext-FTP blockieren und Zugriff auf autorisierte Partner-IPs einschränken",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Security Headers für Apache auf 20.79.218.75 konfigurieren (HSTS, X-Content-Type-Options, X-Frame-Options als Minimum)",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-003"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "HSTS in Cloudflare-Konfiguration für online.heuel.com aktivieren",
+    "effort": "0.5 h",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Content-Security-Policy auf www.heuel.com härten: 'unsafe-eval' entfernen, 'https://*' durch explizite Domänenliste ersetzen",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Woche 1-2"
+   },
+   {
+    "action": "DMARC-Aggregate-Reports auswerten und Policy schrittweise von 'quarantine' auf 'reject' anheben",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-005"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Nach DMARC-Report-Analyse SPF-Qualifier von '~all' auf '-all' umstellen und Include-Liste auf Aktualität prüfen",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "X-Flow-Powered Header in der nginx- oder Neos-Konfiguration entfernen",
+    "effort": "0.5 h",
+    "finding_refs": [
+     "VS-2026-008"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 2,
+   "LOW": 5,
+   "MEDIUM": 1
+  },
+  "tech_profiles": [
+   {
+    "cms": "NEOS",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "NEOS",
+     "confidence": 0.95,
+     "details": {
+      "body_match": "/_Resources/Static/Packages/",
+      "header": "x-flow-powered",
+      "value": "Flow Neos"
+     },
+     "detection_methods": [
+      "body_reference",
+      "response_header"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "fqdns": [
+     "heuel.com",
+     "www.heuel.com",
+     "jobs.heuel.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "217.72.203.132",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443
+    ],
+    "primary_vhost": "heuel.com",
+    "redirect_data": {
+     "heuel.com": {
+      "error": null,
+      "final_domain": "www.heuel.com",
+      "final_url": "https://www.heuel.com/",
+      "is_cross_domain": true,
+      "page_title": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+      "redirect_chain": [
+       "https://heuel.com/",
+       "https://www.heuel.com/",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=1126e1b0",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=b0d00d6e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SequentialGrid.css?bust=2099f61b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FooterBreadcrumb.css?bust=12a336d1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/TeaserMenu.css?bust=1ae306bd",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/IconBar.css?bust=4df8529e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/CardVerticalTeaser.css?bust=7128e739",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LightboxTrigger.css?bust=4ad06a01",
+       "https://www.heuel.com/_res/dfebda3fbed2761d0ec1c9548deb4189b35ca652/logo_heuel.svg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ButtonBar.css?bust=c311de43",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FaqListing.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Menu.css?bust=2a21a5b6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Accordion.css?bust=0c221b62",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LegalMenu.css?bust=b345b6c5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Footer.TypeFlex.css?bust=c4067bc1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ScrollToTopTrigger.css?bust=4839182b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Image.js?bust=2f6004f6",
+       "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+       "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=d04ad3f7",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SearchBar.js?bust=cc60d0df",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Section.js?bust=609c4dc4",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Accordion.js?bust=88f44fa6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/MenuToggle.js?bust=f3bb915e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/ScrollToTopTrigger.js?bust=6adec41c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-700.woff2?bust=d881c829",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-regular.woff2?bust=fa9aa47b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-300.woff2?bust=fa308c21",
+       "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AnimatedCounter.css?bust=38aa7a56",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/GLightbox.css?bust=9b875a42",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelWrapper.css?bust=4804a5fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelTrigger.css?bust=3bdf6d8e",
+       "https://www.heuel.com/api/kd-gdpr-cc/kd_gdpr_cc_676df6a203d43365a936fc9048561dd5e9310c80.js",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1777245328983",
+       "https://www.heuel.com/_res/26fcdd84ec87cb3049908a45d82ca566aa5a623c/Heuel-Logistics-Fuhrpark-LKW-Sonnenaufgang-1920x1280.jpg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1777245328983",
+       "https://www.heuel.com/_res/afb02e6d75fa02f9b282319c914c9061dead77a5/Einzugsgebiet-HEUEL-04.gif",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Icons/Nebula/caret-right.svg?bust=ab1e34ba",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnimatedCounter.js?bust=17f62f36",
+       "https://www.heuel.com/api/kd-gdpr-cc?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde"
+      ],
+      "response_headers": {
+       "content-length": "162",
+       "content-security-policy": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 15:31:08 GMT",
+       "location": "https://www.heuel.com/",
+       "permissions-policy": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geolocation=(self), gyroscope=(self), keyboard-map=(self), magnetometer=(self), microphone=(self), midi=(self), navigation-override=(self), payment=(self), picture-in-picture=(self), publickey-credentials-get=(self), screen-wake-lock=(self), sync-xhr=(self), usb=(self), web-share=(self), xr-spatial-tracking=(self)",
+       "referrer-policy": "no-referrer-when-downgrade",
+       "strict-transport-security": "max-age=31536000;",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-xss-protection": "1"
+      },
+      "screenshot_path": "/tmp/scan-96e9ac2d-c69b-48e0-b54b-41e2b4837570/hosts/217.72.203.132/phase2/screenshot_heuel.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "grid-layout--full sticky-button--size--xl uppercase--header-menu uppercase--nav-elements",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "HEUEL LOGISTICS ist Ihre Spedition für LKW-Landverkehr, Stückgut, Teilpartien (LTL) und Komplettladungen (FTL) – zuverlässig seit über 100 Jahren.",
+         "name": "description"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        },
+        {
+         "content": "summary",
+         "name": "twitter:card"
+        },
+        {
+         "content": "Spedition für Stückguttransporte,  LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+         "name": "twitter:title"
+        },
+        {
+         "content": "HEUEL LOGISTICS ist Ihre Spedition für LKW-Landverkehr, Stückgut, Teilpartien (LTL) und Komplettladungen (FTL) – zuverlässig seit über 100 Jahren.",
+         "name": "twitter:description"
+        },
+        {
+         "content": "https://www.heuel.com/",
+         "name": "twitter:url"
+        },
+        {
+         "content": "https://www.heuel.com/_res/03ca330113611b5131fc3b7e11cc828013e99b0e/Heuel-Logistics-Fuhrpark-Sonnenaufgang-5200x5199-600x600.jpg",
+         "name": "twitter:image"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnimatedCounter.js?bust=17f62f36",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=d04ad3f7",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+        "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc"
+       ],
+       "stylesheets": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=1126e1b0",
+        "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+        "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=b0d00d6e",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ButtonBar.css?bust=c311de43"
+       ],
+       "title": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
+      }
+     },
+     "jobs.heuel.com": {
+      "error": null,
+      "final_domain": "www.heuel.com",
+      "final_url": "https://www.heuel.com/karriere-machen-in-suedwestfalen.html",
+      "is_cross_domain": true,
+      "page_title": "Karriere bei HEUEL LOGISTICS | Jobs, Ausbildung & Perspektiven",
+      "redirect_chain": [
+       "https://jobs.heuel.com/",
+       "https://www.heuel.com/karriere-machen-in-suedwestfalen.html",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=1126e1b0",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=b0d00d6e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FlickitySlider.css?bust=bcb58cd0",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SectionSlider.css?bust=ece40c2c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Hero.css?bust=ff16a4a8",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/TeaserMenu.css?bust=1ae306bd",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ImageTeaser.css?bust=39fada44",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Footer.TypeFlex.css?bust=c4067bc1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FooterBreadcrumb.css?bust=12a336d1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/IconBar.css?bust=4df8529e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SequentialGrid.css?bust=2099f61b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Menu.css?bust=2a21a5b6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LegalMenu.css?bust=b345b6c5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ScrollToTopTrigger.css?bust=4839182b",
+       "https://www.heuel.com/_res/dfebda3fbed2761d0ec1c9548deb4189b35ca652/logo_heuel.svg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+       "https://d10zminp1cyta8.cloudfront.net/widget.js",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Image.js?bust=2f6004f6",
+       "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+       "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-700.woff2?bust=d881c829",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-regular.woff2?bust=fa9aa47b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=d04ad3f7",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SearchBar.js?bust=cc60d0df",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/MenuToggle.js?bust=f3bb915e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Section.js?bust=609c4dc4",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/ScrollToTopTrigger.js?bust=6adec41c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-300.woff2?bust=fa308c21",
+       "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.25.2/raven.js",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/HtmlContainer.css?bust=59c84bf4",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelWrapper.css?bust=4804a5fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelTrigger.css?bust=3bdf6d8e",
+       "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1777245328983",
+       "https://www.heuel.com/_res/559c6c8ceb43b0865dcbf6ab33fc2fc50d8ee6d1/Heuel-Logistics-Karriere-Fahrer-800x533.jpg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/FlickitySlider.js?bust=224efe13",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/306.js?bust=1777245328983",
+       "https://www.heuel.com/api/kd-gdpr-cc/kd_gdpr_cc_676df6a203d43365a936fc9048561dd5e9310c80.js",
+       "https://career.recruitee.com/api/c/87901/widget/?widget=true",
+       "https://www.heuel.com/_res/6977fb57eea2223a1163702010f81cfea9ba53c7/heuel-logistics-buero-disposition-monitor-besprechungsraum-1920x1280.jpg",
+       "https://www.heuel.com/_res/b4e4ec11e9608ad86b8b6864533386e05b328c21/heuel-logistics-lkw-innenraum-paletten-transport-1920x1280.jpg",
+       "https://www.heuel.com/api/kd-gdpr-cc?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde"
+      ],
+      "response_headers": {
+       "content-length": "162",
+       "content-security-policy": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 15:31:23 GMT",
+       "location": "https://www.heuel.com/karriere-machen-in-suedwestfalen.html",
+       "permissions-policy": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geolocation=(self), gyroscope=(self), keyboard-map=(self), magnetometer=(self), microphone=(self), midi=(self), navigation-override=(self), payment=(self), picture-in-picture=(self), publickey-credentials-get=(self), screen-wake-lock=(self), sync-xhr=(self), usb=(self), web-share=(self), xr-spatial-tracking=(self)",
+       "referrer-policy": "no-referrer-when-downgrade",
+       "strict-transport-security": "max-age=31536000;",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "SAMEORIGIN",
+       "x-xss-protection": "1"
+      },
+      "screenshot_path": "/tmp/scan-96e9ac2d-c69b-48e0-b54b-41e2b4837570/hosts/217.72.203.132/phase2/screenshot_jobs.heuel.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "grid-layout--full sticky-button--size--xl uppercase--header-menu uppercase--nav-elements",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "Karriere bei HEUEL LOGISTICS: Jobs, Ausbildung und Entwicklungsmöglichkeiten bei einem inhabergeführten Logistikunternehmen mit über 500 Mitarbeitenden.",
+         "name": "description"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        },
+        {
+         "content": "summary",
+         "name": "twitter:card"
+        },
+        {
+         "content": "Karriere bei HEUEL LOGISTICS | Jobs, Ausbildung & Perspektiven",
+         "name": "twitter:title"
+        },
+        {
+         "content": "Karriere bei HEUEL LOGISTICS: Jobs, Ausbildung und Entwicklungsmöglichkeiten bei einem inhabergeführten Logistikunternehmen mit über 500 Mitarbeitenden.",
+         "name": "twitter:description"
+        },
+        {
+         "content": "https://www.heuel.com/karriere-machen-in-suedwestfalen.html",
+         "name": "twitter:url"
+        },
+        {
+         "content": "https://www.heuel.com/_res/6eb5a9195a0fe0ce578e30a3e60cf53abf86f9ca/heuel-logistics-buero-disposition-monitor-besprechungsraum-7728x3862-600x300.jpg",
+         "name": "twitter:image"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/FlickitySlider.js?bust=224efe13",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/306.js?bust=1777245328983",
+        "https://d10zminp1cyta8.cloudfront.net/widget.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/raven.js/3.25.2/raven.js",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=d04ad3f7",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+        "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c"
+       ],
+       "stylesheets": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=1126e1b0",
+        "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+        "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FlickitySlider.css?bust=bcb58cd0",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SectionSlider.css?bust=ece40c2c",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Hero.css?bust=ff16a4a8",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=b0d00d6e",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b"
+       ],
+       "title": "Karriere bei HEUEL LOGISTICS | Jobs, Ausbildung & Perspektiven"
+      }
+     },
+     "www.heuel.com": {
+      "error": null,
+      "final_domain": "www.heuel.com",
+      "final_url": "https://www.heuel.com/",
+      "is_cross_domain": false,
+      "page_title": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+      "redirect_chain": [
+       "https://www.heuel.com/",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=1126e1b0",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=b0d00d6e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ButtonBar.css?bust=c311de43",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SequentialGrid.css?bust=2099f61b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FooterBreadcrumb.css?bust=12a336d1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Menu.css?bust=2a21a5b6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/IconBar.css?bust=4df8529e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/TeaserMenu.css?bust=1ae306bd",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LegalMenu.css?bust=b345b6c5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/CardVerticalTeaser.css?bust=7128e739",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ScrollToTopTrigger.css?bust=4839182b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LightboxTrigger.css?bust=4ad06a01",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/FaqListing.css?bust=adc83b19",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Accordion.css?bust=0c221b62",
+       "https://www.heuel.com/_res/dfebda3fbed2761d0ec1c9548deb4189b35ca652/logo_heuel.svg",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Footer.TypeFlex.css?bust=c4067bc1",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Image.js?bust=2f6004f6",
+       "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+       "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=d04ad3f7",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/MenuToggle.js?bust=f3bb915e",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/ScrollToTopTrigger.js?bust=6adec41c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Section.js?bust=609c4dc4",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Accordion.js?bust=88f44fa6",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SearchBar.js?bust=cc60d0df",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-300.woff2?bust=fa308c21",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-700.woff2?bust=d881c829",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AnimatedCounter.css?bust=38aa7a56",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Fonts/RobotoCondensed/roboto-condensed-v31-latin-regular.woff2?bust=fa9aa47b",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/GLightbox.css?bust=9b875a42",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelWrapper.css?bust=4804a5fc",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SidePanelTrigger.css?bust=3bdf6d8e",
+       "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1777245328983",
+       "https://www.heuel.com/api/kd-gdpr-cc/kd_gdpr_cc_676df6a203d43365a936fc9048561dd5e9310c80.js",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1777245328983",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1777245328983",
+       "https://www.heuel.com/_res/26fcdd84ec87cb3049908a45d82ca566aa5a623c/Heuel-Logistics-Fuhrpark-LKW-Sonnenaufgang-1920x1280.jpg",
+       "https://www.heuel.com/_res/afb02e6d75fa02f9b282319c914c9061dead77a5/Einzugsgebiet-HEUEL-04.gif",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Icons/Nebula/caret-right.svg?bust=ab1e34ba",
+       "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnimatedCounter.js?bust=17f62f36",
+       "https://www.heuel.com/api/kd-gdpr-cc?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde"
+      ],
+      "response_headers": {
+       "content-encoding": "br",
+       "content-security-policy": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
+       "content-type": "text/html;charset=UTF-8",
+       "date": "Sat, 09 May 2026 15:31:18 GMT",
+       "permissions-policy": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geolocation=(self), gyroscope=(self), keyboard-map=(self), magnetometer=(self), microphone=(self), midi=(self), navigation-override=(self), payment=(self), picture-in-picture=(self), publickey-credentials-get=(self), screen-wake-lock=(self), sync-xhr=(self), usb=(self), web-share=(self), xr-spatial-tracking=(self)",
+       "referrer-policy": "no-referrer-when-downgrade",
+       "strict-transport-security": "max-age=31536000;",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-flow-powered": "Flow Neos",
+       "x-frame-options": "SAMEORIGIN",
+       "x-xss-protection": "1"
+      },
+      "screenshot_path": "/tmp/scan-96e9ac2d-c69b-48e0-b54b-41e2b4837570/hosts/217.72.203.132/phase2/screenshot_www.heuel.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "grid-layout--full sticky-button--size--xl uppercase--header-menu uppercase--nav-elements",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "HEUEL LOGISTICS ist Ihre Spedition für LKW-Landverkehr, Stückgut, Teilpartien (LTL) und Komplettladungen (FTL) – zuverlässig seit über 100 Jahren.",
+         "name": "description"
+        },
+        {
+         "content": "index,follow",
+         "name": "robots"
+        },
+        {
+         "content": "summary",
+         "name": "twitter:card"
+        },
+        {
+         "content": "Spedition für Stückguttransporte,  LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+         "name": "twitter:title"
+        },
+        {
+         "content": "HEUEL LOGISTICS ist Ihre Spedition für LKW-Landverkehr, Stückgut, Teilpartien (LTL) und Komplettladungen (FTL) – zuverlässig seit über 100 Jahren.",
+         "name": "twitter:description"
+        },
+        {
+         "content": "https://www.heuel.com/",
+         "name": "twitter:url"
+        },
+        {
+         "content": "https://www.heuel.com/_res/03ca330113611b5131fc3b7e11cc828013e99b0e/Heuel-Logistics-Fuhrpark-Sonnenaufgang-5200x5199-600x600.jpg",
+         "name": "twitter:image"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Core.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/2.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/9.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/7.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/8.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/311.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/310.js?bust=1777245328983",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SidePanelWrapper.js?bust=cdd1bc68",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnimatedCounter.js?bust=17f62f36",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/InteractionManager.js?bust=ecc964e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Preact.js?bust=0155d0fc",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/runtime.js?bust=d04ad3f7",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AnchorEvents.js?bust=cbbd6ce9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LayoutBase.js?bust=60ec068f",
+        "https://www.heuel.com/api/kd-gdpr-cc.js?dimensions%5Blanguage%5D%5B0%5D=de",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/Header.TypeA.js?bust=9e28b727",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/SkipToContentLink.js?bust=a86ee44c",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LazyIcon.js?bust=eda73519",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/LanguageMenu.js?bust=dd0e92f5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/JavaScript/AutomaticDropdownMenu.js?bust=74988ffc"
+       ],
+       "stylesheets": [
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LayoutBase.css?bust=1126e1b0",
+        "https://www.heuel.com/nova/resources/ColorScopes.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&bust=ba4501c3",
+        "https://www.heuel.com/nova/resources/FontConfig.css?siteNode=%2Fsites%2Fheuel-com%40live%3Blanguage%3Dde&sitePackage=7S.Nebula&bust=024f92e9",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/DefaultLayout.css?bust=adc83b19",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Header.TypeA.css?bust=fe9aab27",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/SkipToContentLink.css?bust=7596dad5",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Button.css?bust=0d4b4841",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Icon.css?bust=2caa70b1",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LabelWithIcon.css?bust=2a4742ef",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Label.css?bust=a78cd623",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/LanguageMenu.css?bust=91e08388",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/AutomaticDropdownMenu.css?bust=41063b53",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MenuToggle.css?bust=fbb16f5a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Section.css?bust=b810190b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Image.css?bust=b0d00d6e",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/MultiColumn.css?bust=c3370d5b",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Box.css?bust=1329dd47",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Headline.css?bust=be94c790",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/Text.css?bust=52641d0a",
+        "https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Stylesheets/ButtonBar.css?bust=c311de43"
+       ],
+       "title": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
+      }
+     }
+    },
+    "server": "nginx",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "NEOS",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "HSTS",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nginx",
+      "source": "server_banner",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "nginx",
+      "version": ""
+     },
+     {
+      "name": "NEOS",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "Neos CMS",
+      "version": ""
+     },
+     {
+      "name": "Neos Flow",
+      "version": "neos"
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "heuel.com": {
+      "cms": "NEOS",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": null
+     },
+     "jobs.heuel.com": {
+      "cms": "NEOS",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": null
+     },
+     "www.heuel.com": {
+      "cms": "NEOS",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "edi.heuel.com",
+     "ose.heuel.com",
+     "mail.heuel.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "20.79.218.75",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     21,
+     22,
+     80,
+     443,
+     8443
+    ],
+    "primary_vhost": "edi.heuel.com",
+    "redirect_data": {
+     "edi.heuel.com": {
+      "error": null,
+      "final_domain": "edi.heuel.com",
+      "final_url": "https://edi.heuel.com/",
+      "is_cross_domain": false,
+      "page_title": "403 Forbidden",
+      "redirect_chain": [
+       "https://edi.heuel.com/"
+      ],
+      "response_headers": {
+       "connection": "Keep-Alive",
+       "content-length": "199",
+       "content-type": "text/html; charset=iso-8859-1",
+       "date": "Sat, 09 May 2026 15:31:29 GMT",
+       "keep-alive": "timeout=15, max=100",
+       "server": "Apache"
+      },
+      "screenshot_path": "/tmp/scan-96e9ac2d-c69b-48e0-b54b-41e2b4837570/hosts/20.79.218.75/phase2/screenshot_edi.heuel.com.png",
+      "status_code": 403,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "403 Forbidden"
+      }
+     },
+     "mail.heuel.com": {
+      "error": null,
+      "final_domain": "mail.heuel.com",
+      "final_url": "https://mail.heuel.com/",
+      "is_cross_domain": false,
+      "page_title": "403 Forbidden",
+      "redirect_chain": [
+       "https://mail.heuel.com/"
+      ],
+      "response_headers": {
+       "connection": "Keep-Alive",
+       "content-length": "199",
+       "content-type": "text/html; charset=iso-8859-1",
+       "date": "Sat, 09 May 2026 15:31:38 GMT",
+       "keep-alive": "timeout=15, max=100",
+       "server": "Apache"
+      },
+      "screenshot_path": "/tmp/scan-96e9ac2d-c69b-48e0-b54b-41e2b4837570/hosts/20.79.218.75/phase2/screenshot_mail.heuel.com.png",
+      "status_code": 403,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "403 Forbidden"
+      }
+     },
+     "ose.heuel.com": {
+      "error": null,
+      "final_domain": "ose.heuel.com",
+      "final_url": "https://ose.heuel.com/",
+      "is_cross_domain": false,
+      "page_title": "Redirector",
+      "redirect_chain": [
+       "https://ose.heuel.com/"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "136",
+       "content-type": "text/html; charset=ISO-8859-1",
+       "date": "Sat, 09 May 2026 15:31:34 GMT",
+       "etag": "\"97-5e331555c605e-gzip\"",
+       "keep-alive": "timeout=15, max=100",
+       "last-modified": "Thu, 07 Jul 2022 06:38:28 GMT",
+       "server": "Apache",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-96e9ac2d-c69b-48e0-b54b-41e2b4837570/hosts/20.79.218.75/phase2/screenshot_ose.heuel.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "1; URL=/webmodule-ee/",
+         "name": "refresh"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Redirector"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "FortiSSH",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "source": "server_banner",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "FortiSSH",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "edi.heuel.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "mail.heuel.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "ose.heuel.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "online.heuel.com"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "104.16.10.6",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443,
+     8080,
+     8443
+    ],
+    "primary_vhost": "online.heuel.com",
+    "redirect_data": {
+     "online.heuel.com": {
+      "error": "Page.goto: Timeout 10000ms exceeded.\nCall log:\n  - navigating to \"http://online.heuel.com/\", waiting until \"networkidle\"\n",
+      "final_domain": "online.heuel.com",
+      "final_url": "https://online.heuel.com/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": "Cloudflare http proxy",
+    "tech_rows": [
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare Bot Management",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Cloudflare Http Proxy",
+      "source": "server_banner",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Cloudflare http proxy",
+      "version": ""
+     },
+     {
+      "name": "Cloudflare",
+      "version": ""
+     },
+     {
+      "name": "Cloudflare Bot Management",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "online.heuel.com": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": "Cloudflare"
+     }
+    },
+    "waf": "Cloudflare",
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}

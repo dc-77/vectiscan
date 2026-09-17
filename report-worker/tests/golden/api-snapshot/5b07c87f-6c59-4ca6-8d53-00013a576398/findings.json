@@ -1,0 +1,1620 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 1,
+   "high": 0,
+   "info": 1,
+   "low": 2,
+   "medium": 1
+  },
+  "business_impact_score": "3.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "_title_template_incomplete": true,
+    "affected": "212.227.60.78:21 (connect.securess.de, partner.securess.de, vermittler.securess.de)",
+    "business_impact_score": 10,
+    "cvss_score": "10.0",
+    "cvss_vector": "AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H",
+    "cwe": "CWE-284",
+    "description": "Auf dem Server 212.227.60.78 ist ein ProFTPD-Dienst auf Port 21 öffentlich erreichbar. FTP überträgt Zugangsdaten und Dateien standardmäßig im Klartext, sofern keine explizite TLS-Verschlüsselung (FTPS) erzwungen wird. Dieser Server hostet gleichzeitig die TYPO3-basierte Geschäftsanwendung connect.securess.de, wodurch kompromittierte FTP-Zugangsdaten direkten Zugriff auf die Webapplikation ermöglichen könnten.",
+    "evidence": "$ nmap -sV 212.227.60.78\n21/tcp  open  ftp  ProFTPD\n\nWeitere offene Ports auf diesem Server: 22, 25, 80, 106, 110, 143, 443, 465, 993, 995, 8443\n(12 offene Ports insgesamt)",
+    "finding_type": "urlhaus_compromise_detected",
+    "id": "VS-2026-001",
+    "impact": "Ein Angreifer im selben Netzwerksegment oder auf dem Übertragungsweg könnte FTP-Zugangsdaten per Man-in-the-Middle-Angriff abfangen. Mit diesen Zugangsdaten wäre potenziell ein Upload von Schadcode auf den Webserver möglich.",
+    "policy_id": "SP-URLHAUS-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> FTP-Zugang auf SFTP (SSH File Transfer Protocol) umstellen. Alternativ FTPS mit erzwungener TLS-Verschlüsselung konfigurieren und Klartext-FTP deaktivieren.\n<b>Mittelfristig:</b> Prüfen, ob der FTP-Dienst überhaupt noch benötigt wird. Deployment-Prozesse auf sichere Alternativen wie Git-basierte Deployments oder SCP/rsync über SSH umstellen.",
+    "severity": "CRITICAL",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "critical",
+     "policy_id": "SP-URLHAUS-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "URLhaus listet Host als aktiv compromised — Malware-Distribution, Phishing oder C2",
+     "rule_references": [
+      "URLhaus",
+      "MITRE ATT&CK T1583.001"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst (Klartext-Protokoll) auf Produktionsserver exponiert",
+    "title_vars": {
+     "host": "connect.securess.de",
+     "port": "21",
+     "tech": "ProFTPD"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "212.227.60.78:8443 (connect.securess.de)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-284",
+    "description": "Das Plesk-Administrationspanel (sw-cp-server) ist auf Port 8443 aus dem Internet erreichbar. Plesk-Panels sind ein häufiges Ziel für Brute-Force-Angriffe und haben in der Vergangenheit mehrere kritische Schwachstellen aufgewiesen. Das Panel offenbart zudem die Hosting-Infrastruktur und bietet Angreifern einen zusätzlichen Authentifizierungspunkt.",
+    "evidence": "$ nmap -sV 212.227.60.78 -p 8443\n8443/tcp  open  https-alt  sw-cp-server\n\nDer X-Powered-By-Header bestätigt die Plesk-Installation:\nX-Powered-By: PHP/8.3.30\\nPleskLin",
+    "id": "VS-2026-002",
+    "impact": "Ein erfolgreicher Brute-Force-Angriff oder die Ausnutzung einer Plesk-Schwachstelle würde vollständigen administrativen Zugriff auf den Server gewähren, einschließlich aller gehosteten Domains, Datenbanken und E-Mail-Konten.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Zugriff auf Port 8443 per Firewall auf bekannte Administrator-IP-Adressen beschränken. Fail2Ban für den Plesk-Login aktivieren und sichere Passwörter sowie Zwei-Faktor-Authentifizierung erzwingen.\n<b>Mittelfristig:</b> Zugriff auf das Plesk-Panel ausschließlich über VPN ermöglichen und den Port aus dem öffentlichen Internet entfernen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Plesk-Administrationspanel öffentlich erreichbar",
+    "title_vars": {
+     "host": "connect.securess.de",
+     "port": "8443",
+     "tech": "Plesk"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "securess.de (DNS TXT-Record)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der SPF-Record der Domain securess.de verwendet den Qualifikator ~all (Softfail) anstelle von -all (Hardfail). Bei Softfail werden E-Mails von nicht autorisierten Servern zwar markiert, aber in der Regel trotzdem zugestellt. In Kombination mit der vorhandenen DMARC-Reject-Policy wird das Risiko deutlich reduziert, dennoch stellt der SPF-Softfail eine nicht optimale Konfiguration dar.",
+    "evidence": "$ dig TXT securess.de +short\n\"v=spf1 a mx ip4:85.22.47.37 include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all\"\n\nQualifikator: ~all (Softfail) statt -all (Hardfail)",
+    "finding_type": "spf_softfail",
+    "id": "VS-2026-006",
+    "impact": "Mail-Server, die DMARC nicht auswerten, könnten gefälschte E-Mails im Namen von securess.de trotz SPF-Fehlschlag zustellen. Das Risiko wird durch die strikte DMARC-Policy (p=reject) auf DMARC-fähigen Empfängern kompensiert.",
+    "policy_id": "SP-DNS-005",
+    "recommendation": "<b>Empfohlen (1-3 Monate):</b> Den SPF-Qualifikator von ~all auf -all umstellen, nachdem verifiziert wurde, dass alle legitimen Versand-Server (Hornetsecurity, Office 365, Plan.io, Softfair) korrekt im SPF-Record erfasst sind. Vor der Umstellung die DMARC-Aggregate-Reports (rua) auswerten, um unerkannte Versandquellen zu identifizieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-005",
+     "policy_version": "2026-05-10.1",
+     "rationale": "SPF mit ~all (softfail) statt -all (hardfail) - schwacher Schutz",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "SPF-Policy auf softfail (~all) statt -all fuer securess.de",
+    "title_vars": {
+     "domain": "securess.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "212.227.60.78 (connect.securess.de), 85.22.47.39 (webmail.securess.de), 85.22.47.41 (securess.de)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "",
+    "cwe": "CWE-200",
+    "description": "Mehrere Server offenbaren über HTTP-Response-Header detaillierte Informationen zu eingesetzten Technologien und Versionen. Dies umfasst Webserver-Versionen, PHP-Versionen und die Hosting-Plattform. Obwohl dies allein kein direktes Risiko darstellt, erleichtert es Angreifern die gezielte Suche nach versionsspezifischen Schwachstellen.",
+    "evidence": "212.227.60.78 (connect.securess.de):\n  Server: Apache\n  X-Powered-By: PHP/8.3.30\\nPleskLin\n\n85.22.47.39 (webmail.securess.de):\n  Server: nginx/1.29.5\n  X-Powered-By: PHP/8.4.20\n\n85.22.47.41 (securess.de):\n  Server: nginx/1.22.1",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-007",
+    "impact": "Die offengelegten Versionsinformationen ermöglichen Angreifern eine effizientere Reconnaissance-Phase. Im aktuellen Fall sind die eingesetzten Versionen jedoch weitgehend aktuell, sodass das praktische Risiko gering ist.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Empfohlen (1-3 Monate):</b> Server-Version in nginx unterdrücken: server_tokens off;\nX-Powered-By-Header in der PHP-Konfiguration deaktivieren: expose_php = Off\nIn Apache: ServerTokens Prod und ServerSignature Off setzen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf securess.de",
+    "title_vars": {
+     "domain": "securess.de",
+     "host": "securess.de"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "85.22.47.41:443 (securess.de, www.securess.de)",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Die Hauptwebsite securess.de liefert keinen der sieben empfohlenen Security-Header aus. Es fehlen Strict-Transport-Security (HSTS), Content-Security-Policy (CSP), X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy und Permissions-Policy. Ohne diese Header sind Besucher anfälliger für Clickjacking, MIME-Type-Sniffing und Cross-Site-Scripting-Angriffe.",
+    "evidence": "$ curl -sI https://www.securess.de | grep -iE '(strict|content-security|x-frame|x-content|x-xss|referrer|permissions)'\n(keine Treffer)\n\nServer: nginx/1.22.1\nVorhandene Security-Header: 0 von 7",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-004",
+    "impact": "Fehlende Security-Header ermöglichen Angriffsvektoren wie Clickjacking (Einbettung der Seite in fremde Frames), MIME-Type-Confusion und erleichtern potenziell Cross-Site-Scripting. Für die WordPress-Seite eines Versicherungsmaklers ist insbesondere das Clickjacking-Risiko relevant.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Folgende Header in der nginx-Konfiguration ergänzen:\nadd_header Strict-Transport-Security \"max-age=63072000; includeSubDomains; preload\" always;\nadd_header X-Frame-Options \"SAMEORIGIN\" always;\nadd_header X-Content-Type-Options \"nosniff\" always;\nadd_header Referrer-Policy \"strict-origin-when-cross-origin\" always;\nadd_header Permissions-Policy \"camera=(), microphone=(), geolocation=()\" always;\n<b>Mittelfristig:</b> Eine Content-Security-Policy schrittweise einführen, zunächst im Report-Only-Modus testen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf securess.de",
+    "title_vars": {
+     "host": "securess.de",
+     "tech": "nginx/1.22.1"
+    }
+   }
+  ],
+  "overall_description": "Die Infrastruktur von securess.de weist ein mittleres Gesamtrisiko auf. Während die DNS-Konfiguration mit DMARC-Reject-Policy und DKIM weitgehend vorbildlich ist und die WordPress-Installation aktuell gehalten wird, vergrößert der Plesk-Server (212.227.60.78) mit 12 exponierten Ports — darunter Klartext-Protokolle und ein öffentlich erreichbares Administrationspanel — die Angriffsfläche erheblich. Fehlende Security-Header auf mehreren Hosts stellen ein zusätzliches Verbesserungspotenzial dar.",
+  "overall_risk": "MEDIUM",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-DISC-001",
+   "SP-DNS-005",
+   "SP-FALLBACK",
+   "SP-URLHAUS-001"
+  ],
+  "policy_version": "2026-05-10.1",
+  "positive_findings": [
+   {
+    "description": "Die Domain securess.de setzt eine DMARC-Policy mit p=reject ein. Dies ist die strengste verfügbare Konfiguration und weist empfangende Mail-Server an, E-Mails, die weder SPF- noch DKIM-Prüfungen bestehen, vollständig abzulehnen. Zusätzlich sind sowohl Aggregate- als auch Forensic-Reporting konfiguriert, was eine kontinuierliche Überwachung ermöglicht.",
+    "title": "DMARC mit strikter Reject-Policy konfiguriert"
+   },
+   {
+    "description": "Für securess.de ist DKIM korrekt konfiguriert. In Kombination mit der strikten DMARC-Policy bietet dies einen robusten Schutz gegen E-Mail-Spoofing und stärkt die Zustellbarkeit legitimer E-Mails erheblich.",
+    "title": "DKIM-Signierung aktiv"
+   },
+   {
+    "description": "Die WordPress-Installation auf securess.de ist mit Version 6.8.5 auf dem aktuellen Stand. Zusätzlich schützt die NinjaFirewall als Web Application Firewall die Anwendung vor automatisierten Angriffen und gängigen Exploit-Versuchen. Auch die eingesetzten Plugins (Elementor 3.33.2, Yoast SEO 27.5) sind in aktuellen Versionen installiert.",
+    "title": "WordPress auf aktuellem Versionsstand mit Web Application Firewall"
+   },
+   {
+    "description": "Auf allen Servern werden aktuelle PHP-Versionen eingesetzt: PHP 8.3.30 auf dem Applikationsserver und PHP 8.4.20 auf dem Mailserver. Beide Versionen erhalten aktive Sicherheitsupdates, was das Risiko durch bekannte PHP-Schwachstellen minimiert.",
+    "title": "Aktuelle PHP-Versionen im Einsatz"
+   },
+   {
+    "description": "Die DNS-Server ns1a.dodns.net und ns2a.dodns.net lehnen Zone-Transfer-Anfragen (AXFR) korrekt ab. Damit ist sichergestellt, dass Angreifer nicht die vollständige DNS-Zonendatei mit allen Subdomains und internen Hostnamen abrufen können.",
+    "title": "DNS-Zone-Transfer korrekt unterbunden"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Zugriff auf das Plesk-Panel (Port 8443) per Firewall auf Administrator-IP-Adressen beschränken oder Zugang ausschließlich über VPN ermöglichen. Zwei-Faktor-Authentifizierung für Plesk aktivieren.",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "FTP-Dienst deaktivieren und auf SFTP (über SSH) oder SCP umstellen. Falls FTP zwingend benötigt wird, FTPS mit erzwungener TLS-Verschlüsselung konfigurieren.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Security-Header auf allen Webservern einrichten: HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy und Permissions-Policy. CSP zunächst im Report-Only-Modus testen.",
+    "effort": "3-5 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Versionsoffenlegung in Server-Headern unterdrücken: nginx (server_tokens off), Apache (ServerTokens Prod), PHP (expose_php = Off).",
+    "effort": "1 h",
+    "finding_refs": [
+     "VS-2026-007"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "DMARC-Aggregate-Reports auswerten und anschließend den SPF-Qualifikator von ~all auf -all umstellen, nachdem bestätigt wurde, dass alle legitimen Versandquellen erfasst sind.",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Architekturelle Trennung von Web- und Mail-Diensten auf Server 212.227.60.78 evaluieren. Idealerweise sollten Webapplikation und Mail-Dienste auf separaten Systemen betrieben werden, um die gegenseitige Angriffsfläche zu reduzieren.",
+    "effort": "8-16 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 1,
+   "HIGH": 0,
+   "INFO": 1,
+   "LOW": 2,
+   "MEDIUM": 1
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {
+     "cms": "WordPress",
+     "confidence": 0.9,
+     "details": {
+      "meta_generator": "WordPress 6.8.5"
+     },
+     "detection_methods": [
+      "meta_tag"
+     ],
+     "version": "6.8.5"
+    },
+    "cms_version": null,
+    "fqdns": [
+     "securess.de",
+     "www.securess.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "85.22.47.41",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     22,
+     80,
+     443
+    ],
+    "primary_vhost": "securess.de",
+    "redirect_data": {
+     "securess.de": {
+      "error": null,
+      "final_domain": "securess.de",
+      "final_url": "https://securess.de/",
+      "is_cross_domain": false,
+      "page_title": "NinjaFirewall 403 Forbidden",
+      "redirect_chain": [
+       "https://securess.de/",
+       "https://www.securess.de/wp-content/plugins/ninjafirewall/images/ninjafirewall_75.png"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store, must-revalidate",
+       "connection": "keep-alive",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 13:10:26 GMT",
+       "expires": "0",
+       "pragma": "no-cache",
+       "server": "nginx/1.22.1",
+       "transfer-encoding": "chunked"
+      },
+      "screenshot_path": "/tmp/scan-5b07c87f-6c59-4ca6-8d53-00013a576398/hosts/85.22.47.41/phase2/screenshot_securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=utf-8",
+         "name": "Content-Type"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "NinjaFirewall 403 Forbidden"
+      }
+     },
+     "www.securess.de": {
+      "error": null,
+      "final_domain": "www.securess.de",
+      "final_url": "https://www.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "NinjaFirewall 403 Forbidden",
+      "redirect_chain": [
+       "https://www.securess.de/",
+       "https://www.securess.de/wp-content/plugins/ninjafirewall/images/ninjafirewall_75.png"
+      ],
+      "response_headers": {
+       "cache-control": "no-cache, no-store, must-revalidate",
+       "connection": "keep-alive",
+       "content-encoding": "gzip",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 13:10:34 GMT",
+       "expires": "0",
+       "pragma": "no-cache",
+       "server": "nginx/1.22.1",
+       "transfer-encoding": "chunked"
+      },
+      "screenshot_path": "/tmp/scan-5b07c87f-6c59-4ca6-8d53-00013a576398/hosts/85.22.47.41/phase2/screenshot_www.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=utf-8",
+         "name": "Content-Type"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "NinjaFirewall 403 Forbidden"
+      }
+     }
+    },
+    "server": "nginx/1.22.1",
+    "tech_rows": [
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "2023-04-11",
+      "is_mega_cve": false,
+      "latest_patch": "1.22.1",
+      "name": "Nginx",
+      "source": "server_banner",
+      "status": "eol",
+      "version": "1.22.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "2025-12-02",
+      "is_mega_cve": false,
+      "latest_patch": "6.8.5",
+      "name": "WordPress",
+      "source": "tech_detect",
+      "status": "minor_eol",
+      "version": "6.8.5",
+      "vuln_name": ""
+     },
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MySQL",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "9.2p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Elementor",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "3.33.2",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery Migrate",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "3.4.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Swiper",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "WP Rocket",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Yoast SEO",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "27.5",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "WAF/Schutz",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "NinjaFirewall",
+      "source": "waf_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "OpenSSH",
+      "version": "9.2p1 Debian 2+deb12u9"
+     },
+     {
+      "name": "nginx",
+      "version": "1.22.1"
+     },
+     {
+      "name": "WordPress",
+      "version": "6.8.5"
+     },
+     {
+      "name": "Elementor",
+      "version": "3.33.2"
+     },
+     {
+      "name": "MySQL",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     },
+     {
+      "name": "Swiper",
+      "version": ""
+     },
+     {
+      "name": "WP Rocket",
+      "version": ""
+     },
+     {
+      "name": "Yoast SEO",
+      "version": "27.5"
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery Migrate",
+      "version": "3.4.1"
+     }
+    ],
+    "vhost_results": {
+     "securess.de": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9,
+      "cms_version": "6.8.5",
+      "waf": "NinjaFirewall"
+     },
+     "www.securess.de": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9,
+      "cms_version": "6.8.5",
+      "waf": "NinjaFirewall"
+     }
+    },
+    "waf": "NinjaFirewall",
+    "web_fqdn": null
+   },
+   {
+    "cms": "TYPO3",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "TYPO3",
+     "confidence": 0.8,
+     "details": {
+      "raw": {
+       "name": "TYPO3",
+       "version": ""
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "webtech"
+     ],
+     "version": null
+    },
+    "cms_version": null,
+    "fqdns": [
+     "connect.securess.de",
+     "partner.securess.de",
+     "vermittler.securess.de"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "212.227.60.78",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     22,
+     25,
+     80,
+     106,
+     110,
+     143,
+     443,
+     465,
+     993,
+     995,
+     8443
+    ],
+    "primary_vhost": "connect.securess.de",
+    "redirect_data": {
+     "connect.securess.de": {
+      "error": null,
+      "final_domain": "connect.securess.de",
+      "final_url": "https://connect.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "SECURESS|connect: SECURESS",
+      "redirect_chain": [
+       "https://connect.securess.de/",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/bootstrap/css/bootstrap.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/owl.carousel/assets/owl.carousel.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/magnific-popup/magnific-popup.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/owl.carousel/assets/owl.theme.default.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/bootstrap-datepicker/css/bootstrap-datepicker3.standalone.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/select2/css/select2.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/datatables/media/css/dataTables.bootstrap5.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/css/formValidation.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/select2-bootstrap-5/select2-bootstrap-5-theme.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/bootstrap-fileinput/css/fileinput.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/summernote/summernote-bs5.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/toastr/css/toastr.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fontawesome/css/all.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fontawesome/css/custom-icons.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fileuploader/font/font-fileuploader.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fileuploader/jquery.fileuploader-theme-thumbnails.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fileuploader/jquery.fileuploader.min.1777104443.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/mmenu-js/mmenu.1777104443.css",
+       "https://connect.securess.de/_assets/f038457a108ded7ca0b077b63bfae195/Css/Main.min.1766077593.css",
+       "https://connect.securess.de/fileadmin/_processed_/e/b/csm_Logo_b782114970.png",
+       "https://connect.securess.de/typo3temp/assets/css/ffa881a9fff85eed142bb37afa6cb49b.1748812536.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Css/securess.1777104481.css",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/plugins.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/bootstrap-datepicker/locales/bootstrap-datepicker.de.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/datatables/media/js/dataTables.bootstrap5.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/bootstrap-datepicker/js/bootstrap-datepicker.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/select2/js/select2.full.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/select2/js/i18n/de.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/js/locales/de_DE.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/datatables/media/js/jquery.dataTables.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/js/plugins/Bootstrap5.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/js/plugins/MandatoryIcon.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/summernote/summernote-bs5.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/summernote/lang/summernote-de-DE.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/js-cookie/js.cookie.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/js/FormValidation.full.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/toastr/js/toastr.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/autoNumeric/autoNumeric.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/signature-pad/signature_pad.umd.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/bootbox/bootbox.all.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/mmenu-js/mmenu.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fileuploader/jquery.fileuploader.min.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/sortable/Sortable.min.1777104443.js",
+       "https://connect.securess.de/_assets/f038457a108ded7ca0b077b63bfae195/JavaScript/Validation.min.1766077593.js",
+       "https://connect.securess.de/_assets/f038457a108ded7ca0b077b63bfae195/JavaScript/Femanager.min.1766077593.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/theme.init.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/validation.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/main.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/module.autonumeric.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/module.modal.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/module.select2.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/module.signaturepad.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/theme.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/module.fileuploader.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/module.favorite.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/JavaScript/unread_issues.1777104443.js",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Fonts/OpenSans/OpenSans-Condensed-Light.woff2",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Fonts/OpenSans/OpenSans-SemiBold.woff2",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Fonts/OpenSans/OpenSans-Regular.woff2",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fontawesome/webfonts/fa-regular-400.woff2",
+       "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fontawesome/webfonts/fa-solid-900.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "private, no-store",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-language": "de-DE",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Sat, 09 May 2026 13:10:17 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "server": "Apache",
+       "strict-transport-security": "max-age=63072000; includeSubDomains",
+       "transfer-encoding": "chunked",
+       "vary": "Accept-Encoding",
+       "x-content-type-options": "nosniff",
+       "x-powered-by": "PHP/8.3.30\nPleskLin",
+       "x-ua-compatible": "IE=edge"
+      },
+      "screenshot_path": "/tmp/scan-5b07c87f-6c59-4ca6-8d53-00013a576398/hosts/212.227.60.78/phase2/screenshot_connect.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "page-1 layout-login",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no",
+         "name": "viewport"
+        },
+        {
+         "content": "summary",
+         "name": "twitter:card"
+        },
+        {
+         "content": "UTF-8",
+         "name": "charset"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/plugins.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/bootstrap-datepicker/js/bootstrap-datepicker.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/bootstrap-datepicker/locales/bootstrap-datepicker.de.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/datatables/media/js/jquery.dataTables.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/datatables/media/js/dataTables.bootstrap5.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/select2/js/select2.full.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/select2/js/i18n/de.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/js/FormValidation.full.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/js/locales/de_DE.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/js/plugins/Bootstrap5.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/js/plugins/MandatoryIcon.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/summernote/summernote-bs5.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/summernote/lang/summernote-de-DE.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/autoNumeric/autoNumeric.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/js-cookie/js.cookie.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/toastr/js/toastr.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/signature-pad/signature_pad.umd.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fileuploader/jquery.fileuploader.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/bootbox/bootbox.all.min.1777104443.js",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/mmenu-js/mmenu.1777104443.js"
+       ],
+       "stylesheets": [
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/bootstrap/css/bootstrap.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/magnific-popup/magnific-popup.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/owl.carousel/assets/owl.carousel.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/owl.carousel/assets/owl.theme.default.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/bootstrap-datepicker/css/bootstrap-datepicker3.standalone.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/Porto/datatables/media/css/dataTables.bootstrap5.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/select2/css/select2.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/select2-bootstrap-5/select2-bootstrap-5-theme.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/bootstrap-fileinput/css/fileinput.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/formvalidation.io/css/formValidation.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/summernote/summernote-bs5.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/toastr/css/toastr.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fontawesome/css/all.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fontawesome/css/custom-icons.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fileuploader/jquery.fileuploader.min.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fileuploader/font/font-fileuploader.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/fileuploader/jquery.fileuploader-theme-thumbnails.1777104443.css",
+        "https://connect.securess.de/_assets/4d10cd9a1c1f7545436c3c15653d6aa9/Vendor/IhrPortal/mmenu-js/mmenu.1777104443.css",
+        "https://connect.securess.de/typo3temp/assets/css/ffa881a9fff85eed142bb37afa6cb49b.1748812536.css",
+        "https://connect.securess.de/_assets/f038457a108ded7ca0b077b63bfae195/Css/Main.min.1766077593.css"
+       ],
+       "title": "SECURESS|connect: SECURESS"
+      }
+     },
+     "partner.securess.de": {
+      "error": null,
+      "final_domain": "partner.securess.de",
+      "final_url": "https://partner.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "Page Not Found",
+      "redirect_chain": [
+       "https://partner.securess.de/"
+      ],
+      "response_headers": {
+       "connection": "Keep-Alive",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Sat, 09 May 2026 13:10:23 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "server": "Apache",
+       "strict-transport-security": "max-age=63072000",
+       "transfer-encoding": "chunked",
+       "x-content-type-options": "nosniff",
+       "x-powered-by": "PHP/8.3.30\nPleskLin",
+       "x-ua-compatible": "IE=edge"
+      },
+      "screenshot_path": "/tmp/scan-5b07c87f-6c59-4ca6-8d53-00013a576398/hosts/212.227.60.78/phase2/screenshot_partner.securess.de.png",
+      "status_code": 404,
+      "tech_info": {
+       "body_classes": "typo3-error-page",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "noindex, follow",
+         "name": "robots"
+        },
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Page Not Found"
+      }
+     },
+     "vermittler.securess.de": {
+      "error": null,
+      "final_domain": "vermittler.securess.de",
+      "final_url": "https://vermittler.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "Page Not Found",
+      "redirect_chain": [
+       "https://vermittler.securess.de/"
+      ],
+      "response_headers": {
+       "connection": "Keep-Alive",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Sat, 09 May 2026 13:10:28 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "server": "Apache",
+       "strict-transport-security": "max-age=63072000",
+       "transfer-encoding": "chunked",
+       "x-content-type-options": "nosniff",
+       "x-powered-by": "PHP/8.3.30\nPleskLin",
+       "x-ua-compatible": "IE=edge"
+      },
+      "screenshot_path": "/tmp/scan-5b07c87f-6c59-4ca6-8d53-00013a576398/hosts/212.227.60.78/phase2/screenshot_vermittler.securess.de.png",
+      "status_code": 404,
+      "tech_info": {
+       "body_classes": "typo3-error-page",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "noindex, follow",
+         "name": "robots"
+        },
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [],
+       "stylesheets": [],
+       "title": "Page Not Found"
+      }
+     }
+    },
+    "server": "Apache httpd",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "TYPO3",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "9.6p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot pop3d",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "HSTS",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "ProFTPD",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "sw-cp-server",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "8.3.30",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "source": "server_banner",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "ProFTPD",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "9.6p1 Ubuntu 3ubuntu13.16"
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": ""
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "sw-cp-server",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": ""
+     },
+     {
+      "name": "PHP/8.3.30\nPleskLin",
+      "version": ""
+     },
+     {
+      "name": "TYPO3",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": "8.3.30"
+     }
+    ],
+    "vhost_results": {
+     "connect.securess.de": {
+      "cms": "TYPO3",
+      "cms_confidence": 0.8,
+      "cms_version": null,
+      "waf": null
+     },
+     "partner.securess.de": {
+      "cms": "TYPO3",
+      "cms_confidence": 0.8,
+      "cms_version": null,
+      "waf": null
+     },
+     "vermittler.securess.de": {
+      "cms": "TYPO3",
+      "cms_confidence": 0.8,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   },
+   {
+    "cms": "Roundcube",
+    "cms_confidence": 0.9,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "mailin.securess.de",
+     "mailout.securess.de",
+     "webmail.securess.de"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": false,
+    "ip": "85.22.47.39",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     25,
+     443,
+     465,
+     587,
+     993
+    ],
+    "primary_vhost": "mailin.securess.de",
+    "redirect_data": {
+     "mailin.securess.de": {
+      "error": null,
+      "final_domain": "mailin.securess.de",
+      "final_url": "https://mailin.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
+      "redirect_chain": [
+       "https://mailin.securess.de/",
+       "https://mailin.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+       "https://mailin.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727",
+       "https://mailin.securess.de/program/js/common.min.js?s=1774777727",
+       "https://mailin.securess.de/program/js/jstz.min.js?s=1774777730",
+       "https://mailin.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+       "https://mailin.securess.de/securess-logo.png?s=1749651799",
+       "https://mailin.securess.de/program/js/jquery.min.js?s=1774777730",
+       "https://mailin.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+       "https://mailin.securess.de/program/js/app.min.js?s=1774777727",
+       "https://mailin.securess.de/skins/elastic/ui.min.js?s=1774777728",
+       "https://mailin.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+       "https://mailin.securess.de/skins/elastic/fonts/roboto-v29-regular.woff2",
+       "https://mailin.securess.de/skins/elastic/fonts/fa-solid-900.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0",
+       "content-encoding": "gzip",
+       "content-language": "en",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 13:10:35 GMT",
+       "expires": "Sat, 09 May 2026 13:10:35 GMT",
+       "last-modified": "Sat, 09 May 2026 13:10:35 GMT",
+       "pragma": "no-cache",
+       "server": "nginx/1.29.5",
+       "transfer-encoding": "chunked",
+       "vary": "Accept-Encoding",
+       "x-frame-options": "sameorigin",
+       "x-powered-by": "PHP/8.4.20"
+      },
+      "screenshot_path": "/tmp/scan-5b07c87f-6c59-4ca6-8d53-00013a576398/hosts/85.22.47.39/phase2/screenshot_mailin.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "task-login action-none",
+       "cookies": "SERVERID=webmail-03",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=UTF-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "theme-color"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "msapplication-navbutton-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://mailin.securess.de/program/js/jquery.min.js?s=1774777730",
+        "https://mailin.securess.de/program/js/common.min.js?s=1774777727",
+        "https://mailin.securess.de/program/js/app.min.js?s=1774777727",
+        "https://mailin.securess.de/program/js/jstz.min.js?s=1774777730",
+        "https://mailin.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+        "https://mailin.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+        "https://mailin.securess.de/skins/elastic/ui.min.js?s=1774777728"
+       ],
+       "stylesheets": [
+        "https://mailin.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+        "https://mailin.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+        "https://mailin.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727"
+       ],
+       "title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
+      }
+     },
+     "mailout.securess.de": {
+      "error": null,
+      "final_domain": "mailout.securess.de",
+      "final_url": "https://mailout.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
+      "redirect_chain": [
+       "https://mailout.securess.de/",
+       "https://mailout.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+       "https://mailout.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727",
+       "https://mailout.securess.de/program/js/common.min.js?s=1774777727",
+       "https://mailout.securess.de/program/js/jstz.min.js?s=1774777730",
+       "https://mailout.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+       "https://mailout.securess.de/program/js/jquery.min.js?s=1774777730",
+       "https://mailout.securess.de/securess-logo.png?s=1749651799",
+       "https://mailout.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+       "https://mailout.securess.de/program/js/app.min.js?s=1774777727",
+       "https://mailout.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+       "https://mailout.securess.de/skins/elastic/ui.min.js?s=1774777728",
+       "https://mailout.securess.de/skins/elastic/fonts/roboto-v29-regular.woff2",
+       "https://mailout.securess.de/skins/elastic/fonts/fa-solid-900.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0",
+       "content-encoding": "gzip",
+       "content-language": "en",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 13:10:39 GMT",
+       "expires": "Sat, 09 May 2026 13:10:39 GMT",
+       "last-modified": "Sat, 09 May 2026 13:10:39 GMT",
+       "pragma": "no-cache",
+       "server": "nginx/1.29.5",
+       "transfer-encoding": "chunked",
+       "vary": "Accept-Encoding",
+       "x-frame-options": "sameorigin",
+       "x-powered-by": "PHP/8.4.20"
+      },
+      "screenshot_path": "/tmp/scan-5b07c87f-6c59-4ca6-8d53-00013a576398/hosts/85.22.47.39/phase2/screenshot_mailout.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "task-login action-none",
+       "cookies": "SERVERID=webmail-03",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=UTF-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "theme-color"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "msapplication-navbutton-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://mailout.securess.de/program/js/jquery.min.js?s=1774777730",
+        "https://mailout.securess.de/program/js/common.min.js?s=1774777727",
+        "https://mailout.securess.de/program/js/app.min.js?s=1774777727",
+        "https://mailout.securess.de/program/js/jstz.min.js?s=1774777730",
+        "https://mailout.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+        "https://mailout.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+        "https://mailout.securess.de/skins/elastic/ui.min.js?s=1774777728"
+       ],
+       "stylesheets": [
+        "https://mailout.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+        "https://mailout.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+        "https://mailout.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727"
+       ],
+       "title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
+      }
+     },
+     "webmail.securess.de": {
+      "error": null,
+      "final_domain": "webmail.securess.de",
+      "final_url": "https://webmail.securess.de/",
+      "is_cross_domain": false,
+      "page_title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)",
+      "redirect_chain": [
+       "https://webmail.securess.de/",
+       "https://webmail.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+       "https://webmail.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727",
+       "https://webmail.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+       "https://webmail.securess.de/program/js/common.min.js?s=1774777727",
+       "https://webmail.securess.de/program/js/jstz.min.js?s=1774777730",
+       "https://webmail.securess.de/securess-logo.png?s=1749651799",
+       "https://webmail.securess.de/program/js/jquery.min.js?s=1774777730",
+       "https://webmail.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+       "https://webmail.securess.de/program/js/app.min.js?s=1774777727",
+       "https://webmail.securess.de/skins/elastic/ui.min.js?s=1774777728",
+       "https://webmail.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+       "https://webmail.securess.de/skins/elastic/fonts/roboto-v29-regular.woff2",
+       "https://webmail.securess.de/skins/elastic/fonts/fa-solid-900.woff2"
+      ],
+      "response_headers": {
+       "cache-control": "private, no-cache, no-store, must-revalidate, post-check=0, pre-check=0",
+       "content-encoding": "gzip",
+       "content-language": "en",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sat, 09 May 2026 13:10:44 GMT",
+       "expires": "Sat, 09 May 2026 13:10:44 GMT",
+       "last-modified": "Sat, 09 May 2026 13:10:44 GMT",
+       "pragma": "no-cache",
+       "server": "nginx/1.29.5",
+       "transfer-encoding": "chunked",
+       "vary": "Accept-Encoding",
+       "x-frame-options": "sameorigin",
+       "x-powered-by": "PHP/8.4.20"
+      },
+      "screenshot_path": "/tmp/scan-5b07c87f-6c59-4ca6-8d53-00013a576398/hosts/85.22.47.39/phase2/screenshot_webmail.securess.de.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "task-login action-none",
+       "cookies": "SERVERID=webmail-03",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "text/html; charset=UTF-8",
+         "name": "content-type"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0, shrink-to-fit=no, maximum-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "theme-color"
+        },
+        {
+         "content": "#f4f4f4",
+         "name": "msapplication-navbutton-color"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://webmail.securess.de/program/js/jquery.min.js?s=1774777730",
+        "https://webmail.securess.de/program/js/common.min.js?s=1774777727",
+        "https://webmail.securess.de/program/js/app.min.js?s=1774777727",
+        "https://webmail.securess.de/program/js/jstz.min.js?s=1774777730",
+        "https://webmail.securess.de/plugins/jqueryui/js/jquery-ui.min.js?s=1774777727",
+        "https://webmail.securess.de/skins/elastic/deps/bootstrap.bundle.min.js?s=1774777731",
+        "https://webmail.securess.de/skins/elastic/ui.min.js?s=1774777728"
+       ],
+       "stylesheets": [
+        "https://webmail.securess.de/skins/elastic/deps/bootstrap.min.css?s=1774777731",
+        "https://webmail.securess.de/skins/elastic/styles/styles.min.css?s=1774777728",
+        "https://webmail.securess.de/plugins/jqueryui/themes/elastic/jquery-ui.min.css?s=1774777727"
+       ],
+       "title": "Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3)"
+      }
+     }
+    },
+    "server": "Apache httpd/2.4.66",
+    "tech_rows": [
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Bootstrap",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery UI",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": 0.9,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Roundcube",
+      "source": "cms_fingerprint",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "8.4.20",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "source": "server_banner",
+      "status": "current",
+      "version": "2.4.66",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "nginx",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "1.29.5",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": "2.4.66"
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "nginx",
+      "version": "1.29.5"
+     },
+     {
+      "name": "PHP",
+      "version": "8.4.20"
+     },
+     {
+      "name": "Bootstrap",
+      "version": ""
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery UI",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "mailin.securess.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "mailout.securess.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "webmail.securess.de": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}

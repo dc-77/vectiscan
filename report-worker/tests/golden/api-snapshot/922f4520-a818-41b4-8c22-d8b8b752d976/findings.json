@@ -1,0 +1,581 @@
+{
+ "data": {
+  "additional_findings": [],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 2,
+   "low": 3,
+   "medium": 1
+  },
+  "business_impact_score": "3.0",
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_title_template_missing": true,
+    "affected": "45.33.32.156:80 (scanme.nmap.org)",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Die Website wird ausschließlich über HTTP (Port 80) ohne TLS-Verschlüsselung ausgeliefert. Es existiert kein HTTPS-Endpunkt (Port 443 ist nicht geöffnet) und somit auch keine Möglichkeit einer Umleitung auf eine verschlüsselte Verbindung. Sämtliche Kommunikation zwischen Client und Server erfolgt im Klartext.",
+    "evidence": "$ httpx -u scanme.nmap.org\nFinal URL: http://scanme.nmap.org\n\n$ nmap -p 443 45.33.32.156\n443/tcp  closed  https\n\nResponse-Header enthalten keinen HSTS-Header.\nRessourcen werden über http:// geladen:\n- http://scanme.nmap.org/shared/css/nst.css\n- http://scanme.nmap.org/shared/js/nst.js\n- http://www.google-analytics.com/analytics.js",
+    "id": "VS-2026-003",
+    "impact": "Sämtlicher Datenverkehr kann durch Man-in-the-Middle-Angriffe mitgelesen oder manipuliert werden. Cookies (inkl. Google Analytics Tracking-Cookies) werden unverschlüsselt übertragen. In öffentlichen Netzwerken ist passives Mitlesen trivial möglich.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Tage):</b> TLS-Zertifikat einrichten (z.B. via Let's Encrypt) und HTTPS auf Port 443 aktivieren. HTTP-zu-HTTPS-Redirect konfigurieren.\n<b>Mittelfristig:</b> HSTS-Header setzen und alle internen Ressourcen auf HTTPS umstellen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Keine Transportverschlüsselung (kein HTTPS) auf scanme.nmap.org",
+    "title_vars": {
+     "host": "scanme.nmap.org",
+     "port": "80"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "45.33.32.156:9929 (scanme.nmap.org)",
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:L",
+    "cwe": "CWE-284",
+    "description": "Auf Port 9929 ist ein Nping-Echo-Dienst öffentlich erreichbar. Nping Echo ist ein Netzwerkdiagnose-Tool, das eingehende Pakete spiegelt. Obwohl der Dienst im Kontext von scanme.nmap.org bewusst bereitgestellt wird, stellt ein öffentlich erreichbarer Echo-Dienst grundsätzlich ein Risiko für Amplification-Angriffe dar.",
+    "evidence": "$ nmap -sV 45.33.32.156 -p 9929\n9929/tcp  open  nping-echo  Nping echo",
+    "id": "VS-2026-005",
+    "impact": "Der Dienst könnte potenziell als Reflektor in DDoS-Amplification-Angriffen missbraucht werden. Das tatsächliche Risiko hängt davon ab, ob eine Authentifizierung (Echo-Token) erzwungen wird und wie groß der Amplification-Faktor ist.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Prüfen, ob der Nping-Echo-Dienst noch benötigt wird. Falls ja, den Zugriff per Firewall auf vertrauenswürdige IP-Adressen beschränken.\n<b>Mittelfristig:</b> Nicht benötigte Dienste grundsätzlich deaktivieren und die Angriffsfläche minimieren.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Nping-Echo-Dienst öffentlich erreichbar auf scanme.nmap.org:9929",
+    "title_vars": {
+     "host": "scanme.nmap.org",
+     "port": "9929",
+     "tech": "Nping echo"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "scanme.nmap.org (DNS)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain scanme.nmap.org sind keine SPF-, DMARC- oder DKIM-Records konfiguriert. Es existieren zwar keine MX-Records (die Domain wird nicht für E-Mail-Empfang genutzt), dennoch könnte die Domain ohne diese Schutzmaßnahmen für E-Mail-Spoofing missbraucht werden. Ein SPF-Record mit '-all' würde explizit signalisieren, dass von dieser Domain keine E-Mails gesendet werden dürfen.",
+    "evidence": "$ dig TXT scanme.nmap.org\n;; ANSWER SECTION: (kein SPF-Record)\n\n$ dig TXT _dmarc.scanme.nmap.org\n;; ANSWER SECTION: (kein DMARC-Record)\n\nDKIM: nicht konfiguriert\nMX-Records: keine vorhanden",
+    "finding_type": "spf_missing",
+    "id": "VS-2026-006",
+    "impact": "Angreifer könnten E-Mails im Namen von scanme.nmap.org versenden, die von empfangenden Mailservern mangels SPF/DMARC/DKIM nicht zuverlässig als gefälscht erkannt werden. Das Risiko ist gemindert, da die Domain keine E-Mail-Infrastruktur betreibt und primär als Scan-Testziel bekannt ist.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig (Wochen):</b> Einen SPF-Record 'v=spf1 -all' setzen, der explizit erklärt, dass keine Server berechtigt sind, E-Mails für diese Domain zu senden.\n<b>Mittelfristig:</b> DMARC-Record hinzufügen: '_dmarc.scanme.nmap.org TXT \"v=DMARC1; p=reject;\"' um Spoofing-Versuche aktiv zu unterbinden.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='spf_missing' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Fehlende E-Mail-Authentifizierung (SPF/DMARC/DKIM) für scanme.nmap.org",
+    "title_vars": {
+     "domain": "scanme.nmap.org",
+     "host": "scanme.nmap.org"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "45.33.32.156:80 (scanme.nmap.org)",
+    "business_impact_score": 2,
+    "cvss_score": "2.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-1104",
+    "description": "Der Webserver betreibt Apache httpd in Version 2.4.7, veröffentlicht im November 2013. Diese Version ist über 12 Jahre alt und hat den End-of-Life-Status längst überschritten. Für Apache 2.4.7 existieren zahlreiche dokumentierte Schwachstellen in den Bereichen Pufferüberläufe, Authentifizierungs-Umgehung und Denial-of-Service.",
+    "evidence": "$ nmap -sV 45.33.32.156\n80/tcp  open  http  Apache httpd 2.4.7\n\nHTTP Response Header:\nServer: Apache/2.4.7 (Ubuntu)\n\nAktuelle stabile Apache-Version: 2.4.62+ (Stand 2025/2026)",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-001",
+    "impact": "Angreifer können öffentlich verfügbare Exploits für bekannte Schwachstellen dieser Apache-Version einsetzen. Je nach aktivierten Modulen sind Informationsabfluss, Authentifizierungs-Umgehung oder Dienstverweigerung möglich.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Apache httpd auf die aktuelle stabile Version (2.4.62+) aktualisieren. Idealerweise das gesamte Betriebssystem auf eine unterstützte Ubuntu-LTS-Version migrieren.\n<b>Mittelfristig:</b> Patch-Management-Prozess etablieren, der kritische Sicherheitsupdates zeitnah einspielt.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Server-Banner mit Versions-Info auf scanme.nmap.org",
+    "title_vars": {
+     "host": "scanme.nmap.org",
+     "port": "80",
+     "tech": "Apache httpd",
+     "version": "2.4.7"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "45.33.32.156:80 (scanme.nmap.org)",
+    "business_impact_score": 0,
+    "cvss_score": "0.0",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Webserver liefert keinen einzigen der empfohlenen HTTP-Security-Header aus. Alle sieben geprüften Header fehlen: Strict-Transport-Security, Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, X-XSS-Protection, Referrer-Policy und Permissions-Policy. Dies hinterlässt den Browser ohne zusätzliche Schutzanweisungen.",
+    "evidence": "$ curl -I http://scanme.nmap.org/\nHTTP/1.1 200 OK\nServer: Apache/2.4.7 (Ubuntu)\nContent-Type: text/html\nContent-Encoding: gzip\nVary: Accept-Encoding\n\nFehlende Header:\n- Strict-Transport-Security\n- Content-Security-Policy\n- X-Frame-Options\n- X-Content-Type-Options\n- X-XSS-Protection\n- Referrer-Policy\n- Permissions-Policy\n\nScore: 0/7",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-004",
+    "impact": "Ohne Security-Header ist die Seite anfälliger für Clickjacking (fehlende X-Frame-Options), MIME-Type-Sniffing (fehlende X-Content-Type-Options) und Cross-Site-Scripting-Angriffe (fehlende CSP). Da zudem kein HTTPS vorhanden ist, bietet HSTS ohnehin keinen zusätzlichen Schutz.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Folgende Header in der Apache-Konfiguration ergänzen:\n• X-Frame-Options: DENY\n• X-Content-Type-Options: nosniff\n• Referrer-Policy: strict-origin-when-cross-origin\n• Permissions-Policy: geolocation=(), camera=(), microphone=()\n<b>Mittelfristig:</b> Nach HTTPS-Einrichtung: Content-Security-Policy und Strict-Transport-Security hinzufügen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy fehlt auf scanme.nmap.org",
+    "title_vars": {
+     "host": "scanme.nmap.org"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "45.33.32.156:31337 (scanme.nmap.org)",
+    "business_impact_score": 0.5,
+    "cvss_score": "",
+    "cvss_vector": "",
+    "cwe": "",
+    "description": "Port 31337 akzeptiert TCP-Verbindungen, der Dienst sendet jedoch keine Daten und schließt die Verbindung sofort (tcpwrapped). Die Portnummer 31337 ist historisch mit Backdoor-Malware assoziiert ('elite'-Port), im Kontext von scanme.nmap.org ist dies jedoch ein absichtlich konfigurierter Testdienst. Es besteht kein nachweisbares Sicherheitsrisiko, da keine Interaktion mit dem Dienst möglich ist.",
+    "evidence": "$ nmap -sV 45.33.32.156 -p 31337\n31337/tcp  open  tcpwrapped\n\nDer TCP-Handshake wird abgeschlossen, aber der Dienst antwortet nicht auf weitere Anfragen.",
+    "id": "VS-2026-007",
+    "impact": "Kein direktes Risiko. Der Dienst verweigert jegliche Kommunikation nach dem TCP-Handshake.",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Empfehlung:</b> Zur Kenntnis nehmen. Falls der Port nicht für Testzwecke benötigt wird, per Firewall schließen, um die Angriffsfläche zu reduzieren.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-05-10.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "Unbekannter Dienst auf Port 31337 (tcpwrapped) auf scanme.nmap.org",
+    "title_vars": {
+     "host": "scanme.nmap.org",
+     "port": "31337"
+    }
+   }
+  ],
+  "overall_description": "Der Host scanme.nmap.org weist erhebliche Risiken durch stark veraltete Software-Komponenten auf. Apache httpd 2.4.7 (2013) und OpenSSH 6.6.1p1 (2014) sind seit über einem Jahrzehnt nicht aktualisiert und besitzen zahlreiche dokumentierte Schwachstellen. Zudem fehlt jegliche Transportverschlüsselung (kein HTTPS), und sämtliche Security-Header sind abwesend.",
+  "overall_risk": "MEDIUM",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-CSP-001",
+   "SP-DISC-001",
+   "SP-FALLBACK"
+  ],
+  "policy_version": "2026-05-10.1",
+  "positive_findings": [
+   {
+    "description": "Zone-Transfers sind für scanme.nmap.org nicht möglich. Dies verhindert, dass Angreifer die vollständige DNS-Zonendatei abrufen und so die gesamte Infrastruktur kartographieren können.",
+    "title": "DNS-Zone-Transfer (AXFR) korrekt unterbunden"
+   },
+   {
+    "description": "Es wurden keine verwaisten CNAME-Einträge gefunden, die auf nicht mehr existierende Dienste verweisen. Damit besteht kein Risiko für Subdomain-Takeover-Angriffe über DNS-Fehlkonfigurationen.",
+    "title": "Keine Dangling-CNAME-Records identifiziert"
+   },
+   {
+    "description": "Die Seite nutzt einen ROBOTS-Meta-Tag mit der Direktive NOARCHIVE, was verhindert, dass Suchmaschinen gecachte Kopien der Seite speichern. Dies reduziert die Menge an öffentlich abrufbaren historischen Inhalten.",
+    "title": "ROBOTS-Meta-Tag mit NOARCHIVE konfiguriert"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Apache httpd von Version 2.4.7 auf die aktuelle stabile Version (2.4.62+) aktualisieren. Idealerweise Migration auf eine aktuelle Ubuntu-LTS-Version durchführen, um auch OpenSSH und alle Systembibliotheken auf den neuesten Stand zu bringen.",
+    "effort": "4-8 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "TLS-Zertifikat (z.B. Let's Encrypt) einrichten, HTTPS auf Port 443 aktivieren und permanenten HTTP-zu-HTTPS-Redirect konfigurieren.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-003"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "HTTP-Security-Header in der Apache-Konfiguration ergänzen: X-Frame-Options, X-Content-Type-Options, Referrer-Policy und Permissions-Policy. Nach HTTPS-Aktivierung zusätzlich HSTS und Content-Security-Policy hinzufügen.",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-004"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "DNS-Records für E-Mail-Schutz setzen: SPF-Record 'v=spf1 -all' und DMARC-Record 'v=DMARC1; p=reject;' konfigurieren, um E-Mail-Spoofing unter dieser Domain zu unterbinden.",
+    "effort": "0.5-1 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Nicht benötigte Dienste (Nping Echo auf Port 9929, Port 31337) evaluieren und bei fehlendem Bedarf per Firewall-Regeln beschränken oder deaktivieren.",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-005",
+     "VS-2026-007"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 2,
+   "LOW": 3,
+   "MEDIUM": 1
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "scanme.nmap.org"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": false,
+    "ip": "45.33.32.156",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [
+     22,
+     80,
+     9929,
+     31337
+    ],
+    "primary_vhost": "scanme.nmap.org",
+    "redirect_data": {
+     "scanme.nmap.org": {
+      "error": null,
+      "final_domain": "scanme.nmap.org",
+      "final_url": "http://scanme.nmap.org/",
+      "is_cross_domain": false,
+      "page_title": "Go ahead and ScanMe!",
+      "redirect_chain": [
+       "http://scanme.nmap.org/",
+       "http://scanme.nmap.org/images/sitelogo.png",
+       "https://www.google-analytics.com/analytics.js",
+       "http://scanme.nmap.org/shared/css/nst.css?v=2",
+       "http://scanme.nmap.org/site.css",
+       "http://scanme.nmap.org/shared/images/nst-icons.svg",
+       "http://www.google-analytics.com/analytics.js",
+       "http://scanme.nmap.org/shared/js/nst.js?v=2",
+       "https://www.google-analytics.com/analytics.js",
+       "http://scanme.nmap.org/shared/css/nst-foot.css?v=2",
+       "https://www.google-analytics.com/j/collect?v=1&_v=j102&a=2095684795&t=pageview&_s=1&dl=http%3A%2F%2Fscanme.nmap.org%2F&ul=en-us&dt=Go%20ahead%20and%20ScanMe!&sr=1280x720&vp=1280x720&_u=IEBAAEABAAAAACAAI~&jid=248199643&gjid=1389896833&cid=224566215.1778358811&tid=UA-11009417-1&_gid=677945832.1778358811&_r=1&_slc=1&z=349805034",
+       "https://www.googletagmanager.com/gtag/js?id=G-ZLCVHN7NXS&cx=c&_slc=1",
+       "https://region1.google-analytics.com/g/collect?v=2&tid=G-ZLCVHN7NXS&gtm=45je6562v9134945724za20g&_p=1778358811028&gcd=13l3lPl2l2l1&npa=0&dma_cps=a&dma=1&_eu=ABAI&are=1&cid=224566215.1778358811&frm=0&pscdl=noapi&rcb=2&sr=1280x720&ul=en-us&_s=1&tag_exp=0~115616986~115938466~115938469~118463261&dl=http%3A%2F%2Fscanme.nmap.org%2F&dt=Go%20ahead%20and%20ScanMe!&sid=1778358811&sct=1&seg=0&_tu=wAQ&en=page_view&_fv=1&_ss=1&_ee=1&tfd=1216"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "2068",
+       "content-type": "text/html",
+       "date": "Sat, 09 May 2026 20:33:30 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "server": "Apache/2.4.7 (Ubuntu)",
+       "vary": "Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-922f4520-a818-41b4-8c22-d8b8b752d976/hosts/45.33.32.156/phase2/screenshot_scanme.nmap.org.png",
+      "status_code": 204,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "_ga=GA1.2.224566215.1778358811; _gid=GA1.2.677945832.1778358811; _gat=1; _ga_ZLCVHN7NXS=GS2.2.s1778358811$o1$g0$t1778358811$j60$l0$h0",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "width=device-width,initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "#2A0D45",
+         "name": "theme-color"
+        },
+        {
+         "content": "NOARCHIVE",
+         "name": "ROBOTS"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://www.googletagmanager.com/gtag/js?id=G-ZLCVHN7NXS&cx=c&_slc=1",
+        "http://www.google-analytics.com/analytics.js",
+        "http://scanme.nmap.org/shared/js/nst.js?v=2"
+       ],
+       "stylesheets": [
+        "http://scanme.nmap.org/shared/css/nst.css?v=2",
+        "http://scanme.nmap.org/shared/css/nst-foot.css?v=2",
+        "http://scanme.nmap.org/site.css"
+       ],
+       "title": "Go ahead and ScanMe!"
+      }
+     }
+    },
+    "server": "Apache httpd/2.4.7",
+    "tech_rows": [
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "cves": [
+       "CVE-2024-38475"
+      ],
+      "eol_date": "",
+      "is_mega_cve": true,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "source": "server_banner",
+      "status": "current",
+      "version": "2.4.7",
+      "vuln_name": "Apache HTTP Server Improper Escaping of Output Vulnerability"
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "6.6.1p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Analytics",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Tag Manager",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nping echo",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "cves": [],
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Ubuntu",
+      "source": "tech_detect",
+      "status": "current",
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "OpenSSH",
+      "version": "6.6.1p1 Ubuntu 2ubuntu2.13"
+     },
+     {
+      "name": "Apache httpd",
+      "version": "2.4.7"
+     },
+     {
+      "name": "Nping echo",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": "2.4.7 (Ubuntu)"
+     },
+     {
+      "name": "Google Analytics",
+      "version": ""
+     },
+     {
+      "name": "Google Tag Manager",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": "2.4.7"
+     },
+     {
+      "name": "Ubuntu",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "scanme.nmap.org": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}
