@@ -1,0 +1,3996 @@
+{
+ "coverage": [
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:27Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"217.243.248.30\": {\"ip\": \"217.243.248.30\", \"abuseConfidenceScore\": 0, \"totalReports\": 0, \"numDistinctUsers\": 0, \"lastReportedAt\": null, \"isWhitelisted\": fal...",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:04Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 458,
+   "evidence": [
+    {
+     "excerpt": "{\"subdomains\": [\"junkerwerk.hu\", \"www.junkerwerk.hu\"], \"error\": null}",
+     "ref": "scan_results:certspotter",
+     "tool": "certspotter"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:certspotter:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:31Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "certspotter"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 3796,
+   "evidence": [
+    {
+     "excerpt": "<html> <head><title>502 Bad Gateway</title></head> <body> <center><h1>502 Bad Gateway</h1></center> <hr><center>nginx</center> </body> </html>",
+     "ref": "scan_results:crtsh",
+     "tool": "crtsh"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:34Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 28043,
+   "evidence": [
+    {
+     "excerpt": "<html> <head><title>502 Bad Gateway</title></head> <body> <center><h1>502 Bad Gateway</h1></center> <hr><center>nginx</center> </body> </html>",
+     "ref": "scan_results:crtsh_retry2",
+     "tool": "crtsh_retry2"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:28:07Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 21153,
+   "evidence": [
+    {
+     "excerpt": "<html> <head><title>502 Bad Gateway</title></head> <body> <center><h1>502 Bad Gateway</h1></center> <hr><center>nginx</center> </body> </html>",
+     "ref": "scan_results:crtsh_retry3",
+     "tool": "crtsh_retry3"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan#3",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:28:43Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"spf\": \"v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all\", \"dmarc\": null, \"dmarc_policy\": {\"dmarc_prese...",
+     "ref": "scan_results:dns_records",
+     "tool": "dns_records"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_records:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:31Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_records"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null, \"nsec3param_present\": false, \"n...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:29Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null, \"nsec3param_present\": false, \"n...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:44Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 6294,
+   "evidence": [
+    {
+     "excerpt": "{\"a\": [\"188.40.3.130\"], \"all\": [\"junkerwerk.hu.\\t600\\tIN\\tA\\t188.40.3.130\", \"\\n;; OPT PSEUDOSECTION:\\n; EDNS: version 0; flags:; udp: 1232\", \"\\n;; OPT PSEUDO...",
+     "ref": "scan_results:dnsx",
+     "tool": "dnsx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dnsx:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:30:37Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dnsx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 180101,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 180s",
+     "ref": "scan_results:gobuster_dns",
+     "tool": "gobuster_dns"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:gobuster_dns:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:30:30Z",
+   "phase": 0,
+   "raw_status": "timeout",
+   "reason": "timeout_after_180s",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "gobuster_dns"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:27Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"domain\": {\"domain\": \"junkerwerk.hu\", \"pulse_count\": 0, \"pulses\": [], \"validation\": [], \"type\": \"domain\", \"alexa_rank\": \"http://www.alexa.com/siteinfo/junke...",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:28Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"domain\": {\"domain\": \"junkerwerk.hu\", \"alexa_rank\": null, \"hostname\": \"junkerwerk.hu\", \"a_records\": [\"188.40.3.130\"], \"mx_records\": [\"mx04.hornetsecurity.co...",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:30Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"shodan_domain\": {\"domain\": \"junkerwerk.hu\", \"subdomains\": [\"www\"], \"records\": [{\"subdomain\": \"\", \"type\": \"A\", \"options\": {\"ttl\": 600}, \"value\": \"188.40.3.1...",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:28Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"shodan_domain\": {\"domain\": \"junkerwerk.hu\", \"subdomains\": [\"www\"], \"records\": [{\"subdomain\": \"\", \"type\": \"A\", \"options\": {\"ttl\": 600}, \"value\": \"188.40.3.1...",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 720,
+   "evidence": [
+    {
+     "excerpt": "{\"host\":\"www.junkerwerk.hu\",\"input\":\"junkerwerk.hu\",\"source\":\"hackertarget\"}",
+     "ref": "scan_results:subfinder",
+     "tool": "subfinder"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:subfinder:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:31Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "subfinder"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:27Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_api_key",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:27Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "no_api_key",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"188.40.3.130\": { \"web_probe\": { \"has_web\": false, \"status\": null, \"final_url\": null, \"title\": null, \"web_fqdn\": null }, \"vhosts\": [], \"vhost_skipped\": []...",
+     "ref": "scan_results:web_probe",
+     "tool": "web_probe"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:web_probe:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "web_probe"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:27Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 49353,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 188.40.3.130 Host is up, received user-set (0.011s latency). Not shown: 938 filtered tcp ports (...",
+     "ref": "scan_results:nmap:188.40.3.130",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:1:nmap:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:32:40Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 21251,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 217.243.248.30 Host is up, received user-set (0.0010s latency). Not shown: 998 filtered tcp port...",
+     "ref": "scan_results:nmap:217.243.248.30",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:1:nmap:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:32:12Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 11139,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://junkerwerk.hu",
+     "ref": "scan_results:wafw00f:188.40.3.130",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "junkerwerk.hu",
+   "host_ip": "188.40.3.130",
+   "id": "cov:1:wafw00f:188.40.3.130:junkerwerk.hu",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:34:12Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 11149,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://www.junkerwerk.hu",
+     "ref": "scan_results:wafw00f:188.40.3.130",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.junkerwerk.hu",
+   "host_ip": "188.40.3.130",
+   "id": "cov:1:wafw00f:188.40.3.130:www.junkerwerk.hu",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:34:12Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 28645,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://openotp.junkerwerk.hu [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:217.243.248.30",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "openotp.junkerwerk.hu",
+   "host_ip": "217.243.248.30",
+   "id": "cov:1:wafw00f:217.243.248.30:openotp.junkerwerk.hu",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:32:48Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "Keine Tech-Signaturen erkennbar fuer junkerwerk.hu, www.junkerwerk.hu (moderne SPA ohne Server/X-Powered-By/generator-Header und ohne Cookie-/Script-/Header-...",
+     "ref": "scan_results:webtech:188.40.3.130",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 1,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:1:webtech:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:34:01Z",
+   "phase": 1,
+   "raw_status": "failed",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"Apache\", \"version\": \"\" } ] }",
+     "ref": "scan_results:webtech:217.243.248.30",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:1:webtech:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:32:19Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_web",
+     "ref": "scan_results:feroxbuster:188.40.3.130",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:feroxbuster:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:13Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_web",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 4053,
+   "evidence": [
+    {
+     "excerpt": "{\"add_slash\": false, \"auto_bail\": true, \"auto_tune\": false, \"backup_extensions\": [\"~\", \".bak\", \".bak2\", \".old\", \".1\"], \"client_cert\": \"\", \"client_key\": \"\", \"...",
+     "ref": "scan_results:feroxbuster:217.243.248.30",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:feroxbuster:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:41:54Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_web",
+     "ref": "scan_results:ffuf_param:188.40.3.130",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:ffuf_param:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:13Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_web",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_api_urls",
+     "ref": "scan_results:ffuf_param:217.243.248.30",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:ffuf_param:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:41:50Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_api_urls",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_web",
+     "ref": "scan_results:ffuf_sensitive:188.40.3.130",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:ffuf_sensitive:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:13Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_web",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_sensitive"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: wordlist_missing:/usr/share/wordlists/seclists/Discovery/Web-Content/raft-small-files.txt",
+     "ref": "scan_results:ffuf_sensitive:217.243.248.30",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:ffuf_sensitive:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:41:54Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "wordlist_missing:/usr/share/wordlists/seclists/Discovery/Web-Content/raft-small-files.txt",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_sensitive"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"junkerwerk.hu\", \"result\": { \"url\": \"https://junkerwerk.hu\", \"reachable\": false, \"score\": null, \"headers\": {}, \"security_headers\": {} } }",
+     "ref": "scan_results:header_check:188.40.3.130",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "junkerwerk.hu",
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:header_check:188.40.3.130:junkerwerk.hu",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:39:02Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"www.junkerwerk.hu\", \"result\": { \"url\": \"https://www.junkerwerk.hu\", \"reachable\": false, \"score\": null, \"headers\": {}, \"security_headers\": {} } }",
+     "ref": "scan_results:header_check:188.40.3.130",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.junkerwerk.hu",
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:header_check:188.40.3.130:www.junkerwerk.hu",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:39:32Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"openotp.junkerwerk.hu\", \"result\": { \"url\": \"https://openotp.junkerwerk.hu\", \"reachable\": false, \"score\": null, \"headers\": {}, \"security_headers\":...",
+     "ref": "scan_results:header_check:217.243.248.30",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "openotp.junkerwerk.hu",
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:header_check:217.243.248.30:openotp.junkerwerk.hu",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:21Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "unreachable",
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "empty",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 20431,
+   "evidence": [
+    {
+     "excerpt": "",
+     "ref": "scan_results:httpx:188.40.3.130",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:httpx:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:39:52Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 20428,
+   "evidence": [
+    {
+     "excerpt": "",
+     "ref": "scan_results:httpx:188.40.3.130",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:httpx:188.40.3.130#2",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:13Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "web_unreachable_after_portscan",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "blocked",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 534,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"openotp.junkerwerk.hu\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\",\"mismatched\":t...",
+     "ref": "scan_results:httpx:217.243.248.30",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:httpx:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:22Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_ssl",
+     "ref": "scan_results:testssl:188.40.3.130",
+     "tool": "testssl"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:testssl:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:38:32Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_ssl",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "testssl"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 96772,
+   "evidence": [
+    {
+     "excerpt": "Start 2026-08-31 14:40:27 -->> 217.243.248.30:443 (openotp.junkerwerk.hu) <<-- A record via: supplied IP \"217.243.248.30\" rDNS (217.243.248.30): (instructed...",
+     "ref": "scan_results:testssl:217.243.248.30",
+     "tool": "testssl"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:testssl:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:41:50Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "testssl"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: cms_not_wordpress",
+     "ref": "scan_results:wpscan:188.40.3.130",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:wpscan:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:13Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "cms_not_wordpress",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: cms_not_wordpress",
+     "ref": "scan_results:wpscan:217.243.248.30",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:wpscan:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:41:54Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "cms_not_wordpress",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_zap_context",
+     "ref": "scan_results:zap:188.40.3.130",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:zap:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:13Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_zap_context",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"active\": 0, \"passive\": 47, \"top_alerts\": [ { \"name\": \"Re-examine Cache-control Directives\", \"risk\": \"Informational\", \"url\": \"https://openotp.junkerwerk.hu...",
+     "ref": "scan_results:zap:217.243.248.30",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:zap:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:41:54Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: passive_only_policy",
+     "ref": "scan_results:zap_active:188.40.3.130",
+     "tool": "zap_active"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:zap_active:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:13Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "passive_only_policy",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "zap_active"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "FAILED: ZAP API error 400: {\"code\":\"does_not_exist\",\"message\":\"Does Not Exist\"}",
+     "ref": "scan_results:zap_active:217.243.248.30",
+     "tool": "zap_active"
+    }
+   ],
+   "exit_code": -2,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:zap_active:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:41:50Z",
+   "phase": 2,
+   "raw_status": "failed",
+   "reason": "ZAP API error 400: {\"code\":\"does_not_exist\",\"message\":\"Does Not Exist\"}",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "zap_active"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_web",
+     "ref": "scan_results:zap_spider:188.40.3.130",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "cov:2:zap_spider:188.40.3.130",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:38:32Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_web",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"urls_found\": 34, \"fqdns_spidered\": 1, \"vhosts\": [ \"openotp.junkerwerk.hu\" ], \"urls\": [ \"https://openotp.junkerwerk.hu\", \"https://openotp.junkerwerk.hu/\",...",
+     "ref": "scan_results:zap_spider:217.243.248.30",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "cov:2:zap_spider:217.243.248.30",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:18Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "junkerwerk.hu",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"total_findings\": 57, \"false_positives\": 14, \"valid_findings\": 43, \"severity_counts\": { \"medium\": 39, \"high\": 2, \"low\": 2 }, \"cves_enriched\": 0, \"cisa_kev_...",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:3:phase3_correlation:scan",
+   "mode": "active",
+   "observed_at": "2026-08-31T14:41:55Z",
+   "phase": 3,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "phase3_correlation"
+  }
+ ],
+ "decisions": [
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Beide Hosts sind kritische Infrastruktur der Junkerwerk-Domain. Host 188.40.3.130 ist Hauptserver mit Basisdomain, exponiert Datenbanken und veraltete Services trotz fehlenden Web-Content. Host 217...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_host_strategy:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:31:51Z",
+   "payload": {
+    "passive_intel_summary": "SPF vorhanden (mit Hornetsecurity + Outlook), DKIM aktiv, aber DMARC fehlt (Compliance-Risiko). Host 188.40.3.130: PostgreSQL 9.6.0 (EOL seit 2021), MariaDB 10.11.18 (aktuell), exponierte Datenbank-Ports. Host 217.243.248.30: Exim 4.96 (aktuell), Apache httpd. Beide IPs mit AbuseIPDB-Score 0 (sauber), kein Tor, kein DNSSEC. Keine OTX-Pulse. Mailserver über Hornetsecurity-MX delegiert.",
+    "strategy_notes": "Beide Hosts sind kritische Infrastruktur der Junkerwerk-Domain. Host 188.40.3.130 ist Hauptserver mit Basisdomain, exponiert Datenbanken und veraltete Services trotz fehlenden Web-Content. Host 217.243.248.30 hostet echte Web-Anwendung (OpenOTP-Portal) und Mail-Services. Keine Skips — beide erfordern vollständige Sicherheitsprüfung."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Basisdomain junkerwerk.hu mit Basisdomain + www-Subdomain; trotz has_web=false zeigt Shodan exponierte Ports (3306 MariaDB, 5432 PostgreSQL, 587 SMTP, 21 FTP) und veraltete PostgreSQL 9.6.0 → kriti...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "dec:ai_host_strategy:188.40.3.130",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:31:51Z",
+   "payload": {
+    "action": "scan",
+    "priority": 1,
+    "reasoning": "Basisdomain junkerwerk.hu mit Basisdomain + www-Subdomain; trotz has_web=false zeigt Shodan exponierte Ports (3306 MariaDB, 5432 PostgreSQL, 587 SMTP, 21 FTP) und veraltete PostgreSQL 9.6.0 → kritische Infrastruktur mit bekannten Schwachstellen."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Subdomain openotp.junkerwerk.hu mit primary VHost (Status 200, echte Web-Anwendung 'Web Applications Portal'); Shodan zeigt Exim SMTP 4.96 auf Port 25 → Web-Scan + Mail-Sicherheit erforderlich.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "dec:ai_host_strategy:217.243.248.30",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:31:51Z",
+   "payload": {
+    "action": "scan",
+    "priority": 1,
+    "reasoning": "Subdomain openotp.junkerwerk.hu mit primary VHost (Status 200, echte Web-Anwendung 'Web Applications Portal'); Shodan zeigt Exim SMTP 4.96 auf Port 25 → Web-Scan + Mail-Sicherheit erforderlich."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"passive-only\", \"zap_spider_max_depth\": 3, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [], \"zap_rate_req_per_sec\": 80, \"z...",
+     "ref": "scan_results:ai_phase2_config:188.40.3.130",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "dec:ai_phase2_config:188.40.3.130",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:38:31Z",
+   "payload": {
+    "reasoning": "Host hat_web=false und zeigt Timeout-Fehler bei HTTP-Zugriffen. Redirect zu HTTPS funktioniert nicht (has_ssl=false). Der Host ist primär ein Mail/FTP/Datenbank-Server (ProFTPD, Dovecot, Courier, MariaDB, PostgreSQL). Apache läuft zwar auf Port 80/443, ist aber nicht erreichbar oder nicht konfiguriert. ZAP wird auf passive-only gesetzt, da kein funktionierendes Web-Frontend vorhanden ist. Active Scanning würde gegen einen nicht-responsiven Service laufen und ist sinnlos. feroxbuster und zap_ajax_spider werden übersprungen, da keine Web-Content-Struktur vorhanden ist. Für die Basisdomain junker",
+    "skip_tools": [
+     "feroxbuster",
+     "zap_ajax_spider"
+    ],
+    "zap_active_categories": [],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "passive-only",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 3,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 5, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"rfi\", \"cmdi\"...",
+     "ref": "scan_results:ai_phase2_config:217.243.248.30",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "dec:ai_phase2_config:217.243.248.30",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:38:30Z",
+   "payload": {
+    "reasoning": "Apache httpd Web-Portal ohne CMS, keine WAF erkannt, kein SPA (is_spa=false). Standard-Scan-Policy mit moderater Tiefe (5) ausreichend. Keine AJAX-Spider nötig. Active Categories für Apache: sqli, xss, lfi, rfi, cmdi. Keine Rate-Limiting oder Verzögerung erforderlich (kein WAF). Port 25 (Exim) ist Mail-Service und wird separat behandelt. skip_tools bleibt leer — feroxbuster sollte zusätzliche Endpoints auf diesem Web-Portal finden. Starke Security-Header vorhanden (CSP, HSTS, X-Frame-Options), aber aktive Scans notwendig für tiefere Vulnerabilities.",
+    "skip_tools": [],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "rfi",
+     "cmdi"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 5,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"system_prompt\": \"Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts...",
+     "ref": "scan_results:ai_phase2_config_debug:188.40.3.130",
+     "tool": "ai_phase2_config_debug"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "188.40.3.130",
+   "id": "dec:ai_phase2_config_debug:188.40.3.130",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:38:31Z",
+   "payload": {
+    "cache_hit": false,
+    "model": "claude-haiku-4-5-20251001",
+    "status": "ok"
+   },
+   "source": "ai_phase2_config_debug"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"system_prompt\": \"Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts...",
+     "ref": "scan_results:ai_phase2_config_debug:217.243.248.30",
+     "tool": "ai_phase2_config_debug"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "217.243.248.30",
+   "id": "dec:ai_phase2_config_debug:217.243.248.30",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:38:30Z",
+   "payload": {
+    "cache_hit": false,
+    "model": "claude-haiku-4-5-20251001",
+    "status": "ok"
+   },
+   "source": "ai_phase2_config_debug"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=57 < 5 ODER tools=2 <= 1 ODER cve=False",
+     "ref": "phase3/ai_prioritization.json",
+     "tool": "ai_prioritization"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_prioritization:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:41:55Z",
+   "payload": {
+    "confidence_scores": 0,
+    "skipped_by_gate": true,
+    "strategy_notes": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=57 < 5 ODER tools=2 <= 1 ODER cve=False"
+   },
+   "source": "ai_prioritization"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal mit Apache httpd für Unternehmensanwendungen.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "openotp.junkerwerk.hu",
+   "host_ip": "217.243.248.30",
+   "id": "dec:site_summary:openotp.junkerwerk.hu",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:31:03Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal mit Apache httpd für Unternehmensanwendungen.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  }
+ ],
+ "dns": [
+  {
+   "bimi": {
+    "present": false
+   },
+   "caa": {
+    "issuers": [],
+    "present": false,
+    "records": []
+   },
+   "confidence": 1.0,
+   "dane": {
+    "https": false,
+    "smtp": false
+   },
+   "dangling_cnames": [],
+   "dkim": {
+    "present": true,
+    "selectors": [
+     "hse1",
+     "hse2"
+    ]
+   },
+   "dmarc": {
+    "adkim": "r",
+    "aspf": "r",
+    "p": null,
+    "pct": 100,
+    "present": false,
+    "raw": null,
+    "rua": [],
+    "ruf": [],
+    "sp": null
+   },
+   "dnssec": {
+    "issues": [
+     "Domain is not DNSSEC-signed"
+    ],
+    "signed": false,
+    "valid": false
+   },
+   "domain": "junkerwerk.hu",
+   "evidence": [
+    {
+     "excerpt": "spf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dmarc=None dkim=True mx=['mx01.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx04.hornetsecurity.com']",
+     "ref": "phase0/dns_records.json",
+     "tool": "dns_records"
+    },
+    {
+     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "ref": "phase0a/dns_security.json",
+     "tool": "dns_security"
+    }
+   ],
+   "id": "dns:junkerwerk.hu",
+   "mode": "active",
+   "mta_sts": {
+    "dns_record": false,
+    "mode": null,
+    "policy": false
+   },
+   "mx": [
+    "mx01.hornetsecurity.com",
+    "mx02.hornetsecurity.com",
+    "mx03.hornetsecurity.com",
+    "mx04.hornetsecurity.com"
+   ],
+   "ns": [
+    "ns.udag.de",
+    "ns.udag.net",
+    "ns.udag.org"
+   ],
+   "observed_at": "2026-08-31T14:27:31Z",
+   "source": "dns_records",
+   "spf": {
+    "all_qualifier": "~all",
+    "raw": "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all"
+   },
+   "tls_rpt": {
+    "present": false,
+    "rua": []
+   },
+   "zone_transfer": {
+    "allowed": false,
+    "ns_tested": [
+     "ns.udag.de",
+     "ns.udag.net",
+     "ns.udag.org"
+    ]
+   }
+  }
+ ],
+ "fqdns": [
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "junkerwerk.hu: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "188.40.3.130",
+   "http_status": null,
+   "id": "fqdn:junkerwerk.hu",
+   "is_primary": null,
+   "mode": "active",
+   "name": "junkerwerk.hu",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": "66de10c312faf09835072ee2758f02bc5355fb8ebfff736e9cffe5f556b20ba4",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "openotp.junkerwerk.hu: status=200 title=Junkerwerk Linder GmbH & Co.KG Web Applications Portal final_url=https://openotp.junkerwerk.hu",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://openotp.junkerwerk.hu",
+   "host_ip": "217.243.248.30",
+   "http_status": 200,
+   "id": "fqdn:openotp.junkerwerk.hu",
+   "is_primary": true,
+   "mode": "active",
+   "name": "openotp.junkerwerk.hu",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "screenshot_key": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108/217.243.248.30__openotp.junkerwerk.hu.png",
+   "source": "web_probe",
+   "title": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "www.junkerwerk.hu: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "188.40.3.130",
+   "http_status": null,
+   "id": "fqdn:www.junkerwerk.hu",
+   "is_primary": null,
+   "mode": "active",
+   "name": "www.junkerwerk.hu",
+   "observed_at": "2026-08-31T14:31:03Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  }
+ ],
+ "generator": {
+  "inputs": [
+   {
+    "kind": "tar",
+    "name": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108.tar.gz",
+    "sha256": "2a1280731eebfda54ef9ca3c56fbcf034d7cd5a99f25d53435756d63ed1903c8"
+   },
+   {
+    "kind": "tool_runs",
+    "name": "results.json",
+    "sha256": "33e6b839ef2b45c98d785c67262baf43534438c5eec57649545a0c78eb161631"
+   },
+   {
+    "kind": "eol_feed",
+    "name": "eol_data_generated.py",
+    "sha256": "95905051fbaf700842d6d0e23930d65fec637f9146ea6f3fcb2f4e2b924b08c5"
+   }
+  ],
+  "name": "reporter.facts",
+  "version": "1.0.0"
+ },
+ "hosts": [
+  {
+   "blocked": {
+    "detected": true,
+    "reason": "web_unreachable_after_portscan",
+    "source": "derived"
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Mon Aug 31 14:32:40 2026; 1 IP address (1 host up) scanned in 49.34 seconds",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=188.40.3.130 rdns=dedi2230.your-server.de fqdns=junkerwerk.hu,www.junkerwerk.hu",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "junkerwerk.hu",
+    "www.junkerwerk.hu"
+   ],
+   "id": "host:188.40.3.130",
+   "ip": "188.40.3.130",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-08-31T14:32:40Z",
+   "ports_summary": {
+    "closed": 51,
+    "filtered": 938,
+    "open": 11
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "Hetzner Online AG - Rechenzentrum Haustechnik",
+    "usage_type": "Data Center/Web Hosting/Transit"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": "dedi2230.your-server.de",
+   "source": "nmap"
+  },
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Mon Aug 31 14:32:12 2026; 1 IP address (1 host up) scanned in 21.24 seconds",
+     "ref": "hosts/217.243.248.30/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=217.243.248.30 rdns= fqdns=openotp.junkerwerk.hu",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "openotp.junkerwerk.hu"
+   ],
+   "id": "host:217.243.248.30",
+   "ip": "217.243.248.30",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-08-31T14:32:12Z",
+   "ports_summary": {
+    "closed": 1,
+    "filtered": 998,
+    "open": 1
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "Junkerwerk Linder GmbH & Co.",
+    "usage_type": "Fixed Line ISP"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": null,
+   "source": "nmap"
+  }
+ ],
+ "http": [
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "junkerwerk.hu: reachable=False score=None server=None x-feserver=None",
+     "ref": "scan_results:header_check:188.40.3.130",
+     "tool": "header_check"
+    }
+   ],
+   "forms": [],
+   "fqdn": "junkerwerk.hu",
+   "headers": {},
+   "host_ip": "188.40.3.130",
+   "hsts": null,
+   "id": "http:junkerwerk.hu",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-08-31T14:39:02Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": false,
+   "score": null,
+   "security_headers": {},
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": null,
+   "technologies": [],
+   "url": "https://junkerwerk.hu",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [
+    {
+     "confidence": "Low",
+     "count": 1,
+     "cwe": "CWE-525",
+     "evidence": null,
+     "name": "Re-examine Cache-control Directives",
+     "plugin_id": "10015",
+     "risk": "Informational",
+     "url": "https://openotp.junkerwerk.hu/robots.txt",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu/robots.txt"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 6,
+     "cwe": "CWE-1021",
+     "evidence": null,
+     "name": "Multiple X-Frame-Options Header Entries",
+     "plugin_id": "10020",
+     "risk": "Medium",
+     "url": "https://openotp.junkerwerk.hu",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu",
+      "https://openotp.junkerwerk.hu/",
+      "https://openotp.junkerwerk.hu/openid/login_uid.php",
+      "https://openotp.junkerwerk.hu/pwreset/index.php",
+      "https://openotp.junkerwerk.hu/selfdesk/index.php"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 2,
+     "cwe": "CWE-693",
+     "evidence": null,
+     "name": "X-Content-Type-Options Header Missing",
+     "plugin_id": "10021",
+     "risk": "Low",
+     "url": "https://openotp.junkerwerk.hu/favicon.png",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu/favicon.png",
+      "https://openotp.junkerwerk.hu/robots.txt"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": "CWE-615",
+     "evidence": "// when user clicks on anchor li",
+     "name": "Information Disclosure - Suspicious Comments",
+     "plugin_id": "10027",
+     "risk": "Informational",
+     "url": "https://openotp.junkerwerk.hu/jspopup.js",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu/jspopup.js"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 8,
+     "cwe": "CWE-319",
+     "evidence": null,
+     "name": "Strict-Transport-Security Header Not Set",
+     "plugin_id": "10035",
+     "risk": "Low",
+     "url": "https://openotp.junkerwerk.hu/favicon.png",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu/favicon.png",
+      "https://openotp.junkerwerk.hu/icon.php?webapp=SelfReg",
+      "https://openotp.junkerwerk.hu/images/countries/de.svg",
+      "https://openotp.junkerwerk.hu/images/countries/en.svg",
+      "https://openotp.junkerwerk.hu/openid/login_uid.php"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 6,
+     "cwe": "CWE-693",
+     "evidence": null,
+     "name": "Content Security Policy (CSP) Header Not Set",
+     "plugin_id": "10038",
+     "risk": "Medium",
+     "url": "https://openotp.junkerwerk.hu/icon.php?webapp=SelfReg",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu/icon.php?webapp=SelfReg",
+      "https://openotp.junkerwerk.hu/images/countries/de.svg",
+      "https://openotp.junkerwerk.hu/images/countries/en.svg",
+      "https://openotp.junkerwerk.hu/openid/login_uid.php",
+      "https://openotp.junkerwerk.hu/openid/style.css"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 8,
+     "cwe": "CWE-693",
+     "evidence": "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com fonts.gstatic.com maps.googleapis.com maps.gstatic.com",
+     "name": "CSP: Failure to Define Directive with No Fallback",
+     "plugin_id": "10055",
+     "risk": "Medium",
+     "url": "https://openotp.junkerwerk.hu",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu",
+      "https://openotp.junkerwerk.hu/",
+      "https://openotp.junkerwerk.hu/openid/index.php",
+      "https://openotp.junkerwerk.hu/openid/login_uid.php",
+      "https://openotp.junkerwerk.hu/pwreset/index.php"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 4,
+     "cwe": null,
+     "evidence": "<a class=\"locale_lang\" onclick=\"jslang.menu();\"><img width=20 src=\"../images/countries/en.svg\"></a>",
+     "name": "Modern Web Application",
+     "plugin_id": "10109",
+     "risk": "Informational",
+     "url": "https://openotp.junkerwerk.hu/openid/login_uid.php",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu/openid/login_uid.php",
+      "https://openotp.junkerwerk.hu/pwreset/index.php",
+      "https://openotp.junkerwerk.hu/selfdesk/index.php",
+      "https://openotp.junkerwerk.hu/selfreg/index.php"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 1,
+     "cwe": null,
+     "evidence": "password",
+     "name": "Authentication Request Identified",
+     "plugin_id": "10111",
+     "risk": "Informational",
+     "url": "https://openotp.junkerwerk.hu/openid/login_uid.php",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu/openid/login_uid.php"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 1,
+     "cwe": "CWE-352",
+     "evidence": "<form name=\"form\" method=\"POST\" autocomplete=\"OFF\">",
+     "name": "Absence of Anti-CSRF Tokens",
+     "plugin_id": "10202",
+     "risk": "Medium",
+     "url": "https://openotp.junkerwerk.hu/openid/login_uid.php",
+     "urls_sample": [
+      "https://openotp.junkerwerk.hu/openid/login_uid.php"
+     ]
+    }
+   ],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [
+    "x-frame-options",
+    "cache-control"
+   ],
+   "evidence": [
+    {
+     "excerpt": "openotp.junkerwerk.hu: reachable=False score=None server=None x-feserver=None",
+     "ref": "scan_results:header_check:217.243.248.30",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "openotp.junkerwerk.hu: status=200 title=Junkerwerk Linder GmbH & Co.KG Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']",
+     "ref": "hosts/217.243.248.30/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "openotp.junkerwerk.hu",
+   "headers": {},
+   "host_ip": "217.243.248.30",
+   "hsts": null,
+   "id": "http:openotp.junkerwerk.hu",
+   "login_form": true,
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:21Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": false,
+   "score": null,
+   "security_headers": {},
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": 34,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "Apache HTTP Server",
+     "version": null
+    },
+    {
+     "name": "HSTS",
+     "version": null
+    }
+   ],
+   "url": "https://openotp.junkerwerk.hu",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "www.junkerwerk.hu: reachable=False score=None server=None x-feserver=None",
+     "ref": "scan_results:header_check:188.40.3.130",
+     "tool": "header_check"
+    }
+   ],
+   "forms": [],
+   "fqdn": "www.junkerwerk.hu",
+   "headers": {},
+   "host_ip": "188.40.3.130",
+   "hsts": null,
+   "id": "http:www.junkerwerk.hu",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-08-31T14:39:32Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": false,
+   "score": null,
+   "security_headers": {},
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": null,
+   "technologies": [],
+   "url": "https://www.junkerwerk.hu",
+   "wordpress": null,
+   "x_feserver": null
+  }
+ ],
+ "passive": [
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "pulse_count": 0
+   },
+   "domain": "junkerwerk.hu",
+   "evidence": [
+    {
+     "excerpt": "pulse_count=0",
+     "ref": "phase0a/otx.json",
+     "tool": "otx"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:otx:junkerwerk.hu",
+   "mode": "passive",
+   "observed_at": "2026-08-31T14:27:28Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "otx",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "a_records": [
+     "188.40.3.130"
+    ],
+    "mx_records": [
+     "mx04.hornetsecurity.com",
+     "mx03.hornetsecurity.com",
+     "mx02.hornetsecurity.com",
+     "mx01.hornetsecurity.com"
+    ],
+    "ns_records": [
+     "ns.udag.org",
+     "ns.udag.net",
+     "ns.udag.de"
+    ],
+    "txt_records": [
+     "v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all",
+     "MS=ms59194931"
+    ]
+   },
+   "domain": "junkerwerk.hu",
+   "evidence": [
+    {
+     "excerpt": "{'a_records': ['188.40.3.130'], 'mx_records': ['mx04.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx01.hornetsecurity.com'], 'ns_records': ['ns.udag.org', 'ns.udag.ne...",
+     "ref": "phase0a/securitytrails.json",
+     "tool": "securitytrails"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:securitytrails:junkerwerk.hu",
+   "mode": "passive",
+   "observed_at": "2026-08-31T14:27:30Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "securitytrails",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOS...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:21 | 220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG ru-RU.UTF-8;ru-...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:21",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 21,
+   "product": null,
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 301 Moved Permanently Date: Mon, 31 Aug 2026 08:14:43 GMT Server: Apache Location: https://www.junkerwerk.com/ Content-Length: 343 Content-Type: tex...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:80 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Mon, 31 Aug 2026 08:14:43 GMT Server: Apache Location: https://www.junkerwerk.com/ Content-Length: 343 Content-Type: text/html; c...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:80",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:110 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:110",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 110,
+   "product": null,
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-RE...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDL...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:143",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 143,
+   "product": null,
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Mon, 31 Aug 2026 08:47:44 GMT Server: Apache Content-Length: 304 Content-Type: text/html; charset=iso-8859-1",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:443 Apache httpd | HTTP/1.1 403 Forbidden Date: Mon, 31 Aug 2026 08:47:44 GMT Server: Apache Content-Length: 304 Content-Type: text/html; charset=iso-8859-1",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:443",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.243.243.95 [224.243.243.95] 250-SIZE 104857600 250-8BITMIME 250-ET...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:587 | 220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.243.243.95 [224.243.243.95] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:587",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 587,
+   "product": null,
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID E...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ A...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:993",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 993,
+   "product": null,
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:995 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:995",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 995,
+   "product": null,
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Server Capabilities: 3327...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:3306 MariaDB 10.11.18-MariaDB-0+deb12u1 | MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Server Cap...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:3306",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 3306,
+   "product": "MariaDB",
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": "10.11.18-MariaDB-0+deb12u1"
+  },
+  {
+   "banner_excerpt": "PostgreSQL FATAL: no pg_hba.conf entry for host \"224.137.206.198\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf entry for host...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "188.40.3.130:5432 PostgreSQL 9.6.0 or later | PostgreSQL FATAL: no pg_hba.conf entry for host \"224.137.206.198\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf entry fo...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "188.40.3.130",
+   "hostnames": [
+    "dedi2230.your-server.de",
+    "junkerwerk.com",
+    "www.junkerwerk.com",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:188.40.3.130:5432",
+   "mode": "passive",
+   "observed_at": "2026-08-31T08:47:45Z",
+   "port": 5432,
+   "product": "PostgreSQL",
+   "seen_at": "2026-08-31T08:47:45Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": "9.6.0 or later"
+  },
+  {
+   "banner_excerpt": "220 archiv.junkerwerk.de ESMTP Exim 4.96 Sun, 30 Aug 2026 14:48:52 +0200 250-archiv.junkerwerk.de Hello wsf6og5mfz.net [224.55.142.174] 250-SIZE 52428800 250...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "217.243.248.30:25 Exim smtpd 4.96 | 220 archiv.junkerwerk.de ESMTP Exim 4.96 Sun, 30 Aug 2026 14:48:52 +0200 250-archiv.junkerwerk.de Hello wsf6og5mfz.net [224.55.142.174] 250-SIZE 52428800 250-8BI...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "217.243.248.30",
+   "hostnames": [
+    "junkerwerk.de"
+   ],
+   "id": "passive:shodan:217.243.248.30:25",
+   "mode": "passive",
+   "observed_at": "2026-08-31T00:28:05Z",
+   "port": 25,
+   "product": "Exim smtpd",
+   "seen_at": "2026-08-31T00:28:05Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": "4.96"
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 200 OK Date: Mon, 31 Aug 2026 00:28:05 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosnif...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "217.243.248.30:443 Apache httpd | HTTP/1.1 200 OK Date: Mon, 31 Aug 2026 00:28:05 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosniff Stri...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "217.243.248.30",
+   "hostnames": [
+    "junkerwerk.de"
+   ],
+   "id": "passive:shodan:217.243.248.30:443",
+   "mode": "passive",
+   "observed_at": "2026-08-31T00:28:05Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "seen_at": "2026-08-31T00:28:05Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "compromised": false
+   },
+   "domain": "junkerwerk.hu",
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:urlhaus:junkerwerk.hu",
+   "mode": "passive",
+   "observed_at": "2026-08-31T14:27:27Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "urlhaus",
+   "transport": null,
+   "verified": null,
+   "version": null
+  }
+ ],
+ "scan": {
+  "confidence": 1.0,
+  "counts": {
+   "correlated_findings": 57,
+   "correlated_fp": 14,
+   "tool_runs": 65
+  },
+  "domain": "junkerwerk.hu",
+  "domains": [
+   "junkerwerk.hu"
+  ],
+  "evidence": [
+   {
+    "excerpt": "startedAt=2026-08-31T14:27:27.784071+00:00 finishedAt=2026-08-31T14:41:55.064398+00:00",
+    "ref": "meta.json",
+    "tool": "meta"
+   }
+  ],
+  "finished_at": "2026-08-31T14:41:55Z",
+  "hosts_scanned": 2,
+  "id": "scan:a6df9d9d-eccd-49d1-8dd3-b00a5e005108",
+  "mode": "active",
+  "nmap_args": "nmap -Pn -n -sV --version-intensity 7 -sC --script-timeout 60s -T4 --max-retries 2 --host-timeout 240s --min-rate 100 --defeat-rst-ratelimit --top-ports 1000 --open -oX <scan-dir> -oN <scan-dir> --reason 188.40.3.130",
+  "observed_at": "2026-08-31T14:41:55Z",
+  "order_id": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108",
+  "package": "perimeter",
+  "policy_version": null,
+  "scanner_egress": "62.217.52.174",
+  "source": "meta",
+  "started_at": "2026-08-31T14:27:27Z",
+  "tool_versions": [
+   {
+    "name": "dnsx",
+    "version": null
+   },
+   {
+    "name": "feroxbuster",
+    "version": "2.11.0"
+   },
+   {
+    "name": "ffuf",
+    "version": "2.1.0"
+   },
+   {
+    "name": "gobuster",
+    "version": null
+   },
+   {
+    "name": "httpx",
+    "version": null
+   },
+   {
+    "name": "nmap",
+    "version": "7.93"
+   },
+   {
+    "name": "searchsploit",
+    "version": null
+   },
+   {
+    "name": "subfinder",
+    "version": "2.13.0"
+   },
+   {
+    "name": "testssl.sh",
+    "version": null
+   },
+   {
+    "name": "wafw00f",
+    "version": null
+   },
+   {
+    "name": "wpscan",
+    "version": null
+   }
+  ]
+ },
+ "schema_version": "1.0.0",
+ "services": [
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp ProFTPD (requires SSL)",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "proftpd",
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:21/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 21,
+   "product": "ProFTPD",
+   "proto": "tcp",
+   "service": "ftp",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh ProFTPD mod_sftp (protocol 2.0)",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "proftpd_sftp",
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:22/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 22,
+   "product": "ProFTPD mod_sftp",
+   "proto": "tcp",
+   "service": "ssh",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "SASL",
+    "TOP",
+    "STLS",
+    "UIDL",
+    "CAPA",
+    "AUTH-RESP-CODE",
+    "PIPELINING",
+    "RESP-CODES"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "110/tcp open pop3 Courier pop3d",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "pop3-capabilities: SASL TOP STLS UIDL CAPA AUTH-RESP-CODE PIPELINING RESP-CODES",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "courier",
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:110/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 110,
+   "product": "Courier pop3d",
+   "proto": "tcp",
+   "service": "pop3",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "capabilities",
+    "IDLE",
+    "IMAP4rev1",
+    "listed",
+    "have",
+    "ENABLE",
+    "Pre-login",
+    "LOGIN-REFERRALS",
+    "LOGINDISABLEDA0001",
+    "post-login",
+    "more",
+    "STARTTLS",
+    "ID",
+    "OK",
+    "LITERAL+",
+    "SASL-IR"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "143/tcp open imap Dovecot imapd",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "imap-capabilities: capabilities IDLE IMAP4rev1 listed have ENABLE Pre-login LOGIN-REFERRALS LOGINDISABLEDA0001 post-login more STARTTLS ID OK LITERAL+ SASL-IR",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:143/tcp",
+   "login_disabled": true,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 143,
+   "product": "Dovecot imapd",
+   "proto": "tcp",
+   "service": "imap",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "openssh",
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:222/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 222,
+   "product": "OpenSSH",
+   "proto": "tcp",
+   "service": "ssh",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": "9.2p1",
+   "version_raw": "9.2p1"
+  },
+  {
+   "auth_mechanisms": [
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "dedi2230.your-server.de Hello nmap.scanme.org [62.217.52.174]",
+    "SIZE 104857600",
+    "8BITMIME",
+    "ETRN",
+    "PIPELINING",
+    "PIPECONNECT",
+    "AUTH LOGIN PLAIN",
+    "CHUNKING",
+    "HELP"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "465/tcp open smtp tunnel=ssl",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: dedi2230.your-server.de Hello nmap.scanme.org [62.217.52.174], SIZE 104857600, 8BITMIME, ETRN, PIPELINING, PIPECONNECT, AUTH LOGIN PLAIN, CHUNKING, HELP Commands supported: AUTH HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSET...",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:465/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 465,
+   "product": null,
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "dedi2230.your-server.de Hello nmap.scanme.org [62.217.52.174]",
+    "SIZE 104857600",
+    "8BITMIME",
+    "ETRN",
+    "PIPELINING",
+    "PIPECONNECT",
+    "CHUNKING",
+    "STARTTLS",
+    "HELP"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "587/tcp open smtp",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: dedi2230.your-server.de Hello nmap.scanme.org [62.217.52.174], SIZE 104857600, 8BITMIME, ETRN, PIPELINING, PIPECONNECT, CHUNKING, STARTTLS, HELP Commands supported: AUTH STARTTLS HELO EHLO MAIL RCPT DATA BDAT NOOP QUIT RSE...",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:587/tcp",
+   "login_disabled": true,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 587,
+   "product": null,
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "IDLE",
+    "IMAP4rev1",
+    "listed",
+    "capabilities",
+    "ENABLE",
+    "Pre-login",
+    "LOGIN-REFERRALS",
+    "have",
+    "post-login",
+    "more",
+    "OK",
+    "ID",
+    "AUTH=PLAINA0001",
+    "LITERAL+",
+    "SASL-IR"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "993/tcp open imaps",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "imap-capabilities: IDLE IMAP4rev1 listed capabilities ENABLE Pre-login LOGIN-REFERRALS have post-login more OK ID AUTH=PLAINA0001 LITERAL+ SASL-IR",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:993/tcp",
+   "login_disabled": false,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 993,
+   "product": null,
+   "proto": "tcp",
+   "service": "imaps",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "SASL(PLAIN)",
+    "TOP",
+    "USER",
+    "UIDL",
+    "CAPA",
+    "AUTH-RESP-CODE",
+    "PIPELINING",
+    "RESP-CODES"
+   ],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2026-11-02T23:59:59Z",
+    "san": [
+     "*.your-server.de",
+     "your-server.de"
+    ]
+   },
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "995/tcp open pop3s",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "pop3-capabilities: SASL(PLAIN) TOP USER UIDL CAPA AUTH-RESP-CODE PIPELINING RESP-CODES",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:995/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 995,
+   "product": null,
+   "proto": "tcp",
+   "service": "pop3s",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "mysql_native_password"
+   ],
+   "auth_required": true,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2030-02-10T15:03:07Z",
+    "san": [
+     "*.your-database.de",
+     "*.your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "mysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 3636798 Capabilities flags: 65534 Some Capabilities: DontAllowDatabaseTableColumn, IgnoreSigpipes, FoundRows, SupportsLoadDataLocal, SupportsTransactions, Spea...",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "mariadb",
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:3306/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 3306,
+   "product": "MySQL",
+   "proto": "tcp",
+   "service": "mysql",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": "10.11.18",
+   "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1"
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.your-server.de",
+    "not_after": "2030-02-10T15:08:59Z",
+    "san": [
+     "*.your-database.de",
+     "*.your-server.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "postgresql",
+   "host_ip": "188.40.3.130",
+   "id": "svc:188.40.3.130:5432/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "port": 5432,
+   "product": "PostgreSQL DB",
+   "proto": "tcp",
+   "service": "postgresql",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": "9.6.0 or later"
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.junkerwerk.de",
+    "not_after": "2026-12-11T23:59:59Z",
+    "san": [
+     "*.junkerwerk.de",
+     "junkerwerk.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
+     "ref": "hosts/217.243.248.30/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "host_ip": "217.243.248.30",
+   "id": "svc:217.243.248.30:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-08-31T14:32:12Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  }
+ ],
+ "software": [
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "110/tcp open pop3 Courier pop3d",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Courier pop3d",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "courier",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:courier:unknown",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "product": "Courier",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "143/tcp open imap Dovecot imapd",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Dovecot imapd",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "dovecot",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:dovecot:unknown",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "product": "Dovecot",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": "debian",
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "mariadb",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:mariadb:10.11.18",
+   "kind": "database",
+   "mode": "active",
+   "note": "MariaDB-Kompatibilitaetspraefix 5.5.5 entfernt",
+   "observed_at": "2026-08-31T14:32:40Z",
+   "product": "MariaDB",
+   "source": "nmap",
+   "version_norm": "10.11.18",
+   "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: OpenSSH 9.2p1",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "openssh",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:openssh:9.2p1",
+   "kind": "ssh",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "product": "OpenSSH",
+   "source": "nmap",
+   "version_norm": "9.2p1",
+   "version_raw": "9.2p1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: PostgreSQL DB 9.6.0 or later",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "postgresql",
+   "fqdn": null,
+   "hints": [
+    "9.6.0 or later"
+   ],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:postgresql:unknown",
+   "kind": "database",
+   "mode": "active",
+   "note": "Bereichsangabe, Version nicht bestimmbar",
+   "observed_at": "2026-08-31T14:32:40Z",
+   "product": "PostgreSQL",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": "9.6.0 or later",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp ProFTPD (requires SSL)",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: ProFTPD",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "proftpd",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:proftpd:unknown",
+   "kind": "ftp",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "product": "ProFTPD",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh ProFTPD mod_sftp (protocol 2.0)",
+     "ref": "hosts/188.40.3.130/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: ProFTPD mod_sftp",
+     "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "proftpd_sftp",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "188.40.3.130",
+   "id": "sw:188.40.3.130:-:proftpd_sftp:unknown",
+   "kind": "ssh",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:32:40Z",
+   "product": "ProFTPD mod_sftp",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
+     "ref": "hosts/217.243.248.30/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "server: Apache httpd",
+     "ref": "hosts/217.243.248.30/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Apache",
+     "ref": "hosts/217.243.248.30/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Apache HTTP Server",
+     "ref": "hosts/217.243.248.30/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Apache httpd",
+     "ref": "hosts/217.243.248.30/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "apache",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.243.248.30",
+   "id": "sw:217.243.248.30:-:apache:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:32:12Z",
+   "product": "Apache httpd",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: HSTS",
+     "ref": "hosts/217.243.248.30/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "hsts",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.243.248.30",
+   "id": "sw:217.243.248.30:-:hsts:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:32:19Z",
+   "product": "HSTS",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Apache HTTP Server",
+     "ref": "hosts/217.243.248.30/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "webserver: Apache",
+     "ref": "hosts/217.243.248.30/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "apache",
+   "fqdn": "openotp.junkerwerk.hu",
+   "hints": [],
+   "host_ip": "217.243.248.30",
+   "id": "sw:217.243.248.30:openotp.junkerwerk.hu:apache:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-08-31T14:40:22Z",
+   "product": "Apache httpd",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  }
+ ],
+ "targets": [
+  {
+   "confidence": 1.0,
+   "discovery_health": {
+    "ct_sources_empty": false,
+    "discovery_added_count": 3,
+    "snapshot_age_minutes": null,
+    "snapshot_seed_count": 0,
+    "snapshot_seeded": false,
+    "tool_counts": {
+     "certspotter": 2,
+     "crtsh": 0,
+     "gobuster_dns": 0,
+     "phase0a_passive": 2,
+     "subfinder": 1
+    },
+    "tools_with_zero_results": [
+     "crtsh",
+     "gobuster_dns"
+    ],
+    "total_subdomains": 3
+   },
+   "domain": "junkerwerk.hu",
+   "evidence": [
+    {
+     "excerpt": "domain=junkerwerk.hu",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "id": "target:junkerwerk.hu",
+   "is_primary": true,
+   "mode": "active",
+   "observed_at": "2026-08-31T14:27:27Z",
+   "out_of_scope": [],
+   "source": "host_inventory",
+   "targets_source": "orders.json",
+   "whois": null
+  }
+ ],
+ "threats": [
+  {
+   "affected_software_ref": null,
+   "confidence": 1.0,
+   "cve_id": "CVE-2013-3587",
+   "cvss_nvd": null,
+   "cwes": [],
+   "epss": null,
+   "evidence": [
+    {
+     "excerpt": "BREACH: potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested",
+     "ref": "scan_results:testssl:217.243.248.30",
+     "tool": "testssl"
+    }
+   ],
+   "exploitdb": null,
+   "host_ip": "217.243.248.30",
+   "id": "threat:CVE-2013-3587:openotp.junkerwerk.hu:443",
+   "kev": null,
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:27Z",
+   "port": 443,
+   "source": "testssl"
+  }
+ ],
+ "tls": [
+  {
+   "cert": {
+    "chain_ok": true,
+    "cn": "*.junkerwerk.de",
+    "days_left": 102,
+    "expired": false,
+    "issuer": "Sectigo Public Server Authentication CA DV R36",
+    "mismatch": true,
+    "not_after": "2026-12-11T23:59:59Z",
+    "not_before": "2025-11-11T00:00:00Z",
+    "san": [
+     "*.junkerwerk.de",
+     "junkerwerk.de"
+    ],
+    "self_signed": null,
+    "wildcard": true
+   },
+   "ciphers_weak": [
+    "3des",
+    "cbc"
+   ],
+   "confidence": 1.0,
+   "entries": [
+    {
+     "cve": null,
+     "finding": "offered",
+     "id": "cipherlist_3DES_IDEA",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "finding": "TLSv1.2   xc012   ECDHE-RSA-DES-CBC3-SHA            ECDH 253   3DES        168      TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
+     "id": "cipher-tls1_2_xc012",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "finding": "TLSv1.2   x16     EDH-RSA-DES-CBC3-SHA              DH 4096    3DES        168      TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
+     "id": "cipher-tls1_2_x16",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "finding": "TLSv1.2   x0a     DES-CBC3-SHA                      RSA        3DES        168      TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+     "id": "cipher-tls1_2_x0a",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "finding": "certificate does not match supplied URI (same w/o SNI)",
+     "id": "cert_trust",
+     "severity": "HIGH"
+    },
+    {
+     "cve": null,
+     "finding": "max-age too short. 1 days (=86400 seconds) < 15552000 seconds",
+     "id": "HSTS_time",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "finding": "Multiple X-Frame-Options headers. Using first header: sameorigin",
+     "id": "X-Frame-Options_multiple",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "finding": "Multiple Cache-Control headers. Using first header: no-store, no-cache, must-revalidate",
+     "id": "Cache-Control_multiple",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": "CVE-2013-3587",
+     "finding": "potentially VULNERABLE, gzip HTTP compression detected  - only supplied '/' tested",
+     "id": "BREACH",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "finding": "M",
+     "id": "overall_grade",
+     "severity": "CRITICAL"
+    }
+   ],
+   "evidence": [
+    {
+     "excerpt": "openotp.junkerwerk.hu:443 tls=tls12 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=True",
+     "ref": "hosts/217.243.248.30/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False",
+     "ref": "scan_results:testssl:217.243.248.30",
+     "tool": "testssl"
+    },
+    {
+     "excerpt": "cipherlist_3DES_IDEA=offered; cipher-tls1_2_xc012=TLSv1.2 xc012 ECDHE-RSA-DES-CBC3-SHA ECDH 253 3DES 168 TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_2_x16=TLSv1.2 x16 EDH-RSA-DES-CBC3-SHA DH 4096 3DES 168 TLS_DHE_RSA_WITH_3DES_EDE_C...",
+     "ref": "hosts/217.243.248.30/phase2/testssl.json",
+     "tool": "testssl"
+    }
+   ],
+   "fallback_scsv": true,
+   "fqdn": "openotp.junkerwerk.hu",
+   "grade": "M",
+   "host_ip": "217.243.248.30",
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": 86400,
+    "preload": null,
+    "present": true,
+    "raw": "max-age too short. 1 days (=86400 seconds) < 15552000 seconds"
+   },
+   "id": "tls:openotp.junkerwerk.hu:443@217.243.248.30",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-08-31T14:40:27Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
+    "TLS1.2": true,
+    "TLS1.3": false
+   },
+   "source": "testssl",
+   "vulns": [
+    {
+     "name": "BREACH",
+     "status": "potential"
+    },
+    {
+     "name": "LUCKY13",
+     "status": "potential"
+    },
+    {
+     "name": "SWEET32",
+     "status": "vulnerable"
+    }
+   ]
+  }
+ ],
+ "unprocessed": [],
+ "warnings": []
+}

@@ -1,0 +1,4357 @@
+{
+ "coverage": [
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 591,
+   "evidence": [
+    {
+     "excerpt": "{\"subdomains\": [\"dev.trunk-immobilien.de\", \"trunk-immobilien.de\", \"www.trunk-immobilien.de\"], \"error\": null}",
+     "ref": "scan_results:certspotter",
+     "tool": "certspotter"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:certspotter:scan",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:25:20Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "certspotter"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 3375,
+   "evidence": [
+    {
+     "excerpt": "<html> <head><title>502 Bad Gateway</title></head> <body> <center><h1>502 Bad Gateway</h1></center> <hr><center>nginx</center> </body> </html>",
+     "ref": "scan_results:crtsh",
+     "tool": "crtsh"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:25:22Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 3157,
+   "evidence": [
+    {
+     "excerpt": "<html> <head><title>502 Bad Gateway</title></head> <body> <center><h1>502 Bad Gateway</h1></center> <hr><center>nginx</center> </body> </html>",
+     "ref": "scan_results:crtsh_retry2",
+     "tool": "crtsh_retry2"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan#2",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:25:31Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 3172,
+   "evidence": [
+    {
+     "excerpt": "<html> <head><title>502 Bad Gateway</title></head> <body> <center><h1>502 Bad Gateway</h1></center> <hr><center>nginx</center> </body> </html>",
+     "ref": "scan_results:crtsh_retry3",
+     "tool": "crtsh_retry3"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan#3",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:25:49Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 16,
+   "evidence": [
+    {
+     "excerpt": "dns_records_collected",
+     "ref": "scan_results:dns_records",
+     "tool": "dns_records"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_records:scan",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:25:20Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_records"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 9265,
+   "evidence": [
+    {
+     "excerpt": "{\"all\": [\"\\n;; OPT PSEUDOSECTION:\\n; EDNS: version 0; flags:; udp: 1232\", \"trunk-immobilien.de.\\t300\\tIN\\tSOA\\tns.publishsoft.de. administrator.publishsoft.d...",
+     "ref": "scan_results:dnsx",
+     "tool": "dnsx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dnsx:scan",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:28:28Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dnsx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 180134,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 180s --- PARTIAL OUTPUT (74 chars) --- dev.trunk-immobilien.de 5.199.141.24 ftp.trunk-immobilien.de 5.199.141.24",
+     "ref": "scan_results:gobuster_dns",
+     "tool": "gobuster_dns"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:gobuster_dns:scan",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:28:19Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": "timeout",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "gobuster_dns"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 1092,
+   "evidence": [
+    {
+     "excerpt": "{\"host\":\"dev.trunk-immobilien.de\",\"input\":\"trunk-immobilien.de\",\"source\":\"hackertarget\"} {\"host\":\"ftp.trunk-immobilien.de\",\"input\":\"trunk-immobilien.de\",\"sou...",
+     "ref": "scan_results:subfinder",
+     "tool": "subfinder"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:subfinder:scan",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:25:20Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "subfinder"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"5.199.141.24\": { \"web_probe\": { \"has_web\": false, \"status\": null, \"final_url\": null, \"title\": null, \"web_fqdn\": null }, \"vhosts\": [], \"vhost_skipped\": [] } }",
+     "ref": "scan_results:web_probe",
+     "tool": "web_probe"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:web_probe:scan",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:28:38Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "web_probe"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 30473,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 5.199.141.24 Host is up, received user-set (0.0019s latency). Not shown: 985 filtered tcp ports...",
+     "ref": "scan_results:nmap:5.199.141.24",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "cov:1:nmap:5.199.141.24",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:30:04Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 32821,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://dev.trunk-immobilien.de [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:5.199.141.24",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "dev.trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:1:wafw00f:5.199.141.24:dev.trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:31:29Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 28787,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://ftp.trunk-immobilien.de [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:5.199.141.24",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "ftp.trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:1:wafw00f:5.199.141.24:ftp.trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:31:25Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 33187,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://trunk-immobilien.de [+] Generic Detection results: [*] The site https://trunk-immobilien.de seems to be behind a WAF or some sort of sec...",
+     "ref": "scan_results:wafw00f:5.199.141.24",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:1:wafw00f:5.199.141.24:trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:31:29Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 28789,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://webmail.trunk-immobilien.de [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:5.199.141.24",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "webmail.trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:1:wafw00f:5.199.141.24:webmail.trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:31:25Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 18143,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://www.trunk-immobilien.de [+] Generic Detection results: [*] The site https://www.trunk-immobilien.de seems to be behind a WAF or some sor...",
+     "ref": "scan_results:wafw00f:5.199.141.24",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:1:wafw00f:5.199.141.24:www.trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:31:14Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"nginx\", \"version\": \"\" }, { \"name\": \"WordPress\", \"version\": \"6.4.2\" }, { \"name\": \"PHP/8.2.30\\nPleskLin\", \"version\": \"\" }, { \"name\": \"Pl...",
+     "ref": "scan_results:webtech:5.199.141.24",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "cov:1:webtech:5.199.141.24",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:30:56Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"dev.trunk-immobilien.de\", \"result\": { \"url\": \"https://dev.trunk-immobilien.de\", \"headers\": { \"server\": \"nginx\", \"date\": \"Sun, 10 May 2026 22:34:5...",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "dev.trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:header_check:5.199.141.24:dev.trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:34:59Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"ftp.trunk-immobilien.de\", \"result\": { \"url\": \"https://ftp.trunk-immobilien.de\", \"headers\": {}, \"security_headers\": { \"x-frame-options\": { \"presen...",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "ftp.trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:header_check:5.199.141.24:ftp.trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:07Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"trunk-immobilien.de\", \"result\": { \"url\": \"https://trunk-immobilien.de\", \"headers\": { \"server\": \"nginx\", \"date\": \"Sun, 10 May 2026 22:34:51 GMT\",...",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:header_check:5.199.141.24:trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:34:51Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"webmail.trunk-immobilien.de\", \"result\": { \"url\": \"https://webmail.trunk-immobilien.de\", \"headers\": {}, \"security_headers\": { \"x-frame-options\": {...",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "webmail.trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:header_check:5.199.141.24:webmail.trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:15Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"www.trunk-immobilien.de\", \"result\": { \"url\": \"https://www.trunk-immobilien.de\", \"headers\": { \"server\": \"nginx\", \"date\": \"Sun, 10 May 2026 22:34:5...",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.trunk-immobilien.de",
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:header_check:5.199.141.24:www.trunk-immobilien.de",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:34:55Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 4635,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"www.trunk-immobilien.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_256_GCM_SHA384\",\"not_before\":\"2026-03-28T08...",
+     "ref": "scan_results:httpx:5.199.141.24",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:httpx:5.199.141.24",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:20Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 952,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"www.trunk-immobilien.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_256_GCM_SHA384\",\"not_before\":\"2026-03-28T08...",
+     "ref": "scan_results:httpx:5.199.141.24",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:httpx:5.199.141.24#2",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:21Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 935,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"dev.trunk-immobilien.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_256_GCM_SHA384\",\"not_before\":\"2026-04-02T11...",
+     "ref": "scan_results:httpx:5.199.141.24",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:httpx:5.199.141.24#3",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:22Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 552,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"ftp.trunk-immobilien.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_256_GCM_SHA384\",\"mismatched\":true,\"not_befo...",
+     "ref": "scan_results:httpx:5.199.141.24",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:httpx:5.199.141.24#4",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:23Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 634,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"webmail.trunk-immobilien.de\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_256_GCM_SHA384\",\"mismatched\":true,\"not_...",
+     "ref": "scan_results:httpx:5.199.141.24",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:httpx:5.199.141.24#5",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:23Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 13877,
+   "evidence": [
+    {
+     "excerpt": "{ \"db_files_updated\": [ \"metadata.json\", \"wp_fingerprints.json\", \"timthumbs-v3.txt\", \"config_backups.txt\", \"db_exports.txt\", \"dynamic_finders.yml\", \"LICENSE\"...",
+     "ref": "scan_results:wpscan:5.199.141.24",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": 4,
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "cov:2:wpscan:5.199.141.24",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:37Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "trunk-immobilien.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"total_findings\": 7, \"false_positives\": 0, \"valid_findings\": 7, \"severity_counts\": { \"low\": 7 }, \"cves_enriched\": 0, \"cisa_kev_matches\": 0, \"fp_details\": [...",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:3:phase3_correlation:scan",
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:38Z",
+   "phase": 3,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "phase3_correlation"
+  }
+ ],
+ "decisions": [
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Host ist Produktionsserver mit Web-, Mail- und Datenbank-Services. Passive Intelligence zeigt mehrere Sicherheitsrisiken: veraltete Software-Versionen, offene Datenbank-Ports, schwache E-Mail-Authe...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_host_strategy:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:29:34Z",
+   "payload": {
+    "passive_intel_summary": "Shodan: OpenSSH 7.4 (EOL seit 2018), MariaDB 5.5.68 (EOL seit 2020), nginx ohne Versionszahl. Exponierte Ports: SSH (22), FTP (21), MySQL (3306), SMTP (25/465/587), POP3 (110), IMAP (143), Custom-Ports (8880/8443). AbuseIPDB-Score 0 (sauber). DMARC p=none mit 100% Reporting, kein DKIM, kein DNSSEC. SPF vorhanden (mx -all). Mailserver mx.publishsoft.de ist extern gehostet.",
+    "strategy_notes": "Host ist Produktionsserver mit Web-, Mail- und Datenbank-Services. Passive Intelligence zeigt mehrere Sicherheitsrisiken: veraltete Software-Versionen, offene Datenbank-Ports, schwache E-Mail-Authentifizierung. Scan mit höchster Priorität erforderlich trotz fehlenden Web-Contents (has_web=false)."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Basisdomain trunk-immobilien.de mit mehreren kritischen Findings: veraltete OpenSSH 7.4 und MariaDB 5.5.68 aus Shodan (Priorität 1), exponierte Management-Ports (22, 3306, 21), Mail-Infrastruktur (...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "dec:ai_host_strategy:5.199.141.24",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:29:34Z",
+   "payload": {
+    "action": "scan",
+    "priority": 1,
+    "reasoning": "Basisdomain trunk-immobilien.de mit mehreren kritischen Findings: veraltete OpenSSH 7.4 und MariaDB 5.5.68 aus Shodan (Priorität 1), exponierte Management-Ports (22, 3306, 21), Mail-Infrastruktur (Postfix) mit schwacher DMARC-Policy (p=none), fehlende DKIM und DNSSEC. Trotz has_web=false müssen alle Services gescannt werden (nmap + testssl + Mail-Checks)."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 5, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"rfi\", \"cmdi\"...",
+     "ref": "scan_results:ai_phase2_config:5.199.141.24",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "dec:ai_phase2_config:5.199.141.24",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:34:47Z",
+   "payload": {
+    "reasoning": "WordPress 6.4.2 auf nginx/PHP 8.2.30 mit Generic WAF erkannt, aber keine aggressiven WAF-Signale (Cloudflare/Akamai). Standard-Policy mit PHP-typischen Active-Scan-Kategorien (sqli, xss, lfi, rfi, cmdi). Keine SPA/JS-Framework erkannt → ajax_spider disabled. Basisdomain und www-Subdomain → skip_tools leer. Zusätzliche Ports 8443/8080 für mögliche alternative Services. wpscan wird automatisch für WordPress aktiviert.",
+    "skip_tools": [],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "rfi",
+     "cmdi"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [
+     "https://trunk-immobilien.de:8443",
+     "http://trunk-immobilien.de:8080"
+    ],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 5,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"system_prompt\": \"Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts...",
+     "ref": "scan_results:ai_phase2_config_debug:5.199.141.24",
+     "tool": "ai_phase2_config_debug"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "dec:ai_phase2_config_debug:5.199.141.24",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:34:47Z",
+   "payload": {
+    "cache_hit": false,
+    "model": "claude-haiku-4-5-20251001",
+    "status": null
+   },
+   "source": "ai_phase2_config_debug"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=7 < 5 ODER tools=1 <= 1 ODER cve=False",
+     "ref": "phase3/ai_prioritization.json",
+     "tool": "ai_prioritization"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_prioritization:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:38Z",
+   "payload": {
+    "confidence_scores": 0,
+    "skipped_by_gate": true,
+    "strategy_notes": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=7 < 5 ODER tools=1 <= 1 ODER cve=False"
+   },
+   "source": "ai_prioritization"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "cms=WordPress cms_version=6.9.4 cms_confidence=0.95",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "tech_profile"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "5.199.141.24",
+   "id": "dec:cms_profile:5.199.141.24",
+   "mode": "active",
+   "note": "cms_version 6.9.4 weicht von cms_details 6.4.2 ab",
+   "observed_at": "2026-05-10T22:34:43Z",
+   "payload": {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details_version": "6.4.2",
+    "cms_version": "6.9.4",
+    "is_spa": false
+   },
+   "source": "ai_tech_analysis"
+  }
+ ],
+ "dns": [
+  {
+   "bimi": {
+    "present": false
+   },
+   "caa": {
+    "issuers": [],
+    "present": false,
+    "records": []
+   },
+   "confidence": 1.0,
+   "dane": {
+    "https": false,
+    "smtp": false
+   },
+   "dangling_cnames": [],
+   "dkim": {
+    "present": false,
+    "selectors": []
+   },
+   "dmarc": {
+    "adkim": "r",
+    "aspf": "r",
+    "p": "none",
+    "pct": 100,
+    "present": true,
+    "raw": "v=DMARC1;p=none;pct=100;aspf=r;adkim=r;",
+    "rua": [],
+    "ruf": [],
+    "sp": null
+   },
+   "dnssec": {
+    "issues": [
+     "Domain is not DNSSEC-signed"
+    ],
+    "signed": false,
+    "valid": false
+   },
+   "domain": "trunk-immobilien.de",
+   "evidence": [
+    {
+     "excerpt": "spf=v=spf1 mx -all dmarc=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; dkim=False mx=['mx.publishsoft.de']",
+     "ref": "phase0/dns_records.json",
+     "tool": "dns_records"
+    },
+    {
+     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "ref": "phase0a/dns_security.json",
+     "tool": "dns_security"
+    }
+   ],
+   "id": "dns:trunk-immobilien.de",
+   "mode": "active",
+   "mta_sts": {
+    "dns_record": false,
+    "mode": null,
+    "policy": false
+   },
+   "mx": [
+    "mx.publishsoft.de"
+   ],
+   "ns": [
+    "ns.publishsoft.de",
+    "ns2.publishsoft.de"
+   ],
+   "observed_at": "2026-05-10T22:25:20Z",
+   "source": "dns_records",
+   "spf": {
+    "all_qualifier": "-all",
+    "raw": "v=spf1 mx -all"
+   },
+   "tls_rpt": {
+    "present": false,
+    "rua": []
+   },
+   "zone_transfer": {
+    "allowed": false,
+    "ns_tested": [
+     "ns.publishsoft.de",
+     "ns2.publishsoft.de"
+    ]
+   }
+  }
+ ],
+ "fqdns": [
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "dev.trunk-immobilien.de: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "5.199.141.24",
+   "http_status": null,
+   "id": "fqdn:dev.trunk-immobilien.de",
+   "is_primary": null,
+   "mode": "active",
+   "name": "dev.trunk-immobilien.de",
+   "observed_at": "2026-05-10T22:28:38Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "ftp.trunk-immobilien.de: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "5.199.141.24",
+   "http_status": null,
+   "id": "fqdn:ftp.trunk-immobilien.de",
+   "is_primary": null,
+   "mode": "active",
+   "name": "ftp.trunk-immobilien.de",
+   "observed_at": "2026-05-10T22:28:38Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "trunk-immobilien.de: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "5.199.141.24",
+   "http_status": null,
+   "id": "fqdn:trunk-immobilien.de",
+   "is_primary": null,
+   "mode": "active",
+   "name": "trunk-immobilien.de",
+   "observed_at": "2026-05-10T22:28:38Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": {
+    "detected": true,
+    "manufacturer": "Unknown",
+    "name": "Generic"
+   },
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "webmail.trunk-immobilien.de: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "5.199.141.24",
+   "http_status": null,
+   "id": "fqdn:webmail.trunk-immobilien.de",
+   "is_primary": null,
+   "mode": "active",
+   "name": "webmail.trunk-immobilien.de",
+   "observed_at": "2026-05-10T22:28:38Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "www.trunk-immobilien.de: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "5.199.141.24",
+   "http_status": null,
+   "id": "fqdn:www.trunk-immobilien.de",
+   "is_primary": null,
+   "mode": "active",
+   "name": "www.trunk-immobilien.de",
+   "observed_at": "2026-05-10T22:28:38Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": {
+    "detected": true,
+    "manufacturer": null,
+    "name": "Generic"
+   },
+   "web_probe_reachable": null
+  }
+ ],
+ "generator": {
+  "inputs": [
+   {
+    "kind": "tar",
+    "name": "45bb234c-d556-4a80-9c78-3ce221ea28a6.tar.gz",
+    "sha256": "55e84c5260994b8002f81f6729bf38537cb1f19713197a3e0835369076a0e6ce"
+   },
+   {
+    "kind": "tool_runs",
+    "name": "results.json",
+    "sha256": "1be020803c09532e6a172347a6d409148a10c6a96e1ea1669d3ed4e686d37a8a"
+   },
+   {
+    "kind": "eol_feed",
+    "name": "eol_data_generated.py",
+    "sha256": "95905051fbaf700842d6d0e23930d65fec637f9146ea6f3fcb2f4e2b924b08c5"
+   }
+  ],
+  "name": "reporter.facts",
+  "version": "1.0.0"
+ },
+ "hosts": [
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Sun May 10 22:30:04 2026; 1 IP address (1 host up) scanned in 30.46 seconds",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=5.199.141.24 rdns=home4.publishsoft.de fqdns=trunk-immobilien.de,www.trunk-immobilien.de,dev.trunk-immobilien.de,ftp.trunk-immobilien.de,webmail.trunk-immobilien.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "dev.trunk-immobilien.de",
+    "ftp.trunk-immobilien.de",
+    "trunk-immobilien.de",
+    "webmail.trunk-immobilien.de",
+    "www.trunk-immobilien.de"
+   ],
+   "id": "host:5.199.141.24",
+   "ip": "5.199.141.24",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-05-10T22:30:04Z",
+   "ports_summary": {
+    "closed": 2,
+    "filtered": 985,
+    "open": 13
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "WIIT AG",
+    "usage_type": "Data Center/Web Hosting/Transit"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": null,
+    "urlhaus_compromised": null
+   },
+   "reverse": "home4.publishsoft.de",
+   "source": "nmap"
+  }
+ ],
+ "http": [
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "dev.trunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "dev.trunk-immobilien.de: status=200 title=J. T. Jürgen Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:27.2.11', 'Complianz', 'MySQL', 'Nginx', 'PHP', 'Plesk', 'WP Fastest Cache', 'WordPress:6.4.2', 'jQuery', 'jQuery Migrate:3.4.1']",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "dev.trunk-immobilien.de",
+   "headers": {
+    "accept-ranges": "bytes",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "content-length": "72186",
+    "content-type": "text/html; charset=UTF-8",
+    "date": "Sun, 10 May 2026 22:34:59 GMT",
+    "expires": "Mon, 29 Oct 1923 20:30:00 GMT",
+    "last-modified": "Mon, 11 Dec 2023 12:30:44 GMT",
+    "pragma": "no-cache",
+    "server": "nginx",
+    "vary": "Accept-Encoding",
+    "x-powered-by": "PleskLin"
+   },
+   "host_ip": "5.199.141.24",
+   "hsts": null,
+   "id": "http:dev.trunk-immobilien.de",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-05-10T22:34:59Z",
+   "paths": [],
+   "powered_by": "PleskLin",
+   "reachable": true,
+   "score": "0/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "nginx",
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "BeTheme",
+     "version": "27.2.11"
+    },
+    {
+     "name": "Complianz",
+     "version": null
+    },
+    {
+     "name": "MySQL",
+     "version": null
+    },
+    {
+     "name": "Nginx",
+     "version": null
+    },
+    {
+     "name": "PHP",
+     "version": null
+    },
+    {
+     "name": "Plesk",
+     "version": null
+    },
+    {
+     "name": "WP Fastest Cache",
+     "version": null
+    },
+    {
+     "name": "WordPress",
+     "version": "6.4.2"
+    },
+    {
+     "name": "jQuery",
+     "version": null
+    },
+    {
+     "name": "jQuery Migrate",
+     "version": "3.4.1"
+    }
+   ],
+   "url": "https://dev.trunk-immobilien.de",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "ftp.trunk-immobilien.de: reachable=None score=0/7 server=None x-feserver=None",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "ftp.trunk-immobilien.de: status=200 title=Default Parallels Plesk Page webserver=nginx tech=['Nginx']",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "ftp.trunk-immobilien.de",
+   "headers": {},
+   "host_ip": "5.199.141.24",
+   "hsts": null,
+   "id": "http:ftp.trunk-immobilien.de",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:07Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "0/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "Nginx",
+     "version": null
+    }
+   ],
+   "url": "https://ftp.trunk-immobilien.de",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "trunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "trunk-immobilien.de: status=200 title=J. T. Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:28.2.1', 'Complianz', 'MySQL', 'Nginx', 'PHP:8.2.30', 'WP Fastest Cache', 'WordPress', 'jQuery', 'jQuery Migrate:3.4.1']",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "trunk-immobilien.de",
+   "headers": {
+    "content-length": "162",
+    "content-type": "text/html",
+    "date": "Sun, 10 May 2026 22:34:51 GMT",
+    "location": "https://www.trunk-immobilien.de/",
+    "server": "nginx"
+   },
+   "host_ip": "5.199.141.24",
+   "hsts": null,
+   "id": "http:trunk-immobilien.de",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-05-10T22:34:51Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "0/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "nginx",
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "BeTheme",
+     "version": "28.2.1"
+    },
+    {
+     "name": "Complianz",
+     "version": null
+    },
+    {
+     "name": "MySQL",
+     "version": null
+    },
+    {
+     "name": "Nginx",
+     "version": null
+    },
+    {
+     "name": "PHP",
+     "version": "8.2.30"
+    },
+    {
+     "name": "WP Fastest Cache",
+     "version": null
+    },
+    {
+     "name": "WordPress",
+     "version": null
+    },
+    {
+     "name": "jQuery",
+     "version": null
+    },
+    {
+     "name": "jQuery Migrate",
+     "version": "3.4.1"
+    }
+   ],
+   "url": "https://trunk-immobilien.de",
+   "wordpress": {
+    "users": [],
+    "version_status": null
+   },
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "webmail.trunk-immobilien.de: reachable=None score=0/7 server=None x-feserver=None",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "webmail.trunk-immobilien.de: status=200 title=Default Parallels Plesk Page webserver=nginx tech=['Nginx']",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "webmail.trunk-immobilien.de",
+   "headers": {},
+   "host_ip": "5.199.141.24",
+   "hsts": null,
+   "id": "http:webmail.trunk-immobilien.de",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:15Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "0/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "Nginx",
+     "version": null
+    }
+   ],
+   "url": "https://webmail.trunk-immobilien.de",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "www.trunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "www.trunk-immobilien.de: status=200 title=J. T. Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:28.2.1', 'Complianz', 'MySQL', 'Nginx', 'PHP:8.2.30', 'WP Fastest Cache', 'WordPress', 'jQuery', 'jQuery Migrate:3.4.1']",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "www.trunk-immobilien.de",
+   "headers": {
+    "cache-control": "max-age=2592000",
+    "content-type": "text/html; charset=UTF-8",
+    "date": "Sun, 10 May 2026 22:34:55 GMT",
+    "expires": "Tue, 09 Jun 2026 22:34:55 GMT",
+    "last-modified": "Tue, 13 Jan 2026 14:26:14 GMT",
+    "server": "nginx",
+    "x-powered-by": "PleskLin"
+   },
+   "host_ip": "5.199.141.24",
+   "hsts": null,
+   "id": "http:www.trunk-immobilien.de",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-05-10T22:34:55Z",
+   "paths": [],
+   "powered_by": "PleskLin",
+   "reachable": true,
+   "score": "0/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "nginx",
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "BeTheme",
+     "version": "28.2.1"
+    },
+    {
+     "name": "Complianz",
+     "version": null
+    },
+    {
+     "name": "MySQL",
+     "version": null
+    },
+    {
+     "name": "Nginx",
+     "version": null
+    },
+    {
+     "name": "PHP",
+     "version": "8.2.30"
+    },
+    {
+     "name": "WP Fastest Cache",
+     "version": null
+    },
+    {
+     "name": "WordPress",
+     "version": null
+    },
+    {
+     "name": "jQuery",
+     "version": null
+    },
+    {
+     "name": "jQuery Migrate",
+     "version": "3.4.1"
+    }
+   ],
+   "url": "https://www.trunk-immobilien.de",
+   "wordpress": null,
+   "x_feserver": null
+  }
+ ],
+ "passive": [
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "pulse_count": 0
+   },
+   "domain": "trunk-immobilien.de",
+   "evidence": [
+    {
+     "excerpt": "pulse_count=0",
+     "ref": "phase0a/otx.json",
+     "tool": "otx"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:otx:trunk-immobilien.de",
+   "mode": "passive",
+   "observed_at": "2026-05-10T22:35:38Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "otx",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 ProFTPD Server (ProFTPD) [5.199.141.24] 530 Login incorrect. 214-The following commands are recognized (* =>'s unimplemented): CWD XCWD CDUP XCUP SMNT* Q...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:21 | 220 ProFTPD Server (ProFTPD) [5.199.141.24] 530 Login incorrect. 214-The following commands are recognized (* =>'s unimplemented): CWD XCWD CDUP XCUP SMNT* QUIT PORT PASV",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:21",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 21,
+   "product": null,
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "SSH-2.0-OpenSSH_7.4 Key type: ssh-rsa Key: AAAAB3NzaC1yc2EAAAADAQABAAABAQDvVHOShuv3M7hVBiAlcUmwohKajfK7vK3WPrHB+JVXeGUu xxctyEO8rd3Nte9uPPe79MOJWi9b8zf5bAZ/2...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:22 OpenSSH 7.4 | SSH-2.0-OpenSSH_7.4 Key type: ssh-rsa Key: AAAAB3NzaC1yc2EAAAADAQABAAABAQDvVHOShuv3M7hVBiAlcUmwohKajfK7vK3WPrHB+JVXeGUu xxctyEO8rd3Nte9uPPe79MOJWi9b8zf5bAZ/2h8sFNSUIsC...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:22",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 22,
+   "product": "OpenSSH",
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": "7.4"
+  },
+  {
+   "banner_excerpt": "220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOG...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:25 Postfix smtpd | 220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-E...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:25",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 25,
+   "product": "Postfix smtpd",
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 301 Moved Permanently Server: nginx Date: Thu, 07 May 2026 09:09:42 GMT Content-Type: text/html Content-Length: 162 Connection: keep-alive Location:...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:80 nginx | HTTP/1.1 301 Moved Permanently Server: nginx Date: Thu, 07 May 2026 09:09:42 GMT Content-Type: text/html Content-Length: 162 Connection: keep-alive Location: https://www.her...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:80",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 80,
+   "product": "nginx",
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "+OK Dovecot ready. <e55.3.69feb11a./TOvijEwjp2GCcyk6D1Feg==@home4.publishsoft.de> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:110 | +OK Dovecot ready. <e55.3.69feb11a./TOvijEwjp2GCcyk6D1Feg==@home4.publishsoft.de> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN DIGEST-MD5 CRA...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:110",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 110,
+   "product": null,
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN AUTH=DIGEST-MD5 AUTH=CRAM-MD5] Dovecot ready. * CAP...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:143 | * OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN AUTH=DIGEST-MD5 AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LOG...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:143",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 143,
+   "product": null,
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 200 OK Server: nginx Date: Sun, 10 May 2026 06:31:35 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive X-...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:443 nginx | HTTP/1.1 200 OK Server: nginx Date: Sun, 10 May 2026 06:31:35 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive X-Powered-By: PHP...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:443",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 443,
+   "product": "nginx",
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-ENHANC...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:465 Postfix smtpd | 220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-ENHANCEDSTATU...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:465",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 465,
+   "product": "Postfix smtpd",
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 2...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:587 Postfix smtpd | 220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250-DSN...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:587",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 587,
+   "product": "Postfix smtpd",
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "MariaDB: Protocol Version: 10 Version: 5.5.68-MariaDB Capabilities: 63487 Server Language: 8 Server Status: 2 Extended Server Capabilities: 40975 Authenticat...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:3306 MariaDB 5.5.68-MariaDB | MariaDB: Protocol Version: 10 Version: 5.5.68-MariaDB Capabilities: 63487 Server Language: 8 Server Status: 2 Extended Server Capabilities: 40975 Authenti...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:3306",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 3306,
+   "product": "MariaDB",
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": "5.5.68-MariaDB"
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 200 OK Server: sw-cp-server Date: Sun, 03 May 2026 02:44:20 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-a...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:8443 | HTTP/1.1 200 OK Server: sw-cp-server Date: Sun, 03 May 2026 02:44:20 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires: Fri, 2...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:8443",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 8443,
+   "product": null,
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 303 See Other Server: sw-cp-server Date: Sat, 18 Apr 2026 15:21:29 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection:...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "5.199.141.24:8880 | HTTP/1.1 303 See Other Server: sw-cp-server Date: Sat, 18 Apr 2026 15:21:29 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Expires:...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "5.199.141.24",
+   "hostnames": [
+    "herzogin-luisen-residenz.de",
+    "home4.publishsoft.de",
+    "www.herzogin-luisen-residenz.de"
+   ],
+   "id": "passive:shodan:5.199.141.24:8880",
+   "mode": "passive",
+   "observed_at": "2026-05-10T06:31:37Z",
+   "port": 8880,
+   "product": null,
+   "seen_at": "2026-05-10T06:31:37Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  }
+ ],
+ "scan": {
+  "confidence": 1.0,
+  "counts": {
+   "correlated_findings": 7,
+   "correlated_fp": 0,
+   "tool_runs": 35
+  },
+  "domain": "trunk-immobilien.de",
+  "domains": [
+   "trunk-immobilien.de"
+  ],
+  "evidence": [
+   {
+    "excerpt": "startedAt=2026-05-10T22:25:04.568947+00:00 finishedAt=2026-05-10T22:35:38.208155+00:00",
+    "ref": "meta.json",
+    "tool": "meta"
+   }
+  ],
+  "finished_at": "2026-05-10T22:35:38Z",
+  "hosts_scanned": 1,
+  "id": "scan:45bb234c-d556-4a80-9c78-3ce221ea28a6",
+  "mode": "active",
+  "nmap_args": "nmap -Pn -n -sV --version-intensity 7 -sC --script-timeout 60s -T4 --max-retries 2 --host-timeout 240s --min-rate 100 --defeat-rst-ratelimit --top-ports 1000 --open -oX <scan-dir> -oN <scan-dir> --reason 5.199.141.24",
+  "observed_at": "2026-05-10T22:35:38Z",
+  "order_id": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
+  "package": "perimeter",
+  "policy_version": null,
+  "scanner_egress": null,
+  "source": "meta",
+  "started_at": "2026-05-10T22:25:04Z",
+  "tool_versions": [
+   {
+    "name": "dnsx",
+    "version": null
+   },
+   {
+    "name": "feroxbuster",
+    "version": "2.11.0"
+   },
+   {
+    "name": "ffuf",
+    "version": "2.1.0"
+   },
+   {
+    "name": "gobuster",
+    "version": null
+   },
+   {
+    "name": "httpx",
+    "version": null
+   },
+   {
+    "name": "nmap",
+    "version": "7.93"
+   },
+   {
+    "name": "searchsploit",
+    "version": null
+   },
+   {
+    "name": "subfinder",
+    "version": "2.13.0"
+   },
+   {
+    "name": "testssl.sh",
+    "version": null
+   },
+   {
+    "name": "wafw00f",
+    "version": null
+   },
+   {
+    "name": "wpscan",
+    "version": null
+   }
+  ]
+ },
+ "schema_version": "1.0.0",
+ "services": [
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp ProFTPD",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "proftpd",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:21/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 21,
+   "product": "ProFTPD",
+   "proto": "tcp",
+   "service": "ftp",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh OpenSSH 7.4 (protocol 2.0)",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "openssh",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:22/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 22,
+   "product": "OpenSSH",
+   "proto": "tcp",
+   "service": "ssh",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": "7.4",
+   "version_raw": "7.4"
+  },
+  {
+   "auth_mechanisms": [
+    "CRAM-MD5",
+    "DIGEST-MD5",
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "home4.publishsoft.de",
+    "PIPELINING",
+    "SIZE 51200000",
+    "ETRN",
+    "STARTTLS",
+    "AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN",
+    "ENHANCEDSTATUSCODES",
+    "8BITMIME",
+    "DSN",
+    "CHUNKING"
+   ],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "25/tcp open smtp Postfix smtpd",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: home4.publishsoft.de, PIPELINING, SIZE 51200000, ETRN, STARTTLS, AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "postfix",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:25/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 25,
+   "product": "Postfix smtpd",
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http nginx",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "nginx",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:80/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 80,
+   "product": "nginx",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "APOP",
+    "AUTH-RESP-CODE",
+    "USER",
+    "SASL(PLAIN",
+    "LOGIN",
+    "DIGEST-MD5",
+    "CRAM-MD5)",
+    "STLS",
+    "UIDL",
+    "TOP",
+    "RESP-CODES",
+    "PIPELINING",
+    "CAPA"
+   ],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "110/tcp open pop3 Dovecot pop3d",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "pop3-capabilities: APOP AUTH-RESP-CODE USER SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) STLS UIDL TOP RESP-CODES PIPELINING CAPA",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:110/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 110,
+   "product": "Dovecot pop3d",
+   "proto": "tcp",
+   "service": "pop3",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "CRAM-MD5",
+    "DIGEST-MD5",
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "OK",
+    "listed",
+    "IDLE",
+    "AUTH=LOGIN",
+    "capabilities",
+    "ID",
+    "post-login",
+    "SASL-IR",
+    "more",
+    "have",
+    "LITERAL+",
+    "AUTH=CRAM-MD5A0001",
+    "Pre-login",
+    "IMAP4rev1",
+    "AUTH=PLAIN",
+    "ENABLE",
+    "AUTH=DIGEST-MD5",
+    "STARTTLS",
+    "LOGIN-REFERRALS"
+   ],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "143/tcp open imap Dovecot imapd",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "imap-capabilities: OK listed IDLE AUTH=LOGIN capabilities ID post-login SASL-IR more have LITERAL+ AUTH=CRAM-MD5A0001 Pre-login IMAP4rev1 AUTH=PLAIN ENABLE AUTH=DIGEST-MD5 STARTTLS LOGIN-REFERRALS",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:143/tcp",
+   "login_disabled": false,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 143,
+   "product": "Dovecot imapd",
+   "proto": "tcp",
+   "service": "imap",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": false,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http nginx tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "nginx",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 443,
+   "product": "nginx",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "CRAM-MD5",
+    "DIGEST-MD5",
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "home4.publishsoft.de",
+    "PIPELINING",
+    "SIZE 51200000",
+    "ETRN",
+    "AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN",
+    "ENHANCEDSTATUSCODES",
+    "8BITMIME",
+    "DSN",
+    "CHUNKING"
+   ],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "465/tcp open smtp Postfix smtpd tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: home4.publishsoft.de, PIPELINING, SIZE 51200000, ETRN, AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "postfix",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:465/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 465,
+   "product": "Postfix smtpd",
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "home4.publishsoft.de",
+    "PIPELINING",
+    "SIZE 51200000",
+    "ETRN",
+    "STARTTLS",
+    "ENHANCEDSTATUSCODES",
+    "8BITMIME",
+    "DSN",
+    "CHUNKING"
+   ],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "587/tcp open smtp Postfix smtpd",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: home4.publishsoft.de, PIPELINING, SIZE 51200000, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "postfix",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:587/tcp",
+   "login_disabled": true,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 587,
+   "product": "Postfix smtpd",
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "CRAM-MD5",
+    "DIGEST-MD5",
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "OK",
+    "listed",
+    "IDLE",
+    "AUTH=LOGIN",
+    "capabilities",
+    "ID",
+    "post-login",
+    "SASL-IR",
+    "more",
+    "have",
+    "AUTH=CRAM-MD5A0001",
+    "Pre-login",
+    "IMAP4rev1",
+    "LITERAL+",
+    "ENABLE",
+    "AUTH=DIGEST-MD5",
+    "AUTH=PLAIN",
+    "LOGIN-REFERRALS"
+   ],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "993/tcp open imap Dovecot imapd tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "imap-capabilities: OK listed IDLE AUTH=LOGIN capabilities ID post-login SASL-IR more have AUTH=CRAM-MD5A0001 Pre-login IMAP4rev1 LITERAL+ ENABLE AUTH=DIGEST-MD5 AUTH=PLAIN LOGIN-REFERRALS",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:993/tcp",
+   "login_disabled": false,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 993,
+   "product": "Dovecot imapd",
+   "proto": "tcp",
+   "service": "imap",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "APOP",
+    "AUTH-RESP-CODE",
+    "USER",
+    "SASL(PLAIN",
+    "LOGIN",
+    "DIGEST-MD5",
+    "CRAM-MD5)",
+    "UIDL",
+    "TOP",
+    "RESP-CODES",
+    "CAPA",
+    "PIPELINING"
+   ],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "995/tcp open pop3 Dovecot pop3d tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "pop3-capabilities: APOP AUTH-RESP-CODE USER SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) UIDL TOP RESP-CODES CAPA PIPELINING",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:995/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 995,
+   "product": "Dovecot pop3d",
+   "proto": "tcp",
+   "service": "pop3",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "mysql_native_password"
+   ],
+   "auth_required": true,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "3306/tcp open mysql MySQL 5.5.68-MariaDB",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "mysql-info: Protocol: 10 Version: 5.5.68-MariaDB Thread ID: 9607553 Capabilities flags: 63487 Some Capabilities: LongColumnFlag, Support41Auth, Speaks41ProtocolOld, InteractiveClient, SupportsLoadDataLocal, FoundRows, SupportsTransaction...",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "mariadb",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:3306/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 3306,
+   "product": "MySQL",
+   "proto": "tcp",
+   "service": "mysql",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": "5.5.68",
+   "version_raw": "5.5.68-MariaDB"
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "home4.publishsoft.de",
+    "not_after": "2026-06-26T08:35:55Z",
+    "san": [
+     "home4.publishsoft.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "8443/tcp open https-alt sw-cp-server tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "plesk",
+   "host_ip": "5.199.141.24",
+   "id": "svc:5.199.141.24:8443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "port": 8443,
+   "product": "sw-cp-server",
+   "proto": "tcp",
+   "service": "https-alt",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  }
+ ],
+ "software": [
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "110/tcp open pop3 Dovecot pop3d",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "143/tcp open imap Dovecot imapd",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "993/tcp open imap Dovecot imapd tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "995/tcp open pop3 Dovecot pop3d tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Dovecot pop3d",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "dovecot",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:dovecot:unknown",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "product": "Dovecot",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": "2020-04-11",
+    "latest_patch": "5.5.68",
+    "source": "endoflife_date",
+    "status": "eol",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "3306/tcp open mysql MySQL 5.5.68-MariaDB",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: MySQL 5.5.68-MariaDB",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "mariadb",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:mariadb:5.5.68",
+   "kind": "database",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "product": "MariaDB",
+   "source": "nmap",
+   "version_norm": "5.5.68",
+   "version_raw": "5.5.68-MariaDB",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http nginx tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "80/tcp open http nginx",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "server: nginx",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: nginx",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "product": "nginx",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh OpenSSH 7.4 (protocol 2.0)",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: OpenSSH 7.4",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "openssh",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:openssh:7.4",
+   "kind": "ssh",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "product": "OpenSSH",
+   "source": "nmap",
+   "version_norm": "7.4",
+   "version_raw": "7.4",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: PHP/8.2.30 PleskLin",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "php",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:php:8.2.30",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:30:56Z",
+   "product": "PHP",
+   "source": "webtech",
+   "version_norm": "8.2.30",
+   "version_raw": "PHP/8.2.30\nPleskLin",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "8443/tcp open https-alt sw-cp-server tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: PleskLin",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: sw-cp-server",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "plesk",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:plesk:unknown",
+   "kind": "control_panel",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "product": "Plesk",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "25/tcp open smtp Postfix smtpd",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "465/tcp open smtp Postfix smtpd tunnel=ssl",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "587/tcp open smtp Postfix smtpd",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Postfix smtpd",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "postfix",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:postfix:unknown",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "product": "Postfix",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp ProFTPD",
+     "ref": "hosts/5.199.141.24/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: ProFTPD",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "proftpd",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:proftpd:unknown",
+   "kind": "ftp",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:30:04Z",
+   "product": "ProFTPD",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "cms_fingerprint",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": "2024-04-02",
+    "latest_patch": "6.4.8",
+    "source": "endoflife_date",
+    "status": "eol",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "cms_details.raw: WordPress 6.4.2",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "cms_fingerprint"
+    },
+    {
+     "excerpt": "technologies: WordPress 6.4.2",
+     "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "wordpress",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:-:wordpress:6.4.2",
+   "kind": "cms_core",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:38Z",
+   "product": "WordPress",
+   "source": "cms_fingerprint",
+   "version_norm": "6.4.2",
+   "version_raw": "6.4.2",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: BeTheme:27.2.11",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "betheme",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:betheme:27.2.11",
+   "kind": "theme",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "BeTheme",
+   "source": "httpx",
+   "version_norm": "27.2.11",
+   "version_raw": "27.2.11",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Complianz",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "complianz",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:complianz:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "Complianz",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:jquery:3.4.1",
+   "kind": "library",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "jQuery",
+   "source": "httpx",
+   "version_norm": "3.4.1",
+   "version_raw": "3.4.1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: MySQL",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "mysql",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:mysql:unknown",
+   "kind": "database",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "MySQL",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: nginx",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Nginx",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "nginx",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: PHP",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "php",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:php:unknown",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "PHP",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "x-powered-by: PleskLin",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Plesk",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "plesk",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:plesk:unknown",
+   "kind": "control_panel",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "Plesk",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": "2024-04-02",
+    "latest_patch": "6.4.8",
+    "source": "endoflife_date",
+    "status": "eol",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: WordPress:6.4.2",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "wordpress",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:wordpress:6.4.2",
+   "kind": "cms_core",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "WordPress",
+   "source": "httpx",
+   "version_norm": "6.4.2",
+   "version_raw": "6.4.2",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: WP Fastest Cache",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "wp_fastest_cache",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:wp_fastest_cache:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "WP Fastest Cache",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Nginx",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "webserver: nginx",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": "ftp.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:ftp.trunk-immobilien.de:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "nginx",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: BeTheme:28.2.1",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "betheme",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:betheme:28.2.1",
+   "kind": "theme",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "BeTheme",
+   "source": "httpx",
+   "version_norm": "28.2.1",
+   "version_raw": "28.2.1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Complianz",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "complianz",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:complianz:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "Complianz",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:jquery:3.4.1",
+   "kind": "library",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "jQuery",
+   "source": "httpx",
+   "version_norm": "3.4.1",
+   "version_raw": "3.4.1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: MySQL",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "mysql",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:mysql:unknown",
+   "kind": "database",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "MySQL",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: nginx",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Nginx",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "nginx",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: PHP:8.2.30",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "php",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:php:8.2.30",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "PHP",
+   "source": "httpx",
+   "version_norm": "8.2.30",
+   "version_raw": "8.2.30",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: WordPress",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "wordpress",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:wordpress:unknown",
+   "kind": "cms_core",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "WordPress",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: WP Fastest Cache",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "wp_fastest_cache",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:wp_fastest_cache:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "WP Fastest Cache",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Nginx",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "webserver: nginx",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": "webmail.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:webmail.trunk-immobilien.de:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "nginx",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: BeTheme:28.2.1",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "betheme",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:betheme:28.2.1",
+   "kind": "theme",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "BeTheme",
+   "source": "httpx",
+   "version_norm": "28.2.1",
+   "version_raw": "28.2.1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Complianz",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "complianz",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:complianz:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "Complianz",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:jquery:3.4.1",
+   "kind": "library",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "jQuery",
+   "source": "httpx",
+   "version_norm": "3.4.1",
+   "version_raw": "3.4.1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: MySQL",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "mysql",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:mysql:unknown",
+   "kind": "database",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "MySQL",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: nginx",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Nginx",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "nginx",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: PHP:8.2.30",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "php",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:php:8.2.30",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "PHP",
+   "source": "httpx",
+   "version_norm": "8.2.30",
+   "version_raw": "8.2.30",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "x-powered-by: PleskLin",
+     "ref": "scan_results:header_check:5.199.141.24",
+     "tool": "header_check"
+    }
+   ],
+   "family": "plesk",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:plesk:unknown",
+   "kind": "control_panel",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:34:55Z",
+   "product": "Plesk",
+   "source": "header_check",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: WordPress",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "wordpress",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:wordpress:unknown",
+   "kind": "cms_core",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "WordPress",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: WP Fastest Cache",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "wp_fastest_cache",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:wp_fastest_cache:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "WP Fastest Cache",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  }
+ ],
+ "targets": [
+  {
+   "confidence": 1.0,
+   "discovery_health": null,
+   "domain": "trunk-immobilien.de",
+   "evidence": [
+    {
+     "excerpt": "domain=trunk-immobilien.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "id": "target:trunk-immobilien.de",
+   "is_primary": true,
+   "mode": "active",
+   "observed_at": "2026-05-10T22:25:04Z",
+   "out_of_scope": [],
+   "source": "host_inventory",
+   "targets_source": "orders.json",
+   "whois": null
+  }
+ ],
+ "threats": [],
+ "tls": [
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "home4.publishsoft.de",
+    "days_left": 46,
+    "expired": false,
+    "issuer": "R13",
+    "mismatch": true,
+    "not_after": "2026-06-26T08:35:55Z",
+    "not_before": "2026-03-28T08:35:56Z",
+    "san": [
+     "home4.publishsoft.de"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "webmail.trunk-immobilien.de:443 tls=tls13 cn=home4.publishsoft.de not_after=2026-06-26T08:35:55Z mismatched=True",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "webmail.trunk-immobilien.de",
+   "grade": null,
+   "host_ip": "5.199.141.24",
+   "hsts": null,
+   "id": "tls:webmail.trunk-immobilien.de:443@5.199.141.24",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-05-10T22:35:23Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  }
+ ],
+ "unprocessed": [],
+ "warnings": []
+}

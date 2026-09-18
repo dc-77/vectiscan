@@ -100,6 +100,25 @@ Mitglieder unabhaengig davon, ob ihr Name ein gueltiger Windows-Pfad waere.
   `abweichungen`. Ebenfalls dort: der Defekt dieses Musters sitzt in der
   Versionsableitung, nicht im Befundtext.
 
+## Golden-Facts (S1)
+
+`facts/<order>.json` ist die Ausgabe von `reporter/facts/` fuer jede Manifest-Order
+mit Tar, gebaut aus dem Tar plus den `scan_results`-Zeilen in
+`api-snapshot/<order>/results.json` und der Zielliste aus `api-snapshot/orders.json`.
+`tests/test_facts_golden.py` baut jede Order neu und vergleicht mit der eingecheckten
+Datei (Drift-Guard). Neubau nach jeder Aenderung an Parsern, Normalisierung, Schema
+oder nach einem Sync von `reporter/eol_data_generated.py`:
+
+```
+cd report-worker && python -m reporter.facts --golden          # schreiben
+cd report-worker && python -m reporter.facts --golden --check  # nur vergleichen, Exit 1 bei Abweichung
+```
+
+Die Dateien sind Text mit LF (`.gitattributes`), deterministisch (sortierte Schluessel,
+keine Erzeugungszeit) und unter 1 MB je Order. Orders ohne Tar (die vier weiteren
+NEG-SPF- und die drei NEG-EOL-Faelle) werden im Test direkt aus dem Snapshot gebaut
+und nicht eingecheckt.
+
 ## Pflege
 
 Jede neue Regel in S2 bekommt ihren Fall hier (spec/05 M7). Widerspricht ein
