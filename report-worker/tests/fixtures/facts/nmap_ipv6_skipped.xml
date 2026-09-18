@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -Pn -n -sV -sC --top-ports 1000 --open -oX out.xml 2001:db8::2" start="1788185789" version="7.93" xmloutputversion="1.05">
+<verbose level="0"/>
+<debugging level="0"/>
+<target specification="2001:db8::2" status="skipped" reason="invalid"/>
+<runstats><finished time="1788185789" timestr="Mon Aug 31 14:16:29 2026" summary="Nmap done at Mon Aug 31 14:16:29 2026; 0 IP addresses (0 hosts up) scanned in 0.23 seconds" elapsed="0.23" exit="success"/><hosts up="0" down="0" total="0"/>
+</runstats>
+</nmaprun>

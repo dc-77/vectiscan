@@ -12,3 +12,7 @@ reportlab==4.4.0
 structlog==25.1.0
 requests==2.34.2
 cvss==3.4
+# S1 (18.09.2026): reporter/facts/ (Evidence Layer) und severity_policy.py nutzen
+# pydantic v2 direkt. Bisher kam es nur transitiv ueber anthropic herein; hier
+# explizit auf den Stand gepinnt, den anthropic 0.118.0 aufloest.
+pydantic==2.12.5
