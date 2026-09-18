@@ -1,0 +1,5724 @@
+{
+ "coverage": [
+  {
+   "confidence": 1.0,
+   "domain": "heuel.com",
+   "duration_ms": 499,
+   "evidence": [
+    {
+     "excerpt": "{\"subdomains\": [\"dl.heuel.com\", \"heuel.com\", \"jobs.heuel.com\", \"online.heuel.com\", \"ose.heuel.com\", \"webportal.heuel.com\", \"www.heuel.com\"], \"error\": null}",
+     "ref": "scan_results:certspotter",
+     "tool": "certspotter"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:certspotter:scan",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:50:50Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "certspotter"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "heuel.com",
+   "duration_ms": 1224,
+   "evidence": [
+    {
+     "excerpt": "[{\"issuer_ca_id\":295817,\"issuer_name\":\"C=US, O=Let's Encrypt, CN=R13\",\"common_name\":\"jobs.heuel.com\",\"name_value\":\"jobs.heuel.com\",\"id\":25566259594,\"entry_ti...",
+     "ref": "scan_results:crtsh",
+     "tool": "crtsh"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:50:51Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "heuel.com",
+   "duration_ms": 4,
+   "evidence": [
+    {
+     "excerpt": "dns_records_collected",
+     "ref": "scan_results:dns_records",
+     "tool": "dns_records"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_records:scan",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:50:50Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_records"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "heuel.com",
+   "duration_ms": 9330,
+   "evidence": [
+    {
+     "excerpt": "{\"all\": [\"\\n;; OPT PSEUDOSECTION:\\n; EDNS: version 0; flags:; udp: 1232\", \"heuel.com.\\t7200\\tIN\\tSOA\\tns1.your-server.de. postmaster.your-server.de. 20260325...",
+     "ref": "scan_results:dnsx",
+     "tool": "dnsx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dnsx:scan",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:53:59Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dnsx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "heuel.com",
+   "duration_ms": 180096,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 180s --- PARTIAL OUTPUT (188 chars) --- as2.heuel.com 194.25.29.98 autodiscover.heuel.com 52.98.253.184,52.98.253.88,40.99.149.168,2603:1026:c0...",
+     "ref": "scan_results:gobuster_dns",
+     "tool": "gobuster_dns"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:gobuster_dns:scan",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:53:50Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": "timeout",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "gobuster_dns"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "heuel.com",
+   "duration_ms": 10709,
+   "evidence": [
+    {
+     "excerpt": "{\"host\":\"webportal.heuel.com\",\"input\":\"heuel.com\",\"source\":\"hackertarget\"} {\"host\":\"www.heuel.com\",\"input\":\"heuel.com\",\"source\":\"hackertarget\"} {\"host\":\"www....",
+     "ref": "scan_results:subfinder",
+     "tool": "subfinder"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:subfinder:scan",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:51:01Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "subfinder"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "heuel.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"217.72.203.132\": { \"web_probe\": { \"has_web\": true, \"status\": 200, \"final_url\": \"https://www.heuel.com\", \"title\": \"Spedition für Stückguttransporte, LTL/FT...",
+     "ref": "scan_results:web_probe",
+     "tool": "web_probe"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:web_probe:scan",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "phase": 0,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "web_probe"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 22405,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 104.16.10.6 Host is up, received user-set (0.0018s latency). Not shown: 996 filtered tcp ports (...",
+     "ref": "scan_results:nmap:104.16.10.6",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "cov:1:nmap:104.16.10.6",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:55:59Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 55938,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 20.79.218.75 Host is up, received user-set (0.0062s latency). Not shown: 995 filtered tcp ports...",
+     "ref": "scan_results:nmap:20.79.218.75",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "cov:1:nmap:20.79.218.75",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:56:13Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 27835,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 217.72.203.132 Host is up, received user-set (0.0080s latency). Not shown: 998 filtered tcp port...",
+     "ref": "scan_results:nmap:217.72.203.132",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "cov:1:nmap:217.72.203.132",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:55:44Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 28611,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://online.heuel.com [+] The site https://online.heuel.com is behind Cloudflare (Cloudflare Inc.) WAF. [+] Generic Detection results: [-] No...",
+     "ref": "scan_results:wafw00f:104.16.10.6",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "online.heuel.com",
+   "host_ip": "104.16.10.6",
+   "id": "cov:1:wafw00f:104.16.10.6:online.heuel.com",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:56:38Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 28699,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://edi.heuel.com [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:20.79.218.75",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "edi.heuel.com",
+   "host_ip": "20.79.218.75",
+   "id": "cov:1:wafw00f:20.79.218.75:edi.heuel.com",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:56:56Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 28801,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://ose.heuel.com [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:20.79.218.75",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "ose.heuel.com",
+   "host_ip": "20.79.218.75",
+   "id": "cov:1:wafw00f:20.79.218.75:ose.heuel.com",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:56:56Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 30057,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://www.heuel.com [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:217.72.203.132",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.heuel.com",
+   "host_ip": "217.72.203.132",
+   "id": "cov:1:wafw00f:217.72.203.132:www.heuel.com",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:56:23Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"Cloudflare CDN\", \"version\": \"\" } ] }",
+     "ref": "scan_results:webtech:104.16.10.6",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "cov:1:webtech:104.16.10.6",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:56:09Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"Apache\", \"version\": \"\" }, { \"name\": \"Java/Servlet\", \"version\": \"\" } ] }",
+     "ref": "scan_results:webtech:20.79.218.75",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "cov:1:webtech:20.79.218.75",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:56:27Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"Google Analytics\", \"version\": \"\" }, { \"name\": \"Google Tag Manager\", \"version\": \"\" } ] }",
+     "ref": "scan_results:webtech:217.72.203.132",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "cov:1:webtech:217.72.203.132",
+   "mode": "active",
+   "observed_at": "2026-05-21T23:55:53Z",
+   "phase": 1,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 839,
+   "evidence": [
+    {
+     "excerpt": "{\"add_slash\": false, \"auto_bail\": true, \"auto_tune\": false, \"backup_extensions\": [\"~\", \".bak\", \".bak2\", \".old\", \".1\"], \"client_cert\": \"\", \"client_key\": \"\", \"...",
+     "ref": "scan_results:feroxbuster:104.16.10.6",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "cov:2:feroxbuster:104.16.10.6",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:29Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 841,
+   "evidence": [
+    {
+     "excerpt": "{\"add_slash\": false, \"auto_bail\": true, \"auto_tune\": false, \"backup_extensions\": [\"~\", \".bak\", \".bak2\", \".old\", \".1\"], \"client_cert\": \"\", \"client_key\": \"\", \"...",
+     "ref": "scan_results:feroxbuster:20.79.218.75",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "cov:2:feroxbuster:20.79.218.75",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:35Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 180044,
+   "evidence": [
+    {
+     "excerpt": "{\"add_slash\": false, \"auto_bail\": true, \"auto_tune\": false, \"backup_extensions\": [\"~\", \".bak\", \".bak2\", \".old\", \".1\"], \"client_cert\": \"\", \"client_key\": \"\", \"...",
+     "ref": "scan_results:feroxbuster:217.72.203.132",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": 1,
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "cov:2:feroxbuster:217.72.203.132",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:09:53Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 150045,
+   "evidence": [
+    {
+     "excerpt": "{\"commandline\":\"ffuf -u https://www.heuel.com/api/kd-gdpr-cc?FUZZ=test -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt -mc 20...",
+     "ref": "scan_results:ffuf_param:217.72.203.132",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "cov:2:ffuf_param:217.72.203.132",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:06:53Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"online.heuel.com\", \"result\": { \"url\": \"https://online.heuel.com\", \"headers\": { \"date\": \"Fri, 22 May 2026 00:11:23 GMT\", \"content-type\": \"text/htm...",
+     "ref": "scan_results:header_check:104.16.10.6",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "online.heuel.com",
+   "host_ip": "104.16.10.6",
+   "id": "cov:2:header_check:104.16.10.6:online.heuel.com",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:23Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"edi.heuel.com\", \"result\": { \"url\": \"https://edi.heuel.com\", \"headers\": { \"Date\": \"Fri, 22 May 2026 00:10:00 GMT\", \"Server\": \"Apache\", \"Content-Ty...",
+     "ref": "scan_results:header_check:20.79.218.75",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "edi.heuel.com",
+   "host_ip": "20.79.218.75",
+   "id": "cov:2:header_check:20.79.218.75:edi.heuel.com",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:00Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"ose.heuel.com\", \"result\": { \"url\": \"https://ose.heuel.com\", \"headers\": { \"Date\": \"Fri, 22 May 2026 00:10:00 GMT\", \"Server\": \"Apache\", \"Last-Modif...",
+     "ref": "scan_results:header_check:20.79.218.75",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "ose.heuel.com",
+   "host_ip": "20.79.218.75",
+   "id": "cov:2:header_check:20.79.218.75:ose.heuel.com",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:00Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"www.heuel.com\", \"result\": { \"url\": \"https://www.heuel.com\", \"headers\": { \"date\": \"Fri, 22 May 2026 00:03:57 GMT\", \"content-type\": \"text/html;char...",
+     "ref": "scan_results:header_check:217.72.203.132",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "www.heuel.com",
+   "host_ip": "217.72.203.132",
+   "id": "cov:2:header_check:217.72.203.132:www.heuel.com",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:03:57Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 597,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"online.heuel.com\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-05-10T02:15:35Z...",
+     "ref": "scan_results:httpx:104.16.10.6",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "cov:2:httpx:104.16.10.6",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:23Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 615,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"ose.heuel.com\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\",\"not_before\":\"2026-03-...",
+     "ref": "scan_results:httpx:20.79.218.75",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "cov:2:httpx:20.79.218.75",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:00Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 605,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"edi.heuel.com\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\",\"not_before\":\"2026-03-...",
+     "ref": "scan_results:httpx:20.79.218.75",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "cov:2:httpx:20.79.218.75#2",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:01Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 1531,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"www.heuel.com\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_256_GCM_SHA384\",\"not_before\":\"2026-04-18T05:21:40Z\",\"...",
+     "ref": "scan_results:httpx:217.72.203.132",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "cov:2:httpx:217.72.203.132",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:03:58Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"active\": 0, \"passive\": 16, \"top_alerts\": [ { \"name\": \"CSP: Failure to Define Directive with No Fallback\", \"risk\": \"Medium\", \"url\": \"https://online.heuel.c...",
+     "ref": "scan_results:zap:104.16.10.6",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "cov:2:zap:104.16.10.6",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:36Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"active\": 20, \"passive\": 99, \"top_alerts\": [ { \"name\": \"Content Security Policy (CSP) Header Not Set\", \"risk\": \"Medium\", \"url\": \"https://ose.heuel.com/site...",
+     "ref": "scan_results:zap:20.79.218.75",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "cov:2:zap:20.79.218.75",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:23Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"active\": 0, \"passive\": 2318, \"top_alerts\": [ { \"name\": \"Re-examine Cache-control Directives\", \"risk\": \"Informational\", \"url\": \"https://www.heuel.com/robot...",
+     "ref": "scan_results:zap:217.72.203.132",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "cov:2:zap:217.72.203.132",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:00Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"urls_found\": 3, \"fqdns_spidered\": 1, \"vhosts\": [ \"online.heuel.com\" ], \"urls\": [ \"https://online.heuel.com\", \"https://online.heuel.com/robots.txt\", \"https...",
+     "ref": "scan_results:zap_spider:104.16.10.6",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "cov:2:zap_spider:104.16.10.6",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:28Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"urls_found\": 319, \"fqdns_spidered\": 2, \"vhosts\": [ \"ose.heuel.com\", \"edi.heuel.com\" ], \"urls\": [ \"https://edi.heuel.com\", \"https://edi.heuel.com/robots.tx...",
+     "ref": "scan_results:zap_spider:20.79.218.75",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "cov:2:zap_spider:20.79.218.75",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:35Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"urls_found\": 579, \"fqdns_spidered\": 1, \"vhosts\": [ \"www.heuel.com\" ], \"urls\": [ \"http://www.heuel.com\", \"http://www.heuel.com/\", \"http://www.heuel.com/_Re...",
+     "ref": "scan_results:zap_spider:217.72.203.132",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "cov:2:zap_spider:217.72.203.132",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:04:23Z",
+   "phase": 2,
+   "raw_status": null,
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "heuel.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"total_findings\": 2462, \"false_positives\": 872, \"valid_findings\": 1590, \"severity_counts\": { \"medium\": 1362, \"low\": 228 }, \"cves_enriched\": 0, \"cisa_kev_ma...",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:3:phase3_correlation:scan",
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:37Z",
+   "phase": 3,
+   "raw_status": null,
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "phase3_correlation"
+  }
+ ],
+ "decisions": [
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "SKIP: IPv6-Duplikat von 213.133.104.51 (gleicher rDNS www51.your-server.de, gleiche FQDNs webportal.heuel.com) – bereits durch IPv4-Host abgedeckt.",
+     "ref": "scan_results:ai_host_skip:2a01:4f8:d0a:2757::2",
+     "tool": "ai_host_skip"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "2a01:4f8:d0a:2757::2",
+   "id": "dec:ai_host_skip:[2a01:4f8:d0a:2757::2]",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:17Z",
+   "payload": {
+    "raw": "SKIP: IPv6-Duplikat von 213.133.104.51 (gleicher rDNS www51.your-server.de, gleiche FQDNs webportal.heuel.com) – bereits durch IPv4-Host abgedeckt."
+   },
+   "source": "ai_host_skip"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Perimeter-Scan mit 5 aktiven Hosts: Basisdomain + www (Priorität 1), zwei Subdomains mit echtem Content (Priorität 2), Mailserver und Multi-Service-Host (Priorität 2–3), Cloudflare-WAF (Priorität 3...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_host_strategy:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:17Z",
+   "payload": {
+    "passive_intel_summary": "Alle Hosts haben AbuseIPDB-Score 0 (sauber), keine Tor-Exit-Nodes. Shodan zeigt: 217.72.203.132 nur Standard-Ports (80/443), 20.79.218.75 mit Port 8443 (Apache), 213.133.104.51 mit vollständiger Mail-Stack (SMTP/IMAP/POP3/FTP/SSH) + HTTP, 104.16.10.6 ist Cloudflare-Edge (Port 2082–2087, 2095–2096 = cPanel-Ports hinter CF). Keine veralteten Service-Versionen erkannt. DMARC p=quarantine mit pct=100 auf allen Hosts aktiv.",
+    "strategy_notes": "Perimeter-Scan mit 5 aktiven Hosts: Basisdomain + www (Priorität 1), zwei Subdomains mit echtem Content (Priorität 2), Mailserver und Multi-Service-Host (Priorität 2–3), Cloudflare-WAF (Priorität 3). IPv6-Duplikat wird übersprungen. DMARC/SPF/DKIM sind konfiguriert, keine kritischen DNS-Findings."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Cloudflare-Edge mit HTTP 403 'Just a moment...' (WAF-Challenge); online.heuel.com ist echte Anwendung hinter Cloudflare – scannen mit niedriger Priorität, Customer-Service liegt dahinter.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "dec:ai_host_strategy:104.16.10.6",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:17Z",
+   "payload": {
+    "action": "scan",
+    "priority": 3,
+    "reasoning": "Cloudflare-Edge mit HTTP 403 'Just a moment...' (WAF-Challenge); online.heuel.com ist echte Anwendung hinter Cloudflare – scannen mit niedriger Priorität, Customer-Service liegt dahinter."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Mailserver (mails.heuel.com, smtp.heuel.com) ohne Web-Content – Port-Scan mit nmap + testssl zur Überprüfung der Mail-Infrastruktur.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "195.225.241.75",
+   "id": "dec:ai_host_strategy:195.225.241.75",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:17Z",
+   "payload": {
+    "action": "scan",
+    "priority": 3,
+    "reasoning": "Mailserver (mails.heuel.com, smtp.heuel.com) ohne Web-Content – Port-Scan mit nmap + testssl zur Überprüfung der Mail-Infrastruktur."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Zwei primary VHosts (ose.heuel.com HTTP 200, edi.heuel.com HTTP 403) mit echtem Content; Shodan zeigt Port 8443 zusätzlich zu 80/443 – scannen trotz generischem 'Redirector'-Title.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "dec:ai_host_strategy:20.79.218.75",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:17Z",
+   "payload": {
+    "action": "scan",
+    "priority": 2,
+    "reasoning": "Zwei primary VHosts (ose.heuel.com HTTP 200, edi.heuel.com HTTP 403) mit echtem Content; Shodan zeigt Port 8443 zusätzlich zu 80/443 – scannen trotz generischem 'Redirector'-Title."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Umfangreiche Mail- und Web-Ports (SMTP, IMAP, POP3, FTP, SSH, HTTP/HTTPS) in Shodan; dl.heuel.com und webportal.heuel.com sind potenzielle Anwendungen – vollständiger Scan erforderlich.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "213.133.104.51",
+   "id": "dec:ai_host_strategy:213.133.104.51",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:17Z",
+   "payload": {
+    "action": "scan",
+    "priority": 2,
+    "reasoning": "Umfangreiche Mail- und Web-Ports (SMTP, IMAP, POP3, FTP, SSH, HTTP/HTTPS) in Shodan; dl.heuel.com und webportal.heuel.com sind potenzielle Anwendungen – vollständiger Scan erforderlich."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Basisdomain heuel.com mit www-Subdomain, produktive Webseite (Speditionslogistik), HTTP 200 mit echtem Content – höchste Priorität.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "dec:ai_host_strategy:217.72.203.132",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:17Z",
+   "payload": {
+    "action": "scan",
+    "priority": 1,
+    "reasoning": "Basisdomain heuel.com mit www-Subdomain, produktive Webseite (Speditionslogistik), HTTP 200 mit echtem Content – höchste Priorität."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "IPv6-Duplikat von 213.133.104.51 (gleicher rDNS www51.your-server.de, gleiche FQDNs webportal.heuel.com) – bereits durch IPv4-Host abgedeckt.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "2a01:4f8:d0a:2757::2",
+   "id": "dec:ai_host_strategy:[2a01:4f8:d0a:2757::2]",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:17Z",
+   "payload": {
+    "action": "skip",
+    "priority": null,
+    "reasoning": "IPv6-Duplikat von 213.133.104.51 (gleicher rDNS www51.your-server.de, gleiche FQDNs webportal.heuel.com) – bereits durch IPv4-Host abgedeckt."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"waf-safe\", \"zap_spider_max_depth\": 5, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\" ], \"zap_rate_re...",
+     "ref": "scan_results:ai_phase2_config:104.16.10.6",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "dec:ai_phase2_config:104.16.10.6",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:47Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:waf-cloudflare",
+    "skip_tools": [
+     "wpscan"
+    ],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 30,
+    "zap_scan_policy": "waf-safe",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 5,
+    "zap_threads": 3
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 5, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"xxe\", \"cmdi\"...",
+     "ref": "scan_results:ai_phase2_config:20.79.218.75",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "dec:ai_phase2_config:20.79.218.75",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:52Z",
+   "payload": {
+    "reasoning": "Java/Servlet-basierte JSF-Anwendung (PrimeFaces 11.0.1, .seam-URLs) auf Apache erkannt. Keine WAF, keine SPA-Frameworks → standard policy, volle Threads/Rate. Java-Stack erfordert sqli, xss, lfi, xxe, cmdi. Port 8443 offen → extra_urls hinzugefügt. edi.heuel.com zeigt 403 (kein Web-Content), ose.heuel.com ist primärer Scan-Ziel. skip_tools bleibt leer für vollständige Coverage. FTP-Service vorhanden (Port 21) aber nicht im Web-Scan relevant.",
+    "skip_tools": [],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "xxe",
+     "cmdi"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [
+     "https://ose.heuel.com:8443/",
+     "http://ose.heuel.com:8443/"
+    ],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 5,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 7, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"ssrf\", \"cmdi\"...",
+     "ref": "scan_results:ai_phase2_config:217.72.203.132",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "dec:ai_phase2_config:217.72.203.132",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:47Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:neos-standard",
+    "skip_tools": [
+     "wpscan"
+    ],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "ssrf",
+     "cmdi",
+     "path_traversal"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 7,
+    "zap_threads": 8
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"system_prompt\": \"Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts...",
+     "ref": "scan_results:ai_phase2_config_debug:20.79.218.75",
+     "tool": "ai_phase2_config_debug"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "20.79.218.75",
+   "id": "dec:ai_phase2_config_debug:20.79.218.75",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:52Z",
+   "payload": {
+    "cache_hit": false,
+    "model": "claude-haiku-4-5-20251001",
+    "status": null
+   },
+   "source": "ai_phase2_config_debug"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"waf-safe\", \"zap_spider_max_depth\": 5, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\" ], \"zap_rate_re...",
+     "ref": "scan_results:ai_phase2_config_rule_based:104.16.10.6",
+     "tool": "ai_phase2_config_rule_based"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "104.16.10.6",
+   "id": "dec:ai_phase2_config_rule_based:104.16.10.6",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:47Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:waf-cloudflare",
+    "skip_tools": [
+     "wpscan"
+    ],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 30,
+    "zap_scan_policy": "waf-safe",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 5,
+    "zap_threads": 3
+   },
+   "source": "ai_phase2_config_rule_based"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 7, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"ssrf\", \"cmdi\"...",
+     "ref": "scan_results:ai_phase2_config_rule_based:217.72.203.132",
+     "tool": "ai_phase2_config_rule_based"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "dec:ai_phase2_config_rule_based:217.72.203.132",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:47Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:neos-standard",
+    "skip_tools": [
+     "wpscan"
+    ],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "ssrf",
+     "cmdi",
+     "path_traversal"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 7,
+    "zap_threads": 8
+   },
+   "source": "ai_phase2_config_rule_based"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=2462 < 5 ODER tools=3 <= 1 ODER cve=False",
+     "ref": "phase3/ai_prioritization.json",
+     "tool": "ai_prioritization"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_prioritization:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:11:37Z",
+   "payload": {
+    "confidence_scores": 0,
+    "skipped_by_gate": true,
+    "strategy_notes": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=2462 < 5 ODER tools=3 <= 1 ODER cve=False"
+   },
+   "source": "ai_prioritization"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "cms=NEOS cms_version=None cms_confidence=0.95",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "tech_profile"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "217.72.203.132",
+   "id": "dec:cms_profile:217.72.203.132",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:47Z",
+   "payload": {
+    "cms": "NEOS",
+    "cms_confidence": 0.95,
+    "cms_details_version": null,
+    "cms_version": null,
+    "is_spa": false
+   },
+   "source": "ai_tech_analysis"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "HTTP 403 — keine erreichbare Webseite",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "online.heuel.com",
+   "host_ip": "104.16.10.6",
+   "id": "dec:site_summary:online.heuel.com",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:54:22Z",
+   "payload": {
+    "classification": "error",
+    "confidence": 1.0,
+    "description": "HTTP 403 — keine erreichbare Webseite",
+    "is_real_content": false
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "HTTP 403 — keine erreichbare Webseite",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "edi.heuel.com",
+   "host_ip": "20.79.218.75",
+   "id": "dec:site_summary:edi.heuel.com",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:54:22Z",
+   "payload": {
+    "classification": "error",
+    "confidence": 1.0,
+    "description": "HTTP 403 — keine erreichbare Webseite",
+    "is_real_content": false
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Redirector-Service auf Apache httpd.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "ose.heuel.com",
+   "host_ip": "20.79.218.75",
+   "id": "dec:site_summary:ose.heuel.com",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:54:22Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Redirector-Service auf Apache httpd.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Speditionsunternehmen für Stückguttransporte in Deutschland und Europa mit NEOS auf nginx.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "www.heuel.com",
+   "host_ip": "217.72.203.132",
+   "id": "dec:site_summary:www.heuel.com",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:54:22Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Speditionsunternehmen für Stückguttransporte in Deutschland und Europa mit NEOS auf nginx.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  }
+ ],
+ "dns": [
+  {
+   "bimi": {
+    "present": false
+   },
+   "caa": {
+    "issuers": [],
+    "present": false,
+    "records": []
+   },
+   "confidence": 1.0,
+   "dane": {
+    "https": false,
+    "smtp": false
+   },
+   "dangling_cnames": [],
+   "dkim": {
+    "present": true,
+    "selectors": [
+     "hse1",
+     "hse2"
+    ]
+   },
+   "dmarc": {
+    "adkim": "r",
+    "aspf": "r",
+    "p": "quarantine",
+    "pct": 100,
+    "present": true,
+    "raw": "v=DMARC1;p=quarantine;pct=100;rua=mailto:dmarcrua@heuel.com",
+    "rua": [
+     "mailto:dmarcrua@heuel.com"
+    ],
+    "ruf": [],
+    "sp": null
+   },
+   "dnssec": {
+    "issues": [
+     "Domain is not DNSSEC-signed"
+    ],
+    "signed": false,
+    "valid": false
+   },
+   "domain": "heuel.com",
+   "evidence": [
+    {
+     "excerpt": "spf=v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com incl...",
+     "ref": "phase0/dns_records.json",
+     "tool": "dns_records"
+    },
+    {
+     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "ref": "phase0a/dns_security.json",
+     "tool": "dns_security"
+    }
+   ],
+   "id": "dns:heuel.com",
+   "mode": "active",
+   "mta_sts": {
+    "dns_record": false,
+    "mode": null,
+    "policy": false
+   },
+   "mx": [
+    "mx01.hornetsecurity.com",
+    "mx02.hornetsecurity.com",
+    "mx03.hornetsecurity.com",
+    "mx04.hornetsecurity.com"
+   ],
+   "ns": [
+    "ns.second-ns.com",
+    "ns1.your-server.de",
+    "ns3.second-ns.de"
+   ],
+   "observed_at": "2026-05-21T23:50:50Z",
+   "source": "dns_records",
+   "spf": {
+    "all_qualifier": "~all",
+    "raw": "v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crsend.com include:_spf.samanage.com \" \"include:spf-de.emailsignatures365.com ~all"
+   },
+   "tls_rpt": {
+    "present": false,
+    "rua": []
+   },
+   "zone_transfer": {
+    "allowed": false,
+    "ns_tested": [
+     "ns.second-ns.com",
+     "ns1.your-server.de",
+     "ns3.second-ns.de"
+    ]
+   }
+  }
+ ],
+ "fqdns": [
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "dl.heuel.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "213.133.104.51",
+   "http_status": null,
+   "id": "fqdn:dl.heuel.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "dl.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [
+    {
+     "fqdn": "mail.heuel.com",
+     "reason": "body-hash-dup",
+     "status": 403
+    }
+   ],
+   "body_hash": "5b13fb5957b84ef7bb9d0b6cd509c947ff6a37d67efdac2b896ddd3b908aad10",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "edi.heuel.com: status=403 title=403 Forbidden final_url=https://edi.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://edi.heuel.com",
+   "host_ip": "20.79.218.75",
+   "http_status": 403,
+   "id": "fqdn:edi.heuel.com",
+   "is_primary": true,
+   "mode": "active",
+   "name": "edi.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/20.79.218.75__edi.heuel.com.png",
+   "source": "web_probe",
+   "title": "403 Forbidden",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "heuel.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "217.72.203.132",
+   "http_status": null,
+   "id": "fqdn:heuel.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "jobs.heuel.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "217.72.203.132",
+   "http_status": null,
+   "id": "fqdn:jobs.heuel.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "jobs.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "mail.heuel.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "20.79.218.75",
+   "http_status": null,
+   "id": "fqdn:mail.heuel.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "mail.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "mails.heuel.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "195.225.241.75",
+   "http_status": null,
+   "id": "fqdn:mails.heuel.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "mails.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": "dbfac7fe5630df78d34a4930a7cf5b19eda363160c9c0586bfadffcb8002b59c",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "online.heuel.com: status=403 title=Just a moment... final_url=https://online.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://online.heuel.com",
+   "host_ip": "104.16.10.6",
+   "http_status": 403,
+   "id": "fqdn:online.heuel.com",
+   "is_primary": true,
+   "mode": "active",
+   "name": "online.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/104.16.10.6__online.heuel.com.png",
+   "source": "web_probe",
+   "title": "Just a moment...",
+   "waf": {
+    "detected": true,
+    "manufacturer": "Cloudflare Inc.",
+    "name": "Cloudflare"
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": "1e3469b7dcc0d76ab034881b9012edeed5d7e626f9eb751838bd36be9cbb68f0",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "ose.heuel.com: status=200 title=Redirector final_url=https://ose.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://ose.heuel.com",
+   "host_ip": "20.79.218.75",
+   "http_status": 200,
+   "id": "fqdn:ose.heuel.com",
+   "is_primary": true,
+   "mode": "active",
+   "name": "ose.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/20.79.218.75__ose.heuel.com.png",
+   "source": "web_probe",
+   "title": "Redirector",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "smtp.heuel.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "195.225.241.75",
+   "http_status": null,
+   "id": "fqdn:smtp.heuel.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "smtp.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "webportal.heuel.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "213.133.104.51",
+   "http_status": null,
+   "id": "fqdn:webportal.heuel.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "webportal.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "webportal.heuel.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "2a01:4f8:d0a:2757::2",
+   "http_status": null,
+   "id": "fqdn:webportal.heuel.com@[2a01:4f8:d0a:2757::2]",
+   "is_primary": null,
+   "mode": "active",
+   "name": "webportal.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [
+    {
+     "fqdn": "heuel.com",
+     "reason": "redirect",
+     "status": 200
+    },
+    {
+     "fqdn": "jobs.heuel.com",
+     "reason": "redirect",
+     "status": 200
+    }
+   ],
+   "body_hash": "611836ee693c1ad6839ad148051d394f95c1ace4627ab72fa4c94109ebc3cadc",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "www.heuel.com: status=200 title=Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS final_url=https://www.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://www.heuel.com",
+   "host_ip": "217.72.203.132",
+   "http_status": 200,
+   "id": "fqdn:www.heuel.com",
+   "is_primary": true,
+   "mode": "active",
+   "name": "www.heuel.com",
+   "observed_at": "2026-05-21T23:54:22Z",
+   "screenshot_key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
+   "source": "web_probe",
+   "title": "Spedition für Stückguttransporte,  LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  }
+ ],
+ "generator": {
+  "inputs": [
+   {
+    "kind": "tar",
+    "name": "176db198-fa4a-4520-bf18-43cbc02a229d.tar.gz",
+    "sha256": "f77a8097b2f929eef155eca020854b1f9172260bf9ddc821a658fe1addcd13f9"
+   },
+   {
+    "kind": "tool_runs",
+    "name": "results.json",
+    "sha256": "0357019ea64a29b7852d4a099497a41137f5ef554a267c850c5da985c584474e"
+   },
+   {
+    "kind": "eol_feed",
+    "name": "eol_data_generated.py",
+    "sha256": "35b5eb969453fa4788c9b973bbd5988391e18ee83a5e221f1d13602436929372"
+   }
+  ],
+  "name": "reporter.facts",
+  "version": "1.0.0"
+ },
+ "hosts": [
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Thu May 21 23:55:59 2026; 1 IP address (1 host up) scanned in 22.39 seconds",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=104.16.10.6 rdns= fqdns=online.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "online.heuel.com"
+   ],
+   "id": "host:104.16.10.6",
+   "ip": "104.16.10.6",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-05-21T23:55:59Z",
+   "ports_summary": {
+    "closed": null,
+    "filtered": 996,
+    "open": 4
+   },
+   "provider": {
+    "country": "US",
+    "isp": "Cloudflare, Inc.",
+    "usage_type": "Content Delivery Network"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": null,
+   "source": "nmap"
+  },
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 0.8,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "ip=195.225.241.75 rdns= fqdns=mails.heuel.com,smtp.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "mails.heuel.com",
+    "smtp.heuel.com"
+   ],
+   "id": "host:195.225.241.75",
+   "ip": "195.225.241.75",
+   "mode": "active",
+   "nmap_state": null,
+   "observed_at": "2026-05-22T00:11:37Z",
+   "ports_summary": {
+    "closed": null,
+    "filtered": null,
+    "open": 0
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "comtrance service GmbH",
+    "usage_type": "Data Center/Web Hosting/Transit"
+   },
+   "reachable": null,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": null,
+   "source": "host_inventory"
+  },
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Thu May 21 23:56:13 2026; 1 IP address (1 host up) scanned in 55.92 seconds",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=20.79.218.75 rdns= fqdns=edi.heuel.com,ose.heuel.com,mail.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "edi.heuel.com",
+    "mail.heuel.com",
+    "ose.heuel.com"
+   ],
+   "id": "host:20.79.218.75",
+   "ip": "20.79.218.75",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-05-21T23:56:12Z",
+   "ports_summary": {
+    "closed": null,
+    "filtered": 995,
+    "open": 5
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "Microsoft Corporation",
+    "usage_type": "Data Center/Web Hosting/Transit"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": null,
+   "source": "nmap"
+  },
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 0.8,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "ip=213.133.104.51 rdns=www51.your-server.de fqdns=dl.heuel.com,webportal.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "dl.heuel.com",
+    "webportal.heuel.com"
+   ],
+   "id": "host:213.133.104.51",
+   "ip": "213.133.104.51",
+   "mode": "active",
+   "nmap_state": null,
+   "observed_at": "2026-05-22T00:11:37Z",
+   "ports_summary": {
+    "closed": null,
+    "filtered": null,
+    "open": 0
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "Hetzner Online AG",
+    "usage_type": "Content Delivery Network"
+   },
+   "reachable": null,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": "www51.your-server.de",
+   "source": "host_inventory"
+  },
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Thu May 21 23:55:44 2026; 1 IP address (1 host up) scanned in 27.82 seconds",
+     "ref": "hosts/217.72.203.132/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=217.72.203.132 rdns=ip217-72-203-132.pbiaas.com fqdns=heuel.com,www.heuel.com,jobs.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "heuel.com",
+    "jobs.heuel.com",
+    "www.heuel.com"
+   ],
+   "id": "host:217.72.203.132",
+   "ip": "217.72.203.132",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-05-21T23:55:44Z",
+   "ports_summary": {
+    "closed": null,
+    "filtered": 998,
+    "open": 2
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "IONOS SE",
+    "usage_type": "Data Center/Web Hosting/Transit"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": "ip217-72-203-132.pbiaas.com",
+   "source": "nmap"
+  },
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 0.8,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "ip=2a01:4f8:d0a:2757::2 rdns=www51.your-server.de fqdns=webportal.heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 6,
+   "fqdns": [
+    "webportal.heuel.com"
+   ],
+   "id": "host:[2a01:4f8:d0a:2757::2]",
+   "ip": "2a01:4f8:d0a:2757::2",
+   "mode": "active",
+   "nmap_state": null,
+   "observed_at": "2026-05-22T00:11:37Z",
+   "ports_summary": {
+    "closed": null,
+    "filtered": null,
+    "open": 0
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "Hetzner Online GmbH",
+    "usage_type": "Content Delivery Network"
+   },
+   "reachable": null,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": "www51.your-server.de",
+   "source": "host_inventory"
+  }
+ ],
+ "http": [
+  {
+   "alerts": [
+    {
+     "confidence": "High",
+     "count": 3,
+     "cwe": "CWE-319",
+     "evidence": null,
+     "name": "Strict-Transport-Security Header Not Set",
+     "plugin_id": "10035",
+     "risk": "Low",
+     "url": "https://edi.heuel.com",
+     "urls_sample": [
+      "https://edi.heuel.com",
+      "https://edi.heuel.com/robots.txt",
+      "https://edi.heuel.com/sitemap.xml"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 3,
+     "cwe": "CWE-693",
+     "evidence": null,
+     "name": "Content Security Policy (CSP) Header Not Set",
+     "plugin_id": "10038",
+     "risk": "Medium",
+     "url": "https://edi.heuel.com",
+     "urls_sample": [
+      "https://edi.heuel.com",
+      "https://edi.heuel.com/robots.txt",
+      "https://edi.heuel.com/sitemap.xml"
+     ]
+    }
+   ],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "edi.heuel.com: reachable=None score=0/7 server=Apache x-feserver=None",
+     "ref": "scan_results:header_check:20.79.218.75",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "edi.heuel.com: status=403 title=403 Forbidden webserver=Apache tech=['Apache HTTP Server']",
+     "ref": "hosts/20.79.218.75/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "edi.heuel.com",
+   "headers": {
+    "content-type": "text/html; charset=iso-8859-1",
+    "date": "Fri, 22 May 2026 00:10:00 GMT",
+    "server": "Apache"
+   },
+   "host_ip": "20.79.218.75",
+   "hsts": null,
+   "id": "http:edi.heuel.com",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:00Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "0/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "Apache",
+   "source": "header_check",
+   "spider_url_count": 3,
+   "status_code": 403,
+   "technologies": [
+    {
+     "name": "Apache HTTP Server",
+     "version": null
+    }
+   ],
+   "url": "https://edi.heuel.com",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [
+    {
+     "confidence": "Low",
+     "count": 1,
+     "cwe": "CWE-525",
+     "evidence": "public, max-age=43200",
+     "name": "Re-examine Cache-control Directives",
+     "plugin_id": "10015",
+     "risk": "Informational",
+     "url": "https://online.heuel.com/robots.txt",
+     "urls_sample": [
+      "https://online.heuel.com/robots.txt"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": "CWE-693",
+     "evidence": null,
+     "name": "X-Content-Type-Options Header Missing",
+     "plugin_id": "10021",
+     "risk": "Low",
+     "url": "https://online.heuel.com/robots.txt",
+     "urls_sample": [
+      "https://online.heuel.com/robots.txt"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 3,
+     "cwe": "CWE-319",
+     "evidence": null,
+     "name": "Strict-Transport-Security Header Not Set",
+     "plugin_id": "10035",
+     "risk": "Low",
+     "url": "https://online.heuel.com",
+     "urls_sample": [
+      "https://online.heuel.com",
+      "https://online.heuel.com/robots.txt",
+      "https://online.heuel.com/sitemap.xml"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": "CWE-525",
+     "evidence": "Age: 43067",
+     "name": "Retrieved from Cache",
+     "plugin_id": "10050",
+     "risk": "Informational",
+     "url": "https://online.heuel.com/robots.txt",
+     "urls_sample": [
+      "https://online.heuel.com/robots.txt"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 3,
+     "cwe": "CWE-1275",
+     "evidence": "set-cookie: __cf_bm",
+     "name": "Cookie with SameSite Attribute None",
+     "plugin_id": "10054",
+     "risk": "Low",
+     "url": "https://online.heuel.com",
+     "urls_sample": [
+      "https://online.heuel.com",
+      "https://online.heuel.com/robots.txt",
+      "https://online.heuel.com/sitemap.xml"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 2,
+     "cwe": "CWE-693",
+     "evidence": "default-src 'none'; script-src 'nonce-athM6Hve1VcI1tB4VNDqXj' 'unsafe-eval' https://challenges.cloudflare.com; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' https://challenges.c...",
+     "name": "CSP: Failure to Define Directive with No Fallback",
+     "plugin_id": "10055",
+     "risk": "Medium",
+     "url": "https://online.heuel.com",
+     "urls_sample": [
+      "https://online.heuel.com",
+      "https://online.heuel.com/sitemap.xml"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 3,
+     "cwe": "CWE-497",
+     "evidence": "1779394869",
+     "name": "Timestamp Disclosure - Unix",
+     "plugin_id": "10096",
+     "risk": "Low",
+     "url": "https://online.heuel.com",
+     "urls_sample": [
+      "https://online.heuel.com",
+      "https://online.heuel.com/robots.txt",
+      "https://online.heuel.com/sitemap.xml"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 2,
+     "cwe": null,
+     "evidence": "<script nonce=\"athM6Hve1VcI1tB4VNDqXj\">(function(){window._cf_chl_opt = {cFPWv: 'b',cH: 'xlqZusuFnlhZIewYAn6_KtTxk20uzsIyPgxpA83ATRE-1779394869-1.2.1.1-JiRF6IgvOSWthd1pm1TKWXsYjkRdWD83Seixpf.hqKAuR...",
+     "name": "Modern Web Application",
+     "plugin_id": "10109",
+     "risk": "Informational",
+     "url": "https://online.heuel.com",
+     "urls_sample": [
+      "https://online.heuel.com",
+      "https://online.heuel.com/sitemap.xml"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 3,
+     "cwe": null,
+     "evidence": "__cf_bm",
+     "name": "Session Management Response Identified",
+     "plugin_id": "10112",
+     "risk": "Informational",
+     "url": "https://online.heuel.com",
+     "urls_sample": [
+      "https://online.heuel.com",
+      "https://online.heuel.com/robots.txt",
+      "https://online.heuel.com/sitemap.xml"
+     ]
+    }
+   ],
+   "confidence": 1.0,
+   "cookies": [
+    {
+     "httponly": true,
+     "name": "__cf_bm",
+     "samesite": "none",
+     "secure": true
+    }
+   ],
+   "csp": {
+    "present": true,
+    "unsafe_eval": true,
+    "unsafe_inline": true,
+    "value": "default-src 'none'; script-src 'nonce-f4Mv3YeitaR7BDgV2z3LIV' 'unsafe-eval' https://challenges.cloudflare.com; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com blob:; child-src 'self' https://challenges.cloudflare.com blob:; worker-src blob:; form-action http: https:; base-uri 'self'",
+    "wildcard": false
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "online.heuel.com: reachable=None score=5/7 server=cloudflare x-feserver=None",
+     "ref": "scan_results:header_check:104.16.10.6",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "online.heuel.com: status=403 title=Just a moment... webserver=cloudflare tech=['Cloudflare', 'Cloudflare Bot Management']",
+     "ref": "hosts/104.16.10.6/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "online.heuel.com",
+   "headers": {
+    "accept-ch": "Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA",
+    "cf-mitigated": "challenge",
+    "cf-ray": "9ff79a6dcd05160f-DUS",
+    "content-length": "5385",
+    "content-security-policy": "default-src 'none'; script-src 'nonce-f4Mv3YeitaR7BDgV2z3LIV' 'unsafe-eval' https://challenges.cloudflare.com; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com blob:; child-src 'self' https://challenges.cloudflare.com blob:; worker-src blob:; form-action http: https:; base-uri 'self'",
+    "content-type": "text/html; charset=UTF-8",
+    "critical-ch": "Sec-CH-UA-Bitness, Sec-CH-UA-Arch, Sec-CH-UA-Full-Version, Sec-CH-UA-Mobile, Sec-CH-UA-Model, Sec-CH-UA-Platform-Version, Sec-CH-UA-Full-Version-List, Sec-CH-UA-Platform, Sec-CH-UA, UA-Bitness, UA-Arch, UA-Full-Version, UA-Mobile, UA-Model, UA-Platform-Version, UA-Platform, UA",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "same-origin",
+    "date": "Fri, 22 May 2026 00:11:23 GMT",
+    "origin-agent-cluster": "?1",
+    "permissions-policy": "accelerometer=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),xr-spatial-tracking=(self)",
+    "referrer-policy": "same-origin",
+    "server": "cloudflare",
+    "server-timing": "chlray;desc=\"9ff79a6dcd05160f\"",
+    "set-cookie": "__cf_bm=DpKcmXq0yv04d6RgmYn6EonP0NZrKt6POfIbmhTn4pg-1779408683.1715834-1.0.1.1-eBFb6UsgK4Q3Ilz.VPbzgnki8bnvWRAzpevGWCpdDImTE.rmw86dF8jNGkF6eoGAMPdSvh_ph83B5U28CDKIvXhqDQNraSE0QZgKMdc5F4joMXhQY0iwq4_mc1oAnrzh; HttpOnly; SameSite=None; Secure; Path=/; Domain=online.heuel.com; Expires=Fri, 22 May 2026 00:41:23 GMT",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "SAMEORIGIN"
+   },
+   "host_ip": "104.16.10.6",
+   "hsts": null,
+   "id": "http:online.heuel.com",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:23Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "5/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": true,
+     "value": "default-src 'none'; script-src 'nonce-f4Mv3YeitaR7BDgV2z3LIV' 'unsafe-eval' https://challenges.cloudflare.com; script-src-attr 'none'; style-src 'unsafe-inline'; img-src 'self' https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com blob:; child-src 'self' https://challenges.cloudflare.com blob:; worker-src blob:; form-action http: https:; base-uri 'self'"
+    },
+    "permissions-policy": {
+     "present": true,
+     "value": "accelerometer=(),browsing-topics=(),camera=(),clipboard-read=(),clipboard-write=(),geolocation=(),gyroscope=(),hid=(),interest-cohort=(),magnetometer=(),microphone=(),payment=(),publickey-credentials-get=(),screen-wake-lock=(),serial=(),sync-xhr=(),usb=(),xr-spatial-tracking=(self)"
+    },
+    "referrer-policy": {
+     "present": true,
+     "value": "same-origin"
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": true,
+     "value": "nosniff"
+    },
+    "x-frame-options": {
+     "present": true,
+     "value": "SAMEORIGIN"
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "cloudflare",
+   "source": "header_check",
+   "spider_url_count": 3,
+   "status_code": 403,
+   "technologies": [
+    {
+     "name": "Cloudflare",
+     "version": null
+    },
+    {
+     "name": "Cloudflare Bot Management",
+     "version": null
+    }
+   ],
+   "url": "https://online.heuel.com",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [
+    {
+     "confidence": "Medium",
+     "count": 5,
+     "cwe": "CWE-1395",
+     "evidence": "/*! jQuery UI - v1.13.0",
+     "name": "Vulnerable JS Library",
+     "plugin_id": "10003",
+     "risk": "Medium",
+     "url": "https://ose.heuel.com/webmodule-ee/javax.faces.resource/jquery/jquery-plugins.js.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?e=11.0.4&ln=primefaces&v=11.0.1-SNAPSHOT",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/javax.faces.resource/jquery/jquery-plugins.js.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?e=11.0.4&ln=primefaces&v=11.0.1-SNAPSHOT",
+      "https://ose.heuel.com/webmodule-ee/javax.faces.resource/jquery/jquery-plugins.js.seam;jsessionid=OYHS6SqAcMRpfvnHOXV8VaGUH1ML9NCTSIDda2dd.ose01?e=11.0.4&ln=primefaces&v=11.0.1-SNAPSHOT",
+      "https://ose.heuel.com/webmodule-ee/javax.faces.resource/jquery/jquery-plugins.js.seam;jsessionid=OobmKGlovAXHNUgbq1fjLuRpD4bc1OZa6jwrPbwu.ose01?e=11.0.4&ln=primefaces&v=11.0.1-SNAPSHOT",
+      "https://ose.heuel.com/webmodule-ee/javax.faces.resource/jquery/jquery-plugins.js.seam;jsessionid=e7ygqIiyDcaecssHIkXkhqfEtAibInLGbjW2_ML3.ose01?e=11.0.4&ln=primefaces&v=11.0.1-SNAPSHOT",
+      "https://ose.heuel.com/webmodule-ee/javax.faces.resource/jquery/jquery-plugins.js.seam?e=11.0.4&ln=primefaces&v=11.0.1-SNAPSHOT"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 2,
+     "cwe": "CWE-497",
+     "evidence": "Apache/2.4.67",
+     "name": "In Page Banner Information Leak",
+     "plugin_id": "10009",
+     "risk": "Low",
+     "url": "https://ose.heuel.com/robots.txt",
+     "urls_sample": [
+      "https://ose.heuel.com/robots.txt",
+      "https://ose.heuel.com/sitemap.xml"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": "CWE-1004",
+     "evidence": "Set-Cookie: JSESSIONID",
+     "name": "Cookie No HttpOnly Flag",
+     "plugin_id": "10010",
+     "risk": "Low",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": "CWE-614",
+     "evidence": "Set-Cookie: JSESSIONID",
+     "name": "Cookie Without Secure Flag",
+     "plugin_id": "10011",
+     "risk": "Low",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 7,
+     "cwe": "CWE-525",
+     "evidence": null,
+     "name": "Re-examine Cache-control Directives",
+     "plugin_id": "10015",
+     "risk": "Informational",
+     "url": "https://ose.heuel.com",
+     "urls_sample": [
+      "https://ose.heuel.com",
+      "https://ose.heuel.com/",
+      "https://ose.heuel.com/webmodule-ee/",
+      "https://ose.heuel.com/webmodule-ee/login.seam",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 8,
+     "cwe": "CWE-1021",
+     "evidence": null,
+     "name": "Missing Anti-clickjacking Header",
+     "plugin_id": "10020",
+     "risk": "Medium",
+     "url": "https://ose.heuel.com",
+     "urls_sample": [
+      "https://ose.heuel.com",
+      "https://ose.heuel.com/",
+      "https://ose.heuel.com/webmodule-ee/",
+      "https://ose.heuel.com/webmodule-ee/login.seam",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 84,
+     "cwe": "CWE-693",
+     "evidence": null,
+     "name": "X-Content-Type-Options Header Missing",
+     "plugin_id": "10021",
+     "risk": "Low",
+     "url": "https://ose.heuel.com",
+     "urls_sample": [
+      "https://ose.heuel.com",
+      "https://ose.heuel.com/",
+      "https://ose.heuel.com/webmodule-ee/",
+      "https://ose.heuel.com/webmodule-ee/images/favicon.svg",
+      "https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?pfdrid_c=true"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 5,
+     "cwe": "CWE-20",
+     "evidence": null,
+     "name": "User Controllable HTML Element Attribute (Potential XSS)",
+     "plugin_id": "10031",
+     "risk": "Informational",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OYHS6SqAcMRpfvnHOXV8VaGUH1ML9NCTSIDda2dd.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OobmKGlovAXHNUgbq1fjLuRpD4bc1OZa6jwrPbwu.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=e7ygqIiyDcaecssHIkXkhqfEtAibInLGbjW2_ML3.ose01"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 93,
+     "cwe": "CWE-319",
+     "evidence": null,
+     "name": "Strict-Transport-Security Header Not Set",
+     "plugin_id": "10035",
+     "risk": "Low",
+     "url": "https://ose.heuel.com",
+     "urls_sample": [
+      "https://ose.heuel.com",
+      "https://ose.heuel.com/",
+      "https://ose.heuel.com/robots.txt",
+      "https://ose.heuel.com/sitemap.xml",
+      "https://ose.heuel.com/webmodule-ee/"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 17,
+     "cwe": "CWE-693",
+     "evidence": null,
+     "name": "Content Security Policy (CSP) Header Not Set",
+     "plugin_id": "10038",
+     "risk": "Medium",
+     "url": "https://ose.heuel.com",
+     "urls_sample": [
+      "https://ose.heuel.com",
+      "https://ose.heuel.com/",
+      "https://ose.heuel.com/robots.txt",
+      "https://ose.heuel.com/sitemap.xml",
+      "https://ose.heuel.com/webmodule-ee/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": "CWE-201",
+     "evidence": null,
+     "name": "Big Redirect Detected (Potential Sensitive Information Leak)",
+     "plugin_id": "10044",
+     "risk": "Low",
+     "url": "https://ose.heuel.com/webmodule-ee",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": "CWE-1275",
+     "evidence": "Set-Cookie: JSESSIONID",
+     "name": "Cookie without SameSite Attribute",
+     "plugin_id": "10054",
+     "risk": "Low",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 89,
+     "cwe": "CWE-264",
+     "evidence": "Access-Control-Allow-Origin: *",
+     "name": "Cross-Domain Misconfiguration",
+     "plugin_id": "10098",
+     "risk": "Medium",
+     "url": "https://ose.heuel.com/webmodule-ee/",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/",
+      "https://ose.heuel.com/webmodule-ee/images/",
+      "https://ose.heuel.com/webmodule-ee/images/favicon.svg",
+      "https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?pfdrid_c=true",
+      "https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=OYHS6SqAcMRpfvnHOXV8VaGUH1ML9NCTSIDda2dd.ose01?pfdrid_c=true"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 5,
+     "cwe": null,
+     "evidence": "<script type=\"text/javascript\" src=\"/webmodule-ee/javax.faces.resource/jquery/jquery.js.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?ln=primefaces&amp;v=11.0.1-SNAPSHOT&amp;e=11.0...",
+     "name": "Modern Web Application",
+     "plugin_id": "10109",
+     "risk": "Informational",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OYHS6SqAcMRpfvnHOXV8VaGUH1ML9NCTSIDda2dd.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OobmKGlovAXHNUgbq1fjLuRpD4bc1OZa6jwrPbwu.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=e7ygqIiyDcaecssHIkXkhqfEtAibInLGbjW2_ML3.ose01"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 5,
+     "cwe": null,
+     "evidence": "password",
+     "name": "Authentication Request Identified",
+     "plugin_id": "10111",
+     "risk": "Informational",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OYHS6SqAcMRpfvnHOXV8VaGUH1ML9NCTSIDda2dd.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OobmKGlovAXHNUgbq1fjLuRpD4bc1OZa6jwrPbwu.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=e7ygqIiyDcaecssHIkXkhqfEtAibInLGbjW2_ML3.ose01"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 1,
+     "cwe": null,
+     "evidence": "JSESSIONID",
+     "name": "Session Management Response Identified",
+     "plugin_id": "10112",
+     "risk": "Informational",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 5,
+     "cwe": "CWE-352",
+     "evidence": "<form id=\"gridForm\" name=\"gridForm\" method=\"post\" action=\"/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01\" enctype=\"application/x-www-form-urlencoded\">",
+     "name": "Absence of Anti-CSRF Tokens",
+     "plugin_id": "10202",
+     "risk": "Medium",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OYHS6SqAcMRpfvnHOXV8VaGUH1ML9NCTSIDda2dd.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OobmKGlovAXHNUgbq1fjLuRpD4bc1OZa6jwrPbwu.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=e7ygqIiyDcaecssHIkXkhqfEtAibInLGbjW2_ML3.ose01"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 3,
+     "cwe": "CWE-497",
+     "evidence": "10.3.2.4",
+     "name": "Private IP Disclosure",
+     "plugin_id": "2",
+     "risk": "Low",
+     "url": "https://ose.heuel.com/robots.txt",
+     "urls_sample": [
+      "https://ose.heuel.com/robots.txt",
+      "https://ose.heuel.com/sitemap.xml",
+      "https://ose.heuel.com/webmodule-ee"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 64,
+     "cwe": "CWE-598",
+     "evidence": "jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x",
+     "name": "Session ID in URL Rewrite",
+     "plugin_id": "3",
+     "risk": "Medium",
+     "url": "https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?pfdrid_c=true",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?pfdrid_c=true",
+      "https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=OYHS6SqAcMRpfvnHOXV8VaGUH1ML9NCTSIDda2dd.ose01?pfdrid_c=true",
+      "https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=OobmKGlovAXHNUgbq1fjLuRpD4bc1OZa6jwrPbwu.ose01?pfdrid_c=true",
+      "https://ose.heuel.com/webmodule-ee/images/loading.gif;jsessionid=e7ygqIiyDcaecssHIkXkhqfEtAibInLGbjW2_ML3.ose01?pfdrid_c=true",
+      "https://ose.heuel.com/webmodule-ee/javax.faces.resource/centerAjaxStatus.css.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01?ln=css&v=1_0"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 5,
+     "cwe": "CWE-436",
+     "evidence": null,
+     "name": "Charset Mismatch (Header Versus Meta Content-Type Charset)",
+     "plugin_id": "90011",
+     "risk": "Informational",
+     "url": "https://ose.heuel.com/webmodule-ee/login.seam",
+     "urls_sample": [
+      "https://ose.heuel.com/webmodule-ee/login.seam",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=KwozKgaX0nxzWMdO9VXjQKYt9WI36x-J5Xxu0lwv.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OYHS6SqAcMRpfvnHOXV8VaGUH1ML9NCTSIDda2dd.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=OobmKGlovAXHNUgbq1fjLuRpD4bc1OZa6jwrPbwu.ose01",
+      "https://ose.heuel.com/webmodule-ee/login.seam;jsessionid=e7ygqIiyDcaecssHIkXkhqfEtAibInLGbjW2_ML3.ose01"
+     ]
+    }
+   ],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "ose.heuel.com: reachable=None score=0/7 server=Apache x-feserver=None",
+     "ref": "scan_results:header_check:20.79.218.75",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "ose.heuel.com: status=200 title=Redirector webserver=Apache tech=['Apache HTTP Server']",
+     "ref": "hosts/20.79.218.75/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "ose.heuel.com",
+   "headers": {
+    "accept-ranges": "bytes",
+    "content-length": "151",
+    "content-type": "text/html; charset=ISO-8859-1",
+    "date": "Fri, 22 May 2026 00:10:00 GMT",
+    "etag": "\"97-5e331555c605e\"",
+    "last-modified": "Thu, 07 Jul 2022 06:38:28 GMT",
+    "server": "Apache",
+    "vary": "Accept-Encoding"
+   },
+   "host_ip": "20.79.218.75",
+   "hsts": null,
+   "id": "http:ose.heuel.com",
+   "login_form": true,
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:00Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "0/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": false,
+     "value": null
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "Apache",
+   "source": "header_check",
+   "spider_url_count": 307,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "Apache HTTP Server",
+     "version": null
+    }
+   ],
+   "url": "https://ose.heuel.com",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [
+    {
+     "confidence": "Medium",
+     "count": 184,
+     "cwe": "CWE-614",
+     "evidence": "Set-Cookie: Neos_Session",
+     "name": "Cookie Without Secure Flag",
+     "plugin_id": "10011",
+     "risk": "Low",
+     "url": "https://www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf",
+     "urls_sample": [
+      "https://www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics.html",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics/Azubi-Workshop-1.html",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics/Azubi-Workshop.html",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics/Azubistart-bei-HEUEL-LOGISTICS.html"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 178,
+     "cwe": "CWE-525",
+     "evidence": null,
+     "name": "Re-examine Cache-control Directives",
+     "plugin_id": "10015",
+     "risk": "Informational",
+     "url": "https://www.heuel.com",
+     "urls_sample": [
+      "https://www.heuel.com",
+      "https://www.heuel.com/",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics.html",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics/Azubi-Workshop-1.html",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics/Azubi-Workshop.html"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 6,
+     "cwe": "CWE-829",
+     "evidence": "<script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>",
+     "name": "Cross-Domain JavaScript Source File Inclusion",
+     "plugin_id": "10017",
+     "risk": "Low",
+     "url": "https://www.heuel.com/en/freight-inquiry.html",
+     "urls_sample": [
+      "https://www.heuel.com/en/freight-inquiry.html",
+      "https://www.heuel.com/frachtanfrage-heuel.html",
+      "https://www.heuel.com/karriere-machen-in-suedwestfalen.html",
+      "https://www.heuel.com/karriere-machen-in-suedwestfalen/offene-stellen-in-suedwestfalen.html",
+      "https://www.heuel.com/spedition/siegen.html"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 6,
+     "cwe": "CWE-20",
+     "evidence": null,
+     "name": "User Controllable HTML Element Attribute (Potential XSS)",
+     "plugin_id": "10031",
+     "risk": "Informational",
+     "url": "https://www.heuel.com/en/kontakt-heuel-logistics.html",
+     "urls_sample": [
+      "https://www.heuel.com/en/kontakt-heuel-logistics.html",
+      "https://www.heuel.com/en/search.html?search=ZAP",
+      "https://www.heuel.com/kontakt-heuel-logistics.html",
+      "https://www.heuel.com/neos/login",
+      "https://www.heuel.com/suche.html?search=ZAP"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 425,
+     "cwe": "CWE-693",
+     "evidence": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; f...",
+     "name": "CSP: Failure to Define Directive with No Fallback",
+     "plugin_id": "10055",
+     "risk": "Medium",
+     "url": "http://www.heuel.com",
+     "urls_sample": [
+      "http://www.heuel.com",
+      "http://www.heuel.com/",
+      "http://www.heuel.com/_Resources/",
+      "http://www.heuel.com/_Resources/Persistent/",
+      "http://www.heuel.com/_Resources/Static/"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 15,
+     "cwe": "CWE-497",
+     "evidence": "1764082512",
+     "name": "Timestamp Disclosure - Unix",
+     "plugin_id": "10096",
+     "risk": "Low",
+     "url": "https://www.heuel.com/_res/13e5aa58eb2182d8ace63266856c8cc29c47c083/site.webmanifest",
+     "urls_sample": [
+      "https://www.heuel.com/_res/13e5aa58eb2182d8ace63266856c8cc29c47c083/site.webmanifest",
+      "https://www.heuel.com/_res/1684c88f8683eef575f7832192bc934f005a4460/favicon-16x16.png",
+      "https://www.heuel.com/_res/30a70cbb4851865b62490b7f4b9562bd797a655e/ADSp-Geschaeftsbedingungen-2017.pdf",
+      "https://www.heuel.com/_res/337c79356c10e8c298b98f039fe8e5460de51eb9/Anfahrtskizze-Standort-2-4-Drolshagen_.pdf",
+      "https://www.heuel.com/_res/45fee6da5f2f3f2d24a0dd4acb5d1516baa2b778/Anfahrtskizze-Standort-12-Drolshagen.pdf"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 381,
+     "cwe": null,
+     "evidence": "<a href=\"#\" class=\"button__link\"><span>Zum Inhalt springen</span><span class=\"icon atom lazyload\" data-iconuri=\"https://www.heuel.com/_Resources/Static/Packages/7S.Nebula/Assets/Icons/Nebula/caret-...",
+     "name": "Modern Web Application",
+     "plugin_id": "10109",
+     "risk": "Informational",
+     "url": "https://www.heuel.com",
+     "urls_sample": [
+      "https://www.heuel.com",
+      "https://www.heuel.com/",
+      "https://www.heuel.com/%5C%22http:%5C",
+      "https://www.heuel.com/%5C%22http:%5C/%5C",
+      "https://www.heuel.com/%5C%22http:%5C/%5C/www.heuel.com%5C%22"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 1,
+     "cwe": null,
+     "evidence": "__authentication[Neos][Flow][Security][Authentication][Token][UsernamePassword][password]",
+     "name": "Authentication Request Identified",
+     "plugin_id": "10111",
+     "risk": "Informational",
+     "url": "https://www.heuel.com/neos/login",
+     "urls_sample": [
+      "https://www.heuel.com/neos/login"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 180,
+     "cwe": null,
+     "evidence": "Neos_Session",
+     "name": "Session Management Response Identified",
+     "plugin_id": "10112",
+     "risk": "Informational",
+     "url": "https://www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf",
+     "urls_sample": [
+      "https://www.heuel.com/_Resources/Persistent/6/6/d/9/66d9b200d1d86fc1699a673c406b08c6c7931133/Fahrplan%20Landverkehre%20Jahreswechsel%2025-26.pdf",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics.html",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics/Azubi-Workshop-1.html",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics/Azubi-Workshop.html",
+      "https://www.heuel.com/aktuelles-von-heuel-logistics/Azubistart-bei-HEUEL-LOGISTICS.html"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 4,
+     "cwe": "CWE-352",
+     "evidence": "<form method=\"post\" enctype=\"multipart/form-data\" id=\"contact\" action=\"https://www.heuel.com/kontakt-heuel-logistics.html#contact\">",
+     "name": "Absence of Anti-CSRF Tokens",
+     "plugin_id": "10202",
+     "risk": "Medium",
+     "url": "https://www.heuel.com/en/kontakt-heuel-logistics.html",
+     "urls_sample": [
+      "https://www.heuel.com/en/kontakt-heuel-logistics.html",
+      "https://www.heuel.com/kontakt-heuel-logistics.html",
+      "https://www.heuel.com/neos/login",
+      "https://www.heuel.com/transport-suche.html"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 6,
+     "cwe": "CWE-345",
+     "evidence": "<script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script>",
+     "name": "Sub Resource Integrity Attribute Missing",
+     "plugin_id": "90003",
+     "risk": "Medium",
+     "url": "https://www.heuel.com/en/freight-inquiry.html",
+     "urls_sample": [
+      "https://www.heuel.com/en/freight-inquiry.html",
+      "https://www.heuel.com/frachtanfrage-heuel.html",
+      "https://www.heuel.com/karriere-machen-in-suedwestfalen.html",
+      "https://www.heuel.com/karriere-machen-in-suedwestfalen/offene-stellen-in-suedwestfalen.html",
+      "https://www.heuel.com/spedition/siegen.html"
+     ]
+    }
+   ],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": true,
+    "unsafe_eval": true,
+    "unsafe_inline": true,
+    "value": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
+    "wildcard": false
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "www.heuel.com: reachable=None score=7/7 server=None x-feserver=None",
+     "ref": "scan_results:header_check:217.72.203.132",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "www.heuel.com: status=200 title=Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS webserver=None tech=['HSTS', 'Neos CMS', 'Neos Flow:neos', 'PHP']",
+     "ref": "hosts/217.72.203.132/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "www.heuel.com",
+   "headers": {
+    "content-length": "187755",
+    "content-security-policy": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;",
+    "content-type": "text/html;charset=UTF-8",
+    "date": "Fri, 22 May 2026 00:03:57 GMT",
+    "permissions-policy": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geolocation=(self), gyroscope=(self), keyboard-map=(self), magnetometer=(self), microphone=(self), midi=(self), navigation-override=(self), payment=(self), picture-in-picture=(self), publickey-credentials-get=(self), screen-wake-lock=(self), sync-xhr=(self), usb=(self), web-share=(self), xr-spatial-tracking=(self)",
+    "referrer-policy": "no-referrer-when-downgrade",
+    "strict-transport-security": "max-age=31536000;",
+    "vary": "Accept-Encoding",
+    "x-content-type-options": "nosniff",
+    "x-flow-powered": "Flow Neos",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "1"
+   },
+   "host_ip": "217.72.203.132",
+   "hsts": {
+    "include_subdomains": false,
+    "max_age": 31536000,
+    "preload": false,
+    "present": true,
+    "raw": "max-age=31536000;"
+   },
+   "id": "http:www.heuel.com",
+   "login_form": true,
+   "mode": "active",
+   "observed_at": "2026-05-22T00:03:57Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "7/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": true,
+     "value": "default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: blob: https://*; worker-src 'self' blob:; font-src 'self' data: https://*; connect-src 'self' webpack: https://*;"
+    },
+    "permissions-policy": {
+     "present": true,
+     "value": "accelerometer=(self), ambient-light-sensor=(self), autoplay=(self), battery=(self), camera=(self), cross-origin-isolated=(self), display-capture=(self), document-domain=(self), encrypted-media=(self), execution-while-not-rendered=(self), execution-while-out-of-viewport=(self), fullscreen=(self), geolocation=(self), gyroscope=(self), keyboard-map=(self), magnetometer=(self), microphone=(self), midi=(self), navigation-override=(self), payment=(self), picture-in-picture=(self), publickey-credentials-get=(self), screen-wake-lock=(self), sync-xhr=(self), usb=(self), web-share=(self), xr-spatial-tracking=(self)"
+    },
+    "referrer-policy": {
+     "present": true,
+     "value": "no-referrer-when-downgrade"
+    },
+    "strict-transport-security": {
+     "present": true,
+     "value": "max-age=31536000;"
+    },
+    "x-content-type-options": {
+     "present": true,
+     "value": "nosniff"
+    },
+    "x-frame-options": {
+     "present": true,
+     "value": "SAMEORIGIN"
+    },
+    "x-xss-protection": {
+     "present": true,
+     "value": "1"
+    }
+   },
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": 579,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "HSTS",
+     "version": null
+    },
+    {
+     "name": "Neos CMS",
+     "version": null
+    },
+    {
+     "name": "Neos Flow:neos",
+     "version": null
+    },
+    {
+     "name": "PHP",
+     "version": null
+    }
+   ],
+   "url": "https://www.heuel.com",
+   "wordpress": null,
+   "x_feserver": null
+  }
+ ],
+ "passive": [
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "pulse_count": 0
+   },
+   "domain": "heuel.com",
+   "evidence": [
+    {
+     "excerpt": "pulse_count=0",
+     "ref": "phase0a/otx.json",
+     "tool": "otx"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:otx:heuel.com",
+   "mode": "passive",
+   "observed_at": "2026-05-22T00:11:37Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "otx",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 301 Moved Permanently Date: Thu, 21 May 2026 05:22:09 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive L...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:80 | HTTP/1.1 301 Moved Permanently Date: Thu, 21 May 2026 05:22:09 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Location: https://connec...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:80",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 80,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Server: cloudflare Date: Wed, 20 May 2026 18:38:37 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fed...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:443 CloudFlare | HTTP/1.1 403 Forbidden Server: cloudflare Date: Wed, 20 May 2026 18:38:37 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fed759d2913164...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:443",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 443,
+   "product": "CloudFlare",
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Thu, 07 May 2026 06:22:06 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: p...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:2052 | HTTP/1.1 403 Forbidden Date: Thu, 07 May 2026 06:22:06 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:2052",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 2052,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 400 Bad Request Server: cloudflare Date: Sun, 03 May 2026 18:44:05 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:2053 | HTTP/1.1 400 Bad Request Server: cloudflare Date: Sun, 03 May 2026 18:44:05 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:2053",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 2053,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Tue, 19 May 2026 03:17:28 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: p...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:2082 | HTTP/1.1 403 Forbidden Date: Tue, 19 May 2026 03:17:28 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:2082",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 2082,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Server: cloudflare Date: Fri, 08 May 2026 15:43:36 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9f89...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:2083 | HTTP/1.1 403 Forbidden Server: cloudflare Date: Fri, 08 May 2026 15:43:36 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9f8994bfea41cf26-SJC",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:2083",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 2083,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Fri, 15 May 2026 16:09:06 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: p...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:2086 | HTTP/1.1 403 Forbidden Date: Fri, 15 May 2026 16:09:06 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:2086",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 2086,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Server: cloudflare Date: Tue, 19 May 2026 14:22:30 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fe3...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:2087 | HTTP/1.1 403 Forbidden Server: cloudflare Date: Tue, 19 May 2026 14:22:30 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fe3c10efe852cb6-DFW",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:2087",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 2087,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Sat, 09 May 2026 15:15:42 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: p...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:2095 | HTTP/1.1 403 Forbidden Date: Sat, 09 May 2026 15:15:42 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:2095",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 2095,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 400 Bad Request Server: cloudflare Date: Tue, 21 Apr 2026 22:47:15 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:2096 | HTTP/1.1 400 Bad Request Server: cloudflare Date: Tue, 21 Apr 2026 22:47:15 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:2096",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 2096,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 400 Bad Request Server: cloudflare-nginx Date: Mon, 11 May 2026 17:47:14 GMT Content-Type: text/html Content-Length: 659 Connection: close CF-Bck-Ct...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:6443 | HTTP/1.1 400 Bad Request Server: cloudflare-nginx Date: Mon, 11 May 2026 17:47:14 GMT Content-Type: text/html Content-Length: 659 Connection: close CF-Bck-Ctrl-1: {\"ob_enable\":fa...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:6443",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 6443,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Fri, 15 May 2026 18:54:45 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: p...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:8080 | HTTP/1.1 403 Forbidden Date: Fri, 15 May 2026 18:54:45 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:8080",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 8080,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Server: cloudflare Date: Tue, 19 May 2026 15:45:35 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fe4...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:8443 CloudFlare | HTTP/1.1 403 Forbidden Server: cloudflare Date: Tue, 19 May 2026 15:45:35 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fe43ac3cb7165...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:8443",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 8443,
+   "product": "CloudFlare",
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 07:57:23 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: p...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "104.16.10.6:8880 | HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 07:57:23 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "104.16.10.6",
+   "hostnames": [
+    "funnelcockpit.com"
+   ],
+   "id": "passive:shodan:104.16.10.6:8880",
+   "mode": "passive",
+   "observed_at": "2026-05-21T05:18:03Z",
+   "port": 8880,
+   "product": null,
+   "seen_at": "2026-05-21T05:18:03Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "20.79.218.75:21 |",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "20.79.218.75",
+   "hostnames": [
+    "heuel.com"
+   ],
+   "id": "passive:shodan:20.79.218.75:21",
+   "mode": "passive",
+   "observed_at": "2026-05-20T17:50:48Z",
+   "port": 21,
+   "product": null,
+   "seen_at": "2026-05-20T17:50:48Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 16:24:39 GMT Server: Apache Content-Length: 199 Content-Type: text/html; charset=iso-8859-1",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "20.79.218.75:80 Apache httpd | HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 16:24:39 GMT Server: Apache Content-Length: 199 Content-Type: text/html; charset=iso-8859-1",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "20.79.218.75",
+   "hostnames": [
+    "heuel.com"
+   ],
+   "id": "passive:shodan:20.79.218.75:80",
+   "mode": "passive",
+   "observed_at": "2026-05-20T17:50:48Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "seen_at": "2026-05-20T17:50:48Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 17:56:58 GMT Server: Apache Content-Length: 199 Content-Type: text/html; charset=iso-8859-1",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "20.79.218.75:443 Apache httpd | HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 17:56:58 GMT Server: Apache Content-Length: 199 Content-Type: text/html; charset=iso-8859-1",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "20.79.218.75",
+   "hostnames": [
+    "heuel.com"
+   ],
+   "id": "passive:shodan:20.79.218.75:443",
+   "mode": "passive",
+   "observed_at": "2026-05-20T17:50:48Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "seen_at": "2026-05-20T17:50:48Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "20.79.218.75:8443 |",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "20.79.218.75",
+   "hostnames": [
+    "heuel.com"
+   ],
+   "id": "passive:shodan:20.79.218.75:8443",
+   "mode": "passive",
+   "observed_at": "2026-05-20T17:50:48Z",
+   "port": 8443,
+   "product": null,
+   "seen_at": "2026-05-20T17:50:48Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOS...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:21 | 220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG en-US.UTF-8*;...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:21",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 21,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIOt4sVSHnRSmtSKCFzy6xD/KQUJa77JAkdOYWkUo9Sce Fingerprint: 27:50:8d:df:37:cf:cb:4e:e8:c1:d...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:22 | SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIOt4sVSHnRSmtSKCFzy6xD/KQUJa77JAkdOYWkUo9Sce Fingerprint: 27:50:8d:df:37:cf:cb:4e:e8:c1:de:b7:b7:28:ac:f9 Kex...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:22",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 22,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello 224.194.174.161 [224.194.174.161] 250-SIZE 104857600 250-8BITMIME 250-ETRN 2...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:25 | 220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello 224.194.174.161 [224.194.174.161] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250-PI...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:25",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 25,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 404 Not Found Date: Thu, 21 May 2026 15:40:11 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 300 Content-Type: text/h...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:80 Apache httpd | HTTP/1.1 404 Not Found Date: Thu, 21 May 2026 15:40:11 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 300 Content-Type: text/html; ch...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:80",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:110 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:110",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 110,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-RE...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE I...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:143",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 143,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 404 Not Found Date: Thu, 21 May 2026 14:31:03 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 301 Content-Type: text/h...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:443 Apache httpd | HTTP/1.1 404 Not Found Date: Thu, 21 May 2026 14:31:03 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 301 Content-Type: text/html; c...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:443",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello oki38c1unrwmsj.net [224.56.21.82] 250-SIZE 104857600 250-8BITMIME 250-ETRN 2...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:465 | 220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello oki38c1unrwmsj.net [224.56.21.82] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250-P...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:465",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 465,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello iic9vjkeug3hw.net [224.197.126.208] 250-SIZE 104857600 250-8BITMIME 250-ETRN...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:587 | 220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello iic9vjkeug3hw.net [224.197.126.208] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:587",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 587,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID E...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:993",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 993,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "213.133.104.51:995 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "213.133.104.51",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:213.133.104.51:995",
+   "mode": "passive",
+   "observed_at": "2026-05-21T19:16:15Z",
+   "port": 995,
+   "product": null,
+   "seen_at": "2026-05-21T19:16:15Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 404 Not Found Date: Wed, 20 May 2026 17:03:04 GMT Content-Type: text/html Content-Length: 548 Connection: keep-alive Content-Security-Policy: defaul...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "217.72.203.132:80 | HTTP/1.1 404 Not Found Date: Wed, 20 May 2026 17:03:04 GMT Content-Type: text/html Content-Length: 548 Connection: keep-alive Content-Security-Policy: default-src 'self' https:/...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "217.72.203.132",
+   "hostnames": [
+    "ip217-72-203-132.pbiaas.com"
+   ],
+   "id": "passive:shodan:217.72.203.132:80",
+   "mode": "passive",
+   "observed_at": "2026-05-20T18:19:39Z",
+   "port": 80,
+   "product": null,
+   "seen_at": "2026-05-20T18:19:39Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 404 Not Found Date: Wed, 20 May 2026 18:25:50 GMT Content-Type: text/html Content-Length: 548 Connection: keep-alive Content-Security-Policy: defaul...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "217.72.203.132:443 | HTTP/1.1 404 Not Found Date: Wed, 20 May 2026 18:25:50 GMT Content-Type: text/html Content-Length: 548 Connection: keep-alive Content-Security-Policy: default-src 'self' https:...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "217.72.203.132",
+   "hostnames": [
+    "ip217-72-203-132.pbiaas.com"
+   ],
+   "id": "passive:shodan:217.72.203.132:443",
+   "mode": "passive",
+   "observed_at": "2026-05-20T18:19:39Z",
+   "port": 443,
+   "product": null,
+   "seen_at": "2026-05-20T18:19:39Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 400 Bad Request Date: Fri, 15 May 2026 18:53:29 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 335 Connection: close...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "2a01:4f8:d0a:2757::2:80 Apache httpd | HTTP/1.1 400 Bad Request Date: Fri, 15 May 2026 18:53:29 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 335 Connection: close C...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "2a01:4f8:d0a:2757::2",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:[2a01:4f8:d0a:2757::2]:80",
+   "mode": "passive",
+   "observed_at": "2026-05-15T18:53:29Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "seen_at": "2026-05-15T18:53:29Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 200 OK Date: Fri, 08 May 2026 22:25:19 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Upgrade: h2 Connection: Upgrade Transfer-Encodi...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "2a01:4f8:d0a:2757::2:443 Apache httpd | HTTP/1.1 200 OK Date: Fri, 08 May 2026 22:25:19 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Upgrade: h2 Connection: Upgrade Transfer-Encodi...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "2a01:4f8:d0a:2757::2",
+   "hostnames": [
+    "www51.your-server.de",
+    "your-server.de"
+   ],
+   "id": "passive:shodan:[2a01:4f8:d0a:2757::2]:443",
+   "mode": "passive",
+   "observed_at": "2026-05-15T18:53:29Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "seen_at": "2026-05-15T18:53:29Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": null,
+   "version": null
+  }
+ ],
+ "scan": {
+  "confidence": 1.0,
+  "counts": {
+   "correlated_findings": 2462,
+   "correlated_fp": 872,
+   "tool_runs": 48
+  },
+  "domain": "heuel.com",
+  "domains": [
+   "heuel.com"
+  ],
+  "evidence": [
+   {
+    "excerpt": "startedAt=2026-05-21T23:50:35.471914+00:00 finishedAt=2026-05-22T00:11:37.114579+00:00",
+    "ref": "meta.json",
+    "tool": "meta"
+   }
+  ],
+  "finished_at": "2026-05-22T00:11:37Z",
+  "hosts_scanned": 6,
+  "id": "scan:176db198-fa4a-4520-bf18-43cbc02a229d",
+  "mode": "active",
+  "nmap_args": "nmap -Pn -n -sV --version-intensity 7 -sC --script-timeout 60s -T4 --max-retries 2 --host-timeout 240s --min-rate 100 --defeat-rst-ratelimit --top-ports 1000 --open -oX <scan-dir> -oN <scan-dir> --reason 104.16.10.6",
+  "observed_at": "2026-05-22T00:11:37Z",
+  "order_id": "176db198-fa4a-4520-bf18-43cbc02a229d",
+  "package": "perimeter",
+  "policy_version": null,
+  "scanner_egress": null,
+  "source": "meta",
+  "started_at": "2026-05-21T23:50:35Z",
+  "tool_versions": [
+   {
+    "name": "dnsx",
+    "version": null
+   },
+   {
+    "name": "feroxbuster",
+    "version": "2.11.0"
+   },
+   {
+    "name": "ffuf",
+    "version": "2.1.0"
+   },
+   {
+    "name": "gobuster",
+    "version": null
+   },
+   {
+    "name": "httpx",
+    "version": null
+   },
+   {
+    "name": "nmap",
+    "version": "7.93"
+   },
+   {
+    "name": "searchsploit",
+    "version": null
+   },
+   {
+    "name": "subfinder",
+    "version": "2.13.0"
+   },
+   {
+    "name": "testssl.sh",
+    "version": null
+   },
+   {
+    "name": "wafw00f",
+    "version": null
+   },
+   {
+    "name": "wpscan",
+    "version": null
+   }
+  ]
+ },
+ "schema_version": "1.0.0",
+ "services": [
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http Cloudflare http proxy",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "cloudflare_http_proxy",
+   "host_ip": "104.16.10.6",
+   "id": "svc:104.16.10.6:80/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:55:59Z",
+   "port": 80,
+   "product": "Cloudflare http proxy",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "funnelcockpit.com",
+    "not_after": "2026-07-08T13:02:04Z",
+    "san": [
+     "*.funnelcockpit.com",
+     "funnelcockpit.com"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Cloudflare http proxy tunnel=ssl",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "cloudflare_http_proxy",
+   "host_ip": "104.16.10.6",
+   "id": "svc:104.16.10.6:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:55:59Z",
+   "port": 443,
+   "product": "Cloudflare http proxy",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "8080/tcp open http Cloudflare http proxy",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "cloudflare_http_proxy",
+   "host_ip": "104.16.10.6",
+   "id": "svc:104.16.10.6:8080/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:55:59Z",
+   "port": 8080,
+   "product": "Cloudflare http proxy",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "funnelcockpit.com",
+    "not_after": "2026-07-08T13:02:04Z",
+    "san": [
+     "*.funnelcockpit.com",
+     "funnelcockpit.com"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "8443/tcp open http Cloudflare http proxy tunnel=ssl",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "cloudflare_http_proxy",
+   "host_ip": "104.16.10.6",
+   "id": "svc:104.16.10.6:8443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:55:59Z",
+   "port": 8443,
+   "product": "Cloudflare http proxy",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.heuel.com",
+    "not_after": "2027-04-14T14:45:26Z",
+    "san": [
+     "*.heuel.com",
+     "heuel.com"
+    ]
+   },
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "20.79.218.75",
+   "id": "svc:20.79.218.75:21/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-05-21T23:56:12Z",
+   "port": 21,
+   "product": null,
+   "proto": "tcp",
+   "service": "ftp",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh FortiSSH (protocol 2.0)",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "fortissh",
+   "host_ip": "20.79.218.75",
+   "id": "svc:20.79.218.75:22/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:56:12Z",
+   "port": 22,
+   "product": "FortiSSH",
+   "proto": "tcp",
+   "service": "ssh",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http Apache httpd",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "host_ip": "20.79.218.75",
+   "id": "svc:20.79.218.75:80/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:56:12Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "*.heuel.com",
+    "not_after": "2027-04-14T14:45:26Z",
+    "san": [
+     "*.heuel.com",
+     "heuel.com"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "host_ip": "20.79.218.75",
+   "id": "svc:20.79.218.75:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:56:12Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "8443/tcp open https-alt",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "20.79.218.75",
+   "id": "svc:20.79.218.75:8443/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-05-21T23:56:12Z",
+   "port": 8443,
+   "product": null,
+   "proto": "tcp",
+   "service": "https-alt",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http nginx (reverse proxy)",
+     "ref": "hosts/217.72.203.132/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "nginx",
+   "host_ip": "217.72.203.132",
+   "id": "svc:217.72.203.132:80/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:55:44Z",
+   "port": 80,
+   "product": "nginx",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "Kubernetes Ingress Controller Fake Certificate",
+    "not_after": "2027-05-18T00:06:03Z",
+    "san": [
+     "ingress.local"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http nginx (reverse proxy) tunnel=ssl",
+     "ref": "hosts/217.72.203.132/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "nginx",
+   "host_ip": "217.72.203.132",
+   "id": "svc:217.72.203.132:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-05-21T23:55:44Z",
+   "port": 443,
+   "product": "nginx",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  }
+ ],
+ "software": [
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Cloudflare",
+     "ref": "hosts/104.16.10.6/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "cloudflare",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "104.16.10.6",
+   "id": "sw:104.16.10.6:-:cloudflare:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:56:09Z",
+   "product": "Cloudflare",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Cloudflare Bot Management",
+     "ref": "hosts/104.16.10.6/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "cloudflare_bot_management",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "104.16.10.6",
+   "id": "sw:104.16.10.6:-:cloudflare_bot_management:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:56:09Z",
+   "product": "Cloudflare Bot Management",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Cloudflare CDN",
+     "ref": "hosts/104.16.10.6/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "cloudflare_cdn",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "104.16.10.6",
+   "id": "sw:104.16.10.6:-:cloudflare_cdn:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:56:09Z",
+   "product": "Cloudflare CDN",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Cloudflare http proxy tunnel=ssl",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "80/tcp open http Cloudflare http proxy",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "8080/tcp open http Cloudflare http proxy",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "8443/tcp open http Cloudflare http proxy tunnel=ssl",
+     "ref": "hosts/104.16.10.6/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Cloudflare http proxy",
+     "ref": "hosts/104.16.10.6/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "cloudflare_http_proxy",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "104.16.10.6",
+   "id": "sw:104.16.10.6:-:cloudflare_http_proxy:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:59Z",
+   "product": "Cloudflare http proxy",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: cloudflare",
+     "ref": "scan_results:header_check:104.16.10.6",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Cloudflare",
+     "ref": "hosts/104.16.10.6/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "cloudflare",
+   "fqdn": "online.heuel.com",
+   "hints": [],
+   "host_ip": "104.16.10.6",
+   "id": "sw:104.16.10.6:online.heuel.com:cloudflare:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:11:23Z",
+   "product": "Cloudflare",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Cloudflare Bot Management",
+     "ref": "hosts/104.16.10.6/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "cloudflare_bot_management",
+   "fqdn": "online.heuel.com",
+   "hints": [],
+   "host_ip": "104.16.10.6",
+   "id": "sw:104.16.10.6:online.heuel.com:cloudflare_bot_management:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:11:23Z",
+   "product": "Cloudflare Bot Management",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "80/tcp open http Apache httpd",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache",
+     "ref": "hosts/20.79.218.75/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Apache HTTP Server",
+     "ref": "hosts/20.79.218.75/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Apache httpd",
+     "ref": "hosts/20.79.218.75/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "apache",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "20.79.218.75",
+   "id": "sw:20.79.218.75:-:apache:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:56:13Z",
+   "product": "Apache httpd",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "22/tcp open ssh FortiSSH (protocol 2.0)",
+     "ref": "hosts/20.79.218.75/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: FortiSSH",
+     "ref": "hosts/20.79.218.75/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "fortissh",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "20.79.218.75",
+   "id": "sw:20.79.218.75:-:fortissh:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:56:13Z",
+   "product": "FortiSSH",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Java/Servlet",
+     "ref": "hosts/20.79.218.75/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "java_servlet",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "20.79.218.75",
+   "id": "sw:20.79.218.75:-:java_servlet:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:56:27Z",
+   "product": "Java/Servlet",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: Apache",
+     "ref": "scan_results:header_check:20.79.218.75",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Apache HTTP Server",
+     "ref": "hosts/20.79.218.75/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "apache",
+   "fqdn": "edi.heuel.com",
+   "hints": [],
+   "host_ip": "20.79.218.75",
+   "id": "sw:20.79.218.75:edi.heuel.com:apache:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:10:00Z",
+   "product": "Apache httpd",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: Apache",
+     "ref": "scan_results:header_check:20.79.218.75",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Apache HTTP Server",
+     "ref": "hosts/20.79.218.75/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "apache",
+   "fqdn": "ose.heuel.com",
+   "hints": [],
+   "host_ip": "20.79.218.75",
+   "id": "sw:20.79.218.75:ose.heuel.com:apache:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:10:00Z",
+   "product": "Apache httpd",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Google Analytics",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "google_analytics",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:-:google_analytics:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:53Z",
+   "product": "Google Analytics",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Google Tag Manager",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "google_tag_manager",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:-:google_tag_manager:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:53Z",
+   "product": "Google Tag Manager",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: HSTS",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "hsts",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:-:hsts:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:53Z",
+   "product": "HSTS",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.95,
+   "detection_sources": [
+    "cms_fingerprint",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "cms_details: NEOS",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "cms_fingerprint"
+    },
+    {
+     "excerpt": "technologies: NEOS",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "neos",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:-:neos:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:11:37Z",
+   "product": "NEOS",
+   "source": "cms_fingerprint",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Neos CMS",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "neos_cms",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:-:neos_cms:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:53Z",
+   "product": "Neos CMS",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Neos Flow neos",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "neos_flow",
+   "fqdn": null,
+   "hints": [
+    "neos"
+   ],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:-:neos_flow:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": "Versionsangabe nicht numerisch",
+   "observed_at": "2026-05-21T23:55:53Z",
+   "product": "Neos Flow",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": "neos",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http nginx (reverse proxy) tunnel=ssl",
+     "ref": "hosts/217.72.203.132/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "80/tcp open http nginx (reverse proxy)",
+     "ref": "hosts/217.72.203.132/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "server: nginx",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: nginx",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "nginx",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:-:nginx:unknown",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:44Z",
+   "product": "nginx",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: PHP",
+     "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "php",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:-:php:unknown",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-21T23:55:53Z",
+   "product": "PHP",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Neos CMS",
+     "ref": "hosts/217.72.203.132/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "neos_cms",
+   "fqdn": "www.heuel.com",
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:www.heuel.com:neos_cms:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:58Z",
+   "product": "Neos CMS",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Neos Flow:neos",
+     "ref": "hosts/217.72.203.132/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "neos_flow_neos",
+   "fqdn": "www.heuel.com",
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:www.heuel.com:neos_flow_neos:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:58Z",
+   "product": "Neos Flow:neos",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: PHP",
+     "ref": "hosts/217.72.203.132/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "php",
+   "fqdn": "www.heuel.com",
+   "hints": [],
+   "host_ip": "217.72.203.132",
+   "id": "sw:217.72.203.132:www.heuel.com:php:unknown",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-22T00:03:58Z",
+   "product": "PHP",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  }
+ ],
+ "targets": [
+  {
+   "confidence": 1.0,
+   "discovery_health": {
+    "ct_sources_empty": false,
+    "discovery_added_count": 3,
+    "snapshot_age_minutes": 223,
+    "snapshot_seed_count": 24,
+    "snapshot_seeded": true,
+    "tool_counts": {
+     "certspotter": 7,
+     "crtsh": 10,
+     "gobuster_dns": 3,
+     "phase0a_passive": 11,
+     "snapshot": 24,
+     "subfinder": 10
+    },
+    "tools_with_zero_results": [],
+    "total_subdomains": 27
+   },
+   "domain": "heuel.com",
+   "evidence": [
+    {
+     "excerpt": "domain=heuel.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "id": "target:heuel.com",
+   "is_primary": true,
+   "mode": "active",
+   "observed_at": "2026-05-21T23:50:35Z",
+   "out_of_scope": [],
+   "source": "host_inventory",
+   "targets_source": "orders.json",
+   "whois": null
+  }
+ ],
+ "threats": [],
+ "tls": [
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "online.heuel.com",
+    "days_left": 78,
+    "expired": false,
+    "issuer": "WE1",
+    "mismatch": null,
+    "not_after": "2026-08-08T03:15:32Z",
+    "not_before": "2026-05-10T02:15:35Z",
+    "san": [
+     "online.heuel.com"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "online.heuel.com:443 tls=tls13 cn=online.heuel.com not_after=2026-08-08T03:15:32Z mismatched=None",
+     "ref": "hosts/104.16.10.6/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "online.heuel.com",
+   "grade": null,
+   "host_ip": "104.16.10.6",
+   "hsts": null,
+   "id": "tls:online.heuel.com:443@104.16.10.6",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-05-22T00:11:23Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "*.heuel.com",
+    "days_left": 327,
+    "expired": false,
+    "issuer": "GlobalSign GCC R6 AlphaSSL CA 2025",
+    "mismatch": null,
+    "not_after": "2027-04-14T14:45:26Z",
+    "not_before": "2026-03-13T14:45:27Z",
+    "san": [
+     "*.heuel.com",
+     "heuel.com"
+    ],
+    "self_signed": null,
+    "wildcard": true
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "edi.heuel.com:443 tls=tls12 cn=*.heuel.com not_after=2027-04-14T14:45:26Z mismatched=None",
+     "ref": "hosts/20.79.218.75/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "edi.heuel.com",
+   "grade": null,
+   "host_ip": "20.79.218.75",
+   "hsts": null,
+   "id": "tls:edi.heuel.com:443@20.79.218.75",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-05-22T00:10:01Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": true,
+    "TLS1.3": null
+   },
+   "source": "httpx",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "www.heuel.com",
+    "days_left": 56,
+    "expired": false,
+    "issuer": "R12",
+    "mismatch": null,
+    "not_after": "2026-07-17T05:21:39Z",
+    "not_before": "2026-04-18T05:21:40Z",
+    "san": [
+     "www.heuel.com"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "www.heuel.com:443 tls=tls13 cn=www.heuel.com not_after=2026-07-17T05:21:39Z mismatched=None",
+     "ref": "hosts/217.72.203.132/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "www.heuel.com",
+   "grade": null,
+   "host_ip": "217.72.203.132",
+   "hsts": null,
+   "id": "tls:www.heuel.com:443@217.72.203.132",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-05-22T00:03:58Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  }
+ ],
+ "unprocessed": [],
+ "warnings": []
+}
