@@ -128,6 +128,16 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def sha256_text_file(path: Path) -> str:
+    """Hash einer Textdatei mit normalisierten Zeilenenden (CRLF -> LF).
+
+    Quellcode wie ``eol_data_generated.py`` liegt unter Windows mit CRLF, in CI mit LF
+    im Arbeitsbaum; der Hash muss auf beiden Seiten gleich sein.
+    """
+    data = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(data).hexdigest()
+
+
 def dumps(data: Any) -> str:
     """Deterministisches JSON: sortierte Schluessel, Einzug 1, kein ASCII-Escaping."""
     return json.dumps(data, ensure_ascii=False, sort_keys=True, indent=1) + "\n"

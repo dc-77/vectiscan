@@ -16,7 +16,7 @@ from urllib.parse import urlsplit
 from reporter.facts import schema as S
 from reporter.facts.nmap_parse import NmapHost, NmapRun, derive_service_flags, parse_nmap_text, parse_nmap_xml
 from reporter.facts.serialize import (
-    days_between, excerpt, ip_family, ip_token, iso_utc, sha256_file, short_hash, sort_key, try_json,
+    days_between, excerpt, ip_family, ip_token, iso_utc, sha256_text_file, short_hash, sort_key, try_json,
 )
 from reporter.facts.sources import (
     ScanBundle, ToolRun, apply_overrides, attach_orders_json, load_from_snapshot, load_scan_source,
@@ -181,7 +181,7 @@ def _generator_inputs(b: ScanBundle) -> list[S.GeneratorInput]:
     try:
         import reporter.eol_data_generated as feed
         p = Path(feed.__file__)
-        inputs.append(S.GeneratorInput(kind="eol_feed", name=p.name, sha256=sha256_file(p)))
+        inputs.append(S.GeneratorInput(kind="eol_feed", name=p.name, sha256=sha256_text_file(p)))
     except Exception:  # noqa: BLE001 - Feed optional
         inputs.append(S.GeneratorInput(kind="eol_feed", name="eol_data_generated.py", sha256=None))
     return inputs
