@@ -46,6 +46,7 @@ class HostSignals:
     testssl_connect_failed: Optional[bool] = None
     testssl_has_data: bool = False
     zap_spider_urls: Optional[int] = None
+    zap_alerts_total: Optional[int] = None
     inventory_blocked: Optional[Blocked] = None
 
 
@@ -232,6 +233,16 @@ def _adjust_with_signals(tool: str, status: str, reason: Optional[str], sig: Hos
         status, reason = "empty", reason or "no_output"
     if tool in ("zap", "zap_spider") and status == "ok" and sig.zap_spider_urls == 0:
         status, reason = "empty", reason or "no_urls_spidered"
+    # Issue #13: ZAP hat gespidert, aber keine einzige Meldung geliefert.
+    # Junkerwerk Lauf 2 (2572eebc) steht so auf "ok" bei 50/34/4 gespiderten
+    # URLs und total_alerts 0, waehrend Lauf 1 fuer dieselben Hosts 127/19/55
+    # Alerts hat. Als "ok" gelesen hiesse das "keine Befunde"; die Wahrheit ist
+    # "nicht belastbar" und gehoert in die Abdeckung, nicht in eine
+    # Auffangregel des Katalogs. Nur `zap` (die passive Analyse) wird
+    # herabgestuft: der Spider zaehlt URLs, nicht Alerts, und zap_active hat
+    # seine eigene Abdeckung.
+    if tool == "zap" and status == "ok" and sig.zap_alerts_total == 0:
+        status, reason = "empty", reason or "zap_no_alerts"
     if blocked is not None and blocked.detected and tool in WEB_TOOLS and status in ("empty", "failed"):
         return "blocked", blocked.reason
     return status, reason

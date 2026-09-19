@@ -10,6 +10,11 @@ Bump-Regel fuer ``FACTS_SCHEMA_VERSION`` (semver):
 - Minor: neue Entitaet oder neues Pflichtfeld mit Default fuer Altbestand.
 - Major: Feld entfernt, umbenannt oder Bedeutung geaendert, ID-Format geaendert.
 Jeder Bump erfordert den Neubau der Golden-Facts (``python -m reporter.facts --golden``).
+
+Historie:
+- 1.0.1 (S2b, Issue #13): ``zap`` mit Status ``ok`` und null Alerts wird als
+  ``empty`` mit Grund ``zap_no_alerts`` gefuehrt. Kein Feld geaendert, aber die
+  Bedeutung einer Coverage-Zeile praeziser; Golden-Facts neu gebaut.
 """
 from __future__ import annotations
 
@@ -17,7 +22,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.0.0"
+FACTS_SCHEMA_VERSION = "1.0.1"
 
 Mode = Literal["active", "passive"]
 

@@ -358,6 +358,14 @@ def _build_hosts(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> tuple
             sig.zap_spider_urls = h.zap_spider_summary["urls_found"]
         elif h and h.zap_spider_urls is not None:
             sig.zap_spider_urls = len(h.zap_spider_urls)
+        # Issue #13: Alertzahl aus dem Tar (Liste) oder aus der Zeile
+        # (Zusammenfassung mit total_alerts). Nur wenn eine der beiden Quellen
+        # vorliegt, ist die Zahl belastbar; sonst bleibt sie None und die
+        # Abdeckung aendert sich nicht.
+        if h and h.zap_alerts is not None:
+            sig.zap_alerts_total = len(h.zap_alerts)
+        elif h and isinstance((h.zap_summary or {}).get("total_alerts"), int):
+            sig.zap_alerts_total = h.zap_summary["total_alerts"]
         if inv.get("blocked") is True:
             sig.inventory_blocked = S.Blocked(detected=True, reason=str(inv.get("blocked_reason") or "blocked")[:160],
                                               source="inventory")

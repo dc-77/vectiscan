@@ -219,3 +219,77 @@ def test_zeile_ohne_etikett_zaehlt_zum_primaerziel(tmp_path):
     whois_rows = [c for c in facts.coverage if c.tool == "whois"]
     assert whois_rows[0].scope == "scan"
     assert whois_rows[0].domain == DOMAIN_A
+
+
+# ----------------------------------------------------- Issue #13 Abdeckung
+
+def _zap_scan_dir(tmp_path: Path, alerts: list | None, spider_urls: int = 5) -> Path:
+    root = _scan_dir(tmp_path, per_vhost=False)
+    p2 = root / "hosts" / IP / "phase2"
+    if alerts is not None:
+        (p2 / "zap_alerts.json").write_text(json.dumps(alerts), encoding="utf-8")
+    (p2 / "zap_spider_urls.json").write_text(
+        json.dumps([f"https://{PRIMARY}/{i}" for i in range(spider_urls)]),
+        encoding="utf-8")
+    return root
+
+
+def _zap_row(status: str = "ok") -> dict:
+    return {"toolName": "zap", "hostIp": IP, "phase": 2, "status": status,
+            "rawOutput": json.dumps({"active": 0, "passive": 0, "total_alerts": 0})}
+
+
+def _coverage(facts, tool: str):
+    return [c for c in facts.coverage if c.tool == tool]
+
+
+def test_zap_ok_ohne_alerts_ist_empty(tmp_path):
+    """Der Defekt: "ok" ohne Alerts las sich als "keine Befunde"."""
+    facts = build_facts(_zap_scan_dir(tmp_path, alerts=[]),
+                        tool_runs=[_zap_row()])
+    zap = _coverage(facts, "zap")
+    assert [c.status for c in zap] == ["empty"]
+    assert zap[0].reason == "zap_no_alerts"
+    # Der Rohstatus der Zeile bleibt sichtbar.
+    assert zap[0].raw_status == "ok"
+
+
+def test_zap_mit_alerts_bleibt_ok(tmp_path):
+    alerts = [{"pluginId": "10038", "name": "CSP Header Not Set", "risk": "Medium",
+               "url": f"https://{PRIMARY}/"}]
+    facts = build_facts(_zap_scan_dir(tmp_path, alerts=alerts),
+                        tool_runs=[_zap_row()])
+    zap = _coverage(facts, "zap")
+    assert [c.status for c in zap] == ["ok"]
+
+
+def test_zap_ohne_alertdatei_bleibt_unveraendert(tmp_path):
+    """Ohne belastbare Quelle fuer die Alertzahl wird nicht herabgestuft."""
+    row = {"toolName": "zap", "hostIp": IP, "phase": 2, "status": "ok",
+           "rawOutput": "irgendein Text ohne JSON"}
+    facts = build_facts(_zap_scan_dir(tmp_path, alerts=None), tool_runs=[row])
+    assert [c.status for c in _coverage(facts, "zap")] == ["ok"]
+
+
+def test_zap_spider_wird_nicht_herabgestuft(tmp_path):
+    """Der Spider zaehlt URLs, nicht Alerts."""
+    row = {"toolName": "zap_spider", "hostIp": IP, "phase": 2, "status": "ok",
+           "rawOutput": json.dumps({"urls_found": 5})}
+    facts = build_facts(_zap_scan_dir(tmp_path, alerts=[]), tool_runs=[row])
+    assert [c.status for c in _coverage(facts, "zap_spider")] == ["ok"]
+
+
+def test_zap_active_wird_nicht_herabgestuft(tmp_path):
+    """zap_active hat seine eigene Abdeckung und eigene Pruefungen."""
+    row = {"toolName": "zap_active", "hostIp": IP, "phase": 2, "status": "ok",
+           "rawOutput": json.dumps({"alerts": 0})}
+    facts = build_facts(_zap_scan_dir(tmp_path, alerts=[]), tool_runs=[row])
+    assert [c.status for c in _coverage(facts, "zap_active")] == ["ok"]
+
+
+def test_grund_passt_zur_katalogtabelle():
+    """Der Grund traegt genau den Code, den tables.COVERAGE_REASONS kennt."""
+    from reporter.catalog.tables import COVERAGE_REASONS
+    status, text = COVERAGE_REASONS["zap_no_alerts"]
+    assert status == "not_testable"
+    assert text
