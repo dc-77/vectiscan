@@ -1,0 +1,1144 @@
+{
+ "appendix": {
+  "cve_refs": [],
+  "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 31.08.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "exposure_scale": [
+   {
+    "l": "kritisch",
+    "t": "Dienst, der nicht an das öffentliche Interface gehört (Datenbanken, Verwaltungsoberflächen, Fernwartung) und aus dem Internet erreichbar ist."
+   },
+   {
+    "l": "erhöht",
+    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
+   }
+  ],
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 63 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (44 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 11 Befunde und 6 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "hygiene_scale": [
+   {
+    "l": "hoch",
+    "t": "Abweichung mit direktem Bezug zu Anmeldedaten, Authentizität oder Zugangswegen; zeitnah beheben."
+   },
+   {
+    "l": "mittel",
+    "t": "Abweichung, die Angriffe erleichtert oder Schutzmechanismen aushebelt; im nächsten Wartungszyklus beheben."
+   },
+   {
+    "l": "niedrig",
+    "t": "Best-Practice-Abweichung ohne unmittelbare Auswirkung; bei Gelegenheit beheben."
+   }
+  ],
+  "inventory": [
+   {
+    "host": "188.40.3.130",
+    "port": "21",
+    "ref": "VS-2026-007",
+    "svc": "ProFTPD, TLS erzwungen"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "22",
+    "ref": "",
+    "svc": "ProFTPD mod_sftp"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "110",
+    "ref": "VS-2026-007",
+    "svc": "Courier pop3d, STARTTLS"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "143",
+    "ref": "VS-2026-007",
+    "svc": "Dovecot imapd, TLS erzwungen"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "222",
+    "ref": "VS-2026-010",
+    "svc": "OpenSSH 9.2p1"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "465",
+    "ref": "",
+    "svc": "SMTP, TLS erzwungen"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "587",
+    "ref": "",
+    "svc": "SMTP, TLS erzwungen"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "993",
+    "ref": "",
+    "svc": "IMAPS, TLS erzwungen"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "995",
+    "ref": "",
+    "svc": "POP3S, TLS erzwungen"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "3306",
+    "ref": "VS-2026-001",
+    "svc": "MySQL 10.11.18"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "5432",
+    "ref": "VS-2026-001",
+    "svc": "PostgreSQL DB"
+   },
+   {
+    "host": "217.243.248.30",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, TLS erzwungen"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "188.40.3.130",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "217.243.248.30",
+    "port": "25",
+    "ref": "VS-2026-005",
+    "svc": "Exim smtpd 4.96, laut Passivquelle"
+   }
+  ],
+  "repeat": [
+   "Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die betroffenen Dienste.",
+   "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
+   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall.",
+   "Freischaltung der Scanner-Adresse beim Betreiber der blockierenden Systeme, damit die offenen Prüfungen im nächsten Durchgang nachgeholt werden können."
+  ],
+  "tool_findings": [
+   {
+    "note": "Werkzeugmeldung ohne eigene Einstufung.",
+    "what": "openotp.junkerwerk.hu (Information Disclosure - Suspicious Comments)",
+    "where": "openotp.junkerwerk.hu"
+   }
+  ],
+  "tools": [
+   {
+    "c": "hoch (Dienste), mittel (Versionen)",
+    "t": "nmap",
+    "u": "Portscan der häufigsten TCP-Ports, Dienst- und Versionserkennung"
+   },
+   {
+    "c": "hoch",
+    "t": "testssl.sh",
+    "u": "Protokolle, Verfahren, Zertifikate und bekannte Schwächen der Transportverschlüsselung"
+   },
+   {
+    "c": "hoch",
+    "t": "httpx, header_check",
+    "u": "HTTP-Antworten, Technologien und Sicherheits-Header je virtuellem Host"
+   },
+   {
+    "c": "mittel",
+    "t": "OWASP ZAP (passiv, Spider)",
+    "u": "Passive Analyse von Antworten, Formularen und Headern"
+   },
+   {
+    "c": "mittel",
+    "t": "feroxbuster",
+    "u": "Verzeichnis- und Datei-Enumeration"
+   },
+   {
+    "c": "mittel",
+    "t": "webtech, wafw00f",
+    "u": "Web-Technologien und vorgelagerte Schutzsysteme"
+   },
+   {
+    "c": "hoch",
+    "t": "dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
+    "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
+   },
+   {
+    "c": "mittel (Passivquelle, Zeitversatz)",
+    "t": "Shodan, AbuseIPDB, OTX, URLhaus",
+    "u": "Passive Dienst- und Reputationsdaten"
+   },
+   {
+    "c": "hoch (autoritative Fremdquelle)",
+    "t": "NVD, EPSS, CISA KEV",
+    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
+   }
+  ],
+  "triage": [
+   {
+    "l": "Rot",
+    "st": "rot",
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist oder einen kritischen Dienst exponiert. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+   },
+   {
+    "l": "Gelb",
+    "st": "gelb",
+    "t": "Handlungsbedarf mit erkennbarem Angriffsweg. Dringlichkeit: In Kürze (1 bis 2 Wochen) oder Mittelfristig (nächster Wartungszyklus)."
+   },
+   {
+    "l": "Blau",
+    "st": "blau",
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig oder Strategisch (laufendes Quartal)."
+   },
+   {
+    "l": "Grün",
+    "st": "gruen",
+    "t": "Positiver Befund: Schutzmaßnahme vorhanden und wirksam."
+   }
+  ]
+ },
+ "architecture": {
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 2 Hosts mit folgenden Aufgaben: Fernzugang und Verwaltung, Mail- und Kalenderplattform und Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "notes": [
+   "2 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie sind kein Befund und wurden intern zur Nachbearbeitung vorgemerkt."
+  ],
+  "posture": [
+   {
+    "items": [
+     {
+      "l": "SPF",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "DKIM",
+      "ok": true,
+      "v": "unauffällig"
+     },
+     {
+      "l": "DMARC",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "MTA-STS",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "TLS-RPT, DANE",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     }
+    ],
+    "name": "E-Mail-Authentizität",
+    "short": "E-Mail-Authentizität"
+   },
+   {
+    "items": [
+     {
+      "l": "DNSSEC",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "CAA",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "Abruf der gesamten Zone",
+      "ok": true,
+      "v": "unauffällig"
+     },
+     {
+      "l": "Verwaiste Einträge",
+      "ok": null,
+      "v": "entfällt"
+     }
+    ],
+    "name": "DNS-Hygiene",
+    "short": "DNS-Hygiene"
+   },
+   {
+    "items": [
+     {
+      "l": "188.40.3.130",
+      "ok": null,
+      "v": "entfällt"
+     },
+     {
+      "l": "217.243.248.30",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "Zertifikate",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     }
+    ],
+    "name": "Transportverschlüsselung",
+    "short": "Transportverschlüsselung"
+   },
+   {
+    "items": [
+     {
+      "l": "188.40.3.130",
+      "ok": null,
+      "v": "nicht prüfbar"
+     },
+     {
+      "l": "217.243.248.30",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     }
+    ],
+    "name": "Sicherheits-Header",
+    "short": "Sicherheits-Header"
+   }
+  ],
+  "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
+  "screens": [
+   {
+    "file": "217.243.248.30__openotp.junkerwerk.hu.png",
+    "host": "openotp.junkerwerk.hu",
+    "what": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal"
+   }
+  ],
+  "screens_lead": "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts.",
+  "services": [
+   {
+    "host": "188.40.3.130",
+    "label": "dedi2230.your-server.de",
+    "ports": [
+     {
+      "p": "21",
+      "s": "ProFTPD",
+      "st": "blau"
+     },
+     {
+      "p": "22",
+      "s": "ProFTPD mod_sftp",
+      "st": "gruen"
+     },
+     {
+      "p": "110",
+      "s": "Courier pop3d",
+      "st": "blau"
+     },
+     {
+      "p": "143",
+      "s": "Dovecot imapd",
+      "st": "blau"
+     },
+     {
+      "p": "222",
+      "s": "OpenSSH",
+      "st": "blau"
+     },
+     {
+      "p": "465",
+      "s": "SMTP",
+      "st": "gruen"
+     },
+     {
+      "p": "587",
+      "s": "SMTP",
+      "st": "gruen"
+     },
+     {
+      "p": "993",
+      "s": "IMAPS",
+      "st": "gruen"
+     },
+     {
+      "p": "995",
+      "s": "POP3S",
+      "st": "gruen"
+     },
+     {
+      "p": "3306",
+      "s": "MySQL",
+      "st": "rot"
+     },
+     {
+      "p": "5432",
+      "s": "PostgreSQL DB",
+      "st": "rot"
+     },
+     {
+      "p": "80",
+      "s": "Apache httpd",
+      "st": "grau"
+     },
+     {
+      "p": "443",
+      "s": "Apache httpd",
+      "st": "grau"
+     }
+    ]
+   },
+   {
+    "host": "217.243.248.30",
+    "label": "",
+    "ports": [
+     {
+      "p": "443",
+      "s": "Apache httpd",
+      "st": "gelb"
+     },
+     {
+      "p": "25",
+      "s": "Exim smtpd",
+      "st": "grau"
+     }
+    ]
+   }
+  ],
+  "services_note": "Rot: Dienst mit kritischem Befund · Gelb: Dienst mit Befund · Blau: Altprotokoll · Grün: unauffällig · Grau: nur aus einer Passivquelle bekannt.",
+  "tech": [
+   {
+    "host": "188.40.3.130 (dedi2230.your-server.de)",
+    "rows": [
+     {
+      "c": "MariaDB",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "10.11.18 (debian)"
+     },
+     {
+      "c": "PostgreSQL",
+      "conf": "mittel",
+      "note": "Version von außen nicht genau bestimmbar",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "ProFTPD",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Courier",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Dovecot",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "OpenSSH",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "9.2p1"
+     },
+     {
+      "c": "ProFTPD mod_sftp",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     }
+    ]
+   },
+   {
+    "host": "217.243.248.30",
+    "rows": [
+     {
+      "c": "HSTS",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Apache httpd",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     }
+    ]
+   }
+  ]
+ },
+ "business": {
+  "implication": "Die Befunde dieses Berichts sind danach geordnet, wie nah sie an den Zugangswegen in das Unternehmensnetz liegen. Ein Dienst, über den sich jemand anmelden kann, wiegt schwerer als eine Abweichung an einer reinen Auslieferungsseite. Bei einem Vorfall mit personenbezogenen Daten gilt die Meldepflicht nach Art. 33 DSGVO innerhalb von 72 Stunden.",
+  "lead": "Was der Scan über das Unternehmen sichtbar macht, bestimmt, welche Befunde wirklich zählen. Maßgeblich ist nicht die Zahl der Meldungen, sondern welche Systeme am Perimeter stehen und wofür sie gebraucht werden.",
+  "observed": [
+   {
+    "meaning": "Über dieses System läuft die geschäftliche Korrespondenz. Ein Zugriff darauf trifft Vertraulichkeit und Arbeitsfähigkeit zugleich.",
+    "system": "Mail- und Kalenderplattform, Fernzugang und Verwaltung (junkerwerk.hu, www.junkerwerk.hu)"
+   },
+   {
+    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
+    "system": "Website und Datenbanken (openotp.junkerwerk.hu)"
+   }
+  ]
+ },
+ "findings": [
+  {
+   "affected": "188.40.3.130:3306 (MariaDB), 188.40.3.130:5432 (PostgreSQL)",
+   "cat": "A",
+   "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 3636798 Capabilities flags: 65534 Some Capabilities: DontAllowDatabaseTableColumn, IgnoreSigpipes, FoundRows, SupportsLoadDataLocal, SupportsTransactions, Spea...\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+   "found": "Der Host 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 188.40.3.130:3306 (MariaDB), 188.40.3.130:5432 (PostgreSQL). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
+   "id": "VS-2026-001",
+   "impact": "Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.",
+   "level": "kritisch",
+   "policy": "SP-DB-001",
+   "recommendation": [
+    [
+     "Unverzüglich",
+     "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken."
+    ],
+    [
+     "In Kürze",
+     "Datenbank-Zugangsdaten rotieren und die Zugriffsprotokolle der letzten Monate auf fremde Anmeldeversuche prüfen."
+    ],
+    [
+     "Mittelfristig",
+     "Administrativen Datenbankzugriff ausschließlich über einen SSH-Tunnel oder ein VPN zulassen."
+    ]
+   ],
+   "scale": "exposure",
+   "source": "aktiv (nmap)",
+   "status": "rot",
+   "threat": null,
+   "title": "Datenbankdienst aus dem Internet erreichbar",
+   "urgency": "Unverzüglich",
+   "verify": "Portscan der betroffenen Datenbankports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+  },
+  {
+   "affected": "junkerwerk.hu, junkerwerk.hu (~all)",
+   "cat": "C",
+   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dmarc=None dkim=True mx=['mx01.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx04.hornetsecurity.com']\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "found": "Für junkerwerk.hu sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: junkerwerk.hu, junkerwerk.hu (~all).",
+   "id": "VS-2026-002",
+   "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+   "level": "hoch",
+   "policy": "SP-DNS-006, SP-DNS-005",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten."
+    ],
+    [
+     "Mittelfristig",
+     "Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records, dns_security)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Richtlinie zur Absender-Authentizität für junkerwerk.hu nicht durchsetzend",
+   "urgency": "In Kürze",
+   "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+  },
+  {
+   "affected": "openotp.junkerwerk.hu:443 (Zertifikat für *.junkerwerk.de)",
+   "cat": "D",
+   "evidence": "httpx · hosts/217.243.248.30/phase2/httpx.json\nopenotp.junkerwerk.hu:443 tls=tls12 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=True\n\ntestssl · scan_results:testssl:217.243.248.30\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False\n\ntestssl · hosts/217.243.248.30/phase2/testssl.json\ncipherlist_3DES_IDEA=offered; cipher-tls1_2_xc012=TLSv1.2 xc012 ECDHE-RSA-DES-CBC3-SHA ECDH 253 3DES 168 TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_2_x16=TLSv1.2 x16 EDH-RSA-DES-CBC3-SHA DH 4096 3DES 168 TLS_DHE_RSA_WITH_3DES_EDE_C...",
+   "found": "Die Zertifikate auf openotp.junkerwerk.hu sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: openotp.junkerwerk.hu:443 (Zertifikat für *.junkerwerk.de).",
+   "id": "VS-2026-003",
+   "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
+   "level": "hoch",
+   "policy": "catalog_sim R-CERT-MISMATCH",
+   "recommendation": [
+    [
+     "Unverzüglich",
+     "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen."
+    ],
+    [
+     "Mittelfristig",
+     "Alle Namen, unter denen ein Dienst aufgerufen wird, in das Zertifikat aufnehmen und die Erneuerung automatisieren."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (httpx, testssl)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Zertifikate auf openotp.junkerwerk.hu mit Beanstandungen",
+   "urgency": "Unverzüglich",
+   "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
+  },
+  {
+   "affected": "openotp.junkerwerk.hu (Junkerwerk Linder GmbH & Co.KG Web Applications Portal)",
+   "cat": "A",
+   "evidence": "web_probe · phase0/host_inventory.json\nopenotp.junkerwerk.hu: status=200 title=Junkerwerk Linder GmbH & Co.KG Web Applications Portal final_url=https://openotp.junkerwerk.hu",
+   "found": "Aus dem Internet sind Portale erreichbar, die eine Anmeldung anbieten: openotp.junkerwerk.hu (Junkerwerk Linder GmbH & Co.KG Web Applications Portal).",
+   "id": "VS-2026-004",
+   "impact": "Ein öffentlich erreichbares Anmeldeportal ist ein gewollter Zugangsweg und zugleich das erste Ziel für Rateangriffe auf Zugangsdaten. Wird ein solches Portal übernommen, steht der Weg in die dahinterliegenden Systeme offen.",
+   "level": "mittel",
+   "policy": "catalog_sim R-LOGIN-PORTAL",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der Portal-Software gegen die Hinweise des Herstellers abgleichen."
+    ],
+    [
+     "Mittelfristig",
+     "Den Zugriff auf die Quellnetze beschränken, aus denen eine Anmeldung fachlich nötig ist, und fehlgeschlagene Anmeldeversuche überwachen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (web_probe)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Anmelde- und Verwaltungsportale aus dem Internet erreichbar",
+   "urgency": "In Kürze",
+   "verify": "Die genannten Portale von außen aufrufen; erwartet wird eine Anmeldung mit zweiter Stufe oder eine Beschränkung auf bekannte Quellnetze."
+  },
+  {
+   "affected": "217.243.248.30:25 (Exim smtpd 4.96, laut Passivquelle)",
+   "cat": "B",
+   "evidence": "shodan · phase0a/shodan_hosts.json\n217.243.248.30:25 Exim smtpd 4.96 | 220 archiv.junkerwerk.de ESMTP Exim 4.96 Sun, 30 Aug 2026 14:48:52 +0200 250-archiv.junkerwerk.de Hello wsf6og5mfz.net [224.55.142.174] 250-SIZE 52428800 250-8BI...",
+   "found": "Für 217.243.248.30 (openotp.junkerwerk.hu) meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestätigen konnte: 217.243.248.30:25 (Exim smtpd 4.96, laut Passivquelle).",
+   "id": "VS-2026-005",
+   "impact": "Ohne aktive Bestätigung ist unklar, ob der gemeldete Dienst und die genannte Version noch aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann außerhalb der eigentlich vorgesehenen Zustellwege erreichbar sein.",
+   "level": "mittel",
+   "policy": "Prototyp VS-004 (Passivquelle)",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen."
+    ],
+    [
+     "Mittelfristig",
+     "Zugriff auf den Dienst auf die Netze beschränken, aus denen eine Zustellung tatsächlich erfolgen muss."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "passiv (shodan)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Dienstversion laut Passivquelle unbestätigt",
+   "urgency": "In Kürze",
+   "verify": "Verbindung zum gemeldeten Port herstellen und die zurückgegebene Version mit dem aktuellen Patchstand des Herstellers abgleichen."
+  },
+  {
+   "affected": "openotp.junkerwerk.hu:443, openotp.junkerwerk.hu:443 (3des, cbc), openotp.junkerwerk.hu:443 (BREACH), openotp.junkerwerk.hu:443 (SWEET32)",
+   "cat": "D",
+   "evidence": "httpx · hosts/217.243.248.30/phase2/httpx.json\nopenotp.junkerwerk.hu:443 tls=tls12 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=True\n\ntestssl · scan_results:testssl:217.243.248.30\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False\n\ntestssl · hosts/217.243.248.30/phase2/testssl.json\ncipherlist_3DES_IDEA=offered; cipher-tls1_2_xc012=TLSv1.2 xc012 ECDHE-RSA-DES-CBC3-SHA ECDH 253 3DES 168 TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_2_x16=TLSv1.2 x16 EDH-RSA-DES-CBC3-SHA DH 4096 3DES 168 TLS_DHE_RSA_WITH_3DES_EDE_C...",
+   "found": "Die Transportverschlüsselung auf 217.243.248.30 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: openotp.junkerwerk.hu:443, openotp.junkerwerk.hu:443 (3des, cbc), openotp.junkerwerk.hu:443 (BREACH), openotp.junkerwerk.hu:443 (SWEET32).",
+   "id": "VS-2026-006",
+   "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
+   "level": "mittel",
+   "policy": "Prototyp VS-009, SP-TLS-002, catalog_sim R-TLS-VULN-SOFT",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Veraltete Protokolle und schwache Verfahren am Dienst abschalten."
+    ],
+    [
+     "Mittelfristig",
+     "Das aktuelle Protokoll aktivieren, den Schutz gegen eine erzwungene Rückstufung einschalten und die Gültigkeitsdauer der Transportsicherheits-Vorgabe auf mindestens ein Jahr setzen."
+    ],
+    [
+     "Strategisch",
+     "Die Konfiguration aller verschlüsselten Dienste an einer gemeinsamen Vorgabe ausrichten und regelmäßig prüfen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (httpx, testssl)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Transportverschlüsselung auf 217.243.248.30 mit veralteten Verfahren",
+   "urgency": "In Kürze",
+   "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
+  },
+  {
+   "affected": "188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP)",
+   "cat": "A",
+   "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n110/tcp open pop3 Courier pop3d\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\npop3-capabilities: SASL TOP STLS UIDL CAPA AUTH-RESP-CODE PIPELINING RESP-CODES\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n143/tcp open imap Dovecot imapd\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\nimap-capabilities: capabilities IDLE IMAP4rev1 listed have ENABLE Pre-login LOGIN-REFERRALS LOGINDISABLEDA0001 post-login more STARTTLS ID OK LITERAL+ SASL-IR",
+   "found": "Der Host 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 188.40.3.130:110 (POP3), 188.40.3.130:143 (IMAP), 188.40.3.130:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
+   "id": "VS-2026-007",
+   "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+   "level": "niedrig",
+   "policy": "Prototyp VS-005",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren."
+    ],
+    [
+     "Mittelfristig",
+     "Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "blau",
+   "threat": null,
+   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+   "urgency": "In Kürze",
+   "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+  },
+  {
+   "affected": "junkerwerk.hu",
+   "cat": "C",
+   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dmarc=None dkim=True mx=['mx01.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx04.hornetsecurity.com']\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "found": "Für junkerwerk.hu fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: junkerwerk.hu.",
+   "id": "VS-2026-008",
+   "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+   "level": "niedrig",
+   "policy": "Prototyp VS-008, SP-DNS-009, SP-DNS-011",
+   "recommendation": [
+    [
+     "Strategisch",
+     "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records, dns_security)",
+   "status": "blau",
+   "threat": null,
+   "title": "Transportverschlüsselung im Mailversand für junkerwerk.hu nicht erzwungen",
+   "urgency": "Strategisch",
+   "verify": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+  },
+  {
+   "affected": "openotp.junkerwerk.hu (/openid/login_uid.php), openotp.junkerwerk.hu (x-frame-options, cache-control)",
+   "cat": "D",
+   "evidence": "header_check · scan_results:header_check:217.243.248.30\nopenotp.junkerwerk.hu: reachable=False score=None server=None x-feserver=None\n\nhttpx · hosts/217.243.248.30/phase2/httpx.json\nopenotp.junkerwerk.hu: status=200 title=Junkerwerk Linder GmbH & Co.KG Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']",
+   "found": "Die Webdienste auf 217.243.248.30 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: openotp.junkerwerk.hu (/openid/login_uid.php), openotp.junkerwerk.hu (x-frame-options, cache-control).",
+   "id": "VS-2026-009",
+   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+   "level": "niedrig",
+   "policy": "SP-CSRF-001, Prototyp VS-011",
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
+    ],
+    [
+     "Strategisch",
+     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (header_check, httpx)",
+   "status": "blau",
+   "threat": null,
+   "title": "Sicherheits-Header und Formularschutz auf 217.243.248.30 unvollständig",
+   "urgency": "Mittelfristig",
+   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+  },
+  {
+   "affected": "188.40.3.130:222 (OpenSSH 9.2p1), 188.40.3.130:3306 (MariaDB 10.11.18), 188.40.3.130:5432 (PostgreSQL unbekannt)",
+   "cat": "E",
+   "evidence": "nmap · hosts/188.40.3.130/phase1/nmap.xml\n222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 3636798 Capabilities flags: 65534 Some Capabilities: DontAllowDatabaseTableColumn, IgnoreSigpipes, FoundRows, SupportsLoadDataLocal, SupportsTransactions, Spea...\n\nnmap · hosts/188.40.3.130/phase1/nmap.xml\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 188.40.3.130:222 (OpenSSH 9.2p1), 188.40.3.130:3306 (MariaDB 10.11.18), 188.40.3.130:5432 (PostgreSQL unbekannt).",
+   "id": "VS-2026-010",
+   "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+   "level": "niedrig",
+   "policy": "SP-DISC-001",
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten."
+    ],
+    [
+     "Strategisch",
+     "Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "blau",
+   "threat": null,
+   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "urgency": "Mittelfristig",
+   "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+  },
+  {
+   "affected": "junkerwerk.hu",
+   "cat": "E",
+   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dmarc=None dkim=True mx=['mx01.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx04.hornetsecurity.com']\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "found": "Für junkerwerk.hu fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: junkerwerk.hu.",
+   "id": "VS-2026-011",
+   "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+   "level": "niedrig",
+   "policy": "SP-DNS-003, SP-DNS-001",
+   "recommendation": [
+    [
+     "Strategisch",
+     "Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records, dns_security)",
+   "status": "blau",
+   "threat": null,
+   "title": "DNS-Absicherung für junkerwerk.hu nicht eingerichtet",
+   "urgency": "Strategisch",
+   "verify": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+  }
+ ],
+ "glance": {
+  "categories": [
+   {
+    "key": "A",
+    "level": 4,
+    "name": "Perimeter-Exposition",
+    "note": "Datenbankdienst aus dem Internet erreichbar; Anmelde- und Verwaltungsportale aus dem Internet erreichbar",
+    "status": "rot"
+   },
+   {
+    "key": "B",
+    "level": 2,
+    "name": "Patch- und EOL-Status",
+    "note": "Dienstversion laut Passivquelle unbestätigt",
+    "status": "gelb"
+   },
+   {
+    "key": "C",
+    "level": 2,
+    "name": "E-Mail-Authentizität",
+    "note": "Richtlinie zur Absender-Authentizität für junkerwerk.hu nicht durchsetzend; Transportverschlüsselung im Mailversand für junkerwerk.hu nicht erzwungen",
+    "status": "gelb"
+   },
+   {
+    "key": "D",
+    "level": 2,
+    "name": "Web- und Transport-Hygiene",
+    "note": "Zertifikate auf openotp.junkerwerk.hu mit Beanstandungen; Transportverschlüsselung auf 217.243.248.30 mit veralteten Verfahren",
+    "status": "gelb"
+   },
+   {
+    "key": "E",
+    "level": 1,
+    "name": "Konfiguration und Informations-Hygiene",
+    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste; DNS-Absicherung für junkerwerk.hu nicht eingerichtet",
+    "status": "blau"
+   }
+  ],
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von junkerwerk.hu am 31.08.2026: 3 Hostnamen auf 2 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "coverage_warning": "Für 188.40.3.130 und 217.243.248.30 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "levers": [
+   {
+    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+    "n": 1,
+    "refs": [
+     "VS-2026-001"
+    ],
+    "title": "Datenbankdienst aus dem Internet erreichbar"
+   },
+   {
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "n": 2,
+    "refs": [
+     "VS-2026-003"
+    ],
+    "title": "Zertifikate auf openotp.junkerwerk.hu mit Beanstandungen"
+   },
+   {
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "n": 3,
+    "refs": [
+     "VS-2026-002"
+    ],
+    "title": "Richtlinie zur Absender-Authentizität für junkerwerk.hu nicht durchsetzend"
+   }
+  ],
+  "overall": "HOCH",
+  "overall_status": "rot",
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die Härtung der erreichbaren Dienste, die Authentizität der E-Mail und die Transportverschlüsselung."
+ },
+ "landscape_lead": "11 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "meta": {
+  "after_fp": 19,
+  "catalog_digest": "60367c08db6b316c55448dbe1a504349c12fe1cf353a554591744216fce42610",
+  "catalog_version": "2026-09-20.1",
+  "classification": "Vertraulich",
+  "consolidated": 11,
+  "customer": "Auftraggeber",
+  "customer_short": "Auftraggeber",
+  "domains": [
+   "junkerwerk.hu"
+  ],
+  "facts_schema_version": "1.0.1",
+  "fqdns_total": 3,
+  "hosts_ipv4": 2,
+  "hosts_ipv6": 0,
+  "hosts_total": 2,
+  "orders": [
+   {
+    "id": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108",
+    "label": "Lauf 1"
+   }
+  ],
+  "package": "Perimeter",
+  "package_label": "PERIMETERSCAN",
+  "policy_version": "2026-09-20.1",
+  "positives": 6,
+  "prose_rejected": [],
+  "provider": "Vectigal GmbH",
+  "provider_address": "Olpe 31-33 · 44135 Dortmund",
+  "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
+  "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
+  "provider_responsible": "Daniel Czischke, Geschäftsführer",
+  "raw_findings": 63,
+  "report_date": "19.09.2026",
+  "report_id": "VS-2026-0831",
+  "report_version": "1.0",
+  "scan_date": "31.08.2026",
+  "scan_window": "31.08.2026, 16:27 bis 16:41 Uhr (CEST)",
+  "tool_runs": 57
+ },
+ "plan": [
+  {
+   "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
+   "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+   "prio": "Unverzüglich",
+   "refs": [
+    "VS-2026-001"
+   ],
+   "st": "rot"
+  },
+  {
+   "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "prio": "Unverzüglich",
+   "refs": [
+    "VS-2026-003"
+   ],
+   "st": "rot"
+  },
+  {
+   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-002"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der Portal-Software gegen die Hinweise des Herstellers abgleichen. Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-004",
+    "VS-2026-005",
+    "VS-2026-007"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-006"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-009"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+   "effect": "Nimmt Angreifern Vorbereitungswissen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-010"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "prio": "Strategisch",
+   "refs": [
+    "VS-2026-008",
+    "VS-2026-011"
+   ],
+   "st": "blau"
+  }
+ ],
+ "positives": [
+  {
+   "cat": "A",
+   "text": "Der Host 217.243.248.30 (openotp.junkerwerk.hu) bietet seinen Webdienst über HTTPS an.",
+   "title": "Webdienst mit Transportverschlüsselung"
+  },
+  {
+   "cat": "A",
+   "text": "Auf 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu) lehnen die Datei- und Mailzugänge eine Anmeldung ohne aufgebaute Transportverschlüsselung ab.",
+   "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
+  },
+  {
+   "cat": "A",
+   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
+   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
+  },
+  {
+   "cat": "C",
+   "text": "Für junkerwerk.hu lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
+   "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
+  },
+  {
+   "cat": "C",
+   "text": "Für junkerwerk.hu sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
+   "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+  },
+  {
+   "cat": "E",
+   "text": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
+   "title": "Keine Einträge in Reputationsquellen"
+  }
+ ],
+ "scope": {
+  "ai_note": "Die Befunde dieses Berichts entstehen regelbasiert aus den Ausgaben der eingesetzten Werkzeuge: ein Prüfkatalog wertet die erhobenen Fakten aus, jede Einstufung folgt einer hinterlegten Regel. Ein Sprachmodell formuliert einzelne erläuternde Absätze und steuert im Scanner die Reihenfolge und die Konfiguration der Werkzeuge. Es entscheidet weder über Befunde noch über deren Einstufung.",
+  "can_cannot": {
+   "advice": "Für die Zugangs-Infrastruktur empfehlen wir ergänzend eine Konfigurationsprüfung mit administrativem Zugang.",
+   "can": [
+    "erreichbare Dienste, Versionen und Konfigurationsschwächen aus Angreifersicht",
+    "E-Mail- und DNS-Authentizität, Transportverschlüsselung, Sicherheits-Header",
+    "bekannte Schwachstellenmuster ohne Anmeldung"
+   ],
+   "cannot": [
+    "Schwachstellen hinter einer Anmeldung",
+    "Versionsstände, die sich nicht in der Antwort eines Dienstes zeigen",
+    "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
+   ]
+  },
+  "hosts": [
+   {
+    "cov": "teil",
+    "coverage": "Portscan vollständig; Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich.",
+    "fqdns": "junkerwerk.hu, www.junkerwerk.hu",
+    "ip": "188.40.3.130",
+    "operator": "Hetzner Online AG - Rechenzentrum Haustechnik (dedi2230.your-server.de)",
+    "role": "Mail- und Kalenderplattform, Fernzugang und Verwaltung"
+   },
+   {
+    "cov": "teil",
+    "coverage": "Portscan vollständig; Ohne Ergebnis blieben: zap_active.",
+    "fqdns": "openotp.junkerwerk.hu",
+    "ip": "217.243.248.30",
+    "operator": "Junkerwerk Linder GmbH & Co.",
+    "role": "Website und Datenbanken"
+   }
+  ],
+  "lead": "Der Scan hat 2 IP-Adressen mit 3 Hostnamen erfasst. Für 2 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "limitations": [
+   {
+    "detail": "Betroffen: openotp.junkerwerk.hu.",
+    "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
+   },
+   {
+    "detail": "Betroffen: ffuf_sensitive auf 217.243.248.30.",
+    "what": "Das Werkzeug ffuf_sensitive hat kein Ergebnis geliefert"
+   },
+   {
+    "detail": "Betroffen: gobuster_dns auf junkerwerk.hu.",
+    "what": "Das Werkzeug gobuster_dns hat kein Ergebnis geliefert"
+   },
+   {
+    "detail": "Betroffen: zap_active auf 217.243.248.30.",
+    "what": "Das Werkzeug zap_active hat kein Ergebnis geliefert"
+   },
+   {
+    "detail": "Betroffen: header_check auf junkerwerk.hu, header_check auf www.junkerwerk.hu, httpx auf 188.40.3.130, junkerwerk.hu, webtech auf 188.40.3.130, www.junkerwerk.hu.",
+    "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
+   },
+   {
+    "detail": "Betroffen: junkerwerk.hu.",
+    "what": "Keine WHOIS-Daten vorhanden"
+   },
+   {
+    "detail": "Betroffen: header_check auf openotp.junkerwerk.hu, openotp.junkerwerk.hu.",
+    "what": "Virtueller Host war über HTTP nicht erreichbar"
+   }
+  ],
+  "method_phases": [
+   {
+    "n": "0",
+    "name": "Aufklärung (passiv)",
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 3 Hostnamen auf 2 IP-Adressen."
+   },
+   {
+    "n": "1",
+    "name": "Technologie-Erkennung",
+    "text": "Portscan der häufigsten TCP-Ports mit Versionserkennung, Erkennung der Web-Technologien und vorgelagerter Schutzsysteme."
+   },
+   {
+    "n": "2",
+    "name": "Tiefenprüfung",
+    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, Verzeichnis-Enumeration und passive Webanalyse."
+   },
+   {
+    "n": "3",
+    "name": "Auswertung",
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 11 Befunde und 6 positive Feststellungen."
+   }
+  ],
+  "numbers": [
+   {
+    "l": "Scandurchgang",
+    "v": "1"
+   },
+   {
+    "l": "Werkzeugläufe",
+    "v": "57"
+   },
+   {
+    "l": "Einzelbeobachtungen",
+    "v": "63"
+   },
+   {
+    "l": "Befunde im Bericht",
+    "v": "11"
+   }
+  ],
+  "out_of_scope": [
+   "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
+   "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",
+   "Social Engineering, Phishing-Simulationen, physische Sicherheit."
+  ],
+  "standard_note": "Einordnung: automatisierte externe Schwachstellenanalyse, angelehnt an die Prüfphasen Aufklärung, Schwachstellenanalyse und Bericht. Kein Penetrationstest, keine Ausnutzung gefundener Schwachstellen, keine Prüfung mit Zugangsdaten."
+ }
+}
+

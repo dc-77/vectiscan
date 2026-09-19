@@ -17,8 +17,8 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
-affected_template: "{target} (Zertifikat fuer {cert_cn})"
+bundle: cert_health
+affected_template: "{target} (Zertifikat für {cert_cn})"
 evidence: [tls]
 references: [CWE-297]
 frameworks:
@@ -35,27 +35,27 @@ policy:
     (R-CERT-MISMATCH) fuehrt den Befund deshalb als Hygiene hoch.
 texts:
   observation: >-
-    Fuer den Dienst {group} passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen
+    Für den Dienst {group} passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen
     Hostnamen: {affected}.
   meaning: >-
-    Ein TLS-Client kann die Identitaet des Dienstes nicht anhand des Zertifikats bestaetigen und
+    Ein TLS-Client kann die Identität des Dienstes nicht anhand des Zertifikats bestätigen und
     muss die Sicherheitswarnung entweder ablehnen oder ignorieren. Werden solche Warnungen
-    ignoriert, faellt ein echter Man-in-the-Middle-Angriff mit einem passend gefaelschten
+    ignoriert, fällt ein echter Man-in-the-Middle-Angriff mit einem passend gefälschten
     Zertifikat nicht mehr auf.
   recommendation:
     - stage: unverzueglich
       text: >-
         Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer
-        Antragstellername den tatsaechlich aufgerufenen Hostnamen enthaelt.
+        Antragstellername den tatsächlich aufgerufenen Hostnamen enthält.
     - stage: mittelfristig
       text: >-
         Die Zuordnung von Hostnamen zu Zertifikaten in die Auslieferung neuer virtueller Hosts
         aufnehmen, damit dieser Zustand nicht erneut entsteht.
   verify: >-
-    Verbindung zum Dienst unter dem oeffentlichen Hostnamen mit einem TLS-Client aufbauen und
-    das Zertifikat pruefen; erwartet wird ein gemeinsamer Name oder ein alternativer
+    Verbindung zum Dienst unter dem öffentlichen Hostnamen mit einem TLS-Client aufbauen und
+    das Zertifikat prüfen; erwartet wird ein gemeinsamer Name oder ein alternativer
     Antragstellername, der zu diesem Hostnamen passt.
   positive:
     title: Zertifikat passt zum Hostnamen
     text: >-
-      Fuer den Dienst {group} passt das eingesetzte TLS-Zertifikat zum aufgerufenen Hostnamen.
+      Für den Dienst {group} passt das eingesetzte TLS-Zertifikat zum aufgerufenen Hostnamen.

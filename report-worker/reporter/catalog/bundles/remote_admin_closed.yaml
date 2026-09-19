@@ -1,0 +1,38 @@
+id: remote_admin_closed
+title: Fernwartung oder Dateifreigabe aus dem Internet erreichbar
+category: A
+merge_by: global
+members: [rdp_exposed, smb_exposed]
+target: findings
+references: [CWE-284, CWE-306]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+texts:
+  observation: >-
+    Aus dem Internet sind Dienste für Fernwartung oder für Dateifreigaben erreichbar: {affected}.
+  meaning: >-
+    Fernwartung und Dateifreigaben gehören nicht an das öffentliche Interface. Beide Protokolle
+    sind die häufigsten Einstiegspunkte für Erpressungsangriffe, weil sie Zugangsdaten entgegen
+    nehmen und in der Vergangenheit schwere Schwachstellen hatten.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Den Zugriff aus dem Internet sperren und Fernwartung nur über ein VPN zulassen.
+    - stage: in_kuerze
+      text: >-
+        Zugangsdaten rotieren und die Anmeldeprotokolle der letzten Monate auf fremde Versuche
+        prüfen.
+    - stage: mittelfristig
+      text: >-
+        Eine zweite Anmeldestufe für den Fernzugang einführen.
+  verify: >-
+    Portscan der betroffenen Ports von einer externen Adresse wiederholen; erwartet wird der
+    Zustand gefiltert oder geschlossen.
+  positive:
+    title: Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar
+    text: >-
+      Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf
+      Verbindungen von außen.

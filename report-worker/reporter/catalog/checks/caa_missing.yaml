@@ -34,21 +34,21 @@ policy:
     Einstufung wird gefolgt.
 texts:
   observation: >-
-    Fuer {affected} ist kein CAA-Eintrag veroeffentlicht. Fuer die Domain {domain} legt damit
-    kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen duerfen.
+    Für {affected} ist kein CAA-Eintrag veröffentlicht. Für die Domain {domain} legt damit
+    kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen dürfen.
   meaning: >-
-    Ohne CAA-Eintrag kann jede oeffentliche Zertifizierungsstelle ein Zertifikat fuer die Domain
-    ausstellen. Eine fehlerhafte oder missbraeuchliche Ausstellung durch eine fremde Stelle faellt
+    Ohne CAA-Eintrag kann jede öffentliche Zertifizierungsstelle ein Zertifikat für die Domain
+    ausstellen. Eine fehlerhafte oder missbräuchliche Ausstellung durch eine fremde Stelle fällt
     dadurch nicht von vornherein auf.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Einen CAA-Eintrag veroeffentlichen, der nur die tatsaechlich genutzten
+        Einen CAA-Eintrag veröffentlichen, der nur die tatsächlich genutzten
         Zertifizierungsstellen zur Ausstellung berechtigt.
   verify: >-
-    DNS-Abfrage des CAA-Eintrags fuer die Domain {domain}; erwartet wird mindestens ein
+    DNS-Abfrage des CAA-Eintrags für die Domain {domain}; erwartet wird mindestens ein
     issue-Eintrag mit der genutzten Zertifizierungsstelle.
   positive:
     title: CAA-Eintrag vorhanden
     text: >-
-      Fuer die Domain {domain} ist ein CAA-Eintrag veroeffentlicht.
+      Für die Domain {domain} ist ein CAA-Eintrag veröffentlicht.

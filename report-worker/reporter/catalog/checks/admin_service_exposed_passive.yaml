@@ -1,5 +1,5 @@
 id: admin_service_exposed_passive
-title: Verwaltungsoberflaeche laut Passivquelle erreichbar
+title: Verwaltungsoberfläche laut Passivquelle erreichbar
 family: admin_service_exposed
 category: A
 scale: hygiene
@@ -32,26 +32,26 @@ policy:
     Pflicht-Pruefschritt gefuehrt (spec/05 M2: verified false).
 texts:
   observation: >-
-    Eine Passivquelle meldet fuer {group} eine Verwaltungs- oder Firewall-Oberflaeche, die der
-    Portscan nicht bestaetigen konnte: {affected}. Der Port liegt ausserhalb der geprueften Ports
+    Eine Passivquelle meldet für {group} eine Verwaltungs- oder Firewall-Oberfläche, die der
+    Portscan nicht bestätigen konnte: {affected}. Der Port liegt außerhalb der geprüften Ports
     oder war vom Scanner aus gefiltert.
   meaning: >-
-    Eine exponierte Verwaltungsoberflaeche ist ein hochwertiges Ziel: Eine Uebernahme betrifft den
+    Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den
     gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal
-    oder die Administrationsoberflaeche handelt, ist von aussen nicht erkennbar.
+    oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Klaeren, welche Funktion auf dem gemeldeten Port laeuft. Verwaltungsoberflaechen duerfen
+        Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen
         nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und
         aktuellem Firmwarestand.
     - stage: in_kuerze
       text: >-
         Firmware gegen die Sicherheitshinweise des Herstellers abgleichen; lokale Benutzerkonten und
-        Standardkonten pruefen.
+        Standardkonten prüfen.
     - stage: mittelfristig
       text: >-
-        Zugriff auf benoetigte Quellnetze beschraenken und Anmeldeversuche ueberwachen.
+        Zugriff auf benötigte Quellnetze beschränken und Anmeldeversuche überwachen.
   verify: >-
     Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine
-    Verwaltungsanmeldung ohne Zugriffsbeschraenkung.
+    Verwaltungsanmeldung ohne Zugriffsbeschränkung.

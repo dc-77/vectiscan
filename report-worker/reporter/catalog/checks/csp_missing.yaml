@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn}"
 evidence: [http]
 references: [CWE-693, OWASP2025-A05]
@@ -37,17 +37,17 @@ texts:
   observation: >-
     Auf {group} ist keine Content-Security-Policy gesetzt: {affected}.
   meaning: >-
-    Ohne Content-Security-Policy hat der Browser keine zusaetzliche Einschraenkung, welche
+    Ohne Content-Security-Policy hat der Browser keine zusätzliche Einschränkung, welche
     Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von
     Fremdinhalten fehlt damit eine zweite Verteidigungslinie.
   recommendation:
     - stage: mittelfristig
       text: >-
         Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die
-        Skript- und Style-Quellen auf die tatsaechlich benoetigten Urspruenge beschraenkt.
+        Skript- und Style-Quellen auf die tatsächlich benötigten Ursprünge beschränkt.
   verify: >-
-    HTTP-Antwortheader der Startseite von aussen abrufen; erwartet wird ein Header
-    Content-Security-Policy mit einer Regel fuer Skriptquellen.
+    HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein Header
+    Content-Security-Policy mit einer Regel für Skriptquellen.
   positive:
     title: Content-Security-Policy gesetzt
     text: >-

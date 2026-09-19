@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
+bundle: tls_hardening
 affected_template: "{target} ({legacy_protocols})"
 evidence: [tls]
 references: [CWE-326, RFC-8996, BSI-TR-03116-4]
@@ -38,9 +38,9 @@ texts:
     Der Dienst {group} bietet neben aktuellen Versionen auch veraltete TLS-Protokolle an, die seit
     RFC 8996 als unsicher gelten: {affected}.
   meaning: >-
-    Verbindungen aelterer Clients koennen auf schwache Protokolle heruntergestuft werden. Unter
-    TLS 1.0 und 1.1 sind bekannte Angriffe auf die Verschluesselung moeglich; bei Zugangsportalen
-    betrifft das die Sitzungen der Mitarbeitenden von aussen.
+    Verbindungen älterer Clients können auf schwache Protokolle heruntergestuft werden. Unter
+    TLS 1.0 und 1.1 sind bekannte Angriffe auf die Verschlüsselung möglich; bei Zugangsportalen
+    betrifft das die Sitzungen der Mitarbeitenden von außen.
   recommendation:
     - stage: mittelfristig
       text: >-
@@ -55,4 +55,4 @@ texts:
   positive:
     title: Nur aktuelle TLS-Protokolle
     text: >-
-      Der Dienst {group} bietet ausschliesslich TLS 1.2 oder hoeher an.
+      Der Dienst {group} bietet ausschließlich TLS 1.2 oder höher an.

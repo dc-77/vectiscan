@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [dns_records]
 kind: check
-bundle: null
+bundle: mail_records
 affected_template: "{domain}"
 evidence: [dns]
 references: [CWE-290, RFC-7208]
@@ -31,20 +31,20 @@ policy:
     fehlendes SPF als Hygiene hoch ein.
 texts:
   observation: >-
-    Fuer die Domain {domain} liegt kein SPF-Eintrag vor: {affected}. Empfangende Mailserver
-    koennen damit nicht pruefen, welche Server im Namen der Domain versenden duerfen.
+    Für die Domain {domain} liegt kein SPF-Eintrag vor: {affected}. Empfangende Mailserver
+    können damit nicht prüfen, welche Server im Namen der Domain versenden dürfen.
   meaning: >-
-    Ohne SPF akzeptieren viele Empfangssysteme E-Mails im Namen der Domain unabhaengig vom
-    tatsaechlich sendenden Server. Das erleichtert Absenderfaelschung fuer Phishing- und
-    Betrugsversuche gegenueber Kunden, Lieferanten und Mitarbeitenden.
+    Ohne SPF akzeptieren viele Empfangssysteme E-Mails im Namen der Domain unabhängig vom
+    tatsächlich sendenden Server. Das erleichtert Absenderfälschung für Phishing- und
+    Betrugsversuche gegenüber Kunden, Lieferanten und Mitarbeitenden.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Einen SPF-Eintrag veroeffentlichen, der alle legitimen Versandquellen der Domain
-        auffuehrt, und die Fehlbehandlung zunaechst weich einstellen.
+        Einen SPF-Eintrag veröffentlichen, der alle legitimen Versandquellen der Domain
+        aufführt, und die Fehlbehandlung zunächst weich einstellen.
     - stage: mittelfristig
       text: >-
-        Die Versandquellen regelmaessig pruefen und den SPF-Eintrag bei Aenderungen der
+        Die Versandquellen regelmäßig prüfen und den SPF-Eintrag bei Änderungen der
         Mailinfrastruktur nachziehen.
   verify: >-
     DNS-Abfrage des TXT-Eintrags der Domain {domain}; erwartet wird ein Eintrag, der mit v=spf1
@@ -52,4 +52,4 @@ texts:
   positive:
     title: SPF-Eintrag vorhanden
     text: >-
-      Fuer die Domain {domain} ist ein SPF-Eintrag veroeffentlicht.
+      Für die Domain {domain} ist ein SPF-Eintrag veröffentlicht.

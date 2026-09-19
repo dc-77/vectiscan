@@ -1,5 +1,5 @@
 id: legacy_protocols_present
-title: Veraltetes Uebertragungsprotokoll aus dem Internet erreichbar
+title: Veraltetes Übertragungsprotokoll aus dem Internet erreichbar
 family: legacy_protocols_present
 category: A
 scale: hygiene
@@ -29,21 +29,21 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} bietet ein aelteres Uebertragungsprotokoll an, das zur Angriffsflaeche des
-    Anschlusses zaehlt: {affected}. Ob eine Verschluesselung erzwungen wird, zeigt diese Pruefung
+    Der Host {group} bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des
+    Anschlusses zählt: {affected}. Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung
     nicht.
   meaning: >-
-    Jeder zusaetzlich erreichbare Dienst vergroessert die Angriffsflaeche des Anschlusses,
-    unabhaengig davon, ob er eine Verschluesselung anbietet oder erzwingt. Altprotokolle bringen
+    Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses,
+    unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen
     zudem eigene, seltener gepflegte Serverkomponenten mit.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Pruefen, ob der Dienst noch benoetigt wird, und ihn andernfalls deaktivieren.
+        Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.
     - stage: mittelfristig
       text: >-
-        Falls der Dienst benoetigt wird, den Zugriff auf feste Quelladressen beschraenken und eine
-        erzwungene Verschluesselung sicherstellen.
+        Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine
+        erzwungene Verschlüsselung sicherstellen.
   verify: >-
     Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der
-    Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benoetigt wird.
+    Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird.

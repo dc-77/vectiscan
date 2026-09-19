@@ -1,5 +1,5 @@
 id: http_no_tls
-title: Webdienst ohne Transportverschluesselung erreichbar
+title: Webdienst ohne Transportverschlüsselung erreichbar
 family: http_no_tls
 category: A
 scale: exposure
@@ -29,24 +29,24 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} bietet einen Webdienst nur ueber unverschluesseltes HTTP an; ein HTTPS-Dienst
+    Der Host {group} bietet einen Webdienst nur über unverschlüsseltes HTTP an; ein HTTPS-Dienst
     auf Port 443 fehlt: {affected}.
   meaning: >-
-    Alle Inhalte und Eingaben laufen im Klartext ueber das Netz. In fremden Netzen kann jeder
-    Mitleser Seiteninhalte veraendern oder Formulareingaben abgreifen; Browser markieren die Seite
+    Alle Inhalte und Eingaben laufen im Klartext über das Netz. In fremden Netzen kann jeder
+    Mitleser Seiteninhalte verändern oder Formulareingaben abgreifen; Browser markieren die Seite
     als nicht sicher.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Ein Zertifikat einer anerkannten Zertifizierungsstelle einrichten und den Dienst ueber HTTPS
+        Ein Zertifikat einer anerkannten Zertifizierungsstelle einrichten und den Dienst über HTTPS
         anbieten; HTTP nur noch als Weiterleitung auf HTTPS betreiben.
     - stage: mittelfristig
       text: >-
         HSTS setzen, sobald alle Hostnamen dauerhaft HTTPS liefern.
   verify: >-
-    Aufruf des Hostnamens ueber HTTPS von aussen; erwartet wird eine gueltige verschluesselte
+    Aufruf des Hostnamens über HTTPS von außen; erwartet wird eine gültige verschlüsselte
     Verbindung und eine Weiterleitung von HTTP auf HTTPS.
   positive:
-    title: Webdienst mit Transportverschluesselung
+    title: Webdienst mit Transportverschlüsselung
     text: >-
-      Der Host {group} bietet seinen Webdienst ueber HTTPS an.
+      Der Host {group} bietet seinen Webdienst über HTTPS an.

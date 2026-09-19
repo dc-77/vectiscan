@@ -1,5 +1,5 @@
 id: mail_plaintext
-title: POP3 oder IMAP ohne erzwungene Transportverschluesselung
+title: POP3 oder IMAP ohne erzwungene Transportverschlüsselung
 family: mail_plaintext
 category: A
 scale: exposure
@@ -18,7 +18,7 @@ undetermined: not_testable
 requires:
   tools: [nmap]
 kind: check
-bundle: null
+bundle: plaintext_services
 affected_template: "{host_ip}:{port} ({mail_name} ohne STARTTLS)"
 evidence: [service]
 references: [CWE-319, CWE-522, OWASP2025-A02]
@@ -37,31 +37,31 @@ policy:
     Verschluesselungsfaehigkeit als nicht pruefbar gilt und keinen Befund ergibt.
 texts:
   observation: >-
-    Auf {group} bietet der Mailabrufdienst keine erzwungene Transportverschluesselung vor der
+    Auf {group} bietet der Mailabrufdienst keine erzwungene Transportverschlüsselung vor der
     Anmeldung an: {affected}.
   meaning: >-
-    Ohne STARTTLS oder eine gleichwertige Verschluesselungspflicht uebertragen POP3 und IMAP
-    Anmeldedaten und Nachrichteninhalte im Klartext ueber das Netz. Jeder Mitleser auf dem
-    Uebertragungsweg kann Postfach-Zugangsdaten abgreifen und fuer weitere Zugriffe nutzen.
+    Ohne STARTTLS oder eine gleichwertige Verschlüsselungspflicht übertragen POP3 und IMAP
+    Anmeldedaten und Nachrichteninhalte im Klartext über das Netz. Jeder Mitleser auf dem
+    Übertragungsweg kann Postfach-Zugangsdaten abgreifen und für weitere Zugriffe nutzen.
   recommendation:
     - stage: unverzueglich
       text: >-
-        Auf dem Mailserver STARTTLS fuer POP3 und IMAP erzwingen oder die Klartextvarianten
-        auf den betroffenen Ports deaktivieren und ausschliesslich die verschluesselten
+        Auf dem Mailserver STARTTLS für POP3 und IMAP erzwingen oder die Klartextvarianten
+        auf den betroffenen Ports deaktivieren und ausschließlich die verschlüsselten
         Varianten anbieten.
     - stage: in_kuerze
       text: >-
-        Postfach-Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschluesselte
-        Anmeldeversuche pruefen.
+        Postfach-Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte
+        Anmeldeversuche prüfen.
     - stage: mittelfristig
       text: >-
-        Mail-Clients auf die verschluesselten Abrufwege umstellen und die Klartextports
-        anschliessend schliessen.
+        Mail-Clients auf die verschlüsselten Abrufwege umstellen und die Klartextports
+        anschließend schließen.
   verify: >-
-    Verbindung zum Mailabrufdienst von aussen aufbauen, bevor STARTTLS angefordert wird;
-    erwartet wird die Ablehnung dieser unverschluesselten Anmeldung.
+    Verbindung zum Mailabrufdienst von außen aufbauen, bevor STARTTLS angefordert wird;
+    erwartet wird die Ablehnung dieser unverschlüsselten Anmeldung.
   positive:
     title: POP3 und IMAP erzwingen TLS vor der Anmeldung
     text: >-
       Auf {group} lassen POP3 und IMAP eine Anmeldung erst nach aufgebauter
-      Transportverschluesselung zu.
+      Transportverschlüsselung zu.

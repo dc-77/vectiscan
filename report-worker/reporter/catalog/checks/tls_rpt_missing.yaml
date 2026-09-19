@@ -35,22 +35,22 @@ policy:
     die Sichtbarkeit auf Transportprobleme verbessert und im Buendel mit MTA-STS und DANE wirkt.
 texts:
   observation: >-
-    Fuer {affected} ist kein TLS-RPT nach RFC 8460 eingerichtet. Fuer die Domain {domain}
-    fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte ueber fehlgeschlagene
-    oder herabgestufte Transportverschluesselung schicken koennen.
+    Für {affected} ist kein TLS-RPT nach RFC 8460 eingerichtet. Für die Domain {domain}
+    fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte über fehlgeschlagene
+    oder herabgestufte Transportverschlüsselung schicken können.
   meaning: >-
     Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen
-    auf dem Uebertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende
-    Mailserver eine erzwungene Transportverschluesselung nicht aufbauen konnten.
+    auf dem Übertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende
+    Mailserver eine erzwungene Transportverschlüsselung nicht aufbauen konnten.
   recommendation:
     - stage: strategisch
       text: >-
-        Einen TLS-RPT-Eintrag mit einer ueberwachten Meldeadresse veroeffentlichen und die
-        eingehenden Berichte regelmaessig auf Transportfehler auswerten.
+        Einen TLS-RPT-Eintrag mit einer überwachten Meldeadresse veröffentlichen und die
+        eingehenden Berichte regelmäßig auf Transportfehler auswerten.
   verify: >-
     DNS-Abfrage des TXT-Eintrags _smtp._tls.{domain}; erwartet wird ein Eintrag, der mit
     v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt.
   positive:
     title: TLS-RPT eingerichtet
     text: >-
-      Fuer die Domain {domain} ist TLS-RPT eingerichtet.
+      Für die Domain {domain} ist TLS-RPT eingerichtet.

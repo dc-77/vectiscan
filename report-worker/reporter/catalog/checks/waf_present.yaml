@@ -32,12 +32,12 @@ texts:
     Vor {group} konnte keine Web Application Firewall festgestellt werden: {affected}.
   meaning: >-
     Eine Web Application Firewall filtert bekannte Angriffsmuster auf Anwendungsebene, bevor sie
-    den Webdienst erreichen, und ist eine zusaetzliche Schutzschicht neben einer sauberen
+    den Webdienst erreichen, und ist eine zusätzliche Schutzschicht neben einer sauberen
     Anwendungskonfiguration.
   recommendation:
     - stage: strategisch
       text: >-
-        Den Einsatz einer Web Application Firewall vor dem Webdienst pruefen, insbesondere fuer
+        Den Einsatz einer Web Application Firewall vor dem Webdienst prüfen, insbesondere für
         Anmeldeportale und Formulare mit Nutzereingaben.
   verify: >-
     Anfragen mit typischen Angriffsmustern an die genannte Adresse senden; erwartet wird eine

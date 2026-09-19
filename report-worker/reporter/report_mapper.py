@@ -112,10 +112,15 @@ SCAN_TOOLS = [
     {"tool": "testssl.sh", "description": "SSL/TLS-Konfigurationsanalyse", "phase": "Phase 2"},
     {"tool": "ZAP Spider", "description": "Web-Crawling und Sitemap-Erstellung", "phase": "Phase 2"},
     {"tool": "ZAP Ajax Spider", "description": "JavaScript-basiertes Web-Crawling", "phase": "Phase 2"},
-    # S0a: "ZAP Active Scan" und "ffuf" sind hier bewusst NICHT gelistet.
-    # zap_active hat in 42 Produktionsscans nie ein Ergebnis geliefert (ZAP-API
-    # "does_not_exist"), ffuf_sensitive wurde wegen fehlender Wordlist immer
-    # uebersprungen. Wieder aufnehmen, sobald S0b gemerged und verifiziert ist.
+    # S3: "ZAP Active Scan" ist wieder gelistet. S0a hatte den Eintrag entfernt, weil
+    # zap_active in 42 Produktionsscans nie ein Ergebnis geliefert hatte (ZAP-API
+    # "does_not_exist"). S0b hat die Ursache behoben (fehlende Scanner-IDs im Image);
+    # erster erfolgreicher Produktionslauf am 18.09.2026, Auftrag 14272c00 gegen
+    # dortmund-beach.com mit status=ok und vollstaendiger Alert-Liste im Tar.
+    {"tool": "ZAP Active Scan", "description": "Aktive Pruefung der Webanwendung auf gaengige Schwachstellenklassen", "phase": "Phase 2"},
+    # "ffuf" bleibt draussen: ffuf_sensitive laeuft seit dem Wordlist-Fix aus S0a, endet
+    # aber regelmaessig im Timeout (spec/07, Abschluss S0b). "VirusTotal" bleibt ohne
+    # Zugang und damit ebenfalls draussen (Entscheidung DC, spec/07 Abschnitt 1).
     {"tool": "feroxbuster", "description": "Rekursive Directory-Enumeration", "phase": "Phase 2"},
     {"tool": "wpscan", "description": "WordPress-Schwachstellen-Scanner", "phase": "Phase 2"},
     {"tool": "NVD/EPSS/KEV", "description": "Threat-Intelligence-Enrichment (NIST, FIRST, CISA)", "phase": "Phase 3"},

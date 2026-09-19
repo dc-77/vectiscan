@@ -20,3 +20,8 @@ pydantic==2.12.5
 # ignore.yaml). Exakt gepinnt wie alles andere hier; CI-Job und Worker-Image
 # installieren aus dieser Datei.
 PyYAML==6.0.3
+# S3 (19.09.2026): reporter/v3 gibt das Scanfenster in Ortszeit aus (Europe/Berlin).
+# zoneinfo braucht dafuer eine Zeitzonendatenbank; debian:bookworm-slim bringt keine
+# mit. Ohne dieses Paket faellt der Bericht auf UTC zurueck und schreibt das an die
+# Uhrzeit, der Lauf bricht also nicht ab.
+tzdata==2025.3

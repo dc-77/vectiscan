@@ -15,7 +15,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn} ({csp_flags})"
 evidence: [http]
 references: [CWE-693, OWASP2025-A05]
@@ -34,17 +34,17 @@ texts:
     lockert: {affected}.
   meaning: >-
     Die Direktiven unsafe-inline und unsafe-eval erlauben eingebettete oder zur Laufzeit
-    erzeugte Skripte, eine Wildcard-Quelle erlaubt Inhalte von beliebigen Urspruengen. Jede
+    erzeugte Skripte, eine Wildcard-Quelle erlaubt Inhalte von beliebigen Ursprüngen. Jede
     dieser Lockerungen hebt genau den Schutz auf, den die Content-Security-Policy gegen
     eingeschleuste Skripte bieten soll.
   recommendation:
     - stage: mittelfristig
       text: >-
         Die Direktiven unsafe-inline und unsafe-eval aus der Content-Security-Policy entfernen
-        und stattdessen Nonces oder Hashes fuer eingebettete Skripte verwenden.
+        und stattdessen Nonces oder Hashes für eingebettete Skripte verwenden.
     - stage: mittelfristig
       text: >-
-        Wildcard-Quellen durch eine Liste der tatsaechlich benoetigten Urspruenge ersetzen.
+        Wildcard-Quellen durch eine Liste der tatsächlich benötigten Ursprünge ersetzen.
   verify: >-
-    HTTP-Antwortheader der Startseite von aussen abrufen; erwartet wird eine
+    HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird eine
     Content-Security-Policy ohne unsafe-inline, ohne unsafe-eval und ohne Wildcard-Quelle.

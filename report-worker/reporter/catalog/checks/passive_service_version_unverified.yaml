@@ -1,5 +1,5 @@
 id: passive_service_version_unverified
-title: Dienstversion laut Passivquelle unbestaetigt
+title: Dienstversion laut Passivquelle unbestätigt
 family: passive_service_unverified
 category: B
 scale: hygiene
@@ -33,21 +33,21 @@ policy:
     bei einem Pruefauftrag zu Patchstand und Erreichbarkeit, ohne eigene EOL-Behauptung.
 texts:
   observation: >-
-    Fuer {group} meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestaetigen
+    Für {group} meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestätigen
     konnte: {affected}.
   meaning: >-
-    Ohne aktive Bestaetigung ist unklar, ob der gemeldete Dienst und die genannte Version noch
-    aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann ausserhalb
+    Ohne aktive Bestätigung ist unklar, ob der gemeldete Dienst und die genannte Version noch
+    aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann außerhalb
     der eigentlich vorgesehenen Zustellwege erreichbar sein.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Anhand einer aktiven Pruefung feststellen, ob Dienst und Version aus der Passivquelle noch
+        Anhand einer aktiven Prüfung feststellen, ob Dienst und Version aus der Passivquelle noch
         zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen.
     - stage: mittelfristig
       text: >-
-        Zugriff auf den Dienst auf die Netze beschraenken, aus denen eine Zustellung tatsaechlich
+        Zugriff auf den Dienst auf die Netze beschränken, aus denen eine Zustellung tatsächlich
         erfolgen muss.
   verify: >-
-    Verbindung zum gemeldeten Port herstellen und die zurueckgegebene Version mit dem aktuellen
+    Verbindung zum gemeldeten Port herstellen und die zurückgegebene Version mit dem aktuellen
     Patchstand des Herstellers abgleichen.

@@ -341,7 +341,9 @@ _TOOL_CONFIDENCE: dict[str, str] = {
     "testssl.sh":          "sehr hoch (autoritative TLS-Analyse)",
     "ZAP Spider":          "mittel",
     "ZAP Ajax Spider":     "mittel",
-    # S0a: "ZAP Active Scan" und "ffuf" stehen bis S0b nicht mehr in SCAN_TOOLS.
+    # S3: zurueck in SCAN_TOOLS, nachdem S0b die Ursache behoben hat und am 18.09.2026
+    # der erste Produktionslauf mit zap_active status=ok vorlag. "ffuf" bleibt draussen.
+    "ZAP Active Scan":     "mittel",
     "feroxbuster":         "mittel",
     "wpscan":              "hoch (CVE-Datenbank-Match)",
     "NVD/EPSS/KEV":        "hoch (autoritative Threat-Intel)",

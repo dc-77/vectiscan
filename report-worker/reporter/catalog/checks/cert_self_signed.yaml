@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
+bundle: cert_health
 affected_template: "{target}"
 evidence: [tls]
 references: [CWE-295, CWE-296]
@@ -34,24 +34,24 @@ policy:
     selbstsignierten Zertifikat setzt.
 texts:
   observation: >-
-    Fuer den Dienst {group} ist ein selbstsigniertes TLS-Zertifikat im Einsatz: {affected}. Das
+    Für den Dienst {group} ist ein selbstsigniertes TLS-Zertifikat im Einsatz: {affected}. Das
     Zertifikat wurde nicht von einer allgemein anerkannten Vertrauensstelle ausgestellt.
   meaning: >-
-    Ohne eine allgemein anerkannte Vertrauensstelle kann ein TLS-Client die Identitaet des
-    Dienstes nicht unabhaengig bestaetigen und muss dem Zertifikat blind vertrauen oder eine
-    Warnung anzeigen. Werden solche Warnungen routinemaessig akzeptiert, faellt ein echter
+    Ohne eine allgemein anerkannte Vertrauensstelle kann ein TLS-Client die Identität des
+    Dienstes nicht unabhängig bestätigen und muss dem Zertifikat blind vertrauen oder eine
+    Warnung anzeigen. Werden solche Warnungen routinemäßig akzeptiert, fällt ein echter
     Man-in-the-Middle-Angriff mit einem eigenen selbstsignierten Zertifikat nicht mehr auf.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Ein Zertifikat einer allgemein anerkannten Vertrauensstelle fuer den betroffenen Dienst
+        Ein Zertifikat einer allgemein anerkannten Vertrauensstelle für den betroffenen Dienst
         ausstellen und einspielen.
     - stage: mittelfristig
       text: >-
-        Fuer intern genutzte Dienste eine eigene Zertifizierungsstelle einrichten und deren
+        Für intern genutzte Dienste eine eigene Zertifizierungsstelle einrichten und deren
         Stammzertifikat gezielt auf den zugreifenden Systemen verteilen, statt einzelne
         selbstsignierte Zertifikate zu verwenden.
   verify: >-
-    Verbindung zum Dienst mit einem TLS-Client aufbauen und den Aussteller des praesentierten
-    Zertifikats pruefen; erwartet wird ein Aussteller, der sich vom Antragsteller unterscheidet
+    Verbindung zum Dienst mit einem TLS-Client aufbauen und den Aussteller des präsentierten
+    Zertifikats prüfen; erwartet wird ein Aussteller, der sich vom Antragsteller unterscheidet
     und einer allgemein anerkannten Vertrauensstelle zugeordnet werden kann.

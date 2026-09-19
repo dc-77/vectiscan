@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
+bundle: tls_hardening
 affected_template: "{target} ({ciphers_weak})"
 evidence: [tls]
 references: [CWE-327, BSI-TR-03116-4]
@@ -32,21 +32,21 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Dienst {group} bietet neben starken auch schwache Verschluesselungsverfahren an, die als
+    Der Dienst {group} bietet neben starken auch schwache Verschlüsselungsverfahren an, die als
     unsicher gelten: {affected}.
   meaning: >-
-    Schwache Cipher-Suiten schuetzen die Verbindung nicht zuverlaessig vor bekannten Angriffen auf
-    die Verschluesselung. Faellt ein Client auf eine solche Suite zurueck, sind Anmeldedaten und
-    Sitzungsinformationen auf dem Uebertragungsweg schwaecher geschuetzt.
+    Schwache Cipher-Suiten schützen die Verbindung nicht zuverlässig vor bekannten Angriffen auf
+    die Verschlüsselung. Fällt ein Client auf eine solche Suite zurück, sind Anmeldedaten und
+    Sitzungsinformationen auf dem Übertragungsweg schwächer geschützt.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Schwache Cipher-Suiten in der Serverkonfiguration deaktivieren und ausschliesslich
+        Schwache Cipher-Suiten in der Serverkonfiguration deaktivieren und ausschließlich
         moderne AEAD-Suiten mit Forward Secrecy anbieten.
   verify: >-
-    Verbindungsversuch mit erzwungener schwacher Cipher-Suite gegen den Dienst durchfuehren;
+    Verbindungsversuch mit erzwungener schwacher Cipher-Suite gegen den Dienst durchführen;
     erwartet wird ein Handshake-Fehler.
   positive:
     title: Keine schwachen TLS-Cipher
     text: >-
-      Der Dienst {group} bietet ausschliesslich als sicher eingestufte Cipher-Suiten an.
+      Der Dienst {group} bietet ausschließlich als sicher eingestufte Cipher-Suiten an.

@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: null
+bundle: banner_disclosure
 affected_template: "{fqdn} ({disclosure_headers})"
 evidence: [http]
 references: [CWE-200, CWE-497]
@@ -33,8 +33,8 @@ texts:
     Serversoftware: {affected}.
   meaning: >-
     Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten
-    Schwachstellen fuer genau diese Version, ohne dass er sie selbst herausfinden muss. Fuer sich
-    genommen ist das keine Schwachstelle, aber ein Vorteil fuer die Aufklaerungsphase eines
+    Schwachstellen für genau diese Version, ohne dass er sie selbst herausfinden muss. Für sich
+    genommen ist das keine Schwachstelle, aber ein Vorteil für die Aufklärungsphase eines
     Angriffs.
   recommendation:
     - stage: mittelfristig
@@ -42,5 +42,5 @@ texts:
         Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration
         entfernen oder auf einen generischen Wert ohne Versionsangabe setzen.
   verify: >-
-    HTTP-Antwortheader der genannten Adresse von aussen abrufen; erwartet wird kein Header mit
+    HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird kein Header mit
     einer konkreten Versionsangabe.

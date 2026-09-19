@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [web_probe]
 kind: check
-bundle: null
+bundle: access_portals_exposed
 affected_template: "{fqdn} ({title})"
 evidence: [fqdn]
 references: [CWE-307, CWE-521]
@@ -32,25 +32,25 @@ policy:
 texts:
   observation: >-
     Die Webseite {group} zeigt ein Anmeldeportal, das aus dem gesamten Internet erreichbar ist:
-    {affected}. Die Erreichbarkeit selbst ist beabsichtigt, wenn das Portal fuer den externen
+    {affected}. Die Erreichbarkeit selbst ist beabsichtigt, wenn das Portal für den externen
     Zugriff vorgesehen ist.
   meaning: >-
-    Ein oeffentlich erreichbares Anmeldeportal ist ein haeufiges Ziel fuer automatisierte
-    Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusaetzliche Absicherung
-    genuegt ein einzelnes bekanntes Passwort fuer den Zugriff.
+    Ein öffentlich erreichbares Anmeldeportal ist ein häufiges Ziel für automatisierte
+    Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusätzliche Absicherung
+    genügt ein einzelnes bekanntes Passwort für den Zugriff.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Die Anmeldung am Portal um einen zusaetzlichen Faktor ergaenzen, etwa eine
+        Die Anmeldung am Portal um einen zusätzlichen Faktor ergänzen, etwa eine
         Authentifizierungs-App oder ein Einmalkennwort.
     - stage: in_kuerze
       text: >-
-        Zugriff auf bekannte Quellnetze beschraenken, soweit die Nutzung des Portals das
-        zulaesst.
+        Zugriff auf bekannte Quellnetze beschränken, soweit die Nutzung des Portals das
+        zulässt.
     - stage: mittelfristig
       text: >-
-        Softwarestand des Portals regelmaessig gegen die Sicherheitshinweise des Herstellers
-        pruefen und zeitnah einspielen.
+        Softwarestand des Portals regelmäßig gegen die Sicherheitshinweise des Herstellers
+        prüfen und zeitnah einspielen.
   verify: >-
-    Anmeldeversuch mit einem falschen Kennwort durchfuehren; erwartet wird eine Sperre oder
-    Verzoegerung nach mehreren Fehlversuchen sowie die Abfrage des zusaetzlichen Faktors.
+    Anmeldeversuch mit einem falschen Kennwort durchführen; erwartet wird eine Sperre oder
+    Verzögerung nach mehreren Fehlversuchen sowie die Abfrage des zusätzlichen Faktors.

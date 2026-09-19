@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [dns_records]
 kind: check
-bundle: null
+bundle: mail_policy
 affected_template: "{domain} ({spf_qualifier})"
 evidence: [dns]
 references: [CWE-290, RFC-7208]
@@ -30,12 +30,12 @@ policy:
 texts:
   observation: >-
     Der SPF-Eintrag der Domain {domain} setzt bei nicht autorisierten Versendern nur auf eine
-    weiche oder neutrale Fehlbehandlung: {affected}. Empfangende Mailserver duerfen die E-Mail
+    weiche oder neutrale Fehlbehandlung: {affected}. Empfangende Mailserver dürfen die E-Mail
     trotzdem zustellen.
   meaning: >-
-    Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdaechtig,
+    Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdächtig,
     lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen
-    gefaelschte E-Mails im Namen der Domain trotzdem zu.
+    gefälschte E-Mails im Namen der Domain trotzdem zu.
   recommendation:
     - stage: mittelfristig
       text: >-

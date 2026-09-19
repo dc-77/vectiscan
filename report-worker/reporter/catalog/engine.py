@@ -26,9 +26,9 @@ from reporter.catalog import render
 from reporter.catalog import tables as T
 from reporter.catalog.catchall import run_catchalls
 from reporter.catalog.expr import CatalogSpecError, Expr, compile_expr
-from reporter.catalog.schema import (CATEGORY_NAMES, LEVEL_LABELS, CatalogOutput, CheckInfo, CheckResult,
-                                     CheckRollup, CheckSpec, EvidenceRef, IgnoreList, Member, NotTestableRule,
-                                     RenderedTexts, Summary)
+from reporter.catalog.schema import (CATEGORY_NAMES, LEVEL_LABELS, BundleSpec, CatalogOutput, CheckInfo,
+                                     CheckResult, CheckRollup, CheckSpec, EvidenceRef, IgnoreList, Member,
+                                     NotTestableRule, RenderedTexts, Summary)
 from reporter.catalog.scope import FactsIndex, Group, Item, build_groups, binding_types
 from reporter.catalog.version import CATALOG_DIR, CATALOG_VERSION, catalog_digest
 from reporter.facts import schema as FS
@@ -58,10 +58,13 @@ class Catalog:
     version: str
     digest: str
     dir: Path
+    bundles: list[BundleSpec] = field(default_factory=list)
     by_id: dict[str, CompiledCheck] = field(default_factory=dict)
+    bundle_by_id: dict[str, BundleSpec] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.by_id = {c.spec.id: c for c in self.checks}
+        self.bundle_by_id = {b.id: b for b in self.bundles}
 
     @property
     def specs(self) -> list[CheckSpec]:
@@ -88,6 +91,57 @@ def load_check(path: Path) -> CheckSpec:
     if spec.id != path.stem:
         raise CatalogSpecError(f"{path.name}: id {spec.id!r} muss dem Dateinamen entsprechen")
     return spec
+
+
+def load_bundle(path: Path) -> BundleSpec:
+    data = load_yaml(path)
+    try:
+        spec = BundleSpec.model_validate(data)
+    except ValidationError as exc:
+        raise CatalogSpecError(f"{path.name}: {exc}") from None
+    if spec.id != path.stem:
+        raise CatalogSpecError(f"{path.name}: id {spec.id!r} muss dem Dateinamen entsprechen")
+    return spec
+
+
+def _link_bundles(compiled: list[CompiledCheck], bundles: list[BundleSpec]) -> list[BundleSpec]:
+    """Beide Seiten der Zuordnung muessen uebereinstimmen, sonst Ladefehler.
+
+    Mitglieder, deren Pruefung in diesem Katalogverzeichnis gar nicht liegt, werden
+    stillschweigend entfernt; ein Buendel ohne verbleibendes Mitglied faellt weg. Damit
+    bleibt ein bewusst verkleinerter Katalog (Testaufbau) ladbar, waehrend ein Tippfehler
+    im vollstaendigen Katalog weiter ein Fehler ist: die Pruefung traegt dann ein
+    ``bundle``, das ihre Buenddatei nicht auffuehrt.
+    """
+    by_id = {c.spec.id: c.spec for c in compiled}
+    known = {b.id for b in bundles}
+    declared: dict[str, str] = {}
+    linked: list[BundleSpec] = []
+    for bundle in bundles:
+        members = []
+        for member in bundle.members:
+            spec = by_id.get(member)
+            if spec is None:
+                continue
+            if member in declared:
+                raise CatalogSpecError(
+                    f"bundle {bundle.id}: Pruefung {member!r} steht schon in {declared[member]!r}")
+            declared[member] = bundle.id
+            if spec.bundle != bundle.id:
+                raise CatalogSpecError(
+                    f"{member}: bundle {spec.bundle!r} passt nicht zu bundles/{bundle.id}.yaml")
+            members.append(member)
+        if members:
+            linked.append(bundle.model_copy(update={"members": members}))
+    for spec in by_id.values():
+        if not spec.bundle:
+            continue
+        if spec.bundle not in known:
+            raise CatalogSpecError(f"{spec.id}: bundle {spec.bundle!r} hat keine Datei unter bundles/")
+        if declared.get(spec.id) != spec.bundle:
+            raise CatalogSpecError(
+                f"{spec.id}: steht nicht in members von bundles/{spec.bundle}.yaml")
+    return linked
 
 
 def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
@@ -146,8 +200,11 @@ def load_catalog(catalog_dir: Path | str | None = None) -> Catalog:
             raise CatalogSpecError(f"ignore.yaml: {exc}") from None
     else:
         ignore = IgnoreList()
+    bundles = [load_bundle(p) for p in sorted((base / "bundles").glob("*.yaml"), key=lambda p: p.name)]
+    bundles = _link_bundles(compiled, bundles)
     compiled.sort(key=lambda c: c.spec.id)
-    return Catalog(checks=compiled, ignore=ignore, version=CATALOG_VERSION, digest=catalog_digest(base), dir=base)
+    return Catalog(checks=compiled, ignore=ignore, version=CATALOG_VERSION, digest=catalog_digest(base),
+                   dir=base, bundles=bundles)
 
 
 _DEFAULT: dict[str, Catalog] = {}
@@ -427,11 +484,11 @@ def evaluate(facts: FS.Facts | dict[str, Any], catalog: Catalog | None = None) -
         catalog_version=cat.version, catalog_digest=cat.digest, facts_schema_version=facts.schema_version,
         order_id=facts.scan.order_id, package=facts.scan.package, domain=facts.scan.domain,
         domains=list(facts.scan.domains) or [facts.scan.domain], generator=facts.generator.model_dump(mode="json"),
-        checks=[check_info(cc.spec) for cc in cat.checks],
+        checks=[check_info(cc.spec) for cc in cat.checks], bundles=list(cat.bundles),
         results=results, rollups=rollups, unprocessed=unprocessed, ignored=ignored,
         facts_unprocessed=[u.model_dump(mode="json") for u in facts.unprocessed], summary=summary,
     )
 
 
 __all__ = ["Catalog", "CompiledCheck", "load_catalog", "default_catalog", "reset_default_catalog", "load_check",
-           "compile_check", "evaluate", "evaluate_check", "rollup", "STATUS_ORDER"]
+           "load_bundle", "compile_check", "evaluate", "evaluate_check", "rollup", "STATUS_ORDER"]

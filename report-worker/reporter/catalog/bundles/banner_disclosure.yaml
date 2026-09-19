@@ -1,0 +1,35 @@
+id: banner_disclosure
+title: Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste
+category: E
+merge_by: global
+members: [service_banner_version, http_header_disclosure, http_trace_enabled]
+target: findings
+references: [CWE-200]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+texts:
+  observation: >-
+    Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht
+    gebraucht werden: {affected}.
+  meaning: >-
+    Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil
+    er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen
+    zurück und helfen bei der Vorbereitung.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst
+        abschalten.
+    - stage: strategisch
+      text: >-
+        Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen.
+  verify: >-
+    Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue
+    Versionsangabe und ohne die zusätzlichen Methoden.
+  positive:
+    title: Dienste ohne genaue Versionsangabe
+    text: >-
+      Die geprüften Dienste geben ihre genaue Version nicht preis.

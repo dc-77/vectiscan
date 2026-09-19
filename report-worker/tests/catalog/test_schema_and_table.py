@@ -64,6 +64,52 @@ def test_tabelle_ist_verbindlich(catalog, rows):
     assert not diffs, "\n".join(diffs)
 
 
+def _bundle_rows() -> dict[str, dict[str, str]]:
+    """Zeilen der Buendeltabelle aus decisions.md (Kopfzeile beginnt mit 'bundle')."""
+    rows: dict[str, dict[str, str]] = {}
+    header: list[str] | None = None
+    for line in DECISIONS.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("|"):
+            if header and not line.strip():
+                header = None
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if header is None:
+            if cells and cells[0] == "bundle":
+                header = cells
+            continue
+        if all(set(c) <= set("-: ") for c in cells):
+            continue
+        rows[cells[0]] = dict(zip(header, cells))
+    return rows
+
+
+def test_buendeltabelle_ist_verbindlich(catalog):
+    rows = _bundle_rows()
+    assert rows, "decisions.md hat keine Buendeltabelle"
+    assert set(rows) == set(catalog.bundle_by_id), (
+        f"Tabelle {sorted(set(rows) - set(catalog.bundle_by_id))}, "
+        f"YAML {sorted(set(catalog.bundle_by_id) - set(rows))}")
+    diffs: list[str] = []
+    for bid, bundle in sorted(catalog.bundle_by_id.items()):
+        row = rows[bid]
+        got = {"category": bundle.category, "merge_by": bundle.merge_by, "target": bundle.target,
+               "Mitglieder": ", ".join(bundle.members)}
+        for key, val in got.items():
+            if row[key] != val:
+                diffs.append(f"{bid}.{key}: YAML {val!r} != Tabelle {row[key]!r}")
+    assert not diffs, "\n".join(diffs)
+
+
+def test_jede_pruefung_hoechstens_in_einem_buendel(catalog):
+    seen: dict[str, str] = {}
+    for bundle in catalog.bundles:
+        for member in bundle.members:
+            assert member not in seen, f"{member} in {bundle.id} und {seen[member]}"
+            seen[member] = bundle.id
+            assert catalog.by_id[member].spec.bundle == bundle.id
+
+
 def test_familien_der_soll_liste_werden_erzeugt(catalog):
     expected = json.loads((GOLDEN / "expected" / "junkerwerk.json").read_text(encoding="utf-8"))
     produced = {c.spec.family for c in catalog.checks}

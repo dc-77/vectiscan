@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [dns_records]
 kind: check
-bundle: null
+bundle: mail_policy
 affected_template: "{domain}"
 evidence: [dns]
 references: [CWE-290, RFC-7489]
@@ -31,12 +31,12 @@ policy:
     der Prototyp (VS-007) stuft es als Hygiene hoch ein.
 texts:
   observation: >-
-    Fuer die Domain {domain} existiert kein DMARC-Eintrag. Ohne DMARC bleibt es dem Empfaenger
-    ueberlassen, was mit E-Mails geschieht, die SPF oder DKIM nicht bestehen.
+    Für die Domain {domain} existiert kein DMARC-Eintrag. Ohne DMARC bleibt es dem Empfänger
+    überlassen, was mit E-Mails geschieht, die SPF oder DKIM nicht bestehen.
   meaning: >-
-    Angreifer koennen E-Mails im Namen der Domain an Kunden, Lieferanten und Mitarbeitende senden
-    (Rechnungsbetrug, CEO-Fraud), ohne dass Empfaengersysteme diese zuverlaessig abweisen. DMARC ist
-    der Schlussstein der Absender-Authentizitaet.
+    Angreifer können E-Mails im Namen der Domain an Kunden, Lieferanten und Mitarbeitende senden
+    (Rechnungsbetrug, CEO-Fraud), ohne dass Empfängersysteme diese zuverlässig abweisen. DMARC ist
+    der Schlussstein der Absender-Authentizität.
   recommendation:
     - stage: in_kuerze
       text: >-
@@ -52,4 +52,4 @@ texts:
   positive:
     title: DMARC-Richtlinie vorhanden
     text: >-
-      Fuer die Domain {domain} ist ein DMARC-Eintrag veroeffentlicht.
+      Für die Domain {domain} ist ein DMARC-Eintrag veröffentlicht.

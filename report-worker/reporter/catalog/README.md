@@ -43,8 +43,9 @@ Ausgabe ist UTF-8 mit LF und deterministisch (sortierte Schluessel ueber
 | `engine.py` | laden, kompilieren, auswerten |
 | `catchall.py` | Ignorierliste und die drei Auffangregeln |
 | `checks/<id>.yaml` | eine Pruefung je Datei, `id` gleich Dateiname |
+| `bundles/<id>.yaml` | ein Befund-Buendel je Datei (S3), `id` gleich Dateiname |
 | `ignore.yaml` | ZAP-Informationsalerts und CDN-Passivports mit Begruendung |
-| `decisions.md` | Entscheidungstabelle: verbindliche Einstufung je Pruefung |
+| `decisions.md` | Entscheidungstabelle: verbindliche Einstufung je Pruefung, dazu die Buendeltabelle |
 
 Tests: `tests/catalog/` (Fixtures je Pruefung, Engine, Schema und Tabelle, Textlint,
 Golden-Tests ueber die Junkerwerk-Laeufe, alle Snapshot-Orders).
@@ -238,21 +239,59 @@ Ein Fakt gilt als verarbeitet, wenn das `when` einer Pruefung getroffen hat. Der
 (`verified False` = vom Portscan nicht bestaetigt, `verified None` = Host nicht aktiv
 gescannt). Zielwert aus spec/06: unter fuenf unverarbeitete Beobachtungen je Auftrag.
 
+## Befund-Buendel (S3)
+
+Der Kundenreport kennt Sachverhalte, nicht Pruefungen: fehlendes CSP, fehlendes HSTS und
+unvollstaendige Sicherheits-Header auf demselben Host sind ein Befund, nicht drei. Ein
+Buendel unter `bundles/<id>.yaml` fasst dafuer mehrere Pruefungen zusammen. Die Auswertung
+selbst aendert sich dadurch nicht: der Katalog liefert weiter ein Ergebnis je Pruefung und
+Gruppe, das Buendel ist reine Zuordnung fuer die Reportdaten (`reporter/v3`).
+
+```yaml
+id: tls_hardening
+title: Transportverschluesselung auf {group} mit veralteten Verfahren
+category: D                 # Kategorie des Positivbefunds; der Befund erbt sie vom Ausloeser
+merge_by: host              # global | domain | host | fqdn
+members: [tls_legacy_protocols, tls_no_13, ...]
+target: findings            # findings | appendix
+references: [CWE-326]
+frameworks: {bsi: [], nis2: [], iso27001: [], tr03116: []}
+texts: {observation, meaning, recommendation[], verify, positive}
+```
+
+Regeln:
+
+- Mitgliedschaft steht doppelt, in `members` und im Feld `bundle` der Pruefung. Der
+  Ladevorgang erzwingt, dass beide Seiten uebereinstimmen; eine Pruefung gehoert zu
+  hoechstens einem Buendel. Mitglieder, deren Pruefung im geladenen Verzeichnis fehlt,
+  werden entfernt, ein Buendel ohne Mitglied faellt weg (verkleinerte Testkataloge).
+- `merge_by` bestimmt, wie die Gruppen der Mitglieder zu einem Befund zusammenlaufen. Bei
+  `host` liefert auch eine FQDN-Gruppe ihren Host, weil die IP im Gruppenschluessel steht.
+- Skala, Einstufung und Kategorie des Befunds kommen vom hoechsten fehlgeschlagenen
+  Mitglied; die im Buendel eingetragene `category` gilt fuer den Positivbefund.
+- `target: appendix` haelt das Buendel aus der Befundliste heraus und schreibt es in den
+  Anhang "Werkzeugbefunde ohne Bewertung" (spec/06 Abschnitt 4, Stufe 2).
+- Die Buendeltabelle in `decisions.md` ist verbindlich und wird per Test erzwungen; die
+  Texte laufen durch denselben Textlint wie die Pruefungstexte.
+
 ## Versionierung
 
 `CATALOG_VERSION` in `version.py`, Format `JJJJ-MM-TT.n` wie `POLICY_VERSION`. Bump-Regel:
-jede inhaltliche Aenderung an `checks/`, `ignore.yaml` oder `tables.py` zieht die Version hoch
+jede inhaltliche Aenderung an `checks/`, `bundles/`, `ignore.yaml` oder `tables.py` zieht die Version hoch
 und bekommt eine Zeile in der Bump-Historie im Modul-Docstring. Zusaetzlich steht in jeder
 Ausgabe `catalog_digest` (sha256 ueber dieselben Dateien, CRLF-normalisiert, ohne BOM), damit
 eine Aenderung ohne Bump im Audit auffaellt. Textkorrekturen ohne Aenderung von Bedingung oder
 Einstufung sind ein Patch (`.n`), neue oder veraenderte Pruefungen ein neues Datum.
 
-Bump-Historie: `2026-09-19.1` Erstversion (S2).
+Bump-Historie: `2026-09-19.1` Erstversion (S2), `2026-09-19.2` echte Umlaute in allen
+Kundentexten und Befund-Buendel (S3).
 
 ## Texte
 
-- Deutsch, Sie-Form, keine Gedankenstriche (weder `–` noch `—`), keine Fragezeichen als
-  Platzhalter, keine `{...}`-Reste.
+- Deutsch mit echten Umlauten, Sie-Form, keine Gedankenstriche (weder `–` noch `—`), keine
+  Fragezeichen als Platzhalter, keine `{...}`-Reste. Bezeichner bleiben ASCII (Pruef-IDs,
+  YAML-Schluessel, Stufen wie `unverzueglich`); die Umschrift `ae/oe/ue` gehoert nicht in
+  einen Kundentext. Die Wortliste dazu steht in `tests/textlint.py` (S3).
 - Generisch: keine Kunden-, Hoster- oder Herstellernamen, die nicht aus Template-Variablen
   kommen. `report_data.py` ist nur die Tonfall-Referenz, nicht die Textquelle.
 - Zahlen nur aus Variablen oder aus der Whitelist des Textlints (Protokollversionen wie

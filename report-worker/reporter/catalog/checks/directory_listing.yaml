@@ -36,7 +36,7 @@ texts:
     gefunden: {affected}.
   meaning: >-
     Ein einsehbares Verzeichnis legt Dateinamen und Struktur offen, die sonst nicht sichtbar
-    waeren, und kann so den Zugriff auf Dateien erleichtern, die nicht fuer die oeffentliche
+    wären, und kann so den Zugriff auf Dateien erleichtern, die nicht für die öffentliche
     Ansicht bestimmt sind.
   recommendation:
     - stage: mittelfristig

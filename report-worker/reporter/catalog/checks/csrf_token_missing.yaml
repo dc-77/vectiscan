@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [zap]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn} ({url_path})"
 evidence: [http]
 references: [CWE-352, OWASP2025-A01]
@@ -33,14 +33,14 @@ texts:
   observation: >-
     Die passive Webanalyse hat auf {group} Formulare ohne Anti-CSRF-Token gefunden: {affected}.
   meaning: >-
-    Fuer sich genommen keine ausnutzbare Schwachstelle. Fehlt das Token bei einem Formular, das
-    Zustand veraendert, kann eine fremde Seite Aktionen im Namen eines angemeldeten Nutzers
-    ausloesen. Bei Anmeldeportalen zaehlt die Tiefe der Verteidigung.
+    Für sich genommen keine ausnutzbare Schwachstelle. Fehlt das Token bei einem Formular, das
+    Zustand verändert, kann eine fremde Seite Aktionen im Namen eines angemeldeten Nutzers
+    auslösen. Bei Anmeldeportalen zählt die Tiefe der Verteidigung.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Anti-CSRF-Token in Formularen, die Zustand veraendern, und das SameSite-Attribut fuer
-        Sitzungs-Cookies setzen (Herstellerkonfiguration pruefen).
+        Anti-CSRF-Token in Formularen, die Zustand verändern, und das SameSite-Attribut für
+        Sitzungs-Cookies setzen (Herstellerkonfiguration prüfen).
   verify: >-
-    Quelltext des betroffenen Formulars pruefen; erwartet wird ein verstecktes Feld mit einem
+    Quelltext des betroffenen Formulars prüfen; erwartet wird ein verstecktes Feld mit einem
     sitzungsgebundenen Token.

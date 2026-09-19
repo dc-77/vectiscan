@@ -30,13 +30,13 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Fuer {group} listet eine externe Bedrohungsdatenbank eine Schwachstelle als aktiv ausgenutzt:
+    Für {group} listet eine externe Bedrohungsdatenbank eine Schwachstelle als aktiv ausgenutzt:
     {affected}. Der Eintrag stammt aus dem Verzeichnis bekannt ausgenutzter Schwachstellen einer
-    nationalen Cybersicherheitsbehoerde.
+    nationalen Cybersicherheitsbehörde.
   meaning: >-
     Eine als aktiv ausgenutzt gelistete Schwachstelle wird bereits von Angreifern gegen
     verwundbare Systeme eingesetzt. Der betroffene Dienst ist damit ein unmittelbares Ziel
-    automatisierter Angriffswerkzeuge, unabhaengig von der eigenen Sichtbarkeit im Internet.
+    automatisierter Angriffswerkzeuge, unabhängig von der eigenen Sichtbarkeit im Internet.
   recommendation:
     - stage: unverzueglich
       text: >-
@@ -45,12 +45,12 @@ texts:
     - stage: unverzueglich
       text: >-
         Zugriffsprotokolle des betroffenen Dienstes auf Anzeichen einer bereits erfolgten
-        Ausnutzung pruefen.
+        Ausnutzung prüfen.
     - stage: mittelfristig
       text: >-
-        Einen festen Update-Rhythmus fuer den betroffenen Dienst einrichten, damit
+        Einen festen Update-Rhythmus für den betroffenen Dienst einrichten, damit
         Sicherheitshinweise zeitnah umgesetzt werden.
   verify: >-
-    Versionsstand des betroffenen Dienstes pruefen und mit dem Sicherheitshinweis zur genannten
+    Versionsstand des betroffenen Dienstes prüfen und mit dem Sicherheitshinweis zur genannten
     Schwachstelle abgleichen; erwartet wird eine Version, die die Schwachstelle nicht mehr
     aufweist.
