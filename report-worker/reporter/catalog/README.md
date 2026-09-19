@@ -328,8 +328,10 @@ Pruefung ihre Pflicht-Fixtures hat. Katalogtest: `cd report-worker && pytest tes
 
 ## Datenfallen (aus S1 uebernommen, im Katalog beruecksichtigt)
 
-- Lauf 2 von Junkerwerk hat `coverage zap ok`, aber null Alerts: ZAP-Pruefungen sind bei
-  `len(http.alerts) == 0` nicht pruefbar (`zap_no_alerts`), nicht bestanden.
+- Lauf 2 von Junkerwerk hat null ZAP-Alerts. Seit S2b (Issue #13) steht das in der
+  Abdeckung: `zap` mit Status `ok` und null Alerts wird als `empty` mit Grund
+  `zap_no_alerts` gefuehrt. Die ZAP-Pruefungen sind darueber nicht pruefbar, nicht
+  bestanden; die frueheren Gruppenregeln `len(http.alerts) == 0` sind zurueckgebaut.
 - `http.reachable False` mit vorhandenen ZAP-Alerts (openotp.junkerwerk.hu): Header-Pruefungen
   sind nicht pruefbar, ZAP-Pruefungen laufen.
 - `tls.protocols` ist bei httpx-Fakten und bei gefilterter testssl-Ausgabe `None`.

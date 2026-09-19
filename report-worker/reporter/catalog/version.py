@@ -8,13 +8,15 @@ damit eine Aenderung ohne Bump im Audit sichtbar bleibt.
 
 Bump-Historie:
     2026-09-19.1  Erstversion (Session S2).
+    2026-09-20.1  S2b: Rueckbau der sieben Gruppenregeln `zap_no_alerts`. Die
+                  Abdeckung traegt den Fall seit Issue #13 selbst.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-19.1"
+CATALOG_VERSION = "2026-09-20.1"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

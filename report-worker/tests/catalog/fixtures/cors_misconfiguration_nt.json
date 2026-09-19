@@ -1,7 +1,22 @@
 {
  "facts": {
   "http": [
-   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "url": "https://www.example.test/", "reachable": true, "alerts": []}
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "www.example.test",
+    "url": "https://www.example.test/",
+    "reachable": true,
+    "alerts": []
+   }
+  ],
+  "coverage": [
+   {
+    "scope": "host",
+    "host_ip": "10.0.0.1",
+    "tool": "zap",
+    "status": "empty",
+    "reason": "zap_no_alerts"
+   }
   ]
  },
  "coverage_default": "ok",
