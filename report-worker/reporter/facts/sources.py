@@ -20,10 +20,29 @@ import tarfile
 from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 from typing import Any, Optional
+from urllib.parse import urlsplit
 
 from reporter.facts.serialize import (
     iso_utc, jsonl, load_json, sha256_bytes, sha256_file, sort_key, try_json,
 )
+
+DOMAIN_LABEL_KEY = "_domain"
+
+
+def _without_domain_label(data: dict[str, Any]) -> dict[str, Any]:
+    """Das Etikett ist Transportmittel, kein Fakt (Issue #12)."""
+    if DOMAIN_LABEL_KEY in data:
+        return {k: v for k, v in data.items() if k != DOMAIN_LABEL_KEY}
+    return data
+
+
+def _host_from_url(url: Any) -> Optional[str]:
+    """Hostname aus einer URL, wie build._headers_by_vhost es tut."""
+    text = str(url or "")
+    if not text:
+        return None
+    return urlsplit(text).hostname or None
+
 
 NON_TOOL_ROWS = frozenset({"report_cost"})
 AI_ROW_PREFIX = "ai_"
@@ -79,6 +98,21 @@ class ToolRun:
                 return v
         return None
 
+    def domain(self) -> Optional[str]:
+        """Domain-Etikett einer domainweiten Zeile (Issue #12).
+
+        scan_results hat keine Domainspalte; der Scanner schreibt die Domain
+        seit S2b als ``_domain`` in das JSON des ``raw_output`` (analog zum
+        ``vhost``-Schluessel bei header_check). Aeltere Zeilen haben den
+        Schluessel nicht, dann bleibt es beim bisherigen Verhalten.
+        """
+        data = self.json()
+        if isinstance(data, dict):
+            v = data.get(DOMAIN_LABEL_KEY)
+            if isinstance(v, str) and v:
+                return v
+        return None
+
 
 def tool_run_from_row(row: dict[str, Any], index: int) -> ToolRun:
     """API-Zeile (camelCase) oder DB-Zeile (snake_case) -> ToolRun."""
@@ -119,6 +153,14 @@ class HostData:
     headers_by_vhost: dict[str, dict[str, Any]] = field(default_factory=dict)
     httpx_lines: list[dict[str, Any]] = field(default_factory=list)
     httpx_rows: dict[str, dict[str, Any]] = field(default_factory=dict)
+    # Issue #10: seit S2b legt der Scanner je VHost eine eigene Datei ab
+    # (headers_<slug>.json, httpx_<slug>.json). Bewusst getrennt von den
+    # zeilengespeisten Feldern darueber, damit der bisherige Weg unberuehrt
+    # bleibt. Aeltere Tars haben diese Dateien nicht, dann bleiben die Maps leer.
+    headers_by_vhost_tar: dict[str, dict[str, Any]] = field(default_factory=dict)
+    headers_ref_by_vhost: dict[str, str] = field(default_factory=dict)
+    httpx_by_vhost_tar: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
+    httpx_ref_by_vhost: dict[str, str] = field(default_factory=dict)
     zap_alerts: Optional[list[dict[str, Any]]] = None
     zap_summary: Optional[dict[str, Any]] = None
     zap_spider_urls: Optional[list[str]] = None
@@ -144,6 +186,12 @@ class ScanBundle:
     dns_security: Optional[dict[str, Any]] = None
     zone_transfer_txt: Optional[str] = None
     passive: dict[str, Any] = field(default_factory=dict)
+    # Issue #12: je Domain der Order. Die Skalare darueber bleiben die Sicht
+    # des Primaerziels, damit jeder bisherige Leser unveraendert weiterlaeuft.
+    dns_records_by_domain: dict[str, dict[str, Any]] = field(default_factory=dict)
+    dns_security_by_domain: dict[str, dict[str, Any]] = field(default_factory=dict)
+    zone_transfer_by_domain: dict[str, str] = field(default_factory=dict)
+    passive_by_domain: dict[str, dict[str, Any]] = field(default_factory=dict)
     host_strategy: Optional[dict[str, Any]] = None
     ai_prioritization: Optional[dict[str, Any]] = None
     correlated_findings: list[dict[str, Any]] = field(default_factory=list)
@@ -241,6 +289,43 @@ def _dir_reader(path: Path) -> tuple[_Reader, str]:
 _HOST_RE = re.compile(r"^hosts/([^/]+)/phase(\d)/([^/]+)$")
 
 
+# Issue #12: je Domain abgelegte Dateien. Der Dateiname traegt einen Slug der
+# Domain, die Wahrheit steht als "_domain" im Inhalt (bei zone_transfer, das
+# reiner Text ist, gilt der Slug). Aeltere Tars haben diese Dateien nicht.
+_DOMAIN_FILE_RE = re.compile(
+    r"^phase0a?/(dns_records|dns_security|whois)_(.+)\.json$")
+_DOMAIN_ZONE_RE = re.compile(r"^phase0/zone_transfer_(.+)\.txt$")
+
+
+def _load_domain_scoped(reader: "_Reader", b: "ScanBundle") -> None:
+    """Domainbezogene Zusatzdateien einlesen (Issue #12)."""
+    for name in reader.names():
+        m = _DOMAIN_FILE_RE.match(name)
+        if m:
+            kind, slug = m.group(1), m.group(2)
+            data = reader.json(name)
+            if not isinstance(data, dict):
+                if (reader.text(name) or "").strip():
+                    b.unparsed.append(("file_unparsable", name, None))
+                continue
+            dom = str(data.get(DOMAIN_LABEL_KEY) or slug)
+            data = _without_domain_label(data)
+            if kind == "dns_records":
+                b.dns_records_by_domain.setdefault(dom, data)
+            elif kind == "dns_security":
+                b.dns_security_by_domain.setdefault(dom, data)
+            else:
+                b.passive_by_domain.setdefault(dom, {}).setdefault("whois", data)
+            b.refs.setdefault(f"{kind}:{dom}", name)
+            continue
+        m = _DOMAIN_ZONE_RE.match(name)
+        if m:
+            text = reader.text(name)
+            if text:
+                b.zone_transfer_by_domain.setdefault(m.group(1), text)
+                b.refs.setdefault(f"zone_transfer:{m.group(1)}", name)
+
+
 def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: str,
                              source_name: str, source_sha: Optional[str]) -> ScanBundle:
     meta = reader.json("meta.json") or {}
@@ -282,6 +367,7 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
     if isinstance(cs, dict):
         b.passive["certspotter"] = cs
         b.refs["certspotter"] = "phase0/certspotter.json"
+    _load_domain_scoped(reader, b)
     cf = reader.json("phase3/correlated_findings.json")
     if isinstance(cf, list):
         b.correlated_findings = cf
@@ -349,6 +435,26 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
             data = reader.json(name)
             if isinstance(data, list):
                 h.zap_spider_urls = [str(x) for x in data]
+        elif fname.startswith("headers_") and fname.endswith(".json"):
+            # Issue #10: je VHost eine Datei. Der FQDN kommt aus dem Inhalt,
+            # nicht aus dem Dateinamen (der Name ist nur eindeutig, nicht
+            # verlaesslich: Wildcards und lange Namen werden gekuerzt).
+            data = reader.json(name)
+            if isinstance(data, dict) and data.get("headers") is not None:
+                vh = _host_from_url(data.get("url"))
+                if vh:
+                    h.headers_by_vhost_tar.setdefault(vh, data)
+                    h.headers_ref_by_vhost.setdefault(vh, name)
+            elif (reader.text(name) or "").strip():
+                h.unparsed.append(name)
+        elif fname.startswith("httpx_") and fname.endswith(".json"):
+            lines = [x for x in jsonl(reader.text(name)) if isinstance(x, dict)]
+            vh = ""
+            if lines:
+                vh = str(lines[0].get("input") or lines[0].get("host") or "").split("/")[0]
+            if vh:
+                h.httpx_by_vhost_tar.setdefault(vh, lines)
+                h.httpx_ref_by_vhost.setdefault(vh, name)
         elif fname == "feroxbuster.json":
             h.feroxbuster = [x for x in jsonl(reader.text(name)) if isinstance(x, dict)]
         elif fname.startswith("ffuf") and fname.endswith(".json"):
@@ -365,7 +471,14 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
             continue
         else:
             h.unparsed.append(name)
-    b.targets = [str(meta.get("domain") or b.host_inventory.get("domain") or "")]
+    # Issue #12: meta.json fuehrt seit S2b alle Domains der Order, Primaerziel
+    # zuerst. Ohne die Liste sieht ein reiner Tar-Bau (ohne orders.json) nur
+    # die erste Domain; aeltere Tars haben nur "domain".
+    meta_domains = meta.get("domains")
+    if isinstance(meta_domains, list) and meta_domains:
+        b.targets = [str(d) for d in meta_domains if d]
+    else:
+        b.targets = [str(meta.get("domain") or b.host_inventory.get("domain") or "")]
     b.targets = [t for t in b.targets if t]
     b.targets_source = "meta"
     return b
@@ -488,6 +601,25 @@ def merge_tool_runs(bundle: ScanBundle, runs: list[ToolRun], *, name: str | None
             if run.is_ai:
                 continue
             data = run.json()
+            # Issue #12: traegt die Zeile ein Domain-Etikett, gehoert sie in
+            # die Domain-Maps. Das Primaerziel fuellt zusaetzlich die Skalare,
+            # damit jeder bisherige Leser unveraendert weiterlaeuft. Zeilen
+            # ohne Etikett (alle Altdaten) verhalten sich wie vorher.
+            row_domain = run.domain()
+            if row_domain and isinstance(data, dict):
+                data = _without_domain_label(data)
+                if run.tool == "dns_records":
+                    bundle.dns_records_by_domain.setdefault(row_domain, data)
+                elif run.tool == "dns_security":
+                    bundle.dns_security_by_domain.setdefault(row_domain, data)
+                elif run.tool in ("whois", "otx", "urlhaus", "securitytrails",
+                                  "virustotal", "shodan_domain"):
+                    bundle.passive_by_domain.setdefault(row_domain, {}).setdefault(
+                        run.tool, data)
+                bundle.refs.setdefault(f"{run.tool}:{row_domain}", run.ref)
+                is_primary = bool(bundle.targets) and row_domain == bundle.targets[0]
+                if not is_primary:
+                    continue
             if run.tool == "dns_records" and isinstance(data, dict) and bundle.dns_records is None:
                 bundle.dns_records = data
                 bundle.refs["dns_records"] = run.ref

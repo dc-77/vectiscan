@@ -166,11 +166,24 @@ def build_coverage(bundle: ScanBundle, signals: dict[str, HostSignals],
         scope = "host" if ip else "scan"
         if fqdn:
             scope = "fqdn"
+        # Issue #12: traegt die Zeile ein Domain-Etikett, ist ihr Geltungsbereich
+        # genau diese Domain. Ohne Etikett bleibt es beim bisherigen Verhalten:
+        # domainweite Zeilen zaehlen zum Primaerziel.
+        row_domain = run.domain() if not ip else None
+        if row_domain:
+            scope = "domain"
         make(scope, tool, status, host_ip=ip, fqdn=fqdn,
-             domain=None if ip else primary_domain, phase=run.phase, raw_status=raw_status,
+             domain=None if ip else (row_domain or primary_domain),
+             phase=run.phase, raw_status=raw_status,
              reason=reason, exit_code=run.exit_code, duration_ms=run.duration_ms,
              observed_at=run.created_at, evidence=ev)
+    # Domains, die eigene domainweite Zeilen mitgebracht haben, brauchen den
+    # Platzhalter nicht mehr. Fuer die historischen Tars (Junkerwerk) bleibt er
+    # erreichbar, deshalb wird der Grund nicht entfernt.
+    labeled = {f.domain for f in facts if f.scope == "domain" and f.domain}
     for dom in extra_domains:
+        if dom in labeled:
+            continue
         make("domain", "dns", "unknown", domain=dom, reason="second_target_unlabeled",
              confidence=CONFIDENCE_DERIVED, source="facts_builder")
     facts.sort(key=lambda f: sort_key(f.phase, f.tool, f.host_ip, f.fqdn, f.domain, f.id))
