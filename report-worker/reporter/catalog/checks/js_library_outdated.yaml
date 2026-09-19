@@ -1,0 +1,48 @@
+id: js_library_outdated
+title: Veraltete JavaScript-Bibliothek eingebunden
+family: js_library_outdated
+category: D
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: http.alerts
+applicable_when: null
+when: zap_match(alert, ZAP_JS_LIBRARY)
+positive_when: never
+not_testable_when:
+  - when: http is not None and len(http.alerts) == 0
+    reason_code: zap_no_alerts
+    context: group
+undetermined: not_testable
+requires:
+  tools: [zap]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({name}, {risk})"
+evidence: [http]
+references: [CWE-937, CWE-1104]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-JS-001
+  start_level: MEDIUM
+  deviation: null
+texts:
+  observation: >-
+    Die passive Webanalyse hat auf {group} eine clientseitige JavaScript-Bibliothek mit
+    bekannten Schwachstellen erkannt: {affected}.
+  meaning: >-
+    Eine veraltete clientseitige Bibliothek kann bekannte Schwachstellen enthalten, die im
+    Browser der Besucher ausgenutzt werden koennen, etwa durch das Einschleusen von
+    Skriptcode ueber die betroffene Bibliothek.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Die gemeldete Bibliothek auf die aktuelle, vom Hersteller unterstuetzte Version
+        anheben oder durch eine weiterhin gepflegte Alternative ersetzen.
+  verify: >-
+    Die eingebundenen Skriptdateien der Seite pruefen und die Versionsangabe der gemeldeten
+    Bibliothek mit dem aktuellen Stand des Herstellers abgleichen.

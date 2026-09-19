@@ -1,0 +1,60 @@
+id: urlhaus_compromise
+title: Ziel laut Bedrohungsdatenbank zur Schadsoftware-Verteilung genutzt
+family: urlhaus_compromise
+category: A
+scale: exposure
+level: kritisch
+group_by: global
+scope: passive
+applicable_when: null
+item_when: passive.source == "urlhaus"
+when: passive.details["compromised"] is True
+positive_when: passive.details["compromised"] is False
+not_testable_when: []
+undetermined: not_applicable
+requires:
+  tools: [urlhaus]
+kind: check
+bundle: null
+affected_template: "{domain} (URLhaus)"
+evidence: [passive]
+references: [CWE-506]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-URLHAUS-001
+  start_level: CRITICAL
+  deviation: null
+texts:
+  observation: >-
+    Eine oeffentliche Bedrohungsdatenbank zur Schadsoftware-Verteilung meldet fuer {group} einen
+    aktiven Treffer: {affected}.
+  meaning: >-
+    Ein aktiver Treffer in einer Malware-Verteilungsdatenbank bedeutet, dass das Ziel
+    nachweislich zur Verbreitung von Schadsoftware oder als Teil einer Angriffsinfrastruktur
+    genutzt wird. Besuchende und andere Systeme, die mit dem Ziel verbinden, sind unmittelbar
+    gefaehrdet.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Das betroffene Ziel vom Netz trennen oder abschalten, bis die Ursache der
+        Kompromittierung geklaert und beseitigt ist.
+    - stage: unverzueglich
+      text: >-
+        Systeme, die mit dem Ziel verbunden waren, auf Schadsoftware und ungewoehnliche
+        Aktivitaet pruefen.
+    - stage: mittelfristig
+      text: >-
+        Zugangsdaten und Schluessel des betroffenen Systems erneuern und die Meldung nach der
+        Bereinigung zur Loeschung bei der Bedrohungsdatenbank einreichen.
+  verify: >-
+    Erneute Abfrage der Bedrohungsdatenbank fuer das betroffene Ziel; erwartet wird kein aktiver
+    Eintrag mehr.
+  positive:
+    title: Keine Eintraege in Malware-Feeds
+    text: >-
+      Fuer {group} liegt kein Treffer in oeffentlichen Datenbanken zur Schadsoftware-Verteilung
+      vor.

@@ -1,0 +1,57 @@
+id: admin_service_exposed_passive
+title: Verwaltungsoberflaeche laut Passivquelle erreichbar
+family: admin_service_exposed
+category: A
+scale: hygiene
+level: hoch
+group_by: host
+scope: passive
+applicable_when: null
+when: passive.source == "shodan" and passive.verified is False and (passive.port in ADMIN_PORTS or matches(passive.product, ADMIN_PRODUCTS))
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [shodan]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} ({product}, laut Passivquelle)"
+evidence: [passive]
+references: [CWE-284, CISA-KEV]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Prototyp VS-002 (manuell, Passivquelle)
+  start_level: hoch
+  deviation: >-
+    Aktiv bestaetigte Verwaltungsoberflaechen sind Exposition erhoeht (admin_service_exposed). Ein
+    nur passiv gemeldeter Port ist nicht verifiziert und wird deshalb als Hygiene hoch mit
+    Pflicht-Pruefschritt gefuehrt (spec/05 M2: verified false).
+texts:
+  observation: >-
+    Eine Passivquelle meldet fuer {group} eine Verwaltungs- oder Firewall-Oberflaeche, die der
+    Portscan nicht bestaetigen konnte: {affected}. Der Port liegt ausserhalb der geprueften Ports
+    oder war vom Scanner aus gefiltert.
+  meaning: >-
+    Eine exponierte Verwaltungsoberflaeche ist ein hochwertiges Ziel: Eine Uebernahme betrifft den
+    gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal
+    oder die Administrationsoberflaeche handelt, ist von aussen nicht erkennbar.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Klaeren, welche Funktion auf dem gemeldeten Port laeuft. Verwaltungsoberflaechen duerfen
+        nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und
+        aktuellem Firmwarestand.
+    - stage: in_kuerze
+      text: >-
+        Firmware gegen die Sicherheitshinweise des Herstellers abgleichen; lokale Benutzerkonten und
+        Standardkonten pruefen.
+    - stage: mittelfristig
+      text: >-
+        Zugriff auf benoetigte Quellnetze beschraenken und Anmeldeversuche ueberwachen.
+  verify: >-
+    Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine
+    Verwaltungsanmeldung ohne Zugriffsbeschraenkung.

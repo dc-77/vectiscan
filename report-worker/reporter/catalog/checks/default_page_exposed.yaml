@@ -1,0 +1,48 @@
+id: default_page_exposed
+title: Standard-Startseite des Webservers erreichbar
+family: default_page_exposed
+category: A
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: fqdn
+applicable_when: null
+when: matches(fqdn.title, DEFAULT_TITLES)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [web_probe]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({title})"
+evidence: [fqdn]
+references: [CWE-1188, CWE-200]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-DEFAULT-PAGE
+  start_level: niedrig
+  deviation: >-
+    Der Prototyp VS-003 stufte die Standardseite wegen eines Zusammenhangs mit einem
+    Fernwartungszugang als mittel ein; ohne diesen Zusammenhang bleibt die reine Standardseite
+    eine Hygieneabweichung niedrig (catalog_sim R-DEFAULT-PAGE).
+texts:
+  observation: >-
+    Die Webseite {group} liefert noch die Standard-Startseite des Webservers oder der
+    Verwaltungssoftware aus, ohne eigenen Inhalt: {affected}.
+  meaning: >-
+    Eine unveraenderte Standardseite zeigt, dass die Installation nicht abgeschlossen oder nicht
+    mehr in Betrieb ist. Sie verraet die eingesetzte Software und wirkt fuer Besucher unfertig
+    oder verlassen.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die Standardseite durch den eigentlichen Inhalt ersetzen oder den Webserver
+        deaktivieren, falls der Host keine eigene Webseite betreiben soll.
+  verify: >-
+    Die genannte Adresse im Browser aufrufen; erwartet wird der eigentliche Seiteninhalt statt
+    der Auslieferungsseite des Webservers.

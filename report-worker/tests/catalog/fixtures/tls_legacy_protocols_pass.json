@@ -1,0 +1,16 @@
+{
+ "facts": {
+  "tls": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "port": 443,
+    "protocols": {"SSLv2": false, "SSLv3": false, "TLS1.0": false, "TLS1.1": false, "TLS1.2": true, "TLS1.3": true},
+    "source": "testssl"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": [],
+  "positive": true
+ }
+}

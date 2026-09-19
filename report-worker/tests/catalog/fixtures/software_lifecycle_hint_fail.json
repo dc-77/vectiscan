@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "fqdns": [
+   {"name": "rdgw-2016.example.test", "host_ip": "10.0.0.1", "http_status": 200}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "rdgw-2016.example.test@10.0.0.1",
+  "affected": ["rdgw-2016.example.test (Produktjahr im Hostnamen)"],
+  "positive": false
+ }
+}

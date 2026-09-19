@@ -1,0 +1,18 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 443, "service": "http"}
+  ],
+  "software": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "product": "Contact Form 7", "family": "contact_form_7",
+    "kind": "plugin", "version_norm": "5.1.0", "vulnerabilities_count": 2}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1: Contact Form 7 5.1.0 (2 bekannte Schwachstellen)"],
+  "positive": false
+ }
+}

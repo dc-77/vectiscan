@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 80, "service": "http", "product": "nginx"},
+   {"host_ip": "10.0.0.1", "port": 443, "service": "http", "product": "nginx", "tls_required": true, "tunnel_ssl": true}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": true
+ }
+}

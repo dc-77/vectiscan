@@ -1,0 +1,18 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 443, "service": "http"}
+  ],
+  "software": [
+   {"host_ip": "10.0.0.1", "product": "PHP", "family": "php", "kind": "language", "version_norm": "8.0.30",
+    "eol": {"status": "eol", "date": "2023-11-26", "source": "endoflife_date"}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1: PHP 8.0.30 (Support beendet 2023-11-26)"],
+  "positive": false
+ }
+}

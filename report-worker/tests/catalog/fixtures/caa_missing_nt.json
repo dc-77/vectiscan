@@ -1,0 +1,7 @@
+{
+  "facts": {
+    "dns": [{"domain": "example.test"}]
+  },
+  "coverage_default": "ok",
+  "expect": {"status": "not_testable", "group_key": "example.test", "reason_code": "insufficient_facts"}
+}

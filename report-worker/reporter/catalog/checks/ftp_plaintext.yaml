@@ -1,0 +1,63 @@
+id: ftp_plaintext
+title: FTP-Dienst ohne erzwungene Transportverschluesselung
+family: ftp_exposed
+category: A
+scale: exposure
+level: erhoeht
+group_by: host
+scope: service
+applicable_when: has_port(services, 21)
+item_when: service.port == 21
+when: service.tls_required is not True and service.tunnel_ssl is False
+positive_when: service.tls_required is True or service.tunnel_ssl is True
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} (FTP ohne TLS-Zwang)"
+evidence: [service]
+references: [CWE-319, CWE-522, OWASP2025-A02]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-FTP-PLAIN
+  start_level: erhoeht
+  deviation: >-
+    FTP hat einen legitimen Zweck, daher gilt die Expositionsskala erhoeht statt kritisch. Nach
+    der Festlegung vom 19.09.2026 gilt ein FTP-Dienst ohne erzwungene Transportverschluesselung
+    unabhaengig von einer zusaetzlich moeglichen impliziten TLS-Verbindung als Klartext-Befund,
+    weil die Anmeldung ohne diesen Zwang unverschluesselt erfolgen kann.
+texts:
+  observation: >-
+    Auf {group} nimmt der FTP-Dienst Anmeldungen entgegen, ohne eine Transportverschluesselung
+    zu erzwingen: {affected}.
+  meaning: >-
+    Ohne erzwungenes TLS uebertraegt der FTP-Dienst Anmeldedaten und Dateiinhalte im Klartext
+    ueber das Netz. Jeder Mitleser auf dem Uebertragungsweg kann Zugangsdaten abgreifen und fuer
+    weitere Zugriffe auf den Dienst oder wiederverwendete Konten nutzen.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Auf dem FTP-Dienst die Option fuer eine erzwungene Transportverschluesselung aktivieren,
+        sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird.
+    - stage: in_kuerze
+      text: >-
+        Zugangsdaten des FTP-Dienstes rotieren und die Zugriffsprotokolle auf unverschluesselte
+        Anmeldeversuche pruefen.
+    - stage: mittelfristig
+      text: >-
+        Pruefen, ob der Dateiaustausch stattdessen ueber ein Uebertragungsprotokoll mit
+        eingebauter Verschluesselung erfolgen kann, und den Klartextzugang danach abschalten.
+  verify: >-
+    Anmeldung am FTP-Dienst von aussen versuchen, bevor eine Transportverschluesselung
+    aufgebaut ist; erwartet wird die Ablehnung dieser unverschluesselten Anmeldung.
+  positive:
+    title: FTP erzwingt TLS vor der Anmeldung
+    text: >-
+      Auf {group} lehnt der FTP-Dienst eine Anmeldung ohne aufgebaute Transportverschluesselung
+      ab.

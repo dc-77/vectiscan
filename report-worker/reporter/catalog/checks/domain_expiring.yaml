@@ -1,0 +1,57 @@
+id: domain_expiring
+title: Domain-Registrierung laeuft in Kuerze ab
+family: domain_expiring
+category: E
+scale: hygiene
+level: hoch
+group_by: domain
+scope: target
+applicable_when: null
+when: days_until(target.whois.expires_at, scan.finished_at) <= DOMAIN_EXPIRING_DAYS
+positive_when: days_until(target.whois.expires_at, scan.finished_at) > DOMAIN_EXPIRING_DAYS
+not_testable_when:
+  - when: coverage_status("whois") != "ok"
+    reason_code: "coverage:whois"
+    context: group
+  - when: target.whois is None or target.whois.expires_at is None
+    reason_code: whois_unavailable
+    context: item
+undetermined: not_testable
+requires:
+  tools: [whois]
+kind: check
+bundle: null
+affected_template: "{domain} (Ablauf {expires_at})"
+evidence: [target]
+references: [CWE-16]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: neu (S2-Auftrag)
+  start_level: hoch
+  deviation: null
+texts:
+  observation: >-
+    Fuer {affected} laeuft die Registrierung der Domain {domain} innerhalb der naechsten 30
+    Tage ab.
+  meaning: >-
+    Nach Ablauf der Registrierung kann die Domain nur noch fuer eine kurze Frist verlaengert
+    werden, danach faellt sie zurueck in die allgemeine Vergabe und kann von Dritten neu
+    registriert werden. Damit gehen Website, E-Mail-Zustellung und alle auf diese Domain
+    ausgestellten Zertifikate verloren.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Die Verlaengerung der Domain-Registrierung veranlassen und eine automatische
+        Verlaengerung fuer kuenftige Ablauftermine einrichten.
+  verify: >-
+    WHOIS-Abfrage der Domain {domain}; erwartet wird ein Ablaufdatum, das mehr als 30 Tage in
+    der Zukunft liegt.
+  positive:
+    title: Domain-Registrierung laeuft nicht in Kuerze ab
+    text: >-
+      Fuer die Domain {domain} liegt das Ablaufdatum der Registrierung mehr als 30 Tage in der
+      Zukunft.

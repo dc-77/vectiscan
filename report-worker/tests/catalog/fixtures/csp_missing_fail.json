@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": true, "csp": {"present": false}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": ["www.example.test"],
+  "positive": false
+ }
+}

@@ -1,0 +1,62 @@
+id: rdp_exposed
+title: RDP-Dienst aus dem Internet erreichbar
+family: rdp_exposed
+category: A
+scale: exposure
+level: kritisch
+group_by: host
+scope: service
+applicable_when: null
+when: service.port == 3389
+positive_when: absent
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} (RDP)"
+evidence: [service]
+references: [CWE-284, OWASP2025-A05]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-RDP-001
+  start_level: HIGH
+  deviation: >-
+    Fernwartung gehoert nach der Expositionsskala des Prototyps nicht an das oeffentliche
+    Interface, daher kritisch statt HIGH; catalog_sim fuehrt den reinen Fund als erhoeht,
+    SP-RDP-002/003 stufen zusaetzliche Befunde (etwa fehlende Netzwerk-Ebenen-Authentifizierung)
+    ohnehin als CRITICAL ein.
+texts:
+  observation: >-
+    Der Host {group} beantwortet Verbindungen auf dem RDP-Port aus dem gesamten Internet:
+    {affected}. Ein Fernwartungsdienst gehoert nicht an das oeffentliche Interface.
+  meaning: >-
+    Ein von aussen erreichbarer RDP-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht
+    jede kuenftige Schwachstelle im Fernwartungsdienst sofort ausnutzbar. Bei erfolgreichem Zugriff
+    ist der gesamte angemeldete Arbeitsplatz oder Server betroffen.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Den externen RDP-Zugriff in der Firewall oder in der Verwaltung des Hosters deaktivieren.
+        Falls Fernwartung von aussen benoetigt wird, den Zugriff ueber ein VPN mit
+        Mehrfaktor-Anmeldung fuehren.
+    - stage: in_kuerze
+      text: >-
+        Anmeldeprotokolle des betroffenen Systems auf fremde Anmeldeversuche pruefen und eine
+        Kontosperrung nach mehreren Fehlversuchen aktivieren.
+    - stage: mittelfristig
+      text: >-
+        Zusaetzliche Zugriffsschutzmechanismen vor den Fernwartungsdienst schalten, etwa eine
+        Netzwerk-Ebenen-Authentifizierung oder ein Gateway mit Mehrfaktor-Anmeldung.
+  verify: >-
+    Portscan des Ports 3389 von einer externen Adresse aus wiederholen; erwartet wird der Zustand
+    gefiltert oder geschlossen.
+  positive:
+    title: Kein RDP-Dienst aus dem Internet erreichbar
+    text: >-
+      Auf {group} antwortet kein Fernwartungsdienst auf RDP-Verbindungen von aussen.

@@ -1,0 +1,7 @@
+{
+  "facts": {
+    "dns": [{"domain": "example.test", "ns": ["ns1.example.test"], "zone_transfer": {"allowed": false, "ns_tested": ["ns1.example.test"]}}]
+  },
+  "coverage_default": "ok",
+  "expect": {"status": "pass", "group_key": "example.test", "positive": true}
+}

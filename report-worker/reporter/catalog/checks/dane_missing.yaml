@@ -1,0 +1,60 @@
+id: dane_missing
+title: DANE fuer SMTP nicht eingerichtet
+family: dane_missing
+category: C
+scale: hygiene
+level: niedrig
+group_by: domain
+scope: dns
+applicable_when: len(dns.mx) > 0
+when: dns.dane is not None and dns.dane.smtp is False
+positive_when: dns.dane is not None and dns.dane.smtp is True
+not_testable_when:
+  - when: dns.dane is None or dns.dane.smtp is None
+    reason_code: insufficient_facts
+    context: item
+undetermined: not_testable
+requires:
+  tools: [dns_security]
+kind: check
+bundle: mail_transport_enforcement
+affected_template: "{domain}"
+evidence: [dns]
+references: [CWE-295, CWE-319]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Prototyp VS-008
+  start_level: niedrig
+  deviation: >-
+    Der Prototyp fuehrt DANE fuer SMTP unter VS-008 ohne eigene Zahlenbewertung; die Einstufung
+    Hygiene niedrig folgt der Einordnung der uebrigen Transportabsicherungen (MTA-STS, TLS-RPT),
+    da DANE erst zusammen mit DNSSEC wirkt und in der Praxis selten flaechendeckend eingerichtet
+    ist.
+texts:
+  observation: >-
+    Fuer {affected} sind keine DANE-Eintraege fuer den SMTP-Uebertragungsweg hinterlegt. Fuer
+    die Domain {domain} lassen sich die Zertifikate der Mailserver damit nicht zusaetzlich
+    ueber DNSSEC-gesicherte TLSA-Eintraege verankern.
+  meaning: >-
+    Ohne DANE verlassen sich sendende Mailserver bei der Transportverschluesselung allein auf
+    die oeffentliche Zertifizierungsstelleninfrastruktur. Ein Angreifer, der ein Zertifikat
+    ueber eine kompromittierte oder fehlgeleitete Ausstellung erhaelt, bleibt ohne DANE
+    unentdeckt, waehrend ein DNSSEC-verankerter TLSA-Eintrag die erwarteten Zertifikatsdaten
+    der Mailserver festschreibt.
+  recommendation:
+    - stage: strategisch
+      text: >-
+        Fuer die Mailserver TLSA-Eintraege veroeffentlichen, sobald die Domain DNSSEC-signiert
+        ist, und die Eintraege bei jedem Zertifikatswechsel aktualisieren.
+  verify: >-
+    DNS-Abfrage des TLSA-Eintrags unter _25._tcp.<mailserver> fuer jeden in den MX-Eintraegen
+    genannten Mailserver; erwartet wird ein signierter Eintrag, der zum eingesetzten
+    Zertifikat passt.
+  positive:
+    title: DANE fuer SMTP vorhanden
+    text: >-
+      Fuer die Domain {domain} sind DANE-Eintraege fuer den SMTP-Uebertragungsweg hinterlegt.

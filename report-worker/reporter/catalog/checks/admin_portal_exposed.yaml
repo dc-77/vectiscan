@@ -1,0 +1,58 @@
+id: admin_portal_exposed
+title: Verwaltungsoberflaeche ueber die Webseite erreichbar
+family: admin_service_exposed
+category: A
+scale: exposure
+level: erhoeht
+group_by: fqdn
+scope: fqdn
+applicable_when: null
+when: fqdn.http_status == 200 and matches(fqdn.title, ADMIN_TITLES)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [web_probe]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({title})"
+evidence: [fqdn]
+references: [CWE-284, CISA-KEV]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-ADMIN-EXPOSED (Titel)
+  start_level: erhoeht
+  deviation: >-
+    Erkennung ueber den Titel der Startseite ergaenzt die portbasierte Pruefung
+    admin_service_exposed; beide Wege fuehren zur gleichen Familie und Einstufung Exposition
+    erhoeht (catalog_sim R-ADMIN-EXPOSED).
+texts:
+  observation: >-
+    Die Webseite {group} zeigt auf ihrer Startseite eine Verwaltungs- oder Anmeldeoberflaeche,
+    die aus dem gesamten Internet erreichbar ist: {affected}. Eine Zugriffsbeschraenkung auf
+    bestimmte Quellnetze ist von aussen nicht erkennbar.
+  meaning: >-
+    Verwaltungsoberflaechen sind ein hochwertiges Ziel: Eine Uebernahme betrifft den gesamten
+    Anschluss inklusive der dahinter liegenden Systeme. Angreifer koennen Anmeldedaten erraten
+    oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Zugriff auf die Verwaltungsoberflaeche auf die benoetigten Quellnetze beschraenken, etwa
+        ueber die Firewall des Hosters, eine Zugriffsliste oder ein VPN.
+    - stage: in_kuerze
+      text: >-
+        Mehrfaktor-Anmeldung fuer die Verwaltungsoberflaeche aktivieren und Standardkonten
+        deaktivieren oder umbenennen.
+    - stage: mittelfristig
+      text: >-
+        Softwarestand der Verwaltungsoberflaeche gegen die Sicherheitshinweise des Herstellers
+        abgleichen und Anmeldeversuche ueberwachen.
+  verify: >-
+    Die genannte Adresse von einer externen Adresse ausserhalb der freigegebenen Quellnetze
+    aufrufen; erwartet wird eine Ablehnung durch die Zugriffsbeschraenkung statt der
+    Anmeldemaske.

@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.6", "port": 3389, "service": "ms-wbt-server"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.6",
+  "affected": ["10.0.0.6:3389 (RDP)"],
+  "positive": false,
+  "members": {"10.0.0.6:3389": "fail"}
+ }
+}

@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 8081, "service": "http-proxy", "product": "nginx"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:8081 (nginx)"],
+  "positive": false
+ }
+}

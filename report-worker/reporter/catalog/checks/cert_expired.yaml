@@ -1,0 +1,61 @@
+id: cert_expired
+title: TLS-Zertifikat abgelaufen
+family: cert_expired
+category: D
+scale: exposure
+level: erhoeht
+group_by: fqdn
+scope: tls
+applicable_when: null
+when: tls.cert.expired is True
+positive_when: tls.cert.expired is False
+not_testable_when:
+  - when: tls.cert is None or tls.cert.expired is None
+    reason_code: cert_unknown
+    context: item
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target} (abgelaufen {not_after})"
+evidence: [tls]
+references: [CWE-298, CWE-295]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: ["TR-03116-4: gueltige Zertifikatskette"]
+policy:
+  source: SP-TLS-004
+  start_level: HIGH
+  deviation: >-
+    SP-TLS-004 bewertet ein abgelaufenes Zertifikat mit HIGH. Die Katalogsimulation (R-CERT-EXPIRED)
+    fuehrt den Befund auf der Expositionsskala als erhoeht, weil das abgelaufene Zertifikat den
+    gesicherten Zugang fuer alle Nutzer unterbricht, ohne dass ein weiterer Angriffsschritt noetig
+    ist; diese Einstufung wird uebernommen.
+texts:
+  observation: >-
+    Fuer den Dienst {group} ist das eingesetzte TLS-Zertifikat abgelaufen: {affected}. Ab diesem
+    Zeitpunkt weisen Browser und andere TLS-Clients die Verbindung als nicht vertrauenswuerdig aus.
+  meaning: >-
+    Ein abgelaufenes Zertifikat unterbricht die gesicherte Verbindung fuer alle Nutzer und gewoehnt
+    sie an Sicherheitswarnungen, die in der Folge eher weggeklickt werden. Das erleichtert einem
+    echten Man-in-the-Middle-Angriff, unbemerkt zu bleiben.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Ein neues Zertifikat fuer den betroffenen Dienst ausstellen und einspielen, sodass die
+        Gueltigkeit wieder gegeben ist.
+    - stage: strategisch
+      text: >-
+        Eine automatisierte Erneuerung des Zertifikats vor dem Ablaufdatum einrichten, damit
+        dieser Zustand nicht erneut eintritt.
+  verify: >-
+    Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des praesentierten
+    Zertifikats pruefen; erwartet wird ein Gueltigkeitszeitraum, der das aktuelle Datum einschliesst.
+  positive:
+    title: Zertifikat gueltig
+    text: >-
+      Fuer den Dienst {group} liegt das aktuelle Datum innerhalb des Gueltigkeitszeitraums des
+      eingesetzten TLS-Zertifikats.

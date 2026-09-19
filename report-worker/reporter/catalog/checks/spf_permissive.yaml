@@ -1,0 +1,50 @@
+id: spf_permissive
+title: SPF-Eintrag erlaubt beliebige Absender
+family: spf_permissive
+category: C
+scale: hygiene
+level: hoch
+group_by: domain
+scope: dns
+applicable_when: dns.spf is not None
+when: dns.spf.all_qualifier == "+all"
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: null
+affected_template: "{domain} ({spf_qualifier})"
+evidence: [dns]
+references: [CWE-290, RFC-7208]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-SPF-PLUSALL
+  start_level: hoch
+  deviation: null
+texts:
+  observation: >-
+    Der SPF-Eintrag der Domain {domain} erlaubt mit seinem Qualifizierer den Versand durch
+    einen beliebigen Server im Namen der Domain: {affected}. Die SPF-Pruefung ist damit
+    wirkungslos.
+  meaning: >-
+    Ein SPF-Eintrag, der jeden Server als Absender zulaesst, verhindert keine Faelschung von
+    Absenderadressen. Empfangende Mailserver werten die Domain als vollstaendig autorisiert,
+    unabhaengig davon, wer die E-Mail tatsaechlich versendet.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Den Qualifizierer des SPF-Eintrags auf eine harte Fehlbehandlung umstellen und nur die
+        tatsaechlich genutzten Versandquellen der Domain auffuehren.
+    - stage: in_kuerze
+      text: >-
+        Alle Versandwege der Domain erfassen, bevor die harte Fehlbehandlung produktiv gesetzt
+        wird, damit kein legitimer Versender ausgeschlossen wird.
+  verify: >-
+    DNS-Abfrage des TXT-Eintrags der Domain {domain}; erwartet wird ein SPF-Eintrag, der nicht
+    mit dem Qualifizierer fuer beliebige Absender endet.

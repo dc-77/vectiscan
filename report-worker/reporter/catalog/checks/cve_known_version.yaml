@@ -1,0 +1,56 @@
+id: cve_known_version
+title: Bekannte Schwachstelle mit hoher externer Risikobewertung
+family: cve_known
+category: B
+scale: exposure
+level: erhoeht
+group_by: host
+scope: threat
+applicable_when: null
+item_when: null
+when: (threat.kev is None or threat.kev.listed is False) and threat.affected_software_ref is not None and ((threat.cvss_nvd is not None and threat.cvss_nvd.score >= 7.0) or (threat.epss is not None and threat.epss.score >= 0.5))
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [phase3_correlation]
+kind: check
+bundle: null
+affected_template: "{cve_id} auf {host_ip}:{port} ({product} {version}, NVD {cvss})"
+evidence: [threat]
+references: [CWE-1035, OWASP2025-A06]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-CVE-003, SP-CVE-004
+  start_level: HIGH
+  deviation: >-
+    Ohne aktiven Eintrag im Verzeichnis bekannt ausgenutzter Schwachstellen zaehlt ein Fund nur
+    mit einer hohen externen Bewertung aus dem Nationalen Schwachstellenregister oder aus dessen
+    Ausnutzungswahrscheinlichkeit; eine allein aus der Versionsnummer abgeleitete Vermutung reicht
+    nicht.
+texts:
+  observation: >-
+    Fuer {group} listet eine externe Bedrohungsdatenbank eine Schwachstelle mit hoher
+    Risikobewertung in eingesetzter Software: {affected}. Die Bewertung stammt aus dem
+    Nationalen Schwachstellenregister oder aus dessen Ausnutzungswahrscheinlichkeit.
+  meaning: >-
+    Eine hohe externe Risikobewertung zeigt eine leicht ausnutzbare oder wahrscheinlich bald
+    ausgenutzte Schwachstelle in eingesetzter Software. Ohne Aktualisierung bleibt der Dienst
+    angreifbar, auch wenn noch kein bestaetigter Angriff bekannt ist.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Die betroffene Software auf eine Version ohne die genannte Schwachstelle aktualisieren
+        oder den Zugriff auf feste, vertrauenswuerdige Quellnetze beschraenken.
+    - stage: mittelfristig
+      text: >-
+        Einen festen Update-Rhythmus fuer die betroffene Software festlegen und
+        Sicherheitshinweise des Herstellers laufend verfolgen.
+  verify: >-
+    Versionsstand der betroffenen Software pruefen und mit dem Sicherheitshinweis zur genannten
+    Schwachstelle abgleichen; erwartet wird eine Version, die die Schwachstelle nicht mehr
+    aufweist.

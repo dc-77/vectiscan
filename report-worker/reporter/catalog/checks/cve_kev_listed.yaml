@@ -1,0 +1,56 @@
+id: cve_kev_listed
+title: Aktiv ausgenutzte Schwachstelle laut Bedrohungsdatenbank
+family: cve_known
+category: B
+scale: exposure
+level: kritisch
+group_by: host
+scope: threat
+applicable_when: null
+item_when: null
+when: threat.kev is not None and threat.kev.listed is True
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [phase3_correlation]
+kind: check
+bundle: null
+affected_template: "{cve_id} auf {host_ip}:{port} ({product} {version})"
+evidence: [threat]
+references: [CWE-1035, CISA-KEV]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-CVE-001
+  start_level: CRITICAL
+  deviation: null
+texts:
+  observation: >-
+    Fuer {group} listet eine externe Bedrohungsdatenbank eine Schwachstelle als aktiv ausgenutzt:
+    {affected}. Der Eintrag stammt aus dem Verzeichnis bekannt ausgenutzter Schwachstellen einer
+    nationalen Cybersicherheitsbehoerde.
+  meaning: >-
+    Eine als aktiv ausgenutzt gelistete Schwachstelle wird bereits von Angreifern gegen
+    verwundbare Systeme eingesetzt. Der betroffene Dienst ist damit ein unmittelbares Ziel
+    automatisierter Angriffswerkzeuge, unabhaengig von der eigenen Sichtbarkeit im Internet.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Den betroffenen Dienst auf eine Version ohne die genannte Schwachstelle aktualisieren
+        oder bis dahin vom Internet trennen.
+    - stage: unverzueglich
+      text: >-
+        Zugriffsprotokolle des betroffenen Dienstes auf Anzeichen einer bereits erfolgten
+        Ausnutzung pruefen.
+    - stage: mittelfristig
+      text: >-
+        Einen festen Update-Rhythmus fuer den betroffenen Dienst einrichten, damit
+        Sicherheitshinweise zeitnah umgesetzt werden.
+  verify: >-
+    Versionsstand des betroffenen Dienstes pruefen und mit dem Sicherheitshinweis zur genannten
+    Schwachstelle abgleichen; erwartet wird eine Version, die die Schwachstelle nicht mehr
+    aufweist.

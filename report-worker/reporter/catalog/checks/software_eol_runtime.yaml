@@ -1,0 +1,56 @@
+id: software_eol_runtime
+title: Anwendungsnahe Software ohne Herstellerpflege
+family: software_eol
+category: B
+scale: hygiene
+level: mittel
+group_by: host
+scope: software
+applicable_when: null
+item_when: null
+when: software.eol.status == "eol" and software.kind in ["language", "cms_core", "library", "plugin", "theme", "component"]
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [webtech]
+kind: check
+bundle: null
+affected_template: "{host_ip}: {product} {version} (Support beendet {eol_date})"
+evidence: [software]
+references: [CWE-1104]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-EOL-002/003
+  start_level: MEDIUM
+  deviation: >-
+    SP-EOL-002 und SP-EOL-003 stufen EOL bei Sprachlaufzeiten und Webservern auf MEDIUM ein; diese
+    Pruefung uebernimmt den Rahmen fuer die anwendungsnahen Bausteine (Sprachlaufzeit, CMS-Kern,
+    Bibliothek, Plugin, Theme, sonstige Komponente), waehrend software_eol die Serversoftware
+    traegt. Grundlage ist ausschliesslich der EOL-Status aus dem Lebenszyklus-Feed (S1); eigene
+    Versionsschwellen werden nicht angesetzt.
+texts:
+  observation: >-
+    Auf {group} ist eine Anwendungskomponente im Einsatz, deren Herstellerpflege laut
+    Lebenszyklusdaten beendet ist: {affected}.
+  meaning: >-
+    Sprachlaufzeiten, CMS-Kerne, Bibliotheken, Plugins, Themes oder sonstige Komponenten ohne
+    Herstellerpflege erhalten keine Sicherheitsaktualisierungen mehr. Bekannte Schwachstellen
+    bleiben ueber die Anwendung erreichbar, auch wenn die Komponente selbst keinen eigenen
+    Netzwerkdienst bereitstellt.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Bestand der betroffenen Komponente ermitteln und mit den Lebenszyklusangaben des
+        Herstellers abgleichen.
+    - stage: mittelfristig
+      text: >-
+        Komponente auf eine vom Hersteller gepflegte Version anheben oder durch eine gepflegte
+        Alternative ersetzen und einen festen Aktualisierungsrhythmus festlegen.
+  verify: >-
+    Versionsstand der Komponente auf dem System pruefen und mit den Lebenszyklusangaben des
+    Herstellers vergleichen; erwartet wird eine Version mit laufender Pflege.

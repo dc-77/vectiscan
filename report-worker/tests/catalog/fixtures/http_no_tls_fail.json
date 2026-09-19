@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 80, "service": "http", "product": "nginx"},
+   {"host_ip": "10.0.0.1", "port": 22, "service": "ssh", "product": "OpenSSH"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1, Port 80 ohne Port 443"],
+  "positive": false
+ }
+}

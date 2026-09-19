@@ -1,0 +1,50 @@
+id: csp_weak
+title: Content-Security-Policy mit unsicheren Direktiven
+family: csp_weak
+category: D
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: http
+applicable_when: http is not None and http.csp is not None and http.csp.present is True
+item_when: http.csp is not None and http.csp.present is True
+when: http.csp.unsafe_inline is True or http.csp.unsafe_eval is True or http.csp.wildcard is True
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [header_check]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({csp_flags})"
+evidence: [http]
+references: [CWE-693, OWASP2025-A05]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-CSP-003, SP-CSP-004, SP-CSP-005
+  start_level: MEDIUM
+  deviation: null
+texts:
+  observation: >-
+    Auf {group} ist eine Content-Security-Policy gesetzt, die einzelne Direktiven wieder
+    lockert: {affected}.
+  meaning: >-
+    Die Direktiven unsafe-inline und unsafe-eval erlauben eingebettete oder zur Laufzeit
+    erzeugte Skripte, eine Wildcard-Quelle erlaubt Inhalte von beliebigen Urspruengen. Jede
+    dieser Lockerungen hebt genau den Schutz auf, den die Content-Security-Policy gegen
+    eingeschleuste Skripte bieten soll.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die Direktiven unsafe-inline und unsafe-eval aus der Content-Security-Policy entfernen
+        und stattdessen Nonces oder Hashes fuer eingebettete Skripte verwenden.
+    - stage: mittelfristig
+      text: >-
+        Wildcard-Quellen durch eine Liste der tatsaechlich benoetigten Urspruenge ersetzen.
+  verify: >-
+    HTTP-Antwortheader der Startseite von aussen abrufen; erwartet wird eine
+    Content-Security-Policy ohne unsafe-inline, ohne unsafe-eval und ohne Wildcard-Quelle.

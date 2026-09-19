@@ -1,0 +1,46 @@
+id: tls_no_fallback_scsv
+title: Kein Schutz vor Downgrade-Angriffen durch Fallback SCSV
+family: tls_no_fallback_protection
+category: D
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: tls
+applicable_when: null
+when: 'tls.fallback_scsv is False and (tls.protocols["TLS1.0"] is True or tls.protocols["TLS1.1"] is True)'
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target}"
+evidence: [tls]
+references: [CWE-757]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Prototyp VS-012
+  start_level: niedrig
+  deviation: null
+texts:
+  observation: >-
+    Der Dienst {group} bietet noch veraltete Protokollversionen an und signalisiert dabei keinen
+    Fallback-SCSV-Schutz vor einer erzwungenen Rueckstufung der Verbindung: {affected}.
+  meaning: >-
+    Ohne dieses Signal kann eine Gegenstelle auf dem Uebertragungsweg einen Verbindungsabbruch
+    erzwingen, der Client und Server zu einer aelteren, schwaecheren Protokollversion greifen
+    laesst. Relevant ist das nur, solange der Dienst diese aelteren Versionen ueberhaupt noch
+    anbietet.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Fallback SCSV in der TLS-Konfiguration aktivieren oder, alternativ, die veralteten
+        Protokollversionen vollstaendig abschalten.
+  verify: >-
+    Verbindungsversuch mit einer erzwungenen Rueckstufung gegen den Dienst durchfuehren;
+    erwartet wird eine Ablehnung durch den Server.

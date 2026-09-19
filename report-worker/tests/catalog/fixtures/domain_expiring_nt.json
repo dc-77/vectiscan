@@ -1,0 +1,8 @@
+{
+  "facts": {
+    "dns": [{"domain": "example.test"}],
+    "targets": [{"domain": "example.test", "whois": null}]
+  },
+  "coverage_default": "ok",
+  "expect": {"status": "not_testable", "group_key": "example.test", "reason_code": "whois_unavailable"}
+}

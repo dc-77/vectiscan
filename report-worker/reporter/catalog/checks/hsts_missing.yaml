@@ -1,0 +1,56 @@
+id: hsts_missing
+title: HTTP Strict Transport Security nicht gesetzt
+family: hsts_missing
+category: D
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: http
+applicable_when: has_port(services, 443)
+item_when: null
+when: http.hsts.present is False
+positive_when: http.hsts.present is True
+not_testable_when:
+  - when: http.reachable is not True or http.hsts is None
+    reason_code: unreachable
+    context: item
+undetermined: not_testable
+requires:
+  tools: [header_check]
+kind: check
+bundle: null
+affected_template: "{fqdn}"
+evidence: [http]
+references: [CWE-319, OWASP2025-A02]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-HDR-001, SP-HDR-002
+  start_level: LOW
+  deviation: >-
+    SP-HDR-001 bewertet den fehlenden HSTS-Header als INFO, SP-HDR-002 als LOW. Der fehlende
+    Downgrade-Schutz betrifft jeden Aufruf des Hosts ueber HTTP gleichermassen, daher fuehrt die
+    Simulation die Pruefung als Hygiene mittel (catalog_sim, S2-Auftrag).
+texts:
+  observation: >-
+    Der Dienst {group} liefert seine Antworten ohne den HTTP Strict Transport Security Header, der
+    Browser dauerhaft auf die verschluesselte Verbindung festlegt: {affected}.
+  meaning: >-
+    Ohne diesen Header kann ein erster Aufruf ueber HTTP unbemerkt abgefangen oder auf eine
+    unverschluesselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Den Header Strict-Transport-Security mit einer ausreichenden Gueltigkeitsdauer setzen,
+        sobald der Hostname dauerhaft ueber HTTPS erreichbar ist.
+  verify: >-
+    HTTP-Antwortheader der Startseite von aussen abrufen; erwartet wird der gesetzte Header
+    Strict-Transport-Security.
+  positive:
+    title: HTTP Strict Transport Security gesetzt
+    text: >-
+      Der Dienst {group} setzt den Header Strict-Transport-Security und legt Browser damit auf die
+      verschluesselte Verbindung fest.

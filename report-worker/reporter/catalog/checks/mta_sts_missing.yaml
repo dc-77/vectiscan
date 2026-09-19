@@ -1,0 +1,58 @@
+id: mta_sts_missing
+title: MTA-STS nicht wirksam veroeffentlicht
+family: mta_sts_missing
+category: C
+scale: hygiene
+level: niedrig
+group_by: domain
+scope: dns
+applicable_when: len(dns.mx) > 0
+when: dns.mta_sts is not None and dns.mta_sts.dns_record is False and dns.mta_sts.policy is False
+positive_when: dns.mta_sts is not None and dns.mta_sts.policy is True
+not_testable_when:
+  - when: dns.mta_sts is None
+    reason_code: insufficient_facts
+    context: item
+undetermined: not_testable
+requires:
+  tools: [dns_security]
+kind: check
+bundle: mail_transport_enforcement
+affected_template: "{domain}"
+evidence: [dns]
+references: [CWE-319, RFC-8461]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DNS-009
+  start_level: INFO
+  deviation: >-
+    SP-DNS-009 fuehrt den fehlenden Transportschutz als INFO; diese Einstufung wird als Hygiene
+    niedrig uebernommen, da MTA-STS in der Praxis bei fast jedem Auftrag fehlt und erst im
+    Zusammenspiel mit TLS-RPT und DANE als Buendel relevant wird.
+texts:
+  observation: >-
+    Fuer {affected} ist kein wirksames MTA-STS nach RFC 8461 veroeffentlicht. Fuer die Domain
+    {domain} fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, ueber die
+    versendende Mailserver eine erzwungene Transportverschluesselung anfordern koennten.
+  meaning: >-
+    Ohne MTA-STS kann ein Angreifer im Uebertragungsweg die STARTTLS-Ankuendigung beim
+    Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschluesselt
+    mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine
+    verschluesselte Verbindung mit gueltigem Zertifikat zu erzwingen.
+  recommendation:
+    - stage: strategisch
+      text: >-
+        Eine MTA-STS-Richtlinie mit Modus enforce veroeffentlichen, nachdem alle eingehenden
+        Mailwege ausschliesslich gueltige TLS-Zertifikate verwenden.
+  verify: >-
+    DNS-Abfrage des TXT-Eintrags _mta-sts.{domain} sowie Abruf der Richtliniendatei unter der
+    zugehoerigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine
+    Richtliniendatei mit mode enforce.
+  positive:
+    title: MTA-STS veroeffentlicht
+    text: >-
+      Fuer die Domain {domain} ist eine MTA-STS-Richtlinie veroeffentlicht.

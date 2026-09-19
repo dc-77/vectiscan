@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 21, "service": "ftp", "product": "ProFTPD"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:21 (FTP ohne TLS-Zwang)"],
+  "positive": false
+ }
+}

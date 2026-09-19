@@ -1,0 +1,56 @@
+id: tls_rpt_missing
+title: TLS-RPT nicht eingerichtet
+family: tls_rpt_missing
+category: C
+scale: hygiene
+level: niedrig
+group_by: domain
+scope: dns
+applicable_when: len(dns.mx) > 0
+when: dns.tls_rpt is not None and dns.tls_rpt.present is False
+positive_when: dns.tls_rpt is not None and dns.tls_rpt.present is True
+not_testable_when:
+  - when: dns.tls_rpt is None
+    reason_code: insufficient_facts
+    context: item
+undetermined: not_testable
+requires:
+  tools: [dns_security]
+kind: check
+bundle: mail_transport_enforcement
+affected_template: "{domain}"
+evidence: [dns]
+references: [CWE-778, RFC-8460]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DNS-011
+  start_level: LOW
+  deviation: >-
+    SP-DNS-011 fuehrt den fehlenden Bericht ueber Transportfehler als LOW; die Einstufung
+    Hygiene niedrig wird uebernommen, da TLS-RPT selbst keinen Schutz herstellt, sondern nur
+    die Sichtbarkeit auf Transportprobleme verbessert und im Buendel mit MTA-STS und DANE wirkt.
+texts:
+  observation: >-
+    Fuer {affected} ist kein TLS-RPT nach RFC 8460 eingerichtet. Fuer die Domain {domain}
+    fehlt damit eine Meldeadresse, an die versendende Mailserver Berichte ueber fehlgeschlagene
+    oder herabgestufte Transportverschluesselung schicken koennen.
+  meaning: >-
+    Ohne TLS-RPT bleiben Downgrade-Versuche oder fehlerhafte MTA-STS- und DANE-Konfigurationen
+    auf dem Uebertragungsweg zur Domain unbemerkt. Betreiber erfahren nicht, wenn sendende
+    Mailserver eine erzwungene Transportverschluesselung nicht aufbauen konnten.
+  recommendation:
+    - stage: strategisch
+      text: >-
+        Einen TLS-RPT-Eintrag mit einer ueberwachten Meldeadresse veroeffentlichen und die
+        eingehenden Berichte regelmaessig auf Transportfehler auswerten.
+  verify: >-
+    DNS-Abfrage des TXT-Eintrags _smtp._tls.{domain}; erwartet wird ein Eintrag, der mit
+    v=TLSRPTv1 beginnt und eine Meldeadresse (rua) nennt.
+  positive:
+    title: TLS-RPT eingerichtet
+    text: >-
+      Fuer die Domain {domain} ist TLS-RPT eingerichtet.

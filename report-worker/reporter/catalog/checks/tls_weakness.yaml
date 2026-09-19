@@ -1,0 +1,46 @@
+id: tls_weakness
+title: TLS-Verschluesselung anfaellig fuer bekannte Angriffe
+family: tls_weakness
+category: D
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: tls.vulns
+applicable_when: null
+when: '(vuln.name in TLS_SOFT_VULNS and vuln.status == "vulnerable") or vuln.name in TLS_COMPRESSION_VULNS'
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target} ({name})"
+evidence: [tls]
+references: [CWE-327]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-TLS-VULN-SOFT
+  start_level: niedrig
+  deviation: null
+texts:
+  observation: >-
+    Die TLS-Analyse hat auf {group} eine Schwachstelle mit geringerer Auswirkung in der
+    Verschluesselung oder in der Antwortkomprimierung nachgewiesen: {affected}.
+  meaning: >-
+    Unter bestimmten Voraussetzungen, etwa bei sehr langen Sitzungen oder bei aktivierter
+    Kompression, ermoeglichen diese Schwachstellen bekannte Angriffe auf die Verschluesselung.
+    Fuer sich genommen ist die Auswirkung gering, in Kombination mit weiteren Schwachstellen
+    steigt sie.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die betroffene Cipher-Suite oder die TLS-Antwortkomprimierung in der
+        Serverkonfiguration deaktivieren, sofern die eingesetzte Softwareversion dies zulaesst.
+  verify: >-
+    TLS-Analyse des Dienstes von aussen wiederholen; erwartet wird ein Ergebnis ohne diese
+    Schwachstelle.

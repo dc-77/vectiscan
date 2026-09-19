@@ -1,0 +1,48 @@
+id: sri_missing
+title: Fehlende Integritaetspruefung eingebundener Ressourcen
+family: sri_missing
+category: D
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: http.alerts
+applicable_when: null
+when: zap_match(alert, ZAP_SRI)
+positive_when: never
+not_testable_when:
+  - when: http is not None and len(http.alerts) == 0
+    reason_code: zap_no_alerts
+    context: group
+undetermined: not_testable
+requires:
+  tools: [zap]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({url_path})"
+evidence: [http]
+references: [CWE-345, CWE-829]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-SRI-001
+  start_level: LOW
+  deviation: null
+texts:
+  observation: >-
+    Die passive Webanalyse hat auf {group} eine eingebundene Ressource ohne
+    Sub-Resource-Integrity-Absicherung gefunden: {affected}.
+  meaning: >-
+    Ohne dieses Attribut prueft der Browser nicht, ob eine von einer fremden Adresse
+    eingebundene Datei unveraendert ist. Wird die fremde Quelle kompromittiert, wird der
+    veraenderte Inhalt ohne Warnung ausgefuehrt.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Fuer extern eingebundene Skript- und Style-Dateien das Attribut integrity mit einem
+        Pruefwert der erwarteten Datei setzen.
+  verify: >-
+    Den Quelltext der genannten Seite pruefen; erwartet wird bei extern eingebundenen
+    Ressourcen ein Attribut integrity mit einem Pruefwert.

@@ -1,0 +1,14 @@
+{
+  "facts": {
+    "fqdns": [
+      {"name": "www.example.test", "host_ip": "10.0.0.1", "http_status": 200, "title": "IIS Windows Server"}
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "fail",
+    "group_key": "www.example.test@10.0.0.1",
+    "affected": ["www.example.test (IIS Windows Server)"],
+    "positive": false
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "facts": {
+    "dns": [{"domain": "example.test", "caa": {"present": false}}]
+  },
+  "coverage_default": "ok",
+  "expect": {"status": "fail", "group_key": "example.test", "affected": ["example.test"], "positive": false}
+}

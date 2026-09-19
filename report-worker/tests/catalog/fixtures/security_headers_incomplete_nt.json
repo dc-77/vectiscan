@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": false, "status_code": null, "security_headers": {}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "not_testable",
+  "group_key": "www.example.test@10.0.0.1",
+  "reason_code": "unreachable",
+  "positive": false
+ }
+}

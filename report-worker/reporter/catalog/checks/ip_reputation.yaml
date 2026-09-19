@@ -1,0 +1,59 @@
+id: ip_reputation
+title: Oeffentliche IP-Adresse mit auffaelliger Reputationsbewertung
+family: ip_reputation
+category: E
+scale: hygiene
+level: mittel
+group_by: host
+scope: host
+applicable_when: null
+item_when: null
+when: host.reputation is not None and (host.reputation.abuseipdb_score >= ABUSEIPDB_FAIL_SCORE or host.reputation.urlhaus_compromised is True or host.reputation.greynoise_classification == "malicious")
+positive_when: host.reputation is not None and host.reputation.abuseipdb_score == 0 and host.reputation.urlhaus_compromised is not True and host.reputation.otx_pulse_count in [0, None]
+not_testable_when:
+  - when: coverage_status("abuseipdb") != "ok"
+    reason_code: coverage:abuseipdb
+    context: group
+undetermined: pass_silent
+requires:
+  tools: [abuseipdb]
+kind: check
+bundle: null
+affected_template: "{host_ip} (AbuseIPDB {abuseipdb_score})"
+evidence: [host]
+references: [CWE-284]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: neu (S2-Auftrag)
+  start_level: mittel
+  deviation: null
+texts:
+  observation: >-
+    Externe Reputationsquellen fuehren die oeffentliche Adresse von {group} als auffaellig:
+    {affected}. Die Bewertung stammt aus mehreren unabhaengigen Quellen zu Missbrauchsmeldungen
+    und Schadsoftware-Aktivitaet.
+  meaning: >-
+    Eine auffaellige Reputationsbewertung deutet auf fruehere Missbrauchsmeldungen, eine
+    Kompromittierung oder eine Weiterverwendung der Adresse fuer Angriffsinfrastruktur hin.
+    Andere Systeme koennen Verbindungen von einer so bewerteten Adresse automatisch blockieren
+    oder als verdaechtig einstufen.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Die eigenen Systeme auf dieser Adresse auf Schadsoftware und ungewoehnliche
+        Netzwerkaktivitaet pruefen.
+    - stage: mittelfristig
+      text: >-
+        Nach Beseitigung der Ursache eine Loeschung oder Korrektur der Bewertung bei den
+        jeweiligen Reputationsquellen beantragen.
+  verify: >-
+    Erneute Abfrage gaengiger Reputationsquellen fuer die betroffene Adresse; erwartet wird eine
+    unauffaellige Bewertung.
+  positive:
+    title: Keine Eintraege in Reputationsquellen
+    text: >-
+      Fuer {group} liegen keine Eintraege in gaengigen Reputationsquellen vor.

@@ -1,0 +1,16 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 22, "service": "ssh", "product": "OpenSSH"},
+   {"host_ip": "10.0.0.1", "port": 222, "service": "ssh", "product": "OpenSSH"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": false,
+  "notes": ["10.0.0.1:222 (SSH auf Nicht-Standardport)"]
+ }
+}

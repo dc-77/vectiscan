@@ -1,0 +1,20 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 3306, "service": "mysql", "product": "MySQL", "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1", "family": "mariadb", "version_norm": "10.11.18"},
+   {"host_ip": "10.0.0.1", "port": 443, "service": "http", "product": "Apache httpd", "tls_required": true, "tunnel_ssl": true}
+  ],
+  "software": [
+   {"host_ip": "10.0.0.1", "product": "MariaDB", "family": "mariadb", "kind": "database", "version_raw": "5.5.5-10.11.18-MariaDB-0+deb12u1", "version_norm": "10.11.18"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:3306 (MariaDB)"],
+  "positive": false,
+  "members": {"10.0.0.1:3306": "fail"},
+  "evidence_min": 0
+ }
+}

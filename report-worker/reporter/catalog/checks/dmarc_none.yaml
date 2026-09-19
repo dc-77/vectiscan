@@ -1,0 +1,53 @@
+id: dmarc_none
+title: DMARC-Richtlinie ohne Durchsetzung
+family: dmarc_none
+category: C
+scale: hygiene
+level: mittel
+group_by: domain
+scope: dns
+applicable_when: dns.dmarc is not None and dns.dmarc.present is True
+when: dns.dmarc.p == "none"
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: null
+affected_template: "{domain} (p={dmarc_p})"
+evidence: [dns]
+references: [CWE-290, RFC-7489]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DNS-007
+  start_level: LOW
+  deviation: >-
+    Der Prototyp stuft eine DMARC-Richtlinie ohne Durchsetzung (p=none) als Hygiene mittel ein,
+    weil sie zwar Auswertung ueber Berichte ermoeglicht, aber keine Zustellentscheidung
+    erzwingt.
+texts:
+  observation: >-
+    Die DMARC-Richtlinie der Domain {domain} ist auf reine Beobachtung gesetzt: {affected}.
+    E-Mails, die SPF oder DKIM nicht bestehen, werden dadurch nicht zurueckgewiesen oder
+    unter Quarantaene gestellt.
+  meaning: >-
+    Eine DMARC-Richtlinie ohne Durchsetzung sammelt zwar Berichte ueber fehlgeschlagene
+    Pruefungen, veraendert aber die Zustellung nicht. Gefaelschte E-Mails im Namen der Domain
+    kommen weiterhin beim Empfaenger an.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Die Berichte der aktuellen Richtlinie auswerten und alle legitimen Versandquellen der
+        Domain bestaetigen.
+    - stage: mittelfristig
+      text: >-
+        Die Richtlinie auf Quarantaene und danach auf Zurueckweisung anheben, sobald alle
+        legitimen Versender erfasst sind.
+  verify: >-
+    DNS-Abfrage des TXT-Eintrags _dmarc.{domain}; erwartet wird eine Richtlinie p, die nicht
+    auf reine Beobachtung gesetzt ist.

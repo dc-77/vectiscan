@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 22, "service": "ssh", "product": "OpenSSH", "version_raw": "9.2p1", "version_norm": "9.2p1"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:22 (OpenSSH 9.2p1)"],
+  "positive": false
+ }
+}

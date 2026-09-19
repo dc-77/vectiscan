@@ -1,0 +1,58 @@
+id: tls_legacy_protocols
+title: Veraltete TLS-Protokollversionen angeboten
+family: tls_legacy_protocols
+category: D
+scale: hygiene
+level: hoch
+group_by: fqdn
+scope: tls
+applicable_when: null
+when: 'tls.protocols["SSLv2"] is True or tls.protocols["SSLv3"] is True or tls.protocols["TLS1.0"] is True or tls.protocols["TLS1.1"] is True'
+positive_when: 'tls.protocols["SSLv2"] is False and tls.protocols["SSLv3"] is False and tls.protocols["TLS1.0"] is False and tls.protocols["TLS1.1"] is False'
+not_testable_when:
+  - when: 'tls.protocols["TLS1.0"] is None and tls.protocols["TLS1.1"] is None'
+    reason_code: tls_protocols_unknown
+    context: item
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target} ({legacy_protocols})"
+evidence: [tls]
+references: [CWE-326, RFC-8996, BSI-TR-03116-4]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: ["TR-03116-4: Mindestversion TLS 1.2"]
+policy:
+  source: SP-TLS-001
+  start_level: HIGH
+  deviation: >-
+    SP-TLS-001 bewertet TLS 1.0/1.1 mit 7.4 bis 9.1 als HIGH. Ohne Nachweis einer praktischen
+    Ausnutzung ist das eine Hygieneabweichung mit Bezug zu Zugangswegen, daher Hygiene hoch, kein 9.1
+    (spec/02 Ursache 5, S2-Auftrag).
+texts:
+  observation: >-
+    Der Dienst {group} bietet neben aktuellen Versionen auch veraltete TLS-Protokolle an, die seit
+    RFC 8996 als unsicher gelten: {affected}.
+  meaning: >-
+    Verbindungen aelterer Clients koennen auf schwache Protokolle heruntergestuft werden. Unter
+    TLS 1.0 und 1.1 sind bekannte Angriffe auf die Verschluesselung moeglich; bei Zugangsportalen
+    betrifft das die Sitzungen der Mitarbeitenden von aussen.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        TLS 1.0 und 1.1 serverseitig deaktivieren und die Cipher-Reihenfolge auf AEAD-Suiten mit
+        Forward Secrecy setzen.
+    - stage: mittelfristig
+      text: >-
+        HSTS aktivieren, sobald alle Hostnamen dauerhaft HTTPS liefern.
+  verify: >-
+    Verbindungsversuch mit erzwungenem TLS 1.0 und TLS 1.1 gegen den Dienst; erwartet wird jeweils
+    ein Handshake-Fehler.
+  positive:
+    title: Nur aktuelle TLS-Protokolle
+    text: >-
+      Der Dienst {group} bietet ausschliesslich TLS 1.2 oder hoeher an.

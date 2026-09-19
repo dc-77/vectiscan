@@ -5,3 +5,10 @@
 report-worker/tests/golden/tars/** binary
 report-worker/tests/golden/**/*.json text eol=lf
 report-worker/tests/golden/orders.txt text eol=lf
+
+# Pruefkatalog (S2, report-worker/reporter/catalog/ und tests/catalog/).
+# YAML, Tabellen und Fixtures bleiben Text mit LF; der Katalog-Digest und die
+# Fixture-Vergleiche muessen unter Windows und Linux denselben Wert liefern.
+report-worker/reporter/catalog/**/*.yaml text eol=lf
+report-worker/reporter/catalog/*.md text eol=lf
+report-worker/tests/catalog/**/*.json text eol=lf

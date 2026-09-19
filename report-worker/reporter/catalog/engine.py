@@ -1,0 +1,437 @@
+"""Engine des Pruefkatalogs: laden, kompilieren, auswerten.
+
+Ablauf je Check und Gruppe (README, Abschnitt "Statuslogik"):
+1. Domain-Gruppe ohne DNS-Fakten -> not_testable mit Grund aus der Abdeckung.
+2. ``applicable_when`` falsch -> not_applicable.
+3. ``not_testable_when`` (Gruppenkontext) trifft -> not_testable(reason_code).
+4. Je Item: ``when`` wahr -> fail (bei ``kind: note`` ein Hinweis); sonst Item-Regeln aus
+   ``not_testable_when`` (context item); sonst ``positive_when`` (Ausdruck) -> pass oder
+   ``undetermined``; bei ``absent``/``never`` zaehlt ein gesehenes Item als pass.
+5. Gruppe: fail > not_testable > pass > not_applicable. Ohne Items entscheidet die
+   Abdeckung der Werkzeuge aus ``requires.tools`` (COVERAGE_REASONS).
+6. ``positive`` nur bei pass mit ``texts.positive`` und (``absent`` oder mindestens einem
+   Item, das den Positivausdruck erfuellt).
+"""
+from __future__ import annotations
+
+from collections import Counter
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Optional
+
+import yaml
+from pydantic import ValidationError
+
+from reporter.catalog import render
+from reporter.catalog import tables as T
+from reporter.catalog.catchall import run_catchalls
+from reporter.catalog.expr import CatalogSpecError, Expr, compile_expr
+from reporter.catalog.schema import (CATEGORY_NAMES, LEVEL_LABELS, CatalogOutput, CheckInfo, CheckResult,
+                                     CheckRollup, CheckSpec, EvidenceRef, IgnoreList, Member, NotTestableRule,
+                                     RenderedTexts, Summary)
+from reporter.catalog.scope import FactsIndex, Group, Item, build_groups, binding_types
+from reporter.catalog.version import CATALOG_DIR, CATALOG_VERSION, catalog_digest
+from reporter.facts import schema as FS
+from reporter.facts.serialize import sort_key
+
+STATUS_ORDER = {"fail": 0, "pass": 1, "not_testable": 2, "not_applicable": 3}
+DNS_SCOPES = ("dns", "dns.dangling_cnames", "target")
+MAX_EVIDENCE = 40
+
+
+@dataclass
+class CompiledCheck:
+    spec: CheckSpec
+    when: Optional[Expr]
+    positive: Optional[Expr]
+    applicable: Optional[Expr]
+    nt_group: list[tuple[NotTestableRule, Expr]]
+    nt_item: list[tuple[NotTestableRule, Expr]]
+    item_filter: Optional[Expr] = None
+    path: Optional[Path] = None
+
+
+@dataclass
+class Catalog:
+    checks: list[CompiledCheck]
+    ignore: IgnoreList
+    version: str
+    digest: str
+    dir: Path
+    by_id: dict[str, CompiledCheck] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.by_id = {c.spec.id: c for c in self.checks}
+
+    @property
+    def specs(self) -> list[CheckSpec]:
+        return [c.spec for c in self.checks]
+
+
+# ---------------------------------------------------------------- Laden
+
+
+def load_yaml(path: Path) -> dict[str, Any]:
+    with open(path, "r", encoding="utf-8-sig") as fh:
+        data = yaml.safe_load(fh)
+    if not isinstance(data, dict):
+        raise CatalogSpecError(f"{path.name}: YAML muss ein Mapping sein")
+    return data
+
+
+def load_check(path: Path) -> CheckSpec:
+    data = load_yaml(path)
+    try:
+        spec = CheckSpec.model_validate(data)
+    except ValidationError as exc:
+        raise CatalogSpecError(f"{path.name}: {exc}") from None
+    if spec.id != path.stem:
+        raise CatalogSpecError(f"{path.name}: id {spec.id!r} muss dem Dateinamen entsprechen")
+    return spec
+
+
+def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
+    where = f"check {spec.id}"
+    types_ = binding_types(spec.scope, spec.group_by)
+    tables = T.EXPR_TABLES
+
+    def comp(text: str | None, part: str) -> Optional[Expr]:
+        if text is None:
+            return None
+        return compile_expr(text, where=f"{where} {part}", types_=types_, tables=tables)
+
+    when = comp(spec.when, "when")
+    positive = comp(spec.positive_when, "positive_when") if spec.positive_mode == "expr" else None
+    applicable = comp(spec.applicable_when, "applicable_when")
+    item_filter = comp(spec.item_when, "item_when")
+    nt_group: list[tuple[NotTestableRule, Expr]] = []
+    nt_item: list[tuple[NotTestableRule, Expr]] = []
+    for i, rule in enumerate(spec.not_testable_when):
+        ex = comp(rule.when, f"not_testable_when[{i}]")
+        assert ex is not None
+        (nt_item if rule.context == "item" else nt_group).append((rule, ex))
+    if spec.positive_mode == "absent" and not spec.requires.tools:
+        raise CatalogSpecError(f"{where}: positive_when absent braucht requires.tools")
+    render.validate_template(spec.affected_template, render.ITEM_VARS[spec.scope], f"{where} affected_template")
+    render.validate_template(spec.texts.observation, render.OBSERVATION_VARS, f"{where} texts.observation")
+    if spec.texts.positive:
+        render.validate_template(spec.texts.positive.title, render.OBSERVATION_VARS, f"{where} texts.positive.title")
+        render.validate_template(spec.texts.positive.text, render.OBSERVATION_VARS, f"{where} texts.positive.text")
+    for name, text in (("meaning", spec.texts.meaning), ("verify", spec.texts.verify), ("title", spec.title)):
+        render.validate_template(text, render.OBSERVATION_VARS, f"{where} {name}")
+    for i, rec in enumerate(spec.texts.recommendation):
+        render.validate_template(rec.text, render.OBSERVATION_VARS, f"{where} recommendation[{i}]")
+    return CompiledCheck(spec=spec, when=when, positive=positive, applicable=applicable, nt_group=nt_group,
+                         nt_item=nt_item, item_filter=item_filter, path=path)
+
+
+def load_catalog(catalog_dir: Path | str | None = None) -> Catalog:
+    base = Path(catalog_dir) if catalog_dir else CATALOG_DIR
+    files = sorted((base / "checks").glob("*.yaml"), key=lambda p: p.name)
+    if not files:
+        raise CatalogSpecError(f"keine Pruefungen unter {base / 'checks'}")
+    compiled: list[CompiledCheck] = []
+    seen: set[str] = set()
+    for path in files:
+        spec = load_check(path)
+        if spec.id in seen:
+            raise CatalogSpecError(f"{path.name}: doppelte id {spec.id!r}")
+        seen.add(spec.id)
+        compiled.append(compile_check(spec, path))
+    ignore_path = base / "ignore.yaml"
+    if ignore_path.exists():
+        try:
+            ignore = IgnoreList.model_validate(load_yaml(ignore_path))
+        except ValidationError as exc:
+            raise CatalogSpecError(f"ignore.yaml: {exc}") from None
+    else:
+        ignore = IgnoreList()
+    compiled.sort(key=lambda c: c.spec.id)
+    return Catalog(checks=compiled, ignore=ignore, version=CATALOG_VERSION, digest=catalog_digest(base), dir=base)
+
+
+_DEFAULT: dict[str, Catalog] = {}
+
+
+def default_catalog() -> Catalog:
+    key = str(CATALOG_DIR)
+    if key not in _DEFAULT:
+        _DEFAULT[key] = load_catalog()
+    return _DEFAULT[key]
+
+
+def reset_default_catalog() -> None:
+    _DEFAULT.clear()
+
+
+# ---------------------------------------------------------------- Auswertung
+
+
+def _reason(code: str | None) -> tuple[str, str, str]:
+    """(status, reason_code, text) fuer einen Coverage- oder Regelcode."""
+    code = code or "insufficient_facts"
+    status, text = T.COVERAGE_REASONS.get(code, ("not_testable", T.GENERIC_NOT_TESTABLE))
+    return status, code, text
+
+
+def _evidence_of(obj: Any) -> list[EvidenceRef]:
+    fid = getattr(obj, "id", None)
+    evs = getattr(obj, "evidence", None)
+    if not fid or not evs:
+        return []
+    return [EvidenceRef(fact_id=fid, tool=e.tool, ref=e.ref, excerpt=e.excerpt) for e in evs]
+
+
+def _source_mode(modes: list[str]) -> str:
+    s = set(modes)
+    if not s:
+        return "none"
+    if s == {"active"}:
+        return "active"
+    if s == {"passive"}:
+        return "passive"
+    return "mixed"
+
+
+def _member(item: Item, label: str, status: str, *, reason_code: str | None = None) -> Member:
+    reason = None
+    if reason_code:
+        _, _, reason = _reason(reason_code)
+    return Member(key=item.key, host_ip=item.host_ip, fqdn=item.fqdn, port=item.port, label=label, status=status,
+                  reason_code=reason_code, reason=reason, fact_ids=[item.fact.id], source_mode=item.source_mode,
+                  verified=item.verified, via_cdn=item.via_cdn, alias_of=item.alias_of)
+
+
+class _Eval:
+    def __init__(self, cc: CompiledCheck, index: FactsIndex, claimed: set[str]):
+        self.cc = cc
+        self.spec = cc.spec
+        self.index = index
+        self.claimed = claimed
+
+    def group(self, g: Group) -> CheckResult:
+        spec = self.spec
+        gctx = g.ctx
+        if g.kind == "domain" and spec.scope in DNS_SCOPES and gctx.get("dns") is None:
+            return self.result(g, "not_testable", reason_code=g.dns_missing_reason or "no_dns_facts")
+        if self.cc.applicable is not None and not self.cc.applicable.test(gctx):
+            return self.result(g, "not_applicable", reason_code="precondition_not_met")
+        for rule, ex in self.cc.nt_group:
+            if not ex.test(gctx):
+                continue
+            if rule.reason_code.startswith("coverage:"):
+                st, reason = g.coverage(self.index, rule.reason_code[len("coverage:"):])
+                if st == "ok":
+                    continue
+                status, code, _ = _reason(reason or st)
+                if status == "ok":
+                    continue
+                return self.result(g, status, reason_code=code)
+            return self.result(g, "not_testable", reason_code=rule.reason_code)
+
+        members: list[Member] = []
+        matched_positive = False
+        seen_ok = 0
+        notes: list[str] = []
+        evidence: list[EvidenceRef] = []
+        for item in g.items:
+            ictx = {**gctx, **item.ctx}
+            if self.cc.item_filter is not None and not self.cc.item_filter.test(ictx):
+                continue
+            label = render.format_strict(spec.affected_template, render.item_vars(spec.scope, item, g, self.index),
+                                         f"check {spec.id} affected_template")
+            if self.cc.when is not None and self.cc.when.test(ictx):
+                self.claimed.add(item.claim_id)
+                if spec.kind == "note":
+                    notes.append(label)
+                    members.append(_member(item, label, "pass"))
+                else:
+                    members.append(_member(item, label, "fail"))
+                    evidence.extend(self.evidence(item, ictx))
+                continue
+            hit = next((rule for rule, ex in self.cc.nt_item if ex.test(ictx)), None)
+            if hit is not None:
+                members.append(_member(item, label, "not_testable", reason_code=hit.reason_code))
+                continue
+            if self.cc.positive is not None:
+                if self.cc.positive.test(ictx):
+                    matched_positive = True
+                    members.append(_member(item, label, "pass"))
+                elif spec.undetermined == "pass_silent":
+                    members.append(_member(item, label, "pass"))
+                elif spec.undetermined == "not_applicable":
+                    members.append(_member(item, label, "not_applicable", reason_code="precondition_not_met"))
+                else:
+                    members.append(_member(item, label, "not_testable", reason_code="insufficient_facts"))
+            else:
+                # absent/never: ein gesehenes, unauffaelliges Item zaehlt, wird aber nicht gelistet
+                seen_ok += 1
+
+        fails = [m for m in members if m.status == "fail"]
+        if fails:
+            return self.result(g, "fail", members=members, evidence=evidence, notes=notes, seen=seen_ok)
+        nts = [m for m in members if m.status == "not_testable"]
+        if nts:
+            return self.result(g, "not_testable", members=members, reason_code=nts[0].reason_code, notes=notes, seen=seen_ok)
+        passes = [m for m in members if m.status == "pass"]
+        if passes or seen_ok:
+            positive = self.is_positive(matched_positive)
+            return self.result(g, "pass", members=members, positive=positive, notes=notes, seen=seen_ok)
+        if members:
+            return self.result(g, "not_applicable", members=members, reason_code="precondition_not_met")
+        return self.empty_group(g)
+
+    def is_positive(self, matched_positive: bool) -> bool:
+        spec = self.spec
+        if spec.kind != "check" or spec.texts.positive is None or spec.positive_mode == "never":
+            return False
+        return spec.positive_mode == "absent" or matched_positive
+
+    def empty_group(self, g: Group) -> CheckResult:
+        spec = self.spec
+        tools = spec.requires.tools
+        if tools:
+            for tool in tools:
+                st, reason = g.coverage(self.index, tool)
+                if st == "ok":
+                    continue
+                status, code, _ = _reason(reason or st)
+                if status == "ok":
+                    continue
+                return self.result(g, status, reason_code=code)
+        if spec.positive_mode == "absent":
+            return self.result(g, "pass", positive=self.is_positive(False))
+        if spec.positive_mode == "never":
+            return self.result(g, "pass")
+        if spec.undetermined == "pass_silent":
+            return self.result(g, "pass")
+        if spec.undetermined == "not_applicable":
+            return self.result(g, "not_applicable", reason_code="precondition_not_met")
+        return self.result(g, "not_testable", reason_code="insufficient_facts")
+
+    def evidence(self, item: Item, ictx: dict[str, Any]) -> list[EvidenceRef]:
+        out = _evidence_of(item.fact)
+        for name in self.spec.evidence:
+            obj = ictx.get(name)
+            if obj is None or obj is item.fact:
+                continue
+            if isinstance(obj, list):
+                for o in obj:
+                    out.extend(_evidence_of(o))
+            else:
+                out.extend(_evidence_of(obj))
+        return out
+
+    def result(self, g: Group, status: str, *, members: list[Member] | None = None, reason_code: str | None = None,
+               evidence: list[EvidenceRef] | None = None, positive: bool = False, notes: list[str] | None = None,
+               seen: int = 0) -> CheckResult:
+        spec = self.spec
+        members = members or []
+        notes = notes or []
+        fails = [m for m in members if m.status == "fail"]
+        labels = sorted({m.label for m in fails}, key=sort_key)
+        fact_ids = sorted({fid for m in fails for fid in m.fact_ids}, key=sort_key)
+        reason_text = None
+        if status == "not_testable" and g.host is not None and g.host.blocked.detected \
+                and reason_code in (None, "unreachable", "insufficient_facts", "no_coverage_rows"):
+            blocked_reason = g.host.blocked.reason or "web_unreachable_after_portscan"
+            if blocked_reason in T.COVERAGE_REASONS:
+                reason_code = blocked_reason
+        if reason_code:
+            _, reason_code, reason_text = _reason(reason_code)
+        modes = [m.source_mode for m in (fails or [m for m in members if m.status == "pass"])]
+        source_mode = _source_mode(modes)
+        verified: bool | None = None
+        if fails:
+            verified = False if source_mode == "passive" else True
+        seen_keys: set[tuple[str, str, str]] = set()
+        ev: list[EvidenceRef] = []
+        for e in evidence or []:
+            key = (e.fact_id, e.ref, e.excerpt)
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+            ev.append(e)
+            if len(ev) >= MAX_EVIDENCE:
+                break
+        gvars = render.group_vars(g, labels, notes)
+        observation = render.format_strict(spec.texts.observation, gvars, f"check {spec.id} observation") if status == "fail" else ""
+        pos = None
+        if positive and spec.texts.positive is not None:
+            pos = spec.texts.positive.model_copy(update={
+                "title": render.format_strict(spec.texts.positive.title, gvars, f"check {spec.id} positive.title"),
+                "text": render.format_strict(spec.texts.positive.text, gvars, f"check {spec.id} positive.text"),
+            })
+        return CheckResult(
+            check_id=spec.id, family=spec.family, bundle=spec.bundle, kind=spec.kind, title=spec.title,
+            category=spec.category, scale=spec.scale, level=spec.level, group_by=spec.group_by, group_key=g.key,
+            group_label=g.label, status=status, positive=positive, verified=verified, source_mode=source_mode,
+            affected=labels, affected_fact_ids=fact_ids, members=members, items_seen=seen + len(members), evidence=ev,
+            reason_code=reason_code, reason=reason_text, notes=sorted(set(notes), key=sort_key),
+            vars={k: (v if isinstance(v, (int, list)) else render._s(v)) for k, v in gvars.items()},
+            texts=RenderedTexts(observation=observation, positive=pos),
+        )
+
+
+def evaluate_check(cc: CompiledCheck, index: FactsIndex, claimed: set[str] | None = None) -> list[CheckResult]:
+    claimed = claimed if claimed is not None else set()
+    ev = _Eval(cc, index, claimed)
+    groups = build_groups(index, cc.spec.scope, cc.spec.group_by)
+    results = [ev.group(g) for g in groups]
+    results.sort(key=lambda r: sort_key(r.group_key))
+    return results
+
+
+def check_info(spec: CheckSpec) -> CheckInfo:
+    return CheckInfo(id=spec.id, title=spec.title, family=spec.family, category=spec.category,
+                     category_name=CATEGORY_NAMES[spec.category], scale=spec.scale, level=spec.level,
+                     level_label=LEVEL_LABELS[spec.level], group_by=spec.group_by, scope=spec.scope, kind=spec.kind,
+                     bundle=spec.bundle, positive_mode=spec.positive_mode, requires=spec.requires,
+                     references=list(spec.references), frameworks=spec.frameworks, policy=spec.policy,
+                     texts=spec.texts)
+
+
+def rollup(check: CheckSpec, results: list[CheckResult]) -> CheckRollup:
+    counts = Counter(r.status for r in results)
+    return CheckRollup(check_id=check.id, family=check.family, groups=len(results),
+                       counts={k: counts.get(k, 0) for k in STATUS_ORDER},
+                       positives=sum(1 for r in results if r.positive),
+                       affected_total=sum(len(r.affected) for r in results))
+
+
+def evaluate(facts: FS.Facts | dict[str, Any], catalog: Catalog | None = None) -> CatalogOutput:
+    """Katalog auf eine Faktendatei anwenden. Deterministisch: Reihenfolge nach check_id und group_key."""
+    if isinstance(facts, dict):
+        facts = FS.Facts.from_dict(facts)
+    cat = catalog or default_catalog()
+    index = FactsIndex(facts)
+    claimed: set[str] = set()
+    results: list[CheckResult] = []
+    rollups: list[CheckRollup] = []
+    for cc in cat.checks:
+        res = evaluate_check(cc, index, claimed)
+        results.extend(res)
+        rollups.append(rollup(cc.spec, res))
+    results.sort(key=lambda r: sort_key(r.check_id, r.group_key))
+    unprocessed, ignored = run_catchalls(index, claimed, cat.ignore)
+    by_status = Counter(r.status for r in results)
+    fails = [r for r in results if r.status == "fail" and r.kind == "check"]
+    summary = Summary(
+        checks=len(cat.checks), results=len(results), by_status={k: by_status.get(k, 0) for k in STATUS_ORDER},
+        fail_by_category={k: v for k, v in sorted(Counter(r.category for r in fails).items())},
+        fail_by_level={k: v for k, v in sorted(Counter(r.level for r in fails).items())},
+        positives=sum(1 for r in results if r.positive), unprocessed=sum(u.count for u in unprocessed),
+        ignored=sum(i.count for i in ignored), warnings=list(facts.warnings),
+    )
+    return CatalogOutput(
+        catalog_version=cat.version, catalog_digest=cat.digest, facts_schema_version=facts.schema_version,
+        order_id=facts.scan.order_id, package=facts.scan.package, domain=facts.scan.domain,
+        domains=list(facts.scan.domains) or [facts.scan.domain], generator=facts.generator.model_dump(mode="json"),
+        checks=[check_info(cc.spec) for cc in cat.checks],
+        results=results, rollups=rollups, unprocessed=unprocessed, ignored=ignored,
+        facts_unprocessed=[u.model_dump(mode="json") for u in facts.unprocessed], summary=summary,
+    )
+
+
+__all__ = ["Catalog", "CompiledCheck", "load_catalog", "default_catalog", "reset_default_catalog", "load_check",
+           "compile_check", "evaluate", "evaluate_check", "rollup", "STATUS_ORDER"]

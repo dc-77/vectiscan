@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "dns": [
+   {"domain": "example.test", "mx": ["mx1.example.test"],
+    "spf": {"raw": "v=spf1 mx -all", "all_qualifier": "-all"}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "example.test",
+  "affected": [],
+  "positive": true
+ }
+}
