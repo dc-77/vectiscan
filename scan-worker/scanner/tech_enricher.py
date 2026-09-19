@@ -22,6 +22,7 @@ Idempotent: doppelte Aufrufe fuegen keine Duplikate ein
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 import re
@@ -148,7 +149,10 @@ def _enrich_one_host(
     phase2_dir = os.path.join(host_dir, "phase2")
     headers_data = _read_json(os.path.join(phase2_dir, "headers.json"))
     httpx_data = _read_json(os.path.join(phase2_dir, "httpx.json"))
-    zap_spider_data = _read_json(os.path.join(phase2_dir, "zap_spider.json"))
+    # Issue #11: Phase 2 schreibt zap_spider_urls.json, gelesen wurde
+    # zap_spider.json. _read_json schluckt FileNotFoundError, deshalb war die
+    # OWA-Build-Extraktion still tot.
+    zap_spider_data = _read_json(os.path.join(phase2_dir, "zap_spider_urls.json"))
 
     exchange_version: str | None = None
     exchange_source: str | None = None
@@ -163,6 +167,16 @@ def _enrich_one_host(
             headers_records = [v for v in headers_data.values() if isinstance(v, dict)]
     elif isinstance(headers_data, list):
         headers_records = [r for r in headers_data if isinstance(r, dict)]
+
+    # Issue #10: seit S2b liegt je VHost eine eigene Datei daneben. headers.json
+    # traegt nur den primaeren VHost; die uebrigen kaemen sonst nie an.
+    seen_urls = {str(rec.get("url") or "") for rec in headers_records}
+    for extra in sorted(glob.glob(os.path.join(phase2_dir, "headers_*.json"))):
+        rec = _read_json(extra)
+        if isinstance(rec, dict) and "headers" in rec:
+            if str(rec.get("url") or "") not in seen_urls:
+                headers_records.append(rec)
+                seen_urls.add(str(rec.get("url") or ""))
 
     for rec in headers_records:
         headers = rec.get("headers") or {}
@@ -199,12 +213,25 @@ def _enrich_one_host(
 
     # cms / cms_version setzen falls Exchange erkannt und kein anderes CMS
     # bereits gesetzt war (CMSFingerprinter kennt Exchange nicht).
-    if exchange_version and not tech_profile.get("cms"):
+    #
+    # Issue #11: steht dort schon Exchange, stammt die Version in aller Regel
+    # von KI #2 ("2016" bei Build 15.2.2562, Junkerwerk). Der aus dem Werkzeug
+    # abgeleitete Build ist ein Messwert und hat Vorrang vor der Schaetzung;
+    # ein anderes CMS wird nicht angefasst.
+    cms_now = tech_profile.get("cms")
+    is_exchange = isinstance(cms_now, str) and "exchange" in cms_now.lower()
+    if exchange_version and (not cms_now or is_exchange):
+        previous = tech_profile.get("cms_version")
         tech_profile["cms"] = "Microsoft Exchange"
         tech_profile["cms_version"] = exchange_version
         tech_profile["cms_confidence"] = 0.95
         tech_profile.setdefault("cms_details", {})
         tech_profile["cms_details"]["enriched_from"] = exchange_source
+        if is_exchange and previous and previous != exchange_version:
+            tech_profile["cms_details"]["replaced_ai_version"] = previous
+            log.info("tech_enricher_cms_version_overridden",
+                     previous=previous, build=exchange_version,
+                     source=exchange_source)
         # Auch in vhost_results fuer den primary VHost ergaenzen
         primary = tech_profile.get("primary_vhost") or (
             (tech_profile.get("fqdns") or [None])[0]
@@ -212,7 +239,10 @@ def _enrich_one_host(
         if primary:
             vh_results = tech_profile.setdefault("vhost_results", {})
             entry = vh_results.setdefault(primary, {})
-            if not entry.get("cms"):
+            entry_cms = entry.get("cms")
+            entry_is_exchange = (isinstance(entry_cms, str)
+                                 and "exchange" in entry_cms.lower())
+            if not entry_cms or entry_is_exchange:
                 entry["cms"] = "Microsoft Exchange"
                 entry["cms_version"] = exchange_version
                 entry["cms_confidence"] = 0.95
