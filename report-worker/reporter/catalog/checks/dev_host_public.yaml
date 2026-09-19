@@ -1,5 +1,5 @@
 id: dev_host_public
-title: Entwicklungs- oder Testsystem oeffentlich erreichbar
+title: Entwicklungs- oder Testsystem öffentlich erreichbar
 family: dev_host_public
 category: A
 scale: hygiene
@@ -34,18 +34,18 @@ texts:
     Der Hostname von {group} beginnt mit einem Namensteil, der auf ein Entwicklungs- oder
     Testsystem hinweist, und antwortet aus dem gesamten Internet: {affected}.
   meaning: >-
-    Entwicklungs- und Testsysteme erhalten haeufig seltener Patches und schwaechere
-    Zugangsbeschraenkungen als produktive Systeme. Sie koennen zudem Testdaten oder unfertige
-    Funktionen enthalten, die nicht fuer die Oeffentlichkeit gedacht sind.
+    Entwicklungs- und Testsysteme erhalten häufig seltener Patches und schwächere
+    Zugangsbeschränkungen als produktive Systeme. Sie können zudem Testdaten oder unfertige
+    Funktionen enthalten, die nicht für die Öffentlichkeit gedacht sind.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Pruefen, ob das System oeffentlich erreichbar sein muss, und den Zugriff andernfalls auf
-        bekannte Quellnetze oder ein VPN beschraenken.
+        Prüfen, ob das System öffentlich erreichbar sein muss, und den Zugriff andernfalls auf
+        bekannte Quellnetze oder ein VPN beschränken.
     - stage: mittelfristig
       text: >-
         Entwicklungs- und Testsysteme mit dem gleichen Patchstand wie produktive Systeme pflegen
-        und Testdaten regelmaessig bereinigen.
+        und Testdaten regelmäßig bereinigen.
   verify: >-
     Die genannte Adresse von einer externen Adresse aus aufrufen; erwartet wird keine Antwort
-    ohne vorherige Zugriffsbeschraenkung.
+    ohne vorherige Zugriffsbeschränkung.

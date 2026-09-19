@@ -1,5 +1,5 @@
 id: session_in_url
-title: Sitzungskennung in der URL uebertragen
+title: Sitzungskennung in der URL übertragen
 family: session_in_url
 category: D
 scale: hygiene
@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [zap]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn} ({url_path})"
 evidence: [http]
 references: [CWE-200, CWE-598]
@@ -33,17 +33,17 @@ policy:
 texts:
   observation: >-
     Die passive Webanalyse hat auf {group} eine Sitzungskennung gefunden, die in der Adresse
-    uebertragen wird: {affected}.
+    übertragen wird: {affected}.
   meaning: >-
     Eine Sitzungskennung in der Adresse landet in Protokolldateien, im Browserverlauf, in
-    Lesezeichen und im Referrer-Header nachfolgender Anfragen. Wer diese Adresse erhaelt, kann
-    unter Umstaenden die Sitzung uebernehmen.
+    Lesezeichen und im Referrer-Header nachfolgender Anfragen. Wer diese Adresse erhält, kann
+    unter Umständen die Sitzung übernehmen.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Die Sitzungskennung ausschliesslich ueber ein Cookie uebertragen und die Weitergabe
+        Die Sitzungskennung ausschließlich über ein Cookie übertragen und die Weitergabe
         per Adresse in der Anwendungs- oder Serverkonfiguration deaktivieren.
   verify: >-
-    Eine Anmeldung ueber den Browser durchfuehren und die Adresszeile sowie die aufgerufenen
-    Links auf eine Sitzungskennung im Text der Adresse pruefen; erwartet wird eine Adresse
+    Eine Anmeldung über den Browser durchführen und die Adresszeile sowie die aufgerufenen
+    Links auf eine Sitzungskennung im Text der Adresse prüfen; erwartet wird eine Adresse
     ohne Sitzungskennung.

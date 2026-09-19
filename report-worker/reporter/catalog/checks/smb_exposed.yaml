@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [nmap]
 kind: check
-bundle: null
+bundle: remote_admin_closed
 affected_template: "{host_ip}:{port} ({service})"
 evidence: [service]
 references: [CWE-284, OWASP2025-A05]
@@ -30,28 +30,28 @@ policy:
 texts:
   observation: >-
     Der Host {group} beantwortet Verbindungen auf SMB-Freigabeports aus dem gesamten Internet:
-    {affected}. Ein Datei- und Freigabedienst gehoert nicht an das oeffentliche Interface.
+    {affected}. Ein Datei- und Freigabedienst gehört nicht an das öffentliche Interface.
   meaning: >-
-    Ein von aussen erreichbarer SMB-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht
-    bekannte Schwachstellen der Dateifreigabe sofort ausnutzbar. Betroffen waeren die auf den
+    Ein von außen erreichbarer SMB-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht
+    bekannte Schwachstellen der Dateifreigabe sofort ausnutzbar. Betroffen wären die auf den
     Freigaben abgelegten Dateien und, bei erfolgreichem Zugriff, angebundene Systeme im internen
     Netz.
   recommendation:
     - stage: unverzueglich
       text: >-
         Den externen Zugriff auf die SMB-Ports in der Firewall oder in der Verwaltung des Hosters
-        deaktivieren. Dateifreigaben ausschliesslich innerhalb des internen Netzes anbieten.
+        deaktivieren. Dateifreigaben ausschließlich innerhalb des internen Netzes anbieten.
     - stage: in_kuerze
       text: >-
-        Zugriffsprotokolle der Freigabe auf fremde Anmeldeversuche pruefen und betroffene
-        Zugangsdaten vorsorglich aendern.
+        Zugriffsprotokolle der Freigabe auf fremde Anmeldeversuche prüfen und betroffene
+        Zugangsdaten vorsorglich ändern.
     - stage: mittelfristig
       text: >-
-        Fernzugriff auf Dateifreigaben ausschliesslich ueber ein VPN zulassen.
+        Fernzugriff auf Dateifreigaben ausschließlich über ein VPN zulassen.
   verify: >-
     Portscan der Ports 139 und 445 von einer externen Adresse aus wiederholen; erwartet wird der
     Zustand gefiltert oder geschlossen.
   positive:
     title: Kein SMB-Dienst aus dem Internet erreichbar
     text: >-
-      Auf {group} antwortet kein SMB-Dienst auf Verbindungen von aussen.
+      Auf {group} antwortet kein SMB-Dienst auf Verbindungen von außen.

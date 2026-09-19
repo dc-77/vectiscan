@@ -18,7 +18,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn}"
 evidence: [http]
 references: [CWE-319, OWASP2025-A02]
@@ -37,20 +37,20 @@ policy:
 texts:
   observation: >-
     Der Dienst {group} liefert seine Antworten ohne den HTTP Strict Transport Security Header, der
-    Browser dauerhaft auf die verschluesselte Verbindung festlegt: {affected}.
+    Browser dauerhaft auf die verschlüsselte Verbindung festlegt: {affected}.
   meaning: >-
-    Ohne diesen Header kann ein erster Aufruf ueber HTTP unbemerkt abgefangen oder auf eine
-    unverschluesselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift.
+    Ohne diesen Header kann ein erster Aufruf über HTTP unbemerkt abgefangen oder auf eine
+    unverschlüsselte Verbindung heruntergestuft werden, bevor eine Weiterleitung auf HTTPS greift.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Den Header Strict-Transport-Security mit einer ausreichenden Gueltigkeitsdauer setzen,
-        sobald der Hostname dauerhaft ueber HTTPS erreichbar ist.
+        Den Header Strict-Transport-Security mit einer ausreichenden Gültigkeitsdauer setzen,
+        sobald der Hostname dauerhaft über HTTPS erreichbar ist.
   verify: >-
-    HTTP-Antwortheader der Startseite von aussen abrufen; erwartet wird der gesetzte Header
+    HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird der gesetzte Header
     Strict-Transport-Security.
   positive:
     title: HTTP Strict Transport Security gesetzt
     text: >-
       Der Dienst {group} setzt den Header Strict-Transport-Security und legt Browser damit auf die
-      verschluesselte Verbindung fest.
+      verschlüsselte Verbindung fest.

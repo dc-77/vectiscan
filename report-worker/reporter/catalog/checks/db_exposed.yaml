@@ -32,27 +32,27 @@ policy:
 texts:
   observation: >-
     Der Host {group} beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet:
-    {affected}. Ein Datenbankdienst gehoert nicht an das oeffentliche Interface.
+    {affected}. Ein Datenbankdienst gehört nicht an das öffentliche Interface.
   meaning: >-
-    Ein von aussen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und
-    macht jede kuenftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen waeren die
+    Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und
+    macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die
     gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.
   recommendation:
     - stage: unverzueglich
       text: >-
         Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren.
-        Falls eine externe Anwendung ihn benoetigt, den Zugriff auf deren feste Quelladressen beschraenken.
+        Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.
     - stage: in_kuerze
       text: >-
         Datenbank-Zugangsdaten rotieren und die Zugriffsprotokolle der letzten Monate auf fremde
-        Anmeldeversuche pruefen.
+        Anmeldeversuche prüfen.
     - stage: mittelfristig
       text: >-
-        Administrativen Datenbankzugriff ausschliesslich ueber einen SSH-Tunnel oder ein VPN zulassen.
+        Administrativen Datenbankzugriff ausschließlich über einen SSH-Tunnel oder ein VPN zulassen.
   verify: >-
     Portscan der betroffenen Datenbankports von einer externen Adresse aus wiederholen; erwartet wird
     der Zustand gefiltert oder geschlossen.
   positive:
     title: Keine Datenbankdienste aus dem Internet erreichbar
     text: >-
-      Auf {group} antwortet kein Datenbankdienst auf Verbindungen von aussen.
+      Auf {group} antwortet kein Datenbankdienst auf Verbindungen von außen.

@@ -1,5 +1,5 @@
 id: cert_expiring
-title: TLS-Zertifikat laeuft in Kuerze ab
+title: TLS-Zertifikat läuft in Kürze ab
 family: cert_expiring
 category: D
 scale: hygiene
@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
+bundle: cert_health
 affected_template: "{target} ({days_left} Tage)"
 evidence: [tls]
 references: [CWE-298]
@@ -32,22 +32,22 @@ policy:
     den Dienst fuer alle Nutzer stoppt, sobald er eintritt; diese Einstufung wird uebernommen.
 texts:
   observation: >-
-    Fuer den Dienst {group} laeuft das eingesetzte TLS-Zertifikat in Kuerze ab: {affected}. Ohne
+    Für den Dienst {group} läuft das eingesetzte TLS-Zertifikat in Kürze ab: {affected}. Ohne
     rechtzeitige Erneuerung entsteht die gleiche Wirkung wie bei einem bereits abgelaufenen
     Zertifikat.
   meaning: >-
-    Laeuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, ist der Dienst fuer alle
+    Läuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, ist der Dienst für alle
     Nutzer mit einer Vertrauenswarnung oder einem Verbindungsabbruch konfrontiert. Ein kurzes
     Zeitfenster reicht oft nicht aus, um eine Erneuerung ungeplant nachzuholen.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Ein neues Zertifikat fuer den betroffenen Dienst rechtzeitig vor dem Ablaufdatum
+        Ein neues Zertifikat für den betroffenen Dienst rechtzeitig vor dem Ablaufdatum
         ausstellen und einspielen.
     - stage: strategisch
       text: >-
         Eine automatisierte Erneuerung des Zertifikats mit ausreichendem zeitlichem Vorlauf vor
         dem Ablauf einrichten.
   verify: >-
-    Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des praesentierten
-    Zertifikats pruefen; erwartet wird ein Vorlauf von mehr als 30 Tagen bis zum Ablauf.
+    Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des präsentierten
+    Zertifikats prüfen; erwartet wird ein Vorlauf von mehr als 30 Tagen bis zum Ablauf.

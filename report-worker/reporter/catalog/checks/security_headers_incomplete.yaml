@@ -1,5 +1,5 @@
 id: security_headers_incomplete
-title: Sicherheits-Header unvollstaendig
+title: Sicherheits-Header unvollständig
 family: security_headers_incomplete
 category: D
 scale: hygiene
@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn} (fehlend: {missing_headers_basic})"
 evidence: [http]
 references: [CWE-693, CWE-1021, OWASP2025-A06]
@@ -35,20 +35,20 @@ policy:
 texts:
   observation: >-
     Auf {group} fehlen Sicherheits-Header, die Browser vor Einbettung, MIME-Sniffing und
-    ungewollter Weitergabe von Referrer-Informationen schuetzen: {affected}.
+    ungewollter Weitergabe von Referrer-Informationen schützen: {affected}.
   meaning: >-
-    Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten moeglich; ohne
-    X-Content-Type-Options koennen aeltere Browser Inhalte falsch interpretieren. Die Auswirkung ist
-    gering, die Massnahme aber schnell umsetzbar.
+    Ohne Framing-Schutz sind Clickjacking-Szenarien auf Anmeldeseiten möglich; ohne
+    X-Content-Type-Options können ältere Browser Inhalte falsch interpretieren. Die Auswirkung ist
+    gering, die Maßnahme aber schnell umsetzbar.
   recommendation:
     - stage: mittelfristig
       text: >-
         Die Header X-Frame-Options (oder frame-ancestors in der CSP), X-Content-Type-Options,
         Referrer-Policy und Permissions-Policy in der Webserver-Konfiguration setzen.
   verify: >-
-    HTTP-Antwortheader der Startseite von aussen abrufen; erwartet werden die vier genannten Header.
+    HTTP-Antwortheader der Startseite von außen abrufen; erwartet werden die vier genannten Header.
   positive:
-    title: Sicherheits-Header vollstaendig
+    title: Sicherheits-Header vollständig
     text: >-
       Auf {group} sind die Sicherheits-Header X-Frame-Options, X-Content-Type-Options,
       Referrer-Policy und Permissions-Policy gesetzt.

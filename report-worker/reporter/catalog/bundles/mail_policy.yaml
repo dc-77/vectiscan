@@ -1,0 +1,35 @@
+id: mail_policy
+title: Richtlinie zur Absender-Authentizität für {group} nicht durchsetzend
+category: C
+merge_by: domain
+members: [dmarc_missing, dmarc_none, dmarc_quarantine, spf_softfail, spf_permissive]
+target: findings
+references: [CWE-290]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+texts:
+  observation: >-
+    Für {group} sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt:
+    {affected}.
+  meaning: >-
+    Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen,
+    weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit
+    wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.
+    - stage: mittelfristig
+      text: >-
+        Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst
+        sind, und den Abgleich der Absender scharf schalten.
+  verify: >-
+    DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte
+    Nachrichten zurückweist.
+  positive:
+    title: Richtlinie zur Absender-Authentizität weist gefälschte Nachrichten ab
+    text: >-
+      Für {group} ist die Richtlinie zur Absender-Authentizität durchsetzend gesetzt.

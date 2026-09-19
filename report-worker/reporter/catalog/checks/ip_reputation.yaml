@@ -1,5 +1,5 @@
 id: ip_reputation
-title: Oeffentliche IP-Adresse mit auffaelliger Reputationsbewertung
+title: Öffentliche IP-Adresse mit auffälliger Reputationsbewertung
 family: ip_reputation
 category: E
 scale: hygiene
@@ -18,7 +18,7 @@ undetermined: pass_silent
 requires:
   tools: [abuseipdb]
 kind: check
-bundle: null
+bundle: reputation_clean
 affected_template: "{host_ip} (AbuseIPDB {abuseipdb_score})"
 evidence: [host]
 references: [CWE-284]
@@ -33,27 +33,27 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Externe Reputationsquellen fuehren die oeffentliche Adresse von {group} als auffaellig:
-    {affected}. Die Bewertung stammt aus mehreren unabhaengigen Quellen zu Missbrauchsmeldungen
-    und Schadsoftware-Aktivitaet.
+    Externe Reputationsquellen führen die öffentliche Adresse von {group} als auffällig:
+    {affected}. Die Bewertung stammt aus mehreren unabhängigen Quellen zu Missbrauchsmeldungen
+    und Schadsoftware-Aktivität.
   meaning: >-
-    Eine auffaellige Reputationsbewertung deutet auf fruehere Missbrauchsmeldungen, eine
-    Kompromittierung oder eine Weiterverwendung der Adresse fuer Angriffsinfrastruktur hin.
-    Andere Systeme koennen Verbindungen von einer so bewerteten Adresse automatisch blockieren
-    oder als verdaechtig einstufen.
+    Eine auffällige Reputationsbewertung deutet auf frühere Missbrauchsmeldungen, eine
+    Kompromittierung oder eine Weiterverwendung der Adresse für Angriffsinfrastruktur hin.
+    Andere Systeme können Verbindungen von einer so bewerteten Adresse automatisch blockieren
+    oder als verdächtig einstufen.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Die eigenen Systeme auf dieser Adresse auf Schadsoftware und ungewoehnliche
-        Netzwerkaktivitaet pruefen.
+        Die eigenen Systeme auf dieser Adresse auf Schadsoftware und ungewöhnliche
+        Netzwerkaktivität prüfen.
     - stage: mittelfristig
       text: >-
-        Nach Beseitigung der Ursache eine Loeschung oder Korrektur der Bewertung bei den
+        Nach Beseitigung der Ursache eine Löschung oder Korrektur der Bewertung bei den
         jeweiligen Reputationsquellen beantragen.
   verify: >-
-    Erneute Abfrage gaengiger Reputationsquellen fuer die betroffene Adresse; erwartet wird eine
-    unauffaellige Bewertung.
+    Erneute Abfrage gängiger Reputationsquellen für die betroffene Adresse; erwartet wird eine
+    unauffällige Bewertung.
   positive:
-    title: Keine Eintraege in Reputationsquellen
+    title: Keine Einträge in Reputationsquellen
     text: >-
-      Fuer {group} liegen keine Eintraege in gaengigen Reputationsquellen vor.
+      Für {group} liegen keine Einträge in gängigen Reputationsquellen vor.

@@ -142,6 +142,41 @@ class CheckSpec(Base):
         return self.positive_when if self.positive_when in POSITIVE_MODES else "expr"
 
 
+# ---------------------------------------------------------------- Befund-Buendel
+
+class BundleSpec(Base):
+    """Ein Buendel fasst mehrere Pruefungen zu einem Befund des Kundenreports zusammen.
+
+    Mitgliedschaft steht doppelt: hier in ``members`` und im Feld ``bundle`` der
+    Pruefung. Der Ladevorgang erzwingt, dass beide Seiten uebereinstimmen, damit eine
+    halb gepflegte Zuordnung ein Ladefehler ist und keine stille Luecke.
+
+    ``merge_by`` bestimmt, wie die Gruppen der Mitglieder zu einem Befund
+    zusammenlaufen: ``global`` ein Befund fuer den ganzen Scan, ``domain`` je Domain,
+    ``host`` je Host-IP (auch fuer FQDN-Gruppen, die IP steht im Gruppenschluessel),
+    ``fqdn`` je virtuellem Host.
+
+    ``target: appendix`` haelt ein Buendel aus der Befundliste heraus und schreibt es in
+    den Anhang "Werkzeugbefunde ohne Bewertung" (spec/06 Abschnitt 4, Stufe 2).
+    """
+
+    id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,63}$")
+    title: str
+    category: Category
+    merge_by: GroupBy
+    members: list[str] = Field(min_length=1)
+    target: Literal["findings", "appendix"] = "findings"
+    references: list[str] = Field(default_factory=list)
+    frameworks: Frameworks = Field(default_factory=Frameworks)
+    texts: Texts
+
+    @model_validator(mode="after")
+    def _members_unique(self) -> "BundleSpec":
+        if len(set(self.members)) != len(self.members):
+            raise ValueError(f"{self.id}: doppelte Mitglieder")
+        return self
+
+
 # ---------------------------------------------------------------- Ignorierliste
 
 class IgnoreEntry(Base):
@@ -297,6 +332,7 @@ class CatalogOutput(Base):
     domains: list[str] = Field(default_factory=list)
     generator: dict[str, Any] = Field(default_factory=dict)
     checks: list[CheckInfo] = Field(default_factory=list)
+    bundles: list[BundleSpec] = Field(default_factory=list)
     results: list[CheckResult] = Field(default_factory=list)
     rollups: list[CheckRollup] = Field(default_factory=list)
     unprocessed: list[Unprocessed] = Field(default_factory=list)

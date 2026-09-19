@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
+bundle: tls_hardening
 affected_template: "{target}"
 evidence: [tls]
 references: [CWE-757]
@@ -30,17 +30,17 @@ policy:
 texts:
   observation: >-
     Der Dienst {group} bietet noch veraltete Protokollversionen an und signalisiert dabei keinen
-    Fallback-SCSV-Schutz vor einer erzwungenen Rueckstufung der Verbindung: {affected}.
+    Fallback-SCSV-Schutz vor einer erzwungenen Rückstufung der Verbindung: {affected}.
   meaning: >-
-    Ohne dieses Signal kann eine Gegenstelle auf dem Uebertragungsweg einen Verbindungsabbruch
-    erzwingen, der Client und Server zu einer aelteren, schwaecheren Protokollversion greifen
-    laesst. Relevant ist das nur, solange der Dienst diese aelteren Versionen ueberhaupt noch
+    Ohne dieses Signal kann eine Gegenstelle auf dem Übertragungsweg einen Verbindungsabbruch
+    erzwingen, der Client und Server zu einer älteren, schwächeren Protokollversion greifen
+    lässt. Relevant ist das nur, solange der Dienst diese älteren Versionen überhaupt noch
     anbietet.
   recommendation:
     - stage: mittelfristig
       text: >-
         Fallback SCSV in der TLS-Konfiguration aktivieren oder, alternativ, die veralteten
-        Protokollversionen vollstaendig abschalten.
+        Protokollversionen vollständig abschalten.
   verify: >-
-    Verbindungsversuch mit einer erzwungenen Rueckstufung gegen den Dienst durchfuehren;
+    Verbindungsversuch mit einer erzwungenen Rückstufung gegen den Dienst durchführen;
     erwartet wird eine Ablehnung durch den Server.

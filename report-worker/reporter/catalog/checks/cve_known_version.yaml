@@ -34,23 +34,23 @@ policy:
     nicht.
 texts:
   observation: >-
-    Fuer {group} listet eine externe Bedrohungsdatenbank eine Schwachstelle mit hoher
+    Für {group} listet eine externe Bedrohungsdatenbank eine Schwachstelle mit hoher
     Risikobewertung in eingesetzter Software: {affected}. Die Bewertung stammt aus dem
     Nationalen Schwachstellenregister oder aus dessen Ausnutzungswahrscheinlichkeit.
   meaning: >-
     Eine hohe externe Risikobewertung zeigt eine leicht ausnutzbare oder wahrscheinlich bald
     ausgenutzte Schwachstelle in eingesetzter Software. Ohne Aktualisierung bleibt der Dienst
-    angreifbar, auch wenn noch kein bestaetigter Angriff bekannt ist.
+    angreifbar, auch wenn noch kein bestätigter Angriff bekannt ist.
   recommendation:
     - stage: in_kuerze
       text: >-
         Die betroffene Software auf eine Version ohne die genannte Schwachstelle aktualisieren
-        oder den Zugriff auf feste, vertrauenswuerdige Quellnetze beschraenken.
+        oder den Zugriff auf feste, vertrauenswürdige Quellnetze beschränken.
     - stage: mittelfristig
       text: >-
-        Einen festen Update-Rhythmus fuer die betroffene Software festlegen und
+        Einen festen Update-Rhythmus für die betroffene Software festlegen und
         Sicherheitshinweise des Herstellers laufend verfolgen.
   verify: >-
-    Versionsstand der betroffenen Software pruefen und mit dem Sicherheitshinweis zur genannten
+    Versionsstand der betroffenen Software prüfen und mit dem Sicherheitshinweis zur genannten
     Schwachstelle abgleichen; erwartet wird eine Version, die die Schwachstelle nicht mehr
     aufweist.

@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [zap]
 kind: check
-bundle: null
+bundle: tool_findings_unrated
 affected_template: "{fqdn} ({name}, {risk})"
 evidence: [http]
 references: [CWE-937, CWE-1104]
@@ -36,13 +36,13 @@ texts:
     bekannten Schwachstellen erkannt: {affected}.
   meaning: >-
     Eine veraltete clientseitige Bibliothek kann bekannte Schwachstellen enthalten, die im
-    Browser der Besucher ausgenutzt werden koennen, etwa durch das Einschleusen von
-    Skriptcode ueber die betroffene Bibliothek.
+    Browser der Besucher ausgenutzt werden können, etwa durch das Einschleusen von
+    Skriptcode über die betroffene Bibliothek.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Die gemeldete Bibliothek auf die aktuelle, vom Hersteller unterstuetzte Version
+        Die gemeldete Bibliothek auf die aktuelle, vom Hersteller unterstützte Version
         anheben oder durch eine weiterhin gepflegte Alternative ersetzen.
   verify: >-
-    Die eingebundenen Skriptdateien der Seite pruefen und die Versionsangabe der gemeldeten
+    Die eingebundenen Skriptdateien der Seite prüfen und die Versionsangabe der gemeldeten
     Bibliothek mit dem aktuellen Stand des Herstellers abgleichen.

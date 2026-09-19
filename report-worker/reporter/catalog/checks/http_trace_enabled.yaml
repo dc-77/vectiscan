@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [nmap]
 kind: check
-bundle: null
+bundle: banner_disclosure
 affected_template: "{host_ip}:{port} (TRACE aktiv)"
 evidence: [service]
 references: [CWE-16, OWASP2025-A05]
@@ -30,16 +30,16 @@ policy:
 texts:
   observation: >-
     Der Webdienst auf {group} akzeptiert die HTTP-Methode TRACE: {affected}. Der Server
-    spiegelt dabei die gesendete Anfrage in der Antwort zurueck.
+    spiegelt dabei die gesendete Anfrage in der Antwort zurück.
   meaning: >-
     Eine aktivierte TRACE-Methode kann zusammen mit anderen Schwachstellen im Browser genutzt
-    werden, um Inhalte auszulesen, die per Skript eigentlich nicht zugaenglich sein sollten, etwa
+    werden, um Inhalte auszulesen, die per Skript eigentlich nicht zugänglich sein sollten, etwa
     Cookies oder Autorisierungs-Header.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die HTTP-Methode TRACE auf dem Webserver deaktivieren; fuer den normalen Betrieb einer
-        Website wird sie nicht benoetigt.
+        Die HTTP-Methode TRACE auf dem Webserver deaktivieren; für den normalen Betrieb einer
+        Website wird sie nicht benötigt.
   verify: >-
     Eine HTTP-Anfrage mit der Methode TRACE an den Dienst senden; erwartet wird eine Ablehnung
     mit dem Status 405 oder 501.

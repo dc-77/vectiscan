@@ -1,0 +1,32 @@
+id: dns_hygiene
+title: DNS-Absicherung für {group} nicht eingerichtet
+category: E
+merge_by: domain
+members: [dnssec_missing, caa_missing]
+target: findings
+references: [CWE-350]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+texts:
+  observation: >-
+    Für {group} fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten
+    eingrenzen: {affected}.
+  meaning: >-
+    Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten
+    verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf
+    jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.
+  recommendation:
+    - stage: strategisch
+      text: >-
+        Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen
+        Zertifizierungsstellen im DNS eingrenzen.
+  verify: >-
+    DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein
+    gültiger Eintrag.
+  positive:
+    title: DNS-Antworten signiert und Ausstellung von Zertifikaten eingegrenzt
+    text: >-
+      Für {group} sind die Einträge zur Absicherung der DNS-Antworten vorhanden.

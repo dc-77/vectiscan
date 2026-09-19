@@ -1,0 +1,41 @@
+id: plaintext_services
+title: Datei- und Mailzugänge auf {group} ohne erzwungene Transportverschlüsselung
+category: A
+merge_by: host
+members: [ftp_plaintext, mail_plaintext]
+target: findings
+references: [CWE-319, CWE-522]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+texts:
+  observation: >-
+    Auf {group} nehmen Datei- oder Mailzugänge eine Anmeldung entgegen, ohne eine
+    Transportverschlüsselung zu erzwingen: {affected}.
+  meaning: >-
+    Ohne erzwungene Transportverschlüsselung gehen Anmeldedaten und Inhalte im Klartext über das
+    Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf
+    den Dienst oder auf wiederverwendete Konten nutzen.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung
+        ohne aufgebautes TLS abgelehnt wird.
+    - stage: in_kuerze
+      text: >-
+        Zugangsdaten rotieren und die Zugriffsprotokolle auf unverschlüsselte Anmeldeversuche
+        prüfen.
+    - stage: mittelfristig
+      text: >-
+        Prüfen, ob die Klartextzugänge abgeschaltet werden können, und den Zugang danach auf
+        Protokolle mit eingebauter Verschlüsselung beschränken.
+  verify: >-
+    Anmeldung an den genannten Diensten versuchen, bevor eine Transportverschlüsselung aufgebaut
+    ist; erwartet wird die Ablehnung dieser Anmeldung.
+  positive:
+    title: Datei- und Mailzugänge erzwingen TLS vor der Anmeldung
+    text: >-
+      Auf {group} lehnen die Datei- und Mailzugänge eine Anmeldung ohne aufgebaute
+      Transportverschlüsselung ab.

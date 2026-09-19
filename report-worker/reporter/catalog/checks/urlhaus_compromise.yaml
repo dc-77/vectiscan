@@ -15,7 +15,7 @@ undetermined: not_applicable
 requires:
   tools: [urlhaus]
 kind: check
-bundle: null
+bundle: reputation_clean
 affected_template: "{domain} (URLhaus)"
 evidence: [passive]
 references: [CWE-506]
@@ -30,31 +30,31 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Eine oeffentliche Bedrohungsdatenbank zur Schadsoftware-Verteilung meldet fuer {group} einen
+    Eine öffentliche Bedrohungsdatenbank zur Schadsoftware-Verteilung meldet für {group} einen
     aktiven Treffer: {affected}.
   meaning: >-
     Ein aktiver Treffer in einer Malware-Verteilungsdatenbank bedeutet, dass das Ziel
     nachweislich zur Verbreitung von Schadsoftware oder als Teil einer Angriffsinfrastruktur
     genutzt wird. Besuchende und andere Systeme, die mit dem Ziel verbinden, sind unmittelbar
-    gefaehrdet.
+    gefährdet.
   recommendation:
     - stage: unverzueglich
       text: >-
         Das betroffene Ziel vom Netz trennen oder abschalten, bis die Ursache der
-        Kompromittierung geklaert und beseitigt ist.
+        Kompromittierung geklärt und beseitigt ist.
     - stage: unverzueglich
       text: >-
-        Systeme, die mit dem Ziel verbunden waren, auf Schadsoftware und ungewoehnliche
-        Aktivitaet pruefen.
+        Systeme, die mit dem Ziel verbunden waren, auf Schadsoftware und ungewöhnliche
+        Aktivität prüfen.
     - stage: mittelfristig
       text: >-
-        Zugangsdaten und Schluessel des betroffenen Systems erneuern und die Meldung nach der
-        Bereinigung zur Loeschung bei der Bedrohungsdatenbank einreichen.
+        Zugangsdaten und Schlüssel des betroffenen Systems erneuern und die Meldung nach der
+        Bereinigung zur Löschung bei der Bedrohungsdatenbank einreichen.
   verify: >-
-    Erneute Abfrage der Bedrohungsdatenbank fuer das betroffene Ziel; erwartet wird kein aktiver
+    Erneute Abfrage der Bedrohungsdatenbank für das betroffene Ziel; erwartet wird kein aktiver
     Eintrag mehr.
   positive:
-    title: Keine Eintraege in Malware-Feeds
+    title: Keine Einträge in Malware-Feeds
     text: >-
-      Fuer {group} liegt kein Treffer in oeffentlichen Datenbanken zur Schadsoftware-Verteilung
+      Für {group} liegt kein Treffer in öffentlichen Datenbanken zur Schadsoftware-Verteilung
       vor.

@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [zap]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn} ({name})"
 evidence: [http]
 references: [CWE-942, CWE-346]
@@ -32,18 +32,18 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Die passive Webanalyse hat auf {group} eine zu weit gefasste Freigabe fuer
-    ursprungsuebergreifende Zugriffe (CORS) gefunden: {affected}.
+    Die passive Webanalyse hat auf {group} eine zu weit gefasste Freigabe für
+    ursprungsübergreifende Zugriffe (CORS) gefunden: {affected}.
   meaning: >-
-    Erlaubt eine Antwort Zugriffe von beliebigen oder nicht vertrauenswuerdigen Ursprungen,
+    Erlaubt eine Antwort Zugriffe von beliebigen oder nicht vertrauenswürdigen Ursprungen,
     kann eine fremde Seite im Namen eines angemeldeten Nutzers Daten der Anwendung auslesen.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Die Freigabe fuer ursprungsuebergreifende Zugriffe auf die tatsaechlich benoetigten
-        Ursprunge einschraenken und einen Platzhalter fuer beliebige Ursprunge entfernen,
+        Die Freigabe für ursprungsübergreifende Zugriffe auf die tatsächlich benötigten
+        Ursprunge einschränken und einen Platzhalter für beliebige Ursprunge entfernen,
         insbesondere in Verbindung mit Anmeldedaten.
   verify: >-
     Eine Anfrage mit einem fremden Ursprung an die betroffene Adresse stellen und den
-    Antwortheader fuer die Zugriffsfreigabe pruefen; erwartet wird ein Wert, der nur die
-    eigenen Ursprunge zulaesst.
+    Antwortheader für die Zugriffsfreigabe prüfen; erwartet wird ein Wert, der nur die
+    eigenen Ursprunge zulässt.

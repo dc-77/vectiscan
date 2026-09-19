@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn} ({name}: {flags_missing})"
 evidence: [http]
 references: [CWE-614, CWE-1004]
@@ -34,15 +34,15 @@ texts:
   observation: >-
     Auf {group} setzen Cookies nicht alle Sicherheits-Attribute: {affected}.
   meaning: >-
-    Ohne das Attribut Secure kann ein Cookie auch ueber eine unverschluesselte Verbindung
-    uebertragen werden. Ohne HttpOnly kann clientseitiges Skript auf das Cookie zugreifen, etwa
+    Ohne das Attribut Secure kann ein Cookie auch über eine unverschlüsselte Verbindung
+    übertragen werden. Ohne HttpOnly kann clientseitiges Skript auf das Cookie zugreifen, etwa
     nach einer erfolgreichen Einschleusung von Fremdinhalten. Ohne SameSite kann das Cookie bei
     Anfragen von anderen Seiten mitgesendet werden.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die Attribute Secure, HttpOnly und SameSite fuer alle Cookies setzen, die eine Sitzung
+        Die Attribute Secure, HttpOnly und SameSite für alle Cookies setzen, die eine Sitzung
         oder eine Anmeldung betreffen.
   verify: >-
-    HTTP-Antwortheader Set-Cookie der Startseite von aussen abrufen; erwartet werden die
+    HTTP-Antwortheader Set-Cookie der Startseite von außen abrufen; erwartet werden die
     Attribute Secure, HttpOnly und SameSite bei jedem Cookie.

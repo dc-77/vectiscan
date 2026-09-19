@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: null
+bundle: web_header_hygiene
 affected_template: "{fqdn} ({duplicate_headers})"
 evidence: [http]
 references: [CWE-693]
@@ -29,18 +29,18 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Die Webantwort von {group} enthaelt denselben Antwortheader mehrfach mit unterschiedlichen
+    Die Webantwort von {group} enthält denselben Antwortheader mehrfach mit unterschiedlichen
     Werten: {affected}.
   meaning: >-
     Browser und vorgelagerte Systeme werten mehrfach gesetzte Header uneinheitlich aus, manche
     nehmen den ersten, andere den letzten Wert. Damit ist nicht sichergestellt, welche der
-    gesetzten Schutzwirkungen tatsaechlich beim Browser ankommt.
+    gesetzten Schutzwirkungen tatsächlich beim Browser ankommt.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die Webserver- und Anwendungskonfiguration darauf pruefen, an welcher Stelle der doppelte
+        Die Webserver- und Anwendungskonfiguration darauf prüfen, an welcher Stelle der doppelte
         Header gesetzt wird, und den Header nur noch an einer Stelle mit einem eindeutigen Wert
         ausliefern.
   verify: >-
-    HTTP-Antwortheader der genannten Adresse von aussen abrufen; erwartet wird jeder Header genau
+    HTTP-Antwortheader der genannten Adresse von außen abrufen; erwartet wird jeder Header genau
     einmal mit einem eindeutigen Wert.

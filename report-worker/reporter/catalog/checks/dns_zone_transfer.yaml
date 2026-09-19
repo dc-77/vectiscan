@@ -1,5 +1,5 @@
 id: dns_zone_transfer
-title: DNS-Zonentransfer moeglich
+title: DNS-Zonentransfer möglich
 family: dns_axfr
 category: C
 scale: exposure
@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [dns_records]
 kind: check
-bundle: null
+bundle: dns_integrity
 affected_template: "{domain} ({ns})"
 evidence: [dns]
 references: [CWE-200, RFC-5936]
@@ -32,22 +32,22 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Fuer {affected} laesst ein Nameserver der Domain {domain} einen vollstaendigen Zonentransfer
+    Für {affected} lässt ein Nameserver der Domain {domain} einen vollständigen Zonentransfer
     zu. Damit kann jede anfragende Gegenstelle die komplette Liste der Hostnamen der Zone auf
     einmal abrufen.
   meaning: >-
-    Ein Zonentransfer liefert alle in der Zone hinterlegten Eintraege, auch solche ohne eigenen
-    Verweis von aussen. Das erleichtert die Aufklaerung der internen Struktur und die Suche nach
-    weniger beachteten Hostnamen fuer einen weiteren Angriff.
+    Ein Zonentransfer liefert alle in der Zone hinterlegten Einträge, auch solche ohne eigenen
+    Verweis von außen. Das erleichtert die Aufklärung der internen Struktur und die Suche nach
+    weniger beachteten Hostnamen für einen weiteren Angriff.
   recommendation:
     - stage: unverzueglich
       text: >-
-        Zonentransfer auf den Nameservern auf die berechtigten sekundaeren Nameserver
-        beschraenken und fuer alle anderen Anfragenden verweigern.
+        Zonentransfer auf den Nameservern auf die berechtigten sekundären Nameserver
+        beschränken und für alle anderen Anfragenden verweigern.
   verify: >-
-    Zonentransfer fuer die Domain {domain} gegen die genannten Nameserver von einer externen
+    Zonentransfer für die Domain {domain} gegen die genannten Nameserver von einer externen
     Adresse aus anfordern; erwartet wird eine Verweigerung.
   positive:
     title: Zonentransfer abgewiesen
     text: >-
-      Fuer die Domain {domain} weisen die Nameserver einen vollstaendigen Zonentransfer ab.
+      Für die Domain {domain} weisen die Nameserver einen vollständigen Zonentransfer ab.

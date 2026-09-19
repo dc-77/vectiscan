@@ -1,5 +1,5 @@
 id: admin_service_exposed
-title: Verwaltungsoberflaeche aus dem Internet erreichbar
+title: Verwaltungsoberfläche aus dem Internet erreichbar
 family: admin_service_exposed
 category: A
 scale: exposure
@@ -29,26 +29,26 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} bietet eine Verwaltungs- oder Firewall-Oberflaeche an, die aus dem gesamten
-    Internet erreichbar ist: {affected}. Eine Zugriffsbeschraenkung auf bestimmte Quellnetze ist
-    von aussen nicht erkennbar.
+    Der Host {group} bietet eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten
+    Internet erreichbar ist: {affected}. Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist
+    von außen nicht erkennbar.
   meaning: >-
-    Verwaltungsoberflaechen sind ein hochwertiges Ziel: Eine Uebernahme betrifft den gesamten
-    Anschluss inklusive der dahinter liegenden Systeme. Angreifer koennen Anmeldedaten erraten oder
+    Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten
+    Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder
     bekannte Schwachstellen der Verwaltungssoftware ausnutzen.
   recommendation:
     - stage: unverzueglich
       text: >-
-        Zugriff auf die Verwaltungsoberflaeche auf die benoetigten Quellnetze beschraenken, etwa
-        ueber die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.
+        Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa
+        über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.
     - stage: in_kuerze
       text: >-
-        Mehrfaktor-Anmeldung fuer die Verwaltungsoberflaeche aktivieren und Standardkonten
+        Mehrfaktor-Anmeldung für die Verwaltungsoberfläche aktivieren und Standardkonten
         deaktivieren oder umbenennen.
     - stage: mittelfristig
       text: >-
-        Softwarestand der Verwaltungsoberflaeche gegen die Sicherheitshinweise des Herstellers
-        abgleichen und Anmeldeversuche ueberwachen.
+        Softwarestand der Verwaltungsoberfläche gegen die Sicherheitshinweise des Herstellers
+        abgleichen und Anmeldeversuche überwachen.
   verify: >-
-    Verbindungsversuch auf den betroffenen Port von einer externen Adresse ausserhalb der
-    freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschraenkung.
+    Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der
+    freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung.

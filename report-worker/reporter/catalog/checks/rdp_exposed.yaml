@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [nmap]
 kind: check
-bundle: null
+bundle: remote_admin_closed
 affected_template: "{host_ip}:{port} (RDP)"
 evidence: [service]
 references: [CWE-284, OWASP2025-A05]
@@ -34,24 +34,24 @@ policy:
 texts:
   observation: >-
     Der Host {group} beantwortet Verbindungen auf dem RDP-Port aus dem gesamten Internet:
-    {affected}. Ein Fernwartungsdienst gehoert nicht an das oeffentliche Interface.
+    {affected}. Ein Fernwartungsdienst gehört nicht an das öffentliche Interface.
   meaning: >-
-    Ein von aussen erreichbarer RDP-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht
-    jede kuenftige Schwachstelle im Fernwartungsdienst sofort ausnutzbar. Bei erfolgreichem Zugriff
+    Ein von außen erreichbarer RDP-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht
+    jede künftige Schwachstelle im Fernwartungsdienst sofort ausnutzbar. Bei erfolgreichem Zugriff
     ist der gesamte angemeldete Arbeitsplatz oder Server betroffen.
   recommendation:
     - stage: unverzueglich
       text: >-
         Den externen RDP-Zugriff in der Firewall oder in der Verwaltung des Hosters deaktivieren.
-        Falls Fernwartung von aussen benoetigt wird, den Zugriff ueber ein VPN mit
-        Mehrfaktor-Anmeldung fuehren.
+        Falls Fernwartung von außen benötigt wird, den Zugriff über ein VPN mit
+        Mehrfaktor-Anmeldung führen.
     - stage: in_kuerze
       text: >-
-        Anmeldeprotokolle des betroffenen Systems auf fremde Anmeldeversuche pruefen und eine
+        Anmeldeprotokolle des betroffenen Systems auf fremde Anmeldeversuche prüfen und eine
         Kontosperrung nach mehreren Fehlversuchen aktivieren.
     - stage: mittelfristig
       text: >-
-        Zusaetzliche Zugriffsschutzmechanismen vor den Fernwartungsdienst schalten, etwa eine
+        Zusätzliche Zugriffsschutzmechanismen vor den Fernwartungsdienst schalten, etwa eine
         Netzwerk-Ebenen-Authentifizierung oder ein Gateway mit Mehrfaktor-Anmeldung.
   verify: >-
     Portscan des Ports 3389 von einer externen Adresse aus wiederholen; erwartet wird der Zustand
@@ -59,4 +59,4 @@ texts:
   positive:
     title: Kein RDP-Dienst aus dem Internet erreichbar
     text: >-
-      Auf {group} antwortet kein Fernwartungsdienst auf RDP-Verbindungen von aussen.
+      Auf {group} antwortet kein Fernwartungsdienst auf RDP-Verbindungen von außen.
