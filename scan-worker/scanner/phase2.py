@@ -1209,7 +1209,10 @@ def run_phase2(
         r: dict[str, Any] = {}
         if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
             publish_event(order_id, {"type": "tool_starting", "tool": "testssl", "host": ip})
-            testssl_sev = (config or {}).get("testssl_severity", "MEDIUM")
+            # Issue #9: Default ist der leere Filter. Frueher stand hier
+            # "MEDIUM", dadurch trug das Tar-JSON weder LOW- noch OK-Zeilen
+            # und die TLS-Pruefungen des Katalogs konnten nichts entscheiden.
+            testssl_sev = (config or {}).get("testssl_severity", "")
             # WebCheck = Schnellscan → fast_mode aktivieren.
             testssl_fast = (config or {}).get("package", "") in ("webcheck", "basic")
             testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id,

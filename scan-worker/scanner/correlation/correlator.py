@@ -94,6 +94,12 @@ class CorrelatedFinding:
 # Finding extraction from Phase 2 results
 # ---------------------------------------------------------------------------
 
+# Issue #9: testssl-Eintraege unterhalb MEDIUM werden nicht zu Findings.
+# Sie stehen weiter vollstaendig im Tar-JSON (hosts/<ip>/phase2/testssl.json)
+# und damit in facts.json; die v2-Befundliste bleibt dadurch unveraendert.
+_TESTSSL_REPORTED_SEVERITIES = frozenset({"medium", "high", "critical"})
+
+
 def extract_findings(phase2_results: list[dict[str, Any]]) -> list[Finding]:
     """Extract normalized findings from all Phase 2 host results."""
     findings: list[Finding] = []
@@ -106,15 +112,15 @@ def extract_findings(phase2_results: list[dict[str, Any]]) -> list[Finding]:
         testssl = host_result.get("testssl")
         if isinstance(testssl, list):
             for entry in testssl:
-                sev = entry.get("severity", "INFO").lower()
-                if sev in ("ok", "info"):
-                    sev = "info"
-                elif sev in ("low",):
-                    sev = "low"
-                elif sev in ("medium",):
-                    sev = "medium"
-                elif sev in ("high", "critical"):
-                    sev = "high"
+                raw_sev = entry.get("severity", "INFO").lower()
+                # Issue #9: testssl laeuft seit S2b ohne --severity-Filter,
+                # damit das Tar auch Protokoll- und OK-Zeilen traegt, die der
+                # Pruefkatalog braucht. Fuer die v2-Korrelation zaehlen wie
+                # bisher nur MEDIUM und hoeher; sonst entstuenden hunderte
+                # Info-Findings je Host, die es vorher nie gab.
+                if raw_sev not in _TESTSSL_REPORTED_SEVERITIES:
+                    continue
+                sev = "high" if raw_sev in ("high", "critical") else "medium"
 
                 # Extract CVE from testssl if present
                 cve_id = None
