@@ -569,6 +569,27 @@ def classify_exit(tool_name: str, exit_code: Optional[int]) -> str:
         return "failed"
 
 
+def domain_labeled_json(payload: object, domain: Optional[str],
+                        limit: int = 50000) -> str:
+    """raw_output einer domainweiten Zeile mit Domain-Etikett (Issue #12).
+
+    scan_results hat keine Domainspalte. Domainweite Zeilen (host_ip NULL)
+    trugen deshalb keine Zuordnung, und der Report-Worker hat sie alle dem
+    Primaerziel zugeschlagen. Das Etikett steht als ``_domain`` im JSON, analog
+    zum vorhandenen ``{"vhost": ..., "result": ...}`` bei header_check.
+
+    Zwei Festlegungen:
+    - Der Schluessel heisst ``_domain`` und nicht ``domain``: securitytrails,
+      otx, urlhaus und shodan_domain fuehren ``domain`` bereits als Nutzdaten.
+    - Das Etikett steht vorn, damit es die Laengenkappung ueberlebt. Ein
+      abgeschnittenes JSON ist ohnehin nicht mehr lesbar, dann faellt der
+      Leser auf das bisherige Verhalten zurueck.
+    """
+    if isinstance(payload, dict) and domain:
+        payload = {"_domain": domain, **payload}
+    return json.dumps(payload, ensure_ascii=False)[:limit]
+
+
 def record_tool_run(
     order_id: Optional[str],
     host_ip: Optional[str],

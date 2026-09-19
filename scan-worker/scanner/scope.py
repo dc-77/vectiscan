@@ -101,6 +101,31 @@ def derive_primary_domain(targets: list[ScanTarget]) -> str:
     return "unknown"
 
 
+# Deckel fuer die zusaetzlichen Domainlaeufe (Issue #12). Eine Order darf bis
+# zu 10 Eingabezeilen tragen; jede weitere Domain kostet DNS-Abfragen und eine
+# WHOIS-Anfrage, und Registries drosseln. Was darueber liegt, bekommt eine
+# skipped-Zeile statt eines stillen Auslassens.
+MAX_EXTRA_DOMAINS = 5
+
+
+def derive_domains(targets: list[ScanTarget]) -> list[str]:
+    """Alle Domains einer Order, Primaerziel zuerst (Issue #12).
+
+    ``derive_primary_domain`` reduziert die Zielliste auf eine Domain; die
+    zweite Domain bekam dadurch weder DNS- noch Passivfakten. Diese Funktion
+    liefert die vollstaendige, deduplizierte Liste in stabiler Reihenfolge.
+    IP- und CIDR-Ziele sind keine Domains und bleiben aussen vor.
+    """
+    primary = derive_primary_domain(targets)
+    domains = [primary] if primary and primary != "unknown" else []
+    for t in targets:
+        if t.target_type not in ("fqdn_root", "fqdn_specific"):
+            continue
+        if t.canonical and t.canonical not in domains:
+            domains.append(t.canonical)
+    return domains
+
+
 def build_partial_inventory_for_non_enumerate(
     targets: list[ScanTarget],
 ) -> list[dict[str, Any]]:

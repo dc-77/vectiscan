@@ -6,6 +6,7 @@ Results enrich the AI Host Strategy with better context.
 
 import json
 import os
+import re
 import time
 from typing import Any
 
@@ -21,7 +22,7 @@ from scanner.passive.otx_client import OTXClient
 from scanner.passive.virustotal_client import VirusTotalClient
 from scanner.passive.dns_security import run_all_dns_security
 from scanner.progress import publish_event
-from scanner.tools import record_tool_run
+from scanner.tools import record_tool_run, domain_labeled_json
 
 log = structlog.get_logger()
 
@@ -31,6 +32,19 @@ PHASE0A_EXPECTED_TOOLS: tuple[str, ...] = (
     "whois", "shodan", "abuseipdb", "securitytrails",
     "urlhaus", "greynoise", "otx", "virustotal",
 )
+
+# Issue #12: Werkzeuge, deren Ergebnis zu genau einer Domain gehoert. Alles
+# andere (abuseipdb, greynoise, shodan_hosts) ist IP-bezogen und auftragsweit.
+DOMAIN_SCOPED_TOOLS: frozenset[str] = frozenset({
+    "whois", "securitytrails", "otx", "urlhaus", "virustotal",
+    "dns_security", "shodan_domain",
+})
+
+# Issue #12, Entscheidung DC (19.09.2026): fuer jede weitere Domain laufen nur
+# DNS, dns_security, Zonentransfer und WHOIS erneut. Alles Kontingentpflichtige
+# (Shodan, SecurityTrails, VirusTotal) und alles, was die Hostentdeckung speist
+# (crtsh, subfinder, gobuster_dns, dnsx), bleibt beim Primaerziel.
+DOMAIN_INTEL_TOOLS: tuple[str, ...] = ("whois", "dns_security")
 
 
 def run_phase0a(
@@ -108,7 +122,14 @@ def run_phase0a(
         raw: str | None = None
         if data:
             try:
-                raw = json.dumps(data, ensure_ascii=False, default=str)[:50000]
+                # Issue #12: domainweite Zeilen tragen ihre Domain als
+                # _domain, damit der Report-Worker sie nicht pauschal dem
+                # Primaerziel zuschlaegt. IP-bezogene Werkzeuge bekommen das
+                # Etikett nicht, sie gehoeren zu keiner einzelnen Domain.
+                label = domain if tool in DOMAIN_SCOPED_TOOLS else None
+                raw = domain_labeled_json(
+                    json.loads(json.dumps(data, ensure_ascii=False, default=str)),
+                    label)
             except Exception:
                 raw = None
         record_tool_run(order_id, None, 0, tool, status,
@@ -500,3 +521,71 @@ def _save_json(directory: str, filename: str, data: Any) -> None:
             json.dump(data, f, indent=2, ensure_ascii=False, default=str)
     except Exception as e:
         log.warning("phase0a_save_failed", file=filename, error=str(e))
+
+
+def domain_slug(domain: str) -> str:
+    """Dateinamens-Token fuer eine Domain (Issue #12).
+
+    Wie bei den VHost-Dateien ist der Name nur ein Eindeutigkeitsmerkmal; die
+    Zuordnung steht als ``_domain`` im Inhalt der Datei.
+    """
+    safe = re.sub(r"[^A-Za-z0-9._-]", "-", domain.strip())[:80]
+    return safe or "domain"
+
+
+def run_domain_intel(domain: str, scan_dir: str, order_id: str,
+                     config: dict[str, Any]) -> dict[str, Any]:
+    """Domainbezogene Fakten fuer eine weitere Domain der Order (Issue #12).
+
+    Bewusst eine eigene Funktion statt eines zweiten ``run_phase0a``-Aufrufs:
+    der wuerde die kontingentpflichtigen Clients (Shodan, SecurityTrails,
+    VirusTotal) erneut fahren und ``phase0a/summary.json`` ueberschreiben.
+
+    Gefahren werden nur die Quellen aus ``DOMAIN_INTEL_TOOLS``, also WHOIS und
+    die DNS-Sicherheitsabfragen. Beide kosten kein Kontingent. Die Dateien
+    bekommen einen Domain-Suffix, die Zeilen das ``_domain``-Etikett; die
+    Dateien ohne Suffix gehoeren weiter dem Primaerziel.
+    """
+    phase0a_dir = os.path.join(scan_dir, "phase0a")
+    os.makedirs(phase0a_dir, exist_ok=True)
+    slug = domain_slug(domain)
+    package = config.get("package", "perimeter")
+    enabled = config.get("phase0a_tools", [])
+    out: dict[str, Any] = {}
+
+    def _record(tool: str, status: str, data: Any = None,
+                reason: str | None = None) -> None:
+        raw: str | None = None
+        if data:
+            try:
+                raw = domain_labeled_json(
+                    json.loads(json.dumps(data, ensure_ascii=False, default=str)),
+                    domain)
+            except Exception:
+                raw = None
+        record_tool_run(order_id, None, 0, tool, status,
+                        reason=reason, raw_output=raw)
+
+    for tool in DOMAIN_INTEL_TOOLS:
+        # dns_security haengt nicht an phase0a_tools (run_phase0a ruft es
+        # ebenfalls unabhaengig auf); whois schon.
+        if tool == "whois" and "whois" not in enabled:
+            continue
+        publish_event(order_id, {"type": "tool_starting", "tool": tool, "host": domain})
+        try:
+            if tool == "whois":
+                data = WhoisClient().lookup(domain)
+            else:
+                data = run_all_dns_security(domain, package)
+            if data:
+                _save_json(phase0a_dir, f"{tool}_{slug}.json", data)
+                out[tool] = data
+                _record(tool, "ok", data)
+            else:
+                _record(tool, "empty", reason="no_data")
+        except Exception as e:
+            log.warning("domain_intel_failed", tool=tool, domain=domain, error=str(e))
+            _record(tool, "failed", reason=str(e)[:200])
+
+    log.info("domain_intel_complete", domain=domain, tools=sorted(out))
+    return out

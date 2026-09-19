@@ -14,7 +14,9 @@ from urllib.parse import urlparse
 
 import structlog
 
-from scanner.tools import run_tool, record_tool_run, classify_exit
+from scanner.tools import (run_tool, record_tool_run, classify_exit,
+                           domain_labeled_json)
+from scanner.phase0a import domain_slug as _domain_slug
 from scanner.progress import publish_event
 
 log = structlog.get_logger()
@@ -458,10 +460,14 @@ def run_gobuster_dns(domain: str, scan_dir: str, order_id: str) -> list[str]:
     return subdomains
 
 
-def run_zone_transfer(domain: str, scan_dir: str, order_id: str) -> dict[str, Any]:
-    """Attempt DNS zone transfer via AXFR. Timeout 30s per NS."""
+def run_zone_transfer(domain: str, scan_dir: str, order_id: str,
+                      filename: str | None = None) -> dict[str, Any]:
+    """Attempt DNS zone transfer via AXFR. Timeout 30s per NS.
+
+    Issue #12: `filename` haelt die Ausgabe je Domain auseinander.
+    """
     publish_event(order_id, {"type": "tool_starting", "tool": "axfr", "host": domain})
-    output_path = os.path.join(scan_dir, "phase0", "zone_transfer.txt")
+    output_path = os.path.join(scan_dir, "phase0", filename or "zone_transfer.txt")
     result_data: dict[str, Any] = {"success": False, "data": {}}
     all_output: list[str] = []
 
@@ -614,9 +620,17 @@ def run_dnsx(subdomains: list[str], scan_dir: str, order_id: str) -> list[dict[s
     return validated
 
 
-def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, Any]:
-    """Collect SPF, DMARC, DKIM, MX, NS records via dig. Saves to dns_records.json."""
-    output_path = os.path.join(scan_dir, "phase0", "dns_records.json")
+def collect_dns_records(domain: str, scan_dir: str, order_id: str,
+                        filename: str | None = None,
+                        label_domain: str | None = None) -> dict[str, Any]:
+    """Collect SPF, DMARC, DKIM, MX, NS records via dig. Saves to dns_records.json.
+
+    Issue #12: `filename` gibt der Ablage je Domain einen eigenen Namen,
+    `label_domain` schreibt die Domain als `_domain` in die scan_results-Zeile.
+    Ohne beides war nicht erkennbar, zu welcher Domain eine domainweite Zeile
+    gehoert; die zweite Domain einer Order hatte gar keine DNS-Fakten.
+    """
+    output_path = os.path.join(scan_dir, "phase0", filename or "dns_records.json")
     records: dict[str, Any] = {
         "spf": None,
         "dmarc": None,
@@ -794,10 +808,10 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str) -> dict[str, 
     # Subprozess entfaellt.
     record_tool_run(
         order_id, None, 0, "dns_records", "ok",
-        raw_output=json.dumps(records, ensure_ascii=False)[:50000],
+        raw_output=domain_labeled_json(records, label_domain),
     )
 
-    log.info("dns_records_complete", records=records)
+    log.info("dns_records_complete", domain=domain, records=records)
     return records
 
 
@@ -1598,9 +1612,15 @@ def _probe_web_hosts(hosts: list[dict[str, Any]], order_id: str, scan_dir: str,
 
 
 def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any] | None = None,
-               seed_subdomains: list[str] | None = None) -> dict[str, Any]:
+               seed_subdomains: list[str] | None = None,
+               extra_domains: list[str] | None = None) -> dict[str, Any]:
     """
     Orchestrate Phase 0: DNS Reconnaissance.
+
+    Issue #12: `extra_domains` sind die weiteren Domains der Order. Fuer sie
+    laufen DNS-Records und Zonentransfer zusaetzlich; die Subdomain-Discovery
+    bleibt beim Primaerziel, weil sie die Hostliste bestimmt und die bereits
+    auftragsweit ueber scan_targets und scope.enforce_scope geregelt ist.
 
     Runs all enumeration tools, collects and deduplicates subdomains,
     validates with dnsx, and creates the host inventory.
@@ -1755,7 +1775,23 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
         # nicht (phase0a_tools=["whois"]) — kein Verlust.
         if "axfr" in phase0_tools:
             discovery_futures[pool.submit(run_zone_transfer, domain, scan_dir, order_id)] = "axfr"
-        discovery_futures[pool.submit(collect_dns_records, domain, scan_dir, order_id)] = "dns_records"
+        discovery_futures[pool.submit(
+            collect_dns_records, domain, scan_dir, order_id,
+            label_domain=domain)] = "dns_records"
+
+        # Issue #12: DNS-Fakten fuer jede weitere Domain der Order. Ohne sie
+        # kann der Pruefkatalog fuer die zweite Domain keine SPF-/DMARC-
+        # Aussage treffen (bei Junkerwerk: junkerwerk.hu).
+        for extra in (extra_domains or []):
+            slug = _domain_slug(extra)
+            discovery_futures[pool.submit(
+                collect_dns_records, extra, scan_dir, order_id,
+                filename=f"dns_records_{slug}.json",
+                label_domain=extra)] = f"dns_records:{extra}"
+            if "axfr" in phase0_tools:
+                discovery_futures[pool.submit(
+                    run_zone_transfer, extra, scan_dir, order_id,
+                    filename=f"zone_transfer_{slug}.txt")] = f"axfr:{extra}"
 
         for future in as_completed(discovery_futures, timeout=_time_remaining()):
             tool_name = discovery_futures[future]
@@ -1767,6 +1803,10 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                 elif tool_name == "dns_records":
                     dns_records = result
                     log.info("phase0_dns_records_done")
+                elif ":" in tool_name:
+                    # Zusatzdomain (Issue #12): Datei und Zeile sind geschrieben,
+                    # das Primaerinventar bleibt unberuehrt.
+                    log.info("phase0_extra_domain_done", tool=tool_name)
                 else:
                     # Subdomain enumeration tools return list[str]
                     subs = result if isinstance(result, list) else []
@@ -1775,8 +1815,14 @@ def run_phase0(domain: str, scan_dir: str, order_id: str, config: dict[str, Any]
                     log.info(f"phase0_{tool_name}_done", found=len(subs))
             except Exception as e:
                 log.error(f"phase0_{tool_name}_error", error=str(e))
-                record_tool_run(order_id, None, 0, tool_name, "failed",
-                                reason=str(e))
+                # Zusatzdomain-Futures heissen "<tool>:<domain>"; die Zeile
+                # traegt den Werkzeugnamen, die Domain das Etikett.
+                base_tool, _, failed_domain = tool_name.partition(":")
+                record_tool_run(order_id, None, 0, base_tool, "failed",
+                                reason=str(e),
+                                raw_output=(domain_labeled_json({"error": str(e)},
+                                                                failed_domain)
+                                            if failed_domain else None))
 
     # Always include the base domain
     all_subdomains.append(domain)
