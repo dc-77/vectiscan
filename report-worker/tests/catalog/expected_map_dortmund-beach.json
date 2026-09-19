@@ -1,0 +1,224 @@
+{
+ "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/dortmund-beach.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "strict": false,
+ "orders": {
+  "main": "14272c00-1145-4675-9b4c-19ce2ead403b"
+ },
+ "findings": {
+  "VS-2026-001": {
+   "checks": [
+    "admin_service_exposed"
+   ]
+  },
+  "VS-2026-002": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-003": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-004": {
+   "checks": [
+    "csrf_token_missing"
+   ]
+  },
+  "VS-2026-005": {
+   "checks": [
+    "dane_missing"
+   ]
+  },
+  "VS-2026-006": {
+   "checks": [
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-007": {
+   "checks": [
+    "dmarc_none"
+   ]
+  },
+  "VS-2026-008": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-009": {
+   "checks": [
+    "ftp_plaintext"
+   ]
+  },
+  "VS-2026-010": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-011": {
+   "checks": [
+    "http_header_disclosure"
+   ]
+  },
+  "VS-2026-012": {
+   "checks": [
+    "info_disclosure"
+   ]
+  },
+  "VS-2026-013": {
+   "checks": [
+    "legacy_protocols_present"
+   ]
+  },
+  "VS-2026-014": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-015": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-016": {
+   "checks": [
+    "service_banner_version"
+   ]
+  },
+  "VS-2026-017": {
+   "checks": [
+    "software_eol_runtime"
+   ]
+  },
+  "VS-2026-018": {
+   "checks": [
+    "spf_softfail"
+   ]
+  },
+  "VS-2026-019": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-020": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  },
+  "VS-2026-021": {
+   "checks": [
+    "tls_weakness"
+   ]
+  },
+  "VS-2026-022": {
+   "checks": [
+    "web_vulnerability_active"
+   ]
+  },
+  "VS-2026-023": {
+   "checks": [
+    "wordpress_core_outdated"
+   ]
+  },
+  "VS-2026-024": {
+   "checks": [
+    "wordpress_plugin_vulnerable"
+   ]
+  },
+  "VS-2026-025": {
+   "checks": [
+    "wordpress_user_enumeration"
+   ]
+  }
+ },
+ "positives": {
+  "VS-2026-P01": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P02": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P03": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-P04": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P05": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-P06": {
+   "checks": [
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P07": {
+   "checks": [
+    "dns_zone_transfer"
+   ]
+  },
+  "VS-2026-P08": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P09": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P10": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P11": {
+   "checks": [
+    "mail_plaintext"
+   ]
+  },
+  "VS-2026-P12": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P13": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P14": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P15": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P16": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P17": {
+   "checks": [
+    "urlhaus_compromise"
+   ]
+  }
+ },
+ "subsumed": {},
+ "expected_coverage_differences": [],
+ "expected_member_differences": []
+}

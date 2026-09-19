@@ -2,7 +2,7 @@
  "beschreibung": "Golden-Fixtures fuer den Report-Umbau (spec/05 bis 07, Session S0c). Dateinamen tragen nur Auftrags-UUIDs, also keine Kundennamen. Domains bleiben in den Daten stehen, weil die Fakten sonst wertlos sind. Screenshots sind aus allen Tars entfernt (spec/07 Abschnitt 1).",
  "api_snapshot_orders": 40,
  "tars_erwartet": 11,
- "tars_vorhanden": 10,
+ "tars_vorhanden": 11,
  "orders": [
   {
    "order_id": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
@@ -260,8 +260,11 @@
    "negative_entries": 0,
    "api_snapshot": true,
    "tar": {
-    "present": false,
-    "reason": "Export noch nicht gelaufen"
+    "present": true,
+    "bytes": 143547,
+    "sha256": "b7e1377d8696ea1b4d982542189aa530032431cb7dbdbf5830baed976a035bd6",
+    "members": 41,
+    "images": 0
    }
   }
  ]
