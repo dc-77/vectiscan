@@ -16,6 +16,8 @@ Datenmodell mit der Soll-Liste.
 | `api-snapshot/<order>/` | `order.json`, `findings.json`, `results.json` je Auftrag, 39 Auftraege |
 | `expected/junkerwerk.json` | 15 Befunde und 8 Positivbefunde des Prototyps als Soll-Liste |
 | `negative.json` | belegbar falsche Befunde aus ausgelieferten Reports; kein Check darf sie erzeugen |
+| `facts/<order>.json` | Ausgabe von `reporter.facts` je Auftrag mit Tar (S1), Neubau mit `python -m reporter.facts --golden` |
+| `report-data/<order>.json` | Datenmodell des Reports aus `reporter.v3` (S3), ohne Auftragsdaten und ohne KI, fester Stichtag; Neubau mit `python -m reporter.v3 --golden-all` |
 
 ## Rollen im Manifest
 
