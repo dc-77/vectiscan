@@ -1,0 +1,44 @@
+id: ssh_alt_port
+title: SSH-Dienst auf Nicht-Standardport
+family: ssh_alt_port
+category: E
+scale: hygiene
+level: niedrig
+group_by: host
+scope: service
+applicable_when: null
+when: service.service == "ssh" and service.port != 22
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: note
+bundle: null
+affected_template: "{host_ip}:{port} (SSH auf Nicht-Standardport)"
+evidence: [service]
+references: []
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: neu (spec/06 Abschnitt 4), kind note
+  start_level: niedrig
+  deviation: null
+texts:
+  observation: >-
+    Auf {group} laeuft ein SSH-Dienst nicht auf dem Standardport: {affected}. Dies ist ein
+    reiner Inventarhinweis und kein Befund.
+  meaning: >-
+    Ein abweichender Port aendert das Sicherheitsniveau des Dienstes nicht, hilft aber bei der
+    Zuordnung im Bestand und bei kuenftigen Pruefungen.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Den abweichenden Port in der internen Dokumentation der Firewall- und Serverregeln
+        festhalten, damit kuenftige Pruefungen ihn zuordnen koennen.
+  verify: >-
+    Verbindungsaufbau zum dokumentierten Port pruefen und mit der internen Dokumentation
+    abgleichen.

@@ -16,3 +16,7 @@ cvss==3.4
 # pydantic v2 direkt. Bisher kam es nur transitiv ueber anthropic herein; hier
 # explizit auf den Stand gepinnt, den anthropic 0.118.0 aufloest.
 pydantic==2.12.5
+# S2 (19.09.2026): reporter/catalog/ liest die Pruefungen als YAML (checks/*.yaml,
+# ignore.yaml). Exakt gepinnt wie alles andere hier; CI-Job und Worker-Image
+# installieren aus dieser Datei.
+PyYAML==6.0.3

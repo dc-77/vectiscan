@@ -1,0 +1,56 @@
+id: sensitive_path_exposed
+title: Potenziell sensibler Pfad erreichbar
+family: sensitive_path_exposed
+category: A
+scale: hygiene
+level: hoch
+group_by: fqdn
+scope: http.paths
+applicable_when: null
+when: path.status == 200 and matches(path.url, SENSITIVE_PATHS)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [feroxbuster]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({url_path})"
+evidence: [http]
+references: [CWE-538, CWE-200]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DISC-007, SP-DISC-008
+  start_level: HIGH bis CRITICAL
+  deviation: >-
+    Der Fund belegt nur den Statuscode 200 der Anfrage; der Inhalt der Datei wurde nicht
+    geprueft. Deshalb fuehrt diese Umsetzung die Familie als Hygiene hoch mit einem
+    verbindlichen Pruefschritt, nicht als bestaetigten Fund mit der vollen Einstufung aus
+    SP-DISC-007/008.
+texts:
+  observation: >-
+    Auf {group} liefert der Webserver fuer einen potenziell sensiblen Pfad den Statuscode 200,
+    ohne dass der Inhalt geprueft wurde: {affected}.
+  meaning: >-
+    Der Pfadname deutet auf eine Konfigurations-, Sicherungs- oder Zugangsdatei hin. Ob dort
+    tatsaechlich Anmeldedaten, Zugangsschluessel oder interne Konfigurationsangaben liegen, ist
+    aus der Anfrage allein nicht erkennbar und muss am Inhalt geprueft werden.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Den Inhalt des gemeldeten Pfads pruefen. Bestaetigt sich eine Konfigurations-,
+        Sicherungs- oder Zugangsdatei, den Zugriff darauf sofort serverseitig sperren oder die
+        Datei aus dem oeffentlich erreichbaren Verzeichnis entfernen.
+    - stage: mittelfristig
+      text: >-
+        Konfigurations-, Sicherungs- und Zugangsdateien grundsaetzlich ausserhalb des oeffentlich
+        erreichbaren Wurzelverzeichnisses ablegen.
+  verify: >-
+    Den gemeldeten Pfad direkt aufrufen und den Inhalt der Antwort sichten. Erwartet wird eine
+    Fehlermeldung mit Status 403 oder eine Antwort ohne Anmeldedaten, Zugangsschluessel oder
+    interne Konfigurationsangaben. Dieser Pruefschritt ist vor jeder weiteren Bewertung des
+    Fundes zwingend erforderlich.

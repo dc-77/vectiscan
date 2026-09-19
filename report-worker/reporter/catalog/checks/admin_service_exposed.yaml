@@ -1,0 +1,54 @@
+id: admin_service_exposed
+title: Verwaltungsoberflaeche aus dem Internet erreichbar
+family: admin_service_exposed
+category: A
+scale: exposure
+level: erhoeht
+group_by: host
+scope: service
+applicable_when: null
+when: (service.port in ADMIN_PORTS or matches(service.product, ADMIN_PRODUCTS)) and not is_cdn(host, services)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} ({product_or_service})"
+evidence: [service]
+references: [CWE-284, CISA-KEV]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-ADMIN-EXPOSED
+  start_level: erhoeht
+  deviation: null
+texts:
+  observation: >-
+    Der Host {group} bietet eine Verwaltungs- oder Firewall-Oberflaeche an, die aus dem gesamten
+    Internet erreichbar ist: {affected}. Eine Zugriffsbeschraenkung auf bestimmte Quellnetze ist
+    von aussen nicht erkennbar.
+  meaning: >-
+    Verwaltungsoberflaechen sind ein hochwertiges Ziel: Eine Uebernahme betrifft den gesamten
+    Anschluss inklusive der dahinter liegenden Systeme. Angreifer koennen Anmeldedaten erraten oder
+    bekannte Schwachstellen der Verwaltungssoftware ausnutzen.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Zugriff auf die Verwaltungsoberflaeche auf die benoetigten Quellnetze beschraenken, etwa
+        ueber die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.
+    - stage: in_kuerze
+      text: >-
+        Mehrfaktor-Anmeldung fuer die Verwaltungsoberflaeche aktivieren und Standardkonten
+        deaktivieren oder umbenennen.
+    - stage: mittelfristig
+      text: >-
+        Softwarestand der Verwaltungsoberflaeche gegen die Sicherheitshinweise des Herstellers
+        abgleichen und Anmeldeversuche ueberwachen.
+  verify: >-
+    Verbindungsversuch auf den betroffenen Port von einer externen Adresse ausserhalb der
+    freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschraenkung.

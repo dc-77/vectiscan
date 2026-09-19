@@ -1,0 +1,14 @@
+{
+  "facts": {
+    "fqdns": [
+      {"name": "dev.example.test", "host_ip": "10.0.0.1", "http_status": 200, "title": "Startseite"}
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "fail",
+    "group_key": "dev.example.test@10.0.0.1",
+    "affected": ["dev.example.test"],
+    "positive": false
+  }
+}

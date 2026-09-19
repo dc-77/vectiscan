@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": true, "server_header": "Microsoft-IIS/10.0", "powered_by": "ASP.NET"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": ["www.example.test (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET)"],
+  "positive": false
+ }
+}

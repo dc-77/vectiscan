@@ -1,0 +1,49 @@
+id: info_disclosure
+title: Technische Informationen aus der Webanwendung offengelegt
+family: info_disclosure
+category: E
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: http.alerts
+applicable_when: null
+when: zap_match(alert, ZAP_INFO_DISCLOSURE)
+positive_when: never
+not_testable_when:
+  - when: http is not None and len(http.alerts) == 0
+    reason_code: zap_no_alerts
+    context: group
+undetermined: not_testable
+requires:
+  tools: [zap]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({name})"
+evidence: [http]
+references: [CWE-200]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DISC-009
+  start_level: LOW
+  deviation: null
+texts:
+  observation: >-
+    Die passive Webanalyse hat auf {group} technische Angaben gefunden, die sich aus der
+    Antwort der Webanwendung auslesen lassen: {affected}.
+  meaning: >-
+    Interne Adressen, Zeitstempel, Entwicklerkommentare im Quelltext oder Fehlermeldungen mit
+    technischen Details sind fuer sich genommen keine Schwachstelle, erleichtern einem
+    Angreifer aber die Vorbereitung eines gezielten Zugriffs auf die Anwendung.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die gemeldeten Ausgaben pruefen und interne Adressen, Entwicklerkommentare und
+        detaillierte Fehlermeldungen aus den Antworten der Anwendung entfernen oder auf eine
+        allgemeine Meldung ohne technische Details umstellen.
+  verify: >-
+    Die genannte Adresse von aussen abrufen und die Antwort auf die gemeldete Angabe pruefen;
+    erwartet wird eine Antwort ohne die technische Zusatzinformation.

@@ -1,0 +1,61 @@
+id: dkim_missing
+title: DKIM-Signatur fehlt
+family: dkim_missing
+category: C
+scale: hygiene
+level: mittel
+group_by: domain
+scope: dns
+applicable_when: len(dns.mx) > 0
+when: dns.dkim is not None and dns.dkim.present is False
+positive_when: dns.dkim is not None and dns.dkim.present is True
+not_testable_when:
+  - when: dns.dkim is None or dns.dkim.present is None
+    reason_code: insufficient_facts
+    context: item
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: null
+affected_template: "{domain}"
+evidence: [dns]
+references: [CWE-290, RFC-6376]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DNS-008
+  start_level: LOW
+  deviation: >-
+    SP-DNS-008 fuehrt die fehlende DKIM-Signatur als LOW; catalog_sim ordnet sie als Hygiene mittel
+    ein, weil DKIM neben SPF die zweite Saeule der Absender-Authentizitaet ist und ohne sie
+    Weiterleitungen die SPF-Pruefung beim Empfaenger regelmaessig scheitern lassen.
+texts:
+  observation: >-
+    Fuer {affected} ist im DNS keine DKIM-Signatur nachweisbar. Fuer ausgehende E-Mails der
+    Domain {domain} fehlt damit ein Selektor, ueber den Empfaengersysteme die Signatur pruefen
+    koennten.
+  meaning: >-
+    Ohne DKIM lassen sich E-Mails der Domain nicht kryptografisch dem versendenden System
+    zuordnen. Weiterleitende Mailserver veraendern haeufig den Umschlagabsender, wodurch die
+    SPF-Pruefung beim Empfaenger allein nicht mehr ausreicht. DKIM ergaenzt SPF um eine von
+    Weiterleitungen unabhaengige Pruefung.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Auf dem Mailserver DKIM fuer die Domain aktivieren, einen Selektor waehlen und den
+        oeffentlichen Schluessel als TXT-Eintrag veroeffentlichen.
+    - stage: mittelfristig
+      text: >-
+        Alle Versandwege der Domain, einschliesslich Marketing- und Support-Systemen, in die
+        DKIM-Signierung einbeziehen und die Signaturen regelmaessig pruefen.
+  verify: >-
+    DNS-Abfrage des TXT-Eintrags am Selektor-Namen unter _domainkey.{domain}; erwartet wird ein
+    Eintrag, der mit v=DKIM1 beginnt und einen oeffentlichen Schluessel enthaelt.
+  positive:
+    title: DKIM vorhanden
+    text: >-
+      Fuer die Domain {domain} ist eine DKIM-Signatur veroeffentlicht.

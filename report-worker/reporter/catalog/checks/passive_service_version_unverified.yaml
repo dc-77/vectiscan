@@ -1,0 +1,53 @@
+id: passive_service_version_unverified
+title: Dienstversion laut Passivquelle unbestaetigt
+family: passive_service_unverified
+category: B
+scale: hygiene
+level: mittel
+group_by: host
+scope: passive
+applicable_when: null
+item_when: null
+when: passive.source == "shodan" and passive.verified is False and passive.version is not None and passive.port not in ADMIN_PORTS and not matches(passive.product, ADMIN_PRODUCTS)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [shodan]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} ({product} {version}, laut Passivquelle)"
+evidence: [passive]
+references: [CWE-200]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Prototyp VS-004 (Passivquelle)
+  start_level: mittel
+  deviation: >-
+    Die Version stammt allein aus der Passivquelle und ist vom Portscan nicht bestaetigt (verified
+    false); eine Aussage zum Support-Ende ist damit nicht belastbar. Die Pruefung bleibt deshalb
+    bei einem Pruefauftrag zu Patchstand und Erreichbarkeit, ohne eigene EOL-Behauptung.
+texts:
+  observation: >-
+    Fuer {group} meldet eine Passivquelle eine Dienstversion, die der Portscan nicht bestaetigen
+    konnte: {affected}.
+  meaning: >-
+    Ohne aktive Bestaetigung ist unklar, ob der gemeldete Dienst und die genannte Version noch
+    aktuell sind. Ein veralteter Patchstand bleibt so unentdeckt, und der Dienst kann ausserhalb
+    der eigentlich vorgesehenen Zustellwege erreichbar sein.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Anhand einer aktiven Pruefung feststellen, ob Dienst und Version aus der Passivquelle noch
+        zutreffen, und den Patchstand mit den Sicherheitshinweisen des Herstellers abgleichen.
+    - stage: mittelfristig
+      text: >-
+        Zugriff auf den Dienst auf die Netze beschraenken, aus denen eine Zustellung tatsaechlich
+        erfolgen muss.
+  verify: >-
+    Verbindung zum gemeldeten Port herstellen und die zurueckgegebene Version mit dem aktuellen
+    Patchstand des Herstellers abgleichen.

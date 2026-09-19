@@ -1,0 +1,7 @@
+{
+  "facts": {
+    "dns": [{"domain": "example.test", "dnssec": {"signed": true, "valid": true}}]
+  },
+  "coverage_default": "ok",
+  "expect": {"status": "pass", "group_key": "example.test", "positive": true}
+}

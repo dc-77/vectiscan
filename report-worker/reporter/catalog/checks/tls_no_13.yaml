@@ -1,0 +1,51 @@
+id: tls_no_13
+title: TLS 1.3 nicht verfuegbar
+family: tls_no_13
+category: D
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: tls
+applicable_when: null
+when: 'tls.protocols["TLS1.2"] is True and tls.protocols["TLS1.3"] is False'
+positive_when: 'tls.protocols["TLS1.3"] is True'
+not_testable_when:
+  - when: 'tls.protocols["TLS1.3"] is None'
+    reason_code: tls_protocols_unknown
+    context: item
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target}"
+evidence: [tls]
+references: [CWE-327]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Prototyp VS-009
+  start_level: niedrig
+  deviation: null
+texts:
+  observation: >-
+    Der Dienst {group} bietet TLS 1.2 an, jedoch keine Unterstuetzung fuer TLS 1.3: {affected}.
+  meaning: >-
+    TLS 1.3 vereinfacht den Verbindungsaufbau, entfernt veraltete Verschluesselungsoptionen und
+    verkleinert die Angriffsflaeche gegenueber aelteren Protokollversionen. Ohne TLS 1.3 bleibt
+    der Dienst auf den groesseren Funktionsumfang von TLS 1.2 angewiesen.
+  recommendation:
+    - stage: strategisch
+      text: >-
+        TLS 1.3 auf dem Dienst aktivieren, sobald die eingesetzte TLS-Bibliothek und alle
+        angebundenen Clients dies unterstuetzen.
+  verify: >-
+    Verbindungsversuch mit einem auf TLS 1.3 beschraenkten Client gegen den Dienst durchfuehren;
+    erwartet wird ein erfolgreicher Verbindungsaufbau.
+  positive:
+    title: TLS 1.3 verfuegbar
+    text: >-
+      Der Dienst {group} unterstuetzt TLS 1.3.

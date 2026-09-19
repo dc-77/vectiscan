@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": true,
+    "csp": {"present": true, "value": "default-src 'self' 'unsafe-inline'", "unsafe_inline": true, "unsafe_eval": false, "wildcard": false}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": ["www.example.test (unsafe-inline)"],
+  "positive": false
+ }
+}

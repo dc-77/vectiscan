@@ -1,0 +1,50 @@
+id: waf_present
+title: Web Application Firewall vor dem Webdienst
+family: waf_present
+category: D
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: fqdn
+applicable_when: null
+when: null
+positive_when: 'fqdn.waf is not None and fqdn.waf.detected is True'
+not_testable_when: []
+undetermined: pass_silent
+requires:
+  tools: [wafw00f]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({waf_name})"
+evidence: [fqdn]
+references: [CWE-693]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: neu (S2-Auftrag, positiv)
+  start_level: null
+  deviation: null
+texts:
+  observation: >-
+    Vor {group} konnte keine Web Application Firewall festgestellt werden: {affected}.
+  meaning: >-
+    Eine Web Application Firewall filtert bekannte Angriffsmuster auf Anwendungsebene, bevor sie
+    den Webdienst erreichen, und ist eine zusaetzliche Schutzschicht neben einer sauberen
+    Anwendungskonfiguration.
+  recommendation:
+    - stage: strategisch
+      text: >-
+        Den Einsatz einer Web Application Firewall vor dem Webdienst pruefen, insbesondere fuer
+        Anmeldeportale und Formulare mit Nutzereingaben.
+  verify: >-
+    Anfragen mit typischen Angriffsmustern an die genannte Adresse senden; erwartet wird eine
+    Blockierung oder Umleitung durch eine vorgeschaltete Schutzkomponente statt einer normalen
+    Antwort der Anwendung.
+  positive:
+    title: Web Application Firewall vorhanden
+    text: >-
+      Vor {group} ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene
+      filtert, bevor sie den Webdienst erreichen.

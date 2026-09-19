@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": true, "status_code": 200,
+    "hsts": {"present": true, "max_age": 86400, "raw": "max-age=86400"}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": ["www.example.test (max-age 86400)"],
+  "positive": false
+ }
+}

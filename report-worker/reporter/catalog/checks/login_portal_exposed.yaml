@@ -1,0 +1,56 @@
+id: login_portal_exposed
+title: Anmeldeportal aus dem Internet erreichbar
+family: login_portal_exposed
+category: A
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: fqdn
+applicable_when: null
+when: fqdn.http_status == 200 and matches(fqdn.title, LOGIN_TITLES) and not matches(fqdn.title, ADMIN_TITLES)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [web_probe]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({title})"
+evidence: [fqdn]
+references: [CWE-307, CWE-521]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-LOGIN-PORTAL
+  start_level: mittel
+  deviation: >-
+    Das Portal ist gewollt erreichbar; die Einstufung Hygiene mittel gilt der fehlenden
+    zusaetzlichen Absicherung, nicht der Erreichbarkeit selbst (catalog_sim R-LOGIN-PORTAL).
+texts:
+  observation: >-
+    Die Webseite {group} zeigt ein Anmeldeportal, das aus dem gesamten Internet erreichbar ist:
+    {affected}. Die Erreichbarkeit selbst ist beabsichtigt, wenn das Portal fuer den externen
+    Zugriff vorgesehen ist.
+  meaning: >-
+    Ein oeffentlich erreichbares Anmeldeportal ist ein haeufiges Ziel fuer automatisierte
+    Anmeldeversuche mit gestohlenen oder erratenen Zugangsdaten. Ohne zusaetzliche Absicherung
+    genuegt ein einzelnes bekanntes Passwort fuer den Zugriff.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Die Anmeldung am Portal um einen zusaetzlichen Faktor ergaenzen, etwa eine
+        Authentifizierungs-App oder ein Einmalkennwort.
+    - stage: in_kuerze
+      text: >-
+        Zugriff auf bekannte Quellnetze beschraenken, soweit die Nutzung des Portals das
+        zulaesst.
+    - stage: mittelfristig
+      text: >-
+        Softwarestand des Portals regelmaessig gegen die Sicherheitshinweise des Herstellers
+        pruefen und zeitnah einspielen.
+  verify: >-
+    Anmeldeversuch mit einem falschen Kennwort durchfuehren; erwartet wird eine Sperre oder
+    Verzoegerung nach mehreren Fehlversuchen sowie die Abfrage des zusaetzlichen Faktors.

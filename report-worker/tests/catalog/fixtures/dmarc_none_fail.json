@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "dns": [
+   {"domain": "example.test", "mx": ["mx1.example.test"],
+    "dmarc": {"present": true, "raw": "v=DMARC1; p=none", "p": "none", "pct": 100}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "example.test",
+  "affected": ["example.test (p=none)"],
+  "positive": false
+ }
+}

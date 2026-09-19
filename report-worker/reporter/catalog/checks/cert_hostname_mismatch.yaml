@@ -1,0 +1,61 @@
+id: cert_hostname_mismatch
+title: TLS-Zertifikat passt nicht zum Hostnamen
+family: cert_hostname_mismatch
+category: D
+scale: hygiene
+level: hoch
+group_by: fqdn
+scope: tls
+applicable_when: null
+when: tls.cert.mismatch is True
+positive_when: tls.cert.mismatch is False
+not_testable_when:
+  - when: tls.cert is None or tls.cert.mismatch is None
+    reason_code: cert_unknown
+    context: item
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target} (Zertifikat fuer {cert_cn})"
+evidence: [tls]
+references: [CWE-297]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: ["TR-03116-4: gueltige Zertifikatskette"]
+policy:
+  source: catalog_sim R-CERT-MISMATCH
+  start_level: hoch
+  deviation: >-
+    Ein Zertifikat, das nicht zum aufgerufenen Hostnamen passt, loest bei jedem Client eine
+    Sicherheitswarnung aus und betrifft die Authentizitaet der Verbindung; die Katalogsimulation
+    (R-CERT-MISMATCH) fuehrt den Befund deshalb als Hygiene hoch.
+texts:
+  observation: >-
+    Fuer den Dienst {group} passt das eingesetzte TLS-Zertifikat nicht zum aufgerufenen
+    Hostnamen: {affected}.
+  meaning: >-
+    Ein TLS-Client kann die Identitaet des Dienstes nicht anhand des Zertifikats bestaetigen und
+    muss die Sicherheitswarnung entweder ablehnen oder ignorieren. Werden solche Warnungen
+    ignoriert, faellt ein echter Man-in-the-Middle-Angriff mit einem passend gefaelschten
+    Zertifikat nicht mehr auf.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Ein Zertifikat ausstellen und einspielen, dessen gemeinsamer Name oder alternativer
+        Antragstellername den tatsaechlich aufgerufenen Hostnamen enthaelt.
+    - stage: mittelfristig
+      text: >-
+        Die Zuordnung von Hostnamen zu Zertifikaten in die Auslieferung neuer virtueller Hosts
+        aufnehmen, damit dieser Zustand nicht erneut entsteht.
+  verify: >-
+    Verbindung zum Dienst unter dem oeffentlichen Hostnamen mit einem TLS-Client aufbauen und
+    das Zertifikat pruefen; erwartet wird ein gemeinsamer Name oder ein alternativer
+    Antragstellername, der zu diesem Hostnamen passt.
+  positive:
+    title: Zertifikat passt zum Hostnamen
+    text: >-
+      Fuer den Dienst {group} passt das eingesetzte TLS-Zertifikat zum aufgerufenen Hostnamen.

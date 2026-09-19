@@ -1,0 +1,46 @@
+id: http_header_disclosure
+title: Webdienst gibt Versionskennung preis
+family: banner_version_disclosure
+category: E
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: http
+applicable_when: null
+when: has_version(http.server_header) or has_version(http.powered_by) or http.x_feserver is not None
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [header_check]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({disclosure_headers})"
+evidence: [http]
+references: [CWE-200, CWE-497]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DISC-001
+  start_level: LOW
+  deviation: null
+texts:
+  observation: >-
+    Die Webantwort von {group} nennt in ihren Antwortheadern die Version der eingesetzten
+    Serversoftware: {affected}.
+  meaning: >-
+    Eine sichtbare Versionskennung erleichtert einem Angreifer die Suche nach bekannten
+    Schwachstellen fuer genau diese Version, ohne dass er sie selbst herausfinden muss. Fuer sich
+    genommen ist das keine Schwachstelle, aber ein Vorteil fuer die Aufklaerungsphase eines
+    Angriffs.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die Versionskennung in den Antwortheadern der Webserver- und Anwendungskonfiguration
+        entfernen oder auf einen generischen Wert ohne Versionsangabe setzen.
+  verify: >-
+    HTTP-Antwortheader der genannten Adresse von aussen abrufen; erwartet wird kein Header mit
+    einer konkreten Versionsangabe.

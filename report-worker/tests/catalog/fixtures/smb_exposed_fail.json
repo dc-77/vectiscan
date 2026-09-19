@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.5", "port": 445, "service": "microsoft-ds"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.5",
+  "affected": ["10.0.0.5:445 (microsoft-ds)"],
+  "positive": false,
+  "members": {"10.0.0.5:445": "fail"}
+ }
+}

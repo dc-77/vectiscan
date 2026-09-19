@@ -1,0 +1,53 @@
+id: cert_expiring
+title: TLS-Zertifikat laeuft in Kuerze ab
+family: cert_expiring
+category: D
+scale: hygiene
+level: hoch
+group_by: fqdn
+scope: tls
+applicable_when: null
+when: tls.cert is not None and tls.cert.expired is not True and tls.cert.days_left <= CERT_EXPIRING_DAYS
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target} ({days_left} Tage)"
+evidence: [tls]
+references: [CWE-298]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-TLS-005
+  start_level: LOW
+  deviation: >-
+    SP-TLS-005 bewertet ein bald ablaufendes Zertifikat mit LOW. Abweichend fuehrt die
+    Katalogsimulation (R-CERT-EXPIRING) den Befund als Hygiene hoch, weil der bevorstehende Ablauf
+    den Dienst fuer alle Nutzer stoppt, sobald er eintritt; diese Einstufung wird uebernommen.
+texts:
+  observation: >-
+    Fuer den Dienst {group} laeuft das eingesetzte TLS-Zertifikat in Kuerze ab: {affected}. Ohne
+    rechtzeitige Erneuerung entsteht die gleiche Wirkung wie bei einem bereits abgelaufenen
+    Zertifikat.
+  meaning: >-
+    Laeuft das Zertifikat ab, ohne dass eine Erneuerung vorbereitet ist, ist der Dienst fuer alle
+    Nutzer mit einer Vertrauenswarnung oder einem Verbindungsabbruch konfrontiert. Ein kurzes
+    Zeitfenster reicht oft nicht aus, um eine Erneuerung ungeplant nachzuholen.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Ein neues Zertifikat fuer den betroffenen Dienst rechtzeitig vor dem Ablaufdatum
+        ausstellen und einspielen.
+    - stage: strategisch
+      text: >-
+        Eine automatisierte Erneuerung des Zertifikats mit ausreichendem zeitlichem Vorlauf vor
+        dem Ablauf einrichten.
+  verify: >-
+    Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des praesentierten
+    Zertifikats pruefen; erwartet wird ein Vorlauf von mehr als 30 Tagen bis zum Ablauf.

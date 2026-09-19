@@ -1,0 +1,57 @@
+id: cert_self_signed
+title: Selbstsigniertes TLS-Zertifikat
+family: cert_self_signed
+category: D
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: tls
+applicable_when: null
+when: tls.cert is not None and tls.cert.self_signed is True
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target}"
+evidence: [tls]
+references: [CWE-295, CWE-296]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-TLS-006
+  start_level: MEDIUM
+  deviation: >-
+    SP-TLS-006 bewertet ein selbstsigniertes Zertifikat in der oeffentlichen PKI mit MEDIUM, weil
+    die fehlende Vertrauenskette die Authentizitaet der Verbindung betrifft, aber allein keinen
+    ausnutzbaren Fehler darstellt; das entspricht hier Hygiene mittel. Ein Ausdruck fuer eine
+    bestandene Pruefung entfaellt, weil der Parser dieses Feld nur bei einem gefundenen
+    selbstsignierten Zertifikat setzt.
+texts:
+  observation: >-
+    Fuer den Dienst {group} ist ein selbstsigniertes TLS-Zertifikat im Einsatz: {affected}. Das
+    Zertifikat wurde nicht von einer allgemein anerkannten Vertrauensstelle ausgestellt.
+  meaning: >-
+    Ohne eine allgemein anerkannte Vertrauensstelle kann ein TLS-Client die Identitaet des
+    Dienstes nicht unabhaengig bestaetigen und muss dem Zertifikat blind vertrauen oder eine
+    Warnung anzeigen. Werden solche Warnungen routinemaessig akzeptiert, faellt ein echter
+    Man-in-the-Middle-Angriff mit einem eigenen selbstsignierten Zertifikat nicht mehr auf.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Ein Zertifikat einer allgemein anerkannten Vertrauensstelle fuer den betroffenen Dienst
+        ausstellen und einspielen.
+    - stage: mittelfristig
+      text: >-
+        Fuer intern genutzte Dienste eine eigene Zertifizierungsstelle einrichten und deren
+        Stammzertifikat gezielt auf den zugreifenden Systemen verteilen, statt einzelne
+        selbstsignierte Zertifikate zu verwenden.
+  verify: >-
+    Verbindung zum Dienst mit einem TLS-Client aufbauen und den Aussteller des praesentierten
+    Zertifikats pruefen; erwartet wird ein Aussteller, der sich vom Antragsteller unterscheidet
+    und einer allgemein anerkannten Vertrauensstelle zugeordnet werden kann.

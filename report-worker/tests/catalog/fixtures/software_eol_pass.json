@@ -1,0 +1,20 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 443, "service": "https", "tls_required": true, "tunnel_ssl": true}
+  ],
+  "software": [
+   {"host_ip": "10.0.0.1", "product": "Microsoft Exchange", "family": "exchange", "kind": "mail", "version_raw": "15.2.2562", "version_norm": "SE", "build": "15.2.2562", "edition": "SE",
+    "hints": ["X-FEServer: EXCHANGE-SE"], "eol": {"status": "unknown"}},
+   {"host_ip": "10.0.0.1", "product": "Microsoft IIS", "family": "iis", "kind": "webserver", "version_norm": "10.0", "eol": {"status": "unknown"}},
+   {"host_ip": "10.0.0.1", "product": "Windows Server", "family": "windows_server", "kind": "os", "eol": {"status": "unknown"}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "10.0.0.1",
+  "affected": [],
+  "positive": true
+ }
+}

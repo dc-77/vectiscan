@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.9", "port": 21, "service": "ftp", "product": "vsftpd"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.9",
+  "affected": ["10.0.0.9:21 (FTP)"],
+  "positive": false,
+  "members": {"10.0.0.9:21": "fail"}
+ }
+}

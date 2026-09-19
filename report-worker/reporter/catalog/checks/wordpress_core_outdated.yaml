@@ -1,0 +1,57 @@
+id: wordpress_core_outdated
+title: WordPress-Kernversion veraltet oder unsicher
+family: wordpress_core_outdated
+category: B
+scale: exposure
+level: erhoeht
+group_by: fqdn
+scope: http
+applicable_when: http is not None and http.wordpress is not None
+item_when: http.wordpress is not None
+when: 'http.wordpress.version_status in ["insecure", "outdated"]'
+positive_when: http.wordpress.version_status == "latest"
+not_testable_when:
+  - when: http.wordpress.version_status is None
+    reason_code: wordpress_unknown
+    context: item
+undetermined: not_testable
+requires:
+  tools: [wpscan]
+kind: check
+bundle: null
+affected_template: "{fqdn} (WordPress {wp_version_status})"
+evidence: [http]
+references: [CWE-1104, OWASP2025-A06]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-WP-CORE-OLD
+  start_level: erhoeht
+  deviation: null
+texts:
+  observation: >-
+    Auf {group} ist eine WordPress-Kernversion im Einsatz, die die Versionspruefung als veraltet
+    oder unsicher einstuft: {affected}.
+  meaning: >-
+    Eine veraltete WordPress-Kernversion enthaelt Schwachstellen, die in neueren Versionen bereits
+    behoben und oeffentlich dokumentiert sind. Die Versionsangabe ist von aussen sichtbar, sodass
+    Angreifer gezielt nach passenden Schwachstellen suchen koennen.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Die WordPress-Kerninstallation auf die aktuelle, vom Projekt gepflegte Version anheben.
+    - stage: mittelfristig
+      text: >-
+        Automatische Kernupdates aktivieren oder einen festen Update-Rhythmus fuer WordPress
+        festlegen, damit neue Versionen zeitnah eingespielt werden.
+  verify: >-
+    Versionsangabe im WordPress-Administrationsbereich pruefen und mit der aktuellen Version des
+    Projekts vergleichen; erwartet wird die jeweils aktuelle, gepflegte Kernversion.
+  positive:
+    title: WordPress-Kernversion aktuell
+    text: >-
+      Auf {group} entspricht die WordPress-Kernversion nach der Versionspruefung dem aktuellen
+      Stand des Projekts.

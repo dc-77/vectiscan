@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": true,
+    "paths": [{"url": "https://www.example.test/robots.txt", "status": 200}]}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "pass",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": [],
+  "positive": false
+ }
+}

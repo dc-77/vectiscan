@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 110, "service": "pop3", "product": "Dovecot pop3d"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "not_testable",
+  "group_key": "10.0.0.1",
+  "reason_code": "mail_capabilities_unknown",
+  "positive": false
+ }
+}

@@ -1,0 +1,54 @@
+id: caa_missing
+title: CAA-Eintrag fehlt
+family: caa_missing
+category: E
+scale: hygiene
+level: niedrig
+group_by: domain
+scope: dns
+applicable_when: null
+when: dns.caa is not None and dns.caa.present is False
+positive_when: dns.caa is not None and dns.caa.present is True
+not_testable_when:
+  - when: dns.caa is None or dns.caa.present is None
+    reason_code: insufficient_facts
+    context: item
+undetermined: not_testable
+requires:
+  tools: [dns_security]
+kind: check
+bundle: dns_hygiene
+affected_template: "{domain}"
+evidence: [dns]
+references: [CWE-16, RFC-8659]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DNS-003
+  start_level: INFO
+  deviation: >-
+    catalog_sim stuft den fehlenden CAA-Eintrag ebenfalls als Hygiene niedrig ein, dieser
+    Einstufung wird gefolgt.
+texts:
+  observation: >-
+    Fuer {affected} ist kein CAA-Eintrag veroeffentlicht. Fuer die Domain {domain} legt damit
+    kein DNS-Eintrag fest, welche Zertifizierungsstellen Zertifikate ausstellen duerfen.
+  meaning: >-
+    Ohne CAA-Eintrag kann jede oeffentliche Zertifizierungsstelle ein Zertifikat fuer die Domain
+    ausstellen. Eine fehlerhafte oder missbraeuchliche Ausstellung durch eine fremde Stelle faellt
+    dadurch nicht von vornherein auf.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Einen CAA-Eintrag veroeffentlichen, der nur die tatsaechlich genutzten
+        Zertifizierungsstellen zur Ausstellung berechtigt.
+  verify: >-
+    DNS-Abfrage des CAA-Eintrags fuer die Domain {domain}; erwartet wird mindestens ein
+    issue-Eintrag mit der genutzten Zertifizierungsstelle.
+  positive:
+    title: CAA-Eintrag vorhanden
+    text: >-
+      Fuer die Domain {domain} ist ein CAA-Eintrag veroeffentlicht.

@@ -1,0 +1,49 @@
+id: legacy_protocols_present
+title: Veraltetes Uebertragungsprotokoll aus dem Internet erreichbar
+family: legacy_protocols_present
+category: A
+scale: hygiene
+level: niedrig
+group_by: host
+scope: service
+applicable_when: null
+when: service.port in LEGACY_PORTS
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} ({legacy_name})"
+evidence: [service]
+references: [CWE-477, OWASP2025-A05]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Prototyp VS-005
+  start_level: niedrig
+  deviation: null
+texts:
+  observation: >-
+    Der Host {group} bietet ein aelteres Uebertragungsprotokoll an, das zur Angriffsflaeche des
+    Anschlusses zaehlt: {affected}. Ob eine Verschluesselung erzwungen wird, zeigt diese Pruefung
+    nicht.
+  meaning: >-
+    Jeder zusaetzlich erreichbare Dienst vergroessert die Angriffsflaeche des Anschlusses,
+    unabhaengig davon, ob er eine Verschluesselung anbietet oder erzwingt. Altprotokolle bringen
+    zudem eigene, seltener gepflegte Serverkomponenten mit.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Pruefen, ob der Dienst noch benoetigt wird, und ihn andernfalls deaktivieren.
+    - stage: mittelfristig
+      text: >-
+        Falls der Dienst benoetigt wird, den Zugriff auf feste Quelladressen beschraenken und eine
+        erzwungene Verschluesselung sicherstellen.
+  verify: >-
+    Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der
+    Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benoetigt wird.

@@ -1,0 +1,49 @@
+id: session_in_url
+title: Sitzungskennung in der URL uebertragen
+family: session_in_url
+category: D
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: http.alerts
+applicable_when: null
+when: zap_match(alert, ZAP_SESSION_URL)
+positive_when: never
+not_testable_when:
+  - when: http is not None and len(http.alerts) == 0
+    reason_code: zap_no_alerts
+    context: group
+undetermined: not_testable
+requires:
+  tools: [zap]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({url_path})"
+evidence: [http]
+references: [CWE-200, CWE-598]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-ZAP
+  start_level: mittel
+  deviation: null
+texts:
+  observation: >-
+    Die passive Webanalyse hat auf {group} eine Sitzungskennung gefunden, die in der Adresse
+    uebertragen wird: {affected}.
+  meaning: >-
+    Eine Sitzungskennung in der Adresse landet in Protokolldateien, im Browserverlauf, in
+    Lesezeichen und im Referrer-Header nachfolgender Anfragen. Wer diese Adresse erhaelt, kann
+    unter Umstaenden die Sitzung uebernehmen.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Die Sitzungskennung ausschliesslich ueber ein Cookie uebertragen und die Weitergabe
+        per Adresse in der Anwendungs- oder Serverkonfiguration deaktivieren.
+  verify: >-
+    Eine Anmeldung ueber den Browser durchfuehren und die Adresszeile sowie die aufgerufenen
+    Links auf eine Sitzungskennung im Text der Adresse pruefen; erwartet wird eine Adresse
+    ohne Sitzungskennung.

@@ -1,0 +1,8 @@
+{
+  "facts": {
+    "dns": [{"domain": "example.test"}],
+    "targets": [{"domain": "example.test", "whois": {"registrar": "Beispiel Registrar", "expires_at": "2026-09-15T00:00:00Z"}}]
+  },
+  "coverage_default": "ok",
+  "expect": {"status": "fail", "group_key": "example.test", "affected": ["example.test (Ablauf 2026-09-15)"], "positive": false}
+}

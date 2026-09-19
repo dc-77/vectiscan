@@ -1,0 +1,21 @@
+{
+  "facts": {
+    "software": [
+      {"host_ip": "10.0.0.1", "product": "OpenSSH", "family": "openssh", "kind": "ssh", "version_norm": "9.2p1"}
+    ],
+    "services": [
+      {"host_ip": "10.0.0.1", "port": 22, "service": "ssh"}
+    ],
+    "threats": [
+      {"host_ip": "10.0.0.1", "port": 22, "cve_id": "CVE-2024-6387", "cvss_nvd": {"score": 5.0},
+       "epss": {"score": 0.1},
+       "affected_software_ref": "sw:10.0.0.1:-:openssh:9.2p1"}
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "pass",
+    "group_key": "10.0.0.1",
+    "positive": false
+  }
+}

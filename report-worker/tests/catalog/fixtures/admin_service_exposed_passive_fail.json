@@ -1,0 +1,20 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 443, "service": "http", "product": "Microsoft IIS httpd", "tls_required": true, "tunnel_ssl": true}
+  ],
+  "passive": [
+   {"host_ip": "10.0.0.1", "port": 4433, "source": "shodan", "product": "SonicWall", "seen_at": "2026-08-30T14:00:00Z", "verified": false, "confidence": 0.5},
+   {"host_ip": "10.0.0.1", "port": 443, "source": "shodan", "product": "Microsoft IIS httpd", "verified": true, "confidence": 0.8}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:4433 (SonicWall, laut Passivquelle)"],
+  "verified": false,
+  "source_mode": "passive",
+  "positive": false
+ }
+}

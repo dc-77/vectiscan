@@ -1,0 +1,51 @@
+id: dev_host_public
+title: Entwicklungs- oder Testsystem oeffentlich erreichbar
+family: dev_host_public
+category: A
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: fqdn
+applicable_when: null
+when: matches(fqdn.name, DEV_HOST_PREFIX) and fqdn.http_status == 200
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [web_probe]
+kind: check
+bundle: null
+affected_template: "{fqdn}"
+evidence: [fqdn]
+references: [CWE-200]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-DEV-HOST
+  start_level: mittel
+  deviation: >-
+    Der Hostname ist ein Hinweis und kein inhaltlicher Fund; die Einstufung Hygiene mittel
+    entspricht dem Prototyp (catalog_sim R-DEV-HOST).
+texts:
+  observation: >-
+    Der Hostname von {group} beginnt mit einem Namensteil, der auf ein Entwicklungs- oder
+    Testsystem hinweist, und antwortet aus dem gesamten Internet: {affected}.
+  meaning: >-
+    Entwicklungs- und Testsysteme erhalten haeufig seltener Patches und schwaechere
+    Zugangsbeschraenkungen als produktive Systeme. Sie koennen zudem Testdaten oder unfertige
+    Funktionen enthalten, die nicht fuer die Oeffentlichkeit gedacht sind.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Pruefen, ob das System oeffentlich erreichbar sein muss, und den Zugriff andernfalls auf
+        bekannte Quellnetze oder ein VPN beschraenken.
+    - stage: mittelfristig
+      text: >-
+        Entwicklungs- und Testsysteme mit dem gleichen Patchstand wie produktive Systeme pflegen
+        und Testdaten regelmaessig bereinigen.
+  verify: >-
+    Die genannte Adresse von einer externen Adresse aus aufrufen; erwartet wird keine Antwort
+    ohne vorherige Zugriffsbeschraenkung.

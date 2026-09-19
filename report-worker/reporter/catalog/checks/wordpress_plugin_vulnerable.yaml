@@ -1,0 +1,55 @@
+id: wordpress_plugin_vulnerable
+title: WordPress-Erweiterung mit bekannten Schwachstellen
+family: wordpress_plugin_vulnerable
+category: B
+scale: exposure
+level: erhoeht
+group_by: host
+scope: software
+applicable_when: null
+item_when: null
+when: software.kind in ["plugin", "theme"] and software.vulnerabilities_count > 0
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [wpscan]
+kind: check
+bundle: null
+affected_template: "{host_ip}: {product} {version} ({vulnerabilities_count} bekannte Schwachstellen)"
+evidence: [software]
+references: [CWE-1395, OWASP2025-A06]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-WP-001
+  start_level: MEDIUM
+  deviation: >-
+    SP-WP-001 stuft die Sammelklasse WordPress-Plugin- und Theme-Schwachstellen auf MEDIUM ein;
+    der Prototyp (catalog_sim) fuehrt oeffentlich ausnutzbare Plugin-Luecken als Exposition
+    erhoeht, weil die Schwachstelle ueber die Anwendung von aussen erreichbar ist. Die Anzahl
+    bekannter Schwachstellen kommt ausschliesslich aus der Werkzeugausgabe; das Label nennt immer
+    Produkt und Version, nie nur eine Zahl.
+texts:
+  observation: >-
+    Auf {group} ist eine WordPress-Erweiterung mit bekannten Schwachstellen im Einsatz: {affected}.
+  meaning: >-
+    Bekannte Schwachstellen in Plugins oder Themes sind oeffentlich dokumentiert und lassen sich
+    ohne Zugriff auf den Server nachvollziehen. Eine veraltete Erweiterung bleibt so lange
+    angreifbar, bis die fehlerbereinigte Version eingespielt ist.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Erweiterung auf die vom Hersteller freigegebene, fehlerbereinigte Version aktualisieren;
+        laesst sich das nicht sofort umsetzen, die Erweiterung deaktivieren.
+    - stage: in_kuerze
+      text: >-
+        Pruefen, ob die Erweiterung fuer den Betrieb noch benoetigt wird, und nicht mehr genutzte
+        Erweiterungen entfernen.
+  verify: >-
+    Versionsstand der Erweiterung im Adminbereich pruefen und mit dem Eintrag im Plugin-
+    beziehungsweise Theme-Verzeichnis des Herstellers abgleichen; erwartet wird die aktuelle,
+    fehlerbereinigte Version ohne offene Schwachstellen.

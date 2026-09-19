@@ -1,0 +1,51 @@
+id: spf_softfail
+title: SPF-Eintrag ohne konsequente Durchsetzung
+family: spf_softfail
+category: C
+scale: hygiene
+level: niedrig
+group_by: domain
+scope: dns
+applicable_when: dns.spf is not None
+when: dns.spf.all_qualifier in ["~all", "?all"]
+positive_when: dns.spf.all_qualifier == "-all"
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: null
+affected_template: "{domain} ({spf_qualifier})"
+evidence: [dns]
+references: [CWE-290, RFC-7208]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DNS-005
+  start_level: LOW
+  deviation: null
+texts:
+  observation: >-
+    Der SPF-Eintrag der Domain {domain} setzt bei nicht autorisierten Versendern nur auf eine
+    weiche oder neutrale Fehlbehandlung: {affected}. Empfangende Mailserver duerfen die E-Mail
+    trotzdem zustellen.
+  meaning: >-
+    Eine weiche oder neutrale Fehlbehandlung markiert eine E-Mail lediglich als verdaechtig,
+    lehnt sie aber nicht ab. Empfangssysteme, die diese Markierung nicht auswerten, stellen
+    gefaelschte E-Mails im Namen der Domain trotzdem zu.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Nach einer Beobachtungsphase ohne Fehlmeldungen den Qualifizierer des SPF-Eintrags auf
+        eine harte Fehlbehandlung umstellen, sobald alle legitimen Versandquellen erfasst sind.
+  verify: >-
+    DNS-Abfrage des TXT-Eintrags der Domain {domain}; erwartet wird ein SPF-Eintrag mit
+    harter Fehlbehandlung am Ende der Regel.
+  positive:
+    title: SPF-Eintrag mit harter Fehlbehandlung
+    text: >-
+      Der SPF-Eintrag der Domain {domain} weist nicht autorisierte Versender mit harter
+      Fehlbehandlung ab.

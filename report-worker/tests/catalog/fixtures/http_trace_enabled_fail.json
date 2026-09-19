@@ -1,0 +1,14 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 80, "service": "http", "product": "Apache httpd", "capabilities": ["METHOD:GET", "METHOD:TRACE"]}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:80 (TRACE aktiv)"],
+  "positive": false
+ }
+}

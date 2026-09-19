@@ -1,0 +1,14 @@
+{
+  "facts": {
+    "passive": [
+      {"source": "urlhaus", "domain": "example.test", "details": {"compromised": true}, "confidence": 0.5}
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "fail",
+    "group_key": "scan",
+    "affected": ["example.test (URLhaus)"],
+    "positive": false
+  }
+}

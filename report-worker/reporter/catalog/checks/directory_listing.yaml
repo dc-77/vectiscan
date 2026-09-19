@@ -1,0 +1,51 @@
+id: directory_listing
+title: Verzeichnisinhalt des Webservers einsehbar
+family: directory_listing
+category: E
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: http.alerts
+applicable_when: null
+when: zap_match(alert, ZAP_DIRECTORY_LISTING)
+positive_when: never
+not_testable_when:
+  - when: http is not None and len(http.alerts) == 0
+    reason_code: zap_no_alerts
+    context: group
+undetermined: not_testable
+requires:
+  tools: [zap]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({url_path})"
+evidence: [http]
+references: [CWE-548]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DISC-005
+  start_level: LOW
+  deviation: >-
+    SP-DISC-005 bewertet eine einsehbare Verzeichnisauflistung mit LOW; die Simulation
+    (catalog_sim) fuehrt die Familie als Hygiene mittel, weil ein einsehbares Verzeichnis
+    unmittelbar Dateinamen und Struktur offenlegt. Diese Umsetzung folgt catalog_sim.
+texts:
+  observation: >-
+    Die passive Webanalyse hat auf {group} ein einsehbares Verzeichnis ohne eigene Startseite
+    gefunden: {affected}.
+  meaning: >-
+    Ein einsehbares Verzeichnis legt Dateinamen und Struktur offen, die sonst nicht sichtbar
+    waeren, und kann so den Zugriff auf Dateien erleichtern, die nicht fuer die oeffentliche
+    Ansicht bestimmt sind.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die Verzeichnisauflistung in der Webserverkonfiguration deaktivieren oder eine
+        Startseite in das betroffene Verzeichnis legen.
+  verify: >-
+    Den gemeldeten Pfad im Browser aufrufen; erwartet wird eine Fehlermeldung oder eine
+    Weiterleitung statt einer Dateiliste.

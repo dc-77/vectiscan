@@ -1,0 +1,15 @@
+{
+  "facts": {
+    "hosts": [
+      {"ip": "10.0.0.1", "reputation": {"abuseipdb_score": 40, "otx_pulse_count": 0, "is_tor": false}}
+    ],
+    "coverage": [
+      {"scope": "domain", "domain": "example.test", "tool": "abuseipdb", "status": "skipped", "reason": "not_in_package"}
+    ]
+  },
+  "expect": {
+    "status": "not_applicable",
+    "group_key": "10.0.0.1",
+    "reason_code": "not_in_package"
+  }
+}

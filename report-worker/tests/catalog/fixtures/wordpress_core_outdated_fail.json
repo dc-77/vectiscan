@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": true, "status_code": 200,
+    "wordpress": {"users": ["admin"], "version_status": "outdated"}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": ["www.example.test (WordPress outdated)"],
+  "positive": false
+ }
+}

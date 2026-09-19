@@ -1,0 +1,50 @@
+id: wordpress_user_enumeration
+title: WordPress-Benutzernamen von aussen ermittelbar
+family: user_enumeration
+category: E
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: http
+applicable_when: http is not None and http.wordpress is not None
+item_when: http.wordpress is not None
+when: len(http.wordpress.users) > 0
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [wpscan]
+kind: check
+bundle: null
+affected_template: "{fqdn} ({wp_users})"
+evidence: [http]
+references: [CWE-203, OWASP2025-A07]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-WP-002
+  start_level: LOW
+  deviation: null
+texts:
+  observation: >-
+    Auf {group} lassen sich ueber WordPress-Schnittstellen gueltige Benutzernamen ermitteln:
+    {affected}.
+  meaning: >-
+    Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein
+    Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Die Offenlegung von Benutzernamen ueber die REST-Schnittstelle und die Autorenarchive
+        einschraenken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der
+        WordPress-Konfiguration.
+    - stage: strategisch
+      text: >-
+        Anmeldenamen von den oeffentlich sichtbaren Anzeigenamen trennen, damit ein ermittelter
+        Anzeigename keinen Rueckschluss auf den Anmeldenamen erlaubt.
+  verify: >-
+    Die WordPress-REST-Schnittstelle und die Autorenarchive von aussen abrufen; erwartet wird,
+    dass dabei keine Benutzernamen preisgegeben werden.

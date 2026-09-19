@@ -1,0 +1,16 @@
+{
+ "facts": {
+  "hosts": [
+   {"ip": "2001:db8::2", "reachable": true, "nmap_state": "skipped"}
+  ],
+  "coverage": [
+   {"scope": "host", "host_ip": "2001:db8::2", "tool": "nmap", "status": "failed", "reason": "target_invalid_ipv6", "raw_status": "ok"}
+  ]
+ },
+ "expect": {
+  "status": "not_testable",
+  "group_key": "[2001:db8::2]",
+  "reason_code": "target_invalid_ipv6",
+  "positive": false
+ }
+}

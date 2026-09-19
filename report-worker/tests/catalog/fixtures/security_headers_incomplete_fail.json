@@ -1,0 +1,23 @@
+{
+ "facts": {
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "url": "https://www.example.test/", "reachable": true, "status_code": 200,
+    "security_headers": {
+     "x-frame-options": {"present": false},
+     "x-content-type-options": {"present": true, "value": "nosniff"},
+     "referrer-policy": {"present": false},
+     "permissions-policy": {"present": true, "value": "geolocation=()"},
+     "strict-transport-security": {"present": true, "value": "max-age=31536000"},
+     "content-security-policy": {"present": false}
+    },
+    "score": "3/7"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": ["www.example.test (fehlend: x-frame-options, referrer-policy)"],
+  "positive": false
+ }
+}

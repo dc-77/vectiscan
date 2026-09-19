@@ -1,0 +1,50 @@
+id: http_alt_port
+title: Webdienst auf unueblichem Port erreichbar
+family: http_alt_port
+category: A
+scale: hygiene
+level: niedrig
+group_by: host
+scope: service
+applicable_when: null
+when: startswith(service.service, "http") and service.port not in WEB_PORTS and service.port not in ADMIN_PORTS and not matches(service.product, ADMIN_PRODUCTS) and not is_cdn(host, services)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} ({product_or_service})"
+evidence: [service]
+references: [CWE-16, OWASP2025-A05]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: neu (spec/06 Abschnitt 4)
+  start_level: niedrig
+  deviation: null
+texts:
+  observation: >-
+    Der Host {group} beantwortet Anfragen an einen Webdienst auf einem Port ausserhalb der
+    ueblichen Web- und Verwaltungsports: {affected}. Der Zweck dieses Dienstes ist von aussen
+    nicht erkennbar.
+  meaning: >-
+    Ein Webdienst auf einem unueblichen Port bleibt bei einer Pruefung der Standardports leicht
+    unbemerkt und vergroessert die Angriffsflaeche um eine Anwendung, deren Pflegezustand von
+    aussen nicht erkennbar ist.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Klaeren, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten
+        Internet dafuer erforderlich ist.
+    - stage: mittelfristig
+      text: >-
+        Nicht mehr benoetigte Dienste abschalten und den zugehoerigen Port schliessen;
+        weiterhin benoetigte Dienste auf feste Quellnetze beschraenken.
+  verify: >-
+    Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur
+    noch fuer berechtigte Quellnetze erreichbar oder vollstaendig geschlossen ist.

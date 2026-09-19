@@ -1,0 +1,52 @@
+id: http_no_tls
+title: Webdienst ohne Transportverschluesselung erreichbar
+family: http_no_tls
+category: A
+scale: exposure
+level: erhoeht
+group_by: host
+scope: host
+applicable_when: null
+when: has_port(services, 80) and not has_port(services, 443) and not is_cdn(host, services)
+positive_when: has_port(services, 443)
+not_testable_when: []
+undetermined: pass_silent
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_label}, Port 80 ohne Port 443"
+evidence: [services]
+references: [CWE-319, OWASP2025-A02]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-HTTP-NO-TLS
+  start_level: erhoeht
+  deviation: null
+texts:
+  observation: >-
+    Der Host {group} bietet einen Webdienst nur ueber unverschluesseltes HTTP an; ein HTTPS-Dienst
+    auf Port 443 fehlt: {affected}.
+  meaning: >-
+    Alle Inhalte und Eingaben laufen im Klartext ueber das Netz. In fremden Netzen kann jeder
+    Mitleser Seiteninhalte veraendern oder Formulareingaben abgreifen; Browser markieren die Seite
+    als nicht sicher.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Ein Zertifikat einer anerkannten Zertifizierungsstelle einrichten und den Dienst ueber HTTPS
+        anbieten; HTTP nur noch als Weiterleitung auf HTTPS betreiben.
+    - stage: mittelfristig
+      text: >-
+        HSTS setzen, sobald alle Hostnamen dauerhaft HTTPS liefern.
+  verify: >-
+    Aufruf des Hostnamens ueber HTTPS von aussen; erwartet wird eine gueltige verschluesselte
+    Verbindung und eine Weiterleitung von HTTP auf HTTPS.
+  positive:
+    title: Webdienst mit Transportverschluesselung
+    text: >-
+      Der Host {group} bietet seinen Webdienst ueber HTTPS an.

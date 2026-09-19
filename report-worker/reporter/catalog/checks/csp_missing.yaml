@@ -1,0 +1,54 @@
+id: csp_missing
+title: Content-Security-Policy fehlt
+family: csp_missing
+category: D
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: http
+applicable_when: null
+when: http.csp.present is False
+positive_when: http.csp.present is True
+not_testable_when:
+  - when: http.reachable is not True or http.csp is None
+    reason_code: unreachable
+    context: item
+undetermined: not_testable
+requires:
+  tools: [header_check]
+kind: check
+bundle: null
+affected_template: "{fqdn}"
+evidence: [http]
+references: [CWE-693, OWASP2025-A05]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-CSP-001, SP-CSP-002
+  start_level: INFO
+  deviation: >-
+    SP-CSP-001 und SP-CSP-002 bewerten eine fehlende Content-Security-Policy mit INFO bis LOW; die
+    Simulation (catalog_sim) fuehrt die Familie als Hygiene mittel. Diese Umsetzung folgt der
+    niedrigeren SP-Einstufung und setzt Hygiene niedrig an.
+texts:
+  observation: >-
+    Auf {group} ist keine Content-Security-Policy gesetzt: {affected}.
+  meaning: >-
+    Ohne Content-Security-Policy hat der Browser keine zusaetzliche Einschraenkung, welche
+    Skript- und Inhaltsquellen eine Seite laden darf. Bei einer erfolgreichen Einschleusung von
+    Fremdinhalten fehlt damit eine zweite Verteidigungslinie.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Eine Content-Security-Policy in der Webserver- oder Anwendungskonfiguration setzen, die
+        Skript- und Style-Quellen auf die tatsaechlich benoetigten Urspruenge beschraenkt.
+  verify: >-
+    HTTP-Antwortheader der Startseite von aussen abrufen; erwartet wird ein Header
+    Content-Security-Policy mit einer Regel fuer Skriptquellen.
+  positive:
+    title: Content-Security-Policy gesetzt
+    text: >-
+      Auf {group} ist eine Content-Security-Policy gesetzt.

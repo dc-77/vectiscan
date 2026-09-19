@@ -1,0 +1,54 @@
+id: software_lifecycle_hint
+title: Hostname mit Hinweis auf ein Produktjahr
+family: software_lifecycle_review
+category: B
+scale: hygiene
+level: niedrig
+group_by: fqdn
+scope: fqdn
+applicable_when: null
+when: matches(fqdn.name, YEAR_HINT) or any_match(fqdn_names, YEAR_HINT)
+positive_when: never
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [web_probe]
+kind: check
+bundle: null
+affected_template: "{year_hint_names} (Produktjahr im Hostnamen)"
+evidence: [fqdn]
+references: [CWE-1104]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: Prototyp VS-006
+  start_level: mittel
+  deviation: >-
+    Der Hostname allein ist eine schwache, rein namensbasierte Evidenz ohne Versionsnachweis; die
+    Einstufung sinkt gegenueber dem Prototyp von mittel auf Hygiene niedrig. Der Befund ist ein
+    Lebenszyklus-Pruefauftrag, keine Aussage ueber die tatsaechlich installierte Softwareversion.
+texts:
+  observation: >-
+    Der Hostname von {group} enthaelt eine Zahlenfolge, die einem gaengigen Produktjahr entspricht:
+    {affected}. Der Hostname allein belegt keine installierte Version, gibt aber einen Anlass fuer
+    eine Pruefung des Lebenszyklus der zugrunde liegenden Plattform.
+  meaning: >-
+    Hostnamen mit einem Produktjahr weisen haeufig auf das Beschaffungsjahr oder die
+    Produktgeneration einer Plattform hin. Ist die Plattform tatsaechlich so alt wie der Hostname
+    vermuten laesst, kann die Herstellerpflege bereits beendet sein. Ohne eine Versionspruefung vor
+    Ort bleibt dies ein Verdachtsmoment.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Anhand des Hostnamens pruefen, welche Plattform und Version tatsaechlich im Einsatz ist,
+        und den Lebenszyklusstatus beim Hersteller abgleichen.
+    - stage: strategisch
+      text: >-
+        Hostnamen mit Produktjahr in die Inventarisierung aufnehmen, damit anstehende
+        Lebenszyklusenden rechtzeitig geplant werden koennen.
+  verify: >-
+    Versionsstand der auf dem Host laufenden Plattform pruefen und mit den Lebenszyklusangaben des
+    Herstellers vergleichen; erwartet wird eine Plattform mit laufender Pflege.

@@ -1,0 +1,102 @@
+# Ignorierliste des Pruefkatalogs (spec/06 Abschnitt 4, Stufe 1). Versioniert ueber
+# CATALOG_VERSION. Jeder Eintrag braucht eine Begruendung. ZAP-Eintraege matchen ueber
+# plugin_id UND Namensmuster; Alerts ohne plugin_id (API-Snapshot) nur ueber den Namen.
+# Die IDs stammen aus der Aggregation ueber die 36 Snapshot-Orders (Session S2).
+entries:
+  # --- ZAP-Informationsalerts ohne Sicherheitsaussage
+  - kind: zap_alert
+    plugin_id: "10109"
+    name: "^modern web application$"
+    reason: Beschreibt nur, dass die Seite JavaScript-lastig ist; keine Schwachstelle.
+  - kind: zap_alert
+    plugin_id: "10112"
+    name: "^session management response identified$"
+    reason: Erkennung eines Sitzungsmechanismus; keine Sicherheitsaussage.
+  - kind: zap_alert
+    plugin_id: "10050"
+    name: "^retrieved from cache$"
+    reason: Antwort kam aus einem Cache; keine Sicherheitsaussage.
+  - kind: zap_alert
+    plugin_id: "10111"
+    name: "^authentication request identified$"
+    reason: Erkennung eines Anmeldeformulars; das Portal selbst bewertet login_portal_exposed.
+  - kind: zap_alert
+    plugin_id: "10031"
+    name: "^user controllable html element attribute"
+    reason: Potenzialhinweis ohne Nachweis; ein XSS-Befund braucht den aktiven Scan.
+  - kind: zap_alert
+    plugin_id: "10029"
+    name: "^cookie poisoning$"
+    reason: Informationaler Hinweis auf Cookie-Werte aus Parametern ohne Nachweis einer Auswirkung.
+  - kind: zap_alert
+    plugin_id: "90011"
+    name: "^charset mismatch"
+    reason: Kodierungsangabe in Header und Meta weicht ab; keine Sicherheitsaussage.
+  - kind: zap_alert
+    plugin_id: "10015"
+    name: "^re-examine cache-control directives$"
+    reason: Cache-Hinweis fuer statische Inhalte; keine Sicherheitsaussage ohne Kontext.
+  - kind: zap_alert
+    plugin_id: "10104"
+    name: "^user agent fuzzer$"
+    reason: Testartefakt des Werkzeugs, kein Befund.
+  # --- Header-Alerts, die durch die Header-Pruefungen aus den header_check-Fakten abgedeckt sind
+  - kind: zap_alert
+    plugin_id: "10035"
+    name: "^strict-transport-security"
+    reason: Abgedeckt durch hsts_missing und hsts_short (Quelle header_check je virtuellem Host).
+  - kind: zap_alert
+    plugin_id: "10038"
+    name: "^content security policy \\(csp\\) header not set$"
+    reason: Abgedeckt durch csp_missing.
+  - kind: zap_alert
+    plugin_id: "10055"
+    name: "^csp:"
+    reason: CSP-Unteralerts sind durch csp_weak abgedeckt (unsafe-inline, unsafe-eval, Wildcard).
+  - kind: zap_alert
+    name: "^csp:"
+    reason: CSP-Unteralerts ohne plugin_id (API-Snapshot) sind durch csp_weak abgedeckt.
+  - kind: zap_alert
+    plugin_id: "10021"
+    name: "^x-content-type-options header missing$"
+    reason: Abgedeckt durch security_headers_incomplete.
+  - kind: zap_alert
+    plugin_id: "10020"
+    name: "^missing anti-clickjacking header$"
+    reason: Abgedeckt durch security_headers_incomplete (X-Frame-Options).
+  - kind: zap_alert
+    plugin_id: "10020"
+    name: "^multiple x-frame-options header entries$"
+    reason: Abgedeckt durch header_duplicate (Quelle header_check duplicate_headers).
+  - kind: zap_alert
+    plugin_id: "10063"
+    name: "^permissions policy header not set$"
+    reason: Abgedeckt durch security_headers_incomplete.
+  - kind: zap_alert
+    plugin_id: "10036"
+    name: "^server leaks version information"
+    reason: Abgedeckt durch http_header_disclosure (Server-Header aus header_check).
+  - kind: zap_alert
+    plugin_id: "10037"
+    name: "^server leaks information via \"x-powered-by\""
+    reason: Abgedeckt durch http_header_disclosure (X-Powered-By aus header_check).
+  - kind: zap_alert
+    name: "^strict-transport-security disabled$"
+    reason: Abgedeckt durch hsts_missing.
+  - kind: zap_alert
+    plugin_id: "10010"
+    name: "^cookie no httponly flag$"
+    reason: Abgedeckt durch cookie_flags (Quelle header_check Cookies).
+  - kind: zap_alert
+    plugin_id: "10011"
+    name: "^cookie without secure flag$"
+    reason: Abgedeckt durch cookie_flags (Quelle header_check Cookies).
+  - kind: zap_alert
+    plugin_id: "10054"
+    name: "^cookie (without|with) samesite attribute"
+    reason: Abgedeckt durch cookie_flags (Quelle header_check Cookies).
+  # --- Passivports an CDN-Edge-Adressen (Cloudflare meldet diese Ports an jeder Edge-IP)
+  - kind: passive_port
+    ports: [2052, 2053, 2082, 2083, 2086, 2087, 2095, 2096, 8080, 8443, 8880]
+    only_cdn: true
+    reason: Standardports der Cloudflare-Edge, gehoeren dem CDN-Betreiber und nicht dem Kunden.

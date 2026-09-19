@@ -1,0 +1,60 @@
+id: software_eol
+title: Serversoftware ohne Herstellerpflege
+family: software_eol
+category: B
+scale: exposure
+level: erhoeht
+group_by: host
+scope: software
+applicable_when: null
+when: software.eol.status == "eol" and software.kind in ["webserver", "database", "mail", "os", "ssh", "ftp", "control_panel"]
+positive_when: software.kind in ["webserver", "database", "mail", "os", "ssh", "ftp", "control_panel"] and (software.eol.status == "supported" or (software.family == "exchange" and software.edition == "SE"))
+not_testable_when: []
+undetermined: pass_silent
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_ip}: {product} {version} (Support beendet {eol_date})"
+evidence: [software]
+references: [CWE-1104]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-EOL-001
+  start_level: HIGH
+  deviation: >-
+    SP-EOL-005 hebt EOL-Serversoftware am Internet auf CRITICAL. Ohne belegte Ausnutzbarkeit ist
+    das Ende der Herstellerpflege eine erhoehte Exposition; kritisch wird es erst mit einer
+    bestaetigten Schwachstelle (cve_kev_listed). EOL nur aus dem Feed mit sicherer Familie und
+    Version (S1); unbekannte Versionen ergeben keinen Befund. Exchange Subscription Edition gilt
+    ueber die Build-Tabelle als gepflegt (Entscheidung DC 19.09.2026).
+texts:
+  observation: >-
+    Auf {group} laeuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist:
+    {affected}.
+  meaning: >-
+    Fuer Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte
+    Schwachstellen bleiben dauerhaft offen, und Angreifer koennen auf veroeffentlichte Exploits
+    zurueckgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner
+    nicht erkennbar ist.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Pruefen, ob die Version tatsaechlich ungepflegt ist oder ob die Distribution
+        Sicherheits-Backports liefert.
+    - stage: mittelfristig
+      text: >-
+        Auf eine vom Hersteller gepflegte Version aktualisieren und einen festen Update-Rhythmus
+        festlegen.
+  verify: >-
+    Versionsstand auf dem System pruefen und mit den Lebenszyklusangaben des Herstellers vergleichen;
+    erwartet wird eine Version mit laufender Pflege.
+  positive:
+    title: Serversoftware mit laufender Herstellerpflege
+    text: >-
+      Auf {group} ist Serversoftware nachweislich in einer vom Hersteller gepflegten Version im
+      Einsatz.

@@ -1,0 +1,55 @@
+id: dmarc_missing
+title: DMARC-Richtlinie fehlt
+family: dmarc_missing
+category: C
+scale: hygiene
+level: hoch
+group_by: domain
+scope: dns
+applicable_when: null
+when: dns.dmarc is None or dns.dmarc.present is False
+positive_when: dns.dmarc.present is True
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: null
+affected_template: "{domain}"
+evidence: [dns]
+references: [CWE-290, RFC-7489]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DNS-006
+  start_level: MEDIUM
+  deviation: >-
+    Fehlendes DMARC hat direkten Bezug zur Absender-Authentizitaet und damit zu Betrugsszenarien;
+    der Prototyp (VS-007) stuft es als Hygiene hoch ein.
+texts:
+  observation: >-
+    Fuer die Domain {domain} existiert kein DMARC-Eintrag. Ohne DMARC bleibt es dem Empfaenger
+    ueberlassen, was mit E-Mails geschieht, die SPF oder DKIM nicht bestehen.
+  meaning: >-
+    Angreifer koennen E-Mails im Namen der Domain an Kunden, Lieferanten und Mitarbeitende senden
+    (Rechnungsbetrug, CEO-Fraud), ohne dass Empfaengersysteme diese zuverlaessig abweisen. DMARC ist
+    der Schlussstein der Absender-Authentizitaet.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Einen DMARC-Eintrag mit p=none und einer Reporting-Adresse (rua) anlegen und vier Wochen die
+        Berichte auswerten.
+    - stage: mittelfristig
+      text: >-
+        Die Richtlinie auf p=quarantine und danach auf p=reject anheben, sobald alle legitimen
+        Versender erfasst sind.
+  verify: >-
+    DNS-Abfrage des TXT-Eintrags _dmarc.{domain}; erwartet wird ein Eintrag, der mit v=DMARC1 beginnt
+    und eine Richtlinie p nennt.
+  positive:
+    title: DMARC-Richtlinie vorhanden
+    text: >-
+      Fuer die Domain {domain} ist ein DMARC-Eintrag veroeffentlicht.

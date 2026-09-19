@@ -1,0 +1,18 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 443, "service": "http", "tls_required": true, "tunnel_ssl": true}
+  ],
+  "http": [
+   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "reachable": true, "status_code": 200,
+    "hsts": {"present": false}}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "www.example.test@10.0.0.1",
+  "affected": ["www.example.test"],
+  "positive": false
+ }
+}

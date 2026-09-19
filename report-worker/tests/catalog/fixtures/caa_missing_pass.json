@@ -1,0 +1,7 @@
+{
+  "facts": {
+    "dns": [{"domain": "example.test", "caa": {"present": true, "issuers": ["letsencrypt.org"]}}]
+  },
+  "coverage_default": "ok",
+  "expect": {"status": "pass", "group_key": "example.test", "positive": true}
+}

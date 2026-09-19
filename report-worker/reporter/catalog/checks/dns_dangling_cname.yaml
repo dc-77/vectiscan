@@ -1,0 +1,54 @@
+id: dns_dangling_cname
+title: Verwaister CNAME-Eintrag mit Uebernahmerisiko
+family: dns_dangling
+category: C
+scale: hygiene
+level: mittel
+group_by: domain
+scope: dns.dangling_cnames
+applicable_when: null
+when: dangling.takeover_risk != "low"
+positive_when: absent
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: null
+affected_template: "{fqdn} (Ziel {cname_target})"
+evidence: [dns]
+references: [CWE-706]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-DNS-DANGLING
+  start_level: mittel
+  deviation: null
+texts:
+  observation: >-
+    Fuer die Domain {domain} liegt mindestens ein CNAME-Eintrag vor, dessen Ziel nicht mehr
+    unter eigener Kontrolle liegt oder nicht mehr antwortet: {affected}.
+  meaning: >-
+    Ein Angreifer, der den freien Zielnamen fuer sich registriert oder auf einem geteilten Dienst
+    anlegt, kann Inhalte unter dem Namen der eigenen Domain ausliefern, Sitzungscookies der
+    Domain lesen oder sich als vertrauenswuerdiger Absender ausgeben.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Den CNAME-Eintrag auf ein tatsaechlich genutztes Ziel umstellen oder vollstaendig aus
+        der Zone entfernen, solange das urspruengliche Ziel nicht mehr existiert.
+    - stage: mittelfristig
+      text: >-
+        Bei der Ausserbetriebnahme von Diensten den zugehoerigen DNS-Eintrag im gleichen
+        Arbeitsschritt entfernen, damit keine weiteren verwaisten Eintraege entstehen.
+  verify: >-
+    DNS-Abfrage des betroffenen Hostnamens und Abgleich mit dem Ziel des CNAME-Eintrags;
+    erwartet wird entweder ein aufloesendes, selbst kontrolliertes Ziel oder das Entfernen des
+    Eintrags.
+  positive:
+    title: Keine verwaisten CNAME-Eintraege
+    text: >-
+      Fuer die Domain {domain} liegen keine verwaisten CNAME-Eintraege vor.

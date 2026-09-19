@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.7", "port": 2087, "service": "whm"}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.7",
+  "affected": ["10.0.0.7:2087 (whm)"],
+  "positive": false,
+  "members": {"10.0.0.7:2087": "fail"}
+ }
+}

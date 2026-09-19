@@ -1,0 +1,15 @@
+{
+ "facts": {
+  "services": [
+   {"host_ip": "10.0.0.1", "port": 110, "service": "pop3", "product": "Dovecot pop3d", "starttls": false, "tunnel_ssl": false},
+   {"host_ip": "10.0.0.1", "port": 143, "service": "imap", "product": "Dovecot imapd", "starttls": false, "tunnel_ssl": false}
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "fail",
+  "group_key": "10.0.0.1",
+  "affected": ["10.0.0.1:110 (POP3 ohne STARTTLS)", "10.0.0.1:143 (IMAP ohne STARTTLS)"],
+  "positive": false
+ }
+}

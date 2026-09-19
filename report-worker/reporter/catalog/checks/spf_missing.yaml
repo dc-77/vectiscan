@@ -1,0 +1,55 @@
+id: spf_missing
+title: SPF-Eintrag fehlt
+family: spf_missing
+category: C
+scale: hygiene
+level: hoch
+group_by: domain
+scope: dns
+applicable_when: null
+when: dns.spf is None
+positive_when: dns.spf is not None
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [dns_records]
+kind: check
+bundle: null
+affected_template: "{domain}"
+evidence: [dns]
+references: [CWE-290, RFC-7208]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: SP-DNS-004
+  start_level: MEDIUM
+  deviation: >-
+    SPF hat direkten Bezug zur Absender-Authentizitaet der Domain; der Prototyp stuft ein
+    fehlendes SPF als Hygiene hoch ein.
+texts:
+  observation: >-
+    Fuer die Domain {domain} liegt kein SPF-Eintrag vor: {affected}. Empfangende Mailserver
+    koennen damit nicht pruefen, welche Server im Namen der Domain versenden duerfen.
+  meaning: >-
+    Ohne SPF akzeptieren viele Empfangssysteme E-Mails im Namen der Domain unabhaengig vom
+    tatsaechlich sendenden Server. Das erleichtert Absenderfaelschung fuer Phishing- und
+    Betrugsversuche gegenueber Kunden, Lieferanten und Mitarbeitenden.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Einen SPF-Eintrag veroeffentlichen, der alle legitimen Versandquellen der Domain
+        auffuehrt, und die Fehlbehandlung zunaechst weich einstellen.
+    - stage: mittelfristig
+      text: >-
+        Die Versandquellen regelmaessig pruefen und den SPF-Eintrag bei Aenderungen der
+        Mailinfrastruktur nachziehen.
+  verify: >-
+    DNS-Abfrage des TXT-Eintrags der Domain {domain}; erwartet wird ein Eintrag, der mit v=spf1
+    beginnt.
+  positive:
+    title: SPF-Eintrag vorhanden
+    text: >-
+      Fuer die Domain {domain} ist ein SPF-Eintrag veroeffentlicht.

@@ -1,0 +1,52 @@
+id: tls_weak_ciphers
+title: Schwache TLS-Cipher-Suiten angeboten
+family: tls_weak_ciphers
+category: D
+scale: hygiene
+level: mittel
+group_by: fqdn
+scope: tls
+applicable_when: null
+when: any_in(tls.ciphers_weak, TLS_WEAK_CIPHER_KEYS)
+positive_when: not any_in(tls.ciphers_weak, TLS_WEAK_CIPHER_KEYS)
+not_testable_when:
+  - when: 'tls.source != "testssl"'
+    reason_code: tls_ciphers_unknown
+    context: item
+undetermined: not_testable
+requires:
+  tools: [testssl]
+kind: check
+bundle: null
+affected_template: "{target} ({ciphers_weak})"
+evidence: [tls]
+references: [CWE-327, BSI-TR-03116-4]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: ["TR-03116-4: keine 3DES-, RC4-, NULL- oder Export-Cipher"]
+policy:
+  source: SP-TLS-002
+  start_level: MEDIUM
+  deviation: null
+texts:
+  observation: >-
+    Der Dienst {group} bietet neben starken auch schwache Verschluesselungsverfahren an, die als
+    unsicher gelten: {affected}.
+  meaning: >-
+    Schwache Cipher-Suiten schuetzen die Verbindung nicht zuverlaessig vor bekannten Angriffen auf
+    die Verschluesselung. Faellt ein Client auf eine solche Suite zurueck, sind Anmeldedaten und
+    Sitzungsinformationen auf dem Uebertragungsweg schwaecher geschuetzt.
+  recommendation:
+    - stage: mittelfristig
+      text: >-
+        Schwache Cipher-Suiten in der Serverkonfiguration deaktivieren und ausschliesslich
+        moderne AEAD-Suiten mit Forward Secrecy anbieten.
+  verify: >-
+    Verbindungsversuch mit erzwungener schwacher Cipher-Suite gegen den Dienst durchfuehren;
+    erwartet wird ein Handshake-Fehler.
+  positive:
+    title: Keine schwachen TLS-Cipher
+    text: >-
+      Der Dienst {group} bietet ausschliesslich als sicher eingestufte Cipher-Suiten an.

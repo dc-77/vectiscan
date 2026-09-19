@@ -1,0 +1,57 @@
+id: smb_exposed
+title: SMB-Dienst aus dem Internet erreichbar
+family: smb_exposed
+category: A
+scale: exposure
+level: kritisch
+group_by: host
+scope: service
+applicable_when: null
+when: service.port in [139, 445]
+positive_when: absent
+not_testable_when: []
+undetermined: not_testable
+requires:
+  tools: [nmap]
+kind: check
+bundle: null
+affected_template: "{host_ip}:{port} ({service})"
+evidence: [service]
+references: [CWE-284, OWASP2025-A05]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+policy:
+  source: catalog_sim R-SMB-EXPOSED
+  start_level: kritisch
+  deviation: null
+texts:
+  observation: >-
+    Der Host {group} beantwortet Verbindungen auf SMB-Freigabeports aus dem gesamten Internet:
+    {affected}. Ein Datei- und Freigabedienst gehoert nicht an das oeffentliche Interface.
+  meaning: >-
+    Ein von aussen erreichbarer SMB-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht
+    bekannte Schwachstellen der Dateifreigabe sofort ausnutzbar. Betroffen waeren die auf den
+    Freigaben abgelegten Dateien und, bei erfolgreichem Zugriff, angebundene Systeme im internen
+    Netz.
+  recommendation:
+    - stage: unverzueglich
+      text: >-
+        Den externen Zugriff auf die SMB-Ports in der Firewall oder in der Verwaltung des Hosters
+        deaktivieren. Dateifreigaben ausschliesslich innerhalb des internen Netzes anbieten.
+    - stage: in_kuerze
+      text: >-
+        Zugriffsprotokolle der Freigabe auf fremde Anmeldeversuche pruefen und betroffene
+        Zugangsdaten vorsorglich aendern.
+    - stage: mittelfristig
+      text: >-
+        Fernzugriff auf Dateifreigaben ausschliesslich ueber ein VPN zulassen.
+  verify: >-
+    Portscan der Ports 139 und 445 von einer externen Adresse aus wiederholen; erwartet wird der
+    Zustand gefiltert oder geschlossen.
+  positive:
+    title: Kein SMB-Dienst aus dem Internet erreichbar
+    text: >-
+      Auf {group} antwortet kein SMB-Dienst auf Verbindungen von aussen.
