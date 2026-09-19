@@ -32,22 +32,22 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Fuer {affected} ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Fuer die Domain
+    Für {affected} ist die DNS-Zone nicht mit einer DNSSEC-Signatur versehen. Für die Domain
     {domain} lassen sich Antworten auf DNS-Abfragen damit nicht kryptografisch auf Echtheit
-    pruefen.
+    prüfen.
   meaning: >-
-    Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefaelschte
+    Ohne DNSSEC kann ein Angreifer, der den Antwortweg einer DNS-Abfrage beeinflusst, gefälschte
     DNS-Antworten unterschieben, ohne dass ein anfragender Resolver dies erkennt. Betroffen sind
-    vor allem die Zustellung von E-Mails und die Aufloesung von Hostnamen in fremden Netzen.
+    vor allem die Zustellung von E-Mails und die Auflösung von Hostnamen in fremden Netzen.
   recommendation:
     - stage: strategisch
       text: >-
-        DNSSEC fuer die Zone aktivieren und den Signaturschluessel beim Registrar als DS-Eintrag
+        DNSSEC für die Zone aktivieren und den Signaturschlüssel beim Registrar als DS-Eintrag
         hinterlegen, damit die Signaturkette bis zur Root nachvollziehbar ist.
   verify: >-
-    DNS-Abfrage der SOA mit aktivierter DNSSEC-Option fuer die Domain {domain}; erwartet wird ein
+    DNS-Abfrage der SOA mit aktivierter DNSSEC-Option für die Domain {domain}; erwartet wird ein
     RRSIG-Eintrag in der Antwort.
   positive:
     title: DNSSEC signiert
     text: >-
-      Fuer die Domain {domain} ist die DNS-Zone mit DNSSEC signiert.
+      Für die Domain {domain} ist die DNS-Zone mit DNSSEC signiert.

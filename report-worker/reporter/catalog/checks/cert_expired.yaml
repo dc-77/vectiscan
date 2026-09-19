@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
+bundle: cert_health
 affected_template: "{target} (abgelaufen {not_after})"
 evidence: [tls]
 references: [CWE-298, CWE-295]
@@ -36,26 +36,26 @@ policy:
     ist; diese Einstufung wird uebernommen.
 texts:
   observation: >-
-    Fuer den Dienst {group} ist das eingesetzte TLS-Zertifikat abgelaufen: {affected}. Ab diesem
-    Zeitpunkt weisen Browser und andere TLS-Clients die Verbindung als nicht vertrauenswuerdig aus.
+    Für den Dienst {group} ist das eingesetzte TLS-Zertifikat abgelaufen: {affected}. Ab diesem
+    Zeitpunkt weisen Browser und andere TLS-Clients die Verbindung als nicht vertrauenswürdig aus.
   meaning: >-
-    Ein abgelaufenes Zertifikat unterbricht die gesicherte Verbindung fuer alle Nutzer und gewoehnt
+    Ein abgelaufenes Zertifikat unterbricht die gesicherte Verbindung für alle Nutzer und gewöhnt
     sie an Sicherheitswarnungen, die in der Folge eher weggeklickt werden. Das erleichtert einem
     echten Man-in-the-Middle-Angriff, unbemerkt zu bleiben.
   recommendation:
     - stage: unverzueglich
       text: >-
-        Ein neues Zertifikat fuer den betroffenen Dienst ausstellen und einspielen, sodass die
-        Gueltigkeit wieder gegeben ist.
+        Ein neues Zertifikat für den betroffenen Dienst ausstellen und einspielen, sodass die
+        Gültigkeit wieder gegeben ist.
     - stage: strategisch
       text: >-
         Eine automatisierte Erneuerung des Zertifikats vor dem Ablaufdatum einrichten, damit
         dieser Zustand nicht erneut eintritt.
   verify: >-
-    Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des praesentierten
-    Zertifikats pruefen; erwartet wird ein Gueltigkeitszeitraum, der das aktuelle Datum einschliesst.
+    Verbindung zum Dienst mit einem TLS-Client aufbauen und das Ablaufdatum des präsentierten
+    Zertifikats prüfen; erwartet wird ein Gültigkeitszeitraum, der das aktuelle Datum einschließt.
   positive:
-    title: Zertifikat gueltig
+    title: Zertifikat gültig
     text: >-
-      Fuer den Dienst {group} liegt das aktuelle Datum innerhalb des Gueltigkeitszeitraums des
+      Für den Dienst {group} liegt das aktuelle Datum innerhalb des Gültigkeitszeitraums des
       eingesetzten TLS-Zertifikats.

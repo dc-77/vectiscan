@@ -34,24 +34,24 @@ policy:
     ueber die Build-Tabelle als gepflegt (Entscheidung DC 19.09.2026).
 texts:
   observation: >-
-    Auf {group} laeuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist:
+    Auf {group} läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist:
     {affected}.
   meaning: >-
-    Fuer Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte
-    Schwachstellen bleiben dauerhaft offen, und Angreifer koennen auf veroeffentlichte Exploits
-    zurueckgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner
+    Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte
+    Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits
+    zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner
     nicht erkennbar ist.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Pruefen, ob die Version tatsaechlich ungepflegt ist oder ob die Distribution
+        Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution
         Sicherheits-Backports liefert.
     - stage: mittelfristig
       text: >-
         Auf eine vom Hersteller gepflegte Version aktualisieren und einen festen Update-Rhythmus
         festlegen.
   verify: >-
-    Versionsstand auf dem System pruefen und mit den Lebenszyklusangaben des Herstellers vergleichen;
+    Versionsstand auf dem System prüfen und mit den Lebenszyklusangaben des Herstellers vergleichen;
     erwartet wird eine Version mit laufender Pflege.
   positive:
     title: Serversoftware mit laufender Herstellerpflege

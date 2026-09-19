@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [web_probe]
 kind: check
-bundle: null
+bundle: windows_edge_exposure
 affected_template: "{fqdn} ({title})"
 evidence: [fqdn]
 references: [CWE-1188, CWE-200]
@@ -35,8 +35,8 @@ texts:
     Die Webseite {group} liefert noch die Standard-Startseite des Webservers oder der
     Verwaltungssoftware aus, ohne eigenen Inhalt: {affected}.
   meaning: >-
-    Eine unveraenderte Standardseite zeigt, dass die Installation nicht abgeschlossen oder nicht
-    mehr in Betrieb ist. Sie verraet die eingesetzte Software und wirkt fuer Besucher unfertig
+    Eine unveränderte Standardseite zeigt, dass die Installation nicht abgeschlossen oder nicht
+    mehr in Betrieb ist. Sie verrät die eingesetzte Software und wirkt für Besucher unfertig
     oder verlassen.
   recommendation:
     - stage: mittelfristig

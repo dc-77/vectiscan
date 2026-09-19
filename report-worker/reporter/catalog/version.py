@@ -8,16 +8,20 @@ damit eine Aenderung ohne Bump im Audit sichtbar bleibt.
 
 Bump-Historie:
     2026-09-19.1  Erstversion (Session S2).
+    2026-09-19.2  Session S3: Kundentexte auf echte Umlaute umgestellt (Titel, texts,
+                  affected_template, COVERAGE_REASONS); Befund-Buendel unter bundles/
+                  eingefuehrt und das Feld bundle je Pruefung gefuellt.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-19.1"
+CATALOG_VERSION = "2026-09-19.2"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"
+BUNDLES_DIR = CATALOG_DIR / "bundles"
 IGNORE_FILE = CATALOG_DIR / "ignore.yaml"
 TABLES_FILE = CATALOG_DIR / "tables.py"
 
@@ -26,6 +30,7 @@ def digest_files(catalog_dir: Path | None = None) -> list[Path]:
     """Dateien, die in den Digest eingehen, in stabiler Reihenfolge."""
     base = Path(catalog_dir) if catalog_dir else CATALOG_DIR
     files = sorted((base / "checks").glob("*.yaml"), key=lambda p: p.name)
+    files.extend(sorted((base / "bundles").glob("*.yaml"), key=lambda p: p.name))
     for extra in (base / "ignore.yaml", base / "tables.py"):
         if extra.exists():
             files.append(extra)

@@ -1,5 +1,5 @@
 id: hsts_short
-title: HTTP Strict Transport Security mit zu kurzer Gueltigkeitsdauer
+title: HTTP Strict Transport Security mit zu kurzer Gültigkeitsdauer
 family: hsts_short
 category: D
 scale: hygiene
@@ -18,7 +18,7 @@ undetermined: not_testable
 requires:
   tools: [header_check]
 kind: check
-bundle: null
+bundle: tls_hardening
 affected_template: "{fqdn} (max-age {hsts_max_age})"
 evidence: [http]
 references: [CWE-693]
@@ -34,21 +34,21 @@ policy:
 texts:
   observation: >-
     Der Dienst {group} setzt den HTTP Strict Transport Security Header mit einer
-    Gueltigkeitsdauer, die unter dem empfohlenen Richtwert liegt: {affected}.
+    Gültigkeitsdauer, die unter dem empfohlenen Richtwert liegt: {affected}.
   meaning: >-
-    Eine kurze Gueltigkeitsdauer laesst den Schutz vor Downgrade-Angriffen bereits nach kurzer
-    Zeit ohne erneuten Seitenaufruf ablaufen; wiederkehrende Besucher sind dann fuer einen
-    Zeitraum wieder ungeschuetzt.
+    Eine kurze Gültigkeitsdauer lässt den Schutz vor Downgrade-Angriffen bereits nach kurzer
+    Zeit ohne erneuten Seitenaufruf ablaufen; wiederkehrende Besucher sind dann für einen
+    Zeitraum wieder ungeschützt.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die Gueltigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate
+        Die Gültigkeitsdauer des Strict-Transport-Security-Headers auf mindestens sechs Monate
         anheben.
   verify: >-
-    HTTP-Antwortheader der Startseite von aussen abrufen; erwartet wird ein gesetzter
-    Strict-Transport-Security-Header mit einer Gueltigkeitsdauer von mindestens sechs Monaten.
+    HTTP-Antwortheader der Startseite von außen abrufen; erwartet wird ein gesetzter
+    Strict-Transport-Security-Header mit einer Gültigkeitsdauer von mindestens sechs Monaten.
   positive:
-    title: HTTP Strict Transport Security mit ausreichender Gueltigkeitsdauer
+    title: HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer
     text: >-
       Der Dienst {group} setzt den Header Strict-Transport-Security mit einer ausreichenden
-      Gueltigkeitsdauer.
+      Gültigkeitsdauer.

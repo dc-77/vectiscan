@@ -1,5 +1,5 @@
 id: http_alt_port
-title: Webdienst auf unueblichem Port erreichbar
+title: Webdienst auf unüblichem Port erreichbar
 family: http_alt_port
 category: A
 scale: hygiene
@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [nmap]
 kind: check
-bundle: null
+bundle: windows_edge_exposure
 affected_template: "{host_ip}:{port} ({product_or_service})"
 evidence: [service]
 references: [CWE-16, OWASP2025-A05]
@@ -29,22 +29,22 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} beantwortet Anfragen an einen Webdienst auf einem Port ausserhalb der
-    ueblichen Web- und Verwaltungsports: {affected}. Der Zweck dieses Dienstes ist von aussen
+    Der Host {group} beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der
+    üblichen Web- und Verwaltungsports: {affected}. Der Zweck dieses Dienstes ist von außen
     nicht erkennbar.
   meaning: >-
-    Ein Webdienst auf einem unueblichen Port bleibt bei einer Pruefung der Standardports leicht
-    unbemerkt und vergroessert die Angriffsflaeche um eine Anwendung, deren Pflegezustand von
-    aussen nicht erkennbar ist.
+    Ein Webdienst auf einem unüblichen Port bleibt bei einer Prüfung der Standardports leicht
+    unbemerkt und vergrößert die Angriffsfläche um eine Anwendung, deren Pflegezustand von
+    außen nicht erkennbar ist.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Klaeren, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten
-        Internet dafuer erforderlich ist.
+        Klären, welche Anwendung den Dienst bereitstellt und ob ein Zugriff aus dem gesamten
+        Internet dafür erforderlich ist.
     - stage: mittelfristig
       text: >-
-        Nicht mehr benoetigte Dienste abschalten und den zugehoerigen Port schliessen;
-        weiterhin benoetigte Dienste auf feste Quellnetze beschraenken.
+        Nicht mehr benötigte Dienste abschalten und den zugehörigen Port schließen;
+        weiterhin benötigte Dienste auf feste Quellnetze beschränken.
   verify: >-
     Portscan des Hosts von einer externen Adresse wiederholen; erwartet wird, dass der Port nur
-    noch fuer berechtigte Quellnetze erreichbar oder vollstaendig geschlossen ist.
+    noch für berechtigte Quellnetze erreichbar oder vollständig geschlossen ist.

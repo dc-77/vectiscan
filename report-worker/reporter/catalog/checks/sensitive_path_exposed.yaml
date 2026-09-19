@@ -33,24 +33,24 @@ policy:
     SP-DISC-007/008.
 texts:
   observation: >-
-    Auf {group} liefert der Webserver fuer einen potenziell sensiblen Pfad den Statuscode 200,
-    ohne dass der Inhalt geprueft wurde: {affected}.
+    Auf {group} liefert der Webserver für einen potenziell sensiblen Pfad den Statuscode 200,
+    ohne dass der Inhalt geprüft wurde: {affected}.
   meaning: >-
     Der Pfadname deutet auf eine Konfigurations-, Sicherungs- oder Zugangsdatei hin. Ob dort
-    tatsaechlich Anmeldedaten, Zugangsschluessel oder interne Konfigurationsangaben liegen, ist
-    aus der Anfrage allein nicht erkennbar und muss am Inhalt geprueft werden.
+    tatsächlich Anmeldedaten, Zugangsschlüssel oder interne Konfigurationsangaben liegen, ist
+    aus der Anfrage allein nicht erkennbar und muss am Inhalt geprüft werden.
   recommendation:
     - stage: unverzueglich
       text: >-
-        Den Inhalt des gemeldeten Pfads pruefen. Bestaetigt sich eine Konfigurations-,
+        Den Inhalt des gemeldeten Pfads prüfen. Bestätigt sich eine Konfigurations-,
         Sicherungs- oder Zugangsdatei, den Zugriff darauf sofort serverseitig sperren oder die
-        Datei aus dem oeffentlich erreichbaren Verzeichnis entfernen.
+        Datei aus dem öffentlich erreichbaren Verzeichnis entfernen.
     - stage: mittelfristig
       text: >-
-        Konfigurations-, Sicherungs- und Zugangsdateien grundsaetzlich ausserhalb des oeffentlich
+        Konfigurations-, Sicherungs- und Zugangsdateien grundsätzlich außerhalb des öffentlich
         erreichbaren Wurzelverzeichnisses ablegen.
   verify: >-
     Den gemeldeten Pfad direkt aufrufen und den Inhalt der Antwort sichten. Erwartet wird eine
-    Fehlermeldung mit Status 403 oder eine Antwort ohne Anmeldedaten, Zugangsschluessel oder
-    interne Konfigurationsangaben. Dieser Pruefschritt ist vor jeder weiteren Bewertung des
+    Fehlermeldung mit Status 403 oder eine Antwort ohne Anmeldedaten, Zugangsschlüssel oder
+    interne Konfigurationsangaben. Dieser Prüfschritt ist vor jeder weiteren Bewertung des
     Fundes zwingend erforderlich.

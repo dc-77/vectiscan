@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [dns_records]
 kind: check
-bundle: null
+bundle: mail_records
 affected_template: "{domain}"
 evidence: [dns]
 references: [CWE-290, RFC-6376]
@@ -35,27 +35,27 @@ policy:
     Weiterleitungen die SPF-Pruefung beim Empfaenger regelmaessig scheitern lassen.
 texts:
   observation: >-
-    Fuer {affected} ist im DNS keine DKIM-Signatur nachweisbar. Fuer ausgehende E-Mails der
-    Domain {domain} fehlt damit ein Selektor, ueber den Empfaengersysteme die Signatur pruefen
-    koennten.
+    Für {affected} ist im DNS keine DKIM-Signatur nachweisbar. Für ausgehende E-Mails der
+    Domain {domain} fehlt damit ein Selektor, über den Empfängersysteme die Signatur prüfen
+    könnten.
   meaning: >-
     Ohne DKIM lassen sich E-Mails der Domain nicht kryptografisch dem versendenden System
-    zuordnen. Weiterleitende Mailserver veraendern haeufig den Umschlagabsender, wodurch die
-    SPF-Pruefung beim Empfaenger allein nicht mehr ausreicht. DKIM ergaenzt SPF um eine von
-    Weiterleitungen unabhaengige Pruefung.
+    zuordnen. Weiterleitende Mailserver verändern häufig den Umschlagabsender, wodurch die
+    SPF-Prüfung beim Empfänger allein nicht mehr ausreicht. DKIM ergänzt SPF um eine von
+    Weiterleitungen unabhängige Prüfung.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Auf dem Mailserver DKIM fuer die Domain aktivieren, einen Selektor waehlen und den
-        oeffentlichen Schluessel als TXT-Eintrag veroeffentlichen.
+        Auf dem Mailserver DKIM für die Domain aktivieren, einen Selektor wählen und den
+        öffentlichen Schlüssel als TXT-Eintrag veröffentlichen.
     - stage: mittelfristig
       text: >-
-        Alle Versandwege der Domain, einschliesslich Marketing- und Support-Systemen, in die
-        DKIM-Signierung einbeziehen und die Signaturen regelmaessig pruefen.
+        Alle Versandwege der Domain, einschließlich Marketing- und Support-Systemen, in die
+        DKIM-Signierung einbeziehen und die Signaturen regelmäßig prüfen.
   verify: >-
     DNS-Abfrage des TXT-Eintrags am Selektor-Namen unter _domainkey.{domain}; erwartet wird ein
-    Eintrag, der mit v=DKIM1 beginnt und einen oeffentlichen Schluessel enthaelt.
+    Eintrag, der mit v=DKIM1 beginnt und einen öffentlichen Schlüssel enthält.
   positive:
     title: DKIM vorhanden
     text: >-
-      Fuer die Domain {domain} ist eine DKIM-Signatur veroeffentlicht.
+      Für die Domain {domain} ist eine DKIM-Signatur veröffentlicht.

@@ -32,23 +32,23 @@ policy:
     Lebenszyklus-Pruefauftrag, keine Aussage ueber die tatsaechlich installierte Softwareversion.
 texts:
   observation: >-
-    Der Hostname von {group} enthaelt eine Zahlenfolge, die einem gaengigen Produktjahr entspricht:
-    {affected}. Der Hostname allein belegt keine installierte Version, gibt aber einen Anlass fuer
-    eine Pruefung des Lebenszyklus der zugrunde liegenden Plattform.
+    Der Hostname von {group} enthält eine Zahlenfolge, die einem gängigen Produktjahr entspricht:
+    {affected}. Der Hostname allein belegt keine installierte Version, gibt aber einen Anlass für
+    eine Prüfung des Lebenszyklus der zugrunde liegenden Plattform.
   meaning: >-
-    Hostnamen mit einem Produktjahr weisen haeufig auf das Beschaffungsjahr oder die
-    Produktgeneration einer Plattform hin. Ist die Plattform tatsaechlich so alt wie der Hostname
-    vermuten laesst, kann die Herstellerpflege bereits beendet sein. Ohne eine Versionspruefung vor
+    Hostnamen mit einem Produktjahr weisen häufig auf das Beschaffungsjahr oder die
+    Produktgeneration einer Plattform hin. Ist die Plattform tatsächlich so alt wie der Hostname
+    vermuten lässt, kann die Herstellerpflege bereits beendet sein. Ohne eine Versionsprüfung vor
     Ort bleibt dies ein Verdachtsmoment.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Anhand des Hostnamens pruefen, welche Plattform und Version tatsaechlich im Einsatz ist,
+        Anhand des Hostnamens prüfen, welche Plattform und Version tatsächlich im Einsatz ist,
         und den Lebenszyklusstatus beim Hersteller abgleichen.
     - stage: strategisch
       text: >-
         Hostnamen mit Produktjahr in die Inventarisierung aufnehmen, damit anstehende
-        Lebenszyklusenden rechtzeitig geplant werden koennen.
+        Lebenszyklusenden rechtzeitig geplant werden können.
   verify: >-
-    Versionsstand der auf dem Host laufenden Plattform pruefen und mit den Lebenszyklusangaben des
+    Versionsstand der auf dem Host laufenden Plattform prüfen und mit den Lebenszyklusangaben des
     Herstellers vergleichen; erwartet wird eine Plattform mit laufender Pflege.

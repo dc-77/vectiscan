@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [zap]
 kind: check
-bundle: null
+bundle: tool_findings_unrated
 affected_template: "{fqdn} ({name})"
 evidence: [http]
 references: [CWE-200]
@@ -36,14 +36,14 @@ texts:
     Antwort der Webanwendung auslesen lassen: {affected}.
   meaning: >-
     Interne Adressen, Zeitstempel, Entwicklerkommentare im Quelltext oder Fehlermeldungen mit
-    technischen Details sind fuer sich genommen keine Schwachstelle, erleichtern einem
+    technischen Details sind für sich genommen keine Schwachstelle, erleichtern einem
     Angreifer aber die Vorbereitung eines gezielten Zugriffs auf die Anwendung.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die gemeldeten Ausgaben pruefen und interne Adressen, Entwicklerkommentare und
+        Die gemeldeten Ausgaben prüfen und interne Adressen, Entwicklerkommentare und
         detaillierte Fehlermeldungen aus den Antworten der Anwendung entfernen oder auf eine
         allgemeine Meldung ohne technische Details umstellen.
   verify: >-
-    Die genannte Adresse von aussen abrufen und die Antwort auf die gemeldete Angabe pruefen;
+    Die genannte Adresse von außen abrufen und die Antwort auf die gemeldete Angabe prüfen;
     erwartet wird eine Antwort ohne die technische Zusatzinformation.

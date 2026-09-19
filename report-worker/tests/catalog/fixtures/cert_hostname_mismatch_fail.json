@@ -12,7 +12,7 @@
  "expect": {
   "status": "fail",
   "group_key": "www.example.test@10.0.0.1",
-  "affected": ["www.example.test:443 (Zertifikat fuer *.other.test)"],
+  "affected": ["www.example.test:443 (Zertifikat für *.other.test)"],
   "positive": false
  }
 }

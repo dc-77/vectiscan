@@ -33,25 +33,25 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Auf {group} ist eine WordPress-Kernversion im Einsatz, die die Versionspruefung als veraltet
+    Auf {group} ist eine WordPress-Kernversion im Einsatz, die die Versionsprüfung als veraltet
     oder unsicher einstuft: {affected}.
   meaning: >-
-    Eine veraltete WordPress-Kernversion enthaelt Schwachstellen, die in neueren Versionen bereits
-    behoben und oeffentlich dokumentiert sind. Die Versionsangabe ist von aussen sichtbar, sodass
-    Angreifer gezielt nach passenden Schwachstellen suchen koennen.
+    Eine veraltete WordPress-Kernversion enthält Schwachstellen, die in neueren Versionen bereits
+    behoben und öffentlich dokumentiert sind. Die Versionsangabe ist von außen sichtbar, sodass
+    Angreifer gezielt nach passenden Schwachstellen suchen können.
   recommendation:
     - stage: in_kuerze
       text: >-
         Die WordPress-Kerninstallation auf die aktuelle, vom Projekt gepflegte Version anheben.
     - stage: mittelfristig
       text: >-
-        Automatische Kernupdates aktivieren oder einen festen Update-Rhythmus fuer WordPress
+        Automatische Kernupdates aktivieren oder einen festen Update-Rhythmus für WordPress
         festlegen, damit neue Versionen zeitnah eingespielt werden.
   verify: >-
-    Versionsangabe im WordPress-Administrationsbereich pruefen und mit der aktuellen Version des
+    Versionsangabe im WordPress-Administrationsbereich prüfen und mit der aktuellen Version des
     Projekts vergleichen; erwartet wird die jeweils aktuelle, gepflegte Kernversion.
   positive:
     title: WordPress-Kernversion aktuell
     text: >-
-      Auf {group} entspricht die WordPress-Kernversion nach der Versionspruefung dem aktuellen
+      Auf {group} entspricht die WordPress-Kernversion nach der Versionsprüfung dem aktuellen
       Stand des Projekts.

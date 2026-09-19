@@ -37,19 +37,19 @@ texts:
   observation: >-
     Auf {group} ist eine WordPress-Erweiterung mit bekannten Schwachstellen im Einsatz: {affected}.
   meaning: >-
-    Bekannte Schwachstellen in Plugins oder Themes sind oeffentlich dokumentiert und lassen sich
+    Bekannte Schwachstellen in Plugins oder Themes sind öffentlich dokumentiert und lassen sich
     ohne Zugriff auf den Server nachvollziehen. Eine veraltete Erweiterung bleibt so lange
     angreifbar, bis die fehlerbereinigte Version eingespielt ist.
   recommendation:
     - stage: unverzueglich
       text: >-
         Erweiterung auf die vom Hersteller freigegebene, fehlerbereinigte Version aktualisieren;
-        laesst sich das nicht sofort umsetzen, die Erweiterung deaktivieren.
+        lässt sich das nicht sofort umsetzen, die Erweiterung deaktivieren.
     - stage: in_kuerze
       text: >-
-        Pruefen, ob die Erweiterung fuer den Betrieb noch benoetigt wird, und nicht mehr genutzte
+        Prüfen, ob die Erweiterung für den Betrieb noch benötigt wird, und nicht mehr genutzte
         Erweiterungen entfernen.
   verify: >-
-    Versionsstand der Erweiterung im Adminbereich pruefen und mit dem Eintrag im Plugin-
+    Versionsstand der Erweiterung im Adminbereich prüfen und mit dem Eintrag im Plugin-
     beziehungsweise Theme-Verzeichnis des Herstellers abgleichen; erwartet wird die aktuelle,
     fehlerbereinigte Version ohne offene Schwachstellen.

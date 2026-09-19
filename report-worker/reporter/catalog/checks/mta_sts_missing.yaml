@@ -1,5 +1,5 @@
 id: mta_sts_missing
-title: MTA-STS nicht wirksam veroeffentlicht
+title: MTA-STS nicht wirksam veröffentlicht
 family: mta_sts_missing
 category: C
 scale: hygiene
@@ -35,24 +35,24 @@ policy:
     Zusammenspiel mit TLS-RPT und DANE als Buendel relevant wird.
 texts:
   observation: >-
-    Fuer {affected} ist kein wirksames MTA-STS nach RFC 8461 veroeffentlicht. Fuer die Domain
-    {domain} fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, ueber die
-    versendende Mailserver eine erzwungene Transportverschluesselung anfordern koennten.
+    Für {affected} ist kein wirksames MTA-STS nach RFC 8461 veröffentlicht. Für die Domain
+    {domain} fehlt damit der DNS-Eintrag, die Richtliniendatei oder beides, über die
+    versendende Mailserver eine erzwungene Transportverschlüsselung anfordern könnten.
   meaning: >-
-    Ohne MTA-STS kann ein Angreifer im Uebertragungsweg die STARTTLS-Ankuendigung beim
-    Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschluesselt
+    Ohne MTA-STS kann ein Angreifer im Übertragungsweg die STARTTLS-Ankündigung beim
+    Verbindungsaufbau entfernen und eingehende E-Mails an die Domain unverschlüsselt
     mitlesen oder umleiten. Sendende Mailserver haben keine verbindliche Vorgabe, eine
-    verschluesselte Verbindung mit gueltigem Zertifikat zu erzwingen.
+    verschlüsselte Verbindung mit gültigem Zertifikat zu erzwingen.
   recommendation:
     - stage: strategisch
       text: >-
-        Eine MTA-STS-Richtlinie mit Modus enforce veroeffentlichen, nachdem alle eingehenden
-        Mailwege ausschliesslich gueltige TLS-Zertifikate verwenden.
+        Eine MTA-STS-Richtlinie mit Modus enforce veröffentlichen, nachdem alle eingehenden
+        Mailwege ausschließlich gültige TLS-Zertifikate verwenden.
   verify: >-
     DNS-Abfrage des TXT-Eintrags _mta-sts.{domain} sowie Abruf der Richtliniendatei unter der
-    zugehoerigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine
+    zugehörigen HTTPS-Adresse; erwartet wird ein Eintrag mit Versionsangabe und eine
     Richtliniendatei mit mode enforce.
   positive:
-    title: MTA-STS veroeffentlicht
+    title: MTA-STS veröffentlicht
     text: >-
-      Fuer die Domain {domain} ist eine MTA-STS-Richtlinie veroeffentlicht.
+      Für die Domain {domain} ist eine MTA-STS-Richtlinie veröffentlicht.

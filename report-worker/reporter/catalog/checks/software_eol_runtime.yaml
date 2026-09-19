@@ -40,7 +40,7 @@ texts:
   meaning: >-
     Sprachlaufzeiten, CMS-Kerne, Bibliotheken, Plugins, Themes oder sonstige Komponenten ohne
     Herstellerpflege erhalten keine Sicherheitsaktualisierungen mehr. Bekannte Schwachstellen
-    bleiben ueber die Anwendung erreichbar, auch wenn die Komponente selbst keinen eigenen
+    bleiben über die Anwendung erreichbar, auch wenn die Komponente selbst keinen eigenen
     Netzwerkdienst bereitstellt.
   recommendation:
     - stage: in_kuerze
@@ -52,5 +52,5 @@ texts:
         Komponente auf eine vom Hersteller gepflegte Version anheben oder durch eine gepflegte
         Alternative ersetzen und einen festen Aktualisierungsrhythmus festlegen.
   verify: >-
-    Versionsstand der Komponente auf dem System pruefen und mit den Lebenszyklusangaben des
+    Versionsstand der Komponente auf dem System prüfen und mit den Lebenszyklusangaben des
     Herstellers vergleichen; erwartet wird eine Version mit laufender Pflege.

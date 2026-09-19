@@ -1,5 +1,5 @@
 id: cert_chain_incomplete
-title: TLS-Zertifikatskette unvollstaendig
+title: TLS-Zertifikatskette unvollständig
 family: cert_chain_incomplete
 category: D
 scale: hygiene
@@ -17,7 +17,7 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
+bundle: cert_health
 affected_template: "{target}"
 evidence: [tls]
 references: [CWE-296]
@@ -35,28 +35,28 @@ policy:
     fuehrt den Befund deshalb als Hygiene mittel.
 texts:
   observation: >-
-    Fuer den Dienst {group} liefert der TLS-Handshake eine unvollstaendige Zertifikatskette:
+    Für den Dienst {group} liefert der TLS-Handshake eine unvollständige Zertifikatskette:
     {affected}. Zwischen dem Server-Zertifikat und einer allgemein bekannten Vertrauensstelle
     fehlt mindestens ein Zwischenzertifikat.
   meaning: >-
-    Clients, die die fehlende Zwischenstelle nicht bereits im eigenen Speicher haben, koennen die
-    Vertrauenskette nicht vollstaendig nachvollziehen und zeigen eine Warnung oder lehnen die
-    Verbindung ab. Betroffen sind vor allem aeltere oder abweichend konfigurierte Clients.
+    Clients, die die fehlende Zwischenstelle nicht bereits im eigenen Speicher haben, können die
+    Vertrauenskette nicht vollständig nachvollziehen und zeigen eine Warnung oder lehnen die
+    Verbindung ab. Betroffen sind vor allem ältere oder abweichend konfigurierte Clients.
   recommendation:
     - stage: in_kuerze
       text: >-
-        Die vollstaendige Zertifikatskette einschliesslich aller Zwischenzertifikate auf dem
+        Die vollständige Zertifikatskette einschließlich aller Zwischenzertifikate auf dem
         Dienst hinterlegen, so wie es die ausstellende Stelle vorgibt.
     - stage: mittelfristig
       text: >-
-        Die Auslieferung der Zertifikatskette in die Pruefung neuer oder erneuerter Zertifikate
+        Die Auslieferung der Zertifikatskette in die Prüfung neuer oder erneuerter Zertifikate
         aufnehmen, damit dieser Zustand nicht erneut entsteht.
   verify: >-
-    Verbindung zum Dienst mit einem TLS-Client aufbauen und die uebermittelte Zertifikatskette
-    pruefen; erwartet wird eine Kette bis zu einer allgemein bekannten Vertrauensstelle ohne
+    Verbindung zum Dienst mit einem TLS-Client aufbauen und die übermittelte Zertifikatskette
+    prüfen; erwartet wird eine Kette bis zu einer allgemein bekannten Vertrauensstelle ohne
     fehlendes Zwischenzertifikat.
   positive:
-    title: Zertifikatskette vollstaendig
+    title: Zertifikatskette vollständig
     text: >-
-      Fuer den Dienst {group} liefert der TLS-Handshake eine vollstaendige Zertifikatskette bis
+      Für den Dienst {group} liefert der TLS-Handshake eine vollständige Zertifikatskette bis
       zu einer allgemein bekannten Vertrauensstelle.

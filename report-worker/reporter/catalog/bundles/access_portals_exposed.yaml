@@ -1,0 +1,35 @@
+id: access_portals_exposed
+title: Anmelde- und Verwaltungsportale aus dem Internet erreichbar
+category: A
+merge_by: global
+members: [login_portal_exposed, admin_portal_exposed]
+target: findings
+references: [CWE-284, CWE-307]
+frameworks:
+  bsi: []
+  nis2: []
+  iso27001: []
+  tr03116: []
+texts:
+  observation: >-
+    Aus dem Internet sind Portale erreichbar, die eine Anmeldung anbieten: {affected}.
+  meaning: >-
+    Ein öffentlich erreichbares Anmeldeportal ist ein gewollter Zugangsweg und zugleich das erste
+    Ziel für Rateangriffe auf Zugangsdaten. Wird ein solches Portal übernommen, steht der Weg in
+    die dahinterliegenden Systeme offen.
+  recommendation:
+    - stage: in_kuerze
+      text: >-
+        Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der
+        Portal-Software gegen die Hinweise des Herstellers abgleichen.
+    - stage: mittelfristig
+      text: >-
+        Den Zugriff auf die Quellnetze beschränken, aus denen eine Anmeldung fachlich nötig ist,
+        und fehlgeschlagene Anmeldeversuche überwachen.
+  verify: >-
+    Die genannten Portale von außen aufrufen; erwartet wird eine Anmeldung mit zweiter Stufe oder
+    eine Beschränkung auf bekannte Quellnetze.
+  positive:
+    title: Keine Anmelde- oder Verwaltungsportale aus dem Internet erreichbar
+    text: >-
+      Auf den geprüften Hosts antwortet kein Portal mit einer Anmeldemaske.

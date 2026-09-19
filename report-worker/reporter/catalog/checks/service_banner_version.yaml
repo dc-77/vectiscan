@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [nmap]
 kind: check
-bundle: null
+bundle: banner_disclosure
 affected_template: "{host_ip}:{port} ({product} {version})"
 evidence: [service]
 references: [CWE-200]
@@ -33,16 +33,16 @@ texts:
     preis: {affected}.
   meaning: >-
     Eine sichtbare Versionskennung erleichtert die gezielte Suche nach bekannten Schwachstellen
-    fuer genau diese Version und beschleunigt damit die Vorbereitung eines Angriffs.
+    für genau diese Version und beschleunigt damit die Vorbereitung eines Angriffs.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Die Versionsausgabe des Dienstes in der Konfiguration unterdruecken oder, sofern der
-        Dienst dies unterstuetzt, auf eine allgemeine Kennung ohne Versionsnummer umstellen.
+        Die Versionsausgabe des Dienstes in der Konfiguration unterdrücken oder, sofern der
+        Dienst dies unterstützt, auf eine allgemeine Kennung ohne Versionsnummer umstellen.
     - stage: strategisch
       text: >-
-        Den Dienst unabhaengig von der sichtbaren Kennung regelmaessig auf verfuegbare
-        Aktualisierungen pruefen.
+        Den Dienst unabhängig von der sichtbaren Kennung regelmäßig auf verfügbare
+        Aktualisierungen prüfen.
   verify: >-
-    Verbindungsaufbau zum Dienst von aussen wiederholen und die zurueckgegebene Kennung mit der
-    internen Versionsuebersicht abgleichen.
+    Verbindungsaufbau zum Dienst von außen wiederholen und die zurückgegebene Kennung mit der
+    internen Versionsübersicht abgleichen.

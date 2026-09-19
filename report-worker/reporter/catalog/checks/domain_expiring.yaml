@@ -1,5 +1,5 @@
 id: domain_expiring
-title: Domain-Registrierung laeuft in Kuerze ab
+title: Domain-Registrierung läuft in Kürze ab
 family: domain_expiring
 category: E
 scale: hygiene
@@ -35,23 +35,23 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Fuer {affected} laeuft die Registrierung der Domain {domain} innerhalb der naechsten 30
+    Für {affected} läuft die Registrierung der Domain {domain} innerhalb der nächsten 30
     Tage ab.
   meaning: >-
-    Nach Ablauf der Registrierung kann die Domain nur noch fuer eine kurze Frist verlaengert
-    werden, danach faellt sie zurueck in die allgemeine Vergabe und kann von Dritten neu
+    Nach Ablauf der Registrierung kann die Domain nur noch für eine kurze Frist verlängert
+    werden, danach fällt sie zurück in die allgemeine Vergabe und kann von Dritten neu
     registriert werden. Damit gehen Website, E-Mail-Zustellung und alle auf diese Domain
     ausgestellten Zertifikate verloren.
   recommendation:
     - stage: unverzueglich
       text: >-
-        Die Verlaengerung der Domain-Registrierung veranlassen und eine automatische
-        Verlaengerung fuer kuenftige Ablauftermine einrichten.
+        Die Verlängerung der Domain-Registrierung veranlassen und eine automatische
+        Verlängerung für künftige Ablauftermine einrichten.
   verify: >-
     WHOIS-Abfrage der Domain {domain}; erwartet wird ein Ablaufdatum, das mehr als 30 Tage in
     der Zukunft liegt.
   positive:
-    title: Domain-Registrierung laeuft nicht in Kuerze ab
+    title: Domain-Registrierung läuft nicht in Kürze ab
     text: >-
-      Fuer die Domain {domain} liegt das Ablaufdatum der Registrierung mehr als 30 Tage in der
+      Für die Domain {domain} liegt das Ablaufdatum der Registrierung mehr als 30 Tage in der
       Zukunft.

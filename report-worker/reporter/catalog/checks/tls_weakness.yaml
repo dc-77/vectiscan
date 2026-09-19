@@ -1,5 +1,5 @@
 id: tls_weakness
-title: TLS-Verschluesselung anfaellig fuer bekannte Angriffe
+title: TLS-Verschlüsselung anfällig für bekannte Angriffe
 family: tls_weakness
 category: D
 scale: hygiene
@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [testssl]
 kind: check
-bundle: null
+bundle: tls_hardening
 affected_template: "{target} ({name})"
 evidence: [tls]
 references: [CWE-327]
@@ -30,17 +30,17 @@ policy:
 texts:
   observation: >-
     Die TLS-Analyse hat auf {group} eine Schwachstelle mit geringerer Auswirkung in der
-    Verschluesselung oder in der Antwortkomprimierung nachgewiesen: {affected}.
+    Verschlüsselung oder in der Antwortkomprimierung nachgewiesen: {affected}.
   meaning: >-
     Unter bestimmten Voraussetzungen, etwa bei sehr langen Sitzungen oder bei aktivierter
-    Kompression, ermoeglichen diese Schwachstellen bekannte Angriffe auf die Verschluesselung.
-    Fuer sich genommen ist die Auswirkung gering, in Kombination mit weiteren Schwachstellen
+    Kompression, ermöglichen diese Schwachstellen bekannte Angriffe auf die Verschlüsselung.
+    Für sich genommen ist die Auswirkung gering, in Kombination mit weiteren Schwachstellen
     steigt sie.
   recommendation:
     - stage: mittelfristig
       text: >-
         Die betroffene Cipher-Suite oder die TLS-Antwortkomprimierung in der
-        Serverkonfiguration deaktivieren, sofern die eingesetzte Softwareversion dies zulaesst.
+        Serverkonfiguration deaktivieren, sofern die eingesetzte Softwareversion dies zulässt.
   verify: >-
-    TLS-Analyse des Dienstes von aussen wiederholen; erwartet wird ein Ergebnis ohne diese
+    TLS-Analyse des Dienstes von außen wiederholen; erwartet wird ein Ergebnis ohne diese
     Schwachstelle.

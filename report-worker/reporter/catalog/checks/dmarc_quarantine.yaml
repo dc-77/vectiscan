@@ -1,5 +1,5 @@
 id: dmarc_quarantine
-title: DMARC-Richtlinie unterhalb von Zurueckweisung
+title: DMARC-Richtlinie unterhalb von Zurückweisung
 family: dmarc_quarantine
 category: C
 scale: hygiene
@@ -14,7 +14,7 @@ undetermined: not_testable
 requires:
   tools: [dns_records]
 kind: check
-bundle: null
+bundle: mail_policy
 affected_template: "{domain} (p={dmarc_p})"
 evidence: [dns]
 references: [CWE-290, RFC-7489]
@@ -30,21 +30,21 @@ policy:
 texts:
   observation: >-
     Die DMARC-Richtlinie der Domain {domain} stellt E-Mails, die SPF oder DKIM nicht bestehen,
-    unter Quarantaene, weist sie aber nicht zurueck: {affected}.
+    unter Quarantäne, weist sie aber nicht zurück: {affected}.
   meaning: >-
-    Eine Quarantaene-Richtlinie verschiebt verdaechtige E-Mails in der Regel in einen
-    Spam-Ordner, statt sie abzulehnen. Je nach Einstellung des Empfangssystems koennen
-    gefaelschte E-Mails im Namen der Domain trotzdem gelesen werden.
+    Eine Quarantäne-Richtlinie verschiebt verdächtige E-Mails in der Regel in einen
+    Spam-Ordner, statt sie abzulehnen. Je nach Einstellung des Empfangssystems können
+    gefälschte E-Mails im Namen der Domain trotzdem gelesen werden.
   recommendation:
     - stage: mittelfristig
       text: >-
-        Nach einer Beobachtungsphase ohne Fehlmeldungen die Richtlinie auf Zurueckweisung
+        Nach einer Beobachtungsphase ohne Fehlmeldungen die Richtlinie auf Zurückweisung
         anheben, sobald alle legitimen Versandquellen der Domain erfasst sind.
   verify: >-
     DNS-Abfrage des TXT-Eintrags _dmarc.{domain}; erwartet wird eine Richtlinie p mit
-    Zurueckweisung.
+    Zurückweisung.
   positive:
-    title: DMARC-Richtlinie mit Zurueckweisung
+    title: DMARC-Richtlinie mit Zurückweisung
     text: >-
       Die DMARC-Richtlinie der Domain {domain} weist E-Mails, die SPF oder DKIM nicht bestehen,
-      zurueck.
+      zurück.

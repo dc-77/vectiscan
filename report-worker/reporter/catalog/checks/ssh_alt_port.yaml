@@ -29,16 +29,16 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Auf {group} laeuft ein SSH-Dienst nicht auf dem Standardport: {affected}. Dies ist ein
+    Auf {group} läuft ein SSH-Dienst nicht auf dem Standardport: {affected}. Dies ist ein
     reiner Inventarhinweis und kein Befund.
   meaning: >-
-    Ein abweichender Port aendert das Sicherheitsniveau des Dienstes nicht, hilft aber bei der
-    Zuordnung im Bestand und bei kuenftigen Pruefungen.
+    Ein abweichender Port ändert das Sicherheitsniveau des Dienstes nicht, hilft aber bei der
+    Zuordnung im Bestand und bei künftigen Prüfungen.
   recommendation:
     - stage: mittelfristig
       text: >-
         Den abweichenden Port in der internen Dokumentation der Firewall- und Serverregeln
-        festhalten, damit kuenftige Pruefungen ihn zuordnen koennen.
+        festhalten, damit künftige Prüfungen ihn zuordnen können.
   verify: >-
-    Verbindungsaufbau zum dokumentierten Port pruefen und mit der internen Dokumentation
+    Verbindungsaufbau zum dokumentierten Port prüfen und mit der internen Dokumentation
     abgleichen.
