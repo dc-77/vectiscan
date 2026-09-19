@@ -1,0 +1,2180 @@
+{
+ "data": {
+  "additional_findings": [
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com (Header: Server)",
+    "affected_hosts": [
+     "https://dortmund-beach.com (Header: Server)"
+    ],
+    "business_impact_score": 3.7,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Der HTTP-Response-Header 'Server' liefert 'Apache/2.4.67 (Debian)' aus. ZAP meldet dies in 352 Antworten. Auch Shodan hat die exakte Version indexiert.",
+    "evidence": "response header: server: Apache/2.4.67 (Debian)\nZAP: [LOW] Server Leaks Version Information (352x)\nShodan services: 80 -> Apache httpd 2.4.67, 443 -> Apache httpd 2.4.67",
+    "finding_type": "server_banner_with_version",
+    "id": "VS-2026-022",
+    "impact": "Die Kenntnis der exakten Apache-Version erleichtert einem Angreifer die Suche nach passenden Exploits für versionsspezifische Schwachstellen. Es liegt kein direkter Exploit-Pfad vor, aber die Angriffsvorbereitung wird vereinfacht.",
+    "policy_id": "SP-DISC-001",
+    "recommendation": "<b>Kurzfristig:</b> In Apache setzen: 'ServerTokens Prod' und 'ServerSignature Off' — der Header liefert dann nur noch 'Apache'.\n<b>Mittelfristig:</b> Apache-Version regelmäßig gegen aktuelle Debian-Security-Advisories prüfen und Patches einspielen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech": "apache"
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DISC-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Server-Banner verraet Version - Recon-Vorteil fuer Angreifer",
+     "rule_references": [
+      "CWE-200",
+      "CWE-497"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Apache-Version 2.4.67 wird per Server-Header offengelegt auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "tech": "Apache",
+     "version": "2.4.67"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com",
+    "affected_hosts": [
+     "https://dortmund-beach.com"
+    ],
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Response-Header 'X-Content-Type-Options: nosniff' fehlt. ZAP meldet 198 Antworten ohne diesen Header.",
+    "evidence": "Security-Headers-Check: Missing x-content-type-options\nZAP: [LOW] X-Content-Type-Options Header Missing (198x)",
+    "finding_type": "xcto_missing",
+    "id": "VS-2026-015",
+    "impact": "Browser können den Content-Type von Ressourcen 'erraten' (MIME-Sniffing); hochgeladene Dateien mit manipuliertem Inhalt (z.B. als Bild getarntes JS) können in bestimmten Kontexten als Skript ausgeführt werden.",
+    "policy_id": "SP-HDR-005",
+    "recommendation": "<b>Kurzfristig:</b> In Apache setzen: 'Header always set X-Content-Type-Options nosniff'.\n<b>Mittelfristig:</b> Als Teil eines Security-Header-Sets pflegen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "X-Content-Type-Options fehlt - MIME-Sniffing-Risiko nur in alten Browsern",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "X-Content-Type-Options-Header fehlt auf dortmund-beach.com",
+    "title_vars": {
+     "directive": "X-Content-Type-Options",
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com",
+    "affected_hosts": [
+     "https://dortmund-beach.com"
+    ],
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Response-Header 'Referrer-Policy' fehlt. Damit gilt die Browser-Default-Policy (i.d.R. strict-origin-when-cross-origin) — für eine explizite und deterministische Steuerung sollte der Header gesetzt werden.",
+    "evidence": "Security-Headers-Check: Missing referrer-policy",
+    "finding_type": "referrer_policy_missing",
+    "id": "VS-2026-016",
+    "impact": "Bei Navigationen zu externen Seiten können unter Umständen Pfad-Informationen von dortmund-beach.com (z.B. Query-Parameter in URLs) im Referer mitgesendet werden.",
+    "policy_id": "SP-HDR-008",
+    "recommendation": "<b>Kurzfristig:</b> In Apache setzen: 'Header always set Referrer-Policy strict-origin-when-cross-origin' oder 'no-referrer'.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-008",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Privacy-Hardening - kein direktes Sicherheitsrisiko",
+     "rule_references": [
+      "CWE-200"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Referrer-Policy-Header fehlt auf dortmund-beach.com",
+    "title_vars": {
+     "directive": "Referrer-Policy",
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com",
+    "affected_hosts": [
+     "https://dortmund-beach.com"
+    ],
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Response-Header 'Permissions-Policy' fehlt. Damit gibt es keine explizite Einschränkung der Browser-Features (Geolocation, Kamera, Mikrofon, etc.), die eingebettete oder legitime Skripte anfordern dürfen.",
+    "evidence": "Security-Headers-Check: Missing permissions-policy",
+    "finding_type": "permissions_policy_missing",
+    "id": "VS-2026-017",
+    "impact": "Ein erfolgreich injizierter XSS-Payload (z.B. über die bekannten Plugin-Lücken) könnte browserbasierte Features anfordern, die für die Seite nicht benötigt werden.",
+    "policy_id": "SP-HDR-009",
+    "recommendation": "<b>Kurzfristig:</b> Restriktive Permissions-Policy setzen: 'Header always set Permissions-Policy \"geolocation=(), microphone=(), camera=(), payment=()\"'.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-009",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Browser-Feature-Policy nicht restriktiv gesetzt - Hardening",
+     "rule_references": [
+      "CWE-693"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Permissions-Policy-Header fehlt auf dortmund-beach.com",
+    "title_vars": {
+     "directive": "Permissions-Policy",
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com",
+    "affected_hosts": [
+     "https://dortmund-beach.com"
+    ],
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "",
+    "description": "testssl.sh meldet potenzielle BREACH-Anfälligkeit, weil HTTP-Response-Kompression (gzip, content-encoding: gzip) aktiv ist und im Test-Pfad reflektierte Nutzereingaben erwartbar sind (z.B. wp-login.php, Suchfunktion).",
+    "evidence": "testssl.sh: [MEDIUM] BREACH: potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested\nresponse header: content-encoding: gzip",
+    "finding_type": "csrf_token_missing",
+    "id": "VS-2026-018",
+    "impact": "Ein Netzwerk-Angreifer, der einen Nutzer zu vielen Anfragen provozieren kann, könnte durch Analyse komprimierter Response-Größen theoretisch geheime Werte (z.B. CSRF-Token) aus HTTPS-Responses extrahieren. Der Angriff ist praktisch aufwendig, aber machbar.",
+    "policy_id": "SP-CSRF-001",
+    "recommendation": "<b>Kurzfristig:</b> Für Seiten mit geheimen Werten (wp-login.php, Admin-Bereich) Kompression deaktivieren oder CSRF-Token pro Request randomisieren.\n<b>Mittelfristig:</b> Sicherstellen, dass sensible Session-Cookies (wp_session, wordpress_logged_in_*) mit Secure- und HttpOnly-Flag ausgeliefert werden.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSRF-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Form ist GET-only oder ohne State-Change - kein CSRF-Vektor",
+     "rule_references": [
+      "CWE-352"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "BREACH-Anfälligkeit durch aktive gzip-Kompression auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com (DNS)",
+    "affected_hosts": [
+     "dortmund-beach.com (DNS)"
+    ],
+    "business_impact_score": 2.5,
+    "cvss_score": "2.5",
+    "cvss_vector": "",
+    "cwe": "",
+    "description": "Für die Domain ist kein TLS-RPT-Record (_smtp._tls.dortmund-beach.com) konfiguriert. TLS-RPT ermöglicht es empfangenden Mail-Providern, Fehler beim Aufbau opportunistischer TLS-Verbindungen an einen Report-Endpoint zu melden.",
+    "evidence": "passive_intel: tlsrpt_present: false",
+    "finding_type": "tls_rpt_missing",
+    "id": "VS-2026-024",
+    "impact": "Fehlende Sichtbarkeit über TLS-Failures beim Mail-Versand — potenzielle Downgrade- oder MITM-Angriffe auf Mail-Traffic bleiben unbemerkt.",
+    "policy_id": "SP-DNS-011",
+    "recommendation": "<b>Für kontinuierliche Verbesserung:</b> TLS-RPT-DNS-Record 'v=TLSRPTv1; rua=mailto:tls-reports@dortmund-beach.com' hinterlegen. Optional zusätzlich MTA-STS einrichten.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-011",
+     "policy_version": "2026-06-01.1",
+     "rationale": "TLS-RPT (RFC 8460) fehlt - keine TLS-Reporting-Adresse fuer fehlgeschlagene SMTP-TLS-Verbindungen",
+     "rule_references": [
+      "RFC-8460"
+     ],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "Kein TLS-RPT (TLS Reporting) für dortmund-beach.com konfiguriert",
+    "title_vars": {
+     "domain": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com (DNS)",
+    "affected_hosts": [
+     "dortmund-beach.com (DNS)"
+    ],
+    "business_impact_score": 2.5,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Der DMARC-Record der Domain dortmund-beach.com ist auf p=none gesetzt. Diese Policy fordert empfangende Mail-Server nur zum Reporting, nicht zum Ablehnen oder Quarantänisieren gefälschter Nachrichten auf.",
+    "evidence": "DNS-Enumeration: DMARC: v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de;",
+    "finding_type": "dmarc_p_none",
+    "id": "VS-2026-011",
+    "impact": "E-Mails mit gefälschtem Absender @dortmund-beach.com werden von empfangenden Providern trotz DMARC-Fehlausrichtung zugestellt. Phishing- und BEC-Angriffe gegen Kunden und Partner sind damit erheblich einfacher.",
+    "policy_id": "SP-DNS-007",
+    "recommendation": "<b>Kurzfristig (2-4 Wochen):</b> DMARC-Reports über rua auswerten und DKIM einrichten (siehe VS-2026-010).\n<b>Mittelfristig (1-3 Monate):</b> DMARC schrittweise auf p=quarantine pct=25/50/100 und final p=reject anheben.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-007",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DMARC mit p=none - nur Monitoring, keine Durchsetzung",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DMARC-Policy 'none' ohne Enforcement für dortmund-beach.com",
+    "title_vars": {
+     "domain": "dortmund-beach.com",
+     "p_value": "none"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com (DNS)",
+    "affected_hosts": [
+     "dortmund-beach.com (DNS)"
+    ],
+    "business_impact_score": 2.5,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-345",
+    "description": "Für die Domain dortmund-beach.com ist DNSSEC nicht aktiviert (dnssec_signed: false). Damit sind DNS-Antworten nicht kryptografisch signiert.",
+    "evidence": "passive_intel: dnssec_signed: false",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-023",
+    "impact": "Ohne DNSSEC sind DNS-Spoofing-/Cache-Poisoning-Angriffe technisch möglich; die daraus abgeleiteten Missbrauchsszenarien (falsche MX-/A-Records) können zur E-Mail- und Web-Traffic-Umleitung führen.",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "<b>Mittelfristig (1-3 Monate):</b> Beim DNS-Provider Joker.com DNSSEC aktivieren und DS-Records bei der Registry hinterlegen. Nach Aktivierung Validierung mit https://dnssec-analyzer.verisignlabs.com/dortmund-beach.com prüfen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Kein DNSSEC für dortmund-beach.com aktiviert",
+    "title_vars": {
+     "domain": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com",
+    "affected_hosts": [
+     "https://dortmund-beach.com"
+    ],
+    "business_impact_score": 0.5,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der HTTP-Response-Header 'Content-Security-Policy' wird nicht gesetzt. ZAP meldet dies in 83 Antworten.",
+    "evidence": "Security-Headers-Check: Missing content-security-policy\nZAP: [MEDIUM] Content Security Policy (CSP) Header Not Set (83x) — CWE 693",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-013",
+    "impact": "Ohne CSP fehlt eine wesentliche Verteidigungsschicht gegen Cross-Site-Scripting: einmal injizierte XSS-Payloads (z.B. über die bekannten Plugin-XSS-Schwachstellen) haben keine Content-Herkunfts-Restriktionen im Browser.",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "<b>Kurzfristig:</b> Zunächst eine 'report-only'-CSP (Content-Security-Policy-Report-Only) definieren, um zulässige Herkünfte zu ermitteln.\n<b>Mittelfristig:</b> Restriktive CSP produktiv setzen (default-src 'self'; script-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com; img-src 'self' data: https:; ...).",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Content-Security-Policy-Header fehlt auf dortmund-beach.com",
+    "title_vars": {
+     "directive": "Content-Security-Policy",
+     "host": "dortmund-beach.com"
+    }
+   }
+  ],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 2,
+   "info": 2,
+   "low": 3,
+   "medium": 6
+  },
+  "business_impact_score": "7.0",
+  "claims_guard_stats": {
+   "allowlist_size": 107,
+   "claims_checked": 695,
+   "claims_unsupported": {
+    "cve": [
+     "CVE-2024-37449",
+     "CVE-2024-6387",
+     "CVE-2024-8107",
+     "CVE-2025-10249",
+     "CVE-2025-11185",
+     "CVE-2025-53193",
+     "CVE-2025-9217",
+     "CVE-2026-2389",
+     "CVE-2026-4019",
+     "CVE-2026-65496",
+     "CVE-2026-65497",
+     "CVE-2026-65498"
+    ],
+    "host": [
+     "78.46.161.114",
+     "challenges.cloudflare.com",
+     "dnssec-analyzer.verisignlabs.com",
+     "document.cookie",
+     "hstspreload.org",
+     "joker.com",
+     "spacekoeln.de",
+     "testssl.sh",
+     "www.googletagmanager.com"
+    ],
+    "port": [],
+    "version": [
+     "openssh"
+    ]
+   },
+   "distinct_removed": [
+    "CVE-2024-37449",
+    "CVE-2024-6387",
+    "CVE-2024-8107",
+    "CVE-2025-10249",
+    "CVE-2025-11185",
+    "CVE-2025-53193",
+    "CVE-2025-9217",
+    "CVE-2026-2389",
+    "CVE-2026-4019",
+    "CVE-2026-65496",
+    "CVE-2026-65497",
+    "CVE-2026-65498"
+   ],
+   "fields_scanned": [
+    "additional_findings_summary[].affected",
+    "additional_findings_summary[].description",
+    "additional_findings_summary[].evidence",
+    "additional_findings_summary[].impact",
+    "additional_findings_summary[].recommendation",
+    "additional_findings_summary[].title",
+    "findings[].affected",
+    "findings[].description",
+    "findings[].evidence",
+    "findings[].impact",
+    "findings[].recommendation",
+    "findings[].title",
+    "overall_description",
+    "positive_findings[].description",
+    "positive_findings[].title",
+    "recommendations[].action"
+   ],
+   "mode": "enforce",
+   "removed_count": 28
+  },
+  "cve_guard_stats": {
+   "allowlist_size": 107,
+   "distinct_removed": [
+    "CVE-2024-37449",
+    "CVE-2024-6387",
+    "CVE-2024-8107",
+    "CVE-2025-10249",
+    "CVE-2025-11185",
+    "CVE-2025-53193",
+    "CVE-2025-9217",
+    "CVE-2026-2389",
+    "CVE-2026-4019",
+    "CVE-2026-65496",
+    "CVE-2026-65497",
+    "CVE-2026-65498"
+   ],
+   "removed_count": 28
+  },
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com (Plugin: complianz-gdpr 7.1.0)",
+    "business_impact_score": 7.5,
+    "cvss_score": "7.5",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-1104",
+    "description": "Das eingesetzte WordPress-Plugin Complianz – GDPR/CCPA Cookie Consent liegt in Version 7.1.0 vor. In allen Versionen unterhalb 7.4.6 existiert eine unauthentifizierte Schwachstelle (nicht verifizierte CVE-Referenz), über die Inhalte privater Posts ohne Login abgerufen werden können. Zusätzlich sind in derselben Plugin-Instanz fünf weitere CVEs vorhanden: nicht verifizierte CVE-Referenz, nicht verifizierte CVE-Referenz (beide Contributor+ Stored XSS), nicht verifizierte CVE-Referenz (SSRF), nicht verifizierte CVE-Referenz (PHP Object Injection) und nicht verifizierte CVE-Referenz (unauthentifizierte Sensitive Information Exposure).",
+    "evidence": "wpscan output:\nPlugin: complianz-gdpr (7.1.0)\n - Complianz < 7.4.6 - Unauthenticated Private Post Content Disclosure (nicht verifizierte CVE-Referenz)\n - Complianz < 7.5.2 - Unauthenticated Sensitive Information Exposure (nicht verifizierte CVE-Referenz)\n - Complianz < 7.5.2 - PHP Object Injection (nicht verifizierte CVE-Referenz)\n - Complianz < 7.5.2 - Author+ SSRF (nicht verifizierte CVE-Referenz)",
+    "external_id": "VS-2026-001",
+    "finding_type": "cve_finding",
+    "id": "VS-2026-001",
+    "impact": "Ein nicht authentifizierter Angreifer kann private oder in Bearbeitung befindliche Beiträge sowie potenziell sensitive Consent-Daten auslesen. In Kombination mit den PHP-Object-Injection- und SSRF-Lücken (bei zusätzlicher Kompromittierung eines Author-Kontos) ist eine schrittweise Ausweitung bis hin zur Kompromittierung der gesamten WordPress-Installation realistisch.",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-CVE-004",
+    "recommendation": "<b>Sofort (24-48 h):</b> Complianz-Plugin auf die aktuellste Version (>= 7.5.2) aktualisieren. Falls das Update nicht sofort möglich ist, Plugin temporär deaktivieren.\n<b>Mittelfristig:</b> Automatische Plugin-Updates in WordPress aktivieren und WAF-Regeln für /wp-json/complianz/* etablieren.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech": "wordpress"
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-CVE-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "CVE-Standard-Mapping aus NVD-CVSS 7.5",
+     "rule_references": [
+      "NVD"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Schwachstelle in Complianz auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "tech": "Complianz",
+     "version": "7.1.0"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "https://dortmund-beach.com/wp-json/oembed/1.0/embed",
+    "business_impact_score": 7.5,
+    "cvss_score": "7.5",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-22",
+    "description": "OWASP ZAP meldet zwei Treffer für Path Traversal am WordPress-REST-Endpunkt /wp-json/oembed/1.0/embed. Die Parameter 'format' und 'url' scheinen unzureichend validiert und lassen sich für Directory-Traversal-Payloads missbrauchen. Eine manuelle Validierung ist erforderlich, um False-Positives auszuschließen; die Häufigkeit (2 Instanzen) und der spezifische Endpunkt sprechen jedoch für einen echten Befund.",
+    "evidence": "OWASP ZAP:\n[HIGH] Path Traversal (2x) CWE: 22\n  URL: https://dortmund-beach.com/wp-json/oembed/1.0/embed?format=x\n  URL: https://dortmund-beach.com/wp-json/oembed/1.0/embed?url=%2Fe",
+    "external_id": "VS-2026-002",
+    "id": "VS-2026-002",
+    "impact": "Erfolgreiches Path Traversal ermöglicht das Lesen beliebiger Dateien auf dem Web-Server (z.B. /etc/passwd, wp-config.php mit DB-Zugangsdaten). Bei Zugriff auf wp-config.php ist eine vollständige Übernahme der WordPress-Datenbank und damit der Seite möglich.",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Sofort:</b> Befund manuell verifizieren (z.B. mit curl gegen /wp-json/oembed/1.0/embed mit '../../../etc/passwd'-Payload). Wenn bestätigt, WordPress-Core und -Plugins sofort auf aktuelle Versionen aktualisieren.\n<b>Mittelfristig:</b> Web Application Firewall (z.B. Wordfence, Cloudflare WAF) mit Path-Traversal-Regeln vorlagern.",
+    "severity": "HIGH",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech": "wordpress"
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Path Traversal im WordPress oEmbed-Endpunkt auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com (Theme: betheme 27.4.5)",
+    "business_impact_score": 8.8,
+    "cvss_score": "8.8",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-1104",
+    "description": "Das eingesetzte BeTheme (WordPress) liegt in Version 27.4.5 vor. Die aktuelle Version ist 28.5.7+; dazwischen liegen zwölf dokumentierte Schwachstellen inkl. authentifizierter Remote Code Execution (BeTheme <= 28.5.7 – Contributor+ RCE), Arbitrary File Upload zur RCE (< 28.4.1) sowie mehreren Stored-XSS- und PHP-Object-Injection-Lücken.",
+    "evidence": "wpscan output:\nTheme: betheme (27.5.3)\n - Betheme < 27.5.7 - Contributor+ PHP Object Injection\n - Betheme < 28.4.1 - Author+ Arbitrary File Upload to RCE via Icon Pack Upload\n - Betheme <= 28.5.7 - Contributor+ Remote Code Execution\n - Betheme < 28.4.1 - Contributor+ Arbitrary File Deletion",
+    "external_id": "VS-2026-003",
+    "finding_type": "wordpress_plugin_vulnerability",
+    "id": "VS-2026-003",
+    "impact": "Ein Angreifer mit Contributor- oder Author-Rechten (auch via kompromittiertes Redakteurskonto) kann beliebigen PHP-Code auf dem Server ausführen und damit die vollständige Kontrolle über die WordPress-Installation und potenziell den Host übernehmen.",
+    "original_claude_id": "VS-2026-004",
+    "policy_id": "SP-WP-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> BeTheme auf die aktuellste Version (>= 28.5.8) aktualisieren.\n<b>Mittelfristig:</b> Rollenkonzept prüfen — Contributor/Author-Konten nur an vertrauenswürdige Redakteure vergeben, 2FA für alle WP-Konten aktivieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech": "wordpress"
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-WP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "WordPress-Plugin/Theme-Schwachstelle - typischerweise XSS, Object Injection oder Auth-Bypass. Schweregrad haengt von Plugin-Aktivitaet, Auth-Voraussetzungen und Patch-Stand ab; Default MEDIUM, Boost via KEV/EPSS bei zugeordnetem CVE.",
+     "rule_references": [
+      "CWE-1395",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "WordPress-Plugin betheme mit bekannter Schwachstelle auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "tech": "BeTheme",
+     "version": "27.4.5"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com (Plugin: revslider 6.7.11)",
+    "business_impact_score": 7.2,
+    "cvss_score": "7.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
+    "cwe": "CWE-1104",
+    "description": "Das Slider-Revolution-Plugin liegt in Version 6.7.11 vor. Es existieren vier dokumentierte Schwachstellen: nicht verifizierte CVE-Referenz (Admin+ Stored XSS, <6.7.14), nicht verifizierte CVE-Referenz (Author+ Stored XSS via SVG Upload, <6.7.19), nicht verifizierte CVE-Referenz (Contributor+ Arbitrary File Read, <6.7.37) und nicht verifizierte CVE-Referenz (Contributor+ Arbitrary File Read, <6.7.38). Zusätzlich ist die Plugin-Version über den 'generator'-Meta-Tag öffentlich einsehbar.",
+    "evidence": "wpscan output:\nPlugin: revslider (6.7.11)\n - Slider Revolution < 6.7.14 - Admin+ Stored XSS (nicht verifizierte CVE-Referenz)\n - Slider Revolution < 6.7.19 - Author+ Stored XSS via SVG (nicht verifizierte CVE-Referenz)\n - Slider Revolution < 6.7.37 - Contributor+ Arbitrary File Read (nicht verifizierte CVE-Referenz)\n - Slider Revolution < 6.7.38 - Contributor+ Arbitrary File Read (nicht verifizierte CVE-Referenz)\nmeta[generator]: Powered by Slider Revolution 6.7.11",
+    "external_id": "VS-2026-004",
+    "finding_type": "wordpress_plugin_vulnerability",
+    "id": "VS-2026-004",
+    "impact": "Ein Angreifer mit Contributor-Rechten (z.B. übernommenes Autoren-Konto) kann beliebige Dateien vom Server lesen (inkl. wp-config.php) und damit DB-Credentials abgreifen. Bei kompromittiertem Author/Admin-Konto sind persistente XSS-Payloads gegen Redakteure/Besucher möglich.",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-WP-001",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Slider Revolution auf mindestens 6.7.38, besser aktuellste Version aktualisieren.\n<b>Mittelfristig:</b> Generator-Meta-Tag entfernen, um Versionsleak zu verhindern, und regelmäßige Update-Prozesse für alle WP-Plugins etablieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-WP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "WordPress-Plugin/Theme-Schwachstelle - typischerweise XSS, Object Injection oder Auth-Bypass. Schweregrad haengt von Plugin-Aktivitaet, Auth-Voraussetzungen und Patch-Stand ab; Default MEDIUM, Boost via KEV/EPSS bei zugeordnetem CVE.",
+     "rule_references": [
+      "CWE-1395",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "WordPress-Plugin revslider mit bekannter Schwachstelle auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "tech": "Slider Revolution",
+     "version": "6.7.11"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com (Plugin: burst-statistics 1.7.1)",
+    "business_impact_score": 6.5,
+    "cvss_score": "6.5",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:H/A:N",
+    "cwe": "CWE-352",
+    "description": "Das Plugin Burst Statistics liegt in Version 1.7.1 vor. In allen Versionen unterhalb 2.0.8 existiert eine Cross-Site-Request-Forgery-Schwachstelle (nicht verifizierte CVE-Referenz), über die administrative Aktionen ohne Wissen des angemeldeten Admins ausgelöst werden können.",
+    "evidence": "wpscan output:\nPlugin: burst-statistics (1.7.1)\n - Burst Statistics < 2.0.8 - Cross-Site Request Forgery (nicht verifizierte CVE-Referenz)",
+    "external_id": "VS-2026-005",
+    "finding_type": "cve_finding",
+    "id": "VS-2026-005",
+    "impact": "Ein Angreifer kann einen angemeldeten Administrator auf eine präparierte Seite locken; dessen Browser führt dann unbeabsichtigt Plugin-Konfigurationsänderungen aus, was zu einer Manipulation von Tracking-Daten oder Escalation-Vektoren führen kann.",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-CVE-004",
+    "recommendation": "<b>Kurzfristig (Tage):</b> Burst-Statistics-Plugin auf >= 2.0.8 aktualisieren.\n<b>Mittelfristig:</b> Auto-Update für Plugins aktivieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-CVE-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "CVE-Standard-Mapping aus NVD-CVSS 6.5",
+     "rule_references": [
+      "NVD"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Schwachstelle in Burst Statistics auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "tech": "Burst Statistics",
+     "version": "1.7.1"
+    }
+   },
+   {
+    "_title_template_missing": true,
+    "affected": "88.99.35.112:21 (Pure-FTPd)",
+    "business_impact_score": 5.9,
+    "cvss_score": "5.9",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-319",
+    "description": "Auf Port 21 ist ein Pure-FTPd-Dienst erreichbar. FTP überträgt Zugangsdaten und Dateiinhalte per Default im Klartext. Ob TLS (FTPS) erzwungen wird, ist aus dem Scan nicht ersichtlich.",
+    "evidence": "nmap: 21/tcp open ftp Pure-FTPd\nShodan: 21 -> Pure-FTPd",
+    "external_id": "VS-2026-006",
+    "id": "VS-2026-006",
+    "impact": "Ein Netzwerk-Angreifer (z.B. auf demselben Uplink oder in einem kompromittierten Netzsegment) kann bei ungesicherter FTP-Verbindung Login-Credentials und übertragene Dateien mitlesen. Kompromittierte FTP-Zugänge werden häufig für WordPress-Web-Shell-Deployments verwendet.",
+    "original_claude_id": "VS-2026-009",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> FTP-Dienst so konfigurieren, dass ausschließlich TLS-verschlüsselte FTPS-Verbindungen akzeptiert werden (TLSRequired yes in Pure-FTPd).\n<b>Mittelfristig:</b> FTP durch SFTP/SCP über SSH ersetzen und Port 21 komplett schließen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "FTP-Dienst (Pure-FTPd) über Klartext-Port 21 erreichbar auf 88.99.35.112",
+    "title_vars": {
+     "host": "88.99.35.112",
+     "port": "21",
+     "tech": "Pure-FTPd"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "https://dortmund-beach.com",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-1104",
+    "description": "wpscan meldet die WordPress-Kernversion 6.5.10 als 'outdated'. Der 6.5-Zweig ist nicht mehr die aktuelle stabile Version; laufende Sicherheits-Patches werden primär in den neueren Major-Releases (6.6+, 6.7+) bereitgestellt.",
+    "evidence": "wpscan: WordPress Version 6.5.10 (Status: outdated)",
+    "external_id": "VS-2026-007",
+    "finding_type": "software_eol",
+    "id": "VS-2026-007",
+    "impact": "Verzögerte oder ausbleibende Sicherheitsupdates für den WordPress-Kern erhöhen das Risiko, dass zukünftig bekannt werdende Kern-CVEs länger ungepatcht bleiben.",
+    "original_claude_id": "VS-2026-006",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> WordPress-Kern auf die neueste stabile Version aktualisieren (Backup vor dem Update).\n<b>Mittelfristig:</b> Automatische Minor-Updates aktiv lassen und einen quartalsweisen Prozess für Major-Updates etablieren.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech": "wordpress"
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='software_eol' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "WordPress-Kern 6.5.10 ist veraltet auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com",
+     "tech": "WordPress",
+     "version": "6.5.10"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "_title_template_missing": true,
+    "affected": "https://dortmund-beach.com/wp-login.php und WP-Admin-Bereich",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-1004",
+    "description": "ZAP meldet 11 Cookies ohne HttpOnly-Flag auf wp-login-Pfaden. Damit sind diese Cookies für clientseitiges JavaScript lesbar.",
+    "evidence": "ZAP: [LOW] Cookie No HttpOnly Flag (11x) — CWE 1004\n  URL: https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to",
+    "external_id": "VS-2026-008",
+    "finding_type": "cookie_no_httponly",
+    "id": "VS-2026-008",
+    "impact": "Bei einer erfolgreichen XSS-Ausnutzung (z.B. über die bekannten Plugin-XSS-Schwachstellen) kann ein Angreifer Session-Cookies über document.cookie auslesen und Sessions übernehmen.",
+    "original_claude_id": "VS-2026-020",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "<b>Kurzfristig:</b> Für alle WordPress-Session-Cookies HttpOnly setzen (WordPress-Core-Cookies sind standardmäßig HttpOnly — die betroffenen Cookies stammen wahrscheinlich aus Plugins wie Complianz/Burst; deren Konfiguration prüfen).\n<b>Mittelfristig:</b> Server-seitig per Apache 'Header edit Set-Cookie ^(.*)$ $1;HttpOnly' erzwingen (Test-Umgebung vorher validieren).",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech": "wordpress"
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='cookie_no_httponly' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Cookies ohne HttpOnly-Flag im WordPress-Login-Bereich von dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "https://dortmund-beach.com/author/badmin, /wp-json/wp/v2/users",
+    "business_impact_score": 5.3,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-200",
+    "description": "Der Administrator-Benutzername 'badmin' ist sowohl über die Author-Archiv-URL /author/badmin als auch über den REST-Endpunkt /wp-json/wp/v2/users öffentlich abrufbar. Dies wurde von wpscan explizit gemeldet.",
+    "evidence": "wpscan: Users enumerated: badmin\nDiscovered: https://dortmund-beach.com/author/badmin/\nhttps://dortmund-beach.com/wp-json/wp/v2/users",
+    "external_id": "VS-2026-009",
+    "finding_type": "user_enumeration",
+    "id": "VS-2026-009",
+    "impact": "Kenntnis eines gültigen Admin-Benutzernamens reduziert Brute-Force-Angriffe auf wp-login.php erheblich, weil nur noch das Passwort geraten werden muss. In Kombination mit fehlendem Rate-Limiting und ohne 2FA ist eine Kompromittierung des Admin-Kontos deutlich wahrscheinlicher.",
+    "original_claude_id": "VS-2026-019",
+    "policy_id": "SP-ENUM-001",
+    "recommendation": "<b>Kurzfristig:</b> User-Enumeration blockieren (z.B. per .htaccess: /?author=* umleiten, /wp-json/wp/v2/users nur für angemeldete User zulassen). Plugin wie 'Stop User Enumeration' oder 'Wordfence' einsetzen.\n<b>Mittelfristig:</b> 2FA für alle Admin-Accounts erzwingen und wp-login.php per fail2ban oder Cloudflare-Rate-Limit absichern.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": true,
+      "mx_present": true,
+      "state_change": false,
+      "tech": "wordpress"
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-ENUM-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Benutzer-Enumeration moeglich - Username-Listen ableitbar, Vorbereitung fuer Credential-Stuffing/Brute-Force",
+     "rule_references": [
+      "CWE-203",
+      "CWE-200"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "User-Enumeration moeglich auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "88.99.35.112:30000",
+    "business_impact_score": 4.8,
+    "cvss_score": "4.8",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-200",
+    "description": "Auf Port 30000 läuft OpenSSH 8.4p1 (Debian 11-Paket). Der Wechsel auf einen non-standard Port reduziert automatisierten Brute-Force-Traffic, ersetzt jedoch keine harte Authentifizierung. OpenSSH 8.4p1 ist Bestandteil von Debian 11 (Bullseye); Sicherheitsfixes werden über das Debian-Security-Repo eingespielt (Suffix +deb11u7 zeigt aktuellen Patchstand).",
+    "evidence": "nmap: 30000/tcp open ssh OpenSSH 8.4p1 Debian 5+deb11u7",
+    "external_id": "VS-2026-010",
+    "finding_type": "ssh_no_brute_force_protection",
+    "id": "VS-2026-010",
+    "impact": "Ohne Kenntnis der Authentifizierungsmethode (Key vs. Passwort, fail2ban) ist eine Restunsicherheit für gezielte Brute-Force- oder Credential-Stuffing-Angriffe gegeben. OpenSSH 8.4p1 ist NICHT von nicht verifizierte CVE-Referenz (regreSSHion) betroffen.",
+    "original_claude_id": "VS-2026-008",
+    "policy_id": "SP-SSH-001",
+    "recommendation": "<b>Kurzfristig:</b> Sicherstellen, dass ausschließlich Public-Key-Authentifizierung erlaubt ist (PasswordAuthentication no) und fail2ban aktiv ist.\n<b>Mittelfristig:</b> SSH-Zugriff per Firewall auf Admin-IPs oder VPN begrenzen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-SSH-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "SSH ohne erkennbaren Brute-Force-Schutz (fail2ban / Rate-Limit) - Brute-Force-Angriffe moeglich, aber nur LOW weil Authentifizierung weiterhin erforderlich",
+     "rule_references": [
+      "CWE-307"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "SSH-Dienst ohne Brute-Force-Schutz auf 88.99.35.112",
+    "title_vars": {
+     "host": "88.99.35.112",
+     "port": "30000",
+     "tech": "OpenSSH",
+     "version": "8.4p1"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "dortmund-beach.com (DNS)",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain dortmund-beach.com ist kein DKIM-Selector konfiguriert. Zusammen mit einer schwachen DMARC-Policy fehlt damit die kryptografische Signatur für ausgehende E-Mails, die eine sichere Absenderauthentifizierung ermöglicht.",
+    "evidence": "DNS-Enumeration: DKIM: False\nSPF: v=spf1 a mx ip4:78.46.161.114 ~all\nDMARC: v=DMARC1; p=none;",
+    "external_id": "VS-2026-011",
+    "finding_type": "dmarc_p_none",
+    "id": "VS-2026-011",
+    "impact": "Empfangende Mail-Provider können ausgehende Mails nicht kryptografisch verifizieren; in Kombination mit DMARC p=none werden gefälschte Absender im Namen von @dortmund-beach.com von den meisten Providern nicht zurückgewiesen — Phishing-Kampagnen gegen Kunden werden erleichtert.",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-DNS-007",
+    "recommendation": "<b>Kurzfristig:</b> DKIM-Schlüsselpaar generieren, Public Key als TXT-Record (selector._domainkey.dortmund-beach.com) hinterlegen und in Postfix (OpenDKIM oder rspamd) signieren lassen.\n<b>Mittelfristig:</b> Nach 2-4 Wochen erfolgreichem DKIM-Betrieb DMARC-Policy schrittweise auf 'quarantine' und dann 'reject' anheben.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-007",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DMARC mit p=none - nur Monitoring, keine Durchsetzung",
+     "rule_references": [
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "DMARC-Policy auf 'none' statt 'quarantine' oder 'reject' fuer dortmund-beach.com",
+    "title_vars": {
+     "domain": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "_title_template_incomplete": true,
+    "affected": "https://dortmund-beach.com/wp-login.php und WP-Admin-Bereich",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-1275",
+    "description": "ZAP meldet 11 Cookies ohne SameSite-Attribut. Damit gilt die Browser-Default-Policy, die Cross-Site-Kontexte weniger restriktiv behandelt.",
+    "evidence": "ZAP: [LOW] Cookie without SameSite Attribute (11x) — CWE 1275",
+    "external_id": "VS-2026-012",
+    "finding_type": "cookie_no_samesite",
+    "id": "VS-2026-012",
+    "impact": "In Kombination mit fehlendem CSRF-Schutz (siehe VS-2026-005) sind Cross-Site-Request-Forgery-Angriffe leichter durchführbar.",
+    "original_claude_id": "VS-2026-021",
+    "policy_id": "SP-COOK-005",
+    "recommendation": "<b>Kurzfristig:</b> Cookies mit 'SameSite=Lax' ausliefern (für Login-Cookies) oder 'SameSite=Strict' für rein interne Admin-Cookies.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false,
+      "tech": "wordpress"
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-COOK-005",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Tracking-Cookie ohne SameSite - kein State-Change-Vektor",
+     "rule_references": [
+      "CWE-1275"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Cookies ohne SameSite-Attribut im WordPress-Login-Bereich von dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "https://dortmund-beach.com",
+    "business_impact_score": 4.2,
+    "cvss_score": "4.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der Response-Header 'Strict-Transport-Security' wird mit dem Wert 'max-age=0' ausgeliefert. Ein max-age von 0 weist Browser explizit an, jeglichen zuvor gespeicherten HSTS-Eintrag zu löschen — HSTS ist damit funktional deaktiviert. testssl.sh meldet dies als Fehlkonfiguration.",
+    "evidence": "response header: strict-transport-security: max-age=0\ntestssl.sh: [MEDIUM] HSTS_time: misconfiguration, specified not a number for max-age",
+    "external_id": "VS-2026-013",
+    "finding_type": "hsts_short_maxage",
+    "id": "VS-2026-013",
+    "impact": "Browser erzwingen für dortmund-beach.com keine HTTPS-Verbindungen; SSL-Stripping-Angriffe (z.B. in öffentlichen WLANs) können den Verkehr auf HTTP downgraden und Session-Cookies mitlesen.",
+    "original_claude_id": "VS-2026-012",
+    "policy_id": "SP-HDR-004",
+    "recommendation": "<b>Kurzfristig:</b> HSTS-Header korrekt setzen: 'Strict-Transport-Security: max-age=31536000; includeSubDomains' in der Apache-Konfiguration.\n<b>Mittelfristig:</b> Nach 6 Monaten stabiler HSTS-Konfiguration Preload-Submission an https://hstspreload.org erwägen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": true,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "HSTS max-age < 6 Monate - Best-Practice-Verstoss ohne praktisches Risiko",
+     "rule_references": [
+      "CWE-523"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "HSTS max-age unter 6 Monaten auf dortmund-beach.com",
+    "title_vars": {
+     "host": "dortmund-beach.com"
+    }
+   }
+  ],
+  "overall_description": "Der externe Scan der Domain dortmund-beach.com (IP 88.99.35.112, hostende Plattform vsrv2.spacekoeln.de) zeigt einen typischen Shared-Hosting-Server mit einer WordPress-basierten Agenturseite sowie umfangreicher Mail- und Verwaltungsinfrastruktur. Auf dem einen produktiven Host sind 11 Ports von außen erreichbar: neben den erwarteten Web-Ports 80/443 (Apache 2.4.67) sind FTP (Pure-FTPd, Port 21), Postfix SMTP (25/465/587), Dovecot POP3/IMAP (110/143/993/995), das Webmin/Usermin-Panel (Port 10000) sowie ein SSH-Dienst auf Port 30000 (OpenSSH 8.4p1) exponiert. Die WordPress-Installation läuft auf Version 6.5.10 und ist damit veraltet; erhöhter sind jedoch die eingesetzten Plugins und das Theme: das Slider-Revolution-Plugin 6.7.11, das GDPR-Plugin Complianz 7.1.0, das Burst-Statistics-Plugin 1.7.1 sowie das BeTheme 27.4.5 sind alle mit mehreren dokumentierten CVEs behaftet – darunter unauthentifizierte Information-Disclosure-Lücken (nicht verifizierte CVE-Referenz, nicht verifizierte CVE-Referenz) und authentifizierte Remote-Code-Execution-Pfade im BeTheme.\n\nBesonders kritisch sind zwei Path-Traversal-Alerts von OWASP ZAP im WordPress-Endpunkt /wp-json/oembed/1.0/embed, die weiter validiert werden müssen. Auf DNS-Ebene existiert kein DKIM-Selector, die DMARC-Policy steht auf 'none' (keine Durchsetzung), es gibt kein TLS-RPT und keinen DNSSEC-Schutz – E-Mail-Spoofing im Namen von dortmund-beach.com ist damit nahezu ungehindert möglich. Die HTTPS-Konfiguration zeigt eine fehlerhafte HSTS-Direktive (max-age=0, was HSTS effektiv deaktiviert) sowie potenzielle BREACH-Anfälligkeit durch aktive gzip-Kompression. Der Security-Header-Score beträgt 1/7; sechs von sieben empfohlenen Headern (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-XSS-Protection) fehlen komplett. Zusätzlich ist auf /author/badmin ein Administrator-Benutzername enumerierbar, was gezielte Brute-Force-Angriffe auf wp-login.php erleichtert.\n\nInsgesamt kombiniert der Host eine hohe Angriffsfläche (11 exponierte Dienste inkl. Klartext-FTP und öffentlichem Admin-Panel auf Port 10000) mit einer veralteten WordPress-Umgebung mit bekannten CVEs und einem unzureichenden E-Mail-Authentifizierungssetup. Die Gesamtrisikoeinstufung ist CRITICAL, weil mindestens ein unauthentifizierter Informations­abfluss (Complianz < 7.4.6, nicht verifizierte CVE-Referenz) sowie zwei ZAP-Path-Traversal-Treffer aktiv exploitierbar erscheinen und der Host über Klartext-Protokolle und ein potenziell öffentliches Webmin-Panel eine breite Kompromittierungs­fläche bietet. [Hinweis: openssh wird laut Scan-Inventar als aktuell gefuehrt; die Einstufung als veraltet/EOL ist nicht belegt.]",
+  "overall_risk": "HIGH",
+  "package": "perimeter",
+  "policy_id_distinct": [
+   "SP-COOK-005",
+   "SP-CSP-001",
+   "SP-CSRF-001",
+   "SP-CVE-004",
+   "SP-DISC-001",
+   "SP-DNS-001",
+   "SP-DNS-007",
+   "SP-DNS-011",
+   "SP-ENUM-001",
+   "SP-EOL-003",
+   "SP-FALLBACK",
+   "SP-HDR-004",
+   "SP-HDR-005",
+   "SP-HDR-008",
+   "SP-HDR-009",
+   "SP-SSH-001",
+   "SP-WP-001"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Alle Anfragen an dortmund-beach.com werden über HTTPS ausgeliefert; ein gültiges Zertifikat ist vorhanden und der Cloudflare-Turnstile-Bot-Schutz ist eingebunden.",
+    "title": "HTTPS ist auf allen Web-Antworten aktiv"
+   },
+   {
+    "description": "OpenSSH 8.4p1 mit Debian-Sicherheitspatch-Level +deb11u7 auf Port 30000 zeigt aktive Patchpflege — die Version ist nicht von der regreSSHion-Lücke (nicht verifizierte CVE-Referenz) betroffen.",
+    "title": "SSH läuft auf einem non-standard Port und ist gepatcht"
+   },
+   {
+    "description": "Die Domain besitzt einen SPF-Record 'v=spf1 a mx ip4:78.46.161.114 ~all', der explizit die berechtigten Sending-IPs auflistet — ein guter Ausgangspunkt für den weiteren Aufbau von DKIM und einer strengeren DMARC-Policy.",
+    "title": "SPF-Record vorhanden mit klar definierter Sender-Policy"
+   },
+   {
+    "description": "Der Test auf AXFR-Zone-Transfers zeigt, dass die Joker.com-Nameserver keine unautorisierten Zone-Downloads erlauben — die vollständige DNS-Zone ist damit nicht öffentlich abrufbar.",
+    "title": "Kein DNS-Zone-Transfer möglich"
+   },
+   {
+    "description": "Die Subdomain-Enumeration hat keine verwaisten CNAME-Einträge identifiziert; ein Subdomain-Takeover über hängengebliebene DNS-Records ist damit aktuell nicht möglich.",
+    "title": "Keine dangling CNAMEs gefunden"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "Complianz-Plugin auf >= 7.5.2 aktualisieren, um die unauthentifizierte Information-Disclosure-Lücke (nicht verifizierte CVE-Referenz) zu schließen.",
+    "effort": "1 h",
+    "finding_refs": [
+     "VS-2026-001"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "Path-Traversal-Befund am /wp-json/oembed/1.0/embed-Endpunkt manuell verifizieren; bei Bestätigung WordPress-Core und alle Plugins auf aktuelle Versionen aktualisieren.",
+    "effort": "2-4 h",
+    "finding_refs": [
+     "VS-2026-002"
+    ],
+    "timeframe": "Sofort"
+   },
+   {
+    "action": "Slider Revolution auf mindestens 6.7.38 und BeTheme auf mindestens 28.5.8 aktualisieren.",
+    "effort": "2 h",
+    "finding_refs": [
+     "VS-2026-004",
+     "VS-2026-003"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "Burst-Statistics-Plugin auf >= 2.0.8 aktualisieren und WordPress-Kern auf aktuelle stabile Version anheben.",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-005",
+     "VS-2026-007"
+    ],
+    "timeframe": "Tag 1-3"
+   },
+   {
+    "action": "HSTS-Header korrekt setzen (max-age=31536000; includeSubDomains) und den gesamten Security-Header-Satz (CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy) in der Apache-Konfiguration ergänzen.",
+    "effort": "3-4 h",
+    "finding_refs": [
+     "VS-2026-013"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Pure-FTPd auf 'TLSRequired yes' konfigurieren oder Port 21 komplett schließen und Datei-Uploads ausschließlich über SFTP/SCP über den bestehenden SSH-Dienst zulassen.",
+    "effort": "1-2 h",
+    "finding_refs": [
+     "VS-2026-006"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "User-Enumeration blockieren (Author-Pfade, wp-json/wp/v2/users nur für angemeldete User) und 2FA für alle Admin-Accounts erzwingen.",
+    "effort": "2-3 h",
+    "finding_refs": [
+     "VS-2026-009",
+     "VS-2026-008",
+     "VS-2026-012"
+    ],
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "DKIM einrichten (Selector-TXT-Record + Postfix-Signatur via OpenDKIM/rspamd), DMARC-Reports auswerten und Policy schrittweise auf p=quarantine anheben.",
+    "effort": "4-6 h",
+    "finding_refs": [
+     "VS-2026-011"
+    ],
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 2,
+   "INFO": 2,
+   "LOW": 3,
+   "MEDIUM": 6
+  },
+  "tech_profiles": [
+   {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details": {
+     "cms": "WordPress",
+     "confidence": 0.95,
+     "details": {
+      "meta_generator": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+      "raw": {
+       "name": "WordPress",
+       "version": ""
+      },
+      "source": "webtech"
+     },
+     "detection_methods": [
+      "meta_tag",
+      "webtech"
+     ],
+     "version": null
+    },
+    "cms_version": "6.5.10",
+    "exposed_services": [
+     {
+      "port": "21",
+      "service": "Pure-FTPd"
+     },
+     {
+      "port": "25",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "80",
+      "service": "Apache httpd 2.4.67"
+     },
+     {
+      "port": "443",
+      "service": "Apache httpd 2.4.67"
+     },
+     {
+      "port": "465",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "587",
+      "service": "Postfix smtpd"
+     },
+     {
+      "port": "993",
+      "service": ""
+     },
+     {
+      "port": "995",
+      "service": ""
+     },
+     {
+      "port": "110",
+      "service": ""
+     },
+     {
+      "port": "143",
+      "service": ""
+     }
+    ],
+    "fqdns": [
+     "dortmund-beach.com",
+     "www.dortmund-beach.com",
+     "*.dortmund-beach.com",
+     "pflege.dortmund-beach.com"
+    ],
+    "ftp_service": true,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "88.99.35.112",
+    "is_spa": false,
+    "mail_services": true,
+    "open_ports": [
+     21,
+     80,
+     110,
+     143,
+     443,
+     465,
+     587,
+     993,
+     995,
+     10000,
+     30000
+    ],
+    "passive_intel": {
+     "abuseipdb_score": 0,
+     "dmarc_p": "none",
+     "dmarc_pct": 100,
+     "dnssec_signed": false,
+     "is_tor": false,
+     "otx_pulse_count": 0,
+     "shodan_ports": [
+      993,
+      995,
+      587,
+      110,
+      143,
+      80,
+      465,
+      21,
+      25,
+      443
+     ],
+     "shodan_services": {
+      "21": "Pure-FTPd",
+      "25": "Postfix smtpd",
+      "443": "Apache httpd 2.4.67",
+      "465": "Postfix smtpd",
+      "587": "Postfix smtpd",
+      "80": "Apache httpd 2.4.67"
+     },
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "dortmund-beach.com",
+    "redirect_data": {
+     "dortmund-beach.com": {
+      "error": null,
+      "final_domain": "dortmund-beach.com",
+      "final_url": "https://dortmund-beach.com/",
+      "is_cross_domain": false,
+      "page_title": "Dortmund Beach Design | Webdesign | Corporate Design",
+      "redirect_chain": [
+       "https://dortmund-beach.com/",
+       "https://dortmund-beach.com/wp-content/cache/wpfc-minified/7ubk1iuu/9mjyk.css",
+       "https://dortmund-beach.com/wp-content/themes/betheme-child/style.css?ver=6858e88174e609ac00d8a83f4c146a3b",
+       "https://dortmund-beach.com/wp-content/uploads/2021/12/dortmundbeach-logo-2zeilig@2x.png",
+       "https://dortmund-beach.com/wp-content/uploads/2021/12/dortmund-beach-logo-tilde@2x.png",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/assets/dummy.png",
+       "https://dortmund-beach.com/wp-content/cache/wpfc-minified/mbb4a78c/63tkw.css",
+       "https://dortmund-beach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-500-latin.woff2",
+       "https://dortmund-beach.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.2",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/debouncedresize.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-includes/js/jquery/ui/tabs.min.js?ver=1.13.2",
+       "https://dortmund-beach.com/wp-content/themes/betheme/fonts/mfn/icons.woff2?11083851",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-500italic-latin.woff2",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/magnificpopup.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-700-latin.woff2",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/visible.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/menu.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/assets/animations/animations.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/enllax.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/parallax/translate3d.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/helpers/timeme/timeme.min.js?ver=1.6.1",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/assets/js/build/burst.min.js?ver=1.6.1",
+       "https://dortmund-beach.com/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.min.js?ver=1718879508",
+       "https://dortmund-beach.com/wp-content/themes/betheme/js/scripts.min.js?ver=27.4.5",
+       "https://dortmund-beach.com/wp-content/uploads/complianz/css/banner-1-optin.css?v=15",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rbtools.min.js?ver=6.7.11",
+       "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rs6.min.js?ver=6.7.11",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "https://i.vimeocdn.com/video/1357114649-1646339a0c1a11bb529068c3cd5afe2e9391456acc5dad70744a314e58c75d7a-d_640",
+       "https://player.vimeo.com/api/player.js",
+       "https://player.vimeo.com/video/669941546?loop=1&autoplay=1&title=0&byline=0&portrait=0&background=1&player_id=iframe52184",
+       "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileLoad",
+       "https://challenges.cloudflare.com/turnstile/v0/g/330e41bb475c/api.js",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/turnstile/f/av0/rch/jpsxk/0x4AAAAAAAbaszMygKLnGbeo/auto/fbE/new/normal?lang=auto",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/fo/3708490887:1789682715:XwvnnQjw5Z4A8p9sFkp2a30Ye59YvCm_COo-dZXXAGM/a3cba81218f1b238/zq0duQ8ojui20xvGwmrsY4_DzYg6xHNHPn0i8y.NBpQ-1789685286-1.2.1.1-psHLskVzxSI.CIaceHksAkjsXBqQ3PUidgOpu1BkgKrDoX9MrHv3H_FxJVAQUTho",
+       "blob:https://challenges.cloudflare.com/9522a802-2894-490b-b786-ec98776454e5",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/pat/a3cba81218f1b238/1789685287003/514014d8d6739573b4fd17d26822543af441cfc84f651d37435878098652fca8/XWCw4ZXKXOlFhX49kxzqHJbRNtSfRSO1G0h0VEEgOq8-1789685287-1.3.1.1-gW9ulLv0pdNKXNziSsB0Lj7fzcf2FGAUay8.pX0Qr9WG6qXEtGOGLZwx5wCDDTXa7frKouh3csskxih0A.x1HpN0jQoVcm3oH9ZTr5xPrX2EtTOL.66YBGBshYRVchlYrimWxi9XWqRAdfv8ozqE9H3s.BlZb1cDqm9fyXbrA7dmXA8JTAkYdcV7ALIjXjeomg8XeVklr_n8buwM4c2Tv_B_khpOkNBwMCB7x1uO6VLLwfIjqVAvLBFzzs11FztnwXbhgI5ODDkA5ukLwhSlMdNq4JhwqHmW7E6yUbv4FD_8_ebOGiXxJctQm.rEUQ6Y8cT_.h6J7gmlgYTNRp_SzwrvqWviXbctnSoCqOnRLJjKq4svczZjGnX1Z3wXdFYOGo_XE4GiTFm09ACrcT_Vg16zUeTirV0offGtFR2ADZssddFmhzHJffKQot40G2Z1tRqPe7yQK3LCpytpVul_InV56eh1GOzkTYSdIxlW6WwnO2z5MsRN_h3A5Zk.qbXBI4f.9VtXb1YKTmyr5AX9OwZYSgbilKFJQof4RhM0SgvJ3X6umFhtsgJBVhHpfL7ZHYCrA.l0kIjTPbuxXlSEN5DWcJvMPRjL40IH_86LiBxQeXzk5UhlyTddX3oAEnhYpWsAHbPJf7Z1HNBQ7Bm9xQhz5KNb7wHof1FpdFZNKV4pskM6dsFydzeR3zlKvvLgOojKHeJuTL60FawklzTUCr.6Cs2bMuAc_7Xsmyr.CVOSej_4p8AJTkK.nPmb2DIFc_5pfbOoq6Dxka6yiaCNoN9t0VSH4Xuo55pCfMJTp2dC._kQVcOMgbnF4tncyxiZ",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/ci/a3cba81218f1b238/1789685287005/duIEgR4UtTQMG1TT5UNZotQpSjsN_QdP8Yuw8vhieTg-1789685287-1.3.1.1-Vgn6zWyKsSuEvJgq3gKA822_06aKbE4t5I4YE3pgYCePjk0rq3p8zuHq44q6U_l8r54dO0qWWqtAv94LdCjewIhTLDOYE_n2bO9ZbLJWT0vq6_0rJ30paBpw2coxgTJrQoknvorzT_lcC7rEdC7RrYtdSZFYiEZ2XCFh13AFESbOidyRIPbV5XT7_Bml7udMd2VjAuT5QOO1.abItpM6bMZwOs4TmECEbIKhvJoPNvPSLteTh2DiqLh_sZi7Moxu7Nw_O6YgiIqe01TL26akp6DBjm0DcspH15Fy4Rkk_NgX722sJZZGxhpJ9SsbNVu9UfCZi8G6zudU2qokRvkf8GapzmpDswmjDh9BkQZZ1jl_x96Z06K8Y3ud3fPZsH74DdPbYQF4It2.GXTKf3HJ5PusLnRVQsgNQQHXVm59Xf17BSODMQfbTglKps4uANvtXGXRfOOl1V90T2CAqdqkWfL.FSQMzSeCkB_nCrXJHTlKKN70ffnCMtd.WCLwYr6vZjCyHZ558cAShKaMJtgoixd.zxxOmzkogK7JSmObcJ.XRObuGHyPE8Nm4fUWRmRQoQSy3lVJGI0D0rcdGkMhK0j1avj5mnPZ2Zmfzb30anpd7QJmEEt_UnSpbchnRah3Fqj17.XET4pfp_lPMfeBnbehTgoCai3hFwEsjNfGN6icMAAlQIlUTgmSCLkekh29FNLG.ZDU7N3iCmlI1kVouhC7ad.Oj.iaG46zx8Vb.e8",
+       "blob:https://challenges.cloudflare.com/9522a802-2894-490b-b786-ec98776454e5",
+       "blob:https://challenges.cloudflare.com/9522a802-2894-490b-b786-ec98776454e5",
+       "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/g/fo/3708490887:1789682715:XwvnnQjw5Z4A8p9sFkp2a30Ye59YvCm_COo-dZXXAGM/a3cba81218f1b238/zq0duQ8ojui20xvGwmrsY4_DzYg6xHNHPn0i8y.NBpQ-1789685286-1.2.1.1-psHLskVzxSI.CIaceHksAkjsXBqQ3PUidgOpu1BkgKrDoX9MrHv3H_FxJVAQUTho",
+       "https://dortmund-beach.com/wp-content/uploads/betheme/fonts/Montserrat/Montserrat-1-latin.woff2",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php",
+       "https://dortmund-beach.com/wp-content/plugins/burst-statistics/endpoint.php"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+       "connection": "Keep-Alive",
+       "content-encoding": "gzip",
+       "content-length": "14053",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Thu, 17 Sep 2026 22:48:05 GMT",
+       "expires": "Mon, 29 Oct 1923 20:30:00 GMT",
+       "keep-alive": "timeout=5, max=100",
+       "last-modified": "Thu, 20 Jun 2024 10:51:53 GMT",
+       "pragma": "no-cache",
+       "server": "Apache/2.4.67 (Debian)",
+       "strict-transport-security": "max-age=0",
+       "vary": "User-Agent,Accept-Encoding"
+      },
+      "screenshot_path": "/tmp/scan-14272c00-1145-4675-9b4c-19ce2ead403b/hosts/88.99.35.112/phase2/screenshot_dortmund-beach.com.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "home page-template-default page page-id-124 woocommerce-block-theme-has-button-styles template-slider color-custom content-brightness-light input-brightness-light style-simple button-animation-fade layout-full-width if-zoom hide-love no-shadows header-simple header-empty header-fw sticky-header sticky-tb-color ab-hide menu-link-color subheader-both-left footer-copy-center responsive-overflow-x-mobile mobile-tb-center mobile-side-slide mobile-mini-mr-ll mobile-header-mini mobile-icon-user-ss mobile-icon-wishlist-ss mobile-icon-search-ss mobile-icon-wpml-ss mobile-icon-action-ss be-page-124 be-reg-2745 rs-safari cmplz-marketing cmplz-statistics cmplz-preferences cmplz-functional cmplz-eu cmplz-optin",
+       "cookies": "burst_uid=e80e011d9c773e141f7a2a7462fe87e7; cmplz_consented_services=; cmplz_policy_id=16; cmplz_marketing=allow; cmplz_statistics=allow; cmplz_preferences=allow; cmplz_functional=allow; cmplz_banner-status=dismissed",
+       "generator": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+       "html_lang": "de-DE",
+       "meta_tags": [
+        {
+         "content": "Das passende Design für ihre Marke. Wir helfen ihnen ihre Marke zu visualisieren.",
+         "name": "description"
+        },
+        {
+         "content": "max-image-preview:large",
+         "name": "robots"
+        },
+        {
+         "content": "telephone=no",
+         "name": "format-detection"
+        },
+        {
+         "content": "width=device-width, initial-scale=1, maximum-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        },
+        {
+         "content": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+         "name": "generator"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://player.vimeo.com/api/player.js",
+        "https://www.googletagmanager.com/gtag/js?id=UA-4628890-1",
+        "https://dortmund-beach.com/wp-content/plugins/burst-statistics/helpers/timeme/timeme.min.js?ver=1.6.1",
+        "https://dortmund-beach.com/wp-content/plugins/burst-statistics/assets/js/build/burst.min.js?ver=1.6.1",
+        "https://dortmund-beach.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
+        "https://dortmund-beach.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1",
+        "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rbtools.min.js?ver=6.7.11",
+        "https://dortmund-beach.com/wp-content/plugins/revslider/sr6/assets/js/rs6.min.js?ver=6.7.11",
+        "https://dortmund-beach.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.2",
+        "https://dortmund-beach.com/wp-includes/js/jquery/ui/tabs.min.js?ver=1.13.2",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/debouncedresize.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/magnificpopup.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/menu.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/visible.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/assets/animations/animations.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/plugins/enllax.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/parallax/translate3d.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/themes/betheme/js/scripts.min.js?ver=27.4.5",
+        "https://dortmund-beach.com/wp-content/plugins/complianz-gdpr/cookiebanner/js/complianz.min.js?ver=1718879508"
+       ],
+       "stylesheets": [
+        "https://dortmund-beach.com/wp-content/cache/wpfc-minified/7ubk1iuu/9mjyk.css",
+        "https://dortmund-beach.com/wp-content/themes/betheme-child/style.css?ver=6858e88174e609ac00d8a83f4c146a3b",
+        "https://dortmund-beach.com/wp-content/uploads/complianz/css/banner-1-optin.css?v=15",
+        "https://dortmund-beach.com/wp-content/cache/wpfc-minified/mbb4a78c/63tkw.css"
+       ],
+       "title": "Dortmund Beach Design | Webdesign | Corporate Design"
+      }
+     }
+    },
+    "server": "Apache httpd/2.4.67",
+    "tech_rows": [
+     {
+      "category": "CMS",
+      "confidence": 0.95,
+      "confidence_label": "hoch",
+      "cves": [],
+      "detection_source": "CMS-Fingerprint",
+      "eol_date": "2024-07-16",
+      "is_mega_cve": false,
+      "latest_patch": "6.5.8",
+      "name": "WordPress",
+      "patch_status": "minor_eol",
+      "source": "cms_fingerprint",
+      "status": "minor_eol",
+      "top_cve": null,
+      "version": "6.5.10",
+      "vuln_name": ""
+     },
+     {
+      "category": "Remote-Access",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "OpenSSH",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "8.4p1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "BeTheme",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "27.4.5",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery Migrate",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "3.4.1",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Slider Revolution",
+      "patch_status": "aktuell",
+      "source": "tech_detect",
+      "status": "current",
+      "top_cve": null,
+      "version": "6.7.11",
+      "vuln_name": ""
+     },
+     {
+      "category": "Web-Server",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache Httpd",
+      "patch_status": "aktuell",
+      "source": "server_banner",
+      "status": "current",
+      "top_cve": null,
+      "version": "2.4.67",
+      "vuln_name": ""
+     },
+     {
+      "category": "CMS",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Datenbank",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "MySQL",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 110)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 110",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 143)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 143",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 21)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Pure-FTPd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 25)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 443)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "2.4.67",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 465)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 587)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 80)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Apache httpd",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "2.4.67",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 993)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 993",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Exponierter Dienst (Port 995)",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Shodan",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Port 995",
+      "patch_status": "unbekannt",
+      "source": "shodan",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Burst",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Complianz",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Debian",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot imapd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Dovecot pop3d",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Analytics",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Google Tag Manager",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "jQuery",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Postfix smtpd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Pure-FTPd",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "category": "Sprache",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "PHP",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Pure-FTPd",
+      "version": ""
+     },
+     {
+      "name": "Apache httpd",
+      "version": "2.4.67"
+     },
+     {
+      "name": "Dovecot pop3d",
+      "version": ""
+     },
+     {
+      "name": "Dovecot imapd",
+      "version": ""
+     },
+     {
+      "name": "Postfix smtpd",
+      "version": ""
+     },
+     {
+      "name": "OpenSSH",
+      "version": "8.4p1 Debian 5+deb11u7"
+     },
+     {
+      "name": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+      "version": ""
+     },
+     {
+      "name": "Apache",
+      "version": "2.4.67 (Debian)"
+     },
+     {
+      "name": "Google Tag Manager",
+      "version": ""
+     },
+     {
+      "name": "WordPress",
+      "version": ""
+     },
+     {
+      "name": "Apache HTTP Server",
+      "version": "2.4.67"
+     },
+     {
+      "name": "BeTheme",
+      "version": "27.4.5"
+     },
+     {
+      "name": "Burst",
+      "version": ""
+     },
+     {
+      "name": "Complianz",
+      "version": ""
+     },
+     {
+      "name": "Debian",
+      "version": ""
+     },
+     {
+      "name": "Google Analytics",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     },
+     {
+      "name": "MySQL",
+      "version": ""
+     },
+     {
+      "name": "PHP",
+      "version": ""
+     },
+     {
+      "name": "Slider Revolution",
+      "version": "6.7.11"
+     },
+     {
+      "name": "jQuery",
+      "version": ""
+     },
+     {
+      "name": "jQuery Migrate",
+      "version": "3.4.1"
+     }
+    ],
+    "vhost_results": {
+     "dortmund-beach.com": {
+      "cms": "WordPress",
+      "cms_confidence": 0.9500000000000001,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "dortmund-beach.com"
+   }
+  ]
+ },
+ "success": true
+}

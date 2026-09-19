@@ -81,6 +81,15 @@ ROLES: dict[str, tuple[list[str], str]] = {
         ["negative"],
         "krause-computer.de",
     ),
+    "14272c00-1145-4675-9b4c-19ce2ead403b": (
+        ["coverage"],
+        "dortmund-beach.com 17.09.2026, Nachweislauf S0b und erster Produktionslauf "
+        "mit zap_active status=ok und vollstaendiger Alert-Liste. In den zehn "
+        "aelteren Fixtures hat zap_active nie ein Ergebnis geliefert, deshalb waren "
+        "web_vulnerability_active und sensitive_path_exposed nur ueber Fixtures "
+        "gedeckt (Issue #14). feroxbuster und ffuf_param laufen hier ebenfalls, "
+        "ffuf_sensitive laeuft in den Timeout",
+    ),
 }
 
 

@@ -1,7 +1,7 @@
 {
  "beschreibung": "Golden-Fixtures fuer den Report-Umbau (spec/05 bis 07, Session S0c). Dateinamen tragen nur Auftrags-UUIDs, also keine Kundennamen. Domains bleiben in den Daten stehen, weil die Fakten sonst wertlos sind. Screenshots sind aus allen Tars entfernt (spec/07 Abschnitt 1).",
- "api_snapshot_orders": 39,
- "tars_erwartet": 10,
+ "api_snapshot_orders": 40,
+ "tars_erwartet": 11,
  "tars_vorhanden": 10,
  "orders": [
   {
@@ -242,6 +242,26 @@
     "sha256": "2a1280731eebfda54ef9ca3c56fbcf034d7cd5a99f25d53435756d63ed1903c8",
     "members": 47,
     "images": 0
+   }
+  },
+  {
+   "order_id": "14272c00-1145-4675-9b4c-19ce2ead403b",
+   "domains": [
+    "dortmund-beach.com"
+   ],
+   "package": "perimeter",
+   "created": "2026-09-17T22:33:02.726Z",
+   "started": "2026-09-17T22:41:25.201Z",
+   "finished": "2026-09-17T23:09:08.826Z",
+   "roles": [
+    "coverage"
+   ],
+   "note": "dortmund-beach.com 17.09.2026, Nachweislauf S0b und erster Produktionslauf mit zap_active status=ok und vollstaendiger Alert-Liste. In den zehn aelteren Fixtures hat zap_active nie ein Ergebnis geliefert, deshalb waren web_vulnerability_active und sensitive_path_exposed nur ueber Fixtures gedeckt (Issue #14). feroxbuster und ffuf_param laufen hier ebenfalls, ffuf_sensitive laeuft in den Timeout",
+   "negative_entries": 0,
+   "api_snapshot": true,
+   "tar": {
+    "present": false,
+    "reason": "Export noch nicht gelaufen"
    }
   }
  ]
