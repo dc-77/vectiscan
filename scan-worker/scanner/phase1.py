@@ -4,6 +4,7 @@ import json
 import os
 import re
 import signal
+import socket
 import subprocess
 import xml.etree.ElementTree as ET
 from typing import Any, Callable, Optional
@@ -273,6 +274,41 @@ def _nmap_hosts_total(xml_path: str) -> Optional[int]:
     return int(total) if total and total.isdigit() else None
 
 
+def _nmap_has_host(xml_path: str) -> bool:
+    """Traegt das nmap-XML mindestens einen `<host>`-Block?
+
+    Mit `--open` laesst nmap den Hostblock weg, wenn kein Port offen ist.
+    Das allein ist also kein Fehler: 217.243.248.27 im Golden-Tar 0bf16342
+    steht so da, nach 23 Sekunden echtem Scan.
+    """
+    try:
+        root = ET.parse(xml_path).getroot()
+    except Exception:
+        return False
+    return root.find("./host") is not None
+
+
+def _ipv6_route_available(ip: str) -> bool:
+    """Hat der Scanner ueberhaupt eine Route zu dieser IPv6-Adresse?
+
+    `connect` auf einem UDP-Socket loest nur die Routenwahl im Kernel aus,
+    es verlaesst kein Paket den Rechner. Ohne Route meldet der Kernel
+    ENETUNREACH, und genau das ist der Unterschied zwischen "Host lebt,
+    kein Port offen" und "der Scanner kommt gar nicht erst hin".
+    """
+    try:
+        sock = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+    except OSError:
+        return False
+    try:
+        sock.connect((ip, 80))
+        return True
+    except OSError:
+        return False
+    finally:
+        sock.close()
+
+
 def _nmap_status_check(ip: str, xml_path: str):
     """status_check fuer run_tool: Exit 0 ohne gescanntes Ziel ist kein Erfolg.
 
@@ -280,13 +316,29 @@ def _nmap_status_check(ip: str, xml_path: str):
     `<target status="skipped" reason="invalid"/>` und `<hosts total="0"/>`,
     endet aber mit Exit 0. Die Zeile stand dadurch auf `ok`, obwohl der Host
     in keinem Lauf geprueft wurde.
+
+    S2c deckt zwei weitere stille Faelle ab, beide am Junkerwerk-Rescan
+    860d0d5a aufgefallen:
+
+    * `_nmap_hosts_total` liefert `None`, wenn das XML fehlt, nicht parsebar
+      ist oder keine `runstats` traegt. Das galt bisher als Erfolg.
+    * Mit `-6`, aber ohne IPv6-Route im Scannernetz meldet nmap
+      `hosts up=1 total=1`, `exit=success` und schreibt trotzdem keinen
+      Hostblock. Am XML ist dieser Lauf nicht von "Host lebt, kein Port
+      offen" zu unterscheiden, nur an der Laufzeit (0,32 statt 23 Sekunden).
+      Statt auf eine Zeitschwelle zu raten, wird die Route direkt geprueft.
     """
     def check(exit_code: int, _raw: str) -> Optional[tuple[str, Optional[str]]]:
         if exit_code != 0:
             return None
-        if _nmap_hosts_total(xml_path) == 0:
+        total = _nmap_hosts_total(xml_path)
+        if total is None:
+            return "failed", "nmap_no_runstats"
+        if total == 0:
             reason = "target_invalid_ipv6" if ":" in ip else "target_skipped"
             return "failed", reason
+        if ":" in ip and not _nmap_has_host(xml_path) and not _ipv6_route_available(ip):
+            return "failed", "no_ipv6_route"
         return None
     return check
 
@@ -376,7 +428,11 @@ def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-por
         log.warning("nmap_failed", ip=ip, exit_code=exit_code)
         return {"open_ports": [], "services": []}
 
-    if _nmap_hosts_total(xml_path) == 0:
+    total = _nmap_hosts_total(xml_path)
+    if total is None:
+        log.warning("nmap_no_runstats", ip=ip, path=xml_path)
+        return {"open_ports": [], "services": []}
+    if total == 0:
         log.warning("nmap_target_not_scanned", ip=ip)
         return {"open_ports": [], "services": []}
 

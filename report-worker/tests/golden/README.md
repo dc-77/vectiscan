@@ -13,8 +13,9 @@ Datenmodell mit der Soll-Liste.
 | `orders.txt` | Auftragsliste fuer den Ops-Job `ops-export-golden-tars` |
 | `tars/<order>.tar.gz` | Roh-Tar aus MinIO `scan-rawdata`, ohne Screenshots, deterministisch gepackt |
 | `api-snapshot/orders.json` | API-Listenantwort; einzige Quelle fuer `createdAt` und die Multi-Target-Liste |
-| `api-snapshot/<order>/` | `order.json`, `findings.json`, `results.json` je Auftrag, 39 Auftraege |
+| `api-snapshot/<order>/` | `order.json`, `findings.json`, `results.json` je Auftrag |
 | `expected/junkerwerk.json` | 15 Befunde und 8 Positivbefunde des Prototyps als Soll-Liste |
+| `expected/<slug>.json` | abgeleitete Soll-Listen der uebrigen Fixtures, erzeugt mit `scripts/golden/build-expected-order.py`; Regressionssperre, keine unabhaengige Gegenprobe |
 | `negative.json` | belegbar falsche Befunde aus ausgelieferten Reports; kein Check darf sie erzeugen |
 | `facts/<order>.json` | Ausgabe von `reporter.facts` je Auftrag mit Tar (S1), Neubau mit `python -m reporter.facts --golden` |
 | `report-data/<order>.json` | Datenmodell des Reports aus `reporter.v3` (S3), ohne Auftragsdaten und ohne KI, fester Stichtag; Neubau mit `python -m reporter.v3 --golden-all` |
@@ -70,11 +71,12 @@ python3 scripts/golden/build-manifest.py
 
 `report-worker/tests/test_golden_fixtures.py`. Der Smoke-Test entpackt jedes Tar,
 loest das Scan-Verzeichnis wie `reporter/worker.py` auf und ruft
-`parse_scan_data`. Unter Windows werden `0bf16342` und `2572eebc` uebersprungen:
-sie fuehren Hosts unter IPv6-Adressen, und der Doppelpunkt ist dort kein
-zulaessiges Pfadzeichen. Vollstaendig laeuft der Test unter Linux, also im
-CI-Job `test-report-worker`, der sich auf einer API-Pipeline manuell starten
-laesst.
+`parse_scan_data`. Unter Windows werden `0bf16342`, `2572eebc` und `860d0d5a`
+uebersprungen: sie fuehren Hosts unter IPv6-Adressen, und der Doppelpunkt ist
+dort kein zulaessiges Pfadzeichen. Der Test erkennt das an den Tar-Mitgliedern
+selbst, es gibt keine gepflegte Liste. Vollstaendig laeuft der Test unter Linux,
+also im CI-Job `test-report-worker`, der sich auf einer API-Pipeline manuell
+starten laesst.
 
 ## Hinweis fuer S1: Hostverzeichnisse nicht nach IP benennen
 
@@ -89,6 +91,27 @@ durch Bindestrich ersetzen oder die Adresse hashen. Die IP bleibt als Feld im
 Datensatz stehen, sie ist nur kein Pfadbestandteil. Lesen aus dem Tar ist
 unproblematisch, solange nicht auf die Platte entpackt wird: `tarfile` liefert
 Mitglieder unabhaengig davon, ob ihr Name ein gueltiger Windows-Pfad waere.
+
+## Die beiden Fixtures aus S2c
+
+Beide Auftraege sind Rescans vom 20.09.2026 bei Pilotkunden mit schriftlicher Freigabe
+und die ersten Fixtures mit den Scannerfixen aus S2b.
+
+`57b3ac85` (lumbeck-wolter.de) ist der Beleg fuer einen bis dahin unsichtbaren Defekt.
+Haupt- und www-Name tragen neben dem A-Record den AAAA `2a01:4f8:d0a:668b::2`, im Lauf
+steht aber nur `116.202.77.64`. Die Zusammenfassung gleicher Hosts in
+`scanner/phase0.py` fasst Adressen mit identischem FQDN-Satz zusammen und behaelt IPv4;
+der AAAA faellt damit vor Phase 1 heraus. Sichtbar ist das in
+`phase0/host_inventory.json`.
+
+`860d0d5a` (junkerwerk.de und junkerwerk.hu) ist der vierte Junkerwerk-Lauf und der
+erste mit einem AAAA-Host. Er traegt drei Nachweise: DNS je Domain (Issue #12,
+`dns_records_junkerwerk.hu.json` und `dns_security_junkerwerk.hu.json` im Tar),
+junkerwerk.hu weiterhin ohne eigene Hosts (Issue #17) und den `-6`-Schalter an echten
+Daten (Issue #8). Beim IPv6-Host `2a01:4f8:d0a:3124::2` steht `-6` in der
+Kommandozeile im Tar, der alte Grund `target_invalid_ipv6` ist weg, und trotzdem kommt
+kein Port zurueck. Warum, steht in `reporter/facts/README.md` unter Datenfalle 6;
+Issue #8 bleibt offen.
 
 ## Bekannte Abweichungen
 
