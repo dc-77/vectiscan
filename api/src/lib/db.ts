@@ -51,6 +51,8 @@ const MIGRATION_041_PATH = path.join(__dirname, '..', 'migrations', '041_order_o
 const MIGRATION_042_PATH = path.join(__dirname, '..', 'migrations', '042_target_limit_default.sql');
 const MIGRATION_043_PATH = path.join(__dirname, '..', 'migrations', '043_reports_supersede_duplicate_v1.sql');
 const MIGRATION_044_PATH = path.join(__dirname, '..', 'migrations', '044_scan_results_run_status.sql');
+const MIGRATION_045_PATH = path.join(__dirname, '..', 'migrations', '045_customer_context.sql');
+const MIGRATION_046_PATH = path.join(__dirname, '..', 'migrations', '046_report_defects.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -715,6 +717,46 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 044 FAILED (continuing without it):', err);
+  }
+
+  // Migration 045 (S5, Sep 2026): orders.customer_context. Defensive try/catch
+  // wie bei 044 — fehlt die Spalte, bleibt der Kundenkontext leer und der
+  // Bericht nennt den Auftraggeber weiter generisch, die API startet trotzdem.
+  try {
+    const context045Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'orders' AND column_name = 'customer_context'
+      ) AS exists
+    `);
+    if (!context045Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 045: orders.customer_context');
+      const migrationSql = fs.readFileSync(MIGRATION_045_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 045 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 045 FAILED (continuing without it):', err);
+  }
+
+  // Migration 046 (S5, Sep 2026): orders.report_defects. Fehlt die Spalte,
+  // faellt der report-worker auf den alten Weg zurueck (Order auf 'failed'
+  // mit Textmeldung), die API startet trotzdem.
+  try {
+    const defects046Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'orders' AND column_name = 'report_defects'
+      ) AS exists
+    `);
+    if (!defects046Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 046: orders.report_defects');
+      const migrationSql = fs.readFileSync(MIGRATION_046_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 046 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 046 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created
