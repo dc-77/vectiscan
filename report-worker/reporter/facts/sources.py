@@ -340,13 +340,15 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
         b.refs["host_inventory"] = "phase0/host_inventory.json"
     else:
         b.warn("phase0/host_inventory.json fehlt oder unlesbar")
+    # Die Dateien des Primaerziels tragen seit S2b ebenfalls das
+    # Domain-Etikett. Es ist Transportmittel, kein Fakt, und faellt hier weg.
     dr = reader.json("phase0/dns_records.json")
     if isinstance(dr, dict):
-        b.dns_records = dr
+        b.dns_records = _without_domain_label(dr)
         b.refs["dns_records"] = "phase0/dns_records.json"
     ds = reader.json("phase0a/dns_security.json")
     if isinstance(ds, dict):
-        b.dns_security = ds
+        b.dns_security = _without_domain_label(ds)
         b.refs["dns_security"] = "phase0a/dns_security.json"
     b.zone_transfer_txt = reader.text("phase0/zone_transfer.txt")
     hs = reader.json("phase0/host_strategy.json")
@@ -361,7 +363,8 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
             if data is None:
                 b.unparsed.append(("file_unparsable", name, None))
             else:
-                b.passive[key] = data
+                b.passive[key] = (_without_domain_label(data)
+                                  if isinstance(data, dict) else data)
                 b.refs[key] = name
     cs = reader.json("phase0/certspotter.json")
     if isinstance(cs, dict):

@@ -293,3 +293,18 @@ def test_grund_passt_zur_katalogtabelle():
     status, text = COVERAGE_REASONS["zap_no_alerts"]
     assert status == "not_testable"
     assert text
+
+
+def test_etikett_faellt_auch_beim_primaerziel_weg(tmp_path):
+    """Die Datei des Primaerziels traegt seit dem Nachweis-Scan ebenfalls
+    `_domain`. Das ist Transportmittel und darf nicht als Fakt auftauchen."""
+    root = _scan_dir(tmp_path, per_vhost=False)
+    p = root / "phase0" / "dns_records.json"
+    daten = json.loads(p.read_text(encoding="utf-8"))
+    p.write_text(json.dumps({"_domain": DOMAIN_A, **daten}), encoding="utf-8")
+
+    bundle = load_from_dir(root)
+    assert "_domain" not in (bundle.dns_records or {})
+    facts = build_facts(root)
+    assert [d.domain for d in facts.dns] == [DOMAIN_A]
+    assert facts.dns[0].spf is not None

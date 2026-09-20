@@ -523,6 +523,19 @@ def _save_json(directory: str, filename: str, data: Any) -> None:
         log.warning("phase0a_save_failed", file=filename, error=str(e))
 
 
+def _with_domain(data: Any, domain: str) -> Any:
+    """Domain-Etikett in die Datei schreiben (Issue #12).
+
+    Der Dateiname mit Domain-Suffix ist nur ein Eindeutigkeitsmerkmal; die
+    Zuordnung gehoert in den Inhalt, sonst ist die Datei nach einem Umbenennen
+    nicht mehr zuzuordnen. Gleiche Regel wie bei den VHost-Dateien, die ihren
+    FQDN in ``url`` beziehungsweise ``input`` tragen.
+    """
+    if isinstance(data, dict):
+        return {"_domain": domain, **data}
+    return data
+
+
 def domain_slug(domain: str) -> str:
     """Dateinamens-Token fuer eine Domain (Issue #12).
 
@@ -578,11 +591,15 @@ def run_domain_intel(domain: str, scan_dir: str, order_id: str,
             else:
                 data = run_all_dns_security(domain, package)
             if data:
-                _save_json(phase0a_dir, f"{tool}_{slug}.json", data)
+                _save_json(phase0a_dir, f"{tool}_{slug}.json",
+                           _with_domain(data, domain))
                 out[tool] = data
                 _record(tool, "ok", data)
             else:
-                _record(tool, "empty", reason="no_data")
+                # Kein Treffer ist kein Fehler: dieselbe Form wie run_phase0a
+                # (ok mit Grund no_data). "empty" waere kein gueltiger Status
+                # und wuerde von record_tool_run still zu "failed" verbogen.
+                _record(tool, "ok", reason="no_data")
         except Exception as e:
             log.warning("domain_intel_failed", tool=tool, domain=domain, error=str(e))
             _record(tool, "failed", reason=str(e)[:200])
