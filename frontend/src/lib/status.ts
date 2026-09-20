@@ -58,6 +58,10 @@ const STATUS_META: Record<string, StatusMeta> = {
   report_generating: { label: 'Bericht wird erstellt', tone: 'active', glyph: 'spinner', active: true },
   report_complete:   { label: 'Bericht fertig',     tone: 'success', glyph: 'doc' },
   delivered:         { label: 'Zugestellt',         tone: 'success', glyph: 'check' },
+  // S5: Das Gate hat Defekte gefunden, der Bericht wird nicht ausgeliefert.
+  // Kein Fehler des Scans, deshalb 'warn' und nicht 'danger': die Rohdaten sind
+  // vollstaendig, nur der Bericht muss vor der Freigabe korrigiert werden.
+  report_blocked:    { label: 'Bericht angehalten', tone: 'warn',    glyph: 'alert' },
 
   // ── Terminalzustände ──
   failed:     { label: 'Fehlgeschlagen', tone: 'danger',  glyph: 'cross' },

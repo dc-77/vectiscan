@@ -311,7 +311,9 @@ export default function ScanDetailPage() {
 
   // Auto-switch to debug tab when scan failed and user is admin
   useEffect(() => {
-    if (order && (order.status === 'failed' || order.status === 'cancelled') && admin) {
+    // S5: report_blocked gehoert dazu — dort liegt die Defektliste.
+    if (order && (order.status === 'failed' || order.status === 'cancelled'
+                  || order.status === 'report_blocked') && admin) {
       setActiveTab('debug');
     }
   }, [order?.status, admin]);

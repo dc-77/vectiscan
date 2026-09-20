@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useAdminGuard, AdminDenied } from '@/components/ds';
+import { useAdminGuard, AdminDenied, StatusChip } from '@/components/ds';
 import {
   getReviewDetail, releaseOrder, deleteAuthorization,
   ReviewDetail, ScanAuthorization,
@@ -11,6 +11,22 @@ import {
 import { useOrderProgress } from '@/lib/websocket';
 import TargetReviewCard from '@/components/TargetReviewCard';
 import ScanAuthorizationUpload from '@/components/ScanAuthorizationUpload';
+import ReportDefectsPanel from '@/components/admin/ReportDefectsPanel';
+import UnprocessedPanel from '@/components/admin/UnprocessedPanel';
+import CustomerContextForm from '@/components/admin/CustomerContextForm';
+
+// S5: Die Seite trägt jetzt vier Reiter. "Freigabe" ist der bisherige Inhalt
+// (Targets und Autorisierungen vor dem Scan), die drei anderen zeigen den
+// Berichtsstand nach dem Scan. Steht die Order auf report_blocked, ist
+// "Defekte" der Startreiter, weil dort die Arbeit liegt.
+type Tab = 'freigabe' | 'defekte' | 'beobachtungen' | 'kunde';
+
+const TAB_LABELS: Record<Tab, string> = {
+  freigabe: 'Freigabe',
+  defekte: 'Defekte',
+  beobachtungen: 'Beobachtungen ohne Regel',
+  kunde: 'Kunde',
+};
 
 const DOC_TYPE_LABELS: Record<string, string> = {
   whois_screenshot: 'WHOIS-Screenshot',
@@ -37,6 +53,7 @@ export default function AdminReviewOrderPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [releasing, setReleasing] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab | null>(null);
 
   const { events, connected } = useOrderProgress(ready ? orderId : null);
 
@@ -70,6 +87,9 @@ export default function AdminReviewOrderPage() {
     const relevant: string[] = [
       'target_approved', 'target_rejected',
       'precheck_target_complete', 'precheck_complete',
+      // S5: Der Berichtslauf endet mit einem Statuswechsel (report_blocked,
+      // pending_review); ohne ihn bliebe die Defektliste veraltet stehen.
+      'status',
     ];
     if (relevant.includes(lastEvent.type as string)) {
       load();
@@ -90,6 +110,11 @@ export default function AdminReviewOrderPage() {
   }, [detail]);
 
   const canRelease = stats.pending === 0 && stats.approved > 0;
+
+  const report = detail?.report ?? null;
+  // Startreiter: ohne Wahl des Admins entscheidet der Zustand der Order.
+  const tab: Tab = activeTab ?? (report?.status === 'report_blocked' ? 'defekte' : 'freigabe');
+  const defectCount = report?.counts?.errors ?? 0;
 
   const handleRelease = async () => {
     setReleasing(true);
@@ -143,6 +168,7 @@ export default function AdminReviewOrderPage() {
             <span className={`text-[10px] px-2 py-0.5 rounded ${connected ? 'bg-green-500/15 text-green-400' : 'bg-slate-500/15 text-slate-500'}`}>
               {connected ? 'Live' : 'Offline'}
             </span>
+            {report?.status && <StatusChip status={report.status} />}
           </div>
           <Link href={`/scan/${orderId}`} className="text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 bg-slate-800 rounded-lg transition-colors">
             Scan-Detail ansehen
@@ -179,6 +205,48 @@ export default function AdminReviewOrderPage() {
           </div>
         )}
 
+        {/* Reiter */}
+        <div className="flex border-b border-gray-800 overflow-x-auto">
+          {(Object.keys(TAB_LABELS) as Tab[]).map(key => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setActiveTab(key)}
+              className={`px-4 py-2.5 text-xs font-medium transition-colors whitespace-nowrap ${
+                tab === key
+                  ? 'text-blue-400 border-b-2 border-blue-400'
+                  : 'text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              {TAB_LABELS[key]}
+              {key === 'defekte' && defectCount > 0 && (
+                <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-red-400/10 text-red-400">
+                  {defectCount}
+                </span>
+              )}
+              {key === 'beobachtungen' && (report?.counts?.unprocessed ?? 0) > 0 && (
+                <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-300">
+                  {report?.counts?.unprocessed}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'defekte' && (
+          <ReportDefectsPanel orderId={orderId} report={report} onChanged={load} />
+        )}
+        {tab === 'beobachtungen' && <UnprocessedPanel report={report} />}
+        {tab === 'kunde' && (
+          <CustomerContextForm
+            key={JSON.stringify(report?.customerContext ?? {})}
+            orderId={orderId}
+            context={report?.customerContext ?? null}
+            onSaved={load}
+          />
+        )}
+
+        {tab === 'freigabe' && (<>
         {/* Authorizations */}
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-slate-400">Scan-Autorisierungen ({detail.authorizations.length})</h2>
@@ -252,6 +320,7 @@ export default function AdminReviewOrderPage() {
             {releasing ? 'Wird freigegeben...' : 'Auftrag freigeben'}
           </button>
         </div>
+        </>)}
       </div>
     </main>
   );

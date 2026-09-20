@@ -34,6 +34,9 @@ const ACTIVE_STATUSES = new Set([
   'scanning', 'passive_intel', 'dns_recon',
   'scan_phase1', 'scan_phase2', 'scan_phase3', 'scan_complete',
   'pending_review', 'approved', 'report_generating',
+  // S5: report_blocked ist kein Fehlschlag. Der Scan ist fertig, der Bericht
+  // wird noch nachgearbeitet; fuer den Kunden ist der Auftrag damit offen.
+  'report_blocked',
 ]);
 const DONE_STATUSES = new Set(['report_complete', 'delivered']);
 const FAILED_STATUSES = new Set(['failed', 'cancelled', 'rejected']);

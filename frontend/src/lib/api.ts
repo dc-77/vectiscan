@@ -125,6 +125,48 @@ export interface ValidationWarningsPayload {
   warning_count: number;
 }
 
+// S5: Defektliste eines Berichtslaufs. Sie traegt beide Engines; woher ein
+// Eintrag kommt, steht am Eintrag selbst.
+export interface ReportDefect {
+  engine: 'v2' | 'v3' | string;
+  check: string;
+  severity: 'error' | 'warning' | string;
+  message: string;
+  finding_id: string | null;
+  detail?: Record<string, unknown>;
+}
+
+/** Beobachtung, die keine Pruefung des Katalogs getroffen hat. */
+export interface UnprocessedObservation {
+  quelle: 'fakten' | 'katalog' | string;
+  kind: string;
+  what: string;
+  host_ip?: string | null;
+  fqdns?: string[];
+  port?: number | null;
+  count?: number;
+  note?: string | null;
+}
+
+export interface ReportDefectsPayload {
+  engine: string | null;
+  level: string | null;
+  blocked_at?: string | null;
+  defects: ReportDefect[];
+  unprocessed: UnprocessedObservation[];
+  counts: { errors: number; warnings: number; unprocessed: number };
+}
+
+/** Kundenkontext einer Order (Migration 045), je Feld mit Herkunft. */
+export interface CustomerContext {
+  firmenname?: string;
+  kuerzel?: string;
+  branche?: string;
+  mitarbeiter?: string;
+  systeme?: Array<{ fqdn: string; zweck: string }>;
+  sources?: Record<string, { source: 'kunde' | 'recherche' | 'admin' | string; url?: string }>;
+}
+
 export interface OrderStatus {
   id: string;
   domain: string;
@@ -149,6 +191,9 @@ export interface OrderStatus {
   // ValidationGate. Null wenn kein Report existiert (z.B. STRICT-Block oder
   // historischer Scan vor Migration 028).
   validationWarnings?: ValidationWarningsPayload | null;
+  // S5: Defektliste des letzten Laufs, admin-only. Sie existiert auch dann,
+  // wenn es keinen Bericht gibt — genau der Fall bei status report_blocked.
+  reportDefects?: ReportDefectsPayload | null;
 }
 
 export interface OrderCorrelation {
@@ -317,6 +362,7 @@ export async function createOrder(
   targets: TargetEntry[],
   pkg: string = 'perimeter',
   preWarmShodan: boolean = false,
+  customerContext?: CustomerContext,
 ): Promise<ApiResponse<OrderWithTargets>> {
   // F-P0A-006: preWarmShodan opt-in fuer One-Off-Orders. Default false.
   // Wenn true triggert scan-worker beim Scan-Start POST /shodan/scan;
@@ -329,6 +375,9 @@ export async function createOrder(
       package: pkg,
       targets,
       pre_warm_shodan: preWarmShodan,
+      // S5: Optionale Angaben zum Unternehmen. Der Server setzt die Quelle
+      // "kunde"; eine spaetere Recherche ueberschreibt sie nie.
+      ...(customerContext ? { customer_context: customerContext } : {}),
     }),
   });
   return handleResponse(res);
@@ -1312,11 +1361,25 @@ export interface ScanAuthorization {
   created_at: string;
 }
 
+/** S5: Berichtsstand einer Order im Admin-Review. */
+export interface ReviewReport {
+  status: string;
+  engine: string | null;
+  level: string | null;
+  blockedAt: string | null;
+  defects: ReportDefect[];
+  unprocessed: UnprocessedObservation[];
+  counts: { errors: number; warnings: number; unprocessed: number };
+  customerContext: CustomerContext | null;
+}
+
 export interface ReviewDetail {
   type: 'order' | 'subscription';
   id: string;
   targets: ScanTargetDetail[];
   authorizations: ScanAuthorization[];
+  /** Nur bei type 'order'; null solange kein Berichtslauf stattfand. */
+  report?: ReviewReport | null;
 }
 
 export async function getReviewDetail(
@@ -1325,6 +1388,25 @@ export async function getReviewDetail(
 ): Promise<ApiResponse<ReviewDetail>> {
   const res = await fetch(`${API_URL}/api/admin/review/${type}/${id}`, {
     headers: authHeaders(),
+  });
+  return handleResponse(res);
+}
+
+/**
+ * S5: Kundenkontext im Admin-Review speichern.
+ *
+ * Jedes gesendete Feld bekommt serverseitig die Quelle "admin" und wird von der
+ * Recherche-KI danach nicht mehr angefasst. Ein leeres Feld gibt es wieder frei.
+ * Wirksam wird die Aenderung mit dem naechsten Berichtslauf.
+ */
+export async function updateCustomerContext(
+  orderId: string,
+  context: CustomerContext,
+): Promise<ApiResponse<{ customerContext: CustomerContext }>> {
+  const res = await fetch(`${API_URL}/api/admin/orders/${orderId}/customer-context`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(context),
   });
   return handleResponse(res);
 }
