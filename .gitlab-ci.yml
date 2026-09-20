@@ -218,14 +218,17 @@ test-report-worker-pdf:
         sh -c "python3 -m pip install --no-cache-dir --break-system-packages --quiet pytest
         && python3 -m pytest tests/pdf_v3 tests/test_branding_integration.py
         -m 'not reportlab_fallback' -q"
+  # Bewusst OHNE die api-Regel, die test-report-worker sonst traegt: dieser Job
+  # braucht das Abbild aus build-report-worker, und das entsteht bei
+  # source=api auf einem Nicht-main-Branch nicht. Die Regeln muessen deshalb
+  # deckungsgleich mit .build-base sein, sonst lehnt GitLab die ganze Pipeline ab
+  # ("needs 'build-report-worker', but ... does not exist in the pipeline") und
+  # der Ops-Weg "API-Pipeline auf einem Session-Branch" ist tot.
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
     - if: $CI_PIPELINE_SOURCE == "web"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_PIPELINE_SOURCE == "api"
-      when: manual
-      allow_failure: true
 
 # VEC-160 / VEC-143 / VEC-269 / VEC-439: Edge admin-guard regression gate (SICHERHEITSKRITISCH).
 # Fails the pipeline if a public Traefik router gains a Host() that is not also
