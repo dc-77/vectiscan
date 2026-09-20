@@ -12,3 +12,13 @@ report-worker/tests/golden/orders.txt text eol=lf
 report-worker/reporter/catalog/**/*.yaml text eol=lf
 report-worker/reporter/catalog/*.md text eol=lf
 report-worker/tests/catalog/**/*.json text eol=lf
+
+# Renderer v3 (S4, report-worker/reporter/pdf/v3/).
+# Die Inter-Schnitte und der HTML-Schnappschuss sind Binaerdaten. Vorlage und SVG
+# bleiben Text mit LF: Jinja normalisiert Zeilenenden zwar beim Lesen, aber der
+# Schnappschuss wird byteweise verglichen und darf nicht am Betriebssystem haengen
+# (dieselbe Falle wie der EOL-Feed-Hash in S1).
+report-worker/reporter/pdf/v3/assets/fonts/*.ttf binary
+report-worker/tests/golden/render/*.gz binary
+report-worker/reporter/pdf/v3/templates/*.j2 text eol=lf
+report-worker/reporter/pdf/v3/assets/*.svg text eol=lf
