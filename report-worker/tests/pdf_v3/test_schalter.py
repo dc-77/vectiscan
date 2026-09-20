@@ -108,3 +108,21 @@ def test_ops_job_ist_in_der_pipeline_hinterlegt():
     assert "VECTISCAN_REQUIRE_WEASYPRINT" in ci
     # Der Abbild-Job muss den Marker abwaehlen, sonst faellt test_font_constants dort.
     assert "not reportlab_fallback" in ci
+
+
+@nur_im_repo
+def test_pdf_job_laeuft_genau_dort_wo_auch_gebaut_wird():
+    """Sonst lehnt GitLab die ganze Pipeline ab.
+
+    test-report-worker-pdf braucht das Abbild aus build-report-worker. Traegt der
+    Testjob eine Regel, die der Buildjob nicht hat, entsteht eine Pipeline, in der
+    das `needs` ins Leere zeigt, und GitLab weist sie komplett zurueck. Das hat den
+    dokumentierten Ops-Weg (API-Pipeline auf einem Session-Branch, siehe
+    ops-export-golden-tars) unbrauchbar gemacht.
+    """
+    import yaml
+
+    ci = yaml.safe_load((REPO / ".gitlab-ci.yml").read_text(encoding="utf-8"))
+    pdf = ci["test-report-worker-pdf"]
+    assert pdf["needs"] == ["build-report-worker"]
+    assert pdf["rules"] == ci[".build-base"]["rules"]
