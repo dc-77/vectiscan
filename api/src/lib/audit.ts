@@ -16,6 +16,7 @@ export type AuditAction =
   | 'order.payment_confirmed'
   | 'order.payment_failed'
   | 'order.free_activation_blocked'
+  | 'order.customer_context'
   | 'scan.started'
   | 'scan.completed'
   | 'scan.failed'
