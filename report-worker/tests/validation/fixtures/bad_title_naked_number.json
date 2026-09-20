@@ -1,0 +1,18 @@
+{
+  "overall_risk": "LOW",
+  "findings": [
+    {
+      "id": "VS-2026-001",
+      "title": "WordPress-Plugin 27 ist veraltet",
+      "severity": "LOW",
+      "cvss_score": 3.1,
+      "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+      "description": "Die 27 ist eine Theme-Version und keine Plugin-Nummer; der Titel stammt aus einer KI-Formulierung.",
+      "evidence": {"note": "Fall aus spec/05 M2, ausgelieferter Bericht trunk-immobilien.de"},
+      "impact": "Ein Titel mit nackter Zahl ist fuer den Kunden nicht lesbar und sachlich falsch.",
+      "recommendation": "Titel aus der Pruefung uebernehmen, nicht aus der Formulierung."
+    }
+  ],
+  "recommendations": [],
+  "package": "perimeter"
+}

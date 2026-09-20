@@ -18,8 +18,8 @@ from reporter.pdf.v2 import generate_report_v2
 
 
 FIXTURE = (
-    pathlib.Path(__file__).parent.parent
-    / "reporter" / "validation" / "tests" / "fixtures"
+    pathlib.Path(__file__).parent
+    / "validation" / "fixtures"
     / "replay_secumetrix_like.json"
 )
 
