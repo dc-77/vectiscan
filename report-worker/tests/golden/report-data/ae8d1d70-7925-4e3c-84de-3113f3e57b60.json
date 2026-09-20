@@ -1836,8 +1836,8 @@
  "landscape_lead": "21 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 52,
-  "catalog_digest": "86748b11b13cd72522e3cb70dc6f2ac29a8e7fe75d1d7f77f7c98d71177f3bc3",
-  "catalog_version": "2026-09-19.2",
+  "catalog_digest": "60367c08db6b316c55448dbe1a504349c12fe1cf353a554591744216fce42610",
+  "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 21,
   "customer": "Auftraggeber",
@@ -1845,7 +1845,7 @@
   "domains": [
    "securess.de"
   ],
-  "facts_schema_version": "1.0.0",
+  "facts_schema_version": "1.0.1",
   "fqdns_total": 26,
   "hosts_ipv4": 12,
   "hosts_ipv6": 0,
@@ -1858,7 +1858,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-19.2",
+  "policy_version": "2026-09-20.1",
   "positives": 9,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2202,10 +2202,6 @@
    {
     "detail": "Betroffen: crtsh auf securess.de.",
     "what": "Das Werkzeug crtsh hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: connect.securess.de, eset.securess.de, ftp.securess.de, login-kundenportal.securess.de, mailcleaner.securess.de, mailin.securess.de und weitere.",
-    "what": "Die passive Webanalyse lieferte keine Meldungen; Ergebnis nicht belastbar"
    },
    {
     "detail": "Betroffen: httpx auf 85.22.47.46, imap.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, partner.securess.de und weitere.",

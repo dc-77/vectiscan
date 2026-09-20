@@ -1,0 +1,485 @@
+{
+ "data": {
+  "businessImpactScore": 7,
+  "correlationCount": 1097,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "dortmund-beach.com",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-09-17T23:09:08.826Z",
+  "hasReport": true,
+  "id": "14272c00-1145-4675-9b4c-19ce2ead403b",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": true,
+     "fo": null,
+     "issues": [],
+     "p": "none",
+     "pct": 100,
+     "raw": "v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de;",
+     "rua": [
+      "mailto:postmaster@spacekoeln.de"
+     ],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/dortmund-beach.com",
+     "domain": "dortmund-beach.com",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/dortmund-beach.com"
+    }
+   },
+   "passive_subdomains": [
+    "*.dortmund-beach.com",
+    "_dmarc.dortmund-beach.com",
+    "pflege.dortmund-beach.com",
+    "www.dortmund-beach.com"
+   ],
+   "securitytrails": {
+    "dns_history": [
+     {
+      "first_seen": "2022-02-14",
+      "last_seen": "2026-09-17",
+      "type": "a",
+      "values": [
+       "88.99.35.112"
+      ]
+     },
+     {
+      "first_seen": "2017-02-06",
+      "last_seen": "2022-02-14",
+      "type": "a",
+      "values": [
+       "176.9.63.202"
+      ]
+     },
+     {
+      "first_seen": "2016-01-01",
+      "last_seen": "2017-02-05",
+      "type": "a",
+      "values": [
+       "176.9.63.202"
+      ]
+     },
+     {
+      "first_seen": "2014-09-18",
+      "last_seen": "2015-12-31",
+      "type": "a",
+      "values": [
+       "176.9.63.202"
+      ]
+     },
+     {
+      "first_seen": "2013-06-23",
+      "last_seen": "2014-09-17",
+      "type": "a",
+      "values": [
+       "176.9.63.202"
+      ]
+     },
+     {
+      "first_seen": "2012-07-10",
+      "last_seen": "2013-06-22",
+      "type": "a",
+      "values": [
+       "176.9.63.202"
+      ]
+     },
+     {
+      "first_seen": "2011-12-01",
+      "last_seen": "2012-07-10",
+      "type": "a",
+      "values": [
+       "213.239.199.164"
+      ]
+     },
+     {
+      "first_seen": "2009-06-28",
+      "last_seen": "2011-11-30",
+      "type": "a",
+      "values": [
+       "213.239.199.164"
+      ]
+     },
+     {
+      "first_seen": "2008-09-01",
+      "last_seen": "2009-06-27",
+      "type": "a",
+      "values": [
+       "213.239.199.164"
+      ]
+     }
+    ],
+    "domain": {
+     "a_records": [
+      "88.99.35.112"
+     ],
+     "alexa_rank": null,
+     "domain": "dortmund-beach.com",
+     "hostname": "dortmund-beach.com",
+     "mx_records": [
+      "mail1.spacekoelnsrv1.de"
+     ],
+     "ns_records": [
+      "z.ns.joker.com",
+      "y.ns.joker.com",
+      "x.ns.joker.com"
+     ],
+     "txt_records": [
+      "v=spf1 a mx ip4:78.46.161.114 ~all",
+      "facebook-domain-verification=vo0ojynv7i4rgrgpdm0dvpvun202us"
+     ]
+    },
+    "subdomains": [
+     "www.dortmund-beach.com",
+     "pflege.dortmund-beach.com"
+    ]
+   },
+   "shodan_domain": {
+    "domain": "dortmund-beach.com",
+    "records": [
+     {
+      "last_seen": "2026-09-17T13:43:53.267000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "88.99.35.112"
+     },
+     {
+      "last_seen": "2026-09-17T13:47:07.170000",
+      "options": {
+       "priority": 50,
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mail1.spacekoelnsrv1.de"
+     },
+     {
+      "last_seen": "2026-09-17T13:46:15.588000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "x.ns.joker.com"
+     },
+     {
+      "last_seen": "2026-09-17T13:46:15.588000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "y.ns.joker.com"
+     },
+     {
+      "last_seen": "2026-09-17T13:46:15.588000",
+      "options": {
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "z.ns.joker.com"
+     },
+     {
+      "last_seen": "2026-09-17T13:47:20.536000",
+      "options": {
+       "expires": 1209600,
+       "hostmaster": "hostmaster.joker.com",
+       "minttl": 300,
+       "refresh": 14400,
+       "retry": 3600,
+       "serial": 2025042245,
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "x.ns.joker.com"
+     },
+     {
+      "last_seen": "2026-09-17T13:45:04.504000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "facebook-domain-verification=vo0ojynv7i4rgrgpdm0dvpvun202us"
+     },
+     {
+      "last_seen": "2026-09-17T13:45:04.504000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 a mx ip4:78.46.161.114 ~all"
+     },
+     {
+      "last_seen": "2026-09-17T13:51:59.210000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "*",
+      "type": "A",
+      "value": "88.99.35.112"
+     },
+     {
+      "last_seen": "2026-09-17T13:45:04.493000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "_dmarc",
+      "type": "TXT",
+      "value": "v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de;"
+     },
+     {
+      "last_seen": "2026-09-17T13:43:53.317000",
+      "options": {
+       "ttl": 300
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "88.99.35.112"
+     }
+    ],
+    "subdomains": [
+     "*",
+     "_dmarc",
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 0,
+     "snapshot_age_minutes": 156,
+     "snapshot_seed_count": 5,
+     "snapshot_seeded": true,
+     "tool_counts": {
+      "certspotter": 2,
+      "crtsh": 1,
+      "gobuster_dns": 0,
+      "phase0a_passive": 4,
+      "snapshot": 5,
+      "subfinder": 2
+     },
+     "tools_with_zero_results": [
+      "gobuster_dns"
+     ],
+     "total_subdomains": 5
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": false,
+     "dmarc": "v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de;",
+     "mx": [
+      "out",
+      "mail1.spacekoelnsrv1.de"
+     ],
+     "ns": [
+      "y.ns.joker.com",
+      "x.ns.joker.com",
+      "z.ns.joker.com"
+     ],
+     "spf": "v=spf1 a mx ip4:78.46.161.114 ~all",
+     "zone_transfer": false
+    },
+    "domain": "dortmund-beach.com",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain mit primärem VHost (200, echte Web-App), zusätzlich Mail-Infrastruktur (Postfix, FTP) mit schwachen DMARC-Policies (p=none) und fehlender DKIM — vollständiger Security-Scan erforderlich.",
+      "fqdns": [
+       "dortmund-beach.com",
+       "www.dortmund-beach.com",
+       "*.dortmund-beach.com",
+       "pflege.dortmund-beach.com"
+      ],
+      "ip": "88.99.35.112",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dmarc_p": "none",
+       "dmarc_pct": 100,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        587,
+        110,
+        143,
+        80,
+        465,
+        21,
+        25,
+        443
+       ],
+       "shodan_services": {
+        "21": "Pure-FTPd",
+        "25": "Postfix smtpd",
+        "443": "Apache httpd 2.4.67",
+        "465": "Postfix smtpd",
+        "587": "Postfix smtpd",
+        "80": "Apache httpd 2.4.67"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "vsrv2.spacekoeln.de",
+      "screenshot_minio_key": "14272c00-1145-4675-9b4c-19ce2ead403b/88.99.35.112__dortmund-beach.com.png",
+      "vhost_skipped": [
+       {
+        "fqdn": "pflege.dortmund-beach.com",
+        "reason": "parking",
+        "site_summary": {
+         "classification": "parking",
+         "confidence": 1,
+         "description": "Parking-Page — Domain ist nicht aktiv im Einsatz",
+         "is_real_content": false
+        },
+        "status": 200,
+        "title": "froxlor - Domain not configured"
+       }
+      ],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "www.dortmund-beach.com",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "332cfeab7ebf854d4038ba710720a7749a6ac2152e731db8d189d7a3cbf9d4d0",
+        "final_url": "https://dortmund-beach.com",
+        "fqdn": "dortmund-beach.com",
+        "is_primary": true,
+        "screenshot_minio_key": "14272c00-1145-4675-9b4c-19ce2ead403b/88.99.35.112__dortmund-beach.com.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Webdesign- und Corporate-Design-Agentur mit WordPress 6.5.10 auf Apache.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Dortmund Beach Design | Webdesign | Corporate Design"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://dortmund-beach.com",
+       "has_web": true,
+       "status": 200,
+       "title": "Dortmund Beach Design | Webdesign | Corporate Design",
+       "web_fqdn": "dortmund-beach.com"
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 1,
+   "hostsTotal": 1,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 2,
+   "INFO": 2,
+   "LOW": 3,
+   "MEDIUM": 6
+  },
+  "startedAt": "2026-09-17T22:41:25.201Z",
+  "status": "pending_review",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "warn",
+   "passed": true,
+   "warning_count": 1,
+   "warnings": [
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "SPF",
+      "title": "DMARC-Policy auf 'none' statt 'quarantine' oder 'reject' fuer dortmund-beach.com",
+      "title_token": "DMARC"
+     },
+     "finding_id": "VS-2026-011",
+     "message": "Title nennt DMARC, Body beschreibt SPF (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

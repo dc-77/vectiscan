@@ -882,8 +882,8 @@
  "landscape_lead": "11 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "86748b11b13cd72522e3cb70dc6f2ac29a8e7fe75d1d7f77f7c98d71177f3bc3",
-  "catalog_version": "2026-09-19.2",
+  "catalog_digest": "60367c08db6b316c55448dbe1a504349c12fe1cf353a554591744216fce42610",
+  "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 11,
   "customer": "Auftraggeber",
@@ -891,7 +891,7 @@
   "domains": [
    "junkerwerk.hu"
   ],
-  "facts_schema_version": "1.0.0",
+  "facts_schema_version": "1.0.1",
   "fqdns_total": 3,
   "hosts_ipv4": 2,
   "hosts_ipv6": 0,
@@ -904,7 +904,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-19.2",
+  "policy_version": "2026-09-20.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1083,10 +1083,6 @@
    {
     "detail": "Betroffen: header_check auf junkerwerk.hu, header_check auf www.junkerwerk.hu, httpx auf 188.40.3.130, junkerwerk.hu, webtech auf 188.40.3.130, www.junkerwerk.hu.",
     "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
-   },
-   {
-    "detail": "Betroffen: junkerwerk.hu, www.junkerwerk.hu.",
-    "what": "Die passive Webanalyse lieferte keine Meldungen; Ergebnis nicht belastbar"
    },
    {
     "detail": "Betroffen: junkerwerk.hu.",

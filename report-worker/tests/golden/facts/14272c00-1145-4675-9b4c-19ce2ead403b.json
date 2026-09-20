@@ -1,0 +1,4417 @@
+{
+ "coverage": [
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"88.99.35.112\": {\"ip\": \"88.99.35.112\", \"abuseConfidenceScore\": 0, \"totalReports\": 0, \"numDistinctUsers\": 0, \"lastReportedAt\": null, \"isWhitelisted\": false,...",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:43Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 504,
+   "evidence": [
+    {
+     "excerpt": "{\"subdomains\": [\"dortmund-beach.com\", \"www.dortmund-beach.com\"], \"error\": null}",
+     "ref": "scan_results:certspotter",
+     "tool": "certspotter"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:certspotter:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:29Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "certspotter"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 1916,
+   "evidence": [
+    {
+     "excerpt": "[{\"issuer_ca_id\":432476,\"issuer_name\":\"C=US, O=Let's Encrypt, CN=YR1\",\"common_name\":\"dortmund-beach.com\",\"name_value\":\"dortmund-beach.com\",\"id\":28445747157,\"...",
+     "ref": "scan_results:crtsh",
+     "tool": "crtsh"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:30Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"spf\": \"v=spf1 a mx ip4:78.46.161.114 ~all\", \"dmarc\": \"v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de;\", \"dmarc_policy\": {\"dmarc_present\": true, \"raw...",
+     "ref": "scan_results:dns_records",
+     "tool": "dns_records"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_records:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:34Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_records"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null, \"nsec3param_present\": false, \"n...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:26Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null, \"nsec3param_present\": false, \"n...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:45:24Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 9661,
+   "evidence": [
+    {
+     "excerpt": "{\"a\": [\"88.99.35.112\"], \"all\": [\"*.dortmund-beach.com.\\t300\\tIN\\tA\\t88.99.35.112\", \"\\n;; OPT PSEUDOSECTION:\\n; EDNS: version 0; flags:; udp: 1232\", \"\\n;; OPT...",
+     "ref": "scan_results:dnsx",
+     "tool": "dnsx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dnsx:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:38Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dnsx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 180120,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 180s",
+     "ref": "scan_results:gobuster_dns",
+     "tool": "gobuster_dns"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:gobuster_dns:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:29Z",
+   "phase": 0,
+   "raw_status": "timeout",
+   "reason": "timeout_after_180s",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "gobuster_dns"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:43Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"domain\": {\"domain\": \"dortmund-beach.com\", \"pulse_count\": 0, \"pulses\": [], \"validation\": [], \"type\": \"domain\", \"alexa_rank\": \"http://www.alexa.com/siteinfo/...",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:43Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"domain\": {\"domain\": \"dortmund-beach.com\", \"alexa_rank\": null, \"hostname\": \"dortmund-beach.com\", \"a_records\": [\"88.99.35.112\"], \"mx_records\": [\"mail1.spacek...",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:28Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:43Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"shodan_domain\": {\"domain\": \"dortmund-beach.com\", \"subdomains\": [\"*\", \"_dmarc\", \"www\"], \"records\": [{\"subdomain\": \"\", \"type\": \"A\", \"options\": {\"ttl\": 300},...",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"shodan_domain\": {\"domain\": \"dortmund-beach.com\", \"subdomains\": [\"*\", \"_dmarc\", \"www\"], \"records\": [{\"subdomain\": \"\", \"type\": \"A\", \"options\": {\"ttl\": 300},...",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:43Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 2767,
+   "evidence": [
+    {
+     "excerpt": "{\"host\":\"pflege.dortmund-beach.com\",\"input\":\"dortmund-beach.com\",\"source\":\"hackertarget\"} {\"host\":\"www.dortmund-beach.com\",\"input\":\"dortmund-beach.com\",\"sour...",
+     "ref": "scan_results:subfinder",
+     "tool": "subfinder"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:subfinder:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:31Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "subfinder"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:43Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:43Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"88.99.35.112\": { \"web_probe\": { \"has_web\": true, \"status\": 200, \"final_url\": \"https://dortmund-beach.com\", \"title\": \"Dortmund Beach Design | Webdesign | C...",
+     "ref": "scan_results:web_probe",
+     "tool": "web_probe"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:web_probe:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:42Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "web_probe"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:44:43Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 150587,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 88.99.35.112 Host is up, received user-set (0.050s latency). Not shown: 932 filtered tcp ports (...",
+     "ref": "scan_results:nmap:88.99.35.112",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:1:nmap:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:48:01Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 33204,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://dortmund-beach.com [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:88.99.35.112",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "dortmund-beach.com",
+   "host_ip": "88.99.35.112",
+   "id": "cov:1:wafw00f:88.99.35.112:dortmund-beach.com",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:48:45Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface...",
+     "ref": "scan_results:webtech:88.99.35.112",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:1:webtech:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:48:12Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 76259,
+   "evidence": [
+    {
+     "excerpt": "{\"content_length\": 58261, \"extension\": \"\", \"headers\": {\"accept-ranges\": \"bytes\", \"cache-control\": \"max-age=0, no-cache, no-store, must-revalidate\", \"content-...",
+     "ref": "scan_results:feroxbuster:88.99.35.112",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:feroxbuster:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:55:48Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 150058,
+   "evidence": [
+    {
+     "excerpt": "{\"commandline\":\"ffuf -u https://dortmund-beach.com/wp-json/wp/v2/pages?FUZZ=test -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names....",
+     "ref": "scan_results:ffuf_param:88.99.35.112",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:ffuf_param:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:54:32Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 180051,
+   "evidence": [
+    {
+     "excerpt": "TIMEOUT after 180s",
+     "ref": "scan_results:ffuf_sensitive:88.99.35.112",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "exit_code": -1,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:ffuf_sensitive:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:58:48Z",
+   "phase": 2,
+   "raw_status": "timeout",
+   "reason": "timeout_after_180s",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "ffuf_sensitive"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"dortmund-beach.com\", \"result\": { \"url\": \"https://dortmund-beach.com\", \"reachable\": true, \"headers\": { \"Date\": \"Thu, 17 Sep 2026 22:50:57 GMT\", \"S...",
+     "ref": "scan_results:header_check:88.99.35.112",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "dortmund-beach.com",
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:header_check:88.99.35.112:dortmund-beach.com",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:50:57Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 828,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"dortmund-beach.com\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls12\",\"cipher\":\"TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384\",\"not_before\":\"202...",
+     "ref": "scan_results:httpx:88.99.35.112",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:httpx:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:50:58Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 69143,
+   "evidence": [
+    {
+     "excerpt": "Start 2026-09-17 22:51:06 -->> 88.99.35.112:443 (dortmund-beach.com) <<-- A record via: supplied IP \"88.99.35.112\" rDNS (88.99.35.112): (instructed to minimi...",
+     "ref": "scan_results:testssl:88.99.35.112",
+     "tool": "testssl"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:testssl:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:52:02Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "testssl"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 618392,
+   "evidence": [
+    {
+     "excerpt": "{ \"data_received_humanised\": \"25.283 MB\", \"data_sent_humanised\": \"215.905 KB\", \"db_files_updated\": [ \"metadata.json\", \"wp_fingerprints.json\", \"timthumbs-v3.t...",
+     "ref": "scan_results:wpscan:88.99.35.112",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": 5,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:wpscan:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T23:09:07Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"active\": 1, \"passive\": 1083, \"top_alerts\": [ { \"name\": \"Missing Anti-clickjacking Header\", \"risk\": \"Medium\", \"url\": \"https://dortmund-beach.com\" }, { \"nam...",
+     "ref": "scan_results:zap:88.99.35.112",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:zap:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T23:09:08Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 730409,
+   "evidence": [
+    {
+     "excerpt": "{ \"categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\", \"pathtraversal\" ], \"dropped_scanners\": [ 40024 ], \"duration_ms\": 730409, \"enabled_scanners\": [ 6, 40009, 4001...",
+     "ref": "scan_results:zap_active:88.99.35.112",
+     "tool": "zap_active"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:zap_active:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T23:04:12Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_active"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"urls_found\": 373, \"fqdns_spidered\": 1, \"vhosts\": [ \"dortmund-beach.com\" ], \"urls\": [ \"https://dortmund-beach.com\", \"https://dortmund-beach.com/\", \"https:/...",
+     "ref": "scan_results:zap_spider:88.99.35.112",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "cov:2:zap_spider:88.99.35.112",
+   "mode": "active",
+   "observed_at": "2026-09-17T22:51:13Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "dortmund-beach.com",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"total_findings\": 1097, \"false_positives\": 531, \"valid_findings\": 566, \"severity_counts\": { \"medium\": 96, \"low\": 469, \"high\": 1 }, \"cves_enriched\": 0, \"cis...",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:3:phase3_correlation:scan",
+   "mode": "active",
+   "observed_at": "2026-09-17T23:09:08Z",
+   "phase": 3,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "phase3_correlation"
+  }
+ ],
+ "decisions": [
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Single-Host-Perimeter mit Web-Anwendung + Mail-Services. Priorität 1 wegen: (1) Basisdomain mit produktivem Content (Webdesign-Agentur), (2) exponierte Mail-Ports (25, 465, 587, 110, 143, 993, 995)...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_host_strategy:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:45:30Z",
+   "payload": {
+    "passive_intel_summary": "Shodan zeigt Mail-Stack (Postfix, Pure-FTPd) und Apache 2.4.67 (aktuell). AbuseIPDB-Score 0 (saubere IP). DMARC mit p=none und 100% rua-Reporting, aber kein DKIM und kein TLSRPT — Mail-Security-Lücken. SPF vorhanden aber einfach. DNSSEC nicht signiert. Keine OTX-Pulse. Insgesamt: Reputations-sauber, aber Mail-Konfiguration und FTP-Exposition rechtfertigen vollständigen Scan.",
+    "strategy_notes": "Single-Host-Perimeter mit Web-Anwendung + Mail-Services. Priorität 1 wegen: (1) Basisdomain mit produktivem Content (Webdesign-Agentur), (2) exponierte Mail-Ports (25, 465, 587, 110, 143, 993, 995) mit Postfix, (3) schwache E-Mail-Authentifizierung (DMARC p=none, kein DKIM, kein TLSRPT). Parking-Page (pflege.dortmund-beach.com) korrekt als vhost_skipped markiert. FTP-Port (21) mit Pure-FTPd ebenfalls Scan-Grund."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Basisdomain mit primärem VHost (200, echte Web-App), zusätzlich Mail-Infrastruktur (Postfix, FTP) mit schwachen DMARC-Policies (p=none) und fehlender DKIM — vollständiger Security-Scan erforderlich.",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "dec:ai_host_strategy:88.99.35.112",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:45:30Z",
+   "payload": {
+    "action": "scan",
+    "priority": 1,
+    "reasoning": "Basisdomain mit primärem VHost (200, echte Web-App), zusätzlich Mail-Infrastruktur (Postfix, FTP) mit schwachen DMARC-Policies (p=none) und fehlender DKIM — vollständiger Security-Scan erforderlich."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 8, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\", \"patht...",
+     "ref": "scan_results:ai_phase2_config:88.99.35.112",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "dec:ai_phase2_config:88.99.35.112",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:53Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:wordpress-standard",
+    "skip_tools": [],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "cmdi",
+     "pathtraversal"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 8,
+    "zap_threads": 10
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 8, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\", \"patht...",
+     "ref": "scan_results:ai_phase2_config_rule_based:88.99.35.112",
+     "tool": "ai_phase2_config_rule_based"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "dec:ai_phase2_config_rule_based:88.99.35.112",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:53Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:wordpress-standard",
+    "skip_tools": [],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "cmdi",
+     "pathtraversal"
+    ],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 8,
+    "zap_threads": 10
+   },
+   "source": "ai_phase2_config_rule_based"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=1097 < 5 ODER tools=5 <= 1 ODER cve=False",
+     "ref": "phase3/ai_prioritization.json",
+     "tool": "ai_prioritization"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_prioritization:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T23:09:08Z",
+   "payload": {
+    "confidence_scores": 0,
+    "skipped_by_gate": true,
+    "strategy_notes": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=1097 < 5 ODER tools=5 <= 1 ODER cve=False"
+   },
+   "source": "ai_prioritization"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "cms=WordPress cms_version=6.5.10 cms_confidence=0.95",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "tech_profile"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "88.99.35.112",
+   "id": "dec:cms_profile:88.99.35.112",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:53Z",
+   "payload": {
+    "cms": "WordPress",
+    "cms_confidence": 0.95,
+    "cms_details_version": null,
+    "cms_version": "6.5.10",
+    "is_spa": false
+   },
+   "source": "ai_tech_analysis"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Webdesign- und Corporate-Design-Agentur mit WordPress 6.5.10 auf Apache.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "dortmund-beach.com",
+   "host_ip": "88.99.35.112",
+   "id": "dec:site_summary:dortmund-beach.com",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:44:42Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Webdesign- und Corporate-Design-Agentur mit WordPress 6.5.10 auf Apache.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  }
+ ],
+ "dns": [
+  {
+   "bimi": {
+    "present": false
+   },
+   "caa": {
+    "issuers": [],
+    "present": false,
+    "records": []
+   },
+   "confidence": 1.0,
+   "dane": {
+    "https": false,
+    "smtp": false
+   },
+   "dangling_cnames": [],
+   "dkim": {
+    "present": false,
+    "selectors": []
+   },
+   "dmarc": {
+    "adkim": "r",
+    "aspf": "r",
+    "p": "none",
+    "pct": 100,
+    "present": true,
+    "raw": "v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de;",
+    "rua": [
+     "mailto:postmaster@spacekoeln.de"
+    ],
+    "ruf": [],
+    "sp": null
+   },
+   "dnssec": {
+    "issues": [
+     "Domain is not DNSSEC-signed"
+    ],
+    "signed": false,
+    "valid": false
+   },
+   "domain": "dortmund-beach.com",
+   "evidence": [
+    {
+     "excerpt": "spf=v=spf1 a mx ip4:78.46.161.114 ~all dmarc=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; dkim=False mx=['out', 'mail1.spacekoelnsrv1.de']",
+     "ref": "phase0/dns_records.json",
+     "tool": "dns_records"
+    },
+    {
+     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "ref": "phase0a/dns_security.json",
+     "tool": "dns_security"
+    }
+   ],
+   "id": "dns:dortmund-beach.com",
+   "mode": "active",
+   "mta_sts": {
+    "dns_record": false,
+    "mode": null,
+    "policy": false
+   },
+   "mx": [
+    "mail1.spacekoelnsrv1.de",
+    "out"
+   ],
+   "ns": [
+    "x.ns.joker.com",
+    "y.ns.joker.com",
+    "z.ns.joker.com"
+   ],
+   "observed_at": "2026-09-17T22:41:34Z",
+   "source": "dns_records",
+   "spf": {
+    "all_qualifier": "~all",
+    "raw": "v=spf1 a mx ip4:78.46.161.114 ~all"
+   },
+   "tls_rpt": {
+    "present": false,
+    "rua": []
+   },
+   "zone_transfer": {
+    "allowed": false,
+    "ns_tested": [
+     "x.ns.joker.com",
+     "y.ns.joker.com",
+     "z.ns.joker.com"
+    ]
+   }
+  }
+ ],
+ "fqdns": [
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "*.dortmund-beach.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "88.99.35.112",
+   "http_status": null,
+   "id": "fqdn:*.dortmund-beach.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "*.dortmund-beach.com",
+   "observed_at": "2026-09-17T22:44:42Z",
+   "screenshot_key": "14272c00-1145-4675-9b4c-19ce2ead403b/88.99.35.112__dortmund-beach.com.png",
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [
+    {
+     "fqdn": "www.dortmund-beach.com",
+     "reason": "redirect",
+     "status": 200
+    }
+   ],
+   "body_hash": "332cfeab7ebf854d4038ba710720a7749a6ac2152e731db8d189d7a3cbf9d4d0",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "dortmund-beach.com: status=200 title=Dortmund Beach Design | Webdesign | Corporate Design final_url=https://dortmund-beach.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://dortmund-beach.com",
+   "host_ip": "88.99.35.112",
+   "http_status": 200,
+   "id": "fqdn:dortmund-beach.com",
+   "is_primary": true,
+   "mode": "active",
+   "name": "dortmund-beach.com",
+   "observed_at": "2026-09-17T22:44:42Z",
+   "screenshot_key": "14272c00-1145-4675-9b4c-19ce2ead403b/88.99.35.112__dortmund-beach.com.png",
+   "source": "web_probe",
+   "title": "Dortmund Beach Design | Webdesign | Corporate Design",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "pflege.dortmund-beach.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "88.99.35.112",
+   "http_status": null,
+   "id": "fqdn:pflege.dortmund-beach.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "pflege.dortmund-beach.com",
+   "observed_at": "2026-09-17T22:44:42Z",
+   "screenshot_key": "14272c00-1145-4675-9b4c-19ce2ead403b/88.99.35.112__dortmund-beach.com.png",
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "www.dortmund-beach.com: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "88.99.35.112",
+   "http_status": null,
+   "id": "fqdn:www.dortmund-beach.com",
+   "is_primary": null,
+   "mode": "active",
+   "name": "www.dortmund-beach.com",
+   "observed_at": "2026-09-17T22:44:42Z",
+   "screenshot_key": "14272c00-1145-4675-9b4c-19ce2ead403b/88.99.35.112__dortmund-beach.com.png",
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  }
+ ],
+ "generator": {
+  "inputs": [
+   {
+    "kind": "tar",
+    "name": "14272c00-1145-4675-9b4c-19ce2ead403b.tar.gz",
+    "sha256": "b7e1377d8696ea1b4d982542189aa530032431cb7dbdbf5830baed976a035bd6"
+   },
+   {
+    "kind": "tool_runs",
+    "name": "results.json",
+    "sha256": "6b68e27f206a700acabe7a449f9997b98350a4422a164d70433344d8f707a25d"
+   },
+   {
+    "kind": "eol_feed",
+    "name": "eol_data_generated.py",
+    "sha256": "35b5eb969453fa4788c9b973bbd5988391e18ee83a5e221f1d13602436929372"
+   }
+  ],
+  "name": "reporter.facts",
+  "version": "1.0.0"
+ },
+ "hosts": [
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Thu Sep 17 22:48:01 2026; 1 IP address (1 host up) scanned in 150.57 seconds",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=88.99.35.112 rdns=vsrv2.spacekoeln.de fqdns=dortmund-beach.com,www.dortmund-beach.com,*.dortmund-beach.com,pflege.dortmund-beach.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "*.dortmund-beach.com",
+    "dortmund-beach.com",
+    "pflege.dortmund-beach.com",
+    "www.dortmund-beach.com"
+   ],
+   "id": "host:88.99.35.112",
+   "ip": "88.99.35.112",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-09-17T22:48:01Z",
+   "ports_summary": {
+    "closed": 57,
+    "filtered": 932,
+    "open": 11
+   },
+   "provider": {
+    "country": "DE",
+    "isp": "Hetzner Online GmbH",
+    "usage_type": "Data Center/Web Hosting/Transit"
+   },
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": 0,
+    "greynoise_classification": null,
+    "is_tor": false,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": "vsrv2.spacekoeln.de",
+   "source": "nmap"
+  }
+ ],
+ "http": [
+  {
+   "alerts": [
+    {
+     "confidence": "High",
+     "count": 34,
+     "cwe": "CWE-497",
+     "evidence": "Apache/2.4.67",
+     "name": "In Page Banner Information Leak",
+     "plugin_id": "10009",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com/wp-admin/css/",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-admin/css/",
+      "https://dortmund-beach.com/wp-admin/js/",
+      "https://dortmund-beach.com/wp-content/cache/wpfc-minified/7ubk1iuu/",
+      "https://dortmund-beach.com/wp-content/cache/wpfc-minified/mbb4a78c/",
+      "https://dortmund-beach.com/wp-content/plugins/burst-statistics/assets/js/build/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 6,
+     "cwe": "CWE-1004",
+     "evidence": "Set-Cookie: wordpress_test_cookie",
+     "name": "Cookie No HttpOnly Flag",
+     "plugin_id": "10010",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com/wp-login.php",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-login.php",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword&wp_lang=de_DE",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F&wp_lang=de_DE"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 39,
+     "cwe": "CWE-525",
+     "evidence": null,
+     "name": "Re-examine Cache-control Directives",
+     "plugin_id": "10015",
+     "risk": "Informational",
+     "url": "https://dortmund-beach.com/?s=ZAP",
+     "urls_sample": [
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author/badmin/feed/",
+      "https://dortmund-beach.com/comments/feed/",
+      "https://dortmund-beach.com/cookie-richtlinie-eu/feed/",
+      "https://dortmund-beach.com/datenschutz/feed/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 15,
+     "cwe": "CWE-829",
+     "evidence": "<script type=\"text/plain\" data-usercentrics=\"Google Analytics\" async src=\"//www.googletagmanager.com/gtag/js?id=UA-4628890-1\"></script>",
+     "name": "Cross-Domain JavaScript Source File Inclusion",
+     "plugin_id": "10017",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com",
+     "urls_sample": [
+      "https://dortmund-beach.com",
+      "https://dortmund-beach.com/",
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author",
+      "https://dortmund-beach.com/author/badmin/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 14,
+     "cwe": "CWE-1021",
+     "evidence": null,
+     "name": "Missing Anti-clickjacking Header",
+     "plugin_id": "10020",
+     "risk": "Medium",
+     "url": "https://dortmund-beach.com",
+     "urls_sample": [
+      "https://dortmund-beach.com",
+      "https://dortmund-beach.com/",
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author/badmin/",
+      "https://dortmund-beach.com/cookie-richtlinie-eu/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 196,
+     "cwe": "CWE-693",
+     "evidence": null,
+     "name": "X-Content-Type-Options Header Missing",
+     "plugin_id": "10021",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com",
+     "urls_sample": [
+      "https://dortmund-beach.com",
+      "https://dortmund-beach.com/",
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author/badmin/",
+      "https://dortmund-beach.com/author/badmin/feed/"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 3,
+     "cwe": "CWE-565",
+     "evidence": null,
+     "name": "Cookie Poisoning",
+     "plugin_id": "10029",
+     "risk": "Informational",
+     "url": "https://dortmund-beach.com/wp-login.php?action=lostpassword&wp_lang=de_DE",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword&wp_lang=de_DE",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F&wp_lang=de_DE",
+      "https://dortmund-beach.com/wp-login.php?wp_lang=de_DE"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 6,
+     "cwe": "CWE-20",
+     "evidence": null,
+     "name": "User Controllable HTML Element Attribute (Potential XSS)",
+     "plugin_id": "10031",
+     "risk": "Informational",
+     "url": "https://dortmund-beach.com/wp-login.php",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-login.php",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword&wp_lang=de_DE",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F&wp_lang=de_DE"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 350,
+     "cwe": "CWE-319",
+     "evidence": "max-age=0",
+     "name": "Strict-Transport-Security Disabled",
+     "plugin_id": "10035",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com",
+     "urls_sample": [
+      "https://dortmund-beach.com",
+      "https://dortmund-beach.com/",
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author",
+      "https://dortmund-beach.com/author/badmin"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 350,
+     "cwe": "CWE-497",
+     "evidence": "Apache/2.4.67 (Debian)",
+     "name": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+     "plugin_id": "10036",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com",
+     "urls_sample": [
+      "https://dortmund-beach.com",
+      "https://dortmund-beach.com/",
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author",
+      "https://dortmund-beach.com/author/badmin"
+     ]
+    },
+    {
+     "confidence": "High",
+     "count": 81,
+     "cwe": "CWE-693",
+     "evidence": null,
+     "name": "Content Security Policy (CSP) Header Not Set",
+     "plugin_id": "10038",
+     "risk": "Medium",
+     "url": "https://dortmund-beach.com",
+     "urls_sample": [
+      "https://dortmund-beach.com",
+      "https://dortmund-beach.com/",
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author",
+      "https://dortmund-beach.com/author/badmin/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 56,
+     "cwe": "CWE-201",
+     "evidence": null,
+     "name": "Big Redirect Detected (Potential Sensitive Information Leak)",
+     "plugin_id": "10044",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com/wp-admin",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-admin",
+      "https://dortmund-beach.com/wp-admin/css",
+      "https://dortmund-beach.com/wp-admin/js",
+      "https://dortmund-beach.com/wp-content",
+      "https://dortmund-beach.com/wp-content/cache"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 6,
+     "cwe": "CWE-1275",
+     "evidence": "Set-Cookie: wordpress_test_cookie",
+     "name": "Cookie without SameSite Attribute",
+     "plugin_id": "10054",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com/wp-login.php",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-login.php",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword&wp_lang=de_DE",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F&wp_lang=de_DE"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 15,
+     "cwe": "CWE-497",
+     "evidence": "1718879507",
+     "name": "Timestamp Disclosure - Unix",
+     "plugin_id": "10096",
+     "risk": "Low",
+     "url": "https://dortmund-beach.com",
+     "urls_sample": [
+      "https://dortmund-beach.com",
+      "https://dortmund-beach.com/",
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author",
+      "https://dortmund-beach.com/author/badmin/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 15,
+     "cwe": null,
+     "evidence": "<a class=\"responsive-menu-toggle \" href=\"#\" aria-label=\"mobile menu\"><i class=\"icon-menu-fine\" aria-hidden=\"true\"></i></a>",
+     "name": "Modern Web Application",
+     "plugin_id": "10109",
+     "risk": "Informational",
+     "url": "https://dortmund-beach.com",
+     "urls_sample": [
+      "https://dortmund-beach.com",
+      "https://dortmund-beach.com/",
+      "https://dortmund-beach.com/?s=ZAP",
+      "https://dortmund-beach.com/author",
+      "https://dortmund-beach.com/author/badmin/"
+     ]
+    },
+    {
+     "confidence": "Medium",
+     "count": 6,
+     "cwe": null,
+     "evidence": "wordpress_test_cookie",
+     "name": "Session Management Response Identified",
+     "plugin_id": "10112",
+     "risk": "Informational",
+     "url": "https://dortmund-beach.com/wp-login.php",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-login.php",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword&wp_lang=de_DE",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F&wp_lang=de_DE"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 6,
+     "cwe": "CWE-352",
+     "evidence": "<form name=\"loginform\" id=\"loginform\" action=\"https://dortmund-beach.com/wp-login.php\" method=\"post\">",
+     "name": "Absence of Anti-CSRF Tokens",
+     "plugin_id": "10202",
+     "risk": "Medium",
+     "url": "https://dortmund-beach.com/wp-login.php",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-login.php",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword",
+      "https://dortmund-beach.com/wp-login.php?action=lostpassword&wp_lang=de_DE",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F",
+      "https://dortmund-beach.com/wp-login.php?reauth=1&redirect_to=https%3A%2F%2Fdortmund-beach.com%2Fwp-admin%2F&wp_lang=de_DE"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 2,
+     "cwe": "CWE-22",
+     "evidence": null,
+     "name": "Path Traversal",
+     "plugin_id": "6",
+     "risk": "High",
+     "url": "https://dortmund-beach.com/wp-json/oembed/1.0/embed?format=xml&url=%2Fembed",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-json/oembed/1.0/embed?format=xml&url=%2Fembed",
+      "https://dortmund-beach.com/wp-json/oembed/1.0/embed?url=%2Fembed"
+     ]
+    },
+    {
+     "confidence": "Low",
+     "count": 1,
+     "cwe": "CWE-436",
+     "evidence": null,
+     "name": "Charset Mismatch",
+     "plugin_id": "90011",
+     "risk": "Informational",
+     "url": "https://dortmund-beach.com/wp-json/oembed/1.0/embed?format=xml&url=https%3A%2F%2Fdortmund-beach.com%2F",
+     "urls_sample": [
+      "https://dortmund-beach.com/wp-json/oembed/1.0/embed?format=xml&url=https%3A%2F%2Fdortmund-beach.com%2F"
+     ]
+    }
+   ],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": false,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "dortmund-beach.com: reachable=True score=1/7 server=Apache/2.4.67 (Debian) x-feserver=None",
+     "ref": "scan_results:header_check:88.99.35.112",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "dortmund-beach.com: status=200 title=Dortmund Beach Design | Webdesign | Corporate Design webserver=Apache/2.4.67 (Debian) tech=['Apache HTTP Server:2.4.67', 'BeTheme:27.4.5', 'Burst', 'Complianz', 'Debian', 'Google Analytics', 'HSTS', '...",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "dortmund-beach.com",
+   "headers": {
+    "accept-ranges": "bytes",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "content-length": "58261",
+    "content-type": "text/html; charset=UTF-8",
+    "date": "Thu, 17 Sep 2026 22:50:57 GMT",
+    "expires": "Mon, 29 Oct 1923 20:30:00 GMT",
+    "last-modified": "Thu, 20 Jun 2024 10:51:53 GMT",
+    "pragma": "no-cache",
+    "server": "Apache/2.4.67 (Debian)",
+    "strict-transport-security": "max-age=0",
+    "vary": "User-Agent,Accept-Encoding"
+   },
+   "host_ip": "88.99.35.112",
+   "hsts": {
+    "include_subdomains": false,
+    "max_age": 0,
+    "preload": false,
+    "present": true,
+    "raw": "max-age=0"
+   },
+   "id": "http:dortmund-beach.com",
+   "login_form": true,
+   "mode": "active",
+   "observed_at": "2026-09-17T22:50:57Z",
+   "paths": [
+    {
+     "length": 58261,
+     "status": 200,
+     "url": "https://dortmund-beach.com/"
+    }
+   ],
+   "powered_by": null,
+   "reachable": true,
+   "score": "1/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": false,
+     "value": null
+    },
+    "strict-transport-security": {
+     "present": true,
+     "value": "max-age=0"
+    },
+    "x-content-type-options": {
+     "present": false,
+     "value": null
+    },
+    "x-frame-options": {
+     "present": false,
+     "value": null
+    },
+    "x-xss-protection": {
+     "present": false,
+     "value": null
+    }
+   },
+   "server_header": "Apache/2.4.67 (Debian)",
+   "source": "header_check",
+   "spider_url_count": 373,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "Apache HTTP Server",
+     "version": "2.4.67"
+    },
+    {
+     "name": "BeTheme",
+     "version": "27.4.5"
+    },
+    {
+     "name": "Burst",
+     "version": null
+    },
+    {
+     "name": "Complianz",
+     "version": null
+    },
+    {
+     "name": "Debian",
+     "version": null
+    },
+    {
+     "name": "Google Analytics",
+     "version": null
+    },
+    {
+     "name": "HSTS",
+     "version": null
+    },
+    {
+     "name": "MySQL",
+     "version": null
+    },
+    {
+     "name": "PHP",
+     "version": null
+    },
+    {
+     "name": "Slider Revolution",
+     "version": "6.7.11"
+    },
+    {
+     "name": "WordPress",
+     "version": null
+    },
+    {
+     "name": "jQuery",
+     "version": null
+    },
+    {
+     "name": "jQuery Migrate",
+     "version": "3.4.1"
+    }
+   ],
+   "url": "https://dortmund-beach.com",
+   "wordpress": {
+    "users": [
+     "badmin"
+    ],
+    "version_status": "outdated"
+   },
+   "x_feserver": null
+  }
+ ],
+ "passive": [
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "pulse_count": 0
+   },
+   "domain": "dortmund-beach.com",
+   "evidence": [
+    {
+     "excerpt": "pulse_count=0",
+     "ref": "phase0a/otx.json",
+     "tool": "otx"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:otx:dortmund-beach.com",
+   "mode": "passive",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "otx",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "a_records": [
+     "88.99.35.112"
+    ],
+    "mx_records": [
+     "mail1.spacekoelnsrv1.de"
+    ],
+    "ns_records": [
+     "z.ns.joker.com",
+     "y.ns.joker.com",
+     "x.ns.joker.com"
+    ],
+    "txt_records": [
+     "v=spf1 a mx ip4:78.46.161.114 ~all",
+     "facebook-domain-verification=vo0ojynv7i4rgrgpdm0dvpvun202us"
+    ]
+   },
+   "domain": "dortmund-beach.com",
+   "evidence": [
+    {
+     "excerpt": "{'a_records': ['88.99.35.112'], 'mx_records': ['mail1.spacekoelnsrv1.de'], 'ns_records': ['z.ns.joker.com', 'y.ns.joker.com', 'x.ns.joker.com'], 'txt_records': ['v=spf1 a mx ip4:78.46.161.114 ~all'...",
+     "ref": "phase0a/securitytrails.json",
+     "tool": "securitytrails"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:securitytrails:dortmund-beach.com",
+   "mode": "passive",
+   "observed_at": "2026-09-17T22:41:28Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "securitytrails",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220---------- Welcome to Pure-FTPd [privsep] [TLS] ---------- 220-You are user number 1 of 50 allowed. 220-Local time is now 16:19. Server port: 21. 220-This...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:21 Pure-FTPd | 220---------- Welcome to Pure-FTPd [privsep] [TLS] ---------- 220-You are user number 1 of 50 allowed. 220-Local time is now 16:19. Server port: 21. 220-This is a privat...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:21",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 21,
+   "product": "Pure-FTPd",
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOG...",
+   "confidence": 0.5,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:25 Postfix smtpd | 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-A...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:25",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 25,
+   "product": "Postfix smtpd",
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": false,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 301 Moved Permanently Date: Wed, 09 Sep 2026 16:18:34 GMT Server: Apache/2.4.67 (Debian) Location: https://vsrv2.spacekoeln.de/ Content-Length: 354...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:80 Apache httpd 2.4.67 | HTTP/1.1 301 Moved Permanently Date: Wed, 09 Sep 2026 16:18:34 GMT Server: Apache/2.4.67 (Debian) Location: https://vsrv2.spacekoeln.de/ Content-Length: 354 Co...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:80",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": "2.4.67"
+  },
+  {
+   "banner_excerpt": "+OK Dovecot (Debian) ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN .",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:110 | +OK Dovecot (Debian) ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN .",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:110",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 110,
+   "product": null,
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN] Dovecot (Debian) ready. * CAPABILITY IMAP4rev1 SAS...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN] Dovecot (Debian) ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:143",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 143,
+   "product": null,
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "HTTP/1.1 200 OK Date: Mon, 14 Sep 2026 13:59:48 GMT Server: Apache/2.4.67 (Debian) Cache-Control: no-store, no-cache, must-revalidate Pragma: no-cache Expire...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:443 Apache httpd 2.4.67 | HTTP/1.1 200 OK Date: Mon, 14 Sep 2026 13:59:48 GMT Server: Apache/2.4.67 (Debian) Cache-Control: no-store, no-cache, must-revalidate Pragma: no-cache Expires...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:443",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": "2.4.67"
+  },
+  {
+   "banner_excerpt": "220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-AUTH PLAIN LOGIN 250-AUTH=P...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:465 Postfix smtpd | 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LO...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:465",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 465,
+   "product": "Postfix smtpd",
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOG...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:587 Postfix smtpd | 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:587",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 587,
+   "product": "Postfix smtpd",
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN AUTH=LOGIN] Dovecot (Debian) ready. * CAPABILITY IMAP4rev1 SASL-IR LOGI...",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN AUTH=LOGIN] Dovecot (Debian) ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE...",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:993",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 993,
+   "product": null,
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": "+OK Dovecot (Debian) ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN .",
+   "confidence": 0.8,
+   "details": {},
+   "domain": null,
+   "evidence": [
+    {
+     "excerpt": "88.99.35.112:995 | +OK Dovecot (Debian) ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN .",
+     "ref": "phase0a/shodan_hosts.json",
+     "tool": "shodan"
+    }
+   ],
+   "host_ip": "88.99.35.112",
+   "hostnames": [
+    "vsrv2.spacekoeln.de"
+   ],
+   "id": "passive:shodan:88.99.35.112:995",
+   "mode": "passive",
+   "observed_at": "2026-09-17T09:29:21Z",
+   "port": 995,
+   "product": null,
+   "seen_at": "2026-09-17T09:29:21Z",
+   "source": "shodan",
+   "transport": "tcp",
+   "verified": true,
+   "version": null
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "compromised": false
+   },
+   "domain": "dortmund-beach.com",
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:urlhaus:dortmund-beach.com",
+   "mode": "passive",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "urlhaus",
+   "transport": null,
+   "verified": null,
+   "version": null
+  }
+ ],
+ "scan": {
+  "confidence": 1.0,
+  "counts": {
+   "correlated_findings": 1097,
+   "correlated_fp": 531,
+   "tool_runs": 45
+  },
+  "domain": "dortmund-beach.com",
+  "domains": [
+   "dortmund-beach.com"
+  ],
+  "evidence": [
+   {
+    "excerpt": "startedAt=2026-09-17T22:41:25.187307+00:00 finishedAt=2026-09-17T23:09:08.665930+00:00",
+    "ref": "meta.json",
+    "tool": "meta"
+   }
+  ],
+  "finished_at": "2026-09-17T23:09:08Z",
+  "hosts_scanned": 1,
+  "id": "scan:14272c00-1145-4675-9b4c-19ce2ead403b",
+  "mode": "active",
+  "nmap_args": "nmap -Pn -n -sV --version-intensity 7 -sC --script-timeout 60s -T4 --max-retries 2 --host-timeout 240s --min-rate 100 --defeat-rst-ratelimit --top-ports 1000 --open -oX <scan-dir> -oN <scan-dir> --reason 88.99.35.112",
+  "observed_at": "2026-09-17T23:09:08Z",
+  "order_id": "14272c00-1145-4675-9b4c-19ce2ead403b",
+  "package": "perimeter",
+  "policy_version": null,
+  "scanner_egress": null,
+  "source": "meta",
+  "started_at": "2026-09-17T22:41:25Z",
+  "tool_versions": [
+   {
+    "name": "dnsx",
+    "version": null
+   },
+   {
+    "name": "feroxbuster",
+    "version": "2.11.0"
+   },
+   {
+    "name": "ffuf",
+    "version": "2.1.0"
+   },
+   {
+    "name": "gobuster",
+    "version": null
+   },
+   {
+    "name": "httpx",
+    "version": null
+   },
+   {
+    "name": "nmap",
+    "version": "7.93"
+   },
+   {
+    "name": "searchsploit",
+    "version": null
+   },
+   {
+    "name": "subfinder",
+    "version": "2.13.0"
+   },
+   {
+    "name": "testssl.sh",
+    "version": null
+   },
+   {
+    "name": "wafw00f",
+    "version": null
+   },
+   {
+    "name": "wpscan",
+    "version": null
+   }
+  ]
+ },
+ "schema_version": "1.0.1",
+ "services": [
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp Pure-FTPd",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "pureftpd",
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:21/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 21,
+   "product": "Pure-FTPd",
+   "proto": "tcp",
+   "service": "ftp",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http Apache httpd 2.4.67",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:80/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 80,
+   "product": "Apache httpd",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": "2.4.67",
+   "version_raw": "2.4.67"
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "USER",
+    "CAPA",
+    "TOP",
+    "UIDL",
+    "SASL(PLAIN",
+    "LOGIN)",
+    "RESP-CODES",
+    "STLS",
+    "PIPELINING",
+    "AUTH-RESP-CODE"
+   ],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "110/tcp open pop3 Dovecot pop3d",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "pop3-capabilities: USER CAPA TOP UIDL SASL(PLAIN LOGIN) RESP-CODES STLS PIPELINING AUTH-RESP-CODE",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:110/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 110,
+   "product": "Dovecot pop3d",
+   "proto": "tcp",
+   "service": "pop3",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "LOGIN-REFERRALS",
+    "LITERAL+",
+    "capabilities",
+    "more",
+    "Pre-login",
+    "post-login",
+    "IDLE",
+    "OK",
+    "ENABLE",
+    "SASL-IR",
+    "listed",
+    "have",
+    "STARTTLS",
+    "IMAP4rev1",
+    "AUTH=PLAIN",
+    "AUTH=LOGINA0001",
+    "ID"
+   ],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "143/tcp open imap Dovecot imapd",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "imap-capabilities: LOGIN-REFERRALS LITERAL+ capabilities more Pre-login post-login IDLE OK ENABLE SASL-IR listed have STARTTLS IMAP4rev1 AUTH=PLAIN AUTH=LOGINA0001 ID",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "dovecot",
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:143/tcp",
+   "login_disabled": false,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 143,
+   "product": "Dovecot imapd",
+   "proto": "tcp",
+   "service": "imap",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": false,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Apache httpd 2.4.67 ((Debian)) tunnel=ssl",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "apache",
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 443,
+   "product": "Apache httpd",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": "2.4.67",
+   "version_raw": "2.4.67"
+  },
+  {
+   "auth_mechanisms": [
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "vsrv2.spacekoeln.de",
+    "PIPELINING",
+    "SIZE 52428800",
+    "VRFY",
+    "ETRN",
+    "AUTH PLAIN LOGIN",
+    "AUTH=PLAIN LOGIN",
+    "ENHANCEDSTATUSCODES",
+    "8BITMIME",
+    "DSN",
+    "CHUNKING"
+   ],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "465/tcp open smtp Postfix smtpd tunnel=ssl",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "postfix",
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:465/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 465,
+   "product": "Postfix smtpd",
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "vsrv2.spacekoeln.de",
+    "PIPELINING",
+    "SIZE 52428800",
+    "VRFY",
+    "ETRN",
+    "STARTTLS",
+    "AUTH PLAIN LOGIN",
+    "AUTH=PLAIN LOGIN",
+    "ENHANCEDSTATUSCODES",
+    "8BITMIME",
+    "DSN",
+    "CHUNKING"
+   ],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "587/tcp open smtp Postfix smtpd",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "smtp-commands: vsrv2.spacekoeln.de, PIPELINING, SIZE 52428800, VRFY, ETRN, STARTTLS, AUTH PLAIN LOGIN, AUTH=PLAIN LOGIN, ENHANCEDSTATUSCODES, 8BITMIME, DSN, CHUNKING",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "postfix",
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:587/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 587,
+   "product": "Postfix smtpd",
+   "proto": "tcp",
+   "service": "smtp",
+   "source": "nmap",
+   "starttls": true,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [
+    "LOGIN",
+    "PLAIN"
+   ],
+   "auth_required": true,
+   "capabilities": [
+    "listed",
+    "have",
+    "LOGIN-REFERRALS",
+    "ENABLE",
+    "AUTH=PLAIN",
+    "SASL-IR",
+    "capabilities",
+    "more",
+    "Pre-login",
+    "OK",
+    "IMAP4rev1",
+    "post-login",
+    "LITERAL+",
+    "IDLE",
+    "AUTH=LOGINA0001",
+    "ID"
+   ],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "993/tcp open imaps",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "imap-capabilities: listed have LOGIN-REFERRALS ENABLE AUTH=PLAIN SASL-IR capabilities more Pre-login OK IMAP4rev1 post-login LITERAL+ IDLE AUTH=LOGINA0001 ID",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:993/tcp",
+   "login_disabled": false,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 993,
+   "product": null,
+   "proto": "tcp",
+   "service": "imaps",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [
+    "AUTH-RESP-CODE",
+    "UIDL",
+    "USER",
+    "SASL(PLAIN",
+    "LOGIN)",
+    "RESP-CODES",
+    "CAPA",
+    "PIPELINING",
+    "TOP"
+   ],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "995/tcp open pop3s",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "pop3-capabilities: AUTH-RESP-CODE UIDL USER SASL(PLAIN LOGIN) RESP-CODES CAPA PIPELINING TOP",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:995/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 995,
+   "product": null,
+   "proto": "tcp",
+   "service": "pop3s",
+   "source": "nmap",
+   "starttls": false,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "vsrv2.spacekoeln.de",
+    "not_after": "2026-10-30T21:10:07Z",
+    "san": [
+     "vsrv2.spacekoeln.de"
+    ]
+   },
+   "confidence": 0.3,
+   "evidence": [
+    {
+     "excerpt": "10000/tcp open snet-sensor-mgmt tunnel=ssl",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": null,
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:10000/tcp",
+   "login_disabled": null,
+   "method": "table",
+   "mode": "active",
+   "nmap_conf": 3,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 10000,
+   "product": null,
+   "proto": "tcp",
+   "service": "snet-sensor-mgmt",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "30000/tcp open ssh OpenSSH 8.4p1 Debian 5+deb11u7 (protocol 2.0)",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "openssh",
+   "host_ip": "88.99.35.112",
+   "id": "svc:88.99.35.112:30000/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "port": 30000,
+   "product": "OpenSSH",
+   "proto": "tcp",
+   "service": "ssh",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": "8.4p1",
+   "version_raw": "8.4p1 Debian 5+deb11u7"
+  }
+ ],
+ "software": [
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": "debian",
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Apache httpd 2.4.67 ((Debian)) tunnel=ssl",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "80/tcp open http Apache httpd 2.4.67",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache 2.4.67 (Debian)",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Apache HTTP Server 2.4.67",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Apache httpd 2.4.67",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "apache",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:apache:2.4.67",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "product": "Apache httpd",
+   "source": "nmap",
+   "version_norm": "2.4.67",
+   "version_raw": "2.4.67",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: BeTheme 27.4.5",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "betheme",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:betheme:27.4.5",
+   "kind": "theme",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "BeTheme",
+   "source": "webtech",
+   "version_norm": "27.4.5",
+   "version_raw": "27.4.5",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Burst",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "burst",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:burst:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "Burst",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Complianz",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "complianz",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:complianz:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "Complianz",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": "debian",
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Debian",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "debian",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:debian:unknown",
+   "kind": "os",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "Debian",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "110/tcp open pop3 Dovecot pop3d",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "143/tcp open imap Dovecot imapd",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Dovecot imapd",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Dovecot pop3d",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "dovecot",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:dovecot:unknown",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "product": "Dovecot",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Google Analytics",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "google_analytics",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:google_analytics:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "Google Analytics",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Google Tag Manager",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "google_tag_manager",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:google_tag_manager:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "Google Tag Manager",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: HSTS",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "hsts",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:hsts:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "HSTS",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: jQuery",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: jQuery Migrate 3.4.1",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "jquery",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:jquery:3.4.1",
+   "kind": "library",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "jQuery",
+   "source": "webtech",
+   "version_norm": "3.4.1",
+   "version_raw": "3.4.1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: MySQL",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "mysql",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:mysql:unknown",
+   "kind": "database",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "MySQL",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": "debian",
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "30000/tcp open ssh OpenSSH 8.4p1 Debian 5+deb11u7 (protocol 2.0)",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: OpenSSH 8.4p1 Debian 5+deb11u7",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "openssh",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:openssh:8.4p1",
+   "kind": "ssh",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "product": "OpenSSH",
+   "source": "nmap",
+   "version_norm": "8.4p1",
+   "version_raw": "8.4p1 Debian 5+deb11u7",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: PHP",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "php",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:php:unknown",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "PHP",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "465/tcp open smtp Postfix smtpd tunnel=ssl",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "587/tcp open smtp Postfix smtpd",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Postfix smtpd",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "postfix",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:postfix:unknown",
+   "kind": "mail",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "product": "Postfix",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "powered_by_slider_revolution",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:powered_by_slider_revolution:6.7.11",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "Powered by Slider Revolution",
+   "source": "webtech",
+   "version_norm": "6.7.11",
+   "version_raw": "Powered by Slider Revolution 6.7.11 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface.",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "21/tcp open ftp Pure-FTPd",
+     "ref": "hosts/88.99.35.112/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Pure-FTPd",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "pureftpd",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:pureftpd:unknown",
+   "kind": "ftp",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:01Z",
+   "product": "Pure-FTPd",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Slider Revolution 6.7.11",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "slider_revolution",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:slider_revolution:6.7.11",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:48:12Z",
+   "product": "Slider Revolution",
+   "source": "webtech",
+   "version_norm": "6.7.11",
+   "version_raw": "6.7.11",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.95,
+   "detection_sources": [
+    "cms_fingerprint",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "cms_details.raw: WordPress",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "cms_fingerprint"
+    },
+    {
+     "excerpt": "technologies: WordPress",
+     "ref": "hosts/88.99.35.112/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "wordpress",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:-:wordpress:unknown",
+   "kind": "cms_core",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T23:09:08Z",
+   "product": "WordPress",
+   "source": "cms_fingerprint",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "header_check",
+    "httpx"
+   ],
+   "distro": "debian",
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "server: Apache/2.4.67 (Debian)",
+     "ref": "scan_results:header_check:88.99.35.112",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "tech: Apache HTTP Server:2.4.67",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "apache",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:apache:2.4.67",
+   "kind": "webserver",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "Apache httpd",
+   "source": "httpx",
+   "version_norm": "2.4.67",
+   "version_raw": "2.4.67",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: BeTheme:27.4.5",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "betheme",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:betheme:27.4.5",
+   "kind": "theme",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "BeTheme",
+   "source": "httpx",
+   "version_norm": "27.4.5",
+   "version_raw": "27.4.5",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "wpscan"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "theme betheme 27.5.3",
+     "ref": "hosts/88.99.35.112/phase2/wpscan.json",
+     "tool": "wpscan"
+    }
+   ],
+   "family": "betheme",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:betheme:27.5.3",
+   "kind": "theme",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T23:09:07Z",
+   "product": "betheme",
+   "source": "wpscan",
+   "version_norm": "27.5.3",
+   "version_raw": "27.5.3",
+   "vulnerabilities_count": 12
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "wpscan"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "theme betheme-child 2.0",
+     "ref": "hosts/88.99.35.112/phase2/wpscan.json",
+     "tool": "wpscan"
+    }
+   ],
+   "family": "betheme_child",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:betheme_child:2.0",
+   "kind": "theme",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T23:09:07Z",
+   "product": "betheme-child",
+   "source": "wpscan",
+   "version_norm": "2.0",
+   "version_raw": "2.0",
+   "vulnerabilities_count": 0
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Burst",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "burst",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:burst:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "Burst",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "wpscan"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "plugin burst-statistics 1.7.1",
+     "ref": "hosts/88.99.35.112/phase2/wpscan.json",
+     "tool": "wpscan"
+    }
+   ],
+   "family": "burst_statistics",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:burst_statistics:1.7.1",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T23:09:07Z",
+   "product": "burst-statistics",
+   "source": "wpscan",
+   "version_norm": "1.7.1",
+   "version_raw": "1.7.1",
+   "vulnerabilities_count": 1
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Complianz",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "complianz",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:complianz:unknown",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "Complianz",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "wpscan"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "plugin complianz-gdpr 7.1.0",
+     "ref": "hosts/88.99.35.112/phase2/wpscan.json",
+     "tool": "wpscan"
+    }
+   ],
+   "family": "complianz_gdpr",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:complianz_gdpr:7.1.0",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T23:09:07Z",
+   "product": "complianz-gdpr",
+   "source": "wpscan",
+   "version_norm": "7.1.0",
+   "version_raw": "7.1.0",
+   "vulnerabilities_count": 6
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": "debian",
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Debian",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "debian",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:debian:unknown",
+   "kind": "os",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "Debian",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Google Analytics",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "google_analytics",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:google_analytics:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "Google Analytics",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:jquery:3.4.1",
+   "kind": "library",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "jQuery",
+   "source": "httpx",
+   "version_norm": "3.4.1",
+   "version_raw": "3.4.1",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: MySQL",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "mysql",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:mysql:unknown",
+   "kind": "database",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "MySQL",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: PHP",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "php",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:php:unknown",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "PHP",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "wpscan"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "plugin revslider 6.7.11",
+     "ref": "hosts/88.99.35.112/phase2/wpscan.json",
+     "tool": "wpscan"
+    }
+   ],
+   "family": "revslider",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:revslider:6.7.11",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T23:09:07Z",
+   "product": "revslider",
+   "source": "wpscan",
+   "version_norm": "6.7.11",
+   "version_raw": "6.7.11",
+   "vulnerabilities_count": 4
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Slider Revolution:6.7.11",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "slider_revolution",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:slider_revolution:6.7.11",
+   "kind": "plugin",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T22:50:58Z",
+   "product": "Slider Revolution",
+   "source": "httpx",
+   "version_norm": "6.7.11",
+   "version_raw": "6.7.11",
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "httpx",
+    "wpscan"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": "2024-07-16",
+    "latest_patch": "6.5.8",
+    "source": "endoflife_date",
+    "status": "eol",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: WordPress",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "version: 6.5.10 status=outdated",
+     "ref": "hosts/88.99.35.112/phase2/wpscan.json",
+     "tool": "wpscan"
+    }
+   ],
+   "family": "wordpress",
+   "fqdn": "dortmund-beach.com",
+   "hints": [],
+   "host_ip": "88.99.35.112",
+   "id": "sw:88.99.35.112:dortmund-beach.com:wordpress:6.5.10",
+   "kind": "cms_core",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-17T23:09:07Z",
+   "product": "WordPress",
+   "source": "wpscan",
+   "version_norm": "6.5.10",
+   "version_raw": "6.5.10",
+   "vulnerabilities_count": 0
+  }
+ ],
+ "targets": [
+  {
+   "confidence": 1.0,
+   "discovery_health": {
+    "ct_sources_empty": false,
+    "discovery_added_count": 0,
+    "snapshot_age_minutes": 156,
+    "snapshot_seed_count": 5,
+    "snapshot_seeded": true,
+    "tool_counts": {
+     "certspotter": 2,
+     "crtsh": 1,
+     "gobuster_dns": 0,
+     "phase0a_passive": 4,
+     "snapshot": 5,
+     "subfinder": 2
+    },
+    "tools_with_zero_results": [
+     "gobuster_dns"
+    ],
+    "total_subdomains": 5
+   },
+   "domain": "dortmund-beach.com",
+   "evidence": [
+    {
+     "excerpt": "domain=dortmund-beach.com",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "id": "target:dortmund-beach.com",
+   "is_primary": true,
+   "mode": "active",
+   "observed_at": "2026-09-17T22:41:25Z",
+   "out_of_scope": [
+    {
+     "host_ip": "88.99.35.112",
+     "kind": "vhost_skipped",
+     "reason": "parking",
+     "value": "pflege.dortmund-beach.com"
+    }
+   ],
+   "source": "host_inventory",
+   "targets_source": "orders.json",
+   "whois": null
+  }
+ ],
+ "threats": [
+  {
+   "affected_software_ref": null,
+   "confidence": 1.0,
+   "cve_id": "CVE-2013-3587",
+   "cvss_nvd": null,
+   "cwes": [],
+   "epss": null,
+   "evidence": [
+    {
+     "excerpt": "BREACH: potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested",
+     "ref": "scan_results:testssl:88.99.35.112",
+     "tool": "testssl"
+    }
+   ],
+   "exploitdb": null,
+   "host_ip": "88.99.35.112",
+   "id": "threat:CVE-2013-3587:dortmund-beach.com:443",
+   "kev": null,
+   "mode": "active",
+   "observed_at": "2026-09-17T22:51:06Z",
+   "port": 443,
+   "source": "testssl"
+  }
+ ],
+ "tls": [
+  {
+   "cert": {
+    "chain_ok": true,
+    "cn": "dortmund-beach.com",
+    "days_left": 42,
+    "expired": false,
+    "issuer": "YR1",
+    "mismatch": false,
+    "not_after": "2026-10-30T21:06:36Z",
+    "not_before": "2026-08-01T21:06:37Z",
+    "san": [
+     "dortmund-beach.com",
+     "www.dortmund-beach.com"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [
+    "cbc"
+   ],
+   "confidence": 1.0,
+   "entries": [
+    {
+     "cve": null,
+     "finding": "misconfiguration, specified not a number for max-age",
+     "id": "HSTS_time",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": "CVE-2013-3587",
+     "finding": "potentially VULNERABLE, gzip HTTP compression detected  - only supplied '/' tested",
+     "id": "BREACH",
+     "severity": "MEDIUM"
+    }
+   ],
+   "evidence": [
+    {
+     "excerpt": "dortmund-beach.com:443 tls=tls12 cn=dortmund-beach.com not_after=2026-10-30T21:06:36Z mismatched=None",
+     "ref": "hosts/88.99.35.112/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False",
+     "ref": "scan_results:testssl:88.99.35.112",
+     "tool": "testssl"
+    },
+    {
+     "excerpt": "HSTS_time=misconfiguration, specified not a number for max-age; BREACH=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested",
+     "ref": "hosts/88.99.35.112/phase2/testssl.json",
+     "tool": "testssl"
+    }
+   ],
+   "fallback_scsv": true,
+   "fqdn": "dortmund-beach.com",
+   "grade": "A-",
+   "host_ip": "88.99.35.112",
+   "hsts": {
+    "include_subdomains": false,
+    "max_age": null,
+    "preload": null,
+    "present": null,
+    "raw": "misconfiguration: \\'0\\' is not a valid max-age specification, just this domain"
+   },
+   "id": "tls:dortmund-beach.com:443@88.99.35.112",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-17T22:51:06Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
+    "TLS1.2": true,
+    "TLS1.3": false
+   },
+   "source": "testssl",
+   "vulns": [
+    {
+     "name": "BREACH",
+     "status": "potential"
+    },
+    {
+     "name": "LUCKY13",
+     "status": "potential"
+    }
+   ]
+  }
+ ],
+ "unprocessed": [],
+ "warnings": []
+}

@@ -1,7 +1,10 @@
 """Phase 2 — Deep scan per host."""
 
+import hashlib
 import json
 import os
+import re
+import shutil
 import signal
 import subprocess
 from typing import Any, Callable, Optional
@@ -15,6 +18,57 @@ from scanner.progress import publish_event, publish_tool_output
 from scanner.tools import run_tool, _save_result, record_tool_run  # noqa: F401
 
 log = structlog.get_logger()
+
+
+_SLUG_FORBIDDEN = re.compile(r"[^A-Za-z0-9._-]")
+
+
+def vhost_slug(fqdn: str) -> str:
+    """Dateinamens-Token fuer einen VHost (Issue #10).
+
+    Baut auf ``tools.redirect_probe.sanitize_vhost`` auf, der schon die
+    Screenshot-Namen bildet; zusaetzlich fallen Zeichen weg, die in einem
+    Tar-Eintrag oder auf einem Windows-Dateisystem stoeren (Wildcards aus
+    Zertifikatsnamen, Unicode). Wurde etwas ersetzt oder gekuerzt, haengt ein
+    kurzer Hash an, damit zwei VHosts nie denselben Namen bekommen.
+
+    Wichtig: der Name ist nur ein Eindeutigkeitsmerkmal, nie die Zuordnung.
+    Wer die Datei liest, nimmt den FQDN aus dem Inhalt (``url`` bzw.
+    ``input``). Eine Kollision waere damit hoechstens eine ueberschriebene
+    Datei, nie ein falsch zugeordneter Befund.
+    """
+    from scanner.tools.redirect_probe import sanitize_vhost
+
+    safe = _SLUG_FORBIDDEN.sub("-", sanitize_vhost(fqdn))
+    if safe == fqdn:
+        return safe
+    return f"{safe[:71]}-{hashlib.sha1(fqdn.encode('utf-8')).hexdigest()[:8]}"
+
+
+def _write_legacy_json(host_dir: str, name: str, payload: Any) -> None:
+    """Legacy-Datei im alten Format schreiben (Issue #10).
+
+    Der v2-Reporter (reporter/parser.py) und tech_enricher lesen weiterhin die
+    festen Namen. Schlaegt das Schreiben fehl, ist das kein Scan-Fehler: die
+    VHost-Datei traegt dieselben Daten.
+    """
+    try:
+        phase2_dir = f"{host_dir}/phase2"
+        os.makedirs(phase2_dir, exist_ok=True)
+        with open(f"{phase2_dir}/{name}", "w") as f:
+            json.dump(payload, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        log.warning("legacy_file_write_failed", name=name, error=str(e))
+
+
+def _copy_legacy_file(host_dir: str, source: str, name: str) -> None:
+    """VHost-Datei zusaetzlich unter dem alten Namen ablegen (Issue #10)."""
+    try:
+        src = f"{host_dir}/phase2/{source}"
+        if os.path.isfile(src):
+            shutil.copyfile(src, f"{host_dir}/phase2/{name}")
+    except Exception as e:
+        log.warning("legacy_file_copy_failed", name=name, error=str(e))
 
 
 def _zap_active_scan_timeout() -> int:
@@ -334,17 +388,22 @@ def run_gobuster_dir(fqdn: str, ip: str, host_dir: str, order_id: str,
     return output_path
 
 
-def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[str, Any]:
+def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str,
+                     filename: str | None = None) -> dict[str, Any]:
     """Check HTTP security headers using curl.
 
     Evaluates presence of key security headers and produces a score.
-    Saves analysis to {host_dir}/phase2/headers.json.
+    Saves analysis to {host_dir}/phase2/{filename or 'headers.json'}.
     Returns the analysis dict.
+
+    Issue #10: `filename` gibt der Ablage je VHost einen eigenen Namen. Ohne
+    ihn ueberschrieb jeder VHost den vorigen und im Tar blieb nur der zuletzt
+    gepruefte uebrig.
     """
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
 
-    output_path = f"{phase2_dir}/headers.json"
+    output_path = f"{phase2_dir}/{filename or 'headers.json'}"
     url = f"https://{fqdn}"
 
     # Strategie: erst HEAD (billig). Wenn der Server Security-Header
@@ -473,11 +532,16 @@ def run_header_check(fqdn: str, ip: str, host_dir: str, order_id: str) -> dict[s
     return analysis
 
 
-def run_httpx(fqdn: str, ip: str, host_dir: str, order_id: str) -> Optional[dict[str, Any]]:
-    """Run httpx for HTTP probing and technology detection."""
+def run_httpx(fqdn: str, ip: str, host_dir: str, order_id: str,
+              filename: str | None = None) -> Optional[dict[str, Any]]:
+    """Run httpx for HTTP probing and technology detection.
+
+    Issue #10: `filename` gibt der Ablage je VHost einen eigenen Namen
+    (siehe run_header_check).
+    """
     phase2_dir = f"{host_dir}/phase2"
     os.makedirs(phase2_dir, exist_ok=True)
-    output_path = f"{phase2_dir}/httpx.json"
+    output_path = f"{phase2_dir}/{filename or 'httpx.json'}"
 
     cmd = [
         "httpx",
@@ -1209,7 +1273,10 @@ def run_phase2(
         r: dict[str, Any] = {}
         if has_ssl and (phase2_tools is None or "testssl" in phase2_tools):
             publish_event(order_id, {"type": "tool_starting", "tool": "testssl", "host": ip})
-            testssl_sev = (config or {}).get("testssl_severity", "MEDIUM")
+            # Issue #9: Default ist der leere Filter. Frueher stand hier
+            # "MEDIUM", dadurch trug das Tar-JSON weder LOW- noch OK-Zeilen
+            # und die TLS-Pruefungen des Katalogs konnten nichts entscheiden.
+            testssl_sev = (config or {}).get("testssl_severity", "")
             # WebCheck = Schnellscan → fast_mode aktivieren.
             testssl_fast = (config or {}).get("package", "") in ("webcheck", "basic")
             testssl_result = run_testssl(primary_fqdn, ip, host_dir, order_id,
@@ -1245,11 +1312,19 @@ def run_phase2(
         zugeordnet werden koennen.
         """
         r: dict[str, Any] = {"_tools": [], "vhost_results": {}}
+        # Issue #10: die Legacy-Dateien headers.json/httpx.json trugen bisher
+        # den zuletzt geprueften VHost. Sie bleiben fuer den v2-Reporter und
+        # tech_enricher erhalten, zeigen aber ab jetzt deterministisch den
+        # primaeren VHost (dieselbe Regel wie beim ZAP-Ziel weiter unten).
+        legacy_vhost = (primary_fqdn if primary_fqdn in vhost_fqdns
+                        else (vhost_fqdns[0] if vhost_fqdns else None))
         if phase2_tools is None or "headers" in phase2_tools:
             for vh in vhost_fqdns:
                 try:
                     publish_event(order_id, {"type": "tool_starting", "tool": "header_check", "host": ip})
-                    header_result = run_header_check(vh, ip, host_dir, order_id)
+                    header_result = run_header_check(
+                        vh, ip, host_dir, order_id,
+                        filename=f"headers_{vhost_slug(vh)}.json")
                     if vh == primary_fqdn:
                         r["headers"] = header_result
                     r["vhost_results"].setdefault(vh, {})["headers"] = header_result
@@ -1269,6 +1344,11 @@ def run_phase2(
                     log.error("header_check_failed", fqdn=vh, ip=ip, error=str(e))
                     _record_phase2_status(order_id, ip, "header_check", "failed",
                                           f"{vh}: {e}")
+            if legacy_vhost is not None:
+                legacy = r["vhost_results"].get(legacy_vhost, {}).get("headers")
+                if legacy is not None:
+                    r.setdefault("headers", legacy)
+                    _write_legacy_json(host_dir, "headers.json", legacy)
             r["_tools"].append("header_check")
             progress_callback(order_id, "header_check", "complete")
         else:
@@ -1278,7 +1358,9 @@ def run_phase2(
             for vh in vhost_fqdns:
                 try:
                     publish_event(order_id, {"type": "tool_starting", "tool": "httpx", "host": ip})
-                    httpx_result = run_httpx(vh, ip, host_dir, order_id)
+                    httpx_result = run_httpx(
+                        vh, ip, host_dir, order_id,
+                        filename=f"httpx_{vhost_slug(vh)}.json")
                     if vh == primary_fqdn:
                         r["httpx"] = httpx_result
                     r["vhost_results"].setdefault(vh, {})["httpx"] = httpx_result
@@ -1291,6 +1373,14 @@ def run_phase2(
                     log.error("httpx_failed", fqdn=vh, ip=ip, error=str(e))
                     _record_phase2_status(order_id, ip, "httpx", "failed",
                                           f"{vh}: {e}")
+            if legacy_vhost is not None:
+                _copy_legacy_file(host_dir,
+                                  f"httpx_{vhost_slug(legacy_vhost)}.json",
+                                  "httpx.json")
+                if "httpx" not in r:
+                    legacy = r["vhost_results"].get(legacy_vhost, {}).get("httpx")
+                    if legacy is not None:
+                        r["httpx"] = legacy
             r["_tools"].append("httpx")
             progress_callback(order_id, "httpx", "complete")
         else:

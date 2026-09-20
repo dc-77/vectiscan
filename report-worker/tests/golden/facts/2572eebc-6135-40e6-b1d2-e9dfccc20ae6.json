@@ -2544,10 +2544,10 @@
    "observed_at": "2026-08-31T14:53:38Z",
    "phase": 2,
    "raw_status": "ok",
-   "reason": null,
+   "reason": "zap_no_alerts",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "zap"
   },
   {
@@ -2569,10 +2569,10 @@
    "observed_at": "2026-08-31T14:52:40Z",
    "phase": 2,
    "raw_status": "ok",
-   "reason": null,
+   "reason": "zap_no_alerts",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "zap"
   },
   {
@@ -2594,10 +2594,10 @@
    "observed_at": "2026-08-31T14:55:05Z",
    "phase": 2,
    "raw_status": "ok",
-   "reason": null,
+   "reason": "zap_no_alerts",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "zap"
   },
   {
@@ -5835,7 +5835,7 @@
    }
   ]
  },
- "schema_version": "1.0.0",
+ "schema_version": "1.0.1",
  "services": [
   {
    "auth_mechanisms": [],

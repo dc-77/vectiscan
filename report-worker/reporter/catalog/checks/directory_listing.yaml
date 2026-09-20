@@ -9,10 +9,7 @@ scope: http.alerts
 applicable_when: null
 when: zap_match(alert, ZAP_DIRECTORY_LISTING)
 positive_when: never
-not_testable_when:
-  - when: http is not None and len(http.alerts) == 0
-    reason_code: zap_no_alerts
-    context: group
+not_testable_when: []
 undetermined: not_testable
 requires:
   tools: [zap]

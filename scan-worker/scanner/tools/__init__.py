@@ -8,7 +8,7 @@ import os
 import signal
 import subprocess
 import time
-from typing import Optional
+from typing import Callable, Optional
 
 import structlog
 
@@ -227,6 +227,7 @@ def run_tool(
     host_ip: Optional[str] = None,
     phase: int = 0,
     tool_name: str = "",
+    status_check: Optional[Callable[[int, str], Optional[tuple[str, Optional[str]]]]] = None,
 ) -> tuple[int, int]:
     """
     Run an external tool as subprocess with timeout.
@@ -248,13 +249,20 @@ def run_tool(
         host_ip: Host IP for DB logging
         phase: Scan phase (0, 1, 2)
         tool_name: Name of the tool
+        status_check: darf den aus dem Exit-Code abgeleiteten Status anhand der
+            tatsaechlichen Ausgabe korrigieren. Bekommt (exit_code, raw) und gibt
+            entweder None (Regelpfad) oder (status, reason). Gedacht fuer
+            Werkzeuge, die mit Exit 0 enden, ohne etwas geprueft zu haben
+            (Issue #8: nmap ueberspringt ein ungueltiges Ziel und meldet
+            trotzdem Erfolg). Greift nicht, wenn der Host als geblockt gilt
+            oder der Lauf in den Timeout laeuft.
 
     Returns:
         Tuple of (exit_code, duration_ms)
     """
     return _run_tool_with_optional_vpn(
         cmd, timeout, output_path, order_id, host_ip, phase, tool_name,
-        retry_with_vpn=True,
+        retry_with_vpn=True, status_check=status_check,
     )
 
 
@@ -263,6 +271,7 @@ def _run_tool_with_optional_vpn(
     order_id: Optional[str], host_ip: Optional[str],
     phase: int, tool_name: str,
     retry_with_vpn: bool,
+    status_check: Optional[Callable[[int, str], Optional[tuple[str, Optional[str]]]]] = None,
 ) -> tuple[int, int]:
     """Internal: wraps subprocess + Block-Detection + optional VPN-Retry."""
     env = _build_env_with_vpn(order_id)
@@ -332,6 +341,7 @@ def _run_tool_with_optional_vpn(
                 return _run_tool_with_optional_vpn(
                     cmd, timeout, output_path, order_id, host_ip,
                     phase, tool_name, retry_with_vpn=False,
+                    status_check=status_check,
                 )
 
         # Save result to scan_results table.
@@ -349,9 +359,19 @@ def _run_tool_with_optional_vpn(
                     raw_output=raw[:50000] if raw else None,
                 )
             else:
+                status = classify_exit(tool_name, exit_code)
+                reason: Optional[str] = None
+                if status_check is not None:
+                    try:
+                        verdict = status_check(exit_code, raw or "")
+                        if verdict:
+                            status, reason = verdict
+                    except Exception as e:
+                        log.warning("tool_status_check_failed",
+                                    tool=tool_name, error=str(e))
                 record_tool_run(
-                    order_id, host_ip, phase, tool_name,
-                    classify_exit(tool_name, exit_code),
+                    order_id, host_ip, phase, tool_name, status,
+                    reason=reason,
                     exit_code=exit_code,
                     duration_ms=duration_ms,
                     raw_output=raw[:50000] if raw else None,
@@ -547,6 +567,27 @@ def classify_exit(tool_name: str, exit_code: Optional[int]) -> str:
     except Exception as e:  # pragma: no cover — reiner Sicherheitsnetz-Pfad
         log.warning("classify_exit_failed", tool=tool_name, error=str(e))
         return "failed"
+
+
+def domain_labeled_json(payload: object, domain: Optional[str],
+                        limit: int = 50000) -> str:
+    """raw_output einer domainweiten Zeile mit Domain-Etikett (Issue #12).
+
+    scan_results hat keine Domainspalte. Domainweite Zeilen (host_ip NULL)
+    trugen deshalb keine Zuordnung, und der Report-Worker hat sie alle dem
+    Primaerziel zugeschlagen. Das Etikett steht als ``_domain`` im JSON, analog
+    zum vorhandenen ``{"vhost": ..., "result": ...}`` bei header_check.
+
+    Zwei Festlegungen:
+    - Der Schluessel heisst ``_domain`` und nicht ``domain``: securitytrails,
+      otx, urlhaus und shodan_domain fuehren ``domain`` bereits als Nutzdaten.
+    - Das Etikett steht vorn, damit es die Laengenkappung ueberlebt. Ein
+      abgeschnittenes JSON ist ohnehin nicht mehr lesbar, dann faellt der
+      Leser auf das bisherige Verhalten zurueck.
+    """
+    if isinstance(payload, dict) and domain:
+        payload = {"_domain": domain, **payload}
+    return json.dumps(payload, ensure_ascii=False)[:limit]
 
 
 def record_tool_run(

@@ -18,7 +18,14 @@ E Konfiguration und Informations-Hygiene.
 Entscheidungen DC (19.09.2026): FTP ohne `requires SSL` ist ein Klartext-Befund, POP3/IMAP ohne
 Faehigkeiten sind nicht pruefbar; Exchange Subscription Edition gilt als gepflegt (Build-
 Tabelle S1); Werkzeuge mit Abdeckung `not_in_package` ergeben `not_applicable`; ZAP ohne
-Alerts ist nicht pruefbar (`zap_no_alerts`), keine S1-Korrektur in S2.
+Alerts ist nicht pruefbar (`zap_no_alerts`).
+
+Nachtrag S2b (20.09.2026, Issue #13): die Korrektur sitzt jetzt in S1. `tool_coverage`
+fuehrt `zap` mit Status `ok` und null Alerts als `empty` mit Grund `zap_no_alerts`. Die
+sieben Gruppenregeln `NT group: len(http.alerts) == 0` sind deshalb zurueckgebaut; die
+Pruefungen kommen ueber `requires.tools: [zap]` und die Abdeckung zum selben Ergebnis mit
+demselben Text. Der Rueckbau war erst nach der S1-Korrektur zulaessig: ohne sie waeren die
+sieben Pruefungen bei `positive_when: never` still auf `pass` gefallen.
 
 Konventionen der Spalte "Bedingung und Hinweise": `A:` applicable_when, `I:` item_when,
 `W:` when, `P:` positive_when, `NT:` not_testable_when (Kontext und reason_code), `R:`
@@ -91,13 +98,13 @@ heisst: in den Golden-Daten nie pruefbar, Nachweis nur ueber Fixtures.
 | service_banner_version | banner_version_disclosure | E | hygiene | niedrig | host | service | never | not_testable | banner_disclosure | - | SP-DISC-001 LOW | W: has_version(service.version_raw) and service.port not in WEB_PORTS. R: nmap. T: "{host_ip}:{port} ({product} {version})". |
 | http_header_disclosure | banner_version_disclosure | E | hygiene | niedrig | fqdn | http | never | not_testable | banner_disclosure | - | SP-DISC-001 LOW | W: has_version(http.server_header) or has_version(http.powered_by) or http.x_feserver is not None. R: header_check. T: "{fqdn} ({disclosure_headers})". |
 | cookie_flags | cookie_flags | D | hygiene | niedrig | fqdn | http.cookies | never | not_testable | web_header_hygiene | - | SP-COOK-001 MEDIUM bis SP-COOK-005 INFO | W: cookie.secure is False or cookie.httponly is False. R: header_check. T: "{fqdn} ({name}: {flags_missing})". Abweichung: Sitzungs- und Tracking-Cookies sind von aussen nicht unterscheidbar, daher einheitlich niedrig. |
-| csrf_token_missing | csrf_token_missing | D | hygiene | niedrig | fqdn | http.alerts | never | not_testable | web_header_hygiene | - | SP-CSRF-001 INFO | Erledigt (Hauptsession). W: zap_match(alert, ZAP_CSRF). NT group: http is not None and len(http.alerts) == 0 -> zap_no_alerts. R: zap. |
-| info_disclosure | info_disclosure | E | hygiene | niedrig | fqdn | http.alerts | never | not_testable | tool_findings_unrated | - | SP-DISC-009 LOW | W: zap_match(alert, ZAP_INFO_DISCLOSURE). NT group: http is not None and len(http.alerts) == 0 -> zap_no_alerts. R: zap. T: "{fqdn} ({name})". |
-| js_library_outdated | js_library_outdated | D | hygiene | mittel | fqdn | http.alerts | never | not_testable | tool_findings_unrated | - | SP-JS-001 MEDIUM | W: zap_match(alert, ZAP_JS_LIBRARY). NT group: http is not None and len(http.alerts) == 0 -> zap_no_alerts. R: zap. T: "{fqdn} ({name}, {risk})". |
-| directory_listing | directory_listing | E | hygiene | mittel | fqdn | http.alerts | never | not_testable | - | - | SP-DISC-005 LOW | W: zap_match(alert, ZAP_DIRECTORY_LISTING). NT group: http is not None and len(http.alerts) == 0 -> zap_no_alerts. R: zap. T: "{fqdn} ({url_path})". Abweichung: catalog_sim mittel. Fixture-only. |
-| session_in_url | session_in_url | D | hygiene | mittel | fqdn | http.alerts | never | not_testable | web_header_hygiene | - | catalog_sim R-ZAP mittel | W: zap_match(alert, ZAP_SESSION_URL). NT group: http is not None and len(http.alerts) == 0 -> zap_no_alerts. R: zap. T: "{fqdn} ({url_path})". |
-| cors_misconfiguration | cors_misconfiguration | D | hygiene | mittel | fqdn | http.alerts | never | not_testable | web_header_hygiene | - | SP-CORS-001 MEDIUM | W: zap_match(alert, ZAP_CORS). NT group: http is not None and len(http.alerts) == 0 -> zap_no_alerts. R: zap. T: "{fqdn} ({name})". |
-| sri_missing | sri_missing | D | hygiene | niedrig | fqdn | http.alerts | never | not_testable | web_header_hygiene | - | SP-SRI-001 LOW | W: zap_match(alert, ZAP_SRI). NT group: http is not None and len(http.alerts) == 0 -> zap_no_alerts. R: zap. T: "{fqdn} ({url_path})". |
+| csrf_token_missing | csrf_token_missing | D | hygiene | niedrig | fqdn | http.alerts | never | not_testable | web_header_hygiene | - | SP-CSRF-001 INFO | Erledigt (Hauptsession). W: zap_match(alert, ZAP_CSRF). R: zap (Abdeckung `empty/zap_no_alerts` macht die Pruefung nicht pruefbar). |
+| info_disclosure | info_disclosure | E | hygiene | niedrig | fqdn | http.alerts | never | not_testable | tool_findings_unrated | - | SP-DISC-009 LOW | W: zap_match(alert, ZAP_INFO_DISCLOSURE). R: zap (Abdeckung `empty/zap_no_alerts` macht die Pruefung nicht pruefbar). T: "{fqdn} ({name})". |
+| js_library_outdated | js_library_outdated | D | hygiene | mittel | fqdn | http.alerts | never | not_testable | tool_findings_unrated | - | SP-JS-001 MEDIUM | W: zap_match(alert, ZAP_JS_LIBRARY). R: zap (Abdeckung `empty/zap_no_alerts` macht die Pruefung nicht pruefbar). T: "{fqdn} ({name}, {risk})". |
+| directory_listing | directory_listing | E | hygiene | mittel | fqdn | http.alerts | never | not_testable | - | - | SP-DISC-005 LOW | W: zap_match(alert, ZAP_DIRECTORY_LISTING). R: zap (Abdeckung `empty/zap_no_alerts` macht die Pruefung nicht pruefbar). T: "{fqdn} ({url_path})". Abweichung: catalog_sim mittel. Fixture-only. |
+| session_in_url | session_in_url | D | hygiene | mittel | fqdn | http.alerts | never | not_testable | web_header_hygiene | - | catalog_sim R-ZAP mittel | W: zap_match(alert, ZAP_SESSION_URL). R: zap (Abdeckung `empty/zap_no_alerts` macht die Pruefung nicht pruefbar). T: "{fqdn} ({url_path})". |
+| cors_misconfiguration | cors_misconfiguration | D | hygiene | mittel | fqdn | http.alerts | never | not_testable | web_header_hygiene | - | SP-CORS-001 MEDIUM | W: zap_match(alert, ZAP_CORS). R: zap (Abdeckung `empty/zap_no_alerts` macht die Pruefung nicht pruefbar). T: "{fqdn} ({name})". |
+| sri_missing | sri_missing | D | hygiene | niedrig | fqdn | http.alerts | never | not_testable | web_header_hygiene | - | SP-SRI-001 LOW | W: zap_match(alert, ZAP_SRI). R: zap (Abdeckung `empty/zap_no_alerts` macht die Pruefung nicht pruefbar). T: "{fqdn} ({url_path})". |
 | waf_present | waf_present | D | hygiene | niedrig | fqdn | fqdn | expr | pass_silent | - | - | neu (S2-Auftrag, positiv) | W: null (kein Fail moeglich). P: fqdn.waf is not None and fqdn.waf.detected is True. R: wafw00f. T: "{fqdn} ({waf_name})". Positiv: Web Application Firewall vorhanden; ohne WAF stummes pass. |
 
 ## Zuordnung zur Soll-Liste (expected/junkerwerk.json)

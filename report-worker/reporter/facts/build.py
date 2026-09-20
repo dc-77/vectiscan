@@ -149,7 +149,7 @@ def build_from_bundle(bundle: ScanBundle) -> S.Facts:
     services = _build_services(ctx, all_ips)
     tls = _build_tls(ctx, all_ips, inv_by_ip)
     http = _build_http(ctx, all_ips, inv_by_ip)
-    dns = _build_dns(ctx, primary_domain)
+    dns = _build_dns(ctx, [primary_domain, *extra_domains])
     _software_from_profiles(ctx, all_ips)
     software = _finish_software(ctx)
     passive = _build_passive(ctx, all_ips, inv_by_ip, primary_domain)
@@ -297,11 +297,15 @@ def _build_targets(ctx: _Ctx, inv_hosts: list[dict]) -> tuple[list[S.TargetFact]
     facts: list[S.TargetFact] = []
     for i, dom in enumerate(domains):
         ev = [S.Evidence(tool="host_inventory", ref=b.refs.get("host_inventory", ""), excerpt=f"domain={dom}")]
+        # Issue #12: WHOIS laeuft seit S2b auch fuer jede weitere Domain.
+        # Aeltere Scans haben dafuer nichts, dann bleibt es bei None.
+        dom_whois = (whois if i == 0
+                     else _whois((b.passive_by_domain.get(dom) or {}).get("whois")))
         facts.append(S.TargetFact(
             id=f"target:{dom}", source="host_inventory" if i == 0 else b.targets_source, mode="active",
             observed_at=ctx.started or ctx.finished, confidence=S.CONFIDENCE_TOOL, evidence=ev,
             domain=dom, is_primary=(i == 0), targets_source=b.targets_source,
-            whois=whois if i == 0 else None,
+            whois=dom_whois,
             discovery_health=b.host_inventory.get("discovery_health") if i == 0 else None,
             out_of_scope=out_of_scope if i == 0 else [],
         ))
@@ -354,6 +358,14 @@ def _build_hosts(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> tuple
             sig.zap_spider_urls = h.zap_spider_summary["urls_found"]
         elif h and h.zap_spider_urls is not None:
             sig.zap_spider_urls = len(h.zap_spider_urls)
+        # Issue #13: Alertzahl aus dem Tar (Liste) oder aus der Zeile
+        # (Zusammenfassung mit total_alerts). Nur wenn eine der beiden Quellen
+        # vorliegt, ist die Zahl belastbar; sonst bleibt sie None und die
+        # Abdeckung aendert sich nicht.
+        if h and h.zap_alerts is not None:
+            sig.zap_alerts_total = len(h.zap_alerts)
+        elif h and isinstance((h.zap_summary or {}).get("total_alerts"), int):
+            sig.zap_alerts_total = h.zap_summary["total_alerts"]
         if inv.get("blocked") is True:
             sig.inventory_blocked = S.Blocked(detected=True, reason=str(inv.get("blocked_reason") or "blocked")[:160],
                                               source="inventory")
@@ -426,13 +438,24 @@ def _bool_or_none(v: Any) -> Optional[bool]:
 
 
 def _headers_by_vhost(ctx: _Ctx, ip: str) -> dict[str, dict[str, Any]]:
-    """Header-Ergebnisse je VHost: Zeilen zuerst, dann die Tar-Datei (nur letzter VHost)."""
+    """Header-Ergebnisse je VHost, in fester Rangfolge.
+
+    1. Tar-Datei je VHost (Issue #10, seit S2b) — das ungekuerzte Original.
+    2. ``scan_results``-Zeile je VHost — auf 50000 Zeichen gekappt und im
+       Snapshot zusaetzlich normalisiert.
+    3. Legacy ``headers.json`` — nur der primaere VHost.
+
+    Beide Quellen beschreiben dieselbe Messung, die reichere gewinnt. Aeltere
+    Tars kennen Stufe 1 nicht, dort bleibt die bisherige Reihenfolge.
+    """
     h = ctx.b.hosts.get(ip)
     out: dict[str, dict[str, Any]] = {}
     if h is None:
         return out
-    for vh, res in h.headers_by_vhost.items():
+    for vh, res in h.headers_by_vhost_tar.items():
         out[vh] = res
+    for vh, res in h.headers_by_vhost.items():
+        out.setdefault(vh, res)
     if h.headers_json and isinstance(h.headers_json, dict):
         url = str(h.headers_json.get("url") or "")
         vh = urlsplit(url).hostname if url else None
@@ -747,8 +770,15 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
         if h is None:
             continue
         ts = ctx.testssl.get(ip)
-        # httpx-TLS-Bloecke (nur Tar)
-        for line in h.httpx_lines:
+        # httpx-TLS-Bloecke (nur Tar). Issue #10: seit S2b liegt je VHost eine
+        # eigene Datei daneben, httpx.json traegt nur den primaeren VHost.
+        httpx_tls_lines: list[tuple[dict[str, Any], str]] = [
+            (line, h.refs.get("httpx.json", "")) for line in h.httpx_lines
+        ]
+        for vh, lines in h.httpx_by_vhost_tar.items():
+            ref = h.httpx_ref_by_vhost.get(vh, "")
+            httpx_tls_lines.extend((line, ref) for line in lines)
+        for line, httpx_ref in httpx_tls_lines:
             tls = line.get("tls")
             if not isinstance(tls, dict) or not tls.get("probe_status", True):
                 continue
@@ -779,7 +809,7 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
             for token, keyname in (("tls13", "TLS1.3"), ("tls12", "TLS1.2"), ("tls11", "TLS1.1"), ("tls10", "TLS1.0")):
                 if ver == token and fact.protocols.get(keyname) is None:
                     fact.protocols[keyname] = True
-            fact.evidence.append(S.Evidence(tool="httpx", ref=h.refs.get("httpx.json", ""),
+            fact.evidence.append(S.Evidence(tool="httpx", ref=httpx_ref,
                                             excerpt=excerpt(f"{fqdn}:{port} tls={ver} cn={tls.get('subject_cn')} not_after={tls.get('not_after')} mismatched={tls.get('mismatched')}", 220)))
             fact.observed_at = iso_utc(line.get("timestamp")) or fact.observed_at
             facts[key] = fact
@@ -877,6 +907,11 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
             continue
         headers_map = _headers_by_vhost(ctx, ip)
         httpx_map: dict[str, dict[str, Any]] = {}
+        # Issue #10: Rangfolge wie bei den Headern — Tar-Datei je VHost vor
+        # der Legacy-Datei und vor der Zeile.
+        for vh, lines in h.httpx_by_vhost_tar.items():
+            if lines:
+                httpx_map.setdefault(vh, lines[0])
         for line in h.httpx_lines:
             vh = str(line.get("input") or line.get("host") or "").split("/")[0]
             if vh:
@@ -927,11 +962,17 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                     technologies.append(S.Tech(name=name, version=ver))
                     if name.strip().lower() in NON_SOFTWARE_TECH:
                         continue
-                    _add_software(ctx, ip, vh, name, ver, "httpx", h.refs.get("httpx.json") or ctx.run_ref("httpx", ip),
+                    _add_software(ctx, ip, vh, name, ver, "httpx",
+                                  h.httpx_ref_by_vhost.get(vh) or h.refs.get("httpx.json") or ctx.run_ref("httpx", ip),
                                   f"tech: {t}", S.CONFIDENCE_DERIVED)
             server = headers.get("server")
             powered = headers.get("x-powered-by")
-            ref_hdr = ctx.run_ref("header_check", ip, vh) if (h.headers_by_vhost.get(vh) is not None and ctx.runs.get(("header_check", ip))) else h.refs.get("headers.json", "")
+            # Issue #10: zeigt auf die VHost-Datei, wenn sie die Quelle war.
+            ref_hdr = (h.headers_ref_by_vhost.get(vh)
+                       or (ctx.run_ref("header_check", ip, vh)
+                           if (h.headers_by_vhost.get(vh) is not None
+                               and ctx.runs.get(("header_check", ip)))
+                           else h.refs.get("headers.json", "")))
             if server:
                 _add_software(ctx, ip, vh, server, None, "header_check" if res is not None else "redirect_probe",
                               ref_hdr or h.refs.get("tech_profile.json", ""), f"server: {server}", confidence)
@@ -944,7 +985,8 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                 _add_software(ctx, ip, vh, "ASP.NET", headers["x-aspnet-version"], "header_check" if res is not None else "redirect_probe",
                               ref_hdr or "", f"x-aspnet-version: {headers['x-aspnet-version']}", confidence)
             if line and line.get("webserver") and not server:
-                _add_software(ctx, ip, vh, str(line["webserver"]), None, "httpx", h.refs.get("httpx.json") or ctx.run_ref("httpx", ip),
+                _add_software(ctx, ip, vh, str(line["webserver"]), None, "httpx",
+                              h.httpx_ref_by_vhost.get(vh) or h.refs.get("httpx.json") or ctx.run_ref("httpx", ip),
                               f"webserver: {line['webserver']}", S.CONFIDENCE_DERIVED)
             alerts = alerts_by_host.pop(vh, [])
             paths = paths_by_host.get(vh, [])[:MAX_PATHS]
@@ -975,7 +1017,9 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                 ev.append(S.Evidence(tool="header_check", ref=ref_hdr, excerpt=excerpt(
                     f"{vh}: reachable={res.get('reachable')} score={res.get('score')} server={server} x-feserver={headers.get('x-feserver')}", 220)))
             if line:
-                ev.append(S.Evidence(tool="httpx", ref=h.refs.get("httpx.json") or ctx.run_ref("httpx", ip), excerpt=excerpt(
+                ev.append(S.Evidence(tool="httpx", ref=(h.httpx_ref_by_vhost.get(vh)
+                                                       or h.refs.get("httpx.json")
+                                                       or ctx.run_ref("httpx", ip)), excerpt=excerpt(
                     f"{vh}: status={line.get('status_code')} title={line.get('title')} webserver={line.get('webserver')} tech={line.get('tech')}", 240)))
             if rd and res is None:
                 ev.append(S.Evidence(tool="redirect_probe", ref=h.refs.get("tech_profile.json", ""), excerpt=excerpt(
@@ -1133,15 +1177,48 @@ def _spider_by_host(h) -> dict[str, int]:
 
 # ------------------------------------------------------------------ dns
 
-def _build_dns(ctx: _Ctx, domain: Optional[str]) -> list[S.DnsFact]:
+def _build_dns(ctx: _Ctx, domains: list[Optional[str]]) -> list[S.DnsFact]:
+    """Ein DnsFact je Domain der Order (Issue #12).
+
+    Bis S2b gab es nur das Primaerziel; fuer jede weitere Domain meldete der
+    Katalog `second_target_unlabeled`. Die Quellen des Primaerziels bleiben die
+    bisherigen Skalare, damit sein Fakt unveraendert bleibt; weitere Domains
+    lesen aus den `*_by_domain`-Maps, die nur neuere Scans fuellen.
+    """
     b = ctx.b
-    if not domain:
-        return []
-    dr = b.dns_records if isinstance(b.dns_records, dict) else {}
-    dnsf = b.host_inventory.get("dns_findings") if isinstance(b.host_inventory.get("dns_findings"), dict) else {}
-    ds = b.dns_security if isinstance(b.dns_security, dict) else {}
+    out: list[S.DnsFact] = []
+    for index, domain in enumerate(d for d in domains if d):
+        if index == 0:
+            fact = _dns_fact(
+                ctx, domain,
+                dr=b.dns_records if isinstance(b.dns_records, dict) else {},
+                ds=b.dns_security if isinstance(b.dns_security, dict) else {},
+                dnsf=(b.host_inventory.get("dns_findings")
+                      if isinstance(b.host_inventory.get("dns_findings"), dict) else {}),
+                zone_txt=b.zone_transfer_txt,
+                ref_dr=b.refs.get("dns_records", ""),
+                ref_ds=b.refs.get("dns_security", ""),
+            )
+        else:
+            fact = _dns_fact(
+                ctx, domain,
+                dr=b.dns_records_by_domain.get(domain) or {},
+                ds=b.dns_security_by_domain.get(domain) or {},
+                dnsf={},
+                zone_txt=b.zone_transfer_by_domain.get(domain),
+                ref_dr=b.refs.get(f"dns_records:{domain}", ""),
+                ref_ds=b.refs.get(f"dns_security:{domain}", ""),
+            )
+        if fact is not None:
+            out.append(fact)
+    return out
+
+
+def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
+              zone_txt: Optional[str], ref_dr: str, ref_ds: str) -> Optional[S.DnsFact]:
+    b = ctx.b
     if not dr and not dnsf and not ds:
-        return []
+        return None
     spf_raw = dr.get("spf") if dr.get("spf") is not None else dnsf.get("spf")
     spf = None
     if isinstance(spf_raw, str) and spf_raw.strip():
@@ -1176,7 +1253,7 @@ def _build_dns(ctx: _Ctx, domain: Optional[str]) -> list[S.DnsFact]:
         bimi = S.Bimi(present=_bool_or_none(ds["bimi"].get("bimi_present")))
     zt = None
     zt_allowed = _bool_or_none(dnsf.get("zone_transfer"))
-    ns_tested = re.findall(r"=== NS: (\S+) ===", b.zone_transfer_txt or "")
+    ns_tested = re.findall(r"=== NS: (\S+) ===", zone_txt or "")
     if zt_allowed is not None or ns_tested:
         zt = S.ZoneTransfer(allowed=zt_allowed, ns_tested=sorted(set(ns_tested)))
     dangling = []
@@ -1187,11 +1264,11 @@ def _build_dns(ctx: _Ctx, domain: Optional[str]) -> list[S.DnsFact]:
                                             reason=dc.get("reason")))
     ev = []
     if dr:
-        ev.append(S.Evidence(tool="dns_records", ref=b.refs.get("dns_records", ""), excerpt=excerpt(f"spf={spf_raw} dmarc={dr.get('dmarc')} dkim={dr.get('dkim')} mx={dr.get('mx')}", 240)))
+        ev.append(S.Evidence(tool="dns_records", ref=ref_dr, excerpt=excerpt(f"spf={spf_raw} dmarc={dr.get('dmarc')} dkim={dr.get('dkim')} mx={dr.get('mx')}", 240)))
     elif dnsf:
         ev.append(S.Evidence(tool="dns_records", ref=b.refs.get("host_inventory", ""), excerpt=excerpt(f"dns_findings: spf={spf_raw} dmarc={dnsf.get('dmarc')} dkim={dnsf.get('dkim')}", 240)))
     if ds:
-        ev.append(S.Evidence(tool="dns_security", ref=b.refs.get("dns_security", ""), excerpt=excerpt(
+        ev.append(S.Evidence(tool="dns_security", ref=ref_ds, excerpt=excerpt(
             f"dnssec_signed={(ds.get('dnssec') or {}).get('dnssec_signed')} caa={(ds.get('caa') or {}).get('has_caa')} mta_sts={(ds.get('mta_sts') or {}).get('has_policy')}", 200)))
     fact = S.DnsFact(
         id=f"dns:{domain}", source="dns_records", mode="active",
@@ -1202,7 +1279,7 @@ def _build_dns(ctx: _Ctx, domain: Optional[str]) -> list[S.DnsFact]:
         spf=spf, dmarc=dmarc, dkim=dkim, dnssec=dnssec, caa=caa, mta_sts=mta, tls_rpt=tlsrpt, dane=dane,
         bimi=bimi, zone_transfer=zt, dangling_cnames=dangling,
     )
-    return [fact]
+    return fact
 
 
 def _dmarc(policy: Optional[dict], raw: Any, sec: Optional[dict]) -> Optional[S.Dmarc]:

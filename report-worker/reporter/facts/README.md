@@ -100,22 +100,87 @@ alle VHosts unerreichbar, testssl ohne Verbindung, httpx leer. Web-Werkzeuge ein
 Hosts werden `blocked` statt `empty`/`failed`. Ohne Zeilen: eine Zeile `scan_results unknown
 no_tool_runs`; keine Erfindung aus Dateipraesenz.
 
-Multi-Target: domainweite Zeilen (`hostIp: null`) tragen keine Domain. `dns` gehoert zum
-Primaerziel, jede weitere Domain bekommt `coverage scope=domain status=unknown reason=
-second_target_unlabeled` und eine Warnung.
+Multi-Target: domainweite Zeilen tragen seit S2b ihre Domain als `_domain` im `rawOutput`
+und bekommen `scope=domain` (Issue #12). Zeilen ohne Etikett zaehlen wie bisher zum
+Primaerziel (`scope=scan`). Eine weitere Domain ohne eigene Zeilen bekommt weiterhin
+`coverage scope=domain status=unknown reason=second_target_unlabeled` und eine Warnung; so
+bleiben die historischen Tars (Junkerwerk) lesbar.
 
-## Datenfallen (Stand 18.09.2026, im Scanner nicht geaendert)
+## Tar-Aufbau
 
-1. nmap laeuft ohne `-6`; IPv6-Ziele werden als `invalid` uebersprungen, die Zeile bleibt
-   `ok` (`scan-worker/scanner/phase1.py:263-342`).
-2. testssl im Perimeter-Paket mit `--severity MEDIUM` (`phase2.py:1212`): das Tar-JSON traegt
-   nur MEDIUM+, "TLS 1.0 offered" (LOW) fehlt. Nur der Rohtext der Zeile hat die Protokolle;
-   ohne Zeilen bleiben Protokolle `None` und `tls.json_filtered` wird gesetzt.
-3. `headers.json` und `httpx.json` je Host werden je VHost ueberschrieben, nur der letzte
-   VHost bleibt (`phase2.py:1248-1298`). Je-VHost-Wahrheit nur in den `header_check`-Zeilen.
-4. `tech_enricher.py:151` liest `zap_spider.json`, Phase 2 schreibt `zap_spider_urls.json`:
-   die OWA-Build-Extraktion des Scanners ist tot; dieses Paket liest die Datei selbst.
-5. Der Freigabe-Job traegt weder `hostInventory` noch `correlatedFindings`; das Tar ist die
+Ein Roh-Tar traegt genau ein Wurzelverzeichnis `<orderId>/`, das beim Lesen abgeschnitten
+wird; alle `ref`-Angaben in den Fakten sind relativ dazu. Gelesen wird ueber `tarfile`, nie
+entpackt. Werkzeuge ohne Leser landen in `unprocessed`.
+
+```
+meta.json                                 orderId, domain, domains[], package,
+                                          startedAt, finishedAt, toolVersions[]
+phase0/host_inventory.json                hosts[], vhosts[], dns_findings, blocked
+phase0/dns_records.json                   SPF/DMARC/DKIM/MX/NS des Primaerziels
+phase0/dns_records_<domain>.json          dito je weiterer Domain (seit S2b)
+phase0/zone_transfer.txt                  AXFR-Versuche des Primaerziels
+phase0/zone_transfer_<domain>.txt         dito je weiterer Domain (seit S2b)
+phase0/host_strategy.json                 KI #1, nur Protokoll
+phase0/certspotter.json                   Passivquelle
+phase0/{crtsh,crtsh_raw,subfinder,dnsx_validation}.json, gobuster_dns.txt
+                                          Discovery-Rohdaten, werden nicht gelesen
+phase0a/dns_security.json                 DNSSEC/CAA/MTA-STS/TLS-RPT/DANE/BIMI (Primaerziel)
+phase0a/dns_security_<domain>.json        dito je weiterer Domain (seit S2b)
+phase0a/whois.json                        WHOIS des Primaerziels
+phase0a/whois_<domain>.json               dito je weiterer Domain (seit S2b)
+phase0a/{shodan_hosts,shodan_domain,abuseipdb,otx,securitytrails,urlhaus,
+         greynoise,summary,virustotal}.json      Passivquellen, auftragsweit
+phase3/correlated_findings.json           Liste
+phase3/enrichment.json                    NVD/EPSS/KEV/ExploitDB, steht nie in der DB
+phase3/ai_prioritization.json             KI, nur Protokoll
+hosts/<ip>/phase1/nmap.xml                Hauptquelle fuer Dienste
+hosts/<ip>/phase1/nmap.txt                Ausweichleser
+hosts/<ip>/phase1/tech_profile.json       inkl. KI#2-Feldern (nie Software-Fakt)
+hosts/<ip>/phase1/{webtech,wafw00f}.json
+hosts/<ip>/phase2/headers.json            primaerer VHost (Legacy-Name, v2-Reporter)
+hosts/<ip>/phase2/headers_<slug>.json     je VHost (seit S2b)
+hosts/<ip>/phase2/httpx.json              primaerer VHost, JSONL (Legacy-Name)
+hosts/<ip>/phase2/httpx_<slug>.json       je VHost, JSONL (seit S2b)
+hosts/<ip>/phase2/testssl.json            seit S2b ohne Severity-Filter
+hosts/<ip>/phase2/zap_alerts.json         Liste, im Snapshot eine Zusammenfassung
+hosts/<ip>/phase2/zap_spider_urls.json    Liste von URLs
+hosts/<ip>/phase2/{feroxbuster,ffuf_*,wpscan}.json
+hosts/<ip>/phase*/screenshot_<vhost>.png  in den Golden-Fixtures entfernt
+```
+
+Zwei Regeln fuer die Namen mit Suffix: der Suffix ist nur ein Eindeutigkeitsmerkmal
+(Wildcards und lange Namen werden gekuerzt und gehasht), die Zuordnung steht im Inhalt.
+Bei den VHost-Dateien ist das `url` beziehungsweise `input`, bei den Domain-Dateien der
+Schluessel `_domain`. Derselbe Schluessel steht in domainweiten `scan_results`-Zeilen,
+weil die Tabelle keine Domainspalte hat.
+
+## Datenfallen
+
+Behoben in Session S2b (gilt fuer Laeufe ab dem Deploy dieser Aenderung; die zehn
+Golden-Tars sind aelter und zeigen alle fuenf Faelle weiterhin):
+
+1. nmap lief ohne `-6`; IPv6-Ziele wurden als `invalid` uebersprungen, die Zeile blieb
+   `ok`. Jetzt setzt `phase1.run_nmap` den Schalter und meldet `failed` mit Grund
+   `target_invalid_ipv6`, wenn `runstats hosts total=0` sagt (Issue #8).
+2. testssl lief im Perimeter-Paket mit `--severity MEDIUM`, das Tar-JSON trug nur MEDIUM+.
+   Der Filter ist jetzt fuer alle Pakete leer; das JSON traegt auch die LOW- und OK-Zeilen,
+   die der Katalog fuer Protokolle und Cipher braucht (Issue #9). Bei alten Tars bleiben die
+   Protokolle `None` und `tls.json_filtered` wird gesetzt; der Rohtext der Zeile hilft.
+3. `headers.json` und `httpx.json` wurden je VHost ueberschrieben, nur der letzte blieb.
+   Jetzt schreibt jeder VHost `headers_<slug>.json` und `httpx_<slug>.json`; die alten
+   Namen bleiben und tragen deterministisch den primaeren VHost (Issue #10). Rangfolge im
+   Leser: VHost-Datei, dann `header_check`-Zeile, dann Legacy-Datei.
+4. `tech_enricher` las `zap_spider.json`, Phase 2 schreibt `zap_spider_urls.json`. Der
+   Dateiname ist korrigiert und der aus dem Build abgeleitete Wert schlaegt den KI#2-Wert
+   (Issue #11). Dieses Paket liest die Datei ohnehin selbst.
+5. Multi-Target: die zweite Domain bekam keine DNS- und Passivlaeufe und die domainweiten
+   Zeilen trugen kein Domainfeld. Jetzt laufen DNS, Zonentransfer, dns_security und WHOIS
+   je Domain, und jede domainweite Zeile traegt `_domain` (Issue #12). Kontingentpflichtige
+   Quellen (Shodan, SecurityTrails, VirusTotal) bleiben beim Primaerziel.
+
+Weiterhin gueltig:
+
+6. Der Freigabe-Job traegt weder `hostInventory` noch `correlatedFindings`; das Tar ist die
    einzige dauerhafte Quelle. `enrichment` steht nie in der DB.
 6. Snapshot-Zeilen sind durch `output_normalizer` gekuerzt (httpx ohne `tls`/`timestamp`).
 7. `meta.json` ist das Scanfenster; `orders.scan_finished_at` wird bei Freigabe ueberschrieben.

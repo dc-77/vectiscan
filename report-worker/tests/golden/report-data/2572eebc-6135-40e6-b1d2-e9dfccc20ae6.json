@@ -1290,8 +1290,8 @@
  "landscape_lead": "16 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 47,
-  "catalog_digest": "86748b11b13cd72522e3cb70dc6f2ac29a8e7fe75d1d7f77f7c98d71177f3bc3",
-  "catalog_version": "2026-09-19.2",
+  "catalog_digest": "60367c08db6b316c55448dbe1a504349c12fe1cf353a554591744216fce42610",
+  "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 16,
   "customer": "Auftraggeber",
@@ -1299,7 +1299,7 @@
   "domains": [
    "junkerwerk.de"
   ],
-  "facts_schema_version": "1.0.0",
+  "facts_schema_version": "1.0.1",
   "fqdns_total": 13,
   "hosts_ipv4": 5,
   "hosts_ipv6": 1,
@@ -1312,7 +1312,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-19.2",
+  "policy_version": "2026-09-20.1",
   "positives": 9,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1573,7 +1573,7 @@
     "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
    },
    {
-    "detail": "Betroffen: autodiscover.junkerwerk.de, cloud.junkerwerk.de (+rdgw-2016.junkerwerk.de, rdgw.junkerwerk.de, team.junkerwerk.de), junkerwerk.de, mail.junkerwerk.de, nachhaltigkeit.junkerwerk.de, openotp.junkerwerk.de und weitere.",
+    "detail": "Betroffen: autodiscover.junkerwerk.de, cloud.junkerwerk.de (+rdgw-2016.junkerwerk.de, rdgw.junkerwerk.de, team.junkerwerk.de), mail.junkerwerk.de, openotp.junkerwerk.de, outlook.junkerwerk.de, zap auf 217.243.248.28 und weitere.",
     "what": "Die passive Webanalyse lieferte keine Meldungen; Ergebnis nicht belastbar"
    },
    {

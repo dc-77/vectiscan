@@ -97,7 +97,7 @@ def test_tech_enricher_exchange_build_from_zap(tmp_path: Path) -> None:
 
     host_dir = tmp_path / "hosts" / "85.22.47.43"
     _write_phase2(host_dir, {
-        "zap_spider.json": {
+        "zap_spider_urls.json": {
             "urls": [
                 "https://owa.example/owa/",
                 "https://owa.example/owa/auth/15.1.2507/themes/resources/favicon.ico",
@@ -169,6 +169,105 @@ def test_tech_enricher_idempotent(tmp_path: Path) -> None:
     assert len(tp["technologies"]) == first_count
 
 
+# ---------------------------------------------------------------- Issue #11
+
+def test_tech_enricher_liest_nicht_mehr_zap_spider_json(tmp_path: Path) -> None:
+    """Der Defekt: gelesen wurde zap_spider.json, Phase 2 schreibt aber
+    zap_spider_urls.json. _read_json schluckt FileNotFoundError, deshalb war
+    die OWA-Build-Extraktion still tot."""
+    from scanner.tech_enricher import enrich_after_phase2
+
+    host_dir = tmp_path / "hosts" / "1.2.3.4"
+    _write_phase2(host_dir, {
+        # Genau der alte, nie geschriebene Name — darf nichts mehr bewirken.
+        "zap_spider.json": {
+            "urls": ["https://owa.example/owa/auth/15.2.2562/themes/x.png"],
+        },
+    })
+    tp = {
+        "ip": "1.2.3.4", "fqdns": ["owa.example"], "primary_vhost": "owa.example",
+        "cms": None, "cms_version": None, "technologies": [], "vhost_results": {},
+    }
+    stats = enrich_after_phase2([tp], str(tmp_path))
+    assert stats["exchange_hosts"] == 0
+    assert tp["cms"] is None
+
+
+def test_tech_enricher_build_schlaegt_ki2_wert(tmp_path: Path) -> None:
+    """Issue #11: bei Junkerwerk stand cms_version auf "2016" (KI #2), der
+    Spider zeigte Build 15.2.2562. Der Messwert hat Vorrang."""
+    from scanner.tech_enricher import enrich_after_phase2
+
+    host_dir = tmp_path / "hosts" / "1.2.3.4"
+    _write_phase2(host_dir, {
+        "zap_spider_urls.json": [
+            "https://mail.example/owa/auth/15.2.2562/themes/resources/x.png",
+        ],
+    })
+    tp = {
+        "ip": "1.2.3.4", "fqdns": ["mail.example"], "primary_vhost": "mail.example",
+        "cms": "Microsoft Exchange", "cms_version": "2016",
+        "technologies": [], "vhost_results": {"mail.example": {"cms": "Microsoft Exchange",
+                                                               "cms_version": "2016"}},
+    }
+    enrich_after_phase2([tp], str(tmp_path))
+
+    assert tp["cms_version"] == "15.2.2562"
+    assert tp["cms_details"]["replaced_ai_version"] == "2016"
+    assert tp["vhost_results"]["mail.example"]["cms_version"] == "15.2.2562"
+
+
+def test_tech_enricher_fasst_fremdes_cms_nicht_an(tmp_path: Path) -> None:
+    """Der Vorrang gilt nur fuer Exchange, nicht fuer ein anderes CMS."""
+    from scanner.tech_enricher import enrich_after_phase2
+
+    host_dir = tmp_path / "hosts" / "1.2.3.4"
+    _write_phase2(host_dir, {
+        "zap_spider_urls.json": ["https://wp.example/owa/auth/15.2.2562/x.png"],
+    })
+    tp = {
+        "ip": "1.2.3.4", "fqdns": ["wp.example"], "primary_vhost": "wp.example",
+        "cms": "WordPress", "cms_version": "6.8",
+        "technologies": [], "vhost_results": {},
+    }
+    enrich_after_phase2([tp], str(tmp_path))
+    assert tp["cms"] == "WordPress"
+    assert tp["cms_version"] == "6.8"
+
+
+def test_tech_enricher_liest_vhost_header_dateien(tmp_path: Path) -> None:
+    """Issue #10: headers.json traegt nur den primaeren VHost; die uebrigen
+    stehen in headers_<slug>.json und muessen mitgelesen werden."""
+    from scanner.tech_enricher import enrich_after_phase2
+
+    host_dir = tmp_path / "hosts" / "1.2.3.4"
+    _write_phase2(host_dir, {
+        "headers.json": {
+            "url": "https://www.example/",
+            "headers": {"server": "Microsoft-IIS/10.0"},
+        },
+        "headers_www.example.json": {
+            "url": "https://www.example/",
+            "headers": {"server": "Microsoft-IIS/10.0"},
+        },
+        "headers_mail.example.json": {
+            "url": "https://mail.example/",
+            "headers": {"x-owa-version": "15.2.2562.17"},
+        },
+    })
+    tp = {
+        "ip": "1.2.3.4", "fqdns": ["www.example", "mail.example"],
+        "primary_vhost": "www.example",
+        "cms": None, "cms_version": None, "technologies": [], "vhost_results": {},
+    }
+    stats = enrich_after_phase2([tp], str(tmp_path))
+
+    assert stats["exchange_hosts"] == 1
+    assert tp["cms_version"] == "15.2.2562.17"
+    techs = {(t["name"], t["version"]) for t in tp["technologies"]}
+    assert ("Microsoft Exchange", "15.2.2562.17") in techs
+
+
 def test_tech_enricher_eol_detector_endtoend(tmp_path: Path) -> None:
     """End-to-end: angereichertes Profil -> EOL-Detector liefert SP-EOL-001."""
     from datetime import date
@@ -180,7 +279,7 @@ def test_tech_enricher_eol_detector_endtoend(tmp_path: Path) -> None:
 
     host_dir = tmp_path / "hosts" / "85.22.47.43"
     _write_phase2(host_dir, {
-        "zap_spider.json": {
+        "zap_spider_urls.json": {
             "urls": ["https://owa.example/owa/auth/15.1.2507/themes/resources/x.png"],
         },
     })

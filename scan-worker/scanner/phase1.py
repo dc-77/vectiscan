@@ -260,6 +260,37 @@ def _parse_nmap_xml(xml_path: str) -> dict[str, Any]:
     return result
 
 
+def _nmap_hosts_total(xml_path: str) -> Optional[int]:
+    """`runstats/hosts/@total` aus dem nmap-XML, None wenn nicht lesbar."""
+    try:
+        root = ET.parse(xml_path).getroot()
+    except Exception:
+        return None
+    hosts_el = root.find("./runstats/hosts")
+    if hosts_el is None:
+        return None
+    total = hosts_el.get("total")
+    return int(total) if total and total.isdigit() else None
+
+
+def _nmap_status_check(ip: str, xml_path: str):
+    """status_check fuer run_tool: Exit 0 ohne gescanntes Ziel ist kein Erfolg.
+
+    Issue #8: bei einer IPv6-Adresse ohne `-6` schreibt nmap
+    `<target status="skipped" reason="invalid"/>` und `<hosts total="0"/>`,
+    endet aber mit Exit 0. Die Zeile stand dadurch auf `ok`, obwohl der Host
+    in keinem Lauf geprueft wurde.
+    """
+    def check(exit_code: int, _raw: str) -> Optional[tuple[str, Optional[str]]]:
+        if exit_code != 0:
+            return None
+        if _nmap_hosts_total(xml_path) == 0:
+            reason = "target_invalid_ipv6" if ":" in ip else "target_skipped"
+            return "failed", reason
+        return None
+    return check
+
+
 def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-ports 1000") -> dict[str, Any]:
     """Run nmap service/version scan against a host.
 
@@ -277,6 +308,11 @@ def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-por
 
     cmd = [
         "nmap",
+        # ── Adressfamilie ──────────────────────────────────────────────
+        # `-6` nur bei IPv6-Zielen; nmap verweigert den Schalter zusammen
+        # mit einem IPv4-Ziel. Ohne ihn ueberspringt nmap die Adresse als
+        # "invalid" und endet trotzdem mit Exit 0 (Issue #8).
+        *(["-6"] if ":" in ip else []),
         # ── Discovery ──────────────────────────────────────────────────
         # `-Pn` skip ICMP-Ping; wir wissen aus phase0 web_probe dass der
         # Host lebt. Spart 1-3s pro Host und vermeidet false-negative
@@ -333,10 +369,15 @@ def run_nmap(ip: str, scan_dir: str, order_id: str, nmap_ports: str = "--top-por
         host_ip=ip,
         phase=1,
         tool_name="nmap",
+        status_check=_nmap_status_check(ip, xml_path),
     )
 
     if exit_code != 0:
         log.warning("nmap_failed", ip=ip, exit_code=exit_code)
+        return {"open_ports": [], "services": []}
+
+    if _nmap_hosts_total(xml_path) == 0:
+        log.warning("nmap_target_not_scanned", ip=ip)
         return {"open_ports": [], "services": []}
 
     return _parse_nmap_xml(xml_path)

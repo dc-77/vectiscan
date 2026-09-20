@@ -44,6 +44,27 @@ def run_top_ports(
     if not ip_list:
         return {}
 
+    # Issue #8: nmap braucht `-6` fuer IPv6-Ziele und akzeptiert den Schalter
+    # nicht zusammen mit IPv4-Adressen. Gemischte Listen laufen deshalb in
+    # zwei Durchgaengen; das Ergebnis wird zusammengefuehrt.
+    v6 = [ip for ip in ip_list if ":" in ip]
+    v4 = [ip for ip in ip_list if ":" not in ip]
+    if v4 and v6:
+        out = _run_one_family(v4, False, top_ports, min_rate, timeout, ports)
+        out.update(_run_one_family(v6, True, top_ports, min_rate, timeout, ports))
+        return out
+    return _run_one_family(ip_list, bool(v6), top_ports, min_rate, timeout, ports)
+
+
+def _run_one_family(
+    ip_list: list[str],
+    ipv6: bool,
+    top_ports: int | None,
+    min_rate: int,
+    timeout: int,
+    ports: str | None,
+) -> dict[str, list[int]]:
+    """Ein nmap-Lauf fuer genau eine Adressfamilie."""
     cmd: list[str] = [
         "nmap", "-T4", "-Pn",
         "--max-retries", "2",
@@ -51,6 +72,8 @@ def run_top_ports(
         "-n",
         "--open",
     ]
+    if ipv6:
+        cmd.append("-6")
     if ports:
         cmd += ["-p", ports]
     elif top_ports is not None:
@@ -80,7 +103,11 @@ def parse_open_ports(nmap_xml: str) -> dict[str, list[int]]:
         return out
 
     for host in root.findall("host"):
+        # Issue #8: auch IPv6-Hosts uebernehmen, sonst faellt das Ergebnis
+        # eines `-6`-Laufs hier wieder heraus.
         addr_el = host.find("address[@addrtype='ipv4']")
+        if addr_el is None:
+            addr_el = host.find("address[@addrtype='ipv6']")
         if addr_el is None:
             continue
         ip = addr_el.get("addr")

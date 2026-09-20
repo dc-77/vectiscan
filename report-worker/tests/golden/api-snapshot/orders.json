@@ -3,6 +3,39 @@
   "orders": [
    {
     "businessImpactScore": null,
+    "createdAt": "2026-09-17T22:33:02.726Z",
+    "currentHost": null,
+    "currentTool": "uploading",
+    "domain": "dortmund-beach.com",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-17T23:09:08.826Z",
+    "hasReport": true,
+    "hostsCompleted": 1,
+    "hostsTotal": 1,
+    "id": "14272c00-1145-4675-9b4c-19ce2ead403b",
+    "isRescan": false,
+    "overallRisk": "HIGH",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 2,
+     "INFO": 2,
+     "LOW": 3,
+     "MEDIUM": 6
+    },
+    "startedAt": "2026-09-17T22:41:25.201Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "dortmund-beach.com"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
     "createdAt": "2026-09-17T11:45:16.146Z",
     "currentHost": null,
     "currentTool": "host_done",

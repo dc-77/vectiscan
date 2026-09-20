@@ -1241,8 +1241,8 @@
  "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 27,
-  "catalog_digest": "86748b11b13cd72522e3cb70dc6f2ac29a8e7fe75d1d7f77f7c98d71177f3bc3",
-  "catalog_version": "2026-09-19.2",
+  "catalog_digest": "60367c08db6b316c55448dbe1a504349c12fe1cf353a554591744216fce42610",
+  "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 14,
   "customer": "Auftraggeber",
@@ -1250,7 +1250,7 @@
   "domains": [
    "krause-computer.de"
   ],
-  "facts_schema_version": "1.0.0",
+  "facts_schema_version": "1.0.1",
   "fqdns_total": 11,
   "hosts_ipv4": 3,
   "hosts_ipv6": 0,
@@ -1263,7 +1263,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-19.2",
+  "policy_version": "2026-09-20.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1461,10 +1461,6 @@
    {
     "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
     "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
-   },
-   {
-    "detail": "Betroffen: filebrowser.krause-computer.de, jitsi.krause-computer.de, krause-computer.de, mx.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere.",
-    "what": "Die passive Webanalyse lieferte keine Meldungen; Ergebnis nicht belastbar"
    },
    {
     "detail": "Betroffen: transmission.krause-computer.de.",

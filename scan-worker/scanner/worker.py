@@ -212,10 +212,15 @@ def _process_job_multi_target(order_id: str, package: str = "perimeter") -> None
         set_scan_failed(order_id, "Keine freigegebenen Targets.")
         return
     primary = scope_module.derive_primary_domain(targets)
+    # Issue #12: bisher fiel hier alles ausser dem Primaerziel weg, und die
+    # zweite Domain hatte weder DNS- noch WHOIS-Fakten.
+    extra_domains = [d for d in scope_module.derive_domains(targets) if d != primary]
     scope_module.snapshot_run_targets(order_id, targets)
     log.info("multi_target_dispatch", order_id=order_id, primary=primary,
-             targets=len(targets))
-    _process_job(order_id, primary, package, multi_target_context={"targets": targets})
+             targets=len(targets), extra_domains=len(extra_domains))
+    _process_job(order_id, primary, package,
+                 multi_target_context={"targets": targets,
+                                       "extra_domains": extra_domains})
 
 
 def _process_job(order_id: str, domain: str, package: str = "perimeter",
@@ -259,10 +264,25 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     tool_versions = _collect_tool_versions()
     log.info("tool_versions_collected", count=len(tool_versions))
 
+    # Issue #12: alle Domains der Order, Primaerziel zuerst. Ueber den Deckel
+    # hinaus bekommt jede Domain eine skipped-Zeile statt stiller Auslassung.
+    from scanner.tools import record_tool_run as _record_tool_run
+
+    _extra_all: list[str] = list((multi_target_context or {}).get("extra_domains") or [])
+    extra_domains = _extra_all[:scope_module.MAX_EXTRA_DOMAINS]
+    for _skipped in _extra_all[scope_module.MAX_EXTRA_DOMAINS:]:
+        _record_tool_run(order_id, None, 0, "dns_records", "skipped",
+                         reason="too_many_domains",
+                         raw_output=json.dumps({"_domain": _skipped}))
+    all_domains = [domain, *extra_domains]
+
     # Write meta.json
     meta = {
         "orderId": order_id,
         "domain": domain,
+        # Ohne diese Liste sieht ein reiner Tar-Bau (ohne orders.json) nur die
+        # erste Domain (reporter/facts/sources.py).
+        "domains": all_domains,
         "package": package,
         "startedAt": datetime.now(timezone.utc).isoformat(),
         "toolVersions": tool_versions,
@@ -299,7 +319,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
         _phase_cursor["t"] = now
 
     # ── Phase 0a: Passive Intelligence (no contact to target) ──
-    from scanner.phase0a import run_phase0a, build_passive_intel_for_ai
+    from scanner.phase0a import (run_phase0a, build_passive_intel_for_ai,
+                                 run_domain_intel)
 
     phase0a_tools = config.get("phase0a_tools", [])
     phase0a_results: dict[str, Any] = {}
@@ -321,6 +342,17 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
 
         _check_timeout()
 
+    # Issue #12: WHOIS und die DNS-Sicherheitsabfragen fuer jede weitere
+    # Domain der Order. Kontingentpflichtige Quellen bleiben beim Primaerziel
+    # (Entscheidung DC 19.09.2026, siehe phase0a.DOMAIN_INTEL_TOOLS).
+    for extra_domain in extra_domains:
+        update_progress(order_id, "passive_intel", f"domain_intel:{extra_domain}")
+        try:
+            run_domain_intel(extra_domain, scan_dir, order_id, config)
+        except Exception as exc:
+            log.warning("domain_intel_error", domain=extra_domain, error=str(exc))
+        _check_timeout()
+
     _phase_checkpoint("phase0a")
 
     # ── Phase 0b: DNS Reconnaissance (active discovery) ────
@@ -330,7 +362,8 @@ def _process_job(order_id: str, domain: str, package: str = "perimeter",
     passive_seed = phase0a_results.get("passive_subdomains") or []
     update_progress(order_id, "dns_recon", "starting")
     host_inventory = run_phase0(domain, scan_dir, order_id, config,
-                                seed_subdomains=passive_seed)
+                                seed_subdomains=passive_seed,
+                                extra_domains=extra_domains)
 
     # ── Multi-Target: non-enumerate Targets dazumergen + Scope-Enforcement ──
     if multi_target_context:

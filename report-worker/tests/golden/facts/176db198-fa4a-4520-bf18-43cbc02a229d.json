@@ -4230,7 +4230,7 @@
    }
   ]
  },
- "schema_version": "1.0.0",
+ "schema_version": "1.0.1",
  "services": [
   {
    "auth_mechanisms": [],

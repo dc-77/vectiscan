@@ -50,6 +50,11 @@ _PERIMETER_BASE: dict[str, Any] = {
     "phase3_timeout": 300,        # 5 Minuten
     "total_timeout": 7200,        # 120 Minuten
     "zap_min_risk": "Low",            # Low+ alerts (skip Informational)
+    # Issue #9: kein --severity-Filter. Der Pruefkatalog braucht auch die
+    # OK-Zeilen ("TLS1.0 not offered"), sonst bleibt tls.protocols[...] None
+    # und es entsteht wegen der Dreiwertigkeit weder ein Befund noch eine
+    # Positivaussage. LOW allein genuegt dafuer nicht.
+    "testssl_severity": "",
 }
 
 
@@ -79,6 +84,7 @@ PACKAGE_CONFIG: dict[str, dict[str, Any]] = {
         "phase3_timeout": 120,        # 2 Minuten
         "total_timeout": 1200,        # 20 Minuten
         "zap_min_risk": "Low",            # Same as perimeter
+        "testssl_severity": "",           # Issue #9, siehe _PERIMETER_BASE
     },
 
     # ------------------------------------------------------------------

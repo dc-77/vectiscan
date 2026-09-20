@@ -11,13 +11,15 @@ Bump-Historie:
     2026-09-19.2  Session S3: Kundentexte auf echte Umlaute umgestellt (Titel, texts,
                   affected_template, COVERAGE_REASONS); Befund-Buendel unter bundles/
                   eingefuehrt und das Feld bundle je Pruefung gefuellt.
+    2026-09-20.1  S2b: Rueckbau der sieben Gruppenregeln `zap_no_alerts`. Die
+                  Abdeckung traegt den Fall seit Issue #13 selbst.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-19.2"
+CATALOG_VERSION = "2026-09-20.1"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"
