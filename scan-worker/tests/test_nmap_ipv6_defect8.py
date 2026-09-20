@@ -49,6 +49,30 @@ XML_SCANNED = """<?xml version="1.0"?>
 </nmaprun>
 """
 
+# S2c: nmap bricht ab, bevor es die Bilanz schreibt. Kein `runstats`, also
+# auch kein `hosts total` — und trotzdem Exit 0.
+XML_OHNE_RUNSTATS = """<?xml version="1.0"?>
+<nmaprun scanner="nmap">
+<target specification="2a01:4f8:d0a:3124::2" status="skipped" reason="invalid"/>
+</nmaprun>
+"""
+
+# Abgeschnittene Datei, wie sie ein harter Abbruch hinterlaesst.
+XML_KAPUTT = """<?xml version="1.0"?>
+<nmaprun scanner="nmap"><runstats><finished"""
+
+# S2c, Junkerwerk-Rescan 860d0d5a: nmap laeuft mit -6, zaehlt den Host wegen
+# -Pn als erreichbar und endet mit exit="success", schreibt aber keinen
+# Hostblock. Am XML ist das nicht von "Host lebt, kein Port offen" zu
+# unterscheiden (mit --open laesst nmap den Block dann ebenfalls weg, siehe
+# 217.243.248.27 im Golden-Tar 0bf16342). Unterschieden wird ueber die Route.
+XML_UP_OHNE_HOSTBLOCK = """<?xml version="1.0"?>
+<nmaprun scanner="nmap">
+<scaninfo type="connect" protocol="tcp" numservices="1000"/>
+<runstats><finished elapsed="0.32" exit="success"/><hosts up="1" down="0" total="1"/></runstats>
+</nmaprun>
+"""
+
 
 def _capture_nmap_cmd(xml_body: str):
     """Patcht run_tool in phase1, faengt die Kommandozeile, legt XML ab."""
@@ -132,6 +156,110 @@ def test_status_check_greift_nicht_bei_exit_ungleich_null(tmp_path):
     with patch("scanner.phase1.run_tool", side_effect=fake):
         phase1.run_nmap(IPV6, str(tmp_path), "order-1")
     assert captured["status_check"](2, "") is None
+
+
+# -------------------------------------------- Exit 0 ohne Bilanz (S2c)
+
+@pytest.mark.parametrize(
+    "xml_body, label",
+    [(XML_OHNE_RUNSTATS, "ohne runstats"), (XML_KAPUTT, "abgeschnittenes XML")],
+    ids=["ohne_runstats", "kaputtes_xml"],
+)
+def test_status_check_meldet_failed_ohne_bilanz(tmp_path, xml_body, label):
+    """Exit 0, aber nmap hat keine Bilanz hinterlassen: kein Erfolg.
+
+    Bis S2c lieferte `_nmap_hosts_total` hier `None`, und der Haken wertete
+    das als Erfolg. Der leere IPv6-Lauf im Junkerwerk-Rescan 860d0d5a stand
+    dadurch auf `ok`, also stiller als vor dem Fix zu Issue #8.
+    """
+    from scanner import phase1
+
+    captured, fake = _capture_nmap_cmd(xml_body)
+    with patch("scanner.phase1.run_tool", side_effect=fake):
+        result = phase1.run_nmap(IPV4, str(tmp_path), "order-1")
+
+    assert captured["status_check"](0, "") == ("failed", "nmap_no_runstats"), label
+    assert result == {"open_ports": [], "services": []}
+
+
+def test_status_check_meldet_failed_ohne_xml_datei(tmp_path):
+    """Gar keine Datei ist derselbe Fall wie eine unlesbare."""
+    from scanner import phase1
+
+    check = phase1._nmap_status_check(IPV4, str(tmp_path / "fehlt.xml"))
+    assert check(0, "") == ("failed", "nmap_no_runstats")
+
+
+# ------------------------------------------------- IPv6 ohne Route (S2c)
+
+def _xml_at(tmp_path, body: str) -> str:
+    path = tmp_path / "nmap.xml"
+    path.write_text(body, encoding="utf-8")
+    return str(path)
+
+
+def test_ipv6_ohne_route_meldet_no_ipv6_route(tmp_path):
+    """Bilanz sagt erreichbar, es gibt keinen Hostblock, und es fehlt die Route."""
+    from scanner import phase1
+
+    check = phase1._nmap_status_check(IPV6, _xml_at(tmp_path, XML_UP_OHNE_HOSTBLOCK))
+    with patch("scanner.phase1._ipv6_route_available", return_value=False):
+        assert check(0, "") == ("failed", "no_ipv6_route")
+
+
+def test_ipv6_mit_route_und_ohne_offenen_port_bleibt_ok(tmp_path):
+    """Derselbe XML-Befund ist bei vorhandener Route der legitime Fall."""
+    from scanner import phase1
+
+    check = phase1._nmap_status_check(IPV6, _xml_at(tmp_path, XML_UP_OHNE_HOSTBLOCK))
+    with patch("scanner.phase1._ipv6_route_available", return_value=True):
+        assert check(0, "") is None
+
+
+def test_ipv4_ohne_hostblock_bleibt_ok(tmp_path):
+    """217.243.248.27 im Tar 0bf16342: 23 Sekunden Scan, kein offener Port.
+
+    Die Routenpruefung gilt nur fuer IPv6-Ziele und darf hier nicht greifen.
+    """
+    from scanner import phase1
+
+    check = phase1._nmap_status_check(IPV4, _xml_at(tmp_path, XML_UP_OHNE_HOSTBLOCK))
+    with patch("scanner.phase1._ipv6_route_available", return_value=False) as route:
+        assert check(0, "") is None
+    route.assert_not_called()
+
+
+def test_ipv6_mit_hostblock_wird_nicht_angefasst(tmp_path):
+    """Sobald nmap einen Hostblock liefert, ist die Route offensichtlich da."""
+    from scanner import phase1
+
+    check = phase1._nmap_status_check(IPV6, _xml_at(tmp_path, XML_SCANNED))
+    with patch("scanner.phase1._ipv6_route_available", return_value=False) as route:
+        assert check(0, "") is None
+    route.assert_not_called()
+
+
+def test_route_pruefung_schickt_kein_paket():
+    """connect auf einem UDP-Socket loest nur die Routenwahl aus."""
+    from scanner import phase1
+
+    sock = MagicMock()
+    with patch("scanner.phase1.socket.socket", return_value=sock):
+        assert phase1._ipv6_route_available("2a01:4f8:d0a:3124::2") is True
+    sock.connect.assert_called_once_with(("2a01:4f8:d0a:3124::2", 80))
+    sock.send.assert_not_called()
+    sock.sendto.assert_not_called()
+    sock.close.assert_called_once()
+
+
+def test_route_pruefung_meldet_fehlende_route():
+    from scanner import phase1
+
+    sock = MagicMock()
+    sock.connect.side_effect = OSError(101, "Network is unreachable")
+    with patch("scanner.phase1.socket.socket", return_value=sock):
+        assert phase1._ipv6_route_available("2a01:4f8:d0a:3124::2") is False
+    sock.close.assert_called_once()
 
 
 # --------------------------------------------------- run_tool-Verdrahtung

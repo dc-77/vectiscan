@@ -94,6 +94,12 @@ Start und Done ist `ok`, auch bei exit 10/246; feroxbuster exit 1 mit JSONL ist 
 mit `target_invalid_ipv6`; Host oben ohne offene Ports ist `ok` mit `no_open_ports`; testssl
 `Can't connect` ist `failed connect`; header_check `reachable: false` ist `empty`.
 
+Zwei Gruende kommen seit S2c nur aus der Zeile, nicht aus dem Tar: `nmap_no_runstats`
+(Exit 0, aber keine Bilanz im XML) und `no_ipv6_route` (nmap lief mit `-6`, meldete
+`hosts up=1` und schrieb trotzdem keinen Hostblock, und der Scanner hatte keine Route
+zum Ziel). Beide setzt `phase1._nmap_status_check`. Aus dem Tar allein sind sie nicht
+ableitbar, siehe Datenfalle 6.
+
 Blockade in fester Reihenfolge: (1) Inventar `blocked` + `blocked_reason`
 (waf_block_detector), (2) Zeile `status = blocked`, (3) abgeleitet: nmap zeigt 80/443 offen,
 alle VHosts unerreichbar, testssl ohne Verbindung, httpx leer. Web-Werkzeuge eines blockierten
@@ -180,6 +186,20 @@ Golden-Tars sind aelter und zeigen alle fuenf Faelle weiterhin):
    Zeilen trugen kein Domainfeld. Jetzt laufen DNS, Zonentransfer, dns_security und WHOIS
    je Domain, und jede domainweite Zeile traegt `_domain` (Issue #12). Kontingentpflichtige
    Quellen (Shodan, SecurityTrails, VirusTotal) bleiben beim Primaerziel.
+
+Aufgefallen in Session S2c am Junkerwerk-Rescan 860d0d5a, dem ersten Fixture mit einem
+AAAA-Host:
+
+6. Ein nmap-Lauf mit `-6` ohne IPv6-Route im Scannernetz ist im Tar nicht von "Host lebt,
+   kein Port offen" zu unterscheiden. Beide schreiben `hosts up=1 total=1`,
+   `exit=success` und wegen `--open` keinen Hostblock; der Unterschied ist allein die
+   Laufzeit (0,32 Sekunden gegen 23 Sekunden bei 217.243.248.27 in 0bf16342). Der Leser
+   macht daraus in beiden Faellen `ok` mit `no_open_ports`, also eine Aussage ueber einen
+   Host, der im zweiten Fall nie erreicht wurde. Auf eine Zeitschwelle wird bewusst keine
+   Regel gebaut; stattdessen prueft `phase1._nmap_status_check` seit S2c die Route und
+   meldet `no_ipv6_route`. Tars ohne diese Zeile, also alle vor dem Deploy der Aenderung,
+   behalten die falsche Aussage. Issue #8 bleibt bis zur IPv6-Anbindung des Scannernetzes
+   offen.
 
 Weiterhin gueltig:
 

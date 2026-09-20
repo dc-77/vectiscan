@@ -114,6 +114,8 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     "zap_no_alerts": ("not_testable", "Die passive Webanalyse lieferte keine Meldungen; Ergebnis nicht belastbar."),
     "target_invalid_ipv6": ("not_testable", "IPv6-Adresse wurde vom Portscan nicht geprüft."),
     "target_skipped": ("not_testable", "Ziel wurde vom Portscan übersprungen."),
+    "nmap_no_runstats": ("not_testable", "Der Portscan hat keine Bilanz hinterlassen; Ergebnis nicht belastbar."),
+    "no_ipv6_route": ("not_testable", "Der Prüfstand hatte keine IPv6-Verbindung zu dieser Adresse; über IPv6 erreichbare Dienste konnten nicht geprüft werden."),
     "host_unreachable": ("not_testable", "Host war während des Scans nicht erreichbar."),
     "web_unreachable_after_portscan": ("not_testable", "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich."),
     "unreachable": ("not_testable", "Virtueller Host war über HTTP nicht erreichbar."),
