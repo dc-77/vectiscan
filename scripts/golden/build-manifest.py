@@ -90,6 +90,22 @@ ROLES: dict[str, tuple[list[str], str]] = {
         "gedeckt (Issue #14). feroxbuster und ffuf_param laufen hier ebenfalls, "
         "ffuf_sensitive laeuft in den Timeout",
     ),
+    "57b3ac85-a1da-47e9-b783-d28ad9a9fa35": (
+        ["golden"],
+        "lumbeck-wolter.de 20.09.2026, Pilotkunde mit schriftlicher Freigabe und "
+        "erster Fixture-Lauf nach den S2b-Scannerfixen. Ein Ziel, ein Host. Der "
+        "AAAA 2a01:4f8:d0a:668b::2 taucht im Lauf nicht auf: Haupt- und "
+        "www-Adresse teilen ihr FQDN-Set mit der A-Adresse, und die "
+        "Zusammenfassung in phase0 bevorzugt IPv4. Der Lauf belegt damit den "
+        "Dual-Stack-Defekt, nicht den IPv6-Scan",
+    ),
+    "860d0d5a-1086-4958-a9ac-4650423095f2": (
+        ["golden", "drift"],
+        "Junkerwerk Lauf 4, beide Domains, 20.09.2026. Erster Fixture-Lauf mit "
+        "einem AAAA-Host (2a01:4f8:d0a:3124::2) und erster mit den S2b-Fixen: DNS "
+        "je Domain (Issue #12), testssl ohne Severity-Filter (#9), Header und "
+        "httpx je VHost (#10). Vierter Lauf im Junkerwerk-Drift-Test",
+    ),
 }
 
 

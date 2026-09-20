@@ -3,6 +3,75 @@
   "orders": [
    {
     "businessImpactScore": null,
+    "createdAt": "2026-09-20T10:43:46.203Z",
+    "currentHost": null,
+    "currentTool": "uploading",
+    "domain": "multi-target (2)",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-20T11:18:54.510Z",
+    "hasReport": true,
+    "hostsCompleted": 4,
+    "hostsTotal": 4,
+    "id": "860d0d5a-1086-4958-a9ac-4650423095f2",
+    "isRescan": false,
+    "overallRisk": "HIGH",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 3,
+     "INFO": 1,
+     "LOW": 2,
+     "MEDIUM": 3
+    },
+    "startedAt": "2026-09-20T10:44:22.484Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 2,
+    "targets": [
+     {
+      "canonical": "junkerwerk.de"
+     },
+     {
+      "canonical": "junkerwerk.hu"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
+    "createdAt": "2026-09-20T10:42:35.092Z",
+    "currentHost": null,
+    "currentTool": "uploading",
+    "domain": "lumbeck-wolter.de",
+    "email": "redacted@example.invalid",
+    "error": null,
+    "finishedAt": "2026-09-20T10:58:46.697Z",
+    "hasReport": true,
+    "hostsCompleted": 1,
+    "hostsTotal": 1,
+    "id": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35",
+    "isRescan": false,
+    "overallRisk": "HIGH",
+    "package": "perimeter",
+    "severityCounts": {
+     "CRITICAL": 0,
+     "HIGH": 1,
+     "INFO": 0,
+     "LOW": 0,
+     "MEDIUM": 3
+    },
+    "startedAt": "2026-09-20T10:44:09.048Z",
+    "status": "pending_review",
+    "subscriptionId": null,
+    "targetCount": 1,
+    "targets": [
+     {
+      "canonical": "lumbeck-wolter.de"
+     }
+    ]
+   },
+   {
+    "businessImpactScore": null,
     "createdAt": "2026-09-17T22:33:02.726Z",
     "currentHost": null,
     "currentTool": "uploading",

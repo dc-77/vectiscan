@@ -1,0 +1,416 @@
+{
+ "data": {
+  "businessImpactScore": 0,
+  "correlationCount": 0,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "lumbeck-wolter.de",
+  "error": null,
+  "estimatedDuration": "~60–90 Minuten",
+  "finishedAt": "2026-09-20T10:58:46.697Z",
+  "hasReport": true,
+  "id": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35",
+  "isRescan": false,
+  "overallRisk": "HIGH",
+  "package": "perimeter",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "bimi": {
+     "bimi_present": false,
+     "issues": [],
+     "logo_url": null,
+     "vmc_url": null
+    },
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dane_tlsa": {
+     "has_https_dane": false,
+     "has_smtp_dane": false,
+     "https_tlsa": null,
+     "smtp_tlsa": {}
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": false,
+     "fo": null,
+     "issues": [],
+     "p": null,
+     "pct": 100,
+     "raw": null,
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/lumbeck-wolter.de",
+     "domain": "lumbeck-wolter.de",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/lumbeck-wolter.de"
+    }
+   },
+   "passive_subdomains": [
+    "www.lumbeck-wolter.de"
+   ],
+   "securitytrails": {
+    "dns_history": [],
+    "domain": null,
+    "subdomains": []
+   },
+   "shodan_domain": {
+    "domain": "lumbeck-wolter.de",
+    "records": [
+     {
+      "last_seen": "2026-09-17T12:09:29.028000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "",
+      "type": "A",
+      "value": "116.202.77.64"
+     },
+     {
+      "last_seen": "2026-09-17T12:25:45.665000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "",
+      "type": "AAAA",
+      "value": "2a01:4f8:d0a:668b::2"
+     },
+     {
+      "last_seen": "2026-09-15T13:29:52.390000",
+      "options": {
+       "priority": 10,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx01.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-09-15T13:29:52.390000",
+      "options": {
+       "priority": 20,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx02.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-09-15T13:29:52.390000",
+      "options": {
+       "priority": 30,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx03.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-09-15T13:29:52.390000",
+      "options": {
+       "priority": 40,
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "MX",
+      "value": "mx04.hornetsecurity.com"
+     },
+     {
+      "last_seen": "2026-09-15T13:28:39.692000",
+      "options": {
+       "ttl": 86377
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1119.ui-dns.biz"
+     },
+     {
+      "last_seen": "2026-09-15T13:28:39.692000",
+      "options": {
+       "ttl": 86377
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1119.ui-dns.com"
+     },
+     {
+      "last_seen": "2026-09-15T13:28:39.692000",
+      "options": {
+       "ttl": 86377
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1119.ui-dns.de"
+     },
+     {
+      "last_seen": "2026-09-15T13:28:39.692000",
+      "options": {
+       "ttl": 86377
+      },
+      "subdomain": "",
+      "type": "NS",
+      "value": "ns1119.ui-dns.org"
+     },
+     {
+      "last_seen": "2026-09-15T13:30:32.721000",
+      "options": {
+       "expires": 604800,
+       "hostmaster": "hostmaster.1und1.de",
+       "minttl": 300,
+       "refresh": 28800,
+       "retry": 7200,
+       "serial": 2016041957,
+       "ttl": 86400
+      },
+      "subdomain": "",
+      "type": "SOA",
+      "value": "ns1119.ui-dns.de"
+     },
+     {
+      "last_seen": "2026-09-15T13:30:07.001000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all"
+     },
+     {
+      "last_seen": "2026-09-15T13:30:07.001000",
+      "options": {
+       "ttl": 3600
+      },
+      "subdomain": "",
+      "type": "TXT",
+      "value": "v=verifydomain MS=8061464"
+     },
+     {
+      "last_seen": "2026-09-17T12:09:29.028000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "www",
+      "type": "A",
+      "value": "116.202.77.64"
+     },
+     {
+      "last_seen": "2026-09-17T12:25:45.674000",
+      "options": {
+       "ttl": 60
+      },
+      "subdomain": "www",
+      "type": "AAAA",
+      "value": "2a01:4f8:d0a:668b::2"
+     }
+    ],
+    "subdomains": [
+     "www"
+    ]
+   }
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 5,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 2,
+      "crtsh": 1,
+      "gobuster_dns": 3,
+      "phase0a_passive": 1,
+      "subfinder": 1
+     },
+     "tools_with_zero_results": [],
+     "total_subdomains": 5
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": true,
+     "dmarc": null,
+     "mx": [
+      "mx03.hornetsecurity.com",
+      "mx02.hornetsecurity.com",
+      "mx04.hornetsecurity.com",
+      "mx01.hornetsecurity.com"
+     ],
+     "ns": [
+      "ns1119.ui-dns.biz",
+      "ns1119.ui-dns.org",
+      "ns1119.ui-dns.com",
+      "ns1119.ui-dns.de"
+     ],
+     "spf": "v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all",
+     "zone_transfer": false
+    },
+    "domain": "lumbeck-wolter.de",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain mit primärem VHost (www.lumbeck-wolter.de, Status 200, E-Commerce-Shop). Passive Intel zeigt exponierte Management-Ports (22, 21, 3306, 5432) und veraltete Datenbank-Versionen (MariaDB 10.11, PostgreSQL 9.6) — kritische Schwachstellen-Kandidaten. Fehlende DMARC trotz SPF/DKIM erhöht Phishing-Risiko. Scan erforderlich.",
+      "fqdns": [
+       "lumbeck-wolter.de",
+       "www.lumbeck-wolter.de"
+      ],
+      "ip": "116.202.77.64",
+      "passive_intel": {
+       "abuseipdb_score": 0,
+       "dnssec_signed": false,
+       "is_tor": false,
+       "otx_pulse_count": 0,
+       "shodan_ports": [
+        993,
+        995,
+        3306,
+        587,
+        110,
+        143,
+        80,
+        465,
+        21,
+        22,
+        5432,
+        25,
+        443,
+        4190
+       ],
+       "shodan_services": {
+        "3306": "MariaDB 10.11.18-MariaDB-0+deb12u1",
+        "443": "Apache httpd",
+        "5432": "PostgreSQL 9.6.0 or later",
+        "80": "Apache httpd"
+       },
+       "tlsrpt_present": false
+      },
+      "rdns": "dedi5705.your-server.de",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [
+         {
+          "fqdn": "lumbeck-wolter.de",
+          "reason": "redirect",
+          "status": 200
+         }
+        ],
+        "body_hash": "7f220f4905a07a608f22a190a54288a5ff08ec5ce7779503baf754e8f4c84a71",
+        "final_url": "https://www.lumbeck-wolter.de",
+        "fqdn": "www.lumbeck-wolter.de",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Lumbeck & Wolter vertreibt Schneidwerkzeuge für Fleischwölfe mit Apache httpd.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter"
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://www.lumbeck-wolter.de",
+       "has_web": true,
+       "status": 200,
+       "title": "Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter",
+       "web_fqdn": "www.lumbeck-wolter.de"
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 1,
+   "hostsTotal": 1,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 1,
+   "INFO": 0,
+   "LOW": 0,
+   "MEDIUM": 3
+  },
+  "startedAt": "2026-09-20T10:44:09.048Z",
+  "status": "pending_review",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "warn",
+   "passed": true,
+   "warning_count": 2,
+   "warnings": [
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "SFTP",
+      "title": "ProFTPD (Port 21) mit Klartext-FTP öffentlich erreichbar auf 116.202.77.64",
+      "title_token": "FTP"
+     },
+     "finding_id": "VS-2026-002",
+     "message": "Title nennt FTP, Body beschreibt SFTP (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    },
+    {
+     "check": "consistency",
+     "detail": {
+      "body_token": "DKIM",
+      "title": "SPF-Record fehlt fuer lumbeck-wolter.de",
+      "title_token": "SPF"
+     },
+     "finding_id": "VS-2026-004",
+     "message": "Title nennt SPF, Body beschreibt DKIM (moegliche Service-Verwechslung — Admin-Review)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

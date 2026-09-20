@@ -1,7 +1,7 @@
 {
  "beschreibung": "Golden-Fixtures fuer den Report-Umbau (spec/05 bis 07, Session S0c). Dateinamen tragen nur Auftrags-UUIDs, also keine Kundennamen. Domains bleiben in den Daten stehen, weil die Fakten sonst wertlos sind. Screenshots sind aus allen Tars entfernt (spec/07 Abschnitt 1).",
- "api_snapshot_orders": 40,
- "tars_erwartet": 11,
+ "api_snapshot_orders": 42,
+ "tars_erwartet": 13,
  "tars_vorhanden": 11,
  "orders": [
   {
@@ -265,6 +265,48 @@
     "sha256": "b7e1377d8696ea1b4d982542189aa530032431cb7dbdbf5830baed976a035bd6",
     "members": 41,
     "images": 0
+   }
+  },
+  {
+   "order_id": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35",
+   "domains": [
+    "lumbeck-wolter.de"
+   ],
+   "package": "perimeter",
+   "created": "2026-09-20T10:42:35.092Z",
+   "started": "2026-09-20T10:44:09.048Z",
+   "finished": "2026-09-20T10:58:46.697Z",
+   "roles": [
+    "golden"
+   ],
+   "note": "lumbeck-wolter.de 20.09.2026, Pilotkunde mit schriftlicher Freigabe und erster Fixture-Lauf nach den S2b-Scannerfixen. Ein Ziel, ein Host. Der AAAA 2a01:4f8:d0a:668b::2 taucht im Lauf nicht auf: Haupt- und www-Adresse teilen ihr FQDN-Set mit der A-Adresse, und die Zusammenfassung in phase0 bevorzugt IPv4. Der Lauf belegt damit den Dual-Stack-Defekt, nicht den IPv6-Scan",
+   "negative_entries": 0,
+   "api_snapshot": true,
+   "tar": {
+    "present": false,
+    "reason": "Export noch nicht gelaufen"
+   }
+  },
+  {
+   "order_id": "860d0d5a-1086-4958-a9ac-4650423095f2",
+   "domains": [
+    "junkerwerk.de",
+    "junkerwerk.hu"
+   ],
+   "package": "perimeter",
+   "created": "2026-09-20T10:43:46.203Z",
+   "started": "2026-09-20T10:44:22.484Z",
+   "finished": "2026-09-20T11:18:54.510Z",
+   "roles": [
+    "golden",
+    "drift"
+   ],
+   "note": "Junkerwerk Lauf 4, beide Domains, 20.09.2026. Erster Fixture-Lauf mit einem AAAA-Host (2a01:4f8:d0a:3124::2) und erster mit den S2b-Fixen: DNS je Domain (Issue #12), testssl ohne Severity-Filter (#9), Header und httpx je VHost (#10). Vierter Lauf im Junkerwerk-Drift-Test",
+   "negative_entries": 0,
+   "api_snapshot": true,
+   "tar": {
+    "present": false,
+    "reason": "Export noch nicht gelaufen"
    }
   }
  ]
