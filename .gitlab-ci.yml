@@ -1068,6 +1068,54 @@ ops-render-v3:
     - docker compose exec -T report-worker rm -f "/tmp/${RENDER_ORDER_ID}-v3.pdf"
     - ls -l ${CI_PROJECT_DIR}/render-v3/ || true
 
+# =============================================================================
+# OPS-GATE-BLOCKED (S5) — Abnahme des Berichts-Gates.
+#
+# Faehrt das Gate gegen eine vorhandene Order und beschaedigt die Reportdaten
+# dabei gezielt im Speicher (nie ein Tar, nie eine Faktendatei). Ohne
+# GATE_APPLY wird nur ausgegeben; mit GATE_APPLY=ja landet die Order auf
+# report_blocked und die Defektliste ist im Admin-Review sichtbar.
+#
+# Zurueck geht es ueber den Knopf "Regenerieren nach Fix" im Admin-Review.
+#
+# Pipeline-Variablen:
+#   GATE_ORDER_ID  Order-UUID (nur eigene Nachweis-Orders, nie ein Kunde)
+#   GATE_DAMAGE    abdeckung | tech | ids | keine   (Vorgabe: abdeckung)
+#   GATE_APPLY     ja, um Status und Defektliste zu schreiben
+# =============================================================================
+ops-gate-blocked:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - gate-blocked/
+  script:
+    - test -n "${GATE_ORDER_ID}" || { echo "GATE_ORDER_ID fehlt (Order-UUID als Pipeline-Variable setzen)"; exit 1; }
+    - mkdir -p ${CI_PROJECT_DIR}/gate-blocked
+    - cd ${DEPLOY_PATH}
+    - DAMAGE="${GATE_DAMAGE:-abdeckung}"
+    - APPLY=""
+    - if [ "${GATE_APPLY}" = "ja" ]; then APPLY="--apply"; fi
+    - echo "Gate gegen ${GATE_ORDER_ID}, Beschaedigung ${DAMAGE}, Schreiben ${GATE_APPLY:-nein}"
+    # Exit 1 heisst "Defekte gefunden" und ist hier das erwartete Ergebnis.
+    - docker compose exec -T report-worker python3 -m reporter.gate
+        --order "${GATE_ORDER_ID}"
+        --damage "${DAMAGE}"
+        ${APPLY}
+        > ${CI_PROJECT_DIR}/gate-blocked/${GATE_ORDER_ID}-${DAMAGE}.json || true
+    - head -c 2000 ${CI_PROJECT_DIR}/gate-blocked/${GATE_ORDER_ID}-${DAMAGE}.json
+    - echo ""
+    - docker compose exec -T db psql -U vectiscan -d vectiscan -tAc
+        "SELECT status FROM orders WHERE id = '${GATE_ORDER_ID}'"
+
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
 rollback:
   extends: .ops-base
