@@ -66,7 +66,7 @@ def _damage(data: Any, facts: Any, art: str) -> str:
     return "nichts beschaedigt"
 
 
-def _research(order_id: str, facts: Any) -> int:
+def _research(order_id: str, facts: Any) -> tuple[int, dict]:
     """Recherche-KI gegen die Fakten des Auftrags, Ergebnis auf die Order.
 
     Fuer die Abnahme: welche Felder dazugekommen sind, mit welcher Quelle, und
@@ -80,7 +80,7 @@ def _research(order_id: str, facts: Any) -> int:
 
     if not research.available():
         print("Recherche uebersprungen: kein ANTHROPIC_API_KEY", file=sys.stderr)
-        return 0
+        return 0, {}
 
     inventory = {
         "domain": facts.scan.domain,
@@ -100,8 +100,8 @@ def _research(order_id: str, facts: Any) -> int:
              if k != "sources" and nachher.get(k) != v]
     if fremd:
         print(f"WARNUNG: bestehende Felder veraendert: {fremd}", file=sys.stderr)
-        return 1
-    return 0
+        return 1, nachher
+    return 0, nachher
 
 
 def _block(order_id: str, payload: dict) -> None:
@@ -148,9 +148,15 @@ def main(argv: list[str] | None = None) -> int:
             quelle, tool_runs=tool_runs_from_db(args.order))
 
     if args.research:
-        rc = _research(args.order, facts)
+        rc, kontext = _research(args.order, facts)
         if rc:
             return rc
+        if kontext:
+            # Neu bauen, sonst prueft das Gate die Daten von vor der Recherche
+            # und meldet einen Auftraggeber, den es inzwischen gibt. Fakten und
+            # Katalogergebnis bleiben, nur die Reportdaten entstehen neu.
+            from reporter.v3 import build_report_data
+            data = build_report_data(facts, output, customer_context=kontext)
 
     beschreibung = _damage(data, facts, args.damage)
 

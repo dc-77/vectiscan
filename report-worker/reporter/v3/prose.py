@@ -36,7 +36,13 @@ from reporter.v3.models import ReportData
 log = structlog.get_logger()
 
 OPUS_MODEL = "claude-opus-4-7"
-MAX_TOKENS = 4096
+# Die Ausgabegrenze muss den ganzen Antwortblock tragen: vier Saetze
+# Zusammenfassung, vier Saetze Kontext, ein bis zwei Saetze je System und ein bis
+# drei Saetze je Befund. Bei castenow (27 Befunde) waren 4096 Token genau
+# aufgebraucht, die Antwort brach mitten im JSON ab und das Ergebnis war
+# unbrauchbar (Abnahme S5, 20.09.). Ab dieser Groesse wird gestreamt, sonst
+# laeuft die Anfrage in die HTTP-Zeitgrenze des SDK.
+MAX_TOKENS = 16000
 CACHE_NAMESPACE = "reporter_v3"
 CACHE_TTL_SECONDS = 24 * 3600
 KI_STEP = "report_prose_v3"
@@ -138,12 +144,13 @@ def generate(payload: dict[str, Any], *, order_id: Optional[str] = None,
 
         client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"], timeout=600.0)
         started = time.monotonic()
-        response = client.messages.create(
+        with client.messages.stream(
             model=model,
             max_tokens=MAX_TOKENS,
             system=SYSTEM_PROMPT,
             messages=messages,
-        )
+        ) as stream:
+            response = stream.get_final_message()
     except Exception as exc:  # pragma: no cover - Netzwerkpfad
         log.warning("report_prose_failed", error=str(exc))
         return {}, {}
@@ -152,12 +159,22 @@ def generate(payload: dict[str, Any], *, order_id: Optional[str] = None,
     cost = cost_from_usage(model, response.usage, KI_STEP)
     cost["duration_ms"] = int((time.monotonic() - started) * 1000)
     log.info("report_prose_cost", **cost)
-    ai_cache.set_cached_response(
-        key, response_text=text, model=model,
-        input_tokens=int(cost["input_tokens"]), output_tokens=int(cost["output_tokens"]),
-        cache_ttl_seconds=CACHE_TTL_SECONDS)
     persist(cost, order_id)
-    return _parse(text), cost
+
+    abgeschnitten = getattr(response, "stop_reason", None) == "max_tokens"
+    if abgeschnitten:
+        log.warning("report_prose_truncated", max_tokens=MAX_TOKENS,
+                    output_tokens=cost["output_tokens"])
+    fields = _parse(text)
+    # Eine abgeschnittene oder unlesbare Antwort gehoert nicht in den Cache,
+    # sonst liefert sie einen Tag lang dasselbe unbrauchbare Ergebnis.
+    if fields and not abgeschnitten:
+        ai_cache.set_cached_response(
+            key, response_text=text, model=model,
+            input_tokens=int(cost["input_tokens"]),
+            output_tokens=int(cost["output_tokens"]),
+            cache_ttl_seconds=CACHE_TTL_SECONDS)
+    return fields, cost
 
 
 def _parse(text: str) -> dict[str, Any]:

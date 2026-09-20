@@ -1122,7 +1122,7 @@ ops-gate-blocked:
         > ${CI_PROJECT_DIR}/gate-blocked/${GATE_ORDER_ID}-${DAMAGE}.json || true
     - head -c 2000 ${CI_PROJECT_DIR}/gate-blocked/${GATE_ORDER_ID}-${DAMAGE}.json
     - echo ""
-    - docker compose exec -T db psql -U vectiscan -d vectiscan -tAc
+    - docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc
         "SELECT status FROM orders WHERE id = '${GATE_ORDER_ID}'"
 
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
