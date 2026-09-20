@@ -389,21 +389,25 @@
    {
     "file": "217.243.248.28__autodiscover.junkerwerk.de.png",
     "host": "autodiscover.junkerwerk.de",
+    "key": "860d0d5a-1086-4958-a9ac-4650423095f2/217.243.248.28__autodiscover.junkerwerk.de.png",
     "what": "Outlook"
    },
    {
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
     "host": "cloud.junkerwerk.de",
+    "key": "860d0d5a-1086-4958-a9ac-4650423095f2/217.243.248.29__cloud.junkerwerk.de.png",
     "what": "IIS Windows Server"
    },
    {
     "file": "217.243.248.28__outlook.junkerwerk.de.png",
     "host": "outlook.junkerwerk.de",
+    "key": "860d0d5a-1086-4958-a9ac-4650423095f2/217.243.248.28__outlook.junkerwerk.de.png",
     "what": "Outlook"
    },
    {
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
     "host": "team.junkerwerk.de",
+    "key": "860d0d5a-1086-4958-a9ac-4650423095f2/217.243.248.29__cloud.junkerwerk.de.png",
     "what": "Antwort von team.junkerwerk.de"
    }
   ],
