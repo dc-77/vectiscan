@@ -4,34 +4,194 @@
  "orders": {
   "multi": "0bf16342-ed96-4b0e-a596-05aee3a62cb5",
   "de": "2572eebc-6135-40e6-b1d2-e9dfccc20ae6",
-  "hu": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108"
+  "hu": "a6df9d9d-eccd-49d1-8dd3-b00a5e005108",
+  "rescan": "860d0d5a-1086-4958-a9ac-4650423095f2"
  },
  "findings": {
-  "VS-2026-001": {"checks": ["db_exposed"], "hosts": ["188.40.3.130"]},
-  "VS-2026-002": {"checks": ["admin_service_exposed_passive"], "hosts": ["217.243.248.28"]},
-  "VS-2026-003": {"checks": ["default_page_exposed"], "also": ["http_alt_port", "http_trace_enabled"], "hosts": ["217.243.248.29"]},
-  "VS-2026-004": {"checks": ["passive_service_version_unverified"], "hosts": ["217.243.248.30"], "deviation": "Exim 4.96 ist ohne Feed-Termin nicht als EOL belegbar; der Katalog liefert den Passivbefund mit Pruefschritt (Patchstand pruefen)."},
-  "VS-2026-005": {"checks": ["legacy_protocols_present"], "hosts": ["188.40.3.130"]},
-  "VS-2026-006": {"checks": ["software_lifecycle_hint"], "hosts": ["217.243.248.29"]},
-  "VS-2026-007": {"checks": ["dmarc_missing", "spf_softfail"]},
-  "VS-2026-008": {"checks": ["mta_sts_missing", "tls_rpt_missing", "dane_missing"]},
-  "VS-2026-009": {"checks": ["tls_weak_ciphers", "tls_no_13", "hsts_short", "tls_weakness"], "hosts": ["217.243.248.30"]},
-  "VS-2026-010": {"checks": ["cert_hostname_mismatch"], "runs": ["hu"], "hosts": ["217.243.248.30"]},
-  "VS-2026-011": {"checks": ["csp_weak", "header_duplicate", "csrf_token_missing"], "hosts": ["217.243.248.30"]},
-  "VS-2026-012": {"checks": ["tls_legacy_protocols", "tls_no_fallback_scsv"], "hosts": ["217.243.248.29"]},
-  "VS-2026-013": {"checks": ["security_headers_incomplete"], "also": ["hsts_missing", "csp_missing"], "hosts": ["217.243.248.28", "217.243.248.29"]},
-  "VS-2026-014": {"checks": ["service_banner_version", "http_header_disclosure", "http_trace_enabled"]},
-  "VS-2026-015": {"checks": ["dnssec_missing", "caa_missing"]}
+  "VS-2026-001": {
+   "checks": [
+    "db_exposed"
+   ],
+   "hosts": [
+    "188.40.3.130"
+   ]
+  },
+  "VS-2026-002": {
+   "checks": [
+    "admin_service_exposed_passive"
+   ],
+   "hosts": [
+    "217.243.248.28"
+   ]
+  },
+  "VS-2026-003": {
+   "checks": [
+    "default_page_exposed"
+   ],
+   "also": [
+    "http_alt_port",
+    "http_trace_enabled"
+   ],
+   "hosts": [
+    "217.243.248.29"
+   ]
+  },
+  "VS-2026-004": {
+   "checks": [
+    "passive_service_version_unverified"
+   ],
+   "hosts": [
+    "217.243.248.30"
+   ],
+   "deviation": "Exim 4.96 ist ohne Feed-Termin nicht als EOL belegbar; der Katalog liefert den Passivbefund mit Pruefschritt (Patchstand pruefen)."
+  },
+  "VS-2026-005": {
+   "checks": [
+    "legacy_protocols_present"
+   ],
+   "hosts": [
+    "188.40.3.130"
+   ]
+  },
+  "VS-2026-006": {
+   "checks": [
+    "software_lifecycle_hint"
+   ],
+   "hosts": [
+    "217.243.248.29"
+   ]
+  },
+  "VS-2026-007": {
+   "checks": [
+    "dmarc_missing",
+    "spf_softfail"
+   ]
+  },
+  "VS-2026-008": {
+   "checks": [
+    "mta_sts_missing",
+    "tls_rpt_missing",
+    "dane_missing"
+   ]
+  },
+  "VS-2026-009": {
+   "checks": [
+    "tls_weak_ciphers",
+    "tls_no_13",
+    "hsts_short",
+    "tls_weakness"
+   ],
+   "hosts": [
+    "217.243.248.30"
+   ]
+  },
+  "VS-2026-010": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ],
+   "runs": [
+    "hu"
+   ],
+   "hosts": [
+    "217.243.248.30"
+   ]
+  },
+  "VS-2026-011": {
+   "checks": [
+    "csp_weak",
+    "header_duplicate",
+    "csrf_token_missing"
+   ],
+   "hosts": [
+    "217.243.248.30"
+   ]
+  },
+  "VS-2026-012": {
+   "checks": [
+    "tls_legacy_protocols",
+    "tls_no_fallback_scsv"
+   ],
+   "hosts": [
+    "217.243.248.29"
+   ]
+  },
+  "VS-2026-013": {
+   "checks": [
+    "security_headers_incomplete"
+   ],
+   "also": [
+    "hsts_missing",
+    "csp_missing"
+   ],
+   "hosts": [
+    "217.243.248.28",
+    "217.243.248.29"
+   ]
+  },
+  "VS-2026-014": {
+   "checks": [
+    "service_banner_version",
+    "http_header_disclosure",
+    "http_trace_enabled"
+   ]
+  },
+  "VS-2026-015": {
+   "checks": [
+    "dnssec_missing",
+    "caa_missing"
+   ]
+  }
  },
  "positives": {
-  "VS-2026-P01": {"checks": ["rdp_exposed", "smb_exposed"]},
-  "VS-2026-P02": {"checks": ["ftp_plaintext", "mail_plaintext"], "group_contains": "188.40.3.130"},
-  "VS-2026-P03": {"checks": ["software_eol"], "group_contains": "217.243.248.28"},
-  "VS-2026-P04": {"checks": ["spf_missing", "dkim_missing"]},
-  "VS-2026-P05": {"checks": ["dns_zone_transfer", "dns_dangling_cname"]},
-  "VS-2026-P06": {"checks": ["cert_expired", "cert_chain_incomplete"]},
-  "VS-2026-P07": {"checks": ["tls_legacy_protocols"], "group_contains": "outlook.junkerwerk.de"},
-  "VS-2026-P08": {"checks": ["ip_reputation", "urlhaus_compromise"]}
+  "VS-2026-P01": {
+   "checks": [
+    "rdp_exposed",
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P02": {
+   "checks": [
+    "ftp_plaintext",
+    "mail_plaintext"
+   ],
+   "group_contains": "188.40.3.130"
+  },
+  "VS-2026-P03": {
+   "checks": [
+    "software_eol"
+   ],
+   "group_contains": "217.243.248.28"
+  },
+  "VS-2026-P04": {
+   "checks": [
+    "spf_missing",
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-P05": {
+   "checks": [
+    "dns_zone_transfer",
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P06": {
+   "checks": [
+    "cert_expired",
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-P07": {
+   "checks": [
+    "tls_legacy_protocols"
+   ],
+   "group_contains": "outlook.junkerwerk.de"
+  },
+  "VS-2026-P08": {
+   "checks": [
+    "ip_reputation",
+    "urlhaus_compromise"
+   ]
+  }
  },
  "subsumed": {
   "info_disclosure": "ZAP-Informationsalerts (Kommentare, X-AspNet-Version, Fehlerseiten) stehen im Prototyp im Anhang Werkzeugbefunde, nicht als Befund.",
@@ -42,43 +202,187 @@
   "tls_weakness": "BEAST (cloud) und BREACH/SWEET32 (openotp) sind Teil von VS-009 und VS-012."
  },
  "expected_coverage_differences": [
-  {"check_prefix": "csrf_token_missing", "reason_code": "zap_no_alerts", "note": "Lauf 2 hat zap ok mit null Alerts"},
-  {"check_prefix": "info_disclosure", "reason_code": "zap_no_alerts", "note": "Lauf 2"},
-  {"check_prefix": "js_library_outdated", "reason_code": "zap_no_alerts", "note": "Lauf 2"},
-  {"check_prefix": "directory_listing", "reason_code": "zap_no_alerts", "note": "Lauf 2"},
-  {"check_prefix": "session_in_url", "reason_code": "zap_no_alerts", "note": "Lauf 2"},
-  {"check_prefix": "cors_misconfiguration", "reason_code": "zap_no_alerts", "note": "Lauf 2"},
-  {"check_prefix": "sri_missing", "reason_code": "zap_no_alerts", "note": "Lauf 2"},
-  {"check_prefix": "web_vulnerability_active", "reason_code": "zap_no_alerts", "note": "Lauf 2"},
-  {"check_prefix": "", "reason_code": "web_unreachable_after_portscan", "note": "188.40.3.130 blockiert den Scanner nach dem Portscan, in Lauf 2 und 3 teils anders gemessen"},
-  {"check_prefix": "", "reason_code": "unreachable", "note": "VHosts ohne Header-Antwort"},
-  {"check_prefix": "", "reason_code": "tls_protocols_unknown", "note": "httpx-Fakten ohne Protokollliste"},
-  {"check_prefix": "", "reason_code": "insufficient_facts", "note": "Gruppen ohne TLS-Fakt trotz testssl ok"},
-  {"check_prefix": "", "reason_code": "second_target_unlabeled", "note": "junkerwerk.hu hat im Multi-Lauf keine DNS-Fakten"},
-  {"check_prefix": "", "reason_code": "target_invalid_ipv6", "note": "IPv6-Host ohne Portscan"},
-  {"check_prefix": "", "reason_code": "no_ssl", "note": "Hosts ohne TLS-Dienst"},
-  {"check_prefix": "", "reason_code": "no_web", "note": "Hosts ohne Webdienst"},
-  {"check_prefix": "", "reason_code": "cms_not_wordpress", "note": "kein WordPress"},
-  {"check_prefix": "", "reason_code": "not_in_package", "note": "Passivquellen ausserhalb des Pakets"},
-  {"check_prefix": "", "reason_code": "no_coverage_rows", "note": "Passivquelle ohne Zeile"},
-  {"check_prefix": "", "reason_code": "no_tech_signals", "note": "webtech ohne Signale auf Hosts ohne Web"},
-  {"check_prefix": "", "reason_code": "passive_only_policy", "note": "zap_active je Lauf von der Steuerung auf passiv gesetzt"},
-  {"check_prefix": "", "reason_code": "host_unreachable", "note": "Host im Lauf nicht erreichbar"},
-  {"check_prefix": "", "reason_code": "no_zap_context", "note": "kein ZAP-Kontext fuer Hosts ohne Web"},
-  {"check_prefix": "", "reason_code": "mail_capabilities_unknown", "note": "Maildienst ohne Faehigkeiten"},
-  {"check_prefix": "", "reason_code": "cert_unknown", "note": "httpx-Fakten ohne Zertifikatsdetails"},
-  {"check_prefix": "", "reason_code": "tls_ciphers_unknown", "note": "httpx-Fakten ohne Cipher-Liste"},
-  {"check_prefix": "", "reason_code": "wordpress_unknown", "note": "wpscan ohne Versionsstatus"},
-  {"check_prefix": "", "reason_code": "whois_unavailable", "note": "whois nicht im Paket"},
-  {"check_prefix": "", "reason_code": "zap_api_error", "note": "zap_active fehlgeschlagen"},
-  {"check_prefix": "", "reason_code": "does_not_exist", "note": "zap_active fehlgeschlagen"},
-  {"check_prefix": "", "reason_code": "wordlist_missing", "note": "ffuf ohne Wortliste"},
-  {"check_prefix": "", "reason_code": "ai_skip", "note": "feroxbuster von der Steuerung uebersprungen"},
-  {"check_prefix": "", "reason_code": "coverage_unknown", "note": "Werkzeug ohne Abdeckungszeile"},
-  {"check_prefix": "", "reason_code": "precondition_not_met", "note": "Vorbedingung je Lauf unterschiedlich erfuellt"}
+  {
+   "check_prefix": "csrf_token_missing",
+   "reason_code": "zap_no_alerts",
+   "note": "Lauf 2 hat zap ok mit null Alerts"
+  },
+  {
+   "check_prefix": "info_disclosure",
+   "reason_code": "zap_no_alerts",
+   "note": "Lauf 2"
+  },
+  {
+   "check_prefix": "js_library_outdated",
+   "reason_code": "zap_no_alerts",
+   "note": "Lauf 2"
+  },
+  {
+   "check_prefix": "directory_listing",
+   "reason_code": "zap_no_alerts",
+   "note": "Lauf 2"
+  },
+  {
+   "check_prefix": "session_in_url",
+   "reason_code": "zap_no_alerts",
+   "note": "Lauf 2"
+  },
+  {
+   "check_prefix": "cors_misconfiguration",
+   "reason_code": "zap_no_alerts",
+   "note": "Lauf 2"
+  },
+  {
+   "check_prefix": "sri_missing",
+   "reason_code": "zap_no_alerts",
+   "note": "Lauf 2"
+  },
+  {
+   "check_prefix": "web_vulnerability_active",
+   "reason_code": "zap_no_alerts",
+   "note": "Lauf 2"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "web_unreachable_after_portscan",
+   "note": "188.40.3.130 blockiert den Scanner nach dem Portscan, in Lauf 2 und 3 teils anders gemessen"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "unreachable",
+   "note": "VHosts ohne Header-Antwort"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "tls_protocols_unknown",
+   "note": "httpx-Fakten ohne Protokollliste"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "insufficient_facts",
+   "note": "Gruppen ohne TLS-Fakt trotz testssl ok"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "second_target_unlabeled",
+   "note": "junkerwerk.hu hat im Multi-Lauf keine DNS-Fakten"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "target_invalid_ipv6",
+   "note": "IPv6-Host ohne Portscan"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "no_ssl",
+   "note": "Hosts ohne TLS-Dienst"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "no_web",
+   "note": "Hosts ohne Webdienst"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "cms_not_wordpress",
+   "note": "kein WordPress"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "not_in_package",
+   "note": "Passivquellen ausserhalb des Pakets"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "no_coverage_rows",
+   "note": "Passivquelle ohne Zeile"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "no_tech_signals",
+   "note": "webtech ohne Signale auf Hosts ohne Web"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "passive_only_policy",
+   "note": "zap_active je Lauf von der Steuerung auf passiv gesetzt"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "host_unreachable",
+   "note": "Host im Lauf nicht erreichbar"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "no_zap_context",
+   "note": "kein ZAP-Kontext fuer Hosts ohne Web"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "mail_capabilities_unknown",
+   "note": "Maildienst ohne Faehigkeiten"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "cert_unknown",
+   "note": "httpx-Fakten ohne Zertifikatsdetails"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "tls_ciphers_unknown",
+   "note": "httpx-Fakten ohne Cipher-Liste"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "wordpress_unknown",
+   "note": "wpscan ohne Versionsstatus"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "whois_unavailable",
+   "note": "whois nicht im Paket"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "zap_api_error",
+   "note": "zap_active fehlgeschlagen"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "does_not_exist",
+   "note": "zap_active fehlgeschlagen"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "wordlist_missing",
+   "note": "ffuf ohne Wortliste"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "ai_skip",
+   "note": "feroxbuster von der Steuerung uebersprungen"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "coverage_unknown",
+   "note": "Werkzeug ohne Abdeckungszeile"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "precondition_not_met",
+   "note": "Vorbedingung je Lauf unterschiedlich erfuellt"
+  }
  ],
  "expected_member_differences": [
-  {"check": "db_exposed", "member": "188.40.3.130:80", "note": "Port 80 nur in Lauf 1 offen gesehen (Blockade danach)"},
-  {"check": "db_exposed", "member": "188.40.3.130:443", "note": "Port 443 nur in Lauf 1 offen gesehen"}
+  {
+   "check": "db_exposed",
+   "member": "188.40.3.130:80",
+   "note": "Port 80 nur in Lauf 1 offen gesehen (Blockade danach)"
+  },
+  {
+   "check": "db_exposed",
+   "member": "188.40.3.130:443",
+   "note": "Port 443 nur in Lauf 1 offen gesehen"
+  }
  ]
 }

@@ -894,6 +894,51 @@ ops-baseline-snapshot:
 # Nutzung: Pipeline auf dem Session-Branch per API ausloesen, dann die
 # Matrix-Jobs starten und golden-tars/ je Job herunterladen.
 # =============================================================================
+# S2c: belegt, warum nmap ueber IPv6 nichts liefert. Im Junkerwerk-Rescan
+# 860d0d5a lief nmap mit -6 gegen 2a01:4f8:d0a:3124::2, meldete exit=success
+# und hosts up=1, schrieb aber keinen Hostblock und war nach 0,32 Sekunden
+# fertig. Am Tar ist dieser Lauf nicht von "Host lebt, kein Port offen" zu
+# unterscheiden; die Ursache liegt im Scannernetz und muss dort abgelesen
+# werden. Der Job ist rein lesend: ip, ping und ein Routen-Lookup.
+ops-diag-scanner-ipv6:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  variables:
+    IPV6_TARGET: "2a01:4f8:d0a:3124::2"
+  script:
+    - cd ${DEPLOY_PATH}
+    - |
+      echo "=== Netze mit EnableIPv6 ==="
+      docker network ls --format '{{.Name}}' | while read -r net; do
+        printf '%s EnableIPv6=%s\n' "$net" "$(docker network inspect "$net" --format '{{.EnableIPv6}}')"
+      done
+    - |
+      echo "=== Adressen und Routen im scan-worker ==="
+      docker compose exec -T scan-worker sh -c 'ip -6 addr show; echo "--- Routen ---"; ip -6 route show' || true
+    - |
+      echo "=== Routen-Lookup zum Ziel, es geht kein Paket raus ==="
+      docker compose exec -T scan-worker python3 - "${IPV6_TARGET}" <<'PYEOF' || true
+      import socket, sys
+      ziel = sys.argv[1]
+      s = socket.socket(socket.AF_INET6, socket.SOCK_DGRAM)
+      try:
+          s.connect((ziel, 80))
+          print("Route vorhanden, Quelladresse", s.getsockname()[0])
+      except OSError as e:
+          print("Keine Route:", e)
+      finally:
+          s.close()
+      PYEOF
+    - |
+      echo "=== nmap -6 direkt gegen das Ziel, nur die Bilanz ==="
+      docker compose exec -T scan-worker sh -c "nmap -6 -Pn -n --top-ports 20 --open ${IPV6_TARGET} 2>&1 | tail -20" || true
+
 ops-export-golden-tars:
   extends: .ops-base
   needs: []
