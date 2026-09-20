@@ -1047,10 +1047,20 @@ ops-render-v3:
     - test -n "${RENDER_ORDER_ID}" || { echo "RENDER_ORDER_ID fehlt (Order-UUID als Pipeline-Variable setzen)"; exit 1; }
     - mkdir -p ${CI_PROJECT_DIR}/render-v3
     - cd ${DEPLOY_PATH}
+    # Issue #24: Speicherbedarf mitschreiben. Der Container ist auf 1 GB begrenzt und
+    # WeasyPrint dekodiert die Bildnachweise zum Setzen. Die Messung laeuft neben dem
+    # Render und darf ihn nicht kippen, deshalb alles fail-open.
+    - CID=$(docker compose ps -q report-worker)
+    - ( while true; do docker stats --no-stream --format '{{.MemUsage}};{{.MemPerc}};{{.CPUPerc}}' "${CID}" >> ${CI_PROJECT_DIR}/render-v3/stats-${RENDER_ORDER_ID}.txt 2>/dev/null || true; sleep 2; done ) &
+    - STATS_PID=$!
     - docker compose exec -T report-worker python3 -m reporter.pdf.v3
         --order "${RENDER_ORDER_ID}"
         -o "/tmp/${RENDER_ORDER_ID}-v3.pdf"
         --upload
+    - kill ${STATS_PID} 2>/dev/null || true
+    - echo "=== Speicher report-worker waehrend des Renders ==="
+    # Kein ": " im Ausdruck, YAML wuerde das als Zuordnung lesen.
+    - awk -F';' '{gsub("%","",$2); if ($2+0>m) {m=$2+0; z=$0}} END {print "Spitze " z; print "Messpunkte " NR}' ${CI_PROJECT_DIR}/render-v3/stats-${RENDER_ORDER_ID}.txt || true
     - docker compose cp "report-worker:/tmp/${RENDER_ORDER_ID}-v3.pdf" ${CI_PROJECT_DIR}/render-v3/ || echo "Kopie ins Artefakt fehlgeschlagen, PDF liegt in MinIO"
     - docker compose exec -T report-worker rm -f "/tmp/${RENDER_ORDER_ID}-v3.pdf"
     - ls -l ${CI_PROJECT_DIR}/render-v3/ || true
