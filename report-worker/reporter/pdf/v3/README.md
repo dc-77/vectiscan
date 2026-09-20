@@ -96,9 +96,12 @@ bekannten halbleeren Seiten. Eine *neue* halbleere Seite ist ein Fehler, eine be
 nicht. Fuer den Referenzauftrag (Junkerwerk, drei Laeufe) gilt die Vorgabe aus S4
 unveraendert: keine halbleere Seite.
 
-Bei datenreichen Auftraegen passt Kapitel 1 nicht mehr auf eine Seite; dort bleiben
-etwa 80 Woerter auf der Folgeseite stehen. Das ist ein Gestaltungsthema und liegt bei
-DC, nicht beim Renderer.
+Kapitel 1.2 und Kapitel 2 fliessen an, erzwingen also keinen Seitenanfang, genau wie
+Kapitel 4, 5 und die Anhaenge. Sonst passte Kapitel 1.1 bei datenreichen Auftraegen
+nicht auf eine Seite und liess zwei Zeilen auf der naechsten stehen. Ueber die elf
+Golden-Auftraege halbiert das die halbleeren Seiten von 14 auf 7, sechs Auftraege
+haben gar keine mehr (Entscheidung DC, 20.09.). Die verbleibenden sieben sind
+Ausklaenge langer Abschnitte und haengen an der Datenmenge, nicht an der Gestaltung.
 
 Neu festschreiben nach einer gewollten Aenderung:
 

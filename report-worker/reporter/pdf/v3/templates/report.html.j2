@@ -208,8 +208,13 @@ tr{break-inside:avoid;}
 </section>
 
 <!-- ===================== 1.2 GESCHÄFTSKONTEXT ===================== -->
-<section class="sec">
- <div class="sec-head"><div class="kicker">Kapitel 1 · Für die Geschäftsführung</div><h2>Kontext und Bedeutung für Ihr Unternehmen</h2></div>
+{# Kapitel 1.2 und 2 fliessen an, erzwingen also keinen Seitenanfang. Dieselbe
+   Technik wie bei Kapitel 4, 5 und den Anhaengen (spec/03). Bei datenreichen
+   Auftraegen passte Kapitel 1.1 sonst nicht auf eine Seite und liess zwei Zeilen
+   auf der naechsten stehen; ueber die elf Golden-Auftraege halbiert das die
+   halbleeren Seiten von 14 auf 7 (Entscheidung DC, 20.09.). #}
+<section>
+ <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 1 · Für die Geschäftsführung</div><h2>Kontext und Bedeutung für Ihr Unternehmen</h2></div>
  <p>{{ g.context }}</p>
  <div class="box warn"><div class="t">Hinweis zur Abdeckung</div>{{ g.coverage_warning }}</div>
  <h3>Was der Scan über Ihr Unternehmen zeigt</h3>
@@ -223,8 +228,8 @@ tr{break-inside:avoid;}
 </section>
 
 <!-- ===================== 2 UMFANG & METHODIK ===================== -->
-<section class="sec">
- <div class="sec-head"><div class="kicker">Kapitel 2 · Für die IT-Leitung</div><h2>Umfang und Methodik</h2></div>
+<section>
+ <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 2 · Für die IT-Leitung</div><h2>Umfang und Methodik</h2></div>
  <p class="lead">{{ s.lead }}</p>
  <h3>2.1 Prüfungsumfang</h3>
  <table>

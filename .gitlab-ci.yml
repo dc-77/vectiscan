@@ -195,8 +195,16 @@ test-report-worker:
 # es nicht und `pip install` darf es nicht nachziehen. Deshalb laufen sie im gerade
 # gebauten Abbild, wo beides liegt. VECTISCAN_REQUIRE_WEASYPRINT=1 macht aus einem
 # stillen Ueberspringen einen Fehlschlag: sonst koennte die Pipeline gruen sein, ohne
-# je ein PDF gebaut zu haben. Der Selbsttest rendert drei Golden-Auftraege und prueft
-# Seitenzahl, halbleere Seiten, eingebettete Schriften und Selbstcheck-Defekte.
+# je ein PDF gebaut zu haben.
+#
+# Zwei Schritte. Erst der Selbsttest ohne Netz: drei Golden-Auftraege, Seitenzahl,
+# halbleere Seiten, eingebettete Schriften, Selbstcheck-Defekte. Danach die
+# Renderer-Suite plus die schriftabhaengigen Branding-Tests im Abbild; pytest liegt
+# nicht im Produktionsbild und wird nur in diesem Wegwerf-Container nachinstalliert.
+# `-m "not reportlab_fallback"` nimmt test_font_constants heraus: der Test prueft die
+# Ersatzschrift und damit die Abwesenheit von DejaVu, das Abbild bringt DejaVu aber
+# mit. Nicht geloescht und nicht global abgeschaltet -- er bleibt ueberall sonst
+# gruen und wird mit dem ReportLab-Pfad in S6 aufgeraeumt.
 test-report-worker-pdf:
   stage: test
   tags: [vectigal]
@@ -205,6 +213,11 @@ test-report-worker-pdf:
     - docker run --rm -e VECTISCAN_REQUIRE_WEASYPRINT=1
         ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
         python3 -m reporter.pdf.v3 --selftest
+    - docker run --rm --user root -e VECTISCAN_REQUIRE_WEASYPRINT=1
+        ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
+        sh -c "python3 -m pip install --no-cache-dir --break-system-packages --quiet pytest
+        && python3 -m pytest tests/pdf_v3 tests/test_branding_integration.py
+        -m 'not reportlab_fallback' -q"
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
