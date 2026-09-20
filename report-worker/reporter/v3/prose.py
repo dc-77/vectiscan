@@ -30,6 +30,7 @@ from reporter import ai_cache
 from reporter.catalog.version import CATALOG_VERSION
 from reporter.facts.schema import FACTS_SCHEMA_VERSION
 from reporter.v3 import gate
+from reporter.v3.aicost import cost_from_cache, cost_from_usage, persist
 from reporter.v3.models import ReportData
 
 log = structlog.get_logger()
@@ -39,12 +40,6 @@ MAX_TOKENS = 4096
 CACHE_NAMESPACE = "reporter_v3"
 CACHE_TTL_SECONDS = 24 * 3600
 KI_STEP = "report_prose_v3"
-
-# Preise je Million Token, gleiche Quelle wie reporter/ai_cache.py.
-PRICING: dict[str, tuple[float, float]] = {
-    "claude-opus-4-7": (15.0, 75.0),
-    "claude-sonnet-4-6": (3.0, 15.0),
-}
 
 SYSTEM_PROMPT = """Du schreibst einzelne Absätze für einen deutschen Sicherheitsbericht.
 
@@ -113,25 +108,6 @@ def build_payload(data: ReportData, customer_context: dict[str, Any] | None = No
 
 # ---------------------------------------------------------------- Aufruf
 
-def _cost(model: str, usage: Any, cache_hit: bool) -> dict[str, Any]:
-    inp = int(getattr(usage, "input_tokens", 0) or 0)
-    out = int(getattr(usage, "output_tokens", 0) or 0)
-    cache_create = int(getattr(usage, "cache_creation_input_tokens", 0) or 0)
-    cache_read = int(getattr(usage, "cache_read_input_tokens", 0) or 0)
-    price_in, price_out = PRICING.get(model, (0.0, 0.0))
-    total = ((inp + cache_create + cache_read) * price_in + out * price_out) / 1_000_000
-    return {
-        "model": model,
-        "ki_step": KI_STEP,
-        "input_tokens": inp,
-        "output_tokens": out,
-        "cache_creation_input_tokens": cache_create,
-        "cache_read_input_tokens": cache_read,
-        "total_cost_usd": round(total, 6),
-        "cache_hit": cache_hit,
-    }
-
-
 def available() -> bool:
     return bool(os.environ.get("ANTHROPIC_API_KEY"))
 
@@ -152,9 +128,8 @@ def generate(payload: dict[str, Any], *, order_id: Optional[str] = None,
                              content_hash=content_hash)
     cached = ai_cache.get_cached_response(key)
     if cached:
-        fields = _parse(cached.get("text", ""))
-        cost = dict(cached.get("cost") or {})
-        cost["cache_hit"] = True
+        fields = _parse(cached.get("response_text", ""))
+        cost = cost_from_cache(model, cached, KI_STEP)
         log.info("report_prose_cost", **cost)
         return fields, cost
 
@@ -174,30 +149,15 @@ def generate(payload: dict[str, Any], *, order_id: Optional[str] = None,
         return {}, {}
 
     text = "".join(getattr(block, "text", "") for block in response.content)
-    cost = _cost(model, response.usage, cache_hit=False)
+    cost = cost_from_usage(model, response.usage, KI_STEP)
     cost["duration_ms"] = int((time.monotonic() - started) * 1000)
     log.info("report_prose_cost", **cost)
-    ai_cache.set_cached_response(key, {"text": text, "cost": cost}, ttl=CACHE_TTL_SECONDS)
-    _persist(cost, order_id)
+    ai_cache.set_cached_response(
+        key, response_text=text, model=model,
+        input_tokens=int(cost["input_tokens"]), output_tokens=int(cost["output_tokens"]),
+        cache_ttl_seconds=CACHE_TTL_SECONDS)
+    persist(cost, order_id)
     return _parse(text), cost
-
-
-def _persist(cost: dict[str, Any], order_id: Optional[str]) -> None:
-    try:
-        from reporter.ai_cost_persist import persist_ai_call_cost
-
-        persist_ai_call_cost(
-            order_id=order_id, ki_step=KI_STEP, model=str(cost.get("model", "")),
-            input_tokens=int(cost.get("input_tokens", 0)),
-            output_tokens=int(cost.get("output_tokens", 0)),
-            cache_creation_tokens=int(cost.get("cache_creation_input_tokens", 0)),
-            cache_read_tokens=int(cost.get("cache_read_input_tokens", 0)),
-            total_cost_usd=float(cost.get("total_cost_usd", 0.0)),
-            cache_hit=bool(cost.get("cache_hit")),
-            duration_ms=cost.get("duration_ms"),
-        )
-    except Exception as exc:  # pragma: no cover - Datenbank ist optional
-        log.warning("report_prose_cost_persist_failed", error=str(exc))
 
 
 def _parse(text: str) -> dict[str, Any]:
