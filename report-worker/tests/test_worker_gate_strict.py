@@ -1,9 +1,9 @@
-"""S0a: Verhalten des Validation-Gates auf Level STRICT in worker.process_job.
+"""S0a/S5: Verhalten des Validation-Gates auf Level STRICT in worker.process_job.
 
-Das Gate ist seit M2 implementiert (worker.py: Order -> 'failed', kein PDF,
-kein Upload), hatte aber keinen Test. Bevor VECTISCAN_VALIDATION_LEVEL
-ausserhalb der Produktion auf 'strict' steht, wird das Verhalten hier
-festgeschrieben.
+Das Gate ist seit M2 implementiert (kein PDF, kein Upload), hatte aber keinen
+Test. S0a hat das Verhalten festgeschrieben, S5 hat den Status geaendert: statt
+'failed' geht die Order auf 'report_blocked' und die Defektliste liegt
+strukturiert auf der Order, damit der Admin sie im Review sieht.
 
 Aufbau wie tests/test_worker.py: alle Collaborators von reporter.worker
 gepatcht, dann process_job() aufrufen und die Statusuebergaenge pruefen.
@@ -22,6 +22,7 @@ COLLABORATORS = (
     "_get_db_connection", "_get_minio_client", "_download_rawdata", "tarfile",
     "parse_scan_data", "call_claude", "map_to_report_data", "generate_report",
     "_upload_report", "_create_report_record", "_update_order_status", "shutil",
+    "_store_report_defects",
 )
 
 JOB_DATA = {
@@ -84,8 +85,8 @@ def _run_process_job(stack: ExitStack, tmp_path: Path, level: ValidationLevel):
     return m
 
 
-def test_strict_gate_failure_sets_order_failed(tmp_path) -> None:
-    """Defekt unter STRICT: Order auf 'failed', kein PDF, kein Upload."""
+def test_strict_gate_failure_blocks_order(tmp_path) -> None:
+    """Defekt unter STRICT: Order auf 'report_blocked', kein PDF, kein Upload."""
     with ExitStack() as stack:
         m = _run_process_job(stack, tmp_path, ValidationLevel.STRICT)
 
@@ -94,13 +95,20 @@ def test_strict_gate_failure_sets_order_failed(tmp_path) -> None:
         assert m._update_order_status.call_count == 1
         args, kwargs = m._update_order_status.call_args
         assert args[1] == "scan-strict-1"
-        assert args[2] == "failed"
+        assert args[2] == "report_blocked"
         assert "Validation-Gate STRICT" in kwargs["error_message"]
 
         # Nichts wird ausgeliefert.
         m.generate_report.assert_not_called()
         m._upload_report.assert_not_called()
         m._create_report_record.assert_not_called()
+
+        # S5: Die Defekte des alten Gates landen strukturiert auf der Order.
+        payload = m._store_report_defects.call_args[0][2]
+        assert payload["engine"] == "v2"
+        assert payload["blocked_at"] is not None
+        assert payload["counts"]["errors"] == 1
+        assert payload["defects"][0]["engine"] == "v2"
 
 
 def test_warn_gate_failure_still_delivers(tmp_path) -> None:
@@ -113,3 +121,8 @@ def test_warn_gate_failure_still_delivers(tmp_path) -> None:
         m._update_order_status.assert_called_with(
             m.conn, "scan-strict-1", "pending_review"
         )
+        # Auch ohne Blockade wird die Liste geschrieben, sonst sieht der Admin
+        # im Review nicht, was der Lauf gefunden hat.
+        payload = m._store_report_defects.call_args[0][2]
+        assert payload["blocked_at"] is None
+        assert payload["counts"]["errors"] == 1

@@ -22,6 +22,7 @@ from minio import Minio
 
 from reporter.claude_client import call_claude
 from reporter.deterministic_pipeline import apply_deterministic_pipeline
+from reporter.gate import defects as GD
 from reporter.generate_report import generate_report
 from reporter.parser import parse_scan_data
 from reporter.qa_check import run_qa_checks
@@ -150,6 +151,138 @@ def _apply_finding_overrides(
                  count=sum(len(v) for v in applied.values()),
                  finding_count=len(applied))
     return applied
+
+
+class ReportBlockedError(RuntimeError):
+    """S5: Der v3-Strang hat Defekte gefunden und das Gate steht auf STRICT.
+
+    Die Order ist beim Auslesen bereits auf ``report_blocked`` gesetzt und die
+    Defektliste liegt auf der Order; diese Ausnahme bricht nur den Job ab.
+    """
+
+    def __init__(self, defects: list):
+        self.defects = list(defects)
+        checks = sorted({d.check for d in self.defects})
+        super().__init__(f"{len(self.defects)} Defekte: {', '.join(checks)}")
+
+
+def _research_customer_context(conn: Any, order_id: str, context: dict,
+                               inventory: dict | None) -> dict:
+    """Recherche-KI fuer die noch leeren Felder des Kundenkontexts.
+
+    Laeuft vor dem Reportbau, damit der Firmenname noch in denselben Bericht
+    kommt. Eingabe sind Domain und Hostnamen aus dem Host-Inventar, nichts
+    weiter. Ohne Zugangsschluessel, ohne offene Felder oder bei einem Fehler
+    bleibt es bei dem, was der Kunde angegeben hat.
+    """
+    context = dict(context or {})
+    try:
+        from reporter.v3 import research
+
+        if not research.available():
+            return context
+        offen = [f for f in ("firmenname", "branche", "mitarbeiter", "systeme")
+                 if not context.get(f)]
+        if not offen:
+            return context
+
+        inv = inventory or {}
+        fqdns = sorted({f for host in (inv.get("hosts") or [])
+                        for f in (host.get("fqdns") or []) if f})
+        domains = [d for d in [inv.get("domain")] if d]
+        payload = research.build_payload(domains, fqdns)
+        suggestion, _cost = research.suggest(payload, order_id=order_id)
+        if not suggestion:
+            return context
+        enriched, rejected = research.apply_suggestion(context, suggestion, fqdns=fqdns)
+        if enriched == context:
+            return context
+        _store_customer_context(conn, order_id, enriched)
+        log.info("customer_context_researched", order_id=order_id,
+                 fields=sorted(k for k in enriched if k != "sources"),
+                 rejected=len(rejected))
+        return enriched
+    except Exception as exc:  # pragma: no cover - Netz- und Datenbankpfad
+        log.warning("customer_context_research_failed", order_id=order_id,
+                    error=str(exc))
+        return context
+
+
+def _load_customer_context(conn: Any, order_id: str) -> dict:
+    """Kundenkontext der Order (Migration 045).
+
+    Fehlt die Spalte (alte Datenbank waehrend eines Rolling-Deploys), bleibt der
+    Kontext leer und der Bericht nennt den Auftraggeber generisch. Der Firmenname
+    aus der Kundenanlage (``customers.company_name``) gilt als Kundenangabe und
+    fuellt ``firmenname``, solange dort nichts steht; die Recherche-KI muss dafuer
+    gar nicht erst laufen.
+    """
+    context: dict = {}
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT o.customer_context, c.company_name
+                  FROM orders o
+                  LEFT JOIN customers c ON c.id = o.customer_id
+                 WHERE o.id = %s
+                """,
+                (order_id,),
+            )
+            row = cur.fetchone()
+    except psycopg2.Error as exc:
+        conn.rollback()
+        log.warning("customer_context_unavailable", order_id=order_id, error=str(exc))
+        return {}
+    if not row:
+        return {}
+    stored, company_name = row
+    if isinstance(stored, dict):
+        context = dict(stored)
+    elif isinstance(stored, str) and stored.strip():
+        try:
+            context = dict(json.loads(stored))
+        except (json.JSONDecodeError, TypeError, ValueError):
+            context = {}
+    if company_name and not context.get("firmenname"):
+        context["firmenname"] = str(company_name)
+        sources = dict(context.get("sources") or {})
+        sources.setdefault("firmenname", {"source": "kunde"})
+        context["sources"] = sources
+    return context
+
+
+def _store_customer_context(conn: Any, order_id: str, context: dict) -> None:
+    """Kundenkontext zurueckschreiben (Vorschlaege der Recherche-KI)."""
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE orders SET customer_context = %s, updated_at = NOW() WHERE id = %s",
+                (json.dumps(context, ensure_ascii=False), order_id),
+            )
+        conn.commit()
+    except psycopg2.Error as exc:
+        conn.rollback()
+        log.warning("customer_context_store_failed", order_id=order_id, error=str(exc))
+
+
+def _store_report_defects(conn: Any, order_id: str, payload: dict | None) -> None:
+    """Defektliste des Berichtslaufs auf die Order schreiben (Migration 046).
+
+    Bewusst nicht als reports-Zeile ohne PDF: eine solche Zeile waere in jeder
+    Abfrage sichtbar, die den letzten Bericht sucht (Download-Token, Mailversand,
+    has_report), und der Kunde bekaeme einen Downloadverweis auf nichts.
+    """
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "UPDATE orders SET report_defects = %s, updated_at = NOW() WHERE id = %s",
+                (json.dumps(payload, ensure_ascii=False) if payload else None, order_id),
+            )
+        conn.commit()
+    except psycopg2.Error as exc:
+        conn.rollback()
+        log.warning("report_defects_store_failed", order_id=order_id, error=str(exc))
 
 
 def _load_tool_runs(conn: Any, order_id: str) -> list[dict]:
@@ -451,9 +584,11 @@ def _update_order_status(
 ) -> None:
     """Update the order status (and optionally the error_message).
 
-    Sets scan_finished_at for terminal statuses (report_complete, failed).
+    Sets scan_finished_at for terminal statuses (report_complete, failed,
+    report_blocked). report_blocked (S5) ist ein Halt, kein Fehler: der Scan ist
+    fertig, nur der Bericht darf so nicht raus.
     """
-    is_terminal = status in ("report_complete", "failed")
+    is_terminal = status in ("report_complete", "failed", "report_blocked")
     with conn.cursor() as cur:
         if error_message is not None:
             cur.execute(
@@ -1065,11 +1200,16 @@ def process_job(job_data: dict) -> None:
                 warning_count=len(gate_result.warnings),
             )
             if gate.level == ValidationLevel.STRICT:
-                # In STRICT: Order auf failed setzen, kein PDF/Upload, kein
-                # report-record. Tech-Lead diagnostiziert via Logs +
-                # orders.error_message.
+                # S5: In STRICT geht die Order auf report_blocked, kein PDF, kein
+                # Upload, kein report-record. Die Defektliste liegt strukturiert
+                # auf der Order und ist im Admin-Review sichtbar; frueher stand
+                # dort nur "failed" plus ein Satz, und die Liste blieb im Log.
+                _store_report_defects(conn, order_id, GD.payload(
+                    GD.from_validation_result(gate_result),
+                    engine="v2", level=gate.level.value, blocked=True,
+                ))
                 _update_order_status(
-                    conn, order_id, "failed",
+                    conn, order_id, "report_blocked",
                     error_message=(
                         f"Validation-Gate STRICT: "
                         f"{len(gate_result.errors)} Defekte"
@@ -1087,6 +1227,9 @@ def process_job(job_data: dict) -> None:
         # Legacy v1 -- Big-Bang-Cutover erst in M6.
         pdf_path = work_dir / f"{order_id}.pdf"
         layout = os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower()
+        # S5: Die Defekte des alten Gates gehen in dieselbe Liste wie die des
+        # v3-Strangs, unterschieden nur durch die Engine am Eintrag.
+        report_defects_payload: dict | None = None
         if layout == "v3":
             # S4: Renderer v3 (Jinja2 + WeasyPrint). Er liest nicht `report_data`,
             # sondern baut sein eigenes Modell aus Fakten und Pruefkatalog. Bis zur
@@ -1097,17 +1240,34 @@ def process_job(job_data: dict) -> None:
             # Kein stiller Rueckfall auf v2 bei einem Fehler: sonst laege ein
             # v2-PDF im Bucket und niemand saehe, dass v3 nicht lief.
             # VECTISCAN_REPORT_LAYOUT=v3 ist eine ausdrueckliche Entscheidung.
+            from reporter.gate import v3_checks
             from reporter.pdf.v3 import render_report_v3
-            from reporter.pdf.v3.pipeline import report_data_from_source
+            from reporter.pdf.v3.pipeline import report_bundle_from_source
             from reporter.pdf.v3.screenshots import MinioScreenshots
-            v3_data = report_data_from_source(
+            from reporter.v3.selfcheck import check_report_data_detailed
+
+            # S5: Kundenkontext der Order, danach die Recherche-KI fuer die
+            # noch leeren Felder. Beides vor dem Reportbau, damit der Firmenname
+            # in denselben Bericht kommt; ohne ihn nennt der Bericht den
+            # Auftraggeber generisch und das Gate meldet es als Warnung.
+            customer_context = _research_customer_context(
+                conn, order_id, _load_customer_context(conn, order_id),
+                effective_inventory)
+            v3_facts, v3_output, v3_data = report_bundle_from_source(
                 scan_data_dir, effective_inventory, effective_profiles,
                 job_data.get("correlatedFindings"), job_data,
                 tool_runs=_load_tool_runs(conn, order_id),
+                customer_context=customer_context,
             )
+
+            v3_defects = GD.from_validation_result(gate_result)
+            v3_defects.extend(GD.from_selfcheck(check_report_data_detailed(v3_data)))
+            v3_defects.extend(v3_checks.run_all(v3_data, v3_facts, v3_output))
+
             result = render_report_v3(v3_data, str(pdf_path),
                                       resolver=MinioScreenshots(minio_client),
                                       package=package)
+            v3_defects.extend(GD.from_render_result(result))
             log.info(
                 "pdf_generated_v3",
                 path=str(pdf_path),
@@ -1116,6 +1276,27 @@ def process_job(job_data: dict) -> None:
                 defects=len(result.defects),
                 sparse_pages=list(result.sparse_pages),
             )
+
+            # S5: Die Defektliste wird immer geschrieben, auch wenn nichts
+            # blockiert — der Admin sieht im Review sonst nicht, was der Lauf
+            # gefunden hat. Nur unter STRICT haelt sie den Bericht auf.
+            blocking = [d for d in v3_defects if d.is_error]
+            blocks_now = bool(blocking) and gate.level == ValidationLevel.STRICT
+            report_defects_payload = GD.payload(
+                v3_defects, engine="v3", level=gate.level.value,
+                facts=v3_facts, output=v3_output, blocked=blocks_now,
+            )
+            if blocking:
+                log.warning("report_gate_v3_defects", order_id=order_id,
+                            level=gate.level.value, errors=len(blocking),
+                            checks=sorted({d.check for d in blocking}))
+            if blocks_now:
+                _store_report_defects(conn, order_id, report_defects_payload)
+                _update_order_status(
+                    conn, order_id, "report_blocked",
+                    error_message=f"Bericht v3 blockiert: {len(blocking)} Defekte",
+                )
+                raise ReportBlockedError(blocking)
         elif layout == "v2":
             from reporter.pdf.v2 import generate_report_v2
             generate_report_v2(report_data, str(pdf_path))
@@ -1131,6 +1312,15 @@ def process_job(job_data: dict) -> None:
                 path=str(pdf_path),
                 size=pdf_path.stat().st_size,
             )
+
+        # S5: Defektliste des Laufs auf die Order. Im v1- und v2-Layout sind das
+        # die Befunde des alten Gates, im v3-Layout beide Engines zusammen.
+        if report_defects_payload is None:
+            report_defects_payload = GD.payload(
+                GD.from_validation_result(gate_result),
+                engine=layout, level=gate.level.value,
+            )
+        _store_report_defects(conn, order_id, report_defects_payload)
 
         # -- 7. Upload PDF to MinIO -------------------------------------------
         file_size = _upload_report(minio_client, pdf_path, minio_pdf_path)
@@ -1233,13 +1423,16 @@ def process_job(job_data: dict) -> None:
         log.info("job_completed", order_id=order_id, package=package, status=final_status)
 
     except Exception as e:
-        # Validation-Gate-STRICT-Failure: Order ist bereits auf failed gesetzt
-        # mit kuratierter error_message. Nicht ueberschreiben — nur loggen +
-        # weiter mit finally-Cleanup.
+        # Gate-STRICT-Abbruch: Order steht bereits auf report_blocked mit
+        # kuratierter Meldung und Defektliste. Nicht ueberschreiben — nur loggen
+        # und weiter mit dem finally-Cleanup.
         from reporter.validation.gate import ValidationFailedError
         if isinstance(e, ValidationFailedError):
             log.warning("job_blocked_by_validation_gate", order_id=order_id,
                         error_count=len(e.result.errors))
+        elif isinstance(e, ReportBlockedError):
+            log.warning("job_blocked_by_report_gate", order_id=order_id,
+                        error_count=len(e.defects))
         else:
             log.exception("job_failed", order_id=order_id)
             # Best-effort: mark the order as failed in the database

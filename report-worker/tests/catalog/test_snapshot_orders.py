@@ -63,7 +63,14 @@ def test_katalog_laeuft_ohne_fehler(order_id):
 
 
 def test_unverarbeitete_beobachtungen_protokoll(capsys):
-    """Zielwert aus spec/06: unter fuenf je Auftrag. Nur Protokoll, kein Fehler."""
+    """Zielwert aus spec/06: unter fuenf je Auftrag. Nur Protokoll, kein Fehler.
+
+    Die Schwelle steht seit S5 im Gate (reporter/gate/v3_checks), das daraus eine
+    Warnung im Admin-Review macht. Hier wird sie von dort gelesen, damit es die
+    Zahl nur einmal gibt.
+    """
+    from reporter.gate.v3_checks import UNPROCESSED_WARN_THRESHOLD
+
     cat = get_catalog()
     rows = []
     for order_id in snapshot_orders():
@@ -72,5 +79,5 @@ def test_unverarbeitete_beobachtungen_protokoll(capsys):
         rows.append((order_id[:8], out.domain, sum(u.count for u in out.unprocessed), dict(kinds)))
     for r in sorted(rows, key=lambda x: -x[2]):
         print(f"unprocessed {r[0]} {r[1]}: {r[2]} {r[3]}")
-    ueber = [r for r in rows if r[2] > 5]
-    print(f"orders ueber Zielwert 5: {len(ueber)} von {len(rows)}")
+    ueber = [r for r in rows if r[2] > UNPROCESSED_WARN_THRESHOLD]
+    print(f"orders ueber Zielwert {UNPROCESSED_WARN_THRESHOLD}: {len(ueber)} von {len(rows)}")
