@@ -151,8 +151,11 @@ hosts/<ip>/phase*/screenshot_<vhost>.png  in den Golden-Fixtures entfernt
 Zwei Regeln fuer die Namen mit Suffix: der Suffix ist nur ein Eindeutigkeitsmerkmal
 (Wildcards und lange Namen werden gekuerzt und gehasht), die Zuordnung steht im Inhalt.
 Bei den VHost-Dateien ist das `url` beziehungsweise `input`, bei den Domain-Dateien der
-Schluessel `_domain`. Derselbe Schluessel steht in domainweiten `scan_results`-Zeilen,
-weil die Tabelle keine Domainspalte hat.
+Schluessel `_domain` als erster Eintrag. Derselbe Schluessel steht in domainweiten
+`scan_results`-Zeilen, weil die Tabelle keine Domainspalte hat, und auch in den Dateien
+des Primaerziels; er ist Transportmittel und wird beim Lesen entfernt, bevor daraus ein
+Fakt wird. Einzige Ausnahme: `zone_transfer_<domain>.txt` ist reiner Text und traegt
+keinen Schluessel, dort gilt der Dateiname.
 
 ## Datenfallen
 

@@ -258,3 +258,92 @@ def test_phase0_ohne_zusatzdomains_unveraendert(tmp_path):
 def test_deckel_ist_gesetzt():
     """Registries drosseln WHOIS; jede Order darf bis zu 10 Zeilen tragen."""
     assert MAX_EXTRA_DOMAINS == 5
+
+
+# ----------------------------------- Nachweis-Scan 20.09.2026, zwei Befunde
+
+def test_domain_intel_ohne_treffer_ist_kein_fehler(tmp_path):
+    """Befund aus dem Nachweis-Scan (Order 75338c97): die whois-Zeile fuer die
+    zweite Domain stand auf `failed`, obwohl die Registry nur nichts lieferte.
+
+    Ursache: "empty" ist kein Wert aus TOOL_RUN_STATUSES; record_tool_run hat
+    ihn still zu "failed" verbogen. run_phase0a fuehrt denselben Fall als
+    ok mit Grund no_data.
+    """
+    with patch("scanner.phase0a.WhoisClient") as whois_cls, \
+            patch("scanner.phase0a.run_all_dns_security",
+                  return_value={"dnssec": {"enabled": False}}), \
+            patch("scanner.phase0a.publish_event"), \
+            patch("scanner.phase0a.record_tool_run") as rec:
+        whois_cls.return_value.lookup.return_value = None
+        run_domain_intel("zweite.example", str(tmp_path), "order-1",
+                         {"package": "perimeter", "phase0a_tools": ["whois"]})
+
+    stati = {(c.args[3], c.args[4]) for c in rec.call_args_list}
+    assert ("whois", "ok") in stati, stati
+    assert ("whois", "failed") not in stati
+    grund = [c.kwargs.get("reason") for c in rec.call_args_list
+             if c.args[3] == "whois"][0]
+    assert grund == "no_data"
+
+
+def test_status_wird_nicht_still_verbogen():
+    """Sicherheitsnetz: nur Werte aus TOOL_RUN_STATUSES verwenden."""
+    from scanner.phase0a import DOMAIN_INTEL_TOOLS  # noqa: F401
+    from scanner.tools import TOOL_RUN_STATUSES
+    assert "empty" not in TOOL_RUN_STATUSES
+
+
+def test_domain_dateien_tragen_das_etikett(tmp_path):
+    """Befund aus dem Nachweis-Scan: die Dateien mit Domain-Suffix trugen die
+    Domain nur im Dateinamen. Die Zuordnung gehoert in den Inhalt, sonst ist
+    die Datei nach einem Umbenennen nicht mehr zuzuordnen (gleiche Regel wie
+    bei den VHost-Dateien, die ihren FQDN in url bzw. input tragen)."""
+    with patch("scanner.phase0a.WhoisClient") as whois_cls, \
+            patch("scanner.phase0a.run_all_dns_security",
+                  return_value={"dnssec": {"dnssec_signed": False}}), \
+            patch("scanner.phase0a.publish_event"), \
+            patch("scanner.phase0a.record_tool_run"):
+        whois_cls.return_value.lookup.return_value = {"registrar": "X"}
+        run_domain_intel("zweite.example", str(tmp_path), "order-1",
+                         {"package": "perimeter", "phase0a_tools": ["whois"]})
+
+    p0a = tmp_path / "phase0a"
+    for name in ("whois_zweite.example.json", "dns_security_zweite.example.json"):
+        data = json.loads((p0a / name).read_text(encoding="utf-8"))
+        assert data["_domain"] == "zweite.example", name
+        # Das Etikett steht vorn, damit es eine Laengenkappung ueberlebt.
+        assert next(iter(data)) == "_domain"
+
+
+def test_dns_records_datei_traegt_das_etikett(tmp_path):
+    from scanner import phase0
+
+    (tmp_path / "phase0").mkdir(parents=True)
+    proc = MagicMock()
+    proc.stdout = ""
+    proc.returncode = 0
+    with patch("scanner.phase0.subprocess.run", return_value=proc), \
+            patch("scanner.phase0.record_tool_run"):
+        phase0.collect_dns_records("zweite.example", str(tmp_path), "order-1",
+                                   filename="dns_records_zweite.example.json",
+                                   label_domain="zweite.example")
+    data = json.loads(
+        (tmp_path / "phase0" / "dns_records_zweite.example.json").read_text(encoding="utf-8"))
+    assert data["_domain"] == "zweite.example"
+    assert "spf" in data
+
+
+def test_dns_records_ohne_label_bleibt_ohne_etikett(tmp_path):
+    from scanner import phase0
+
+    (tmp_path / "phase0").mkdir(parents=True)
+    proc = MagicMock()
+    proc.stdout = ""
+    proc.returncode = 0
+    with patch("scanner.phase0.subprocess.run", return_value=proc), \
+            patch("scanner.phase0.record_tool_run"):
+        phase0.collect_dns_records("erste.example", str(tmp_path), "order-1")
+    data = json.loads(
+        (tmp_path / "phase0" / "dns_records.json").read_text(encoding="utf-8"))
+    assert "_domain" not in data

@@ -796,10 +796,15 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str,
     except Exception as e:
         log.warning("ns_lookup_error", error=str(e))
 
-    # Save result and log to DB
+    # Save result and log to DB. Issue #12: traegt die Datei einen
+    # Domain-Suffix, gehoert die Zuordnung auch in den Inhalt; der Dateiname
+    # ist nur ein Eindeutigkeitsmerkmal.
     try:
+        payload = dict(records)
+        if label_domain:
+            payload = {"_domain": label_domain, **payload}
         with open(output_path, "w") as f:
-            json.dump(records, f, indent=2)
+            json.dump(payload, f, indent=2)
     except Exception as e:
         log.warning("dns_records_save_error", error=str(e))
 
