@@ -13,6 +13,7 @@ const PHASE_LABELS: Record<string, string> = {
   scan_complete: 'Scan Complete',
   report_generating: 'Generating Report',
   report_complete: 'Complete',
+  report_blocked: 'Bericht angehalten',
   failed: 'Failed',
   cancelled: 'Cancelled',
 };
@@ -28,6 +29,7 @@ const PHASE_COLORS: Record<string, { bg: string; text: string }> = {
   scan_complete:      { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   report_generating:  { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   report_complete:    { bg: 'bg-slate-700',   text: 'text-slate-300' },
+  report_blocked:     { bg: 'bg-amber-500/15', text: 'text-amber-400' },
   failed:             { bg: 'bg-red-500/15',  text: 'text-red-400' },
   cancelled:          { bg: 'bg-red-500/15',  text: 'text-red-400' },
 };
@@ -109,7 +111,9 @@ export default function ScanProgress({ scan, onCancel, cancelling }: Props) {
   const pkgLabel = PACKAGE_LABELS[scan.package] || scan.package.toUpperCase();
   // PR-I (Mai 2026): delivered + pending_review zaehlen als final / non-active —
   // Cancel-Button + Live-Pulse + ETA werden ausgeblendet.
-  const isActive = !['report_complete', 'failed', 'cancelled', 'delivered', 'pending_review'].includes(status);
+  // S5: report_blocked ist ein Halt, kein laufender Scan.
+  const isActive = !['report_complete', 'failed', 'cancelled', 'delivered',
+                     'pending_review', 'report_blocked'].includes(status);
 
   const percent = calcProgress(status, progress.hostsCompleted, progress.hostsTotal, scan.package);
   const hostPhase = status === 'scan_phase1' || status === 'scan_phase2';

@@ -39,6 +39,7 @@ export const STATUS_LABELS: Record<string, string> = {
   report_generating: 'Report wird erstellt...',
   report_complete: 'Fertig',
   delivered: 'Zugestellt',
+  report_blocked: 'Bericht angehalten',
   failed: 'Fehlgeschlagen',
   cancelled: 'Abgebrochen',
   verified: 'Verifiziert',

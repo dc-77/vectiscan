@@ -131,7 +131,47 @@ Body: `{ "reason": "..." }`. Setzt Order auf `rejected` mit `review_notes`.
 ### POST /api/admin/orders/:id/requeue-report
 **Admin only.** (VEC-133: unter `/api/admin/*` für Edge-Admin-Shield-Deckung.) Lädt host_inventory + tech_profiles + phase3-Daten aus
 `scan_results`, setzt Status auf `scan_complete` und enqueued einen neuen
-Report-Job. Für gescheiterte Reports.
+Report-Job. Für gescheiterte Reports und seit S5 für `report_blocked`
+(Knopf "Regenerieren nach Fix" im Admin-Review). Es wird kein neuer Scan
+gefahren, die Rohdaten kommen aus MinIO.
+
+### PUT /api/admin/orders/:id/customer-context
+**Admin only.** (S5) Pflegt `orders.customer_context`. Body sind die flachen
+Felder `firmenname`, `kuerzel`, `branche`, `mitarbeiter` und
+`systeme[{fqdn, zweck}]`; alles andere wird verworfen. Jedes gesetzte Feld
+bekommt serverseitig `sources[feld] = {"source": "admin"}` und wird von der
+Recherche-KI danach nicht mehr angefasst. Ein leer übergebenes Feld löscht Wert
+und Herkunft und gibt es damit wieder frei. Nicht genannte Felder bleiben
+unverändert. Antwort: `{ "customerContext": {...} }`. Wirksam wird die Änderung
+mit dem nächsten Berichtslauf.
+
+### GET /api/admin/review/:type/:id
+**Admin only.** `type` ist `order` oder `subscription`. Liefert Targets,
+Pre-Check-Hosts und Autorisierungen. Für `order` zusätzlich seit S5 den Block
+`report`:
+
+```json
+{
+  "report": {
+    "status": "report_blocked",
+    "engine": "v3", "level": "strict",
+    "blockedAt": "2026-09-20T18:00:00+00:00",
+    "defects": [
+      { "engine": "v3", "check": "abdeckungskapitel_leer", "severity": "error",
+        "message": "...", "finding_id": null, "detail": {} }
+    ],
+    "unprocessed": [
+      { "quelle": "katalog", "kind": "service_unknown_port", "what": "1.2.3.4:2052", "count": 1 }
+    ],
+    "counts": { "errors": 1, "warnings": 0, "unprocessed": 1 },
+    "customerContext": { "firmenname": "...", "sources": { "firmenname": { "source": "kunde" } } }
+  }
+}
+```
+
+Quelle ist `orders.report_defects`. Aufträge aus der Zeit davor haben die Spalte
+nicht; für sie fällt die Antwort auf `reports.validation_warnings` des letzten
+Berichts zurück und kennzeichnet die Einträge als `engine: "v2"`.
 
 ### GET /api/admin/pending-domains
 Subscription-Domains, die auf Admin-Freigabe warten.

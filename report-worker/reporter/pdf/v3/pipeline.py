@@ -25,22 +25,26 @@ DEBUG_BUCKET = "scan-debug"
 DEBUG_PREFIX = "v3"
 
 
-def report_data_from_source(source: str | Path,
-                            host_inventory: dict | None = None,
-                            tech_profiles: list | None = None,
-                            correlated_findings: list | None = None,
-                            job_payload: dict | None = None, *,
-                            tool_runs: Any = None,
-                            orders_json: Any = None,
-                            order: dict | None = None,
-                            customer_context: dict | None = None,
-                            report_version: str = "1.0",
-                            report_date: str | None = None,
-                            prose: Any = None) -> ReportData:
-    """Roh-Tar oder entpacktes Scan-Verzeichnis -> Fakten -> Katalog -> Reportdaten.
+def report_bundle_from_source(source: str | Path,
+                              host_inventory: dict | None = None,
+                              tech_profiles: list | None = None,
+                              correlated_findings: list | None = None,
+                              job_payload: dict | None = None, *,
+                              tool_runs: Any = None,
+                              orders_json: Any = None,
+                              order: dict | None = None,
+                              customer_context: dict | None = None,
+                              report_version: str = "1.0",
+                              report_date: str | None = None,
+                              prose: Any = None) -> tuple[Any, Any, ReportData]:
+    """Roh-Tar oder entpacktes Scan-Verzeichnis -> Fakten, Katalog, Reportdaten.
 
     Die ersten fuenf Parameter sind die Signatur von ``reporter.facts.build_facts``;
     der Worker hat sie alle schon zur Hand.
+
+    Gibt alle drei Zwischenstaende zurueck, weil das Gate aus S5 die Fakten (fuer
+    die Beobachtungen ohne Regel) und das Katalogergebnis (fuer deren Zahl)
+    braucht. Wer nur die Reportdaten will, nimmt ``report_data_from_source``.
     """
     from reporter.catalog import evaluate
     from reporter.facts import build_facts
@@ -57,7 +61,12 @@ def report_data_from_source(source: str | Path,
     log.info("report_data_v3_built", order_id=facts.scan.order_id,
              findings=len(data.findings), positives=len(data.positives),
              warnings=len(facts.warnings))
-    return data
+    return facts, output, data
+
+
+def report_data_from_source(*args: Any, **kwargs: Any) -> ReportData:
+    """Nur die Reportdaten; Signatur wie ``report_bundle_from_source``."""
+    return report_bundle_from_source(*args, **kwargs)[2]
 
 
 def tool_runs_from_db(order_id: str) -> list[dict]:

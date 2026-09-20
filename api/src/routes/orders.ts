@@ -8,6 +8,7 @@ import { verifyJwt } from '../lib/auth.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
+import { sanitizeCustomerContext } from '../lib/customerContext.js';
 import {
   normalizeSeverityCounts,
   sumSeverityCounts,
@@ -104,6 +105,10 @@ interface CreateOrderBody {
   // Default false. Wenn true loest scan-worker beim Scan-Start
   // POST /shodan/scan aus — frischere Shodan-Daten 24-48h spaeter.
   pre_warm_shodan?: boolean;
+  // S5: Optionaler Kundenkontext (Firmenname, Kuerzel, Branche, Mitarbeiterzahl,
+  // Zweck je System). Nichts davon ist Pflicht; was hier steht, gilt als
+  // Kundenangabe und wird von der Recherche-KI nie ueberschrieben.
+  customer_context?: unknown;
 }
 
 interface OrderParams {
@@ -222,11 +227,19 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     const initialStatus = mustPay ? 'awaiting_payment' : 'precheck_running';
     const initialPaymentStatus = mustPay ? 'unpaid' : null;
 
+    // S5: Kundenkontext aus dem Bestellprozess. Whitelist und Herkunft setzt
+    // sanitizeCustomerContext; leer bleibt NULL, damit die Recherche-KI weiss,
+    // dass nichts vorgegeben ist.
+    const customerContext = sanitizeCustomerContext(body.customer_context, 'kunde');
+    const customerContextJson = Object.keys(customerContext).length > 0
+      ? JSON.stringify(customerContext)
+      : null;
+
     const orderResult = await query<{ id: string; status: string; package: string; created_at: Date }>(
-      `INSERT INTO orders (customer_id, target_url, package, status, target_count, pre_warm_requested, payment_status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO orders (customer_id, target_url, package, status, target_count, pre_warm_requested, payment_status, customer_context)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
        RETURNING id, status, package, created_at`,
-      [customerId, displayName, pkg, initialStatus, validTargets.length, preWarmRequested, initialPaymentStatus],
+      [customerId, displayName, pkg, initialStatus, validTargets.length, preWarmRequested, initialPaymentStatus, customerContextJson],
     );
     const order = orderResult.rows[0];
 
@@ -571,7 +584,7 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
               o.current_phase, o.current_tool, o.current_host,
               o.scan_started_at, o.scan_finished_at, o.error_message, o.created_at,
               o.subscription_id, o.is_rescan,
-              o.passive_intel_summary, o.business_impact_score,
+              o.passive_intel_summary, o.business_impact_score, o.report_defects,
               jsonb_array_length(COALESCE(o.correlation_data, '[]'::jsonb)) AS correlation_count
        FROM orders o WHERE o.id = $1`,
       [id],
@@ -661,6 +674,10 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
         // Validation-Gate-Output (Migration 028) — admin-only.
         // Null wenn kein Report existiert (z.B. STRICT-Block vor Report-Erzeugung).
         validationWarnings: isAdmin ? (latestReport?.validation_warnings ?? null) : undefined,
+        // S5: Defektliste des letzten Laufs (Migration 046) — admin-only. Sie
+        // existiert auch dann, wenn es keinen Report gibt; genau das ist der
+        // Fall bei status report_blocked.
+        reportDefects: isAdmin ? (order.report_defects ?? null) : undefined,
       },
     };
   });
@@ -1682,9 +1699,13 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
       // hat (z.B. Container down zum Zeitpunkt des Enqueue) — Daten liegen in MinIO,
       // re-enqueue ist sicher.
       const status = order.status as string;
+      // 'report_blocked' (S5): das Gate hat den Bericht angehalten, die Rohdaten
+      // liegen unveraendert in MinIO — ein neuer Lauf nach dem Fix ist genau der
+      // vorgesehene Weg.
       const allowedStatuses = [
         'report_complete', 'completed', 'failed', 'report_generating',
         'cancelled', 'scan_complete', 'delivered', 'pending_review',
+        'report_blocked',
       ];
       if (!allowedStatuses.includes(status)) {
         return reply.status(409).send({

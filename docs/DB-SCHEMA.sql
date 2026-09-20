@@ -100,7 +100,20 @@ CREATE INDEX idx_orders_status_review  ON orders(status) WHERE status = 'pending
 --   verification_pending, queued, scanning, passive_intel, dns_recon,
 --   scan_phase1, scan_phase2, scan_phase3, scan_complete, pending_review,
 --   approved, rejected, report_generating, report_complete, delivered,
---   failed, cancelled
+--   report_blocked, failed, cancelled
+--
+-- report_blocked (S5, Sep 2026): das Berichts-Gate hat unter
+-- VECTISCAN_VALIDATION_LEVEL=strict Defekte gefunden. Der Scan ist fertig, es
+-- gibt kein PDF und keine reports-Zeile; die Defektliste steht in
+-- orders.report_defects und im Admin-Review. Der Weg zurueck ist ein neuer
+-- Berichtslauf (POST /api/admin/orders/:id/requeue-report), kein neuer Scan.
+
+-- S5 (Sep 2026), Migrationen 045 und 046 — additiv, nullable:
+--   orders.customer_context  JSONB  Firmenname, Kuerzel, Branche,
+--       Mitarbeiterzahl, systeme[{fqdn, zweck}] plus sources{feld:{source,url}}
+--       mit source in kunde, recherche, admin.
+--   orders.report_defects    JSONB  Defektliste des letzten Berichtslaufs:
+--       engine, level, blocked_at, defects[], unprocessed[], counts.
 
 -- ============================================================
 -- Persistente Domain-Verifizierungen (90 Tage gültig) — 010

@@ -613,8 +613,8 @@ class TestAugmentWiring:
 # 11. Render-Smoke (generate_report_v2)
 # ====================================================================
 FIXTURE_DIR = (
-    pathlib.Path(__file__).parent.parent
-    / "reporter" / "validation" / "tests" / "fixtures"
+    pathlib.Path(__file__).parent
+    / "validation" / "fixtures"
 )
 TRUNK_FX = FIXTURE_DIR / "replay_trunk_heuel_like.json"
 

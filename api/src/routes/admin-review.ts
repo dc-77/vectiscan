@@ -13,6 +13,7 @@ import { minioClient } from '../lib/minio.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { requireAdmin } from '../middleware/requireAdmin.js';
 import { audit } from '../lib/audit.js';
+import { sanitizeCustomerContext, type CustomerContext } from '../lib/customerContext.js';
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_POLICIES = new Set(['enumerate', 'scoped', 'ip_only']);
@@ -21,6 +22,62 @@ const VALID_DOCUMENT_TYPES = new Set([
   'scan_agreement', 'other',
 ]);
 const AUTH_BUCKET = 'scan-authorizations';
+
+/**
+ * S5: Berichtsstand einer Order fuer das Admin-Review.
+ *
+ * Die Defektliste steht auf der Order (Migration 046). Aeltere Laeufe haben sie
+ * nicht; fuer die faellt die Antwort auf `reports.validation_warnings` des
+ * letzten Berichts zurueck, damit auch alte Orders etwas anzeigen.
+ */
+async function loadReportReview(orderId: string): Promise<Record<string, unknown> | null> {
+  const orderRow = await query(
+    'SELECT status, report_defects, customer_context FROM orders WHERE id = $1',
+    [orderId],
+  );
+  if (orderRow.rows.length === 0) return null;
+  const order = orderRow.rows[0] as Record<string, unknown>;
+
+  let defectsPayload = order.report_defects as Record<string, unknown> | null;
+  if (!defectsPayload) {
+    const legacy = await query(
+      `SELECT validation_warnings FROM reports
+        WHERE order_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [orderId],
+    );
+    const warnings = legacy.rows[0]?.validation_warnings as Record<string, unknown> | undefined;
+    if (warnings) {
+      const issues = [
+        ...((warnings.errors as Array<Record<string, unknown>>) ?? []),
+        ...((warnings.warnings as Array<Record<string, unknown>>) ?? []),
+      ].map(i => ({ ...i, engine: 'v2' }));
+      defectsPayload = {
+        engine: 'v2',
+        level: warnings.level ?? 'warn',
+        blocked_at: null,
+        defects: issues,
+        unprocessed: [],
+        counts: {
+          errors: warnings.error_count ?? 0,
+          warnings: warnings.warning_count ?? 0,
+          unprocessed: 0,
+        },
+      };
+    }
+  }
+
+  const payload = (defectsPayload ?? {}) as Record<string, unknown>;
+  return {
+    status: order.status,
+    engine: payload.engine ?? null,
+    level: payload.level ?? null,
+    blockedAt: payload.blocked_at ?? null,
+    defects: payload.defects ?? [],
+    unprocessed: payload.unprocessed ?? [],
+    counts: payload.counts ?? { errors: 0, warnings: 0, unprocessed: 0 },
+    customerContext: order.customer_context ?? null,
+  };
+}
 
 export async function adminReviewRoutes(server: FastifyInstance): Promise<void> {
   await server.register(fastifyMultipart, { limits: { fileSize: 20 * 1024 * 1024 } });
@@ -125,10 +182,15 @@ export async function adminReviewRoutes(server: FastifyInstance): Promise<void> 
         hostsByTarget.get(tid)!.push(h);
       }
 
+      // S5: Berichtsstand der Order — Defektliste, Beobachtungen ohne Regel,
+      // Kundenkontext. Fuer Subscriptions gibt es das nicht.
+      const report = type === 'order' ? await loadReportReview(id) : null;
+
       return {
         success: true,
         data: {
           type, id,
+          report,
           targets: (targets.rows as Array<Record<string, unknown>>).map(t => ({
             id: t.id,
             raw_input: t.raw_input,
@@ -292,6 +354,43 @@ export async function adminReviewRoutes(server: FastifyInstance): Promise<void> 
       }
 
       return { success: true, data: { id: row.id, status: 'rejected' } };
+    },
+  );
+
+  // PUT /api/admin/orders/:id/customer-context — Kundenkontext im Review pflegen
+  // S5: Jedes hier gesetzte Feld traegt danach die Quelle "admin" und wird von
+  // der Recherche-KI nicht mehr angefasst. Ein geleertes Feld gibt es wieder
+  // frei. Wirksam wird die Aenderung mit dem naechsten Berichtslauf
+  // ("Regenerieren nach Fix").
+  server.put<{ Params: { id: string }; Body: unknown }>(
+    '/api/admin/orders/:id/customer-context',
+    { preHandler: [requireAuth, requireAdmin] },
+    async (request, reply) => {
+      const { id } = request.params;
+      if (!UUID_REGEX.test(id)) {
+        return reply.status(400).send({ success: false, error: 'Invalid order ID' });
+      }
+      const existing = await query(
+        'SELECT customer_context FROM orders WHERE id = $1',
+        [id],
+      );
+      if (existing.rows.length === 0) {
+        return reply.status(404).send({ success: false, error: 'Order not found' });
+      }
+      const previous = (existing.rows[0] as Record<string, unknown>)
+        .customer_context as CustomerContext | null;
+      const context = sanitizeCustomerContext(request.body, 'admin', previous);
+      await query(
+        'UPDATE orders SET customer_context = $1::jsonb, updated_at = NOW() WHERE id = $2',
+        [JSON.stringify(context), id],
+      );
+      audit({
+        orderId: id,
+        action: 'order.customer_context',
+        details: { fields: Object.keys(context).filter(k => k !== 'sources') },
+        ip: request.ip,
+      });
+      return { success: true, data: { customerContext: context } };
     },
   );
 

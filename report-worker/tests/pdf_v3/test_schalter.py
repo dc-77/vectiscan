@@ -43,7 +43,10 @@ def test_worker_kennt_den_v3_zweig():
     assert 'if layout == "v3":' in WORKER
     assert 'elif layout == "v2":' in WORKER
     assert "render_report_v3" in WORKER
-    assert "report_data_from_source" in WORKER
+    # S5: Der Worker nimmt die Variante mit den Zwischenstaenden, weil das Gate
+    # die Fakten und das Katalogergebnis braucht. Die Verkettung selbst bleibt
+    # an einer Stelle; report_data_from_source ruft dieselbe Funktion.
+    assert "report_bundle_from_source" in WORKER
 
 
 def test_worker_faellt_bei_v3_nicht_still_auf_v2_zurueck():

@@ -17,7 +17,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createOrder, listSubscriptions, Subscription, TargetEntry } from '@/lib/api';
+import { createOrder, listSubscriptions, CustomerContext, Subscription, TargetEntry } from '@/lib/api';
 import { isLoggedIn } from '@/lib/auth';
 import { getPackage, type PackageKey } from '@/lib/catalog.generated';
 import TargetInput from '@/components/TargetInput';
@@ -54,6 +54,15 @@ export default function ScanNewPage() {
   const [stepId, setStepId] = useState<string>('target');
   const [targets, setTargets] = useState<TargetEntry[]>([{ raw_input: '', exclusions: [] }]);
   const [selectedPackage, setSelectedPackage] = useState<ScanPackage>('perimeter');
+  // S5: Optionale Angaben zum Unternehmen. Nichts davon ist Pflicht; sie stehen
+  // spaeter im Bericht (Firmenname auf dem Deckblatt, Kuerzel in den
+  // Befund-Nummern, Branche und Groesse im Kontextabsatz) und lassen sich im
+  // Admin-Review nachtragen.
+  const [kontextOffen, setKontextOffen] = useState(false);
+  const [firmenname, setFirmenname] = useState('');
+  const [kuerzel, setKuerzel] = useState('');
+  const [branche, setBranche] = useState('');
+  const [mitarbeiter, setMitarbeiter] = useState('');
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -139,7 +148,15 @@ export default function ScanNewPage() {
     }
     setSubmitting(true);
     try {
-      const res = await createOrder(cleaned, selectedPackage);
+      const kontext: CustomerContext = {
+        firmenname: firmenname.trim(),
+        kuerzel: kuerzel.trim(),
+        branche: branche.trim(),
+        mitarbeiter: mitarbeiter.trim(),
+      };
+      const hatKontext = Object.values(kontext).some(v => v);
+      const res = await createOrder(cleaned, selectedPackage, false,
+                                    hatKontext ? kontext : undefined);
       if (res.success && res.data) {
         // VEC-436: Einmalzahlungs-Pfad. Hat das Backend eine Stripe-Checkout-URL
         // zurückgegeben, ist die Order 'awaiting_payment' und der Scan startet
@@ -173,12 +190,13 @@ export default function ScanNewPage() {
     } finally {
       setSubmitting(false);
     }
-  }, [targets, selectedPackage, router]);
+  }, [targets, selectedPackage, router, firmenname, kuerzel, branche, mitarbeiter]);
 
   if (!ready) return null;
 
   const btnPrimary = 'min-h-[44px] px-6 py-2.5 rounded-lg text-sm font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed';
   const btnSecondary = 'min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-medium transition-all';
+  const inputClass = 'w-full min-h-[44px] px-3 py-2 rounded-lg text-sm outline-none focus:border-[color:var(--tone-active)]';
 
   return (
     <div className="w-full max-w-[640px] mx-auto px-4 py-8 space-y-7">
@@ -326,6 +344,57 @@ export default function ScanNewPage() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* S5: Optionale Angaben zum Unternehmen. Eingeklappt, damit der Weg
+              zum Scan gleich kurz bleibt. */}
+          <div className="rounded-xl" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border-subtle)' }}>
+            <button
+              type="button"
+              onClick={() => setKontextOffen(o => !o)}
+              aria-expanded={kontextOffen}
+              className="w-full min-h-[44px] px-5 py-3 flex items-center justify-between text-left"
+            >
+              <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>
+                Angaben zum Unternehmen <span style={{ color: 'var(--text-dim)' }}>(optional)</span>
+              </span>
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{kontextOffen ? 'Zuklappen' : 'Aufklappen'}</span>
+            </button>
+            {kontextOffen && (
+              <div className="px-5 pb-5 space-y-3">
+                <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                  Diese Angaben stehen im Bericht: der Firmenname auf dem Deckblatt, das
+                  Kürzel in den Befund-Nummern, Branche und Größe im Kontextabsatz. Du
+                  kannst sie auch später nachtragen lassen.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="ctx-firmenname" className="block text-xs mb-1" style={{ color: 'var(--text-dim)' }}>Firmenname</label>
+                    <input id="ctx-firmenname" value={firmenname} onChange={e => setFirmenname(e.target.value)}
+                           placeholder="Beispiel Maschinenbau GmbH" className={inputClass}
+                           style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border-subtle)', color: 'var(--text)' }} />
+                  </div>
+                  <div>
+                    <label htmlFor="ctx-kuerzel" className="block text-xs mb-1" style={{ color: 'var(--text-dim)' }}>Kürzel für Befund-Nummern</label>
+                    <input id="ctx-kuerzel" value={kuerzel} onChange={e => setKuerzel(e.target.value)}
+                           placeholder="BSP" className={inputClass}
+                           style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border-subtle)', color: 'var(--text)' }} />
+                  </div>
+                  <div>
+                    <label htmlFor="ctx-branche" className="block text-xs mb-1" style={{ color: 'var(--text-dim)' }}>Branche</label>
+                    <input id="ctx-branche" value={branche} onChange={e => setBranche(e.target.value)}
+                           placeholder="Maschinenbau" className={inputClass}
+                           style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border-subtle)', color: 'var(--text)' }} />
+                  </div>
+                  <div>
+                    <label htmlFor="ctx-mitarbeiter" className="block text-xs mb-1" style={{ color: 'var(--text-dim)' }}>Mitarbeiterzahl</label>
+                    <input id="ctx-mitarbeiter" value={mitarbeiter} onChange={e => setMitarbeiter(e.target.value)}
+                           placeholder="120" className={inputClass}
+                           style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border-subtle)', color: 'var(--text)' }} />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Nächste Schritte / Verifikation (§5.2: „nur falls nötig") */}

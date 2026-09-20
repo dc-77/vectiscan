@@ -495,7 +495,8 @@ export default function ModernView({
         {/* ── VALIDATION-WARNINGS (admin-only, collapsible) ─ */}
         {/* Sichtbar fuer Admins immer wenn ein Report existiert ODER der Scan
             wegen STRICT-Validation-Gate failed ist (heuel.com-Vorfall Mai 2026). */}
-        {admin && (order.validationWarnings !== undefined || order.status === 'failed') && (
+        {admin && (order.validationWarnings !== undefined || order.status === 'failed'
+                   || order.status === 'report_blocked') && (
           <ValidationWarnings
             orderId={orderId}
             orderStatus={order.status}

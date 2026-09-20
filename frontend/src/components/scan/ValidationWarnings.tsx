@@ -301,8 +301,11 @@ export default function ValidationWarnings({ orderId, orderStatus, payload }: Pr
   const totalCount = errorCount + warningCount;
   const passed = payload?.passed ?? null;
 
-  const isFailedOrderWithoutPayload = !payload && orderStatus === 'failed';
-  const showRequeueButton = isFailedOrderWithoutPayload || totalCount > 0 || orderStatus === 'failed';
+  // S5: 'report_blocked' ist der maschinenlesbare Nachfolger des frueheren
+  // 'failed' bei einem Gate-Abbruch. Beide Zustaende zeigen dieselbe Ansicht.
+  const angehalten = orderStatus === 'failed' || orderStatus === 'report_blocked';
+  const isFailedOrderWithoutPayload = !payload && angehalten;
+  const showRequeueButton = isFailedOrderWithoutPayload || totalCount > 0 || angehalten;
 
   const handleRequeue = async () => {
     if (!confirm(
@@ -358,7 +361,9 @@ export default function ValidationWarnings({ orderId, orderStatus, payload }: Pr
           )}
           {!payload && isFailedOrderWithoutPayload && (
             <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-700/40 text-slate-300 ring-1 ring-slate-600/40">
-              keine Daten — Scan vor Report-Erzeugung geblockt
+              {orderStatus === 'report_blocked'
+                ? 'Bericht angehalten — Defektliste im Admin-Review'
+                : 'keine Daten — Scan vor Report-Erzeugung geblockt'}
             </span>
           )}
           {!payload && !isFailedOrderWithoutPayload && (
@@ -377,9 +382,11 @@ export default function ValidationWarnings({ orderId, orderStatus, payload }: Pr
         <div className="mt-4 space-y-4">
           {!payload && (
             <p className="text-xs text-slate-400">
-              {isFailedOrderWithoutPayload
-                ? 'Für diesen Scan wurde kein Report erzeugt — das Validation-Gate hat den Build geblockt, bevor die Defekte in die DB persistiert werden konnten. Klicke unten auf „Report neu erzeugen", um den Report mit dem aktualisierten Code-Stand erneut zu rendern.'
-                : 'Keine Validation-Warnungen verfügbar (z.B. historischer Scan vor Migration 028).'}
+              {orderStatus === 'report_blocked'
+                ? 'Das Gate hat den Bericht angehalten, es gibt deshalb keine Report-Zeile. Die vollständige Defektliste steht im Admin-Review unter „Defekte"; dort liegt auch „Regenerieren nach Fix". Der Knopf unten macht dasselbe.'
+                : isFailedOrderWithoutPayload
+                  ? 'Für diesen Scan wurde kein Report erzeugt — das Validation-Gate hat den Build geblockt, bevor die Defekte in die DB persistiert werden konnten. Klicke unten auf „Report neu erzeugen", um den Report mit dem aktualisierten Code-Stand erneut zu rendern.'
+                  : 'Keine Validation-Warnungen verfügbar (z.B. historischer Scan vor Migration 028).'}
             </p>
           )}
 
