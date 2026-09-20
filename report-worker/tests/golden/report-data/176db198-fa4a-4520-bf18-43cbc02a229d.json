@@ -481,31 +481,37 @@
    {
     "file": "20.79.218.75__edi.heuel.com.png",
     "host": "edi.heuel.com",
+    "key": "176db198-fa4a-4520-bf18-43cbc02a229d/20.79.218.75__edi.heuel.com.png",
     "what": "403 Forbidden"
    },
    {
     "file": "217.72.203.132__www.heuel.com.png",
     "host": "heuel.com",
+    "key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
     "what": "Antwort von heuel.com"
    },
    {
     "file": "217.72.203.132__www.heuel.com.png",
     "host": "jobs.heuel.com",
+    "key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
     "what": "Antwort von jobs.heuel.com"
    },
    {
     "file": "104.16.10.6__online.heuel.com.png",
     "host": "online.heuel.com",
+    "key": "176db198-fa4a-4520-bf18-43cbc02a229d/104.16.10.6__online.heuel.com.png",
     "what": "Just a moment..."
    },
    {
     "file": "20.79.218.75__ose.heuel.com.png",
     "host": "ose.heuel.com",
+    "key": "176db198-fa4a-4520-bf18-43cbc02a229d/20.79.218.75__ose.heuel.com.png",
     "what": "Redirector"
    },
    {
     "file": "217.72.203.132__www.heuel.com.png",
     "host": "www.heuel.com",
+    "key": "176db198-fa4a-4520-bf18-43cbc02a229d/217.72.203.132__www.heuel.com.png",
     "what": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
    }
   ],

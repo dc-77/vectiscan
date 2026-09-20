@@ -482,66 +482,79 @@
    {
     "file": "212.227.60.78__connect.securess.de.png",
     "host": "connect.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__connect.securess.de.png",
     "what": "Antwort von connect.securess.de"
    },
    {
     "file": "85.22.47.38__eset.securess.de.png",
     "host": "eset.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__eset.securess.de.png",
     "what": "Antwort von eset.securess.de"
    },
    {
     "file": "85.22.47.41__ftp.securess.de.png",
     "host": "ftp.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__ftp.securess.de.png",
     "what": "Antwort von ftp.securess.de"
    },
    {
     "file": "51.116.154.224__login-kundenportal.securess.de.png",
     "host": "login-kundenportal.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/51.116.154.224__login-kundenportal.securess.de.png",
     "what": "Antwort von login-kundenportal.securess.de"
    },
    {
     "file": "85.22.47.39__mailcleaner.securess.de.png",
     "host": "mailcleaner.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailcleaner.securess.de.png",
     "what": "Antwort von mailcleaner.securess.de"
    },
    {
     "file": "85.22.47.39__mailin.securess.de.png",
     "host": "mailin.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailin.securess.de.png",
     "what": "Antwort von mailin.securess.de"
    },
    {
     "file": "85.22.47.39__mailout.securess.de.png",
     "host": "mailout.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mailout.securess.de.png",
     "what": "Antwort von mailout.securess.de"
    },
    {
     "file": "85.22.47.39__mx1.securess.de.png",
     "host": "mx1.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.39__mx1.securess.de.png",
     "what": "Antwort von mx1.securess.de"
    },
    {
     "file": "85.22.47.38__openotp.securess.de.png",
     "host": "openotp.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.38__openotp.securess.de.png",
     "what": "Antwort von openotp.securess.de"
    },
    {
     "file": "212.227.60.78__partner.securess.de.png",
     "host": "partner.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__partner.securess.de.png",
     "what": "Antwort von partner.securess.de"
    },
    {
     "file": "85.22.47.41__securess.de.png",
     "host": "securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__securess.de.png",
     "what": "Antwort von securess.de"
    },
    {
     "file": "212.227.60.78__vermittler.securess.de.png",
     "host": "vermittler.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/212.227.60.78__vermittler.securess.de.png",
     "what": "Antwort von vermittler.securess.de"
    },
    {
     "file": "85.22.47.41__www.securess.de.png",
     "host": "www.securess.de",
+    "key": "ae8d1d70-7925-4e3c-84de-3113f3e57b60/85.22.47.41__www.securess.de.png",
     "what": "Antwort von www.securess.de"
    }
   ],

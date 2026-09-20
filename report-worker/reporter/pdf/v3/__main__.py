@@ -1,0 +1,215 @@
+# -*- coding: utf-8 -*-
+"""CLI des Renderers v3.
+
+    python -m reporter.pdf.v3 --golden <order_id> [-o bericht.pdf] [--html b.html]
+    python -m reporter.pdf.v3 --source <tar|verzeichnis> -o bericht.pdf
+    python -m reporter.pdf.v3 --order <order_id> --upload      # holt das Tar aus MinIO
+    python -m reporter.pdf.v3 --selftest                       # Abnahme im Abbild
+    python -m reporter.pdf.v3 --write-snapshot                 # Regressionsdatei neu
+
+``--golden`` und ``--source`` bauen die Reportdaten ohne Sprachmodell (Katalogtexte).
+``--upload`` legt das PDF unter ``scan-debug/v3/`` ab und laesst Auftrag, Status und
+``reports`` unberuehrt.
+"""
+from __future__ import annotations
+
+import argparse
+import gzip
+import json
+import sys
+import tempfile
+from datetime import datetime, timezone
+from pathlib import Path
+
+REPORT_WORKER = Path(__file__).resolve().parents[3]
+SNAPSHOT_DIR = REPORT_WORKER / "tests" / "golden" / "render"
+SNAPSHOT_ORDER = "0bf16342-ed96-4b0e-a596-05aee3a62cb5"
+PAGES_FILE = SNAPSHOT_DIR / "expected-pages.json"
+
+# Fuer den Selbsttest: ein grosser Auftrag mit Anhang zu Kapitel 6, ein mittlerer mit
+# mehreren Domains, ein kleiner. Mehr braucht die Abnahme im Abbild nicht.
+SELFTEST_ORDERS = (
+    "4e6b6883-a6c8-4204-8b13-b37f907322ca",   # castenow, 29 Befunde
+    SNAPSHOT_ORDER,                            # Junkerwerk, drei Laeufe
+    "a6df9d9d-eccd-49d1-8dd3-b00a5e005108",   # junkerwerk.hu, kurz
+)
+
+# Der Auftrag, gegen den der Prototyp entworfen wurde. Hier gilt die Vorgabe aus S4
+# unveraendert: keine halbleere Seite. Bei den uebrigen Auftraegen wird der Ist-Stand
+# festgeschrieben, damit eine *neue* halbleere Seite auffaellt.
+REFERENZ_ORDER = SNAPSHOT_ORDER
+
+# Fester Stichtag, damit Seitenzahl und Schnappschuss nicht vom Kalender abhaengen.
+REPORT_DATE = "19.09.2026"
+
+
+def _golden_data(order_id: str):
+    from reporter.v3.golden import build_golden_report_data
+    return build_golden_report_data(order_id)
+
+
+def _snapshot_path(order_id: str) -> Path:
+    return SNAPSHOT_DIR / f"{order_id}.html.gz"
+
+
+def _write_snapshot(order_id: str) -> Path:
+    from reporter.pdf.v3 import render_html
+    html = render_html(_golden_data(order_id))[0]
+    SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
+    path = _snapshot_path(order_id)
+    # mtime=0, damit zwei Laeufe dieselbe Datei ergeben und der Diff aussagekraeftig ist.
+    with gzip.GzipFile(path, "wb", mtime=0) as fh:
+        fh.write(html.encode("utf-8"))
+    return path
+
+
+def erwartungen() -> dict[str, dict]:
+    if not PAGES_FILE.exists():
+        return {}
+    return json.loads(PAGES_FILE.read_text(encoding="utf-8"))
+
+
+def pruefe(order_id: str, result, soll: dict | None) -> list[str]:
+    """Abweichungen eines Renders vom Erwartungswert."""
+    fehler = [f"{order_id[:8]} Defekt: {d}" for d in result.defects]
+    # Ohne pypdf liefern Sparse- und Schriftpruefung stillschweigend nichts. Das waere
+    # eine gruene Abnahme ohne eine einzige Pruefung.
+    if not result.words_per_page:
+        fehler.append(f"{order_id[:8]} keine Wortzahl je Seite (pypdf fehlt?)")
+    fehler += [f"{order_id[:8]} {w}" for w in result.warnings
+               if "Schrift nicht eingebettet" in w]
+    if order_id == REFERENZ_ORDER and result.sparse_pages:
+        fehler.append(f"{order_id[:8]} halbleere Seiten {list(result.sparse_pages)} "
+                      "im Referenzauftrag")
+    if soll is None:
+        fehler.append(f"{order_id[:8]} kein Erwartungswert in {PAGES_FILE.name}")
+        return fehler
+    if result.pages != soll["pages"]:
+        fehler.append(f"{order_id[:8]} Seitenzahl {result.pages} statt {soll['pages']}")
+    neu = sorted(set(result.sparse_pages) - set(soll.get("sparse", [])))
+    if neu:
+        fehler.append(f"{order_id[:8]} neue halbleere Seiten {neu}")
+    return fehler
+
+
+def _selftest() -> int:
+    from reporter.pdf.v3 import render_report_v3
+
+    erwartet = erwartungen()
+    fehler: list[str] = []
+    with tempfile.TemporaryDirectory() as tmp:
+        for order_id in SELFTEST_ORDERS:
+            result = render_report_v3(_golden_data(order_id), Path(tmp) / f"{order_id}.pdf")
+            soll = erwartet.get(order_id)
+            print(f"{order_id[:8]} Seiten={result.pages} soll={soll} "
+                  f"sparse={list(result.sparse_pages)} defekte={len(result.defects)}")
+            fehler += pruefe(order_id, result, soll)
+    for zeile in fehler:
+        print(f"FEHLER {zeile}", file=sys.stderr)
+    print(f"selftest: {len(fehler)} Fehler", file=sys.stderr)
+    return 1 if fehler else 0
+
+
+def _update_pages() -> int:
+    """Seitenzahlen und bekannte halbleere Seiten festschreiben.
+
+    Laeuft ueber alle Golden-Auftraege, nicht nur die drei des Selbsttests: die Datei
+    ist der Erwartungswert fuer tests/pdf_v3/test_pdf.py.
+    """
+    from reporter.pdf.v3 import render_report_v3
+    from reporter.v3.golden import order_ids
+
+    SNAPSHOT_DIR.mkdir(parents=True, exist_ok=True)
+    werte: dict[str, dict] = {}
+    with tempfile.TemporaryDirectory() as tmp:
+        for order_id in order_ids():
+            result = render_report_v3(_golden_data(order_id), Path(tmp) / "x.pdf")
+            werte[order_id] = {"pages": result.pages,
+                               "sparse": list(result.sparse_pages)}
+            print(f"{order_id[:8]} -> {result.pages} Seiten, "
+                  f"halbleer {list(result.sparse_pages)}")
+    PAGES_FILE.write_text(json.dumps(werte, indent=1, sort_keys=True) + "\n",
+                          encoding="utf-8")
+    print(f"geschrieben {PAGES_FILE}", file=sys.stderr)
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="python -m reporter.pdf.v3", description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--golden", metavar="ORDER_ID", help="Reportdaten aus den Golden-Fakten")
+    ap.add_argument("--source", help="Roh-Tar oder entpacktes Scan-Verzeichnis")
+    ap.add_argument("--order", metavar="ORDER_ID", help="Roh-Tar aus MinIO holen")
+    ap.add_argument("--upload", action="store_true",
+                    help="mit --order: PDF nach scan-debug/v3/ legen")
+    ap.add_argument("--package", help="Paketvariante uebersteuern (webcheck, perimeter, ...)")
+    ap.add_argument("-o", "--out", help="Ziel-PDF")
+    ap.add_argument("--html", help="zusaetzlich das HTML schreiben")
+    ap.add_argument("--html-only", action="store_true", help="kein PDF, nur HTML (ohne WeasyPrint)")
+    ap.add_argument("--strict", action="store_true", help="Defekte als Fehler behandeln")
+    ap.add_argument("--selftest", action="store_true", help="Golden-Auftraege rendern und pruefen")
+    ap.add_argument("--write-snapshot", action="store_true", help="Regressionsdatei neu schreiben")
+    ap.add_argument("--update-pages", action="store_true", help="Seitenzahlen neu festschreiben")
+    args = ap.parse_args(argv)
+
+    if args.write_snapshot:
+        print(f"geschrieben {_write_snapshot(SNAPSHOT_ORDER)}", file=sys.stderr)
+        return 0
+    if args.update_pages:
+        return _update_pages()
+    if args.selftest:
+        return _selftest()
+
+    from reporter.pdf.v3 import render_html, render_report_v3
+    from reporter.pdf.v3 import pipeline as P
+    from reporter.pdf.v3.screenshots import MinioScreenshots
+
+    resolver = None
+    tmpdir: tempfile.TemporaryDirectory | None = None
+    client = None
+    order_id = args.order or args.golden or "bericht"
+
+    if args.golden:
+        data = _golden_data(args.golden)
+    elif args.source:
+        data = P.report_data_from_source(args.source, report_date=REPORT_DATE)
+    elif args.order:
+        client = P.minio_client()
+        tmpdir = tempfile.TemporaryDirectory()
+        tar = P.fetch_rawdata(client, args.order, Path(tmpdir.name))
+        data = P.report_data_from_source(tar, tool_runs=P.tool_runs_from_db(args.order))
+        resolver = MinioScreenshots(client)
+    else:
+        ap.error("eine Quelle angeben: --golden, --source oder --order")
+        return 2
+
+    if args.html_only:
+        html = render_html(data, resolver=resolver, package=args.package)[0]
+        target = Path(args.html or args.out or f"{order_id}.html")
+        target.write_text(html, encoding="utf-8")
+        print(f"geschrieben {target}", file=sys.stderr)
+        return 0
+
+    out = Path(args.out) if args.out else Path(f"{order_id}.pdf")
+    result = render_report_v3(data, out, resolver=resolver, package=args.package,
+                              html_out=args.html, strict=args.strict)
+    print(f"{out} · {result.pages} Seiten · {len(result.defects)} Defekte · "
+          f"{len(result.warnings)} Warnungen")
+    for defekt in result.defects:
+        print(f"  Defekt: {defekt}", file=sys.stderr)
+    for warnung in result.warnings:
+        print(f"  Warnung: {warnung}", file=sys.stderr)
+
+    if args.upload:
+        if client is None:
+            client = P.minio_client()
+        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        print(f"MinIO: {P.upload_debug_pdf(client, order_id, out, stamp)}")
+
+    if tmpdir is not None:
+        tmpdir.cleanup()
+    return 1 if result.defects else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

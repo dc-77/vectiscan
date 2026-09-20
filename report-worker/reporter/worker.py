@@ -1087,7 +1087,36 @@ def process_job(job_data: dict) -> None:
         # Legacy v1 -- Big-Bang-Cutover erst in M6.
         pdf_path = work_dir / f"{order_id}.pdf"
         layout = os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower()
-        if layout == "v2":
+        if layout == "v3":
+            # S4: Renderer v3 (Jinja2 + WeasyPrint). Er liest nicht `report_data`,
+            # sondern baut sein eigenes Modell aus Fakten und Pruefkatalog. Bis zur
+            # Umschaltung in S6 laeuft die alte Kette davor trotzdem durch; ihr
+            # Ergebnis wird hier verworfen. Das kostet einen KI-Aufruf je Lauf und
+            # ist bewusst so, damit v2 jederzeit wieder greift.
+            #
+            # Kein stiller Rueckfall auf v2 bei einem Fehler: sonst laege ein
+            # v2-PDF im Bucket und niemand saehe, dass v3 nicht lief.
+            # VECTISCAN_REPORT_LAYOUT=v3 ist eine ausdrueckliche Entscheidung.
+            from reporter.pdf.v3 import render_report_v3
+            from reporter.pdf.v3.pipeline import report_data_from_source
+            from reporter.pdf.v3.screenshots import MinioScreenshots
+            v3_data = report_data_from_source(
+                scan_data_dir, effective_inventory, effective_profiles,
+                job_data.get("correlatedFindings"), job_data,
+                tool_runs=_load_tool_runs(conn, order_id),
+            )
+            result = render_report_v3(v3_data, str(pdf_path),
+                                      resolver=MinioScreenshots(minio_client),
+                                      package=package)
+            log.info(
+                "pdf_generated_v3",
+                path=str(pdf_path),
+                size=pdf_path.stat().st_size,
+                pages=result.pages,
+                defects=len(result.defects),
+                sparse_pages=list(result.sparse_pages),
+            )
+        elif layout == "v2":
             from reporter.pdf.v2 import generate_report_v2
             generate_report_v2(report_data, str(pdf_path))
             log.info(

@@ -540,61 +540,73 @@
    {
     "file": "195.50.179.4__autodiscover.castenow.de.png",
     "host": "autodiscover.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.4__autodiscover.castenow.de.png",
     "what": "Outlook"
    },
    {
     "file": "195.50.179.6__bitwarden.castenow.de.png",
     "host": "bitwarden.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.6__bitwarden.castenow.de.png",
     "what": "Bitwarden Web vault"
    },
    {
     "file": "159.69.143.80__www.castenow.de.png",
     "host": "castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/159.69.143.80__www.castenow.de.png",
     "what": "Antwort von castenow.de"
    },
    {
     "file": "195.50.179.5__mailstore.castenow.de.png",
     "host": "mailstore.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.5__mailstore.castenow.de.png",
     "what": "Nextcloud"
    },
    {
     "file": "195.50.179.5__nextcloud.castenow.de.png",
     "host": "nextcloud.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.5__nextcloud.castenow.de.png",
     "what": "Anmelden · Nextcloud"
    },
    {
     "file": "195.50.179.9__openotp.castenow.de.png",
     "host": "openotp.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.9__openotp.castenow.de.png",
     "what": "Antwort von openotp.castenow.de"
    },
    {
     "file": "195.50.179.4__owa.castenow.de.png",
     "host": "owa.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.4__owa.castenow.de.png",
     "what": "Outlook"
    },
    {
     "file": "195.50.179.7__rdgw.castenow.de.png",
     "host": "rdgw.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.7__rdgw.castenow.de.png",
     "what": "IIS Windows Server"
    },
    {
     "file": "92.205.163.53__ubb-wiki.castenow.de.png",
     "host": "ubb-wiki.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/92.205.163.53__ubb-wiki.castenow.de.png",
     "what": "Login · My CMS"
    },
    {
     "file": "54.230.172.14__umfrage.castenow.de.png",
     "host": "umfrage.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/54.230.172.14__umfrage.castenow.de.png",
     "what": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
    },
    {
     "file": "195.50.179.2__vpn.castenow.de.png",
     "host": "vpn.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/195.50.179.2__vpn.castenow.de.png",
     "what": "Antwort von vpn.castenow.de"
    },
    {
     "file": "159.69.143.80__www.castenow.de.png",
     "host": "www.castenow.de",
+    "key": "2d2d4f39-0816-46a0-ba96-4d36b248a86c/159.69.143.80__www.castenow.de.png",
     "what": "CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW"
    }
   ],

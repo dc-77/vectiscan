@@ -25,3 +25,31 @@ PyYAML==6.0.3
 # mit. Ohne dieses Paket faellt der Bericht auf UTC zurueck und schreibt das an die
 # Uhrzeit, der Lauf bricht also nicht ab.
 tzdata==2025.3
+# S4 (20.09.2026): Renderer v3 (reporter/pdf/v3) rendert den Bericht als HTML und
+# setzt ihn mit WeasyPrint. Version 69.0 ist die des abgenommenen Prototyps
+# (report-prototype/build/build_report.py); 70.0 waere ein Hauptversionssprung und
+# kann den Umbruch verschieben, also erst nach einem Abgleich der Seitenzahlen.
+#
+# Die transitiven Pakete stehen hier mit, und das ist kein Uebereifer: Pyphen macht
+# die Silbentrennung (hyphens:auto in der Vorlage) und WeasyPrint den Umbruch. Beide
+# bestimmen damit die Seitenzahl, die tests/golden/render/expected-pages.json
+# festschreibt. Ungepinnt waere dieser Erwartungswert von der Tagesform der
+# Aufloesung abhaengig.
+weasyprint==69.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+pydyf==0.12.1
+tinycss2==1.5.1
+tinyhtml5==2.1.0
+cssselect2==0.10.1
+pyphen==0.18.1
+fonttools==4.65.0
+brotli==1.2.0
+zopfli==0.4.3
+pillow==12.3.0
+cffi==2.1.1
+pycparser==3.0
+webencodings==0.6.1
+# Wortzahl je Seite fuer den Sparse-Check. Oeffentliche API und reines Python; der
+# Prototyp rief dafuer pdftotext auf, poppler muss deshalb nicht ins Abbild.
+pypdf==6.19.0
