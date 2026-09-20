@@ -1,7 +1,10 @@
 """Golden-Tests des Katalogs (Auftrag S2, Abnahme):
 
-1. Drift: drei Junkerwerk-Laeufe ergeben auf Member-Ebene dieselben Ergebnisse, bis auf
+1. Drift: die Junkerwerk-Laeufe ergeben auf Member-Ebene dieselben Ergebnisse, bis auf
    Coverage-Unterschiede (not_testable / not_applicable), die in expected_map.json stehen.
+   Seit S2c sind es vier Laeufe: die drei vom 31.08. und der Rescan 860d0d5a vom 20.09.,
+   der erste mit den Scannerfixen aus S2b und mit einem AAAA-Host. Welche Laeufe verglichen
+   werden, steht allein in expected_map.json unter "orders".
 2. Soll-Liste: jeder Befund und jede Positivaussage aus tests/golden/expected/junkerwerk.json
    wird von den zugeordneten Pruefungen erzeugt; im strikten Modus faellt kein Check ausserhalb
    der Zuordnung.
@@ -146,8 +149,13 @@ def _group_reason(out: CatalogOutput, check_id: str, key: str) -> str:
     return ""
 
 
-@pytest.mark.parametrize("pair", [("multi", "de"), ("multi", "hu"), ("de", "hu")], ids=lambda p: f"{p[0]}-{p[1]}")
-def test_drift_drei_laeufe(pair):
+# Alle Paare aus expected_map.json["orders"]. Seit S2c sind das vier Laeufe
+# und damit sechs Paare; frueher standen die drei Paare fest im Code.
+PAARE = [(a, b) for i, a in enumerate(RUNS) for b in list(RUNS)[i + 1:]]
+
+
+@pytest.mark.parametrize("pair", PAARE, ids=lambda p: f"{p[0]}-{p[1]}")
+def test_drift_der_laeufe(pair):
     a, b = (out_for(RUNS[pair[0]]), out_for(RUNS[pair[1]]))
     ta, tb = _member_table(a), _member_table(b)
     drift: list[str] = []

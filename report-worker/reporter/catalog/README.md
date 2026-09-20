@@ -199,7 +199,8 @@ Felder vom Typ `Optional[bool]` duerfen nur mit `is True`, `is False`, `is not T
    die Member zeigen das Detail) > `pass` > `not_applicable`.
 6. Ohne Items entscheidet die Abdeckung der `requires.tools` ueber `COVERAGE_REASONS`
    (`no_ssl`, `cms_not_wordpress`, `no_web`, `not_in_package` -> `not_applicable`;
-   `wordlist_missing`, `does_not_exist`, `target_invalid_ipv6`, `web_unreachable_after_portscan`
+   `wordlist_missing`, `does_not_exist`, `target_invalid_ipv6`, `nmap_no_runstats`,
+   `no_ipv6_route`, `web_unreachable_after_portscan`
    ... -> `not_testable`). Ist alles `ok`: `absent` -> pass (positiv, wenn `texts.positive`),
    `never` -> stummes pass, Ausdruck -> `undetermined`.
 7. `positive: true` nur bei `pass` mit `texts.positive` und (`absent` oder mindestens einem

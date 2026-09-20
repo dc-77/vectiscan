@@ -1,0 +1,119 @@
+{
+ "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/lumbeck-wolter.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "strict": false,
+ "orders": {
+  "main": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35"
+ },
+ "findings": {
+  "VS-2026-001": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-002": {
+   "checks": [
+    "dane_missing"
+   ]
+  },
+  "VS-2026-003": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-004": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-005": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-006": {
+   "checks": [
+    "legacy_protocols_present"
+   ]
+  },
+  "VS-2026-007": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-008": {
+   "checks": [
+    "service_banner_version"
+   ]
+  },
+  "VS-2026-009": {
+   "checks": [
+    "spf_softfail"
+   ]
+  },
+  "VS-2026-010": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  }
+ },
+ "positives": {
+  "VS-2026-P01": {
+   "checks": [
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-P02": {
+   "checks": [
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P03": {
+   "checks": [
+    "dns_zone_transfer"
+   ]
+  },
+  "VS-2026-P04": {
+   "checks": [
+    "ftp_plaintext"
+   ]
+  },
+  "VS-2026-P05": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P06": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P07": {
+   "checks": [
+    "mail_plaintext"
+   ]
+  },
+  "VS-2026-P08": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P09": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P10": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P11": {
+   "checks": [
+    "urlhaus_compromise"
+   ]
+  }
+ },
+ "subsumed": {},
+ "expected_coverage_differences": [],
+ "expected_member_differences": []
+}

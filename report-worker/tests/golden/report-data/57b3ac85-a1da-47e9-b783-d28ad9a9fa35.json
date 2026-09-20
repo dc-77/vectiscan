@@ -1,0 +1,896 @@
+{
+ "appendix": {
+  "cve_refs": [],
+  "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 20.09.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "exposure_scale": [
+   {
+    "l": "kritisch",
+    "t": "Dienst, der nicht an das öffentliche Interface gehört (Datenbanken, Verwaltungsoberflächen, Fernwartung) und aus dem Internet erreichbar ist."
+   },
+   {
+    "l": "erhöht",
+    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
+   }
+  ],
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 17 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (7 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 6 Befunde und 6 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "hygiene_scale": [
+   {
+    "l": "hoch",
+    "t": "Abweichung mit direktem Bezug zu Anmeldedaten, Authentizität oder Zugangswegen; zeitnah beheben."
+   },
+   {
+    "l": "mittel",
+    "t": "Abweichung, die Angriffe erleichtert oder Schutzmechanismen aushebelt; im nächsten Wartungszyklus beheben."
+   },
+   {
+    "l": "niedrig",
+    "t": "Best-Practice-Abweichung ohne unmittelbare Auswirkung; bei Gelegenheit beheben."
+   }
+  ],
+  "inventory": [
+   {
+    "host": "116.202.77.64",
+    "port": "21",
+    "ref": "VS-2026-003",
+    "svc": "ProFTPD, TLS erzwungen"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "22",
+    "ref": "",
+    "svc": "ProFTPD mod_sftp"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "110",
+    "ref": "VS-2026-003",
+    "svc": "Courier pop3d, STARTTLS"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "143",
+    "ref": "VS-2026-003",
+    "svc": "Dovecot imapd, TLS erzwungen"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "222",
+    "ref": "VS-2026-005",
+    "svc": "OpenSSH 9.2p1"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, TLS erzwungen"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "465",
+    "ref": "",
+    "svc": "SMTP, TLS erzwungen"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "587",
+    "ref": "",
+    "svc": "SMTP, TLS erzwungen"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "993",
+    "ref": "",
+    "svc": "IMAPS, TLS erzwungen"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "995",
+    "ref": "",
+    "svc": "POP3S, TLS erzwungen"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "3306",
+    "ref": "VS-2026-001",
+    "svc": "MySQL 10.11.18"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "5432",
+    "ref": "VS-2026-001",
+    "svc": "PostgreSQL DB"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "25",
+    "ref": "",
+    "svc": "unbekannt, laut Passivquelle"
+   },
+   {
+    "host": "116.202.77.64",
+    "port": "4190",
+    "ref": "",
+    "svc": "unbekannt, laut Passivquelle"
+   }
+  ],
+  "repeat": [
+   "Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die betroffenen Dienste.",
+   "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
+   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall.",
+   "Freischaltung der Scanner-Adresse beim Betreiber der blockierenden Systeme, damit die offenen Prüfungen im nächsten Durchgang nachgeholt werden können."
+  ],
+  "tool_findings": [],
+  "tools": [
+   {
+    "c": "hoch (Dienste), mittel (Versionen)",
+    "t": "nmap",
+    "u": "Portscan der häufigsten TCP-Ports, Dienst- und Versionserkennung"
+   },
+   {
+    "c": "mittel",
+    "t": "OWASP ZAP (passiv, Spider)",
+    "u": "Passive Analyse von Antworten, Formularen und Headern"
+   },
+   {
+    "c": "mittel",
+    "t": "feroxbuster",
+    "u": "Verzeichnis- und Datei-Enumeration"
+   },
+   {
+    "c": "mittel",
+    "t": "webtech, wafw00f",
+    "u": "Web-Technologien und vorgelagerte Schutzsysteme"
+   },
+   {
+    "c": "hoch",
+    "t": "dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
+    "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
+   },
+   {
+    "c": "mittel (Passivquelle, Zeitversatz)",
+    "t": "Shodan, AbuseIPDB, OTX, URLhaus",
+    "u": "Passive Dienst- und Reputationsdaten"
+   },
+   {
+    "c": "hoch (autoritative Fremdquelle)",
+    "t": "NVD, EPSS, CISA KEV",
+    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
+   }
+  ],
+  "triage": [
+   {
+    "l": "Rot",
+    "st": "rot",
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist oder einen kritischen Dienst exponiert. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+   },
+   {
+    "l": "Gelb",
+    "st": "gelb",
+    "t": "Handlungsbedarf mit erkennbarem Angriffsweg. Dringlichkeit: In Kürze (1 bis 2 Wochen) oder Mittelfristig (nächster Wartungszyklus)."
+   },
+   {
+    "l": "Blau",
+    "st": "blau",
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig oder Strategisch (laufendes Quartal)."
+   },
+   {
+    "l": "Grün",
+    "st": "gruen",
+    "t": "Positiver Befund: Schutzmaßnahme vorhanden und wirksam."
+   }
+  ]
+ },
+ "architecture": {
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 1 Host mit folgenden Aufgaben: Mail- und Kalenderplattform und Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "notes": [
+   "2 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie sind kein Befund und wurden intern zur Nachbearbeitung vorgemerkt."
+  ],
+  "posture": [
+   {
+    "items": [
+     {
+      "l": "SPF",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "DKIM",
+      "ok": true,
+      "v": "unauffällig"
+     },
+     {
+      "l": "DMARC",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "MTA-STS",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "TLS-RPT, DANE",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     }
+    ],
+    "name": "E-Mail-Authentizität",
+    "short": "E-Mail-Authentizität"
+   },
+   {
+    "items": [
+     {
+      "l": "DNSSEC",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "CAA",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "Abruf der gesamten Zone",
+      "ok": true,
+      "v": "unauffällig"
+     },
+     {
+      "l": "Verwaiste Einträge",
+      "ok": null,
+      "v": "entfällt"
+     }
+    ],
+    "name": "DNS-Hygiene",
+    "short": "DNS-Hygiene"
+   },
+   {
+    "items": [
+     {
+      "l": "116.202.77.64",
+      "ok": null,
+      "v": "nicht prüfbar"
+     },
+     {
+      "l": "Zertifikate",
+      "ok": null,
+      "v": "nicht prüfbar"
+     }
+    ],
+    "name": "Transportverschlüsselung",
+    "short": "Transportverschlüsselung"
+   },
+   {
+    "items": [
+     {
+      "l": "116.202.77.64",
+      "ok": null,
+      "v": "nicht prüfbar"
+     }
+    ],
+    "name": "Sicherheits-Header",
+    "short": "Sicherheits-Header"
+   }
+  ],
+  "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
+  "screens": [],
+  "screens_lead": "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts.",
+  "services": [
+   {
+    "host": "116.202.77.64",
+    "label": "dedi5705.your-server.de",
+    "ports": [
+     {
+      "p": "21",
+      "s": "ProFTPD",
+      "st": "blau"
+     },
+     {
+      "p": "22",
+      "s": "ProFTPD mod_sftp",
+      "st": "gruen"
+     },
+     {
+      "p": "80",
+      "s": "Apache httpd",
+      "st": "gruen"
+     },
+     {
+      "p": "110",
+      "s": "Courier pop3d",
+      "st": "blau"
+     },
+     {
+      "p": "143",
+      "s": "Dovecot imapd",
+      "st": "blau"
+     },
+     {
+      "p": "222",
+      "s": "OpenSSH",
+      "st": "blau"
+     },
+     {
+      "p": "443",
+      "s": "Apache httpd",
+      "st": "gruen"
+     },
+     {
+      "p": "465",
+      "s": "SMTP",
+      "st": "gruen"
+     },
+     {
+      "p": "587",
+      "s": "SMTP",
+      "st": "gruen"
+     },
+     {
+      "p": "993",
+      "s": "IMAPS",
+      "st": "gruen"
+     },
+     {
+      "p": "995",
+      "s": "POP3S",
+      "st": "gruen"
+     },
+     {
+      "p": "3306",
+      "s": "MySQL",
+      "st": "rot"
+     },
+     {
+      "p": "5432",
+      "s": "PostgreSQL DB",
+      "st": "rot"
+     },
+     {
+      "p": "25",
+      "s": "unbekannt",
+      "st": "grau"
+     },
+     {
+      "p": "4190",
+      "s": "unbekannt",
+      "st": "grau"
+     }
+    ]
+   }
+  ],
+  "services_note": "Rot: Dienst mit kritischem Befund · Gelb: Dienst mit Befund · Blau: Altprotokoll · Grün: unauffällig · Grau: nur aus einer Passivquelle bekannt.",
+  "tech": [
+   {
+    "host": "116.202.77.64 (dedi5705.your-server.de)",
+    "rows": [
+     {
+      "c": "MariaDB",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "10.11.18 (debian)"
+     },
+     {
+      "c": "PostgreSQL",
+      "conf": "mittel",
+      "note": "Version von außen nicht genau bestimmbar",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "ProFTPD",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Courier",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Dovecot",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "OpenSSH",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "9.2p1"
+     },
+     {
+      "c": "ProFTPD mod_sftp",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Apache httpd",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     }
+    ]
+   }
+  ]
+ },
+ "business": {
+  "implication": "Die Befunde dieses Berichts sind danach geordnet, wie nah sie an den Zugangswegen in das Unternehmensnetz liegen. Ein Dienst, über den sich jemand anmelden kann, wiegt schwerer als eine Abweichung an einer reinen Auslieferungsseite. Bei einem Vorfall mit personenbezogenen Daten gilt die Meldepflicht nach Art. 33 DSGVO innerhalb von 72 Stunden.",
+  "lead": "Was der Scan über das Unternehmen sichtbar macht, bestimmt, welche Befunde wirklich zählen. Maßgeblich ist nicht die Zahl der Meldungen, sondern welche Systeme am Perimeter stehen und wofür sie gebraucht werden.",
+  "observed": [
+   {
+    "meaning": "Über dieses System läuft die geschäftliche Korrespondenz. Ein Zugriff darauf trifft Vertraulichkeit und Arbeitsfähigkeit zugleich.",
+    "system": "Mail- und Kalenderplattform, Website und Datenbanken (lumbeck-wolter.de, www.lumbeck-wolter.de)"
+   }
+  ]
+ },
+ "findings": [
+  {
+   "affected": "116.202.77.64:3306 (MariaDB), 116.202.77.64:5432 (PostgreSQL)",
+   "cat": "A",
+   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 880965 Capabilities flags: 65534 Some Capabilities: LongColumnFlag, SwitchToSSLAfterHandshake, FoundRows, IgnoreSpaceBeforeParenthesis, SupportsTransactions, O...\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+   "found": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 116.202.77.64:3306 (MariaDB), 116.202.77.64:5432 (PostgreSQL). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
+   "id": "VS-2026-001",
+   "impact": "Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.",
+   "level": "kritisch",
+   "policy": "SP-DB-001",
+   "recommendation": [
+    [
+     "Unverzüglich",
+     "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken."
+    ],
+    [
+     "In Kürze",
+     "Datenbank-Zugangsdaten rotieren und die Zugriffsprotokolle der letzten Monate auf fremde Anmeldeversuche prüfen."
+    ],
+    [
+     "Mittelfristig",
+     "Administrativen Datenbankzugriff ausschließlich über einen SSH-Tunnel oder ein VPN zulassen."
+    ]
+   ],
+   "scale": "exposure",
+   "source": "aktiv (nmap)",
+   "status": "rot",
+   "threat": null,
+   "title": "Datenbankdienst aus dem Internet erreichbar",
+   "urgency": "Unverzüglich",
+   "verify": "Portscan der betroffenen Datenbankports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen."
+  },
+  {
+   "affected": "lumbeck-wolter.de, lumbeck-wolter.de (~all)",
+   "cat": "C",
+   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "found": "Für lumbeck-wolter.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: lumbeck-wolter.de, lumbeck-wolter.de (~all).",
+   "id": "VS-2026-002",
+   "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+   "level": "hoch",
+   "policy": "SP-DNS-006, SP-DNS-005",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten."
+    ],
+    [
+     "Mittelfristig",
+     "Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records, dns_security)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Richtlinie zur Absender-Authentizität für lumbeck-wolter.de nicht durchsetzend",
+   "urgency": "In Kürze",
+   "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+  },
+  {
+   "affected": "116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP)",
+   "cat": "A",
+   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n110/tcp open pop3 Courier pop3d\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\npop3-capabilities: TOP UIDL CAPA SASL AUTH-RESP-CODE PIPELINING RESP-CODES STLS\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n143/tcp open imap Dovecot imapd\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nimap-capabilities: LOGIN-REFERRALS LOGINDISABLEDA0001 LITERAL+ post-login listed OK Pre-login ID SASL-IR IMAP4rev1 more ENABLE IDLE STARTTLS capabilities have",
+   "found": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
+   "id": "VS-2026-003",
+   "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+   "level": "niedrig",
+   "policy": "Prototyp VS-005",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren."
+    ],
+    [
+     "Mittelfristig",
+     "Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "blau",
+   "threat": null,
+   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+   "urgency": "In Kürze",
+   "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+  },
+  {
+   "affected": "lumbeck-wolter.de",
+   "cat": "C",
+   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "found": "Für lumbeck-wolter.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: lumbeck-wolter.de.",
+   "id": "VS-2026-004",
+   "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+   "level": "niedrig",
+   "policy": "Prototyp VS-008, SP-DNS-009, SP-DNS-011",
+   "recommendation": [
+    [
+     "Strategisch",
+     "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records, dns_security)",
+   "status": "blau",
+   "threat": null,
+   "title": "Transportverschlüsselung im Mailversand für lumbeck-wolter.de nicht erzwungen",
+   "urgency": "Strategisch",
+   "verify": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+  },
+  {
+   "affected": "116.202.77.64:222 (OpenSSH 9.2p1), 116.202.77.64:3306 (MariaDB 10.11.18), 116.202.77.64:5432 (PostgreSQL unbekannt)",
+   "cat": "E",
+   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 880965 Capabilities flags: 65534 Some Capabilities: LongColumnFlag, SwitchToSSLAfterHandshake, FoundRows, IgnoreSpaceBeforeParenthesis, SupportsTransactions, O...\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 116.202.77.64:222 (OpenSSH 9.2p1), 116.202.77.64:3306 (MariaDB 10.11.18), 116.202.77.64:5432 (PostgreSQL unbekannt).",
+   "id": "VS-2026-005",
+   "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+   "level": "niedrig",
+   "policy": "SP-DISC-001",
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten."
+    ],
+    [
+     "Strategisch",
+     "Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "blau",
+   "threat": null,
+   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "urgency": "Mittelfristig",
+   "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+  },
+  {
+   "affected": "lumbeck-wolter.de",
+   "cat": "E",
+   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "found": "Für lumbeck-wolter.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: lumbeck-wolter.de.",
+   "id": "VS-2026-006",
+   "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+   "level": "niedrig",
+   "policy": "SP-DNS-003, SP-DNS-001",
+   "recommendation": [
+    [
+     "Strategisch",
+     "Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records, dns_security)",
+   "status": "blau",
+   "threat": null,
+   "title": "DNS-Absicherung für lumbeck-wolter.de nicht eingerichtet",
+   "urgency": "Strategisch",
+   "verify": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+  }
+ ],
+ "glance": {
+  "categories": [
+   {
+    "key": "A",
+    "level": 4,
+    "name": "Perimeter-Exposition",
+    "note": "Datenbankdienst aus dem Internet erreichbar; Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+    "status": "rot"
+   },
+   {
+    "key": "B",
+    "level": 0,
+    "name": "Patch- und EOL-Status",
+    "note": "Keine Befunde in dieser Kategorie",
+    "status": "gruen"
+   },
+   {
+    "key": "C",
+    "level": 2,
+    "name": "E-Mail-Authentizität",
+    "note": "Richtlinie zur Absender-Authentizität für lumbeck-wolter.de nicht durchsetzend; Transportverschlüsselung im Mailversand für lumbeck-wolter.de nicht erzwungen",
+    "status": "gelb"
+   },
+   {
+    "key": "D",
+    "level": 0,
+    "name": "Web- und Transport-Hygiene",
+    "note": "Keine Befunde in dieser Kategorie",
+    "status": "gruen"
+   },
+   {
+    "key": "E",
+    "level": 1,
+    "name": "Konfiguration und Informations-Hygiene",
+    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste; DNS-Absicherung für lumbeck-wolter.de nicht eingerichtet",
+    "status": "blau"
+   }
+  ],
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von lumbeck-wolter.de am 20.09.2026: 2 Hostnamen auf 1 IP-Adresse. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "coverage_warning": "Für 116.202.77.64 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "levers": [
+   {
+    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+    "n": 1,
+    "refs": [
+     "VS-2026-001"
+    ],
+    "title": "Datenbankdienst aus dem Internet erreichbar"
+   },
+   {
+    "effect": "Schützt die Authentizität der eigenen E-Mail",
+    "n": 2,
+    "refs": [
+     "VS-2026-002"
+    ],
+    "title": "Richtlinie zur Absender-Authentizität für lumbeck-wolter.de nicht durchsetzend"
+   },
+   {
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "n": 3,
+    "refs": [
+     "VS-2026-003"
+    ],
+    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+   }
+  ],
+  "overall": "HOCH",
+  "overall_status": "rot",
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die Härtung der erreichbaren Dienste, die Authentizität der E-Mail und die Transportverschlüsselung."
+ },
+ "landscape_lead": "6 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "meta": {
+  "after_fp": 10,
+  "catalog_digest": "af96d64eabc6b26698929f9ffc487c9885b6d99064d0d199b74ae1030bf0053c",
+  "catalog_version": "2026-09-20.1",
+  "classification": "Vertraulich",
+  "consolidated": 6,
+  "customer": "Auftraggeber",
+  "customer_short": "Auftraggeber",
+  "domains": [
+   "lumbeck-wolter.de"
+  ],
+  "facts_schema_version": "1.0.1",
+  "fqdns_total": 2,
+  "hosts_ipv4": 1,
+  "hosts_ipv6": 0,
+  "hosts_total": 1,
+  "orders": [
+   {
+    "id": "57b3ac85-a1da-47e9-b783-d28ad9a9fa35",
+    "label": "Lauf 1"
+   }
+  ],
+  "package": "Perimeter",
+  "package_label": "PERIMETERSCAN",
+  "policy_version": "2026-09-20.1",
+  "positives": 6,
+  "prose_rejected": [],
+  "provider": "Vectigal GmbH",
+  "provider_address": "Olpe 31-33 · 44135 Dortmund",
+  "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
+  "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
+  "provider_responsible": "Daniel Czischke, Geschäftsführer",
+  "raw_findings": 17,
+  "report_date": "19.09.2026",
+  "report_id": "VS-2026-0920",
+  "report_version": "1.0",
+  "scan_date": "20.09.2026",
+  "scan_window": "20.09.2026, 12:44 bis 12:58 Uhr (CEST)",
+  "tool_runs": 39
+ },
+ "plan": [
+  {
+   "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
+   "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+   "prio": "Unverzüglich",
+   "refs": [
+    "VS-2026-001"
+   ],
+   "st": "rot"
+  },
+  {
+   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-002"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-003"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+   "effect": "Nimmt Angreifern Vorbereitungswissen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-005"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "prio": "Strategisch",
+   "refs": [
+    "VS-2026-004",
+    "VS-2026-006"
+   ],
+   "st": "blau"
+  }
+ ],
+ "positives": [
+  {
+   "cat": "A",
+   "text": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet seinen Webdienst über HTTPS an.",
+   "title": "Webdienst mit Transportverschlüsselung"
+  },
+  {
+   "cat": "A",
+   "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) lehnen die Datei- und Mailzugänge eine Anmeldung ohne aufgebaute Transportverschlüsselung ab.",
+   "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
+  },
+  {
+   "cat": "A",
+   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
+   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
+  },
+  {
+   "cat": "C",
+   "text": "Für lumbeck-wolter.de lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
+   "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
+  },
+  {
+   "cat": "C",
+   "text": "Für lumbeck-wolter.de sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
+   "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+  },
+  {
+   "cat": "E",
+   "text": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
+   "title": "Keine Einträge in Reputationsquellen"
+  }
+ ],
+ "scope": {
+  "ai_note": "Die Befunde dieses Berichts entstehen regelbasiert aus den Ausgaben der eingesetzten Werkzeuge: ein Prüfkatalog wertet die erhobenen Fakten aus, jede Einstufung folgt einer hinterlegten Regel. Ein Sprachmodell formuliert einzelne erläuternde Absätze und steuert im Scanner die Reihenfolge und die Konfiguration der Werkzeuge. Es entscheidet weder über Befunde noch über deren Einstufung.",
+  "can_cannot": {
+   "advice": "Für die Zugangs-Infrastruktur empfehlen wir ergänzend eine Konfigurationsprüfung mit administrativem Zugang.",
+   "can": [
+    "erreichbare Dienste, Versionen und Konfigurationsschwächen aus Angreifersicht",
+    "E-Mail- und DNS-Authentizität, Transportverschlüsselung, Sicherheits-Header",
+    "bekannte Schwachstellenmuster ohne Anmeldung"
+   ],
+   "cannot": [
+    "Schwachstellen hinter einer Anmeldung",
+    "Versionsstände, die sich nicht in der Antwort eines Dienstes zeigen",
+    "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
+   ]
+  },
+  "hosts": [
+   {
+    "cov": "teil",
+    "coverage": "Portscan vollständig; Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich.",
+    "fqdns": "lumbeck-wolter.de, www.lumbeck-wolter.de",
+    "ip": "116.202.77.64",
+    "operator": "Hetzner Online GmbH (dedi5705.your-server.de)",
+    "role": "Mail- und Kalenderplattform, Website und Datenbanken"
+   }
+  ],
+  "lead": "Der Scan hat 1 IP-Adresse mit 2 Hostnamen erfasst. Für 1 Host war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "limitations": [
+   {
+    "detail": "Betroffen: gobuster_dns auf lumbeck-wolter.de.",
+    "what": "Das Werkzeug gobuster_dns hat kein Ergebnis geliefert"
+   },
+   {
+    "detail": "Betroffen: ffuf_sensitive auf 116.202.77.64, header_check auf www.lumbeck-wolter.de, httpx auf 116.202.77.64, testssl auf 116.202.77.64, webtech auf 116.202.77.64, www.lumbeck-wolter.de (+lumbeck-wolter.de) und weitere.",
+    "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
+   },
+   {
+    "detail": "Betroffen: lumbeck-wolter.de.",
+    "what": "Keine WHOIS-Daten vorhanden"
+   }
+  ],
+  "method_phases": [
+   {
+    "n": "0",
+    "name": "Aufklärung (passiv)",
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 2 Hostnamen auf 1 IP-Adressen."
+   },
+   {
+    "n": "1",
+    "name": "Technologie-Erkennung",
+    "text": "Portscan der häufigsten TCP-Ports mit Versionserkennung, Erkennung der Web-Technologien und vorgelagerter Schutzsysteme."
+   },
+   {
+    "n": "2",
+    "name": "Tiefenprüfung",
+    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, Verzeichnis-Enumeration und passive Webanalyse."
+   },
+   {
+    "n": "3",
+    "name": "Auswertung",
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 6 Befunde und 6 positive Feststellungen."
+   }
+  ],
+  "numbers": [
+   {
+    "l": "Scandurchgang",
+    "v": "1"
+   },
+   {
+    "l": "Werkzeugläufe",
+    "v": "39"
+   },
+   {
+    "l": "Einzelbeobachtungen",
+    "v": "17"
+   },
+   {
+    "l": "Befunde im Bericht",
+    "v": "6"
+   }
+  ],
+  "out_of_scope": [
+   "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
+   "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",
+   "Social Engineering, Phishing-Simulationen, physische Sicherheit."
+  ],
+  "standard_note": "Einordnung: automatisierte externe Schwachstellenanalyse, angelehnt an die Prüfphasen Aufklärung, Schwachstellenanalyse und Bericht. Kein Penetrationstest, keine Ausnutzung gefundener Schwachstellen, keine Prüfung mit Zugangsdaten."
+ }
+}
+
