@@ -10,6 +10,11 @@
 ``--golden`` und ``--source`` bauen die Reportdaten ohne Sprachmodell (Katalogtexte).
 ``--upload`` legt das PDF unter ``scan-debug/v3/`` ab und laesst Auftrag, Status und
 ``reports`` unberuehrt.
+
+``--context`` holt den Kundenkontext der Order (S5), ``--prose`` laesst zusaetzlich
+die Prosa-KI laufen und meldet, welche Felder das Gate genommen und welche es
+abgelehnt hat. Beides ist fuer die Abnahme auf Produktion gedacht; der Auftrag
+bleibt auch damit unberuehrt.
 """
 from __future__ import annotations
 
@@ -41,6 +46,19 @@ REFERENZ_ORDER = SNAPSHOT_ORDER
 
 # Fester Stichtag, damit Seitenzahl und Schnappschuss nicht vom Kalender abhaengen.
 REPORT_DATE = "19.09.2026"
+
+
+def _kundenkontext(order_id: str) -> dict:
+    """Kundenkontext der Order aus der Datenbank (S5). Leer, wenn nichts da ist."""
+    try:
+        import psycopg2
+
+        from reporter.worker import DATABASE_URL, _load_customer_context
+        with psycopg2.connect(DATABASE_URL) as conn:
+            return _load_customer_context(conn, order_id)
+    except Exception as exc:  # pragma: no cover - Datenbankpfad
+        print(f"Kundenkontext nicht lesbar: {exc}", file=sys.stderr)
+        return {}
 
 
 def _golden_data(order_id: str):
@@ -134,6 +152,47 @@ def _update_pages() -> int:
     return 0
 
 
+def _prosa(data, customer_context: dict | None, order_id: str | None) -> int:
+    """Prosa-KI auf fertige Reportdaten anwenden und berichten.
+
+    Fuer die Abnahme: welche der vier Felder das Gate genommen hat, welche es mit
+    welcher Begruendung abgelehnt hat, und was der Aufruf gekostet hat.
+    """
+    from reporter.v3 import prose
+
+    if not prose.available():
+        print("Prosa-KI uebersprungen: kein ANTHROPIC_API_KEY", file=sys.stderr)
+        return 0
+
+    payload = prose.build_payload(data, customer_context)
+    vorher = (data.glance.overall_text, data.business.implication,
+              [o.meaning for o in data.business.observed],
+              [f.impact for f in data.findings])
+    fields, cost = prose.generate(payload, order_id=order_id)
+    rejected = prose.apply_prose(data, fields, payload)
+
+    angenommen = []
+    if data.glance.overall_text != vorher[0]:
+        angenommen.append("overall_text")
+    if data.business.implication != vorher[1]:
+        angenommen.append("implication")
+    geaendert = sum(1 for alt, o in zip(vorher[2], data.business.observed)
+                    if alt != o.meaning)
+    if geaendert:
+        angenommen.append(f"observed ({geaendert} von {len(vorher[2])})")
+    geaendert = sum(1 for alt, f in zip(vorher[3], data.findings) if alt != f.impact)
+    if geaendert:
+        angenommen.append(f"impact ({geaendert} von {len(vorher[3])})")
+
+    print(f"Prosa angenommen: {', '.join(angenommen) or 'nichts'}")
+    print(f"Prosa abgelehnt: {len(rejected)}")
+    for grund in rejected:
+        print(f"  abgelehnt: {grund}", file=sys.stderr)
+    if cost:
+        print(f"Prosa Kosten: {json.dumps(cost, ensure_ascii=False, sort_keys=True)}")
+    return len(rejected)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="python -m reporter.pdf.v3", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -147,6 +206,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--html", help="zusaetzlich das HTML schreiben")
     ap.add_argument("--html-only", action="store_true", help="kein PDF, nur HTML (ohne WeasyPrint)")
     ap.add_argument("--strict", action="store_true", help="Defekte als Fehler behandeln")
+    ap.add_argument("--context", action="store_true",
+                    help="mit --order: Kundenkontext aus der Datenbank laden (S5)")
+    ap.add_argument("--prose", action="store_true",
+                    help="Prosa-KI laufen lassen und das Ergebnis berichten (S5)")
     ap.add_argument("--selftest", action="store_true", help="Golden-Auftraege rendern und pruefen")
     ap.add_argument("--write-snapshot", action="store_true", help="Regressionsdatei neu schreiben")
     ap.add_argument("--update-pages", action="store_true", help="Seitenzahlen neu festschreiben")
@@ -167,6 +230,7 @@ def main(argv: list[str] | None = None) -> int:
     resolver = None
     tmpdir: tempfile.TemporaryDirectory | None = None
     client = None
+    customer_context: dict | None = None
     order_id = args.order or args.golden or "bericht"
 
     if args.golden:
@@ -177,11 +241,18 @@ def main(argv: list[str] | None = None) -> int:
         client = P.minio_client()
         tmpdir = tempfile.TemporaryDirectory()
         tar = P.fetch_rawdata(client, args.order, Path(tmpdir.name))
-        data = P.report_data_from_source(tar, tool_runs=P.tool_runs_from_db(args.order))
+        if args.context:
+            customer_context = _kundenkontext(args.order)
+            print(f"Kundenkontext: {json.dumps(customer_context, ensure_ascii=False, sort_keys=True)}")
+        data = P.report_data_from_source(tar, tool_runs=P.tool_runs_from_db(args.order),
+                                         customer_context=customer_context)
         resolver = MinioScreenshots(client)
     else:
         ap.error("eine Quelle angeben: --golden, --source oder --order")
         return 2
+
+    if args.prose:
+        _prosa(data, customer_context, args.order)
 
     if args.html_only:
         html = render_html(data, resolver=resolver, package=args.package)[0]

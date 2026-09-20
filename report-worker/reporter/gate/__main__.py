@@ -13,6 +13,12 @@ Schalter wird nur ausgegeben.
 
     python -m reporter.gate --order <uuid>
     python -m reporter.gate --order <uuid> --damage abdeckung --apply
+    python -m reporter.gate --order <uuid> --research
+
+``--research`` laesst die Recherche-KI gegen die Domains und Hostnamen des
+Auftrags laufen und schreibt die Vorschlaege nach ``orders.customer_context``.
+Kundenangaben und Admin-Korrekturen bleiben unberuehrt; ohne Zugangsschluessel
+passiert nichts.
 """
 from __future__ import annotations
 
@@ -60,6 +66,44 @@ def _damage(data: Any, facts: Any, art: str) -> str:
     return "nichts beschaedigt"
 
 
+def _research(order_id: str, facts: Any) -> int:
+    """Recherche-KI gegen die Fakten des Auftrags, Ergebnis auf die Order.
+
+    Fuer die Abnahme: welche Felder dazugekommen sind, mit welcher Quelle, und
+    was das Gate abgelehnt hat.
+    """
+    import psycopg2
+
+    from reporter.v3 import research
+    from reporter.worker import (DATABASE_URL, _load_customer_context,
+                                 _research_customer_context)
+
+    if not research.available():
+        print("Recherche uebersprungen: kein ANTHROPIC_API_KEY", file=sys.stderr)
+        return 0
+
+    inventory = {
+        "domain": facts.scan.domain,
+        "hosts": [{"ip": h.ip, "fqdns": [f.name for f in facts.fqdns if f.host_ip == h.ip]}
+                  for h in facts.hosts],
+    }
+    with psycopg2.connect(DATABASE_URL) as conn:
+        vorher = _load_customer_context(conn, order_id)
+        nachher = _research_customer_context(conn, order_id, vorher, inventory)
+
+    neu = sorted(k for k in nachher
+                 if k != "sources" and nachher.get(k) != vorher.get(k))
+    print(f"Recherche ergaenzt: {', '.join(neu) or 'nichts'}")
+    print(f"Kundenkontext: {json.dumps(nachher, ensure_ascii=False, sort_keys=True)}")
+    # Belegen, dass keine Kundenangabe ueberschrieben wurde.
+    fremd = [k for k, v in vorher.items()
+             if k != "sources" and nachher.get(k) != v]
+    if fremd:
+        print(f"WARNUNG: bestehende Felder veraendert: {fremd}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def _block(order_id: str, payload: dict) -> None:
     """Defektliste und Status auf die Order schreiben."""
     import psycopg2
@@ -82,6 +126,8 @@ def main(argv: list[str] | None = None) -> int:
                     help="Datenmodell gezielt beschaedigen (nur im Speicher)")
     ap.add_argument("--apply", action="store_true",
                     help="Defektliste und Status report_blocked auf die Order schreiben")
+    ap.add_argument("--research", action="store_true",
+                    help="Recherche-KI fuer den Kundenkontext laufen lassen (S5)")
     args = ap.parse_args(argv)
 
     # Das JSON geht nach stdout und soll durch eine Pipe lesbar bleiben; die
@@ -100,6 +146,11 @@ def main(argv: list[str] | None = None) -> int:
             minio_client(), args.order, Path(tmp))
         facts, output, data = report_bundle_from_source(
             quelle, tool_runs=tool_runs_from_db(args.order))
+
+    if args.research:
+        rc = _research(args.order, facts)
+        if rc:
+            return rc
 
     beschreibung = _damage(data, facts, args.damage)
 
