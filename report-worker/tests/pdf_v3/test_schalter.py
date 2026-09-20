@@ -20,13 +20,22 @@ from tests.pdf_v3.conftest import JUNKERWERK_MULTI, REPORT_WORKER
 
 WORKER = (REPORT_WORKER / "reporter" / "worker.py").read_text(encoding="utf-8")
 TAR = REPORT_WORKER / "tests" / "golden" / "tars" / f"{JUNKERWERK_MULTI}.tar.gz"
+REPO = REPORT_WORKER.parent
+
+# docker-compose.yml und .gitlab-ci.yml liegen im Repo-Wurzelverzeichnis. Der
+# Docker-Build-Kontext des Workers ist report-worker/, im Abbild gibt es sie also
+# nicht. Die beiden Tests pruefen das Zusammenspiel im Repo, nicht den Renderer, und
+# werden dort uebersprungen (Lauf im Abbild: test-report-worker-pdf).
+nur_im_repo = pytest.mark.skipif(not (REPO / "docker-compose.yml").exists(),
+                                 reason="Repo-Wurzel fehlt (Lauf im Abbild)")
 
 
+@nur_im_repo
 def test_vorgabewerte_bleiben_wie_sie_waren():
     """v3 ist ein Opt-in. Code-Vorgabe v1, Compose-Vorgabe v2, beides unveraendert."""
     os.environ.pop("VECTISCAN_REPORT_LAYOUT", None)
     assert os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower() == "v1"
-    compose = (REPORT_WORKER.parent / "docker-compose.yml").read_text(encoding="utf-8")
+    compose = (REPO / "docker-compose.yml").read_text(encoding="utf-8")
     assert "VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v2}" in compose
 
 
@@ -91,8 +100,11 @@ def test_ablage_im_debug_bucket_statt_bei_den_berichten():
     assert DEBUG_PREFIX == "v3"
 
 
+@nur_im_repo
 def test_ops_job_ist_in_der_pipeline_hinterlegt():
-    ci = (REPORT_WORKER.parent / ".gitlab-ci.yml").read_text(encoding="utf-8")
+    ci = (REPO / ".gitlab-ci.yml").read_text(encoding="utf-8")
     assert "ops-render-v3:" in ci
     assert "test-report-worker-pdf:" in ci
     assert "VECTISCAN_REQUIRE_WEASYPRINT" in ci
+    # Der Abbild-Job muss den Marker abwaehlen, sonst faellt test_font_constants dort.
+    assert "not reportlab_fallback" in ci
