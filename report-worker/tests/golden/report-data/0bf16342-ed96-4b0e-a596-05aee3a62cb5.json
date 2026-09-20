@@ -430,41 +430,49 @@
    {
     "file": "217.243.248.28__autodiscover.junkerwerk.de.png",
     "host": "autodiscover.junkerwerk.de",
+    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__autodiscover.junkerwerk.de.png",
     "what": "Outlook"
    },
    {
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
     "host": "cloud.junkerwerk.de",
+    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.29__cloud.junkerwerk.de.png",
     "what": "IIS Windows Server"
    },
    {
     "file": "217.243.248.28__mail.junkerwerk.de.png",
     "host": "mail.junkerwerk.de",
+    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__mail.junkerwerk.de.png",
     "what": "Outlook"
    },
    {
     "file": "217.243.248.30__openotp.junkerwerk.de.png",
     "host": "openotp.junkerwerk.de",
+    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.30__openotp.junkerwerk.de.png",
     "what": "Junkerwerk Linder GmbH & Co.KG Web Applications Portal"
    },
    {
     "file": "217.243.248.28__outlook.junkerwerk.de.png",
     "host": "outlook.junkerwerk.de",
+    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.28__outlook.junkerwerk.de.png",
     "what": "Outlook"
    },
    {
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
     "host": "rdgw-2016.junkerwerk.de",
+    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.29__cloud.junkerwerk.de.png",
     "what": "Antwort von rdgw-2016.junkerwerk.de"
    },
    {
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
     "host": "rdgw.junkerwerk.de",
+    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.29__cloud.junkerwerk.de.png",
     "what": "Antwort von rdgw.junkerwerk.de"
    },
    {
     "file": "217.243.248.29__cloud.junkerwerk.de.png",
     "host": "team.junkerwerk.de",
+    "key": "0bf16342-ed96-4b0e-a596-05aee3a62cb5/217.243.248.29__cloud.junkerwerk.de.png",
     "what": "Antwort von team.junkerwerk.de"
    }
   ],

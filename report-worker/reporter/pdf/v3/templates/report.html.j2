@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>VectiScan {{ variant.report_title }} {{ m.customer_short }}</title>
+<style>
+/* ===== VectiScan Report v3 · Farbtokens aus frontend/src/app/globals.css ===== */
+/* Inter liegt als Paketressource neben dieser Vorlage (assets/fonts). Mitgeliefert
+   statt ueber Fontconfig gesucht, damit Umbruch und Seitenzahl in Image, CI und
+   Entwicklungsumgebung dieselben sind. SIL OFL 1.1, siehe assets/fonts/OFL.txt. */
+@font-face{font-family:Inter;font-style:normal;font-weight:400;src:url("fonts/Inter-Regular.ttf")format("truetype");}
+@font-face{font-family:Inter;font-style:normal;font-weight:500;src:url("fonts/Inter-Medium.ttf")format("truetype");}
+@font-face{font-family:Inter;font-style:normal;font-weight:600;src:url("fonts/Inter-SemiBold.ttf")format("truetype");}
+@font-face{font-family:Inter;font-style:normal;font-weight:700;src:url("fonts/Inter-Bold.ttf")format("truetype");}
+:root{
+ --navy:#0F172A; --navy2:#1E293B; --bg-dark:#0C1222; --cyan:#2DD4BF; --cyan-deep:#0F766E; --cyan-line:#14B8A6; --gold:#EAB308;
+ --ink:#1E293B; --body:#334155; --muted:#64748B; --muted2:#94A3B8;
+ --line:#E2E8F0; --line2:#CBD5E1; --off:#F1F5F9; --off2:#F8FAFC;
+ --rot:#EF4444; --gelb:#F59E0B; --blau:#3B82F6; --gruen:#22C55E; --grau:#94A3B8;
+ --rot-bg:#FEF2F2; --gelb-bg:#FFFBEB; --blau-bg:#EFF6FF; --gruen-bg:#F0FDF4; --grau-bg:#F1F5F9;
+}
+*{box-sizing:border-box;}
+@page{size:A4;margin:22mm 18mm 20mm 18mm;
+ @top-left{content:element(rhead);vertical-align:bottom;}
+ @bottom-left{content:"VectiScan · {{ variant.assessment|css_string }} · {{ m.customer_short|css_string }} · {{ m.classification|css_string }}";font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
+ @bottom-right{content:"Seite " counter(page) " von " counter(pages);font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
+}
+@page:first{margin:0;@top-left{content:none;}@bottom-left{content:none;}@bottom-right{content:none;}}
+body{font-family:Inter,sans-serif;color:var(--body);font-size:9.6pt;line-height:1.45;margin:0;}
+p{margin:0 0 5pt;} b,strong{font-weight:600;color:var(--ink);}
+.rhead{position:running(rhead);width:174mm;display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:2.2mm;border-bottom:0.6pt solid var(--line2);font-size:7.8pt;color:var(--muted);}
+.wm{font-weight:700;letter-spacing:-0.02em;color:var(--navy);font-size:10pt;display:inline-flex;align-items:center;gap:1.6mm;} .wm .c{color:var(--cyan-line);} .wm svg{display:inline-block;}
+.rhead .r{font-weight:400;}
+
+/* ---- Cover ---- */
+.cover{height:297mm;width:210mm;background:var(--bg-dark);color:#fff;position:relative;overflow:hidden;break-after:page;padding:24mm 22mm 18mm 26mm;}
+.cover .bar{position:absolute;left:0;top:0;width:7mm;height:297mm;background:var(--cyan);}
+.cover .wm{color:#F8FAFC;font-size:16pt;letter-spacing:-0.03em;gap:2.4mm;} .cover .wm .c{color:var(--cyan);}
+.cover .tag{display:inline-block;margin-top:2.5mm;font-size:7.5pt;letter-spacing:0.16em;color:var(--muted2);text-transform:uppercase;}
+.cover .badge{position:absolute;right:22mm;top:24mm;background:var(--cyan);color:var(--navy);font-weight:700;font-size:8pt;letter-spacing:0.14em;padding:1.8mm 3.5mm;border-radius:2px;}
+.cover .mid{margin-top:58mm;}
+.cover .eyebrow{font-size:9pt;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:6mm;}
+.cover h1{font-size:32pt;font-weight:700;line-height:1.08;letter-spacing:-0.02em;margin:0 0 3mm;color:#fff;}
+.cover .cust{font-size:17pt;font-weight:600;color:#fff;margin:0 0 5mm;}
+.cover .sub{font-size:14pt;font-weight:400;color:#E2E8F0;line-height:1.4;}
+.cover .sub .dom{color:#fff;font-weight:600;}
+.cover .meta{position:absolute;left:26mm;right:22mm;bottom:34mm;border-top:0.6pt solid #475569;padding-top:6mm;display:flex;}
+.cover .meta > div{width:54mm;padding-right:4mm;}
+.cover .meta .k{font-size:7.2pt;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted2);margin-bottom:1mm;}
+.cover .meta .v{font-size:9.2pt;color:#E2E8F0;font-weight:500;margin-bottom:4mm;}
+.cover .foot{position:absolute;left:26mm;right:22mm;bottom:14mm;font-size:7.5pt;color:var(--muted2);display:flex;justify-content:space-between;border-top:0.6pt solid #334155;padding-top:3mm;}
+.cover .logo-bg{position:absolute;right:-28mm;bottom:-22mm;width:150mm;height:158mm;opacity:0.07;}
+
+/* ---- Sections ---- */
+.sec{break-before:page;padding-top:2mm;}
+.sec-head{border-bottom:1.4pt solid var(--cyan-line);padding-bottom:2.5mm;margin:0 0 4.5mm;}
+.kicker{font-size:7.8pt;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--cyan-deep);}
+h2{font-size:17pt;font-weight:700;color:var(--navy);letter-spacing:-0.012em;margin:1.5mm 0 0;line-height:1.15;}
+h3{font-size:11pt;font-weight:600;color:var(--navy);margin:4mm 0 1.8mm;} h3:first-child{margin-top:0;}
+h4{font-size:9.4pt;font-weight:600;color:var(--navy2);margin:2.5mm 0 1mm;}
+.lead{font-size:10.4pt;color:var(--ink);margin:0 0 4mm;}
+.small{font-size:8.4pt;color:var(--muted);}
+ul{margin:0 0 5pt;padding-left:0;list-style:none;} li{position:relative;padding-left:5mm;margin-bottom:2.5pt;}
+li::before{content:"";position:absolute;left:0;top:0.55em;width:4.5px;height:4.5px;background:var(--cyan-line);border-radius:1px;}
+table{width:100%;border-collapse:collapse;font-size:8.6pt;margin:2mm 0 4mm;table-layout:fixed;}
+th{text-align:left;font-weight:600;color:var(--navy);border-bottom:1.1pt solid var(--navy);padding:1.5mm 2.5mm 1.5mm 0;font-size:8.4pt;}
+td{border-bottom:0.5pt solid var(--line);padding:1.2mm 2.2mm 1.2mm 0;vertical-align:top;}
+td{hyphens:auto;hyphenate-limit-chars:14 6 6;} p,li{hyphens:manual;}
+.mono{overflow-wrap:anywhere;}
+tr:last-child td{border-bottom:none;}
+tr{break-inside:avoid;}
+.mono{font-family:"DejaVu Sans Mono",monospace;font-size:8pt;}
+.pill{display:inline-block;font-size:7.6pt;font-weight:600;padding:0.5mm 2mm;border-radius:3px;white-space:nowrap;letter-spacing:0.02em;}
+.p-rot{background:var(--rot-bg);color:#B91C1C;} .p-gelb{background:var(--gelb-bg);color:#92400E;}
+.p-blau{background:var(--blau-bg);color:#1D4ED8;} .p-gruen{background:var(--gruen-bg);color:#15803D;} .p-grau{background:var(--grau-bg);color:#475569;}
+.dot{display:inline-block;width:2.6mm;height:2.6mm;border-radius:50%;vertical-align:middle;margin-right:1.5mm;}
+.d-rot{background:var(--rot);} .d-gelb{background:var(--gelb);} .d-blau{background:var(--blau);} .d-gruen{background:var(--gruen);} .d-grau{background:var(--grau);}
+.box{border:0.6pt solid var(--line2);border-radius:3px;padding:2.8mm 3.5mm;margin:2.5mm 0;break-inside:avoid;}
+.box.warn{border-color:#FDE68A;background:#FFFBEB;} .box.info{background:var(--off2);}
+.box .t{font-size:8pt;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--navy);margin-bottom:1.5mm;}
+.grid2{display:flex;gap:6mm;margin:2mm 0;} .grid2>div{flex:1;min-width:0;}
+
+/* ---- Ampel ---- */
+.ampel{width:100%;border-collapse:collapse;margin:2mm 0 3.5mm;font-size:9pt;}
+.ampel td{border-bottom:0.5pt solid var(--line);padding:1.7mm 2mm 1.7mm 0;vertical-align:middle;}
+.ampel .name{font-weight:600;color:var(--navy);}
+.seg{display:inline-block;width:9mm;height:3.2mm;margin-right:1mm;background:var(--line);border-radius:1px;vertical-align:middle;}
+.seg.on-rot{background:var(--rot);} .seg.on-gelb{background:var(--gelb);} .seg.on-blau{background:var(--blau);} .seg.on-gruen{background:var(--gruen);}
+.overall{display:flex;align-items:center;gap:5mm;background:var(--bg-dark);color:#fff;border-radius:3px;padding:3mm 4.5mm;margin:0 0 3mm;}
+.overall .lbl{font-size:7.5pt;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted2);}
+.overall .val{font-size:20pt;font-weight:700;letter-spacing:0.02em;line-height:1;}
+.overall .txt{font-size:8.9pt;color:#E2E8F0;line-height:1.4;flex:1;}
+.v-rot{color:#F87171;} .v-gelb{color:#FBBF24;} .v-blau{color:#60A5FA;} .v-gruen{color:#4ADE80;}
+.lever{border-left:2.2pt solid var(--cyan-line);background:var(--off2);padding:2.2mm 3.5mm 2mm;margin:0 0 2mm;break-inside:avoid;}
+.lever .n{font-size:8pt;font-weight:700;color:var(--cyan-deep);letter-spacing:0.1em;}
+.lever .ti{font-size:10.2pt;font-weight:600;color:var(--navy);margin:0.3mm 0 0.8mm;}
+.lever .ef{font-size:9pt;color:var(--body);} .lever .rf{font-size:7.8pt;color:var(--muted);margin-top:1mm;}
+
+/* ---- Numbers ---- */
+.nums{display:flex;gap:4mm;margin:2mm 0 3mm;}
+.nums>div{flex:1;border:0.6pt solid var(--line2);border-radius:3px;padding:2.2mm 3mm 2mm;text-align:center;}
+.nums .v{font-size:17pt;font-weight:700;color:var(--navy);line-height:1;} .nums .l{font-size:7.8pt;color:var(--muted);margin-top:1.5mm;}
+.phase{display:flex;gap:3.5mm;margin:2mm 0 3mm;}
+.phase>div{flex:1;border-top:2pt solid var(--cyan-line);padding-top:1.6mm;font-size:8.2pt;line-height:1.38;}
+.phase .n{font-size:7.4pt;font-weight:700;letter-spacing:0.12em;color:var(--cyan-deep);} .phase .t{font-weight:600;color:var(--navy);font-size:9pt;margin:0.5mm 0 1mm;}
+
+/* ---- Services ---- */
+.svc{margin:0 0 2.2mm;break-inside:avoid;}
+.svc .h{font-size:9pt;font-weight:600;color:var(--navy);margin-bottom:1.2mm;} .svc .h span{font-weight:400;color:var(--muted);}
+.chip{display:inline-block;font-size:7.6pt;padding:0.8mm 1.8mm;margin:0 1.2mm 1mm 0;border-radius:2px;border:0.5pt solid var(--line2);background:#fff;color:var(--ink);white-space:nowrap;border-left-width:2.4pt;}
+.chip b{font-weight:700;margin-right:1mm;}
+.c-rot{border-left-color:var(--rot);background:var(--rot-bg);} .c-gelb{border-left-color:var(--gelb);background:var(--gelb-bg);}
+.c-blau{border-left-color:var(--blau);background:var(--blau-bg);} .c-gruen{border-left-color:var(--gruen);background:#fff;} .c-grau{border-left-color:var(--grau);background:var(--grau-bg);color:var(--muted);}
+
+/* ---- Posture ---- */
+.post{width:100%;border-collapse:separate;border-spacing:2.5mm 0;margin:1.5mm -2.5mm 2mm;}
+.post{break-inside:avoid;} .post tr{break-inside:avoid;}
+.post td{border:0.6pt solid var(--line2);border-radius:3px;padding:1.8mm 2.4mm;width:25%;vertical-align:top;break-inside:avoid;}
+.post .h{font-size:7.4pt;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:1.2mm;}
+.post .it{font-size:7.9pt;padding:0.4mm 0;border-bottom:0.4pt dotted var(--line);line-height:1.3;}
+.post .it:last-child{border-bottom:none;}
+.ok{color:#16A34A;font-weight:700;} .nok{color:#DC2626;font-weight:700;} .na{color:var(--muted2);font-weight:700;}
+
+/* ---- Screens ---- */
+.shots{width:100%;border-collapse:separate;border-spacing:3mm 0;margin:1.5mm -3mm 1mm;table-layout:fixed;}
+.shots td{width:33.33%;vertical-align:top;border:none;padding:0 0 3mm;}
+.shots img{width:100%;height:auto;display:block;border:0.5pt solid var(--line2);border-radius:2px;}
+.shots .cap{font-size:7.6pt;color:var(--muted);line-height:1.3;margin-top:1mm;}
+.shots .cap b{color:var(--navy);font-weight:600;}
+/* ---- Landscape ---- */
+.cat{margin:0 0 4mm;break-inside:avoid;}
+.cat .h{display:flex;align-items:center;gap:2.5mm;border-bottom:0.6pt solid var(--line2);padding-bottom:1.2mm;margin-bottom:1.5mm;}
+.cat .h .k{font-size:8pt;font-weight:700;letter-spacing:0.12em;color:var(--cyan-deep);}
+.cat .h .nm{font-size:10pt;font-weight:600;color:var(--navy);flex:1;}
+.cat .h .ct{font-size:8pt;color:var(--muted);}
+.cat table{margin:0;} .cat td{padding:1.2mm 2mm 1.2mm 0;font-size:8.8pt;}
+
+/* ---- Findings ---- */
+.fd{border:0.6pt solid var(--line2);border-radius:3px;margin:0 0 4mm;break-inside:auto;}
+.fd .hd{display:flex;align-items:flex-start;gap:3mm;padding:2.4mm 4mm;border-left:3pt solid var(--line2);background:var(--off2);break-inside:avoid;}
+.fd.s-rot .hd{border-left-color:var(--rot);} .fd.s-gelb .hd{border-left-color:var(--gelb);} .fd.s-blau .hd{border-left-color:var(--blau);}
+.fd .hd .id{font-family:"DejaVu Sans Mono",monospace;font-size:8.6pt;font-weight:700;color:var(--navy);white-space:nowrap;padding-top:0.6mm;}
+.fd .hd .ti{font-size:10.2pt;font-weight:600;color:var(--navy);line-height:1.3;flex:1;}
+.fd .meta{display:flex;flex-wrap:nowrap;gap:2.5mm;padding:2mm 4mm;border-bottom:0.5pt solid var(--line);font-size:8pt;color:var(--muted);align-items:center;}
+.fd .meta .sc{margin-left:auto;font-family:"DejaVu Sans Mono",monospace;color:var(--ink);white-space:nowrap;}
+.fd .bd{padding:2.5mm 4mm 1mm;}
+.fd .lab{font-size:7.2pt;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--cyan-deep);margin:1.8mm 0 0.6mm;break-after:avoid;}
+.ev{break-inside:avoid;}
+.fd p{font-size:8.9pt;margin:0 0 3pt;}
+.ev{font-family:"DejaVu Sans Mono",monospace;font-size:7.3pt;line-height:1.35;background:var(--off);border-radius:2px;padding:1.6mm 2.5mm;white-space:pre-wrap;color:var(--ink);margin:0 0 1mm;}
+.rec{margin:0 0 1.5mm;} .rec .u{display:inline-block;min-width:24mm;font-weight:600;color:var(--navy);font-size:8.6pt;}
+.rec div{padding-left:0;margin-bottom:1mm;font-size:8.9pt;}
+.ref{font-size:7.8pt;color:var(--muted);border-top:0.4pt solid var(--line);padding:1.5mm 0 0;margin-top:2mm;}
+
+/* Umbruchhinweis, kein Gestaltungswechsel: die beiden Schlusszeilen von Kapitel 1
+   duerfen nicht allein auf einer Seite landen. Ohne diese Regel entsteht bei
+   datenreichen Auftraegen eine Seite mit 46 Woertern (Sparse-Pruefung). */
+.wrapup{margin-top:2mm;break-before:avoid;break-inside:avoid;}
+
+/* ---- Appendix ---- */
+.lastpage{display:flex;flex-direction:column;justify-content:space-between;height:252mm;}
+.impblock{border-top:0.6pt solid var(--line2);padding-top:3mm;}
+.imprint{display:flex;gap:8mm;font-size:8.6pt;margin-top:2mm;}
+.imprint>div{flex:1;} .imprint .h{font-weight:600;color:var(--navy);margin-bottom:1.5mm;}
+</style></head><body>
+{% macro shield(w, color, ghost) -%}<svg viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg" style="width:{{ w }}mm;height:{{ (w * 1.05)|round(2) }}mm"><path d="M100 8 L178 48 L178 116 C178 156 144 186 100 200 C56 186 22 156 22 116 L22 48 Z" fill="none" stroke="{{ color }}" stroke-width="3" opacity="{{ ghost }}"/><path d="M100 22 L166 56 L166 110 C166 146 138 174 100 186 C62 174 34 146 34 110 L34 56 Z" fill="none" stroke="{{ color }}" stroke-width="5"/><path d="M70 74 L100 140 L130 74" fill="none" stroke="{{ color }}" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg>{%- endmacro %}
+
+<div class="rhead"><span class="wm">{{ shield(4.2, '#14B8A6', '0.35') }}<span>vecti<span class="c">scan</span></span></span><span class="r">{{ m.customer }} · {{ m.domains|join(' · ') }} · {{ variant.assessment }}</span></div>
+
+<!-- ===================== COVER ===================== -->
+<section class="cover">
+ <div class="bar"></div>
+ <div class="wm">{{ shield(9, '#2DD4BF', '0.35') }}<span>vecti<span class="c">scan</span></span></div>
+ <div class="tag">Automated Security Assessment · Vectigal GmbH</div>
+ <div class="badge">{{ m.package_label }}</div>
+ <div class="mid">
+  <div class="eyebrow">{{ variant.eyebrow }}</div>
+  <h1>{{ variant.report_title }}</h1>
+  <div class="cust">{{ m.customer }}</div>
+  <div class="sub">Geprüfte Domains: {% for d in m.domains %}<span class="dom">{{ d }}</span>{% if not loop.last %} und {% endif %}{% endfor %}<br>{{ runs_line }}</div>
+ </div>
+ <div class="meta">
+  <div><div class="k">Scan-Datum</div><div class="v">{{ m.scan_date }}</div><div class="k">Berichtsdatum</div><div class="v">{{ m.report_date }}</div></div>
+  <div><div class="k">Paket</div><div class="v">{{ m.package }} · externe Schwachstellenanalyse</div><div class="k">Bericht</div><div class="v">{{ m.report_id }} · Version {{ m.report_version }}</div></div>
+  <div><div class="k">Klassifizierung</div><div class="v">{{ m.classification }}</div><div class="k">Erstellt von</div><div class="v">{{ m.provider }}</div></div>
+ </div>
+ <div class="foot"><span>{{ m.provider }} · {{ m.provider_address }} · {{ m.provider_contact }}</span><span>Vertraulich · nur für autorisierte Empfänger</span></div>
+ <div class="logo-bg">{{ shield(150, '#2DD4BF', '0.5') }}</div>
+</section>
+
+<!-- ===================== 1 AUF EINEN BLICK ===================== -->
+<section class="sec">
+ <div class="sec-head"><div class="kicker">Kapitel 1 · Für die Geschäftsführung</div><h2>Auf einen Blick</h2></div>
+ <div class="overall"><div><div class="lbl">Gesamtbewertung</div><div class="val v-{{ g.overall_status }}">{{ g.overall }}</div></div><div class="txt">{{ g.overall_text }}</div></div>
+ <table class="ampel">
+  {% for c in g.categories %}
+  <tr><td style="width:52mm" class="name"><span class="dot d-{{ c.status }}"></span>{{ c.name }}</td>
+      <td style="width:42mm">{% for i in range(4) %}<span class="seg {% if i < c.level %}on-{{ c.status }}{% endif %}"></span>{% endfor %}</td>
+      <td style="width:16mm"><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN'}[c.status] }}</span></td>
+      <td class="small" style="color:#475569;width:58mm">{{ c.note }}</td></tr>
+  {% endfor %}
+ </table>
+ <h3>Die drei wichtigsten Hebel</h3>
+ {% for l in g.levers %}
+ <div class="lever"><div class="n">HEBEL {{ l.n }}</div><div class="ti">{{ l.title }}</div><div class="ef">{{ l.effect }}</div><div class="rf">Adressiert: {{ l.refs|join(', ') }}</div></div>
+ {% endfor %}
+ <div class="wrapup">
+ <p class="small">{{ distribution_line }}</p>
+ <p class="small" style="margin-top:2mm">Rot = unverzüglich handeln · Gelb = Handlungsbedarf in Wochen · Blau = geplante Verbesserung · Grün = positiv. Diese Seite nennt bewusst keine CVSS-Werte; Umsetzungsdetails ab Kapitel 5.</p>
+ </div>
+</section>
+
+<!-- ===================== 1.2 GESCHÄFTSKONTEXT ===================== -->
+{# Kapitel 1.2 und 2 fliessen an, erzwingen also keinen Seitenanfang. Dieselbe
+   Technik wie bei Kapitel 4, 5 und den Anhaengen (spec/03). Bei datenreichen
+   Auftraegen passte Kapitel 1.1 sonst nicht auf eine Seite und liess zwei Zeilen
+   auf der naechsten stehen; ueber die elf Golden-Auftraege halbiert das die
+   halbleeren Seiten von 14 auf 7 (Entscheidung DC, 20.09.). #}
+<section>
+ <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 1 · Für die Geschäftsführung</div><h2>Kontext und Bedeutung für Ihr Unternehmen</h2></div>
+ <p>{{ g.context }}</p>
+ <div class="box warn"><div class="t">Hinweis zur Abdeckung</div>{{ g.coverage_warning }}</div>
+ <h3>Was der Scan über Ihr Unternehmen zeigt</h3>
+ <p>{{ b.lead }}</p>
+ <table>
+  <tr><th style="width:54mm">Beobachtetes System</th><th style="width:114mm">Bedeutung für das Risiko</th></tr>
+  {% for o in b.observed %}<tr><td><b>{{ o.system }}</b></td><td>{{ o.meaning }}</td></tr>{% endfor %}
+ </table>
+ <h3>Was das für Sie bedeutet</h3>
+ <p>{{ b.implication }}</p>
+</section>
+
+<!-- ===================== 2 UMFANG & METHODIK ===================== -->
+<section>
+ <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 2 · Für die IT-Leitung</div><h2>Umfang und Methodik</h2></div>
+ <p class="lead">{{ s.lead }}</p>
+ <h3>2.1 Prüfungsumfang</h3>
+ <table>
+  <tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">Betrieb / Rolle</th><th style="width:44mm">Abdeckung</th></tr>
+  {% for h in s.hosts %}
+  <tr><td class="mono">{{ h.ip }}</td><td>{{ h.fqdns }}</td><td>{{ h.operator }}<br><span class="small">{{ h.role }}</span></td>
+      <td><span class="dot d-{{ {'voll':'gruen','teil':'gelb','keine':'rot'}[h.cov] }}"></span>{{ h.coverage }}</td></tr>
+  {% endfor %}
+ </table>
+ <p><b>Prüfzeitraum:</b> {{ period_note }}</p>
+ <h4>Nicht Bestandteil dieser Prüfung</h4>
+ <ul>{% for o in s.out_of_scope %}<li>{{ o }}</li>{% endfor %}</ul>
+ <h3>2.2 Einschränkungen dieses Laufs</h3>
+ <table>
+  <tr><th style="width:38mm">Einschränkung</th><th style="width:130mm">Auswirkung auf die Ergebnisse</th></tr>
+  {% for l in s.limitations %}<tr><td><b>{{ l.what }}</b></td><td>{{ l.detail }}</td></tr>{% endfor %}
+ </table>
+<div style="margin-top:2mm"></div>
+ <div class="nums">{% for n in s.numbers %}<div><div class="v">{{ n.v }}</div><div class="l">{{ n.l }}</div></div>{% endfor %}</div>
+ <h3>2.3 Vorgehen in vier Phasen</h3>
+ <div class="phase">{% for p in s.method_phases %}<div><div class="n">PHASE {{ p.n }}</div><div class="t">{{ p.name }}</div>{{ p.text }}</div>{% endfor %}</div>
+ <p>{{ s.standard_note }}</p>
+ <p>{{ s.ai_note }}</p>
+ <h3>2.4 Was dieser Scan leisten kann und was nicht</h3>
+ <div class="grid2">
+  <div class="box info"><div class="t">Der Scan zeigt</div><ul>{% for c in s.can_cannot.can %}<li>{{ c }}</li>{% endfor %}</ul></div>
+  <div class="box info"><div class="t">Der Scan zeigt nicht</div><ul>{% for c in s.can_cannot.cannot %}<li>{{ c }}</li>{% endfor %}</ul></div>
+ </div>
+ <p>{{ s.can_cannot.advice }}</p>
+</section>
+
+<!-- ===================== 3 ARCHITEKTUR ===================== -->
+<section class="sec">
+ <div class="sec-head"><div class="kicker">Kapitel 3 · Für die IT-Leitung</div><h2>Architektur-Sicht</h2></div>
+ <p class="lead">{{ a.lead }}</p>
+ <h3>3.1 Erkannte Technologien je Host</h3>
+ {% for h in a.tech %}
+ <h4>{{ h.host }}</h4>
+ <table style="margin-top:0.5mm;margin-bottom:2.5mm;font-size:8.2pt">
+  <tr><th style="width:40mm">Komponente</th><th style="width:30mm">Version</th><th style="width:36mm">Erkennung (Quelle, Konfidenz)</th><th style="width:26mm">Patch-Status</th><th style="width:36mm">Hinweis</th></tr>
+  {% for r in h.rows %}<tr><td>{{ r.c }}</td><td class="mono">{{ r.v }}</td><td class="small">{{ r.src }}, {{ r.conf }}</td><td><span class="pill p-{{ r.st }}">{{ r.status }}</span></td><td class="small">{{ r.note }}</td></tr>{% endfor %}
+ </table>
+ {% endfor %}
+ <ul>{% for n in a.notes %}<li>{{ n }}</li>{% endfor %}</ul>
+
+ <h3>3.2 Service-Karte</h3>
+ {% for h in a.services %}
+ <div class="svc"><div class="h">{{ h.host }} <span>· {{ h.label }}</span></div>
+  {% if h.ports %}{% for p in h.ports %}<span class="chip c-{{ p.st }}"><b>{{ p.p }}</b>{{ p.s }}</span>{% endfor %}{% else %}<span class="chip c-gruen">keine erreichbaren Ports</span>{% endif %}
+ </div>
+ {% endfor %}
+ <p class="small">{{ a.services_note }}</p>
+ <h3>3.3 Posture-Indikatoren</h3>
+ <table class="post">
+  <tr>{% for blk in a.posture %}<td><div class="h">{{ blk.short }}</div>
+   {% for it in blk['items'] %}<div class="it">{% if it.ok is none %}<span class="na">○</span>{% elif it.ok %}<span class="ok">✔</span>{% else %}<span class="nok">✘</span>{% endif %} <b>{{ it.l }}</b><br><span class="small">{{ it.v }}</span></div>{% endfor %}
+  </td>{% endfor %}</tr>
+ </table>
+ {% if show_screens %}
+ <h3>3.4 Gesichtete Web-Oberflächen</h3>
+ <p>{{ a.screens_lead }}</p>
+ <table class="shots">
+  {% for row in a.screens|batch(3) %}<tr>{% for sc in row %}<td><img src="vectiscan-screenshot:{{ sc.key or sc.file }}" alt="{{ sc.host }}"><div class="cap"><b>{{ sc.host }}</b><br>{{ sc.what }}</div></td>{% endfor %}</tr>{% endfor %}
+ </table>
+ {% endif %}
+
+<!-- ===================== 4 BEFUND-LANDSCHAFT ===================== -->
+ <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 4 · Für die IT-Leitung</div><h2>Befund-Landschaft</h2></div>
+ <p class="lead">{{ landscape_lead }}</p>
+ {% for c in g.categories %}
+ {% set fs = findings|selectattr('cat','equalto',c.key)|list %}
+ <div class="cat"><div class="h"><span class="k">KATEGORIE {{ c.key }}</span><span class="nm">{{ c.name }}</span><span class="pill p-{{ c.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU','gruen':'GRÜN'}[c.status] }}</span><span class="ct">{{ fs|length }} Befund{{ 'e' if fs|length != 1 else '' }}</span></div>
+  <table><colgroup><col style="width:24mm"><col style="width:22mm"><col style="width:122mm"></colgroup>{% for f in fs %}<tr><td class="mono">{{ f.id }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td><td>{{ f.title }}</td></tr>{% endfor %}</table>
+ </div>
+ {% endfor %}
+ <div class="cat"><div class="h"><span class="k">POSITIV</span><span class="nm">Wirksame Schutzmaßnahmen</span><span class="pill p-gruen">GRÜN</span><span class="ct">{{ positives|length }} Feststellungen</span></div>
+  <table><colgroup><col style="width:24mm"><col style="width:144mm"></colgroup>{% for p in positives %}<tr><td><span class="dot d-gruen"></span><span class="small">Kat. {{ p.cat }}</span></td><td><b>{{ p.title }}</b><br><span class="small">{{ p.text }}</span></td></tr>{% endfor %}</table>
+ </div>
+</section>
+
+<!-- ===================== 5 MASSNAHMENPLAN ===================== -->
+ <div class="sec-head" style="margin-top:6mm"><div class="kicker">Kapitel 5 · Für IT-Leitung und Umsetzung</div><h2>Maßnahmenplan</h2></div>
+ <p class="lead">Priorisiert nach Dringlichkeit und Wirkung. Der Plan nennt bewusst keine Aufwände oder Kosten: Diese hängen von Umgebung, Verträgen und Dienstleistern ab und gehören in die Planung des Umsetzers. Die technischen Details je Maßnahme stehen im jeweiligen Befund in Kapitel 6.</p>
+ <table>
+  <tr><th style="width:22mm">Priorität</th><th style="width:84mm">Maßnahme</th><th style="width:26mm">Befunde</th><th style="width:36mm">Erwarteter Effekt</th></tr>
+  {% for p in plan %}<tr><td><span class="pill p-{{ p.st }}">{{ p.prio }}</span></td><td>{{ p.action }}</td><td class="mono" style="font-size:7.6pt">{% for r in p.refs %}{{ r }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td class="small">{{ p.effect }}</td></tr>{% endfor %}
+ </table>
+ <div class="box info"><div class="t">Zeitstufen</div><b>Unverzüglich</b> innerhalb von 24 bis 72 Stunden · <b>In Kürze</b> innerhalb von 1 bis 2 Wochen · <b>Mittelfristig</b> im nächsten Wartungs- oder Release-Zyklus · <b>Strategisch</b> als Architektur- oder Planungsentscheidung im laufenden Quartal.</div>
+</section>
+
+<!-- ===================== 6 BEFUND-DETAILS ===================== -->
+{# Ein Befundblock, zwei Fundstellen: Kapitel 6 und der Anhang dazu. Als Makro, damit
+   ein gekappter Befund im Anhang dieselben Felder in derselben Form traegt. #}
+{% macro finding_block(f) -%}
+ <div class="fd s-{{ f.status }}">
+  <div style="break-inside:avoid">
+  <div class="hd"><span class="id">{{ f.id }}</span><span class="ti">{{ f.title }}</span></div>
+  <div class="meta"><span class="pill p-{{ f.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU'}[f.status] }}</span><span><b>{{ f.urgency }}</b></span><span>· Kategorie {{ f.cat }}</span>
+   <span class="sc">{% if f.scale == 'exposure' %}Exposition: {{ f.level }}{% else %}Hygiene: {{ f.level }}{% endif %}</span></div>
+  <div class="bd" style="padding-bottom:0">
+   <div class="lab">Betroffen</div><p>{{ f.affected }}<br><span class="small">Quelle: {{ f.source }}</span></p>
+  </div></div>
+  <div class="bd" style="padding-top:0">
+   <div class="lab">Was wurde gefunden</div><p>{{ f.found }}</p>
+   <div class="lab">Nachweis</div><div class="ev">{{ f.evidence }}</div>
+   {% if f.threat %}<div class="lab">Threat Intelligence</div><p>{% for c in f.threat.cves %}{{ c }}{% if not loop.last %}; {% endif %}{% endfor %} · CISA KEV: {{ f.threat.kev }}{% if f.threat.note %} · {{ f.threat.note }}{% endif %}</p>{% endif %}
+   <div class="lab">Auswirkung</div><p>{{ f.impact }}</p>
+   <div class="lab">Empfehlung</div><div class="rec">{% for u,t in f.recommendation %}<div><span class="u">{{ u }}</span>{{ t }}</div>{% endfor %}</div>
+   <div class="lab">Verifikation nach Umsetzung</div><div class="ev">{{ f.verify }}</div>
+   <div class="ref">Interne Referenz: Policy {{ f.policy }} · VectiScan-Severity-Policy {{ m.policy_version }}</div>
+  </div>
+ </div>
+{%- endmacro %}
+<section class="sec">
+ <div class="sec-head"><div class="kicker">Kapitel 6 · Für Administration und Dienstleister</div><h2>Befunde im Detail</h2></div>
+ <p class="lead">Jeder Befund nennt, was gefunden wurde, den Nachweis aus den Werkzeugdaten, die Auswirkung, gestufte Empfehlungen und einen Verifikationsschritt, mit dem die Umsetzung geprüft werden kann. Die Einstufung (Exposition oder Hygiene) ist die eigene Bewertung; CVSS-Werte erscheinen nur als Fremdreferenz bei zitierten CVEs. Befunde aus Passivquellen sind als solche gekennzeichnet.</p>
+ {% if findings_more %}<p class="lead">{{ split_note }}</p>{% endif %}
+ {% for f in findings_main %}{{ finding_block(f) }}{% endfor %}
+</section>
+
+{% if findings_more %}
+<!-- ============== ANHANG ZU KAPITEL 6: WEITERE SACHVERHALTE ============== -->
+<section class="sec">
+ <div class="sec-head"><div class="kicker">{{ txt.MORE_KICKER }}</div><h2>{{ txt.MORE_TITLE }}</h2></div>
+ <p class="lead">{{ txt.MORE_LEAD }}</p>
+ {% for f in findings_more %}{{ finding_block(f) }}{% endfor %}
+</section>
+{% endif %}
+
+<!-- ===================== ANHÄNGE ===================== -->
+ <div class="sec-head" style="margin-top:8mm"><div class="kicker">Anhang {{ ltr.scales }}</div><h2>Bewertungsmaßstäbe</h2></div>
+ <h3>A.1 Triage-Modell dieses Berichts</h3>
+ <table><tr><th style="width:18mm">Status</th><th style="width:150mm">Bedeutung</th></tr>
+ {% for t in ap.triage %}<tr><td><span class="pill p-{{ t.st }}">{{ t.l }}</span></td><td>{{ t.t }}</td></tr>{% endfor %}</table>
+ <h3>A.2 Eigene Einstufung: Exposition und Hygiene</h3>
+ <p>Der Bericht vergibt keine eigenen CVSS-Werte. Erreichbare Dienste werden nach Exposition eingestuft, Konfigurations- und Best-Practice-Abweichungen nach der VectiScan-Hygiene-Skala. CVSS-Basiswerte erscheinen ausschließlich als Fremdreferenz zu zitierten CVEs (A.3).</p>
+ <table><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Exposition</th></tr>
+ {% for h in ap.exposure_scale %}<tr><td><b>{{ h.l }}</b></td><td>{{ h.t }}</td></tr>{% endfor %}</table>
+ <table><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Hygiene</th></tr>
+ {% for h in ap.hygiene_scale %}<tr><td><b>{{ h.l }}</b></td><td>{{ h.t }}</td></tr>{% endfor %}</table>
+ <table><tr><th style="width:24mm">ID</th><th style="width:96mm">Titel</th><th style="width:24mm">Einstufung</th><th style="width:24mm">Dringlichkeit</th></tr>
+ {% for f in findings %}<tr><td class="mono">{{ f.id }}</td><td>{{ f.title }}</td><td>{{ 'Exposition' if f.scale == 'exposure' else 'Hygiene' }} {{ f.level }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td></tr>{% endfor %}</table>
+ <h3>A.3 CVE-Referenzen (Fremdbewertung)</h3>
+ <table><tr><th style="width:30mm">CVE</th><th style="width:44mm">Bezeichnung</th><th style="width:16mm">Basiswert</th><th style="width:18mm">Quelle</th><th style="width:22mm">Befund</th><th style="width:38mm">Hinweis</th></tr>
+ {% for c in ap.cve_refs %}<tr><td class="mono">{{ c.cve }}</td><td>{{ c.name }}</td><td class="mono">{{ c.score }}</td><td>{{ c.src }}</td><td class="mono">{{ c.ref }}</td><td class="small">{{ c.note }}</td></tr>{% endfor %}</table>
+ {% if show_inventory %}
+ <div class="sec-head" style="margin-top:6mm"><div class="kicker">Anhang {{ ltr.inventory }}</div><h2>Service-Inventar</h2></div>
+ <p>Alle erkannten Dienste je Host, als Nachschlagewerk für den Maßnahmenplan. Einträge aus Passivquellen sind gekennzeichnet.</p>
+ <table><tr><th style="width:36mm">Host</th><th style="width:14mm">Port</th><th style="width:82mm">Dienst</th><th style="width:36mm">Befund</th></tr>
+ {% for r in ap.inventory %}<tr><td class="mono">{{ r.host }}</td><td class="mono">{{ r.port }}</td><td>{{ r.svc }}</td><td class="mono" style="font-size:7.6pt">{{ r.ref }}</td></tr>{% endfor %}</table>
+ {% endif %}
+ <h3>Anhang {{ ltr.tools }} · Eingesetzte Werkzeuge</h3>
+ <table><tr><th style="width:44mm">Werkzeug</th><th style="width:84mm">Einsatz</th><th style="width:40mm">Konfidenz</th></tr>
+ {% for t in ap.tools %}<tr><td>{{ t.t }}</td><td>{{ t.u }}</td><td class="small">{{ t.c }}</td></tr>{% endfor %}</table>
+ {% if show_tool_findings %}
+ <h4>{{ txt.TOOL_FINDINGS_TITLE }}</h4>
+ <p class="small">{{ txt.TOOL_FINDINGS_LEAD }}</p>
+ <table><tr><th style="width:104mm">Meldung</th><th style="width:34mm">Betrifft</th><th style="width:30mm">Hinweis</th></tr>
+ {% for t in ap.tool_findings %}<tr><td>{{ t.what }}</td><td class="small">{{ t.where }}</td><td class="small">{{ t.note }}</td></tr>{% endfor %}</table>
+ {% endif %}
+
+</section>
+<section class="sec lastpage">
+ <div>
+ <div class="sec-head"><div class="kicker">Anhang {{ ap_tail_range }}</div><h2>Methodische Filterung, Wiederholung, Haftung</h2></div>
+ <h3>Anhang {{ ltr.filtering }} · Methodische Filterung</h3>
+ <p>{{ ap.filtering }}</p>
+ <h3>Anhang {{ ltr.repeat }} · Wiederholungsempfehlung</h3>
+ <ul>{% for r in ap.repeat %}<li>{{ r }}</li>{% endfor %}</ul>
+ <h3>Anhang {{ ltr.disclaimer }} · Geltung und Haftungsausschluss</h3>
+ <p>{{ ap.disclaimer }}</p>
+ </div>
+ <div class="impblock">
+ <h3>Erstellt von</h3>
+ <div class="imprint">
+  <div><div class="h">Kontakt</div>{{ m.provider }}<br>{{ m.provider_address|dot_br }}<br>{{ m.provider_contact|dot_br }}</div>
+  <div><div class="h">Gesellschaft</div>{{ m.provider_register|dot_br }}</div>
+  <div><div class="h">Verantwortlich</div>{{ m.provider_responsible }}<br>Produkt: VectiScan</div>
+  <div style="text-align:right;opacity:0.55;margin-top:-9mm"><span style="display:inline-block">{{ shield(30, '#2DD4BF', '0.35') }}</span></div>
+ </div>
+ <p class="small" style="margin-top:4mm">Bericht {{ m.report_id }} · Version {{ m.report_version }} · Stand {{ m.report_date }} · Scan-Orders {% for o in m.orders %}{{ o.id[:8] }}{% if not loop.last %}, {% endif %}{% endfor %} · Severity-Policy {{ m.policy_version }}</p>
+ </div>
+</section>
+</body></html>

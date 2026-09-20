@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <rect x="0" y="0" width="800" height="450" fill="#F1F5F9"/>
+  <rect x="4" y="4" width="792" height="442" fill="none" stroke="#CBD5E1" stroke-width="4" stroke-dasharray="14 10"/>
+  <g fill="none" stroke="#94A3B8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="315" y="170" width="170" height="120" rx="8"/>
+    <path d="M315 258 L365 214 L410 252 L447 226 L485 258"/>
+  </g>
+  <circle cx="357" cy="202" r="12" fill="#94A3B8"/>
+  <text x="400" y="336" text-anchor="middle" font-family="DejaVu Sans, sans-serif" font-size="26" fill="#64748B">Bildnachweis nicht verf&#252;gbar</text>
+</svg>

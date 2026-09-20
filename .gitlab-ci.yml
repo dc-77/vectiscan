@@ -190,6 +190,43 @@ test-report-worker:
       when: manual
       allow_failure: true
 
+# S4: PDF-Tests des Renderers v3. Sie brauchen WeasyPrint samt Pango, und der Runner
+# ist ein Shell-Executor auf dem Host -- `image:` oben wird dort ignoriert, Pango gibt
+# es nicht und `pip install` darf es nicht nachziehen. Deshalb laufen sie im gerade
+# gebauten Abbild, wo beides liegt. VECTISCAN_REQUIRE_WEASYPRINT=1 macht aus einem
+# stillen Ueberspringen einen Fehlschlag: sonst koennte die Pipeline gruen sein, ohne
+# je ein PDF gebaut zu haben.
+#
+# Zwei Schritte. Erst der Selbsttest ohne Netz: drei Golden-Auftraege, Seitenzahl,
+# halbleere Seiten, eingebettete Schriften, Selbstcheck-Defekte. Danach die
+# Renderer-Suite plus die schriftabhaengigen Branding-Tests im Abbild; pytest liegt
+# nicht im Produktionsbild und wird nur in diesem Wegwerf-Container nachinstalliert.
+# `-m "not reportlab_fallback"` nimmt test_font_constants heraus: der Test prueft die
+# Ersatzschrift und damit die Abwesenheit von DejaVu, das Abbild bringt DejaVu aber
+# mit. Nicht geloescht und nicht global abgeschaltet -- er bleibt ueberall sonst
+# gruen und wird mit dem ReportLab-Pfad in S6 aufgeraeumt.
+test-report-worker-pdf:
+  stage: test
+  tags: [vectigal]
+  needs: [build-report-worker]
+  script:
+    - docker run --rm -e VECTISCAN_REQUIRE_WEASYPRINT=1
+        ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
+        python3 -m reporter.pdf.v3 --selftest
+    - docker run --rm --user root -e VECTISCAN_REQUIRE_WEASYPRINT=1
+        ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
+        sh -c "python3 -m pip install --no-cache-dir --break-system-packages --quiet pytest
+        && python3 -m pytest tests/pdf_v3 tests/test_branding_integration.py
+        -m 'not reportlab_fallback' -q"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+
 # VEC-160 / VEC-143 / VEC-269 / VEC-439: Edge admin-guard regression gate (SICHERHEITSKRITISCH).
 # Fails the pipeline if a public Traefik router gains a Host() that is not also
 # covered by the /admin guard router (oauth2-proxy-redirect@file since VEC-439 C3) — i.e. an
@@ -974,6 +1011,59 @@ ops-export-golden-tars:
         ${CI_PROJECT_DIR}/report-worker/tests/golden/orders.txt
         ${CI_PROJECT_DIR}/golden-tars
         ${DEPLOY_PATH}
+
+# =============================================================================
+# OPS-RENDER-V3 (S4) — Bericht im Renderer v3 bauen, ohne einen Auftrag anzufassen
+# =============================================================================
+# Baut im laufenden report-worker aus dem Roh-Tar einer bestehenden Order Fakten,
+# Pruefkatalog, Reportdaten und PDF und legt das Ergebnis unter scan-debug/v3/ ab.
+#
+# Was der Job NICHT tut: Order-Status aendern, eine Zeile in `reports` schreiben,
+# etwas in scan-reports legen oder ein Sprachmodell aufrufen. Der Kundenbericht der
+# Order bleibt, wie er ist. Damit ist der Job auf Produktion gefahrlos und die
+# Abnahme von S4 ("ein Staging-Report mit LAYOUT=v3 liegt in MinIO") erfuellbar,
+# ohne die Umschaltung aus S6 vorzuziehen.
+#
+# Nutzung: Pipeline mit der Variablen RENDER_ORDER_ID=<uuid> ausloesen, dann diesen
+# Job manuell starten. Das PDF kommt zusaetzlich als Job-Artefakt zurueck; bei
+# grossen Berichten kann der Upload an der 413-Grenze von git-extern scheitern, der
+# Objektpfad in MinIO steht dann trotzdem im Log.
+# =============================================================================
+ops-render-v3:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - render-v3/
+  script:
+    - test -n "${RENDER_ORDER_ID}" || { echo "RENDER_ORDER_ID fehlt (Order-UUID als Pipeline-Variable setzen)"; exit 1; }
+    - mkdir -p ${CI_PROJECT_DIR}/render-v3
+    - cd ${DEPLOY_PATH}
+    # Issue #24: Speicherbedarf mitschreiben. Der Container ist auf 1 GB begrenzt und
+    # WeasyPrint dekodiert die Bildnachweise zum Setzen. Die Messung laeuft neben dem
+    # Render und darf ihn nicht kippen, deshalb alles fail-open.
+    - CID=$(docker compose ps -q report-worker)
+    - ( while true; do docker stats --no-stream --format '{{.MemUsage}};{{.MemPerc}};{{.CPUPerc}}' "${CID}" >> ${CI_PROJECT_DIR}/render-v3/stats-${RENDER_ORDER_ID}.txt 2>/dev/null || true; sleep 2; done ) &
+    - STATS_PID=$!
+    - docker compose exec -T report-worker python3 -m reporter.pdf.v3
+        --order "${RENDER_ORDER_ID}"
+        -o "/tmp/${RENDER_ORDER_ID}-v3.pdf"
+        --upload
+    - kill ${STATS_PID} 2>/dev/null || true
+    - echo "=== Speicher report-worker waehrend des Renders ==="
+    # Kein ": " im Ausdruck, YAML wuerde das als Zuordnung lesen.
+    - awk -F';' '{gsub("%","",$2); if ($2+0>m) {m=$2+0; z=$0}} END {print "Spitze " z; print "Messpunkte " NR}' ${CI_PROJECT_DIR}/render-v3/stats-${RENDER_ORDER_ID}.txt || true
+    - docker compose cp "report-worker:/tmp/${RENDER_ORDER_ID}-v3.pdf" ${CI_PROJECT_DIR}/render-v3/ || echo "Kopie ins Artefakt fehlgeschlagen, PDF liegt in MinIO"
+    - docker compose exec -T report-worker rm -f "/tmp/${RENDER_ORDER_ID}-v3.pdf"
+    - ls -l ${CI_PROJECT_DIR}/render-v3/ || true
 
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
 rollback:

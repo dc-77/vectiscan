@@ -191,6 +191,10 @@ class Screenshot(Base):
     file: str
     host: str
     what: str = ""
+    # Vollstaendiger MinIO-Schluessel (<order_id>/<ip>__<vhost>.png). ``file`` ist nur
+    # der Basisname; bei Berichten ueber mehrere Laeufe laesst sich der Schluessel
+    # daraus nicht rekonstruieren, und der Renderer (S4) braucht ihn zum Laden.
+    key: str = ""
 
 
 class Architecture(Base):

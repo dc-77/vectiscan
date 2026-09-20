@@ -468,6 +468,7 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
             continue
         out.append(Screenshot(
             file=fq.screenshot_key.rsplit("/", 1)[-1],
+            key=fq.screenshot_key,
             host=fq.name,
             what=clean_foreign_text(fq.title) or f"Antwort von {fq.name}"))
     return out
