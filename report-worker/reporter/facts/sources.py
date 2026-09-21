@@ -70,10 +70,24 @@ class ToolRun:
     created_at: Optional[str] = None
     raw_output: Optional[str] = None
     index: int = 0
+    raw_omitted: bool = False
 
     @property
     def tool_norm(self) -> str:
         return normalize_tool_name(self.tool)
+
+    @property
+    def raw_known(self) -> bool:
+        """Ist der Rohtext dieser Zeile ueberhaupt geladen worden?
+
+        "Nicht geladen" ist ein ausdrueckliches Signal des Laders
+        (``raw_output_omitted``, siehe ``worker._load_tool_runs``), kein
+        stillschweigendes ``None``: eine Zeile, deren Spalte in der Datenbank
+        wirklich leer ist, hat kein Ergebnis geliefert, und das ist eine
+        Aussage. Nur die wegen der Groessengrenze ausgelassene Zeile darf die
+        Abdeckung nicht als leeres Ergebnis werten.
+        """
+        return not self.raw_omitted
 
     @property
     def is_ai(self) -> bool:
@@ -135,6 +149,7 @@ def tool_run_from_row(row: dict[str, Any], index: int) -> ToolRun:
         created_at=iso_utc(pick("createdAt", "created_at")),
         raw_output=pick("rawOutput", "raw_output"),
         index=index,
+        raw_omitted=bool(row.get("raw_output_omitted") or row.get("rawOutputOmitted")),
     )
 
 
@@ -194,6 +209,10 @@ class ScanBundle:
     passive_by_domain: dict[str, dict[str, Any]] = field(default_factory=dict)
     host_strategy: Optional[dict[str, Any]] = None
     ai_prioritization: Optional[dict[str, Any]] = None
+    # Bilanz der Phase-3-Korrelation (Zeile ``phase3_correlation``): wie viele
+    # Werkzeugmeldungen eingingen, wie viele als Doppel- oder Falschmeldung
+    # verworfen wurden und mit welcher Begruendung. Protokoll, nie ein Befund.
+    phase3_summary: Optional[dict[str, Any]] = None
     correlated_findings: list[dict[str, Any]] = field(default_factory=list)
     enrichment: dict[str, Any] = field(default_factory=dict)
     tool_runs: list[ToolRun] = field(default_factory=list)
@@ -508,7 +527,14 @@ def load_scan_source(path: str | Path) -> ScanBundle:
 
 def load_tool_runs(rows_or_path: Any) -> tuple[list[ToolRun], Optional[str], Optional[str]]:
     """Zeilen aus ``results.json`` (API-Form ``{"data": {"results": [...]}}``), einer
-    reinen Liste oder DB-Dicts. Liefert (runs, name, sha256)."""
+    reinen Liste oder DB-Dicts. Liefert (runs, name, sha256).
+
+    Kommen die Zeilen nicht aus einer Datei, sondern aus der Datenbank (so im
+    Produktionspfad, ``worker._load_tool_runs``), gibt es keinen Dateinamen. Die
+    Herkunft bleibt trotzdem vermerkt: Name ``scan_results``, Pruefsumme ueber
+    die gelesenen Zeilen. Sonst stuende in den Fakten, sie seien ohne Zeilen
+    entstanden.
+    """
     name = None
     sha = None
     rows = rows_or_path
@@ -524,7 +550,20 @@ def load_tool_runs(rows_or_path: Any) -> tuple[list[ToolRun], Optional[str], Opt
         return [], name, sha
     runs = [tool_run_from_row(r, i) for i, r in enumerate(rows) if isinstance(r, dict)]
     runs.sort(key=lambda r: sort_key(r.phase, r.tool, r.host_ip, r.created_at, r.index))
+    if name is None and runs:
+        name = "scan_results"
+        sha = sha256_bytes(_runs_digest(runs).encode("utf-8"))
     return runs, name, sha
+
+
+def _runs_digest(runs: list[ToolRun]) -> str:
+    """Stabile Textform der Zeilen fuer die Pruefsumme der Herkunft."""
+    return "\n".join(
+        "\t".join(str(v) for v in (r.phase, r.tool, r.host_ip, r.status, r.reason,
+                                   r.exit_code, r.duration_ms, r.created_at,
+                                   len(r.raw_output or ""), r.raw_omitted))
+        for r in runs
+    )
 
 
 def _useful(raw: str) -> bool:
@@ -601,6 +640,14 @@ def merge_tool_runs(bundle: ScanBundle, runs: list[ToolRun], *, name: str | None
                 if isinstance(data, dict) and h.wpscan is None:
                     h.wpscan = data
         else:
+            if run.tool == "phase3_correlation":
+                # Die einzige Zeile der Phase 3. Sie hat keinen Host und ist
+                # deshalb bis S5b durch jedes Raster gefallen.
+                data = run.json()
+                if isinstance(data, dict) and bundle.phase3_summary is None:
+                    bundle.phase3_summary = data
+                    bundle.refs["phase3_summary"] = run.ref
+                continue
             if run.is_ai:
                 continue
             data = run.json()
