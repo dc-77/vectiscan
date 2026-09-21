@@ -81,7 +81,9 @@ def check_report_data_detailed(data: ReportData | dict) -> list[Befund]:
             if score and score.group(2) != ref.score:
                 add("cve_score_abweichung",
                     f"CVE-Score weicht ab in {f.id}: {score.group(2)} statt {ref.score}", f.id)
-            if ref.ref != f.id:
+            # Anhang A.3 fuehrt jede CVE einmal und nennt alle Befunde, in denen
+            # sie zitiert wird; dieser Befund muss darunter sein.
+            if f.id not in [x.strip() for x in ref.ref.split(",")]:
                 add("cve_referenz_falsch",
                     f"CVE-Referenz zeigt auf {ref.ref}, zitiert wird sie in {f.id}", f.id)
 

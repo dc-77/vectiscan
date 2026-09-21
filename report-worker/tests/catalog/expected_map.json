@@ -371,6 +371,11 @@
    "check_prefix": "",
    "reason_code": "precondition_not_met",
    "note": "Vorbedingung je Lauf unterschiedlich erfuellt"
+  },
+  {
+   "check_prefix": "cve_",
+   "reason_code": "no_enrichment",
+   "note": "S5b: die Phase-3-Anreicherung liefert in keinem Lauf einen Fremdwert (cves_enriched 0). Die CVE-Pruefungen sind damit in allen vier Laeufen nicht pruefbar statt still bestanden"
   }
  ],
  "expected_member_differences": [

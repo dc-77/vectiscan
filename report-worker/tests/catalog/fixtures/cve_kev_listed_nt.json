@@ -1,0 +1,19 @@
+{
+  "facts": {
+    "software": [
+      {"host_ip": "10.0.0.1", "product": "OpenSSH", "family": "openssh", "kind": "ssh", "version_norm": "9.2p1"}
+    ],
+    "services": [
+      {"host_ip": "10.0.0.1", "port": 22, "service": "ssh"}
+    ],
+    "threats": [
+      {"host_ip": "10.0.0.1", "port": 443, "cve_id": "CVE-2011-3389", "source": "testssl"}
+    ]
+  },
+  "coverage_default": "ok",
+  "expect": {
+    "status": "not_testable",
+    "group_key": "10.0.0.1",
+    "reason_code": "no_enrichment"
+  }
+}
