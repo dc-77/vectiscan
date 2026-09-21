@@ -49,3 +49,19 @@ def test_eingabe_der_ki_traegt_keine_rohdaten(ohne_key):
                                "beobachtung", "bedeutung", "dringlichkeit", "fremdreferenzen"}
     text = str(payload)
     assert "nmap.xml" not in text and "evidence" not in text
+
+
+def test_beide_ki_aufrufe_laufen_auf_demselben_modell() -> None:
+    """Prosa und Recherche auf Opus 5 (S5-Nachtrag).
+
+    Der Wechsel von Opus 4.7 war eine Kostenentscheidung: derselbe Aufruf kostet
+    ein Drittel. Das Modell steht im Cache-Schluessel, ein Wechsel invalidiert
+    die alten Eintraege von selbst.
+    """
+    from reporter.v3 import research
+    from reporter.v3.aicost import PRICING
+
+    assert prose.OPUS_MODEL == "claude-opus-5"
+    assert research.OPUS_MODEL == prose.OPUS_MODEL
+    # Ohne Preiseintrag rechnet die Kostenzeile still mit null.
+    assert PRICING[prose.OPUS_MODEL] == (5.0, 25.0)
