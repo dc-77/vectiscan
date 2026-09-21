@@ -22,7 +22,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.0.1"
+FACTS_SCHEMA_VERSION = "1.0.2"
 
 Mode = Literal["active", "passive"]
 
@@ -222,8 +222,15 @@ class TlsCert(Base):
 
 
 class TlsVuln(Base):
+    """Urteil von testssl zu einer benannten TLS-Schwachstelle.
+
+    Drei Werte, kein zweiwertiges Bild: ``not_tested`` steht fuer eine Pruefung,
+    die testssl selbst nicht zu Ende gebracht hat (WARN, Zeitueberschreitung,
+    Verbindungsfehler). Sie darf weder als Befund noch als "geprueft und in
+    Ordnung" gelten; ohne den dritten Wert verschwand sie bisher ganz (S5b).
+    """
     name: str
-    status: Literal["vulnerable", "potential"]
+    status: Literal["vulnerable", "potential", "not_tested"]
 
 
 class TlsEntry(Base):
