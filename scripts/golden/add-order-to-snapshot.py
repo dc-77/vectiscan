@@ -52,6 +52,35 @@ SECRET_RE = re.compile(r"Bearer\s+[A-Za-z0-9._-]{10,}|\"password\"\s*:\s*\"[^\"]
 LIST_KEYS = ("id", "domain", "package", "status", "createdAt", "startedAt",
              "finishedAt", "targets", "email")
 
+# Aus dem Kundenkontext darf nur der Firmenname in ein Fixture (Auflage S5b,
+# spec/07 "Freigegebene Scanziele"). Personennamen, Adressen und die
+# Fundstellen der Recherche gehoeren nicht ins Repo, auch nicht bei eigenen
+# Domains. Der heutige Detail-Endpunkt liefert das Feld gar nicht mit; die
+# Filterung steht hier fuer den Tag, an dem er es tut.
+CONTEXT_KEYS = ("firmenname",)
+CONTEXT_FIELDS = ("customerContext", "customer_context")
+
+# Felder, die nur Admins sehen und die die uebrigen Schnappschuesse nicht haben.
+# Sie wuerden das Set uneinheitlich machen, ohne etwas zu belegen.
+ADMIN_FIELDS = ("reportDefects", "report_defects")
+
+
+def _strip_admin_and_context(node: Any) -> Any:
+    """Kundenkontext auf den Firmennamen kuerzen, Admin-Felder entfernen."""
+    if isinstance(node, list):
+        return [_strip_admin_and_context(x) for x in node]
+    if not isinstance(node, dict):
+        return node
+    out: dict[str, Any] = {}
+    for key, value in node.items():
+        if key in ADMIN_FIELDS:
+            continue
+        if key in CONTEXT_FIELDS and isinstance(value, dict):
+            out[key] = {k: v for k, v in value.items() if k in CONTEXT_KEYS}
+            continue
+        out[key] = _strip_admin_and_context(value)
+    return out
+
 
 def write_json(path: Path, data: object) -> None:
     text = json.dumps(data, ensure_ascii=False, sort_keys=True, indent=1) + "\n"
@@ -141,11 +170,12 @@ def main() -> int:
 
     if list_entry.get("email"):
         list_entry["email"] = REDACTED_EMAIL
+    list_entry = _strip_admin_and_context(list_entry)
 
     out_dir = snapshot / order_id
     out_dir.mkdir(exist_ok=True)
     for name, doc in docs.items():
-        write_json(out_dir / name, doc)
+        write_json(out_dir / name, _strip_admin_and_context(doc))
 
     orders_doc = json.loads(orders_path.read_text(encoding="utf-8"))
     orders = (orders_doc.get("data") or {}).get("orders")

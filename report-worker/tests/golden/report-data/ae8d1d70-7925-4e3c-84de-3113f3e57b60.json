@@ -1,6 +1,23 @@
 {
  "appendix": {
-  "cve_refs": [],
+  "cve_refs": [
+   {
+    "cve": "CVE-2013-3587",
+    "name": "",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-004, VS-2026-006, VS-2026-013, VS-2026-015",
+    "score": "",
+    "src": "testssl"
+   },
+   {
+    "cve": "CVE-2011-3389",
+    "name": "",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-005",
+    "score": "",
+    "src": "testssl"
+   }
+  ],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 19.07.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
   "exposure_scale": [
    {
@@ -1297,7 +1314,13 @@
    "scale": "hygiene",
    "source": "aktiv (httpx)",
    "status": "gelb",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "nein",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Zertifikate auf vermittler.securess.de mit Beanstandungen",
    "urgency": "Unverzüglich",
    "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
@@ -1328,7 +1351,13 @@
    "scale": "hygiene",
    "source": "aktiv (testssl)",
    "status": "gelb",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2011-3389 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "nein",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf 85.22.47.46 mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1359,7 +1388,13 @@
    "scale": "hygiene",
    "source": "aktiv (testssl)",
    "status": "gelb",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "nein",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf 85.22.47.38 mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1548,7 +1583,13 @@
    "scale": "hygiene",
    "source": "aktiv (testssl)",
    "status": "blau",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "nein",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf connect.securess.de mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1610,7 +1651,13 @@
    "scale": "hygiene",
    "source": "aktiv (testssl)",
    "status": "blau",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "nein",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf mailcleaner.securess.de mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1849,7 +1896,7 @@
  "landscape_lead": "21 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 52,
-  "catalog_digest": "af96d64eabc6b26698929f9ffc487c9885b6d99064d0d199b74ae1030bf0053c",
+  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 21,
@@ -1858,7 +1905,7 @@
   "domains": [
    "securess.de"
   ],
-  "facts_schema_version": "1.0.1",
+  "facts_schema_version": "1.0.2",
   "fqdns_total": 26,
   "hosts_ipv4": 12,
   "hosts_ipv6": 0,
@@ -2223,6 +2270,10 @@
    {
     "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.36 (vpn01.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de), 85.22.47.40 (apache01.securess.de, portal.securess.de, ssi.securess.de) und weitere.",
     "what": "Keine Abdeckungsinformation für dieses Werkzeug"
+   },
+   {
+    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.36 (vpn01.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, webmail.securess.de), 85.22.47.40 (apache01.securess.de, portal.securess.de, ssi.securess.de) und weitere.",
+    "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {
     "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",

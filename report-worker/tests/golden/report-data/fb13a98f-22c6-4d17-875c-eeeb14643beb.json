@@ -1251,7 +1251,7 @@
  "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 27,
-  "catalog_digest": "af96d64eabc6b26698929f9ffc487c9885b6d99064d0d199b74ae1030bf0053c",
+  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 14,
@@ -1260,7 +1260,7 @@
   "domains": [
    "krause-computer.de"
   ],
-  "facts_schema_version": "1.0.1",
+  "facts_schema_version": "1.0.2",
   "fqdns_total": 11,
   "hosts_ipv4": 3,
   "hosts_ipv6": 0,
@@ -1479,6 +1479,10 @@
    {
     "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de, transmission.krause-computer.de, youtube.krause-computer.de), filebrowser.krause-computer.de, jitsi.krause-computer.de, krause-computer.de und weitere.",
     "what": "Keine Abdeckungsinformation für dieses Werkzeug"
+   },
+   {
+    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de, transmission.krause-computer.de, youtube.krause-computer.de).",
+    "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {
     "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",

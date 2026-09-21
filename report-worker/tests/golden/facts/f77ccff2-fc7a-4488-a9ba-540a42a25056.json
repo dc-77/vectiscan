@@ -3340,6 +3340,34 @@
    "source": "ai_tech_analysis"
   },
   {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"cisa_kev_matches\": 0, \"cves_enriched\": 0, \"false_positives\": 104, \"total_findings\": 390, \"valid_findings\": 286 }",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:phase3_correlation:scan",
+   "mode": "active",
+   "note": "Bilanz der Korrelation, kein Befund.",
+   "observed_at": "2026-07-20T00:25:49Z",
+   "payload": {
+    "cisa_kev_matches": 0,
+    "cves_enriched": 0,
+    "false_positives": 104,
+    "fp_by_reason": {
+     "Header-Dedup": 99,
+     "SSL-Dedup": 5
+    },
+    "total_findings": 390,
+    "valid_findings": 286
+   },
+   "source": "phase3_correlation"
+  },
+  {
    "confidence": 0.8,
    "evidence": [
     {
@@ -7891,7 +7919,7 @@
    }
   ]
  },
- "schema_version": "1.0.1",
+ "schema_version": "1.0.2",
  "services": [
   {
    "auth_mechanisms": [],

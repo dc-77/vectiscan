@@ -1,6 +1,15 @@
 {
  "appendix": {
-  "cve_refs": [],
+  "cve_refs": [
+   {
+    "cve": "CVE-2013-3587",
+    "name": "",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-011",
+    "score": "",
+    "src": "testssl"
+   }
+  ],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 18.09.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
   "exposure_scale": [
    {
@@ -932,7 +941,13 @@
    "scale": "hygiene",
    "source": "aktiv (header_check, httpx, testssl)",
    "status": "blau",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "nein",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf 88.99.35.112 mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1119,7 +1134,7 @@
  "landscape_lead": "15 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 25,
-  "catalog_digest": "af96d64eabc6b26698929f9ffc487c9885b6d99064d0d199b74ae1030bf0053c",
+  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 15,
@@ -1128,7 +1143,7 @@
   "domains": [
    "dortmund-beach.com"
   ],
-  "facts_schema_version": "1.0.1",
+  "facts_schema_version": "1.0.2",
   "fqdns_total": 4,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
@@ -1308,6 +1323,10 @@
    {
     "detail": "Betroffen: *.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com.",
     "what": "Fakten reichen für eine Aussage nicht aus"
+   },
+   {
+    "detail": "Betroffen: 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com).",
+    "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {
     "detail": "Betroffen: dortmund-beach.com.",

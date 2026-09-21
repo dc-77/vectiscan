@@ -1,0 +1,1311 @@
+{
+ "data": {
+  "additional_findings": [
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "62.217.52.165:443 (vhost: 10finance.vectigal.tech)",
+    "affected_hosts": [
+     "62.217.52.165:443 (vhost: 10finance.vectigal.tech)"
+    ],
+    "business_impact_score": 2.5,
+    "cvss_score": "4.2",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-829",
+    "description": "Die Anwendung 10finance.vectigal.tech lädt React-Bibliotheken direkt von unpkg.com (einem öffentlichen CDN) ohne Integritätsprüfung (Subresource Integrity). Sollte unpkg.com kompromittiert werden oder die geladenen Pakete manipuliert sein, würde schadhafter Code direkt im Browser der Nutzer ausgeführt. Dies ist besonders kritisch für eine Finanzanwendung.",
+    "finding_type": "sri_missing",
+    "id": "VS-2026-011",
+    "policy_id": "SP-SRI-001",
+    "recommendation": "Bündeln Sie alle JavaScript-Abhängigkeiten lokal (Self-Hosting) und entfernen Sie externe CDN-Referenzen. Falls externe Quellen unvermeidbar sind, fügen Sie Subresource-Integrity-Hashes (integrity-Attribut) hinzu. Empfohlen innerhalb 2–4 Wochen.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-SRI-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Externe JavaScript-/Stylesheet-Ressourcen ohne Subresource-Integrity-Hash eingebunden — kompromittierter CDN kann beliebigen Code ausliefern; Risiko abh. von CDN-Reputation",
+     "rule_references": [
+      "CWE-353",
+      "OWASP2025-A06"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Externe JavaScript-Abhängigkeiten von unpkg.com auf 10finance.vectigal.tech",
+    "title_vars": {
+     "host": "10finance.vectigal.tech"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "62.217.52.165:443 (vhost: crm.vectigal.tech)",
+    "affected_hosts": [
+     "62.217.52.165:443 (vhost: crm.vectigal.tech)"
+    ],
+    "business_impact_score": 0.5,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-693",
+    "description": "Der HTTP-Response-Header 'Content-Security-Policy' (CSP) fehlt auf crm.vectigal.tech. Ohne CSP können Angreifer bei einer vorhandenen Cross-Site-Scripting-Schwachstelle beliebige Skripte im Browser der Nutzer ausführen, da der Browser keine Einschränkungen bezüglich erlaubter Skriptquellen kennt. Das Twenty CRM verarbeitet potenziell sensible Kundendaten, was das Risiko erhöht.",
+    "finding_type": "csp_missing",
+    "id": "VS-2026-006",
+    "policy_id": "SP-CSP-001",
+    "recommendation": "Implementieren Sie einen restriktiven CSP-Header, der nur explizit erlaubte Quellen für Skripte, Styles und andere Ressourcen zulässt. Beginnen Sie mit einem Report-Only-Modus, um Kompatibilitätsprobleme zu erkennen. Empfohlen innerhalb 2–4 Wochen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-CSP-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Statische Seite ohne inline-Scripts oder Forms - kein praktisches XSS-Risiko",
+     "rule_references": [
+      "CWE-693",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Fehlender Content-Security-Policy-Header auf crm.vectigal.tech",
+    "title_vars": {
+     "host": "crm.vectigal.tech",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "DNS-Zone vectigal.tech",
+    "affected_hosts": [
+     "DNS-Zone vectigal.tech"
+    ],
+    "business_impact_score": 0.5,
+    "cvss_score": "",
+    "cvss_vector": "",
+    "cwe": "",
+    "description": "Für vectigal.tech ist kein TLS-Reporting (TLSRPT, RFC 8460) konfiguriert. TLSRPT ermöglicht es, automatisierte Berichte über TLS-Verbindungsfehler zu empfangen und so Fehlkonfigurationen oder Angriffe auf die E-Mail-Transportverschlüsselung frühzeitig zu erkennen.",
+    "finding_type": "tls_rpt_missing",
+    "id": "VS-2026-012",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "Erwägen Sie die Einrichtung eines TLSRPT-Eintrags (_smtp._tls.vectigal.tech), sobald E-Mail-Dienste für die Domain aktiv genutzt werden. Für kontinuierliche Verbesserung berücksichtigen.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='tls_rpt_missing' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "info"
+     }
+    },
+    "title": "Fehlende TLSRPT-Konfiguration für vectigal.tech",
+    "title_vars": {
+     "domain": "vectigal.tech"
+    }
+   }
+  ],
+  "audit_severity_counts": {
+   "critical": 0,
+   "high": 0,
+   "info": 2,
+   "low": 1,
+   "medium": 5
+  },
+  "business_impact_score": "0.0",
+  "claims_guard_stats": {
+   "allowlist_size": 107,
+   "claims_checked": 68,
+   "claims_unsupported": {
+    "cve": [],
+    "host": [
+     "dodns.net",
+     "ns1a.dodns.net",
+     "ns2a.dodns.net",
+     "unpkg.com"
+    ],
+    "port": [],
+    "version": []
+   },
+   "distinct_removed": [],
+   "fields_scanned": [
+    "additional_findings_summary[].affected",
+    "additional_findings_summary[].description",
+    "additional_findings_summary[].recommendation",
+    "additional_findings_summary[].title",
+    "findings[].affected",
+    "findings[].description",
+    "findings[].recommendation",
+    "findings[].title",
+    "overall_description",
+    "positive_findings[].description",
+    "positive_findings[].title",
+    "top_recommendations[].action"
+   ],
+   "mode": "enforce",
+   "removed_count": 0
+  },
+  "cve_guard_stats": {
+   "allowlist_size": 107,
+   "distinct_removed": [],
+   "removed_count": 0
+  },
+  "excluded_finding_ids": [],
+  "exclusions": [],
+  "findings": [
+   {
+    "_title_template_missing": true,
+    "affected": "62.217.52.165:443",
+    "business_impact_score": 5.9,
+    "cvss_score": "5.9",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "cwe": "CWE-326",
+    "description": "Das eingesetzte TLS-Zertifikat enthält weder einen OCSP- noch einen CRL-Endpunkt. Clients können daher nicht prüfen, ob das Zertifikat widerrufen wurde. Im Falle eines kompromittierten privaten Schlüssels bleibt das Zertifikat für Angreifer weiterhin nutzbar, ohne dass Clients dies erkennen können.",
+    "external_id": "VS-2026-002",
+    "id": "VS-2026-002",
+    "original_claude_id": "VS-2026-002",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "Verwenden Sie ein Zertifikat einer vertrauenswürdigen CA, das OCSP-Stapling und einen CRL-Verteilungspunkt enthält, und aktivieren Sie OCSP-Stapling auf dem Webserver. Empfohlen innerhalb 2–4 Wochen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Kein OCSP- und kein CRL-Endpunkt im TLS-Zertifikat auf 62.217.52.165",
+    "title_vars": {
+     "host": "62.217.52.165",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "62.217.52.165:443 (vhost: crm.vectigal.tech)",
+    "business_impact_score": 5.4,
+    "cvss_score": "5.4",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+    "cwe": "CWE-942",
+    "description": "Der Response-Header 'Access-Control-Allow-Origin: *' erlaubt es beliebigen Webseiten, Cross-Origin-Anfragen an crm.vectigal.tech zu stellen und die Antworten auszulesen. Für ein CRM-System, das potenziell sensible Kundendaten verarbeitet, ist eine derart offene CORS-Konfiguration unangemessen, da sie das Risiko von Datenlecks durch bösartige Webseiten erhöht.",
+    "external_id": "VS-2026-003",
+    "finding_type": "cors_misconfiguration",
+    "id": "VS-2026-003",
+    "original_claude_id": "VS-2026-010",
+    "policy_id": "SP-CORS-001",
+    "recommendation": "Beschränken Sie den CORS-Header auf explizit erlaubte Ursprünge (z.B. die eigene Domain) statt den Wildcard-Wert '*' zu verwenden. Passen Sie die Konfiguration im Golang-Backend oder im Reverse Proxy an. Empfohlen innerhalb 2–4 Wochen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-CORS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "CORS / Cross-Domain-Fehlkonfiguration (z.B. wildcard Access-Control-Allow-Origin, fehlerhafte Preflight-Logik) ermoeglicht Cross-Origin-Datenzugriff mit Auth-Cookies",
+     "rule_references": [
+      "CWE-942",
+      "CWE-346",
+      "OWASP2025-A05"
+     ],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "CORS-Misconfiguration auf crm.vectigal.tech",
+    "title_vars": {
+     "host": "crm.vectigal.tech",
+     "port": "443"
+    }
+   },
+   {
+    "_qa_cap_applied": true,
+    "_title_template_missing": true,
+    "affected": "62.217.52.165:443 (alle VHosts: crm.vectigal.tech, board.vectigal.tech, gutachter.vectigal.tech u.a.)",
+    "business_impact_score": 7.4,
+    "cvss_score": "5.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N",
+    "cwe": "CWE-326",
+    "description": "Die TLS-Zertifikatskette auf dem Haupthost ist unvollständig — Intermediate-Zertifikate fehlen, sodass Clients die Vertrauenskette nicht vollständig aufbauen können. Zusätzlich stimmt das präsentierte Zertifikat nicht mit dem aufgerufenen Hostnamen überein, was auf eine Fehlkonfiguration des SNI-Routings hindeutet. Betroffen sind alle produktiven Anwendungen auf diesem Host.",
+    "external_id": "VS-2026-001",
+    "id": "VS-2026-001",
+    "original_claude_id": "VS-2026-001",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "Stellen Sie die vollständige Zertifikatskette inklusive aller Intermediate-Zertifikate bereit und stellen Sie sicher, dass für jeden VHost ein passendes Zertifikat (Wildcard oder SAN-Zertifikat) konfiguriert ist. Behebung innerhalb weniger Tage.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "high",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='<unmapped>' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "high"
+     }
+    },
+    "title": "Unvollständige TLS-Zertifikatskette auf 62.217.52.165",
+    "title_vars": {
+     "host": "62.217.52.165",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "DNS-Zone vectigal.tech",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain vectigal.tech ist kein SPF-Eintrag (Sender Policy Framework) im DNS hinterlegt. Ohne SPF können beliebige Server E-Mails im Namen von vectigal.tech versenden, ohne dass empfangende Mailserver dies anhand des DNS erkennen und ablehnen können. Dies erleichtert Phishing- und Spoofing-Angriffe gegen Kunden und Partner.",
+    "external_id": "VS-2026-004",
+    "finding_type": "spf_missing",
+    "id": "VS-2026-004",
+    "original_claude_id": "VS-2026-003",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "Erstellen Sie einen SPF-TXT-Eintrag in der DNS-Zone, der ausschließlich autorisierte Mailserver auflistet, z.B. 'v=spf1 include:<mailprovider> -all'. Empfohlen innerhalb 2–4 Wochen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='spf_missing' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Fehlender SPF-Eintrag für vectigal.tech",
+    "title_vars": {
+     "domain": "vectigal.tech"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "_title_template_missing": true,
+    "affected": "DNS-Zone vectigal.tech",
+    "business_impact_score": 4.3,
+    "cvss_score": "4.3",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "Für die Domain vectigal.tech ist kein DKIM-Eintrag (DomainKeys Identified Mail) konfiguriert. DKIM ermöglicht es, ausgehende E-Mails kryptografisch zu signieren, sodass Empfänger die Authentizität und Integrität der Nachricht verifizieren können. Ohne DKIM können E-Mails im Transit manipuliert werden, ohne dass dies erkennbar ist.",
+    "external_id": "VS-2026-005",
+    "finding_type": "dkim_missing",
+    "id": "VS-2026-005",
+    "original_claude_id": "VS-2026-005",
+    "policy_id": "SP-FALLBACK",
+    "recommendation": "Konfigurieren Sie DKIM in Ihrem E-Mail-Dienst und veröffentlichen Sie den zugehörigen öffentlichen Schlüssel als TXT-Eintrag im DNS (z.B. 'mail._domainkey.vectigal.tech'). Empfohlen innerhalb 2–4 Wochen.",
+    "severity": "MEDIUM",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "medium",
+     "policy_id": "SP-FALLBACK",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Keine Policy-Regel fuer finding_type='dkim_missing' - Tool-Severity uebernommen",
+     "rule_references": [],
+     "tool_severities": {
+      "claude_extraction": "medium"
+     }
+    },
+    "title": "Fehlender DKIM-Eintrag für vectigal.tech",
+    "title_vars": {
+     "domain": "vectigal.tech"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "DNS-Zone vectigal.tech (NS: ns1a.dodns.net, ns2a.dodns.net)",
+    "business_impact_score": 2.5,
+    "cvss_score": "3.7",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+    "cwe": "CWE-290",
+    "description": "DNSSEC ist für die Domain vectigal.tech nicht aktiviert. Ohne DNSSEC können DNS-Antworten durch Cache-Poisoning-Angriffe gefälscht werden, sodass Nutzer auf manipulierte Server umgeleitet werden, ohne dies zu bemerken. Bei einer Infrastruktur mit zahlreichen produktiven Diensten und sensiblen Anwendungen (CRM, KI-Dienste, Finanztools) ist dies ein relevantes Risiko.",
+    "external_id": "VS-2026-006",
+    "finding_type": "dnssec_missing",
+    "id": "VS-2026-006",
+    "original_claude_id": "VS-2026-008",
+    "policy_id": "SP-DNS-001",
+    "recommendation": "Aktivieren Sie DNSSEC bei Ihrem DNS-Anbieter (dodns.net) und stellen Sie sicher, dass DS-Records beim Registrar hinterlegt werden. Empfohlen innerhalb 1–3 Monaten.",
+    "severity": "LOW",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "low",
+     "policy_id": "SP-DNS-001",
+     "policy_version": "2026-06-01.1",
+     "rationale": "DNSSEC nicht aktiviert - DNS-Spoofing-Risiko",
+     "rule_references": [
+      "CWE-345",
+      "CWE-290"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "DNSSEC fehlt fuer vectigal.tech",
+    "title_vars": {
+     "domain": "vectigal.tech"
+    }
+   },
+   {
+    "_finding_type_source": "regex",
+    "affected": "62.217.52.165:443 (vhost: crm.vectigal.tech)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-693",
+    "description": "Der HTTP-Response-Header 'Permissions-Policy' fehlt auf crm.vectigal.tech. Dieser Header ermöglicht es, den Zugriff auf Browser-APIs wie Kamera, Mikrofon oder Geolocation einzuschränken. Ohne diese Einschränkung könnten eingebettete Drittanbieter-Skripte oder eine XSS-Schwachstelle auf diese Funktionen zugreifen.",
+    "external_id": "VS-2026-008",
+    "finding_type": "permissions_policy_missing",
+    "id": "VS-2026-008",
+    "original_claude_id": "VS-2026-007",
+    "policy_id": "SP-HDR-009",
+    "recommendation": "Setzen Sie einen Permissions-Policy-Header, der nicht benötigte Browser-Features explizit deaktiviert, z.B. 'Permissions-Policy: camera=(), microphone=(), geolocation=()'. Empfohlen innerhalb 1–3 Monaten.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-HDR-009",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Browser-Feature-Policy nicht restriktiv gesetzt - Hardening",
+     "rule_references": [
+      "CWE-693"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "HSTS-Preload-Eintrag fehlt fuer crm.vectigal.tech",
+    "title_vars": {
+     "host": "crm.vectigal.tech",
+     "port": "443"
+    }
+   },
+   {
+    "_finding_type_source": "ai_fallback",
+    "affected": "62.217.52.165:443 (vhost: crm.vectigal.tech)",
+    "business_impact_score": 3.1,
+    "cvss_score": "3.1",
+    "cvss_vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:N/A:N",
+    "cwe": "CWE-614",
+    "description": "Das Cookie 'analyticsCookie' wird auf crm.vectigal.tech ohne das Secure-Flag gesetzt. Ohne dieses Flag könnte das Cookie theoretisch über eine unverschlüsselte HTTP-Verbindung übertragen werden, sofern ein Angreifer einen Downgrade-Angriff durchführt. Obwohl HSTS aktiv ist, sollte das Secure-Flag als Defense-in-Depth-Maßnahme gesetzt werden.",
+    "external_id": "VS-2026-007",
+    "finding_type": "cookie_no_secure",
+    "id": "VS-2026-007",
+    "original_claude_id": "VS-2026-009",
+    "policy_id": "SP-COOK-004",
+    "recommendation": "Setzen Sie das Secure-Flag für alle Cookies, die auf HTTPS-Seiten gesetzt werden, um sicherzustellen, dass diese ausschließlich über verschlüsselte Verbindungen übertragen werden. Empfohlen innerhalb 1–3 Monaten.",
+    "severity": "INFO",
+    "severity_provenance": {
+     "context_flags": {
+      "auth_present": false,
+      "cookie_session": false,
+      "cve_epss_high": false,
+      "cve_in_kev": false,
+      "cve_ransomware": false,
+      "form_present": false,
+      "https_in_use": true,
+      "inline_scripts": false,
+      "is_internet_facing": true,
+      "is_session_path": false,
+      "mx_present": false,
+      "state_change": false
+     },
+     "policy_decision": "info",
+     "policy_id": "SP-COOK-004",
+     "policy_version": "2026-06-01.1",
+     "rationale": "Tracking-Cookie ohne Secure - kein Auth-Risiko",
+     "rule_references": [
+      "CWE-614"
+     ],
+     "tool_severities": {
+      "claude_extraction": "low"
+     }
+    },
+    "title": "Session-Cookie analyticsCookie ohne Secure-Flag auf crm.vectigal.tech",
+    "title_vars": {
+     "cookie_name": "analyticsCookie",
+     "host": "crm.vectigal.tech"
+    }
+   }
+  ],
+  "overall_description": "Die Infrastruktur von vectigal.tech umfasst zwei Hosts (62.217.52.165 und 62.217.52.177) mit insgesamt 31 Subdomains. Auf dem Haupthost 62.217.52.165 betreibt vectigal.tech eine Vielzahl produktiver Webanwendungen: das Twenty CRM-System (crm.vectigal.tech), das Projektmanagement-Tool Paperclip (board.vectigal.tech), eine Streamlit-basierte CRM-Viewer-Anwendung (crmviewer.vectigal.tech), eine KI-gestützte Gutachter-Plattform (gutachter.vectigal.tech), einen Finanz-Quickcheck (10finance.vectigal.tech) sowie weitere API- und Hilfsdienste. Der gesamte Stack basiert auf einem Golang net/http Server, der als Reverse Proxy (vermutlich Traefik) fungiert. Der zweite Host 62.217.52.177 (test.vectigal.tech) zeigt keine offenen Ports und ist derzeit nicht erreichbar.\n\nDie drei gravierendsten Risikobereiche sind: Erstens weist die TLS-Konfiguration auf 62.217.52.165 schwerwiegende Mängel auf — die Zertifikatskette ist unvollständig, das Zertifikat stimmt nicht mit dem aufgerufenen Host überein und es fehlen sowohl CRL- als auch OCSP-Prüfpunkte, was eine zuverlässige Vertrauensvalidierung unmöglich macht. Zweitens fehlen für die Domain vectigal.tech sowohl SPF- als auch DMARC- und DKIM-Einträge vollständig, sodass die Domain für E-Mail-Spoofing und Phishing-Angriffe im Namen von vectigal.tech missbraucht werden kann. Drittens fehlen auf mehreren produktiven Webanwendungen wichtige Sicherheits-Header wie Content-Security-Policy und Permissions-Policy, was das Risiko von clientseitigen Angriffen erhöht. Zusätzlich ist DNSSEC für beide Hosts nicht aktiviert, was DNS-Manipulation begünstigt.",
+  "overall_risk": "MEDIUM",
+  "package": "webcheck",
+  "policy_id_distinct": [
+   "SP-COOK-004",
+   "SP-CORS-001",
+   "SP-CSP-001",
+   "SP-DNS-001",
+   "SP-FALLBACK",
+   "SP-HDR-009",
+   "SP-SRI-001"
+  ],
+  "policy_version": "2026-06-01.1",
+  "positive_findings": [
+   {
+    "description": "Die einheitliche Referrer-Policy 'strict-origin-when-cross-origin' stellt sicher, dass beim Navigieren zu externen Seiten nur der Ursprung (ohne Pfad und Query-Parameter) übermittelt wird. Dies schützt potenziell sensible URL-Parameter vor unbeabsichtigter Weitergabe an Dritte.",
+    "title": "Referrer-Policy: strict-origin-when-cross-origin auf allen VHosts konfiguriert"
+   },
+   {
+    "description": "Der Port-Scan zeigt, dass auf 62.217.52.165 ausschließlich die Ports 80 und 443 erreichbar sind. Datenbank-Ports, Redis, RabbitMQ oder ähnliche interne Dienste sind nicht direkt aus dem Internet erreichbar — ein wichtiges Merkmal einer durchdachten Netzwerksegmentierung.",
+    "title": "Keine offenen Datenbank- oder Management-Ports nach außen exponiert"
+   }
+  ],
+  "recommendations": [
+   {
+    "action": "TLS-Zertifikatskette reparieren: vollständige Intermediate-Zertifikate einbinden und sicherstellen, dass das Zertifikat alle VHosts (Wildcard oder SAN) abdeckt",
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "SPF-, DMARC- und DKIM-DNS-Einträge für vectigal.tech einrichten, um E-Mail-Spoofing zu verhindern",
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "CORS-Konfiguration auf crm.vectigal.tech von Wildcard (*) auf explizit erlaubte Ursprünge einschränken",
+    "timeframe": "Woche 1"
+   },
+   {
+    "action": "Content-Security-Policy-Header auf allen produktiven VHosts implementieren (zunächst im Report-Only-Modus)",
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "Externe JavaScript-Abhängigkeiten auf 10finance.vectigal.tech lokal bündeln oder mit Subresource-Integrity-Hashes absichern",
+    "timeframe": "Monat 1"
+   },
+   {
+    "action": "DNSSEC für vectigal.tech beim DNS-Anbieter aktivieren und DS-Records beim Registrar hinterlegen",
+    "timeframe": "Monat 1"
+   }
+  ],
+  "severity_counts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 2,
+   "LOW": 1,
+   "MEDIUM": 5
+  },
+  "tech_profiles": [
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "crm.vectigal.tech",
+     "vectigal.tech",
+     "10finance.vectigal.tech",
+     "agent.vectigal.tech",
+     "auth.vectigal.tech",
+     "board.vectigal.tech",
+     "crmviewer.vectigal.tech",
+     "feedgenerator.vectigal.tech",
+     "gutachter-api.vectigal.tech",
+     "gutachter.vectigal.tech",
+     "id.vectigal.tech",
+     "ki-check-10finance.vectigal.tech",
+     "ki-check.vectigal.tech",
+     "logs.vectigal.tech",
+     "mcp-test.vectigal.tech",
+     "monitoring.vectigal.tech",
+     "page.vectigal.tech",
+     "protokoll-assist.vectigal.tech",
+     "rankingcoach.vectigal.tech",
+     "saferouter-admin.vectigal.tech",
+     "saferouter-api.vectigal.tech",
+     "saferouter-app.vectigal.tech",
+     "saferouter-auth.vectigal.tech",
+     "saferouter-www.vectigal.tech",
+     "scan-api.vectigal.tech",
+     "scan.vectigal.tech",
+     "shopify.vectigal.tech",
+     "status.vectigal.tech",
+     "traefik.vectigal.tech",
+     "webcheck.vectigal.tech"
+    ],
+    "ftp_service": false,
+    "has_ssl": true,
+    "has_web": true,
+    "ip": "62.217.52.165",
+    "is_spa": true,
+    "mail_services": false,
+    "open_ports": [
+     80,
+     443
+    ],
+    "passive_intel": {
+     "dnssec_signed": false,
+     "otx_pulse_count": 0,
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "crm.vectigal.tech",
+    "redirect_data": {
+     "10finance.vectigal.tech": {
+      "error": null,
+      "final_domain": "10finance.vectigal.tech",
+      "final_url": "https://10finance.vectigal.tech/",
+      "is_cross_domain": false,
+      "page_title": "10FINANCE Stabilitäts-Quickcheck",
+      "redirect_chain": [
+       "https://10finance.vectigal.tech/",
+       "https://10finance.vectigal.tech/css/fonts/inter-v20-latin-regular.woff2",
+       "https://10finance.vectigal.tech/css/fonts.css",
+       "https://10finance.vectigal.tech/js/components/radar-chart.js",
+       "https://10finance.vectigal.tech/js/config.js",
+       "https://10finance.vectigal.tech/css/styles.css",
+       "https://10finance.vectigal.tech/js/api.js",
+       "https://10finance.vectigal.tech/js/components/stufen-leiste.js",
+       "https://10finance.vectigal.tech/css/fonts/hanken-grotesk-v12-latin-700.woff2",
+       "https://10finance.vectigal.tech/js/components/module-bar.js",
+       "https://10finance.vectigal.tech/js/components/lead-gate.js",
+       "https://10finance.vectigal.tech/js/app.js",
+       "https://10finance.vectigal.tech/js/components/score-circle.js",
+       "https://unpkg.com/react@18/umd/react.production.min.js",
+       "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js",
+       "https://unpkg.com/react@18.3.1/umd/react.production.min.js",
+       "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js",
+       "https://10finance.vectigal.tech/images/logo-light.png",
+       "https://10finance.vectigal.tech/css/fonts/inter-v20-latin-600.woff2",
+       "https://10finance.vectigal.tech/css/fonts/inter-v20-latin-700.woff2"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "public, max-age=0",
+       "content-length": "1600",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sun, 20 Sep 2026 09:08:40 GMT",
+       "etag": "W/\"640-1a032bf02b0\"",
+       "last-modified": "Mon, 24 Aug 2026 07:49:34 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "DENY",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-75338c97-6707-4d11-92bf-bb3cd2e02cde/hosts/62.217.52.165/phase2/screenshot_10finance.vectigal.tech.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "de",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        },
+        {
+         "content": "5 Minuten, rund 12 Fragen. Danach wissen Sie, wo Ihr Unternehmen finanziell steht. Eine ehrliche Einordnung, kein Verkaufsgespräch.",
+         "name": "description"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://unpkg.com/react@18/umd/react.production.min.js",
+        "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js",
+        "https://10finance.vectigal.tech/js/config.js",
+        "https://10finance.vectigal.tech/js/api.js",
+        "https://10finance.vectigal.tech/js/components/radar-chart.js",
+        "https://10finance.vectigal.tech/js/components/score-circle.js",
+        "https://10finance.vectigal.tech/js/components/module-bar.js",
+        "https://10finance.vectigal.tech/js/components/stufen-leiste.js",
+        "https://10finance.vectigal.tech/js/components/lead-gate.js",
+        "https://10finance.vectigal.tech/js/app.js"
+       ],
+       "stylesheets": [
+        "https://10finance.vectigal.tech/css/fonts.css",
+        "https://10finance.vectigal.tech/css/styles.css"
+       ],
+       "title": "10FINANCE Stabilitäts-Quickcheck"
+      }
+     },
+     "board.vectigal.tech": {
+      "error": null,
+      "final_domain": "board.vectigal.tech",
+      "final_url": "https://board.vectigal.tech/auth?next=%2F",
+      "is_cross_domain": false,
+      "page_title": "Paperclip",
+      "redirect_chain": [
+       "https://board.vectigal.tech/",
+       "https://board.vectigal.tech/assets/index-BqfqfoQX.css",
+       "https://board.vectigal.tech/assets/index-CnBrDwGT.js",
+       "https://board.vectigal.tech/api/adapters",
+       "https://board.vectigal.tech/api/health",
+       "https://board.vectigal.tech/api/auth/get-session",
+       "https://board.vectigal.tech/api/companies",
+       "https://board.vectigal.tech/fonts/InterVariable.woff2",
+       "https://board.vectigal.tech/api/adapters"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "no-cache",
+       "content-length": "2243",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Sun, 20 Sep 2026 09:08:37 GMT",
+       "etag": "W/\"8c3-1a032ef5d98\"",
+       "last-modified": "Mon, 24 Aug 2026 08:42:23 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "DENY",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-75338c97-6707-4d11-92bf-bb3cd2e02cde/hosts/62.217.52.165/phase2/screenshot_board.vectigal.tech.png",
+      "status_code": 403,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1.0, viewport-fit=cover",
+         "name": "viewport"
+        },
+        {
+         "content": "#ffffff",
+         "name": "theme-color"
+        },
+        {
+         "content": "Paperclip",
+         "name": "apple-mobile-web-app-title"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://board.vectigal.tech/assets/index-CnBrDwGT.js"
+       ],
+       "stylesheets": [
+        "https://board.vectigal.tech/assets/index-BqfqfoQX.css"
+       ],
+       "title": "Paperclip"
+      }
+     },
+     "crm.vectigal.tech": {
+      "error": null,
+      "final_domain": "crm.vectigal.tech",
+      "final_url": "https://crm.vectigal.tech/welcome",
+      "is_cross_domain": false,
+      "page_title": "Sign in or Create an account",
+      "redirect_chain": [
+       "https://crm.vectigal.tech/",
+       "https://crm.vectigal.tech/assets/index-BZ0LKx70.css",
+       "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
+       "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap",
+       "https://crm.vectigal.tech/assets/index-uvuyZ357.js",
+       "https://crm.vectigal.tech/assets/en-BvW1M3NI.js",
+       "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+       "https://twentyhq.github.io/placeholder-images/workspaces/twenty-logo.png",
+       "https://crm.vectigal.tech/client-config",
+       "https://crm.vectigal.tech/assets/NavigationItemDropTarget-w6QOSZ_o.css",
+       "https://crm.vectigal.tech/assets/FavoritesSectionDispatcher-BCNyJqAW.js",
+       "https://crm.vectigal.tech/assets/getDndKitDropTargetId-N9_3WnYc.js",
+       "https://crm.vectigal.tech/assets/FavoritesSectionDispatcher-B7VMdF38.css",
+       "https://crm.vectigal.tech/assets/NavigationMenuItemSection-DR0ybeiN.css"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "access-control-allow-origin": "*",
+       "access-control-expose-headers": "WWW-Authenticate",
+       "cache-control": "public, max-age=0",
+       "content-length": "2510",
+       "content-type": "text/html; charset=UTF-8",
+       "date": "Sun, 20 Sep 2026 09:08:30 GMT",
+       "etag": "W/\"9ce-1a08b6c0308\"",
+       "last-modified": "Thu, 10 Sep 2026 13:05:06 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "DENY",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-75338c97-6707-4d11-92bf-bb3cd2e02cde/hosts/62.217.52.165/phase2/screenshot_crm.vectigal.tech.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "analyticsCookie=4ab2cb3e-e9de-4a80-b2da-c94d7a1c2c56",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "#000000",
+         "name": "theme-color"
+        },
+        {
+         "content": "A modern open-source CRM",
+         "name": "description"
+        },
+        {
+         "content": "summary_large_image",
+         "name": "twitter:card"
+        },
+        {
+         "content": "https://raw.githubusercontent.com/twentyhq/twenty/main/docs/static/img/social-card.png",
+         "name": "twitter:image"
+        },
+        {
+         "content": "A modern open-source CRM",
+         "name": "twitter:description"
+        },
+        {
+         "content": "Twenty",
+         "name": "twitter:title"
+        },
+        {
+         "content": "width=device-width, initial-scale=1.0",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://crm.vectigal.tech/assets/index-uvuyZ357.js"
+       ],
+       "stylesheets": [
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap",
+        "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&display=swap",
+        "https://crm.vectigal.tech/assets/index-BZ0LKx70.css",
+        "https://crm.vectigal.tech/assets/NavigationMenuItemSection-DR0ybeiN.css",
+        "https://crm.vectigal.tech/assets/NavigationItemDropTarget-w6QOSZ_o.css",
+        "https://crm.vectigal.tech/assets/FavoritesSectionDispatcher-B7VMdF38.css",
+        "https://crm.vectigal.tech/assets/WorkspaceSectionDispatcher-SDheB5jV.css",
+        "https://crm.vectigal.tech/assets/TopBar-DA3QV_Uf.css",
+        "https://crm.vectigal.tech/assets/BackgroundMockPage-C8ooE5CR.css",
+        "https://crm.vectigal.tech/assets/StyledOnboardingContentContainer-Cu6_Jy_O.css",
+        "https://crm.vectigal.tech/assets/Logo-CaKvbQPg.css",
+        "https://crm.vectigal.tech/assets/SignInUp-3sNo6wvg.css"
+       ],
+       "title": "Sign in or Create an account"
+      }
+     },
+     "crmviewer.vectigal.tech": {
+      "error": null,
+      "final_domain": "crmviewer.vectigal.tech",
+      "final_url": "https://crmviewer.vectigal.tech/",
+      "is_cross_domain": false,
+      "page_title": "Streamlit",
+      "redirect_chain": [
+       "https://crmviewer.vectigal.tech/",
+       "https://crmviewer.vectigal.tech/static/css/index.DHyCV7PK.css",
+       "https://crmviewer.vectigal.tech/static/css/katex.CAfVENUR.css",
+       "https://crmviewer.vectigal.tech/static/js/emotion-react.browser.esm.CnqdHrzD.js",
+       "https://crmviewer.vectigal.tech/static/js/types.cZoyy9Y-.js",
+       "https://crmviewer.vectigal.tech/static/js/loglevel.xXLtmX_e.js",
+       "https://crmviewer.vectigal.tech/static/js/isArrayLike.Crw2F5li.js",
+       "https://crmviewer.vectigal.tech/static/js/toString.tRXNBxtF.js",
+       "https://crmviewer.vectigal.tech/static/js/rolldown-runtime.C0FnF6B9.js",
+       "https://crmviewer.vectigal.tech/static/js/isSymbol.CmW3dkoN.js",
+       "https://crmviewer.vectigal.tech/static/js/emotion-styled.browser.esm.BYv_Qzcq.js",
+       "https://crmviewer.vectigal.tech/static/js/emotion-is-prop-valid.esm.CuYlOKOk.js",
+       "https://crmviewer.vectigal.tech/static/js/UriUtil.FYzIdBsL.js",
+       "https://crmviewer.vectigal.tech/static/js/_baseClone.Bcnb-YL-.js",
+       "https://crmviewer.vectigal.tech/static/js/merge.CV9itYNj.js",
+       "https://crmviewer.vectigal.tech/static/js/_isIterateeCall.BUStsXAd.js",
+       "https://crmviewer.vectigal.tech/static/js/getColors.DtAxY2Hd.js",
+       "https://crmviewer.vectigal.tech/static/js/useEmotionTheme.Dmt_qJ4x.js",
+       "https://crmviewer.vectigal.tech/static/js/lib.DaUKNU-6.js",
+       "https://crmviewer.vectigal.tech/static/js/Tooltip.CcubhKj6.js",
+       "https://crmviewer.vectigal.tech/static/js/useFloatingOverlay.Cpeg7fG2.js",
+       "https://crmviewer.vectigal.tech/static/js/utils.Vs712G4Z.js",
+       "https://crmviewer.vectigal.tech/static/js/useLabelTitleTooltip.VS7apAPP.js",
+       "https://crmviewer.vectigal.tech/static/js/PortalContext.DiHTlKpY.js",
+       "https://crmviewer.vectigal.tech/static/js/lib.DuoFSfCJ.js",
+       "https://crmviewer.vectigal.tech/static/js/isArrayLikeObject.B3Zf3PTL.js",
+       "https://crmviewer.vectigal.tech/static/js/textSelection.DgmAmjoW.js",
+       "https://crmviewer.vectigal.tech/static/js/lib.CMmWlZtt.js",
+       "https://crmviewer.vectigal.tech/static/js/FormsContext.C6bVDc7u.js",
+       "https://crmviewer.vectigal.tech/static/js/useCrossOriginAttribute.K-ObP1Bx.js",
+       "https://crmviewer.vectigal.tech/static/js/last.DfjdtCRp.js",
+       "https://crmviewer.vectigal.tech/static/js/preload-helper.HclGiUj8.js",
+       "https://crmviewer.vectigal.tech/static/js/ErrorElement.Bn6KKjq6.js",
+       "https://crmviewer.vectigal.tech/static/js/space-separated-tokens.BqhiSyze.js",
+       "https://crmviewer.vectigal.tech/static/js/Toolbar.C5O8pUCg.js",
+       "https://crmviewer.vectigal.tech/static/js/useLabel.DizWobrd.js",
+       "https://crmviewer.vectigal.tech/static/js/FocusScope.iQ9jRcfz.js",
+       "https://crmviewer.vectigal.tech/static/js/useCalculatedDimensions.DmyA6xJn.js",
+       "https://crmviewer.vectigal.tech/static/js/usePress.efhlSQnF.js",
+       "https://crmviewer.vectigal.tech/static/js/_baseIsEqual.sdZCjgvS.js",
+       "https://crmviewer.vectigal.tech/static/js/useResizeObserver.3kyCQ1g6.js",
+       "https://crmviewer.vectigal.tech/static/js/useResolvedWrap.DnjqnyWR.js",
+       "https://crmviewer.vectigal.tech/static/js/Check.esm.tHOxRXBO.js",
+       "https://crmviewer.vectigal.tech/static/js/_baseFlatten.IOj0lc7G.js",
+       "https://crmviewer.vectigal.tech/static/js/ContentCopy.esm.Ccfy7DwA.js",
+       "https://crmviewer.vectigal.tech/static/js/CodeBlockCopyToolbar.B63lmxFm.js",
+       "https://crmviewer.vectigal.tech/static/js/isMobile.BrviDGEH.js",
+       "https://crmviewer.vectigal.tech/static/js/AlertElement.jnyaBsKJ.js",
+       "https://crmviewer.vectigal.tech/static/js/getScrollParent.DcXPel1L.js",
+       "https://crmviewer.vectigal.tech/static/js/useCopyToClipboard.C-ywP4Jl.js",
+       "https://crmviewer.vectigal.tech/static/js/ViewStateContext.BWrgx8uF.js",
+       "https://crmviewer.vectigal.tech/static/js/v4.DDdyfk2q.js",
+       "https://crmviewer.vectigal.tech/static/js/SharedElementTransition.D-H-TuM3.js",
+       "https://crmviewer.vectigal.tech/static/js/DynamicButtonLabel.BTjDBnmI.js",
+       "https://crmviewer.vectigal.tech/static/js/useWindowDimensionsContext.Bq7b7Xl1.js",
+       "https://crmviewer.vectigal.tech/static/js/uri.UNMuXGg5.js",
+       "https://crmviewer.vectigal.tech/static/js/BackendOperationContext.BhY2-GLf.js",
+       "https://crmviewer.vectigal.tech/static/js/useRequiredContext.DBsQavvD.js",
+       "https://crmviewer.vectigal.tech/static/js/SelectionIndicator.Bj4Tikfi.js",
+       "https://crmviewer.vectigal.tech/static/js/BaseButton.eTlHCX_j.js",
+       "https://crmviewer.vectigal.tech/static/js/useCollection.ChFCPfFU.js",
+       "https://crmviewer.vectigal.tech/static/js/utils.C5rmUD0V.js",
+       "https://crmviewer.vectigal.tech/static/js/NavigationContext.4T7w2rIe.js",
+       "https://crmviewer.vectigal.tech/static/js/_baseEach.PLhpSRgM.js",
+       "https://crmviewer.vectigal.tech/static/js/FormClearHelper.G2WY61Ig.js",
+       "https://crmviewer.vectigal.tech/static/js/query-string.CE9hiqqO.js",
+       "https://crmviewer.vectigal.tech/static/js/styled-components.C8Nbdcp-.js",
+       "https://crmviewer.vectigal.tech/static/js/styled-components.BjKbfR5p.js",
+       "https://crmviewer.vectigal.tech/static/js/useNumberFormatter.C74S3dgX.js",
+       "https://crmviewer.vectigal.tech/static/js/useFocusRing.DKgtHVTa.js",
+       "https://crmviewer.vectigal.tech/static/js/src.D7mXJKB_.js",
+       "https://crmviewer.vectigal.tech/static/js/Close.esm.C9UX1nP9.js",
+       "https://crmviewer.vectigal.tech/static/js/NumberFormatter.CHYrjPj-.js",
+       "https://crmviewer.vectigal.tech/static/js/_baseProperty.BV6HSwpm.js",
+       "https://crmviewer.vectigal.tech/static/js/useWidgetManagerElementState.pqPEebW5.js",
+       "https://crmviewer.vectigal.tech/static/js/useDescription.D44v6Ed8.js",
+       "https://crmviewer.vectigal.tech/static/js/extends.SdklyJLW.js",
+       "https://crmviewer.vectigal.tech/static/js/DynamicIcon.qdIiJ9dI.js",
+       "https://crmviewer.vectigal.tech/static/js/ProgressBar.Dnq9p48R.js",
+       "https://crmviewer.vectigal.tech/static/js/useExecuteWhenChanged.1O5Ch07q.js",
+       "https://crmviewer.vectigal.tech/static/js/pick.CbtWtxHL.js",
+       "https://crmviewer.vectigal.tech/static/js/isEqual.CgNOpGTC.js",
+       "https://crmviewer.vectigal.tech/static/js/FlexContext.CiIL1cCY.js",
+       "https://crmviewer.vectigal.tech/static/js/Icon.BwNwD-ho.js",
+       "https://crmviewer.vectigal.tech/static/js/useOverlayDismissal.Pckd1piy.js",
+       "https://crmviewer.vectigal.tech/static/js/useFocusable.BMuUTJBc.js",
+       "https://crmviewer.vectigal.tech/static/js/useFormReset.Dm_0HjET.js",
+       "https://crmviewer.vectigal.tech/static/js/shim.BbyJgaa_.js",
+       "https://crmviewer.vectigal.tech/static/js/katex.min.CvAXSeo_.js",
+       "https://crmviewer.vectigal.tech/static/js/classnames.CRvvUuc_.js",
+       "https://crmviewer.vectigal.tech/static/js/useTimeout.DgWF0Nme.js",
+       "https://crmviewer.vectigal.tech/static/js/ErrorHandling.H5STbbYb.js",
+       "https://crmviewer.vectigal.tech/static/js/extends.CvVTau-c.js",
+       "https://crmviewer.vectigal.tech/static/js/BaseButtonTooltip.B83DZSNb.js",
+       "https://crmviewer.vectigal.tech/static/js/Text.CLxOerZw.js",
+       "https://crmviewer.vectigal.tech/static/js/lib.BQWveI8K.js",
+       "https://crmviewer.vectigal.tech/static/js/ResizeObserver.es.B3NkmA6c.js",
+       "https://crmviewer.vectigal.tech/static/js/extends.To_WgASY.js",
+       "https://crmviewer.vectigal.tech/static/js/useToggleState.RbyUIfC3.js",
+       "https://crmviewer.vectigal.tech/static/js/toastQueue.CeWtco9l.js",
+       "https://crmviewer.vectigal.tech/static/js/useScrollbarGutterSize.Dz-mAUy7.js",
+       "https://crmviewer.vectigal.tech/static/js/index.esm.BUFMYQEK.js",
+       "https://crmviewer.vectigal.tech/static/js/useSlot.BgZLzoY2.js",
+       "https://crmviewer.vectigal.tech/static/js/styled-components.3il69GG_.js",
+       "https://crmviewer.vectigal.tech/static/js/Hidden.tKmNEkoU.js",
+       "https://crmviewer.vectigal.tech/static/js/KeyboardArrowDown.esm.CTwXU0Q8.js",
+       "https://crmviewer.vectigal.tech/static/js/VisuallyHidden.BzpdCoAc.js",
+       "https://crmviewer.vectigal.tech/static/js/constants.M-X9ULkd.js",
+       "https://crmviewer.vectigal.tech/static/js/useFormValidation.BcvRvPA1.js",
+       "https://crmviewer.vectigal.tech/static/js/react-dom.BzV73oHg.js",
+       "https://crmviewer.vectigal.tech/static/media/SourceSansVF-Upright.ttf.BsWL4Kly.woff2",
+       "https://crmviewer.vectigal.tech/static/js/StreamlitMarkdown.BYA62LKI.js",
+       "https://crmviewer.vectigal.tech/static/js/index.dZusM_HY.js",
+       "https://crmviewer.vectigal.tech/static/js/protobuf.Ckf-kxfD.js",
+       "https://crmviewer.vectigal.tech/_stcore/host-config",
+       "https://crmviewer.vectigal.tech/_stcore/health"
+      ],
+      "response_headers": {
+       "accept-ranges": "bytes",
+       "cache-control": "no-cache",
+       "content-length": "11141",
+       "content-type": "text/html; charset=utf-8",
+       "date": "Sun, 20 Sep 2026 09:08:42 GMT",
+       "etag": "\"75dfe2247e380e332b7e2e54963e825b\"",
+       "last-modified": "Mon, 24 Aug 2026 09:48:21 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "DENY",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-75338c97-6707-4d11-92bf-bb3cd2e02cde/hosts/62.217.52.165/phase2/screenshot_crmviewer.vectigal.tech.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "en",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1, shrink-to-fit=no",
+         "name": "viewport"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://crmviewer.vectigal.tech/static/js/index.dZusM_HY.js"
+       ],
+       "stylesheets": [
+        "https://crmviewer.vectigal.tech/static/css/katex.CAfVENUR.css",
+        "https://crmviewer.vectigal.tech/static/css/index.DHyCV7PK.css"
+       ],
+       "title": "Streamlit"
+      }
+     },
+     "gutachter.vectigal.tech": {
+      "error": null,
+      "final_domain": "gutachter.vectigal.tech",
+      "final_url": "https://gutachter.vectigal.tech/",
+      "is_cross_domain": false,
+      "page_title": "gutachter.ai",
+      "redirect_chain": [
+       "https://gutachter.vectigal.tech/",
+       "https://gutachter.vectigal.tech/_nuxt/entry.z5rr3j_j.css",
+       "https://gutachter.vectigal.tech/_nuxt/BbGXAIIj.js",
+       "https://gutachter.vectigal.tech/_nuxt/CY1acNAG.js",
+       "https://gutachter.vectigal.tech/_nuxt/XXnUAVBH.js",
+       "https://gutachter.vectigal.tech/_nuxt/BoqBDwlI.js",
+       "https://gutachter.vectigal.tech/_nuxt/DbSNq0tQ.js",
+       "https://gutachter.vectigal.tech/_nuxt/cC6h0nc7.js",
+       "https://gutachter.vectigal.tech/_nuxt/Bulrz4Mq.js",
+       "https://gutachter.vectigal.tech/_nuxt/CHI6M-Qk.js",
+       "https://gutachter.vectigal.tech/_nuxt/DiKifFUB.js",
+       "https://gutachter.vectigal.tech/_nuxt/DFoh_UHB.js",
+       "https://gutachter.vectigal.tech/_nuxt/BTA2TfQW.js",
+       "https://gutachter.vectigal.tech/_nuxt/D9Pz0Ie8.js",
+       "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+       "https://fonts.gstatic.com/s/sourcesans3/v19/nwpStKy2OAdR1K-IwhWudF-R3w8aZQ.woff2",
+       "https://fonts.gstatic.com/s/lora/v37/0QIhMX1D_JOuMw_LIftL.woff2",
+       "https://fonts.gstatic.com/s/lora/v37/0QIvMX1D_JOuMwr7Iw.woff2",
+       "https://gutachter.vectigal.tech/_nuxt/Czl7Nxj8.js",
+       "https://gutachter.vectigal.tech/_nuxt/Db6BrfCo.js",
+       "https://gutachter.vectigal.tech/_nuxt/legal.B2eD-k2X.css",
+       "https://gutachter.vectigal.tech/_nuxt/C_6SJqwM.js",
+       "https://gutachter.vectigal.tech/_nuxt/xlGp3OhQ.js",
+       "https://gutachter.vectigal.tech/_nuxt/Dfuspy6l.js",
+       "https://gutachter.vectigal.tech/_nuxt/B6j6kUbv.js",
+       "https://gutachter.vectigal.tech/_nuxt/builds/meta/b53b9b36-5bbe-41b2-9d64-f82fee17c9db.json"
+      ],
+      "response_headers": {
+       "content-length": "69391",
+       "content-type": "text/html;charset=utf-8",
+       "date": "Sun, 20 Sep 2026 09:08:47 GMT",
+       "referrer-policy": "strict-origin-when-cross-origin",
+       "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+       "x-content-type-options": "nosniff",
+       "x-frame-options": "DENY",
+       "x-xss-protection": "1; mode=block"
+      },
+      "screenshot_path": "/tmp/scan-75338c97-6707-4d11-92bf-bb3cd2e02cde/hosts/62.217.52.165/phase2/screenshot_gutachter.vectigal.tech.png",
+      "status_code": 200,
+      "tech_info": {
+       "body_classes": "",
+       "cookies": "",
+       "generator": null,
+       "html_lang": "",
+       "meta_tags": [
+        {
+         "content": "width=device-width, initial-scale=1",
+         "name": "viewport"
+        },
+        {
+         "content": "KI-gestuetztes Assistenzsystem fuer Sachverstaendige",
+         "name": "description"
+        }
+       ],
+       "powered_by": null,
+       "scripts": [
+        "https://gutachter.vectigal.tech/_nuxt/D9Pz0Ie8.js"
+       ],
+       "stylesheets": [
+        "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+        "https://gutachter.vectigal.tech/_nuxt/entry.z5rr3j_j.css",
+        "https://gutachter.vectigal.tech/_nuxt/legal.B2eD-k2X.css"
+       ],
+       "title": "gutachter.ai"
+      }
+     }
+    },
+    "server": "Golang net/http server",
+    "tech_rows": [
+     {
+      "_multi_vhost_versions": true,
+      "category": "Framework",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "React",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "HTTP-Server-Banner",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Golang Net/Http Server",
+      "patch_status": "unbekannt",
+      "source": "server_banner",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     },
+     {
+      "_multi_vhost_versions": true,
+      "category": "Sonstiges",
+      "confidence": null,
+      "confidence_label": "niedrig",
+      "cves": [],
+      "detection_source": "Tech-Detect",
+      "eol_date": "",
+      "is_mega_cve": false,
+      "latest_patch": "",
+      "name": "Nuxt.js",
+      "patch_status": "unbekannt",
+      "source": "tech_detect",
+      "status": "unbekannt",
+      "top_cve": null,
+      "version": "",
+      "vuln_name": ""
+     }
+    ],
+    "technologies": [
+     {
+      "name": "Golang net/http server",
+      "version": ""
+     },
+     {
+      "name": "React",
+      "version": ""
+     },
+     {
+      "name": "Nuxt.js",
+      "version": ""
+     },
+     {
+      "name": "HSTS",
+      "version": ""
+     }
+    ],
+    "vhost_results": {
+     "10finance.vectigal.tech": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "board.vectigal.tech": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "crm.vectigal.tech": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "crmviewer.vectigal.tech": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     },
+     "gutachter.vectigal.tech": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": "crm.vectigal.tech"
+   },
+   {
+    "cms": null,
+    "cms_confidence": 0,
+    "cms_details": {},
+    "cms_version": null,
+    "fqdns": [
+     "test.vectigal.tech"
+    ],
+    "ftp_service": false,
+    "has_ssl": false,
+    "has_web": false,
+    "ip": "62.217.52.177",
+    "is_spa": false,
+    "mail_services": false,
+    "open_ports": [],
+    "passive_intel": {
+     "dnssec_signed": false,
+     "otx_pulse_count": 0,
+     "tlsrpt_present": false
+    },
+    "primary_vhost": "test.vectigal.tech",
+    "redirect_data": {
+     "test.vectigal.tech": {
+      "error": "Page.goto: net::ERR_CONNECTION_REFUSED at http://test.vectigal.tech/\nCall log:\n  - navigating to \"http://test.vectigal.tech/\", waiting until \"domcontentloaded\"\n",
+      "final_domain": "test.vectigal.tech",
+      "final_url": "https://test.vectigal.tech/",
+      "is_cross_domain": false,
+      "page_title": "",
+      "redirect_chain": [],
+      "response_headers": {},
+      "screenshot_path": null,
+      "status_code": 0,
+      "tech_info": {}
+     }
+    },
+    "server": null,
+    "tech_rows": [],
+    "technologies": [],
+    "vhost_results": {
+     "test.vectigal.tech": {
+      "cms": null,
+      "cms_confidence": 0,
+      "cms_version": null,
+      "waf": null
+     }
+    },
+    "waf": null,
+    "web_fqdn": null
+   }
+  ]
+ },
+ "success": true
+}

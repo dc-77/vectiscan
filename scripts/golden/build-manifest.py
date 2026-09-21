@@ -106,6 +106,14 @@ ROLES: dict[str, tuple[list[str], str]] = {
         "je Domain (Issue #12), testssl ohne Severity-Filter (#9), Header und "
         "httpx je VHost (#10). Vierter Lauf im Junkerwerk-Drift-Test",
     ),
+    "75338c97-6707-4d11-92bf-bb3cd2e02cde": (
+        ["golden", "coverage"],
+        "vectigal.tech und vectiscan.de, 20.09.2026, eigene Domains. Der einzige "
+        "WebCheck-Auftrag im Satz und damit der erste Beleg fuer die Paketvariante "
+        "an echten Daten (Issue #23). Kleinerer Werkzeugsatz, Hostgrenze drei, "
+        "beide Ziele hinter derselben Traefik-Instanz mit Rate-Limit. Interner "
+        "Nachweislauf aus S2b, wird nicht ausgeliefert",
+    ),
 }
 
 
