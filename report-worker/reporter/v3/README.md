@@ -92,11 +92,34 @@ Dienst ist keine Aussage.
 | `findings[].found/verify` | Katalogtexte, Platzhalter mit den zusammengefuehrten Werten |
 | `findings[].impact` | Katalogtext `texts.meaning`; **KI-Feld 4** |
 | `findings[].evidence` | Faktreferenzen aus dem Katalogergebnis (Werkzeug, Fundstelle, Auszug) |
-| `findings[].threat`, `appendix.cve_refs` | nur Fremdwerte aus `facts.threats` (NVD-Score oder KEV) |
+| `findings[].threat`, `appendix.cve_refs` | `facts.threats`: Fremdwerte (NVD-Score, KEV) und seit S5b auch CVEs, die ein Werkzeug genannt hat |
 | `plan`, `glance.levers` | Empfehlungsstufen der fehlgeschlagenen Pruefungen |
 | `appendix.inventory` | `facts.services` und `facts.passive` |
 | `appendix.tools` | Werkzeuge, die laut `facts.coverage` gelaufen sind, ohne Versionsnummer |
 | `appendix.tool_findings` | Buendel mit `target: appendix` |
+
+## Anhang A.3: zwei Faelle, benannt (S5b)
+
+A.3 zitierte bis S5b nur CVEs mit Fremdbewertung. Da die Phase-3-Anreicherung in keinem
+Produktionslauf je einen Fremdwert geliefert hat (`cves_enriched` 0 ueber 42 Auftraege,
+`phase3/enrichment.json` ueberall `{}`), blieb der Anhang leer und die testssl-CVEs
+tauchten nirgends auf. Jetzt gilt:
+
+- **Fremdbewertet** (NVD-Basiswert oder KEV): Basiswert und Quelle stehen in der Zeile.
+- **Vom Werkzeug genannt** (`source` in `findings.WERKZEUG_QUELLEN`, heute `testssl`):
+  Basiswert leer, Quelle ist das Werkzeug, die Einstufung steht im verwiesenen Befund.
+  Der Satz in A.2 sagt das ausdruecklich, damit ein leerer Basiswert nicht als
+  "unbewertet" gelesen wird.
+- **Weder noch**: wird nicht zitiert.
+
+Ein werkzeuggestuetzter Threat wird nur bei den Befunden zitiert, deren fehlgeschlagene
+Pruefungen genau dieses Werkzeug brauchen (`ThreatIndex.for_results`). Ohne diese Bindung
+stuende eine TLS-CVE unter dem Header-Befund desselben Hosts, weil beide an Port 443
+haengen. Dieselbe CVE kann in mehreren Befunden zitiert werden; A.3 fuehrt sie einmal und
+nennt alle Befunde, der Selbstcheck prueft Zugehoerigkeit statt Gleichheit.
+
+`CveRef.name` bleibt leer: die Bezeichnung kaeme aus der NVD-Antwort, und die gibt es
+nicht. Der Prototyp fuellt die Spalte, dieser Bericht bislang nicht.
 
 ## Die vier Prosa-Felder
 
