@@ -1,0 +1,309 @@
+{
+ "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/vectigal-tech.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "strict": false,
+ "orders": {
+  "main": "75338c97-6707-4d11-92bf-bb3cd2e02cde"
+ },
+ "findings": {
+  "VS-2026-001": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-002": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-003": {
+   "checks": [
+    "cert_chain_incomplete"
+   ]
+  },
+  "VS-2026-004": {
+   "checks": [
+    "cert_hostname_mismatch"
+   ]
+  },
+  "VS-2026-005": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-006": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-007": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-008": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-009": {
+   "checks": [
+    "csp_missing"
+   ]
+  },
+  "VS-2026-010": {
+   "checks": [
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-011": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-012": {
+   "checks": [
+    "dmarc_none"
+   ]
+  },
+  "VS-2026-013": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-014": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-015": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-016": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-017": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-018": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-019": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-020": {
+   "checks": [
+    "security_headers_incomplete"
+   ]
+  },
+  "VS-2026-021": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-022": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-023": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  }
+ },
+ "positives": {
+  "VS-2026-P01": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P02": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P03": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P04": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P05": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P06": {
+   "checks": [
+    "cert_expired"
+   ]
+  },
+  "VS-2026-P07": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P08": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-P09": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-P10": {
+   "checks": [
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P11": {
+   "checks": [
+    "dns_dangling_cname"
+   ]
+  },
+  "VS-2026-P12": {
+   "checks": [
+    "dns_zone_transfer"
+   ]
+  },
+  "VS-2026-P13": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P14": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P15": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P16": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P17": {
+   "checks": [
+    "hsts_missing"
+   ]
+  },
+  "VS-2026-P18": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P19": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P20": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P21": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P22": {
+   "checks": [
+    "hsts_short"
+   ]
+  },
+  "VS-2026-P23": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P24": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P25": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P26": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P27": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P28": {
+   "checks": [
+    "tls_legacy_protocols"
+   ]
+  },
+  "VS-2026-P29": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P30": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P31": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P32": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P33": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P34": {
+   "checks": [
+    "tls_no_13"
+   ]
+  },
+  "VS-2026-P35": {
+   "checks": [
+    "tls_weak_ciphers"
+   ]
+  },
+  "VS-2026-P36": {
+   "checks": [
+    "urlhaus_compromise"
+   ]
+  }
+ },
+ "subsumed": {},
+ "expected_coverage_differences": [],
+ "expected_member_differences": []
+}
