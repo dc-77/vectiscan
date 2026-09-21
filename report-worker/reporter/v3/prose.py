@@ -12,7 +12,7 @@ Werkzeugausgaben. Ausgabe sind vier Felder:
 Jedes Feld läuft einzeln durch ``gate.check_field``. Fällt eines durch, bleibt der
 deterministische Text stehen; die anderen dürfen trotzdem übernommen werden.
 
-Abweichung von der Determinismus-Vorgabe: ``claude-opus-4-7`` nimmt keinen
+Abweichung von der Determinismus-Vorgabe: die Opus-Modelle nehmen keinen
 ``temperature``-Parameter mehr an (siehe reporter/claude_client.py). Determinismus
 kommt deshalb aus dem Redis-Cache (Namensraum ``reporter_v3``, der Schlüssel enthält
 CATALOG_VERSION und FACTS_SCHEMA_VERSION), dem Gate und dem Katalog-Fallback.
@@ -35,7 +35,12 @@ from reporter.v3.models import ReportData
 
 log = structlog.get_logger()
 
-OPUS_MODEL = "claude-opus-4-7"
+# Opus 5 statt Opus 4.7: derselbe Aufruf kostet ein Drittel (5 statt 15 je
+# Million Eingabe-Token, 25 statt 75 fuer die Ausgabe). Gemessen an castenow
+# waren es 0,775 USD; der Zielwert aus spec/05 Abschnitt 7 liegt bei 0,20 USD.
+# Die Recherche-KI laeuft schon darauf. Der Cache-Schluessel enthaelt das Modell,
+# alte Eintraege verfallen damit von selbst.
+OPUS_MODEL = "claude-opus-5"
 # Die Ausgabegrenze muss den ganzen Antwortblock tragen: vier Saetze
 # Zusammenfassung, vier Saetze Kontext, ein bis zwei Saetze je System und ein bis
 # drei Saetze je Befund. Bei castenow (27 Befunde) waren 4096 Token genau
