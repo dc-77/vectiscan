@@ -108,7 +108,12 @@ def build_report_data(
     architecture = C.build_architecture(facts, output, finding_items, finding_list)
 
     package_name, package_label = T.package_labels(facts.scan.package)
-    customer = str(order.get("customer") or context.get("customer") or "Auftraggeber")
+    # S5: der Firmenname steht im Kundenkontext unter "firmenname" (Migration 045,
+    # Quelle kunde, recherche oder admin). Ohne ihn bleibt "Auftraggeber" stehen
+    # und das Gate meldet es als Warnung. "customer" bleibt als Schluessel
+    # bestehen, weil die Golden-Testdaten den Auftraggeber so mitgeben.
+    customer = str(order.get("customer") or context.get("firmenname")
+                   or context.get("customer") or "Auftraggeber")
     customer_short = str(order.get("customer_short") or kuerzel or customer.split()[0])
     month_day = "".join(reversed(scan_date.split(".")[:2])) if scan_date != C.UNKNOWN else "0000"
     meta = Meta(
