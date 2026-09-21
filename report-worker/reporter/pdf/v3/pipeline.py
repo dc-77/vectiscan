@@ -10,6 +10,7 @@ sind Session S6; hier wird nur der v3-Strang bedient.
 """
 from __future__ import annotations
 
+import io
 import os
 from pathlib import Path
 from typing import Any
@@ -107,6 +108,54 @@ def fetch_rawdata(client, order_id: str, dest: Path) -> Path:
     client.fget_object(RAWDATA_BUCKET, key, str(local))
     log.info("rawdata_downloaded", key=key, size=local.stat().st_size)
     return local
+
+
+def facts_export_enabled() -> bool:
+    """Schalter ``VECTISCAN_FACTS_EXPORT``. Ohne ihn aendert sich nichts."""
+    return os.environ.get("VECTISCAN_FACTS_EXPORT", "").strip().lower() in ("1", "true", "ja", "yes")
+
+
+def upload_facts_export(client, order_id: str, facts: Any, output: Any) -> list[str]:
+    """``facts.json`` und das Katalogergebnis neben das Roh-Tar legen.
+
+    Ziel ist ``scan-rawdata``, nicht der Auslieferungs-Bucket: die Dateien sind
+    Arbeitsmaterial fuer Admin-Review, Fehlersuche und den Export in S7, kein
+    Kundendokument. Sie liegen damit an derselben Stelle wie die Rohdaten, aus
+    denen sie entstanden sind.
+
+    Deterministisch geschrieben (``reporter.facts.serialize.dumps``), damit zwei
+    Laeufe derselben Order byte-gleiche Dateien ergeben.
+    """
+    from reporter.facts.serialize import dumps
+
+    if not client.bucket_exists(RAWDATA_BUCKET):
+        client.make_bucket(RAWDATA_BUCKET)
+    keys: list[str] = []
+    for name, obj in (("facts.json", facts), ("catalog.json", output)):
+        data = dumps(obj.to_dict()).encode("utf-8")
+        key = f"{order_id}/{name}"
+        client.put_object(RAWDATA_BUCKET, key, io.BytesIO(data), len(data),
+                          content_type="application/json")
+        log.info("facts_export_uploaded", bucket=RAWDATA_BUCKET, key=key, size=len(data))
+        keys.append(f"{RAWDATA_BUCKET}/{key}")
+    return keys
+
+
+def export_facts_if_enabled(client, order_id: str, facts: Any, output: Any) -> list[str]:
+    """Export nur mit Schalter, und nie auf Kosten des Berichts.
+
+    Die Ausnahmebehandlung steht hier und nicht beim Aufrufer: der v3-Zweig im
+    Worker soll ohne ``try`` auskommen, damit ein Fehler beim Rendern nicht
+    versehentlich abgefangen wird und ein v2-PDF unter dem Etikett v3 landet
+    (Waechtertest ``test_worker_faellt_bei_v3_nicht_still_auf_v2_zurueck``).
+    """
+    if not facts_export_enabled():
+        return []
+    try:
+        return upload_facts_export(client, order_id, facts, output)
+    except Exception as exc:
+        log.warning("facts_export_failed", order_id=order_id, error=str(exc))
+        return []
 
 
 def upload_debug_pdf(client, order_id: str, pdf: Path, stamp: str) -> str:
