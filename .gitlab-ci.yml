@@ -1170,6 +1170,13 @@ ops-gate-blocked:
 #   FACTS_CONFIRM   intern                 (nur fuer FACTS_MODE=voll)
 #   FACTS_EXPORT    ja, um facts.json und catalog.json nach scan-rawdata zu legen
 #   FACTS_RENDER    ja, um lesend zusaetzlich ein PDF nach scan-debug/v3/ zu legen
+#   FACTS_NO_AI     ja, um mit leerem ANTHROPIC_API_KEY zu fahren (S6-Nachweis:
+#                   derselbe Bericht ohne Prosa und ohne Recherche)
+#
+# Seit S6 gilt im Container ohnehin VECTISCAN_REPORT_ENGINE=catalog und
+# VECTISCAN_REPORT_LAYOUT=v3; das -e beim Vollmodus bleibt als Absicherung.
+# Das gerenderte PDF liegt zusaetzlich in den Job-Artefakten unter facts-prod/,
+# damit es ohne MinIO-Zugang lesbar ist.
 # =============================================================================
 ops-facts-prod:
   extends: .ops-base
@@ -1192,7 +1199,12 @@ ops-facts-prod:
     - MODE="${FACTS_MODE:-lesend}"
     - EXPORT=""
     - if [ "${FACTS_EXPORT}" = "ja" ]; then EXPORT="-e VECTISCAN_FACTS_EXPORT=1"; fi
-    - echo "Order ${FACTS_ORDER_ID}, Betriebsart ${MODE}, Export ${FACTS_EXPORT:-nein}"
+    # S6: Nachweis, dass der Bericht ohne Sprachmodell vollstaendig ist. Ein
+    # leerer Schluessel laesst Prosa und Recherche leer durchlaufen; die Befunde
+    # und alle Zahlen kommen aus dem Pruefkatalog und aendern sich nicht.
+    - NOAI=""
+    - if [ "${FACTS_NO_AI}" = "ja" ]; then NOAI="-e ANTHROPIC_API_KEY="; fi
+    - echo "Order ${FACTS_ORDER_ID}, Betriebsart ${MODE}, Export ${FACTS_EXPORT:-nein}, ohne KI ${FACTS_NO_AI:-nein}"
     # Ausgangslage festhalten, damit ein Schreiben belegbar ist.
     - docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc
         "SELECT status FROM orders WHERE id = '${FACTS_ORDER_ID}'"
@@ -1210,7 +1222,7 @@ ops-facts-prod:
         docker compose exec -T \
           -e VECTISCAN_REPORT_LAYOUT=v3 \
           -e VECTISCAN_ONCE_CONFIRM="${FACTS_CONFIRM}" \
-          ${EXPORT} \
+          ${EXPORT} ${NOAI} \
           report-worker python3 -m reporter.worker --once --order "${FACTS_ORDER_ID}" \
           2>&1 | tee ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-voll.log
         # S6: Den eben gebauten Bericht zusaetzlich in die Job-Artefakte legen.
@@ -1225,7 +1237,7 @@ ops-facts-prod:
           "${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-v3.pdf" || true
         docker compose exec -T report-worker rm -f "/tmp/${FACTS_ORDER_ID}-v3.pdf" || true
       else
-        docker compose exec -T ${EXPORT} report-worker python3 -m reporter.pdf.v3 \
+        docker compose exec -T ${EXPORT} ${NOAI} report-worker python3 -m reporter.pdf.v3 \
           --kennzahlen --order "${FACTS_ORDER_ID}" \
           > ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-kennzahlen.json || true
         cat ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-kennzahlen.json
