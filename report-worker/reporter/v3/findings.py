@@ -24,7 +24,7 @@ from reporter.v3.bundles import GLOBAL_KEY, Consolidated
 from reporter.v3.models import CveRef, Finding, Positive, Threat, ToolFinding
 from reporter.v3.orthography import clean_foreign_text
 
-MAX_EVIDENCE_LINES = 12
+MAX_EVIDENCE_LINES = 6
 
 # Werkzeuge, deren Aussagen nicht aus einer eigenen Messung stammen.
 PASSIVE_TOOLS: frozenset[str] = frozenset({
@@ -97,19 +97,34 @@ def _render(template: str, values: dict[str, Any], where: str) -> str:
 
 
 def evidence_block(results: list[CheckResult]) -> str:
-    """Nachweis als Klartextblock: Werkzeug, Fundstelle, woertlicher Auszug."""
+    """Nachweis als Klartextblock: Werkzeug, Fundstelle, woertlicher Auszug.
+
+    Ein Sachverhalt ueber viele virtuelle Hosts bringt je Host eine Zeile mit.
+    Der Block endete dabei stumm bei zwoelf Zeilen: der Leser sah zwoelf
+    Fundstellen und wusste nicht, dass es mehr sind. Jetzt stehen sechs, und
+    die Zeile darunter sagt, wie viele noch dazugehoeren. Wer sie braucht,
+    findet die betroffenen Namen vollstaendig in der Betroffenenliste.
+    """
     lines: list[str] = []
     seen: set[tuple[str, str]] = set()
+    weitere = 0
     for r in results:
         for ev in r.evidence:
             key = (ev.tool, ev.excerpt)
             if not ev.excerpt or key in seen:
                 continue
             seen.add(key)
+            if len(lines) >= MAX_EVIDENCE_LINES:
+                weitere += 1
+                continue
             kopf = f"{ev.tool} · {ev.ref}" if ev.ref else ev.tool
             lines.append(f"{kopf}\n{ev.excerpt}")
-            if len(lines) >= MAX_EVIDENCE_LINES:
-                return "\n\n".join(lines)
+    if weitere:
+        lines.append(f"und {weitere} weitere Fundstellen gleicher Art; "
+                     "die betroffenen Namen stehen vollständig unter Betroffen."
+                     if weitere > 1 else
+                     "und eine weitere Fundstelle gleicher Art; "
+                     "die betroffenen Namen stehen vollständig unter Betroffen.")
     return "\n\n".join(lines)
 
 

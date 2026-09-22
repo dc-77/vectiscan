@@ -262,8 +262,13 @@ tr{break-inside:avoid;}
 </section>
 
 <!-- ===================== 3 ARCHITEKTUR ===================== -->
-<section class="sec">
- <div class="sec-head"><div class="kicker">Kapitel 3 · Für die IT-Leitung</div><h2>Architektur-Sicht</h2></div>
+{# S6: Kapitel 3 faengt keine neue Seite mehr an, wie 1.2, 2, 4 und 5 seit S4.
+   Mit der Umschaltung fallen die Positivbefunde weg, die eine nicht pruefbare
+   Pruefung mitbrachte (spec/08 Punkt 7); dadurch endete Kapitel 2 frueher und
+   liess die Seite vor dem erzwungenen Umbruch halb leer. Gemessen ueber alle
+   vierzehn Golden-Auftraege in ops-update-pages. #}
+<section>
+ <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 3 · Für die IT-Leitung</div><h2>Architektur-Sicht</h2></div>
  <p class="lead">{{ a.lead }}</p>
  <h3>3.1 Erkannte Technologien je Host</h3>
  {% for h in a.tech %}
@@ -343,8 +348,11 @@ tr{break-inside:avoid;}
   </div>
  </div>
 {%- endmacro %}
-<section class="sec">
- <div class="sec-head"><div class="kicker">Kapitel 6 · Für Administration und Dienstleister</div><h2>Befunde im Detail</h2></div>
+{# S6: auch Kapitel 6 faengt keine neue Seite mehr an. Jeder Befundblock hat
+   seinen eigenen Rahmen und bricht nicht mitten im Kopf um; der erzwungene
+   Umbruch davor liess nur die letzte Seite von Kapitel 5 halb leer. #}
+<section>
+ <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 6 · Für Administration und Dienstleister</div><h2>Befunde im Detail</h2></div>
  <p class="lead">Jeder Befund nennt, was gefunden wurde, den Nachweis aus den Werkzeugdaten, die Auswirkung, gestufte Empfehlungen und einen Verifikationsschritt, mit dem die Umsetzung geprüft werden kann. Die Einstufung (Exposition oder Hygiene) ist die eigene Bewertung; CVSS-Werte erscheinen nur als Fremdreferenz bei zitierten CVEs. Befunde aus Passivquellen sind als solche gekennzeichnet.</p>
  {% if findings_more %}<p class="lead">{{ split_note }}</p>{% endif %}
  {% for f in findings_main %}{{ finding_block(f) }}{% endfor %}
