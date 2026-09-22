@@ -1281,8 +1281,14 @@ ops-facts-prod:
         # Der Worker laedt ihn nach MinIO und raeumt sein Arbeitsverzeichnis auf,
         # deshalb wird er hier ueber den Ops-Weg noch einmal gerendert (ohne
         # --upload, ohne DB-Schreibzugriff) statt aus dem Bucket geholt.
-        docker compose exec -T report-worker python3 -m reporter.pdf.v3 \
-          --order "${FACTS_ORDER_ID}" -o "/tmp/${FACTS_ORDER_ID}-v3.pdf" \
+        #
+        # --context und --prose sind Pflicht, sonst ist das Artefakt nicht der
+        # ausgelieferte Bericht: ohne --context steht "Auftraggeber" statt des
+        # Firmennamens auf dem Deckblatt, ohne --prose fehlen die vier
+        # KI-Absaetze. Genau das ist bei der ersten Abnahme passiert.
+        docker compose exec -T ${NOAI} report-worker python3 -m reporter.pdf.v3 \
+          --order "${FACTS_ORDER_ID}" --context --prose \
+          -o "/tmp/${FACTS_ORDER_ID}-v3.pdf" \
           2>&1 | tee ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-render.log || true
         docker compose cp \
           "report-worker:/tmp/${FACTS_ORDER_ID}-v3.pdf" \
@@ -1294,8 +1300,9 @@ ops-facts-prod:
           > ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-kennzahlen.json || true
         cat ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-kennzahlen.json
         if [ "${FACTS_RENDER}" = "ja" ]; then
-          docker compose exec -T report-worker python3 -m reporter.pdf.v3 \
-            --order "${FACTS_ORDER_ID}" -o "/tmp/${FACTS_ORDER_ID}-v3.pdf" --upload \
+          docker compose exec -T ${NOAI} report-worker python3 -m reporter.pdf.v3 \
+            --order "${FACTS_ORDER_ID}" --context --prose \
+            -o "/tmp/${FACTS_ORDER_ID}-v3.pdf" --upload \
             2>&1 | tee ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-render.log || true
           # S6: Das PDF liegt sonst nur in scan-debug im MinIO, und wer es
           # gegenlesen soll, braucht dafuer einen Bucket-Zugang. Jetzt haengt es
