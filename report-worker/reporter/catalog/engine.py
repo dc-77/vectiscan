@@ -25,7 +25,7 @@ from pydantic import ValidationError
 from reporter.catalog import render
 from reporter.catalog import tables as T
 from reporter.catalog.catchall import run_catchalls
-from reporter.catalog.evidence import KEEP_FACT_EVIDENCE, detail_evidence
+from reporter.catalog.evidence import KEEP_FACT_EVIDENCE, detail_evidence, ist_redundant
 from reporter.catalog.expr import CatalogSpecError, Expr, compile_expr
 from reporter.catalog.schema import (CATEGORY_NAMES, LEVEL_LABELS, BundleSpec, CatalogOutput, CheckInfo,
                                      CheckResult, CheckRollup, CheckSpec, EvidenceRef, IgnoreList, Member,
@@ -386,8 +386,15 @@ class _Eval:
         Zusammenfassungszeile des header_check.
         """
         out = detail_evidence(self.spec.scope, item, ictx, self.spec.evidence_detail)
-        if not out or self.spec.scope in KEEP_FACT_EVIDENCE:
+        if not out:
             out.extend(_evidence_of(item.fact))
+        elif self.spec.scope in KEEP_FACT_EVIDENCE:
+            # Der woertliche Werkzeugauszug bleibt, soweit er etwas sagt, das
+            # nicht schon in der Detailzeile steht (``21/tcp open ftp ProFTPD``
+            # neben ``...:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open``).
+            detail = " ".join(e.excerpt for e in out)
+            out.extend(e for e in _evidence_of(item.fact)
+                       if not ist_redundant(e.excerpt, detail))
         if out:
             return out
         for name in self.spec.evidence:

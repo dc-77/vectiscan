@@ -316,4 +316,22 @@ def detail_evidence(scope: str, item: Any, ictx: dict[str, Any],
         return []
 
 
-__all__ = ["detail_evidence", "BUILDERS", "DETAIL_MAX"]
+def ist_redundant(roh: str, detail: str) -> bool:
+    """Sagt die Werkzeugzeile schon alles, was in der Detailzeile steht?
+
+    Die nmap-Zeile ``21/tcp open ftp ProFTPD`` steht vollstaendig in
+    ``92.205.163.53:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open``; zweimal
+    dasselbe macht den Nachweis nur laenger. Die Zeile
+    ``pop3-capabilities: CAPA AUTH-RESP-CODE STLS ...`` dagegen traegt etwas
+    Eigenes und bleibt. Geprueft wird ueber die Bestandteile: steht jeder von
+    mindestens drei Zeichen Laenge irgendwo in der Detailzeile, ist die
+    Werkzeugzeile entbehrlich.
+    """
+    teile = [t for t in (roh or "").replace(",", " ").split() if len(t) >= 3]
+    if not teile:
+        return True
+    return all(t in detail for t in teile)
+
+
+__all__ = ["detail_evidence", "ist_redundant", "BUILDERS", "DETAIL_MAX",
+           "KEEP_FACT_EVIDENCE"]

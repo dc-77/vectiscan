@@ -909,7 +909,7 @@
   {
    "affected": "20.79.218.75:21 (FTP ohne TLS-Zwang)",
    "cat": "A",
-   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:21/tcp Dienst=ftp Zustand=open\n\nnmap · hosts/20.79.218.75/phase1/nmap.xml\n21/tcp open ftp",
+   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:21/tcp Dienst=ftp Zustand=open",
    "found": "Auf 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) nehmen Datei- oder Mailzugänge eine Anmeldung entgegen, ohne eine Transportverschlüsselung zu erzwingen: 20.79.218.75:21 (FTP ohne TLS-Zwang).",
    "id": "VS-2026-001",
    "impact": "Ohne erzwungene Transportverschlüsselung gehen Anmeldedaten und Inhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf den Dienst oder auf wiederverwendete Konten nutzen.",
@@ -1057,7 +1057,7 @@
   {
    "affected": "20.79.218.75:21 (FTP)",
    "cat": "A",
-   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:21/tcp Dienst=ftp Zustand=open\n\nnmap · hosts/20.79.218.75/phase1/nmap.xml\n21/tcp open ftp",
+   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:21/tcp Dienst=ftp Zustand=open",
    "found": "Der Host 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 20.79.218.75:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
    "id": "VS-2026-006",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
@@ -1085,7 +1085,7 @@
   {
    "affected": "20.79.218.75:8443 (https-alt)",
    "cat": "A",
-   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:8443/tcp Dienst=https-alt Zustand=open\n\nnmap · hosts/20.79.218.75/phase1/nmap.xml\n8443/tcp open https-alt",
+   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:8443/tcp Dienst=https-alt Zustand=open",
    "found": "Auf 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) beantwortet ein Webdienst Anfragen mit der unveränderten Auslieferungsseite des Herstellers, teils auf einem zusätzlichen Port: 20.79.218.75:8443 (https-alt).",
    "id": "VS-2026-007",
    "impact": "Eine unveränderte Auslieferungsseite verrät, dass hier ein Webserver ohne eigene Anwendung antwortet, und lädt zum Ausprobieren bekannter Pfade ein. Ein zusätzlicher Webport vergrößert die Angriffsfläche, ohne dass sein Zweck von außen erkennbar ist.",
