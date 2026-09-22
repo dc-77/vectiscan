@@ -20,6 +20,14 @@ def test_worker_module_imports() -> None:
     assert worker.__doc__ is not None
 
 
+# S6: Diese Datei prueft den alten Weg (KI#5, Reparaturkette, ReportLab). Seit der
+# Umschaltung ist ``catalog`` mit Renderer v3 die Vorgabe; der alte Weg laeuft nur
+# noch unter ``VECTISCAN_REPORT_ENGINE=legacy``.
+@pytest.fixture(autouse=True)
+def _legacy_engine(monkeypatch):
+    monkeypatch.setenv("VECTISCAN_REPORT_ENGINE", "legacy")
+    monkeypatch.setenv("VECTISCAN_REPORT_LAYOUT", "v1")
+
 class TestProcessJob:
     """Tests for the process_job function."""
 

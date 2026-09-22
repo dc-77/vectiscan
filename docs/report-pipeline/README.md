@@ -1,54 +1,135 @@
-# report-pipeline — Code-Truth-Dokumentation
+# Report-Pipeline (v3)
 
-Ist-Stand der PDF-Report-Pipeline aus dem laufenden Code (Mai 2026, v2-Renderer als Prod-Default).
+Stand 22.09.2026, Session S6. Der Bericht entsteht seit der Umschaltung so:
 
-## Methodik
-
-- **Code-Wahrheit vor Spec-Wahrheit.** Alle Aussagen sind aus dem aktuellen Code (`report-worker/reporter/**.py`, `docker-compose.yml`) verifiziert. Wo der Code von Design-Dokumenten oder dem Master-Plan abweicht, ist der Code dokumentiert.
-- **`file:line`-Verweise** auf alle nicht-trivialen Funktionen und Konstanten — der Leser kann in einem Klick zur Code-Stelle springen.
-- **Test-Fixtures (`tests/fixtures/`) sind nicht als Schema-Quelle herangezogen** — sie sind synthetisch.
-
-## Lesereihenfolge
-
-| Datei | Inhalt |
-|---|---|
-| [`01_overview.md`](01_overview.md) | Big-Picture-Pipeline, ASCII-Diagramm, Layout-Switch v1/v2, Determinismus-Schichten |
-| [`02_data_sources.md`](02_data_sources.md) | MinIO-Tar-Layout, `parse_scan_data`, DB-Tabellen, Phase-1-Profil-Schema |
-| [`03_orchestration.md`](03_orchestration.md) | `worker.process_job` Block-für-Block, `_augment_for_v2` Augment-Felder |
-| [`04_determinism.md`](04_determinism.md) | title_policy, severity_policy (74 Regeln), selection (Top-N/Floor), eol_detector, tech_table_builder, cvss_consistency, id_renumber |
-| [`05_validation_gate.md`](05_validation_gate.md) | ValidationGate + 7 Checks (titles/ids/cvss/consistency/tech_table/eol/plan) |
-| [`06_v2_renderer.md`](06_v2_renderer.md) | `generate_report_v2`, PageTemplates, 6 Flowables, Story-Aufbau |
-| [`07_layer1_aggregators.md`](07_layer1_aggregators.md) | `layer1_aggregator`: 5 Risk-Kategorien, POLICY_PREFIX_TO_RISK_CATEGORY, 8 MASSNAHMEN_CLUSTER |
-| [`08_layer2_data.md`](08_layer2_data.md) | business_context (8 Branchencluster), v2_data, befund_landschaft, posture_v2 |
-| [`09_layer3_findings.md`](09_layer3_findings.md) | 7-Sektionen-Body, verification_templates (21 policy_ids), Severity-Mapping |
-| [`10_appendices.md`](10_appendices.md) | Anhänge A–F mit allen Tool-Konfidenz-Maps, Port-Recommendation-Maps |
-| [`11_compliance_mappings.md`](11_compliance_mappings.md) | NIS2/BSIG, BSI-Grundschutz, ISO 27001, DSGVO mit allen Keyword-Mappings |
-| [`12_screenshot_pipeline.md`](12_screenshot_pipeline.md) | `_build_screenshot_data` + `dedup_and_cap` + Render-Pfad |
-| [`13_config_envvars.md`](13_config_envvars.md) | Alle `VECTISCAN_*`-ENV-Variablen + Infra-ENV + hartcodierte Konstanten |
-| [`99_known_issues.md`](99_known_issues.md) | Code ≠ Code Inkonsistenzen, Code ≠ CLAUDE.md Drift, offene Bug-Marker |
-| [`samples/`](samples/) | Zwei Real-Sample-PDFs + README mit Struktur-Hinweisen |
-
-## Quick-Links zu Schlüssel-Code
-
-- Worker-Orchestrator: [`worker.py:387`](../../report-worker/reporter/worker.py)
-- Report-Mapper: [`report_mapper.py:1694`](../../report-worker/reporter/report_mapper.py)
-- v2-Renderer: [`pdf/v2/generate.py:29`](../../report-worker/reporter/pdf/v2/generate.py)
-- Severity-Policy: [`severity_policy.py:1275`](../../report-worker/reporter/severity_policy.py)
-- Selection: [`selection.py:243`](../../report-worker/reporter/selection.py)
-- Validation-Gate: [`validation/gate.py:95`](../../report-worker/reporter/validation/gate.py)
-
-## Was diese Doku NICHT abdeckt
-
-- Scan-Worker-Pipeline (Phase 0-3, Tool-Outputs). Quelle: `docs/SCAN-PIPELINE-v2.md`, `docs/PIPELINE-AI-FLOW.md`.
-- Frontend / Dashboard. Quelle: `frontend/`-Source.
-- DB-Schema. Quelle: `docs/DB-SCHEMA.sql`.
-- API-Endpoints. Quelle: `docs/API-SPEC.md`.
-- Compliance-Spezial-Sektionen pro Paket (NIS2-Audit-Trail im `map_nis2_report`, ISO-27001-Summary im `map_supplychain_report`, Insurance-Matrix). Diese sind paket-spezifische Pfade im `report_mapper.py`, nicht im 3-Schichten-v2-Layout.
-
-## Verifikation
-
-Quick-Check `file:line`-Referenzen:
-
-```bash
-grep -rc "\.py:[0-9]" docs/report-pipeline/ | grep -v ":0$"
 ```
+Roh-Tar aus MinIO
+  │
+  ├─ 1 Fakten        reporter/facts/       facts.json, ein Schema, versioniert
+  ├─ 2 Prüfkatalog   reporter/catalog/     73 Prüfungen als YAML, Ergebnis je Gruppe
+  ├─ 3 Reportdaten   reporter/v3/          Sachverhalte, Kapitel, Anhänge, Prosa
+  ├─ 4 Renderer      reporter/pdf/v3/      Jinja2 und WeasyPrint
+  └─ 5 Gate          reporter/gate/        Defektliste beider Engines, strict blockiert
+```
+
+**Kein Befund ohne Fakt aus einem Werkzeug.** Ein Sprachmodell schreibt Prosa
+und recherchiert den Kundenkontext; es entscheidet weder über Befunde noch über
+deren Einstufung, und es vergibt keine CVSS-Werte. Die Einstufung eines Befunds
+kommt aus der Prüfung, die ihn erzeugt hat, die Farbe und die Dringlichkeit aus
+einer einzigen Abbildungstabelle.
+
+## Die fünf Schritte
+
+| Schritt | Modul | Was dort entsteht | Tiefe |
+|---|---|---|---|
+| Fakten | `report-worker/reporter/facts/` | `facts.json`: Hosts, Dienste, TLS, HTTP, DNS, Software, Abdeckung, Passivquellen, jeweils mit Werkzeug, Fundstelle und wörtlichem Auszug | [README](../../report-worker/reporter/facts/README.md) |
+| Prüfkatalog | `report-worker/reporter/catalog/` | ein Ergebnis je Prüfung und Gruppe: `fail`, `pass`, `not_testable`, `not_applicable`, dazu Betroffene, Nachweis und Positivaussagen | [README](../../report-worker/reporter/catalog/README.md), [Entscheidungstabelle](../../report-worker/reporter/catalog/decisions.md) |
+| Reportdaten | `report-worker/reporter/v3/` | Sachverhalte aus den Ergebnissen, Kapitel 1 bis 6, Maßnahmenplan, Anhänge, Dashboard-Liste | [README](../../report-worker/reporter/v3/README.md) |
+| Renderer | `report-worker/reporter/pdf/v3/` | das PDF, Paketvarianten, Bildauflösung aus MinIO | [README](../../report-worker/reporter/pdf/v3/README.md) |
+| Gate | `report-worker/reporter/gate/` | Defektliste auf der Order, `report_blocked` bei einem Fehler unter `strict` | [README](../../report-worker/reporter/gate/README.md) |
+
+Die READMEs neben dem Code sind die technische Wahrheit. Dieses Verzeichnis
+beantwortet nur die Fragen, die sich über alle fünf Schritte stellen.
+
+## Schalter
+
+Drei Umgebungsvariablen, gelesen an genau einer Stelle
+(`report-worker/reporter/engine.py`). Ein unbekannter Wert ist ein Startfehler,
+kein stiller Rückfall.
+
+| Variable | Werte | Vorgabe | Wirkung |
+|---|---|---|---|
+| `VECTISCAN_REPORT_ENGINE` | `catalog`, `legacy` | `catalog` | woher die Befunde kommen |
+| `VECTISCAN_REPORT_LAYOUT` | `v3`, `v2`, `v1` | `v3` | welcher Renderer setzt |
+| `VECTISCAN_VALIDATION_LEVEL` | `strict`, `warn`, `off` | `strict` | wie scharf das Gate ist |
+
+`engine=catalog` mit `layout=v2` oder `v1` ist eine Fehlkonfiguration: der alte
+Renderer liest das Datenmodell der alten Kette, und das entsteht unter `catalog`
+nicht. `engine=legacy` mit `layout=v3` bleibt erlaubt, so lief die Produktion
+zwischen S4 und S6.
+
+**Rückweg bei einem Vorfall**, drei Zeilen in der `.env` des Servers:
+
+```
+VECTISCAN_REPORT_ENGINE=legacy
+VECTISCAN_REPORT_LAYOUT=v2
+VECTISCAN_VALIDATION_LEVEL=warn
+```
+
+Der alte Weg verschwindet eine Release nach S6. Was er kostet, steht unten.
+
+## Versionen im Bericht
+
+Zwei Versionen sagen, gegen welchen Stand ein Bericht entstanden ist:
+
+- `CATALOG_VERSION` (`reporter/catalog/version.py`, Format `JJJJ-MM-TT.n`) steigt
+  bei jeder Änderung an `checks/`, `bundles/`, `ignore.yaml` oder `tables.py`.
+  Zur Laufzeit wird zusätzlich ein Digest über genau diese Dateien gebildet,
+  damit eine Änderung ohne Bump im Audit sichtbar bleibt.
+- `FACTS_SCHEMA_VERSION` (`reporter/facts/schema.py`, semver) steigt, wenn sich
+  das Faktenschema ändert. Jeder Bump verlangt den Neubau der Golden-Fakten.
+
+Beide stehen im Impressum des PDF und zusammen in `reports.policy_version`
+(`Katalog <version> / Fakten <version>`). Die alte Severity-Policy
+(`reporter/severity_policy.py`) füllt diese Spalte nur noch im Legacy-Weg.
+
+## Was der Bericht nicht behauptet
+
+- Keine Zusagen zu Prüfstandards, zur Rolle von Sprachmodellen oder zur
+  Vollständigkeit. Der Wächter dazu ist
+  `report-worker/tests/test_no_legacy_claims.py`.
+- Keine eigenen CVSS-Werte. Ein Basiswert erscheint nur als Fremdreferenz zu
+  einer zitierten CVE (Anhang A.3).
+- Kein Positivbefund, solange die Prüfung für einen betroffenen Host nicht
+  prüfbar war. Nicht prüfbar ist nicht bestanden.
+- Keine Aussage über Systeme, die der Scan nicht erreicht hat. Die Lücken
+  stehen in Kapitel 2, nicht im Kleingedruckten.
+
+## Kosten je Bericht
+
+Zwei KI-Aufrufe, beide auf `claude-opus-5`, beide mit Redis-Cache:
+
+| Aufruf | Modul | Zweck | Messwert |
+|---|---|---|---|
+| Prosa | `reporter/v3/prose.py` | vier Textfelder, jedes durch ein Wort- und Längen-Gate | rund 0,25 USD |
+| Recherche | `reporter/v3/research.py` | Firmenname, Branche, Mitarbeiterzahl, Systemzwecke, jeweils mit Fundstelle | rund 0,29 USD |
+
+Ohne `ANTHROPIC_API_KEY` läuft beides leer durch und der Bericht steht
+vollständig aus Katalogtexten. Der Legacy-Weg kostet zum Vergleich rund
+1,85 USD je Bericht (Opus 4.7, KI#5 mit Reparaturkette).
+
+## Golden-Fixtures
+
+`report-worker/tests/golden/` hält vierzehn Produktionsläufe als Roh-Tar samt
+abgeleiteten Fakten, Reportdaten und Soll-Listen. Jede Änderung am Katalog, an
+den Fakten oder am Renderer läuft dagegen.
+
+```
+python -m reporter.facts --golden        # Fakten neu bauen
+python -m reporter.v3 --golden-all       # Reportdaten neu bauen
+python -m reporter.pdf.v3 --write-snapshot   # HTML-Schnappschuss
+python -m pytest                          # alles
+```
+
+Einzelheiten und der Weg, einen Auftrag aufzunehmen:
+[tests/golden/README.md](../../report-worker/tests/golden/README.md).
+
+## Freigabe und Auslieferung
+
+Ein Bericht geht nach `pending_review`, und nur ein ausdrückliches
+`POST /api/admin/orders/:id/approve` setzt ihn auf `report_complete`. Erst
+dieser Status löst die Fertig-Mail mit Download-Verweis aus
+(`api/src/lib/ws-manager.ts`). Eine Ausschlussliste allein ist keine Freigabe,
+und `POST /api/orders/:id/regenerate-report` verlangt Admin-Rechte.
+
+Blockiert das Gate, steht die Order auf `report_blocked`, es gibt kein PDF und
+keinen Upload; die Defektliste liegt in `orders.report_defects` und steht im
+Admin-Review unter `/admin/review/<orderId>`.
+
+## Die alte Pipeline
+
+Die Dokumentation des Wegs bis S6 liegt unter
+[`docs/archive/report-pipeline-v2/`](../archive/report-pipeline-v2/). Sie
+beschreibt die KI-erzeugten Befunde, die Reparaturkette und den
+ReportLab-Renderer. Solange `engine=legacy` erreichbar ist, gilt sie für diesen
+Weg; danach ist sie Historie.

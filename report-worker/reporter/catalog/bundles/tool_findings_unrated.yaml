@@ -2,7 +2,7 @@ id: tool_findings_unrated
 title: Werkzeugbefunde ohne eigene Bewertung
 category: E
 merge_by: global
-members: [info_disclosure, js_library_outdated]
+members: [info_disclosure, js_library_outdated, web_vulnerability_reported]
 target: appendix
 references: [CWE-200]
 frameworks:

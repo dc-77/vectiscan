@@ -16,8 +16,8 @@ from urllib.parse import urlsplit
 from reporter.facts import schema as S
 from reporter.facts.nmap_parse import NmapHost, NmapRun, derive_service_flags, parse_nmap_text, parse_nmap_xml
 from reporter.facts.serialize import (
-    days_between, dumps, excerpt, ip_family, ip_token, iso_utc, sha256_text_file, short_hash,
-    sort_key, try_json,
+    days_between, dumps, excerpt, ip_family, ip_token, iso_utc, kv, sha256_text_file,
+    short_hash, sort_key, try_json,
 )
 from reporter.facts.sources import (
     ScanBundle, ToolRun, apply_overrides, attach_orders_json, load_from_snapshot, load_scan_source,
@@ -256,7 +256,8 @@ def _build_scan(ctx: _Ctx) -> S.ScanFact:
     fp = sum(1 for c in b.correlated_findings if isinstance(c, dict) and c.get("is_false_positive"))
     policy = meta.get("policyVersion") or None
     ev = [S.Evidence(tool="meta", ref="meta.json" if b.source_kind != "snapshot" else "order.json",
-                     excerpt=excerpt(f"startedAt={meta.get('startedAt')} finishedAt={meta.get('finishedAt')}"))]
+                     excerpt=kv([("Beginn", meta.get("startedAt")),
+                                 ("Ende", meta.get("finishedAt"))]))]
     return S.ScanFact(
         id=f"scan:{b.order_id}", source="meta", mode="active", observed_at=ctx.finished,
         confidence=S.CONFIDENCE_TOOL, evidence=ev, order_id=b.order_id,
@@ -414,7 +415,8 @@ def _build_hosts(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> tuple
             ev.append(S.Evidence(tool="nmap", ref=ctx.runs[("nmap", ip)][0].ref, excerpt=excerpt(run.summary if run else "", 160)))
         if inv:
             ev.append(S.Evidence(tool="host_inventory", ref=b.refs.get("host_inventory", ""),
-                                 excerpt=excerpt(f"ip={ip} rdns={inv.get('rdns')} fqdns={','.join(inv.get('fqdns') or [])}", 200)))
+                                 excerpt=kv([("ip", ip), ("rdns", inv.get("rdns")),
+                                             ("fqdns", inv.get("fqdns") or [])], 200)))
         observed = (nh.end_time if nh else None) or ctx.run_time("nmap", ip) or ctx.finished
         facts.append(S.HostFact(
             id=f"host:{ip_token(ip)}", source="nmap" if nh else "host_inventory", mode="active",
@@ -486,8 +488,11 @@ def _build_fqdns(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[
                        for a in (v.get("aliases") or []) if isinstance(a, dict) and a.get("fqdn")]
             screenshot = v.get("screenshot_minio_key") or (inv.get("screenshot_minio_key") if len(vhosts) <= 1 else None)
             ev = [S.Evidence(tool="web_probe", ref=b.refs.get("host_inventory", ""),
-                             excerpt=excerpt(f"{name}: status={v.get('status')} title={v.get('title')} final_url={v.get('final_url')}", 220))]
+                             excerpt=kv([("", f"{name}:"), ("status", v.get("status")),
+                                         ("titel", v.get("title")),
+                                         ("final_url", v.get("final_url"))], 220))]
             facts.append(S.FqdnFact(
+                wildcard=name.startswith("*."),
                 id=ctx.unique_id(f"fqdn:{name}", ip_token(ip)), source="web_probe", mode="active",
                 observed_at=probe_time, confidence=S.CONFIDENCE_TOOL, evidence=ev,
                 name=name, host_ip=ip, http_status=_int_or_none(v.get("status")), title=v.get("title") or None,
@@ -813,7 +818,11 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
                 if ver == token and fact.protocols.get(keyname) is None:
                     fact.protocols[keyname] = True
             fact.evidence.append(S.Evidence(tool="httpx", ref=httpx_ref,
-                                            excerpt=excerpt(f"{fqdn}:{port} tls={ver} cn={tls.get('subject_cn')} not_after={tls.get('not_after')} mismatched={tls.get('mismatched')}", 220)))
+                                            excerpt=kv([
+                                                ("", f"{fqdn}:{port}"), ("tls", ver),
+                                                ("cn", tls.get("subject_cn")),
+                                                ("gueltig_bis", tls.get("not_after")),
+                                                ("namensabweichung", tls.get("mismatched"))], 220)))
             fact.observed_at = iso_utc(line.get("timestamp")) or fact.observed_at
             facts[key] = fact
         # testssl
@@ -851,12 +860,18 @@ def _build_tls(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S.
                 fact.hsts = S.HstsInfo(**{k: ts.hsts.get(k) for k in ("present", "max_age", "include_subdomains", "preload", "raw")})
             fact.fallback_scsv = ts.fallback_scsv
             fact.grade = ts.grade
-            fact.entries = [S.TlsEntry(id=e["id"], severity=e["severity"], finding=e["finding"], cve=e.get("cve")) for e in ts.entries]
+            fact.entries = [S.TlsEntry(id=e["id"], severity=e["severity"], finding=e["finding"],
+                                       cve=e.get("cve"), cves=list(e.get("cves") or []))
+                            for e in ts.entries]
             fact.json_filtered = ts.json_filtered
             ref = h.refs.get("testssl.json") or (ctx.runs[("testssl", ip)][0].ref if ctx.runs.get(("testssl", ip)) else "")
             if ts.text_parsed and ctx.runs.get(("testssl", ip)):
                 fact.evidence.append(S.Evidence(tool="testssl", ref=ctx.runs[("testssl", ip)][0].ref,
-                                                excerpt=excerpt("protocols " + " ".join(f"{k}={v}" for k, v in ts.protocols.items()), 200)))
+                                                excerpt=kv(
+                                                    [("angeboten", [k for k, v in ts.protocols.items() if v is True]),
+                                                     ("nicht angeboten", [k for k, v in ts.protocols.items() if v is False]),
+                                                     ("nicht geprueft", [k for k, v in ts.protocols.items() if v is None])],
+                                                    200)))
             if ts.json_parsed:
                 fact.evidence.append(S.Evidence(tool="testssl", ref=ref, excerpt=excerpt(
                     "; ".join(f"{e['id']}={e['finding']}" for e in ts.entries[:6]), 240)))
@@ -1017,16 +1032,21 @@ def _build_http(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> list[S
                 status_code = None
             ev: list[S.Evidence] = []
             if res is not None:
-                ev.append(S.Evidence(tool="header_check", ref=ref_hdr, excerpt=excerpt(
-                    f"{vh}: reachable={res.get('reachable')} score={res.get('score')} server={server} x-feserver={headers.get('x-feserver')}", 220)))
+                ev.append(S.Evidence(tool="header_check", ref=ref_hdr, excerpt=kv([
+                    ("", f"{vh}:"), ("erreichbar", res.get("reachable")),
+                    ("score", res.get("score")), ("server", server),
+                    ("x-feserver", headers.get("x-feserver"))], 220)))
             if line:
                 ev.append(S.Evidence(tool="httpx", ref=(h.httpx_ref_by_vhost.get(vh)
                                                        or h.refs.get("httpx.json")
-                                                       or ctx.run_ref("httpx", ip)), excerpt=excerpt(
-                    f"{vh}: status={line.get('status_code')} title={line.get('title')} webserver={line.get('webserver')} tech={line.get('tech')}", 240)))
+                                                       or ctx.run_ref("httpx", ip)), excerpt=kv([
+                    ("", f"{vh}:"), ("status", line.get("status_code")),
+                    ("titel", line.get("title")), ("webserver", line.get("webserver")),
+                    ("tech", line.get("tech"))], 240)))
             if rd and res is None:
-                ev.append(S.Evidence(tool="redirect_probe", ref=h.refs.get("tech_profile.json", ""), excerpt=excerpt(
-                    f"{vh}: final_url={rd.get('final_url')} status={rd.get('status_code')}", 200)))
+                ev.append(S.Evidence(tool="redirect_probe", ref=h.refs.get("tech_profile.json", ""), excerpt=kv([
+                    ("", f"{vh}:"), ("final_url", rd.get("final_url")),
+                    ("status", rd.get("status_code"))], 200)))
             observed = ctx.run_time("header_check", ip, vh) or iso_utc((line or {}).get("timestamp")) \
                 or ctx.run_time("httpx", ip) or ctx.finished
             reachable = res.get("reachable") if isinstance(res, dict) and isinstance(res.get("reachable"), bool) else (
@@ -1267,12 +1287,17 @@ def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
                                             reason=dc.get("reason")))
     ev = []
     if dr:
-        ev.append(S.Evidence(tool="dns_records", ref=ref_dr, excerpt=excerpt(f"spf={spf_raw} dmarc={dr.get('dmarc')} dkim={dr.get('dkim')} mx={dr.get('mx')}", 240)))
+        ev.append(S.Evidence(tool="dns_records", ref=ref_dr, excerpt=kv([
+            ("spf", spf_raw), ("dmarc", dr.get("dmarc")), ("dkim", dr.get("dkim")),
+            ("mx", dr.get("mx"))], 240)))
     elif dnsf:
-        ev.append(S.Evidence(tool="dns_records", ref=b.refs.get("host_inventory", ""), excerpt=excerpt(f"dns_findings: spf={spf_raw} dmarc={dnsf.get('dmarc')} dkim={dnsf.get('dkim')}", 240)))
+        ev.append(S.Evidence(tool="dns_records", ref=b.refs.get("host_inventory", ""), excerpt=kv([
+            ("spf", spf_raw), ("dmarc", dnsf.get("dmarc")), ("dkim", dnsf.get("dkim"))], 240)))
     if ds:
-        ev.append(S.Evidence(tool="dns_security", ref=ref_ds, excerpt=excerpt(
-            f"dnssec_signed={(ds.get('dnssec') or {}).get('dnssec_signed')} caa={(ds.get('caa') or {}).get('has_caa')} mta_sts={(ds.get('mta_sts') or {}).get('has_policy')}", 200)))
+        ev.append(S.Evidence(tool="dns_security", ref=ref_ds, excerpt=kv([
+            ("dnssec_signiert", (ds.get("dnssec") or {}).get("dnssec_signed")),
+            ("caa", (ds.get("caa") or {}).get("has_caa")),
+            ("mta_sts", (ds.get("mta_sts") or {}).get("has_policy"))], 200)))
     fact = S.DnsFact(
         id=f"dns:{domain}", source="dns_records", mode="active",
         observed_at=ctx.run_time("dns_records") or ctx.run_time("dns_security") or ctx.started or ctx.finished,
@@ -1332,7 +1357,9 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
                 facts.append(S.PassiveFact(
                     id=f"passive:shodan:{ip_token(ip)}:{port}", source="shodan", mode="passive", observed_at=seen or ctx.finished,
                     confidence=S.CONFIDENCE_PASSIVE if not (open_ports and port in open_ports) else S.CONFIDENCE_DERIVED,
-                    evidence=[S.Evidence(tool="shodan", ref=ref, excerpt=excerpt(f"{ip}:{port} {s.get('product') or ''} {s.get('version') or ''} | {s.get('banner') or ''}", 200))],
+                    evidence=[S.Evidence(tool="shodan", ref=ref, excerpt=kv([
+                        ("", f"{ip}:{port}"), ("", s.get("product")), ("", s.get("version")),
+                        ("banner", s.get("banner"))], 200))],
                     host_ip=ip, port=port, transport=s.get("transport"), product=s.get("product") or None,
                     version=str(s.get("version")) if s.get("version") else None,
                     banner_excerpt=excerpt(s.get("banner"), 160) or None, seen_at=seen,
@@ -1342,7 +1369,7 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
     if isinstance(otx, dict) and isinstance(otx.get("domain"), dict) and domain:
         d = otx["domain"]
         facts.append(S.PassiveFact(id=f"passive:otx:{domain}", source="otx", mode="passive", observed_at=ctx.run_time("otx") or ctx.finished,
-                                   confidence=S.CONFIDENCE_PASSIVE, evidence=[S.Evidence(tool="otx", ref=b.refs.get("otx", ""), excerpt=f"pulse_count={d.get('pulse_count')}")],
+                                   confidence=S.CONFIDENCE_PASSIVE, evidence=[S.Evidence(tool="otx", ref=b.refs.get("otx", ""), excerpt=kv([("pulse_count", d.get("pulse_count"))]))],
                                    domain=domain, details={"pulse_count": _int_or_none(d.get("pulse_count"))}))
     st = b.passive.get("securitytrails")
     if isinstance(st, dict) and isinstance(st.get("domain"), dict) and domain:
@@ -1353,7 +1380,8 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
             details["txt_records"] = [str(x)[:200] for x in txt[:10]]
         facts.append(S.PassiveFact(id=f"passive:securitytrails:{domain}", source="securitytrails", mode="passive",
                                    observed_at=ctx.run_time("securitytrails") or ctx.finished, confidence=S.CONFIDENCE_PASSIVE,
-                                   evidence=[S.Evidence(tool="securitytrails", ref=b.refs.get("securitytrails", ""), excerpt=excerpt(str(details), 200))],
+                                   evidence=[S.Evidence(tool="securitytrails", ref=b.refs.get("securitytrails", ""),
+                                                        excerpt=kv(sorted(details.items()), 200))],
                                    domain=domain, details=details))
     uh = b.passive.get("urlhaus")
     if isinstance(uh, dict) and domain:
@@ -1361,7 +1389,9 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
         details = {"compromised": comp if isinstance(comp, bool) else (False if uh.get("no_data") else None)}
         facts.append(S.PassiveFact(id=f"passive:urlhaus:{domain}", source="urlhaus", mode="passive",
                                    observed_at=ctx.run_time("urlhaus") or ctx.finished, confidence=S.CONFIDENCE_PASSIVE,
-                                   evidence=[S.Evidence(tool="urlhaus", ref=b.refs.get("urlhaus", ""), excerpt=excerpt(uh.get("raw") or str(details), 160))],
+                                   evidence=[S.Evidence(tool="urlhaus", ref=b.refs.get("urlhaus", ""),
+                                                        excerpt=excerpt(uh.get("raw"), 160)
+                                                        or kv([("kompromittiert", details["compromised"])], 160))],
                                    domain=domain, details=details))
     gn = b.passive.get("greynoise")
     if isinstance(gn, dict):
@@ -1371,7 +1401,10 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
                 continue
             facts.append(S.PassiveFact(id=f"passive:greynoise:{ip_token(ip)}", source="greynoise", mode="passive",
                                        observed_at=ctx.run_time("greynoise") or ctx.finished, confidence=S.CONFIDENCE_PASSIVE,
-                                       evidence=[S.Evidence(tool="greynoise", ref=b.refs.get("greynoise", ""), excerpt=excerpt(str(e), 160))],
+                                       evidence=[S.Evidence(tool="greynoise", ref=b.refs.get("greynoise", ""),
+                                                            excerpt=kv([(k, e.get(k)) for k in
+                                                                        ("classification", "noise", "riot")
+                                                                        if k in e], 160))],
                                        host_ip=ip, details={k: e.get(k) for k in ("classification", "noise", "riot") if k in e}))
     facts.sort(key=lambda f: sort_key(f.source, f.domain, f.host_ip, f.port))
     return facts
@@ -1435,7 +1468,9 @@ def _build_threats(ctx: _Ctx, software: list[S.SoftwareFact],
         sw_ref = _software_ref_for(software, services, host_ip or None, port)
         facts[cve] = S.ThreatFact(
             id=f"threat:{cve}", source="enrichment", mode="passive", observed_at=ctx.run_time("phase3_correlation") or ctx.finished,
-            confidence=S.CONFIDENCE_TOOL, evidence=[S.Evidence(tool="enrichment", ref=b.refs.get("enrichment", ""), excerpt=excerpt(f"{cve} nvd={nvd.get('cvss_score')} epss={(epss or {}).get('epss')} kev={bool(kev)}", 160))],
+            confidence=S.CONFIDENCE_TOOL, evidence=[S.Evidence(tool="enrichment", ref=b.refs.get("enrichment", ""), excerpt=kv([("", cve), ("nvd", nvd.get("cvss_score")),
+                                                                ("epss", (epss or {}).get("epss")),
+                                                                ("kev", bool(kev))], 160))],
             cve_id=cve, cvss_nvd=S.CvssRef(score=_float_or_none(nvd.get("cvss_score")), vector=nvd.get("cvss_vector")) if nvd else None,
             cwes=[str(x) for x in (nvd.get("cwes") or [])], epss=S.Epss(score=_float_or_none(epss.get("epss")), percentile=_float_or_none(epss.get("percentile"))) if epss else None,
             kev=S.Kev(listed=True, date_added=kev.get("date_added"), known_ransomware=kev.get("known_ransomware")) if kev else None,
@@ -1585,7 +1620,10 @@ def _build_decisions(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> l
                 facts.append(S.DecisionFact(
                     id=f"dec:cms_profile:{ip_token(ip)}", source="ai_tech_analysis", mode="active",
                     observed_at=ctx.run_time("ai_tech_analysis_debug") or ctx.finished, confidence=S.CONFIDENCE_DERIVED,
-                    evidence=[S.Evidence(tool="tech_profile", ref=h.refs.get("tech_profile.json", ""), excerpt=excerpt(f"cms={tp.get('cms')} cms_version={tp.get('cms_version')} cms_confidence={tp.get('cms_confidence')}", 160))],
+                    evidence=[S.Evidence(tool="tech_profile", ref=h.refs.get("tech_profile.json", ""),
+                                         excerpt=kv([("cms", tp.get("cms")),
+                                                     ("cms_version", tp.get("cms_version")),
+                                                     ("cms_confidence", tp.get("cms_confidence"))], 160))],
                     host_ip=ip, payload={"cms": tp.get("cms"), "cms_version": tp.get("cms_version"), "cms_confidence": tp.get("cms_confidence"),
                                          "cms_details_version": dv, "is_spa": tp.get("is_spa")}, note=note,
                 ))

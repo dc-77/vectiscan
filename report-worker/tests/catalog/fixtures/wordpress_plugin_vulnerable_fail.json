@@ -12,7 +12,7 @@
  "expect": {
   "status": "fail",
   "group_key": "10.0.0.1",
-  "affected": ["10.0.0.1: Contact Form 7 5.1.0 (2 bekannte Schwachstellen)"],
+  "affected": ["10.0.0.1: Contact Form 7 5.1.0 (laut wpscan bekannte Schwachstellen: 2)"],
   "positive": false
  }
 }

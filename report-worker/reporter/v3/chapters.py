@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from reporter.catalog.schema import CATEGORY_NAMES, CatalogOutput, CheckResult
+from reporter.catalog import scope as CS
 from reporter.catalog import tables as CT
 from reporter.facts import schema as FS
 from reporter.v3 import levels as L
@@ -116,9 +117,99 @@ def host_coverage(facts: FS.Facts, ip: str) -> tuple[str, str]:
     return "voll", "Portscan und Tiefenprüfung vollständig"
 
 
+# Maschinenwerte aus dem Scanner in Kundensprache. Ein Wert ohne Eintrag wird
+# weggelassen; ein Rohtoken wie "parking" gehoert nicht in den Bericht
+# (Entscheidung DC, spec/08 Punkt 13).
+OUT_OF_SCOPE_REASONS: dict[str, str] = {
+    "parking": "geparkte Domain ohne eigenen Inhalt",
+    "vhost_skipped": "nicht beauftragt",
+    "not_in_scope": "ausserhalb des beauftragten Umfangs",
+    "wildcard": "Wildcard-Eintrag",
+    "out_of_scope": "ausserhalb des beauftragten Umfangs",
+}
+
+
+def _unbeauftragt(facts: FS.Facts, output: CatalogOutput) -> set[str]:
+    """Namen, die im Bericht sonst nirgends vorkommen.
+
+    S6 (spec/08 Punkt 13, Entscheidung DC): "Sichtbar, aber nicht beauftragt"
+    gilt nur fuer Hosts ausserhalb aller Umfangstabellen und Befunde.
+    pflege.dortmund-beach.com stand in beiden Listen gleichzeitig.
+    """
+    bekannt = {f.name.lower() for f in facts.fqdns if not f.wildcard}
+    bekannt |= {(r.group_label or "").lower() for r in output.results if r.status == "fail"}
+    bekannt |= {a.lower() for r in output.results if r.status == "fail" for a in r.affected}
+    out: set[str] = set()
+    for target in facts.targets:
+        for oos in target.out_of_scope:
+            wert = (oos.value or "").strip()
+            if not wert or wert.lower() in bekannt:
+                continue
+            if any(wert.lower() in eintrag for eintrag in bekannt):
+                continue
+            grund = OUT_OF_SCOPE_REASONS.get((oos.reason or "").strip().lower(), "")
+            out.add(f"{wert} ({grund})" if grund else wert)
+    return out
+
+
+def wildcard_hinweise(facts: FS.Facts) -> list[str]:
+    """Ein Satz je Wildcard-Eintrag fuer Kapitel 2.1."""
+    namen = sorted({f.name for f in facts.fqdns if f.wildcard})
+    return [f"Wildcard-Eintrag {name}: er verweist alle nicht einzeln benannten Namen "
+            "auf denselben Host und ist selbst kein geprüfter Hostname."
+            for name in namen]
+
+
 def coverage_by_host(facts: FS.Facts) -> dict[str, tuple[str, str]]:
     """Abdeckung je Host, einmal berechnet und von allen Kapiteln geteilt."""
     return {h.ip: host_coverage(facts, h.ip) for h in facts.hosts}
+
+
+def hosts_ohne_leitwerkzeug(facts: FS.Facts) -> list[str]:
+    """Hosts, fuer die ein Leitwerkzeug des Pakets kein Ergebnis hat (spec/08 Punkt 10).
+
+    Massstab fuer den Abdeckungshinweis auf Seite 3. Ein fehlendes Nebenwerkzeug
+    (ffuf_sensitive) macht eine Pruefung nicht unvollstaendig; nmap, testssl und
+    die Webanalyse des Pakets schon. Ein Werkzeug ausserhalb des Pakets zaehlt
+    nicht, und ein Host ohne jede Abdeckungszeile zaehlt immer.
+    """
+    leit = set(T.lead_tools(facts.scan.package))
+    out: list[str] = []
+    for host in facts.hosts:
+        rows = [c for c in facts.coverage if c.host_ip == host.ip and c.tool in leit]
+        if not rows:
+            out.append(host.ip)
+            continue
+        fehlt = False
+        for tool in sorted(leit):
+            je_tool = [c for c in rows if c.tool == tool]
+            if not je_tool:
+                continue
+            if any(c.status in ("ok", "empty") for c in je_tool):
+                continue
+            # skipped mit einem Grund, der die Pruefung gar nicht vorsieht
+            # (kein TLS-Dienst, nicht im Paket), ist keine Luecke.
+            gruende = {CS.normalize_reason(c.reason, c.raw_status) for c in je_tool}
+            if all(CT.COVERAGE_REASONS.get(g, ("not_testable", ""))[0]
+                   in ("ok", "not_applicable") for g in gruende):
+                continue
+            fehlt = True
+        if fehlt:
+            out.append(host.ip)
+    return out
+
+
+def blockade_belegt(facts: FS.Facts) -> bool:
+    """Hat ein Ziel den Scanner nachweislich abgewiesen? (spec/08 Punkt 9)
+
+    Der Satz zur Freischaltung der Scanner-Adresse stand bisher in jedem Bericht
+    mit irgendeiner Luecke, auch wenn nichts blockiert hat. Beleg ist entweder
+    ein Host mit erkannter Blockade oder eine Abdeckungszeile mit dem Status
+    ``blocked``.
+    """
+    if any(h.blocked.detected for h in facts.hosts):
+        return True
+    return any(c.status == "blocked" for c in facts.coverage)
 
 
 # Werkzeuge, die bewusst nicht Teil des Produkts sind. Ihr Fehlen ist keine
@@ -133,20 +224,38 @@ def limitations(facts: FS.Facts, output: CatalogOutput) -> list[Limitation]:
     derselben Erklaerung ergeben eine Zeile. Ein Code ohne hinterlegte Erklaerung
     bekommt eine, die das Werkzeug nennt, statt einer nichtssagenden Sammelmeldung.
     """
-    by_text: dict[str, set[str]] = {}
+    # S6 (spec/08 Punkt 12): eine Zeile je Ursache, und je Ursache ein Eintrag je
+    # betroffenem Ort. Vorher standen derselbe Host einmal als Werkzeugzeile
+    # ("webtech auf 62.217.52.177") und einmal als Gruppenname
+    # ("62.217.52.177 (test.vectigal.tech)") in derselben Zeile; der WebCheck
+    # bekam so elf Zeilen, davon drei fuer dieselbe Ursache.
+    by_text: dict[str, dict[str, str]] = {}
+
+    def merken(text: str, schluessel: str, label: str) -> None:
+        orte = by_text.setdefault(text, {})
+        vorhanden = orte.get(schluessel)
+        # Der ausfuehrlichere Name gewinnt: die IP mit ihren Namen sagt mehr als
+        # die IP allein.
+        if vorhanden is None or len(label) > len(vorhanden):
+            orte[schluessel] = label
+
     for row in facts.coverage:
         if row.status not in ("failed", "blocked", "empty", "skipped"):
             continue
         if row.tool in OUT_OF_PRODUCT_TOOLS:
             continue
-        code = row.reason or row.raw_status or "insufficient_facts"
+        # S6: derselbe Weg wie im Katalog. Ohne Normalisierung landet ein
+        # Rohgrund wie "package_webcheck" oder "ZAP API error 400: {...}" in
+        # keiner Tabelle und bekommt den Sammeltext "Das Werkzeug X hat kein
+        # Ergebnis geliefert" (spec/08 Punkte 9 und 11).
+        code = CS.normalize_reason(row.reason, row.raw_status) or "insufficient_facts"
         status, text = CT.COVERAGE_REASONS.get(code, ("not_testable", ""))
         if status in ("ok", "not_applicable"):
             continue
         if not text:
             text = f"Das Werkzeug {row.tool} hat kein Ergebnis geliefert."
-        where = row.fqdn or row.host_ip or row.domain or "scanweit"
-        by_text.setdefault(text, set()).add(f"{row.tool} auf {where}")
+        schluessel = row.host_ip or row.fqdn or row.domain or "scanweit"
+        merken(text, schluessel, row.fqdn or row.host_ip or row.domain or "scanweit")
     for result in output.results:
         if result.status != "not_testable" or not result.reason_code:
             continue
@@ -154,10 +263,13 @@ def limitations(facts: FS.Facts, output: CatalogOutput) -> list[Limitation]:
         status, text = CT.COVERAGE_REASONS.get(code, ("not_testable", ""))
         if status != "not_testable" or not text:
             continue
-        by_text.setdefault(text, set()).add(result.group_label)
+        schluessel = (str(result.vars.get("host_ip") or "")
+                      or str(result.vars.get("domain") or "")
+                      or result.group_key)
+        merken(text, schluessel, result.group_label)
     out: list[Limitation] = []
     for text in sorted(by_text):
-        where = sorted(_kurz(w) for w in by_text[text])
+        where = sorted(_kurz(w) for w in by_text[text].values())
         shown = ", ".join(where[:6]) + (" und weitere" if len(where) > 6 else "")
         out.append(Limitation(what=text.rstrip("."), detail=f"Betroffen: {shown}."))
     return out
@@ -209,23 +321,54 @@ def build_glance(items: list[Consolidated], findings: list[Finding], counts: N.C
     )
 
 
+# Wie eine Kategorie im Gesamtbewertungstext benannt wird. Die Namen aus
+# CATEGORY_NAMES sind Ueberschriften ("Patch- und EOL-Status") und lesen sich im
+# Fliesstext nicht; hier steht die Satzform.
+CATEGORY_IN_SENTENCE: dict[str, str] = {
+    "A": "die aus dem Internet erreichbaren Dienste",
+    "B": "den Softwarestand der erkannten Systeme",
+    "C": "die Authentizität der E-Mail",
+    "D": "die Transportverschlüsselung und die Sicherheits-Header",
+    "E": "die Konfiguration und die preisgegebenen Angaben",
+}
+
+
+def _aufzaehlung(teile: list[str]) -> str:
+    # Das letzte Glied haengt mit "sowie" an, weil die Kategorienamen selbst ein
+    # "und" tragen koennen und zwei "und" in einem Satz stolpern lassen.
+    if len(teile) == 1:
+        return teile[0]
+    return ", ".join(teile[:-1]) + " sowie " + teile[-1]
+
+
 def overall_text(findings: list[Finding]) -> str:
-    """Zusammenfassung Seite 1 als Katalogfassung; die KI darf sie ersetzen."""
+    """Zusammenfassung Seite 1 als Katalogfassung; die KI darf sie ersetzen.
+
+    Der zweite Satz war bis S6 ein Festtext je Stufe und nannte auch dort
+    Dienste, E-Mail und Transportverschluesselung, wo der Bericht gar keinen
+    solchen Befund hatte (spec/08 Punkt 16). Jetzt steht dort, welche Kategorien
+    tatsaechlich Befunde tragen.
+    """
     red = [f for f in findings if f.status == "rot"]
-    yellow = [f for f in findings if f.status == "gelb"]
+    rest = [f for f in findings if f.status != "rot"]
     if red:
         head = (f"{len(red)} Befunde erfordern unverzügliches Handeln."
                 if len(red) > 1 else "Ein Befund erfordert unverzügliches Handeln.")
-    elif yellow:
+    elif any(f.status == "gelb" for f in findings):
         head = ("Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf "
                 "mit erkennbarem Angriffsweg.")
-    else:
+    elif findings:
         head = "Es wurde kein Befund mit erkennbarem Angriffsweg festgestellt."
-    tail = ("Die übrigen Befunde betreffen die Härtung der erreichbaren Dienste, die "
-            "Authentizität der E-Mail und die Transportverschlüsselung."
-            if yellow else
-            "Die verbleibenden Punkte sind Verbesserungen ohne akutes Risiko.")
-    return f"{head} {tail}"
+    else:
+        return "In dieser Prüfung ist kein Befund entstanden."
+
+    cats = [c for c in ("A", "B", "C", "D", "E")
+            if any(f.cat == c for f in (rest or findings))]
+    namen = [CATEGORY_IN_SENTENCE[c] for c in cats if c in CATEGORY_IN_SENTENCE]
+    if not namen:
+        return head
+    wort = "Die übrigen Befunde betreffen" if red else "Die Befunde betreffen"
+    return f"{head} {wort} {_aufzaehlung(namen)}."
 
 
 def build_business(facts: FS.Facts, roles: list[tuple[str, str]]) -> Business:
@@ -311,10 +454,11 @@ def build_scope(facts: FS.Facts, output: CatalogOutput, counts: N.Counts,
             ip=host.ip, fqdns=", ".join(sorted(host.fqdns)) or UNKNOWN,
             operator=operator, role=host_role(facts, host.ip), coverage=text, cov=cov))
     out_of_scope = list(N.OUT_OF_SCOPE_BASE)
-    extra = sorted({f"{o.value} ({o.reason})" if o.reason else o.value
-                    for t in facts.targets for o in t.out_of_scope})
+    extra = sorted(_unbeauftragt(facts, output))
     if extra:
         out_of_scope.append("Sichtbar, aber nicht beauftragt: " + "; ".join(extra) + ".")
+    for hinweis in wildcard_hinweise(facts):
+        out_of_scope.append(hinweis)
     return Scope(
         lead=N.scope_lead(counts),
         hosts=hosts,
@@ -484,7 +628,9 @@ def build_screens(facts: FS.Facts) -> list[Screenshot]:
     """
     out: list[Screenshot] = []
     for fq in sorted(facts.fqdns, key=lambda f: f.name):
-        if not fq.screenshot_key:
+        # Ein Wildcard-Eintrag bekommt keine Bildunterschrift "Antwort von
+        # *.domain" (S6, spec/08 Punkt 13).
+        if not fq.screenshot_key or fq.wildcard:
             continue
         out.append(Screenshot(
             file=fq.screenshot_key.rsplit("/", 1)[-1],
@@ -510,14 +656,17 @@ def build_architecture(facts: FS.Facts, output: CatalogOutput, items: list[Conso
     counter = Counter(u.kind for u in output.unprocessed)
     if counter:
         total = sum(u.count for u in output.unprocessed)
+        # S6 (spec/08 Punkte 11 und 19): Singular bei 1, und der Satz sagt in
+        # Kundensprache, was mit der Beobachtung geschieht, statt "intern zur
+        # Nachbearbeitung vorgemerkt".
+        wort = "Beobachtung" if total == 1 else "Beobachtungen"
+        hat = "hat" if total == 1 else "haben"
         notes.append(
-            f"{total} Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs "
-            "getroffen. Sie sind kein Befund und wurden intern zur Nachbearbeitung "
-            "vorgemerkt.")
-    for target in facts.targets:
-        for oos in target.out_of_scope:
-            notes.append(f"Sichtbar, aber nicht beauftragt: {oos.value}."
-                         + (f" {oos.reason}" if oos.reason else ""))
+            f"{total} {wort} der Werkzeuge {hat} keine Regel des Prüfkatalogs "
+            "getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen "
+            "wiederkehrende Fälle in den Katalog auf.")
+    for wert in sorted(_unbeauftragt(facts, output)):
+        notes.append(f"Sichtbar, aber nicht beauftragt: {wert}.")
     # facts.warnings sind Hinweise des Faktenbauers an den Betreiber, keine Kundentexte.
     # Was davon den Kunden betrifft, steht ueber die Abdeckungsgruende in Kapitel 2.
     return Architecture(

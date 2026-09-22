@@ -918,12 +918,12 @@
    "domain": "trunk-immobilien.de",
    "evidence": [
     {
-     "excerpt": "spf=v=spf1 mx -all dmarc=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; dkim=False mx=['mx.publishsoft.de']",
+     "excerpt": "spf=v=spf1 mx -all dmarc=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; dkim=nein mx=mx.publishsoft.de",
      "ref": "phase0/dns_records.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -968,7 +968,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "dev.trunk-immobilien.de: status=None title=None final_url=None",
+     "excerpt": "dev.trunk-immobilien.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -989,7 +989,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -997,7 +998,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "ftp.trunk-immobilien.de: status=None title=None final_url=None",
+     "excerpt": "ftp.trunk-immobilien.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1018,7 +1019,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1026,7 +1028,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "trunk-immobilien.de: status=None title=None final_url=None",
+     "excerpt": "trunk-immobilien.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1047,7 +1049,8 @@
     "manufacturer": "Unknown",
     "name": "Generic"
    },
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1055,7 +1058,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "webmail.trunk-immobilien.de: status=None title=None final_url=None",
+     "excerpt": "webmail.trunk-immobilien.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1076,7 +1079,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1084,7 +1088,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.trunk-immobilien.de: status=None title=None final_url=None",
+     "excerpt": "www.trunk-immobilien.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1105,7 +1109,8 @@
     "manufacturer": null,
     "name": "Generic"
    },
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -1146,7 +1151,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=5.199.141.24 rdns=home4.publishsoft.de fqdns=trunk-immobilien.de,www.trunk-immobilien.de,dev.trunk-immobilien.de,ftp.trunk-immobilien.de,webmail.trunk-immobilien.de",
+     "excerpt": "ip=5.199.141.24 rdns=home4.publishsoft.de fqdns=trunk-immobilien.de, www.trunk-immobilien.de, dev.trunk-immobilien.de, ftp.trunk-immobilien.de, webmail.trunk-immobilien.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -1195,12 +1200,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "dev.trunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None",
+     "excerpt": "dev.trunk-immobilien.de: score=0/7 server=nginx",
      "ref": "scan_results:header_check:5.199.141.24",
      "tool": "header_check"
     },
     {
-     "excerpt": "dev.trunk-immobilien.de: status=200 title=J. T. Jürgen Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:27.2.11', 'Complianz', 'MySQL', 'Nginx', 'PHP', 'Plesk', 'WP Fastest Cache', 'WordPress:6.4.2', 'jQuery', 'jQuery Migrate:3.4.1']",
+     "excerpt": "dev.trunk-immobilien.de: status=200 titel=J. T. Jürgen Trunk Immobilien GmbH webserver=nginx tech=BeTheme:27.2.11, Complianz, MySQL, Nginx, PHP, Plesk, WP Fastest Cache, WordPress:6.4.2, jQuery, jQuery Migrate:3.4.1",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -1318,12 +1323,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "ftp.trunk-immobilien.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "ftp.trunk-immobilien.de: score=0/7",
      "ref": "scan_results:header_check:5.199.141.24",
      "tool": "header_check"
     },
     {
-     "excerpt": "ftp.trunk-immobilien.de: status=200 title=Default Parallels Plesk Page webserver=nginx tech=['Nginx']",
+     "excerpt": "ftp.trunk-immobilien.de: status=200 titel=Default Parallels Plesk Page webserver=nginx tech=Nginx",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -1393,12 +1398,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "trunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None",
+     "excerpt": "trunk-immobilien.de: score=0/7 server=nginx",
      "ref": "scan_results:header_check:5.199.141.24",
      "tool": "header_check"
     },
     {
-     "excerpt": "trunk-immobilien.de: status=200 title=J. T. Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:28.2.1', 'Complianz', 'MySQL', 'Nginx', 'PHP:8.2.30', 'WP Fastest Cache', 'WordPress', 'jQuery', 'jQuery Migrate:3.4.1']",
+     "excerpt": "trunk-immobilien.de: status=200 titel=J. T. Trunk Immobilien GmbH webserver=nginx tech=BeTheme:28.2.1, Complianz, MySQL, Nginx, PHP:8.2.30, WP Fastest Cache, WordPress, jQuery, jQuery Migrate:3.4.1",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -1509,12 +1514,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "webmail.trunk-immobilien.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "webmail.trunk-immobilien.de: score=0/7",
      "ref": "scan_results:header_check:5.199.141.24",
      "tool": "header_check"
     },
     {
-     "excerpt": "webmail.trunk-immobilien.de: status=200 title=Default Parallels Plesk Page webserver=nginx tech=['Nginx']",
+     "excerpt": "webmail.trunk-immobilien.de: status=200 titel=Default Parallels Plesk Page webserver=nginx tech=Nginx",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -1584,12 +1589,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.trunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None",
+     "excerpt": "www.trunk-immobilien.de: score=0/7 server=nginx",
      "ref": "scan_results:header_check:5.199.141.24",
      "tool": "header_check"
     },
     {
-     "excerpt": "www.trunk-immobilien.de: status=200 title=J. T. Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:28.2.1', 'Complianz', 'MySQL', 'Nginx', 'PHP:8.2.30', 'WP Fastest Cache', 'WordPress', 'jQuery', 'jQuery Migrate:3.4.1']",
+     "excerpt": "www.trunk-immobilien.de: status=200 titel=J. T. Trunk Immobilien GmbH webserver=nginx tech=BeTheme:28.2.1, Complianz, MySQL, Nginx, PHP:8.2.30, WP Fastest Cache, WordPress, jQuery, jQuery Migrate:3.4.1",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -1727,7 +1732,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:21 | 220 ProFTPD Server (ProFTPD) [5.199.141.24] 530 Login incorrect. 214-The following commands are recognized (* =>'s unimplemented): CWD XCWD CDUP XCUP SMNT* QUIT PORT PASV",
+     "excerpt": "5.199.141.24:21 banner=220 ProFTPD Server (ProFTPD) [5.199.141.24] 530 Login incorrect. 214-The following commands are recognized (* =>'s unimplemented): CWD XCWD CDUP XCUP SMNT* QUIT PORT PASV",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1756,7 +1761,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:22 OpenSSH 7.4 | SSH-2.0-OpenSSH_7.4 Key type: ssh-rsa Key: AAAAB3NzaC1yc2EAAAADAQABAAABAQDvVHOShuv3M7hVBiAlcUmwohKajfK7vK3WPrHB+JVXeGUu xxctyEO8rd3Nte9uPPe79MOJWi9b8zf5bAZ/2h8sFNSUIsC...",
+     "excerpt": "5.199.141.24:22 OpenSSH 7.4 banner=SSH-2.0-OpenSSH_7.4 Key type: ssh-rsa Key: AAAAB3NzaC1yc2EAAAADAQABAAABAQDvVHOShuv3M7hVBiAlcUmwohKajfK7vK3WPrHB+JVXeGUu xxctyEO8rd3Nte9uPPe79MOJWi9b8zf5bAZ/2h8sFN...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1785,7 +1790,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:25 Postfix smtpd | 220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-E...",
+     "excerpt": "5.199.141.24:25 Postfix smtpd banner=220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1814,7 +1819,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:80 nginx | HTTP/1.1 301 Moved Permanently Server: nginx Date: Thu, 07 May 2026 09:09:42 GMT Content-Type: text/html Content-Length: 162 Connection: keep-alive Location: https://www.her...",
+     "excerpt": "5.199.141.24:80 nginx banner=HTTP/1.1 301 Moved Permanently Server: nginx Date: Thu, 07 May 2026 09:09:42 GMT Content-Type: text/html Content-Length: 162 Connection: keep-alive Location: https://ww...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1843,7 +1848,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:110 | +OK Dovecot ready. <e55.3.69feb11a./TOvijEwjp2GCcyk6D1Feg==@home4.publishsoft.de> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN DIGEST-MD5 CRA...",
+     "excerpt": "5.199.141.24:110 banner=+OK Dovecot ready. <e55.3.69feb11a./TOvijEwjp2GCcyk6D1Feg==@home4.publishsoft.de> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN DIGEST-MD...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1872,7 +1877,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:143 | * OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN AUTH=DIGEST-MD5 AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LOG...",
+     "excerpt": "5.199.141.24:143 banner=* OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN AUTH=DIGEST-MD5 AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1901,7 +1906,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:443 nginx | HTTP/1.1 200 OK Server: nginx Date: Sun, 10 May 2026 06:31:35 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive X-Powered-By: PHP...",
+     "excerpt": "5.199.141.24:443 nginx banner=HTTP/1.1 200 OK Server: nginx Date: Sun, 10 May 2026 06:31:35 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive X-Powered-By...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1930,7 +1935,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:465 Postfix smtpd | 220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-ENHANCEDSTATU...",
+     "excerpt": "5.199.141.24:465 Postfix smtpd banner=220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-ENHANCED...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1959,7 +1964,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:587 Postfix smtpd | 220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250-DSN...",
+     "excerpt": "5.199.141.24:587 Postfix smtpd banner=220 home4.publishsoft.de ESMTP Postfix 250-home4.publishsoft.de 250-PIPELINING 250-SIZE 51200000 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1988,7 +1993,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:3306 MariaDB 5.5.68-MariaDB | MariaDB: Protocol Version: 10 Version: 5.5.68-MariaDB Capabilities: 63487 Server Language: 8 Server Status: 2 Extended Server Capabilities: 40975 Authenti...",
+     "excerpt": "5.199.141.24:3306 MariaDB 5.5.68-MariaDB banner=MariaDB: Protocol Version: 10 Version: 5.5.68-MariaDB Capabilities: 63487 Server Language: 8 Server Status: 2 Extended Server Capabilities: 40975 Aut...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2017,7 +2022,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:8443 | HTTP/1.1 200 OK Server: sw-cp-server Date: Sun, 03 May 2026 02:44:20 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires: Fri, 2...",
+     "excerpt": "5.199.141.24:8443 banner=HTTP/1.1 200 OK Server: sw-cp-server Date: Sun, 03 May 2026 02:44:20 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires: F...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2046,7 +2051,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "5.199.141.24:8880 | HTTP/1.1 303 See Other Server: sw-cp-server Date: Sat, 18 Apr 2026 15:21:29 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Expires:...",
+     "excerpt": "5.199.141.24:8880 banner=HTTP/1.1 303 See Other Server: sw-cp-server Date: Sat, 18 Apr 2026 15:21:29 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Exp...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2082,7 +2087,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-05-10T22:25:04.568947+00:00 finishedAt=2026-05-10T22:35:38.208155+00:00",
+    "excerpt": "Beginn=2026-05-10T22:25:04.568947+00:00 Ende=2026-05-10T22:35:38.208155+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -2146,7 +2151,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -4350,7 +4355,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "webmail.trunk-immobilien.de:443 tls=tls13 cn=home4.publishsoft.de not_after=2026-06-26T08:35:55Z mismatched=True",
+     "excerpt": "webmail.trunk-immobilien.de:443 tls=tls13 cn=home4.publishsoft.de gueltig_bis=2026-06-26T08:35:55Z namensabweichung=ja",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
     }

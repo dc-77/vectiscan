@@ -12,7 +12,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from reporter.pdf.branding import (
     COLORS, SEVERITY_COLORS, PACKAGE_BADGES,
     COMPANY_NAME, CLASSIFICATION_LABEL_DE, LOGO_PATH,
-    FONT_BODY, FONT_HEADING, FONT_MONO,
     FONT_SIZE_BODY, FONT_SIZE_HEADING1, FONT_SIZE_HEADING2,
     FONT_SIZE_EVIDENCE, FONT_SIZE_TABLE_HEADER, FONT_SIZE_TABLE_CELL,
     FONT_SIZE_FOOTER, FONT_SIZE_COVER_TITLE, FONT_SIZE_COVER_SUBTITLE,
@@ -70,17 +69,13 @@ class TestBrandingModule:
     def test_classification_label_de(self):
         assert "VERTRAULICH" in CLASSIFICATION_LABEL_DE
 
-    @pytest.mark.reportlab_fallback
-    def test_font_constants(self):
-        # Prueft die Ersatzschrift von branding.py und damit die *Abwesenheit* von
-        # DejaVu: liegt das Paket fonts-dejavu-core vor, registriert branding.py
-        # VectiSans und dieser Test faellt. Unter Windows und auf dem Runner ist er
-        # gruen, im report-worker-Abbild nicht. Der Marker nimmt ihn dort heraus
-        # (.gitlab-ci.yml: test-report-worker-pdf, -m "not reportlab_fallback").
-        # Aufgeraeumt wird das mit dem ReportLab-Pfad in Session S6.
-        assert FONT_BODY == "Helvetica"
-        assert FONT_HEADING == "Helvetica-Bold"
-        assert FONT_MONO == "Courier"
+    # S6: `test_font_constants` ist geloescht. Er hat die Ersatzschrift von
+    # branding.py geprueft und damit die *Abwesenheit* von DejaVu; liegt das
+    # Paket vor, registriert branding.py VectiSans und der Test fiel. Unter
+    # Windows und auf dem Runner war er gruen, im report-worker-Abbild nicht,
+    # und der Abbild-Job musste ihn ueber einen eigenen Marker abwaehlen. Er
+    # sagte nichts ueber den Bericht aus, sondern ueber die Ausstattung des
+    # Rechners, auf dem er lief.
 
     def test_font_sizes_positive(self):
         sizes = [

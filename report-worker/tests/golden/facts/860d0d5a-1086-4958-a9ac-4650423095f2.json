@@ -2794,12 +2794,12 @@
    "domain": "junkerwerk.de",
    "evidence": [
     {
-     "excerpt": "spf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dmarc=None dkim=True mx=['mx02.hornetsecurity.com', 'mx04.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx01.hornetsecurity.com']",
+     "excerpt": "spf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dkim=ja mx=mx02.hornetsecurity.com, mx04.hornetsecurity.com, mx03.hornetsecurity.com, mx01.hornetsecurity.com",
      "ref": "phase0/dns_records.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -2884,12 +2884,12 @@
    "domain": "junkerwerk.hu",
    "evidence": [
     {
-     "excerpt": "spf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dmarc=None dkim=True mx=['mx04.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx01.hornetsecurity.com']",
+     "excerpt": "spf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dkim=ja mx=mx04.hornetsecurity.com, mx02.hornetsecurity.com, mx03.hornetsecurity.com, mx01.hornetsecurity.com",
      "ref": "phase0/dns_records_junkerwerk.hu.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security_junkerwerk.hu.json",
      "tool": "dns_security"
     }
@@ -2939,7 +2939,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "autodiscover.junkerwerk.de: status=200 title=Outlook final_url=https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0",
+     "excerpt": "autodiscover.junkerwerk.de: status=200 titel=Outlook final_url=https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2960,7 +2960,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [
@@ -2974,7 +2975,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "cloud.junkerwerk.de: status=200 title=IIS Windows Server final_url=https://cloud.junkerwerk.de",
+     "excerpt": "cloud.junkerwerk.de: status=200 titel=IIS Windows Server final_url=https://cloud.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2995,7 +2996,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3003,7 +3005,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3020,7 +3022,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3028,7 +3031,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "nachhaltigkeit.junkerwerk.de: status=403 title=403 Forbidden final_url=https://nachhaltigkeit.junkerwerk.de",
+     "excerpt": "nachhaltigkeit.junkerwerk.de: status=403 titel=403 Forbidden final_url=https://nachhaltigkeit.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3045,7 +3048,8 @@
    "source": "web_probe",
    "title": "403 Forbidden",
    "waf": null,
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3053,7 +3057,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "nachhaltigkeit.junkerwerk.de: status=403 title=403 Forbidden final_url=https://nachhaltigkeit.junkerwerk.de",
+     "excerpt": "nachhaltigkeit.junkerwerk.de: status=403 titel=403 Forbidden final_url=https://nachhaltigkeit.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3070,7 +3074,8 @@
    "source": "web_probe",
    "title": "403 Forbidden",
    "waf": null,
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3078,7 +3083,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "outlook.junkerwerk.de: status=200 title=Outlook final_url=https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0",
+     "excerpt": "outlook.junkerwerk.de: status=200 titel=Outlook final_url=https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3099,7 +3104,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3107,7 +3113,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "team.junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "team.junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3124,7 +3130,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [
@@ -3138,7 +3145,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.junkerwerk.de: status=200 title=Home - Junkerwerk - Schaumstoffverarbeitung final_url=https://www.junkerwerk.de",
+     "excerpt": "www.junkerwerk.de: status=200 titel=Home - Junkerwerk - Schaumstoffverarbeitung final_url=https://www.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3155,7 +3162,8 @@
    "source": "web_probe",
    "title": "Home  - Junkerwerk - Schaumstoffverarbeitung",
    "waf": null,
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -3196,7 +3204,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=188.40.3.130 rdns=dedi2230.your-server.de fqdns=junkerwerk.de,www.junkerwerk.de,nachhaltigkeit.junkerwerk.de",
+     "excerpt": "ip=188.40.3.130 rdns=dedi2230.your-server.de fqdns=junkerwerk.de, www.junkerwerk.de, nachhaltigkeit.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3249,7 +3257,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=217.243.248.28 rdns=junkerwerk-solingen.de fqdns=outlook.junkerwerk.de,autodiscover.junkerwerk.de",
+     "excerpt": "ip=217.243.248.28 rdns=junkerwerk-solingen.de fqdns=outlook.junkerwerk.de, autodiscover.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3301,7 +3309,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=217.243.248.29 rdns= fqdns=cloud.junkerwerk.de,team.junkerwerk.de",
+     "excerpt": "ip=217.243.248.29 fqdns=cloud.junkerwerk.de, team.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3532,12 +3540,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "autodiscover.junkerwerk.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
+     "excerpt": "autodiscover.junkerwerk.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
      "ref": "hosts/217.243.248.28/phase2/headers_autodiscover.junkerwerk.de.json",
      "tool": "header_check"
     },
     {
-     "excerpt": "autodiscover.junkerwerk.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET', 'Outlook Web App:15.2.2562', 'Windows Server']",
+     "excerpt": "autodiscover.junkerwerk.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET, Outlook Web App:15.2.2562, Windows Server",
      "ref": "hosts/217.243.248.28/phase2/httpx_autodiscover.junkerwerk.de.json",
      "tool": "httpx"
     }
@@ -3744,12 +3752,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "cloud.junkerwerk.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=None",
+     "excerpt": "cloud.junkerwerk.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0",
      "ref": "hosts/217.243.248.29/phase2/headers_cloud.junkerwerk.de.json",
      "tool": "header_check"
     },
     {
-     "excerpt": "cloud.junkerwerk.de: status=200 title=IIS Windows Server webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET', 'Windows Server']",
+     "excerpt": "cloud.junkerwerk.de: status=200 titel=IIS Windows Server webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET, Windows Server",
      "ref": "hosts/217.243.248.29/phase2/httpx_cloud.junkerwerk.de.json",
      "tool": "httpx"
     }
@@ -3863,7 +3871,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "nachhaltigkeit.junkerwerk.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "nachhaltigkeit.junkerwerk.de: erreichbar=nein",
      "ref": "hosts/188.40.3.130/phase2/headers_nachhaltigkeit.junkerwerk.de.json",
      "tool": "header_check"
     }
@@ -3899,7 +3907,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "nachhaltigkeit.junkerwerk.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "nachhaltigkeit.junkerwerk.de: erreichbar=nein",
      "ref": "hosts/2a01:4f8:d0a:3124::2/phase2/headers_nachhaltigkeit.junkerwerk.de.json",
      "tool": "header_check"
     }
@@ -4088,12 +4096,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "outlook.junkerwerk.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
+     "excerpt": "outlook.junkerwerk.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
      "ref": "hosts/217.243.248.28/phase2/headers_outlook.junkerwerk.de.json",
      "tool": "header_check"
     },
     {
-     "excerpt": "outlook.junkerwerk.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.2.2562', 'Windows Server']",
+     "excerpt": "outlook.junkerwerk.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET:4.0.30319, Outlook Web App:15.2.2562, Windows Server",
      "ref": "hosts/217.243.248.28/phase2/httpx_outlook.junkerwerk.de.json",
      "tool": "httpx"
     }
@@ -5191,7 +5199,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.junkerwerk.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "www.junkerwerk.de: erreichbar=nein",
      "ref": "hosts/188.40.3.130/phase2/headers_www.junkerwerk.de.json",
      "tool": "header_check"
     }
@@ -5255,7 +5263,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:21 | 220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG ru-RU.UTF-8;ru-...",
+     "excerpt": "188.40.3.130:21 banner=220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG ru-RU.UTF-...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5285,7 +5293,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:25 | 220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.212.76.37 [224.212.76.37] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250-PI...",
+     "excerpt": "188.40.3.130:25 banner=220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.212.76.37 [224.212.76.37] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 2...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5315,7 +5323,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:80 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Sat, 19 Sep 2026 13:37:46 GMT Server: Apache Location: https://junkerwerk.com/ Content-Length: 335 Content-Type: text/html; chars...",
+     "excerpt": "188.40.3.130:80 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Sat, 19 Sep 2026 13:37:46 GMT Server: Apache Location: https://junkerwerk.com/ Content-Length: 335 Content-Type: text/html;...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5345,7 +5353,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:110 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+     "excerpt": "188.40.3.130:110 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5375,7 +5383,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDL...",
+     "excerpt": "188.40.3.130:143 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABL...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5405,7 +5413,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:222 OpenSSH 9.2p1 | SSH-2.0-OpenSSH_9.2p1 Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIG8v6Y30WtM3glXtTrDuzd/z9LHoBqPtpXellmEds1Ut Fingerprint: f7:40:ef:a6:d9:2e:03:ae:43:02:63:...",
+     "excerpt": "188.40.3.130:222 OpenSSH 9.2p1 banner=SSH-2.0-OpenSSH_9.2p1 Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIG8v6Y30WtM3glXtTrDuzd/z9LHoBqPtpXellmEds1Ut Fingerprint: f7:40:ef:a6:d9:2e:03:ae:43:0...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5435,7 +5443,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:443 Apache httpd | HTTP/1.1 403 Forbidden Date: Sat, 19 Sep 2026 13:38:07 GMT Server: Apache Content-Length: 304 Content-Type: text/html; charset=iso-8859-1",
+     "excerpt": "188.40.3.130:443 Apache httpd banner=HTTP/1.1 403 Forbidden Date: Sat, 19 Sep 2026 13:38:07 GMT Server: Apache Content-Length: 304 Content-Type: text/html; charset=iso-8859-1",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5465,7 +5473,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:465 | 220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.27.1.70 [224.27.1.70] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250-PIPEC...",
+     "excerpt": "188.40.3.130:465 banner=220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.27.1.70 [224.27.1.70] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250-...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5495,7 +5503,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:587 | 220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.135.44.221 [224.135.44.221] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250...",
+     "excerpt": "188.40.3.130:587 banner=220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.135.44.221 [224.135.44.221] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELININ...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5525,7 +5533,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ A...",
+     "excerpt": "188.40.3.130:993 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITER...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5555,7 +5563,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:995 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+     "excerpt": "188.40.3.130:995 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5585,7 +5593,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:3306 MariaDB 10.11.18-MariaDB-0+deb12u1 | MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Server Cap...",
+     "excerpt": "188.40.3.130:3306 MariaDB 10.11.18-MariaDB-0+deb12u1 banner=MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Serve...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5615,7 +5623,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:5432 PostgreSQL 9.6.0 or later | PostgreSQL FATAL: no pg_hba.conf entry for host \"224.39.1.164\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf entry for h...",
+     "excerpt": "188.40.3.130:5432 PostgreSQL 9.6.0 or later banner=PostgreSQL FATAL: no pg_hba.conf entry for host \"224.39.1.164\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf entry...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5645,7 +5653,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.28:25 | 220 junkerwerk-solingen.de SMTP service ready 250-junkerwerk-solingen.de 250-SIZE 104857600 250-8BITMIME 250 STARTTLS",
+     "excerpt": "217.243.248.28:25 banner=220 junkerwerk-solingen.de SMTP service ready 250-junkerwerk-solingen.de 250-SIZE 104857600 250-8BITMIME 250 STARTTLS",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5673,7 +5681,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.28:443 Outlook Web App | HTTP/1.1 200 OK Cache-Control: no-cache, no-store Pragma: no-cache Content-Type: text/html; charset=utf-8 Expires: -1 Server: Microsoft-IIS/10.0 request-id: bfb...",
+     "excerpt": "217.243.248.28:443 Outlook Web App banner=HTTP/1.1 200 OK Cache-Control: no-cache, no-store Pragma: no-cache Content-Type: text/html; charset=utf-8 Expires: -1 Server: Microsoft-IIS/10.0 request-id...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5701,7 +5709,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.28:4433 SonicWall | HTTP/1.1 200 OK Server: Web Server Cache-Control: no-store, max-age=0 Content-type: text/html; charset=UTF-8; X-Content-Type-Options: nosniff X-XSS-Protection: 1; mo...",
+     "excerpt": "217.243.248.28:4433 SonicWall banner=HTTP/1.1 200 OK Server: Web Server Cache-Control: no-store, max-age=0 Content-type: text/html; charset=UTF-8; X-Content-Type-Options: nosniff X-XSS-Protection:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5729,7 +5737,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.29:443 Microsoft IIS httpd 10.0 | HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Tue, 23 Sep 2025 13:01:11 GMT Accept-Ranges: bytes ETag: \"42ffd9228a2cdc1:0\" Server: Microsoft-I...",
+     "excerpt": "217.243.248.29:443 Microsoft IIS httpd 10.0 banner=HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Tue, 23 Sep 2025 13:01:11 GMT Accept-Ranges: bytes ETag: \"42ffd9228a2cdc1:0\" Server: Micros...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5756,7 +5764,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "2a01:4f8:d0a:3124::2:80 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Sat, 12 Sep 2026 23:19:44 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1 X-Content-Type-Options: nosn...",
+     "excerpt": "2a01:4f8:d0a:3124::2:80 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Sat, 12 Sep 2026 23:19:44 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1 X-Content-Type-Options:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5785,7 +5793,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "2a01:4f8:d0a:3124::2:443 Apache httpd | HTTP/1.1 200 OK Date: Wed, 09 Sep 2026 16:47:23 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Upgrade: h2 Connection: Upgrade Last-Modified:...",
+     "excerpt": "2a01:4f8:d0a:3124::2:443 Apache httpd banner=HTTP/1.1 200 OK Date: Wed, 09 Sep 2026 16:47:23 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Upgrade: h2 Connection: Upgrade Last-Modif...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5849,7 +5857,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-09-20T10:44:22.474065+00:00 finishedAt=2026-09-20T11:18:54.360728+00:00",
+    "excerpt": "Beginn=2026-09-20T10:44:22.474065+00:00 Ende=2026-09-20T11:18:54.360728+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -5913,7 +5921,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -7931,7 +7939,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "autodiscover.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=None",
+     "excerpt": "autodiscover.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.28/phase2/httpx_autodiscover.junkerwerk.de.json",
      "tool": "httpx"
     }
@@ -7981,960 +7989,1168 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "HTTP",
      "id": "service",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No 128 cipher limit bug",
      "id": "pre_128cipher",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "SSLv2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "SSLv3",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "TLS1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "TLS1_1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "TLS1_2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered with final",
      "id": "TLS1_3",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "NPN",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "h2",
      "id": "ALPN_HTTP2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "http/1.1",
      "id": "ALPN",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_NULL",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_aNULL",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_EXPORT",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_LOW",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_3DES_IDEA",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_OBSOLETED",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_STRONG_NOFS",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_STRONG_FS",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "server",
      "id": "cipher_order-tls1_2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc030   ECDHE-RSA-AES256-GCM-SHA384       ECDH 384   AESGCM      256      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
      "id": "cipher-tls1_2_xc030",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc02f   ECDHE-RSA-AES128-GCM-SHA256       ECDH 256   AESGCM      128      TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
      "id": "cipher-tls1_2_xc02f",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc028   ECDHE-RSA-AES256-SHA384           ECDH 384   AES         256      TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
      "id": "cipher-tls1_2_xc028",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc027   ECDHE-RSA-AES128-SHA256           ECDH 256   AES         128      TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
      "id": "cipher-tls1_2_xc027",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES256-SHA384 ECDHE-RSA-AES128-SHA256",
      "id": "cipherorder_TLSv1_2",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "server",
      "id": "cipher_order-tls1_3",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3   x1302   TLS_AES_256_GCM_SHA384            ECDH 256   AESGCM      256      TLS_AES_256_GCM_SHA384",
      "id": "cipher-tls1_3_x1302",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3   x1301   TLS_AES_128_GCM_SHA256            ECDH 256   AESGCM      128      TLS_AES_128_GCM_SHA256",
      "id": "cipher-tls1_3_x1301",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLS_AES_256_GCM_SHA384 TLS_AES_128_GCM_SHA256",
      "id": "cipherorder_TLSv1_3",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "server",
      "id": "cipher_order",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "FS",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLS_AES_256_GCM_SHA384 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-AES256-SHA384 TLS_AES_128_GCM_SHA256 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES128-SHA256",
      "id": "FS_ciphers",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No KEMs offered",
      "id": "FS_KEMs",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "prime256v1 secp384r1",
      "id": "FS_ECDHE_curves",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "RSA-PSS-RSAE+SHA256 RSA+SHA256 RSA-PSS-RSAE+SHA384 RSA+SHA384 RSA-PSS-RSAE+SHA512 RSA+SHA512 RSA+SHA1",
      "id": "FS_TLS12_sig_algs",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "RSA-PSS-RSAE+SHA256 RSA-PSS-RSAE+SHA384 RSA-PSS-RSAE+SHA512",
      "id": "FS_TLS13_sig_algs",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "'status request/#5' 'application layer protocol negotiation/#16' 'extended master secret/#23' 'supported versions/#43' 'key share/#51' 'renegotiation info/#65281'",
      "id": "TLS_extensions",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no -- no lifetime advertised",
      "id": "TLS_session_ticket",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "yes",
      "id": "SSL_sessionID_support",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not supported",
      "id": "sessionresumption_ticket",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not supported",
      "id": "sessionresumption_ID",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "random",
      "id": "TLS_timestamp",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "none",
      "id": "certificate_compression",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "none",
      "id": "clientAuth",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "1",
      "id": "cert_numbers",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "SHA256 with RSA",
      "id": "cert_signatureAlgorithm",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "RSA 4096 bits (exponent is 65537)",
      "id": "cert_keySize",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Digital Signature, Key Encipherment",
      "id": "cert_keyUsage",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLS Web Server Authentication, TLS Web Client Authentication",
      "id": "cert_extKeyUsage",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "F2C6B90456A4EDF1D505F44791795C68",
      "id": "cert_serialNumber",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "16",
      "id": "cert_serialNumberLen",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "24ECACFDA47054C51095FEB0FE6ACC9D865D43AA",
      "id": "cert_fingerprintSHA1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "F812127F2E2BD9533470DF2E404042FF5F581F693767B0E99FCBB978C2E59DF1",
      "id": "cert_fingerprintSHA256",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "-----BEGIN CERTIFICATE-----\nMIIHhDCCBeygAwIBAgIRAPLGuQRWpO3x1QX0R5F5XGgwDQYJKoZIhvcNAQELBQAwYDELMAkGA1UEBhMCR0IxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDE3MDUGA1UEAxMuU2VjdGlnbyBQdWJsaWMgU2VydmVyIEF1dGhlbnRpY2F0aW9uIENBIERWIFIzNjAeFw0yNTExMTEwMDAwMDBaFw0yNjEyMTEyMzU5NTlaMBoxGDAWBgNVBAMMDyouanVua2Vyd2Vyay5k",
      "id": "cert",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "*.junkerwerk.de",
      "id": "cert_commonName",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "*.junkerwerk.de",
      "id": "cert_commonName_wo_SNI",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "*.junkerwerk.de junkerwerk.de",
      "id": "cert_subjectAltName",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Ok via SAN wildcard and CN wildcard (same w/o SNI)",
      "id": "cert_trust",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "trust is via wildcard",
      "id": "cert_trust_wildcard",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "passed.",
      "id": "cert_chain_of_trust",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no",
      "id": "cert_certificatePolicies_EV",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "82 >= 60 days",
      "id": "cert_expirationStatus",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2025-11-11 00:00",
      "id": "cert_notBefore",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2026-12-11 23:59",
      "id": "cert_notAfter",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "certificate has no extended life time according to browser forum",
      "id": "cert_extlifeSpan",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not present",
      "id": "cert_eTLS",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "cert_crlDistributionPoints",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "http://ocsp.sectigo.com",
      "id": "cert_ocspURL",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "OCSP_stapling",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not revoked",
      "id": "cert_ocspRevoked",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "cert_mustStapleExtension",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "check skipped as instructed",
      "id": "DNS_CAArecord",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "yes (certificate extension)",
      "id": "certificate_transparency",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2",
      "id": "certs_countServer",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no",
      "id": "certs_list_ordering_problem",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Sectigo Public Server Authentication CA DV R36 (Sectigo Limited from GB)",
      "id": "cert_caIssuers",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "-----BEGIN CERTIFICATE-----\nMIIGTDCCBDSgAwIBAgIQOXpmzCdWNi4NqofKbqvjsTANBgkqhkiG9w0BAQwFADBfMQswCQYDVQQGEwJHQjEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMTYwNAYDVQQDEy1TZWN0aWdvIFB1YmxpYyBTZXJ2ZXIgQXV0aGVudGljYXRpb24gUm9vdCBSNDYwHhcNMjEwMzIyMDAwMDAwWhcNMzYwMzIxMjM1OTU5WjBgMQswCQYDVQQGEwJHQjEYMBYGA1UEChMPU2Vj",
      "id": "intermediate_cert <#1>",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "8C54C334B66BA4E426772AF4A3F9136C19A1AEC729FDB28C535C07A5A4EF22E0",
      "id": "intermediate_cert_fingerprintSHA256 <#1>",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2021-03-22 00:00",
      "id": "intermediate_cert_notBefore <#1>",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2036-03-21 23:59",
      "id": "intermediate_cert_notAfter <#1>",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "ok > 40 days",
      "id": "intermediate_cert_expiration <#1>",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Sectigo Public Server Authentication CA DV R36 <-- Sectigo Public Server Authentication Root R46",
      "id": "intermediate_cert_chain <#1>",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "intermediate certificate(s) is/are ok",
      "id": "intermediate_cert_badOCSP",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "302 Moved Temporarily ('/')",
      "id": "HTTP_status_code",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "0 seconds from localtime",
      "id": "HTTP_clock_skew",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "1789902346",
      "id": "HTTP_headerTime",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "HSTS",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No support for HTTP Public Key Pinning",
      "id": "HPKP",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Microsoft-IIS/10.0",
      "id": "banner_server",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No application banner found",
      "id": "banner_application",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "0 at '/' (30x detected, better try target URL of 30x)",
      "id": "cookie_count",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no-cache",
      "id": "Cache-Control",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no-cache",
      "id": "Pragma",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "banner_reverseproxy",
      "severity": "INFO"
     },
     {
      "cve": "CVE-2014-0160",
+     "cves": [
+      "CVE-2014-0160"
+     ],
      "finding": "not vulnerable, no heartbeat extension",
      "id": "heartbleed",
      "severity": "OK"
     },
     {
      "cve": "CVE-2014-0224",
+     "cves": [
+      "CVE-2014-0224"
+     ],
      "finding": "not vulnerable",
      "id": "CCS",
      "severity": "OK"
     },
     {
      "cve": "CVE-2016-9244",
+     "cves": [
+      "CVE-2016-9244"
+     ],
      "finding": "no session ticket extension",
      "id": "ticketbleed",
      "severity": "OK"
     },
     {
      "cve": "CVE-2017-17382",
+     "cves": [
+      "CVE-2017-17382",
+      "CVE-2017-17427",
+      "CVE-2017-17428",
+      "CVE-2017-13098",
+      "CVE-2017-1000385",
+      "CVE-2017-13099",
+      "CVE-2016-6883",
+      "CVE-2012-5081",
+      "CVE-2017-6168"
+     ],
      "finding": "not vulnerable, no RSA key transport cipher",
      "id": "ROBOT",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "supported",
      "id": "secure_renego",
      "severity": "OK"
     },
     {
      "cve": "CVE-2011-1473",
+     "cves": [
+      "CVE-2011-1473"
+     ],
      "finding": "not vulnerable",
      "id": "secure_client_renego",
      "severity": "OK"
     },
     {
      "cve": "CVE-2012-4929",
+     "cves": [
+      "CVE-2012-4929"
+     ],
      "finding": "not vulnerable",
      "id": "CRIME_TLS",
      "severity": "OK"
     },
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "not vulnerable, no gzip/deflate/compress/br HTTP compression  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "OK"
     },
     {
      "cve": "CVE-2014-3566",
+     "cves": [
+      "CVE-2014-3566"
+     ],
      "finding": "not vulnerable, no SSLv3",
      "id": "POODLE_SSL",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no protocol below TLS 1.2 offered",
      "id": "fallback_SCSV",
      "severity": "OK"
     },
     {
      "cve": "CVE-2016-2183",
+     "cves": [
+      "CVE-2016-2183",
+      "CVE-2016-6329"
+     ],
      "finding": "not vulnerable",
      "id": "SWEET32",
      "severity": "OK"
     },
     {
      "cve": "CVE-2015-0204",
+     "cves": [
+      "CVE-2015-0204"
+     ],
      "finding": "not vulnerable",
      "id": "FREAK",
      "severity": "OK"
     },
     {
      "cve": "CVE-2016-0800",
+     "cves": [
+      "CVE-2016-0800",
+      "CVE-2016-0703"
+     ],
      "finding": "not vulnerable on this host and port",
      "id": "DROWN",
      "severity": "OK"
     },
     {
      "cve": "CVE-2016-0800",
+     "cves": [
+      "CVE-2016-0800",
+      "CVE-2016-0703"
+     ],
      "finding": "Make sure you don't use this certificate elsewhere with SSLv2 enabled services, see https://search.censys.io/search?resource=hosts&virtual_hosts=INCLUDE&q=F812127F2E2BD9533470DF2E404042FF5F581F693767B0E99FCBB978C2E59DF1",
      "id": "DROWN_hint",
      "severity": "INFO"
     },
     {
      "cve": "CVE-2015-4000",
+     "cves": [
+      "CVE-2015-4000"
+     ],
      "finding": "not vulnerable, no DH EXPORT ciphers,",
      "id": "LOGJAM",
      "severity": "OK"
     },
     {
      "cve": "CVE-2015-4000",
+     "cves": [
+      "CVE-2015-4000"
+     ],
      "finding": "no DH key with <= TLS 1.2",
      "id": "LOGJAM-common_primes",
      "severity": "OK"
     },
     {
      "cve": "CVE-2011-3389",
+     "cves": [
+      "CVE-2011-3389"
+     ],
      "finding": "not vulnerable, no SSL3 or TLS1",
      "id": "BEAST",
      "severity": "OK"
     },
     {
      "cve": "CVE-2013-0169",
+     "cves": [
+      "CVE-2013-0169"
+     ],
      "finding": "potentially vulnerable, uses obsolete TLS CBC ciphers",
      "id": "LUCKY13",
      "severity": "LOW"
     },
     {
      "cve": "CVE-2014-6321",
+     "cves": [
+      "CVE-2014-6321"
+     ],
      "finding": "not vulnerable",
      "id": "winshock",
      "severity": "OK"
     },
     {
      "cve": "CVE-2013-2566",
+     "cves": [
+      "CVE-2013-2566",
+      "CVE-2015-2808"
+     ],
      "finding": "not vulnerable",
      "id": "RC4",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-android_70",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-android_81",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_90",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_X",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_11_12",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_13_14",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_15",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-chrome_101_win10",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-chromium_137_win11",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-firefox_100_win10",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-firefox_137_win11",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No connection",
      "id": "clientsimulation-ie_8_win7",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-SHA384",
      "id": "clientsimulation-ie_11_win7",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-SHA384",
      "id": "clientsimulation-ie_11_win81",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES128-SHA256",
      "id": "clientsimulation-ie_11_winphone81",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-ie_11_win10",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-edge_15_win10",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-edge_101_win10_21h2",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-edge_133_win11_23h2",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-safari_184_ios_184",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-safari_154_osx_1231",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-safari_184_osx_154",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No connection",
      "id": "clientsimulation-java_7u25",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-java_80442",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-java_1102",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-java_1703",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-java_2106",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-go_1178",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-libressl_336",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-openssl_102e",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-openssl_111d",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-openssl_315",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-openssl_350",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-apple_mail_16_0",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-thunderbird_91_9",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "SSL Labs's 'SSL Server Rating Guide' (version 2009r from 2025-05-16)",
      "id": "rating_spec",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "https://github.com/ssllabs/research/wiki/SSL-Server-Rating-Guide",
      "id": "rating_doc",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "100",
      "id": "protocol_support_score",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "30",
      "id": "protocol_support_score_weighted",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "100",
      "id": "key_exchange_score",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "30",
      "id": "key_exchange_score_weighted",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "90",
      "id": "cipher_strength_score",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "36",
      "id": "cipher_strength_score_weighted",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "96",
      "id": "final_score",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "A+",
      "id": "overall_grade",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "58",
      "id": "scanTime",
      "severity": "INFO"
@@ -8942,17 +9158,17 @@
    ],
    "evidence": [
     {
-     "excerpt": "outlook.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=None",
+     "excerpt": "outlook.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.28/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "outlook.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=None",
+     "excerpt": "outlook.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.28/phase2/httpx_outlook.junkerwerk.de.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:217.243.248.28",
      "tool": "testssl"
     },
@@ -9018,1092 +9234,1324 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "HTTP",
      "id": "service",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No 128 cipher limit bug",
      "id": "pre_128cipher",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "SSLv2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "SSLv3",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered (deprecated)",
      "id": "TLS1",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered (deprecated)",
      "id": "TLS1_1",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "TLS1_2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered with final",
      "id": "TLS1_3",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "NPN",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "h2",
      "id": "ALPN_HTTP2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "http/1.1",
      "id": "ALPN",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_NULL",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_aNULL",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_EXPORT",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_LOW",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "cipherlist_3DES_IDEA",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_OBSOLETED",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_STRONG_NOFS",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_STRONG_FS",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "server",
      "id": "cipher_order-tls1",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1   xc014   ECDHE-RSA-AES256-SHA              ECDH 384   AES         256      TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
      "id": "cipher-tls1_xc014",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1   xc013   ECDHE-RSA-AES128-SHA              ECDH 256   AES         128      TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
      "id": "cipher-tls1_xc013",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1   x35     AES256-SHA                        RSA        AES         256      TLS_RSA_WITH_AES_256_CBC_SHA",
      "id": "cipher-tls1_x35",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1   x2f     AES128-SHA                        RSA        AES         128      TLS_RSA_WITH_AES_128_CBC_SHA",
      "id": "cipher-tls1_x2f",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-SHA AES128-SHA",
      "id": "cipherorder_TLSv1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "server",
      "id": "cipher_order-tls1_1",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.1   xc014   ECDHE-RSA-AES256-SHA              ECDH 384   AES         256      TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
      "id": "cipher-tls1_1_xc014",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.1   xc013   ECDHE-RSA-AES128-SHA              ECDH 256   AES         128      TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
      "id": "cipher-tls1_1_xc013",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.1   x35     AES256-SHA                        RSA        AES         256      TLS_RSA_WITH_AES_256_CBC_SHA",
      "id": "cipher-tls1_1_x35",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.1   x2f     AES128-SHA                        RSA        AES         128      TLS_RSA_WITH_AES_128_CBC_SHA",
      "id": "cipher-tls1_1_x2f",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-SHA AES128-SHA",
      "id": "cipherorder_TLSv1_1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "server",
      "id": "cipher_order-tls1_2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc030   ECDHE-RSA-AES256-GCM-SHA384       ECDH 384   AESGCM      256      TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
      "id": "cipher-tls1_2_xc030",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc02f   ECDHE-RSA-AES128-GCM-SHA256       ECDH 256   AESGCM      128      TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
      "id": "cipher-tls1_2_xc02f",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc028   ECDHE-RSA-AES256-SHA384           ECDH 384   AES         256      TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
      "id": "cipher-tls1_2_xc028",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc027   ECDHE-RSA-AES128-SHA256           ECDH 256   AES         128      TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
      "id": "cipher-tls1_2_xc027",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc014   ECDHE-RSA-AES256-SHA              ECDH 384   AES         256      TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
      "id": "cipher-tls1_2_xc014",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc013   ECDHE-RSA-AES128-SHA              ECDH 256   AES         128      TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
      "id": "cipher-tls1_2_xc013",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x9d     AES256-GCM-SHA384                 RSA        AESGCM      256      TLS_RSA_WITH_AES_256_GCM_SHA384",
      "id": "cipher-tls1_2_x9d",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x9c     AES128-GCM-SHA256                 RSA        AESGCM      128      TLS_RSA_WITH_AES_128_GCM_SHA256",
      "id": "cipher-tls1_2_x9c",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x3d     AES256-SHA256                     RSA        AES         256      TLS_RSA_WITH_AES_256_CBC_SHA256",
      "id": "cipher-tls1_2_x3d",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x3c     AES128-SHA256                     RSA        AES         128      TLS_RSA_WITH_AES_128_CBC_SHA256",
      "id": "cipher-tls1_2_x3c",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x35     AES256-SHA                        RSA        AES         256      TLS_RSA_WITH_AES_256_CBC_SHA",
      "id": "cipher-tls1_2_x35",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x2f     AES128-SHA                        RSA        AES         128      TLS_RSA_WITH_AES_128_CBC_SHA",
      "id": "cipher-tls1_2_x2f",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES256-SHA384 ECDHE-RSA-AES128-SHA256 ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-GCM-SHA384 AES128-GCM-SHA256 AES256-SHA256 AES128-SHA256 AES256-SHA AES128-SHA",
      "id": "cipherorder_TLSv1_2",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "server",
      "id": "cipher_order-tls1_3",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3   x1302   TLS_AES_256_GCM_SHA384            ECDH 253   AESGCM      256      TLS_AES_256_GCM_SHA384",
      "id": "cipher-tls1_3_x1302",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3   x1301   TLS_AES_128_GCM_SHA256            ECDH 253   AESGCM      128      TLS_AES_128_GCM_SHA256",
      "id": "cipher-tls1_3_x1301",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLS_AES_256_GCM_SHA384 TLS_AES_128_GCM_SHA256",
      "id": "cipherorder_TLSv1_3",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "server",
      "id": "cipher_order",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "FS",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLS_AES_256_GCM_SHA384 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-AES256-SHA384 ECDHE-RSA-AES256-SHA TLS_AES_128_GCM_SHA256 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES128-SHA256 ECDHE-RSA-AES128-SHA",
      "id": "FS_ciphers",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No KEMs offered",
      "id": "FS_KEMs",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "prime256v1 secp384r1 X25519",
      "id": "FS_ECDHE_curves",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "RSA-PSS-RSAE+SHA256 RSA+SHA256 RSA-PSS-RSAE+SHA384 RSA+SHA384 RSA-PSS-RSAE+SHA512 RSA+SHA512 RSA+SHA1",
      "id": "FS_TLS12_sig_algs",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "RSA-PSS-RSAE+SHA256 RSA-PSS-RSAE+SHA384 RSA-PSS-RSAE+SHA512",
      "id": "FS_TLS13_sig_algs",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "'status request/#5' 'application layer protocol negotiation/#16' 'extended master secret/#23' 'supported versions/#43' 'key share/#51' 'renegotiation info/#65281'",
      "id": "TLS_extensions",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no -- no lifetime advertised",
      "id": "TLS_session_ticket",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "yes",
      "id": "SSL_sessionID_support",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not supported",
      "id": "sessionresumption_ticket",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not supported",
      "id": "sessionresumption_ID",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "off by 0 seconds from your localtime",
      "id": "TLS_timestamp",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "none",
      "id": "certificate_compression",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "none",
      "id": "clientAuth",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "1",
      "id": "cert_numbers",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "SHA256 with RSA",
      "id": "cert_signatureAlgorithm",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "RSA 4096 bits (exponent is 65537)",
      "id": "cert_keySize",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Digital Signature, Key Encipherment",
      "id": "cert_keyUsage",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLS Web Server Authentication, TLS Web Client Authentication",
      "id": "cert_extKeyUsage",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "F2C6B90456A4EDF1D505F44791795C68",
      "id": "cert_serialNumber",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "16",
      "id": "cert_serialNumberLen",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "24ECACFDA47054C51095FEB0FE6ACC9D865D43AA",
      "id": "cert_fingerprintSHA1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "F812127F2E2BD9533470DF2E404042FF5F581F693767B0E99FCBB978C2E59DF1",
      "id": "cert_fingerprintSHA256",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "-----BEGIN CERTIFICATE-----\nMIIHhDCCBeygAwIBAgIRAPLGuQRWpO3x1QX0R5F5XGgwDQYJKoZIhvcNAQELBQAwYDELMAkGA1UEBhMCR0IxGDAWBgNVBAoTD1NlY3RpZ28gTGltaXRlZDE3MDUGA1UEAxMuU2VjdGlnbyBQdWJsaWMgU2VydmVyIEF1dGhlbnRpY2F0aW9uIENBIERWIFIzNjAeFw0yNTExMTEwMDAwMDBaFw0yNjEyMTEyMzU5NTlaMBoxGDAWBgNVBAMMDyouanVua2Vyd2Vyay5k",
      "id": "cert",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "*.junkerwerk.de",
      "id": "cert_commonName",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "*.junkerwerk.de",
      "id": "cert_commonName_wo_SNI",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "*.junkerwerk.de junkerwerk.de",
      "id": "cert_subjectAltName",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Ok via SAN wildcard and CN wildcard (same w/o SNI)",
      "id": "cert_trust",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "trust is via wildcard",
      "id": "cert_trust_wildcard",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "passed.",
      "id": "cert_chain_of_trust",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no",
      "id": "cert_certificatePolicies_EV",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "82 >= 60 days",
      "id": "cert_expirationStatus",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2025-11-11 00:00",
      "id": "cert_notBefore",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2026-12-11 23:59",
      "id": "cert_notAfter",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "certificate has no extended life time according to browser forum",
      "id": "cert_extlifeSpan",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not present",
      "id": "cert_eTLS",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "cert_crlDistributionPoints",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "http://ocsp.sectigo.com",
      "id": "cert_ocspURL",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "OCSP_stapling",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not revoked",
      "id": "cert_ocspRevoked",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "cert_mustStapleExtension",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "check skipped as instructed",
      "id": "DNS_CAArecord",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "yes (certificate extension)",
      "id": "certificate_transparency",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2",
      "id": "certs_countServer",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no",
      "id": "certs_list_ordering_problem",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Sectigo Public Server Authentication CA DV R36 (Sectigo Limited from GB)",
      "id": "cert_caIssuers",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "-----BEGIN CERTIFICATE-----\nMIIGTDCCBDSgAwIBAgIQOXpmzCdWNi4NqofKbqvjsTANBgkqhkiG9w0BAQwFADBfMQswCQYDVQQGEwJHQjEYMBYGA1UEChMPU2VjdGlnbyBMaW1pdGVkMTYwNAYDVQQDEy1TZWN0aWdvIFB1YmxpYyBTZXJ2ZXIgQXV0aGVudGljYXRpb24gUm9vdCBSNDYwHhcNMjEwMzIyMDAwMDAwWhcNMzYwMzIxMjM1OTU5WjBgMQswCQYDVQQGEwJHQjEYMBYGA1UEChMPU2Vj",
      "id": "intermediate_cert <#1>",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "8C54C334B66BA4E426772AF4A3F9136C19A1AEC729FDB28C535C07A5A4EF22E0",
      "id": "intermediate_cert_fingerprintSHA256 <#1>",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2021-03-22 00:00",
      "id": "intermediate_cert_notBefore <#1>",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2036-03-21 23:59",
      "id": "intermediate_cert_notAfter <#1>",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "ok > 40 days",
      "id": "intermediate_cert_expiration <#1>",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Sectigo Public Server Authentication CA DV R36 <-- Sectigo Public Server Authentication Root R46",
      "id": "intermediate_cert_chain <#1>",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "intermediate certificate(s) is/are ok",
      "id": "intermediate_cert_badOCSP",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "200 OK ('/')",
      "id": "HTTP_status_code",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "0 seconds from localtime",
      "id": "HTTP_clock_skew",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "1789902527",
      "id": "HTTP_headerTime",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "HSTS",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No support for HTTP Public Key Pinning",
      "id": "HPKP",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Microsoft-IIS/10.0",
      "id": "banner_server",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "X-Powered-By: ASP.NET",
      "id": "banner_application",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "0 at '/'",
      "id": "cookie_count",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "security_headers",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "banner_reverseproxy",
      "severity": "INFO"
     },
     {
      "cve": "CVE-2014-0160",
+     "cves": [
+      "CVE-2014-0160"
+     ],
      "finding": "not vulnerable, no heartbeat extension",
      "id": "heartbleed",
      "severity": "OK"
     },
     {
      "cve": "CVE-2014-0224",
+     "cves": [
+      "CVE-2014-0224"
+     ],
      "finding": "not vulnerable",
      "id": "CCS",
      "severity": "OK"
     },
     {
      "cve": "CVE-2016-9244",
+     "cves": [
+      "CVE-2016-9244"
+     ],
      "finding": "no session ticket extension",
      "id": "ticketbleed",
      "severity": "OK"
     },
     {
      "cve": "CVE-2017-17382",
+     "cves": [
+      "CVE-2017-17382",
+      "CVE-2017-17427",
+      "CVE-2017-17428",
+      "CVE-2017-13098",
+      "CVE-2017-1000385",
+      "CVE-2017-13099",
+      "CVE-2016-6883",
+      "CVE-2012-5081",
+      "CVE-2017-6168"
+     ],
      "finding": "not vulnerable",
      "id": "ROBOT",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "supported",
      "id": "secure_renego",
      "severity": "OK"
     },
     {
      "cve": "CVE-2011-1473",
+     "cves": [
+      "CVE-2011-1473"
+     ],
      "finding": "not vulnerable",
      "id": "secure_client_renego",
      "severity": "OK"
     },
     {
      "cve": "CVE-2012-4929",
+     "cves": [
+      "CVE-2012-4929"
+     ],
      "finding": "not vulnerable",
      "id": "CRIME_TLS",
      "severity": "OK"
     },
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "not vulnerable, no gzip/deflate/compress/br HTTP compression  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "OK"
     },
     {
      "cve": "CVE-2014-3566",
+     "cves": [
+      "CVE-2014-3566"
+     ],
      "finding": "not vulnerable, no SSLv3",
      "id": "POODLE_SSL",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "NOT supported",
      "id": "fallback_SCSV",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2016-2183",
+     "cves": [
+      "CVE-2016-2183",
+      "CVE-2016-6329"
+     ],
      "finding": "not vulnerable",
      "id": "SWEET32",
      "severity": "OK"
     },
     {
      "cve": "CVE-2015-0204",
+     "cves": [
+      "CVE-2015-0204"
+     ],
      "finding": "not vulnerable",
      "id": "FREAK",
      "severity": "OK"
     },
     {
      "cve": "CVE-2016-0800",
+     "cves": [
+      "CVE-2016-0800",
+      "CVE-2016-0703"
+     ],
      "finding": "not vulnerable on this host and port",
      "id": "DROWN",
      "severity": "OK"
     },
     {
      "cve": "CVE-2016-0800",
+     "cves": [
+      "CVE-2016-0800",
+      "CVE-2016-0703"
+     ],
      "finding": "Make sure you don't use this certificate elsewhere with SSLv2 enabled services, see https://search.censys.io/search?resource=hosts&virtual_hosts=INCLUDE&q=F812127F2E2BD9533470DF2E404042FF5F581F693767B0E99FCBB978C2E59DF1",
      "id": "DROWN_hint",
      "severity": "INFO"
     },
     {
      "cve": "CVE-2015-4000",
+     "cves": [
+      "CVE-2015-4000"
+     ],
      "finding": "not vulnerable, no DH EXPORT ciphers,",
      "id": "LOGJAM",
      "severity": "OK"
     },
     {
      "cve": "CVE-2015-4000",
+     "cves": [
+      "CVE-2015-4000"
+     ],
      "finding": "no DH key with <= TLS 1.2",
      "id": "LOGJAM-common_primes",
      "severity": "OK"
     },
     {
      "cve": "CVE-2011-3389",
+     "cves": [
+      "CVE-2011-3389"
+     ],
      "finding": "ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-SHA AES128-SHA",
      "id": "BEAST_CBC_TLS1",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2011-3389",
+     "cves": [
+      "CVE-2011-3389"
+     ],
      "finding": "VULNERABLE -- but also supports higher protocols  TLSv1.1 TLSv1.2 (likely mitigated)",
      "id": "BEAST",
      "severity": "LOW"
     },
     {
      "cve": "CVE-2013-0169",
+     "cves": [
+      "CVE-2013-0169"
+     ],
      "finding": "potentially vulnerable, uses obsolete TLS CBC ciphers",
      "id": "LUCKY13",
      "severity": "LOW"
     },
     {
      "cve": "CVE-2014-6321",
+     "cves": [
+      "CVE-2014-6321"
+     ],
      "finding": "not vulnerable",
      "id": "winshock",
      "severity": "OK"
     },
     {
      "cve": "CVE-2013-2566",
+     "cves": [
+      "CVE-2013-2566",
+      "CVE-2015-2808"
+     ],
      "finding": "not vulnerable",
      "id": "RC4",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-android_70",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-android_81",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_90",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_X",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_11_12",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_13_14",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-android_15",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-chrome_101_win10",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-chromium_137_win11",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-firefox_100_win10",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-firefox_137_win11",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.0 ECDHE-RSA-AES256-SHA",
      "id": "clientsimulation-ie_8_win7",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-SHA384",
      "id": "clientsimulation-ie_11_win7",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-SHA384",
      "id": "clientsimulation-ie_11_win81",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES128-SHA256",
      "id": "clientsimulation-ie_11_winphone81",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-ie_11_win10",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-edge_15_win10",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-edge_101_win10_21h2",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-edge_133_win11_23h2",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-safari_184_ios_184",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-safari_154_osx_1231",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-safari_184_osx_154",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.0 ECDHE-RSA-AES128-SHA",
      "id": "clientsimulation-java_7u25",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-java_80442",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-java_1102",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-java_1703",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-java_2106",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-go_1178",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-libressl_336",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-openssl_102e",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-openssl_111d",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-openssl_315",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-openssl_350",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384",
      "id": "clientsimulation-apple_mail_16_0",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.3 TLS_AES_256_GCM_SHA384",
      "id": "clientsimulation-thunderbird_91_9",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "SSL Labs's 'SSL Server Rating Guide' (version 2009r from 2025-05-16)",
      "id": "rating_spec",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "https://github.com/ssllabs/research/wiki/SSL-Server-Rating-Guide",
      "id": "rating_doc",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "95",
      "id": "protocol_support_score",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "28",
      "id": "protocol_support_score_weighted",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "100",
      "id": "key_exchange_score",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "30",
      "id": "key_exchange_score_weighted",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "90",
      "id": "cipher_strength_score",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "36",
      "id": "cipher_strength_score_weighted",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "94",
      "id": "final_score",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "B",
      "id": "overall_grade",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Grade capped to B. TLS 1.1 offered",
      "id": "grade_cap_reason_1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Grade capped to B. TLS 1.0 offered",
      "id": "grade_cap_reason_2",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "76",
      "id": "scanTime",
      "severity": "INFO"
@@ -10111,17 +10559,17 @@
    ],
    "evidence": [
     {
-     "excerpt": "cloud.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=None",
+     "excerpt": "cloud.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.29/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "cloud.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=None",
+     "excerpt": "cloud.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.29/phase2/httpx_cloud.junkerwerk.de.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=True TLS1.1=True TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.0, TLS1.1, TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3",
      "ref": "scan_results:testssl:217.243.248.29",
      "tool": "testssl"
     },

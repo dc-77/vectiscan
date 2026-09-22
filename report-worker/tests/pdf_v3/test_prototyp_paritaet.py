@@ -58,6 +58,21 @@ ERLAUBT: tuple[tuple[str, str], ...] = (
     ("A.3 CVE-Referenzen", "A.3 fuehrt seit S5b zwei Faelle"),
     ("Schwachstellennummern, die in den Befunden zitiert werden",
      "neuer Vorspann zu A.3"),
+    # S6: Die Zeitstufen stehen jetzt in derselben Form wie die Dringlichkeit am
+    # Befund, damit A.1, Befundzeile und Plan nicht auseinanderlaufen
+    # (spec/08 Punkt 1).
+    ("Zeitstufen", "Zeitstufen kommen aus derselben Tabelle wie die Dringlichkeiten"),
+    # S6 (spec/08 Punkt 19): Empfehlungsstufe und Text liefen ohne Trenner
+    # ineinander ("MittelfristigDie Eintraege").
+    ("Empfehlung", "Empfehlungsstufe ist jetzt mit Doppelpunkt vom Text getrennt"),
+    # S6 (spec/08 Punkt 11): "Interne Referenz: Policy catalog_sim R-..." nennt
+    # Begriffe aus der Entstehung des Katalogs; jetzt steht dort die Regel.
+    ("Interne Referenz", "Referenzzeile nennt jetzt Pruefkatalog und Regel"),
+    ("Prüfkatalog", "Referenzzeile nennt jetzt Pruefkatalog und Regel"),
+    # S6 (Teil A Punkt 3): Das Impressum nennt Katalog- und Faktenversion
+    # statt der Severity-Policy; die alte Kette liefert sie nicht mehr.
+    ("Severity-Policy", "Impressum nennt jetzt Pruefkatalog und Faktenschema"),
+    ("Scan-Orders", "Impressum nennt jetzt Pruefkatalog und Faktenschema"),
 )
 
 

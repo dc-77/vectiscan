@@ -1311,7 +1311,7 @@
    "confidence": 0.8,
    "evidence": [
     {
-     "excerpt": "cms=NEOS cms_version=None cms_confidence=0.95",
+     "excerpt": "cms=NEOS cms_confidence=0.95",
      "ref": "hosts/217.72.203.132/phase1/tech_profile.json",
      "tool": "tech_profile"
     }
@@ -1503,7 +1503,7 @@
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -1553,7 +1553,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "dl.heuel.com: status=None title=None final_url=None",
+     "excerpt": "dl.heuel.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1570,7 +1570,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [
@@ -1584,7 +1585,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "edi.heuel.com: status=403 title=403 Forbidden final_url=https://edi.heuel.com",
+     "excerpt": "edi.heuel.com: status=403 titel=403 Forbidden final_url=https://edi.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1605,7 +1606,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1613,7 +1615,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "heuel.com: status=None title=None final_url=None",
+     "excerpt": "heuel.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1630,7 +1632,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1638,7 +1641,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "jobs.heuel.com: status=None title=None final_url=None",
+     "excerpt": "jobs.heuel.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1655,7 +1658,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1663,7 +1667,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mail.heuel.com: status=None title=None final_url=None",
+     "excerpt": "mail.heuel.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1680,7 +1684,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1688,7 +1693,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mails.heuel.com: status=None title=None final_url=None",
+     "excerpt": "mails.heuel.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1705,7 +1710,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1713,7 +1719,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "online.heuel.com: status=403 title=Just a moment... final_url=https://online.heuel.com",
+     "excerpt": "online.heuel.com: status=403 titel=Just a moment... final_url=https://online.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1734,7 +1740,8 @@
     "manufacturer": "Cloudflare Inc.",
     "name": "Cloudflare"
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1742,7 +1749,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "ose.heuel.com: status=200 title=Redirector final_url=https://ose.heuel.com",
+     "excerpt": "ose.heuel.com: status=200 titel=Redirector final_url=https://ose.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1763,7 +1770,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1771,7 +1779,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "smtp.heuel.com: status=None title=None final_url=None",
+     "excerpt": "smtp.heuel.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1788,7 +1796,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1796,7 +1805,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "webportal.heuel.com: status=None title=None final_url=None",
+     "excerpt": "webportal.heuel.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1813,7 +1822,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1821,7 +1831,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "webportal.heuel.com: status=None title=None final_url=None",
+     "excerpt": "webportal.heuel.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1838,7 +1848,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [
@@ -1857,7 +1868,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.heuel.com: status=200 title=Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS final_url=https://www.heuel.com",
+     "excerpt": "www.heuel.com: status=200 titel=Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS final_url=https://www.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1878,7 +1889,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -1919,7 +1931,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=104.16.10.6 rdns= fqdns=online.heuel.com",
+     "excerpt": "ip=104.16.10.6 fqdns=online.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -1965,7 +1977,7 @@
    "edge_ips": [],
    "evidence": [
     {
-     "excerpt": "ip=195.225.241.75 rdns= fqdns=mails.heuel.com,smtp.heuel.com",
+     "excerpt": "ip=195.225.241.75 fqdns=mails.heuel.com, smtp.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -2017,7 +2029,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=20.79.218.75 rdns= fqdns=edi.heuel.com,ose.heuel.com,mail.heuel.com",
+     "excerpt": "ip=20.79.218.75 fqdns=edi.heuel.com, ose.heuel.com, mail.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -2065,7 +2077,7 @@
    "edge_ips": [],
    "evidence": [
     {
-     "excerpt": "ip=213.133.104.51 rdns=www51.your-server.de fqdns=dl.heuel.com,webportal.heuel.com",
+     "excerpt": "ip=213.133.104.51 rdns=www51.your-server.de fqdns=dl.heuel.com, webportal.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -2117,7 +2129,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=217.72.203.132 rdns=ip217-72-203-132.pbiaas.com fqdns=heuel.com,www.heuel.com,jobs.heuel.com",
+     "excerpt": "ip=217.72.203.132 rdns=ip217-72-203-132.pbiaas.com fqdns=heuel.com, www.heuel.com, jobs.heuel.com",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -2241,12 +2253,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "edi.heuel.com: reachable=None score=0/7 server=Apache x-feserver=None",
+     "excerpt": "edi.heuel.com: score=0/7 server=Apache",
      "ref": "scan_results:header_check:20.79.218.75",
      "tool": "header_check"
     },
     {
-     "excerpt": "edi.heuel.com: status=403 title=403 Forbidden webserver=Apache tech=['Apache HTTP Server']",
+     "excerpt": "edi.heuel.com: status=403 titel=403 Forbidden webserver=Apache tech=Apache HTTP Server",
      "ref": "hosts/20.79.218.75/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -2461,12 +2473,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "online.heuel.com: reachable=None score=5/7 server=cloudflare x-feserver=None",
+     "excerpt": "online.heuel.com: score=5/7 server=cloudflare",
      "ref": "scan_results:header_check:104.16.10.6",
      "tool": "header_check"
     },
     {
-     "excerpt": "online.heuel.com: status=403 title=Just a moment... webserver=cloudflare tech=['Cloudflare', 'Cloudflare Bot Management']",
+     "excerpt": "online.heuel.com: status=403 titel=Just a moment... webserver=cloudflare tech=Cloudflare, Cloudflare Bot Management",
      "ref": "hosts/104.16.10.6/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -2876,12 +2888,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "ose.heuel.com: reachable=None score=0/7 server=Apache x-feserver=None",
+     "excerpt": "ose.heuel.com: score=0/7 server=Apache",
      "ref": "scan_results:header_check:20.79.218.75",
      "tool": "header_check"
     },
     {
-     "excerpt": "ose.heuel.com: status=200 title=Redirector webserver=Apache tech=['Apache HTTP Server']",
+     "excerpt": "ose.heuel.com: status=200 titel=Redirector webserver=Apache tech=Apache HTTP Server",
      "ref": "hosts/20.79.218.75/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -3149,12 +3161,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.heuel.com: reachable=None score=7/7 server=None x-feserver=None",
+     "excerpt": "www.heuel.com: score=7/7",
      "ref": "scan_results:header_check:217.72.203.132",
      "tool": "header_check"
     },
     {
-     "excerpt": "www.heuel.com: status=200 title=Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS webserver=None tech=['HSTS', 'Neos CMS', 'Neos Flow:neos', 'PHP']",
+     "excerpt": "www.heuel.com: status=200 titel=Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS tech=HSTS, Neos CMS, Neos Flow:neos, PHP",
      "ref": "hosts/217.72.203.132/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -3283,7 +3295,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:80 | HTTP/1.1 301 Moved Permanently Date: Thu, 21 May 2026 05:22:09 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Location: https://connec...",
+     "excerpt": "104.16.10.6:80 banner=HTTP/1.1 301 Moved Permanently Date: Thu, 21 May 2026 05:22:09 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Location: https://c...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3310,7 +3322,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:443 CloudFlare | HTTP/1.1 403 Forbidden Server: cloudflare Date: Wed, 20 May 2026 18:38:37 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fed759d2913164...",
+     "excerpt": "104.16.10.6:443 CloudFlare banner=HTTP/1.1 403 Forbidden Server: cloudflare Date: Wed, 20 May 2026 18:38:37 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fed759d29...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3337,7 +3349,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:2052 | HTTP/1.1 403 Forbidden Date: Thu, 07 May 2026 06:22:06 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "excerpt": "104.16.10.6:2052 banner=HTTP/1.1 403 Forbidden Date: Thu, 07 May 2026 06:22:06 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3364,7 +3376,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:2053 | HTTP/1.1 400 Bad Request Server: cloudflare Date: Sun, 03 May 2026 18:44:05 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
+     "excerpt": "104.16.10.6:2053 banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Sun, 03 May 2026 18:44:05 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3391,7 +3403,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:2082 | HTTP/1.1 403 Forbidden Date: Tue, 19 May 2026 03:17:28 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "excerpt": "104.16.10.6:2082 banner=HTTP/1.1 403 Forbidden Date: Tue, 19 May 2026 03:17:28 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3418,7 +3430,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:2083 | HTTP/1.1 403 Forbidden Server: cloudflare Date: Fri, 08 May 2026 15:43:36 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9f8994bfea41cf26-SJC",
+     "excerpt": "104.16.10.6:2083 banner=HTTP/1.1 403 Forbidden Server: cloudflare Date: Fri, 08 May 2026 15:43:36 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9f8994bfea41cf26-SJC",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3445,7 +3457,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:2086 | HTTP/1.1 403 Forbidden Date: Fri, 15 May 2026 16:09:06 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "excerpt": "104.16.10.6:2086 banner=HTTP/1.1 403 Forbidden Date: Fri, 15 May 2026 16:09:06 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3472,7 +3484,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:2087 | HTTP/1.1 403 Forbidden Server: cloudflare Date: Tue, 19 May 2026 14:22:30 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fe3c10efe852cb6-DFW",
+     "excerpt": "104.16.10.6:2087 banner=HTTP/1.1 403 Forbidden Server: cloudflare Date: Tue, 19 May 2026 14:22:30 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fe3c10efe852cb6-DFW",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3499,7 +3511,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:2095 | HTTP/1.1 403 Forbidden Date: Sat, 09 May 2026 15:15:42 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "excerpt": "104.16.10.6:2095 banner=HTTP/1.1 403 Forbidden Date: Sat, 09 May 2026 15:15:42 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3526,7 +3538,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:2096 | HTTP/1.1 400 Bad Request Server: cloudflare Date: Tue, 21 Apr 2026 22:47:15 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
+     "excerpt": "104.16.10.6:2096 banner=HTTP/1.1 400 Bad Request Server: cloudflare Date: Tue, 21 Apr 2026 22:47:15 GMT Content-Type: text/html Content-Length: 655 Connection: close CF-RAY: -",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3553,7 +3565,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:6443 | HTTP/1.1 400 Bad Request Server: cloudflare-nginx Date: Mon, 11 May 2026 17:47:14 GMT Content-Type: text/html Content-Length: 659 Connection: close CF-Bck-Ctrl-1: {\"ob_enable\":fa...",
+     "excerpt": "104.16.10.6:6443 banner=HTTP/1.1 400 Bad Request Server: cloudflare-nginx Date: Mon, 11 May 2026 17:47:14 GMT Content-Type: text/html Content-Length: 659 Connection: close CF-Bck-Ctrl-1: {\"ob_enabl...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3580,7 +3592,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:8080 | HTTP/1.1 403 Forbidden Date: Fri, 15 May 2026 18:54:45 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "excerpt": "104.16.10.6:8080 banner=HTTP/1.1 403 Forbidden Date: Fri, 15 May 2026 18:54:45 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3607,7 +3619,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:8443 CloudFlare | HTTP/1.1 403 Forbidden Server: cloudflare Date: Tue, 19 May 2026 15:45:35 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fe43ac3cb7165...",
+     "excerpt": "104.16.10.6:8443 CloudFlare banner=HTTP/1.1 403 Forbidden Server: cloudflare Date: Tue, 19 May 2026 15:45:35 GMT Content-Type: text/html Content-Length: 553 Connection: keep-alive CF-RAY: 9fe43ac3c...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3634,7 +3646,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "104.16.10.6:8880 | HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 07:57:23 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=0, no...",
+     "excerpt": "104.16.10.6:8880 banner=HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 07:57:23 GMT Content-Type: text/plain; charset=UTF-8 Content-Length: 16 Connection: keep-alive Cache-Control: private, max-age=...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3661,7 +3673,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "20.79.218.75:21 |",
+     "excerpt": "20.79.218.75:21",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3688,7 +3700,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "20.79.218.75:80 Apache httpd | HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 16:24:39 GMT Server: Apache Content-Length: 199 Content-Type: text/html; charset=iso-8859-1",
+     "excerpt": "20.79.218.75:80 Apache httpd banner=HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 16:24:39 GMT Server: Apache Content-Length: 199 Content-Type: text/html; charset=iso-8859-1",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3715,7 +3727,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "20.79.218.75:443 Apache httpd | HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 17:56:58 GMT Server: Apache Content-Length: 199 Content-Type: text/html; charset=iso-8859-1",
+     "excerpt": "20.79.218.75:443 Apache httpd banner=HTTP/1.1 403 Forbidden Date: Wed, 20 May 2026 17:56:58 GMT Server: Apache Content-Length: 199 Content-Type: text/html; charset=iso-8859-1",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3742,7 +3754,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "20.79.218.75:8443 |",
+     "excerpt": "20.79.218.75:8443",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3769,7 +3781,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:21 | 220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG en-US.UTF-8*;...",
+     "excerpt": "213.133.104.51:21 banner=220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG en-US.UT...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3797,7 +3809,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:22 | SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIOt4sVSHnRSmtSKCFzy6xD/KQUJa77JAkdOYWkUo9Sce Fingerprint: 27:50:8d:df:37:cf:cb:4e:e8:c1:de:b7:b7:28:ac:f9 Kex...",
+     "excerpt": "213.133.104.51:22 banner=SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIOt4sVSHnRSmtSKCFzy6xD/KQUJa77JAkdOYWkUo9Sce Fingerprint: 27:50:8d:df:37:cf:cb:4e:e8:c1:de:b7:b7:28:ac:f...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3825,7 +3837,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:25 | 220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello 224.194.174.161 [224.194.174.161] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250-PI...",
+     "excerpt": "213.133.104.51:25 banner=220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello 224.194.174.161 [224.194.174.161] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 2...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3853,7 +3865,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:80 Apache httpd | HTTP/1.1 404 Not Found Date: Thu, 21 May 2026 15:40:11 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 300 Content-Type: text/html; ch...",
+     "excerpt": "213.133.104.51:80 Apache httpd banner=HTTP/1.1 404 Not Found Date: Thu, 21 May 2026 15:40:11 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 300 Content-Type: text/htm...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3881,7 +3893,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:110 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+     "excerpt": "213.133.104.51:110 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3909,7 +3921,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE I...",
+     "excerpt": "213.133.104.51:143 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENA...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3937,7 +3949,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:443 Apache httpd | HTTP/1.1 404 Not Found Date: Thu, 21 May 2026 14:31:03 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 301 Content-Type: text/html; c...",
+     "excerpt": "213.133.104.51:443 Apache httpd banner=HTTP/1.1 404 Not Found Date: Thu, 21 May 2026 14:31:03 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 301 Content-Type: text/ht...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3965,7 +3977,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:465 | 220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello oki38c1unrwmsj.net [224.56.21.82] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250-P...",
+     "excerpt": "213.133.104.51:465 banner=220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello oki38c1unrwmsj.net [224.56.21.82] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3993,7 +4005,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:587 | 220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello iic9vjkeug3hw.net [224.197.126.208] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250...",
+     "excerpt": "213.133.104.51:587 banner=220 www51.your-server.de Exim ESMTP Service ready 250-www51.your-server.de Hello iic9vjkeug3hw.net [224.197.126.208] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELININ...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -4021,7 +4033,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+...",
+     "excerpt": "213.133.104.51:993 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LIT...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -4049,7 +4061,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "213.133.104.51:995 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+     "excerpt": "213.133.104.51:995 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -4077,7 +4089,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.72.203.132:80 | HTTP/1.1 404 Not Found Date: Wed, 20 May 2026 17:03:04 GMT Content-Type: text/html Content-Length: 548 Connection: keep-alive Content-Security-Policy: default-src 'self' https:/...",
+     "excerpt": "217.72.203.132:80 banner=HTTP/1.1 404 Not Found Date: Wed, 20 May 2026 17:03:04 GMT Content-Type: text/html Content-Length: 548 Connection: keep-alive Content-Security-Policy: default-src 'self' ht...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -4104,7 +4116,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.72.203.132:443 | HTTP/1.1 404 Not Found Date: Wed, 20 May 2026 18:25:50 GMT Content-Type: text/html Content-Length: 548 Connection: keep-alive Content-Security-Policy: default-src 'self' https:...",
+     "excerpt": "217.72.203.132:443 banner=HTTP/1.1 404 Not Found Date: Wed, 20 May 2026 18:25:50 GMT Content-Type: text/html Content-Length: 548 Connection: keep-alive Content-Security-Policy: default-src 'self' h...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -4131,7 +4143,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "2a01:4f8:d0a:2757::2:80 Apache httpd | HTTP/1.1 400 Bad Request Date: Fri, 15 May 2026 18:53:29 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 335 Connection: close C...",
+     "excerpt": "2a01:4f8:d0a:2757::2:80 Apache httpd banner=HTTP/1.1 400 Bad Request Date: Fri, 15 May 2026 18:53:29 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Content-Length: 335 Connection: cl...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -4159,7 +4171,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "2a01:4f8:d0a:2757::2:443 Apache httpd | HTTP/1.1 200 OK Date: Fri, 08 May 2026 22:25:19 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Upgrade: h2 Connection: Upgrade Transfer-Encodi...",
+     "excerpt": "2a01:4f8:d0a:2757::2:443 Apache httpd banner=HTTP/1.1 200 OK Date: Fri, 08 May 2026 22:25:19 GMT Server: Apache X-Robots-Tag: noindex, nofollow, noarchive Upgrade: h2 Connection: Upgrade Transfer-E...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -4194,7 +4206,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-05-21T23:50:35.471914+00:00 finishedAt=2026-05-22T00:11:37.114579+00:00",
+    "excerpt": "Beginn=2026-05-21T23:50:35.471914+00:00 Ende=2026-05-22T00:11:37.114579+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -4258,7 +4270,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -5625,7 +5637,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "online.heuel.com:443 tls=tls13 cn=online.heuel.com not_after=2026-08-08T03:15:32Z mismatched=None",
+     "excerpt": "online.heuel.com:443 tls=tls13 cn=online.heuel.com gueltig_bis=2026-08-08T03:15:32Z",
      "ref": "hosts/104.16.10.6/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5673,7 +5685,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "edi.heuel.com:443 tls=tls12 cn=*.heuel.com not_after=2027-04-14T14:45:26Z mismatched=None",
+     "excerpt": "edi.heuel.com:443 tls=tls12 cn=*.heuel.com gueltig_bis=2027-04-14T14:45:26Z",
      "ref": "hosts/20.79.218.75/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5720,7 +5732,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "www.heuel.com:443 tls=tls13 cn=www.heuel.com not_after=2026-07-17T05:21:39Z mismatched=None",
+     "excerpt": "www.heuel.com:443 tls=tls13 cn=www.heuel.com gueltig_bis=2026-07-17T05:21:39Z",
      "ref": "hosts/217.72.203.132/phase2/httpx.json",
      "tool": "httpx"
     }

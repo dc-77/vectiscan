@@ -20,6 +20,9 @@ PLACEHOLDER = re.compile(r"\{.*?\}|\[Hinweis")
 VERSION_IN_TOOL = re.compile(r"\d+\.\d+")
 CVE_WITH_SCORE = re.compile(r"(CVE-\d{4}-\d+).*?Basiswert (\d+(?:\.\d+)?)")
 CVE_ANY = re.compile(r"(CVE-\d{4}-\d+)")
+# None, True, False als eigenstaendiges Wort oder eine Liste in eckigen
+# Klammern: alles Spuren einer f-String-Formatierung ueber Python-Werte.
+PYTHON_REPR = re.compile(r"(?<![\w-])(None|True|False)(?![\w-])|\['|\[\"")
 
 
 class Befund(NamedTuple):
@@ -69,7 +72,10 @@ def check_report_data_detailed(data: ReportData | dict) -> list[Befund]:
 
     # Fremdwerte: jede zitierte CVE braucht einen Eintrag in Anhang A.3, mit gleichem
     # Score und einem Rueckverweis auf genau diesen Befund.
-    refs = {c.cve: c for c in d.appendix.cve_refs}
+    # Eine Zeile in A.3 kann mehrere Kennungen desselben testssl-Tests tragen
+    # (S6, spec/08 Punkt 18); jede davon muss den Befund wiederfinden.
+    refs = {teil.strip(): c for c in d.appendix.cve_refs
+            for teil in c.cve.split(",") if teil.strip()}
     for f in d.findings:
         for cited in (f.threat.cves if f.threat else []):
             match = CVE_ANY.search(cited)
@@ -94,6 +100,16 @@ def check_report_data_detailed(data: ReportData | dict) -> list[Befund]:
     missing = set(ids) - plan_refs
     if missing:
         add("befund_ohne_massnahme", f"Befunde ohne Massnahme: {sorted(missing)}")
+
+    # S6 (spec/08 Punkt 3): Python-Darstellungen gehoeren nicht in den
+    # Kundentext. Sie entstanden in den Nachweiszeilen der Faktenschicht
+    # ("x-feserver=None", "reachable=True", "dkim=False") und waren im PDF
+    # sichtbar.
+    for f in d.findings:
+        treffer = PYTHON_REPR.search(f.evidence or "")
+        if treffer:
+            add("nachweis_python_darstellung",
+                f"Python-Darstellung im Nachweis von {f.id}: {treffer.group(0)}", f.id)
 
     for tool in d.appendix.tools:
         if VERSION_IN_TOOL.search(tool.t):

@@ -1232,12 +1232,12 @@
    "domain": "dortmund-beach.com",
    "evidence": [
     {
-     "excerpt": "spf=v=spf1 a mx ip4:78.46.161.114 ~all dmarc=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; dkim=False mx=['out', 'mail1.spacekoelnsrv1.de']",
+     "excerpt": "spf=v=spf1 a mx ip4:78.46.161.114 ~all dmarc=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; dkim=nein mx=out, mail1.spacekoelnsrv1.de",
      "ref": "phase0/dns_records.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -1285,7 +1285,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "*.dortmund-beach.com: status=None title=None final_url=None",
+     "excerpt": "*.dortmund-beach.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1302,7 +1302,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": true
   },
   {
    "aliases": [
@@ -1316,7 +1317,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "dortmund-beach.com: status=200 title=Dortmund Beach Design | Webdesign | Corporate Design final_url=https://dortmund-beach.com",
+     "excerpt": "dortmund-beach.com: status=200 titel=Dortmund Beach Design | Webdesign | Corporate Design final_url=https://dortmund-beach.com",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1337,7 +1338,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1345,7 +1347,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "pflege.dortmund-beach.com: status=None title=None final_url=None",
+     "excerpt": "pflege.dortmund-beach.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1362,7 +1364,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1370,7 +1373,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.dortmund-beach.com: status=None title=None final_url=None",
+     "excerpt": "www.dortmund-beach.com:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1387,7 +1390,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -1428,7 +1432,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=88.99.35.112 rdns=vsrv2.spacekoeln.de fqdns=dortmund-beach.com,www.dortmund-beach.com,*.dortmund-beach.com,pflege.dortmund-beach.com",
+     "excerpt": "ip=88.99.35.112 rdns=vsrv2.spacekoeln.de fqdns=dortmund-beach.com, www.dortmund-beach.com, *.dortmund-beach.com, pflege.dortmund-beach.com",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -1797,12 +1801,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "dortmund-beach.com: reachable=True score=1/7 server=Apache/2.4.67 (Debian) x-feserver=None",
+     "excerpt": "dortmund-beach.com: erreichbar=ja score=1/7 server=Apache/2.4.67 (Debian)",
      "ref": "scan_results:header_check:88.99.35.112",
      "tool": "header_check"
     },
     {
-     "excerpt": "dortmund-beach.com: status=200 title=Dortmund Beach Design | Webdesign | Corporate Design webserver=Apache/2.4.67 (Debian) tech=['Apache HTTP Server:2.4.67', 'BeTheme:27.4.5', 'Burst', 'Complianz', 'Debian', 'Google Analytics', 'HSTS', '...",
+     "excerpt": "dortmund-beach.com: status=200 titel=Dortmund Beach Design | Webdesign | Corporate Design webserver=Apache/2.4.67 (Debian) tech=Apache HTTP Server:2.4.67, BeTheme:27.4.5, Burst, Complianz, Debian, Google Analytics, HSTS, MySQL, PHP, Slid...",
      "ref": "hosts/88.99.35.112/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -1993,7 +1997,7 @@
    "domain": "dortmund-beach.com",
    "evidence": [
     {
-     "excerpt": "{'a_records': ['88.99.35.112'], 'mx_records': ['mail1.spacekoelnsrv1.de'], 'ns_records': ['z.ns.joker.com', 'y.ns.joker.com', 'x.ns.joker.com'], 'txt_records': ['v=spf1 a mx ip4:78.46.161.114 ~all'...",
+     "excerpt": "a_records=88.99.35.112 mx_records=mail1.spacekoelnsrv1.de ns_records=z.ns.joker.com, y.ns.joker.com, x.ns.joker.com txt_records=v=spf1 a mx ip4:78.46.161.114 ~all, facebook-domain-verification=vo0o...",
      "ref": "phase0a/securitytrails.json",
      "tool": "securitytrails"
     }
@@ -2018,7 +2022,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:21 Pure-FTPd | 220---------- Welcome to Pure-FTPd [privsep] [TLS] ---------- 220-You are user number 1 of 50 allowed. 220-Local time is now 16:19. Server port: 21. 220-This is a privat...",
+     "excerpt": "88.99.35.112:21 Pure-FTPd banner=220---------- Welcome to Pure-FTPd [privsep] [TLS] ---------- 220-You are user number 1 of 50 allowed. 220-Local time is now 16:19. Server port: 21. 220-This is a p...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2045,7 +2049,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:25 Postfix smtpd | 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-A...",
+     "excerpt": "88.99.35.112:25 Postfix smtpd banner=220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2072,7 +2076,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:80 Apache httpd 2.4.67 | HTTP/1.1 301 Moved Permanently Date: Wed, 09 Sep 2026 16:18:34 GMT Server: Apache/2.4.67 (Debian) Location: https://vsrv2.spacekoeln.de/ Content-Length: 354 Co...",
+     "excerpt": "88.99.35.112:80 Apache httpd 2.4.67 banner=HTTP/1.1 301 Moved Permanently Date: Wed, 09 Sep 2026 16:18:34 GMT Server: Apache/2.4.67 (Debian) Location: https://vsrv2.spacekoeln.de/ Content-Length: 3...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2099,7 +2103,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:110 | +OK Dovecot (Debian) ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN .",
+     "excerpt": "88.99.35.112:110 banner=+OK Dovecot (Debian) ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2126,7 +2130,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN] Dovecot (Debian) ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS...",
+     "excerpt": "88.99.35.112:143 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN] Dovecot (Debian) ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFER...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2153,7 +2157,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:443 Apache httpd 2.4.67 | HTTP/1.1 200 OK Date: Mon, 14 Sep 2026 13:59:48 GMT Server: Apache/2.4.67 (Debian) Cache-Control: no-store, no-cache, must-revalidate Pragma: no-cache Expires...",
+     "excerpt": "88.99.35.112:443 Apache httpd 2.4.67 banner=HTTP/1.1 200 OK Date: Mon, 14 Sep 2026 13:59:48 GMT Server: Apache/2.4.67 (Debian) Cache-Control: no-store, no-cache, must-revalidate Pragma: no-cache Ex...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2180,7 +2184,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:465 Postfix smtpd | 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LO...",
+     "excerpt": "88.99.35.112:465 Postfix smtpd banner=220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-AUTH PLAIN LOGIN 250-AUTH=PLA...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2207,7 +2211,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:587 Postfix smtpd | 220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-...",
+     "excerpt": "88.99.35.112:587 Postfix smtpd banner=220 vsrv2.spacekoeln.de ESMTP Postfix (Debian/GNU) 250-vsrv2.spacekoeln.de 250-PIPELINING 250-SIZE 52428800 250-VRFY 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2234,7 +2238,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN AUTH=LOGIN] Dovecot (Debian) ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE...",
+     "excerpt": "88.99.35.112:993 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN AUTH=LOGIN] Dovecot (Debian) ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID E...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2261,7 +2265,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "88.99.35.112:995 | +OK Dovecot (Debian) ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN .",
+     "excerpt": "88.99.35.112:995 banner=+OK Dovecot (Debian) ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -2322,7 +2326,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-09-17T22:41:25.187307+00:00 finishedAt=2026-09-17T23:09:08.665930+00:00",
+    "excerpt": "Beginn=2026-09-17T22:41:25.187307+00:00 Ende=2026-09-17T23:09:08.665930+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -2386,7 +2390,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -4374,12 +4378,16 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "misconfiguration, specified not a number for max-age",
      "id": "HSTS_time",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "potentially VULNERABLE, gzip HTTP compression detected  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "MEDIUM"
@@ -4387,12 +4395,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "dortmund-beach.com:443 tls=tls12 cn=dortmund-beach.com not_after=2026-10-30T21:06:36Z mismatched=None",
+     "excerpt": "dortmund-beach.com:443 tls=tls12 cn=dortmund-beach.com gueltig_bis=2026-10-30T21:06:36Z",
      "ref": "hosts/88.99.35.112/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False",
+     "excerpt": "angeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3",
      "ref": "scan_results:testssl:88.99.35.112",
      "tool": "testssl"
     },

@@ -101,7 +101,12 @@ def test_fail_gewinnt_ueber_not_testable():
     ]}, coverage_default="ok")
     r = _one(run_check("tls_legacy_protocols", facts), "a.example.test@10.0.0.1")
     assert r.status == "fail" and r.affected == ["a.example.test:443 (TLS 1.0)"]
-    assert r.evidence == []  # Fixture ohne evidence
+    # S6: Der Nachweis kommt aus dem getroffenen Teilobjekt, nicht aus der
+    # Evidenzliste des Fakts. Ein Fixture ohne evidence traegt deshalb jetzt
+    # trotzdem eine Zeile, und sie nennt genau das, was die Regel gesehen hat.
+    assert len(r.evidence) == 1
+    assert r.evidence[0].tool == "testssl"
+    assert "TLS1.0" in r.evidence[0].excerpt
 
 
 def test_evidence_wird_uebernommen():

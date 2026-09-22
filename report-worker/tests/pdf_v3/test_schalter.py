@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 
+from reporter import engine as E
 from reporter.pdf.v3.pipeline import DEBUG_BUCKET, DEBUG_PREFIX, report_data_from_source
 from reporter.v3.models import ReportData
 from tests.pdf_v3.conftest import JUNKERWERK_MULTI, REPORT_WORKER
@@ -30,13 +31,76 @@ nur_im_repo = pytest.mark.skipif(not (REPO / "docker-compose.yml").exists(),
                                  reason="Repo-Wurzel fehlt (Lauf im Abbild)")
 
 
+def test_ohne_env_gilt_katalog_v3_und_strict(monkeypatch):
+    """S6: Der Katalogweg ist die Vorgabe, nicht mehr ein Opt-in.
+
+    Bis S6 stand hier das Gegenteil: Code-Vorgabe v1, Compose-Vorgabe v2, Gate
+    warn. Wer eine dieser Zeilen aendert, aendert, was beim Kunden ankommt, und
+    soll hier vorbeikommen.
+    """
+    for name in ("VECTISCAN_REPORT_ENGINE", "VECTISCAN_REPORT_LAYOUT",
+                 "VECTISCAN_VALIDATION_LEVEL"):
+        monkeypatch.delenv(name, raising=False)
+    assert E.engine() == "catalog"
+    assert E.layout() == "v3"
+    assert E.validation_level() == "strict"
+    assert E.resolve() == ("catalog", "v3")
+    assert E.uses_catalog() is True
+
+
+def test_legacy_bleibt_eine_release_lang_erreichbar(monkeypatch):
+    monkeypatch.setenv("VECTISCAN_REPORT_ENGINE", "legacy")
+    monkeypatch.setenv("VECTISCAN_REPORT_LAYOUT", "v2")
+    assert E.resolve() == ("legacy", "v2")
+    assert E.uses_catalog() is False
+    # Der Weg aus S4 und S5 (alte Kette, v3-Renderer) bleibt fuer Vergleichslaeufe.
+    monkeypatch.setenv("VECTISCAN_REPORT_LAYOUT", "v3")
+    assert E.resolve() == ("legacy", "v3")
+
+
+def test_katalog_mit_altem_renderer_faellt_laut(monkeypatch):
+    """Der v2-Renderer liest das Datenmodell der alten Kette; unter catalog gibt es das nicht."""
+    monkeypatch.setenv("VECTISCAN_REPORT_ENGINE", "catalog")
+    for layout in ("v2", "v1"):
+        monkeypatch.setenv("VECTISCAN_REPORT_LAYOUT", layout)
+        with pytest.raises(E.EngineConfigError):
+            E.resolve()
+
+
+def test_tippfehler_ist_ein_fehler_kein_rueckfall(monkeypatch):
+    monkeypatch.setenv("VECTISCAN_REPORT_ENGINE", "ctalog")
+    with pytest.raises(E.EngineConfigError):
+        E.engine()
+    monkeypatch.setenv("VECTISCAN_REPORT_ENGINE", "catalog")
+    monkeypatch.setenv("VECTISCAN_VALIDATION_LEVEL", "strikt")
+    with pytest.raises(E.EngineConfigError):
+        E.validation_level()
+
+
 @nur_im_repo
-def test_vorgabewerte_bleiben_wie_sie_waren():
-    """v3 ist ein Opt-in. Code-Vorgabe v1, Compose-Vorgabe v2, beides unveraendert."""
-    os.environ.pop("VECTISCAN_REPORT_LAYOUT", None)
-    assert os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower() == "v1"
+def test_deploy_konfiguration_traegt_dieselben_vorgaben():
     compose = (REPO / "docker-compose.yml").read_text(encoding="utf-8")
-    assert "VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v2}" in compose
+    assert "VECTISCAN_REPORT_ENGINE: ${VECTISCAN_REPORT_ENGINE:-catalog}" in compose
+    assert "VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v3}" in compose
+    assert "VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-strict}" in compose
+    ci = (REPO / ".gitlab-ci.yml").read_text(encoding="utf-8")
+    # Ohne die Zeilen im .env haengt die Produktion still am Compose-Default und
+    # ein Rueckweg braucht eine Compose-Aenderung.
+    assert "VECTISCAN_REPORT_ENGINE=${VECTISCAN_REPORT_ENGINE:-catalog}" in ci
+    assert "VECTISCAN_REPORT_LAYOUT=${VECTISCAN_REPORT_LAYOUT:-v3}" in ci
+    assert "VECTISCAN_VALIDATION_LEVEL=${VECTISCAN_VALIDATION_LEVEL:-strict}" in ci
+    vorlage = (REPO / ".env.template").read_text(encoding="utf-8")
+    assert "VECTISCAN_REPORT_ENGINE=catalog" in vorlage
+    assert "VECTISCAN_VALIDATION_LEVEL=strict" in vorlage
+
+
+@nur_im_repo
+def test_die_alte_kette_laeuft_nicht_mehr_im_katalogweg():
+    """Teil A Punkt 2: KI#5 und die Reparaturkette gehoeren in den legacy-Zweig."""
+    assert "if not uses_legacy:" in WORKER
+    # call_claude darf nur noch unter legacy erreichbar sein.
+    vor_der_verzweigung = WORKER[:WORKER.index("if not uses_legacy:")]
+    assert "call_claude(" not in vor_der_verzweigung
 
 
 def test_worker_kennt_den_v3_zweig():
@@ -109,8 +173,10 @@ def test_ops_job_ist_in_der_pipeline_hinterlegt():
     assert "ops-render-v3:" in ci
     assert "test-report-worker-pdf:" in ci
     assert "VECTISCAN_REQUIRE_WEASYPRINT" in ci
-    # Der Abbild-Job muss den Marker abwaehlen, sonst faellt test_font_constants dort.
-    assert "not reportlab_fallback" in ci
+    # S6: Der Marker reportlab_fallback ist weg, samt dem Test, den er abwaehlte.
+    # Bleibt die Abwahl in der Pipeline stehen, laeuft pytest mit einem
+    # unbekannten Marker und meldet nur eine Warnung.
+    assert "reportlab_fallback" not in ci
 
 
 @nur_im_repo

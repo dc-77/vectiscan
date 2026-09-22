@@ -111,8 +111,32 @@ def test_jeder_positivbefund_ist_abgedeckt(p_id, mapping):
     entry = mapping["positives"][p_id]
     leitpruefung = entry["checks"][0]
     treffer = [s for s in _positive_checks(JUNKERWERK["multi"]) if leitpruefung in s]
+    unterdrueckt = mapping.get("positives_unterdrueckt", {}).get(p_id)
+    if unterdrueckt:
+        # S6, spec/08 Punkt 7: nicht pruefbar zaehlt nicht als bestanden. Der
+        # Positivbefund darf hier nicht stehen, und der Grund muss in den Daten
+        # belegbar sein; sonst waere die Unterdrueckung nur eine Behauptung.
+        assert not treffer, (
+            f"{p_id}: Positivbefund wieder da, obwohl als unterdrueckt gefuehrt. "
+            f"Wenn das gewollt ist, Eintrag in expected_map.json entfernen.")
+        _belege_unterdrueckung(p_id, unterdrueckt)
+        return
     assert treffer, f"{p_id}: kein Positivbefund v3 enthaelt {leitpruefung}"
     assert len(treffer) == 1, f"{p_id}: {leitpruefung} in mehreren Positivbefunden"
+
+
+def _belege_unterdrueckung(p_id: str, eintrag: dict) -> None:
+    """Der genannte Grund muss als nicht pruefbare Gruppe in den Daten stehen."""
+    output = output_for(JUNKERWERK["multi"])
+    bundle_of = {m: b.id for b in output.bundles for m in b.members}
+    owner = eintrag["bundle"]
+    gefunden = {r.reason_code for r in output.results
+                if r.kind == "check" and r.status == "not_testable"
+                and (bundle_of.get(r.check_id) or r.check_id) == owner}
+    fehlend = [c for c in eintrag["reason_codes"] if c not in gefunden]
+    assert not fehlend, (
+        f"{p_id}: Gruende {fehlend} stehen nicht mehr in den Fakten; "
+        f"vorhanden sind {sorted(gefunden)}")
 
 
 def test_kein_fehlgeschlagener_check_verschwindet():

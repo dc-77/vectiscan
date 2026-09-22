@@ -62,7 +62,10 @@ def test_pflichtteile_des_berichts_sind_gefuellt(order_id):
 def test_ohne_fremdwert_kein_cve_zitat(order_id):
     """Anhang A.3 fuehrt nur Fremdwerte; ein Befund zitiert nur, was dort steht."""
     data = data_for(order_id)
-    bekannt = {c.cve for c in data.appendix.cve_refs}
+    # Eine Zeile in A.3 kann seit S6 mehrere Kennungen desselben testssl-Tests
+    # tragen (spec/08 Punkt 18).
+    bekannt = {teil.strip() for c in data.appendix.cve_refs
+               for teil in c.cve.split(",") if teil.strip()}
     for finding in data.findings:
         for cited in (finding.threat.cves if finding.threat else []):
             assert any(cve in cited for cve in bekannt), f"{finding.id}: {cited}"

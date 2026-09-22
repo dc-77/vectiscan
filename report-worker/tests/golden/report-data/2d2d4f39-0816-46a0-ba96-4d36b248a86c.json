@@ -3,15 +3,15 @@
   "cve_refs": [
    {
     "cve": "CVE-2011-3389",
-    "name": "",
+    "name": "BEAST (CBC in TLS 1.0)",
     "note": "Werkzeugbefund, keine Fremdbewertung.",
     "ref": "VS-2026-006",
     "score": "",
     "src": "testssl"
    },
    {
-    "cve": "CVE-2013-2566",
-    "name": "",
+    "cve": "CVE-2013-2566, CVE-2015-2808",
+    "name": "RC4-Verfahren",
     "note": "Werkzeugbefund, keine Fremdbewertung.",
     "ref": "VS-2026-006",
     "score": "",
@@ -19,7 +19,7 @@
    },
    {
     "cve": "CVE-2013-3587",
-    "name": "",
+    "name": "BREACH (HTTP-Kompression)",
     "note": "Werkzeugbefund, keine Fremdbewertung.",
     "ref": "VS-2026-009, VS-2026-010, VS-2026-022, VS-2026-023",
     "score": "",
@@ -37,7 +37,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 542 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (467 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 28 Befunde und 10 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 542 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (467 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 28 Befunde und 8 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -224,8 +224,7 @@
   ],
   "repeat": [
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
-   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall.",
-   "Freischaltung der Scanner-Adresse beim Betreiber der blockierenden Systeme, damit die offenen Prüfungen im nächsten Durchgang nachgeholt werden können."
+   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall."
   ],
   "tool_findings": [
    {
@@ -355,7 +354,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist oder einen kritischen Dienst exponiert. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
    },
    {
     "l": "Gelb",
@@ -365,7 +364,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
    },
    {
     "l": "Grün",
@@ -377,7 +376,7 @@
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 10 Hosts mit folgenden Aufgaben: Mail- und Kalenderplattform und Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "1 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie sind kein Befund und wurden intern zur Nachbearbeitung vorgemerkt."
+   "1 Beobachtung der Werkzeuge hat keine Regel des Prüfkatalogs getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen wiederkehrende Fälle in den Katalog auf."
   ],
   "posture": [
    {
@@ -1331,12 +1330,13 @@
   {
    "affected": "92.205.163.53:8443 (Plesk)",
    "cat": "A",
-   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n8443/tcp open https-alt sw-cp-server tunnel=ssl",
+   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:8443/tcp Dienst=https-alt Produkt=sw-cp-server Zustand=open TLS erzwungen=ja\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n8443/tcp open https-alt sw-cp-server tunnel=ssl",
    "found": "Der Host 92.205.163.53 (ubb-wiki.castenow.de) bietet eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten Internet erreichbar ist: 92.205.163.53:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist von außen nicht erkennbar.",
    "id": "VS-2026-001",
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
    "level": "erhoeht",
-   "policy": "catalog_sim R-ADMIN-EXPOSED",
+   "level_label": "erhöht",
+   "policy": "admin_service_exposed",
    "recommendation": [
     [
      "Unverzüglich",
@@ -1356,18 +1356,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Verwaltungsoberfläche aus dem Internet erreichbar",
-   "urgency": "Unverzüglich",
+   "urgency": "In Kürze",
    "verify": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
   },
   {
    "affected": "92.205.163.53:21 (FTP ohne TLS-Zwang)",
    "cat": "A",
-   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n21/tcp open ftp ProFTPD",
+   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open",
    "found": "Auf 92.205.163.53 (ubb-wiki.castenow.de) nehmen Datei- oder Mailzugänge eine Anmeldung entgegen, ohne eine Transportverschlüsselung zu erzwingen: 92.205.163.53:21 (FTP ohne TLS-Zwang).",
    "id": "VS-2026-002",
    "impact": "Ohne erzwungene Transportverschlüsselung gehen Anmeldedaten und Inhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf den Dienst oder auf wiederverwendete Konten nutzen.",
    "level": "erhoeht",
-   "policy": "catalog_sim R-FTP-PLAIN",
+   "level_label": "erhöht",
+   "policy": "ftp_plaintext",
    "recommendation": [
     [
      "Unverzüglich",
@@ -1387,18 +1388,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Datei- und Mailzugänge auf 92.205.163.53 (ubb-wiki.castenow.de) ohne erzwungene Transportverschlüsselung",
-   "urgency": "Unverzüglich",
+   "urgency": "In Kürze",
    "verify": "Anmeldung an den genannten Diensten versuchen, bevor eine Transportverschlüsselung aufgebaut ist; erwartet wird die Ablehnung dieser Anmeldung."
   },
   {
    "affected": "195.50.179.4: Microsoft Exchange 2016 (Support beendet 2025-10-14)",
    "cat": "B",
-   "evidence": "redirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://autodiscover.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://owa.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nwebtech · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Microsoft Exchange EXCHANGE01\n\nwebtech · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Outlook Web App 15.1.2507\n\nzap_spider · hosts/195.50.179.4/phase2/zap_spider_urls.json\nspider url: https://autodiscover.castenow.de/owa/auth/15.1.2507/themes/resources/favicon.ico\n\nhttpx · hosts/195.50.179.4/phase2/httpx.json\ntech: Outlook Web App:15.1.2507",
+   "evidence": "redirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\n195.50.179.4: Produkt=Microsoft Exchange Familie=exchange Version=2016 Build=15.1.2507 Pflegestatus=eol Pflegeende=2025-10-14 Quelle=manual\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://autodiscover.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://owa.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nwebtech · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Microsoft Exchange EXCHANGE01\n\nwebtech · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Outlook Web App 15.1.2507\n\nzap_spider · hosts/195.50.179.4/phase2/zap_spider_urls.json\nspider url: https://autodiscover.castenow.de/owa/auth/15.1.2507/themes/resources/favicon.ico\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Auf 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de, owa.castenow.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 195.50.179.4: Microsoft Exchange 2016 (Support beendet 2025-10-14).",
    "id": "VS-2026-003",
    "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist.",
    "level": "erhoeht",
-   "policy": "SP-EOL-001",
+   "level_label": "erhöht",
+   "policy": "software_eol",
    "recommendation": [
     [
      "In Kürze",
@@ -1420,12 +1422,13 @@
   {
    "affected": "92.205.163.53:8880 (unbekannt, laut Passivquelle)",
    "cat": "A",
-   "evidence": "shodan · phase0a/shodan_hosts.json\n92.205.163.53:8880 | HTTP/1.1 200 OK Server: sw-cp-server Date: Fri, 17 Jul 2026 16:58:26 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires: Fri,...",
+   "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 92.205.163.53:8880 gesehen am=2026-07-21T10:37:04Z Banner=HTTP/1.1 200 OK Server: sw-cp-server Date: Fri, 17 Jul 2026 16:58:26 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-a...\n\nshodan · phase0a/shodan_hosts.json\n92.205.163.53:8880 banner=HTTP/1.1 200 OK Server: sw-cp-server Date: Fri, 17 Jul 2026 16:58:26 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires:...",
    "found": "Eine Passivquelle meldet für 92.205.163.53 (ubb-wiki.castenow.de) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 92.205.163.53:8880 (unbekannt, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
    "id": "VS-2026-004",
    "impact": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
    "level": "hoch",
-   "policy": "Prototyp VS-002 (manuell, Passivquelle)",
+   "level_label": "hoch",
+   "policy": "admin_service_exposed_passive",
    "recommendation": [
     [
      "In Kürze",
@@ -1451,12 +1454,13 @@
   {
    "affected": "vpn.castenow.de:443 (TLS 1.1), vpn.castenow.de:443",
    "cat": "D",
-   "evidence": "httpx · hosts/195.50.179.2/phase2/httpx.json\nvpn.castenow.de:443 tls=tls12 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None\n\ntestssl · scan_results:testssl:195.50.179.2\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=True TLS1.2=True TLS1.3=False\n\ntestssl · hosts/195.50.179.2/phase2/testssl.json\noverall_grade=B",
+   "evidence": "httpx · hosts/195.50.179.2/phase2/httpx.json\nvpn.castenow.de:443 CN=*.castenow.de SAN=*.castenow.de, castenow.de Aussteller=Sectigo Public Server Authentication CA DV R36 gueltig_bis=2026-09-24T23:59:59Z abgelaufen=nein Resttage=64 Namensabweichung=nein Kette vollstaendig=ja Protok...\n\nhttpx · hosts/195.50.179.2/phase2/httpx.json\nvpn.castenow.de:443 tls=tls12 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z\n\ntestssl · scan_results:testssl:195.50.179.2\nangeboten=TLS1.1, TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.3\n\ntestssl · hosts/195.50.179.2/phase2/testssl.json\noverall_grade=B",
    "found": "Die Transportverschlüsselung auf 195.50.179.2 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: vpn.castenow.de:443 (TLS 1.1), vpn.castenow.de:443.",
    "id": "VS-2026-005",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "hoch",
-   "policy": "SP-TLS-001, Prototyp VS-009",
+   "level_label": "hoch",
+   "policy": "tls_legacy_protocols, tls_no_13",
    "recommendation": [
     [
      "In Kürze",
@@ -1482,12 +1486,13 @@
   {
    "affected": "rdgw.castenow.de:443 (TLS 1.0, TLS 1.1), rdgw.castenow.de:443, rdgw.castenow.de:443 (3des, cbc, low), rdgw.castenow.de:443 (BEAST), rdgw.castenow.de:443 (RC4), rdgw.castenow.de:443 (SWEET32)",
    "cat": "D",
-   "evidence": "httpx · hosts/195.50.179.7/phase2/httpx.json\nrdgw.castenow.de:443 tls=tls12 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None\n\ntestssl · scan_results:testssl:195.50.179.7\nprotocols SSLv2=False SSLv3=False TLS1.0=True TLS1.1=True TLS1.2=True TLS1.3=False\n\ntestssl · hosts/195.50.179.7/phase2/testssl.json\ncipherlist_LOW=offered; cipherlist_3DES_IDEA=offered; cipher-tls1_x0a=TLSv1 x0a DES-CBC3-SHA RSA 3DES 168 TLS_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_x05=TLSv1 x05 RC4-SHA RSA RC4 128 TLS_RSA_WITH_RC4_128_SHA; cipher-tls1_x04=TLSv1 x04 RC...",
+   "evidence": "httpx · hosts/195.50.179.7/phase2/httpx.json\nrdgw.castenow.de:443 CN=*.castenow.de SAN=*.castenow.de, castenow.de Aussteller=Sectigo Public Server Authentication CA DV R36 gueltig_bis=2026-09-24T23:59:59Z abgelaufen=nein Resttage=64 Namensabweichung=nein Kette vollstaendig=ja Proto...\n\nhttpx · hosts/195.50.179.7/phase2/httpx.json\nrdgw.castenow.de:443 tls=tls12 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z\n\ntestssl · scan_results:testssl:195.50.179.7\nangeboten=TLS1.0, TLS1.1, TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.3\n\ntestssl · hosts/195.50.179.7/phase2/testssl.json\ncipherlist_LOW=offered; cipherlist_3DES_IDEA=offered; cipher-tls1_x0a=TLSv1 x0a DES-CBC3-SHA RSA 3DES 168 TLS_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_x05=TLSv1 x05 RC4-SHA RSA RC4 128 TLS_RSA_WITH_RC4_128_SHA; cipher-tls1_x04=TLSv1 x04 RC...\n\ntestssl\nrdgw.castenow.de:443 Pruefung=BEAST Urteil=vulnerable\n\ntestssl\nrdgw.castenow.de:443 Pruefung=RC4 Urteil=vulnerable CVE=CVE-2013-2566 Ausgabe=VULNERABLE, Detected ciphers: RC4-SHA RC4-MD5\n\nund eine weitere Fundstelle gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Die Transportverschlüsselung auf 195.50.179.7 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: rdgw.castenow.de:443 (TLS 1.0, TLS 1.1), rdgw.castenow.de:443, rdgw.castenow.de:443 (3des, cbc, low), rdgw.castenow.de:443 (BEAST), rdgw.castenow.de:443 (RC4), rdgw.castenow.de:443 (SWEET32).",
    "id": "VS-2026-006",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "hoch",
-   "policy": "SP-TLS-001, Prototyp VS-009, Prototyp VS-012, SP-TLS-002, catalog_sim R-TLS-VULN-SOFT",
+   "level_label": "hoch",
+   "policy": "tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness",
    "recommendation": [
     [
      "In Kürze",
@@ -1520,12 +1525,13 @@
   {
    "affected": "autodiscover.castenow.de (Outlook), bitwarden.castenow.de (Bitwarden Web vault), nextcloud.castenow.de (Anmelden · Nextcloud), owa.castenow.de (Outlook), ubb-wiki.castenow.de (Login · My CMS)",
    "cat": "A",
-   "evidence": "web_probe · phase0/host_inventory.json\nautodiscover.castenow.de: status=200 title=Outlook final_url=https://autodiscover.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.castenow.de%2fowa%2f&reason=0\n\nweb_probe · phase0/host_inventory.json\nbitwarden.castenow.de: status=200 title=Bitwarden Web vault final_url=https://bitwarden.castenow.de\n\nweb_probe · phase0/host_inventory.json\nnextcloud.castenow.de: status=200 title=Anmelden – Nextcloud final_url=https://nextcloud.castenow.de/login\n\nweb_probe · phase0/host_inventory.json\nowa.castenow.de: status=200 title=Outlook final_url=https://owa.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.castenow.de%2fowa%2f&reason=0\n\nweb_probe · phase0/host_inventory.json\nubb-wiki.castenow.de: status=200 title=Login – My CMS final_url=https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
+   "evidence": "web_probe · phase0/host_inventory.json\nautodiscover.castenow.de Status=200 Titel=Outlook Zieladresse=https://autodiscover.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.castenow.de%2fowa%2f&reason=0 erreichbar=ja\n\nweb_probe · phase0/host_inventory.json\nbitwarden.castenow.de Status=200 Titel=Bitwarden Web vault Zieladresse=https://bitwarden.castenow.de erreichbar=ja\n\nweb_probe · phase0/host_inventory.json\nnextcloud.castenow.de Status=200 Titel=Anmelden – Nextcloud Zieladresse=https://nextcloud.castenow.de/login erreichbar=ja\n\nweb_probe · phase0/host_inventory.json\nowa.castenow.de Status=200 Titel=Outlook Zieladresse=https://owa.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.castenow.de%2fowa%2f&reason=0 erreichbar=ja\n\nweb_probe · phase0/host_inventory.json\nubb-wiki.castenow.de Status=200 Titel=Login – My CMS Zieladresse=https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F Schutzsystem=Generic erreichbar=ja",
    "found": "Aus dem Internet sind Portale erreichbar, die eine Anmeldung anbieten: autodiscover.castenow.de (Outlook), bitwarden.castenow.de (Bitwarden Web vault), nextcloud.castenow.de (Anmelden · Nextcloud), owa.castenow.de (Outlook), ubb-wiki.castenow.de (Login · My CMS).",
    "id": "VS-2026-007",
    "impact": "Ein öffentlich erreichbares Anmeldeportal ist ein gewollter Zugangsweg und zugleich das erste Ziel für Rateangriffe auf Zugangsdaten. Wird ein solches Portal übernommen, steht der Weg in die dahinterliegenden Systeme offen.",
    "level": "mittel",
-   "policy": "catalog_sim R-LOGIN-PORTAL",
+   "level_label": "mittel",
+   "policy": "login_portal_exposed",
    "recommendation": [
     [
      "In Kürze",
@@ -1541,18 +1547,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Anmelde- und Verwaltungsportale aus dem Internet erreichbar",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die genannten Portale von außen aufrufen; erwartet wird eine Anmeldung mit zweiter Stufe oder eine Beschränkung auf bekannte Quellnetze."
   },
   {
    "affected": "castenow.de (p=none), castenow.de (~all)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all dmarc=v=DMARC1; p=none; rua=mailto:dmarc@castenow.de dkim=True mx=['mx03.hornetsecurity.com', 'mx02.hornetsecuri...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=True mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\ncastenow.de: SPF=v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all DMARC=v=DMARC1; p=none; rua=mailto:dmarc@castenow.de DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecur...",
    "found": "Für castenow.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: castenow.de (p=none), castenow.de (~all).",
    "id": "VS-2026-008",
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "mittel",
-   "policy": "SP-DNS-007, SP-DNS-005",
+   "level_label": "mittel",
+   "policy": "dmarc_none, spf_softfail",
    "recommendation": [
     [
      "In Kürze",
@@ -1564,22 +1571,23 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
    "title": "Richtlinie zur Absender-Authentizität für castenow.de nicht durchsetzend",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
   },
   {
    "affected": "bitwarden.castenow.de:443",
    "cat": "D",
-   "evidence": "httpx · hosts/195.50.179.6/phase2/httpx.json\nbitwarden.castenow.de:443 tls=tls13 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None\n\ntestssl · scan_results:testssl:195.50.179.6\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True\n\ntestssl · hosts/195.50.179.6/phase2/testssl.json\ncert_chain_of_trust=failed (chain incomplete).; BREACH=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested; overall_grade=B",
+   "evidence": "httpx · hosts/195.50.179.6/phase2/httpx.json\nbitwarden.castenow.de:443 CN=*.castenow.de SAN=*.castenow.de, castenow.de Aussteller=Sectigo Public Server Authentication CA DV R36 gueltig_bis=2026-09-24T23:59:59Z abgelaufen=nein Resttage=64 Namensabweichung=nein Kette vollstaendig=nei...\n\nhttpx · hosts/195.50.179.6/phase2/httpx.json\nbitwarden.castenow.de:443 tls=tls13 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z\n\ntestssl · scan_results:testssl:195.50.179.6\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/195.50.179.6/phase2/testssl.json\ncert_chain_of_trust=failed (chain incomplete).; BREACH=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested; overall_grade=B",
    "found": "Die Zertifikate auf bitwarden.castenow.de sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: bitwarden.castenow.de:443.",
    "id": "VS-2026-009",
    "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
    "level": "mittel",
-   "policy": "catalog_sim R-CERT-CHAIN",
+   "level_label": "mittel",
+   "policy": "cert_chain_incomplete",
    "recommendation": [
     [
      "Unverzüglich",
@@ -1601,18 +1609,19 @@
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Zertifikate auf bitwarden.castenow.de mit Beanstandungen",
-   "urgency": "Unverzüglich",
+   "urgency": "Mittelfristig",
    "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
   },
   {
    "affected": "openotp.castenow.de:443, openotp.castenow.de:443 (3des, cbc), openotp.castenow.de:443 (BREACH), openotp.castenow.de:443 (SWEET32)",
    "cat": "D",
-   "evidence": "httpx · hosts/195.50.179.9/phase2/httpx.json\nopenotp.castenow.de:443 tls=tls12 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None\n\ntestssl · scan_results:testssl:195.50.179.9\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False\n\ntestssl · hosts/195.50.179.9/phase2/testssl.json\ncipherlist_3DES_IDEA=offered; cipher-tls1_2_xc012=TLSv1.2 xc012 ECDHE-RSA-DES-CBC3-SHA ECDH 253 3DES 168 TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_2_x16=TLSv1.2 x16 EDH-RSA-DES-CBC3-SHA DH 4096 3DES 168 TLS_DHE_RSA_WITH_3DES_EDE_C...",
+   "evidence": "httpx · hosts/195.50.179.9/phase2/httpx.json\nopenotp.castenow.de:443 CN=*.castenow.de SAN=*.castenow.de, castenow.de Aussteller=Sectigo Public Server Authentication CA DV R36 gueltig_bis=2026-09-24T23:59:59Z abgelaufen=nein Resttage=64 Namensabweichung=nein Kette vollstaendig=ja Pr...\n\nhttpx · hosts/195.50.179.9/phase2/httpx.json\nopenotp.castenow.de:443 tls=tls12 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z\n\ntestssl · scan_results:testssl:195.50.179.9\nangeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3\n\ntestssl · hosts/195.50.179.9/phase2/testssl.json\ncipherlist_3DES_IDEA=offered; cipher-tls1_2_xc012=TLSv1.2 xc012 ECDHE-RSA-DES-CBC3-SHA ECDH 253 3DES 168 TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_2_x16=TLSv1.2 x16 EDH-RSA-DES-CBC3-SHA DH 4096 3DES 168 TLS_DHE_RSA_WITH_3DES_EDE_C...\n\ntestssl\nopenotp.castenow.de:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested\n\ntestssl\nopenotp.castenow.de:443 Pruefung=SWEET32 Urteil=vulnerable",
    "found": "Die Transportverschlüsselung auf 195.50.179.9 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: openotp.castenow.de:443, openotp.castenow.de:443 (3des, cbc), openotp.castenow.de:443 (BREACH), openotp.castenow.de:443 (SWEET32).",
    "id": "VS-2026-010",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "mittel",
-   "policy": "Prototyp VS-009, SP-TLS-002, catalog_sim R-TLS-VULN-SOFT",
+   "level_label": "mittel",
+   "policy": "tls_no_13, tls_weak_ciphers, tls_weakness",
    "recommendation": [
     [
      "In Kürze",
@@ -1638,18 +1647,19 @@
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf 195.50.179.9 mit veralteten Verfahren",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
    "affected": "www.castenow.de (unsafe-inline, unsafe-eval), www.castenow.de (fehlend: permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:159.69.143.80\nwww.castenow.de: reachable=True score=6/7 server=Apache x-feserver=None\n\nhttpx · hosts/159.69.143.80/phase2/httpx.json\nwww.castenow.de: status=200 title=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW webserver=Apache tech=['Apache HTTP Server', 'Drupal:11', 'HSTS', 'PHP', 'jQuery']",
+   "evidence": "header_check · scan_results:header_check:159.69.143.80\nwww.castenow.de: URL=https://www.castenow.de fehlende Header=permissions-policy gesetzte Header=content-security-policy: default-src 'none'; connect-src 'self' wss: data: https://matomo.pw6.de/; font-src 'self' data:; frame-src 'self' ww...",
    "found": "Die Webdienste auf 159.69.143.80 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: www.castenow.de (unsafe-inline, unsafe-eval), www.castenow.de (fehlend: permissions-policy).",
    "id": "VS-2026-011",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
-   "policy": "SP-CSP-003, SP-CSP-004, SP-CSP-005, SP-HDR-005",
+   "level_label": "mittel",
+   "policy": "csp_weak, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1661,7 +1671,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 159.69.143.80 unvollständig",
@@ -1671,12 +1681,13 @@
   {
    "affected": "vpn.castenow.de, vpn.castenow.de (/), vpn.castenow.de (fehlend: x-frame-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:195.50.179.2\nvpn.castenow.de: reachable=True score=1/7 server=Web Server x-feserver=None\n\nhttpx · hosts/195.50.179.2/phase2/httpx.json\nvpn.castenow.de: status=200 title=None webserver=Web Server tech=['HSTS', 'jQuery']",
+   "evidence": "header_check · scan_results:header_check:195.50.179.2\nvpn.castenow.de: URL=https://vpn.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-frame-options, x-xss-protection gesetzte Header=x-content-type-options: nosniff Serve...\n\nzap_active\nAbsence of Anti-CSRF Tokens ZAP-Kennung=10202 Risiko=Medium Konfidenz=Low Adresse=https://vpn.castenow.de Beleg=<form name=\"standardPass\" id=\"standardPass\" action=\"auth.cgi\" method=\"POST\" target=\"sslvpnTgtFrm\"> CWE=CWE-352",
    "found": "Die Webdienste auf 195.50.179.2 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: vpn.castenow.de, vpn.castenow.de (/), vpn.castenow.de (fehlend: x-frame-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-012",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
-   "policy": "SP-CSP-001, SP-CSP-002, SP-CSRF-001, SP-HDR-001, SP-HDR-002, SP-HDR-005",
+   "level_label": "mittel",
+   "policy": "csp_missing, csrf_token_missing, hsts_missing, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1688,7 +1699,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check, zap_active)",
    "status": "gelb",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 195.50.179.2 unvollständig",
@@ -1698,12 +1709,13 @@
   {
    "affected": "autodiscover.castenow.de, owa.castenow.de, autodiscover.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), owa.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:195.50.179.4\nautodiscover.castenow.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01\n\nhttpx · hosts/195.50.179.4/phase2/httpx.json\nautodiscover.castenow.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.1.2507', 'Windows Server']\n\nheader_check · scan_results:header_check:195.50.179.4\nowa.castenow.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01\n\nhttpx · hosts/195.50.179.4/phase2/httpx.json\nowa.castenow.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.1.2507', 'Windows Server']",
+   "evidence": "header_check · scan_results:header_check:195.50.179.4\nautodiscover.castenow.de: URL=https://autodiscover.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Micr...\n\nheader_check · scan_results:header_check:195.50.179.4\nowa.castenow.de: URL=https://owa.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Microsoft-IIS/10.0",
    "found": "Die Webdienste auf 195.50.179.4 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: autodiscover.castenow.de, owa.castenow.de, autodiscover.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), owa.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-013",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
-   "policy": "SP-CSP-001, SP-CSP-002, SP-HDR-001, SP-HDR-002, SP-HDR-005",
+   "level_label": "mittel",
+   "policy": "csp_missing, hsts_missing, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1715,7 +1727,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 195.50.179.4 unvollständig",
@@ -1725,12 +1737,13 @@
   {
    "affected": "mailstore.castenow.de (unsafe-inline, Wildcard), nextcloud.castenow.de (unsafe-inline, Wildcard), mailstore.castenow.de (fehlend: permissions-policy), nextcloud.castenow.de (fehlend: permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:195.50.179.5\nmailstore.castenow.de: reachable=True score=6/7 server=Apache x-feserver=None\n\nhttpx · hosts/195.50.179.5/phase2/httpx.json\nmailstore.castenow.de: status=400 title=Nextcloud webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'Nextcloud', 'PHP']\n\nheader_check · scan_results:header_check:195.50.179.5\nnextcloud.castenow.de: reachable=True score=6/7 server=Apache x-feserver=None\n\nhttpx · hosts/195.50.179.5/phase2/httpx.json\nnextcloud.castenow.de: status=200 title=Login – Nextcloud webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'Nextcloud', 'PHP']",
+   "evidence": "header_check · scan_results:header_check:195.50.179.5\nmailstore.castenow.de: URL=https://mailstore.castenow.de fehlende Header=permissions-policy gesetzte Header=content-security-policy: default-src 'self'; script-src 'self' 'nonce-IdJJ74PqhS9I7gsOPCPujrOT3Zr3//LZhrSlDN64OLQ='; style-src 's...\n\nheader_check · scan_results:header_check:195.50.179.5\nnextcloud.castenow.de: URL=https://nextcloud.castenow.de fehlende Header=permissions-policy gesetzte Header=content-security-policy: default-src 'self'; script-src 'self' 'nonce-pbopIKuHxFGSZW8KYvlKFSjvCWassgm+OoxLSzLF01g='; style-src 's...",
    "found": "Die Webdienste auf 195.50.179.5 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: mailstore.castenow.de (unsafe-inline, Wildcard), nextcloud.castenow.de (unsafe-inline, Wildcard), mailstore.castenow.de (fehlend: permissions-policy), nextcloud.castenow.de (fehlend: permissions-policy).",
    "id": "VS-2026-014",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
-   "policy": "SP-CSP-003, SP-CSP-004, SP-CSP-005, SP-HDR-005",
+   "level_label": "mittel",
+   "policy": "csp_weak, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1742,7 +1755,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 195.50.179.5 unvollständig",
@@ -1752,12 +1765,13 @@
   {
    "affected": "rdgw.castenow.de, rdgw.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:195.50.179.7\nrdgw.castenow.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=None\n\nhttpx · hosts/195.50.179.7/phase2/httpx.json\nrdgw.castenow.de: status=200 title=IIS Windows Server webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET', 'Windows Server']",
+   "evidence": "header_check · scan_results:header_check:195.50.179.7\nrdgw.castenow.de: URL=https://rdgw.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Microsoft-IIS/10.0 X...",
    "found": "Die Webdienste auf 195.50.179.7 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: rdgw.castenow.de, rdgw.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-015",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
-   "policy": "SP-CSP-001, SP-CSP-002, SP-HDR-001, SP-HDR-002, SP-HDR-005",
+   "level_label": "mittel",
+   "policy": "csp_missing, hsts_missing, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1769,7 +1783,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 195.50.179.7 unvollständig",
@@ -1779,12 +1793,13 @@
   {
    "affected": "openotp.castenow.de (unsafe-inline, unsafe-eval), openotp.castenow.de (x-frame-options, cache-control), openotp.castenow.de (fehlend: permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:195.50.179.9\nopenotp.castenow.de: reachable=True score=6/7 server=Apache x-feserver=None\n\nhttpx · hosts/195.50.179.9/phase2/httpx.json\nopenotp.castenow.de: status=200 title=Castenow GmbH Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']",
+   "evidence": "header_check · scan_results:header_check:195.50.179.9\nopenotp.castenow.de: URL=https://openotp.castenow.de fehlende Header=permissions-policy gesetzte Header=content-security-policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis...",
    "found": "Die Webdienste auf 195.50.179.9 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: openotp.castenow.de (unsafe-inline, unsafe-eval), openotp.castenow.de (x-frame-options, cache-control), openotp.castenow.de (fehlend: permissions-policy).",
    "id": "VS-2026-016",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
-   "policy": "SP-CSP-003, SP-CSP-004, SP-CSP-005, Prototyp VS-011, SP-HDR-005",
+   "level_label": "mittel",
+   "policy": "csp_weak, header_duplicate, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1796,7 +1811,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 195.50.179.9 unvollständig",
@@ -1806,12 +1821,13 @@
   {
    "affected": "92.205.163.53:110 (POP3), 92.205.163.53:143 (IMAP), 92.205.163.53:21 (FTP)",
    "cat": "A",
-   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n21/tcp open ftp ProFTPD\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n110/tcp open pop3 Dovecot pop3d\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\npop3-capabilities: APOP STLS UIDL AUTH-RESP-CODE SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) RESP-CODES TOP USER CAPA PIPELINING\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n143/tcp open imap Dovecot imapd\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\nimap-capabilities: Pre-login ID STARTTLS ENABLE IDLE AUTH=DIGEST-MD5 capabilities listed LOGIN-REFERRALS AUTH=PLAIN post-login IMAP4rev1 AUTH=LOGIN LITERAL+ have more OK AUTH=CRAM-MD5A0001 SASL-IR",
+   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=APOP, STLS, UIDL, AUTH-RESP-CODE\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\npop3-capabilities: APOP STLS UIDL AUTH-RESP-CODE SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) RESP-CODES TOP USER CAPA PIPELINING\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN Capabilities=Pre-login, ID, STARTTLS, ENABLE\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\nimap-capabilities: Pre-login ID STARTTLS ENABLE IDLE AUTH=DIGEST-MD5 capabilities listed LOGIN-REFERRALS AUTH=PLAIN post-login IMAP4rev1 AUTH=LOGIN LITERAL+ have more OK AUTH=CRAM-MD5A0001 SASL-IR",
    "found": "Der Host 92.205.163.53 (ubb-wiki.castenow.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 92.205.163.53:110 (POP3), 92.205.163.53:143 (IMAP), 92.205.163.53:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
    "id": "VS-2026-017",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
-   "policy": "Prototyp VS-005",
+   "level_label": "niedrig",
+   "policy": "legacy_protocols_present",
    "recommendation": [
     [
      "In Kürze",
@@ -1827,18 +1843,19 @@
    "status": "blau",
    "threat": null,
    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
   {
    "affected": "rdgw.castenow.de (IIS Windows Server)",
    "cat": "A",
-   "evidence": "web_probe · phase0/host_inventory.json\nrdgw.castenow.de: status=200 title=IIS Windows Server final_url=https://rdgw.castenow.de",
+   "evidence": "web_probe · phase0/host_inventory.json\nrdgw.castenow.de Status=200 Titel=IIS Windows Server Zieladresse=https://rdgw.castenow.de erreichbar=ja",
    "found": "Auf rdgw.castenow.de beantwortet ein Webdienst Anfragen mit der unveränderten Auslieferungsseite des Herstellers, teils auf einem zusätzlichen Port: rdgw.castenow.de (IIS Windows Server).",
    "id": "VS-2026-018",
    "impact": "Eine unveränderte Auslieferungsseite verrät, dass hier ein Webserver ohne eigene Anwendung antwortet, und lädt zum Ausprobieren bekannter Pfade ein. Ein zusätzlicher Webport vergrößert die Angriffsfläche, ohne dass sein Zweck von außen erkennbar ist.",
    "level": "niedrig",
-   "policy": "catalog_sim R-DEFAULT-PAGE",
+   "level_label": "niedrig",
+   "policy": "default_page_exposed",
    "recommendation": [
     [
      "In Kürze",
@@ -1854,18 +1871,19 @@
    "status": "blau",
    "threat": null,
    "title": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf rdgw.castenow.de",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die genannten Adressen von außen erneut aufrufen; erwartet wird keine Auslieferungsseite des Herstellers und kein zusätzlicher Webport."
   },
   {
    "affected": "92.205.163.53:8000 (http-alt), 92.205.163.53:8800 (Icecast)",
    "cat": "A",
-   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n8000/tcp open http-alt\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n8800/tcp open http Icecast streaming media server 2.4.4",
+   "evidence": "nmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:8000/tcp Dienst=http-alt Zustand=open\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n92.205.163.53:8800/tcp Dienst=http Produkt=Icecast streaming media server Version=2.4.4 Zustand=open",
    "found": "Auf 92.205.163.53 (ubb-wiki.castenow.de) beantwortet ein Webdienst Anfragen mit der unveränderten Auslieferungsseite des Herstellers, teils auf einem zusätzlichen Port: 92.205.163.53:8000 (http-alt), 92.205.163.53:8800 (Icecast).",
    "id": "VS-2026-019",
    "impact": "Eine unveränderte Auslieferungsseite verrät, dass hier ein Webserver ohne eigene Anwendung antwortet, und lädt zum Ausprobieren bekannter Pfade ein. Ein zusätzlicher Webport vergrößert die Angriffsfläche, ohne dass sein Zweck von außen erkennbar ist.",
    "level": "niedrig",
-   "policy": "neu (spec/06 Abschnitt 4)",
+   "level_label": "niedrig",
+   "policy": "http_alt_port",
    "recommendation": [
     [
      "In Kürze",
@@ -1881,18 +1899,19 @@
    "status": "blau",
    "threat": null,
    "title": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 92.205.163.53 (ubb-wiki.castenow.de)",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die genannten Adressen von außen erneut aufrufen; erwartet wird keine Auslieferungsseite des Herstellers und kein zusätzlicher Webport."
   },
   {
    "affected": "castenow.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all dmarc=v=DMARC1; p=none; rua=mailto:dmarc@castenow.de dkim=True mx=['mx03.hornetsecurity.com', 'mx02.hornetsecuri...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=True mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\ncastenow.de: SPF=v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all DMARC=v=DMARC1; p=none; rua=mailto:dmarc@castenow.de DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecur...",
    "found": "Für castenow.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: castenow.de.",
    "id": "VS-2026-020",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
-   "policy": "Prototyp VS-008, SP-DNS-009, SP-DNS-011",
+   "level_label": "niedrig",
+   "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -1900,7 +1919,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "Transportverschlüsselung im Mailversand für castenow.de nicht erzwungen",
@@ -1910,12 +1929,13 @@
   {
    "affected": "mail2.castenow.de:443",
    "cat": "D",
-   "evidence": "testssl · scan_results:testssl:195.50.179.4\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False",
+   "evidence": "testssl · scan_results:testssl:195.50.179.4\nmail2.castenow.de:443 CN=*.castenow.de SAN=*.castenow.de, castenow.de Aussteller=Sectigo Public Server Authentication CA DV R36 (Sectigo Limited from GB) gueltig_bis=2026-09-24T23:59:00Z abgelaufen=nein Resttage=64 Namensabweichung=nein...\n\ntestssl · scan_results:testssl:195.50.179.4\nangeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3",
    "found": "Die Transportverschlüsselung auf mail2.castenow.de lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: mail2.castenow.de:443.",
    "id": "VS-2026-021",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
-   "policy": "Prototyp VS-009",
+   "level_label": "niedrig",
+   "policy": "tls_no_13",
    "recommendation": [
     [
      "In Kürze",
@@ -1935,18 +1955,19 @@
    "status": "blau",
    "threat": null,
    "title": "Transportverschlüsselung auf mail2.castenow.de mit veralteten Verfahren",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
    "affected": "bitwarden.castenow.de:443 (BREACH)",
    "cat": "D",
-   "evidence": "httpx · hosts/195.50.179.6/phase2/httpx.json\nbitwarden.castenow.de:443 tls=tls13 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None\n\ntestssl · scan_results:testssl:195.50.179.6\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True\n\ntestssl · hosts/195.50.179.6/phase2/testssl.json\ncert_chain_of_trust=failed (chain incomplete).; BREACH=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested; overall_grade=B",
+   "evidence": "testssl\nbitwarden.castenow.de:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested\n\nhttpx · hosts/195.50.179.6/phase2/httpx.json\nbitwarden.castenow.de:443 tls=tls13 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z\n\ntestssl · scan_results:testssl:195.50.179.6\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/195.50.179.6/phase2/testssl.json\ncert_chain_of_trust=failed (chain incomplete).; BREACH=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested; overall_grade=B",
    "found": "Die Transportverschlüsselung auf bitwarden.castenow.de lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: bitwarden.castenow.de:443 (BREACH).",
    "id": "VS-2026-022",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
-   "policy": "catalog_sim R-TLS-VULN-SOFT",
+   "level_label": "niedrig",
+   "policy": "tls_weakness",
    "recommendation": [
     [
      "In Kürze",
@@ -1972,18 +1993,19 @@
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf bitwarden.castenow.de mit veralteten Verfahren",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
    "affected": "umfrage.castenow.de:443 (BREACH)",
    "cat": "D",
-   "evidence": "httpx · hosts/54.230.172.14/phase2/httpx.json\numfrage.castenow.de:443 tls=tls13 cn=castenow.de not_after=2026-09-29T16:46:29Z mismatched=None\n\ntestssl · scan_results:testssl:54.230.172.14\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True\n\ntestssl · hosts/54.230.172.14/phase2/testssl.json\nBREACH=potentially VULNERABLE, gzip deflate HTTP compression detected - only supplied '/' tested",
+   "evidence": "testssl\numfrage.castenow.de:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip deflate HTTP compression detected - only supplied '/' tested\n\nhttpx · hosts/54.230.172.14/phase2/httpx.json\numfrage.castenow.de:443 tls=tls13 cn=castenow.de gueltig_bis=2026-09-29T16:46:29Z\n\ntestssl · scan_results:testssl:54.230.172.14\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/54.230.172.14/phase2/testssl.json\nBREACH=potentially VULNERABLE, gzip deflate HTTP compression detected - only supplied '/' tested",
    "found": "Die Transportverschlüsselung auf umfrage.castenow.de lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: umfrage.castenow.de:443 (BREACH).",
    "id": "VS-2026-023",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
-   "policy": "catalog_sim R-TLS-VULN-SOFT",
+   "level_label": "niedrig",
+   "policy": "tls_weakness",
    "recommendation": [
     [
      "In Kürze",
@@ -2009,18 +2031,19 @@
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf umfrage.castenow.de mit veralteten Verfahren",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
    "affected": "umfrage.castenow.de, umfrage.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:54.230.172.14\numfrage.castenow.de: reachable=True score=1/7 server=Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5 x-feserver=None\n\nhttpx · hosts/54.230.172.14/phase2/httpx.json\numfrage.castenow.de: status=200 title=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW webserver=Apache tech=['Apache HTTP Server', 'Drupal:11', 'HSTS', 'PHP', 'jQuery']",
+   "evidence": "header_check · scan_results:header_check:54.230.172.14\numfrage.castenow.de: URL=https://umfrage.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-a...",
    "found": "Die Webdienste auf 54.230.172.14 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: umfrage.castenow.de, umfrage.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-024",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
-   "policy": "SP-CSP-001, SP-CSP-002, SP-HDR-005",
+   "level_label": "niedrig",
+   "policy": "csp_missing, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -2032,7 +2055,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 54.230.172.14 unvollständig",
@@ -2042,12 +2065,13 @@
   {
    "affected": "ubb-wiki.castenow.de, ubb-wiki.castenow.de (/login/), ubb-wiki.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:92.205.163.53\nubb-wiki.castenow.de: reachable=True score=1/7 server=nginx x-feserver=None\n\nhttpx · hosts/92.205.163.53/phase2/httpx.json\nubb-wiki.castenow.de: status=200 title=Login – My CMS webserver=nginx tech=['HSTS', 'HTTP/3', 'MySQL', 'Nginx', 'PHP:8.4.23', 'Underscore.js:1.13.8', 'WordPress:7.0.2', 'jQuery', 'jQuery Migrate:3.4.1']",
+   "evidence": "header_check · scan_results:header_check:92.205.163.53\nubb-wiki.castenow.de: URL=https://ubb-wiki.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max...\n\nzap_active\nAbsence of Anti-CSRF Tokens ZAP-Kennung=10202 Risiko=Medium Konfidenz=Low Adresse=https://ubb-wiki.castenow.de/login/ Beleg=<form method=\"post\" action=\"\" autocomplete=\"off\"> CWE=CWE-352 betroffene Adressen=8",
    "found": "Die Webdienste auf 92.205.163.53 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: ubb-wiki.castenow.de, ubb-wiki.castenow.de (/login/), ubb-wiki.castenow.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-025",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
-   "policy": "SP-CSP-001, SP-CSP-002, SP-CSRF-001, SP-HDR-005",
+   "level_label": "niedrig",
+   "policy": "csp_missing, csrf_token_missing, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -2059,7 +2083,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check, zap_active)",
    "status": "blau",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 92.205.163.53 unvollständig",
@@ -2069,12 +2093,13 @@
   {
    "affected": "autodiscover.castenow.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE01), owa.castenow.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE01), rdgw.castenow.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), umfrage.castenow.de (Server: Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5), 195.50.179.7:443 (TRACE aktiv), 92.205.163.53:8800 (Icecast 2.4.4)",
    "cat": "E",
-   "evidence": "header_check · scan_results:header_check:195.50.179.4\nautodiscover.castenow.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01\n\nhttpx · hosts/195.50.179.4/phase2/httpx.json\nautodiscover.castenow.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.1.2507', 'Windows Server']\n\nheader_check · scan_results:header_check:195.50.179.4\nowa.castenow.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01\n\nhttpx · hosts/195.50.179.4/phase2/httpx.json\nowa.castenow.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.1.2507', 'Windows Server']\n\nheader_check · scan_results:header_check:195.50.179.7\nrdgw.castenow.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=None\n\nhttpx · hosts/195.50.179.7/phase2/httpx.json\nrdgw.castenow.de: status=200 title=IIS Windows Server webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET', 'Windows Server']\n\nheader_check · scan_results:header_check:54.230.172.14\numfrage.castenow.de: reachable=True score=1/7 server=Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5 x-feserver=None\n\nhttpx · hosts/54.230.172.14/phase2/httpx.json\numfrage.castenow.de: status=200 title=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW webserver=Apache tech=['Apache HTTP Server', 'Drupal:11', 'HSTS', 'PHP', 'jQuery']\n\nnmap · hosts/195.50.179.7/phase1/nmap.xml\n443/tcp open http Microsoft IIS httpd 10.0 tunnel=ssl\n\nnmap · hosts/195.50.179.7/phase1/nmap.xml\nhttp-methods: Potentially risky methods: TRACE\n\nnmap · hosts/92.205.163.53/phase1/nmap.xml\n8800/tcp open http Icecast streaming media server 2.4.4",
+   "evidence": "header_check · scan_results:header_check:195.50.179.4\nautodiscover.castenow.de: URL=https://autodiscover.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Micr...\n\nheader_check · scan_results:header_check:195.50.179.4\nowa.castenow.de: URL=https://owa.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Microsoft-IIS/10.0\n\nheader_check · scan_results:header_check:195.50.179.7\nrdgw.castenow.de: URL=https://rdgw.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Microsoft-IIS/10.0 X...\n\nheader_check · scan_results:header_check:54.230.172.14\numfrage.castenow.de: URL=https://umfrage.castenow.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-a...\n\nnmap · hosts/195.50.179.7/phase1/nmap.xml\n195.50.179.7:443/tcp Dienst=http Produkt=Microsoft IIS httpd Version=10.0 Zustand=open TLS erzwungen=ja Capabilities=METHOD:TRACE\n\nnmap · hosts/195.50.179.7/phase1/nmap.xml\n443/tcp open http Microsoft IIS httpd 10.0 tunnel=ssl\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: autodiscover.castenow.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE01), owa.castenow.de (Server: Microsoft-IIS/10.0, X-FEServer: EXCHANGE01), rdgw.castenow.de (Server: Microsoft-IIS/10.0, X-Powered-By: ASP.NET), umfrage.castenow.de (Server: Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5), 195.50.179.7:443 (TRACE aktiv), 92.205.163.53:8800 (Icecast 2.4.4).",
    "id": "VS-2026-026",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
-   "policy": "SP-DISC-001, Prototyp VS-014",
+   "level_label": "niedrig",
+   "policy": "http_header_disclosure, http_trace_enabled, service_banner_version",
    "recommendation": [
     [
      "Mittelfristig",
@@ -2086,7 +2111,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx, nmap)",
+   "source": "aktiv (header_check, nmap)",
    "status": "blau",
    "threat": null,
    "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
@@ -2096,12 +2121,13 @@
   {
    "affected": "castenow.de",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all dmarc=v=DMARC1; p=none; rua=mailto:dmarc@castenow.de dkim=True mx=['mx03.hornetsecurity.com', 'mx02.hornetsecuri...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=True mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\ncastenow.de: SPF=v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all DMARC=v=DMARC1; p=none; rua=mailto:dmarc@castenow.de DKIM-Selektoren=hse1, hse2 MX=mx01.hornetsecur...",
    "found": "Für castenow.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: castenow.de.",
    "id": "VS-2026-027",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
-   "policy": "SP-DNS-001",
+   "level_label": "niedrig",
+   "policy": "dnssec_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -2109,7 +2135,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "DNS-Absicherung für castenow.de nicht eingerichtet",
@@ -2119,12 +2145,13 @@
   {
    "affected": "ubb-wiki.castenow.de (florian-endriss)",
    "cat": "E",
-   "evidence": "header_check · scan_results:header_check:92.205.163.53\nubb-wiki.castenow.de: reachable=True score=1/7 server=nginx x-feserver=None\n\nhttpx · hosts/92.205.163.53/phase2/httpx.json\nubb-wiki.castenow.de: status=200 title=Login – My CMS webserver=nginx tech=['HSTS', 'HTTP/3', 'MySQL', 'Nginx', 'PHP:8.4.23', 'Underscore.js:1.13.8', 'WordPress:7.0.2', 'jQuery', 'jQuery Migrate:3.4.1']",
+   "evidence": "wpscan\nubb-wiki.castenow.de: Benutzernamen unter=https://ubb-wiki.castenow.de/wp-json/wp/v2/users gefunden=florian-endriss Kernstand=latest",
    "found": "Auf ubb-wiki.castenow.de lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln: ubb-wiki.castenow.de (florian-endriss).",
    "id": "VS-2026-028",
    "impact": "Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt.",
    "level": "niedrig",
-   "policy": "SP-WP-002",
+   "level_label": "niedrig",
+   "policy": "wordpress_user_enumeration",
    "recommendation": [
     [
      "Mittelfristig",
@@ -2136,7 +2163,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (wpscan)",
    "status": "blau",
    "threat": null,
    "title": "WordPress-Benutzernamen von außen ermittelbar",
@@ -2183,10 +2210,10 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von castenow.de am 22.07.2026: 15 Hostnamen auf 10 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 159.69.143.80, 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7, 54.230.172.14 und 92.205.163.53 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "Für 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7, 54.230.172.14 und 92.205.163.53 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
-    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
     "n": 1,
     "refs": [
      "VS-2026-002"
@@ -2197,7 +2224,9 @@
     "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
     "n": 2,
     "refs": [
-     "VS-2026-001"
+     "VS-2026-001",
+     "VS-2026-003",
+     "VS-2026-004"
     ],
     "title": "Verwaltungsoberfläche aus dem Internet erreichbar"
    },
@@ -2205,20 +2234,20 @@
     "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
     "n": 3,
     "refs": [
-     "VS-2026-009"
+     "VS-2026-005"
     ],
-    "title": "Zertifikate auf bitwarden.castenow.de mit Beanstandungen"
+    "title": "Transportverschlüsselung auf 195.50.179.2 mit veralteten Verfahren"
    }
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die übrigen Befunde betreffen die Härtung der erreichbaren Dienste, die Authentizität der E-Mail und die Transportverschlüsselung."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "28 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 75,
-  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 28,
   "customer": "Auftraggeber",
@@ -2226,7 +2255,7 @@
   "domains": [
    "castenow.de"
   ],
-  "facts_schema_version": "1.0.2",
+  "facts_schema_version": "1.0.3",
   "fqdns_total": 15,
   "hosts_ipv4": 10,
   "hosts_ipv6": 0,
@@ -2239,8 +2268,8 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
-  "positives": 10,
+  "policy_version": "2026-09-22.1",
+  "positives": 8,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
@@ -2258,40 +2287,21 @@
  "plan": [
   {
    "action": "Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird.",
-   "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
-   "prio": "Unverzüglich",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "In Kürze",
    "refs": [
     "VS-2026-002"
    ],
-   "st": "rot"
+   "st": "gelb"
   },
   {
-   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.",
+   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst. Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
-   "prio": "Unverzüglich",
-   "refs": [
-    "VS-2026-001"
-   ],
-   "st": "rot"
-  },
-  {
-   "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Unverzüglich",
-   "refs": [
-    "VS-2026-009"
-   ],
-   "st": "rot"
-  },
-  {
-   "action": "Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand. Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der Portal-Software gegen die Hinweise des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
-   "effect": "Schließt bekannte Lücken in veralteten Ständen",
    "prio": "In Kürze",
    "refs": [
+    "VS-2026-001",
     "VS-2026-003",
-    "VS-2026-004",
-    "VS-2026-007",
-    "VS-2026-017"
+    "VS-2026-004"
    ],
    "st": "gelb"
   },
@@ -2305,66 +2315,32 @@
    "st": "gelb"
   },
   {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.",
+   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "In Kürze",
    "refs": [
-    "VS-2026-006",
-    "VS-2026-018"
+    "VS-2026-006"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Für jedes Portal eine zweite Anmeldestufe verlangen und den Versionsstand der Portal-Software gegen die Hinweise des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten. Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-007",
+    "VS-2026-017",
+    "VS-2026-026",
+    "VS-2026-028"
    ],
    "st": "gelb"
   },
   {
    "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
-   "prio": "In Kürze",
+   "prio": "Mittelfristig",
    "refs": [
     "VS-2026-008"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-010"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.",
-   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-019"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-021"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-022"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-023"
    ],
    "st": "gelb"
   },
@@ -2375,7 +2351,7 @@
    "refs": [
     "VS-2026-011"
    ],
-   "st": "blau"
+   "st": "gelb"
   },
   {
    "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
@@ -2384,16 +2360,17 @@
    "refs": [
     "VS-2026-012"
    ],
-   "st": "blau"
+   "st": "gelb"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren. Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-013"
+    "VS-2026-013",
+    "VS-2026-021"
    ],
-   "st": "blau"
+   "st": "gelb"
   },
   {
    "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
@@ -2402,51 +2379,55 @@
    "refs": [
     "VS-2026-014"
    ],
-   "st": "blau"
+   "st": "gelb"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen. Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-015"
+    "VS-2026-009",
+    "VS-2026-022"
    ],
-   "st": "blau"
+   "st": "gelb"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren. Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
+    "VS-2026-015",
+    "VS-2026-018"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-010",
     "VS-2026-016"
    ],
-   "st": "blau"
+   "st": "gelb"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "action": "Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-024"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
+    "VS-2026-019",
     "VS-2026-025"
    ],
    "st": "blau"
   },
   {
-   "action": "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten. Die Offenlegung von Benutzernamen über die REST-Schnittstelle und die Autorenarchive einschränken, etwa durch eine entsprechende Erweiterung oder eine Anpassung der WordPress-Konfiguration.",
-   "effect": "Nimmt Angreifern Vorbereitungswissen",
+   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-026",
-    "VS-2026-028"
+    "VS-2026-023",
+    "VS-2026-024"
    ],
    "st": "blau"
   },
@@ -2491,16 +2472,6 @@
    "cat": "C",
    "text": "Für castenow.de sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
-  },
-  {
-   "cat": "D",
-   "text": "Auf den geprüften Hosts liefern die verschlüsselten Dienste gültige Zertifikate mit vollständiger Vertrauenskette aus.",
-   "title": "Zertifikate gültig, vollständig verkettet und passend zum Namen"
-  },
-  {
-   "cat": "D",
-   "text": "Auf den geprüften Hosts bieten die verschlüsselten Dienste nur aktuelle Protokolle und Verfahren an.",
-   "title": "Transportverschlüsselung ohne veraltete Protokolle und Verfahren"
   },
   {
    "cat": "D",
@@ -2613,60 +2584,56 @@
   "lead": "Der Scan hat 10 IP-Adressen mit 15 Hostnamen erfasst. Für 8 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: autodiscover.castenow.de, bitwarden.castenow.de, mail.castenow.de, mail2.castenow.de, mailstore.castenow.de, nextcloud.castenow.de und weitere.",
+    "detail": "Betroffen: 159.69.143.80 (castenow.de, www.castenow.de), 195.50.179.2 (vpn.castenow.de), 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de und weitere), 195.50.179.5 (mailstore.castenow.de, nextcloud.castenow.de), 195.50.179.6 (bitwarden.castenow.de), 195.50.179.7 (rdgw.castenow.de) und weitere.",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
+    "detail": "Betroffen: autodiscover.castenow.de, bitwarden.castenow.de, mailstore.castenow.de, rdgw.castenow.de, ubb-wiki.castenow.de, umfrage.castenow.de und weitere.",
     "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
    },
    {
-    "detail": "Betroffen: autodiscover.castenow.de, www.castenow.de (+castenow.de).",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
-   },
-   {
-    "detail": "Betroffen: ffuf_sensitive auf 159.69.143.80, ffuf_sensitive auf 195.50.179.2, ffuf_sensitive auf 195.50.179.4, ffuf_sensitive auf 195.50.179.5, ffuf_sensitive auf 195.50.179.6, ffuf_sensitive auf 195.50.179.7 und weitere.",
-    "what": "Das Werkzeug ffuf_sensitive hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: gobuster_dns auf castenow.de.",
-    "what": "Das Werkzeug gobuster_dns hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: httpx auf 213.23.169.167.",
+    "detail": "Betroffen: 213.23.169.167.",
     "what": "Das Werkzeug httpx hat kein Ergebnis geliefert"
    },
    {
-    "detail": "Betroffen: zap_active auf 195.50.179.2, zap_active auf 195.50.179.4, zap_active auf 195.50.179.5, zap_active auf 195.50.179.6, zap_active auf 195.50.179.7, zap_active auf 54.230.172.14 und weitere.",
-    "what": "Das Werkzeug zap_active hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: zap_spider auf 159.69.143.80.",
-    "what": "Das Werkzeug zap_spider hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: castenow.de, mail.castenow.de, mail2.castenow.de, nextcloud.castenow.de, owa.castenow.de.",
-    "what": "Fakten reichen für eine Aussage nicht aus"
-   },
-   {
-    "detail": "Betroffen: 159.69.143.80 (castenow.de, www.castenow.de), 195.50.179.2 (vpn.castenow.de), 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de und weitere), 195.50.179.5 (mailstore.castenow.de, nextcloud.castenow.de), 195.50.179.6 (bitwarden.castenow.de), 195.50.179.7 (rdgw.castenow.de) und weitere.",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
-   },
-   {
-    "detail": "Betroffen: 213.23.169.167 (forti-vpn.castenow.de), webtech auf 213.23.169.167.",
-    "what": "Keine Technologie-Signale erkannt"
-   },
-   {
     "detail": "Betroffen: castenow.de.",
-    "what": "Keine WHOIS-Daten vorhanden"
+    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
    },
    {
     "detail": "Betroffen: autodiscover.castenow.de, www.castenow.de (+castenow.de).",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
    },
    {
-    "detail": "Betroffen: bitwarden.castenow.de, forti-vpn.castenow.de, header_check auf bitwarden.castenow.de, header_check auf forti-vpn.castenow.de.",
+    "detail": "Betroffen: autodiscover.castenow.de, www.castenow.de (+castenow.de).",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: 159.69.143.80.",
+    "what": "Die Webanalyse-Komponente war nicht erreichbar"
+   },
+   {
+    "detail": "Betroffen: castenow.de, mail2.castenow.de, nextcloud.castenow.de.",
+    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
+   },
+   {
+    "detail": "Betroffen: 213.23.169.167 (forti-vpn.castenow.de).",
+    "what": "Keine Technologie-Signale erkannt"
+   },
+   {
+    "detail": "Betroffen: bitwarden.castenow.de, forti-vpn.castenow.de.",
     "what": "Virtueller Host war über HTTP nicht erreichbar"
    },
    {
-    "detail": "Betroffen: autodiscover.castenow.de, feroxbuster auf 195.50.179.4, feroxbuster auf 213.23.169.167, forti-vpn.castenow.de, mail.castenow.de, mail2.castenow.de und weitere.",
+    "detail": "Betroffen: castenow.de.",
+    "what": "Werkzeug lief in einen Timeout"
+   },
+   {
+    "detail": "Betroffen: autodiscover.castenow.de, forti-vpn.castenow.de.",
     "what": "Werkzeug wurde von der Scan-Steuerung übersprungen"
+   },
+   {
+    "detail": "Betroffen: 159.69.143.80, 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7 und weitere.",
+    "what": "Wortliste im Scanner fehlte, Verzeichnis-Prüfung nicht durchgeführt"
    },
    {
     "detail": "Betroffen: autodiscover.castenow.de, www.castenow.de (+castenow.de).",
@@ -2692,7 +2659,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 28 Befunde und 10 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 28 Befunde und 8 positive Feststellungen."
    }
   ],
   "numbers": [

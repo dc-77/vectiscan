@@ -389,5 +389,54 @@
    "member": "188.40.3.130:443",
    "note": "Port 443 nur in Lauf 1 offen gesehen"
   }
- ]
+ ],
+ "hinweis_positive_unterdrueckt": "S6, spec/08 Punkt 7 (Entscheidung DC): Ein Positivbefund entsteht nur, wenn die Pruefung fuer alle betroffenen Hosts bestanden ist; nicht pruefbar zaehlt nicht als bestanden. Diese Positivaussagen des Prototyps entfallen deshalb an den Junkerwerk-Daten. Jeder Eintrag nennt den Grund; verschwindet der Grund aus den Fakten, muss der Positivbefund wieder erscheinen, und der Test faellt.",
+ "positives_unterdrueckt": {
+  "VS-2026-P01": {
+   "bundle": "remote_admin_closed",
+   "reason_codes": [
+    "target_invalid_ipv6"
+   ],
+   "warum": "Die IPv6-Adresse des Auftrags wurde vom Portscan nie geprueft (Issue #8). Ob dort RDP oder SMB offen ist, weiss der Scan nicht."
+  },
+  "VS-2026-P03": {
+   "bundle": "software_eol",
+   "reason_codes": [
+    "target_invalid_ipv6"
+   ],
+   "warum": "Derselbe ungeprueffte IPv6-Host; eine Aussage zum Pflegestand aller Systeme waere nicht belegt."
+  },
+  "VS-2026-P04": {
+   "bundle": "mail_records",
+   "reason_codes": [
+    "second_target_unlabeled"
+   ],
+   "warum": "Fuer junkerwerk.hu liegen keine eigenen DNS-Abfragen vor (Issue #12); SPF und DKIM sind dort nicht geprueft."
+  },
+  "VS-2026-P05": {
+   "bundle": "dns_integrity",
+   "reason_codes": [
+    "second_target_unlabeled"
+   ],
+   "warum": "Dieselbe fehlende DNS-Abfrage fuer die zweite Domain."
+  },
+  "VS-2026-P06": {
+   "bundle": "cert_health",
+   "reason_codes": [
+    "cert_unknown",
+    "insufficient_facts",
+    "web_unreachable_after_portscan"
+   ],
+   "warum": "Fuer mehrere virtuelle Hosts fehlen die Zertifikatsdaten; 'alle Zertifikate in Ordnung' waere unbelegt."
+  },
+  "VS-2026-P07": {
+   "bundle": "tls_hardening",
+   "reason_codes": [
+    "insufficient_facts",
+    "tls_protocols_unknown",
+    "web_unreachable_after_portscan"
+   ],
+   "warum": "Genau der Fall aus spec/08 Punkt 7: der Bericht nannte die Transportverschluesselung unauffaellig, waehrend Kapitel 2 fuer mehrere Hosts 'Protokollliste nicht verfuegbar' meldete."
+  }
+ }
 }

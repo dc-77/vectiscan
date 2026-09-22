@@ -16,7 +16,18 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from reporter.validation.gate import ValidationGate, ValidationLevel
+
+
+# S6: Diese Datei prueft den alten Weg (KI#5, Reparaturkette, ReportLab). Seit der
+# Umschaltung ist ``catalog`` mit Renderer v3 die Vorgabe; der alte Weg laeuft nur
+# noch unter ``VECTISCAN_REPORT_ENGINE=legacy``.
+@pytest.fixture(autouse=True)
+def _legacy_engine(monkeypatch):
+    monkeypatch.setenv("VECTISCAN_REPORT_ENGINE", "legacy")
+    monkeypatch.setenv("VECTISCAN_REPORT_LAYOUT", "v1")
 
 COLLABORATORS = (
     "_get_db_connection", "_get_minio_client", "_download_rawdata", "tarfile",

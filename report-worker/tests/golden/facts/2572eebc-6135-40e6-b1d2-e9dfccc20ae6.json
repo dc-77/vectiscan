@@ -3686,12 +3686,12 @@
    "domain": "junkerwerk.de",
    "evidence": [
     {
-     "excerpt": "spf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dmarc=None dkim=True mx=['mx03.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx04.hornetsecurity.com', 'mx01.hornetsecurity.com']",
+     "excerpt": "spf=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.hornetsecurity.com ~all dkim=ja mx=mx03.hornetsecurity.com, mx02.hornetsecurity.com, mx04.hornetsecurity.com, mx01.hornetsecurity.com",
      "ref": "phase0/dns_records.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -3741,7 +3741,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "autodiscover.junkerwerk.de: status=200 title=Outlook final_url=https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0",
+     "excerpt": "autodiscover.junkerwerk.de: status=200 titel=Outlook final_url=https://autodiscover.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.junkerwerk.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3762,7 +3762,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [
@@ -3786,7 +3787,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "cloud.junkerwerk.de: status=200 title=IIS Windows Server final_url=https://cloud.junkerwerk.de",
+     "excerpt": "cloud.junkerwerk.de: status=200 titel=IIS Windows Server final_url=https://cloud.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3807,7 +3808,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3815,7 +3817,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3832,7 +3834,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3840,7 +3843,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mail.junkerwerk.de: status=200 title=Outlook final_url=https://mail.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.junkerwerk.de%2fowa%2f&reason=0",
+     "excerpt": "mail.junkerwerk.de: status=200 titel=Outlook final_url=https://mail.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.junkerwerk.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3861,7 +3864,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3869,7 +3873,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "nachhaltigkeit.junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "nachhaltigkeit.junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3886,7 +3890,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3894,7 +3899,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "nachhaltigkeit.junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "nachhaltigkeit.junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3911,7 +3916,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3919,7 +3925,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "openotp.junkerwerk.de: status=200 title=Junkerwerk Linder GmbH & Co.KG Web Applications Portal final_url=https://openotp.junkerwerk.de",
+     "excerpt": "openotp.junkerwerk.de: status=200 titel=Junkerwerk Linder GmbH & Co.KG Web Applications Portal final_url=https://openotp.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3940,7 +3946,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3948,7 +3955,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "outlook.junkerwerk.de: status=200 title=Outlook final_url=https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0",
+     "excerpt": "outlook.junkerwerk.de: status=200 titel=Outlook final_url=https://outlook.junkerwerk.de/owa/auth/logon.aspx?url=https%3a%2f%2foutlook.junkerwerk.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3969,7 +3976,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3977,7 +3985,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "rdgw-2016.junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "rdgw-2016.junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3994,7 +4002,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4002,7 +4011,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "rdgw.junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "rdgw.junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4019,7 +4028,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4027,7 +4037,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "team.junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "team.junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4044,7 +4054,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4052,7 +4063,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "ticket.junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "ticket.junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4069,7 +4080,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4077,7 +4089,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.junkerwerk.de: status=None title=None final_url=None",
+     "excerpt": "www.junkerwerk.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4094,7 +4106,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -4135,7 +4148,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=188.40.3.130 rdns=dedi2230.your-server.de fqdns=junkerwerk.de,www.junkerwerk.de,nachhaltigkeit.junkerwerk.de",
+     "excerpt": "ip=188.40.3.130 rdns=dedi2230.your-server.de fqdns=junkerwerk.de, www.junkerwerk.de, nachhaltigkeit.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4188,7 +4201,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=217.243.248.27 rdns= fqdns=ticket.junkerwerk.de",
+     "excerpt": "ip=217.243.248.27 fqdns=ticket.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4239,7 +4252,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=217.243.248.28 rdns=junkerwerk-solingen.de fqdns=outlook.junkerwerk.de,autodiscover.junkerwerk.de,mail.junkerwerk.de",
+     "excerpt": "ip=217.243.248.28 rdns=junkerwerk-solingen.de fqdns=outlook.junkerwerk.de, autodiscover.junkerwerk.de, mail.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4292,7 +4305,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=217.243.248.29 rdns= fqdns=cloud.junkerwerk.de,rdgw-2016.junkerwerk.de,rdgw.junkerwerk.de,team.junkerwerk.de",
+     "excerpt": "ip=217.243.248.29 fqdns=cloud.junkerwerk.de, rdgw-2016.junkerwerk.de, rdgw.junkerwerk.de, team.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4346,7 +4359,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=217.243.248.30 rdns= fqdns=openotp.junkerwerk.de",
+     "excerpt": "ip=217.243.248.30 fqdns=openotp.junkerwerk.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4448,12 +4461,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "autodiscover.junkerwerk.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
+     "excerpt": "autodiscover.junkerwerk.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
      "ref": "scan_results:header_check:217.243.248.28",
      "tool": "header_check"
     },
     {
-     "excerpt": "autodiscover.junkerwerk.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.2.2562', 'Windows Server']",
+     "excerpt": "autodiscover.junkerwerk.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET:4.0.30319, Outlook Web App:15.2.2562, Windows Server",
      "ref": "hosts/217.243.248.28/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4556,12 +4569,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "cloud.junkerwerk.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=None",
+     "excerpt": "cloud.junkerwerk.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0",
      "ref": "scan_results:header_check:217.243.248.29",
      "tool": "header_check"
     },
     {
-     "excerpt": "cloud.junkerwerk.de: status=200 title=IIS Windows Server webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET', 'Windows Server']",
+     "excerpt": "cloud.junkerwerk.de: status=200 titel=IIS Windows Server webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET, Windows Server",
      "ref": "hosts/217.243.248.29/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4665,7 +4678,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "junkerwerk.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "junkerwerk.de: erreichbar=nein",
      "ref": "scan_results:header_check:188.40.3.130",
      "tool": "header_check"
     }
@@ -4707,12 +4720,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mail.junkerwerk.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
+     "excerpt": "mail.junkerwerk.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
      "ref": "scan_results:header_check:217.243.248.28",
      "tool": "header_check"
     },
     {
-     "excerpt": "mail.junkerwerk.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.2.2562', 'Windows Server']",
+     "excerpt": "mail.junkerwerk.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET:4.0.30319, Outlook Web App:15.2.2562, Windows Server",
      "ref": "hosts/217.243.248.28/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4809,7 +4822,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "nachhaltigkeit.junkerwerk.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "nachhaltigkeit.junkerwerk.de: erreichbar=nein",
      "ref": "scan_results:header_check:188.40.3.130",
      "tool": "header_check"
     }
@@ -4845,7 +4858,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "nachhaltigkeit.junkerwerk.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "nachhaltigkeit.junkerwerk.de: erreichbar=nein",
      "ref": "scan_results:header_check:2a01:4f8:d0a:3124::2",
      "tool": "header_check"
     }
@@ -4890,12 +4903,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "openotp.junkerwerk.de: reachable=True score=6/7 server=Apache x-feserver=None",
+     "excerpt": "openotp.junkerwerk.de: erreichbar=ja score=6/7 server=Apache",
      "ref": "scan_results:header_check:217.243.248.30",
      "tool": "header_check"
     },
     {
-     "excerpt": "openotp.junkerwerk.de: status=200 title=Junkerwerk Linder GmbH & Co.KG Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']",
+     "excerpt": "openotp.junkerwerk.de: status=200 titel=Junkerwerk Linder GmbH & Co.KG Web Applications Portal webserver=Apache tech=Apache HTTP Server, HSTS",
      "ref": "hosts/217.243.248.30/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4998,12 +5011,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "outlook.junkerwerk.de: reachable=True score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
+     "excerpt": "outlook.junkerwerk.de: erreichbar=ja score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE-SE",
      "ref": "scan_results:header_check:217.243.248.28",
      "tool": "header_check"
     },
     {
-     "excerpt": "outlook.junkerwerk.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET', 'Outlook Web App:15.2.2562', 'Windows Server']",
+     "excerpt": "outlook.junkerwerk.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET, Outlook Web App:15.2.2562, Windows Server",
      "ref": "hosts/217.243.248.28/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5100,7 +5113,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "ticket.junkerwerk.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "ticket.junkerwerk.de: erreichbar=nein",
      "ref": "scan_results:header_check:217.243.248.27",
      "tool": "header_check"
     }
@@ -5136,7 +5149,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.junkerwerk.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "www.junkerwerk.de: erreichbar=nein",
      "ref": "scan_results:header_check:188.40.3.130",
      "tool": "header_check"
     }
@@ -5215,7 +5228,7 @@
    "domain": "junkerwerk.de",
    "evidence": [
     {
-     "excerpt": "{'a_records': ['188.40.3.130'], 'mx_records': ['junkerwerk-solingen.de'], 'ns_records': ['ns.udag.org', 'ns.udag.net', 'ns.udag.de'], 'txt_records': ['v=spf1 a mx ip4:217.243.248.28 include:spf.pro...",
+     "excerpt": "a_records=188.40.3.130 mx_records=junkerwerk-solingen.de ns_records=ns.udag.org, ns.udag.net, ns.udag.de txt_records=v=spf1 a mx ip4:217.243.248.28 include:spf.protection.outlook.com include:spf.ho...",
      "ref": "phase0a/securitytrails.json",
      "tool": "securitytrails"
     }
@@ -5240,7 +5253,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:21 | 220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG ru-RU.UTF-8;ru-...",
+     "excerpt": "188.40.3.130:21 banner=220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG ru-RU.UTF-...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5270,7 +5283,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:80 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Mon, 31 Aug 2026 08:14:43 GMT Server: Apache Location: https://www.junkerwerk.com/ Content-Length: 343 Content-Type: text/html; c...",
+     "excerpt": "188.40.3.130:80 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Mon, 31 Aug 2026 08:14:43 GMT Server: Apache Location: https://www.junkerwerk.com/ Content-Length: 343 Content-Type: text/ht...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5300,7 +5313,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:110 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+     "excerpt": "188.40.3.130:110 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5330,7 +5343,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDL...",
+     "excerpt": "188.40.3.130:143 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABL...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5360,7 +5373,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:443 Apache httpd | HTTP/1.1 403 Forbidden Date: Mon, 31 Aug 2026 08:47:44 GMT Server: Apache Content-Length: 304 Content-Type: text/html; charset=iso-8859-1",
+     "excerpt": "188.40.3.130:443 Apache httpd banner=HTTP/1.1 403 Forbidden Date: Mon, 31 Aug 2026 08:47:44 GMT Server: Apache Content-Length: 304 Content-Type: text/html; charset=iso-8859-1",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5390,7 +5403,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:587 | 220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.243.243.95 [224.243.243.95] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250...",
+     "excerpt": "188.40.3.130:587 banner=220 dedi2230.your-server.de Exim ESMTP Service ready 250-dedi2230.your-server.de Hello 224.243.243.95 [224.243.243.95] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELININ...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5420,7 +5433,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ A...",
+     "excerpt": "188.40.3.130:993 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITER...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5450,7 +5463,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:995 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+     "excerpt": "188.40.3.130:995 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5480,7 +5493,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:3306 MariaDB 10.11.18-MariaDB-0+deb12u1 | MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Server Cap...",
+     "excerpt": "188.40.3.130:3306 MariaDB 10.11.18-MariaDB-0+deb12u1 banner=MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Serve...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5510,7 +5523,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "188.40.3.130:5432 PostgreSQL 9.6.0 or later | PostgreSQL FATAL: no pg_hba.conf entry for host \"224.137.206.198\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf entry fo...",
+     "excerpt": "188.40.3.130:5432 PostgreSQL 9.6.0 or later banner=PostgreSQL FATAL: no pg_hba.conf entry for host \"224.137.206.198\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf ent...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5540,7 +5553,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.28:25 | 220 junkerwerk-solingen.de SMTP service ready 250-junkerwerk-solingen.de 250-SIZE 104857600 250-8BITMIME 250 STARTTLS",
+     "excerpt": "217.243.248.28:25 banner=220 junkerwerk-solingen.de SMTP service ready 250-junkerwerk-solingen.de 250-SIZE 104857600 250-8BITMIME 250 STARTTLS",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5568,7 +5581,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.28:4433 SonicWall | HTTP/1.1 200 OK Server: Web Server Cache-Control: no-store, max-age=0 Content-type: text/html; charset=UTF-8; X-Content-Type-Options: nosniff X-XSS-Protection: 1; mo...",
+     "excerpt": "217.243.248.28:4433 SonicWall banner=HTTP/1.1 200 OK Server: Web Server Cache-Control: no-store, max-age=0 Content-type: text/html; charset=UTF-8; X-Content-Type-Options: nosniff X-XSS-Protection:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5596,7 +5609,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.29:443 Microsoft IIS httpd 10.0 | HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Tue, 23 Sep 2025 13:01:11 GMT Accept-Ranges: bytes ETag: \"42ffd9228a2cdc1:0\" Server: Microsoft-I...",
+     "excerpt": "217.243.248.29:443 Microsoft IIS httpd 10.0 banner=HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Tue, 23 Sep 2025 13:01:11 GMT Accept-Ranges: bytes ETag: \"42ffd9228a2cdc1:0\" Server: Micros...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5623,7 +5636,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.29:8443 Microsoft IIS httpd 10.0 | HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Tue, 23 Sep 2025 13:01:11 GMT Accept-Ranges: bytes ETag: \"42ffd9228a2cdc1:0\" Server: Microsoft-...",
+     "excerpt": "217.243.248.29:8443 Microsoft IIS httpd 10.0 banner=HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Tue, 23 Sep 2025 13:01:11 GMT Accept-Ranges: bytes ETag: \"42ffd9228a2cdc1:0\" Server: Micro...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5650,7 +5663,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.30:25 Exim smtpd 4.96 | 220 archiv.junkerwerk.de ESMTP Exim 4.96 Sun, 30 Aug 2026 14:48:52 +0200 250-archiv.junkerwerk.de Hello wsf6og5mfz.net [224.55.142.174] 250-SIZE 52428800 250-8BI...",
+     "excerpt": "217.243.248.30:25 Exim smtpd 4.96 banner=220 archiv.junkerwerk.de ESMTP Exim 4.96 Sun, 30 Aug 2026 14:48:52 +0200 250-archiv.junkerwerk.de Hello wsf6og5mfz.net [224.55.142.174] 250-SIZE 52428800 25...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5677,7 +5690,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "217.243.248.30:443 Apache httpd | HTTP/1.1 200 OK Date: Mon, 31 Aug 2026 00:28:05 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosniff Stri...",
+     "excerpt": "217.243.248.30:443 Apache httpd banner=HTTP/1.1 200 OK Date: Mon, 31 Aug 2026 00:28:05 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosniff...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5704,7 +5717,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "2a01:4f8:d0a:3124::2:80 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Mon, 31 Aug 2026 11:21:49 GMT Server: Apache Location: https://erbbauverein.de/ Content-Length: 337 Content-Type: text/ht...",
+     "excerpt": "2a01:4f8:d0a:3124::2:80 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Mon, 31 Aug 2026 11:21:49 GMT Server: Apache Location: https://erbbauverein.de/ Content-Length: 337 Content-Type: te...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5733,7 +5746,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "2a01:4f8:d0a:3124::2:443 Apache httpd | HTTP/1.1 200 OK Date: Mon, 31 Aug 2026 11:22:03 GMT Server: Apache Expires: Thu, 19 Nov 1981 08:52:00 GMT Cache-Control: no-store, no-cache, must-revalidate...",
+     "excerpt": "2a01:4f8:d0a:3124::2:443 Apache httpd banner=HTTP/1.1 200 OK Date: Mon, 31 Aug 2026 11:22:03 GMT Server: Apache Expires: Thu, 19 Nov 1981 08:52:00 GMT Cache-Control: no-store, no-cache, must-revali...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5796,7 +5809,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-08-31T14:27:22.394256+00:00 finishedAt=2026-08-31T14:56:47.128641+00:00",
+    "excerpt": "Beginn=2026-08-31T14:27:22.394256+00:00 Ende=2026-08-31T14:56:47.128641+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -5860,7 +5873,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -8051,7 +8064,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "autodiscover.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=None",
+     "excerpt": "autodiscover.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.28/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -8101,7 +8114,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:217.243.248.28",
      "tool": "testssl"
     }
@@ -8162,24 +8175,30 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "security_headers",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "NOT supported",
      "id": "fallback_SCSV",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2011-3389",
+     "cves": [
+      "CVE-2011-3389"
+     ],
      "finding": "ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-SHA AES128-SHA",
      "id": "BEAST_CBC_TLS1",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "B",
      "id": "overall_grade",
      "severity": "MEDIUM"
@@ -8187,12 +8206,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "cloud.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=None",
+     "excerpt": "cloud.junkerwerk.de:443 tls=tls13 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.29/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=True TLS1.1=True TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.0, TLS1.1, TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3",
      "ref": "scan_results:testssl:217.243.248.29",
      "tool": "testssl"
     },
@@ -8263,48 +8282,58 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_3DES_IDEA",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc012   ECDHE-RSA-DES-CBC3-SHA            ECDH 253   3DES        168      TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_xc012",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x16     EDH-RSA-DES-CBC3-SHA              DH 4096    3DES        168      TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_x16",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x0a     DES-CBC3-SHA                      RSA        3DES        168      TLS_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_x0a",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "max-age too short. 1 days (=86400 seconds) < 15552000 seconds",
      "id": "HSTS_time",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Multiple X-Frame-Options headers. Using first header: sameorigin",
      "id": "X-Frame-Options_multiple",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Multiple Cache-Control headers. Using first header: no-store, no-cache, must-revalidate",
      "id": "Cache-Control_multiple",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "potentially VULNERABLE, gzip HTTP compression detected  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "MEDIUM"
@@ -8312,12 +8341,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "openotp.junkerwerk.de:443 tls=tls12 cn=*.junkerwerk.de not_after=2026-12-11T23:59:59Z mismatched=None",
+     "excerpt": "openotp.junkerwerk.de:443 tls=tls12 cn=*.junkerwerk.de gueltig_bis=2026-12-11T23:59:59Z",
      "ref": "hosts/217.243.248.30/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False",
+     "excerpt": "angeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3",
      "ref": "scan_results:testssl:217.243.248.30",
      "tool": "testssl"
     },

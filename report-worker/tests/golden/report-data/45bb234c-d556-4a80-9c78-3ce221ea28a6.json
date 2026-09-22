@@ -12,7 +12,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 25 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (4 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 14 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 25 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (4 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 14 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -116,8 +116,7 @@
   "repeat": [
    "Nachprüfung der Sofortmaßnahmen nach ihrer Umsetzung, gezielt auf die betroffenen Dienste.",
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
-   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall.",
-   "Freischaltung der Scanner-Adresse beim Betreiber der blockierenden Systeme, damit die offenen Prüfungen im nächsten Durchgang nachgeholt werden können."
+   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall."
   ],
   "tool_findings": [],
   "tools": [
@@ -151,7 +150,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist oder einen kritischen Dienst exponiert. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
    },
    {
     "l": "Gelb",
@@ -161,7 +160,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
    },
    {
     "l": "Grün",
@@ -516,12 +515,13 @@
   {
    "affected": "5.199.141.24:3306 (MariaDB)",
    "cat": "A",
-   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.68-MariaDB\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.68-MariaDB Thread ID: 9607553 Capabilities flags: 63487 Some Capabilities: LongColumnFlag, Support41Auth, Speaks41ProtocolOld, InteractiveClient, SupportsLoadDataLocal, FoundRows, SupportsTransaction...",
+   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.68-MariaDB Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.68-MariaDB Thread ID: 9607553 Capabilities flags: 63487 Some Capabilities: LongColumnFlag, Support41Auth, Speaks41ProtocolOld, InteractiveClient, SupportsLoadDataLocal, FoundRows, SupportsTransaction...",
    "found": "Der Host 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 5.199.141.24:3306 (MariaDB). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
    "id": "VS-2026-001",
    "impact": "Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.",
    "level": "kritisch",
-   "policy": "SP-DB-001",
+   "level_label": "kritisch",
+   "policy": "db_exposed",
    "recommendation": [
     [
      "Unverzüglich",
@@ -547,12 +547,13 @@
   {
    "affected": "5.199.141.24:8443 (Plesk)",
    "cat": "A",
-   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n8443/tcp open https-alt sw-cp-server tunnel=ssl",
+   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:8443/tcp Dienst=https-alt Produkt=sw-cp-server Zustand=open TLS erzwungen=ja\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n8443/tcp open https-alt sw-cp-server tunnel=ssl",
    "found": "Der Host 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) bietet eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten Internet erreichbar ist: 5.199.141.24:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist von außen nicht erkennbar.",
    "id": "VS-2026-002",
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
    "level": "erhoeht",
-   "policy": "catalog_sim R-ADMIN-EXPOSED",
+   "level_label": "erhöht",
+   "policy": "admin_service_exposed",
    "recommendation": [
     [
      "Unverzüglich",
@@ -572,18 +573,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Verwaltungsoberfläche aus dem Internet erreichbar",
-   "urgency": "Unverzüglich",
+   "urgency": "In Kürze",
    "verify": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
   },
   {
    "affected": "5.199.141.24:21 (FTP ohne TLS-Zwang)",
    "cat": "A",
-   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n21/tcp open ftp ProFTPD",
+   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open",
    "found": "Auf 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) nehmen Datei- oder Mailzugänge eine Anmeldung entgegen, ohne eine Transportverschlüsselung zu erzwingen: 5.199.141.24:21 (FTP ohne TLS-Zwang).",
    "id": "VS-2026-003",
    "impact": "Ohne erzwungene Transportverschlüsselung gehen Anmeldedaten und Inhalte im Klartext über das Netz. Jeder Mitleser auf dem Übertragungsweg kann sie abgreifen und für weitere Zugriffe auf den Dienst oder auf wiederverwendete Konten nutzen.",
    "level": "erhoeht",
-   "policy": "catalog_sim R-FTP-PLAIN",
+   "level_label": "erhöht",
+   "policy": "ftp_plaintext",
    "recommendation": [
     [
      "Unverzüglich",
@@ -603,18 +605,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Datei- und Mailzugänge auf 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) ohne erzwungene Transportverschlüsselung",
-   "urgency": "Unverzüglich",
+   "urgency": "In Kürze",
    "verify": "Anmeldung an den genannten Diensten versuchen, bevor eine Transportverschlüsselung aufgebaut ist; erwartet wird die Ablehnung dieser Anmeldung."
   },
   {
    "affected": "5.199.141.24: MariaDB 5.5.68 (Support beendet 2020-04-11)",
    "cat": "B",
-   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.68-MariaDB\n\nwebtech · hosts/5.199.141.24/phase1/tech_profile.json\ntechnologies: MySQL 5.5.68-MariaDB",
+   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24: Produkt=MariaDB Familie=mariadb Version=5.5.68 Pflegestatus=eol Pflegeende=2020-04-11 Quelle=endoflife_date\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.68-MariaDB\n\nwebtech · hosts/5.199.141.24/phase1/tech_profile.json\ntechnologies: MySQL 5.5.68-MariaDB",
    "found": "Auf 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 5.199.141.24: MariaDB 5.5.68 (Support beendet 2020-04-11).",
    "id": "VS-2026-004",
    "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist.",
    "level": "erhoeht",
-   "policy": "SP-EOL-001",
+   "level_label": "erhöht",
+   "policy": "software_eol",
    "recommendation": [
     [
      "In Kürze",
@@ -636,12 +639,13 @@
   {
    "affected": "5.199.141.24:8880 (unbekannt, laut Passivquelle)",
    "cat": "A",
-   "evidence": "shodan · phase0a/shodan_hosts.json\n5.199.141.24:8880 | HTTP/1.1 303 See Other Server: sw-cp-server Date: Sat, 18 Apr 2026 15:21:29 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Expires:...",
+   "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 5.199.141.24:8880 gesehen am=2026-05-10T06:31:37Z Banner=HTTP/1.1 303 See Other Server: sw-cp-server Date: Sat, 18 Apr 2026 15:21:29 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection:...\n\nshodan · phase0a/shodan_hosts.json\n5.199.141.24:8880 banner=HTTP/1.1 303 See Other Server: sw-cp-server Date: Sat, 18 Apr 2026 15:21:29 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Exp...",
    "found": "Eine Passivquelle meldet für 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 5.199.141.24:8880 (unbekannt, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
    "id": "VS-2026-005",
    "impact": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
    "level": "hoch",
-   "policy": "Prototyp VS-002 (manuell, Passivquelle)",
+   "level_label": "hoch",
+   "policy": "admin_service_exposed_passive",
    "recommendation": [
     [
      "In Kürze",
@@ -667,12 +671,13 @@
   {
    "affected": "webmail.trunk-immobilien.de:443 (Zertifikat für home4.publishsoft.de)",
    "cat": "D",
-   "evidence": "httpx · hosts/5.199.141.24/phase2/httpx.json\nwebmail.trunk-immobilien.de:443 tls=tls13 cn=home4.publishsoft.de not_after=2026-06-26T08:35:55Z mismatched=True",
+   "evidence": "httpx · hosts/5.199.141.24/phase2/httpx.json\nwebmail.trunk-immobilien.de:443 CN=home4.publishsoft.de SAN=home4.publishsoft.de Aussteller=R13 gueltig_bis=2026-06-26T08:35:55Z abgelaufen=nein Resttage=46 Namensabweichung=ja Protokolle=TLS1.3\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\nwebmail.trunk-immobilien.de:443 tls=tls13 cn=home4.publishsoft.de gueltig_bis=2026-06-26T08:35:55Z namensabweichung=ja",
    "found": "Die Zertifikate auf webmail.trunk-immobilien.de sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: webmail.trunk-immobilien.de:443 (Zertifikat für home4.publishsoft.de).",
    "id": "VS-2026-006",
    "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
    "level": "hoch",
-   "policy": "catalog_sim R-CERT-MISMATCH",
+   "level_label": "hoch",
+   "policy": "cert_hostname_mismatch",
    "recommendation": [
     [
      "Unverzüglich",
@@ -688,18 +693,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Zertifikate auf webmail.trunk-immobilien.de mit Beanstandungen",
-   "urgency": "Unverzüglich",
+   "urgency": "In Kürze",
    "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
   },
   {
    "affected": "5.199.141.24: WordPress 6.4.2 (Support beendet 2024-04-02)",
    "cat": "B",
-   "evidence": "cms_fingerprint · hosts/5.199.141.24/phase1/tech_profile.json\ncms_details.raw: WordPress 6.4.2\n\nwebtech · hosts/5.199.141.24/phase1/tech_profile.json\ntechnologies: WordPress 6.4.2\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\ntech: WordPress:6.4.2",
+   "evidence": "cms_fingerprint · hosts/5.199.141.24/phase1/tech_profile.json\n5.199.141.24: Produkt=WordPress Familie=wordpress Version=6.4.2 Pflegestatus=eol Pflegeende=2024-04-02 Quelle=endoflife_date\n\ncms_fingerprint · hosts/5.199.141.24/phase1/tech_profile.json\ncms_details.raw: WordPress 6.4.2\n\nwebtech · hosts/5.199.141.24/phase1/tech_profile.json\ntechnologies: WordPress 6.4.2\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\n5.199.141.24: Produkt=WordPress Familie=wordpress Version=6.4.2 Pflegestatus=eol Pflegeende=2024-04-02 Quelle=endoflife_date\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\ntech: WordPress:6.4.2",
    "found": "Auf 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) ist eine Anwendungskomponente im Einsatz, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 5.199.141.24: WordPress 6.4.2 (Support beendet 2024-04-02).",
    "id": "VS-2026-007",
    "impact": "Sprachlaufzeiten, CMS-Kerne, Bibliotheken, Plugins, Themes oder sonstige Komponenten ohne Herstellerpflege erhalten keine Sicherheitsaktualisierungen mehr. Bekannte Schwachstellen bleiben über die Anwendung erreichbar, auch wenn die Komponente selbst keinen eigenen Netzwerkdienst bereitstellt.",
    "level": "mittel",
-   "policy": "SP-EOL-002/003",
+   "level_label": "mittel",
+   "policy": "software_eol_runtime",
    "recommendation": [
     [
      "In Kürze",
@@ -715,18 +721,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Anwendungsnahe Software ohne Herstellerpflege",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Versionsstand der Komponente auf dem System prüfen und mit den Lebenszyklusangaben des Herstellers vergleichen; erwartet wird eine Version mit laufender Pflege."
   },
   {
    "affected": "trunk-immobilien.de (p=none)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 mx -all dmarc=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; dkim=False mx=['mx.publishsoft.de']\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\ntrunk-immobilien.de: SPF=v=spf1 mx -all DMARC=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; DKIM-Selektoren=keiner bekannt MX=mx.publishsoft.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für trunk-immobilien.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: trunk-immobilien.de (p=none).",
    "id": "VS-2026-008",
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "mittel",
-   "policy": "SP-DNS-007",
+   "level_label": "mittel",
+   "policy": "dmarc_none",
    "recommendation": [
     [
      "In Kürze",
@@ -738,22 +745,23 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
    "title": "Richtlinie zur Absender-Authentizität für trunk-immobilien.de nicht durchsetzend",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
   },
   {
    "affected": "trunk-immobilien.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 mx -all dmarc=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; dkim=False mx=['mx.publishsoft.de']\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\ntrunk-immobilien.de: SPF=v=spf1 mx -all DMARC=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; DKIM-Selektoren=keiner bekannt MX=mx.publishsoft.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für trunk-immobilien.de fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können: trunk-immobilien.de.",
    "id": "VS-2026-009",
    "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
    "level": "mittel",
-   "policy": "SP-DNS-008",
+   "level_label": "mittel",
+   "policy": "dkim_missing",
    "recommendation": [
     [
      "In Kürze",
@@ -765,22 +773,23 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
    "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für trunk-immobilien.de",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "DNS-Abfrage für die genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
   },
   {
    "affected": "5.199.141.24:110 (POP3), 5.199.141.24:143 (IMAP), 5.199.141.24:21 (FTP)",
    "cat": "A",
-   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n21/tcp open ftp ProFTPD\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n110/tcp open pop3 Dovecot pop3d\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\npop3-capabilities: APOP AUTH-RESP-CODE USER SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) STLS UIDL TOP RESP-CODES PIPELINING CAPA\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n143/tcp open imap Dovecot imapd\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\nimap-capabilities: OK listed IDLE AUTH=LOGIN capabilities ID post-login SASL-IR more have LITERAL+ AUTH=CRAM-MD5A0001 Pre-login IMAP4rev1 AUTH=PLAIN ENABLE AUTH=DIGEST-MD5 STARTTLS LOGIN-REFERRALS",
+   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=APOP, AUTH-RESP-CODE, USER, SASL(PLAIN\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\npop3-capabilities: APOP AUTH-RESP-CODE USER SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) STLS UIDL TOP RESP-CODES PIPELINING CAPA\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN Capabilities=OK, listed, IDLE, AUTH=LOGIN\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\nimap-capabilities: OK listed IDLE AUTH=LOGIN capabilities ID post-login SASL-IR more have LITERAL+ AUTH=CRAM-MD5A0001 Pre-login IMAP4rev1 AUTH=PLAIN ENABLE AUTH=DIGEST-MD5 STARTTLS LOGIN-REFERRALS",
    "found": "Der Host 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 5.199.141.24:110 (POP3), 5.199.141.24:143 (IMAP), 5.199.141.24:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
    "id": "VS-2026-010",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
-   "policy": "Prototyp VS-005",
+   "level_label": "niedrig",
+   "policy": "legacy_protocols_present",
    "recommendation": [
     [
      "In Kürze",
@@ -796,18 +805,19 @@
    "status": "blau",
    "threat": null,
    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
   {
    "affected": "trunk-immobilien.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 mx -all dmarc=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; dkim=False mx=['mx.publishsoft.de']\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\ntrunk-immobilien.de: SPF=v=spf1 mx -all DMARC=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; DKIM-Selektoren=keiner bekannt MX=mx.publishsoft.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für trunk-immobilien.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: trunk-immobilien.de.",
    "id": "VS-2026-011",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
-   "policy": "Prototyp VS-008, SP-DNS-009, SP-DNS-011",
+   "level_label": "niedrig",
+   "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -815,7 +825,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "Transportverschlüsselung im Mailversand für trunk-immobilien.de nicht erzwungen",
@@ -825,12 +835,13 @@
   {
    "affected": "dev.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), webmail.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), www.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:5.199.141.24\ndev.trunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\ndev.trunk-immobilien.de: status=200 title=J. T. Jürgen Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:27.2.11', 'Complianz', 'MySQL', 'Nginx', 'PHP', 'Plesk', 'WP Fastest Cache', 'WordPress:6.4.2', 'jQuery', 'jQuery Migrate:3.4.1']\n\nheader_check · scan_results:header_check:5.199.141.24\nftp.trunk-immobilien.de: reachable=None score=0/7 server=None x-feserver=None\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\nftp.trunk-immobilien.de: status=200 title=Default Parallels Plesk Page webserver=nginx tech=['Nginx']\n\nheader_check · scan_results:header_check:5.199.141.24\ntrunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\ntrunk-immobilien.de: status=200 title=J. T. Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:28.2.1', 'Complianz', 'MySQL', 'Nginx', 'PHP:8.2.30', 'WP Fastest Cache', 'WordPress', 'jQuery', 'jQuery Migrate:3.4.1']\n\nheader_check · scan_results:header_check:5.199.141.24\nwebmail.trunk-immobilien.de: reachable=None score=0/7 server=None x-feserver=None\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\nwebmail.trunk-immobilien.de: status=200 title=Default Parallels Plesk Page webserver=nginx tech=['Nginx']\n\nheader_check · scan_results:header_check:5.199.141.24\nwww.trunk-immobilien.de: reachable=None score=0/7 server=nginx x-feserver=None\n\nhttpx · hosts/5.199.141.24/phase2/httpx.json\nwww.trunk-immobilien.de: status=200 title=J. T. Trunk Immobilien GmbH webserver=nginx tech=['BeTheme:28.2.1', 'Complianz', 'MySQL', 'Nginx', 'PHP:8.2.30', 'WP Fastest Cache', 'WordPress', 'jQuery', 'jQuery Migrate:3.4.1']",
+   "evidence": "header_check · scan_results:header_check:5.199.141.24\ndev.trunk-immobilien.de: URL=https://dev.trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx...\n\nheader_check · scan_results:header_check:5.199.141.24\nftp.trunk-immobilien.de: URL=https://ftp.trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:5.199.141.24\ntrunk-immobilien.de: URL=https://trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx\n\nheader_check · scan_results:header_check:5.199.141.24\nwebmail.trunk-immobilien.de: URL=https://webmail.trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:5.199.141.24\nwww.trunk-immobilien.de: URL=https://www.trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx...",
    "found": "Die Webdienste auf 5.199.141.24 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: dev.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), webmail.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), www.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-012",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
-   "policy": "SP-HDR-005",
+   "level_label": "niedrig",
+   "policy": "security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -842,7 +853,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 5.199.141.24 unvollständig",
@@ -852,12 +863,13 @@
   {
    "affected": "5.199.141.24:22 (OpenSSH 7.4), 5.199.141.24:3306 (MariaDB 5.5.68)",
    "cat": "E",
-   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n22/tcp open ssh OpenSSH 7.4 (protocol 2.0)\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.68-MariaDB\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.68-MariaDB Thread ID: 9607553 Capabilities flags: 63487 Some Capabilities: LongColumnFlag, Support41Auth, Speaks41ProtocolOld, InteractiveClient, SupportsLoadDataLocal, FoundRows, SupportsTransaction...",
+   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:22/tcp Dienst=ssh Produkt=OpenSSH Version=7.4 Zustand=open\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n22/tcp open ssh OpenSSH 7.4 (protocol 2.0)\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.68-MariaDB Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.68-MariaDB Thread ID: 9607553 Capabilities flags: 63487 Some Capabilities: LongColumnFlag, Support41Auth, Speaks41ProtocolOld, InteractiveClient, SupportsLoadDataLocal, FoundRows, SupportsTransaction...",
    "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 5.199.141.24:22 (OpenSSH 7.4), 5.199.141.24:3306 (MariaDB 5.5.68).",
    "id": "VS-2026-013",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
-   "policy": "SP-DISC-001",
+   "level_label": "niedrig",
+   "policy": "service_banner_version",
    "recommendation": [
     [
      "Mittelfristig",
@@ -879,12 +891,13 @@
   {
    "affected": "trunk-immobilien.de",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 mx -all dmarc=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; dkim=False mx=['mx.publishsoft.de']\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\ntrunk-immobilien.de: SPF=v=spf1 mx -all DMARC=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; DKIM-Selektoren=keiner bekannt MX=mx.publishsoft.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für trunk-immobilien.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: trunk-immobilien.de.",
    "id": "VS-2026-014",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
-   "policy": "SP-DNS-003, SP-DNS-001",
+   "level_label": "niedrig",
+   "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -892,7 +905,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "DNS-Absicherung für trunk-immobilien.de nicht eingerichtet",
@@ -945,8 +958,7 @@
     "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
     "n": 1,
     "refs": [
-     "VS-2026-001",
-     "VS-2026-002"
+     "VS-2026-001"
     ],
     "title": "Datenbankdienst aus dem Internet erreichbar"
    },
@@ -960,26 +972,25 @@
     "title": "Datei- und Mailzugänge auf 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) ohne erzwungene Transportverschlüsselung"
    },
    {
-    "effect": "Schließt bekannte Lücken in veralteten Ständen",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
     "n": 3,
     "refs": [
+     "VS-2026-002",
      "VS-2026-004",
-     "VS-2026-005",
-     "VS-2026-007",
-     "VS-2026-010"
+     "VS-2026-005"
     ],
-    "title": "Serversoftware ohne Herstellerpflege"
+    "title": "Verwaltungsoberfläche aus dem Internet erreichbar"
    }
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die Härtung der erreichbaren Dienste, die Authentizität der E-Mail und die Transportverschlüsselung."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 21,
-  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 14,
   "customer": "Auftraggeber",
@@ -987,7 +998,7 @@
   "domains": [
    "trunk-immobilien.de"
   ],
-  "facts_schema_version": "1.0.2",
+  "facts_schema_version": "1.0.3",
   "fqdns_total": 5,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
@@ -1000,8 +1011,8 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
-  "positives": 5,
+  "policy_version": "2026-09-22.1",
+  "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
@@ -1018,41 +1029,50 @@
  },
  "plan": [
   {
-   "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken. Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.",
+   "action": "Den externen Datenbankzugriff in der Verwaltung des Hosters oder in der Firewall deaktivieren. Falls eine externe Anwendung ihn benötigt, den Zugriff auf deren feste Quelladressen beschränken.",
    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
    "prio": "Unverzüglich",
    "refs": [
-    "VS-2026-001",
-    "VS-2026-002"
+    "VS-2026-001"
    ],
    "st": "rot"
   },
   {
    "action": "Auf den betroffenen Diensten die Transportverschlüsselung erzwingen, sodass eine Anmeldung ohne aufgebautes TLS abgelehnt wird. Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
-   "prio": "Unverzüglich",
+   "prio": "In Kürze",
    "refs": [
     "VS-2026-003",
     "VS-2026-006"
    ],
-   "st": "rot"
+   "st": "gelb"
   },
   {
-   "action": "Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand. Bestand der betroffenen Komponente ermitteln und mit den Lebenszyklusangaben des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
-   "effect": "Schließt bekannte Lücken in veralteten Ständen",
+   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst. Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
    "prio": "In Kürze",
    "refs": [
+    "VS-2026-002",
     "VS-2026-004",
-    "VS-2026-005",
+    "VS-2026-005"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Bestand der betroffenen Komponente ermitteln und mit den Lebenszyklusangaben des Herstellers abgleichen. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+   "effect": "Schließt bekannte Lücken in veralteten Ständen",
+   "prio": "Mittelfristig",
+   "refs": [
     "VS-2026-007",
-    "VS-2026-010"
+    "VS-2026-010",
+    "VS-2026-013"
    ],
    "st": "gelb"
   },
   {
    "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten. Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
-   "prio": "In Kürze",
+   "prio": "Mittelfristig",
    "refs": [
     "VS-2026-008",
     "VS-2026-009"
@@ -1065,15 +1085,6 @@
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-012"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
-   "effect": "Nimmt Angreifern Vorbereitungswissen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-013"
    ],
    "st": "blau"
   },
@@ -1103,11 +1114,6 @@
    "cat": "C",
    "text": "Für trunk-immobilien.de lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
    "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
-  },
-  {
-   "cat": "D",
-   "text": "Auf webmail.trunk-immobilien.de bieten die verschlüsselten Dienste nur aktuelle Protokolle und Verfahren an.",
-   "title": "Transportverschlüsselung ohne veraltete Protokolle und Verfahren"
   },
   {
    "cat": "D",
@@ -1143,47 +1149,47 @@
   "lead": "Der Scan hat 1 IP-Adresse mit 5 Hostnamen erfasst. Alle Hosts konnten aktiv geprüft werden.",
   "limitations": [
    {
+    "detail": "Betroffen: 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de und weitere).",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
     "detail": "Betroffen: webmail.trunk-immobilien.de.",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: webmail.trunk-immobilien.de.",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
    },
    {
     "detail": "Betroffen: trunk-immobilien.de.",
-    "what": "Fakten reichen für eine Aussage nicht aus"
-   },
-   {
-    "detail": "Betroffen: 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de und weitere), dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de.",
-    "what": "Keine Abdeckungsinformation für dieses Werkzeug"
-   },
-   {
-    "detail": "Betroffen: 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de und weitere).",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
+    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
    },
    {
     "detail": "Betroffen: webmail.trunk-immobilien.de.",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
-   },
-   {
-    "detail": "Betroffen: dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de.",
     "what": "Virtueller Host war über HTTP nicht erreichbar"
    },
    {
-    "detail": "Betroffen: gobuster_dns auf trunk-immobilien.de.",
-    "what": "Werkzeug lief in einen Timeout"
-   },
-   {
     "detail": "Betroffen: trunk-immobilien.de.",
-    "what": "WordPress-Details nicht verfügbar (wpscan ohne Ergebnis)"
+    "what": "Werkzeug lief in einen Timeout"
    },
    {
     "detail": "Betroffen: webmail.trunk-immobilien.de.",
     "what": "Zertifikatsdetails nicht verfügbar"
+   },
+   {
+    "detail": "Betroffen: 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de und weitere), trunk-immobilien.de, trunk-immobilien.de.",
+    "what": "Zu diesem Werkzeug liegt kein Laufprotokoll vor"
+   },
+   {
+    "detail": "Betroffen: trunk-immobilien.de.",
+    "what": "Zur WordPress-Installation lagen keine Angaben zu Kern, Erweiterungen und Benutzern vor"
    }
   ],
   "method_phases": [
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 5 Hostnamen auf 1 IP-Adressen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 5 Hostnamen auf 1 IP-Adresse."
    },
    {
     "n": "1",
@@ -1198,7 +1204,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 14 Befunde und 5 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 14 Befunde und 4 positive Feststellungen."
    }
   ],
   "numbers": [

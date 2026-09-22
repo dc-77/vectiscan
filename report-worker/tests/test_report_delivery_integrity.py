@@ -37,6 +37,14 @@ def _write_pdf(path: Path, *, body_kb: int = 40, tail: bytes = b"startxref\n123\
     return path
 
 
+# S6: Diese Datei prueft den alten Weg (KI#5, Reparaturkette, ReportLab). Seit der
+# Umschaltung ist ``catalog`` mit Renderer v3 die Vorgabe; der alte Weg laeuft nur
+# noch unter ``VECTISCAN_REPORT_ENGINE=legacy``.
+@pytest.fixture(autouse=True)
+def _legacy_engine(monkeypatch):
+    monkeypatch.setenv("VECTISCAN_REPORT_ENGINE", "legacy")
+    monkeypatch.setenv("VECTISCAN_REPORT_LAYOUT", "v1")
+
 class TestAssertPdfIntact:
     def test_accepts_complete_pdf(self, tmp_path: Path) -> None:
         pdf = _write_pdf(tmp_path / "ok.pdf")

@@ -152,9 +152,13 @@ def apply_json(result: TestsslResult, entries: list[dict[str, Any]] | None) -> N
         except (TypeError, ValueError):
             pass
         result.json_parsed = True
-        cve = _CVE_RE.search(str(e.get("cve") or ""))
+        # S6 (spec/08 Punkt 18): testssl nennt je Test mehrere CVE-Kennungen
+        # ("CVE-2013-2566 CVE-2015-2808" bei RC4, neun bei ROBOT). Bisher stand
+        # nur die erste im Fakt, und Anhang A.3 liess die uebrigen weg.
+        cves = _CVE_RE.findall(str(e.get("cve") or ""))
         result.entries.append({"id": eid, "severity": sev, "finding": finding[:300],
-                               "cve": cve.group(0) if cve else None})
+                               "cve": cves[0] if cves else None,
+                               "cves": cves})
         if eid == "scanProblem" or (sev == "FATAL" and "connect" in finding.lower()):
             result.connect_failed = True
             continue

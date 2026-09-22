@@ -91,13 +91,28 @@ def test_zap_active_hat_abdeckung(results):
 
 
 def test_web_vulnerability_active_ist_an_echten_daten_entschieden(results):
-    """Bis S2b war die Pruefung nur ueber Fixtures gedeckt."""
+    """Bis S2b war die Pruefung nur ueber Fixtures gedeckt.
+
+    Seit S6 (Issue #15, spec/08 Punkt 2) entscheidet die Konfidenz: dieser Auftrag
+    traegt eine Path-Traversal-Meldung auf dem oEmbed-Endpunkt von WordPress mit
+    niedriger Konfidenz. Sie stand im ausgelieferten Bericht als "aktiv
+    nachgewiesen" und ist ein bekannter Falschpositiv-Kandidat. Jetzt ist sie eine
+    Werkzeugmeldung im Anhang und kein Befund.
+    """
     rows = _by_check(results, "web_vulnerability_active")
     assert rows
     assert all(r.status in ("fail", "pass") for r in rows), (
         f"unentschieden: {[(r.status, r.reason_code) for r in rows]}")
-    assert any(r.status == "fail" for r in rows), (
-        "erwartet wird mindestens ein aktiv nachgewiesener Befund")
+    assert not any(r.status == "fail" for r in rows), (
+        "keine Meldung dieses Auftrags hat Konfidenz High")
+
+    gemeldet = _by_check(results, "web_vulnerability_reported")
+    treffer = [r for r in gemeldet if r.status == "fail"]
+    assert treffer, "die Meldung muss als Werkzeugmeldung erhalten bleiben"
+    assert not any(r.active_proof for r in treffer)
+    nachweis = treffer[0].evidence[0]
+    assert nachweis.tool == "zap_active"
+    assert "Konfidenz=" in nachweis.excerpt
 
 
 def test_sensitive_path_exposed_ist_pruefbar(results):

@@ -135,6 +135,11 @@ class FactsIndex:
         self.fqdn_by_key: dict[tuple[str, str], FS.FqdnFact] = {}
         self.fqdns_by_ip: dict[str, list[FS.FqdnFact]] = defaultdict(list)
         for f in sorted(facts.fqdns, key=lambda x: sort_key(x.name, x.host_ip)):
+            # S6 (spec/08 Punkt 13): Ein Wildcard-Eintrag steht fuer alle nicht
+            # einzeln benannten Namen und ist selbst kein pruefbarer Host. Er
+            # wuerde sonst in jeder Betroffenenliste und unter jedem Bild stehen.
+            if f.wildcard:
+                continue
             self.fqdn_by_key[(f.name, f.host_ip)] = f
             self.fqdns_by_ip[f.host_ip].append(f)
         # Alias-Aufloesung: (alias, ip) -> kanonischer Name
@@ -213,6 +218,13 @@ def normalize_reason(reason: str | None, raw_status: str | None = None) -> str:
     if not text:
         return raw_status or "no_output"
     low = text.lower()
+    # S6 (spec/08 Punkt 9): Der Scanner schreibt fuer ein Werkzeug ausserhalb des
+    # gebuchten Pakets teils "not_in_package", teils "package_<paket>"
+    # (phase2, zap_active im WebCheck). Der zweite Fall stand in keiner Tabelle und
+    # wurde deshalb zu "nicht pruefbar": der WebCheck-Bericht behauptete, die aktive
+    # Webanalyse habe kein Ergebnis geliefert, obwohl das Paket sie gar nicht enthaelt.
+    if low.startswith("package_") or low == "not_in_package":
+        return "not_in_package"
     if low.startswith("wordlist_missing"):
         return "wordlist_missing"
     if low.startswith("timeout"):

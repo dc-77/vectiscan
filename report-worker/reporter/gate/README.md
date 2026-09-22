@@ -37,8 +37,9 @@ nicht zwei; woher ein Eintrag kommt, steht deshalb am Eintrag (`engine`).
 | Schrift nicht eingebettet | Fehler | WeasyPrint setzt still mit einer Ersatzschrift weiter, dann stehen wieder ae und ue statt Umlauten. |
 | Gedankenstrich im Fließtext | Fehler | Hausregel für Kundentexte. |
 | Halbleere Seiten | Warnung | Sie hängen an der Datenmenge und sind je Auftrag in `tests/golden/render/expected-pages.json` bekannt (S4). |
+| Kein Werkzeuglauf mit Ergebnis | Fehler | Fällt der Lader aus, steht jede Zeile auf `empty` oder `unknown`; der Bericht liest sich dann wie eine unauffällige Prüfung (S6, offener Punkt nach S5b). |
 | Mehr als fünf Beobachtungen ohne Regel | Warnung | Ein Hinweis auf fehlende Prüfungen, kein Fehler im Bericht. |
-| Auftraggeber fehlt | Warnung | Der Bericht bleibt lesbar, nennt den Kunden aber generisch. |
+| Auftraggeber fehlt | Fehler unter `strict`, sonst Warnung | Bis S6 immer nur Warnung: der WebCheck-Bericht `75338c97` trug deshalb 39-mal „Auftraggeber“ und ging mit 0 Fehlern durch (spec/08 Punkt 8). Rückweg ist das Kundenkontext-Feld im Admin. |
 
 ## Wo die Liste landet
 

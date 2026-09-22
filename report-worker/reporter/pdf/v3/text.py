@@ -24,9 +24,15 @@ def zahlwort(n: int) -> str:
 
 
 def runs_line(hosts_total: int, fqdns_total: int, runs: int) -> str:
-    """Zeile unter den Domains auf dem Deckblatt."""
+    """Zeile unter den Domains auf dem Deckblatt.
+
+    S6 (spec/08 Punkt 19): Auf dem Deckblatt eines Auftrags mit einem Host stand
+    "1 IP-Adressen, 3 Hostnamen".
+    """
+    adressen = "IP-Adresse" if hosts_total == 1 else "IP-Adressen"
+    namen = "Hostname" if fqdns_total == 1 else "Hostnamen"
     lauf = "Scandurchgang" if runs == 1 else "Scandurchgänge"
-    return (f"{hosts_total} IP-Adressen, {fqdns_total} Hostnamen, "
+    return (f"{hosts_total} {adressen}, {fqdns_total} {namen}, "
             f"{zahlwort(runs).lower()} {lauf}")
 
 

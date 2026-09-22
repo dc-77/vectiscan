@@ -2214,12 +2214,12 @@
    "domain": "vectigal.tech",
    "evidence": [
     {
-     "excerpt": "spf=None dmarc=None dkim=False mx=[]",
+     "excerpt": "dkim=nein",
      "ref": "phase0/dns_records.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -2285,12 +2285,12 @@
    "domain": "vectiscan.de",
    "evidence": [
     {
-     "excerpt": "spf=None dmarc=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de dkim=False mx=['mx00.udag.de', 'mx01.udag.de']",
+     "excerpt": "dmarc=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de dkim=nein mx=mx00.udag.de, mx01.udag.de",
      "ref": "phase0/dns_records_vectiscan.de.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security_vectiscan.de.json",
      "tool": "dns_security"
     }
@@ -2328,7 +2328,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "10finance.vectigal.tech: status=200 title=10FINANCE Stabilitäts-Quickcheck final_url=https://10finance.vectigal.tech",
+     "excerpt": "10finance.vectigal.tech: status=200 titel=10FINANCE Stabilitäts-Quickcheck final_url=https://10finance.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2349,7 +2349,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2357,7 +2358,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "agent.vectigal.tech: status=401 title= final_url=https://agent.vectigal.tech",
+     "excerpt": "agent.vectigal.tech: status=401 final_url=https://agent.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2374,7 +2375,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2382,7 +2384,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "auth.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "auth.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2399,7 +2401,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2407,7 +2410,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "board.vectigal.tech: status=200 title=Paperclip final_url=https://board.vectigal.tech",
+     "excerpt": "board.vectigal.tech: status=200 titel=Paperclip final_url=https://board.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2428,7 +2431,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2436,7 +2440,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "crm.vectigal.tech: status=200 title=Twenty final_url=https://crm.vectigal.tech",
+     "excerpt": "crm.vectigal.tech: status=200 titel=Twenty final_url=https://crm.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2457,7 +2461,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2465,7 +2470,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "crmviewer.vectigal.tech: status=200 title=Streamlit final_url=https://crmviewer.vectigal.tech",
+     "excerpt": "crmviewer.vectigal.tech: status=200 titel=Streamlit final_url=https://crmviewer.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2486,7 +2491,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2494,7 +2500,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "feedgenerator.vectigal.tech: status=200 title= final_url=https://feedgenerator.vectigal.tech",
+     "excerpt": "feedgenerator.vectigal.tech: status=200 final_url=https://feedgenerator.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2511,7 +2517,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2519,7 +2526,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "gutachter-api.vectigal.tech: status=404 title= final_url=https://gutachter-api.vectigal.tech",
+     "excerpt": "gutachter-api.vectigal.tech: status=404 final_url=https://gutachter-api.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2536,7 +2543,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2544,7 +2552,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "gutachter.vectigal.tech: status=200 title=gutachter.ai final_url=https://gutachter.vectigal.tech",
+     "excerpt": "gutachter.vectigal.tech: status=200 titel=gutachter.ai final_url=https://gutachter.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2565,7 +2573,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2573,7 +2582,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "id.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "id.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2590,7 +2599,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2598,7 +2608,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "ki-check-10finance.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "ki-check-10finance.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2615,7 +2625,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2623,7 +2634,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "ki-check.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "ki-check.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2640,7 +2651,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2648,7 +2660,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "logs.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "logs.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2665,7 +2677,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2673,7 +2686,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mcp-test.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "mcp-test.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2690,7 +2703,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2698,7 +2712,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "monitoring.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "monitoring.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2715,7 +2729,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2723,7 +2738,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "page.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "page.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2740,7 +2755,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2748,7 +2764,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "protokoll-assist.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "protokoll-assist.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2765,7 +2781,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2773,7 +2790,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "rankingcoach.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "rankingcoach.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2790,7 +2807,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2798,7 +2816,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "saferouter-admin.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "saferouter-admin.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2815,7 +2833,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2823,7 +2842,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "saferouter-api.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "saferouter-api.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2840,7 +2859,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2848,7 +2868,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "saferouter-app.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "saferouter-app.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2865,7 +2885,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2873,7 +2894,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "saferouter-auth.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "saferouter-auth.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2890,7 +2911,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2898,7 +2920,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "saferouter-www.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "saferouter-www.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2915,7 +2937,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2923,7 +2946,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "scan-api.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "scan-api.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2940,7 +2963,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2948,7 +2972,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "scan.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "scan.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2965,7 +2989,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2973,7 +2998,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "shopify.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "shopify.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2990,7 +3015,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2998,7 +3024,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "status.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "status.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3015,7 +3041,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3023,7 +3050,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "test.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "test.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3040,7 +3067,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3048,7 +3076,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "traefik.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "traefik.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3065,7 +3093,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3073,7 +3102,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3090,7 +3119,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3098,7 +3128,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "webcheck.vectigal.tech: status=None title=None final_url=None",
+     "excerpt": "webcheck.vectigal.tech:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3115,7 +3145,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -3156,7 +3187,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=62.217.52.165 rdns= fqdns=vectigal.tech,10finance.vectigal.tech,agent.vectigal.tech,auth.vectigal.tech,board.vectigal.tech,crm.vectigal.tech,crmviewer.vectigal.tech,feedgenerator.vectigal.tech,g...",
+     "excerpt": "ip=62.217.52.165 fqdns=vectigal.tech, 10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech,...",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3232,7 +3263,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=62.217.52.177 rdns= fqdns=test.vectigal.tech",
+     "excerpt": "ip=62.217.52.177 fqdns=test.vectigal.tech",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3279,12 +3310,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "10finance.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "excerpt": "10finance.vectigal.tech: erreichbar=ja score=5/7",
      "ref": "hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json",
      "tool": "header_check"
     },
     {
-     "excerpt": "10finance.vectigal.tech: status=200 title=10FINANCE Stabilitäts-Quickcheck webserver=None tech=['HSTS', 'Unpkg']",
+     "excerpt": "10finance.vectigal.tech: status=200 titel=10FINANCE Stabilitäts-Quickcheck tech=HSTS, Unpkg",
      "ref": "hosts/62.217.52.165/phase2/httpx_10finance.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -3383,12 +3414,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "board.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "excerpt": "board.vectigal.tech: erreichbar=ja score=5/7",
      "ref": "hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json",
      "tool": "header_check"
     },
     {
-     "excerpt": "board.vectigal.tech: status=200 title=Paperclip webserver=None tech=['HSTS']",
+     "excerpt": "board.vectigal.tech: status=200 titel=Paperclip tech=HSTS",
      "ref": "hosts/62.217.52.165/phase2/httpx_board.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -3483,12 +3514,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "crm.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "excerpt": "crm.vectigal.tech: erreichbar=ja score=5/7",
      "ref": "hosts/62.217.52.165/phase2/headers_crm.vectigal.tech.json",
      "tool": "header_check"
     },
     {
-     "excerpt": "crm.vectigal.tech: status=200 title=Twenty webserver=None tech=['HSTS']",
+     "excerpt": "crm.vectigal.tech: status=200 titel=Twenty tech=HSTS",
      "ref": "hosts/62.217.52.165/phase2/httpx_crm.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -3585,12 +3616,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "crmviewer.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "excerpt": "crmviewer.vectigal.tech: erreichbar=ja score=5/7",
      "ref": "hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json",
      "tool": "header_check"
     },
     {
-     "excerpt": "crmviewer.vectigal.tech: status=200 title=Streamlit webserver=None tech=['HSTS']",
+     "excerpt": "crmviewer.vectigal.tech: status=200 titel=Streamlit tech=HSTS",
      "ref": "hosts/62.217.52.165/phase2/httpx_crmviewer.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -3685,12 +3716,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "gutachter.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "excerpt": "gutachter.vectigal.tech: erreichbar=ja score=5/7",
      "ref": "hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json",
      "tool": "header_check"
     },
     {
-     "excerpt": "gutachter.vectigal.tech: status=200 title=gutachter.ai webserver=None tech=['HSTS', 'Node.js', 'Nuxt.js', 'Vue.js']",
+     "excerpt": "gutachter.vectigal.tech: status=200 titel=gutachter.ai tech=HSTS, Node.js, Nuxt.js, Vue.js",
      "ref": "hosts/62.217.52.165/phase2/httpx_gutachter.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -3786,7 +3817,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "test.vectigal.tech: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "test.vectigal.tech: erreichbar=nein",
      "ref": "hosts/62.217.52.177/phase2/headers_test.vectigal.tech.json",
      "tool": "header_check"
     }
@@ -3885,7 +3916,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-09-20T09:07:28.885467+00:00 finishedAt=2026-09-20T09:13:52.775772+00:00",
+    "excerpt": "Beginn=2026-09-20T09:07:28.885467+00:00 Ende=2026-09-20T09:13:52.775772+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -3949,7 +3980,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -4418,7 +4449,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "10finance.vectigal.tech:443 tls=tls13 cn=10finance.vectigal.tech not_after=2026-10-31T07:42:52Z mismatched=None",
+     "excerpt": "10finance.vectigal.tech:443 tls=tls13 cn=10finance.vectigal.tech gueltig_bis=2026-10-31T07:42:52Z",
      "ref": "hosts/62.217.52.165/phase2/httpx_10finance.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -4465,7 +4496,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "board.vectigal.tech:443 tls=tls13 cn=board.vectigal.tech not_after=2026-11-01T07:42:54Z mismatched=None",
+     "excerpt": "board.vectigal.tech:443 tls=tls13 cn=board.vectigal.tech gueltig_bis=2026-11-01T07:42:54Z",
      "ref": "hosts/62.217.52.165/phase2/httpx_board.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -4512,12 +4543,12 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "crm.vectigal.tech:443 tls=tls13 cn=crm.vectigal.tech not_after=2026-11-04T07:42:53Z mismatched=None",
+     "excerpt": "crm.vectigal.tech:443 tls=tls13 cn=crm.vectigal.tech gueltig_bis=2026-11-04T07:42:53Z",
      "ref": "hosts/62.217.52.165/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "crm.vectigal.tech:443 tls=tls13 cn=crm.vectigal.tech not_after=2026-11-04T07:42:53Z mismatched=None",
+     "excerpt": "crm.vectigal.tech:443 tls=tls13 cn=crm.vectigal.tech gueltig_bis=2026-11-04T07:42:53Z",
      "ref": "hosts/62.217.52.165/phase2/httpx_crm.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -4564,7 +4595,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "crmviewer.vectigal.tech:443 tls=tls13 cn=crmviewer.vectigal.tech not_after=2026-12-14T11:40:17Z mismatched=None",
+     "excerpt": "crmviewer.vectigal.tech:443 tls=tls13 cn=crmviewer.vectigal.tech gueltig_bis=2026-12-14T11:40:17Z",
      "ref": "hosts/62.217.52.165/phase2/httpx_crmviewer.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -4611,7 +4642,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "gutachter.vectigal.tech:443 tls=tls13 cn=gutachter.vectigal.tech not_after=2026-10-23T07:42:53Z mismatched=None",
+     "excerpt": "gutachter.vectigal.tech:443 tls=tls13 cn=gutachter.vectigal.tech gueltig_bis=2026-10-23T07:42:53Z",
      "ref": "hosts/62.217.52.165/phase2/httpx_gutachter.vectigal.tech.json",
      "tool": "httpx"
     }
@@ -4658,372 +4689,434 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "HTTP",
      "id": "service",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No 128 cipher limit bug",
      "id": "pre_128cipher",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "SSLv2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "SSLv3",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "TLS1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "TLS1_1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "TLS1_2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered with final",
      "id": "TLS1_3",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "NPN",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "h2",
      "id": "ALPN_HTTP2",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "http/1.1",
      "id": "ALPN",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "'server name/#0' 'EC point formats/#11' 'application layer protocol negotiation/#16' 'extended master secret/#23' 'session ticket/#35' 'supported versions/#43' 'key share/#51' 'renegotiation info/#65281'",
      "id": "TLS_extensions",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no -- no lifetime advertised",
      "id": "TLS_session_ticket",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "yes",
      "id": "SSL_sessionID_support",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not supported",
      "id": "sessionresumption_ticket",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not supported",
      "id": "sessionresumption_ID",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "random",
      "id": "TLS_timestamp",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "none",
      "id": "certificate_compression",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "none",
      "id": "clientAuth",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "1",
      "id": "cert_numbers",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "SHA256 with RSA",
      "id": "cert_signatureAlgorithm",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "RSA 2048 bits (exponent is 65537)",
      "id": "cert_keySize",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Digital Signature, Key Encipherment, Data Encipherment, Key Agreement",
      "id": "cert_keyUsage",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLS Web Server Authentication",
      "id": "cert_extKeyUsage",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "CC618634D16C91C3DD40E61ABFD28DFF",
      "id": "cert_serialNumber",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "16",
      "id": "cert_serialNumberLen",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "C4EA5C83B0164EBD390753218526969DE16A0613",
      "id": "cert_fingerprintSHA1",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "6BA05A8E3099D3C685019D38A7039A29630B482E28734812E1D951F23B17EC82",
      "id": "cert_fingerprintSHA256",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "-----BEGIN CERTIFICATE-----\nMIIDXjCCAkagAwIBAgIRAMxhhjTRbJHD3UDmGr/Sjf8wDQYJKoZIhvcNAQELBQAwHzEdMBsGA1UEAxMUVFJBRUZJSyBERUZBVUxUIENFUlQwHhcNMjYwOTIwMDkwMzQ0WhcNMjcwOTIwMDkwMzQ0WjAfMR0wGwYDVQQDExRUUkFFRklLIERFRkFVTFQgQ0VSVDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMFL942qbJXwN6yQn4r476+NkfJGADf4thFH",
      "id": "cert",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TRAEFIK DEFAULT CERT",
      "id": "cert_commonName",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TRAEFIK DEFAULT CERT",
      "id": "cert_commonName_wo_SNI",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default",
      "id": "cert_subjectAltName",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "certificate does not match supplied URI (same w/o SNI)",
      "id": "cert_trust",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "failed (chain incomplete).",
      "id": "cert_chain_of_trust",
      "severity": "CRITICAL"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no",
      "id": "cert_certificatePolicies_EV",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "364 >= 60 days",
      "id": "cert_expirationStatus",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2026-09-20 09:03",
      "id": "cert_notBefore",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2027-09-20 09:03",
      "id": "cert_notAfter",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "certificate has no extended life time according to browser forum",
      "id": "cert_extlifeSpan",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not present",
      "id": "cert_eTLS",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "cert_crlDistributionPoints",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "cert_ocspURL",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Neither CRL nor OCSP URI provided",
      "id": "cert_revocation",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "OCSP_stapling",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "cert_mustStapleExtension",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "check skipped as instructed",
      "id": "DNS_CAArecord",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "certificate_transparency",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "1",
      "id": "certs_countServer",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "no",
      "id": "certs_list_ordering_problem",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TRAEFIK DEFAULT CERT",
      "id": "cert_caIssuers",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "intermediate certificate(s) is/are ok",
      "id": "intermediate_cert_badOCSP",
      "severity": "OK"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Unexpected 502 Bad Gateway @ '/'",
      "id": "HTTP_status_code",
      "severity": "WARN"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "0 seconds from localtime",
      "id": "HTTP_clock_skew",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "1789895402",
      "id": "HTTP_headerTime",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "not offered",
      "id": "HSTS",
      "severity": "LOW"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No support for HTTP Public Key Pinning",
      "id": "HPKP",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No Server banner line in header, interesting!",
      "id": "banner_server",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "No application banner found",
      "id": "banner_application",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "0 at '/' (maybe missed the application)",
      "id": "cookie_count",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "security_headers",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "banner_reverseproxy",
      "severity": "INFO"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "12",
      "id": "scanTime",
      "severity": "INFO"
@@ -5031,7 +5124,7 @@
    ],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:62.217.52.165",
      "tool": "testssl"
     },

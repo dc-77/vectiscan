@@ -1503,7 +1503,7 @@
    "confidence": 0.8,
    "evidence": [
     {
-     "excerpt": "cms=Joomla cms_version=None cms_confidence=0.95",
+     "excerpt": "cms=Joomla cms_confidence=0.95",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
      "tool": "tech_profile"
     }
@@ -1820,12 +1820,12 @@
    "domain": "krause-computer.de",
    "evidence": [
     {
-     "excerpt": "spf=v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all dmarc=v=DMARC1; p=reject; adkim=r; aspf=r dkim=False mx=['krause.skclient.de', 'mx.krause-computer.de', 'mail.krause-computer.de', 'w020687e.kasserver.com',...",
+     "excerpt": "spf=v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all dmarc=v=DMARC1; p=reject; adkim=r; aspf=r dkim=nein mx=krause.skclient.de, mx.krause-computer.de, mail.krause-computer.de, w020687e.kasserver.com, nospamprox...",
      "ref": "phase0/dns_records.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -1874,7 +1874,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "filebrowser.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "filebrowser.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1895,7 +1895,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1903,7 +1904,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "jitsi.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "jitsi.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1924,7 +1925,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1932,7 +1934,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1953,7 +1955,8 @@
     "manufacturer": "Unknown",
     "name": "Generic"
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1961,7 +1964,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mx.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "mx.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1982,7 +1985,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -1990,7 +1994,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "navidrome.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "navidrome.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2011,7 +2015,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2019,7 +2024,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "nextcloud.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "nextcloud.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2040,7 +2045,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2048,7 +2054,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "nospamproxy.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "nospamproxy.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2069,7 +2075,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2077,7 +2084,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "rustdesk.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "rustdesk.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2098,7 +2105,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2106,7 +2114,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "transmission.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "transmission.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2123,7 +2131,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2131,7 +2140,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "www.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2152,7 +2161,8 @@
     "manufacturer": null,
     "name": "Generic"
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2160,7 +2170,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "youtube.krause-computer.de: status=None title=None final_url=None",
+     "excerpt": "youtube.krause-computer.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2181,7 +2191,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -2222,7 +2233,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=37.114.55.171 rdns=mx.krause-computer.de fqdns=jitsi.krause-computer.de,nospamproxy.krause-computer.de,rustdesk.krause-computer.de,mx.krause-computer.de",
+     "excerpt": "ip=37.114.55.171 rdns=mx.krause-computer.de fqdns=jitsi.krause-computer.de, nospamproxy.krause-computer.de, rustdesk.krause-computer.de, mx.krause-computer.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -2276,7 +2287,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=85.13.167.158 rdns=dd55420.kasserver.com fqdns=krause-computer.de,www.krause-computer.de",
+     "excerpt": "ip=85.13.167.158 rdns=dd55420.kasserver.com fqdns=krause-computer.de, www.krause-computer.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -2328,7 +2339,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=87.79.190.79 rdns=xdsl-87-79-190-79.nc.de fqdns=filebrowser.krause-computer.de,navidrome.krause-computer.de,nextcloud.krause-computer.de,transmission.krause-computer.de,youtube.krause-computer.de",
+     "excerpt": "ip=87.79.190.79 rdns=xdsl-87-79-190-79.nc.de fqdns=filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de, transmission.krause-computer.de, youtube.krause-comput...",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -2377,12 +2388,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "filebrowser.krause-computer.de: reachable=None score=1/7 server=nginx x-feserver=None",
+     "excerpt": "filebrowser.krause-computer.de: score=1/7 server=nginx",
      "ref": "scan_results:header_check:87.79.190.79",
      "tool": "header_check"
     },
     {
-     "excerpt": "filebrowser.krause-computer.de: status=200 title=File Browser webserver=nginx tech=['Nginx']",
+     "excerpt": "filebrowser.krause-computer.de: status=200 titel=File Browser webserver=nginx tech=Nginx",
      "ref": "hosts/87.79.190.79/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -2460,12 +2471,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "jitsi.krause-computer.de: reachable=None score=1/7 server=nginx x-feserver=None",
+     "excerpt": "jitsi.krause-computer.de: score=1/7 server=nginx",
      "ref": "scan_results:header_check:37.114.55.171",
      "tool": "header_check"
     },
     {
-     "excerpt": "jitsi.krause-computer.de: status=200 title=Jitsi Meet webserver=nginx tech=['HSTS', 'Jitsi', 'Nginx']",
+     "excerpt": "jitsi.krause-computer.de: status=200 titel=Jitsi Meet webserver=nginx tech=HSTS, Jitsi, Nginx",
      "ref": "hosts/37.114.55.171/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -2562,12 +2573,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "krause-computer.de: reachable=None score=4/7 server=Apache x-feserver=None",
+     "excerpt": "krause-computer.de: score=4/7 server=Apache",
      "ref": "scan_results:header_check:85.13.167.158",
      "tool": "header_check"
     },
     {
-     "excerpt": "krause-computer.de: status=200 title=Computer-Service Krause – Ihr kompetenter IT-Partner webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'Joomla', 'PHP']",
+     "excerpt": "krause-computer.de: status=200 titel=Computer-Service Krause – Ihr kompetenter IT-Partner webserver=Apache tech=Apache HTTP Server, HSTS, Joomla, PHP",
      "ref": "hosts/85.13.167.158/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -2670,12 +2681,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mx.krause-computer.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "mx.krause-computer.de: score=0/7",
      "ref": "scan_results:header_check:37.114.55.171",
      "tool": "header_check"
     },
     {
-     "excerpt": "mx.krause-computer.de: status=200 title=Jitsi Meet webserver=nginx tech=['HSTS', 'Jitsi', 'Nginx']",
+     "excerpt": "mx.krause-computer.de: status=200 titel=Jitsi Meet webserver=nginx tech=HSTS, Jitsi, Nginx",
      "ref": "hosts/37.114.55.171/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -2753,12 +2764,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "navidrome.krause-computer.de: reachable=None score=0/7 server=nginx x-feserver=None",
+     "excerpt": "navidrome.krause-computer.de: score=0/7 server=nginx",
      "ref": "scan_results:header_check:87.79.190.79",
      "tool": "header_check"
     },
     {
-     "excerpt": "navidrome.krause-computer.de: status=200 title=Navidrome webserver=nginx tech=['Nginx']",
+     "excerpt": "navidrome.krause-computer.de: status=200 titel=Navidrome webserver=nginx tech=Nginx",
      "ref": "hosts/87.79.190.79/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -2846,12 +2857,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "nextcloud.krause-computer.de: reachable=None score=7/7 server=nginx x-feserver=None",
+     "excerpt": "nextcloud.krause-computer.de: score=7/7 server=nginx",
      "ref": "scan_results:header_check:87.79.190.79",
      "tool": "header_check"
     },
     {
-     "excerpt": "nextcloud.krause-computer.de: status=200 title=Login – Nextcloud webserver=nginx tech=['HSTS', 'Nextcloud', 'Nginx', 'PHP']",
+     "excerpt": "nextcloud.krause-computer.de: status=200 titel=Login – Nextcloud webserver=nginx tech=HSTS, Nextcloud, Nginx, PHP",
      "ref": "hosts/87.79.190.79/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -2956,12 +2967,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "nospamproxy.krause-computer.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "nospamproxy.krause-computer.de: score=0/7",
      "ref": "scan_results:header_check:37.114.55.171",
      "tool": "header_check"
     },
     {
-     "excerpt": "nospamproxy.krause-computer.de: status=200 title=Jitsi Meet webserver=nginx tech=['HSTS', 'Jitsi', 'Nginx']",
+     "excerpt": "nospamproxy.krause-computer.de: status=200 titel=Jitsi Meet webserver=nginx tech=HSTS, Jitsi, Nginx",
      "ref": "hosts/37.114.55.171/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -3039,12 +3050,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "rustdesk.krause-computer.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "rustdesk.krause-computer.de: score=0/7",
      "ref": "scan_results:header_check:37.114.55.171",
      "tool": "header_check"
     },
     {
-     "excerpt": "rustdesk.krause-computer.de: status=200 title=Jitsi Meet webserver=nginx tech=['HSTS', 'Jitsi', 'Nginx']",
+     "excerpt": "rustdesk.krause-computer.de: status=200 titel=Jitsi Meet webserver=nginx tech=HSTS, Jitsi, Nginx",
      "ref": "hosts/37.114.55.171/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -3129,12 +3140,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.krause-computer.de: reachable=None score=4/7 server=Apache x-feserver=None",
+     "excerpt": "www.krause-computer.de: score=4/7 server=Apache",
      "ref": "scan_results:header_check:85.13.167.158",
      "tool": "header_check"
     },
     {
-     "excerpt": "www.krause-computer.de: status=200 title=Computer-Service Krause – Ihr kompetenter IT-Partner webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'Joomla', 'PHP']",
+     "excerpt": "www.krause-computer.de: status=200 titel=Computer-Service Krause – Ihr kompetenter IT-Partner webserver=Apache tech=Apache HTTP Server, HSTS, Joomla, PHP",
      "ref": "hosts/85.13.167.158/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -3237,12 +3248,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "youtube.krause-computer.de: reachable=None score=0/7 server=nginx x-feserver=None",
+     "excerpt": "youtube.krause-computer.de: score=0/7 server=nginx",
      "ref": "scan_results:header_check:87.79.190.79",
      "tool": "header_check"
     },
     {
-     "excerpt": "youtube.krause-computer.de: status=200 title=yt-dlp Web UI webserver=nginx tech=['Nginx']",
+     "excerpt": "youtube.krause-computer.de: status=200 titel=yt-dlp Web UI webserver=nginx tech=Nginx",
      "ref": "hosts/87.79.190.79/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -3348,7 +3359,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "37.114.55.171:22 OpenSSH 10.0p2 Debian 7+deb13u2 | SSH-2.0-OpenSSH_10.0p2 Debian-7+deb13u2 Key type: ecdsa-sha2-nistp256 Key: AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBISzk6SJWphj+iHbrPH...",
+     "excerpt": "37.114.55.171:22 OpenSSH 10.0p2 Debian 7+deb13u2 banner=SSH-2.0-OpenSSH_10.0p2 Debian-7+deb13u2 Key type: ecdsa-sha2-nistp256 Key: AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBISzk6SJWphj+i...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3376,7 +3387,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "37.114.55.171:25 | 220-mx.krause-computer.de ESMTP Proxmox 250-mx.krause-computer.de 250-SIZE 104857600 250-VRFY 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250-DSN 250-SMTPUTF8 250...",
+     "excerpt": "37.114.55.171:25 banner=220-mx.krause-computer.de ESMTP Proxmox 250-mx.krause-computer.de 250-SIZE 104857600 250-VRFY 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250-DSN 250-SMTPUTF8...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3404,7 +3415,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "37.114.55.171:26 | 220 mx.krause-computer.de ESMTP Proxmox\\r\\n",
+     "excerpt": "37.114.55.171:26 banner=220 mx.krause-computer.de ESMTP Proxmox\\r\\n",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3432,7 +3443,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "37.114.55.171:80 nginx | HTTP/1.1 200 OK Server: nginx Date: Tue, 26 May 2026 04:56:33 GMT Content-Type: text/html Content-Length: 615 Last-Modified: Tue, 14 Apr 2026 10:13:20 GMT Connection: keep-...",
+     "excerpt": "37.114.55.171:80 nginx banner=HTTP/1.1 200 OK Server: nginx Date: Tue, 26 May 2026 04:56:33 GMT Content-Type: text/html Content-Length: 615 Last-Modified: Tue, 14 Apr 2026 10:13:20 GMT Connection:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3460,7 +3471,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "37.114.55.171:111 | Portmap Program Version Protocol Port portmapper 4 tcp 111 portmapper 3 tcp 111 portmapper 2 tcp 111 portmapper 4 udp 111 portmapper 3 udp 111 portmapper 2 udp 111",
+     "excerpt": "37.114.55.171:111 banner=Portmap Program Version Protocol Port portmapper 4 tcp 111 portmapper 3 tcp 111 portmapper 2 tcp 111 portmapper 4 udp 111 portmapper 3 udp 111 portmapper 2 udp 111",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3488,7 +3499,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "37.114.55.171:443 nginx | HTTP/1.1 200 OK Server: nginx Date: Fri, 22 May 2026 11:42:54 GMT Content-Type: text/html Transfer-Encoding: chunked Connection: keep-alive Vary: Accept-Encoding Strict-Tr...",
+     "excerpt": "37.114.55.171:443 nginx banner=HTTP/1.1 200 OK Server: nginx Date: Fri, 22 May 2026 11:42:54 GMT Content-Type: text/html Transfer-Encoding: chunked Connection: keep-alive Vary: Accept-Encoding Stri...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3516,7 +3527,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "37.114.55.171:3128 | HTTP/1.1 501 method 'GET' not available Cache-Control: max-age=0 Connection: close Date: Sat, 02 May 2026 07:03:30 GMT Pragma: no-cache Server: pve-api-daemon/3.0 Expires: Sat,...",
+     "excerpt": "37.114.55.171:3128 banner=HTTP/1.1 501 method 'GET' not available Cache-Control: max-age=0 Connection: close Date: Sat, 02 May 2026 07:03:30 GMT Pragma: no-cache Server: pve-api-daemon/3.0 Expires:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3544,7 +3555,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "37.114.55.171:3478 | STUN Server IP: 37.114.55.171",
+     "excerpt": "37.114.55.171:3478 banner=STUN Server IP: 37.114.55.171",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3572,7 +3583,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:22 OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 | SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.16 Key type: ecdsa-sha2-nistp256 Key: AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBIIlzdS0Qw37XB/...",
+     "excerpt": "85.13.167.158:22 OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 banner=SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.16 Key type: ecdsa-sha2-nistp256 Key: AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBIIlzdS0Qw...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3600,7 +3611,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:25 | 220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 250-ENHANCEDSTATUSCODE...",
+     "excerpt": "85.13.167.158:25 banner=220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 250-ENHANCEDSTATU...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3628,7 +3639,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:80 Apache httpd | HTTP/1.1 503 Service Unavailable Date: Sat, 23 May 2026 02:55:47 GMT Server: Apache Retry-After: 3600 Vary: User-Agent Connection: close Transfer-Encoding: chunked C...",
+     "excerpt": "85.13.167.158:80 Apache httpd banner=HTTP/1.1 503 Service Unavailable Date: Sat, 23 May 2026 02:55:47 GMT Server: Apache Retry-After: 3600 Vary: User-Agent Connection: close Transfer-Encoding: chun...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3656,7 +3667,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE XLIST LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN] kasserver.com mailserver ready. * CAPABILITY IMAP4rev1 SASL-IR L...",
+     "excerpt": "85.13.167.158:143 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE XLIST LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN] kasserver.com mailserver ready. * CAPABILITY IMAP4rev1 SASL...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3684,7 +3695,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:443 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Fri, 22 May 2026 06:31:08 GMT Server: Apache Location: http://85.13.167.158/ Content-Length: 269 Content-Type: text/html; chars...",
+     "excerpt": "85.13.167.158:443 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Fri, 22 May 2026 06:31:08 GMT Server: Apache Location: http://85.13.167.158/ Content-Length: 269 Content-Type: text/html;...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3712,7 +3723,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:465 | 220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 250-ENHANCEDSTATUSCODES 250-8BITMI...",
+     "excerpt": "85.13.167.158:465 banner=220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 250-ENHANCEDSTATUSCODES 250-8...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3740,7 +3751,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:587 | 220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 250-ENHANCEDSTATUSCOD...",
+     "excerpt": "85.13.167.158:587 banner=220 dd55420.kasserver.com ESMTP 250-dd55420.kasserver.com 250-PIPELINING 250-SIZE 153600000 250-ETRN 250-STARTTLS 250-AUTH PLAIN LOGIN 250-AUTH=PLAIN LOGIN 250-ENHANCEDSTAT...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3768,7 +3779,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE XLIST LITERAL+ AUTH=PLAIN AUTH=LOGIN] kasserver.com mailserver ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFE...",
+     "excerpt": "85.13.167.158:993 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE XLIST LITERAL+ AUTH=PLAIN AUTH=LOGIN] kasserver.com mailserver ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3796,7 +3807,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.13.167.158:995 | +OK kasserver.com mailserver ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN .",
+     "excerpt": "85.13.167.158:995 banner=+OK kasserver.com mailserver ready. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3824,7 +3835,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "87.79.190.79:443 | HTTP/1.1 200 OK Cache-Control: no-cache Cache-Control: no-cache, no-store, must-revalidate Connection: close Content-Type: text/html; charset=utf-8 Date: Sun, 26 Apr 2026 17:29:2...",
+     "excerpt": "87.79.190.79:443 banner=HTTP/1.1 200 OK Cache-Control: no-cache Cache-Control: no-cache, no-store, must-revalidate Connection: close Content-Type: text/html; charset=utf-8 Date: Sun, 26 Apr 2026 17...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -3864,7 +3875,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-05-26T12:21:13.609701+00:00 finishedAt=2026-05-26T12:37:26.499340+00:00",
+    "excerpt": "Beginn=2026-05-26T12:21:13.609701+00:00 Ende=2026-05-26T12:37:26.499340+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -3928,7 +3939,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -6717,7 +6728,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "mx.krause-computer.de:443 tls=tls13 cn=jitsi.krause-computer.de not_after=2026-08-11T12:53:40Z mismatched=True",
+     "excerpt": "mx.krause-computer.de:443 tls=tls13 cn=jitsi.krause-computer.de gueltig_bis=2026-08-11T12:53:40Z namensabweichung=ja",
      "ref": "hosts/37.114.55.171/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -6765,7 +6776,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "www.krause-computer.de:443 tls=tls13 cn=krause-computer.de not_after=2026-07-25T18:35:12Z mismatched=None",
+     "excerpt": "www.krause-computer.de:443 tls=tls13 cn=krause-computer.de gueltig_bis=2026-07-25T18:35:12Z",
      "ref": "hosts/85.13.167.158/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -6819,7 +6830,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "youtube.krause-computer.de:443 tls=tls13 cn=jitsi.krause-computer.de not_after=2026-06-27T02:08:19Z mismatched=None",
+     "excerpt": "youtube.krause-computer.de:443 tls=tls13 cn=jitsi.krause-computer.de gueltig_bis=2026-06-27T02:08:19Z",
      "ref": "hosts/87.79.190.79/phase2/httpx.json",
      "tool": "httpx"
     }

@@ -64,6 +64,7 @@ scope: service                    # worueber iteriert wird, siehe Scopes
 applicable_when: null             # Gruppenkontext; false -> not_applicable
 item_when: null                   # Itemfilter; Items mit false werden gar nicht betrachtet
 when: service.port in DB_PORTS    # Itemkontext; true -> fail (bei kind note: Hinweis)
+active_proof_when: null           # Itemkontext; true -> aktiver Nachweis (rot, unverzueglich)
 positive_when: absent             # absent | never | <Ausdruck im Itemkontext>
 not_testable_when: []             # [{when, reason_code, context: group|item}]
 undetermined: not_testable        # not_testable | pass_silent | not_applicable
@@ -72,7 +73,8 @@ requires:
 kind: check                       # check | note (note: nie fail, liefert Inventarhinweise in notes)
 bundle: null                      # Buendelungshinweis fuer S3, z. B. mail_transport_enforcement
 affected_template: "{host_ip}:{port} ({product})"   # Variablen je Scope, siehe unten
-evidence: [service]               # Bindungen, deren evidence[] uebernommen wird
+evidence: [service]               # Bindungen, deren evidence[] uebernommen wird (Rueckfall)
+evidence_detail: null             # Bereich fuer den befundspezifischen Nachweis; leer = scope
 references: [CWE-284]
 frameworks: {bsi: [], nis2: [], iso27001: [], tr03116: []}
 policy: {source: SP-DB-001, start_level: HIGH, deviation: "warum abgewichen wird"}
@@ -87,7 +89,30 @@ texts:
 Pflichtfelder laut Auftrag: id, title, family, scale, level, group_by, when, positive_when,
 not_testable_when, affected_template, evidence, references, frameworks, texts. Erweiterungen
 dieser Umsetzung: category, scope, applicable_when, item_when, undetermined, requires, kind,
-bundle, policy. Alle Modelle sind `extra="forbid"`: ein unbekanntes Feld ist ein Ladefehler.
+bundle, policy, dazu seit S6 `active_proof_when` und `evidence_detail`. Alle Modelle sind
+`extra="forbid"`: ein unbekanntes Feld ist ein Ladefehler.
+
+### Aktiver Nachweis (S6)
+
+`active_proof_when` wird je Item wie `when` ausgewertet. Trifft es fuer ein
+fehlgeschlagenes Mitglied, traegt das Ergebnis `active_proof` und der Befund wird rot
+mit Dringlichkeit "Unverzueglich", unabhaengig von seiner Einstufung
+(`reporter/v3/levels.py`). Gesetzt ist es in genau zwei Pruefungen, beide mit einem
+eigenen Nachweis des Werkzeugs: `web_vulnerability_active` (ZAP mit Risiko High **und**
+Konfidenz High) und `tls_known_vulnerability` (testssl-Urteil aus der harten Liste).
+Entscheidung DC, spec/08 Punkt 1, Variante (a).
+
+### Nachweis je Befund (S6)
+
+Der Nachweis eines Befunds ist das, was die Regel getroffen hat, nicht die
+Zusammenfassung der Werkzeugzeile. `reporter/catalog/evidence.py` baut je Bereich eine
+Zeile aus dem getroffenen Teilobjekt: welche Sicherheits-Header fehlen, welche Adresse
+die ZAP-Meldung nennt, welche Daten das Zertifikat traegt. Sie steht im Bericht vorn;
+die Evidenz des Fakts kommt nur bei Bereichen dazu, deren Auszug ein woertlicher
+Werkzeugtext ist (`service`, `software`, `tls`, `passive`, `threat`). `evidence_detail`
+ueberschreibt den Bereich, wenn der `scope` allein nicht trifft: `wordpress_user_enumeration`
+laeuft auf `scope: http`, will im Nachweis aber die REST-Adresse und die Benutzernamen,
+also `evidence_detail: http.wordpress`.
 
 ### Scopes und Bindungen
 

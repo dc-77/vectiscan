@@ -1669,10 +1669,26 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
     },
   );
 
-  // POST /api/orders/:id/regenerate-report — regenerate report with excluded findings
+  // POST /api/admin/orders/:id/regenerate-report — Bericht mit den vorhandenen
+  // Ausschluessen neu bauen.
+  //
+  // S6 (Sicherheitsnetz): Bis hierher lag die Route unter `/api/orders/` und
+  // trug nur `requireAuth`. Sie schickte vorhandene finding_exclusions als
+  // `excludedFindings` mit, ohne `approved` zu setzen; der Worker wertete eine
+  // nicht leere Ausschlussliste aber als Freigabe (`report_complete`), und
+  // dieser Status loest ueber lib/ws-manager.ts die Fertig-Mail mit
+  // Download-Verweis aus. Ein Kunde konnte seinen Bericht damit selbst
+  // ausliefern.
+  //
+  // Der Knopf im Frontend war immer schon nur fuer Admins sichtbar
+  // (app/scan/[orderId]), deshalb `requireAdmin`. Damit muss die Route auch
+  // unter `/api/admin` liegen: der Edge-Shield in Traefik deckt nur dieses
+  // Praefix ab, und eine admin-privilegierte Route daneben haette nur die
+  // In-App-Pruefung (VEC-133, admin_edge_invariant.test.ts). Die Freigabe
+  // selbst haengt im Worker ausschliesslich an `approved`.
   server.post<{ Params: OrderParams }>(
-    '/api/orders/:id/regenerate-report',
-    { preHandler: [requireAuth] },
+    '/api/admin/orders/:id/regenerate-report',
+    { preHandler: [requireAuth, requireAdmin] },
     async (request, reply) => {
       const { id } = request.params;
       const user = request.user!;

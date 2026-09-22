@@ -15,7 +15,10 @@ Regeln:
 * Positivbefunde laufen immer ueber den ganzen Auftrag zusammen. Eine Gruppe, in der ein
   Mitglied fehlgeschlagen ist, liefert keinen Positivbefund. Gruppen ohne gesehene Items
   bleiben ebenfalls draussen, weil "kein Datenbankdienst" auf einem Host ohne jeden
-  Dienst keine Aussage ist.
+  Dienst keine Aussage ist. Seit S6 genuegt eine einzige nicht pruefbare Gruppe, um den
+  Positivbefund der ganzen Pruefung zu unterdruecken: nicht pruefbar ist nicht bestanden.
+* Ein aktiv nachgewiesenes Mitglied (``active_proof``) faerbt den Sachverhalt rot,
+  unabhaengig von seiner Einstufung; die Abbildung dazu steht in ``levels.py``.
 * Skala, Einstufung und Kategorie eines Buendelbefunds kommen vom schwersten
   fehlgeschlagenen Mitglied; der Positivbefund traegt die Kategorie des Buendels.
 """
@@ -45,6 +48,7 @@ class Consolidated:
     texts: Texts
     target: str                    # findings | appendix
     positive: bool
+    active_proof: bool = False     # aktiv nachgewiesen (S6, siehe levels.py)
     results: list[CheckResult] = field(default_factory=list)
 
     @property
@@ -79,6 +83,11 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
 
     fails: dict[tuple[str, str], list[CheckResult]] = {}
     passes: dict[tuple[str, str], list[CheckResult]] = {}
+    # S6 (spec/08 Punkt 7): Ein Positivbefund entsteht nur, wenn die Pruefung fuer
+    # alle betroffenen Hosts bestanden ist. Nicht pruefbar zaehlt nicht als
+    # bestanden; sonst steht "Transportverschluesselung ohne veraltete Protokolle"
+    # neben "Protokollliste nicht verfuegbar" fuer fuenf Hosts.
+    unpruefbar: set[str] = set()
     for result in output.results:
         if result.kind != "check":
             continue
@@ -87,6 +96,8 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
         owner = bid or result.check_id
         if result.status == "fail":
             fails.setdefault((owner, _merge_key(result, merge_by)), []).append(result)
+        elif result.status == "not_testable":
+            unpruefbar.add(owner)
         elif result.positive:
             # Positivbefunde laufen global zusammen; die Gruppe merken wir uns, um
             # Gruppen mit einem Fehlschlag auszuschliessen.
@@ -97,23 +108,24 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
         results.sort(key=lambda r: sort_key(r.check_id, r.group_key))
         bundle = bundles.get(owner)
         scale, level, category = _worst(results)
+        aktiv = any(r.active_proof for r in results)
         if bundle is not None:
             findings.append(Consolidated(
                 key=owner, is_bundle=True, merge_key=merge_key, category=category, scale=scale,
                 level=level, title=bundle.title, texts=bundle.texts, target=bundle.target,
-                positive=False, results=results))
+                positive=False, active_proof=aktiv, results=results))
         else:
             info = by_check[owner]
             findings.append(Consolidated(
                 key=owner, is_bundle=False, merge_key=merge_key, category=info.category,
                 scale=info.scale, level=info.level, title=info.title, texts=info.texts,
-                target="findings", positive=False, results=results))
+                target="findings", positive=False, active_proof=aktiv, results=results))
 
     positives: list[Consolidated] = []
     failed_groups = set(fails)
     by_owner: dict[str, list[CheckResult]] = {}
     for (owner, merge_key), results in passes.items():
-        if (owner, merge_key) in failed_groups:
+        if (owner, merge_key) in failed_groups or owner in unpruefbar:
             continue
         for result in results:
             info = by_check[result.check_id]

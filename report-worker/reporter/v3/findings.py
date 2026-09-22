@@ -19,11 +19,12 @@ from reporter.catalog.schema import CatalogOutput, CheckInfo, CheckResult
 from reporter.facts import schema as FS
 from reporter.v3 import ids as IDS
 from reporter.v3 import levels as L
+from reporter.v3 import tables as T
 from reporter.v3.bundles import GLOBAL_KEY, Consolidated
 from reporter.v3.models import CveRef, Finding, Positive, Threat, ToolFinding
 from reporter.v3.orthography import clean_foreign_text
 
-MAX_EVIDENCE_LINES = 12
+MAX_EVIDENCE_LINES = 6
 
 # Werkzeuge, deren Aussagen nicht aus einer eigenen Messung stammen.
 PASSIVE_TOOLS: frozenset[str] = frozenset({
@@ -96,18 +97,34 @@ def _render(template: str, values: dict[str, Any], where: str) -> str:
 
 
 def evidence_block(results: list[CheckResult]) -> str:
-    """Nachweis als Klartextblock: Werkzeug, Fundstelle, woertlicher Auszug."""
+    """Nachweis als Klartextblock: Werkzeug, Fundstelle, woertlicher Auszug.
+
+    Ein Sachverhalt ueber viele virtuelle Hosts bringt je Host eine Zeile mit.
+    Der Block endete dabei stumm bei zwoelf Zeilen: der Leser sah zwoelf
+    Fundstellen und wusste nicht, dass es mehr sind. Jetzt stehen sechs, und
+    die Zeile darunter sagt, wie viele noch dazugehoeren. Wer sie braucht,
+    findet die betroffenen Namen vollstaendig in der Betroffenenliste.
+    """
     lines: list[str] = []
     seen: set[tuple[str, str]] = set()
+    weitere = 0
     for r in results:
         for ev in r.evidence:
             key = (ev.tool, ev.excerpt)
             if not ev.excerpt or key in seen:
                 continue
             seen.add(key)
-            lines.append(f"{ev.tool} · {ev.ref}\n{ev.excerpt}")
             if len(lines) >= MAX_EVIDENCE_LINES:
-                return "\n\n".join(lines)
+                weitere += 1
+                continue
+            kopf = f"{ev.tool} · {ev.ref}" if ev.ref else ev.tool
+            lines.append(f"{kopf}\n{ev.excerpt}")
+    if weitere:
+        lines.append(f"und {weitere} weitere Fundstellen gleicher Art; "
+                     "die betroffenen Namen stehen vollständig unter Betroffen."
+                     if weitere > 1 else
+                     "und eine weitere Fundstelle gleicher Art; "
+                     "die betroffenen Namen stehen vollständig unter Betroffen.")
     return "\n\n".join(lines)
 
 
@@ -131,12 +148,18 @@ def source_label(results: list[CheckResult]) -> str:
 
 
 def policy_label(results: list[CheckResult], checks: dict[str, CheckInfo]) -> str:
-    sources: list[str] = []
+    """Die Regeln, die diesen Befund erzeugt haben.
+
+    Bis S6 stand hier die Herkunft der Einstufung ("catalog_sim R-ADMIN-EXPOSED",
+    "Prototyp VS-005"). Das sind interne Begriffe aus der Entstehungsgeschichte
+    des Katalogs und im Kundentext nichts wert (spec/08 Punkt 11). Jetzt steht
+    dort die Regel, unter der der Befund im Katalog nachschlagbar ist.
+    """
+    ids: list[str] = []
     for r in results:
-        info = checks.get(r.check_id)
-        if info and info.policy.source not in sources:
-            sources.append(info.policy.source)
-    return ", ".join(sources)
+        if r.check_id not in ids:
+            ids.append(r.check_id)
+    return ", ".join(ids)
 
 
 def recommendations(item: Consolidated) -> list[list[str]]:
@@ -169,6 +192,25 @@ def fremdbewertet(t: FS.ThreatFact) -> bool:
 
 def zitierbar(t: FS.ThreatFact) -> bool:
     return fremdbewertet(t) or t.source in WERKZEUG_QUELLEN
+
+
+def testssl_tests(facts: FS.Facts) -> dict[str, tuple[str, list[str]]]:
+    """CVE-Kennung -> (Test-ID, alle Kennungen desselben Tests).
+
+    S6 (spec/08 Punkt 18): Anhang A.3 fuehrte je Test nur die erste Kennung; bei
+    RC4 fehlte CVE-2015-2808, bei ROBOT acht von neun. testssl nennt sie alle in
+    derselben Zeile, deshalb steht der Test in einer Zeile mit allen Kennungen.
+    """
+    out: dict[str, tuple[str, list[str]]] = {}
+    for tls in facts.tls:
+        for e in tls.entries:
+            alle = list(e.cves) or ([e.cve] if e.cve else [])
+            if not alle:
+                continue
+            for cve in alle:
+                if cve not in out or len(alle) > len(out[cve][1]):
+                    out[cve] = (e.id, alle)
+    return out
 
 
 @dataclass
@@ -261,6 +303,7 @@ def build_findings(
     """Befunde, Anhang A.3 und die Werkzeugbefunde ohne Bewertung."""
     checks = {c.id: c for c in output.checks}
     threats = ThreatIndex.build(facts)
+    tests = testssl_tests(facts)
     findings: list[Finding] = []
     cve_refs: list[CveRef] = []
     tool_findings: list[ToolFinding] = []
@@ -318,18 +361,26 @@ def build_findings(
                     note = "Fremdwert, nicht selbst vergeben."
                 else:
                     src = t.source
+                test_id, alle = tests.get(t.cve_id, ("", [t.cve_id]))
+                # Die uebrigen Kennungen desselben Tests bekommen keine eigene
+                # Zeile mehr; sie stehen in dieser.
+                for weitere in alle:
+                    seen_cves.setdefault(weitere, []).append(fid)
                 cve_refs.append(CveRef(
-                    cve=t.cve_id, name="", score=score, src=src, ref=fid, note=note))
+                    cve=", ".join(alle) if len(alle) > 1 else t.cve_id,
+                    name=T.testssl_name(test_id) if test_id else "",
+                    score=score, src=src, ref=fid, note=note))
         findings.append(Finding(
             id=fid,
             cat=item.category,
-            status=L.status_for(item.level),
-            urgency=L.urgency_for(stages(item)),
+            status=L.status_for(item.scale, item.level, item.active_proof),
+            urgency=L.urgency_for(item.scale, item.level, stages(item), item.active_proof),
             title=_render(item.title, values, f"{where}.title"),
             affected=", ".join(values["affected"]),
             source=source_label(item.results),
             scale=item.scale,
             level=item.level,
+            level_label=L.LEVEL_LABELS.get(item.level, item.level),
             found=_render(item.texts.observation, values, f"{where}.observation"),
             evidence=evidence_block(item.results),
             threat=threat,
@@ -339,7 +390,12 @@ def build_findings(
             policy=policy_label(item.results, checks),
         ))
     for ref in cve_refs:
-        ref.ref = ", ".join(seen_cves.get(ref.cve, [ref.ref]))
+        erste = ref.cve.split(",")[0].strip()
+        befunde: list[str] = []
+        for fid in seen_cves.get(erste, [ref.ref]):
+            if fid not in befunde:
+                befunde.append(fid)
+        ref.ref = ", ".join(befunde)
     return findings, cve_refs, tool_findings
 
 

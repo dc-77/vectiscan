@@ -19,8 +19,9 @@ log = structlog.get_logger()
 class ValidationLevel(str, Enum):
     OFF = "off"      # nur fuer lokale Tests
     WARN = "warn"    # Defekte werden geloggt + in reports.validation_warnings persistiert,
-                     # Build geht durch. Default in Prod waehrend M1.
-    STRICT = "strict"  # Defekte blockieren den Build (Order -> failed). Default ab M2-Ende.
+                     # Build geht durch. Bis S6 die Vorgabe in Produktion.
+    STRICT = "strict"  # Fehler halten den Bericht auf (Order -> report_blocked).
+                       # Vorgabe seit der Umschaltung auf v3 (S6).
 
 
 @dataclass
@@ -84,12 +85,16 @@ class ValidationGate:
 
     @classmethod
     def from_env(cls) -> "ValidationGate":
-        raw = os.environ.get("VECTISCAN_VALIDATION_LEVEL", "warn").lower().strip()
+        # S6: Der Wert kommt aus reporter.engine, damit es nur eine Lesestelle
+        # je Schalter gibt. Vorgabe ist seit der Umschaltung strict.
+        from reporter import engine as _engine
+
+        raw = _engine.validation_level()
         try:
             level = ValidationLevel(raw)
-        except ValueError:
-            log.warning("validation_level_invalid", raw=raw, fallback="warn")
-            level = ValidationLevel.WARN
+        except ValueError:  # pragma: no cover - engine.validation_level prueft schon
+            log.warning("validation_level_invalid", raw=raw, fallback="strict")
+            level = ValidationLevel.STRICT
         return cls(level=level)
 
     def run(

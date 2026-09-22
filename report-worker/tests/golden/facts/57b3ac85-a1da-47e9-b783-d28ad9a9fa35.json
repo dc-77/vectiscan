@@ -1174,7 +1174,7 @@
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -1226,7 +1226,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "lumbeck-wolter.de: status=None title=None final_url=None",
+     "excerpt": "lumbeck-wolter.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1243,7 +1243,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [
@@ -1257,7 +1258,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.lumbeck-wolter.de: status=200 title=Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter final_url=https://www.lumbeck-wolter.de",
+     "excerpt": "www.lumbeck-wolter.de: status=200 titel=Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter final_url=https://www.lumbeck-wolter.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -1274,7 +1275,8 @@
    "source": "web_probe",
    "title": "Schneidwerkzeuge für Fleischwölfe | Lumbeck & Wolter",
    "waf": null,
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -1315,7 +1317,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=116.202.77.64 rdns=dedi5705.your-server.de fqdns=lumbeck-wolter.de,www.lumbeck-wolter.de",
+     "excerpt": "ip=116.202.77.64 rdns=dedi5705.your-server.de fqdns=lumbeck-wolter.de, www.lumbeck-wolter.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -1361,7 +1363,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.lumbeck-wolter.de: reachable=False score=None server=None x-feserver=None",
+     "excerpt": "www.lumbeck-wolter.de: erreichbar=nein",
      "ref": "hosts/116.202.77.64/phase2/headers_www.lumbeck-wolter.de.json",
      "tool": "header_check"
     }
@@ -1425,7 +1427,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:21 | 220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG ru-RU.UTF-8;ru...",
+     "excerpt": "116.202.77.64:21 banner=220 FTP Server 1.0 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPSV HOST LANG ru-RU.UTF...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1455,7 +1457,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:22 | SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIGFu5Fjuml/0rtF1KTmimKw1xoNLSG5hrr7401SzTajO Fingerprint: c0:d6:f0:fd:f1:96:ad:51:24:c9:36:9c:83:c7:85:35 Kex...",
+     "excerpt": "116.202.77.64:22 banner=SSH-2.0-mod_sftp Key type: ssh-ed25519 Key: AAAAC3NzaC1lZDI1NTE5AAAAIGFu5Fjuml/0rtF1KTmimKw1xoNLSG5hrr7401SzTajO Fingerprint: c0:d6:f0:fd:f1:96:ad:51:24:c9:36:9c:83:c7:85:35...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1485,7 +1487,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:25 | 220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.2.110.187 [224.2.110.187] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 250-P...",
+     "excerpt": "116.202.77.64:25 banner=220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.2.110.187 [224.2.110.187] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1515,7 +1517,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:80 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Sat, 19 Sep 2026 05:42:19 GMT Server: Apache X-dlm-no-waypoints: true X-Pingback: http://www.flott.de/xmlrpc.php Expires: Sat, 1...",
+     "excerpt": "116.202.77.64:80 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Sat, 19 Sep 2026 05:42:19 GMT Server: Apache X-dlm-no-waypoints: true X-Pingback: http://www.flott.de/xmlrpc.php Expires: S...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1545,7 +1547,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:110 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
+     "excerpt": "116.202.77.64:110 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS SASL .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1575,7 +1577,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:143 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE ID...",
+     "excerpt": "116.202.77.64:143 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ STARTTLS LOGINDISABLED] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENAB...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1605,7 +1607,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:443 Apache httpd | HTTP/1.1 200 OK Date: Sat, 19 Sep 2026 11:57:22 GMT Server: Apache X-dlm-no-waypoints: true X-Pingback: https://www.flott.de/xmlrpc.php Link: <https://www.flott.de/...",
+     "excerpt": "116.202.77.64:443 Apache httpd banner=HTTP/1.1 200 OK Date: Sat, 19 Sep 2026 11:57:22 GMT Server: Apache X-dlm-no-waypoints: true X-Pingback: https://www.flott.de/xmlrpc.php Link: <https://www.flot...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1635,7 +1637,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:465 | 220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.124.255.102 [224.124.255.102] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING...",
+     "excerpt": "116.202.77.64:465 banner=220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.124.255.102 [224.124.255.102] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELI...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1665,7 +1667,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:587 | 220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.129.54.193 [224.129.54.193] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINING 25...",
+     "excerpt": "116.202.77.64:587 banner=220 dedi5705.your-server.de Exim ESMTP Service ready 250-dedi5705.your-server.de Hello 224.129.54.193 [224.129.54.193] 250-SIZE 104857600 250-8BITMIME 250-ETRN 250-PIPELINI...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1695,7 +1697,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:993 | * OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+...",
+     "excerpt": "116.202.77.64:993 banner=* OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITERAL+ AUTH=PLAIN] IMAP server ready. * CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE LITE...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1725,7 +1727,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:995 | +OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
+     "excerpt": "116.202.77.64:995 banner=+OK Hello there. +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN .",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1755,7 +1757,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:3306 MariaDB 10.11.18-MariaDB-0+deb12u1 | MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Server Ca...",
+     "excerpt": "116.202.77.64:3306 MariaDB 10.11.18-MariaDB-0+deb12u1 banner=MariaDB: Protocol Version: 10 Version: 10.11.18-MariaDB-0+deb12u1 Capabilities: 65534 Server Language: 33 Server Status: 2 Extended Serv...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1785,7 +1787,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:4190 | \"IMPLEMENTATION\" \"Dovecot (Debian) Pigeonhole\"\\r\\n\"SIEVE\" \"fileinto reject envelope encoded-character vacation subaddress comparator-i;ascii-numeric relational regex imap4flags...",
+     "excerpt": "116.202.77.64:4190 banner=\"IMPLEMENTATION\" \"Dovecot (Debian) Pigeonhole\"\\r\\n\"SIEVE\" \"fileinto reject envelope encoded-character vacation subaddress comparator-i;ascii-numeric relational regex imap4...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1815,7 +1817,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "116.202.77.64:5432 PostgreSQL 9.6.0 or later | PostgreSQL FATAL: no pg_hba.conf entry for host \"224.238.127.246\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf entry f...",
+     "excerpt": "116.202.77.64:5432 PostgreSQL 9.6.0 or later banner=PostgreSQL FATAL: no pg_hba.conf entry for host \"224.238.127.246\", user \"postgres\", database \"template0\", SSL encryption FATAL: no pg_hba.conf en...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -1879,7 +1881,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-09-20T10:44:09.037594+00:00 finishedAt=2026-09-20T10:58:46.662992+00:00",
+    "excerpt": "Beginn=2026-09-20T10:44:09.037594+00:00 Ende=2026-09-20T10:58:46.662992+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -1943,7 +1945,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],

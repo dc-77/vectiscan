@@ -3,7 +3,7 @@
   "cve_refs": [
    {
     "cve": "CVE-2013-3587",
-    "name": "",
+    "name": "BREACH (HTTP-Kompression)",
     "note": "Werkzeugbefund, keine Fremdbewertung.",
     "ref": "VS-2026-004, VS-2026-006, VS-2026-013, VS-2026-015",
     "score": "",
@@ -11,7 +11,7 @@
    },
    {
     "cve": "CVE-2011-3389",
-    "name": "",
+    "name": "BEAST (CBC in TLS 1.0)",
     "note": "Werkzeugbefund, keine Fremdbewertung.",
     "ref": "VS-2026-005",
     "score": "",
@@ -29,7 +29,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 63 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (11 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 21 Befunde und 9 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 63 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (11 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 21 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -234,8 +234,7 @@
   ],
   "repeat": [
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
-   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall.",
-   "Freischaltung der Scanner-Adresse beim Betreiber der blockierenden Systeme, damit die offenen Prüfungen im nächsten Durchgang nachgeholt werden können."
+   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall."
   ],
   "tool_findings": [],
   "tools": [
@@ -269,7 +268,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist oder einen kritischen Dienst exponiert. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
    },
    {
     "l": "Gelb",
@@ -279,7 +278,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
    },
    {
     "l": "Grün",
@@ -291,7 +290,7 @@
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 12 Hosts mit folgenden Aufgaben: Fernzugang und Verwaltung, Mail- und Kalenderplattform und Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "5 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie sind kein Befund und wurden intern zur Nachbearbeitung vorgemerkt."
+   "5 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen wiederkehrende Fälle in den Katalog auf."
   ],
   "posture": [
    {
@@ -1201,12 +1200,13 @@
   {
    "affected": "212.227.60.78:8443 (Plesk)",
    "cat": "A",
-   "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n8443/tcp open https-alt sw-cp-server tunnel=ssl",
+   "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:8443/tcp Dienst=https-alt Produkt=sw-cp-server Zustand=open TLS erzwungen=ja\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\n8443/tcp open https-alt sw-cp-server tunnel=ssl",
    "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten Internet erreichbar ist: 212.227.60.78:8443 (Plesk). Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist von außen nicht erkennbar.",
    "id": "VS-2026-001",
    "impact": "Verwaltungsoberflächen sind ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Angreifer können Anmeldedaten erraten oder bekannte Schwachstellen der Verwaltungssoftware ausnutzen.",
    "level": "erhoeht",
-   "policy": "catalog_sim R-ADMIN-EXPOSED",
+   "level_label": "erhöht",
+   "policy": "admin_service_exposed",
    "recommendation": [
     [
      "Unverzüglich",
@@ -1226,18 +1226,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Verwaltungsoberfläche aus dem Internet erreichbar",
-   "urgency": "Unverzüglich",
+   "urgency": "In Kürze",
    "verify": "Verbindungsversuch auf den betroffenen Port von einer externen Adresse außerhalb der freigegebenen Quellnetze; erwartet wird eine Ablehnung durch die Zugriffsbeschränkung."
   },
   {
    "affected": "85.22.47.41: nginx 1.22.1 (Support beendet 2023-04-11)",
    "cat": "B",
-   "evidence": "nmap · hosts/85.22.47.41/phase1/nmap.xml\n443/tcp open http nginx 1.22.1 tunnel=ssl\n\nnmap · hosts/85.22.47.41/phase1/nmap.xml\n80/tcp open http nginx 1.22.1\n\nwebtech · hosts/85.22.47.41/phase1/tech_profile.json\nserver: nginx/1.22.1\n\nwebtech · hosts/85.22.47.41/phase1/tech_profile.json\ntechnologies: nginx 1.22.1\n\nheader_check · scan_results:header_check:85.22.47.41\nserver: nginx/1.22.1\n\nhttpx · hosts/85.22.47.41/phase2/httpx.json\ntech: Nginx:1.22.1",
+   "evidence": "nmap · hosts/85.22.47.41/phase1/nmap.xml\n85.22.47.41: Produkt=nginx Familie=nginx Version=1.22.1 Pflegestatus=eol Pflegeende=2023-04-11 Quelle=endoflife_date\n\nnmap · hosts/85.22.47.41/phase1/nmap.xml\n443/tcp open http nginx 1.22.1 tunnel=ssl\n\nnmap · hosts/85.22.47.41/phase1/nmap.xml\n80/tcp open http nginx 1.22.1\n\nwebtech · hosts/85.22.47.41/phase1/tech_profile.json\nserver: nginx/1.22.1\n\nwebtech · hosts/85.22.47.41/phase1/tech_profile.json\ntechnologies: nginx 1.22.1\n\nheader_check · scan_results:header_check:85.22.47.41\n85.22.47.41: Produkt=nginx Familie=nginx Version=1.22.1 Pflegestatus=eol Pflegeende=2023-04-11 Quelle=endoflife_date\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Auf 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 85.22.47.41: nginx 1.22.1 (Support beendet 2023-04-11).",
    "id": "VS-2026-002",
    "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist.",
    "level": "erhoeht",
-   "policy": "SP-EOL-001",
+   "level_label": "erhöht",
+   "policy": "software_eol",
    "recommendation": [
     [
      "In Kürze",
@@ -1259,12 +1260,13 @@
   {
    "affected": "212.227.60.78:8880 (unbekannt, laut Passivquelle)",
    "cat": "A",
-   "evidence": "shodan · phase0a/shodan_hosts.json\n212.227.60.78:8880 | HTTP/1.1 303 See Other Server: sw-cp-server Date: Fri, 03 Jul 2026 05:08:45 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Expires...",
+   "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 212.227.60.78:8880 gesehen am=2026-07-18T15:23:41Z Banner=HTTP/1.1 303 See Other Server: sw-cp-server Date: Fri, 03 Jul 2026 05:08:45 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection:...\n\nshodan · phase0a/shodan_hosts.json\n212.227.60.78:8880 banner=HTTP/1.1 303 See Other Server: sw-cp-server Date: Fri, 03 Jul 2026 05:08:45 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Ex...",
    "found": "Eine Passivquelle meldet für 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 212.227.60.78:8880 (unbekannt, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
    "id": "VS-2026-003",
    "impact": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
    "level": "hoch",
-   "policy": "Prototyp VS-002 (manuell, Passivquelle)",
+   "level_label": "hoch",
+   "policy": "admin_service_exposed_passive",
    "recommendation": [
     [
      "In Kürze",
@@ -1290,12 +1292,13 @@
   {
    "affected": "vermittler.securess.de:443 (Zertifikat für portal.premium-finance.net)",
    "cat": "D",
-   "evidence": "httpx · hosts/212.227.60.78/phase2/httpx.json\nvermittler.securess.de:443 tls=tls13 cn=portal.premium-finance.net not_after=2026-10-14T13:16:37Z mismatched=True",
+   "evidence": "httpx · hosts/212.227.60.78/phase2/httpx.json\nvermittler.securess.de:443 CN=portal.premium-finance.net SAN=portal.premium-finance.net Aussteller=YR2 gueltig_bis=2026-10-14T13:16:37Z abgelaufen=nein Resttage=86 Namensabweichung=ja Protokolle=TLS1.3\n\nhttpx · hosts/212.227.60.78/phase2/httpx.json\nvermittler.securess.de:443 tls=tls13 cn=portal.premium-finance.net gueltig_bis=2026-10-14T13:16:37Z namensabweichung=ja",
    "found": "Die Zertifikate auf vermittler.securess.de sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: vermittler.securess.de:443 (Zertifikat für portal.premium-finance.net).",
    "id": "VS-2026-004",
    "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
    "level": "hoch",
-   "policy": "catalog_sim R-CERT-MISMATCH",
+   "level_label": "hoch",
+   "policy": "cert_hostname_mismatch",
    "recommendation": [
     [
      "Unverzüglich",
@@ -1317,18 +1320,19 @@
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Zertifikate auf vermittler.securess.de mit Beanstandungen",
-   "urgency": "Unverzüglich",
+   "urgency": "In Kürze",
    "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
   },
   {
    "affected": "rdgw.securess.de:443 (TLS 1.0, TLS 1.1), rdgw.securess.de:443, rdgw.securess.de:443 (BEAST)",
    "cat": "D",
-   "evidence": "testssl · scan_results:testssl:85.22.47.46\nprotocols SSLv2=False SSLv3=False TLS1.0=True TLS1.1=True TLS1.2=True TLS1.3=True\n\ntestssl · hosts/85.22.47.46/phase2/testssl.json\nservice=Couldn't determine service, skipping all HTTP checks; cert_expirationStatus=expires < 60 days (55); cert_notAfter=2026-09-12 23:59; fallback_SCSV=NOT supported; BEAST_CBC_TLS1=ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-SHA...",
+   "evidence": "testssl · scan_results:testssl:85.22.47.46\nrdgw.securess.de:443 CN=*.securess.de SAN=*.securess.de, securess.de Aussteller=Sectigo Public Server Authentication CA DV R36 (Sectigo Limited from GB) gueltig_bis=2026-09-12T23:59:00Z abgelaufen=nein Resttage=55 Namensabweichung=nein K...\n\ntestssl · scan_results:testssl:85.22.47.46\nangeboten=TLS1.0, TLS1.1, TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3\n\ntestssl · hosts/85.22.47.46/phase2/testssl.json\nservice=Couldn't determine service, skipping all HTTP checks; cert_expirationStatus=expires < 60 days (55); cert_notAfter=2026-09-12 23:59; fallback_SCSV=NOT supported; BEAST_CBC_TLS1=ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-SHA...\n\ntestssl · scan_results:testssl:85.22.47.46\nrdgw.securess.de:443 Pruefung=BEAST Urteil=vulnerable",
    "found": "Die Transportverschlüsselung auf 85.22.47.46 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: rdgw.securess.de:443 (TLS 1.0, TLS 1.1), rdgw.securess.de:443, rdgw.securess.de:443 (BEAST).",
    "id": "VS-2026-005",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "hoch",
-   "policy": "SP-TLS-001, Prototyp VS-012, catalog_sim R-TLS-VULN-SOFT",
+   "level_label": "hoch",
+   "policy": "tls_legacy_protocols, tls_no_fallback_scsv, tls_weakness",
    "recommendation": [
     [
      "In Kürze",
@@ -1360,12 +1364,13 @@
   {
    "affected": "eset.securess.de:443, eset.securess.de:443 (3des, cbc), eset.securess.de:443 (BREACH), eset.securess.de:443 (SWEET32)",
    "cat": "D",
-   "evidence": "testssl · scan_results:testssl:85.22.47.38\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False\n\ntestssl · hosts/85.22.47.38/phase2/testssl.json\ncipherlist_3DES_IDEA=offered; cipher-tls1_2_xc012=TLSv1.2 xc012 ECDHE-RSA-DES-CBC3-SHA ECDH 253 3DES 168 TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_2_x16=TLSv1.2 x16 EDH-RSA-DES-CBC3-SHA DH 4096 3DES 168 TLS_DHE_RSA_WITH_3DES_EDE_C...",
+   "evidence": "testssl · scan_results:testssl:85.22.47.38\neset.securess.de:443 CN=*.securess.de SAN=*.securess.de, securess.de Aussteller=Sectigo Public Server Authentication CA DV R36 (Sectigo Limited from GB) gueltig_bis=2026-09-12T23:59:00Z abgelaufen=nein Resttage=55 Namensabweichung=nein K...\n\ntestssl · scan_results:testssl:85.22.47.38\nangeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3\n\ntestssl · hosts/85.22.47.38/phase2/testssl.json\ncipherlist_3DES_IDEA=offered; cipher-tls1_2_xc012=TLSv1.2 xc012 ECDHE-RSA-DES-CBC3-SHA ECDH 253 3DES 168 TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA; cipher-tls1_2_x16=TLSv1.2 x16 EDH-RSA-DES-CBC3-SHA DH 4096 3DES 168 TLS_DHE_RSA_WITH_3DES_EDE_C...\n\ntestssl · scan_results:testssl:85.22.47.38\neset.securess.de:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested\n\ntestssl · scan_results:testssl:85.22.47.38\neset.securess.de:443 Pruefung=SWEET32 Urteil=vulnerable",
    "found": "Die Transportverschlüsselung auf 85.22.47.38 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: eset.securess.de:443, eset.securess.de:443 (3des, cbc), eset.securess.de:443 (BREACH), eset.securess.de:443 (SWEET32).",
    "id": "VS-2026-006",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "mittel",
-   "policy": "Prototyp VS-009, SP-TLS-002, catalog_sim R-TLS-VULN-SOFT",
+   "level_label": "mittel",
+   "policy": "tls_no_13, tls_weak_ciphers, tls_weakness",
    "recommendation": [
     [
      "In Kürze",
@@ -1391,18 +1396,19 @@
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf 85.22.47.38 mit veralteten Verfahren",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
    "affected": "login-kundenportal.securess.de (unsafe-inline, Wildcard), login-kundenportal.securess.de (fehlend: x-frame-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:51.116.154.224\nlogin-kundenportal.securess.de: reachable=None score=3/7 server=None x-feserver=None\n\nhttpx · hosts/51.116.154.224/phase2/httpx.json\nlogin-kundenportal.securess.de: status=200 title=Login Kundenportal webserver=None tech=['Blazor', 'Bootstrap', 'HSTS', 'Microsoft ASP.NET', 'jQuery']",
+   "evidence": "header_check · scan_results:header_check:51.116.154.224\nlogin-kundenportal.securess.de: URL=https://login-kundenportal.securess.de fehlende Header=permissions-policy, referrer-policy, x-frame-options, x-xss-protection gesetzte Header=content-security-policy: default-src 'none'; script-src 'se...",
    "found": "Die Webdienste auf 51.116.154.224 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: login-kundenportal.securess.de (unsafe-inline, Wildcard), login-kundenportal.securess.de (fehlend: x-frame-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-007",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
-   "policy": "SP-CSP-003, SP-CSP-004, SP-CSP-005, SP-HDR-005",
+   "level_label": "mittel",
+   "policy": "csp_weak, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1414,7 +1420,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 51.116.154.224 unvollständig",
@@ -1424,12 +1430,13 @@
   {
    "affected": "eset.securess.de (unsafe-inline, unsafe-eval), openotp.securess.de (unsafe-inline, unsafe-eval), eset.securess.de (x-frame-options, cache-control), eset.securess.de (fehlend: permissions-policy), openotp.securess.de (fehlend: permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:85.22.47.38\neset.securess.de: reachable=None score=6/7 server=Apache x-feserver=None\n\nhttpx · hosts/85.22.47.38/phase2/httpx.json\neset.securess.de: status=200 title=Securess Versicherungsmakler GmbH Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']\n\nheader_check · scan_results:header_check:85.22.47.38\nopenotp.securess.de: reachable=None score=6/7 server=Apache x-feserver=None\n\nhttpx · hosts/85.22.47.38/phase2/httpx.json\nopenotp.securess.de: status=200 title=Securess Versicherungsmakler GmbH Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']",
+   "evidence": "header_check · scan_results:header_check:85.22.47.38\neset.securess.de: URL=https://eset.securess.de fehlende Header=permissions-policy gesetzte Header=content-security-policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis.com f...\n\nheader_check · scan_results:header_check:85.22.47.38\nopenotp.securess.de: URL=https://openotp.securess.de fehlende Header=permissions-policy gesetzte Header=content-security-policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: www.google.com www.gstatic.com fonts.googleapis...",
    "found": "Die Webdienste auf 85.22.47.38 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: eset.securess.de (unsafe-inline, unsafe-eval), openotp.securess.de (unsafe-inline, unsafe-eval), eset.securess.de (x-frame-options, cache-control), eset.securess.de (fehlend: permissions-policy), openotp.securess.de (fehlend: permissions-policy).",
    "id": "VS-2026-008",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
-   "policy": "SP-CSP-003, SP-CSP-004, SP-CSP-005, Prototyp VS-011, SP-HDR-005",
+   "level_label": "mittel",
+   "policy": "csp_weak, header_duplicate, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1441,7 +1448,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "gelb",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 85.22.47.38 unvollständig",
@@ -1451,12 +1458,13 @@
   {
    "affected": "212.227.60.78:110 (POP3), 212.227.60.78:143 (IMAP), 212.227.60.78:21 (FTP)",
    "cat": "A",
-   "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\n110/tcp open pop3 Dovecot pop3d\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\npop3-capabilities: TOP AUTH-RESP-CODE USER CAPA RESP-CODES PIPELINING UIDL SASL(PLAIN LOGIN CRAM-MD5) STLS APOP\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\n143/tcp open imap Dovecot imapd\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\nimap-capabilities: STARTTLS OK LOGIN-REFERRALS have LITERAL+ AUTH=CRAM-MD5A0001 more listed IMAP4rev1 SASL-IR AUTH=LOGIN post-login capabilities IDLE ENABLE ID Pre-login AUTH=PLAIN",
+   "evidence": "nmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open TLS erzwungen=ja\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=TOP, AUTH-RESP-CODE, USER, CAPA\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\npop3-capabilities: TOP AUTH-RESP-CODE USER CAPA RESP-CODES PIPELINING UIDL SASL(PLAIN LOGIN CRAM-MD5) STLS APOP\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\n212.227.60.78:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=CRAM-MD5, LOGIN, PLAIN Capabilities=STARTTLS, OK, LOGIN-REFERRALS, have\n\nnmap · hosts/212.227.60.78/phase1/nmap.xml\nimap-capabilities: STARTTLS OK LOGIN-REFERRALS have LITERAL+ AUTH=CRAM-MD5A0001 more listed IMAP4rev1 SASL-IR AUTH=LOGIN post-login capabilities IDLE ENABLE ID Pre-login AUTH=PLAIN",
    "found": "Der Host 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 212.227.60.78:110 (POP3), 212.227.60.78:143 (IMAP), 212.227.60.78:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
    "id": "VS-2026-009",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
-   "policy": "Prototyp VS-005",
+   "level_label": "niedrig",
+   "policy": "legacy_protocols_present",
    "recommendation": [
     [
      "In Kürze",
@@ -1472,18 +1480,19 @@
    "status": "blau",
    "threat": null,
    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
   {
    "affected": "rdgw-2016.securess.de (Produktjahr im Hostnamen)",
    "cat": "B",
-   "evidence": "web_probe · phase0/host_inventory.json\nrdgw-2016.securess.de: status=None title=None final_url=None",
+   "evidence": "web_probe · phase0/host_inventory.json\nrdgw-2016.securess.de",
    "found": "Der Hostname von rdgw-2016.securess.de enthält eine Zahlenfolge, die einem gängigen Produktjahr entspricht: rdgw-2016.securess.de (Produktjahr im Hostnamen). Der Hostname allein belegt keine installierte Version, gibt aber einen Anlass für eine Prüfung des Lebenszyklus der zugrunde liegenden Plattform.",
    "id": "VS-2026-010",
    "impact": "Hostnamen mit einem Produktjahr weisen häufig auf das Beschaffungsjahr oder die Produktgeneration einer Plattform hin. Ist die Plattform tatsächlich so alt wie der Hostname vermuten lässt, kann die Herstellerpflege bereits beendet sein. Ohne eine Versionsprüfung vor Ort bleibt dies ein Verdachtsmoment.",
    "level": "niedrig",
-   "policy": "Prototyp VS-006",
+   "level_label": "niedrig",
+   "policy": "software_lifecycle_hint",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1505,12 +1514,13 @@
   {
    "affected": "securess.de (~all)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all dmarc=v=DMARC1; p=reject; rua=mailto:administrator@...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nsecuress.de: SPF=v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all DMARC=v=DMARC1; p=reject; rua=mailto:a...",
    "found": "Für securess.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: securess.de (~all).",
    "id": "VS-2026-011",
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "niedrig",
-   "policy": "SP-DNS-005",
+   "level_label": "niedrig",
+   "policy": "spf_softfail",
    "recommendation": [
     [
      "In Kürze",
@@ -1522,22 +1532,23 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "Richtlinie zur Absender-Authentizität für securess.de nicht durchsetzend",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
   },
   {
    "affected": "securess.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all dmarc=v=DMARC1; p=reject; rua=mailto:administrator@...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nsecuress.de: SPF=v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all DMARC=v=DMARC1; p=reject; rua=mailto:a...",
    "found": "Für securess.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: securess.de.",
    "id": "VS-2026-012",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
-   "policy": "Prototyp VS-008, SP-DNS-009, SP-DNS-011",
+   "level_label": "niedrig",
+   "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -1545,7 +1556,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "Transportverschlüsselung im Mailversand für securess.de nicht erzwungen",
@@ -1555,12 +1566,13 @@
   {
    "affected": "connect.securess.de:443 (BREACH)",
    "cat": "D",
-   "evidence": "testssl · scan_results:testssl:212.227.60.78\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True\n\ntestssl · hosts/212.227.60.78/phase2/testssl.json\nBREACH=potentially VULNERABLE, gzip deflate HTTP compression detected - only supplied '/' tested",
+   "evidence": "testssl · scan_results:testssl:212.227.60.78\nconnect.securess.de:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip deflate HTTP compression detected - only supplied '/' tested\n\ntestssl · scan_results:testssl:212.227.60.78\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/212.227.60.78/phase2/testssl.json\nBREACH=potentially VULNERABLE, gzip deflate HTTP compression detected - only supplied '/' tested",
    "found": "Die Transportverschlüsselung auf connect.securess.de lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: connect.securess.de:443 (BREACH).",
    "id": "VS-2026-013",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
-   "policy": "catalog_sim R-TLS-VULN-SOFT",
+   "level_label": "niedrig",
+   "policy": "tls_weakness",
    "recommendation": [
     [
      "In Kürze",
@@ -1586,18 +1598,19 @@
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf connect.securess.de mit veralteten Verfahren",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
    "affected": "login-kundenportal.securess.de (max-age 86400)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:51.116.154.224\nlogin-kundenportal.securess.de: reachable=None score=3/7 server=None x-feserver=None\n\nhttpx · hosts/51.116.154.224/phase2/httpx.json\nlogin-kundenportal.securess.de: status=200 title=Login Kundenportal webserver=None tech=['Blazor', 'Bootstrap', 'HSTS', 'Microsoft ASP.NET', 'jQuery']",
+   "evidence": "header_check · scan_results:header_check:51.116.154.224\nlogin-kundenportal.securess.de: URL=https://login-kundenportal.securess.de fehlende Header=permissions-policy, referrer-policy, x-frame-options, x-xss-protection gesetzte Header=content-security-policy: default-src 'none'; script-src 'se...",
    "found": "Die Transportverschlüsselung auf login-kundenportal.securess.de lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: login-kundenportal.securess.de (max-age 86400).",
    "id": "VS-2026-014",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
-   "policy": "SP-HDR-004",
+   "level_label": "niedrig",
+   "policy": "hsts_short",
    "recommendation": [
     [
      "In Kürze",
@@ -1613,22 +1626,23 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
    "title": "Transportverschlüsselung auf login-kundenportal.securess.de mit veralteten Verfahren",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
    "affected": "mailcleaner.securess.de:443 (BREACH)",
    "cat": "D",
-   "evidence": "testssl · scan_results:testssl:85.22.47.39\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True\n\ntestssl · hosts/85.22.47.39/phase2/testssl.json\ncert_expirationStatus=expires < 60 days (55); cert_notAfter=2026-09-12 23:59; BREACH=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested",
+   "evidence": "testssl · scan_results:testssl:85.22.47.39\nmailcleaner.securess.de:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested\n\ntestssl · scan_results:testssl:85.22.47.39\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/85.22.47.39/phase2/testssl.json\ncert_expirationStatus=expires < 60 days (55); cert_notAfter=2026-09-12 23:59; BREACH=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested",
    "found": "Die Transportverschlüsselung auf mailcleaner.securess.de lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: mailcleaner.securess.de:443 (BREACH).",
    "id": "VS-2026-015",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
-   "policy": "catalog_sim R-TLS-VULN-SOFT",
+   "level_label": "niedrig",
+   "policy": "tls_weakness",
    "recommendation": [
     [
      "In Kürze",
@@ -1654,18 +1668,19 @@
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf mailcleaner.securess.de mit veralteten Verfahren",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
   },
   {
    "affected": "connect.securess.de (fehlend: x-frame-options, referrer-policy, permissions-policy), partner.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), vermittler.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:212.227.60.78\nconnect.securess.de: reachable=None score=2/7 server=Apache x-feserver=None\n\nhttpx · hosts/212.227.60.78/phase2/httpx.json\nconnect.securess.de: status=200 title=SECURESS|connect: SECURESS webserver=Apache tech=['Apache HTTP Server', 'Bootstrap:1771057841', 'DataTables', 'HSTS', 'PHP:8.3.32', 'jQuery']\n\nheader_check · scan_results:header_check:212.227.60.78\npartner.securess.de: reachable=None score=0/7 server=None x-feserver=None\n\nhttpx · hosts/212.227.60.78/phase2/httpx.json\npartner.securess.de: status=404 title=Page Not Found webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'PHP:8.3.32']\n\nheader_check · scan_results:header_check:212.227.60.78\nvermittler.securess.de: reachable=None score=0/7 server=None x-feserver=None\n\nhttpx · hosts/212.227.60.78/phase2/httpx.json\nvermittler.securess.de: status=404 title=Page Not Found webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'PHP:8.3.32']",
+   "evidence": "header_check · scan_results:header_check:212.227.60.78\nconnect.securess.de: URL=https://connect.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-age=63072000; includeSubD...\n\nheader_check · scan_results:header_check:212.227.60.78\npartner.securess.de: URL=https://partner.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:212.227.60.78\nvermittler.securess.de: URL=https://vermittler.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection",
    "found": "Die Webdienste auf 212.227.60.78 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: connect.securess.de (fehlend: x-frame-options, referrer-policy, permissions-policy), partner.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), vermittler.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-016",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
-   "policy": "SP-HDR-005",
+   "level_label": "niedrig",
+   "policy": "security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1677,7 +1692,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 212.227.60.78 unvollständig",
@@ -1687,12 +1702,13 @@
   {
    "affected": "mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailcleaner.securess.de (fehlend: x-content-type-options, referrer-policy, permissions-policy), mailin.securess.de (fehlend: x-content-type-options, referrer-policy, permissions-policy), mailout.securess.de (fehlend: x-content-type-options, referrer-policy, permissions-policy), mx1.securess.de (fehlend: x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:85.22.47.39\nmailcleaner.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None\n\nhttpx · hosts/85.22.47.39/phase2/httpx.json\nmailcleaner.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']\n\nheader_check · scan_results:header_check:85.22.47.39\nmailin.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None\n\nhttpx · hosts/85.22.47.39/phase2/httpx.json\nmailin.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']\n\nheader_check · scan_results:header_check:85.22.47.39\nmailout.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None\n\nhttpx · hosts/85.22.47.39/phase2/httpx.json\nmailout.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']\n\nheader_check · scan_results:header_check:85.22.47.39\nmx1.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None\n\nhttpx · hosts/85.22.47.39/phase2/httpx.json\nmx1.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']",
+   "evidence": "header_check · scan_results:header_check:85.22.47.39\nmailcleaner.securess.de: Cookie=SERVERID ohne=Secure, HttpOnly, SameSite\n\nheader_check · scan_results:header_check:85.22.47.39\nmailin.securess.de: Cookie=SERVERID ohne=Secure, HttpOnly, SameSite\n\nheader_check · scan_results:header_check:85.22.47.39\nmailout.securess.de: Cookie=SERVERID ohne=Secure, HttpOnly, SameSite\n\nheader_check · scan_results:header_check:85.22.47.39\nmx1.securess.de: Cookie=SERVERID ohne=Secure, HttpOnly, SameSite\n\nheader_check · scan_results:header_check:85.22.47.39\nmailcleaner.securess.de: URL=https://mailcleaner.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-xss-protection gesetzte Header=x-frame-option...\n\nheader_check · scan_results:header_check:85.22.47.39\nmailin.securess.de: URL=https://mailin.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-xss-protection gesetzte Header=x-frame-options: sameori...\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Die Webdienste auf 85.22.47.39 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: mailcleaner.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailin.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailout.securess.de (SERVERID: Secure, HttpOnly, SameSite), mx1.securess.de (SERVERID: Secure, HttpOnly, SameSite), mailcleaner.securess.de (fehlend: x-content-type-options, referrer-policy, permissions-policy), mailin.securess.de (fehlend: x-content-type-options, referrer-policy, permissions-policy), mailout.securess.de (fehlend: x-content-type-options, referrer-policy, permissions-policy), mx1.securess.de (fehlend: x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-017",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
-   "policy": "SP-COOK-001 bis SP-COOK-005, SP-HDR-005",
+   "level_label": "niedrig",
+   "policy": "cookie_flags, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1704,7 +1720,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 85.22.47.39 unvollständig",
@@ -1714,12 +1730,13 @@
   {
    "affected": "ftp.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), www.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:85.22.47.41\nftp.securess.de: reachable=None score=0/7 server=nginx/1.22.1 x-feserver=None\n\nhttpx · hosts/85.22.47.41/phase2/httpx.json\nftp.securess.de: status=200 title=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=['Elementor:4.1.3', 'MySQL', 'Nginx:1.22.1', 'PHP', 'Swiper', 'WP Rocket', 'WordPress:7.0.2', 'Yoast SEO:28.0'...\n\nheader_check · scan_results:header_check:85.22.47.41\nsecuress.de: reachable=None score=0/7 server=nginx/1.22.1 x-feserver=None\n\nhttpx · hosts/85.22.47.41/phase2/httpx.json\nsecuress.de: status=200 title=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=['Elementor:4.1.3', 'MySQL', 'Nginx:1.22.1', 'PHP', 'Swiper', 'WP Rocket', 'WordPress:7.0.2', 'Yoast SEO:28.0', 'j...\n\nheader_check · scan_results:header_check:85.22.47.41\nwww.securess.de: reachable=None score=0/7 server=nginx/1.22.1 x-feserver=None\n\nhttpx · hosts/85.22.47.41/phase2/httpx.json\nwww.securess.de: status=200 title=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=['Elementor:4.1.3', 'MySQL', 'Nginx:1.22.1', 'PHP', 'Swiper', 'WP Rocket', 'WordPress:7.0.2', 'Yoast SEO:28.0'...",
+   "evidence": "header_check · scan_results:header_check:85.22.47.41\nftp.securess.de: URL=https://ftp.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx/1.22.1\n\nheader_check · scan_results:header_check:85.22.47.41\nsecuress.de: URL=https://securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx/1.22.1\n\nheader_check · scan_results:header_check:85.22.47.41\nwww.securess.de: URL=https://www.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx/1.22.1",
    "found": "Die Webdienste auf 85.22.47.41 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: ftp.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), www.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-018",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
-   "policy": "SP-HDR-005",
+   "level_label": "niedrig",
+   "policy": "security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1731,7 +1748,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 85.22.47.41 unvollständig",
@@ -1741,12 +1758,13 @@
   {
    "affected": "rdgw.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · scan_results:header_check:85.22.47.46\nrdgw.securess.de: reachable=None score=0/7 server=None x-feserver=None",
+   "evidence": "header_check · scan_results:header_check:85.22.47.46\nrdgw.securess.de: URL=https://rdgw.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection",
    "found": "Die Webdienste auf rdgw.securess.de liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: rdgw.securess.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
    "id": "VS-2026-019",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
-   "policy": "SP-HDR-005",
+   "level_label": "niedrig",
+   "policy": "security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1768,12 +1786,13 @@
   {
    "affected": "ftp.securess.de (Server: nginx/1.22.1), mailcleaner.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mailin.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mailout.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mx1.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), securess.de (Server: nginx/1.22.1), www.securess.de (Server: nginx/1.22.1), 212.227.60.78:22 (OpenSSH 9.6p1), 85.22.47.41:22 (OpenSSH 9.2p1)",
    "cat": "E",
-   "evidence": "header_check · scan_results:header_check:85.22.47.41\nftp.securess.de: reachable=None score=0/7 server=nginx/1.22.1 x-feserver=None\n\nhttpx · hosts/85.22.47.41/phase2/httpx.json\nftp.securess.de: status=200 title=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=['Elementor:4.1.3', 'MySQL', 'Nginx:1.22.1', 'PHP', 'Swiper', 'WP Rocket', 'WordPress:7.0.2', 'Yoast SEO:28.0'...\n\nheader_check · scan_results:header_check:85.22.47.39\nmailcleaner.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None\n\nhttpx · hosts/85.22.47.39/phase2/httpx.json\nmailcleaner.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']\n\nheader_check · scan_results:header_check:85.22.47.39\nmailin.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None\n\nhttpx · hosts/85.22.47.39/phase2/httpx.json\nmailin.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']\n\nheader_check · scan_results:header_check:85.22.47.39\nmailout.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None\n\nhttpx · hosts/85.22.47.39/phase2/httpx.json\nmailout.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']\n\nheader_check · scan_results:header_check:85.22.47.39\nmx1.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None\n\nhttpx · hosts/85.22.47.39/phase2/httpx.json\nmx1.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']\n\nheader_check · scan_results:header_check:85.22.47.41\nsecuress.de: reachable=None score=0/7 server=nginx/1.22.1 x-feserver=None\n\nhttpx · hosts/85.22.47.41/phase2/httpx.json\nsecuress.de: status=200 title=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=['Elementor:4.1.3', 'MySQL', 'Nginx:1.22.1', 'PHP', 'Swiper', 'WP Rocket', 'WordPress:7.0.2', 'Yoast SEO:28.0', 'j...",
+   "evidence": "header_check · scan_results:header_check:85.22.47.41\nftp.securess.de: URL=https://ftp.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx/1.22.1\n\nheader_check · scan_results:header_check:85.22.47.39\nmailcleaner.securess.de: URL=https://mailcleaner.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-xss-protection gesetzte Header=x-frame-option...\n\nheader_check · scan_results:header_check:85.22.47.39\nmailin.securess.de: URL=https://mailin.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-xss-protection gesetzte Header=x-frame-options: sameori...\n\nheader_check · scan_results:header_check:85.22.47.39\nmailout.securess.de: URL=https://mailout.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-xss-protection gesetzte Header=x-frame-options: sameo...\n\nheader_check · scan_results:header_check:85.22.47.39\nmx1.securess.de: URL=https://mx1.securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-xss-protection gesetzte Header=x-frame-options: sameorigin Se...\n\nheader_check · scan_results:header_check:85.22.47.41\nsecuress.de: URL=https://securess.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx/1.22.1\n\nund 5 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: ftp.securess.de (Server: nginx/1.22.1), mailcleaner.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mailin.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mailout.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), mx1.securess.de (Server: nginx/1.31.2, X-Powered-By: PHP/8.4.22), securess.de (Server: nginx/1.22.1), www.securess.de (Server: nginx/1.22.1), 212.227.60.78:22 (OpenSSH 9.6p1), 85.22.47.41:22 (OpenSSH 9.2p1).",
    "id": "VS-2026-020",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
-   "policy": "SP-DISC-001",
+   "level_label": "niedrig",
+   "policy": "http_header_disclosure, service_banner_version",
    "recommendation": [
     [
      "Mittelfristig",
@@ -1785,7 +1804,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx, nmap)",
+   "source": "aktiv (header_check, nmap)",
    "status": "blau",
    "threat": null,
    "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
@@ -1795,12 +1814,13 @@
   {
    "affected": "securess.de",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all dmarc=v=DMARC1; p=reject; rua=mailto:administrator@...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nsecuress.de: SPF=v=spf1 a mx ip4:85.22.47.37 include:spf-de.emailsignatures365.com include:_spf.plan.io include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.softfair.de ~all DMARC=v=DMARC1; p=reject; rua=mailto:a...",
    "found": "Für securess.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: securess.de.",
    "id": "VS-2026-021",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
-   "policy": "SP-DNS-003, SP-DNS-001",
+   "level_label": "niedrig",
+   "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -1808,7 +1828,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "DNS-Absicherung für securess.de nicht eingerichtet",
@@ -1858,10 +1878,12 @@
   "coverage_warning": "Für 85.22.47.36, 85.22.47.40, 85.22.47.42, 85.22.47.43, 85.22.47.45 und 85.22.47.47 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
   "levers": [
    {
-    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
     "n": 1,
     "refs": [
-     "VS-2026-001"
+     "VS-2026-001",
+     "VS-2026-002",
+     "VS-2026-003"
     ],
     "title": "Verwaltungsoberfläche aus dem Internet erreichbar"
    },
@@ -1874,25 +1896,23 @@
     "title": "Zertifikate auf vermittler.securess.de mit Beanstandungen"
    },
    {
-    "effect": "Schließt bekannte Lücken in veralteten Ständen",
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
     "n": 3,
     "refs": [
-     "VS-2026-002",
-     "VS-2026-003",
-     "VS-2026-009"
+     "VS-2026-005"
     ],
-    "title": "Serversoftware ohne Herstellerpflege"
+    "title": "Transportverschlüsselung auf 85.22.47.46 mit veralteten Verfahren"
    }
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die übrigen Befunde betreffen die Härtung der erreichbaren Dienste, die Authentizität der E-Mail und die Transportverschlüsselung."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "21 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 52,
-  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 21,
   "customer": "Auftraggeber",
@@ -1900,7 +1920,7 @@
   "domains": [
    "securess.de"
   ],
-  "facts_schema_version": "1.0.2",
+  "facts_schema_version": "1.0.3",
   "fqdns_total": 26,
   "hosts_ipv4": 12,
   "hosts_ipv6": 0,
@@ -1913,8 +1933,8 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
-  "positives": 9,
+  "policy_version": "2026-09-22.1",
+  "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
@@ -1931,31 +1951,22 @@
  },
  "plan": [
   {
-   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst.",
-   "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
-   "prio": "Unverzüglich",
+   "action": "Zugriff auf die Verwaltungsoberfläche auf die benötigten Quellnetze beschränken, etwa über die Firewall des Hosters oder eine Zugriffsliste am Dienst selbst. Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "In Kürze",
    "refs": [
-    "VS-2026-001"
+    "VS-2026-001",
+    "VS-2026-002",
+    "VS-2026-003"
    ],
-   "st": "rot"
+   "st": "gelb"
   },
   {
    "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Unverzüglich",
-   "refs": [
-    "VS-2026-004"
-   ],
-   "st": "rot"
-  },
-  {
-   "action": "Prüfen, ob die Version tatsächlich ungepflegt ist oder ob die Distribution Sicherheits-Backports liefert. Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand. Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
-   "effect": "Schließt bekannte Lücken in veralteten Ständen",
    "prio": "In Kürze",
    "refs": [
-    "VS-2026-002",
-    "VS-2026-003",
-    "VS-2026-009"
+    "VS-2026-004"
    ],
    "st": "gelb"
   },
@@ -1969,92 +1980,61 @@
    "st": "gelb"
   },
   {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
+   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren. Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
+   "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-006"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-011"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-013"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
-   "refs": [
+    "VS-2026-007",
     "VS-2026-014"
    ],
    "st": "gelb"
   },
   {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
+   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
+   "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-015"
+    "VS-2026-006",
+    "VS-2026-008"
    ],
    "st": "gelb"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Anhand des Hostnamens prüfen, welche Plattform und Version tatsächlich im Einsatz ist, und den Lebenszyklusstatus beim Hersteller abgleichen. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-007"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-008"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Anhand des Hostnamens prüfen, welche Plattform und Version tatsächlich im Einsatz ist, und den Lebenszyklusstatus beim Hersteller abgleichen. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
-   "effect": "Schließt bekannte Lücken in veralteten Ständen",
-   "prio": "Mittelfristig",
-   "refs": [
+    "VS-2026-009",
     "VS-2026-010",
     "VS-2026-020"
    ],
    "st": "blau"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-011"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
+    "VS-2026-013",
     "VS-2026-016"
    ],
    "st": "blau"
   },
   {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
+    "VS-2026-015",
     "VS-2026-017"
    ],
    "st": "blau"
@@ -2091,11 +2071,6 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Auf den geprüften Hosts antwortet kein Datenbankdienst auf Verbindungen von außen.",
-   "title": "Keine Datenbankdienste aus dem Internet erreichbar"
-  },
-  {
-   "cat": "A",
    "text": "Der Host den geprüften Hosts bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
@@ -2103,11 +2078,6 @@
    "cat": "A",
    "text": "Auf 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de) lehnen die Datei- und Mailzugänge eine Anmeldung ohne aufgebaute Transportverschlüsselung ab.",
    "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
-  },
-  {
-   "cat": "A",
-   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
-   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
   },
   {
    "cat": "C",
@@ -2118,16 +2088,6 @@
    "cat": "C",
    "text": "Für securess.de sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
    "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
-  },
-  {
-   "cat": "D",
-   "text": "Auf den geprüften Hosts liefern die verschlüsselten Dienste gültige Zertifikate mit vollständiger Vertrauenskette aus.",
-   "title": "Zertifikate gültig, vollständig verkettet und passend zum Namen"
-  },
-  {
-   "cat": "D",
-   "text": "Auf securess.de, ftp.securess.de bieten die verschlüsselten Dienste nur aktuelle Protokolle und Verfahren an.",
-   "title": "Transportverschlüsselung ohne veraltete Protokolle und Verfahren"
   },
   {
    "cat": "D",
@@ -2169,7 +2129,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "vpn01.securess.de",
     "ip": "85.22.47.36",
     "operator": "Securess Versicherungsmakler GmbH",
@@ -2193,7 +2153,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "apache01.securess.de, portal.securess.de, ssi.securess.de",
     "ip": "85.22.47.40",
     "operator": "Securess Versicherungsmakler GmbH",
@@ -2209,7 +2169,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "starface.securess.de",
     "ip": "85.22.47.42",
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-42.ip.dokom21.de)",
@@ -2217,7 +2177,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "autodiscover.securess.de, owa.securess.de",
     "ip": "85.22.47.43",
     "operator": "Securess Versicherungsmakler GmbH",
@@ -2225,7 +2185,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "sma.securess.de",
     "ip": "85.22.47.45",
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-45.ip.dokom21.de)",
@@ -2241,7 +2201,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "rdgw-2016.securess.de",
     "ip": "85.22.47.47",
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-47.ip.dokom21.de)",
@@ -2251,40 +2211,40 @@
   "lead": "Der Scan hat 12 IP-Adressen mit 26 Hostnamen erfasst. Für 6 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
-   },
-   {
-    "detail": "Betroffen: crtsh auf securess.de.",
-    "what": "Das Werkzeug crtsh hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: httpx auf 85.22.47.46, imap.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, partner.securess.de und weitere.",
-    "what": "Fakten reichen für eine Aussage nicht aus"
-   },
-   {
     "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.36 (vpn01.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und weitere), 85.22.47.40 (apache01.securess.de, portal.securess.de, ssi.securess.de) und weitere.",
-    "what": "Keine Abdeckungsinformation für dieses Werkzeug"
-   },
-   {
-    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.36 (vpn01.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und weitere), 85.22.47.40 (apache01.securess.de, portal.securess.de, ssi.securess.de) und weitere.",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
    },
    {
     "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
    },
    {
-    "detail": "Betroffen: connect.securess.de, ftp.securess.de, mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mx1.securess.de und weitere.",
+    "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: mailstore.securess.de, partner.securess.de, www.securess.de.",
+    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
+   },
+   {
+    "detail": "Betroffen: ftp.securess.de, mailcleaner.securess.de, rdgw.securess.de, vermittler.securess.de.",
     "what": "Virtueller Host war über HTTP nicht erreichbar"
    },
    {
-    "detail": "Betroffen: gobuster_dns auf securess.de.",
+    "detail": "Betroffen: securess.de.",
     "what": "Werkzeug lief in einen Timeout"
+   },
+   {
+    "detail": "Betroffen: 85.22.47.46, securess.de.",
+    "what": "Werkzeug lieferte keine Ausgabe"
    },
    {
     "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",
     "what": "Zertifikatsdetails nicht verfügbar"
+   },
+   {
+    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.36 (vpn01.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und weitere), 85.22.47.40 (apache01.securess.de, portal.securess.de, ssi.securess.de) und weitere.",
+    "what": "Zu diesem Werkzeug liegt kein Laufprotokoll vor"
    }
   ],
   "method_phases": [
@@ -2306,7 +2266,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 21 Befunde und 9 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 21 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [

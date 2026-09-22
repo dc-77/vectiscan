@@ -112,7 +112,7 @@
   },
   "VS-2026-022": {
    "checks": [
-    "web_vulnerability_active"
+    "web_vulnerability_reported"
    ]
   },
   "VS-2026-023": {

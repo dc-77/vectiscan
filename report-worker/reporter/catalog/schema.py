@@ -100,6 +100,11 @@ class CheckSpec(Base):
     applicable_when: Optional[str] = None
     item_when: Optional[str] = None
     when: Optional[str] = None
+    # S6: Ein Treffer dieses Ausdrucks macht aus dem Befund einen aktiv
+    # nachgewiesenen (rot, Unverzueglich), unabhaengig von level. Nur fuer
+    # Pruefungen, die einen eigenen Nachweis fuehren (ZAP-Meldung mit hoher
+    # Konfidenz, testssl-Schwachstelle aus der harten Liste).
+    active_proof_when: Optional[str] = None
     positive_when: str = "absent"
     not_testable_when: list[NotTestableRule] = Field(default_factory=list)
     undetermined: Undetermined = "not_testable"
@@ -108,6 +113,9 @@ class CheckSpec(Base):
     bundle: Optional[str] = None
     affected_template: str
     evidence: list[str] = Field(default_factory=list)
+    # S6: Bereich, aus dem der befundspezifische Nachweis gebaut wird
+    # (reporter/catalog/evidence.py). Ohne Angabe gilt der scope der Pruefung.
+    evidence_detail: Optional[str] = None
     references: list[str] = Field(default_factory=list)
     frameworks: Frameworks = Field(default_factory=Frameworks)
     policy: PolicyRef
@@ -267,6 +275,7 @@ class CheckResult(Base):
     group_label: str
     status: Status
     positive: bool = False
+    active_proof: bool = False
     verified: Optional[bool] = None
     source_mode: SourceMode = "none"
     affected: list[str] = Field(default_factory=list)

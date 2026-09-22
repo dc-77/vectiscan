@@ -25,6 +25,7 @@ from pydantic import ValidationError
 from reporter.catalog import render
 from reporter.catalog import tables as T
 from reporter.catalog.catchall import run_catchalls
+from reporter.catalog.evidence import KEEP_FACT_EVIDENCE, detail_evidence, ist_redundant
 from reporter.catalog.expr import CatalogSpecError, Expr, compile_expr
 from reporter.catalog.schema import (CATEGORY_NAMES, LEVEL_LABELS, BundleSpec, CatalogOutput, CheckInfo,
                                      CheckResult, CheckRollup, CheckSpec, EvidenceRef, IgnoreList, Member,
@@ -48,6 +49,7 @@ class CompiledCheck:
     nt_group: list[tuple[NotTestableRule, Expr]]
     nt_item: list[tuple[NotTestableRule, Expr]]
     item_filter: Optional[Expr] = None
+    active_proof: Optional[Expr] = None
     path: Optional[Path] = None
 
 
@@ -158,6 +160,7 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     positive = comp(spec.positive_when, "positive_when") if spec.positive_mode == "expr" else None
     applicable = comp(spec.applicable_when, "applicable_when")
     item_filter = comp(spec.item_when, "item_when")
+    active_proof = comp(spec.active_proof_when, "active_proof_when")
     nt_group: list[tuple[NotTestableRule, Expr]] = []
     nt_item: list[tuple[NotTestableRule, Expr]] = []
     for i, rule in enumerate(spec.not_testable_when):
@@ -176,7 +179,7 @@ def compile_check(spec: CheckSpec, path: Path | None = None) -> CompiledCheck:
     for i, rec in enumerate(spec.texts.recommendation):
         render.validate_template(rec.text, render.OBSERVATION_VARS, f"{where} recommendation[{i}]")
     return CompiledCheck(spec=spec, when=when, positive=positive, applicable=applicable, nt_group=nt_group,
-                         nt_item=nt_item, item_filter=item_filter, path=path)
+                         nt_item=nt_item, item_filter=item_filter, active_proof=active_proof, path=path)
 
 
 def load_catalog(catalog_dir: Path | str | None = None) -> Catalog:
@@ -291,6 +294,7 @@ class _Eval:
         seen_ok = 0
         notes: list[str] = []
         evidence: list[EvidenceRef] = []
+        active_proof = False
         for item in g.items:
             ictx = {**gctx, **item.ctx}
             if self.cc.item_filter is not None and not self.cc.item_filter.test(ictx):
@@ -305,6 +309,11 @@ class _Eval:
                 else:
                     members.append(_member(item, label, "fail"))
                     evidence.extend(self.evidence(item, ictx))
+                    # S6: aktiver Nachweis. Trifft der Ausdruck fuer ein
+                    # fehlgeschlagenes Mitglied, ist der ganze Sachverhalt
+                    # belegt und wird rot mit Unverzueglich.
+                    if self.cc.active_proof is not None and self.cc.active_proof.test(ictx):
+                        active_proof = True
                 continue
             hit = next((rule for rule, ex in self.cc.nt_item if ex.test(ictx)), None)
             if hit is not None:
@@ -326,7 +335,8 @@ class _Eval:
 
         fails = [m for m in members if m.status == "fail"]
         if fails:
-            return self.result(g, "fail", members=members, evidence=evidence, notes=notes, seen=seen_ok)
+            return self.result(g, "fail", members=members, evidence=evidence, notes=notes,
+                               seen=seen_ok, active_proof=active_proof)
         nts = [m for m in members if m.status == "not_testable"]
         if nts:
             return self.result(g, "not_testable", members=members, reason_code=nts[0].reason_code, notes=notes, seen=seen_ok)
@@ -367,7 +377,26 @@ class _Eval:
         return self.result(g, "not_testable", reason_code="insufficient_facts")
 
     def evidence(self, item: Item, ictx: dict[str, Any]) -> list[EvidenceRef]:
-        out = _evidence_of(item.fact)
+        """Nachweis dieses Treffers.
+
+        S6 (spec/08 Punkt 3): Zuerst die befundspezifische Zeile aus dem
+        getroffenen Teilobjekt, danach die Evidenz des tragenden Fakts. Die
+        bereichsweite Evidenz aus ``evidence: [...]`` kommt nur noch dran, wenn
+        vorher nichts entstanden ist; sonst stand in sieben Befunden dieselbe
+        Zusammenfassungszeile des header_check.
+        """
+        out = detail_evidence(self.spec.scope, item, ictx, self.spec.evidence_detail)
+        if not out:
+            out.extend(_evidence_of(item.fact))
+        elif self.spec.scope in KEEP_FACT_EVIDENCE:
+            # Der woertliche Werkzeugauszug bleibt, soweit er etwas sagt, das
+            # nicht schon in der Detailzeile steht (``21/tcp open ftp ProFTPD``
+            # neben ``...:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open``).
+            detail = " ".join(e.excerpt for e in out)
+            out.extend(e for e in _evidence_of(item.fact)
+                       if not ist_redundant(e.excerpt, detail))
+        if out:
+            return out
         for name in self.spec.evidence:
             obj = ictx.get(name)
             if obj is None or obj is item.fact:
@@ -381,7 +410,7 @@ class _Eval:
 
     def result(self, g: Group, status: str, *, members: list[Member] | None = None, reason_code: str | None = None,
                evidence: list[EvidenceRef] | None = None, positive: bool = False, notes: list[str] | None = None,
-               seen: int = 0) -> CheckResult:
+               seen: int = 0, active_proof: bool = False) -> CheckResult:
         spec = self.spec
         members = members or []
         notes = notes or []
@@ -422,7 +451,8 @@ class _Eval:
         return CheckResult(
             check_id=spec.id, family=spec.family, bundle=spec.bundle, kind=spec.kind, title=spec.title,
             category=spec.category, scale=spec.scale, level=spec.level, group_by=spec.group_by, group_key=g.key,
-            group_label=g.label, status=status, positive=positive, verified=verified, source_mode=source_mode,
+            group_label=g.label, status=status, positive=positive, active_proof=active_proof,
+            verified=verified, source_mode=source_mode,
             affected=labels, affected_fact_ids=fact_ids, members=members, items_seen=seen + len(members), evidence=ev,
             reason_code=reason_code, reason=reason_text, notes=sorted(set(notes), key=sort_key),
             vars={k: (v if isinstance(v, (int, list)) else render._s(v)) for k, v in gvars.items()},

@@ -3271,7 +3271,7 @@
    "confidence": 0.8,
    "evidence": [
     {
-     "excerpt": "cms=Nextcloud cms_version=None cms_confidence=0.95",
+     "excerpt": "cms=Nextcloud cms_confidence=0.95",
      "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
      "tool": "tech_profile"
     }
@@ -3723,12 +3723,12 @@
    "domain": "castenow.de",
    "evidence": [
     {
-     "excerpt": "spf=v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all dmarc=v=DMARC1; p=none; rua=mailto:dmarc@castenow.de dkim=True mx=['mx04.hornetsecurity.com', 'mx01.hornetsecuri...",
+     "excerpt": "spf=v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all dmarc=v=DMARC1; p=none; rua=mailto:dmarc@castenow.de dkim=ja mx=mx04.hornetsecurity.com, mx01.hornetsecurity.com...",
      "ref": "phase0/dns_records.json",
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=True mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=ja mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -3776,7 +3776,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "autodiscover.castenow.de: status=200 title=Outlook final_url=https://autodiscover.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.castenow.de%2fowa%2f&reason=0",
+     "excerpt": "autodiscover.castenow.de: status=200 titel=Outlook final_url=https://autodiscover.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fautodiscover.castenow.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3797,7 +3797,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3805,7 +3806,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "bitwarden.castenow.de: status=200 title=Bitwarden Web vault final_url=https://bitwarden.castenow.de",
+     "excerpt": "bitwarden.castenow.de: status=200 titel=Bitwarden Web vault final_url=https://bitwarden.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3826,7 +3827,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3834,7 +3836,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "castenow.de: status=None title=None final_url=None",
+     "excerpt": "castenow.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3851,7 +3853,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3859,7 +3862,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mail.castenow.de: status=200 title=Outlook final_url=https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0",
+     "excerpt": "mail.castenow.de: status=200 titel=Outlook final_url=https://mail.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail.castenow.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3880,7 +3883,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3888,7 +3892,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mail2.castenow.de: status=200 title=Outlook final_url=https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0",
+     "excerpt": "mail2.castenow.de: status=200 titel=Outlook final_url=https://mail2.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fmail2.castenow.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3909,7 +3913,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3917,7 +3922,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mailstore.castenow.de: status=400 title=Nextcloud final_url=https://mailstore.castenow.de",
+     "excerpt": "mailstore.castenow.de: status=400 titel=Nextcloud final_url=https://mailstore.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3938,7 +3943,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3946,7 +3952,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "nextcloud.castenow.de: status=200 title=Anmelden – Nextcloud final_url=https://nextcloud.castenow.de/login",
+     "excerpt": "nextcloud.castenow.de: status=200 titel=Anmelden – Nextcloud final_url=https://nextcloud.castenow.de/login",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3967,7 +3973,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3975,7 +3982,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "openotp.castenow.de: status=None title=None final_url=None",
+     "excerpt": "openotp.castenow.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3996,7 +4003,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4004,7 +4012,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "owa.castenow.de: status=200 title=Outlook final_url=https://owa.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.castenow.de%2fowa%2f&reason=0",
+     "excerpt": "owa.castenow.de: status=200 titel=Outlook final_url=https://owa.castenow.de/owa/auth/logon.aspx?url=https%3a%2f%2fowa.castenow.de%2fowa%2f&reason=0",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4025,7 +4033,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4033,7 +4042,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "rdgw.castenow.de: status=200 title=IIS Windows Server final_url=https://rdgw.castenow.de",
+     "excerpt": "rdgw.castenow.de: status=200 titel=IIS Windows Server final_url=https://rdgw.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4054,7 +4063,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4062,7 +4072,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "ubb-wiki.castenow.de: status=200 title=Login – My CMS final_url=https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
+     "excerpt": "ubb-wiki.castenow.de: status=200 titel=Login – My CMS final_url=https://ubb-wiki.castenow.de/login/?redirect_to=https%3A%2F%2Fubb-wiki.castenow.de%2F",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4083,7 +4093,8 @@
     "manufacturer": "Unknown",
     "name": "Generic"
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4091,7 +4102,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "umfrage.castenow.de: status=200 title=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW final_url=https://www.castenow.de/",
+     "excerpt": "umfrage.castenow.de: status=200 titel=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW final_url=https://www.castenow.de/",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4112,7 +4123,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -4120,7 +4132,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "vpn.castenow.de: status=200 title= final_url=https://vpn.castenow.de",
+     "excerpt": "vpn.castenow.de: status=200 final_url=https://vpn.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4141,7 +4153,8 @@
     "manufacturer": "Unknown",
     "name": "Generic"
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   },
   {
    "aliases": [
@@ -4155,7 +4168,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.castenow.de: status=200 title=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW final_url=https://www.castenow.de",
+     "excerpt": "www.castenow.de: status=200 titel=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW final_url=https://www.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -4176,7 +4189,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": true
+   "web_probe_reachable": true,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -4217,7 +4231,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=159.69.143.80 rdns=yak.planwerk6.de fqdns=castenow.de,www.castenow.de",
+     "excerpt": "ip=159.69.143.80 rdns=yak.planwerk6.de fqdns=castenow.de, www.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4269,7 +4283,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=195.50.179.2 rdns= fqdns=vpn.castenow.de",
+     "excerpt": "ip=195.50.179.2 fqdns=vpn.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4320,7 +4334,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=195.50.179.4 rdns= fqdns=mail2.castenow.de,owa.castenow.de,autodiscover.castenow.de,mail.castenow.de",
+     "excerpt": "ip=195.50.179.4 fqdns=mail2.castenow.de, owa.castenow.de, autodiscover.castenow.de, mail.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4374,7 +4388,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=195.50.179.5 rdns= fqdns=mailstore.castenow.de,nextcloud.castenow.de",
+     "excerpt": "ip=195.50.179.5 fqdns=mailstore.castenow.de, nextcloud.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4426,7 +4440,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=195.50.179.6 rdns= fqdns=bitwarden.castenow.de",
+     "excerpt": "ip=195.50.179.6 fqdns=bitwarden.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4477,7 +4491,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=195.50.179.7 rdns= fqdns=rdgw.castenow.de",
+     "excerpt": "ip=195.50.179.7 fqdns=rdgw.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4528,7 +4542,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=195.50.179.9 rdns= fqdns=openotp.castenow.de",
+     "excerpt": "ip=195.50.179.9 fqdns=openotp.castenow.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4675,12 +4689,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "autodiscover.castenow.de: reachable=None score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01",
+     "excerpt": "autodiscover.castenow.de: score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01",
      "ref": "scan_results:header_check:195.50.179.4",
      "tool": "header_check"
     },
     {
-     "excerpt": "autodiscover.castenow.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.1.2507', 'Windows Server']",
+     "excerpt": "autodiscover.castenow.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET:4.0.30319, Outlook Web App:15.1.2507, Windows Server",
      "ref": "hosts/195.50.179.4/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4855,12 +4869,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "bitwarden.castenow.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "bitwarden.castenow.de: score=0/7",
      "ref": "scan_results:header_check:195.50.179.6",
      "tool": "header_check"
     },
     {
-     "excerpt": "bitwarden.castenow.de: status=200 title=Bitwarden Web vault webserver=nginx tech=['HSTS', 'Nginx']",
+     "excerpt": "bitwarden.castenow.de: status=200 titel=Bitwarden Web vault webserver=nginx tech=HSTS, Nginx",
      "ref": "hosts/195.50.179.6/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4934,12 +4948,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mail.castenow.de: reachable=None score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01",
+     "excerpt": "mail.castenow.de: score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01",
      "ref": "scan_results:header_check:195.50.179.4",
      "tool": "header_check"
     },
     {
-     "excerpt": "mail.castenow.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.1.2507', 'Windows Server']",
+     "excerpt": "mail.castenow.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET:4.0.30319, Outlook Web App:15.1.2507, Windows Server",
      "ref": "hosts/195.50.179.4/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5030,12 +5044,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mail2.castenow.de: reachable=None score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01",
+     "excerpt": "mail2.castenow.de: score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01",
      "ref": "scan_results:header_check:195.50.179.4",
      "tool": "header_check"
     },
     {
-     "excerpt": "mail2.castenow.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET', 'Outlook Web App:15.1.2507', 'Windows Server']",
+     "excerpt": "mail2.castenow.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET, Outlook Web App:15.1.2507, Windows Server",
      "ref": "hosts/195.50.179.4/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5213,12 +5227,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mailstore.castenow.de: reachable=None score=6/7 server=Apache x-feserver=None",
+     "excerpt": "mailstore.castenow.de: score=6/7 server=Apache",
      "ref": "scan_results:header_check:195.50.179.5",
      "tool": "header_check"
     },
     {
-     "excerpt": "mailstore.castenow.de: status=400 title=Nextcloud webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'Nextcloud', 'PHP']",
+     "excerpt": "mailstore.castenow.de: status=400 titel=Nextcloud webserver=Apache tech=Apache HTTP Server, HSTS, Nextcloud, PHP",
      "ref": "hosts/195.50.179.5/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5571,12 +5585,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "nextcloud.castenow.de: reachable=None score=6/7 server=Apache x-feserver=None",
+     "excerpt": "nextcloud.castenow.de: score=6/7 server=Apache",
      "ref": "scan_results:header_check:195.50.179.5",
      "tool": "header_check"
     },
     {
-     "excerpt": "nextcloud.castenow.de: status=200 title=Login – Nextcloud webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'Nextcloud', 'PHP']",
+     "excerpt": "nextcloud.castenow.de: status=200 titel=Login – Nextcloud webserver=Apache tech=Apache HTTP Server, HSTS, Nextcloud, PHP",
      "ref": "hosts/195.50.179.5/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5687,12 +5701,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "openotp.castenow.de: reachable=None score=6/7 server=Apache x-feserver=None",
+     "excerpt": "openotp.castenow.de: score=6/7 server=Apache",
      "ref": "scan_results:header_check:195.50.179.9",
      "tool": "header_check"
     },
     {
-     "excerpt": "openotp.castenow.de: status=200 title=Castenow GmbH Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']",
+     "excerpt": "openotp.castenow.de: status=200 titel=Castenow GmbH Web Applications Portal webserver=Apache tech=Apache HTTP Server, HSTS",
      "ref": "hosts/195.50.179.9/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5783,12 +5797,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "owa.castenow.de: reachable=None score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01",
+     "excerpt": "owa.castenow.de: score=0/7 server=Microsoft-IIS/10.0 x-feserver=EXCHANGE01",
      "ref": "scan_results:header_check:195.50.179.4",
      "tool": "header_check"
     },
     {
-     "excerpt": "owa.castenow.de: status=200 title=Outlook webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET:4.0.30319', 'Outlook Web App:15.1.2507', 'Windows Server']",
+     "excerpt": "owa.castenow.de: status=200 titel=Outlook webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET:4.0.30319, Outlook Web App:15.1.2507, Windows Server",
      "ref": "hosts/195.50.179.4/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5983,12 +5997,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "rdgw.castenow.de: reachable=None score=0/7 server=Microsoft-IIS/10.0 x-feserver=None",
+     "excerpt": "rdgw.castenow.de: score=0/7 server=Microsoft-IIS/10.0",
      "ref": "scan_results:header_check:195.50.179.7",
      "tool": "header_check"
     },
     {
-     "excerpt": "rdgw.castenow.de: status=200 title=IIS Windows Server webserver=Microsoft-IIS/10.0 tech=['IIS:10.0', 'Microsoft ASP.NET', 'Windows Server']",
+     "excerpt": "rdgw.castenow.de: status=200 titel=IIS Windows Server webserver=Microsoft-IIS/10.0 tech=IIS:10.0, Microsoft ASP.NET, Windows Server",
      "ref": "hosts/195.50.179.7/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -6290,12 +6304,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "ubb-wiki.castenow.de: reachable=None score=1/7 server=nginx x-feserver=None",
+     "excerpt": "ubb-wiki.castenow.de: score=1/7 server=nginx",
      "ref": "scan_results:header_check:92.205.163.53",
      "tool": "header_check"
     },
     {
-     "excerpt": "ubb-wiki.castenow.de: status=200 title=Login – My CMS webserver=nginx tech=['HSTS', 'HTTP/3', 'MySQL', 'Nginx', 'PHP:8.4.23', 'Underscore.js:1.13.8', 'WordPress:7.0.2', 'jQuery', 'jQuery Migrate:3.4.1']",
+     "excerpt": "ubb-wiki.castenow.de: status=200 titel=Login – My CMS webserver=nginx tech=HSTS, HTTP/3, MySQL, Nginx, PHP:8.4.23, Underscore.js:1.13.8, WordPress:7.0.2, jQuery, jQuery Migrate:3.4.1",
      "ref": "hosts/92.205.163.53/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -6505,12 +6519,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "umfrage.castenow.de: reachable=None score=1/7 server=Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5 x-feserver=None",
+     "excerpt": "umfrage.castenow.de: score=1/7 server=Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5",
      "ref": "scan_results:header_check:3.174.46.10",
      "tool": "header_check"
     },
     {
-     "excerpt": "umfrage.castenow.de: status=200 title=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW webserver=Apache tech=['Apache HTTP Server', 'Drupal:11', 'HSTS', 'PHP', 'jQuery']",
+     "excerpt": "umfrage.castenow.de: status=200 titel=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW webserver=Apache tech=Apache HTTP Server, Drupal:11, HSTS, PHP, jQuery",
      "ref": "hosts/3.174.46.10/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -6729,12 +6743,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "vpn.castenow.de: reachable=None score=1/7 server=Web Server x-feserver=None",
+     "excerpt": "vpn.castenow.de: score=1/7 server=Web Server",
      "ref": "scan_results:header_check:195.50.179.2",
      "tool": "header_check"
     },
     {
-     "excerpt": "vpn.castenow.de: status=200 title=None webserver=Web Server tech=['HSTS', 'jQuery']",
+     "excerpt": "vpn.castenow.de: status=200 webserver=Web Server tech=HSTS, jQuery",
      "ref": "hosts/195.50.179.2/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -6826,12 +6840,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.castenow.de: reachable=None score=6/7 server=Apache x-feserver=None",
+     "excerpt": "www.castenow.de: score=6/7 server=Apache",
      "ref": "scan_results:header_check:159.69.143.80",
      "tool": "header_check"
     },
     {
-     "excerpt": "www.castenow.de: status=200 title=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW webserver=Apache tech=['Apache HTTP Server', 'Drupal:11', 'HSTS', 'PHP', 'jQuery']",
+     "excerpt": "www.castenow.de: status=200 titel=CASTENOW │Agentur für Employer Branding & Markenführung | CASTENOW webserver=Apache tech=Apache HTTP Server, Drupal:11, HSTS, PHP, jQuery",
      "ref": "hosts/159.69.143.80/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -6990,7 +7004,7 @@
    "domain": "castenow.de",
    "evidence": [
     {
-     "excerpt": "{'a_records': ['159.69.143.80'], 'mx_records': ['mx04.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx01.hornetsecurity.com'], 'ns_records': ['ns2a.dodns.net', 'ns1a.d...",
+     "excerpt": "a_records=159.69.143.80 mx_records=mx04.hornetsecurity.com, mx03.hornetsecurity.com, mx02.hornetsecurity.com, mx01.hornetsecurity.com ns_records=ns2a.dodns.net, ns1a.dodns.net txt_records=v=spf1 a...",
      "ref": "phase0a/securitytrails.json",
      "tool": "securitytrails"
     }
@@ -7015,7 +7029,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "159.69.143.80:80 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Sun, 19 Jul 2026 04:32:52 GMT Server: Apache Strict-Transport-Security: max-age=31536000 X-XSS-Protection: 0 Referrer-Policy: st...",
+     "excerpt": "159.69.143.80:80 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Sun, 19 Jul 2026 04:32:52 GMT Server: Apache Strict-Transport-Security: max-age=31536000 X-XSS-Protection: 0 Referrer-Polic...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7044,7 +7058,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "159.69.143.80:443 Apache httpd | HTTP/1.1 200 OK Date: Sun, 19 Jul 2026 20:47:23 GMT Server: Apache Strict-Transport-Security: max-age=31536000 X-XSS-Protection: 0 Referrer-Policy: strict-origin-wh...",
+     "excerpt": "159.69.143.80:443 Apache httpd banner=HTTP/1.1 200 OK Date: Sun, 19 Jul 2026 20:47:23 GMT Server: Apache Strict-Transport-Security: max-age=31536000 X-XSS-Protection: 0 Referrer-Policy: strict-orig...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7073,7 +7087,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "195.50.179.2:443 | HTTP/1.0 200 OK Server: Web Server Expires: -1 Cache-Control: no-cache Content-type: text/html; charset=UTF-8; X-Content-Type-Options: nosniff X-XSS-Protection: 1; mode=block X-F...",
+     "excerpt": "195.50.179.2:443 banner=HTTP/1.0 200 OK Server: Web Server Expires: -1 Cache-Control: no-cache Content-type: text/html; charset=UTF-8; X-Content-Type-Options: nosniff X-XSS-Protection: 1; mode=bloc...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7098,7 +7112,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "195.50.179.4:25 | 220 ciphermail.castenow.de ESMTP CipherMail 250-ciphermail.castenow.de 250-PIPELINING 250-SIZE 31457280 250-VRFY 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250 CHUNKING",
+     "excerpt": "195.50.179.4:25 banner=220 ciphermail.castenow.de ESMTP CipherMail 250-ciphermail.castenow.de 250-PIPELINING 250-SIZE 31457280 250-VRFY 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250 CHUNKING",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7123,7 +7137,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "195.50.179.4:443 | HTTP/1.1 200 OK Cache-Control: no-cache, no-store Pragma: no-cache Content-Type: text/html; charset=utf-8 Expires: -1 Server: Microsoft-IIS/10.0 request-id: 6658b41c-5ecc-4537-97...",
+     "excerpt": "195.50.179.4:443 banner=HTTP/1.1 200 OK Cache-Control: no-cache, no-store Pragma: no-cache Content-Type: text/html; charset=utf-8 Expires: -1 Server: Microsoft-IIS/10.0 request-id: 6658b41c-5ecc-45...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7148,7 +7162,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "195.50.179.5:443 Apache httpd | HTTP/1.1 400 Bad Request Date: Sat, 18 Jul 2026 17:50:16 GMT Server: Apache Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-mHYP7A2HUSmU/QYZlUC...",
+     "excerpt": "195.50.179.5:443 Apache httpd banner=HTTP/1.1 400 Bad Request Date: Sat, 18 Jul 2026 17:50:16 GMT Server: Apache Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-mHYP7A2HUSmU/Q...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7173,7 +7187,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "195.50.179.6:443 | HTTP/1.1 200 OK Server: nginx Date: Sat, 18 Jul 2026 07:40:46 GMT Content-Type: text/html Content-Length: 23090 Connection: keep-alive Vary: Accept-Encoding Accept-Ranges: bytes...",
+     "excerpt": "195.50.179.6:443 banner=HTTP/1.1 200 OK Server: nginx Date: Sat, 18 Jul 2026 07:40:46 GMT Content-Type: text/html Content-Length: 23090 Connection: keep-alive Vary: Accept-Encoding Accept-Ranges: b...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7198,7 +7212,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "195.50.179.7:443 | HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Thu, 26 Apr 2018 14:27:57 GMT Accept-Ranges: bytes ETag: \"a1c6a7c56addd31:0\" Server: Microsoft-IIS/10.0 X-Powered-By: ASP.N...",
+     "excerpt": "195.50.179.7:443 banner=HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Thu, 26 Apr 2018 14:27:57 GMT Accept-Ranges: bytes ETag: \"a1c6a7c56addd31:0\" Server: Microsoft-IIS/10.0 X-Powered-By:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7223,7 +7237,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "195.50.179.9:443 Apache httpd | HTTP/1.1 200 OK Date: Sun, 19 Jul 2026 10:01:57 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosniff Referr...",
+     "excerpt": "195.50.179.9:443 Apache httpd banner=HTTP/1.1 200 OK Date: Sun, 19 Jul 2026 10:01:57 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosniff R...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7248,7 +7262,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "3.174.46.10:80 | HTTP/1.1 403 Forbidden Server: CloudFront Date: Sat, 18 Jul 2026 14:15:22 GMT Content-Type: text/html Content-Length: 915 Connection: keep-alive X-Cache: Error from cloudfront Via:...",
+     "excerpt": "3.174.46.10:80 banner=HTTP/1.1 403 Forbidden Server: CloudFront Date: Sat, 18 Jul 2026 14:15:22 GMT Content-Type: text/html Content-Length: 915 Connection: keep-alive X-Cache: Error from cloudfront...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7276,7 +7290,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "3.174.46.10:443 | HTTP/1.1 200 OK Content-Type: text/html Content-Length: 46885 Connection: keep-alive Date: Wed, 15 Jul 2026 21:03:16 GMT Last-Modified: Fri, 10 Jul 2026 02:08:29 GMT ETag: \"8dc0d2...",
+     "excerpt": "3.174.46.10:443 banner=HTTP/1.1 200 OK Content-Type: text/html Content-Length: 46885 Connection: keep-alive Date: Wed, 15 Jul 2026 21:03:16 GMT Last-Modified: Fri, 10 Jul 2026 02:08:29 GMT ETag: \"8...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7304,7 +7318,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:21 | 220 ProFTPD Server (ProFTPD) [92.205.163.53] 530 Login incorrect. 214-The following commands are recognized (* =>'s unimplemented): CWD XCWD CDUP XCUP SMNT* QUIT PORT PASV",
+     "excerpt": "92.205.163.53:21 banner=220 ProFTPD Server (ProFTPD) [92.205.163.53] 530 Login incorrect. 214-The following commands are recognized (* =>'s unimplemented): CWD XCWD CDUP XCUP SMNT* QUIT PORT PASV",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7336,7 +7350,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:25 Postfix smtpd | 220 netscope-media.de ESMTP Postfix 250-netscope-media.de 250-PIPELINING 250-SIZE 25600000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-ENHANC...",
+     "excerpt": "92.205.163.53:25 Postfix smtpd banner=220 netscope-media.de ESMTP Postfix 250-netscope-media.de 250-PIPELINING 250-SIZE 25600000 250-ETRN 250-STARTTLS 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-E...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7368,7 +7382,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:53 | Resolver name: netscope-media.de",
+     "excerpt": "92.205.163.53:53 banner= Resolver name: netscope-media.de",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7400,7 +7414,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:80 | HTTP/1.1 200 OK Server: nginx Date: Sun, 19 Jul 2026 00:37:20 GMT Content-Type: text/html Content-Length: 71 Connection: keep-alive Last-Modified: Wed, 09 Oct 2024 20:55:26 GMT E...",
+     "excerpt": "92.205.163.53:80 banner=HTTP/1.1 200 OK Server: nginx Date: Sun, 19 Jul 2026 00:37:20 GMT Content-Type: text/html Content-Length: 71 Connection: keep-alive Last-Modified: Wed, 09 Oct 2024 20:55:26...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7432,7 +7446,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:106 |",
+     "excerpt": "92.205.163.53:106",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7464,7 +7478,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:110 | +OK Dovecot ready. <2f9185.1.6a575eb1./4v0O7hKG+44/W3LyUuAHA==@netscope-media.de> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN DIGEST-MD5 CR...",
+     "excerpt": "92.205.163.53:110 banner=+OK Dovecot ready. <2f9185.1.6a575eb1./4v0O7hKG+44/W3LyUuAHA==@netscope-media.de> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN LOGIN DIGEST-M...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7496,7 +7510,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:143 | * OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN AUTH=DIGEST-MD5 AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LO...",
+     "excerpt": "92.205.163.53:143 banner=* OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN AUTH=DIGEST-MD5 AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4re...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7528,7 +7542,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:443 | HTTP/1.1 200 OK Server: nginx Date: Sun, 19 Jul 2026 21:24:42 GMT Content-Type: text/html Content-Length: 71 Connection: keep-alive Last-Modified: Wed, 09 Oct 2024 20:55:26 GMT...",
+     "excerpt": "92.205.163.53:443 banner=HTTP/1.1 200 OK Server: nginx Date: Sun, 19 Jul 2026 21:24:42 GMT Content-Type: text/html Content-Length: 71 Connection: keep-alive Last-Modified: Wed, 09 Oct 2024 20:55:26...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7560,7 +7574,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:465 Postfix smtpd | 220 netscope-media.de ESMTP Postfix 250-netscope-media.de 250-PIPELINING 250-SIZE 25600000 250-ETRN 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-ENHANCEDSTATUSCODE...",
+     "excerpt": "92.205.163.53:465 Postfix smtpd banner=220 netscope-media.de ESMTP Postfix 250-netscope-media.de 250-PIPELINING 250-SIZE 25600000 250-ETRN 250-AUTH DIGEST-MD5 CRAM-MD5 PLAIN LOGIN 250-ENHANCEDSTATU...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7592,7 +7606,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:587 Postfix smtpd | 220 netscope-media.de ESMTP Postfix 250-netscope-media.de 250-PIPELINING 250-SIZE 25600000 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250-DSN 250 C...",
+     "excerpt": "92.205.163.53:587 Postfix smtpd banner=220 netscope-media.de ESMTP Postfix 250-netscope-media.de 250-PIPELINING 250-SIZE 25600000 250-ETRN 250-STARTTLS 250-ENHANCEDSTATUSCODES 250-8BITMIME 250-DSN...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7624,7 +7638,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:993 | * OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ AUTH=PLAIN AUTH=LOGIN AUTH=DIGEST-MD5 AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LOGIN-REFER...",
+     "excerpt": "92.205.163.53:993 banner=* OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ AUTH=PLAIN AUTH=LOGIN AUTH=DIGEST-MD5 AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LOGIN-...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7656,7 +7670,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:995 | +OK Dovecot ready. <1bc076.1.6a5393d3.UfonS6tYPx2D9Bdql4mINQ==@netscope-media.de> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN DIGEST-MD5 CRAM-MD5 .",
+     "excerpt": "92.205.163.53:995 banner=+OK Dovecot ready. <1bc076.1.6a5393d3.UfonS6tYPx2D9Bdql4mINQ==@netscope-media.de> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN DIGEST-MD5 CR...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7688,7 +7702,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:8000 | HTTP/1.1 200 OK Content-Type:text/html;charset=utf-8 Content-Length:4168",
+     "excerpt": "92.205.163.53:8000 banner=HTTP/1.1 200 OK Content-Type:text/html;charset=utf-8 Content-Length:4168",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7720,7 +7734,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:8001 |",
+     "excerpt": "92.205.163.53:8001",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7752,7 +7766,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:8443 | HTTP/1.1 200 OK Server: sw-cp-server Date: Sat, 18 Jul 2026 20:42:05 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires: Fri,...",
+     "excerpt": "92.205.163.53:8443 banner=HTTP/1.1 200 OK Server: sw-cp-server Date: Sat, 18 Jul 2026 20:42:05 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7784,7 +7798,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:8800 | HTTP/1.0 200 OK Server: Icecast 2.4.4 Connection: Close Date: Sun, 19 Jul 2026 05:01:03 GMT Content-Type: text/xml; charset=UTF-8 Cache-Control: no-cache, no-store Expires: Mon...",
+     "excerpt": "92.205.163.53:8800 banner=HTTP/1.0 200 OK Server: Icecast 2.4.4 Connection: Close Date: Sun, 19 Jul 2026 05:01:03 GMT Content-Type: text/xml; charset=UTF-8 Cache-Control: no-cache, no-store Expires...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7816,7 +7830,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "92.205.163.53:8880 | HTTP/1.1 200 OK Server: sw-cp-server Date: Fri, 17 Jul 2026 16:58:26 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires: Fri,...",
+     "excerpt": "92.205.163.53:8880 banner=HTTP/1.1 200 OK Server: sw-cp-server Date: Fri, 17 Jul 2026 16:58:26 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -7855,7 +7869,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-07-19T23:40:06.089429+00:00 finishedAt=2026-07-20T00:25:49.386570+00:00",
+    "excerpt": "Beginn=2026-07-19T23:40:06.089429+00:00 Ende=2026-07-20T00:25:49.386570+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -7919,7 +7933,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -12962,7 +12976,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:159.69.143.80",
      "tool": "testssl"
     }
@@ -13019,7 +13033,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "www.castenow.de:443 tls=tls13 cn=castenow.de not_after=2026-09-29T16:46:29Z mismatched=None",
+     "excerpt": "www.castenow.de:443 tls=tls13 cn=castenow.de gueltig_bis=2026-09-29T16:46:29Z",
      "ref": "hosts/159.69.143.80/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -13069,6 +13083,7 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "B",
      "id": "overall_grade",
      "severity": "MEDIUM"
@@ -13076,12 +13091,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "vpn.castenow.de:443 tls=tls12 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None",
+     "excerpt": "vpn.castenow.de:443 tls=tls12 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z",
      "ref": "hosts/195.50.179.2/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=True TLS1.2=True TLS1.3=False",
+     "excerpt": "angeboten=TLS1.1, TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.3",
      "ref": "scan_results:testssl:195.50.179.2",
      "tool": "testssl"
     },
@@ -13145,7 +13160,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "autodiscover.castenow.de:443 tls=tls12 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None",
+     "excerpt": "autodiscover.castenow.de:443 tls=tls12 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z",
      "ref": "hosts/195.50.179.4/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -13195,7 +13210,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False",
+     "excerpt": "angeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3",
      "ref": "scan_results:testssl:195.50.179.4",
      "tool": "testssl"
     }
@@ -13254,12 +13269,12 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "mailstore.castenow.de:443 tls=tls13 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None",
+     "excerpt": "mailstore.castenow.de:443 tls=tls13 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z",
      "ref": "hosts/195.50.179.5/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:195.50.179.5",
      "tool": "testssl"
     }
@@ -13313,18 +13328,23 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "failed (chain incomplete).",
      "id": "cert_chain_of_trust",
      "severity": "CRITICAL"
     },
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "potentially VULNERABLE, gzip HTTP compression detected  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "B",
      "id": "overall_grade",
      "severity": "MEDIUM"
@@ -13332,12 +13352,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "bitwarden.castenow.de:443 tls=tls13 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None",
+     "excerpt": "bitwarden.castenow.de:443 tls=tls13 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z",
      "ref": "hosts/195.50.179.6/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:195.50.179.6",
      "tool": "testssl"
     },
@@ -13405,96 +13425,117 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_LOW",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_3DES_IDEA",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1   x0a     DES-CBC3-SHA                      RSA        3DES        168      TLS_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_x0a",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1   x05     RC4-SHA                           RSA        RC4         128      TLS_RSA_WITH_RC4_128_SHA",
      "id": "cipher-tls1_x05",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1   x04     RC4-MD5                           RSA        RC4         128      TLS_RSA_WITH_RC4_128_MD5",
      "id": "cipher-tls1_x04",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.1   x0a     DES-CBC3-SHA                      RSA        3DES        168      TLS_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_1_x0a",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.1   x05     RC4-SHA                           RSA        RC4         128      TLS_RSA_WITH_RC4_128_SHA",
      "id": "cipher-tls1_1_x05",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.1   x04     RC4-MD5                           RSA        RC4         128      TLS_RSA_WITH_RC4_128_MD5",
      "id": "cipher-tls1_1_x04",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x0a     DES-CBC3-SHA                      RSA        3DES        168      TLS_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_x0a",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x05     RC4-SHA                           RSA        RC4         128      TLS_RSA_WITH_RC4_128_SHA",
      "id": "cipher-tls1_2_x05",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x04     RC4-MD5                           RSA        RC4         128      TLS_RSA_WITH_RC4_128_MD5",
      "id": "cipher-tls1_2_x04",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "security_headers",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "NOT supported",
      "id": "fallback_SCSV",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2011-3389",
+     "cves": [
+      "CVE-2011-3389"
+     ],
      "finding": "ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA DHE-RSA-AES256-SHA DHE-RSA-AES128-SHA AES256-SHA AES128-SHA DES-CBC3-SHA",
      "id": "BEAST_CBC_TLS1",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2013-2566",
+     "cves": [
+      "CVE-2013-2566",
+      "CVE-2015-2808"
+     ],
      "finding": "VULNERABLE, Detected ciphers: RC4-SHA RC4-MD5",
      "id": "RC4",
      "severity": "HIGH"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "B",
      "id": "overall_grade",
      "severity": "MEDIUM"
@@ -13502,12 +13543,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "rdgw.castenow.de:443 tls=tls12 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None",
+     "excerpt": "rdgw.castenow.de:443 tls=tls12 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z",
      "ref": "hosts/195.50.179.7/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=True TLS1.1=True TLS1.2=True TLS1.3=False",
+     "excerpt": "angeboten=TLS1.0, TLS1.1, TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.3",
      "ref": "scan_results:testssl:195.50.179.7",
      "tool": "testssl"
     },
@@ -13586,42 +13627,51 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_3DES_IDEA",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc012   ECDHE-RSA-DES-CBC3-SHA            ECDH 253   3DES        168      TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_xc012",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x16     EDH-RSA-DES-CBC3-SHA              DH 4096    3DES        168      TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_x16",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x0a     DES-CBC3-SHA                      RSA        3DES        168      TLS_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_x0a",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Multiple X-Frame-Options headers. Using first header: sameorigin",
      "id": "X-Frame-Options_multiple",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Multiple Cache-Control headers. Using first header: no-store, no-cache, must-revalidate",
      "id": "Cache-Control_multiple",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "potentially VULNERABLE, gzip HTTP compression detected  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "MEDIUM"
@@ -13629,12 +13679,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "openotp.castenow.de:443 tls=tls12 cn=*.castenow.de not_after=2026-09-24T23:59:59Z mismatched=None",
+     "excerpt": "openotp.castenow.de:443 tls=tls12 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z",
      "ref": "hosts/195.50.179.9/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False",
+     "excerpt": "angeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3",
      "ref": "scan_results:testssl:195.50.179.9",
      "tool": "testssl"
     },
@@ -13709,6 +13759,9 @@
    "entries": [
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "potentially VULNERABLE, gzip deflate HTTP compression detected  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "MEDIUM"
@@ -13716,12 +13769,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "umfrage.castenow.de:443 tls=tls13 cn=castenow.de not_after=2026-09-29T16:46:29Z mismatched=None",
+     "excerpt": "umfrage.castenow.de:443 tls=tls13 cn=castenow.de gueltig_bis=2026-09-29T16:46:29Z",
      "ref": "hosts/3.174.46.10/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:3.174.46.10",
      "tool": "testssl"
     },
@@ -13784,6 +13837,7 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "security_headers",
      "severity": "MEDIUM"
@@ -13791,12 +13845,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "ubb-wiki.castenow.de:443 tls=tls13 cn=ubb-wiki.castenow.de not_after=2026-10-06T23:40:38Z mismatched=None",
+     "excerpt": "ubb-wiki.castenow.de:443 tls=tls13 cn=ubb-wiki.castenow.de gueltig_bis=2026-10-06T23:40:38Z",
      "ref": "hosts/92.205.163.53/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:92.205.163.53",
      "tool": "testssl"
     },

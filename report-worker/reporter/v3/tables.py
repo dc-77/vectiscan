@@ -40,6 +40,29 @@ def package_labels(package: str) -> tuple[str, str]:
     return PACKAGE_LABELS.get((package or "").lower(), (package or "Scan", "SCAN"))
 
 
+# ---------------------------------------------------------------- Leitwerkzeuge
+# S6 (spec/08 Punkt 10): Der Abdeckungshinweis auf Seite 3 feuerte, sobald fuer
+# einen Host irgendein Werkzeug ohne Ergebnis blieb. Bei dortmund-beach war das
+# ein einziges Nebenwerkzeug (ffuf_sensitive) bei 30 von 39 erfolgreichen
+# Laeufen, und der Bericht sagte trotzdem "keine oder nur eine teilweise aktive
+# Pruefung". Jetzt zaehlen nur noch die Werkzeuge, die das Paket ausmachen.
+LEAD_TOOLS: dict[str, tuple[str, ...]] = {
+    "webcheck": ("nmap", "testssl", "zap"),
+    "perimeter": ("nmap", "testssl", "zap_active"),
+    "compliance": ("nmap", "testssl", "zap_active"),
+    "supplychain": ("nmap", "testssl", "zap_active"),
+    "insurance": ("nmap", "testssl", "zap_active"),
+    "tlscompliance": ("nmap", "testssl"),
+}
+LEAD_TOOLS_DEFAULT: tuple[str, ...] = ("nmap", "testssl")
+
+
+def lead_tools(package: str) -> tuple[str, ...]:
+    key = (package or "").lower()
+    key = {"basic": "webcheck", "professional": "perimeter", "nis2": "compliance"}.get(key, key)
+    return LEAD_TOOLS.get(key, LEAD_TOOLS_DEFAULT)
+
+
 # ---------------------------------------------------------------- Werkzeugliste
 # (Zeile, Zweck, Konfidenz) je Anzeigename, dazu die Coverage-Werkzeuge, die dahinter
 # stehen. Eine Zeile erscheint nur, wenn mindestens eines ihrer Werkzeuge gelaufen ist.
@@ -84,6 +107,41 @@ TOOL_ROWS: list[tuple[str, str, str, tuple[str, ...]]] = [
 # abgefragt, wenn eine Schwachstellennummer zu pruefen war (S5b).
 ENRICHMENT_TOOLS = ("phase3_correlation",)
 
+# ---------------------------------------------------------------- testssl-Kennungen
+# S6 (spec/08 Punkt 18 und offener Punkt 2 nach S5b): Anhang A.3 hatte die
+# Spalte "Bezeichnung" leer, weil sie nur aus einer Fremdbewertung kam und die
+# in keinem Produktionslauf vorlag. Die Namen der testssl-Pruefungen sind
+# allgemein bekannt und stehen deshalb hier als feste Tabelle; erfunden wird
+# nichts, der Basiswert bleibt leer.
+TESTSSL_NAMES: dict[str, str] = {
+    "BEAST": "BEAST (CBC in TLS 1.0)",
+    "BEAST_CBC_TLS1": "BEAST (CBC in TLS 1.0)",
+    "BREACH": "BREACH (HTTP-Kompression)",
+    "CCS": "CCS Injection",
+    "CRIME_TLS": "CRIME (TLS-Kompression)",
+    "DROWN": "DROWN (SSLv2)",
+    "DROWN_hint": "DROWN (SSLv2 auf verwandtem Dienst)",
+    "FREAK": "FREAK (Export-RSA)",
+    "heartbleed": "Heartbleed",
+    "LOGJAM": "Logjam (schwache Diffie-Hellman-Gruppen)",
+    "LOGJAM-common_primes": "Logjam (verbreitete Primzahlen)",
+    "LUCKY13": "Lucky 13 (CBC-Zeitangriff)",
+    "POODLE_SSL": "POODLE (SSLv3)",
+    "RC4": "RC4-Verfahren",
+    "ROBOT": "ROBOT (RSA-Padding-Orakel)",
+    "secure_client_renego": "Client-seitige Neuverhandlung",
+    "secure_renego": "Sichere Neuverhandlung",
+    "SWEET32": "Sweet32 (64-Bit-Blockchiffren)",
+    "ticketbleed": "Ticketbleed",
+    "winshock": "Winshock (Schannel)",
+}
+
+
+def testssl_name(test_id: str) -> str:
+    """Deutsche Bezeichnung einer testssl-Pruefung, sonst die Kennung selbst."""
+    return TESTSSL_NAMES.get(test_id, test_id)
+
+
 # ---------------------------------------------------------------- Skalen (Anhang A)
 
 EXPOSURE_SCALE: list[tuple[str, str]] = [
@@ -101,15 +159,38 @@ HYGIENE_SCALE: list[tuple[str, str]] = [
     ("niedrig", "Best-Practice-Abweichung ohne unmittelbare Auswirkung; bei Gelegenheit beheben."),
 ]
 
-TRIAGE: list[tuple[str, str, str]] = [
-    ("Rot", "rot", "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist oder einen kritischen "
-                   "Dienst exponiert. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."),
-    ("Gelb", "gelb", "Handlungsbedarf mit erkennbarem Angriffsweg. Dringlichkeit: In Kürze "
-                     "(1 bis 2 Wochen) oder Mittelfristig (nächster Wartungszyklus)."),
-    ("Blau", "blau", "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig oder "
-                     "Strategisch (laufendes Quartal)."),
-    ("Grün", "gruen", "Positiver Befund: Schutzmaßnahme vorhanden und wirksam."),
+# Bedeutung je Ampelfarbe. Welche Dringlichkeit dazugehoert, steht nicht hier,
+# sondern folgt aus der Abbildungstabelle in ``reporter/v3/levels.py``; A.1 setzt
+# beides in ``triage_rows()`` zusammen. Vorher stand die Dringlichkeit doppelt,
+# einmal hier als Satz und einmal in der Ableitung, und beide liefen auseinander
+# (spec/08 Punkt 1).
+TRIAGE_MEANING: list[tuple[str, str]] = [
+    ("rot", "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen "
+            "Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde."),
+    ("gelb", "Handlungsbedarf mit erkennbarem Angriffsweg."),
+    ("blau", "Verbesserung ohne akutes Risiko."),
+    ("gruen", "Positiver Befund: Schutzmaßnahme vorhanden und wirksam."),
 ]
+
+
+def triage_rows() -> list[tuple[str, str, str]]:
+    """(Anzeigename, Farbe, Text) fuer Anhang A.1, Dringlichkeit aus levels.py."""
+    from reporter.v3 import levels as L
+
+    out: list[tuple[str, str, str]] = []
+    for status, meaning in TRIAGE_MEANING:
+        phrase = L.urgency_phrase(status)
+        text = f"{meaning} Dringlichkeit: {phrase}." if phrase else meaning
+        out.append((L.STATUS_LABELS[status], status, text))
+    return out
+
+
+def stage_box() -> str:
+    """Erklaerung der Zeitstufen unter dem Massnahmenplan, aus denselben Werten."""
+    from reporter.v3 import levels as L
+
+    parts = [f"{L.URGENCY_BY_STAGE[s]}: {L.STAGE_WINDOW[s]}" for s in L.STAGE_ORDER]
+    return " · ".join(parts)
 
 # ---------------------------------------------------------------- Posture (Kapitel 3)
 # Vier Blöcke; jedes Item zeigt auf Pruefungen des Katalogs. ``per_host`` erzeugt ein

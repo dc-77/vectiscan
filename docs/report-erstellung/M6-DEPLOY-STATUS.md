@@ -102,3 +102,61 @@ Lokaler Doppel-Render-Test:
 cd report-worker
 python -m pytest tests/test_m5_layer3_appendix.py::TestM5DoppelRender -v
 ```
+
+---
+
+## Nachtrag S6 (2026-09-22): Umschaltung auf den Pruefkatalog
+
+Der M6-Cutover oben schaltete zwischen zwei ReportLab-Renderern (v1 und v2).
+Seit S6 ist der Bericht ein anderer: die Befunde kommen aus dem Pruefkatalog,
+nicht mehr aus einer KI-Ausgabe, und gesetzt wird mit WeasyPrint. Vorgaben seit
+diesem Stand:
+
+| Variable | Vorgabe | Wirkung |
+|---|---|---|
+| `VECTISCAN_REPORT_ENGINE` | `catalog` | woher die Befunde kommen |
+| `VECTISCAN_REPORT_LAYOUT` | `v3` | welcher Renderer setzt |
+| `VECTISCAN_VALIDATION_LEVEL` | `strict` | Fehler halten den Bericht auf |
+
+### Rueckweg
+
+Drei Zeilen in `/opt/vectiscan/.env` auf vectigal-docker02, danach
+`docker compose up -d report-worker`. Kein Code-Change, kein Build.
+
+```
+VECTISCAN_REPORT_ENGINE=legacy
+VECTISCAN_REPORT_LAYOUT=v2
+VECTISCAN_VALIDATION_LEVEL=warn
+```
+
+Die drei Zeilen stehen seit S6 auch in dem `.env`, das `deploy-auto` schreibt
+(`.gitlab-ci.yml`, `.deploy-base`), jeweils mit einer CI-Variable als
+Uebersteuerung. Dauerhaft gehoert der Rueckweg deshalb in die CI-Variablen und
+nicht in die Datei auf dem Host: das naechste Deploy schreibt sie neu.
+
+**Die drei Zeilen gehoeren zusammen.** `VECTISCAN_REPORT_ENGINE=catalog` mit
+`VECTISCAN_REPORT_LAYOUT=v2` ist ein Startfehler und kein stiller Rueckfall:
+der alte Renderer liest das Datenmodell der alten Kette, und das entsteht unter
+`catalog` nicht. Ein unbekannter Wert ist ebenfalls ein Fehler, damit ein
+Tippfehler in der Deploy-Konfiguration nicht unbemerkt den alten Weg faehrt.
+
+### Was der Rueckweg kostet
+
+Der Legacy-Weg faehrt KI#5 mit der Reparaturkette (Opus 4.7) und kostet rund
+1,85 USD je Bericht; der Katalogweg liegt bei rund 0,54 USD (Prosa und
+Recherche auf Opus 5). Der Rueckweg bringt ausserdem die Befunde zurueck, die
+das Gegenlesen in `report-prototype/spec/08-gegenlesen-v3-pdfs.md` beanstandet
+hat. Er ist als Notbremse gedacht, nicht als Betriebszustand, und verschwindet
+eine Release nach S6 zusammen mit `severity_policy.py` und dem ReportLab-Pfad.
+
+### Wenn das Gate blockiert
+
+`strict` heisst: ein Fehler haelt den Bericht auf, die Order geht auf
+`report_blocked`, es gibt kein PDF und keinen Upload. Die Defektliste steht in
+`orders.report_defects` und im Admin-Review unter `/admin/review/<orderId>` im
+Reiter "Defekte"; von dort fuehrt "Regenerieren nach Fix" den Lauf ohne neuen
+Scan noch einmal aus. Erst wenn das nicht weiterhilft, ist
+`VECTISCAN_VALIDATION_LEVEL=warn` der Zwischenschritt, und auch dann haengt die
+Auslieferung weiter an der Admin-Freigabe.
+
+Einzelheiten zur Pipeline: `docs/report-pipeline/`.
