@@ -1260,8 +1260,8 @@
  "landscape_lead": "10 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 24,
-  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 10,
   "customer": "Auftraggeber",
@@ -1282,7 +1282,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
+  "policy_version": "2026-09-22.1",
   "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1422,7 +1422,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "mails.heuel.com, smtp.heuel.com",
     "ip": "195.225.241.75",
     "operator": "comtrance service GmbH",
@@ -1438,7 +1438,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "dl.heuel.com, webportal.heuel.com",
     "ip": "213.133.104.51",
     "operator": "Hetzner Online AG (www51.your-server.de)",
@@ -1454,7 +1454,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "webportal.heuel.com",
     "ip": "2a01:4f8:d0a:2757::2",
     "operator": "Hetzner Online GmbH (www51.your-server.de)",
@@ -1464,20 +1464,16 @@
   "lead": "Der Scan hat 6 IP-Adressen mit 12 Hostnamen erfasst. Für 3 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: edi.heuel.com (+mail.heuel.com), online.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com).",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
-   },
-   {
-    "detail": "Betroffen: 104.16.10.6 (online.heuel.com), 195.225.241.75 (mails.heuel.com, smtp.heuel.com), 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com), 213.133.104.51 (dl.heuel.com, webportal.heuel.com), 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com), 2a01:4f8:d0a:2757::2 (webportal.heuel.com) und weitere.",
-    "what": "Keine Abdeckungsinformation für dieses Werkzeug"
-   },
-   {
     "detail": "Betroffen: 104.16.10.6 (online.heuel.com), 195.225.241.75 (mails.heuel.com, smtp.heuel.com), 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com), 213.133.104.51 (dl.heuel.com, webportal.heuel.com), 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com), 2a01:4f8:d0a:2757::2 (webportal.heuel.com).",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
    },
    {
     "detail": "Betroffen: edi.heuel.com (+mail.heuel.com), online.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com).",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: edi.heuel.com (+mail.heuel.com), online.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com).",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
    },
    {
     "detail": "Betroffen: edi.heuel.com (+mail.heuel.com), online.heuel.com.",
@@ -1490,6 +1486,10 @@
    {
     "detail": "Betroffen: edi.heuel.com (+mail.heuel.com), online.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com).",
     "what": "Zertifikatsdetails nicht verfügbar"
+   },
+   {
+    "detail": "Betroffen: 104.16.10.6 (online.heuel.com), 195.225.241.75 (mails.heuel.com, smtp.heuel.com), 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com), 213.133.104.51 (dl.heuel.com, webportal.heuel.com), 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com), 2a01:4f8:d0a:2757::2 (webportal.heuel.com) und weitere.",
+    "what": "Zu diesem Werkzeug liegt kein Laufprotokoll vor"
    }
   ],
   "method_phases": [

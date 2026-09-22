@@ -1911,8 +1911,8 @@
  "landscape_lead": "21 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 52,
-  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 21,
   "customer": "Auftraggeber",
@@ -1933,7 +1933,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
+  "policy_version": "2026-09-22.1",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2129,7 +2129,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "vpn01.securess.de",
     "ip": "85.22.47.36",
     "operator": "Securess Versicherungsmakler GmbH",
@@ -2153,7 +2153,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "apache01.securess.de, portal.securess.de, ssi.securess.de",
     "ip": "85.22.47.40",
     "operator": "Securess Versicherungsmakler GmbH",
@@ -2169,7 +2169,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "starface.securess.de",
     "ip": "85.22.47.42",
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-42.ip.dokom21.de)",
@@ -2177,7 +2177,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "autodiscover.securess.de, owa.securess.de",
     "ip": "85.22.47.43",
     "operator": "Securess Versicherungsmakler GmbH",
@@ -2185,7 +2185,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "sma.securess.de",
     "ip": "85.22.47.45",
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-45.ip.dokom21.de)",
@@ -2201,7 +2201,7 @@
    },
    {
     "cov": "keine",
-    "coverage": "Keine Werkzeug-Protokolle vorhanden, Abdeckung unbekannt.",
+    "coverage": "Zu diesem Host liegt kein Laufprotokoll vor; welche Prüfungen stattgefunden haben, ist nicht belegt.",
     "fqdns": "rdgw-2016.securess.de",
     "ip": "85.22.47.47",
     "operator": "Securess Versicherungsmakler GmbH (85-22-47-47.ip.dokom21.de)",
@@ -2211,28 +2211,20 @@
   "lead": "Der Scan hat 12 IP-Adressen mit 26 Hostnamen erfasst. Für 6 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
-   },
-   {
-    "detail": "Betroffen: securess.de.",
-    "what": "Das Werkzeug crtsh hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: 85.22.47.46, mailstore.securess.de, partner.securess.de, www.securess.de.",
-    "what": "Fakten reichen für eine Aussage nicht aus"
-   },
-   {
     "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.36 (vpn01.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und weitere), 85.22.47.40 (apache01.securess.de, portal.securess.de, ssi.securess.de) und weitere.",
-    "what": "Keine Abdeckungsinformation für dieses Werkzeug"
-   },
-   {
-    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.36 (vpn01.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und weitere), 85.22.47.40 (apache01.securess.de, portal.securess.de, ssi.securess.de) und weitere.",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
    },
    {
     "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: mailstore.securess.de, partner.securess.de, www.securess.de.",
+    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
    },
    {
     "detail": "Betroffen: ftp.securess.de, mailcleaner.securess.de, rdgw.securess.de, vermittler.securess.de.",
@@ -2243,8 +2235,16 @@
     "what": "Werkzeug lief in einen Timeout"
    },
    {
+    "detail": "Betroffen: 85.22.47.46, securess.de.",
+    "what": "Werkzeug lieferte keine Ausgabe"
+   },
+   {
     "detail": "Betroffen: ftp.securess.de, mx1.securess.de, openotp.securess.de, vermittler.securess.de.",
     "what": "Zertifikatsdetails nicht verfügbar"
+   },
+   {
+    "detail": "Betroffen: 212.227.60.78 (connect.securess.de, partner.securess.de, vermittler.securess.de), 51.116.154.224 (login-kundenportal.securess.de), 85.22.47.36 (vpn01.securess.de), 85.22.47.38 (eset.securess.de, openotp.securess.de), 85.22.47.39 (imap.securess.de, mailcleaner.securess.de, mailin.securess.de und weitere), 85.22.47.40 (apache01.securess.de, portal.securess.de, ssi.securess.de) und weitere.",
+    "what": "Zu diesem Werkzeug liegt kein Laufprotokoll vor"
    }
   ],
   "method_phases": [

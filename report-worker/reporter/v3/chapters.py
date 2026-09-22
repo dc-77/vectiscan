@@ -244,7 +244,11 @@ def limitations(facts: FS.Facts, output: CatalogOutput) -> list[Limitation]:
             continue
         if row.tool in OUT_OF_PRODUCT_TOOLS:
             continue
-        code = row.reason or row.raw_status or "insufficient_facts"
+        # S6: derselbe Weg wie im Katalog. Ohne Normalisierung landet ein
+        # Rohgrund wie "package_webcheck" oder "ZAP API error 400: {...}" in
+        # keiner Tabelle und bekommt den Sammeltext "Das Werkzeug X hat kein
+        # Ergebnis geliefert" (spec/08 Punkte 9 und 11).
+        code = CS.normalize_reason(row.reason, row.raw_status) or "insufficient_facts"
         status, text = CT.COVERAGE_REASONS.get(code, ("not_testable", ""))
         if status in ("ok", "not_applicable"):
             continue

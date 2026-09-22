@@ -2326,8 +2326,8 @@
  "landscape_lead": "29 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 75,
-  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 29,
   "customer": "Auftraggeber",
@@ -2348,7 +2348,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
+  "policy_version": "2026-09-22.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2655,64 +2655,60 @@
   "lead": "Der Scan hat 10 IP-Adressen mit 15 Hostnamen erfasst. Für 10 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
+    "detail": "Betroffen: 159.69.143.80 (castenow.de, www.castenow.de), 195.50.179.2 (vpn.castenow.de), 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de und weitere), 195.50.179.5 (mailstore.castenow.de, nextcloud.castenow.de), 195.50.179.6 (bitwarden.castenow.de), 195.50.179.7 (rdgw.castenow.de) und weitere.",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
     "detail": "Betroffen: autodiscover.castenow.de, bitwarden.castenow.de, mailstore.castenow.de, openotp.castenow.de, rdgw.castenow.de, ubb-wiki.castenow.de und weitere.",
     "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
    },
    {
-    "detail": "Betroffen: autodiscover.castenow.de, nextcloud.castenow.de, www.castenow.de (+castenow.de).",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
-   },
-   {
-    "detail": "Betroffen: 159.69.143.80, 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7 und weitere.",
-    "what": "Das Werkzeug ffuf_sensitive hat kein Ergebnis geliefert"
-   },
-   {
     "detail": "Betroffen: castenow.de.",
-    "what": "Das Werkzeug gobuster_dns hat kein Ergebnis geliefert"
+    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
    },
    {
-    "detail": "Betroffen: 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7, 195.50.179.9 und weitere.",
-    "what": "Das Werkzeug zap_active hat kein Ergebnis geliefert"
+    "detail": "Betroffen: autodiscover.castenow.de, nextcloud.castenow.de, www.castenow.de (+castenow.de).",
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: autodiscover.castenow.de, nextcloud.castenow.de, www.castenow.de (+castenow.de).",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
    },
    {
     "detail": "Betroffen: 159.69.143.80.",
-    "what": "Das Werkzeug zap_spider hat kein Ergebnis geliefert"
+    "what": "Die Webanalyse-Komponente war nicht erreichbar"
    },
    {
     "detail": "Betroffen: castenow.de, mail.castenow.de, mailstore.castenow.de.",
-    "what": "Fakten reichen für eine Aussage nicht aus"
+    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
    },
    {
     "detail": "Betroffen: 213.23.169.167 (forti-vpn.castenow.de).",
     "what": "Host war während des Scans nicht erreichbar"
    },
    {
-    "detail": "Betroffen: forti-vpn.castenow.de.",
-    "what": "Keine Abdeckungsinformation für dieses Werkzeug"
-   },
-   {
-    "detail": "Betroffen: 159.69.143.80 (castenow.de, www.castenow.de), 195.50.179.2 (vpn.castenow.de), 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de und weitere), 195.50.179.5 (mailstore.castenow.de, nextcloud.castenow.de), 195.50.179.6 (bitwarden.castenow.de), 195.50.179.7 (rdgw.castenow.de) und weitere.",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
+    "detail": "Betroffen: autodiscover.castenow.de, bitwarden.castenow.de, rdgw.castenow.de, ubb-wiki.castenow.de, umfrage.castenow.de, vpn.castenow.de.",
+    "what": "Virtueller Host war über HTTP nicht erreichbar"
    },
    {
     "detail": "Betroffen: castenow.de.",
-    "what": "Keine WHOIS-Daten vorhanden"
-   },
-   {
-    "detail": "Betroffen: autodiscover.castenow.de, nextcloud.castenow.de, www.castenow.de (+castenow.de).",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
-   },
-   {
-    "detail": "Betroffen: autodiscover.castenow.de, bitwarden.castenow.de, rdgw.castenow.de, ubb-wiki.castenow.de, umfrage.castenow.de, vpn.castenow.de.",
-    "what": "Virtueller Host war über HTTP nicht erreichbar"
+    "what": "Werkzeug lief in einen Timeout"
    },
    {
     "detail": "Betroffen: autodiscover.castenow.de.",
     "what": "Werkzeug wurde von der Scan-Steuerung übersprungen"
    },
    {
+    "detail": "Betroffen: 159.69.143.80, 195.50.179.2, 195.50.179.4, 195.50.179.5, 195.50.179.6, 195.50.179.7 und weitere.",
+    "what": "Wortliste im Scanner fehlte, Verzeichnis-Prüfung nicht durchgeführt"
+   },
+   {
     "detail": "Betroffen: autodiscover.castenow.de, nextcloud.castenow.de, www.castenow.de (+castenow.de).",
     "what": "Zertifikatsdetails nicht verfügbar"
+   },
+   {
+    "detail": "Betroffen: forti-vpn.castenow.de.",
+    "what": "Zu diesem Werkzeug liegt kein Laufprotokoll vor"
    }
   ],
   "method_phases": [

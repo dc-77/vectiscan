@@ -18,8 +18,11 @@ import { join } from 'path';
 const ORDERS = readFileSync(join(__dirname, '..', 'routes', 'orders.ts'), 'utf-8');
 
 describe('S6 — Auslieferung nur nach Admin-Freigabe', () => {
-  it('regenerate-report verlangt Admin-Rechte', () => {
-    const start = ORDERS.indexOf("'/api/orders/:id/regenerate-report'");
+  it('regenerate-report liegt unter /api/admin und verlangt Admin-Rechte', () => {
+    // Beides gehoert zusammen: der Edge-Shield in Traefik deckt nur
+    // /api/admin/* ab (VEC-133), und ohne requireAdmin koennte der Kunde den
+    // Lauf selbst anstossen.
+    const start = ORDERS.indexOf("'/api/admin/orders/:id/regenerate-report'");
     expect(start).toBeGreaterThan(-1);
     const preHandler = ORDERS.slice(start, start + 200);
     expect(preHandler).toContain('requireAuth, requireAdmin');
@@ -37,7 +40,7 @@ describe('S6 — Auslieferung nur nach Admin-Freigabe', () => {
   });
 
   it('regenerate-report setzt approved nicht', () => {
-    const start = ORDERS.indexOf("'/api/orders/:id/regenerate-report'");
+    const start = ORDERS.indexOf("'/api/admin/orders/:id/regenerate-report'");
     const ende = ORDERS.indexOf('server.', start + 10);
     const route = ORDERS.slice(start, ende > start ? ende : start + 4000);
     expect(route).not.toContain('approved: true');

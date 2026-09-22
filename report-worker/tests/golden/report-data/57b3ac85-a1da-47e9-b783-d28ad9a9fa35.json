@@ -689,8 +689,8 @@
  "landscape_lead": "6 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 10,
-  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 6,
   "customer": "Auftraggeber",
@@ -711,7 +711,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
+  "policy_version": "2026-09-22.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -827,20 +827,20 @@
   "lead": "Der Scan hat 1 IP-Adresse mit 2 Hostnamen erfasst. Für 1 Host war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: lumbeck-wolter.de.",
-    "what": "Das Werkzeug gobuster_dns hat kein Ergebnis geliefert"
+    "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de).",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
    },
    {
     "detail": "Betroffen: www.lumbeck-wolter.de (+lumbeck-wolter.de).",
     "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
    },
    {
-    "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de).",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
+    "detail": "Betroffen: lumbeck-wolter.de.",
+    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
    },
    {
     "detail": "Betroffen: lumbeck-wolter.de.",
-    "what": "Keine WHOIS-Daten vorhanden"
+    "what": "Werkzeug lief in einen Timeout"
    }
   ],
   "method_phases": [

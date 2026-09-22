@@ -654,8 +654,8 @@
  "landscape_lead": "9 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 23,
-  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 9,
   "customer": "Auftraggeber",
@@ -677,7 +677,7 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-20.1",
+  "policy_version": "2026-09-22.1",
   "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -818,40 +818,36 @@
   "lead": "Der Scan hat 2 IP-Adressen mit 31 Hostnamen erfasst. Für 1 Host war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: 10finance.vectigal.tech.",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
+    "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere), 62.217.52.177 (test.vectigal.tech).",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
+    "detail": "Betroffen: 62.217.52.165.",
+    "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
    },
    {
     "detail": "Betroffen: 62.217.52.177.",
     "what": "Das Werkzeug httpx hat kein Ergebnis geliefert"
    },
    {
-    "detail": "Betroffen: 62.217.52.165, 62.217.52.177.",
-    "what": "Das Werkzeug zap_active hat kein Ergebnis geliefert"
+    "detail": "Betroffen: vectigal.tech, vectiscan.de.",
+    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
    },
    {
-    "detail": "Betroffen: 62.217.52.165.",
-    "what": "Das Werkzeug zap_spider hat kein Ergebnis geliefert"
+    "detail": "Betroffen: 10finance.vectigal.tech.",
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: 10finance.vectigal.tech.",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
    },
    {
     "detail": "Betroffen: ki-check-10finance.vectigal.tech, vectiscan.de.",
-    "what": "Fakten reichen für eine Aussage nicht aus"
-   },
-   {
-    "detail": "Betroffen: 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere), 62.217.52.177 (test.vectigal.tech).",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
+    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
    },
    {
     "detail": "Betroffen: 62.217.52.177 (test.vectigal.tech).",
     "what": "Keine Technologie-Signale erkannt"
-   },
-   {
-    "detail": "Betroffen: vectigal.tech, vectiscan.de.",
-    "what": "Keine WHOIS-Daten vorhanden"
-   },
-   {
-    "detail": "Betroffen: 10finance.vectigal.tech.",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
    },
    {
     "detail": "Betroffen: test.vectigal.tech.",

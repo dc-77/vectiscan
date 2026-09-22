@@ -1179,7 +1179,7 @@ export async function unexcludeFinding(orderId: string, findingId: string): Prom
 }
 
 export async function regenerateReport(orderId: string): Promise<ApiResponse<{ message: string }>> {
-  const res = await fetch(`${API_URL}/api/orders/${orderId}/regenerate-report`, {
+  const res = await fetch(`${API_URL}/api/admin/orders/${orderId}/regenerate-report`, {
     method: 'POST',
     headers: authHeaders(),
   });

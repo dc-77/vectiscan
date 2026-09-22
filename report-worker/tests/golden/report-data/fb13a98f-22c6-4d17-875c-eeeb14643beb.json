@@ -1258,8 +1258,8 @@
  "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 27,
-  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 14,
   "customer": "Auftraggeber",
@@ -1280,7 +1280,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
+  "policy_version": "2026-09-22.1",
   "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1458,24 +1458,20 @@
   "lead": "Der Scan hat 3 IP-Adressen mit 11 Hostnamen erfasst. Alle Hosts konnten aktiv geprüft werden.",
   "limitations": [
    {
+    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere).",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
     "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
    },
    {
     "detail": "Betroffen: transmission.krause-computer.de.",
-    "what": "Fakten reichen für eine Aussage nicht aus"
-   },
-   {
-    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere), krause-computer.de, krause-computer.de.",
-    "what": "Keine Abdeckungsinformation für dieses Werkzeug"
-   },
-   {
-    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere).",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
-   },
-   {
-    "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
+    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
    },
    {
     "detail": "Betroffen: filebrowser.krause-computer.de, nospamproxy.krause-computer.de, www.krause-computer.de.",
@@ -1488,6 +1484,10 @@
    {
     "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
     "what": "Zertifikatsdetails nicht verfügbar"
+   },
+   {
+    "detail": "Betroffen: 37.114.55.171 (jitsi.krause-computer.de, mx.krause-computer.de, nospamproxy.krause-computer.de und weitere), 85.13.167.158 (krause-computer.de, www.krause-computer.de), 87.79.190.79 (filebrowser.krause-computer.de, navidrome.krause-computer.de, nextcloud.krause-computer.de und weitere), krause-computer.de, krause-computer.de.",
+    "what": "Zu diesem Werkzeug liegt kein Laufprotokoll vor"
    }
   ],
   "method_phases": [

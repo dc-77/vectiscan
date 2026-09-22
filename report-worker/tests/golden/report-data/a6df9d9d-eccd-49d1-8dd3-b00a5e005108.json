@@ -910,8 +910,8 @@
  "landscape_lead": "11 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 19,
-  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 11,
   "customer": "Auftraggeber",
@@ -932,7 +932,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
+  "policy_version": "2026-09-22.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1077,36 +1077,32 @@
   "lead": "Der Scan hat 2 IP-Adressen mit 3 Hostnamen erfasst. Für 2 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
+    "detail": "Betroffen: 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), 217.243.248.30 (openotp.junkerwerk.hu).",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
     "detail": "Betroffen: openotp.junkerwerk.hu.",
     "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
-   },
-   {
-    "detail": "Betroffen: 217.243.248.30.",
-    "what": "Das Werkzeug ffuf_sensitive hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: junkerwerk.hu.",
-    "what": "Das Werkzeug gobuster_dns hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: 217.243.248.30.",
-    "what": "Das Werkzeug zap_active hat kein Ergebnis geliefert"
    },
    {
     "detail": "Betroffen: www.junkerwerk.hu.",
     "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
    },
    {
-    "detail": "Betroffen: 188.40.3.130 (junkerwerk.hu, www.junkerwerk.hu), 217.243.248.30 (openotp.junkerwerk.hu).",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
-   },
-   {
     "detail": "Betroffen: junkerwerk.hu.",
-    "what": "Keine WHOIS-Daten vorhanden"
+    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
    },
    {
     "detail": "Betroffen: openotp.junkerwerk.hu.",
     "what": "Virtueller Host war über HTTP nicht erreichbar"
+   },
+   {
+    "detail": "Betroffen: junkerwerk.hu.",
+    "what": "Werkzeug lief in einen Timeout"
+   },
+   {
+    "detail": "Betroffen: 217.243.248.30.",
+    "what": "Wortliste im Scanner fehlte, Verzeichnis-Prüfung nicht durchgeführt"
    }
   ],
   "method_phases": [

@@ -21,6 +21,8 @@ Bump-Historie:
                   `web_vulnerability_active` und `tls_known_vulnerability`.
                   Neues Feld `evidence_detail` und befundspezifische Nachweise.
                   `wordpress_plugin_vulnerable` zaehlt ohne Singular-Fehler.
+                  COVERAGE_REASONS in Kundensprache (spec/08 Punkt 11);
+                  `package_<paket>` zaehlt als `not_in_package` (Punkt 9).
 """
 from __future__ import annotations
 

@@ -1238,8 +1238,8 @@
  "landscape_lead": "15 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 41,
-  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
-  "catalog_version": "2026-09-20.1",
+  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
+  "catalog_version": "2026-09-22.1",
   "classification": "Vertraulich",
   "consolidated": 15,
   "customer": "Auftraggeber",
@@ -1261,7 +1261,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-20.1",
+  "policy_version": "2026-09-22.1",
   "positives": 6,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1458,60 +1458,52 @@
   "lead": "Der Scan hat 4 IP-Adressen mit 8 Hostnamen erfasst. Für 2 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
+    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de), 217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de), 2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de).",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
     "detail": "Betroffen: nachhaltigkeit.junkerwerk.de.",
     "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
-   },
-   {
-    "detail": "Betroffen: autodiscover.junkerwerk.de.",
-    "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
-   },
-   {
-    "detail": "Betroffen: 2a01:4f8:d0a:3124::2.",
-    "what": "Das Werkzeug ffuf_sensitive hat kein Ergebnis geliefert"
-   },
-   {
-    "detail": "Betroffen: junkerwerk.de.",
-    "what": "Das Werkzeug gobuster_dns hat kein Ergebnis geliefert"
    },
    {
     "detail": "Betroffen: 2a01:4f8:d0a:3124::2.",
     "what": "Das Werkzeug httpx hat kein Ergebnis geliefert"
    },
    {
-    "detail": "Betroffen: 2a01:4f8:d0a:3124::2.",
-    "what": "Das Werkzeug zap_active hat kein Ergebnis geliefert"
-   },
-   {
     "detail": "Betroffen: nachhaltigkeit.junkerwerk.de, www.junkerwerk.de (+junkerwerk.de).",
     "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
+   },
+   {
+    "detail": "Betroffen: junkerwerk.de, junkerwerk.hu.",
+    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
+   },
+   {
+    "detail": "Betroffen: autodiscover.junkerwerk.de.",
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: autodiscover.junkerwerk.de.",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: junkerwerk.hu.",
+    "what": "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus"
    },
    {
     "detail": "Betroffen: nachhaltigkeit.junkerwerk.de.",
     "what": "Die passive Webanalyse lieferte keine Meldungen; Ergebnis nicht belastbar"
    },
    {
-    "detail": "Betroffen: junkerwerk.hu.",
-    "what": "Fakten reichen für eine Aussage nicht aus"
-   },
-   {
-    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de), 217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de), 2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de).",
-    "what": "Keine Schwachstellen-Anreicherung vorhanden"
-   },
-   {
     "detail": "Betroffen: 2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de).",
     "what": "Keine Technologie-Signale erkannt"
    },
    {
-    "detail": "Betroffen: junkerwerk.de, junkerwerk.hu.",
-    "what": "Keine WHOIS-Daten vorhanden"
-   },
-   {
-    "detail": "Betroffen: autodiscover.junkerwerk.de.",
-    "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
-   },
-   {
     "detail": "Betroffen: nachhaltigkeit.junkerwerk.de.",
     "what": "Virtueller Host war über HTTP nicht erreichbar"
+   },
+   {
+    "detail": "Betroffen: 2a01:4f8:d0a:3124::2, junkerwerk.de.",
+    "what": "Werkzeug lief in einen Timeout"
    },
    {
     "detail": "Betroffen: autodiscover.junkerwerk.de.",
