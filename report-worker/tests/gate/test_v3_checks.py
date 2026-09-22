@@ -166,3 +166,38 @@ def test_run_all_liefert_alle_pruefungen_in_fester_reihenfolge() -> None:
         "unprocessed_ueber_schwelle", "auftraggeber_fehlt",
     ]
     assert [d.is_error for d in defekte] == [True, True, False, False]
+
+def test_run_all_unter_strict_haelt_den_bericht_auf() -> None:
+    """Ohne Firmennamen wird der Bericht in der Produktion angehalten."""
+    order = JUNKERWERK["multi"]
+    defekte = VC.run_all(data_for(order), facts_for(order), output_for(HEUEL),
+                         strict=True)
+
+    fehlend = [d for d in defekte if d.check == "auftraggeber_fehlt"]
+    assert len(fehlend) == 1
+    assert fehlend[0].is_error
+
+
+def test_kennzahlen_misst_mit_derselben_strenge(monkeypatch) -> None:
+    """Ein gruenes --kennzahlen muss heissen, dass der Bericht durchgeht.
+
+    Die Diagnose rief ``run_all`` ohne ``strict`` auf und meldete deshalb fuer
+    62c1e866 "auftraggeber_fehlt: warning" und "fehler": 0, waehrend derselbe
+    Bericht im Worker unter strict auf ``report_blocked`` gelaufen waere.
+    """
+    from reporter.pdf.v3 import __main__ as CLI
+
+    gesehen: dict[str, object] = {}
+
+    def merke(data, facts, output, *, strict=False):
+        gesehen["strict"] = strict
+        return []
+
+    monkeypatch.setattr(VC, "run_all", merke)
+    monkeypatch.setenv("VECTISCAN_VALIDATION_LEVEL", "strict")
+    CLI._kennzahlen(JUNKERWERK["multi"], tar=False)
+    assert gesehen["strict"] is True
+
+    monkeypatch.setenv("VECTISCAN_VALIDATION_LEVEL", "warn")
+    CLI._kennzahlen(JUNKERWERK["multi"], tar=False)
+    assert gesehen["strict"] is False
