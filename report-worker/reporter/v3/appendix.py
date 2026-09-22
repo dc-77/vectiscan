@@ -55,13 +55,38 @@ def build_inventory(facts: FS.Facts, findings: list[Finding]) -> list[InventoryR
 
 
 def build_tools(facts: FS.Facts) -> list[ToolRow]:
-    """Nur Werkzeuge, die in diesem Auftrag tatsächlich gelaufen sind."""
+    """Nur Werkzeuge, die in diesem Auftrag tatsächlich gelaufen sind.
+
+    Für die Fremdquellen reicht der Lauf des Korrelators nicht: er läuft immer,
+    der Abgleich gegen NVD, EPSS und den KEV-Katalog aber nur, wenn überhaupt
+    eine Schwachstellennummer zu prüfen war. Ohne Treffer stünde sonst eine
+    autoritative Fremdquelle im Bericht, die nichts beigetragen hat (S5b).
+    """
     ran = {c.tool for c in facts.coverage if c.status in ("ok", "empty")}
+    if not _anreicherung_gelaufen(facts):
+        ran -= set(T.ENRICHMENT_TOOLS)
     out: list[ToolRow] = []
     for label, purpose, confidence, tools in T.TOOL_ROWS:
         if ran & set(tools):
             out.append(ToolRow(t=label, u=purpose, c=confidence))
     return out
+
+
+def _anreicherung_gelaufen(facts: FS.Facts) -> bool:
+    """Hat der Abgleich gegen die Fremdquellen etwas erbracht?
+
+    Zwei Belege, beide aus den Fakten: ein Threat mit Fremdwert, oder die Bilanz
+    der Korrelation mit ``cves_enriched`` über null.
+    """
+    for t in facts.threats:
+        if (t.cvss_nvd and t.cvss_nvd.score is not None) or (t.kev and t.kev.listed) \
+                or t.epss is not None:
+            return True
+    for d in facts.decisions:
+        if d.source == "phase3_correlation":
+            if int(d.payload.get("cves_enriched") or 0) > 0:
+                return True
+    return False
 
 
 def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Finding],

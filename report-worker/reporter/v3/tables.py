@@ -79,6 +79,11 @@ TOOL_ROWS: list[tuple[str, str, str, tuple[str, ...]]] = [
      "hoch (autoritative Fremdquelle)", ("phase3_correlation",)),
 ]
 
+# Werkzeuge, deren Zeile nur erscheint, wenn der Abgleich auch etwas erbracht
+# hat. Der Korrelator laeuft in jedem Auftrag; die Fremdquellen werden nur
+# abgefragt, wenn eine Schwachstellennummer zu pruefen war (S5b).
+ENRICHMENT_TOOLS = ("phase3_correlation",)
+
 # ---------------------------------------------------------------- Skalen (Anhang A)
 
 EXPOSURE_SCALE: list[tuple[str, str]] = [

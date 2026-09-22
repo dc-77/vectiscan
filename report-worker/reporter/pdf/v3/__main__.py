@@ -110,6 +110,79 @@ def pruefe(order_id: str, result, soll: dict | None) -> list[str]:
     return fehler
 
 
+def _kennzahlen(order_id: str | None, *, tar: bool) -> int:
+    """Nur nachsehen, nichts schreiben: kommt die Faktenschicht in Produktion an?
+
+    Die Zahlen sind genau die Abnahmepunkte aus S5b: Abdeckung je Host (nicht
+    ``unknown``), TLS-Protokolle vorhanden, Anhang A.3 gefuellt, Defekte des
+    Gates, dazu Laufzeit und Spitzenspeicher. Geladen wird ueber dieselben Wege
+    wie im Worker: Roh-Tar aus MinIO und ``scan_results`` ueber
+    ``_load_tool_runs``. Auftrag, ``reports`` und Defektliste bleiben unberuehrt.
+    """
+    import time
+    try:
+        import resource  # nur unter Unix, also im Abbild und in der Pipeline
+    except ImportError:  # pragma: no cover - Windows
+        resource = None  # type: ignore[assignment]
+
+    from reporter.gate import v3_checks
+    from reporter.gate.defects import Defect  # noqa: F401  (Typ fuer die Lesbarkeit)
+    from reporter.pdf.v3 import pipeline as P
+    from reporter.v3.selfcheck import check_report_data_detailed
+
+    if not order_id:
+        print("--kennzahlen braucht --order oder --golden", file=sys.stderr)
+        return 2
+
+    start = time.monotonic()
+    tmpdir: tempfile.TemporaryDirectory | None = None
+    if tar:
+        tmpdir = tempfile.TemporaryDirectory()
+        quelle: object = P.fetch_rawdata(P.minio_client(), order_id, Path(tmpdir.name))
+        zeilen = P.tool_runs_from_db(order_id)
+    else:
+        from reporter.facts.golden import results_path, tar_path
+        quelle = tar_path(order_id)
+        zeilen = results_path(order_id)
+
+    facts, output, data = P.report_bundle_from_source(quelle, tool_runs=zeilen)
+    defekte = [d for d in v3_checks.run_all(data, facts, output)]
+    defekte += list(check_report_data_detailed(data))
+
+    stati: dict[str, int] = {}
+    for c in facts.coverage:
+        stati[c.status] = stati.get(c.status, 0) + 1
+    hosts_ohne = [h.ip for h in data.scope.hosts if not (h.coverage or "").strip()]
+    tls_mit = sum(1 for t in facts.tls if t.protocols
+                  and any(v is not None for v in t.protocols.values()))
+
+    bericht = {
+        "order_id": facts.scan.order_id,
+        "paket": facts.scan.package,
+        "zeilen": len(zeilen) if isinstance(zeilen, list) else None,
+        "coverage": stati,
+        "hosts": len(data.scope.hosts),
+        "hosts_ohne_abdeckung": hosts_ohne,
+        "tls_dienste": len(facts.tls),
+        "tls_mit_protokollen": tls_mit,
+        "threats": len(facts.threats),
+        "cve_refs": len(data.appendix.cve_refs),
+        "befunde": len(data.findings),
+        "positive": len(data.positives),
+        "werkzeuge_im_anhang": len(data.appendix.tools),
+        "defekte": [{"pruefung": d.check, "stufe": d.severity, "meldung": d.message}
+                    for d in defekte],
+        "fehler": sum(1 for d in defekte if d.severity == "error"),
+        "laufzeit_s": round(time.monotonic() - start, 1),
+        "speicher_mib": (round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024, 1)
+                         if resource is not None else None),
+    }
+    print(json.dumps(bericht, ensure_ascii=False, indent=1, sort_keys=True))
+    if tmpdir is not None:
+        tmpdir.cleanup()
+    return 1 if bericht["fehler"] else 0
+
+
 def _selftest() -> int:
     from reporter.pdf.v3 import render_report_v3
 
@@ -213,6 +286,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--selftest", action="store_true", help="Golden-Auftraege rendern und pruefen")
     ap.add_argument("--write-snapshot", action="store_true", help="Regressionsdatei neu schreiben")
     ap.add_argument("--update-pages", action="store_true", help="Seitenzahlen neu festschreiben")
+    ap.add_argument("--kennzahlen", action="store_true",
+                    help="nur nachsehen: Abdeckung, TLS, Anhang A.3, Defekte als JSON")
     args = ap.parse_args(argv)
 
     if args.write_snapshot:
@@ -222,6 +297,8 @@ def main(argv: list[str] | None = None) -> int:
         return _update_pages()
     if args.selftest:
         return _selftest()
+    if args.kennzahlen:
+        return _kennzahlen(args.order or args.golden, tar=not args.golden)
 
     from reporter.pdf.v3 import render_html, render_report_v3
     from reporter.pdf.v3 import pipeline as P

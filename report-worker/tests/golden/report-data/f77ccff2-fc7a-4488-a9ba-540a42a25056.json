@@ -1,6 +1,31 @@
 {
  "appendix": {
-  "cve_refs": [],
+  "cve_refs": [
+   {
+    "cve": "CVE-2011-3389",
+    "name": "",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-006",
+    "score": "",
+    "src": "testssl"
+   },
+   {
+    "cve": "CVE-2013-2566",
+    "name": "",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-006",
+    "score": "",
+    "src": "testssl"
+   },
+   {
+    "cve": "CVE-2013-3587",
+    "name": "",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-009, VS-2026-010, VS-2026-019, VS-2026-020",
+    "score": "",
+    "src": "testssl"
+   }
+  ],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 20.07.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
   "exposure_scale": [
    {
@@ -294,11 +319,6 @@
     "c": "hoch",
     "t": "dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
     "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
-   },
-   {
-    "c": "hoch (autoritative Fremdquelle)",
-    "t": "NVD, EPSS, CISA KEV",
-    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
    }
   ],
   "triage": [
@@ -1462,7 +1482,14 @@
    "scale": "hygiene",
    "source": "aktiv (httpx, testssl)",
    "status": "gelb",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2011-3389 (von testssl genannt, keine Fremdbewertung vorhanden)",
+     "CVE-2013-2566 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf 195.50.179.7 mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1543,7 +1570,13 @@
    "scale": "hygiene",
    "source": "aktiv (httpx, testssl)",
    "status": "gelb",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Zertifikate auf bitwarden.castenow.de mit Beanstandungen",
    "urgency": "Unverzüglich",
    "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
@@ -1574,7 +1607,13 @@
    "scale": "hygiene",
    "source": "aktiv (httpx, testssl)",
    "status": "gelb",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf 195.50.179.9 mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1821,7 +1860,13 @@
    "scale": "hygiene",
    "source": "aktiv (httpx, testssl)",
    "status": "blau",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf bitwarden.castenow.de mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1852,7 +1897,13 @@
    "scale": "hygiene",
    "source": "aktiv (httpx, testssl)",
    "status": "blau",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf umfrage.castenow.de mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -2170,7 +2221,7 @@
  "landscape_lead": "29 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 70,
-  "catalog_digest": "af96d64eabc6b26698929f9ffc487c9885b6d99064d0d199b74ae1030bf0053c",
+  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 29,
@@ -2179,7 +2230,7 @@
   "domains": [
    "castenow.de"
   ],
-  "facts_schema_version": "1.0.1",
+  "facts_schema_version": "1.0.2",
   "fqdns_total": 14,
   "hosts_ipv4": 9,
   "hosts_ipv6": 0,
@@ -2570,8 +2621,12 @@
     "what": "Fakten reichen für eine Aussage nicht aus"
    },
    {
-    "detail": "Betroffen: 159.69.143.80 (castenow.de, www.castenow.de), 195.50.179.2 (vpn.castenow.de), 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de, owa.castenow.de), 195.50.179.5 (mailstore.castenow.de, nextcloud.castenow.de), 195.50.179.6 (bitwarden.castenow.de), 195.50.179.7 (rdgw.castenow.de) und weitere.",
+    "detail": "Betroffen: 159.69.143.80 (castenow.de, www.castenow.de), 195.50.179.2 (vpn.castenow.de), 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de und weitere), 195.50.179.5 (mailstore.castenow.de, nextcloud.castenow.de), 195.50.179.6 (bitwarden.castenow.de), 195.50.179.7 (rdgw.castenow.de) und weitere.",
     "what": "Keine Abdeckungsinformation für dieses Werkzeug"
+   },
+   {
+    "detail": "Betroffen: 159.69.143.80 (castenow.de, www.castenow.de), 195.50.179.2 (vpn.castenow.de), 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de und weitere), 195.50.179.5 (mailstore.castenow.de, nextcloud.castenow.de), 195.50.179.6 (bitwarden.castenow.de), 195.50.179.7 (rdgw.castenow.de) und weitere.",
+    "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {
     "detail": "Betroffen: autodiscover.castenow.de, www.castenow.de (+castenow.de).",

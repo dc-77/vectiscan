@@ -10,7 +10,10 @@ applicable_when: null
 item_when: null
 when: (threat.kev is None or threat.kev.listed is False) and threat.affected_software_ref is not None and ((threat.cvss_nvd is not None and threat.cvss_nvd.score >= 7.0) or (threat.epss is not None and threat.epss.score >= 0.5))
 positive_when: never
-not_testable_when: []
+not_testable_when:
+  - when: not has_enrichment(threats)
+    reason_code: no_enrichment
+    context: group
 undetermined: not_testable
 requires:
   tools: [phase3_correlation]

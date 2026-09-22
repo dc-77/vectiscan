@@ -158,9 +158,34 @@ def stages(item: Consolidated) -> list[str]:
 
 # ---------------------------------------------------------------- Threat Intelligence
 
+# Quellen, deren CVE-Nennung ein Werkzeugbefund ist. ``enrichment`` steht nicht
+# darin: eine Anreicherung ohne Fremdwert ist keine Aussage.
+WERKZEUG_QUELLEN = frozenset({"testssl"})
+
+
+def fremdbewertet(t: FS.ThreatFact) -> bool:
+    return bool((t.cvss_nvd and t.cvss_nvd.score is not None) or (t.kev and t.kev.listed))
+
+
+def zitierbar(t: FS.ThreatFact) -> bool:
+    return fremdbewertet(t) or t.source in WERKZEUG_QUELLEN
+
+
 @dataclass
 class ThreatIndex:
-    """Fremdbewertete CVE je Host und Port. Ohne Fremdwert kein Eintrag."""
+    """Zitierbare CVE je Host und Port.
+
+    Zwei Faelle, und die Unterscheidung steht im Bericht: eine CVE mit
+    Fremdbewertung (NVD-Basiswert oder KEV-Eintrag) und eine CVE, die ein
+    Werkzeug selbst genannt hat, ohne dass eine Fremdbewertung vorliegt. Der
+    zweite Fall ist seit S5b zugelassen, weil die Phase-3-Anreicherung in keinem
+    Produktionslauf je einen Fremdwert geliefert hat (``cves_enriched`` 0 ueber
+    42 Auftraege) und die testssl-CVE sonst nirgends auftaucht. Erfunden wird
+    dabei nichts: der Basiswert bleibt leer, die Einstufung kommt aus dem Befund.
+
+    Nicht zitiert wird eine CVE ohne beides: weder Fremdwert noch Werkzeug, das
+    sie genannt haette.
+    """
 
     by_host_port: dict[tuple[str, Optional[int]], list[FS.ThreatFact]]
 
@@ -168,14 +193,23 @@ class ThreatIndex:
     def build(cls, facts: FS.Facts) -> "ThreatIndex":
         by: dict[tuple[str, Optional[int]], list[FS.ThreatFact]] = {}
         for t in facts.threats:
-            has_score = bool(t.cvss_nvd and t.cvss_nvd.score is not None)
-            has_kev = bool(t.kev and t.kev.listed)
-            if not (has_score or has_kev):
+            if not zitierbar(t):
                 continue
             by.setdefault((t.host_ip or "", t.port), []).append(t)
         return cls(by_host_port=by)
 
-    def for_results(self, results: list[CheckResult]) -> list[FS.ThreatFact]:
+    def for_results(self, results: list[CheckResult],
+                    werkzeuge: set[str] | None = None) -> list[FS.ThreatFact]:
+        """Threats, die zu diesem Sachverhalt gehoeren.
+
+        Host und Port allein reichen nicht. Eine von testssl genannte CVE haengt
+        an Port 443, und an Port 443 haengt auch der Befund zu fehlenden
+        Sicherheits-Headern; ohne weitere Bedingung staende die TLS-CVE unter
+        einem Header-Befund. Ein werkzeuggestuetzter Threat wird deshalb nur
+        zitiert, wenn eine der fehlgeschlagenen Pruefungen dieses Sachverhalts
+        genau dieses Werkzeug braucht. Fremdbewertete Threats kommen aus der
+        Korrelation und tragen ihre Zuordnung schon mit.
+        """
         wanted: set[tuple[str, Optional[int]]] = set()
         for r in results:
             for m in r.members:
@@ -186,15 +220,32 @@ class ThreatIndex:
         out: list[FS.ThreatFact] = []
         for key in sorted(wanted, key=lambda k: (k[0], k[1] or 0)):
             for t in self.by_host_port.get(key, []):
-                if t not in out:
-                    out.append(t)
+                if t in out:
+                    continue
+                if not fremdbewertet(t) and werkzeuge is not None and t.source not in werkzeuge:
+                    continue
+                out.append(t)
         return sorted(out, key=lambda t: t.cve_id)
+
+
+def _threat_note(found: list[FS.ThreatFact]) -> str:
+    """Der Begleitsatz darf nicht mehr versprechen, als die Daten hergeben."""
+    if all(fremdbewertet(t) for t in found):
+        return ("Fremdbewertung; die Zuordnung stützt sich auf die erkannte Version "
+                "und wurde nicht durch einen eigenen Nachweis bestätigt.")
+    if any(fremdbewertet(t) for t in found):
+        return ("Teils Fremdbewertung, teils Werkzeugbefund; die Zuordnung stützt sich auf "
+                "die erkannte Version und wurde nicht eigens nachgewiesen.")
+    return ("Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds "
+            "stammt aus dem Prüfkatalog.")
 
 
 def _cve_text(t: FS.ThreatFact) -> str:
     if t.cvss_nvd and t.cvss_nvd.score is not None:
         return f"{t.cve_id} (Basiswert {t.cvss_nvd.score} laut NVD)"
-    return f"{t.cve_id} (im KEV-Katalog der CISA gelistet)"
+    if t.kev and t.kev.listed:
+        return f"{t.cve_id} (im KEV-Katalog der CISA gelistet)"
+    return f"{t.cve_id} (von {t.source} genannt, keine Fremdbewertung vorhanden)"
 
 
 # ---------------------------------------------------------------- Befunde
@@ -213,7 +264,7 @@ def build_findings(
     findings: list[Finding] = []
     cve_refs: list[CveRef] = []
     tool_findings: list[ToolFinding] = []
-    seen_cves: set[str] = set()
+    seen_cves: dict[str, list[str]] = {}
 
     index = 0
     for item in items:
@@ -228,28 +279,47 @@ def build_findings(
         fid = IDS.finding_id(kuerzel, year, index)
         where = f"{item.key}/{item.merge_key}"
         threat: Optional[Threat] = None
-        found = threats.for_results(item.results)
+        werkzeuge: set[str] = set()
+        for r in item.results:
+            info = checks.get(r.check_id)
+            if info is not None and any(m.status == "fail" for m in r.members):
+                werkzeuge.update(info.requires.tools)
+        found = threats.for_results(item.results, werkzeuge)
         if found:
             cves = [_cve_text(t) for t in found]
-            kev = "ja" if any(t.kev and t.kev.listed for t in found) else "nein"
-            threat = Threat(
-                cves=cves, kev=kev,
-                note="Fremdbewertung; die Zuordnung stützt sich auf die erkannte Version "
-                     "und wurde nicht durch einen eigenen Nachweis bestätigt.")
+            if any(t.kev and t.kev.listed for t in found):
+                kev = "ja"
+            elif any(fremdbewertet(t) for t in found):
+                kev = "nein"
+            else:
+                # Ohne Fremdbewertung wurde der KEV-Katalog nie abgefragt. Ein
+                # "nein" behauptete, die CVE stehe nicht darin; niemand hat
+                # nachgesehen.
+                kev = ""
+            threat = Threat(cves=cves, kev=kev, note=_threat_note(found))
             for t in found:
+                # Dieselbe CVE kann in mehreren Befunden zitiert werden (ein Host,
+                # zwei Sachverhalte). Anhang A.3 fuehrt sie einmal und nennt alle
+                # Befunde; der Selbstcheck prueft die Zugehoerigkeit, nicht
+                # Gleichheit mit dem ersten Befund.
                 if t.cve_id in seen_cves:
+                    seen_cves[t.cve_id].append(fid)
                     continue
-                seen_cves.add(t.cve_id)
+                seen_cves[t.cve_id] = [fid]
                 score = ""
                 src = ""
+                note = "Werkzeugbefund, keine Fremdbewertung."
                 if t.cvss_nvd and t.cvss_nvd.score is not None:
                     score = str(t.cvss_nvd.score)
                     src = "NVD"
+                    note = "Fremdwert, nicht selbst vergeben."
                 elif t.kev and t.kev.listed:
                     src = "CISA KEV"
+                    note = "Fremdwert, nicht selbst vergeben."
+                else:
+                    src = t.source
                 cve_refs.append(CveRef(
-                    cve=t.cve_id, name="", score=score, src=src, ref=fid,
-                    note="Fremdwert, nicht selbst vergeben."))
+                    cve=t.cve_id, name="", score=score, src=src, ref=fid, note=note))
         findings.append(Finding(
             id=fid,
             cat=item.category,
@@ -268,6 +338,8 @@ def build_findings(
             verify=_render(item.texts.verify, values, f"{where}.verify"),
             policy=policy_label(item.results, checks),
         ))
+    for ref in cve_refs:
+        ref.ref = ", ".join(seen_cves.get(ref.cve, [ref.ref]))
     return findings, cve_refs, tool_findings
 
 

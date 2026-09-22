@@ -145,11 +145,6 @@
     "c": "hoch",
     "t": "dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
     "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
-   },
-   {
-    "c": "hoch (autoritative Fremdquelle)",
-    "t": "NVD, EPSS, CISA KEV",
-    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
    }
   ],
   "triage": [
@@ -983,7 +978,7 @@
  "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 21,
-  "catalog_digest": "af96d64eabc6b26698929f9ffc487c9885b6d99064d0d199b74ae1030bf0053c",
+  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 14,
@@ -992,7 +987,7 @@
   "domains": [
    "trunk-immobilien.de"
   ],
-  "facts_schema_version": "1.0.1",
+  "facts_schema_version": "1.0.2",
   "fqdns_total": 5,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
@@ -1156,8 +1151,12 @@
     "what": "Fakten reichen für eine Aussage nicht aus"
    },
    {
-    "detail": "Betroffen: 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de), dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de.",
+    "detail": "Betroffen: 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de und weitere), dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de.",
     "what": "Keine Abdeckungsinformation für dieses Werkzeug"
+   },
+   {
+    "detail": "Betroffen: 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de und weitere).",
+    "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {
     "detail": "Betroffen: webmail.trunk-immobilien.de.",

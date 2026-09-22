@@ -7,9 +7,12 @@ level: niedrig
 group_by: fqdn
 scope: tls.vulns
 applicable_when: null
-when: '(vuln.name in TLS_SOFT_VULNS and vuln.status == "vulnerable") or vuln.name in TLS_COMPRESSION_VULNS'
+when: '(vuln.name in TLS_SOFT_VULNS and vuln.status == "vulnerable") or (vuln.name in TLS_COMPRESSION_VULNS and vuln.status != "not_tested")'
 positive_when: never
-not_testable_when: []
+not_testable_when:
+  - when: 'vuln.status == "not_tested"'
+    reason_code: testssl_nicht_getestet
+    context: item
 undetermined: not_testable
 requires:
   tools: [testssl]

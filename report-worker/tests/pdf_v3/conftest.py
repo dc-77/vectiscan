@@ -24,6 +24,9 @@ RENDER_GOLDEN = REPORT_WORKER / "tests" / "golden" / "render"
 ORDERS = order_ids()
 JUNKERWERK_MULTI = "0bf16342-ed96-4b0e-a596-05aee3a62cb5"
 CASTENOW = "4e6b6883-a6c8-4204-8b13-b37f907322ca"
+# Der einzige WebCheck-Auftrag im Satz (S5b, Issue #23). Bis dahin liess sich die
+# Paketvariante nur an einem umetikettierten Perimeter-Auftrag pruefen.
+WEBCHECK = "75338c97-6707-4d11-92bf-bb3cd2e02cde"
 
 _HTML: dict[tuple[str, str | None, bool], str] = {}
 
@@ -36,9 +39,11 @@ def fake_screenshots(key: str) -> bytes | None:
 def as_package(order_id: str, package: str):
     """Denselben Auftrag als anderes Paket.
 
-    Im Golden-Satz sind alle elf Auftraege Perimeter. Die WebCheck-Variante laesst sich
-    deshalb nur synthetisch pruefen; dafuer wird das ganze Datenmodell umgestellt, nicht
-    nur der Renderer uebersteuert, sonst widerspraeche die Meta-Angabe dem Deckblatt.
+    Seit S5b gibt es mit ``WEBCHECK`` einen echten WebCheck-Auftrag; die Variante
+    wird dort an eigenen Daten geprueft. Diese Umstellung bleibt als Gegenprobe
+    "gleiche Daten, anderes Paket": sie trennt, was am Paket haengt, von dem, was
+    an der Datenmenge haengt. Umgestellt wird das ganze Datenmodell, nicht nur der
+    Renderer, sonst widerspraeche die Meta-Angabe dem Deckblatt.
     """
     from reporter.v3.tables import package_labels
 

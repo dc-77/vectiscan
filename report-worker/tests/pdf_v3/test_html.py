@@ -13,7 +13,9 @@ import pytest
 from reporter.pdf.v3 import render_html
 from reporter.pdf.v3.checks import dash_check, text_of
 from reporter.pdf.v3.context import TOP_N_HAUPTTEIL, split_findings
-from tests.pdf_v3.conftest import CASTENOW, JUNKERWERK_MULTI, ORDERS, html_for
+from tests.pdf_v3.conftest import (
+    CASTENOW, JUNKERWERK_MULTI, ORDERS, WEBCHECK, html_for,
+)
 from tests.v3.conftest import data_for
 
 JINJA_REST = re.compile(r"\{\{|\{%|\{#")
@@ -110,6 +112,39 @@ def test_webcheck_ohne_bildraster_und_ohne_inventar():
     assert "Perimeter-Bericht" not in html
     assert "Perimeter-Sicherheitsbewertung" not in html
     assert "Paket  WebCheck" in re.sub(r"<[^>]+>", " ", html)
+
+
+def test_echter_webcheck_auftrag_laesst_dieselben_teile_weg():
+    """Dasselbe an echten WebCheck-Daten statt am umetikettierten Auftrag (Issue #23).
+
+    Der Auftrag bringt fuenf Bildnachweise mit; sie duerfen trotzdem nicht als
+    Kapitel 3.4 erscheinen, sonst haengt die Variante am Datenbestand statt am
+    Paket. Das Service-Inventar entfaellt ebenso, obwohl Dienste erkannt wurden.
+    """
+    data = data_for(WEBCHECK)
+    assert data.meta.package == "WebCheck"
+    assert data.architecture.screens, "Fixture ohne Bildnachweise, Gegenprobe wertlos"
+    html = html_for(WEBCHECK, with_shots=True)
+    assert "3.4 Gesichtete Web-Oberflächen" not in html
+    assert "Service-Inventar" not in html
+    assert "vectiscan-screenshot:" not in html
+    assert "WebCheck-Bericht" in html
+    assert "Perimeter-Bericht" not in html
+    gefunden = re.findall(r'<div class="kicker">Anhang ([A-H])</div>|'
+                          r"<h3>Anhang ([A-H]) · ", html)
+    assert [a or b for a, b in gefunden] == list("ABCDE")
+
+
+def test_echter_webcheck_auftrag_hat_keine_leeren_pflichtkapitel():
+    """Die offene Frage aus Issue #23: reisst der kleinere Satz Luecken?"""
+    data = data_for(WEBCHECK)
+    text = text_of(html_for(WEBCHECK))
+    assert data.scope.hosts, "Kapitel 2 ohne Hosts"
+    assert all((h.coverage or "").strip() for h in data.scope.hosts)
+    assert data.architecture.tech, "Kapitel 3.3 ohne Technologiezeilen"
+    assert data.appendix.tools, "Anhang 'Eingesetzte Werkzeuge' leer"
+    assert data.findings and data.positives
+    assert "Platzhalter" not in text
 
 
 def test_perimeter_zeigt_bildraster_und_inventar():

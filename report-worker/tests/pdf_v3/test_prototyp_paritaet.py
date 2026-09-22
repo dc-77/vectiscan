@@ -48,6 +48,16 @@ ERLAUBT: tuple[tuple[str, str], ...] = (
     # unvollstaendig. Neu steht er ganz da.
     ("</dev/null", "Prototyp verlor die Umleitung an den HTML-Parser"),
     ("openssl s_client -connect openotp", "siehe Zeile darueber"),
+    # S5b: Anhang A.3 nennt jetzt auch CVEs, die ein Werkzeug genannt hat und zu
+    # denen keine Fremdbewertung vorliegt. Ueberschrift, Vorspann und der
+    # Verweissatz in A.2 sagen das ausdruecklich, damit ein leerer Basiswert
+    # nicht als "unbewertet" gelesen wird.
+    ("Ein CVSS-Basiswert erscheint nur dort", "A.3 fuehrt seit S5b zwei Faelle"),
+    ("CVSS-Basiswerte erscheinen ausschließlich als Fremdreferenz",
+     "Satz des Prototyps, ersetzt durch die Fassung mit beiden Faellen"),
+    ("A.3 CVE-Referenzen", "A.3 fuehrt seit S5b zwei Faelle"),
+    ("Schwachstellennummern, die in den Befunden zitiert werden",
+     "neuer Vorspann zu A.3"),
 )
 
 

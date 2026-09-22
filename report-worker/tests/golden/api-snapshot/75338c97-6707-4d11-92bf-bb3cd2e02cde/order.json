@@ -1,0 +1,416 @@
+{
+ "data": {
+  "businessImpactScore": 0,
+  "correlationCount": 6,
+  "customerId": "6c8c0e68-512c-4043-9abd-1fdb0c351adb",
+  "domain": "multi-target (2)",
+  "error": null,
+  "estimatedDuration": "~15–20 Minuten",
+  "finishedAt": "2026-09-20T09:13:52.940Z",
+  "hasReport": true,
+  "id": "75338c97-6707-4d11-92bf-bb3cd2e02cde",
+  "isRescan": false,
+  "overallRisk": "MEDIUM",
+  "package": "webcheck",
+  "passiveIntelSummary": {
+   "dns_security": {
+    "caa": {
+     "has_caa": false,
+     "issuers": [],
+     "records": []
+    },
+    "dmarc": {
+     "adkim": "r",
+     "aspf": "r",
+     "dmarc_present": false,
+     "fo": null,
+     "issues": [],
+     "p": null,
+     "pct": 100,
+     "raw": null,
+     "rua": [],
+     "ruf": [],
+     "sp": null
+    },
+    "dnssec": {
+     "dnskey_count": 0,
+     "dnssec_signed": false,
+     "dnssec_valid": false,
+     "ds_algorithm": null,
+     "issues": [
+      "Domain is not DNSSEC-signed"
+     ],
+     "nsec3_iterations": null,
+     "nsec3_rfc9276_violation": false,
+     "nsec3param_present": false
+    },
+    "mta_sts": {
+     "dns_txt": null,
+     "has_dns_record": false,
+     "has_policy": false,
+     "mode": null
+    },
+    "tls_rpt": {
+     "issues": [],
+     "rua_targets": [],
+     "tlsrpt_present": false
+    }
+   },
+   "otx": {
+    "domain": {
+     "alexa_rank": "http://www.alexa.com/siteinfo/vectigal.tech",
+     "domain": "vectigal.tech",
+     "pulse_count": 0,
+     "pulses": [],
+     "type": "domain",
+     "validation": [],
+     "whois": "http://whois.domaintools.com/vectigal.tech"
+    }
+   },
+   "passive_subdomains": []
+  },
+  "progress": {
+   "currentHost": null,
+   "currentTool": "uploading",
+   "discoveredHosts": {
+    "discovery_health": {
+     "ct_sources_empty": false,
+     "discovery_added_count": 30,
+     "snapshot_age_minutes": null,
+     "snapshot_seed_count": 0,
+     "snapshot_seeded": false,
+     "tool_counts": {
+      "certspotter": 30,
+      "crtsh": 0,
+      "subfinder": 29
+     },
+     "tools_with_zero_results": [
+      "crtsh"
+     ],
+     "total_subdomains": 31
+    },
+    "dns_findings": {
+     "dangling_cnames": [],
+     "dkim": false,
+     "dmarc": null,
+     "mx": [],
+     "ns": [
+      "ns2a.dodns.net",
+      "ns1a.dodns.net"
+     ],
+     "spf": null,
+     "zone_transfer": false
+    },
+    "domain": "vectigal.tech",
+    "hosts": [
+     {
+      "_reasoning": "Basisdomain vectigal.tech mit 8 primary VHosts (CRM, Board, 10Finance, CRMViewer, Gutachter, FeedGenerator, Agent, Gutachter-API) — mehrere produktive Web-Anwendungen (Twenty CRM, Paperclip Board, Streamlit-App, AI-Services) mit Status 200/401/404 erfordern umfassenden Security-Scan.",
+      "fqdns": [
+       "vectigal.tech",
+       "10finance.vectigal.tech",
+       "agent.vectigal.tech",
+       "auth.vectigal.tech",
+       "board.vectigal.tech",
+       "crm.vectigal.tech",
+       "crmviewer.vectigal.tech",
+       "feedgenerator.vectigal.tech",
+       "gutachter-api.vectigal.tech",
+       "gutachter.vectigal.tech",
+       "id.vectigal.tech",
+       "ki-check-10finance.vectigal.tech",
+       "ki-check.vectigal.tech",
+       "logs.vectigal.tech",
+       "mcp-test.vectigal.tech",
+       "monitoring.vectigal.tech",
+       "page.vectigal.tech",
+       "protokoll-assist.vectigal.tech",
+       "rankingcoach.vectigal.tech",
+       "saferouter-admin.vectigal.tech",
+       "saferouter-api.vectigal.tech",
+       "saferouter-app.vectigal.tech",
+       "saferouter-auth.vectigal.tech",
+       "saferouter-www.vectigal.tech",
+       "scan-api.vectigal.tech",
+       "scan.vectigal.tech",
+       "shopify.vectigal.tech",
+       "status.vectigal.tech",
+       "traefik.vectigal.tech",
+       "webcheck.vectigal.tech"
+      ],
+      "ip": "62.217.52.165",
+      "passive_intel": {
+       "dnssec_signed": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "screenshot_minio_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crm.vectigal.tech.png",
+      "vhost_skipped": [],
+      "vhosts": [
+       {
+        "aliases": [],
+        "body_hash": "024af07ba765df09131115b3d5e8bf285aeaa7d64ebb59b055e0ad13cc20a0ec",
+        "final_url": "https://crm.vectigal.tech",
+        "fqdn": "crm.vectigal.tech",
+        "is_primary": true,
+        "screenshot_minio_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crm.vectigal.tech.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Twenty ist ein CRM-System auf Golang net/http server Basis.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Twenty"
+       },
+       {
+        "aliases": [],
+        "body_hash": "116271e05f7fe8e0d03530289b974c7862e456d50a5c41a7d4a4a1d1e0bb99a3",
+        "final_url": "https://board.vectigal.tech",
+        "fqdn": "board.vectigal.tech",
+        "is_primary": true,
+        "screenshot_minio_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__board.vectigal.tech.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Paperclip ist ein Projektmanagement-Tool mit Golang net/http server.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Paperclip"
+       },
+       {
+        "aliases": [],
+        "body_hash": "4d43b74617240f52fc82f14bfb74c6ee114af0f122b42c47472a515eeceafe7b",
+        "final_url": "https://10finance.vectigal.tech",
+        "fqdn": "10finance.vectigal.tech",
+        "is_primary": true,
+        "screenshot_minio_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__10finance.vectigal.tech.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "10FINANCE Stabilitäts-Quickcheck prüft Finanzstabilität via Golang net/http server.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "10FINANCE Stabilitäts-Quickcheck"
+       },
+       {
+        "aliases": [],
+        "body_hash": "f270430e64b19a95c8c5f3279b0519675f5d893047361fa020f33a0e08d24b06",
+        "final_url": "https://crmviewer.vectigal.tech",
+        "fqdn": "crmviewer.vectigal.tech",
+        "is_primary": true,
+        "screenshot_minio_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crmviewer.vectigal.tech.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "Streamlit-basierte CRM-Viewer-Anwendung auf Golang net/http server.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "Streamlit"
+       },
+       {
+        "aliases": [],
+        "body_hash": "632423e75aeb805ac4bfefb5c4d286eab8575ca599223fc6bef25bf69b99dab0",
+        "final_url": "https://gutachter.vectigal.tech",
+        "fqdn": "gutachter.vectigal.tech",
+        "is_primary": true,
+        "screenshot_minio_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__gutachter.vectigal.tech.png",
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.95,
+         "description": "gutachter.ai bietet KI-gestützte Gutachten auf Golang net/http server.",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": "gutachter.ai"
+       },
+       {
+        "aliases": [],
+        "body_hash": "6c97e9b0c85720c18cdd5f3257fd886b8bca617b719fb143e36ec6efb0424a32",
+        "final_url": "https://feedgenerator.vectigal.tech",
+        "fqdn": "feedgenerator.vectigal.tech",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "web_content",
+         "confidence": 0.7,
+         "description": "Golang net/http server",
+         "is_real_content": true
+        },
+        "status": 200,
+        "title": ""
+       },
+       {
+        "aliases": [],
+        "body_hash": "f5f62f712f3f30c09c7202f15179a2d76a8af46cd08838268862303f189b00e9",
+        "final_url": "https://agent.vectigal.tech",
+        "fqdn": "agent.vectigal.tech",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 401 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 401,
+        "title": ""
+       },
+       {
+        "aliases": [],
+        "body_hash": "7624c3765af10ed3b6eb9e50f416066457b419bf3d6e57f99a0ba18d3598ce6b",
+        "final_url": "https://gutachter-api.vectigal.tech",
+        "fqdn": "gutachter-api.vectigal.tech",
+        "is_primary": true,
+        "site_summary": {
+         "classification": "error",
+         "confidence": 1,
+         "description": "HTTP 404 — keine erreichbare Webseite",
+         "is_real_content": false
+        },
+        "status": 404,
+        "title": ""
+       }
+      ],
+      "web_probe": {
+       "final_url": "https://crm.vectigal.tech",
+       "has_web": true,
+       "status": 200,
+       "title": "Twenty",
+       "web_fqdn": "crm.vectigal.tech"
+      }
+     },
+     {
+      "_reasoning": "test.vectigal.tech hat kein Web-Content (has_web=false), aber als Test-Subdomain der Domain sollte Port-Scan + TLS-Check durchgeführt werden um potenzielle offene Management-Ports oder schwache Konfigurationen zu erkennen.",
+      "fqdns": [
+       "test.vectigal.tech"
+      ],
+      "ip": "62.217.52.177",
+      "passive_intel": {
+       "dnssec_signed": false,
+       "otx_pulse_count": 0,
+       "tlsrpt_present": false
+      },
+      "rdns": "",
+      "vhosts": [],
+      "web_probe": {
+       "final_url": null,
+       "has_web": false,
+       "status": null,
+       "title": null,
+       "web_fqdn": null
+      }
+     }
+    ],
+    "skipped_hosts": []
+   },
+   "hostsCompleted": 2,
+   "hostsTotal": 2,
+   "lastCompletedTool": null,
+   "phase": "scan_complete",
+   "toolOutput": null
+  },
+  "severityCounts": {
+   "CRITICAL": 0,
+   "HIGH": 0,
+   "INFO": 2,
+   "LOW": 1,
+   "MEDIUM": 5
+  },
+  "startedAt": "2026-09-20T09:07:28.892Z",
+  "status": "pending_review",
+  "subscriptionId": null,
+  "validationWarnings": {
+   "checks_run": [
+    "titles",
+    "ids",
+    "cvss",
+    "consistency",
+    "tech_table",
+    "eol",
+    "plan"
+   ],
+   "checks_skipped": [],
+   "error_count": 0,
+   "errors": [],
+   "level": "warn",
+   "passed": true,
+   "warning_count": 7,
+   "warnings": [
+    {
+     "check": "cvss",
+     "detail": {
+      "computed": 7.4,
+      "cvss_score": 5.3,
+      "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N"
+     },
+     "finding_id": "VS-2026-001",
+     "message": "CVSS-Score 5.3 weicht von Vektor-berechnetem Base-Score 7.4 ab — Admin-Review (Override-UI)",
+     "severity": "warning"
+    },
+    {
+     "check": "plan",
+     "detail": {
+      "rec_index": 0,
+      "rec_text": ""
+     },
+     "finding_id": null,
+     "message": "recommendation #1 hat keine finding_refs (Orphan-Massnahme)",
+     "severity": "warning"
+    },
+    {
+     "check": "plan",
+     "detail": {
+      "rec_index": 1,
+      "rec_text": ""
+     },
+     "finding_id": null,
+     "message": "recommendation #2 hat keine finding_refs (Orphan-Massnahme)",
+     "severity": "warning"
+    },
+    {
+     "check": "plan",
+     "detail": {
+      "rec_index": 2,
+      "rec_text": ""
+     },
+     "finding_id": null,
+     "message": "recommendation #3 hat keine finding_refs (Orphan-Massnahme)",
+     "severity": "warning"
+    },
+    {
+     "check": "plan",
+     "detail": {
+      "rec_index": 3,
+      "rec_text": ""
+     },
+     "finding_id": null,
+     "message": "recommendation #4 hat keine finding_refs (Orphan-Massnahme)",
+     "severity": "warning"
+    },
+    {
+     "check": "plan",
+     "detail": {
+      "rec_index": 4,
+      "rec_text": ""
+     },
+     "finding_id": null,
+     "message": "recommendation #5 hat keine finding_refs (Orphan-Massnahme)",
+     "severity": "warning"
+    },
+    {
+     "check": "plan",
+     "detail": {
+      "rec_index": 5,
+      "rec_text": ""
+     },
+     "finding_id": null,
+     "message": "recommendation #6 hat keine finding_refs (Orphan-Massnahme)",
+     "severity": "warning"
+    }
+   ]
+  }
+ },
+ "success": true
+}

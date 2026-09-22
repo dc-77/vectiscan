@@ -16,13 +16,16 @@ from urllib.parse import urlsplit
 from reporter.facts import schema as S
 from reporter.facts.nmap_parse import NmapHost, NmapRun, derive_service_flags, parse_nmap_text, parse_nmap_xml
 from reporter.facts.serialize import (
-    days_between, excerpt, ip_family, ip_token, iso_utc, sha256_text_file, short_hash, sort_key, try_json,
+    days_between, dumps, excerpt, ip_family, ip_token, iso_utc, sha256_text_file, short_hash,
+    sort_key, try_json,
 )
 from reporter.facts.sources import (
     ScanBundle, ToolRun, apply_overrides, attach_orders_json, load_from_snapshot, load_scan_source,
     load_tool_runs, merge_tool_runs,
 )
-from reporter.facts.testssl_parse import TestsslResult, parse_testssl
+from reporter.facts.testssl_parse import (
+    VULN_SEVERITIES as TESTSSL_VULN_SEVERITIES, TestsslResult, parse_testssl,
+)
 from reporter.facts.tool_coverage import WEB_PORTS, HostSignals, build_coverage, derive_blocked
 from reporter.facts.versions import Normalized, lookup_eol, normalize
 
@@ -154,7 +157,7 @@ def build_from_bundle(bundle: ScanBundle) -> S.Facts:
     software = _finish_software(ctx)
     passive = _build_passive(ctx, all_ips, inv_by_ip, primary_domain)
     coverage = build_coverage(b, signals, blocked, ctx.finished, primary_domain, extra_domains)
-    threats = _build_threats(ctx, software)
+    threats = _build_threats(ctx, software, services)
     _unprocessed_from_bundle(ctx)
     decisions = _build_decisions(ctx, all_ips, inv_by_ip)
 
@@ -1376,7 +1379,45 @@ def _build_passive(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict], domain
 
 # ------------------------------------------------------------------ threats
 
-def _build_threats(ctx: _Ctx, software: list[S.SoftwareFact]) -> list[S.ThreatFact]:
+def _testssl_verwundbar(entry: dict[str, Any]) -> bool:
+    """Spricht diese testssl-Zeile ein Urteil "verwundbar" aus?
+
+    Massgeblich ist die Severity, nicht der Text allein: das JSON nennt bei
+    Treffern oft nur die Cipher-Liste. ``OK``, ``INFO``, ``DEBUG``, ``WARN`` und
+    ``FATAL`` sind kein Fund. ``WARN`` heisst "nicht geprueft" und steht als
+    ``not_tested`` in ``tls[].vulns``, nicht hier.
+    """
+    if str(entry.get("severity") or "").upper() not in TESTSSL_VULN_SEVERITIES:
+        return False
+    return "not vulnerable" not in str(entry.get("finding") or "").lower()
+
+
+def _software_ref_for(software: list[S.SoftwareFact], services: list[S.ServiceFact],
+                      host_ip: Optional[str], port: Optional[int]) -> Optional[str]:
+    """Software hinter einem Dienst, oder ``None`` wenn es nicht eindeutig ist.
+
+    ``SoftwareFact`` kennt keinen Port, die Bruecke ist der Dienst: er nennt
+    Produkt und Familie an genau diesem Port, und darueber wird die Software
+    desselben Hosts gesucht. Bleibt es mehrdeutig, bleibt die Zuordnung leer;
+    ``cve_known_version`` haengt an diesem Feld, und lieber keine Zuordnung als
+    die erstbeste. (Bis S5b stand hier ``any(p == port for p in [port])``, immer
+    wahr, womit schlicht die erste Software des Hosts verlinkt wurde.)
+    """
+    if not host_ip or port is None:
+        return None
+    svc = next((s for s in services if s.host_ip == host_ip and s.port == port), None)
+    if svc is None:
+        return None
+    schluessel = {v.lower() for v in (svc.family, svc.product) if v}
+    if not schluessel:
+        return None
+    treffer = [s for s in software if s.host_ip == host_ip
+               and ({s.family.lower(), s.product.lower()} & schluessel)]
+    return treffer[0].id if len(treffer) == 1 else None
+
+
+def _build_threats(ctx: _Ctx, software: list[S.SoftwareFact],
+                   services: list[S.ServiceFact]) -> list[S.ThreatFact]:
     b = ctx.b
     facts: dict[str, S.ThreatFact] = {}
     cve_hosts: dict[str, list[tuple[str, Optional[int]]]] = defaultdict(list)
@@ -1391,12 +1432,7 @@ def _build_threats(ctx: _Ctx, software: list[S.SoftwareFact]) -> list[S.ThreatFa
         kev = data.get("cisa_kev") if isinstance(data.get("cisa_kev"), dict) else None
         edb = data.get("exploitdb") if isinstance(data.get("exploitdb"), dict) else None
         host_ip, port = (cve_hosts.get(cve) or [(None, None)])[0]
-        sw_ref = None
-        if host_ip:
-            for s in software:
-                if s.host_ip == host_ip and any(p == port for p in [port]) and port is not None:
-                    sw_ref = s.id
-                    break
+        sw_ref = _software_ref_for(software, services, host_ip or None, port)
         facts[cve] = S.ThreatFact(
             id=f"threat:{cve}", source="enrichment", mode="passive", observed_at=ctx.run_time("phase3_correlation") or ctx.finished,
             confidence=S.CONFIDENCE_TOOL, evidence=[S.Evidence(tool="enrichment", ref=b.refs.get("enrichment", ""), excerpt=excerpt(f"{cve} nvd={nvd.get('cvss_score')} epss={(epss or {}).get('epss')} kev={bool(kev)}", 160))],
@@ -1406,13 +1442,30 @@ def _build_threats(ctx: _Ctx, software: list[S.SoftwareFact]) -> list[S.ThreatFa
             exploitdb=S.ExploitDb(count=_int_or_none(edb.get("exploit_count")), metasploit=_bool_or_none(edb.get("metasploit_module"))) if edb else None,
             affected_software_ref=sw_ref, host_ip=host_ip or None, port=port,
         )
+    # testssl nennt im Feld ``cve`` die Nummer, GEGEN die geprueft wurde, auch
+    # wenn das Ergebnis "not vulnerable" lautet. Nur das Urteil entscheidet, ob
+    # daraus ein Fakt wird: Severity aus VULN_SEVERITIES und ein Befundtext ohne
+    # "not vulnerable". Ohne diesen Filter trug der juengste Junkerwerk-Lauf 32
+    # CVE-Fakten, darunter Heartbleed, saemtlich mit ``severity: OK`` (S5b).
     for ts_ip, ts in ctx.testssl.items():
         if ts is None:
             continue
         for e in ts.entries:
-            if e.get("cve"):
+            if e.get("cve") and _testssl_verwundbar(e):
                 fid = f"threat:{e['cve']}:{ts.fqdn or ip_token(ts_ip)}:{ts.port}"
                 if fid in facts:
+                    continue
+                vorhanden = facts.get(e["cve"])
+                if vorhanden is not None:
+                    # Dieselbe CVE, zwei Quellen: die Anreicherung traegt den
+                    # Fremdwert, testssl den Hostbezug. Bis S5b entstanden daraus
+                    # zwei Fakten, weil die Schluessel nie kollidierten.
+                    if vorhanden.host_ip is None:
+                        vorhanden.host_ip = ts_ip
+                        vorhanden.port = ts.port
+                    vorhanden.evidence = list(vorhanden.evidence) + [S.Evidence(
+                        tool="testssl", ref=ctx.run_ref("testssl", ts_ip),
+                        excerpt=excerpt(f"{e['id']}: {e['finding']}", 160))]
                     continue
                 facts[fid] = S.ThreatFact(
                     id=fid, source="testssl", mode="active", observed_at=ts.started_at or ctx.finished,
@@ -1468,6 +1521,27 @@ def _build_decisions(ctx: _Ctx, ips: list[str], inv_by_ip: dict[str, dict]) -> l
                 id="dec:ai_host_strategy:scan", source="ai_host_strategy", mode="active", observed_at=hs_time,
                 confidence=S.CONFIDENCE_TOOL, evidence=[S.Evidence(tool="ai_host_strategy", ref=b.refs.get("host_strategy", ""), excerpt=excerpt(hs.get("strategy_notes"), 200))],
                 payload={"strategy_notes": str(hs.get("strategy_notes") or "")[:1000], "passive_intel_summary": str(hs.get("passive_intel_summary") or "")[:1000]},
+            ))
+    if isinstance(b.phase3_summary, dict):
+        # Protokoll der Phase-3-Korrelation: wie viele Werkzeugmeldungen
+        # eingingen und wie viele mit welcher Begruendung verworfen wurden.
+        # Das belegt den Abschnitt "Filterung" im Bericht; ein Befund wird
+        # daraus nie. Die Bilanz kommt aus der Zeile ``phase3_correlation``,
+        # die der Produktionspfad seit S5b mitliest.
+        ps = b.phase3_summary
+        zahlen = {k: ps.get(k) for k in ("total_findings", "false_positives", "valid_findings",
+                                         "cves_enriched", "cisa_kev_matches")
+                  if isinstance(ps.get(k), int)}
+        gruende = ps.get("fp_by_reason") if isinstance(ps.get("fp_by_reason"), dict) else {}
+        if zahlen or gruende:
+            facts.append(S.DecisionFact(
+                id="dec:phase3_correlation:scan", source="phase3_correlation", mode="active",
+                observed_at=ctx.run_time("phase3_correlation") or ctx.finished,
+                confidence=S.CONFIDENCE_TOOL,
+                evidence=[S.Evidence(tool="phase3_correlation", ref=b.refs.get("phase3_summary", ""),
+                                     excerpt=excerpt(dumps(zahlen), 200))],
+                payload={**zahlen, "fp_by_reason": {str(k): v for k, v in sorted(gruende.items())}},
+                note="Bilanz der Korrelation, kein Befund.",
             ))
     if isinstance(b.ai_prioritization, dict):
         ap = b.ai_prioritization

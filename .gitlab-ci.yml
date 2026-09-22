@@ -1004,6 +1004,7 @@ ops-export-golden-tars:
           - "14272c00-1145-4675-9b4c-19ce2ead403b"
           - "57b3ac85-a1da-47e9-b783-d28ad9a9fa35"
           - "860d0d5a-1086-4958-a9ac-4650423095f2"
+          - "75338c97-6707-4d11-92bf-bb3cd2e02cde"
   artifacts:
     when: always
     expire_in: 7 days
@@ -1124,6 +1125,97 @@ ops-gate-blocked:
     - echo ""
     - docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc
         "SELECT status FROM orders WHERE id = '${GATE_ORDER_ID}'"
+
+# =============================================================================
+# OPS-FACTS-PROD (S5b) — kommt die Faktenschicht im Produktionspfad an?
+#
+# Zwei Betriebsarten, beide gegen die echte Datenbank und das echte Roh-Tar:
+#
+#   lesend (Vorgabe)  python -m reporter.pdf.v3 --kennzahlen --order <id>
+#       Laedt Tar aus MinIO und die scan_results-Zeilen ueber _load_tool_runs,
+#       baut Fakten, Katalog und Reportdaten und meldet Abdeckung je Host,
+#       TLS-Protokolle, Anhang A.3, Gate-Defekte, Laufzeit und Speicher.
+#       Schreibt nichts an Auftrag, reports oder Defektliste. Fuer jeden
+#       Auftrag zulaessig, auch fuer ausgelieferte Kundenauftraege.
+#
+#   voll (FACTS_MODE=voll)  python -m reporter.worker --once --order <id>
+#       Vollstaendiger Produktionspfad mit VECTISCAN_REPORT_LAYOUT=v3, also
+#       inklusive PDF-Upload, reports-Zeile, Statuswechsel und KI-Aufrufen.
+#       Nur fuer die internen Nachweisauftraege (INTERNE_ORDERS in worker.py);
+#       zusaetzlich FACTS_CONFIRM=intern noetig. Ein ausgelieferter
+#       Kundenauftrag bekommt keinen Lauf von Hand (Entscheidung DC, S5b).
+#
+# Der Env-Wert muss an "docker compose exec" uebergeben werden, geerbt wird er
+# nicht; ohne -e gilt der Compose-Wert v2.
+#
+# Pipeline-Variablen:
+#   FACTS_ORDER_ID  Order-UUID
+#   FACTS_MODE      lesend | voll          (Vorgabe: lesend)
+#   FACTS_CONFIRM   intern                 (nur fuer FACTS_MODE=voll)
+#   FACTS_EXPORT    ja, um facts.json und catalog.json nach scan-rawdata zu legen
+#   FACTS_RENDER    ja, um lesend zusaetzlich ein PDF nach scan-debug/v3/ zu legen
+# =============================================================================
+ops-facts-prod:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - facts-prod/
+  script:
+    - test -n "${FACTS_ORDER_ID}" || { echo "FACTS_ORDER_ID fehlt (Order-UUID als Pipeline-Variable setzen)"; exit 1; }
+    - mkdir -p ${CI_PROJECT_DIR}/facts-prod
+    - cd ${DEPLOY_PATH}
+    - MODE="${FACTS_MODE:-lesend}"
+    - EXPORT=""
+    - if [ "${FACTS_EXPORT}" = "ja" ]; then EXPORT="-e VECTISCAN_FACTS_EXPORT=1"; fi
+    - echo "Order ${FACTS_ORDER_ID}, Betriebsart ${MODE}, Export ${FACTS_EXPORT:-nein}"
+    # Ausgangslage festhalten, damit ein Schreiben belegbar ist.
+    - docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc
+        "SELECT status FROM orders WHERE id = '${FACTS_ORDER_ID}'"
+        > ${CI_PROJECT_DIR}/facts-prod/status-vorher.txt || true
+    - docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc
+        "SELECT count(*) FROM reports WHERE order_id = '${FACTS_ORDER_ID}'"
+        >> ${CI_PROJECT_DIR}/facts-prod/status-vorher.txt || true
+    - cat ${CI_PROJECT_DIR}/facts-prod/status-vorher.txt
+    # Speicher mitschreiben, solange der Lauf laeuft (Muster aus ops-render-v3).
+    - CID=$(docker compose ps -q report-worker)
+    - ( while true; do docker stats --no-stream --format '{{.MemUsage}};{{.MemPerc}}' "${CID}" >> ${CI_PROJECT_DIR}/facts-prod/stats-${FACTS_ORDER_ID}.txt 2>/dev/null || true; sleep 2; done ) &
+    - STATS_PID=$!
+    - |
+      if [ "${MODE}" = "voll" ]; then
+        docker compose exec -T \
+          -e VECTISCAN_REPORT_LAYOUT=v3 \
+          -e VECTISCAN_ONCE_CONFIRM="${FACTS_CONFIRM}" \
+          ${EXPORT} \
+          report-worker python3 -m reporter.worker --once --order "${FACTS_ORDER_ID}" \
+          2>&1 | tee ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-voll.log
+      else
+        docker compose exec -T ${EXPORT} report-worker python3 -m reporter.pdf.v3 \
+          --kennzahlen --order "${FACTS_ORDER_ID}" \
+          > ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-kennzahlen.json || true
+        cat ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-kennzahlen.json
+        if [ "${FACTS_RENDER}" = "ja" ]; then
+          docker compose exec -T report-worker python3 -m reporter.pdf.v3 \
+            --order "${FACTS_ORDER_ID}" -o "/tmp/${FACTS_ORDER_ID}-v3.pdf" --upload \
+            2>&1 | tee ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-render.log || true
+          docker compose exec -T report-worker rm -f "/tmp/${FACTS_ORDER_ID}-v3.pdf" || true
+        fi
+      fi
+    - kill ${STATS_PID} 2>/dev/null || true
+    - awk -F';' '{gsub("%","",$2); if ($2+0>m) {m=$2+0; z=$0}} END {print "Spitze " z; print "Messpunkte " NR}' ${CI_PROJECT_DIR}/facts-prod/stats-${FACTS_ORDER_ID}.txt || true
+    - docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc
+        "SELECT status FROM orders WHERE id = '${FACTS_ORDER_ID}'"
+    - docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -tAc
+        "SELECT count(*) FROM reports WHERE order_id = '${FACTS_ORDER_ID}'"
+    - ls -l ${CI_PROJECT_DIR}/facts-prod/ || true
 
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
 rollback:

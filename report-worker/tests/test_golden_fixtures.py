@@ -150,6 +150,35 @@ def test_api_snapshot_ohne_bestelleradresse():
         assert order.get("email") == "redacted@example.invalid"
 
 
+# Aus dem Kundenkontext darf nur der Firmenname in ein Fixture (Auflage S5b).
+# Personennamen (Inhaber, Geschaeftsfuehrer), Adressen und die Fundstellen der
+# Recherche-KI gehoeren nicht ins Repo, auch nicht bei eigenen Domains.
+KONTEXT_ERLAUBT = {"firmenname"}
+KONTEXT_FELDER = ("customerContext", "customer_context")
+
+
+def _kontexte(node, treffer):
+    if isinstance(node, list):
+        for x in node:
+            _kontexte(x, treffer)
+        return treffer
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key in KONTEXT_FELDER and isinstance(value, dict):
+                treffer.append(value)
+            _kontexte(value, treffer)
+    return treffer
+
+
+def test_api_snapshot_ohne_kundenkontext():
+    """Heute traegt kein Schnappschuss das Feld; der Test haelt das fest."""
+    dateien = sorted(SNAPSHOT.glob("*/order.json")) + [SNAPSHOT / "orders.json"]
+    for datei in dateien:
+        for kontext in _kontexte(load(datei), []):
+            ueberschuss = sorted(set(kontext) - KONTEXT_ERLAUBT)
+            assert not ueberschuss, f"{datei.parent.name}: Kundenkontext {ueberschuss}"
+
+
 # -------------------------------------------------------------- Soll-Liste
 
 def test_expected_junkerwerk():

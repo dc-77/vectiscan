@@ -285,22 +285,38 @@ def _store_report_defects(conn: Any, order_id: str, payload: dict | None) -> Non
         log.warning("report_defects_store_failed", order_id=order_id, error=str(exc))
 
 
+# Obergrenze fuer ``raw_output`` je Zeile. Der Container hat 1 GB RAM-Limit
+# (docker-compose.yml), eine einzelne TEXT-Spalte darf ihn nicht kippen.
+# Messgrundlage S5b: groesste Zeile ueber alle 42 Auftrags-Schnappschuesse
+# 515 KB (phase3_correlation), groesster Auftrag insgesamt 715 KB Rohtext.
+RAW_OUTPUT_MAX_BYTES = int(os.environ.get("VECTISCAN_TOOLRUN_RAW_MAX", str(1024 * 1024)))
+
+
 def _load_tool_runs(conn: Any, order_id: str) -> list[dict]:
-    """Laedt die Tool-Lauf-Zeilen (scan_results) fuer C3-Abdeckungskapitel.
+    """Laedt die Tool-Lauf-Zeilen (scan_results) fuer Abdeckung und Fakten.
 
     Autoritative Quelle fuer "welches Tool lief auf welchem Host mit welchem
     Ergebnis" ist die Tabelle ``scan_results`` — der report-worker liest sie
-    bisher nie (er schreibt nur die ``report_cost``-Zeile). Ein SELECT auf die
+    sonst nie (er schreibt nur die ``report_cost``-Zeile). Ein SELECT auf die
     ohnehin offene Connection (worker.py:629) ist neue Query, keine neue
     Infrastruktur.
 
-    ZWINGEND OHNE ``raw_output``: die Spalte ist TEXT und traegt pro Zeile
-    potenziell MB an nuclei/testssl-Rohtext. Der Container hat 1 GB RAM-Limit
-    (docker-compose.yml) — ein ``SELECT *`` wuerde ihn kippen.
+    ``created_at`` und ``raw_output`` sind seit S5b dabei, weil die
+    Faktenschicht beides braucht (``reporter/facts/sources.py::tool_run_from_row``).
+    Ohne sie wird jede ``ok``-Zeile zu ``empty``, die TLS-Protokolle fehlen und
+    header_check je VHost kommt nicht an; gemessen an allen dreizehn
+    Golden-Auftraegen fiel die Zahl der ``ok``-Abdeckungszeilen dadurch auf null.
 
-    ``status``/``skip_reason`` (A7, Migration 044) werden mitselektiert: sie
-    sind die autoritative Skip-Begruendung. Auf Alt-DBs ohne Migration 044
-    faellt der SELECT auf die Legacy-Spalten zurueck (status/skip_reason=None).
+    ``raw_output`` ist je Zeile auf ``RAW_OUTPUT_MAX_BYTES`` gedeckelt und wird
+    bei Ueberschreitung **ganz weggelassen**, nie abgeschnitten: ein halbes JSON
+    im Parser ist schlimmer als ein fehlendes. ``None`` heisst "nicht geladen"
+    und laesst den Status der Zeile stehen, ``""`` bleibt ein leeres Ergebnis.
+    Eine ausgelassene Zeile traegt ``raw_output_omitted`` und erscheint in der
+    Abdeckung als "Rohtext nicht geladen", damit die Luecke sichtbar bleibt.
+
+    ``status``/``skip_reason`` (A7, Migration 044) sind die autoritative
+    Skip-Begruendung. Auf Alt-DBs ohne Migration 044 faellt der SELECT auf die
+    Legacy-Spalten zurueck (status/skip_reason=None).
 
     Vollstaendig defensiv (Muster wie ``_apply_finding_overrides``): jeder
     Fehler -> log.warning + conn.rollback() + Rueckgabe ``[]``. Ein DB-Problem
@@ -308,33 +324,55 @@ def _load_tool_runs(conn: Any, order_id: str) -> list[dict]:
     """
     select_with_status = """
         SELECT host_ip, phase, tool_name, exit_code, duration_ms,
-               status, skip_reason
+               status, skip_reason, created_at,
+               CASE WHEN octet_length(raw_output) <= %s THEN raw_output END,
+               octet_length(raw_output)
           FROM scan_results
          WHERE order_id = %s
-         ORDER BY phase, tool_name, host_ip
+         ORDER BY phase, tool_name, host_ip, created_at, id
     """
     select_legacy = """
-        SELECT host_ip, phase, tool_name, exit_code, duration_ms
+        SELECT host_ip, phase, tool_name, exit_code, duration_ms,
+               created_at,
+               CASE WHEN octet_length(raw_output) <= %s THEN raw_output END,
+               octet_length(raw_output)
           FROM scan_results
          WHERE order_id = %s
-         ORDER BY phase, tool_name, host_ip
+         ORDER BY phase, tool_name, host_ip, created_at, id
     """
+
+    def _row(host_ip: Any, phase: Any, tool: Any, exit_code: Any, duration: Any,
+             status: Any, reason: Any, created: Any, raw: Any, size: Any) -> dict:
+        row = {
+            "host_ip": host_ip,
+            "phase": phase,
+            "tool_name": tool,
+            "exit_code": exit_code,
+            "duration_ms": duration,
+            "status": status,
+            "skip_reason": reason,
+            "created_at": created,
+            "raw_output": raw,
+        }
+        if raw is None and size is not None and size > RAW_OUTPUT_MAX_BYTES:
+            row["raw_output_omitted"] = True
+            log.warning("tool_run_raw_uebersprungen", order_id=order_id,
+                        tool=tool, host_ip=host_ip, groesse=size,
+                        limit=RAW_OUTPUT_MAX_BYTES)
+        return row
+
+    def _bilanz(rows: list[dict]) -> list[dict]:
+        log.info("tool_runs_loaded", order_id=order_id, rows=len(rows),
+                 raw_bytes=sum(len(r["raw_output"] or "") for r in rows),
+                 raw_omitted=sum(1 for r in rows if r.get("raw_output_omitted")))
+        return rows
+
     try:
         with conn.cursor() as cur:
-            cur.execute(select_with_status, (order_id,))
+            cur.execute(select_with_status, (RAW_OUTPUT_MAX_BYTES, order_id))
             rows = cur.fetchall()
-        return [
-            {
-                "host_ip": r[0],
-                "phase": r[1],
-                "tool_name": r[2],
-                "exit_code": r[3],
-                "duration_ms": r[4],
-                "status": r[5],
-                "skip_reason": r[6],
-            }
-            for r in rows
-        ]
+        return _bilanz([_row(r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9])
+                        for r in rows])
     except Exception as exc:
         # Wahrscheinlichster Fall: Migration 044 fehlt (status/skip_reason
         # noch nicht vorhanden) -> Legacy-SELECT ohne die zwei Spalten.
@@ -344,22 +382,12 @@ def _load_tool_runs(conn: Any, order_id: str) -> list[dict]:
             pass
         try:
             with conn.cursor() as cur:
-                cur.execute(select_legacy, (order_id,))
+                cur.execute(select_legacy, (RAW_OUTPUT_MAX_BYTES, order_id))
                 rows = cur.fetchall()
             log.info("tool_runs_loaded_legacy", order_id=order_id,
                      hint="scan_results ohne status/skip_reason (Migration 044?)")
-            return [
-                {
-                    "host_ip": r[0],
-                    "phase": r[1],
-                    "tool_name": r[2],
-                    "exit_code": r[3],
-                    "duration_ms": r[4],
-                    "status": None,
-                    "skip_reason": None,
-                }
-                for r in rows
-            ]
+            return _bilanz([_row(r[0], r[1], r[2], r[3], r[4], None, None, r[5], r[6], r[7])
+                            for r in rows])
         except Exception as exc2:
             log.warning("tool_runs_load_failed",
                         order_id=order_id, error=str(exc2),
@@ -369,6 +397,19 @@ def _load_tool_runs(conn: Any, order_id: str) -> list[dict]:
             except Exception:
                 pass
             return []
+
+
+# Schluessel, die der v2-Kanal (``scan_meta["toolRuns"]`` -> reporter/coverage.py)
+# liest. Der Rohtext gehoert nicht dazu: er waere pro Auftrag ein knappes
+# Megabyte, das durch ``map_to_report_data`` und damit moeglicherweise in
+# gespeicherte Reportdaten liefe. Die Faktenschicht bekommt die vollen Zeilen
+# direkt, ohne Umweg ueber scan_meta.
+V2_TOOLRUN_KEYS = ("host_ip", "phase", "tool_name", "exit_code", "duration_ms",
+                   "status", "skip_reason")
+
+
+def _ohne_rohtext(rows: list[dict]) -> list[dict]:
+    return [{k: r.get(k) for k in V2_TOOLRUN_KEYS} for r in rows]
 
 
 def _build_findings_data(claude_output: dict, package: str, report_data: dict | None = None) -> dict:
@@ -1076,6 +1117,9 @@ def process_job(job_data: dict) -> None:
             _recalculate_overall_risk(claude_output)
 
         # -- 5. Map Claude output to report_data ------------------------------
+        # Einmal laden, zweimal genutzt: der v2-Kanal bekommt die schlanke Form
+        # (siehe _ohne_rohtext), die Faktenschicht im v3-Zweig die vollen Zeilen.
+        tool_runs = _load_tool_runs(conn, order_id)
         parsed_meta = parsed.get("meta", {})
         scan_meta = {
             "domain": domain,
@@ -1089,9 +1133,10 @@ def process_job(job_data: dict) -> None:
             # C3 (Phase 1): Datenkanal fuer das Abdeckungskapitel. scan_meta ist
             # der einzige Weg, den map_to_report_data/_augment_for_v2 ohne
             # Signaturaenderung bereits durchreichen. toolRuns = autoritative
-            # scan_results-Zeilen (ohne raw_output); hostStrategy = KI-#1-Entscheid
-            # (Skip-Gruende). Beide fail-open ([]/{}), nie den Report kippend.
-            "toolRuns": _load_tool_runs(conn, order_id),
+            # scan_results-Zeilen (ohne raw_output, siehe _ohne_rohtext);
+            # hostStrategy = KI-#1-Entscheid (Skip-Gruende). Beide fail-open
+            # ([]/{}), nie den Report kippend.
+            "toolRuns": _ohne_rohtext(tool_runs),
             "hostStrategy": parsed.get("host_strategy") or {},
         }
         report_data = map_to_report_data(
@@ -1242,7 +1287,9 @@ def process_job(job_data: dict) -> None:
             # VECTISCAN_REPORT_LAYOUT=v3 ist eine ausdrueckliche Entscheidung.
             from reporter.gate import v3_checks
             from reporter.pdf.v3 import render_report_v3
-            from reporter.pdf.v3.pipeline import report_bundle_from_source
+            from reporter.pdf.v3.pipeline import (
+                export_facts_if_enabled, report_bundle_from_source,
+            )
             from reporter.pdf.v3.screenshots import MinioScreenshots
             from reporter.v3.selfcheck import check_report_data_detailed
 
@@ -1256,9 +1303,15 @@ def process_job(job_data: dict) -> None:
             v3_facts, v3_output, v3_data = report_bundle_from_source(
                 scan_data_dir, effective_inventory, effective_profiles,
                 job_data.get("correlatedFindings"), job_data,
-                tool_runs=_load_tool_runs(conn, order_id),
+                tool_runs=tool_runs,
                 customer_context=customer_context,
             )
+
+            # S5b: Fakten und Katalogergebnis neben das Roh-Tar legen, wenn
+            # VECTISCAN_FACTS_EXPORT gesetzt ist. Der Aufruf faengt seine Fehler
+            # selbst ab; hier steht bewusst kein try, damit der Zweig ohne
+            # Ausnahmebehandlung bleibt (kein stiller Rueckfall auf v2).
+            export_facts_if_enabled(minio_client, order_id, v3_facts, v3_output)
 
             v3_defects = GD.from_validation_result(gate_result)
             v3_defects.extend(GD.from_selfcheck(check_report_data_detailed(v3_data)))
@@ -1498,8 +1551,96 @@ def wait_for_jobs(redis_client: redis.Redis) -> None:
 # Entry point
 # ---------------------------------------------------------------------------
 
+# Auftraege, die der Einzellauf anfassen darf. Es sind die internen
+# Nachweislaeufe aus S2b und S0b; sie werden nicht ausgeliefert, ein
+# Statuswechsel und eine weitere Reportzeile kosten dort nichts. Ein
+# ausgelieferter Kundenauftrag gehoert nicht in diese Liste (Entscheidung DC,
+# S5b): fuer den gibt es den lesenden Weg ``python -m reporter.pdf.v3
+# --kennzahlen --order <id>``.
+INTERNE_ORDERS = frozenset({
+    "14272c00-1145-4675-9b4c-19ce2ead403b",   # dortmund-beach.com, Nachweis S0b
+    "75338c97-6707-4d11-92bf-bb3cd2e02cde",   # vectigal.tech + vectiscan.de, Nachweis S2b
+})
+
+
+def _job_payload_fuer(conn: Any, order_id: str) -> dict:
+    """Denselben Payload bauen wie der Regenerate-Pfad der API.
+
+    Quelle sind dieselben Zeilen (``api/src/routes/orders.ts``): Hostinventar aus
+    ``ai_host_strategy``, Tech-Profile aus ``ai_tech_analysis_debug``,
+    Anreicherung und korrelierte Befunde aus ``phase3_correlation``. Ein leeres
+    ``{}`` gilt wie "nicht vorhanden" (BEFUND 4 dort).
+    """
+    def raw(tool: str) -> Any:
+        with conn.cursor() as cur:
+            cur.execute("SELECT raw_output FROM scan_results "
+                        "WHERE order_id = %s AND tool_name = %s LIMIT 1", (order_id, tool))
+            row = cur.fetchone()
+        if not row or not row[0]:
+            return None
+        try:
+            return json.loads(row[0])
+        except (ValueError, TypeError):
+            return None
+
+    with conn.cursor() as cur:
+        cur.execute("SELECT target_url, package FROM orders WHERE id = %s", (order_id,))
+        order = cur.fetchone()
+    if not order:
+        raise SystemExit(f"Auftrag {order_id} steht nicht in der Datenbank")
+
+    inventar = raw("ai_host_strategy")
+    payload: dict[str, Any] = {
+        "orderId": order_id,
+        "rawDataPath": f"{order_id}.tar.gz",
+        "hostInventory": inventar if isinstance(inventar, dict) and inventar.get("hosts")
+                         else {"hosts": [], "domain": order[0]},
+        "techProfiles": raw("ai_tech_analysis_debug") or [],
+        "package": order[1] or "perimeter",
+    }
+    phase3 = raw("phase3_correlation")
+    if isinstance(phase3, dict) and phase3:
+        payload["enrichment"] = phase3.get("enrichment") or {}
+        payload["correlatedFindings"] = phase3.get("correlated_findings") or []
+        payload["businessImpactScore"] = phase3.get("business_impact_score") or 0.0
+        payload["phase3Summary"] = phase3.get("phase3_summary") or {}
+    return payload
+
+
+def _einzellauf(order_id: str) -> int:
+    """Einen Auftrag durch ``process_job`` schicken, ohne Warteschlange.
+
+    Das ist der Produktionspfad, nicht eine Nachbildung davon: derselbe Payload,
+    dieselbe Funktion, dieselben Umgebungsvariablen. Er schreibt deshalb auch
+    wie in Produktion (PDF, ``reports``-Zeile, Orderstatus) und ist auf die
+    internen Nachweisauftraege beschraenkt.
+    """
+    if order_id not in INTERNE_ORDERS:
+        print(f"{order_id} steht nicht in INTERNE_ORDERS; ein ausgelieferter Auftrag "
+              f"bekommt keinen Lauf von Hand. Lesend: python -m reporter.pdf.v3 "
+              f"--kennzahlen --order {order_id}", file=sys.stderr)
+        return 2
+    if os.environ.get("VECTISCAN_ONCE_CONFIRM") != "intern":
+        print("VECTISCAN_ONCE_CONFIRM=intern fehlt", file=sys.stderr)
+        return 2
+    conn = _get_db_connection()
+    try:
+        payload = _job_payload_fuer(conn, order_id)
+    finally:
+        conn.close()
+    log.info("einzellauf_gestartet", order_id=order_id,
+             layout=os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1"),
+             keys=sorted(payload))
+    process_job(payload)
+    return 0
+
+
 def main() -> None:
     """Entry point for the report worker."""
+    if "--once" in sys.argv:
+        order_id = sys.argv[sys.argv.index("--order") + 1] if "--order" in sys.argv else ""
+        sys.exit(_einzellauf(order_id))
+
     log.info("report_worker_started")
 
     redis_client = redis.from_url(REDIS_URL)

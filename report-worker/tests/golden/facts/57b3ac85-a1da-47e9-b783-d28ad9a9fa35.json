@@ -1077,6 +1077,31 @@
    "source": "ai_phase2_config_debug"
   },
   {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"cisa_kev_matches\": 0, \"cves_enriched\": 0, \"false_positives\": 0, \"total_findings\": 0, \"valid_findings\": 0 }",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:phase3_correlation:scan",
+   "mode": "active",
+   "note": "Bilanz der Korrelation, kein Befund.",
+   "observed_at": "2026-09-20T10:58:46Z",
+   "payload": {
+    "cisa_kev_matches": 0,
+    "cves_enriched": 0,
+    "false_positives": 0,
+    "fp_by_reason": {},
+    "total_findings": 0,
+    "valid_findings": 0
+   },
+   "source": "phase3_correlation"
+  },
+  {
    "confidence": 0.8,
    "evidence": [
     {
@@ -1918,7 +1943,7 @@
    }
   ]
  },
- "schema_version": "1.0.1",
+ "schema_version": "1.0.2",
  "services": [
   {
    "auth_mechanisms": [],

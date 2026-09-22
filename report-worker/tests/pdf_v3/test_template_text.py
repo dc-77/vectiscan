@@ -30,7 +30,11 @@ CLAIM_AUSNAHMEN: tuple[str, ...] = (
     "Diese Seite nennt bewusst keine CVSS-Werte",
     "CVSS-Werte erscheinen nur als Fremdreferenz bei zitierten CVEs",
     "Der Bericht vergibt keine eigenen CVSS-Werte",
-    "CVSS-Basiswerte erscheinen ausschließlich als Fremdreferenz zu zitierten CVEs",
+    # Seit S5b nennt A.3 auch CVEs, die ein Werkzeug genannt hat und zu denen
+    # keine Fremdbewertung vorliegt. Der Satz sagt, wann ein Basiswert steht
+    # und wann nicht, und darf den Begriff deshalb fuehren.
+    "Ein CVSS-Basiswert erscheint nur dort, wo eine Fremdbewertung zu einer "
+    "zitierten CVE vorliegt",
 )
 
 

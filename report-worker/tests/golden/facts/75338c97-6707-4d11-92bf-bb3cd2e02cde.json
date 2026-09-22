@@ -1,0 +1,5076 @@
+{
+ "coverage": [
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:28Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:abuseipdb",
+     "tool": "abuseipdb"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:abuseipdb:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "abuseipdb"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:axfr",
+     "tool": "axfr"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:axfr:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "axfr"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 888,
+   "evidence": [
+    {
+     "excerpt": "{\"subdomains\": [\"10finance.vectigal.tech\", \"agent.vectigal.tech\", \"auth.vectigal.tech\", \"board.vectigal.tech\", \"crm.vectigal.tech\", \"crmviewer.vectigal.tech\"...",
+     "ref": "scan_results:certspotter",
+     "tool": "certspotter"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:certspotter:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:30Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "certspotter"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 3236,
+   "evidence": [
+    {
+     "excerpt": "<html> <head><title>502 Bad Gateway</title></head> <body> <center><h1>502 Bad Gateway</h1></center> <hr><center>nginx</center> </body> </html>",
+     "ref": "scan_results:crtsh",
+     "tool": "crtsh"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:33Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 3173,
+   "evidence": [
+    {
+     "excerpt": "<html> <head><title>502 Bad Gateway</title></head> <body> <center><h1>502 Bad Gateway</h1></center> <hr><center>nginx</center> </body> </html>",
+     "ref": "scan_results:crtsh_retry2",
+     "tool": "crtsh_retry2"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:41Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 2048,
+   "evidence": [
+    {
+     "excerpt": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\"> <html><head> <title>404 Not Found</title> </head><body> <h1>Not Found</h1> <p>The requested URL was not fo...",
+     "ref": "scan_results:crtsh_retry3",
+     "tool": "crtsh_retry3"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:crtsh:scan#3",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:58Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "crtsh"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"vectigal.tech\", \"spf\": null, \"dmarc\": null, \"dmarc_policy\": {\"dmarc_present\": false, \"raw\": null, \"p\": null, \"sp\": null, \"pct\": 100, \"rua\": [],...",
+     "ref": "scan_results:dns_records",
+     "tool": "dns_records"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_records:vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:30Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_records"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectiscan.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"vectiscan.de\", \"spf\": null, \"dmarc\": \"v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de\", \"dmarc_policy\": {\"dmarc_present\": true, \"raw\": \"v=DMARC1...",
+     "ref": "scan_results:dns_records",
+     "tool": "dns_records"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_records:vectiscan.de",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:30Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_records"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"vectigal.tech\", \"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null, \"ns...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"vectigal.tech\", \"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null, \"ns...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:vectigal.tech#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectiscan.de",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"vectiscan.de\", \"dnssec\": {\"dnssec_signed\": false, \"dnssec_valid\": false, \"ds_algorithm\": null, \"dnskey_count\": 0, \"nsec3_iterations\": null, \"nse...",
+     "ref": "scan_results:dns_security",
+     "tool": "dns_security"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dns_security:vectiscan.de",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dns_security"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 406,
+   "evidence": [
+    {
+     "excerpt": "{\"a\": [\"62.217.52.165\"], \"all\": [\"10finance.vectigal.tech.\\t3600\\tIN\\tA\\t62.217.52.165\", \"\\n;; OPT PSEUDOSECTION:\\n; EDNS: version 0; flags:; udp: 512\", \"\\n;...",
+     "ref": "scan_results:dnsx",
+     "tool": "dnsx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:dnsx:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:58Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "dnsx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:gobuster_dns",
+     "tool": "gobuster_dns"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:gobuster_dns:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "gobuster_dns"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:greynoise",
+     "tool": "greynoise"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:greynoise:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "greynoise"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{\"_domain\": \"vectigal.tech\", \"domain\": {\"domain\": \"vectigal.tech\", \"pulse_count\": 0, \"pulses\": [], \"validation\": [], \"type\": \"domain\", \"alexa_rank\": \"http://...",
+     "ref": "scan_results:otx",
+     "tool": "otx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:otx:vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "domain",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "otx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:securitytrails",
+     "tool": "securitytrails"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:securitytrails:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "securitytrails"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:28Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:shodan",
+     "tool": "shodan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:shodan:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "shodan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 15190,
+   "evidence": [
+    {
+     "excerpt": "{\"host\":\"status.vectigal.tech\",\"input\":\"vectigal.tech\",\"source\":\"hackertarget\"} {\"host\":\"board.vectigal.tech\",\"input\":\"vectigal.tech\",\"source\":\"hackertarget\"...",
+     "ref": "scan_results:subfinder",
+     "tool": "subfinder"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:subfinder:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:45Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "subfinder"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:urlhaus:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "urlhaus"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:virustotal",
+     "tool": "virustotal"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:virustotal:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "virustotal"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"62.217.52.165\": { \"web_probe\": { \"has_web\": true, \"status\": 200, \"final_url\": \"https://crm.vectigal.tech\", \"title\": \"Twenty\", \"web_fqdn\": \"crm.vectigal.te...",
+     "ref": "scan_results:web_probe",
+     "tool": "web_probe"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:web_probe:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "web_probe"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "ok",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "FAILED: no_data",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": -2,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "phase": 0,
+   "raw_status": "failed",
+   "reason": "no_data",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:whois",
+     "tool": "whois"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:0:whois:scan#3",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:00Z",
+   "phase": 0,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "whois"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 20280,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Nmap scan report for 62.217.52.165 Host is up, received user-set (0.00034s latency). Not shown: 97 filtered tcp ports...",
+     "ref": "scan_results:nmap:62.217.52.165",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:1:nmap:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:29Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 6998,
+   "evidence": [
+    {
+     "excerpt": "Starting Nmap 7.93 ( https://nmap.org ) Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .",
+     "ref": "scan_results:nmap:62.217.52.177",
+     "tool": "nmap"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:1:nmap:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:15Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": "no_open_ports",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "nmap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 811,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://10finance.vectigal.tech [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:62.217.52.165",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "10finance.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:1:wafw00f:62.217.52.165:10finance.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:51Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 814,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://board.vectigal.tech [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:62.217.52.165",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "board.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:1:wafw00f:62.217.52.165:board.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:51Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 834,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://crm.vectigal.tech [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:62.217.52.165",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "crm.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:1:wafw00f:62.217.52.165:crm.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:51Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 4392,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://crmviewer.vectigal.tech [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:62.217.52.165",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "crmviewer.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:1:wafw00f:62.217.52.165:crmviewer.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:54Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 967,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://gutachter.vectigal.tech [+] Generic Detection results: [-] No WAF detected by the generic detection",
+     "ref": "scan_results:wafw00f:62.217.52.165",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "gutachter.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:1:wafw00f:62.217.52.165:gutachter.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:51Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 140,
+   "evidence": [
+    {
+     "excerpt": "[*] Checking https://test.vectigal.tech",
+     "ref": "scan_results:wafw00f:62.217.52.177",
+     "tool": "wafw00f"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "test.vectigal.tech",
+   "host_ip": "62.217.52.177",
+   "id": "cov:1:wafw00f:62.217.52.177:test.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:24Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "wafw00f"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"tech\": [ { \"name\": \"React\", \"version\": \"\" }, { \"name\": \"Nuxt.js\", \"version\": \"\" } ] }",
+     "ref": "scan_results:webtech:62.217.52.165",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:1:webtech:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:50Z",
+   "phase": 1,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "Keine Tech-Signaturen erkennbar fuer test.vectigal.tech (moderne SPA ohne Server/X-Powered-By/generator-Header und ohne Cookie-/Script-/Header-Pattern-Match)...",
+     "ref": "scan_results:webtech:62.217.52.177",
+     "tool": "webtech"
+    }
+   ],
+   "exit_code": 1,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:1:webtech:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:08:24Z",
+   "phase": 1,
+   "raw_status": "failed",
+   "reason": "no_tech_signals",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "webtech"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:feroxbuster:62.217.52.165",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:feroxbuster:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:feroxbuster:62.217.52.177",
+     "tool": "feroxbuster"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:feroxbuster:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "feroxbuster"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:ffuf_param:62.217.52.165",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:ffuf_param:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:ffuf_param:62.217.52.177",
+     "tool": "ffuf_param"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:ffuf_param:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_param"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:ffuf_sensitive:62.217.52.165",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:ffuf_sensitive:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_sensitive"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: not_in_package",
+     "ref": "scan_results:ffuf_sensitive:62.217.52.177",
+     "tool": "ffuf_sensitive"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:ffuf_sensitive:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "not_in_package",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "ffuf_sensitive"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"10finance.vectigal.tech\", \"result\": { \"url\": \"https://10finance.vectigal.tech\", \"reachable\": true, \"headers\": { \"accept-ranges\": \"bytes\", \"cache-...",
+     "ref": "scan_results:header_check:62.217.52.165",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "10finance.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:header_check:62.217.52.165:10finance.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"board.vectigal.tech\", \"result\": { \"url\": \"https://board.vectigal.tech\", \"reachable\": true, \"headers\": { \"accept-ranges\": \"bytes\", \"cache-control\"...",
+     "ref": "scan_results:header_check:62.217.52.165",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "board.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:header_check:62.217.52.165:board.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"crm.vectigal.tech\", \"result\": { \"url\": \"https://crm.vectigal.tech\", \"reachable\": true, \"headers\": { \"accept-ranges\": \"bytes\", \"access-control-all...",
+     "ref": "scan_results:header_check:62.217.52.165",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "crm.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:header_check:62.217.52.165:crm.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"crmviewer.vectigal.tech\", \"result\": { \"url\": \"https://crmviewer.vectigal.tech\", \"reachable\": true, \"headers\": { \"accept-ranges\": \"bytes\", \"cache-...",
+     "ref": "scan_results:header_check:62.217.52.165",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "crmviewer.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:header_check:62.217.52.165:crmviewer.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"gutachter.vectigal.tech\", \"result\": { \"url\": \"https://gutachter.vectigal.tech\", \"reachable\": true, \"headers\": { \"content-type\": \"text/html;charse...",
+     "ref": "scan_results:header_check:62.217.52.165",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "gutachter.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:header_check:62.217.52.165:gutachter.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"vhost\": \"test.vectigal.tech\", \"result\": { \"url\": \"https://test.vectigal.tech\", \"reachable\": false, \"score\": null, \"headers\": {}, \"security_headers\": {} } }",
+     "ref": "scan_results:header_check:62.217.52.177",
+     "tool": "header_check"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": "test.vectigal.tech",
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:header_check:62.217.52.177:test.vectigal.tech",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": "unreachable",
+   "scope": "fqdn",
+   "source": "scan_results",
+   "status": "empty",
+   "tool": "header_check"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 541,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"crm.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-08-06T07:42:54...",
+     "ref": "scan_results:httpx:62.217.52.165",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:httpx:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:51Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 557,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"board.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-08-03T07:42:...",
+     "ref": "scan_results:httpx:62.217.52.165",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:httpx:62.217.52.165#2",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:51Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 512,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"10finance.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-08-02T07...",
+     "ref": "scan_results:httpx:62.217.52.165",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:httpx:62.217.52.165#3",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:52Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 552,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"crmviewer.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-09-15T11...",
+     "ref": "scan_results:httpx:62.217.52.165",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:httpx:62.217.52.165#4",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:52Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 660,
+   "evidence": [
+    {
+     "excerpt": "{\"tls\":{\"host\":\"gutachter.vectigal.tech\",\"port\":\"443\",\"probe_status\":true,\"tls_version\":\"tls13\",\"cipher\":\"TLS_AES_128_GCM_SHA256\",\"not_before\":\"2026-07-25T07...",
+     "ref": "scan_results:httpx:62.217.52.165",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:httpx:62.217.52.165#5",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:53Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 544,
+   "evidence": [
+    {
+     "excerpt": "",
+     "ref": "scan_results:httpx:62.217.52.177",
+     "tool": "httpx"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:httpx:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "empty",
+   "tool": "httpx"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 12659,
+   "evidence": [
+    {
+     "excerpt": "Start 2026-09-20 09:09:52 -->> 62.217.52.165:443 (vectigal.tech) <<-- A record via: supplied IP \"62.217.52.165\" rDNS (62.217.52.165): (instructed to minimize...",
+     "ref": "scan_results:testssl:62.217.52.165",
+     "tool": "testssl"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:testssl:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:10:03Z",
+   "phase": 2,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "host",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "testssl"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_ssl",
+     "ref": "scan_results:testssl:62.217.52.177",
+     "tool": "testssl"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:testssl:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_ssl",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "testssl"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: cms_not_wordpress",
+     "ref": "scan_results:wpscan:62.217.52.165",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:wpscan:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "cms_not_wordpress",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: cms_not_wordpress",
+     "ref": "scan_results:wpscan:62.217.52.177",
+     "tool": "wpscan"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:wpscan:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "cms_not_wordpress",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "wpscan"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_zap_context",
+     "ref": "scan_results:zap:62.217.52.165",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:zap:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_zap_context",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_zap_context",
+     "ref": "scan_results:zap:62.217.52.177",
+     "tool": "zap"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:zap:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_zap_context",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "zap"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: package_webcheck",
+     "ref": "scan_results:zap_active:62.217.52.165",
+     "tool": "zap_active"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:zap_active:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "package_webcheck",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "zap_active"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: package_webcheck",
+     "ref": "scan_results:zap_active:62.217.52.177",
+     "tool": "zap_active"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:zap_active:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "package_webcheck",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "zap_active"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "FAILED: ZAP API error 400: scan_in_progress / Scan In Progress [endpoint=/JSON/ajaxSpider/action/scan/, params={'url': 'https://board.vectigal.tech', 'contex...",
+     "ref": "scan_results:zap_spider:62.217.52.165",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": -2,
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "cov:2:zap_spider:62.217.52.165",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "failed",
+   "reason": "ZAP API error 400: scan_in_progress / Scan In Progress [endpoint=/JSON/ajaxSpider/action/scan/, params={'url': 'https://board.vectigal.tech', 'contextName': 'ct",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "failed",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": null,
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "SKIPPED: no_web",
+     "ref": "scan_results:zap_spider:62.217.52.177",
+     "tool": "zap_spider"
+    }
+   ],
+   "exit_code": -3,
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "cov:2:zap_spider:62.217.52.177",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "phase": 2,
+   "raw_status": "skipped",
+   "reason": "no_web",
+   "scope": "host",
+   "source": "scan_results",
+   "status": "skipped",
+   "tool": "zap_spider"
+  },
+  {
+   "confidence": 1.0,
+   "domain": "vectigal.tech",
+   "duration_ms": 0,
+   "evidence": [
+    {
+     "excerpt": "{ \"total_findings\": 6, \"false_positives\": 0, \"valid_findings\": 6, \"severity_counts\": { \"high\": 3, \"medium\": 1, \"low\": 2 }, \"cves_enriched\": 0, \"cisa_kev_matc...",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "exit_code": 0,
+   "fqdn": null,
+   "host_ip": null,
+   "id": "cov:3:phase3_correlation:scan",
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "phase": 3,
+   "raw_status": "ok",
+   "reason": null,
+   "scope": "scan",
+   "source": "scan_results",
+   "status": "ok",
+   "tool": "phase3_correlation"
+  }
+ ],
+ "decisions": [
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "IP 62.217.52.165 ist Produktions-Host mit umfangreicher Microservice-Architektur (CRM, Board, Finance-Tools, AI-Services, APIs). Alle 8 primary VHosts liefern echten Content oder sind geschützte En...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_host_strategy:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:08:08Z",
+   "payload": {
+    "passive_intel_summary": "Beide IPs: DNSSEC nicht signiert, kein TLSRPT, keine OTX-Pulse. Keine Shodan-Daten, AbuseIPDB-Scores oder Tor-Indikatoren vorhanden. Keine Hinweise auf Kompromittierung oder veraltete Services aus passiver Intelligence.",
+    "strategy_notes": "IP 62.217.52.165 ist Produktions-Host mit umfangreicher Microservice-Architektur (CRM, Board, Finance-Tools, AI-Services, APIs). Alle 8 primary VHosts liefern echten Content oder sind geschützte Endpoints (401) — keine Skip-Gründe. IP 62.217.52.177 ist Test-Host ohne Web-Content, wird mit niedrigerer Priorität gescannt (Port-Scan + TLS). Domain hat keine SPF/DMARC/DKIM und keine MX-Records — kein Mailserver-Scan erforderlich."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "Basisdomain vectigal.tech mit 8 primary VHosts (CRM, Board, 10Finance, CRMViewer, Gutachter, FeedGenerator, Agent, Gutachter-API) — mehrere produktive Web-Anwendungen (Twenty CRM, Paperclip Board,...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "dec:ai_host_strategy:62.217.52.165",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:08:08Z",
+   "payload": {
+    "action": "scan",
+    "priority": 1,
+    "reasoning": "Basisdomain vectigal.tech mit 8 primary VHosts (CRM, Board, 10Finance, CRMViewer, Gutachter, FeedGenerator, Agent, Gutachter-API) — mehrere produktive Web-Anwendungen (Twenty CRM, Paperclip Board, Streamlit-App, AI-Services) mit Status 200/401/404 erfordern umfassenden Security-Scan."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "test.vectigal.tech hat kein Web-Content (has_web=false), aber als Test-Subdomain der Domain sollte Port-Scan + TLS-Check durchgeführt werden um potenzielle offene Management-Ports oder schwache Kon...",
+     "ref": "phase0/host_strategy.json",
+     "tool": "ai_host_strategy"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "dec:ai_host_strategy:62.217.52.177",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:08:08Z",
+   "payload": {
+    "action": "scan",
+    "priority": 3,
+    "reasoning": "test.vectigal.tech hat kein Web-Content (has_web=false), aber als Test-Subdomain der Domain sollte Port-Scan + TLS-Check durchgeführt werden um potenzielle offene Management-Ports oder schwache Konfigurationen zu erkennen."
+   },
+   "source": "ai_host_strategy"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 6, \"zap_ajax_spider_enabled\": true, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\", \"pathtr...",
+     "ref": "scan_results:ai_phase2_config:62.217.52.165",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "dec:ai_phase2_config:62.217.52.165",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:09:45Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:spa-ajax",
+    "skip_tools": [
+     "wpscan"
+    ],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "cmdi",
+     "pathtraversal"
+    ],
+    "zap_ajax_spider_enabled": true,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 60,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 6,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"passive-only\", \"zap_spider_max_depth\": 3, \"zap_ajax_spider_enabled\": false, \"zap_active_categories\": [], \"zap_rate_req_per_sec\": 80, \"z...",
+     "ref": "scan_results:ai_phase2_config:62.217.52.177",
+     "tool": "ai_phase2_config"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "dec:ai_phase2_config:62.217.52.177",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:09:48Z",
+   "payload": {
+    "reasoning": "Host hat keine erreichbare Web-Anwendung (has_web=false, Connection Refused auf HTTP). Redirect zeigt HTTPS-Ziel, aber keine Inhalte verfügbar. Keine CMS, keine Technologien, keine WAF erkannt. ZAP wird auf passive-only gesetzt (WebCheck-Default für nicht-erreichbare Hosts). Active Scanning und feroxbuster sind sinnlos ohne Web-Content. Spider-Tiefe minimal (3), keine AJAX-Spider nötig (keine SPA). Passive Scans können dennoch Metadaten und Konfigurationsfehler aufdecken.",
+    "skip_tools": [
+     "feroxbuster"
+    ],
+    "zap_active_categories": [],
+    "zap_ajax_spider_enabled": false,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 80,
+    "zap_scan_policy": "passive-only",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 3,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"system_prompt\": \"Du bist ein Security-Scanner-Orchestrator. Du konfigurierst Phase-2-Scan-Tools optimal basierend auf dem erkannten Tech-Stack eines Hosts...",
+     "ref": "scan_results:ai_phase2_config_debug:62.217.52.177",
+     "tool": "ai_phase2_config_debug"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "62.217.52.177",
+   "id": "dec:ai_phase2_config_debug:62.217.52.177",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:09:48Z",
+   "payload": {
+    "cache_hit": false,
+    "model": "claude-haiku-4-5-20251001",
+    "status": "ok"
+   },
+   "source": "ai_phase2_config_debug"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"zap_scan_policy\": \"standard\", \"zap_spider_max_depth\": 6, \"zap_ajax_spider_enabled\": true, \"zap_active_categories\": [ \"sqli\", \"xss\", \"lfi\", \"cmdi\", \"pathtr...",
+     "ref": "scan_results:ai_phase2_config_rule_based:62.217.52.165",
+     "tool": "ai_phase2_config_rule_based"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": "62.217.52.165",
+   "id": "dec:ai_phase2_config_rule_based:62.217.52.165",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:09:45Z",
+   "payload": {
+    "_rule_based": true,
+    "reasoning": "[RULE-BASED] rule:spa-ajax",
+    "skip_tools": [
+     "wpscan"
+    ],
+    "zap_active_categories": [
+     "sqli",
+     "xss",
+     "lfi",
+     "cmdi",
+     "pathtraversal"
+    ],
+    "zap_ajax_spider_enabled": true,
+    "zap_extra_urls": [],
+    "zap_rate_req_per_sec": 60,
+    "zap_scan_policy": "standard",
+    "zap_spider_delay_ms": 0,
+    "zap_spider_max_depth": 6,
+    "zap_threads": 5
+   },
+   "source": "ai_phase2_config_rule_based"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=6 < 5 ODER tools=2 <= 1 ODER cve=False",
+     "ref": "phase3/ai_prioritization.json",
+     "tool": "ai_prioritization"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:ai_prioritization:scan",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:13:52Z",
+   "payload": {
+    "confidence_scores": 0,
+    "skipped_by_gate": true,
+    "strategy_notes": "[SKIP-GATE] Cross-Tool-Korrelation uebersprungen: findings=6 < 5 ODER tools=2 <= 1 ODER cve=False"
+   },
+   "source": "ai_prioritization"
+  },
+  {
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "{ \"cisa_kev_matches\": 0, \"cves_enriched\": 0, \"false_positives\": 0, \"total_findings\": 6, \"valid_findings\": 6 }",
+     "ref": "scan_results:phase3_correlation",
+     "tool": "phase3_correlation"
+    }
+   ],
+   "fqdn": null,
+   "host_ip": null,
+   "id": "dec:phase3_correlation:scan",
+   "mode": "active",
+   "note": "Bilanz der Korrelation, kein Befund.",
+   "observed_at": "2026-09-20T09:13:52Z",
+   "payload": {
+    "cisa_kev_matches": 0,
+    "cves_enriched": 0,
+    "false_positives": 0,
+    "fp_by_reason": {},
+    "total_findings": 6,
+    "valid_findings": 6
+   },
+   "source": "phase3_correlation"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "10FINANCE Stabilitäts-Quickcheck prüft Finanzstabilität via Golang net/http server.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "10finance.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "dec:site_summary:10finance.vectigal.tech",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:07:59Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "10FINANCE Stabilitäts-Quickcheck prüft Finanzstabilität via Golang net/http server.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "HTTP 401 — keine erreichbare Webseite",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "agent.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "dec:site_summary:agent.vectigal.tech",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:07:59Z",
+   "payload": {
+    "classification": "error",
+    "confidence": 1.0,
+    "description": "HTTP 401 — keine erreichbare Webseite",
+    "is_real_content": false
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Paperclip ist ein Projektmanagement-Tool mit Golang net/http server.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "board.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "dec:site_summary:board.vectigal.tech",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:07:59Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Paperclip ist ein Projektmanagement-Tool mit Golang net/http server.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Twenty ist ein CRM-System auf Golang net/http server Basis.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "crm.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "dec:site_summary:crm.vectigal.tech",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:07:59Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Twenty ist ein CRM-System auf Golang net/http server Basis.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Streamlit-basierte CRM-Viewer-Anwendung auf Golang net/http server.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "crmviewer.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "dec:site_summary:crmviewer.vectigal.tech",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:07:59Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "Streamlit-basierte CRM-Viewer-Anwendung auf Golang net/http server.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "Golang net/http server",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "feedgenerator.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "dec:site_summary:feedgenerator.vectigal.tech",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:07:59Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.7,
+    "description": "Golang net/http server",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "HTTP 404 — keine erreichbare Webseite",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "gutachter-api.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "dec:site_summary:gutachter-api.vectigal.tech",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:07:59Z",
+   "payload": {
+    "classification": "error",
+    "confidence": 1.0,
+    "description": "HTTP 404 — keine erreichbare Webseite",
+    "is_real_content": false
+   },
+   "source": "site_summary"
+  },
+  {
+   "confidence": 0.8,
+   "evidence": [
+    {
+     "excerpt": "gutachter.ai bietet KI-gestützte Gutachten auf Golang net/http server.",
+     "ref": "phase0/host_inventory.json",
+     "tool": "site_summary"
+    }
+   ],
+   "fqdn": "gutachter.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "id": "dec:site_summary:gutachter.vectigal.tech",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:07:59Z",
+   "payload": {
+    "classification": "web_content",
+    "confidence": 0.95,
+    "description": "gutachter.ai bietet KI-gestützte Gutachten auf Golang net/http server.",
+    "is_real_content": true
+   },
+   "source": "site_summary"
+  }
+ ],
+ "dns": [
+  {
+   "bimi": null,
+   "caa": {
+    "issuers": [],
+    "present": false,
+    "records": []
+   },
+   "confidence": 1.0,
+   "dane": null,
+   "dangling_cnames": [],
+   "dkim": {
+    "present": false,
+    "selectors": []
+   },
+   "dmarc": {
+    "adkim": "r",
+    "aspf": "r",
+    "p": null,
+    "pct": 100,
+    "present": false,
+    "raw": null,
+    "rua": [],
+    "ruf": [],
+    "sp": null
+   },
+   "dnssec": {
+    "issues": [
+     "Domain is not DNSSEC-signed"
+    ],
+    "signed": false,
+    "valid": false
+   },
+   "domain": "vectigal.tech",
+   "evidence": [
+    {
+     "excerpt": "spf=None dmarc=None dkim=False mx=[]",
+     "ref": "phase0/dns_records.json",
+     "tool": "dns_records"
+    },
+    {
+     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "ref": "phase0a/dns_security.json",
+     "tool": "dns_security"
+    }
+   ],
+   "id": "dns:vectigal.tech",
+   "mode": "active",
+   "mta_sts": {
+    "dns_record": false,
+    "mode": null,
+    "policy": false
+   },
+   "mx": [],
+   "ns": [
+    "ns1a.dodns.net",
+    "ns2a.dodns.net"
+   ],
+   "observed_at": "2026-09-20T09:07:30Z",
+   "source": "dns_records",
+   "spf": null,
+   "tls_rpt": {
+    "present": false,
+    "rua": []
+   },
+   "zone_transfer": {
+    "allowed": false,
+    "ns_tested": []
+   }
+  },
+  {
+   "bimi": null,
+   "caa": {
+    "issuers": [],
+    "present": false,
+    "records": []
+   },
+   "confidence": 1.0,
+   "dane": null,
+   "dangling_cnames": [],
+   "dkim": {
+    "present": false,
+    "selectors": []
+   },
+   "dmarc": {
+    "adkim": "r",
+    "aspf": "r",
+    "p": "none",
+    "pct": 100,
+    "present": true,
+    "raw": "v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de",
+    "rua": [
+     "mailto:dmarc@vectiscan.de"
+    ],
+    "ruf": [],
+    "sp": null
+   },
+   "dnssec": {
+    "issues": [
+     "Domain is not DNSSEC-signed"
+    ],
+    "signed": false,
+    "valid": false
+   },
+   "domain": "vectiscan.de",
+   "evidence": [
+    {
+     "excerpt": "spf=None dmarc=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de dkim=False mx=['mx00.udag.de', 'mx01.udag.de']",
+     "ref": "phase0/dns_records_vectiscan.de.json",
+     "tool": "dns_records"
+    },
+    {
+     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "ref": "phase0a/dns_security_vectiscan.de.json",
+     "tool": "dns_security"
+    }
+   ],
+   "id": "dns:vectiscan.de",
+   "mode": "active",
+   "mta_sts": {
+    "dns_record": false,
+    "mode": null,
+    "policy": false
+   },
+   "mx": [
+    "mx00.udag.de",
+    "mx01.udag.de"
+   ],
+   "ns": [
+    "ns.udag.de",
+    "ns.udag.net",
+    "ns.udag.org"
+   ],
+   "observed_at": "2026-09-20T09:07:30Z",
+   "source": "dns_records",
+   "spf": null,
+   "tls_rpt": {
+    "present": false,
+    "rua": []
+   },
+   "zone_transfer": null
+  }
+ ],
+ "fqdns": [
+  {
+   "aliases": [],
+   "body_hash": "4d43b74617240f52fc82f14bfb74c6ee114af0f122b42c47472a515eeceafe7b",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "10finance.vectigal.tech: status=200 title=10FINANCE Stabilitäts-Quickcheck final_url=https://10finance.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://10finance.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "http_status": 200,
+   "id": "fqdn:10finance.vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "name": "10finance.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__10finance.vectigal.tech.png",
+   "source": "web_probe",
+   "title": "10FINANCE Stabilitäts-Quickcheck",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": "f5f62f712f3f30c09c7202f15179a2d76a8af46cd08838268862303f189b00e9",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "agent.vectigal.tech: status=401 title= final_url=https://agent.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://agent.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "http_status": 401,
+   "id": "fqdn:agent.vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "name": "agent.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "auth.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:auth.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "auth.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": "116271e05f7fe8e0d03530289b974c7862e456d50a5c41a7d4a4a1d1e0bb99a3",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "board.vectigal.tech: status=200 title=Paperclip final_url=https://board.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://board.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "http_status": 200,
+   "id": "fqdn:board.vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "name": "board.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__board.vectigal.tech.png",
+   "source": "web_probe",
+   "title": "Paperclip",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": "024af07ba765df09131115b3d5e8bf285aeaa7d64ebb59b055e0ad13cc20a0ec",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "crm.vectigal.tech: status=200 title=Twenty final_url=https://crm.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://crm.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "http_status": 200,
+   "id": "fqdn:crm.vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "name": "crm.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crm.vectigal.tech.png",
+   "source": "web_probe",
+   "title": "Twenty",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": "f270430e64b19a95c8c5f3279b0519675f5d893047361fa020f33a0e08d24b06",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "crmviewer.vectigal.tech: status=200 title=Streamlit final_url=https://crmviewer.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://crmviewer.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "http_status": 200,
+   "id": "fqdn:crmviewer.vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "name": "crmviewer.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__crmviewer.vectigal.tech.png",
+   "source": "web_probe",
+   "title": "Streamlit",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": "6c97e9b0c85720c18cdd5f3257fd886b8bca617b719fb143e36ec6efb0424a32",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "feedgenerator.vectigal.tech: status=200 title= final_url=https://feedgenerator.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://feedgenerator.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "http_status": 200,
+   "id": "fqdn:feedgenerator.vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "name": "feedgenerator.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": "7624c3765af10ed3b6eb9e50f416066457b419bf3d6e57f99a0ba18d3598ce6b",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "gutachter-api.vectigal.tech: status=404 title= final_url=https://gutachter-api.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://gutachter-api.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "http_status": 404,
+   "id": "fqdn:gutachter-api.vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "name": "gutachter-api.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": "632423e75aeb805ac4bfefb5c4d286eab8575ca599223fc6bef25bf69b99dab0",
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "gutachter.vectigal.tech: status=200 title=gutachter.ai final_url=https://gutachter.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": "https://gutachter.vectigal.tech",
+   "host_ip": "62.217.52.165",
+   "http_status": 200,
+   "id": "fqdn:gutachter.vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "name": "gutachter.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": "75338c97-6707-4d11-92bf-bb3cd2e02cde/62.217.52.165__gutachter.vectigal.tech.png",
+   "source": "web_probe",
+   "title": "gutachter.ai",
+   "waf": {
+    "detected": false,
+    "manufacturer": null,
+    "name": null
+   },
+   "web_probe_reachable": true
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "id.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:id.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "id.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "ki-check-10finance.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:ki-check-10finance.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "ki-check-10finance.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "ki-check.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:ki-check.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "ki-check.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "logs.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:logs.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "logs.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "mcp-test.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:mcp-test.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "mcp-test.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "monitoring.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:monitoring.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "monitoring.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "page.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:page.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "page.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "protokoll-assist.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:protokoll-assist.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "protokoll-assist.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "rankingcoach.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:rankingcoach.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "rankingcoach.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "saferouter-admin.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:saferouter-admin.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "saferouter-admin.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "saferouter-api.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:saferouter-api.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "saferouter-api.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "saferouter-app.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:saferouter-app.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "saferouter-app.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "saferouter-auth.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:saferouter-auth.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "saferouter-auth.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "saferouter-www.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:saferouter-www.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "saferouter-www.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "scan-api.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:scan-api.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "scan-api.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "scan.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:scan.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "scan.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "shopify.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:shopify.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "shopify.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "status.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:status.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "status.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "test.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.177",
+   "http_status": null,
+   "id": "fqdn:test.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "test.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "traefik.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:traefik.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "traefik.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  },
+  {
+   "aliases": [],
+   "body_hash": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "webcheck.vectigal.tech: status=None title=None final_url=None",
+     "ref": "phase0/host_inventory.json",
+     "tool": "web_probe"
+    }
+   ],
+   "final_url": null,
+   "host_ip": "62.217.52.165",
+   "http_status": null,
+   "id": "fqdn:webcheck.vectigal.tech",
+   "is_primary": null,
+   "mode": "active",
+   "name": "webcheck.vectigal.tech",
+   "observed_at": "2026-09-20T09:07:59Z",
+   "screenshot_key": null,
+   "source": "web_probe",
+   "title": null,
+   "waf": null,
+   "web_probe_reachable": null
+  }
+ ],
+ "generator": {
+  "inputs": [
+   {
+    "kind": "tar",
+    "name": "75338c97-6707-4d11-92bf-bb3cd2e02cde.tar.gz",
+    "sha256": "5bdee9cdb93dd42afc5e39c7e30ff2d0a7e5dab47f79a72ef19bf8bd7fa57f7a"
+   },
+   {
+    "kind": "tool_runs",
+    "name": "results.json",
+    "sha256": "f0cf564195dc746954f64974cd35b2b54d0352585b9f5a4a72a99b046be3d9ae"
+   },
+   {
+    "kind": "eol_feed",
+    "name": "eol_data_generated.py",
+    "sha256": "35b5eb969453fa4788c9b973bbd5988391e18ee83a5e221f1d13602436929372"
+   }
+  ],
+  "name": "reporter.facts",
+  "version": "1.0.0"
+ },
+ "hosts": [
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Sun Sep 20 09:08:29 2026; 1 IP address (1 host up) scanned in 20.26 seconds",
+     "ref": "hosts/62.217.52.165/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=62.217.52.165 rdns= fqdns=vectigal.tech,10finance.vectigal.tech,agent.vectigal.tech,auth.vectigal.tech,board.vectigal.tech,crm.vectigal.tech,crmviewer.vectigal.tech,feedgenerator.vectigal.tech,g...",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "10finance.vectigal.tech",
+    "agent.vectigal.tech",
+    "auth.vectigal.tech",
+    "board.vectigal.tech",
+    "crm.vectigal.tech",
+    "crmviewer.vectigal.tech",
+    "feedgenerator.vectigal.tech",
+    "gutachter-api.vectigal.tech",
+    "gutachter.vectigal.tech",
+    "id.vectigal.tech",
+    "ki-check-10finance.vectigal.tech",
+    "ki-check.vectigal.tech",
+    "logs.vectigal.tech",
+    "mcp-test.vectigal.tech",
+    "monitoring.vectigal.tech",
+    "page.vectigal.tech",
+    "protokoll-assist.vectigal.tech",
+    "rankingcoach.vectigal.tech",
+    "saferouter-admin.vectigal.tech",
+    "saferouter-api.vectigal.tech",
+    "saferouter-app.vectigal.tech",
+    "saferouter-auth.vectigal.tech",
+    "saferouter-www.vectigal.tech",
+    "scan-api.vectigal.tech",
+    "scan.vectigal.tech",
+    "shopify.vectigal.tech",
+    "status.vectigal.tech",
+    "traefik.vectigal.tech",
+    "vectigal.tech",
+    "webcheck.vectigal.tech"
+   ],
+   "id": "host:62.217.52.165",
+   "ip": "62.217.52.165",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-09-20T09:08:29Z",
+   "ports_summary": {
+    "closed": 1,
+    "filtered": 97,
+    "open": 2
+   },
+   "provider": null,
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": null,
+    "greynoise_classification": null,
+    "is_tor": null,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": null,
+   "source": "nmap"
+  },
+  {
+   "blocked": {
+    "detected": false,
+    "reason": null,
+    "source": null
+   },
+   "cdn_provider": null,
+   "confidence": 1.0,
+   "edge_ips": [],
+   "evidence": [
+    {
+     "excerpt": "Nmap done at Sun Sep 20 09:08:15 2026; 1 IP address (1 host up) scanned in 6.98 seconds",
+     "ref": "hosts/62.217.52.177/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "ip=62.217.52.177 rdns= fqdns=test.vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "family": 4,
+   "fqdns": [
+    "test.vectigal.tech"
+   ],
+   "id": "host:62.217.52.177",
+   "ip": "62.217.52.177",
+   "mode": "active",
+   "nmap_state": "up",
+   "observed_at": "2026-09-20T09:08:15Z",
+   "ports_summary": {
+    "closed": null,
+    "filtered": null,
+    "open": 0
+   },
+   "provider": null,
+   "reachable": true,
+   "reputation": {
+    "abuseipdb_score": null,
+    "greynoise_classification": null,
+    "is_tor": null,
+    "otx_pulse_count": 0,
+    "urlhaus_compromised": null
+   },
+   "reverse": null,
+   "source": "nmap"
+  }
+ ],
+ "http": [
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": false,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "10finance.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "ref": "hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "10finance.vectigal.tech: status=200 title=10FINANCE Stabilitäts-Quickcheck webserver=None tech=['HSTS', 'Unpkg']",
+     "ref": "hosts/62.217.52.165/phase2/httpx_10finance.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "10finance.vectigal.tech",
+   "headers": {
+    "accept-ranges": "bytes",
+    "cache-control": "public, max-age=0",
+    "content-length": "1600",
+    "content-type": "text/html; charset=UTF-8",
+    "date": "Sun, 20 Sep 2026 09:09:50 GMT",
+    "etag": "W/\"640-1a032bf02b0\"",
+    "last-modified": "Mon, 24 Aug 2026 07:49:34 GMT",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "1; mode=block"
+   },
+   "host_ip": "62.217.52.165",
+   "hsts": {
+    "include_subdomains": true,
+    "max_age": 31536000,
+    "preload": true,
+    "present": true,
+    "raw": "max-age=31536000; includeSubDomains; preload"
+   },
+   "id": "http:10finance.vectigal.tech",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "5/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": true,
+     "value": "strict-origin-when-cross-origin"
+    },
+    "strict-transport-security": {
+     "present": true,
+     "value": "max-age=31536000; includeSubDomains; preload"
+    },
+    "x-content-type-options": {
+     "present": true,
+     "value": "nosniff"
+    },
+    "x-frame-options": {
+     "present": true,
+     "value": "DENY"
+    },
+    "x-xss-protection": {
+     "present": true,
+     "value": "1; mode=block"
+    }
+   },
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "HSTS",
+     "version": null
+    },
+    {
+     "name": "Unpkg",
+     "version": null
+    }
+   ],
+   "url": "https://10finance.vectigal.tech",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": false,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "board.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "ref": "hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "board.vectigal.tech: status=200 title=Paperclip webserver=None tech=['HSTS']",
+     "ref": "hosts/62.217.52.165/phase2/httpx_board.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "board.vectigal.tech",
+   "headers": {
+    "accept-ranges": "bytes",
+    "cache-control": "no-cache",
+    "content-length": "2243",
+    "content-type": "text/html; charset=utf-8",
+    "date": "Sun, 20 Sep 2026 09:09:50 GMT",
+    "etag": "W/\"8c3-1a032ef5d98\"",
+    "last-modified": "Mon, 24 Aug 2026 08:42:23 GMT",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "1; mode=block"
+   },
+   "host_ip": "62.217.52.165",
+   "hsts": {
+    "include_subdomains": true,
+    "max_age": 31536000,
+    "preload": true,
+    "present": true,
+    "raw": "max-age=31536000; includeSubDomains; preload"
+   },
+   "id": "http:board.vectigal.tech",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "5/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": true,
+     "value": "strict-origin-when-cross-origin"
+    },
+    "strict-transport-security": {
+     "present": true,
+     "value": "max-age=31536000; includeSubDomains; preload"
+    },
+    "x-content-type-options": {
+     "present": true,
+     "value": "nosniff"
+    },
+    "x-frame-options": {
+     "present": true,
+     "value": "DENY"
+    },
+    "x-xss-protection": {
+     "present": true,
+     "value": "1; mode=block"
+    }
+   },
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "HSTS",
+     "version": null
+    }
+   ],
+   "url": "https://board.vectigal.tech",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": false,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "crm.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "ref": "hosts/62.217.52.165/phase2/headers_crm.vectigal.tech.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "crm.vectigal.tech: status=200 title=Twenty webserver=None tech=['HSTS']",
+     "ref": "hosts/62.217.52.165/phase2/httpx_crm.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "crm.vectigal.tech",
+   "headers": {
+    "accept-ranges": "bytes",
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate",
+    "cache-control": "public, max-age=0",
+    "content-length": "2510",
+    "content-type": "text/html; charset=UTF-8",
+    "date": "Sun, 20 Sep 2026 09:09:50 GMT",
+    "etag": "W/\"9ce-1a08b6c0308\"",
+    "last-modified": "Thu, 10 Sep 2026 13:05:06 GMT",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "1; mode=block"
+   },
+   "host_ip": "62.217.52.165",
+   "hsts": {
+    "include_subdomains": true,
+    "max_age": 31536000,
+    "preload": true,
+    "present": true,
+    "raw": "max-age=31536000; includeSubDomains; preload"
+   },
+   "id": "http:crm.vectigal.tech",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "5/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": true,
+     "value": "strict-origin-when-cross-origin"
+    },
+    "strict-transport-security": {
+     "present": true,
+     "value": "max-age=31536000; includeSubDomains; preload"
+    },
+    "x-content-type-options": {
+     "present": true,
+     "value": "nosniff"
+    },
+    "x-frame-options": {
+     "present": true,
+     "value": "DENY"
+    },
+    "x-xss-protection": {
+     "present": true,
+     "value": "1; mode=block"
+    }
+   },
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "HSTS",
+     "version": null
+    }
+   ],
+   "url": "https://crm.vectigal.tech",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": false,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "crmviewer.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "ref": "hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "crmviewer.vectigal.tech: status=200 title=Streamlit webserver=None tech=['HSTS']",
+     "ref": "hosts/62.217.52.165/phase2/httpx_crmviewer.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "crmviewer.vectigal.tech",
+   "headers": {
+    "accept-ranges": "bytes",
+    "cache-control": "no-cache",
+    "content-length": "11141",
+    "content-type": "text/html; charset=utf-8",
+    "date": "Sun, 20 Sep 2026 09:09:50 GMT",
+    "etag": "\"75dfe2247e380e332b7e2e54963e825b\"",
+    "last-modified": "Mon, 24 Aug 2026 09:48:21 GMT",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "1; mode=block"
+   },
+   "host_ip": "62.217.52.165",
+   "hsts": {
+    "include_subdomains": true,
+    "max_age": 31536000,
+    "preload": true,
+    "present": true,
+    "raw": "max-age=31536000; includeSubDomains; preload"
+   },
+   "id": "http:crmviewer.vectigal.tech",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "5/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": true,
+     "value": "strict-origin-when-cross-origin"
+    },
+    "strict-transport-security": {
+     "present": true,
+     "value": "max-age=31536000; includeSubDomains; preload"
+    },
+    "x-content-type-options": {
+     "present": true,
+     "value": "nosniff"
+    },
+    "x-frame-options": {
+     "present": true,
+     "value": "DENY"
+    },
+    "x-xss-protection": {
+     "present": true,
+     "value": "1; mode=block"
+    }
+   },
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "HSTS",
+     "version": null
+    }
+   ],
+   "url": "https://crmviewer.vectigal.tech",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": {
+    "present": false,
+    "unsafe_eval": null,
+    "unsafe_inline": null,
+    "value": null,
+    "wildcard": null
+   },
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "gutachter.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None",
+     "ref": "hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "gutachter.vectigal.tech: status=200 title=gutachter.ai webserver=None tech=['HSTS', 'Node.js', 'Nuxt.js', 'Vue.js']",
+     "ref": "hosts/62.217.52.165/phase2/httpx_gutachter.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "forms": [],
+   "fqdn": "gutachter.vectigal.tech",
+   "headers": {
+    "content-type": "text/html;charset=utf-8",
+    "date": "Sun, 20 Sep 2026 09:09:50 GMT",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "x-xss-protection": "1; mode=block"
+   },
+   "host_ip": "62.217.52.165",
+   "hsts": {
+    "include_subdomains": true,
+    "max_age": 31536000,
+    "preload": true,
+    "present": true,
+    "raw": "max-age=31536000; includeSubDomains; preload"
+   },
+   "id": "http:gutachter.vectigal.tech",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:50Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": true,
+   "score": "5/7",
+   "security_headers": {
+    "content-security-policy": {
+     "present": false,
+     "value": null
+    },
+    "permissions-policy": {
+     "present": false,
+     "value": null
+    },
+    "referrer-policy": {
+     "present": true,
+     "value": "strict-origin-when-cross-origin"
+    },
+    "strict-transport-security": {
+     "present": true,
+     "value": "max-age=31536000; includeSubDomains; preload"
+    },
+    "x-content-type-options": {
+     "present": true,
+     "value": "nosniff"
+    },
+    "x-frame-options": {
+     "present": true,
+     "value": "DENY"
+    },
+    "x-xss-protection": {
+     "present": true,
+     "value": "1; mode=block"
+    }
+   },
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": 200,
+   "technologies": [
+    {
+     "name": "HSTS",
+     "version": null
+    },
+    {
+     "name": "Node.js",
+     "version": null
+    },
+    {
+     "name": "Nuxt.js",
+     "version": null
+    },
+    {
+     "name": "Vue.js",
+     "version": null
+    }
+   ],
+   "url": "https://gutachter.vectigal.tech",
+   "wordpress": null,
+   "x_feserver": null
+  },
+  {
+   "alerts": [],
+   "confidence": 1.0,
+   "cookies": [],
+   "csp": null,
+   "duplicate_headers": [],
+   "evidence": [
+    {
+     "excerpt": "test.vectigal.tech: reachable=False score=None server=None x-feserver=None",
+     "ref": "hosts/62.217.52.177/phase2/headers_test.vectigal.tech.json",
+     "tool": "header_check"
+    }
+   ],
+   "forms": [],
+   "fqdn": "test.vectigal.tech",
+   "headers": {},
+   "host_ip": "62.217.52.177",
+   "hsts": null,
+   "id": "http:test.vectigal.tech",
+   "login_form": null,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:13:51Z",
+   "paths": [],
+   "powered_by": null,
+   "reachable": false,
+   "score": null,
+   "security_headers": {},
+   "server_header": null,
+   "source": "header_check",
+   "spider_url_count": null,
+   "status_code": null,
+   "technologies": [],
+   "url": "https://test.vectigal.tech",
+   "wordpress": null,
+   "x_feserver": null
+  }
+ ],
+ "passive": [
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "pulse_count": 0
+   },
+   "domain": "vectigal.tech",
+   "evidence": [
+    {
+     "excerpt": "pulse_count=0",
+     "ref": "phase0a/otx.json",
+     "tool": "otx"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:otx:vectigal.tech",
+   "mode": "passive",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "otx",
+   "transport": null,
+   "verified": null,
+   "version": null
+  },
+  {
+   "banner_excerpt": null,
+   "confidence": 0.5,
+   "details": {
+    "compromised": false
+   },
+   "domain": "vectigal.tech",
+   "evidence": [
+    {
+     "excerpt": "OK: no_data",
+     "ref": "scan_results:urlhaus",
+     "tool": "urlhaus"
+    }
+   ],
+   "host_ip": null,
+   "hostnames": [],
+   "id": "passive:urlhaus:vectigal.tech",
+   "mode": "passive",
+   "observed_at": "2026-09-20T09:07:29Z",
+   "port": null,
+   "product": null,
+   "seen_at": null,
+   "source": "urlhaus",
+   "transport": null,
+   "verified": null,
+   "version": null
+  }
+ ],
+ "scan": {
+  "confidence": 1.0,
+  "counts": {
+   "correlated_findings": 6,
+   "correlated_fp": 0,
+   "tool_runs": 78
+  },
+  "domain": "vectigal.tech",
+  "domains": [
+   "vectigal.tech",
+   "vectiscan.de"
+  ],
+  "evidence": [
+   {
+    "excerpt": "startedAt=2026-09-20T09:07:28.885467+00:00 finishedAt=2026-09-20T09:13:52.775772+00:00",
+    "ref": "meta.json",
+    "tool": "meta"
+   }
+  ],
+  "finished_at": "2026-09-20T09:13:52Z",
+  "hosts_scanned": 2,
+  "id": "scan:75338c97-6707-4d11-92bf-bb3cd2e02cde",
+  "mode": "active",
+  "nmap_args": "nmap -Pn -n -sV --version-intensity 7 -sC --script-timeout 60s -T4 --max-retries 2 --host-timeout 240s --min-rate 100 --defeat-rst-ratelimit --top-ports 100 --open -oX <scan-dir> -oN <scan-dir> --reason 62.217.52.165",
+  "observed_at": "2026-09-20T09:13:52Z",
+  "order_id": "75338c97-6707-4d11-92bf-bb3cd2e02cde",
+  "package": "webcheck",
+  "policy_version": null,
+  "scanner_egress": null,
+  "source": "meta",
+  "started_at": "2026-09-20T09:07:28Z",
+  "tool_versions": [
+   {
+    "name": "dnsx",
+    "version": null
+   },
+   {
+    "name": "feroxbuster",
+    "version": "2.11.0"
+   },
+   {
+    "name": "ffuf",
+    "version": "2.1.0"
+   },
+   {
+    "name": "gobuster",
+    "version": null
+   },
+   {
+    "name": "httpx",
+    "version": null
+   },
+   {
+    "name": "nmap",
+    "version": "7.93"
+   },
+   {
+    "name": "searchsploit",
+    "version": null
+   },
+   {
+    "name": "subfinder",
+    "version": "2.13.0"
+   },
+   {
+    "name": "testssl.sh",
+    "version": null
+   },
+   {
+    "name": "wafw00f",
+    "version": null
+   },
+   {
+    "name": "wpscan",
+    "version": null
+   }
+  ]
+ },
+ "schema_version": "1.0.2",
+ "services": [
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": null,
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "80/tcp open http Golang net/http server (Go-IPFS json-rpc or InfluxDB API)",
+     "ref": "hosts/62.217.52.165/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "golang_net_http_server",
+   "host_ip": "62.217.52.165",
+   "id": "svc:62.217.52.165:80/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-20T09:08:29Z",
+   "port": 80,
+   "product": "Golang net/http server",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": null,
+   "tunnel_ssl": false,
+   "version_norm": null,
+   "version_raw": null
+  },
+  {
+   "auth_mechanisms": [],
+   "auth_required": null,
+   "capabilities": [],
+   "cert": {
+    "cn": "TRAEFIK DEFAULT CERT",
+    "not_after": "2027-09-20T09:03:44Z",
+    "san": [
+     "b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default"
+    ]
+   },
+   "confidence": 1.0,
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Golang net/http server (Go-IPFS json-rpc or InfluxDB API) tunnel=ssl",
+     "ref": "hosts/62.217.52.165/phase1/nmap.xml",
+     "tool": "nmap"
+    }
+   ],
+   "family": "golang_net_http_server",
+   "host_ip": "62.217.52.165",
+   "id": "svc:62.217.52.165:443/tcp",
+   "login_disabled": null,
+   "method": "probed",
+   "mode": "active",
+   "nmap_conf": 10,
+   "observed_at": "2026-09-20T09:08:29Z",
+   "port": 443,
+   "product": "Golang net/http server",
+   "proto": "tcp",
+   "service": "http",
+   "source": "nmap",
+   "starttls": null,
+   "state": "open",
+   "tls_required": true,
+   "tunnel_ssl": true,
+   "version_norm": null,
+   "version_raw": null
+  }
+ ],
+ "software": [
+  {
+   "build": null,
+   "confidence": 1.0,
+   "detection_sources": [
+    "nmap",
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "443/tcp open http Golang net/http server (Go-IPFS json-rpc or InfluxDB API) tunnel=ssl",
+     "ref": "hosts/62.217.52.165/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "80/tcp open http Golang net/http server (Go-IPFS json-rpc or InfluxDB API)",
+     "ref": "hosts/62.217.52.165/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "server: Golang net/http server",
+     "ref": "hosts/62.217.52.165/phase1/tech_profile.json",
+     "tool": "webtech"
+    },
+    {
+     "excerpt": "technologies: Golang net/http server",
+     "ref": "hosts/62.217.52.165/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "golang_net_http_server",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "62.217.52.165",
+   "id": "sw:62.217.52.165:-:golang_net_http_server:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:08:29Z",
+   "product": "Golang net/http server",
+   "source": "nmap",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: HSTS",
+     "ref": "hosts/62.217.52.165/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "hsts",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "62.217.52.165",
+   "id": "sw:62.217.52.165:-:hsts:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:08:50Z",
+   "product": "HSTS",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: Nuxt.js",
+     "ref": "hosts/62.217.52.165/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "nuxt_js",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "62.217.52.165",
+   "id": "sw:62.217.52.165:-:nuxt_js:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:08:50Z",
+   "product": "Nuxt.js",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "webtech"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "technologies: React",
+     "ref": "hosts/62.217.52.165/phase1/tech_profile.json",
+     "tool": "webtech"
+    }
+   ],
+   "family": "react",
+   "fqdn": null,
+   "hints": [],
+   "host_ip": "62.217.52.165",
+   "id": "sw:62.217.52.165:-:react:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:08:50Z",
+   "product": "React",
+   "source": "webtech",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Unpkg",
+     "ref": "hosts/62.217.52.165/phase2/httpx_10finance.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "unpkg",
+   "fqdn": "10finance.vectigal.tech",
+   "hints": [],
+   "host_ip": "62.217.52.165",
+   "id": "sw:62.217.52.165:10finance.vectigal.tech:unpkg:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:09:51Z",
+   "product": "Unpkg",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Node.js",
+     "ref": "hosts/62.217.52.165/phase2/httpx_gutachter.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "nodejs",
+   "fqdn": "gutachter.vectigal.tech",
+   "hints": [],
+   "host_ip": "62.217.52.165",
+   "id": "sw:62.217.52.165:gutachter.vectigal.tech:nodejs:unknown",
+   "kind": "language",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:09:51Z",
+   "product": "Node.js",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Nuxt.js",
+     "ref": "hosts/62.217.52.165/phase2/httpx_gutachter.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "nuxt_js",
+   "fqdn": "gutachter.vectigal.tech",
+   "hints": [],
+   "host_ip": "62.217.52.165",
+   "id": "sw:62.217.52.165:gutachter.vectigal.tech:nuxt_js:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:09:51Z",
+   "product": "Nuxt.js",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: Vue.js",
+     "ref": "hosts/62.217.52.165/phase2/httpx_gutachter.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "vue_js",
+   "fqdn": "gutachter.vectigal.tech",
+   "hints": [],
+   "host_ip": "62.217.52.165",
+   "id": "sw:62.217.52.165:gutachter.vectigal.tech:vue_js:unknown",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-09-20T09:09:51Z",
+   "product": "Vue.js",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  }
+ ],
+ "targets": [
+  {
+   "confidence": 1.0,
+   "discovery_health": {
+    "ct_sources_empty": false,
+    "discovery_added_count": 30,
+    "snapshot_age_minutes": null,
+    "snapshot_seed_count": 0,
+    "snapshot_seeded": false,
+    "tool_counts": {
+     "certspotter": 30,
+     "crtsh": 0,
+     "subfinder": 29
+    },
+    "tools_with_zero_results": [
+     "crtsh"
+    ],
+    "total_subdomains": 31
+   },
+   "domain": "vectigal.tech",
+   "evidence": [
+    {
+     "excerpt": "domain=vectigal.tech",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "id": "target:vectigal.tech",
+   "is_primary": true,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:28Z",
+   "out_of_scope": [],
+   "source": "host_inventory",
+   "targets_source": "orders.json",
+   "whois": null
+  },
+  {
+   "confidence": 1.0,
+   "discovery_health": null,
+   "domain": "vectiscan.de",
+   "evidence": [
+    {
+     "excerpt": "domain=vectiscan.de",
+     "ref": "phase0/host_inventory.json",
+     "tool": "host_inventory"
+    }
+   ],
+   "id": "target:vectiscan.de",
+   "is_primary": false,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:07:28Z",
+   "out_of_scope": [],
+   "source": "orders.json",
+   "targets_source": "orders.json",
+   "whois": null
+  }
+ ],
+ "threats": [],
+ "tls": [
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "10finance.vectigal.tech",
+    "days_left": 40,
+    "expired": false,
+    "issuer": "YR1",
+    "mismatch": null,
+    "not_after": "2026-10-31T07:42:52Z",
+    "not_before": "2026-08-02T07:42:53Z",
+    "san": [
+     "10finance.vectigal.tech"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "10finance.vectigal.tech:443 tls=tls13 cn=10finance.vectigal.tech not_after=2026-10-31T07:42:52Z mismatched=None",
+     "ref": "hosts/62.217.52.165/phase2/httpx_10finance.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "10finance.vectigal.tech",
+   "grade": null,
+   "host_ip": "62.217.52.165",
+   "hsts": null,
+   "id": "tls:10finance.vectigal.tech:443@62.217.52.165",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:52Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "board.vectigal.tech",
+    "days_left": 41,
+    "expired": false,
+    "issuer": "YR1",
+    "mismatch": null,
+    "not_after": "2026-11-01T07:42:54Z",
+    "not_before": "2026-08-03T07:42:55Z",
+    "san": [
+     "board.vectigal.tech"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "board.vectigal.tech:443 tls=tls13 cn=board.vectigal.tech not_after=2026-11-01T07:42:54Z mismatched=None",
+     "ref": "hosts/62.217.52.165/phase2/httpx_board.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "board.vectigal.tech",
+   "grade": null,
+   "host_ip": "62.217.52.165",
+   "hsts": null,
+   "id": "tls:board.vectigal.tech:443@62.217.52.165",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:51Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "crm.vectigal.tech",
+    "days_left": 44,
+    "expired": false,
+    "issuer": "YR2",
+    "mismatch": null,
+    "not_after": "2026-11-04T07:42:53Z",
+    "not_before": "2026-08-06T07:42:54Z",
+    "san": [
+     "crm.vectigal.tech"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "crm.vectigal.tech:443 tls=tls13 cn=crm.vectigal.tech not_after=2026-11-04T07:42:53Z mismatched=None",
+     "ref": "hosts/62.217.52.165/phase2/httpx.json",
+     "tool": "httpx"
+    },
+    {
+     "excerpt": "crm.vectigal.tech:443 tls=tls13 cn=crm.vectigal.tech not_after=2026-11-04T07:42:53Z mismatched=None",
+     "ref": "hosts/62.217.52.165/phase2/httpx_crm.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "crm.vectigal.tech",
+   "grade": null,
+   "host_ip": "62.217.52.165",
+   "hsts": null,
+   "id": "tls:crm.vectigal.tech:443@62.217.52.165",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:51Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "crmviewer.vectigal.tech",
+    "days_left": 85,
+    "expired": false,
+    "issuer": "YR1",
+    "mismatch": null,
+    "not_after": "2026-12-14T11:40:17Z",
+    "not_before": "2026-09-15T11:40:18Z",
+    "san": [
+     "crmviewer.vectigal.tech"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "crmviewer.vectigal.tech:443 tls=tls13 cn=crmviewer.vectigal.tech not_after=2026-12-14T11:40:17Z mismatched=None",
+     "ref": "hosts/62.217.52.165/phase2/httpx_crmviewer.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "crmviewer.vectigal.tech",
+   "grade": null,
+   "host_ip": "62.217.52.165",
+   "hsts": null,
+   "id": "tls:crmviewer.vectigal.tech:443@62.217.52.165",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:52Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": null,
+    "cn": "gutachter.vectigal.tech",
+    "days_left": 32,
+    "expired": false,
+    "issuer": "YR2",
+    "mismatch": null,
+    "not_after": "2026-10-23T07:42:53Z",
+    "not_before": "2026-07-25T07:42:54Z",
+    "san": [
+     "gutachter.vectigal.tech"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [],
+   "evidence": [
+    {
+     "excerpt": "gutachter.vectigal.tech:443 tls=tls13 cn=gutachter.vectigal.tech not_after=2026-10-23T07:42:53Z mismatched=None",
+     "ref": "hosts/62.217.52.165/phase2/httpx_gutachter.vectigal.tech.json",
+     "tool": "httpx"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "gutachter.vectigal.tech",
+   "grade": null,
+   "host_ip": "62.217.52.165",
+   "hsts": null,
+   "id": "tls:gutachter.vectigal.tech:443@62.217.52.165",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:53Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": null,
+    "SSLv3": null,
+    "TLS1.0": null,
+    "TLS1.1": null,
+    "TLS1.2": null,
+    "TLS1.3": true
+   },
+   "source": "httpx",
+   "vulns": []
+  },
+  {
+   "cert": {
+    "chain_ok": false,
+    "cn": "TRAEFIK DEFAULT CERT",
+    "days_left": 364,
+    "expired": false,
+    "issuer": "TRAEFIK DEFAULT CERT",
+    "mismatch": true,
+    "not_after": "2027-09-20T09:03:00Z",
+    "not_before": "2026-09-20T09:03:00Z",
+    "san": [
+     "b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default"
+    ],
+    "self_signed": null,
+    "wildcard": false
+   },
+   "ciphers_weak": [],
+   "confidence": 1.0,
+   "entries": [
+    {
+     "cve": null,
+     "finding": "HTTP",
+     "id": "service",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "No 128 cipher limit bug",
+     "id": "pre_128cipher",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "not offered",
+     "id": "SSLv2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "not offered",
+     "id": "SSLv3",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "not offered",
+     "id": "TLS1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "not offered",
+     "id": "TLS1_1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "offered",
+     "id": "TLS1_2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "offered with final",
+     "id": "TLS1_3",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "not offered",
+     "id": "NPN",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "h2",
+     "id": "ALPN_HTTP2",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "http/1.1",
+     "id": "ALPN",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "'server name/#0' 'EC point formats/#11' 'application layer protocol negotiation/#16' 'extended master secret/#23' 'session ticket/#35' 'supported versions/#43' 'key share/#51' 'renegotiation info/#65281'",
+     "id": "TLS_extensions",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "no -- no lifetime advertised",
+     "id": "TLS_session_ticket",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "yes",
+     "id": "SSL_sessionID_support",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "not supported",
+     "id": "sessionresumption_ticket",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "not supported",
+     "id": "sessionresumption_ID",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "random",
+     "id": "TLS_timestamp",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "none",
+     "id": "certificate_compression",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "none",
+     "id": "clientAuth",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "1",
+     "id": "cert_numbers",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "SHA256 with RSA",
+     "id": "cert_signatureAlgorithm",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "RSA 2048 bits (exponent is 65537)",
+     "id": "cert_keySize",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "Digital Signature, Key Encipherment, Data Encipherment, Key Agreement",
+     "id": "cert_keyUsage",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "TLS Web Server Authentication",
+     "id": "cert_extKeyUsage",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "CC618634D16C91C3DD40E61ABFD28DFF",
+     "id": "cert_serialNumber",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "16",
+     "id": "cert_serialNumberLen",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "C4EA5C83B0164EBD390753218526969DE16A0613",
+     "id": "cert_fingerprintSHA1",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "6BA05A8E3099D3C685019D38A7039A29630B482E28734812E1D951F23B17EC82",
+     "id": "cert_fingerprintSHA256",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "-----BEGIN CERTIFICATE-----\nMIIDXjCCAkagAwIBAgIRAMxhhjTRbJHD3UDmGr/Sjf8wDQYJKoZIhvcNAQELBQAwHzEdMBsGA1UEAxMUVFJBRUZJSyBERUZBVUxUIENFUlQwHhcNMjYwOTIwMDkwMzQ0WhcNMjcwOTIwMDkwMzQ0WjAfMR0wGwYDVQQDExRUUkFFRklLIERFRkFVTFQgQ0VSVDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMFL942qbJXwN6yQn4r476+NkfJGADf4thFH",
+     "id": "cert",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "TRAEFIK DEFAULT CERT",
+     "id": "cert_commonName",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "TRAEFIK DEFAULT CERT",
+     "id": "cert_commonName_wo_SNI",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default",
+     "id": "cert_subjectAltName",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "certificate does not match supplied URI (same w/o SNI)",
+     "id": "cert_trust",
+     "severity": "HIGH"
+    },
+    {
+     "cve": null,
+     "finding": "failed (chain incomplete).",
+     "id": "cert_chain_of_trust",
+     "severity": "CRITICAL"
+    },
+    {
+     "cve": null,
+     "finding": "no",
+     "id": "cert_certificatePolicies_EV",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "364 >= 60 days",
+     "id": "cert_expirationStatus",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "2026-09-20 09:03",
+     "id": "cert_notBefore",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "2027-09-20 09:03",
+     "id": "cert_notAfter",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "certificate has no extended life time according to browser forum",
+     "id": "cert_extlifeSpan",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "not present",
+     "id": "cert_eTLS",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "--",
+     "id": "cert_crlDistributionPoints",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "--",
+     "id": "cert_ocspURL",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "Neither CRL nor OCSP URI provided",
+     "id": "cert_revocation",
+     "severity": "HIGH"
+    },
+    {
+     "cve": null,
+     "finding": "not offered",
+     "id": "OCSP_stapling",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "--",
+     "id": "cert_mustStapleExtension",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "check skipped as instructed",
+     "id": "DNS_CAArecord",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "--",
+     "id": "certificate_transparency",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "1",
+     "id": "certs_countServer",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "no",
+     "id": "certs_list_ordering_problem",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "TRAEFIK DEFAULT CERT",
+     "id": "cert_caIssuers",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "intermediate certificate(s) is/are ok",
+     "id": "intermediate_cert_badOCSP",
+     "severity": "OK"
+    },
+    {
+     "cve": null,
+     "finding": "Unexpected 502 Bad Gateway @ '/'",
+     "id": "HTTP_status_code",
+     "severity": "WARN"
+    },
+    {
+     "cve": null,
+     "finding": "0 seconds from localtime",
+     "id": "HTTP_clock_skew",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "1789895402",
+     "id": "HTTP_headerTime",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "not offered",
+     "id": "HSTS",
+     "severity": "LOW"
+    },
+    {
+     "cve": null,
+     "finding": "No support for HTTP Public Key Pinning",
+     "id": "HPKP",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "No Server banner line in header, interesting!",
+     "id": "banner_server",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "No application banner found",
+     "id": "banner_application",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "0 at '/' (maybe missed the application)",
+     "id": "cookie_count",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "--",
+     "id": "security_headers",
+     "severity": "MEDIUM"
+    },
+    {
+     "cve": null,
+     "finding": "--",
+     "id": "banner_reverseproxy",
+     "severity": "INFO"
+    },
+    {
+     "cve": null,
+     "finding": "12",
+     "id": "scanTime",
+     "severity": "INFO"
+    }
+   ],
+   "evidence": [
+    {
+     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "ref": "scan_results:testssl:62.217.52.165",
+     "tool": "testssl"
+    },
+    {
+     "excerpt": "service=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
+     "ref": "hosts/62.217.52.165/phase2/testssl.json",
+     "tool": "testssl"
+    }
+   ],
+   "fallback_scsv": null,
+   "fqdn": "vectigal.tech",
+   "grade": null,
+   "host_ip": "62.217.52.165",
+   "hsts": {
+    "include_subdomains": null,
+    "max_age": null,
+    "preload": null,
+    "present": false,
+    "raw": "not offered"
+   },
+   "id": "tls:vectigal.tech:443@62.217.52.165",
+   "json_filtered": false,
+   "mode": "active",
+   "observed_at": "2026-09-20T09:09:52Z",
+   "port": 443,
+   "protocols": {
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
+    "TLS1.2": true,
+    "TLS1.3": true
+   },
+   "source": "testssl",
+   "vulns": []
+  }
+ ],
+ "unprocessed": [],
+ "warnings": [
+  "Multi-Target: nur die erste Domain hat eigene DNS- und Passivlaeufe; weitere Domains: vectiscan.de"
+ ]
+}

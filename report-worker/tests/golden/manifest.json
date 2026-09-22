@@ -1,8 +1,8 @@
 {
  "beschreibung": "Golden-Fixtures fuer den Report-Umbau (spec/05 bis 07, Session S0c). Dateinamen tragen nur Auftrags-UUIDs, also keine Kundennamen. Domains bleiben in den Daten stehen, weil die Fakten sonst wertlos sind. Screenshots sind aus allen Tars entfernt (spec/07 Abschnitt 1).",
- "api_snapshot_orders": 42,
- "tars_erwartet": 13,
- "tars_vorhanden": 13,
+ "api_snapshot_orders": 43,
+ "tars_erwartet": 14,
+ "tars_vorhanden": 14,
  "orders": [
   {
    "order_id": "45bb234c-d556-4a80-9c78-3ce221ea28a6",
@@ -264,6 +264,31 @@
     "bytes": 143547,
     "sha256": "b7e1377d8696ea1b4d982542189aa530032431cb7dbdbf5830baed976a035bd6",
     "members": 41,
+    "images": 0
+   }
+  },
+  {
+   "order_id": "75338c97-6707-4d11-92bf-bb3cd2e02cde",
+   "domains": [
+    "vectigal.tech",
+    "vectiscan.de"
+   ],
+   "package": "webcheck",
+   "created": "2026-09-20T09:07:05.648Z",
+   "started": "2026-09-20T09:07:28.892Z",
+   "finished": "2026-09-20T09:13:52.940Z",
+   "roles": [
+    "golden",
+    "coverage"
+   ],
+   "note": "vectigal.tech und vectiscan.de, 20.09.2026, eigene Domains. Der einzige WebCheck-Auftrag im Satz und damit der erste Beleg fuer die Paketvariante an echten Daten (Issue #23). Kleinerer Werkzeugsatz, Hostgrenze drei, beide Ziele hinter derselben Traefik-Instanz mit Rate-Limit. Interner Nachweislauf aus S2b, wird nicht ausgeliefert",
+   "negative_entries": 0,
+   "api_snapshot": true,
+   "tar": {
+    "present": true,
+    "bytes": 21649,
+    "sha256": "5bdee9cdb93dd42afc5e39c7e30ff2d0a7e5dab47f79a72ef19bf8bd7fa57f7a",
+    "members": 52,
     "images": 0
    }
   },

@@ -57,6 +57,13 @@ python3 scripts/golden/build-expected-junkerwerk.py
 # 3 Negativ-Fixtures (arbeitet auf dem eingecheckten Snapshot)
 python3 scripts/golden/build-negative-fixtures.py
 
+# 3b Einzelnen Auftrag aufnehmen (statt Schritt 1, wenn nur einer dazukommt):
+#   python3 scripts/golden/add-order-to-snapshot.py <uuid> --creds <pfad>
+#   Danach orders.txt, die GOLDEN_ORDER-Matrix in .gitlab-ci.yml und ROLES in
+#   scripts/golden/build-manifest.py ergaenzen, sonst faellt test_golden_fixtures.
+#   Das Skript kuerzt einen etwaigen Kundenkontext auf den Firmennamen und
+#   entfernt Admin-Felder (Auflage S5b).
+
 # 4 Roh-Tars: API-Pipeline auf dem Branch ausloesen, die zehn Matrix-Jobs
 #   ops-export-golden-tars starten, die Artefakte golden-tars/ nach tars/ entpacken.
 #   Ein Auftrag je Job, weil der Artefakt-Upload dieser GitLab-Instanz schon bei
@@ -112,6 +119,19 @@ Daten (Issue #8). Beim IPv6-Host `2a01:4f8:d0a:3124::2` steht `-6` in der
 Kommandozeile im Tar, der alte Grund `target_invalid_ipv6` ist weg, und trotzdem kommt
 kein Port zurueck. Warum, steht in `reporter/facts/README.md` unter Datenfalle 6;
 Issue #8 bleibt offen.
+
+## Das Fixture aus S5b: der einzige WebCheck-Auftrag
+
+`75338c97` (vectigal.tech und vectiscan.de, 20.09.2026) ist der vierzehnte Auftrag und
+der erste, der nicht Perimeter ist. Bis dahin war die WebCheck-Variante des Renderers nur
+synthetisch geprueft: `tests/pdf_v3/conftest.py::as_package` stellte einen
+Perimeter-Auftrag im Datenmodell auf WebCheck um. An echten Daten war weder belegt, dass
+Kapitel 3.4 und das Service-Inventar sauber entfallen, noch was die Hostgrenze drei und
+der kleinere Werkzeugsatz mit den uebrigen Kapiteln machen (Issue #23).
+
+Beide Ziele sind eigene Domains hinter derselben Traefik-Instanz mit Rate-Limit; der Lauf
+ist ein interner Nachweis aus S2b und wird nicht ausgeliefert. Die synthetische Pruefung
+bleibt als Gegenprobe "gleiche Daten, anderes Paket" bestehen.
 
 ## Bekannte Abweichungen
 

@@ -156,11 +156,6 @@
     "c": "mittel (Passivquelle, Zeitversatz)",
     "t": "Shodan, AbuseIPDB, OTX, URLhaus",
     "u": "Passive Dienst- und Reputationsdaten"
-   },
-   {
-    "c": "hoch (autoritative Fremdquelle)",
-    "t": "NVD, EPSS, CISA KEV",
-    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
    }
   ],
   "triage": [
@@ -687,7 +682,7 @@
  "landscape_lead": "6 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 10,
-  "catalog_digest": "af96d64eabc6b26698929f9ffc487c9885b6d99064d0d199b74ae1030bf0053c",
+  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 6,
@@ -696,7 +691,7 @@
   "domains": [
    "lumbeck-wolter.de"
   ],
-  "facts_schema_version": "1.0.1",
+  "facts_schema_version": "1.0.2",
   "fqdns_total": 2,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
@@ -839,6 +834,10 @@
    {
     "detail": "Betroffen: ffuf_sensitive auf 116.202.77.64, header_check auf www.lumbeck-wolter.de, httpx auf 116.202.77.64, testssl auf 116.202.77.64, webtech auf 116.202.77.64, www.lumbeck-wolter.de (+lumbeck-wolter.de) und weitere.",
     "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
+   },
+   {
+    "detail": "Betroffen: 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de).",
+    "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {
     "detail": "Betroffen: lumbeck-wolter.de.",

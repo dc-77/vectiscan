@@ -1,6 +1,23 @@
 {
  "appendix": {
-  "cve_refs": [],
+  "cve_refs": [
+   {
+    "cve": "CVE-2011-3389",
+    "name": "",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-005",
+    "score": "",
+    "src": "testssl"
+   },
+   {
+    "cve": "CVE-2013-0169",
+    "name": "",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-005",
+    "score": "",
+    "src": "testssl"
+   }
+  ],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 20.09.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
   "exposure_scale": [
    {
@@ -233,11 +250,6 @@
     "c": "mittel (Passivquelle, Zeitversatz)",
     "t": "Shodan, AbuseIPDB, OTX, URLhaus",
     "u": "Passive Dienst- und Reputationsdaten"
-   },
-   {
-    "c": "hoch (autoritative Fremdquelle)",
-    "t": "NVD, EPSS, CISA KEV",
-    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
    }
   ],
   "triage": [
@@ -871,7 +883,14 @@
    "scale": "hygiene",
    "source": "aktiv (httpx, testssl)",
    "status": "gelb",
-   "threat": null,
+   "threat": {
+    "cves": [
+     "CVE-2011-3389 (von testssl genannt, keine Fremdbewertung vorhanden)",
+     "CVE-2013-0169 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
    "title": "Transportverschlüsselung auf 217.243.248.29 mit veralteten Verfahren",
    "urgency": "In Kürze",
    "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
@@ -1206,7 +1225,7 @@
  "landscape_lead": "15 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 41,
-  "catalog_digest": "af96d64eabc6b26698929f9ffc487c9885b6d99064d0d199b74ae1030bf0053c",
+  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 15,
@@ -1216,7 +1235,7 @@
    "junkerwerk.de",
    "junkerwerk.hu"
   ],
-  "facts_schema_version": "1.0.1",
+  "facts_schema_version": "1.0.2",
   "fqdns_total": 8,
   "hosts_ipv4": 3,
   "hosts_ipv6": 1,
@@ -1475,6 +1494,10 @@
    {
     "detail": "Betroffen: junkerwerk.hu.",
     "what": "Fakten reichen für eine Aussage nicht aus"
+   },
+   {
+    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), 217.243.248.28 (autodiscover.junkerwerk.de, outlook.junkerwerk.de), 217.243.248.29 (cloud.junkerwerk.de, team.junkerwerk.de), 2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de).",
+    "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {
     "detail": "Betroffen: 2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de), webtech auf 2a01:4f8:d0a:3124::2.",

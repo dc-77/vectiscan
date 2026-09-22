@@ -47,7 +47,7 @@ entfernt, max 300 Zeichen).
 | software | Produkt, Familie, Art, Version roh und normalisiert, Build, Distribution, Edition, EOL, Hinweise, Quellen | nmap, header_check, httpx `tech`, tech_profile (`cms_details.raw`, `technologies[]`), wpscan |
 | passive | Shodan-Ports mit `verified` (nmap bestaetigt), OTX, SecurityTrails, URLhaus, GreyNoise | phase0a/*.json, Zeilen |
 | coverage | eine Zeile je Werkzeuglauf mit Status `ok/empty/failed/blocked/skipped/unknown` und Grund | scan_results-Zeilen plus Sonderfaelle |
-| threats | CVE mit NVD-Score, EPSS, KEV, ExploitDB (Durchreichung), testssl-CVEs | enrichment (Job, sonst Tar), testssl `cve` |
+| threats | CVE mit NVD-Score, EPSS, KEV, ExploitDB (Durchreichung), testssl-CVEs | enrichment (Job, sonst Tar), testssl `cve` **nur bei Urteil "verwundbar"** |
 | unprocessed | unparsbare Dateien, Werkzeuge ohne Leser, Alerts ohne pluginId, Shodan-Hosts ausserhalb Inventar | Builder |
 | decisions | KI-Entscheidungen nur als Protokoll: Host-Strategie, Phase-2-Konfiguration, Tech-Analyse (cms-Felder), Priorisierung, Site-Summary | host_strategy.json, ai_*-Zeilen, ai_prioritization.json, tech_profile, vhosts[].site_summary |
 
@@ -93,6 +93,11 @@ Start und Done ist `ok`, auch bei exit 10/246; feroxbuster exit 1 mit JSONL ist 
 `raw_status = timeout`. Sonderfaelle: nmap ohne gescanntes Ziel (IPv6 ohne `-6`) ist `failed`
 mit `target_invalid_ipv6`; Host oben ohne offene Ports ist `ok` mit `no_open_ports`; testssl
 `Can't connect` ist `failed connect`; header_check `reachable: false` ist `empty`.
+
+Seit S5b gibt es einen weiteren Grund, der nur aus dem Lader kommt:
+`rohtext_nicht_geladen`. Er steht an einer Zeile, deren `raw_output` die Groessengrenze
+ueberschritten hat und deshalb gar nicht erst geladen wurde. Der Status der Zeile bleibt
+stehen, die Luecke ist benannt statt still.
 
 Zwei Gruende kommen seit S2c nur aus der Zeile, nicht aus dem Tar: `nmap_no_runstats`
 (Exit 0, aber keine Bilanz im XML) und `no_ipv6_route` (nmap lief mit `-6`, meldete
@@ -201,6 +206,21 @@ AAAA-Host:
    behalten die falsche Aussage. Issue #8 bleibt bis zur IPv6-Anbindung des Scannernetzes
    offen.
 
+Aufgefallen in Session S5b, als die CVE-Fakten erstmals in den Bericht kamen:
+
+7. **testssl nennt im Feld `cve` die Nummer, GEGEN die geprueft wurde**, auch wenn das
+   Ergebnis "not vulnerable" lautet. Der Builder nahm bis S5b jede solche Zeile als Fakt.
+   Im Fixture `860d0d5a` waren das 32 CVE-Fakten, darunter Heartbleed und POODLE, saemtlich
+   mit `severity: OK`. Seit S2b laeuft testssl ohne Severity-Filter, der Fehler haette also
+   jeden Produktionslauf getroffen, sobald die Fakten irgendwo sichtbar werden. Jetzt
+   entscheidet das Urteil: Severity in `LOW/MEDIUM/HIGH/CRITICAL` und Befundtext ohne
+   "not vulnerable" (`build._testssl_verwundbar`). `860d0d5a` faellt damit von 32 auf 3
+   Threats, die uebrigen Auftraege bleiben unveraendert.
+8. **`WARN` heisst "nicht geprueft"**, nicht "in Ordnung". `TlsVuln.status` hat dafuer den
+   dritten Wert `not_tested` bekommen (Schema 1.0.2); vorher verschwand die Zeile ganz und
+   war weder Fund noch Abdeckungsluecke. In den vierzehn Fixtures kommt der Fall nicht vor
+   (`WARN` steht dort nur als `scanTime`), sichtbar wird er erst an Produktionsdaten.
+
 Weiterhin gueltig:
 
 6. Der Freigabe-Job traegt weder `hostInventory` noch `correlatedFindings`; das Tar ist die
@@ -210,14 +230,30 @@ Weiterhin gueltig:
 8. Mit `--open` schreibt nmap fuer Hosts ohne offene Ports kein `<host>`-Element; der Host
    wird aus `runstats` synthetisiert.
 
-## Anbindung (nicht in S1, Entscheidung DC 18.09.2026)
+## Anbindung (S5b, erledigt)
 
-Produktiv braucht der Builder neben dem Tar die `scan_results`-Zeilen mit `created_at` und
-`raw_output` fuer eine Whitelist kleiner Werkzeuge (header_check, testssl, nmap, ai_*).
-`reporter/worker.py::_load_tool_runs` liest heute weder `created_at` noch `raw_output`.
-Vorschlag fuer S3/S6: SELECT erweitern, `build_facts(scan_data_dir, ..., tool_runs=rows)`
-nach `parse_scan_data` aufrufen, Ergebnis als `<orderId>.facts.json` neben dem Tar nach MinIO
-(`scan-rawdata`), geschaltet ueber `VECTISCAN_FACTS_EXPORT=1`, fail-open.
+`reporter/worker.py::_load_tool_runs` liefert seit S5b `created_at` und `raw_output`; der
+Produktionspfad baut damit dieselben Fakten wie der Golden-Pfad. Gemessen an allen dreizehn
+Auftraegen fiel vorher die Zahl der `ok`-Abdeckungszeilen auf null, weil `classify_run` eine
+`ok`-Zeile ohne Rohtext als leeres Ergebnis liest; dazu fehlten TLS-Protokolle und
+header_check je VHost.
+
+- **Keine Whitelist.** Alle Werkzeuge bekommen ihren Rohtext, sonst waere die Gleichheit mit
+  dem Tar-Pfad nicht zu halten. Je Zeile gilt `RAW_OUTPUT_MAX_BYTES` (1 MiB,
+  `VECTISCAN_TOOLRUN_RAW_MAX`); groessere Zeilen werden **weggelassen, nie abgeschnitten**
+  (ein halbes JSON im Parser ist schlimmer als ein fehlendes). Messgrundlage: groesste Zeile
+  ueber alle 42 Schnappschuesse 515 KB (`phase3_correlation`), groesster Auftrag 715 KB.
+- **"Nicht geladen" ist ein eigenes Signal**, kein stilles `None`: die Zeile traegt
+  `raw_output_omitted`, `ToolRun.raw_known` wird falsch, die Abdeckung bekommt den Grund
+  `rohtext_nicht_geladen`. Eine Spalte, die in der Datenbank wirklich leer ist, bleibt ein
+  leeres Ergebnis (18 solche `httpx`-Zeilen im Schnappschuss).
+- **Gleichheitstest:** `tests/test_facts_production_parity.py` faehrt die Werte des
+  Schnappschusses durch `_load_tool_runs` (Cursor-Doppel in der Spaltenreihenfolge des
+  SELECT) und vergleicht mit den eingecheckten Golden-Facts. Abweichen darf nur die Herkunft
+  der Zeilen (`generator.inputs[kind=tool_runs]`), nichts am Inhalt.
+- **Export:** `VECTISCAN_FACTS_EXPORT=1` legt `facts.json` und `catalog.json` unter
+  `scan-rawdata/<order_id>/` neben das Roh-Tar (`pipeline.export_facts_if_enabled`),
+  fail-open und nur im v3-Zweig, weil nur dort Fakten entstehen.
 
 ## Tests
 

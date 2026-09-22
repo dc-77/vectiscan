@@ -141,6 +141,8 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     "insufficient_facts": ("not_testable", "Fakten reichen für eine Aussage nicht aus."),
     "precondition_not_met": ("not_applicable", "Voraussetzung der Prüfung nicht gegeben."),
     "coverage_unknown": ("not_testable", "Abdeckung des Werkzeugs unbekannt."),
+    "rohtext_nicht_geladen": ("not_testable", "Die Werkzeugausgabe war zu groß und wurde nicht geladen; Ergebnis nicht belastbar."),
+    "testssl_nicht_getestet": ("not_testable", "testssl konnte diese Schwachstelle nicht prüfen (Zeitüberschreitung oder Verbindungsfehler)."),
 }
 GENERIC_NOT_TESTABLE = "Prüfung nicht durchführbar."
 

@@ -8,6 +8,7 @@ wird als unbekannt ausgewiesen und nicht geraten.
 from __future__ import annotations
 
 import os
+import re
 from collections import Counter
 from datetime import datetime, timezone
 from typing import Optional
@@ -156,10 +157,29 @@ def limitations(facts: FS.Facts, output: CatalogOutput) -> list[Limitation]:
         by_text.setdefault(text, set()).add(result.group_label)
     out: list[Limitation] = []
     for text in sorted(by_text):
-        where = sorted(by_text[text])
+        where = sorted(_kurz(w) for w in by_text[text])
         shown = ", ".join(where[:6]) + (" und weitere" if len(where) > 6 else "")
         out.append(Limitation(what=text.rstrip("."), detail=f"Betroffen: {shown}."))
     return out
+
+
+# Ein Host mit vielen VHosts traegt sie alle im Gruppennamen. In der
+# Betroffenenliste einer Einschraenkung ist das eine Wand aus Namen: bei
+# vectigal.tech sind es 31 hinter einer einzigen IP. Die Kuerzung der Liste
+# selbst (sechs Eintraege) greift dort nicht, weil das Ganze ein Eintrag ist.
+_GRUPPE_MIT_VHOSTS = re.compile(r"^(?P<kopf>[^(]+) \((?P<namen>[^()]+)\)$")
+_VHOSTS_IM_NAMEN = 3
+
+
+def _kurz(label: str) -> str:
+    treffer = _GRUPPE_MIT_VHOSTS.match(label)
+    if not treffer:
+        return label
+    namen = [n.strip() for n in treffer.group("namen").split(",") if n.strip()]
+    if len(namen) <= _VHOSTS_IM_NAMEN:
+        return label
+    return (f"{treffer.group('kopf')} ("
+            f"{', '.join(namen[:_VHOSTS_IM_NAMEN])} und weitere)")
 
 
 # ---------------------------------------------------------------- Kapitel 1

@@ -335,7 +335,7 @@ tr{break-inside:avoid;}
   <div class="bd" style="padding-top:0">
    <div class="lab">Was wurde gefunden</div><p>{{ f.found }}</p>
    <div class="lab">Nachweis</div><div class="ev">{{ f.evidence }}</div>
-   {% if f.threat %}<div class="lab">Threat Intelligence</div><p>{% for c in f.threat.cves %}{{ c }}{% if not loop.last %}; {% endif %}{% endfor %} · CISA KEV: {{ f.threat.kev }}{% if f.threat.note %} · {{ f.threat.note }}{% endif %}</p>{% endif %}
+   {% if f.threat %}<div class="lab">Threat Intelligence</div><p>{% for c in f.threat.cves %}{{ c }}{% if not loop.last %}; {% endif %}{% endfor %}{% if f.threat.kev %} · CISA KEV: {{ f.threat.kev }}{% endif %}{% if f.threat.note %} · {{ f.threat.note }}{% endif %}</p>{% endif %}
    <div class="lab">Auswirkung</div><p>{{ f.impact }}</p>
    <div class="lab">Empfehlung</div><div class="rec">{% for u,t in f.recommendation %}<div><span class="u">{{ u }}</span>{{ t }}</div>{% endfor %}</div>
    <div class="lab">Verifikation nach Umsetzung</div><div class="ev">{{ f.verify }}</div>
@@ -365,15 +365,15 @@ tr{break-inside:avoid;}
  <table><tr><th style="width:18mm">Status</th><th style="width:150mm">Bedeutung</th></tr>
  {% for t in ap.triage %}<tr><td><span class="pill p-{{ t.st }}">{{ t.l }}</span></td><td>{{ t.t }}</td></tr>{% endfor %}</table>
  <h3>A.2 Eigene Einstufung: Exposition und Hygiene</h3>
- <p>Der Bericht vergibt keine eigenen CVSS-Werte. Erreichbare Dienste werden nach Exposition eingestuft, Konfigurations- und Best-Practice-Abweichungen nach der VectiScan-Hygiene-Skala. CVSS-Basiswerte erscheinen ausschließlich als Fremdreferenz zu zitierten CVEs (A.3).</p>
+ <p>Der Bericht vergibt keine eigenen CVSS-Werte. Erreichbare Dienste werden nach Exposition eingestuft, Konfigurations- und Best-Practice-Abweichungen nach der VectiScan-Hygiene-Skala. Ein CVSS-Basiswert erscheint nur dort, wo eine Fremdbewertung zu einer zitierten CVE vorliegt (A.3); fehlt er, stammt die Schwachstellennummer aus dem Prüfwerkzeug und die Einstufung aus dem zugehörigen Befund.</p>
  <table><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Exposition</th></tr>
  {% for h in ap.exposure_scale %}<tr><td><b>{{ h.l }}</b></td><td>{{ h.t }}</td></tr>{% endfor %}</table>
  <table><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Hygiene</th></tr>
  {% for h in ap.hygiene_scale %}<tr><td><b>{{ h.l }}</b></td><td>{{ h.t }}</td></tr>{% endfor %}</table>
  <table><tr><th style="width:24mm">ID</th><th style="width:96mm">Titel</th><th style="width:24mm">Einstufung</th><th style="width:24mm">Dringlichkeit</th></tr>
  {% for f in findings %}<tr><td class="mono">{{ f.id }}</td><td>{{ f.title }}</td><td>{{ 'Exposition' if f.scale == 'exposure' else 'Hygiene' }} {{ f.level }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td></tr>{% endfor %}</table>
- <h3>A.3 CVE-Referenzen (Fremdbewertung)</h3>
- <table><tr><th style="width:30mm">CVE</th><th style="width:44mm">Bezeichnung</th><th style="width:16mm">Basiswert</th><th style="width:18mm">Quelle</th><th style="width:22mm">Befund</th><th style="width:38mm">Hinweis</th></tr>
+ <h3>A.3 CVE-Referenzen</h3>
+ <table><tr><th style="width:28mm">CVE</th><th style="width:34mm">Bezeichnung</th><th style="width:14mm">Basiswert</th><th style="width:16mm">Quelle</th><th style="width:34mm">Befund</th><th style="width:42mm">Hinweis</th></tr>
  {% for c in ap.cve_refs %}<tr><td class="mono">{{ c.cve }}</td><td>{{ c.name }}</td><td class="mono">{{ c.score }}</td><td>{{ c.src }}</td><td class="mono">{{ c.ref }}</td><td class="small">{{ c.note }}</td></tr>{% endfor %}</table>
  {% if show_inventory %}
  <div class="sec-head" style="margin-top:6mm"><div class="kicker">Anhang {{ ltr.inventory }}</div><h2>Service-Inventar</h2></div>

@@ -32,6 +32,10 @@ TOOL_OK_EXIT_CODES = {
     "ffuf_dir": (0, 1), "ffuf_vhost": (0, 1), "feroxbuster": (0, 1),
 }
 EXIT_TIMEOUT, EXIT_ERROR, EXIT_SKIPPED = -1, -2, -3
+# Grund fuer eine Zeile, deren Rohtext der Lader wegen der Groessengrenze
+# weggelassen hat (``worker._load_tool_runs``, S5b). Die Zeile bleibt in der
+# Abdeckung sichtbar, statt still als leeres Ergebnis zu erscheinen.
+RAW_NOT_LOADED = "rohtext_nicht_geladen"
 
 
 @dataclass
@@ -67,13 +71,23 @@ def _looks_complete(run: ToolRun) -> bool:
 
 
 def classify_run(run: ToolRun) -> tuple[str, Optional[str], Optional[str]]:
-    """(status, reason, raw_status) fuer eine Zeile, ohne Host-Kontext."""
+    """(status, reason, raw_status) fuer eine Zeile, ohne Host-Kontext.
+
+    ``run.raw_known`` unterscheidet "leer gelaufen" von "nicht geladen" (S5b).
+    Eine Zeile ohne geladenen Rohtext behaelt ihren Status; sie als ``empty`` zu
+    fuehren hiesse, ueber ein Werkzeug zu urteilen, dessen Ausgabe nie gelesen
+    wurde. Wurde der Rohtext wegen der Groessengrenze weggelassen, steht das als
+    Grund in der Abdeckung.
+    """
     raw_status = run.status
     reason = run.reason
+    if run.raw_omitted and not reason:
+        reason = RAW_NOT_LOADED
     raw = (run.raw_output or "").strip()
     if raw_status in ("ok", "skipped", "failed", "blocked"):
         status = raw_status
-        if status == "ok" and not raw and run.tool_norm not in ("ai_host_strategy",):
+        if status == "ok" and not raw and run.raw_known \
+                and run.tool_norm not in ("ai_host_strategy",):
             status = "empty"
         return status, reason, raw_status
     if raw_status == "timeout":
@@ -98,9 +112,11 @@ def classify_run(run: ToolRun) -> tuple[str, Optional[str], Optional[str]]:
     if run.exit_code is not None and run.exit_code > 0:
         ok_codes = TOOL_OK_EXIT_CODES.get(run.tool_norm, (0,))
         if run.exit_code in ok_codes:
-            return ("ok" if raw else "empty"), reason, None
+            return ("ok" if raw or not run.raw_known else "empty"), reason, None
         return "failed", reason or f"exit_{run.exit_code}", None
     if not raw:
+        if not run.raw_known:
+            return "unknown", reason or RAW_NOT_LOADED, None
         return "empty", reason, None
     return "ok", reason, None
 

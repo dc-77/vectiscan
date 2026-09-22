@@ -227,6 +227,9 @@ class PlanRow(Base):
 
 class Threat(Base):
     cves: list[str] = Field(default_factory=list)
+    # "ja", "nein" oder leer. Leer heisst: zu diesen CVE liegt keine
+    # Fremdbewertung vor, also wurde auch der KEV-Katalog nicht abgefragt. Ein
+    # "nein" waere dann eine Aussage ueber etwas, das niemand nachgesehen hat.
     kev: str = "nein"
     note: str = ""
 

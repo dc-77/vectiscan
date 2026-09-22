@@ -158,6 +158,48 @@ def test_testssl_connect_fehler():
     assert r.connect_failed is True
 
 
+def test_testssl_warn_ist_nicht_geprueft():
+    """WARN heisst weder verwundbar noch in Ordnung (S5b)."""
+    entries = [{"id": "heartbleed", "ip": "a/1.2.3.4", "port": "443", "severity": "WARN",
+                "finding": "Test failed (timeout)"}]
+    r = parse_testssl(entries, None)
+    assert r.vulns == {"Heartbleed": "not_tested"}
+
+
+def test_testssl_fund_schlaegt_nicht_geprueft():
+    entries = [{"id": "heartbleed", "ip": "a/1.2.3.4", "port": "443", "severity": "WARN",
+                "finding": "Test failed (timeout)"},
+               {"id": "heartbleed", "ip": "a/1.2.3.4", "port": "443", "severity": "CRITICAL",
+                "finding": "VULNERABLE (NOT ok)"}]
+    assert parse_testssl(entries, None).vulns == {"Heartbleed": "vulnerable"}
+    assert parse_testssl(list(reversed(entries)), None).vulns == {"Heartbleed": "vulnerable"}
+
+
+# -------------------------------------- testssl-CVE nur bei echtem Urteil (S5b)
+
+_TESTSSL_CVE_ENTRIES = [
+    # Regressionssperre: die CVE im Feld ``cve`` ist die Nummer, GEGEN die
+    # geprueft wurde. Ein "not vulnerable" darf keinen Fakt erzeugen, sonst
+    # steht Heartbleed im Bericht eines Hosts, der es nie hatte.
+    ({"id": "heartbleed", "severity": "OK", "cve": "CVE-2014-0160",
+      "finding": "not vulnerable, no heartbeat extension"}, False),
+    ({"id": "heartbleed", "severity": "CRITICAL", "cve": "CVE-2014-0160",
+      "finding": "VULNERABLE (NOT ok)"}, True),
+    ({"id": "BEAST_CBC_TLS1", "severity": "MEDIUM", "cve": "CVE-2011-3389",
+      "finding": "ECDHE-RSA-AES256-SHA"}, True),
+    ({"id": "LUCKY13", "severity": "INFO", "cve": "CVE-2013-0169",
+      "finding": "potentially vulnerable, uses cipher block chaining (CBC) ciphers"}, False),
+    ({"id": "CCS", "severity": "WARN", "cve": "CVE-2014-0224",
+      "finding": "Test failed (timeout)"}, False),
+]
+
+
+@pytest.mark.parametrize("entry,erwartet", _TESTSSL_CVE_ENTRIES)
+def test_testssl_cve_nur_bei_urteil(entry, erwartet):
+    from reporter.facts.build import _testssl_verwundbar
+    assert _testssl_verwundbar(entry) is erwartet
+
+
 # ------------------------------------------------------------------ Coverage
 
 def _row(**kw) -> ToolRun:

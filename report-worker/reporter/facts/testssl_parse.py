@@ -51,6 +51,11 @@ _VULN_TEXT = (
     ("RC4", "RC4"),
 )
 _CVE_RE = re.compile(r"CVE-\d{4}-\d{4,}")
+# Severities, mit denen testssl ein Urteil "verwundbar" ausspricht. ``OK`` und
+# ``INFO`` sind Entwarnungen und tragen trotzdem oft eine CVE-Nummer im Feld
+# ``cve`` (die CVE, gegen die geprueft wurde). Wer sie als Fund liest, schreibt
+# Heartbleed in den Bericht eines Hosts, der nicht betroffen ist (S5b).
+VULN_SEVERITIES = frozenset({"LOW", "MEDIUM", "HIGH", "CRITICAL"})
 _START_RE = re.compile(r"Start (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+-->> ([^\s:]+):(\d+) \(([^)]*)\) <<--")
 
 
@@ -163,10 +168,14 @@ def apply_json(result: TestsslResult, entries: list[dict[str, Any]] | None) -> N
             result.fallback_scsv = _fallback_state(finding)
         elif eid in _VULN_IDS:
             st = _vuln_state(finding)
-            if st is None and sev.upper() in ("LOW", "MEDIUM", "HIGH", "CRITICAL") \
+            if st is None and sev.upper() in VULN_SEVERITIES \
                     and "not vulnerable" not in finding.lower():
                 # testssl-JSON nennt bei Treffern oft nur die Cipher-Liste; die Severity traegt das Urteil.
                 st = "potential" if "potentially" in finding.lower() else "vulnerable"
+            if st is None and sev.upper() == "WARN":
+                # WARN heisst "konnte nicht geprueft werden" (Zeitueberschreitung,
+                # Verbindungsfehler). Weder Fund noch Entwarnung.
+                st = "not_tested"
             if st:
                 _worst(result.vulns, _VULN_IDS[eid], st)
         elif eid == "overall_grade":
@@ -236,8 +245,12 @@ def _add(lst: list[str], item: str) -> None:
         lst.append(item)
 
 
+_VULN_RANK = {"not_tested": 0, "potential": 1, "vulnerable": 2}
+
+
 def _worst(vulns: dict[str, str], name: str, state: str) -> None:
-    if vulns.get(name) == "vulnerable":
+    """Das schwerere Urteil gewinnt; "nicht getestet" ueberschreibt nie einen Fund."""
+    if _VULN_RANK.get(vulns.get(name, ""), -1) >= _VULN_RANK.get(state, -1):
         return
     vulns[name] = state
 

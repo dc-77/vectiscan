@@ -180,7 +180,25 @@ def f_zap_match(alert: Any, pairs: Any) -> bool:
     return False
 
 
+def f_has_enrichment(seq: Any) -> bool:
+    """Traegt mindestens ein Threat einen Fremdwert (NVD-Basiswert oder KEV)?
+
+    Ohne Anreicherung aus Phase 3 sind die CVE-Pruefungen nicht beantwortbar:
+    ihre Bedingungen fragen nach Werten, die dann nirgends stehen. Vor S5b
+    liefen sie deshalb still auf "bestanden" durch, obwohl nichts geprueft war.
+    """
+    for item in seq or []:
+        cvss = getattr(item, "cvss_nvd", None)
+        if cvss is not None and getattr(cvss, "score", None) is not None:
+            return True
+        kev = getattr(item, "kev", None)
+        if kev is not None and getattr(kev, "listed", False):
+            return True
+    return False
+
+
 FUNCS: dict[str, Callable[..., Any]] = {
+    "has_enrichment": f_has_enrichment,
     "len": f_len, "count": f_count, "any_in": f_any_in, "matches": f_matches, "any_match": f_any_match, "startswith": f_startswith,
     "contains": f_contains, "lower": f_lower, "ports": f_ports, "has_port": f_has_port,
     "days_until": f_days_until, "has_version": f_has_version, "is_cdn": f_is_cdn, "any_attr": f_any_attr,

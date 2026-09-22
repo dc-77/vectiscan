@@ -571,6 +571,15 @@ services:
       #     mehrwoechiger Pilot-Phase, dann separate Removal-PR).
       #   Override per .env wenn ein Pilot-Reset noetig ist.
       VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v2}
+      # S5b: legt facts.json und catalog.json neben das Roh-Tar
+      # (scan-rawdata/<order_id>/), damit Admin-Review, Fehlersuche und der
+      # Export in S7 sie haben. Vorgabe leer, dann aendert sich nichts; greift
+      # ohnehin nur im v3-Zweig, weil nur dort Fakten entstehen.
+      VECTISCAN_FACTS_EXPORT: ${VECTISCAN_FACTS_EXPORT:-}
+      # S5b: Obergrenze fuer raw_output je scan_results-Zeile. Groesser als
+      # diese Zahl wird die Spalte nicht abgeschnitten, sondern weggelassen
+      # und in der Abdeckung vermerkt. Vorgabe 1 MiB im Code.
+      VECTISCAN_TOOLRUN_RAW_MAX: ${VECTISCAN_TOOLRUN_RAW_MAX:-1048576}
     deploy:
       resources:
         limits:
