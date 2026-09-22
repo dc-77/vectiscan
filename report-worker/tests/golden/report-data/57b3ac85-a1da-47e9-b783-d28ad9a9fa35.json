@@ -156,11 +156,6 @@
     "c": "mittel (Passivquelle, Zeitversatz)",
     "t": "Shodan, AbuseIPDB, OTX, URLhaus",
     "u": "Passive Dienst- und Reputationsdaten"
-   },
-   {
-    "c": "hoch (autoritative Fremdquelle)",
-    "t": "NVD, EPSS, CISA KEV",
-    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
    }
   ],
   "triage": [

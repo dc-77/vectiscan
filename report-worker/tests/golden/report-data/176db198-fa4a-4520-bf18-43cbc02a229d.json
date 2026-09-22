@@ -305,11 +305,6 @@
     "c": "hoch",
     "t": "dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
     "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
-   },
-   {
-    "c": "hoch (autoritative Fremdquelle)",
-    "t": "NVD, EPSS, CISA KEV",
-    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
    }
   ],
   "triage": [

@@ -250,11 +250,6 @@
     "c": "mittel (Passivquelle, Zeitversatz)",
     "t": "Shodan, AbuseIPDB, OTX, URLhaus",
     "u": "Passive Dienst- und Reputationsdaten"
-   },
-   {
-    "c": "hoch (autoritative Fremdquelle)",
-    "t": "NVD, EPSS, CISA KEV",
-    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
    }
   ],
   "triage": [
@@ -893,7 +888,7 @@
      "CVE-2011-3389 (von testssl genannt, keine Fremdbewertung vorhanden)",
      "CVE-2013-0169 (von testssl genannt, keine Fremdbewertung vorhanden)"
     ],
-    "kev": "nein",
+    "kev": "",
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf 217.243.248.29 mit veralteten Verfahren",

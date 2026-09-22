@@ -225,11 +225,6 @@
     "c": "mittel (Passivquelle, Zeitversatz)",
     "t": "Shodan, AbuseIPDB, OTX, URLhaus",
     "u": "Passive Dienst- und Reputationsdaten"
-   },
-   {
-    "c": "hoch (autoritative Fremdquelle)",
-    "t": "NVD, EPSS, CISA KEV",
-    "u": "Abgleich erkannter Versionen mit Fremdquellen zu Schwachstellen"
    }
   ],
   "triage": [
@@ -917,7 +912,7 @@
     "cves": [
      "CVE-2011-3389 (von testssl genannt, keine Fremdbewertung vorhanden)"
     ],
-    "kev": "nein",
+    "kev": "",
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf 217.243.248.29 mit veralteten Verfahren",
@@ -1008,7 +1003,7 @@
     "cves": [
      "CVE-2013-3587 (von testssl genannt, keine Fremdbewertung vorhanden)"
     ],
-    "kev": "nein",
+    "kev": "",
     "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
    },
    "title": "Transportverschlüsselung auf 217.243.248.30 mit veralteten Verfahren",
@@ -1622,7 +1617,7 @@
     "what": "IPv6-Adresse wurde vom Portscan nicht geprüft"
    },
    {
-    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), 217.243.248.27 (ticket.junkerwerk.de), 217.243.248.28 (autodiscover.junkerwerk.de, mail.junkerwerk.de, outlook.junkerwerk.de), 217.243.248.29 (cloud.junkerwerk.de, rdgw-2016.junkerwerk.de, rdgw.junkerwerk.de, team.junkerwerk.de), 217.243.248.30 (openotp.junkerwerk.de), 2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de).",
+    "detail": "Betroffen: 188.40.3.130 (junkerwerk.de, nachhaltigkeit.junkerwerk.de, www.junkerwerk.de), 217.243.248.27 (ticket.junkerwerk.de), 217.243.248.28 (autodiscover.junkerwerk.de, mail.junkerwerk.de, outlook.junkerwerk.de), 217.243.248.29 (cloud.junkerwerk.de, rdgw-2016.junkerwerk.de, rdgw.junkerwerk.de und weitere), 217.243.248.30 (openotp.junkerwerk.de), 2a01:4f8:d0a:3124::2 (nachhaltigkeit.junkerwerk.de).",
     "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {

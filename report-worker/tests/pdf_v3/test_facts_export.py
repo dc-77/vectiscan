@@ -15,8 +15,10 @@ import pytest
 
 from reporter.pdf.v3 import pipeline as P
 
-REPO = Path(__file__).resolve().parents[3]
-WORKER = (REPO / "report-worker" / "reporter" / "worker.py").read_text(encoding="utf-8")
+# Relativ zur report-worker-Wurzel, nicht zur Repo-Wurzel: im Docker-Abbild
+# liegt nur dieser Dienst, die Ebene darueber gibt es dort nicht.
+REPORT_WORKER = Path(__file__).resolve().parents[2]
+WORKER = (REPORT_WORKER / "reporter" / "worker.py").read_text(encoding="utf-8")
 
 
 class _Fakten:

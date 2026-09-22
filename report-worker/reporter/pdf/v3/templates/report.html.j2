@@ -335,7 +335,7 @@ tr{break-inside:avoid;}
   <div class="bd" style="padding-top:0">
    <div class="lab">Was wurde gefunden</div><p>{{ f.found }}</p>
    <div class="lab">Nachweis</div><div class="ev">{{ f.evidence }}</div>
-   {% if f.threat %}<div class="lab">Threat Intelligence</div><p>{% for c in f.threat.cves %}{{ c }}{% if not loop.last %}; {% endif %}{% endfor %} · CISA KEV: {{ f.threat.kev }}{% if f.threat.note %} · {{ f.threat.note }}{% endif %}</p>{% endif %}
+   {% if f.threat %}<div class="lab">Threat Intelligence</div><p>{% for c in f.threat.cves %}{{ c }}{% if not loop.last %}; {% endif %}{% endfor %}{% if f.threat.kev %} · CISA KEV: {{ f.threat.kev }}{% endif %}{% if f.threat.note %} · {{ f.threat.note }}{% endif %}</p>{% endif %}
    <div class="lab">Auswirkung</div><p>{{ f.impact }}</p>
    <div class="lab">Empfehlung</div><div class="rec">{% for u,t in f.recommendation %}<div><span class="u">{{ u }}</span>{{ t }}</div>{% endfor %}</div>
    <div class="lab">Verifikation nach Umsetzung</div><div class="ev">{{ f.verify }}</div>

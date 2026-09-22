@@ -287,7 +287,15 @@ def build_findings(
         found = threats.for_results(item.results, werkzeuge)
         if found:
             cves = [_cve_text(t) for t in found]
-            kev = "ja" if any(t.kev and t.kev.listed for t in found) else "nein"
+            if any(t.kev and t.kev.listed for t in found):
+                kev = "ja"
+            elif any(fremdbewertet(t) for t in found):
+                kev = "nein"
+            else:
+                # Ohne Fremdbewertung wurde der KEV-Katalog nie abgefragt. Ein
+                # "nein" behauptete, die CVE stehe nicht darin; niemand hat
+                # nachgesehen.
+                kev = ""
             threat = Threat(cves=cves, kev=kev, note=_threat_note(found))
             for t in found:
                 # Dieselbe CVE kann in mehreren Befunden zitiert werden (ein Host,
