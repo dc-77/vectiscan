@@ -166,6 +166,45 @@ class ReportBlockedError(RuntimeError):
         super().__init__(f"{len(self.defects)} Defekte: {', '.join(checks)}")
 
 
+def _apply_report_prose(data: Any, customer_context: dict | None,
+                        order_id: str | None) -> None:
+    """Prosa-KI auf die fertigen Reportdaten anwenden (S6).
+
+    Der zweite und letzte KI-Aufruf des Berichts. Er schreibt vier Felder:
+    die Zusammenfassung auf Seite 1, den Absatz "Was das fuer Sie bedeutet",
+    einen Satz je beobachtetem System und die Auswirkung je Befund. Jedes Feld
+    laeuft durch das Wort- und Laengen-Gate in ``reporter/v3/gate.py``; was
+    durchfaellt, behaelt seinen Katalogtext.
+
+    Bis S6 hat der Worker ``prose`` nie durchgereicht: ``report_bundle_from_source``
+    nimmt den Parameter, der Aufruf hier liess ihn aber weg. Die Prosa lief
+    deshalb nur ueber die Ops-Wege (``python -m reporter.pdf.v3 --prose``), und
+    jeder Bericht aus der Produktion stand allein auf Katalogtexten. Aufgefallen
+    ist es bei der Abnahme von S6, weil im Lauf kein ``report_prose_cost``
+    stand.
+
+    Faellt der Aufruf aus, bleibt der Bericht vollstaendig; die Katalogtexte
+    sind die Grundlage, die KI macht ihn lesbarer, nicht richtiger (spec/05 M4).
+    """
+    from reporter.v3 import prose as P
+
+    if not P.available():
+        log.info("report_prose_skipped", reason="kein ANTHROPIC_API_KEY",
+                 order_id=order_id)
+        return
+    try:
+        payload = P.build_payload(data, customer_context)
+        fields, _cost = P.generate(payload, order_id=order_id)
+        if not fields:
+            log.warning("report_prose_leer", order_id=order_id)
+            return
+        rejected = P.apply_prose(data, fields, payload)
+        log.info("report_prose_applied", order_id=order_id,
+                 felder=sorted(fields), abgelehnt=rejected)
+    except Exception as e:  # noqa: BLE001
+        log.warning("report_prose_failed", order_id=order_id, error=str(e))
+
+
 def _research_customer_context(conn: Any, order_id: str, context: dict,
                                inventory: dict | None) -> dict:
     """Recherche-KI fuer die noch leeren Felder des Kundenkontexts.
@@ -1339,6 +1378,7 @@ def process_job(job_data: dict) -> None:
                 tool_runs=tool_runs,
                 customer_context=customer_context,
             )
+            _apply_report_prose(v3_data, customer_context, order_id)
 
             # S5b: Fakten und Katalogergebnis neben das Roh-Tar legen, wenn
             # VECTISCAN_FACTS_EXPORT gesetzt ist. Der Aufruf faengt seine Fehler
