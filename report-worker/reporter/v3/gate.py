@@ -101,7 +101,7 @@ def check_field(name: str, text: str, haystack: str) -> Verdict:
         reasons.append("verbotene Zusage")
     if DU_FORM.search(text):
         reasons.append("keine Sie-Form")
-    umlauts = find_transliterations(text)
+    umlauts = find_transliterations(text, haystack)
     if umlauts:
         reasons.append(f"Umschrift statt Umlaut: {sorted(set(umlauts))}")
 
