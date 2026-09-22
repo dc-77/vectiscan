@@ -97,3 +97,35 @@ def test_saubere_felder_werden_uebernommen(data):
     assert kopie.glance.overall_text == GUT
     assert kopie.findings[0].impact.startswith("Der Zugriff von außen")
     assert rejected == []
+
+ZITAT = ("Der Webauftritt huendgen-entsorgung.de ist aus dem Internet erreichbar "
+         "und liefert das Zertifikat TRAEFIK DEFAULT CERT aus.")
+
+
+def test_name_aus_den_eingabedaten_ist_zitat_und_keine_umschrift():
+    """Ein Name aus dem Scan gehoert nicht dem Rechtschreibpruefer.
+
+    Bei huendgen-entsorgung.de hat das Gate neun von zehn Feldern verworfen, jedes mit
+    demselben Grund: der Domainname des Kunden traegt "ue". Damit stand der Bericht
+    trotz Zugangsschluessel auf Katalogtexten.
+    """
+    eigen = gate.corpus({"hosts": ["huendgen-entsorgung.de"],
+                         "tls": {"subject": "TRAEFIK DEFAULT CERT"}})
+    verdict = gate.check_field("overall_text", ZITAT, eigen)
+    assert verdict.ok, verdict.reasons
+
+
+def test_derselbe_name_ohne_beleg_bleibt_ein_fehler(haystack):
+    """Die Ausnahme haengt am Beleg, nicht am Wort."""
+    verdict = gate.check_field("overall_text", ZITAT, haystack)
+    assert not verdict.ok
+    assert any("Umschrift statt Umlaut" in reason for reason in verdict.reasons), verdict.reasons
+
+
+def test_wortliste_gilt_auch_als_zitat():
+    """Ein deutsches Wort bleibt falsch geschrieben, auch wenn ein Werkzeug es so ausgibt."""
+    satz = "Der Zugang gehoert geschlossen."
+    eigen = gate.corpus({"evidence": satz})
+    verdict = gate.check_field("overall_text", satz, eigen)
+    assert not verdict.ok
+    assert any("Umschrift statt Umlaut" in reason for reason in verdict.reasons), verdict.reasons

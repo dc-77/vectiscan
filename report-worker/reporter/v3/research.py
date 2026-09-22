@@ -242,6 +242,9 @@ def _clean(value: Any, field: str) -> Optional[str]:
         return None
     if any(dash in text for dash in DASHES):
         return None
+    # Ohne Quelldaten und damit strenger als das Prosa-Gate: hier entsteht der
+    # Firmenname, der auf dem Deckblatt steht. "Huendgen Entsorgung" waere dort ein
+    # Fehler, auch wenn der Domainname die Umschrift traegt.
     if find_transliterations(text):
         return None
     if field == "mitarbeiter" and not _MITARBEITER.match(text):

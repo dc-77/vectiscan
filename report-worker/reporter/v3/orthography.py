@@ -298,8 +298,10 @@ DU_FORM = re.compile(r"\b(du|dein|deine|deinem|deinen|dich|dir)\b", re.I)
 # (aktuell, virtuell, manuell). Alles andere ist mit grosser Wahrscheinlichkeit eine
 # Umschrift: fuer, ueber, pruefen, gehoeren, Zugaenge.
 #
-# Ein Fehlalarm kostet nur den KI-Text, der dann durch den Katalogtext ersetzt wird.
-# Ein uebersehener Fall stuende im Kundenreport. Die Regel ist deshalb bewusst streng.
+# Ein uebersehener Fall stuende im Kundenreport. Die Regel ist deshalb streng, aber
+# sie gilt nur fuer Woerter, die die KI selbst gebildet hat. Woerter, die woertlich in
+# den Eingabedaten stehen, sind Zitat und keine Schreibweise (siehe
+# ``find_transliterations``).
 _GENERIC_TRANSLITERATION = re.compile(r"(?<![aeiouäöüqAEIOUÄÖÜQ])(ae|oe|ue)(?!ll)", re.I)
 
 # Woerter, die der Regel widersprechen und trotzdem richtig geschrieben sind.
@@ -339,14 +341,28 @@ def find_ascii_umlauts(text: str) -> list[str]:
     return _ASCII_UMLAUT_RE.findall(text)
 
 
-def find_transliterations(text: str) -> list[str]:
+def find_transliterations(text: str, quelldaten: str = "") -> list[str]:
     """Wie ``find_ascii_umlauts``, zusaetzlich mit der generischen Regel.
 
     Fuer Text, dessen Wortschatz nicht feststeht, also fuer die Prosa der KI.
+
+    ``quelldaten`` ist der kleingeschriebene Text der Daten, die die KI als Eingabe
+    gesehen hat (``gate.corpus``). Ein Wort, das dort woertlich vorkommt, zitiert einen
+    Namen aus dem Scan und ist keine Umschrift: ``huendgen-entsorgung.de`` ist der
+    Domainname des Kunden, ``TRAEFIK DEFAULT CERT`` der Name in einem Zertifikat. Ohne
+    diese Ausnahme verwirft das Gate bei so einem Kunden faktisch jeden KI-Absatz, weil
+    der Domainname in fast jedem Satz steht; genau das ist bei huendgen-entsorgung.de
+    passiert (neun von zehn Feldern, alle mit demselben Grund).
+
+    Die Wortliste oben gilt weiter ohne Ausnahme. Ein echtes deutsches Wort bleibt auch
+    dann ein Fehler, wenn es zufaellig in den Werkzeugausgaben steht; ausgenommen sind
+    nur Woerter, die die Liste nicht kennt.
     """
     hits = list(_ASCII_UMLAUT_RE.findall(text))
     for word in re.findall(r"[A-Za-zÄÖÜäöüß]+", text):
         if word.lower() in GENERIC_ALLOWLIST or word in hits:
+            continue
+        if quelldaten and word.lower() in quelldaten:
             continue
         if _GENERIC_TRANSLITERATION.search(word):
             hits.append(word)
