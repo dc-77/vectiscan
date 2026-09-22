@@ -170,3 +170,58 @@ def test_endstatus_raeumt_das_laufende_werkzeug_ab(status, leert) -> None:
     sql = cur.execute.call_args.args[0]
     assert ("current_tool = NULL" in sql) is leert, sql
     assert ("current_host = NULL" in sql) is leert, sql
+
+
+def test_prosa_ki_laeuft_im_produktionspfad(tmp_path, monkeypatch) -> None:
+    """S6: Der Worker reichte `prose` nie durch.
+
+    `report_bundle_from_source` nimmt den Parameter seit S3, der Aufruf im
+    Worker liess ihn weg. Die Prosa lief deshalb nur ueber die Ops-Wege, und
+    jeder Bericht aus der Produktion stand allein auf Katalogtexten.
+    Aufgefallen bei der Abnahme von S6, weil im Lauf kein `report_prose_cost`
+    stand.
+    """
+    monkeypatch.delenv("VECTISCAN_REPORT_ENGINE", raising=False)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    gesehen: dict = {}
+
+    def fake_generate(payload, *, order_id=None, **kwargs):
+        gesehen["order_id"] = order_id
+        gesehen["payload"] = payload
+        return {"overall_text": "Aus der Prosa-KI."}, {"total_cost_usd": 0.25}
+
+    def fake_apply(data, fields, payload=None):
+        gesehen["angewendet"] = sorted(fields)
+        return []
+
+    with ExitStack() as stack:
+        stack.enter_context(patch("reporter.v3.prose.available", return_value=True))
+        stack.enter_context(patch("reporter.v3.prose.generate", fake_generate))
+        stack.enter_context(patch("reporter.v3.prose.apply_prose", fake_apply))
+        _lauf(stack, tmp_path, monkeypatch)
+
+    assert gesehen.get("angewendet") == ["overall_text"]
+    assert gesehen.get("payload"), "die Prosa-KI bekam keine Reportdaten"
+
+
+def test_ohne_schluessel_bleibt_der_katalogtext(tmp_path, monkeypatch) -> None:
+    """Ein Lauf ohne KI-Schluessel liefert denselben Bericht ohne Prosa."""
+    monkeypatch.delenv("VECTISCAN_REPORT_ENGINE", raising=False)
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    with ExitStack() as stack:
+        erzeugt = stack.enter_context(patch("reporter.v3.prose.generate"))
+        _lauf(stack, tmp_path, monkeypatch)
+    erzeugt.assert_not_called()
+
+
+def test_ein_fehler_der_prosa_haelt_den_bericht_nicht_auf(tmp_path, monkeypatch) -> None:
+    monkeypatch.delenv("VECTISCAN_REPORT_ENGINE", raising=False)
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    with ExitStack() as stack:
+        stack.enter_context(patch("reporter.v3.prose.available", return_value=True))
+        stack.enter_context(patch("reporter.v3.prose.generate",
+                                  side_effect=RuntimeError("API weg")))
+        m = _lauf(stack, tmp_path, monkeypatch)
+    # Der Bericht entsteht trotzdem, nur mit den Katalogtexten.
+    m._create_report_record.assert_called_once()
+    assert [c.args[2] for c in m._update_order_status.call_args_list][-1] == "pending_review"
