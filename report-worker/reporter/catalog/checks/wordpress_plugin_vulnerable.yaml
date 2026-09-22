@@ -16,7 +16,9 @@ requires:
   tools: [wpscan]
 kind: check
 bundle: null
-affected_template: "{host_ip}: {product} {version} ({vulnerabilities_count} bekannte Schwachstellen)"
+# S6 (spec/08 Punkt 19): "(1 bekannte Schwachstellen)" ging nicht; die Zahl
+# steht deshalb hinten und der Satzbau bleibt fuer jede Anzahl richtig.
+affected_template: "{host_ip}: {product} {version} (laut wpscan bekannte Schwachstellen: {vulnerabilities_count})"
 evidence: [software]
 references: [CWE-1395, OWASP2025-A06]
 frameworks:

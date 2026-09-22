@@ -18,6 +18,7 @@ kind: check
 bundle: null
 affected_template: "{fqdn} ({wp_users})"
 evidence: [http]
+evidence_detail: http.wordpress
 references: [CWE-203, OWASP2025-A07]
 frameworks:
   bsi: []

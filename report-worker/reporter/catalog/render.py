@@ -27,7 +27,8 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
     "http": ("fqdn", "host_ip", "url", "score", "missing_headers", "missing_headers_basic", "server_header", "powered_by",
              "disclosure_headers", "hsts_max_age", "csp_flags", "duplicate_headers", "x_feserver", "wp_users",
              "wp_version_status", "host_label"),
-    "http.alerts": ("fqdn", "host_ip", "plugin_id", "name", "risk", "url_path", "count", "host_label"),
+    "http.alerts": ("fqdn", "host_ip", "plugin_id", "name", "risk", "confidence", "url_path", "count",
+                    "host_label"),
     "http.paths": ("fqdn", "host_ip", "url_path", "status", "host_label"),
     "http.cookies": ("fqdn", "host_ip", "name", "flags_missing", "host_label"),
     "tls": ("fqdn", "host_ip", "port", "legacy_protocols", "ciphers_weak", "vulns", "cert_cn", "days_left", "not_after",
@@ -146,7 +147,8 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
                   "wp_version_status": o.wordpress.version_status if o.wordpress else None})
     elif scope == "http.alerts":
         from reporter.catalog.scope import _url_path
-        v.update({"plugin_id": o.plugin_id, "name": o.name, "risk": o.risk, "url_path": _url_path(o.url), "count": o.count})
+        v.update({"plugin_id": o.plugin_id, "name": o.name, "risk": o.risk,
+                  "confidence": o.confidence or "", "url_path": _url_path(o.url), "count": o.count})
     elif scope == "http.paths":
         from reporter.catalog.scope import _url_path
         v.update({"url_path": _url_path(o.url), "status": o.status})

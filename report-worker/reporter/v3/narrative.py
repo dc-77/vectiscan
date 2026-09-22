@@ -105,7 +105,7 @@ def scope_lead(c: Counts) -> str:
     return (
         f"Der Scan hat {c.hosts_total} "
         f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')} mit {c.fqdns_total} "
-        f"{_plural(c.fqdns_total, 'Hostnamen', 'Hostnamen')} erfasst.{tail}"
+        f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} erfasst.{tail}"
     )
 
 
@@ -149,8 +149,9 @@ def method_phases(c: Counts) -> list[tuple[str, str, str]]:
     return [
         ("0", "Aufklärung (passiv)",
          "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, "
-         f"Reputationsdienste. Ergebnis: {c.fqdns_total} Hostnamen auf {c.hosts_total} "
-         "IP-Adressen."),
+         f"Reputationsdienste. Ergebnis: {c.fqdns_total} "
+         f"{_plural(c.fqdns_total, 'Hostname', 'Hostnamen')} auf {c.hosts_total} "
+         f"{_plural(c.hosts_total, 'IP-Adresse', 'IP-Adressen')}."),
         ("1", "Technologie-Erkennung",
          "Portscan der häufigsten TCP-Ports mit Versionserkennung, Erkennung der "
          "Web-Technologien und vorgelagerter Schutzsysteme."),
@@ -169,9 +170,10 @@ def method_phases(c: Counts) -> list[tuple[str, str, str]]:
 def numbers(c: Counts) -> list[tuple[str, str]]:
     return [
         (str(c.runs), _plural(c.runs, "Scandurchgang", "Scandurchgänge")),
-        (str(c.tool_runs), "Werkzeugläufe"),
-        (str(c.raw_findings), "Einzelbeobachtungen"),
-        (str(c.findings), "Befunde im Bericht"),
+        (str(c.tool_runs), _plural(c.tool_runs, "Werkzeuglauf", "Werkzeugläufe")),
+        (str(c.raw_findings), _plural(c.raw_findings, "Einzelbeobachtung",
+                                      "Einzelbeobachtungen")),
+        (str(c.findings), _plural(c.findings, "Befund im Bericht", "Befunde im Bericht")),
     ]
 
 

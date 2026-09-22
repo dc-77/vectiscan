@@ -159,7 +159,7 @@ FAMILIES: frozenset[str] = frozenset({
     "db_exposed", "smb_exposed", "rdp_exposed", "admin_service_exposed", "ftp_exposed", "mail_plaintext",
     "legacy_protocols_present", "http_no_tls", "http_alt_port", "ssh_alt_port", "sensitive_path_exposed",
     "http_trace_enabled", "default_page_exposed", "login_portal_exposed", "dev_host_public",
-    "web_vulnerability_active", "urlhaus_compromise", "software_eol", "software_lifecycle_review",
+    "web_vulnerability_active", "web_vulnerability_reported", "urlhaus_compromise", "software_eol", "software_lifecycle_review",
     "passive_service_unverified", "cve_known", "wordpress_plugin_vulnerable", "wordpress_core_outdated",
     "user_enumeration", "spf_missing", "spf_permissive", "spf_softfail", "dmarc_missing", "dmarc_none",
     "dmarc_quarantine", "dkim_missing", "mta_sts_missing", "tls_rpt_missing", "dane_missing",

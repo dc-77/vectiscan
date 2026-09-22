@@ -30,17 +30,40 @@ def test_firmenname_aus_dem_kundenkontext() -> None:
     data = _data(customer_context={"firmenname": "Beispiel Maschinenbau GmbH"})
 
     assert data.meta.customer == "Beispiel Maschinenbau GmbH"
-    assert data.meta.customer_short == "Beispiel"
+    # S6 (spec/08 Punkt 8): der Kurzname ist der Firmenname ohne Rechtsform,
+    # nie das erste Wort. "Dortmund Beach Design" wurde sonst zu "Dortmund".
+    assert data.meta.customer_short == "Beispiel Maschinenbau"
     assert VC.auftraggeber_fehlt(data) == []
 
 
-def test_kuerzel_gewinnt_beim_kurznamen() -> None:
-    """Das Kuerzel steht in der Fusszeile und in den Befund-Nummern."""
+def test_kurzname_ist_ein_eigenes_feld() -> None:
+    """Steht ein Kurzname im Kundenkontext, gewinnt er."""
+    data = _data(customer_context={"firmenname": "Beispiel Maschinenbau GmbH",
+                                   "kurzname": "Beispiel Maschinenbau"})
+
+    assert data.meta.customer_short == "Beispiel Maschinenbau"
+
+
+def test_kuerzel_nummeriert_die_befunde_und_ist_kein_kurzname() -> None:
+    """Das Kuerzel steht in den Befund-Nummern, nicht in der Fusszeile.
+
+    Bis S6 war es auch der Kurzname; "BSP" in der Fusszeile sagt dem Leser
+    weniger als der Firmenname ohne Rechtsform (Entscheidung DC).
+    """
     data = _data(customer_context={"firmenname": "Beispiel Maschinenbau GmbH",
                                    "kuerzel": "BSP"})
 
-    assert data.meta.customer_short == "BSP"
+    assert data.meta.customer_short == "Beispiel Maschinenbau"
     assert data.findings[0].id.startswith("VS-BSP-")
+
+
+def test_personenzusatz_kommt_nicht_in_den_bericht() -> None:
+    """spec/08 Punkt 8: dortmund-beach trug "Inhaber Christian Tacke" im Titel."""
+    from reporter.v3.research import firmenname_ohne_person, kurzname_aus
+
+    roh = "Dortmund Beach Design, Inhaber Christian Tacke"
+    assert firmenname_ohne_person(roh) == "Dortmund Beach Design"
+    assert kurzname_aus(roh) == "Dortmund Beach Design"
 
 
 def test_auftraggeber_aus_der_order_gewinnt() -> None:

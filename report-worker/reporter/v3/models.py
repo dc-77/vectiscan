@@ -244,6 +244,9 @@ class Finding(Base):
     source: str
     scale: str
     level: str
+    # Anzeigetext der Einstufung ("erhöht" statt "erhoeht"). Der Bezeichner
+    # bleibt ASCII, der Kundentext nicht (S6, spec/08 Punkt 11).
+    level_label: str = ""
     found: str
     evidence: str = ""
     threat: Optional[Threat] = None

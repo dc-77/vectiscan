@@ -9,16 +9,40 @@ from reporter.v3 import ids as IDS
 from reporter.v3 import levels as L
 
 
-def test_jede_einstufung_hat_eine_farbe():
+def test_jede_einstufung_steht_in_der_abbildungstabelle():
+    """Keine Einstufung darf auf den Rueckfall laufen (S6, spec/08 Punkt 1)."""
     for scale, levels in LEVELS_BY_SCALE.items():
         for level in levels:
-            assert L.status_for(level) in ("rot", "gelb", "blau")
+            assert (scale, level) in L.TRIAGE_BY_LEVEL
+            assert L.status_for(scale, level) in ("rot", "gelb", "blau")
             assert L.severity_key(scale, level)[1] < 9
 
 
-def test_nur_kritisch_ist_rot():
-    rot = [lvl for lvl, status in L.STATUS_BY_LEVEL.items() if status == "rot"]
-    assert rot == ["kritisch"]
+def test_nur_kritisch_und_aktiver_nachweis_sind_rot():
+    rot = sorted(k for k, tri in L.TRIAGE_BY_LEVEL.items() if tri.status == "rot")
+    assert rot == [("exposure", "kritisch")]
+    assert L.status_for("hygiene", "hoch", active_proof=True) == "rot"
+
+
+def test_dringlichkeit_passt_immer_zur_ampelfarbe():
+    """Der Kern von spec/08 Punkt 1: A.1 und die Befundzeile duerfen sich nicht
+    widersprechen. Jede Stufe, die eine Einstufung tragen kann, muss in der
+    Dringlichkeitsliste ihrer Farbe stehen."""
+    for (scale, level), tri in L.TRIAGE_BY_LEVEL.items():
+        erlaubt = L.stages_for_status(tri.status)
+        for stage in L.STAGE_ORDER:
+            wirksam = L.stage_for(scale, level, [stage])
+            assert wirksam in tri.stages
+            assert wirksam in erlaubt
+
+
+def test_unverzueglich_nur_bei_rot():
+    for (scale, level), tri in L.TRIAGE_BY_LEVEL.items():
+        if "unverzueglich" in tri.stages:
+            assert tri.status == "rot"
+        # Eine dringlichere Katalogstufe wird gedeckelt, nicht uebernommen.
+        if tri.status != "rot":
+            assert L.urgency_for(scale, level, ["unverzueglich"]) != "Unverzüglich"
 
 
 def test_exposition_wiegt_schwerer_als_hygiene():
@@ -26,14 +50,35 @@ def test_exposition_wiegt_schwerer_als_hygiene():
     assert L.worst([("hygiene", "hoch"), ("exposure", "kritisch")]) == ("exposure", "kritisch")
 
 
-@pytest.mark.parametrize("stages,erwartet", [
-    (["mittelfristig", "unverzueglich"], "Unverzüglich"),
-    (["strategisch", "mittelfristig"], "Mittelfristig"),
-    (["in_kuerze"], "In Kürze"),
-    ([], "Mittelfristig"),
+@pytest.mark.parametrize("scale,level,stages,erwartet", [
+    # Exposition kritisch traegt die einzige unverzuegliche Stufe.
+    ("exposure", "kritisch", ["mittelfristig", "unverzueglich"], "Unverzüglich"),
+    # Der Fall aus spec/08: admin_service_exposed schlaegt unverzueglich vor,
+    # ist aber Exposition erhoeht und damit gelb.
+    ("exposure", "erhoeht", ["unverzueglich", "in_kuerze"], "In Kürze"),
+    ("hygiene", "hoch", ["unverzueglich"], "In Kürze"),
+    ("hygiene", "mittel", ["in_kuerze"], "Mittelfristig"),
+    # Hygiene niedrig darf zwischen Mittelfristig und Strategisch waehlen.
+    ("hygiene", "niedrig", ["strategisch"], "Strategisch"),
+    ("hygiene", "niedrig", ["mittelfristig"], "Mittelfristig"),
+    ("hygiene", "niedrig", [], "Mittelfristig"),
 ])
-def test_dringlichkeit_ist_die_dringlichste_stufe(stages, erwartet):
-    assert L.urgency_for(stages) == erwartet
+def test_dringlichkeit_kommt_aus_der_tabelle(scale, level, stages, erwartet):
+    assert L.urgency_for(scale, level, stages) == erwartet
+
+
+def test_aktiver_nachweis_wird_rot_und_unverzueglich():
+    assert L.urgency_for("exposure", "erhoeht", ["mittelfristig"],
+                         active_proof=True) == "Unverzüglich"
+    assert L.severity_for("exposure", "erhoeht", active_proof=True) == "CRITICAL"
+
+
+def test_dashboard_stufe_je_einstufung():
+    assert L.severity_for("exposure", "kritisch") == "CRITICAL"
+    assert L.severity_for("exposure", "erhoeht") == "HIGH"
+    assert L.severity_for("hygiene", "hoch") == "HIGH"
+    assert L.severity_for("hygiene", "mittel") == "MEDIUM"
+    assert L.severity_for("hygiene", "niedrig") == "LOW"
 
 
 def test_ampelwert_folgt_der_farbe():

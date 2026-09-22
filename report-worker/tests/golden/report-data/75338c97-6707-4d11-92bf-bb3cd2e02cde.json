@@ -12,7 +12,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 23 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 9 Befunde und 6 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 23 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 9 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -43,8 +43,7 @@
   ],
   "repeat": [
    "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
-   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall.",
-   "Freischaltung der Scanner-Adresse beim Betreiber der blockierenden Systeme, damit die offenen Prüfungen im nächsten Durchgang nachgeholt werden können."
+   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall."
   ],
   "tool_findings": [],
   "tools": [
@@ -83,7 +82,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist oder einen kritischen Dienst exponiert. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
    },
    {
     "l": "Gelb",
@@ -93,7 +92,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
    },
    {
     "l": "Grün",
@@ -343,12 +342,13 @@
   {
    "affected": "vectigal.tech",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=None dmarc=None dkim=False mx=[]\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nvectigal.tech: DMARC=nicht vorhanden DKIM-Selektoren=keiner bekannt DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für vectigal.tech sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: vectigal.tech.",
    "id": "VS-2026-001",
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "hoch",
-   "policy": "SP-DNS-006",
+   "level_label": "hoch",
+   "policy": "dmarc_missing",
    "recommendation": [
     [
      "In Kürze",
@@ -360,7 +360,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
    "title": "Richtlinie zur Absender-Authentizität für vectigal.tech nicht durchsetzend",
@@ -370,12 +370,13 @@
   {
    "affected": "vectigal.tech",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=None dmarc=None dkim=False mx=[]\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nvectigal.tech: DMARC=nicht vorhanden DKIM-Selektoren=keiner bekannt DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für vectigal.tech fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können: vectigal.tech.",
    "id": "VS-2026-002",
    "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
    "level": "hoch",
-   "policy": "SP-DNS-004",
+   "level_label": "hoch",
+   "policy": "spf_missing",
    "recommendation": [
     [
      "In Kürze",
@@ -387,7 +388,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
    "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für vectigal.tech",
@@ -397,12 +398,13 @@
   {
    "affected": "vectiscan.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nspf=None dmarc=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de dkim=False mx=['mx00.udag.de', 'mx01.udag.de']\n\ndns_security · phase0a/dns_security_vectiscan.de.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de: DMARC=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de DKIM-Selektoren=keiner bekannt MX=mx00.udag.de, mx01.udag.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für vectiscan.de fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können: vectiscan.de.",
    "id": "VS-2026-003",
    "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
    "level": "hoch",
-   "policy": "SP-DNS-008, SP-DNS-004",
+   "level_label": "hoch",
+   "policy": "dkim_missing, spf_missing",
    "recommendation": [
     [
      "In Kürze",
@@ -414,7 +416,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
    "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für vectiscan.de",
@@ -424,12 +426,13 @@
   {
    "affected": "vectigal.tech:443, vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT)",
    "cat": "D",
-   "evidence": "testssl · scan_results:testssl:62.217.52.165\nprotocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True\n\ntestssl · hosts/62.217.52.165/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
+   "evidence": "testssl · scan_results:testssl:62.217.52.165\nvectigal.tech:443 CN=TRAEFIK DEFAULT CERT SAN=b7ac570d803b471e8b7b2b0fd41a6112.0cc7297b85e043717ea982a9e9019f1a.traefik.default Aussteller=TRAEFIK DEFAULT CERT gueltig_bis=2027-09-20T09:03:00Z abgelaufen=nein Resttage=364 Namensabweichun...\n\ntestssl · scan_results:testssl:62.217.52.165\nangeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1\n\ntestssl · hosts/62.217.52.165/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
    "found": "Die Zertifikate auf 62.217.52.165 sind abgelaufen, laufen in Kürze ab, werden unvollständig ausgeliefert oder passen nicht zum aufgerufenen Namen: vectigal.tech:443, vectigal.tech:443 (Zertifikat für TRAEFIK DEFAULT CERT).",
    "id": "VS-2026-004",
    "impact": "Ein Zertifikat mit Beanstandung führt im Browser zu einer Vertrauenswarnung. Nutzer gewöhnen sich daran, solche Warnungen wegzuklicken, und übersehen dann auch eine echte Täuschung.",
    "level": "hoch",
-   "policy": "catalog_sim R-CERT-CHAIN, catalog_sim R-CERT-MISMATCH",
+   "level_label": "hoch",
+   "policy": "cert_chain_incomplete, cert_hostname_mismatch",
    "recommendation": [
     [
      "Unverzüglich",
@@ -445,18 +448,19 @@
    "status": "gelb",
    "threat": null,
    "title": "Zertifikate auf 62.217.52.165 mit Beanstandungen",
-   "urgency": "Unverzüglich",
+   "urgency": "In Kürze",
    "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
   },
   {
    "affected": "vectiscan.de (p=none)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nspf=None dmarc=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de dkim=False mx=['mx00.udag.de', 'mx01.udag.de']\n\ndns_security · phase0a/dns_security_vectiscan.de.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de: DMARC=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de DKIM-Selektoren=keiner bekannt MX=mx00.udag.de, mx01.udag.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für vectiscan.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: vectiscan.de (p=none).",
    "id": "VS-2026-005",
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "mittel",
-   "policy": "SP-DNS-007",
+   "level_label": "mittel",
+   "policy": "dmarc_none",
    "recommendation": [
     [
      "In Kürze",
@@ -468,22 +472,23 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
    "title": "Richtlinie zur Absender-Authentizität für vectiscan.de nicht durchsetzend",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
   },
   {
    "affected": "vectiscan.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nspf=None dmarc=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de dkim=False mx=['mx00.udag.de', 'mx01.udag.de']\n\ndns_security · phase0a/dns_security_vectiscan.de.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de: DMARC=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de DKIM-Selektoren=keiner bekannt MX=mx00.udag.de, mx01.udag.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für vectiscan.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: vectiscan.de.",
    "id": "VS-2026-006",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
-   "policy": "SP-DNS-009, SP-DNS-011",
+   "level_label": "niedrig",
+   "policy": "mta_sts_missing, tls_rpt_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -491,7 +496,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "Transportverschlüsselung im Mailversand für vectiscan.de nicht erzwungen",
@@ -501,12 +506,13 @@
   {
    "affected": "10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech, 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy)",
    "cat": "D",
-   "evidence": "header_check · hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json\n10finance.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None\n\nhttpx · hosts/62.217.52.165/phase2/httpx_10finance.vectigal.tech.json\n10finance.vectigal.tech: status=200 title=10FINANCE Stabilitäts-Quickcheck webserver=None tech=['HSTS', 'Unpkg']\n\nheader_check · hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json\nboard.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None\n\nhttpx · hosts/62.217.52.165/phase2/httpx_board.vectigal.tech.json\nboard.vectigal.tech: status=200 title=Paperclip webserver=None tech=['HSTS']\n\nheader_check · hosts/62.217.52.165/phase2/headers_crm.vectigal.tech.json\ncrm.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None\n\nhttpx · hosts/62.217.52.165/phase2/httpx_crm.vectigal.tech.json\ncrm.vectigal.tech: status=200 title=Twenty webserver=None tech=['HSTS']\n\nheader_check · hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json\ncrmviewer.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None\n\nhttpx · hosts/62.217.52.165/phase2/httpx_crmviewer.vectigal.tech.json\ncrmviewer.vectigal.tech: status=200 title=Streamlit webserver=None tech=['HSTS']\n\nheader_check · hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json\ngutachter.vectigal.tech: reachable=True score=5/7 server=None x-feserver=None\n\nhttpx · hosts/62.217.52.165/phase2/httpx_gutachter.vectigal.tech.json\ngutachter.vectigal.tech: status=200 title=gutachter.ai webserver=None tech=['HSTS', 'Node.js', 'Nuxt.js', 'Vue.js']",
+   "evidence": "header_check · hosts/62.217.52.165/phase2/headers_10finance.vectigal.tech.json\n10finance.vectigal.tech: URL=https://10finance.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...\n\nheader_check · hosts/62.217.52.165/phase2/headers_board.vectigal.tech.json\nboard.vectigal.tech: URL=https://board.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; includeSubDom...\n\nheader_check · hosts/62.217.52.165/phase2/headers_crm.vectigal.tech.json\ncrm.vectigal.tech: URL=https://crm.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; includeSubDomains...\n\nheader_check · hosts/62.217.52.165/phase2/headers_crmviewer.vectigal.tech.json\ncrmviewer.vectigal.tech: URL=https://crmviewer.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...\n\nheader_check · hosts/62.217.52.165/phase2/headers_gutachter.vectigal.tech.json\ngutachter.vectigal.tech: URL=https://gutachter.vectigal.tech fehlende Header=content-security-policy, permissions-policy gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=31536000; inclu...",
    "found": "Die Webdienste auf 62.217.52.165 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech, 10finance.vectigal.tech (fehlend: permissions-policy), board.vectigal.tech (fehlend: permissions-policy), crm.vectigal.tech (fehlend: permissions-policy), crmviewer.vectigal.tech (fehlend: permissions-policy), gutachter.vectigal.tech (fehlend: permissions-policy).",
    "id": "VS-2026-007",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
-   "policy": "SP-CSP-001, SP-CSP-002, SP-HDR-005",
+   "level_label": "niedrig",
+   "policy": "csp_missing, security_headers_incomplete",
    "recommendation": [
     [
      "Mittelfristig",
@@ -518,7 +524,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (header_check, httpx)",
+   "source": "aktiv (header_check)",
    "status": "blau",
    "threat": null,
    "title": "Sicherheits-Header und Formularschutz auf 62.217.52.165 unvollständig",
@@ -528,12 +534,13 @@
   {
    "affected": "vectigal.tech",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=None dmarc=None dkim=False mx=[]\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nvectigal.tech: DMARC=nicht vorhanden DKIM-Selektoren=keiner bekannt DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für vectigal.tech fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: vectigal.tech.",
    "id": "VS-2026-008",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
-   "policy": "SP-DNS-003, SP-DNS-001",
+   "level_label": "niedrig",
+   "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -541,7 +548,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "DNS-Absicherung für vectigal.tech nicht eingerichtet",
@@ -551,12 +558,13 @@
   {
    "affected": "vectiscan.de",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nspf=None dmarc=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de dkim=False mx=['mx00.udag.de', 'mx01.udag.de']\n\ndns_security · phase0a/dns_security_vectiscan.de.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records_vectiscan.de.json\nvectiscan.de: DMARC=v=DMARC1; p=none; rua=mailto:dmarc@vectiscan.de DKIM-Selektoren=keiner bekannt MX=mx00.udag.de, mx01.udag.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für vectiscan.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: vectiscan.de.",
    "id": "VS-2026-009",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
-   "policy": "SP-DNS-003, SP-DNS-001",
+   "level_label": "niedrig",
+   "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -564,7 +572,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "DNS-Absicherung für vectiscan.de nicht eingerichtet",
@@ -611,19 +619,11 @@
    }
   ],
   "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von vectigal.tech und vectiscan.de am 20.09.2026: 31 Hostnamen auf 2 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
-  "coverage_warning": "Für 62.217.52.165 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "coverage_warning": "",
   "levers": [
    {
-    "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
-    "n": 1,
-    "refs": [
-     "VS-2026-004"
-    ],
-    "title": "Zertifikate auf 62.217.52.165 mit Beanstandungen"
-   },
-   {
     "effect": "Schützt die Authentizität der eigenen E-Mail",
-    "n": 2,
+    "n": 1,
     "refs": [
      "VS-2026-001",
      "VS-2026-002"
@@ -632,22 +632,29 @@
    },
    {
     "effect": "Schützt die Authentizität der eigenen E-Mail",
-    "n": 3,
+    "n": 2,
     "refs": [
-     "VS-2026-003",
-     "VS-2026-005"
+     "VS-2026-003"
     ],
     "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für vectiscan.de"
+   },
+   {
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "n": 3,
+    "refs": [
+     "VS-2026-004"
+    ],
+    "title": "Zertifikate auf 62.217.52.165 mit Beanstandungen"
    }
   ],
   "overall": "MITTEL",
   "overall_status": "gelb",
-  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die übrigen Befunde betreffen die Härtung der erreichbaren Dienste, die Authentizität der E-Mail und die Transportverschlüsselung."
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "9 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 23,
-  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
+  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 9,
@@ -657,7 +664,7 @@
    "vectigal.tech",
    "vectiscan.de"
   ],
-  "facts_schema_version": "1.0.2",
+  "facts_schema_version": "1.0.3",
   "fqdns_total": 31,
   "hosts_ipv4": 2,
   "hosts_ipv6": 0,
@@ -671,7 +678,7 @@
   "package": "WebCheck",
   "package_label": "WEBCHECK",
   "policy_version": "2026-09-20.1",
-  "positives": 6,
+  "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
@@ -688,15 +695,6 @@
  },
  "plan": [
   {
-   "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
-   "effect": "Beseitigt das dringlichste Risiko dieses Berichts",
-   "prio": "Unverzüglich",
-   "refs": [
-    "VS-2026-004"
-   ],
-   "st": "rot"
-  },
-  {
    "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten. Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "In Kürze",
@@ -707,11 +705,28 @@
    "st": "gelb"
   },
   {
-   "action": "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden. Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+   "action": "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "In Kürze",
    "refs": [
-    "VS-2026-003",
+    "VS-2026-003"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Abgelaufene Zertifikate erneuern und die vollständige Vertrauenskette am Dienst hinterlegen.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-004"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "prio": "Mittelfristig",
+   "refs": [
     "VS-2026-005"
    ],
    "st": "gelb"
@@ -762,16 +777,6 @@
    "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
   },
   {
-   "cat": "C",
-   "text": "Für vectigal.tech lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
-   "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
-  },
-  {
-   "cat": "D",
-   "text": "Auf den geprüften Hosts bieten die verschlüsselten Dienste nur aktuelle Protokolle und Verfahren an.",
-   "title": "Transportverschlüsselung ohne veraltete Protokolle und Verfahren"
-  },
-  {
    "cat": "E",
    "text": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
    "title": "Keine Einträge in Reputationsquellen"
@@ -813,23 +818,23 @@
   "lead": "Der Scan hat 2 IP-Adressen mit 31 Hostnamen erfasst. Für 1 Host war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech.",
+    "detail": "Betroffen: 10finance.vectigal.tech.",
     "what": "Cipher-Liste nicht verfügbar (kein testssl-Lauf für diesen Dienst)"
    },
    {
-    "detail": "Betroffen: httpx auf 62.217.52.177.",
+    "detail": "Betroffen: 62.217.52.177.",
     "what": "Das Werkzeug httpx hat kein Ergebnis geliefert"
    },
    {
-    "detail": "Betroffen: zap_active auf 62.217.52.165, zap_active auf 62.217.52.177.",
+    "detail": "Betroffen: 62.217.52.165, 62.217.52.177.",
     "what": "Das Werkzeug zap_active hat kein Ergebnis geliefert"
    },
    {
-    "detail": "Betroffen: zap_spider auf 62.217.52.165.",
+    "detail": "Betroffen: 62.217.52.165.",
     "what": "Das Werkzeug zap_spider hat kein Ergebnis geliefert"
    },
    {
-    "detail": "Betroffen: agent.vectigal.tech, auth.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech und weitere.",
+    "detail": "Betroffen: ki-check-10finance.vectigal.tech, vectiscan.de.",
     "what": "Fakten reichen für eine Aussage nicht aus"
    },
    {
@@ -837,7 +842,7 @@
     "what": "Keine Schwachstellen-Anreicherung vorhanden"
    },
    {
-    "detail": "Betroffen: 62.217.52.177 (test.vectigal.tech), webtech auf 62.217.52.177.",
+    "detail": "Betroffen: 62.217.52.177 (test.vectigal.tech).",
     "what": "Keine Technologie-Signale erkannt"
    },
    {
@@ -845,15 +850,15 @@
     "what": "Keine WHOIS-Daten vorhanden"
    },
    {
-    "detail": "Betroffen: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech.",
+    "detail": "Betroffen: 10finance.vectigal.tech.",
     "what": "Protokollliste nicht verfügbar (testssl-Ausgabe gefiltert)"
    },
    {
-    "detail": "Betroffen: header_check auf test.vectigal.tech, test.vectigal.tech.",
+    "detail": "Betroffen: test.vectigal.tech.",
     "what": "Virtueller Host war über HTTP nicht erreichbar"
    },
    {
-    "detail": "Betroffen: 10finance.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, gutachter.vectigal.tech.",
+    "detail": "Betroffen: 10finance.vectigal.tech.",
     "what": "Zertifikatsdetails nicht verfügbar"
    }
   ],
@@ -876,7 +881,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 9 Befunde und 6 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 9 Befunde und 4 positive Feststellungen."
    }
   ],
   "numbers": [

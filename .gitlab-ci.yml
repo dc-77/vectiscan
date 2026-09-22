@@ -201,10 +201,6 @@ test-report-worker:
 # halbleere Seiten, eingebettete Schriften, Selbstcheck-Defekte. Danach die
 # Renderer-Suite plus die schriftabhaengigen Branding-Tests im Abbild; pytest liegt
 # nicht im Produktionsbild und wird nur in diesem Wegwerf-Container nachinstalliert.
-# `-m "not reportlab_fallback"` nimmt test_font_constants heraus: der Test prueft die
-# Ersatzschrift und damit die Abwesenheit von DejaVu, das Abbild bringt DejaVu aber
-# mit. Nicht geloescht und nicht global abgeschaltet -- er bleibt ueberall sonst
-# gruen und wird mit dem ReportLab-Pfad in S6 aufgeraeumt.
 test-report-worker-pdf:
   stage: test
   tags: [vectigal]
@@ -216,8 +212,7 @@ test-report-worker-pdf:
     - docker run --rm --user root -e VECTISCAN_REQUIRE_WEASYPRINT=1
         ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
         sh -c "python3 -m pip install --no-cache-dir --break-system-packages --quiet pytest
-        && python3 -m pytest tests/pdf_v3 tests/test_branding_integration.py
-        -m 'not reportlab_fallback' -q"
+        && python3 -m pytest tests/pdf_v3 tests/test_branding_integration.py -q"
   # Bewusst OHNE die api-Regel, die test-report-worker sonst traegt: dieser Job
   # braucht das Abbild aus build-report-worker, und das entsteht bei
   # source=api auf einem Nicht-main-Branch nicht. Die Regeln muessen deshalb
@@ -325,8 +320,29 @@ test-edge:
       KC_BOOTSTRAP_ADMIN_USERNAME=${KC_BOOTSTRAP_ADMIN_USERNAME:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD=${KC_BOOTSTRAP_ADMIN_PASSWORD:-}
       KEYCLOAK_GRAFANA_SECRET=${KEYCLOAK_GRAFANA_SECRET:-}
+      VECTISCAN_REPORT_ENGINE=${VECTISCAN_REPORT_ENGINE:-catalog}
+      VECTISCAN_REPORT_LAYOUT=${VECTISCAN_REPORT_LAYOUT:-v3}
+      VECTISCAN_VALIDATION_LEVEL=${VECTISCAN_VALIDATION_LEVEL:-strict}
       ENVEOF
     - sed -i 's/^[[:space:]]*//' .env
+    # ── Deploy-Guard (S6): Die drei Report-Schalter stehen seit der Umschaltung
+    #    im .env, damit die Produktion nicht still am Compose-Default haengt und
+    #    ein Rueckweg per CI-Variable ohne Compose-Aenderung moeglich ist. Ein
+    #    unbekannter Wert ist im Worker ein Startfehler; hier wird nur laut, wer
+    #    noch auf dem alten Weg steht.
+    - |
+      for zeile in VECTISCAN_REPORT_ENGINE VECTISCAN_REPORT_LAYOUT VECTISCAN_VALIDATION_LEVEL; do
+        wert=$(grep "^${zeile}=" .env | cut -d= -f2-)
+        echo "INFO: ${zeile}=${wert}"
+      done
+      if grep -q '^VECTISCAN_REPORT_ENGINE=legacy$' .env; then
+        echo "WARN: Report-Engine steht auf 'legacy' — die alte KI-Kette laeuft"
+        echo "      wieder mit (rund 1,85 USD je Bericht) und der Bericht kommt"
+        echo "      nicht aus dem Pruefkatalog. Nur als Rueckweg gedacht (S6)."
+      fi
+      if grep -q '^VECTISCAN_VALIDATION_LEVEL=warn$' .env; then
+        echo "WARN: Gate steht auf 'warn' — Defekte halten keinen Bericht mehr auf."
+      fi
     # ── Deploy-Guard (VEC-217): RESEND_API_KEY ist eine *protected* CI-Var; auf
     #    einem unprotected Branch erreicht sie den .env-Write nicht und landet
     #    leer im Container -> E-Mail-/Lead-Routing ist STILL tot (Root-Cause
@@ -1197,6 +1213,17 @@ ops-facts-prod:
           ${EXPORT} \
           report-worker python3 -m reporter.worker --once --order "${FACTS_ORDER_ID}" \
           2>&1 | tee ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-voll.log
+        # S6: Den eben gebauten Bericht zusaetzlich in die Job-Artefakte legen.
+        # Der Worker laedt ihn nach MinIO und raeumt sein Arbeitsverzeichnis auf,
+        # deshalb wird er hier ueber den Ops-Weg noch einmal gerendert (ohne
+        # --upload, ohne DB-Schreibzugriff) statt aus dem Bucket geholt.
+        docker compose exec -T report-worker python3 -m reporter.pdf.v3 \
+          --order "${FACTS_ORDER_ID}" -o "/tmp/${FACTS_ORDER_ID}-v3.pdf" \
+          2>&1 | tee ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-render.log || true
+        docker compose cp \
+          "report-worker:/tmp/${FACTS_ORDER_ID}-v3.pdf" \
+          "${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-v3.pdf" || true
+        docker compose exec -T report-worker rm -f "/tmp/${FACTS_ORDER_ID}-v3.pdf" || true
       else
         docker compose exec -T ${EXPORT} report-worker python3 -m reporter.pdf.v3 \
           --kennzahlen --order "${FACTS_ORDER_ID}" \
@@ -1206,6 +1233,12 @@ ops-facts-prod:
           docker compose exec -T report-worker python3 -m reporter.pdf.v3 \
             --order "${FACTS_ORDER_ID}" -o "/tmp/${FACTS_ORDER_ID}-v3.pdf" --upload \
             2>&1 | tee ${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-render.log || true
+          # S6: Das PDF liegt sonst nur in scan-debug im MinIO, und wer es
+          # gegenlesen soll, braucht dafuer einen Bucket-Zugang. Jetzt haengt es
+          # an den Job-Artefakten (facts-prod/), wie die Logs daneben.
+          docker compose cp \
+            "report-worker:/tmp/${FACTS_ORDER_ID}-v3.pdf" \
+            "${CI_PROJECT_DIR}/facts-prod/${FACTS_ORDER_ID}-v3.pdf" || true
           docker compose exec -T report-worker rm -f "/tmp/${FACTS_ORDER_ID}-v3.pdf" || true
         fi
       fi
@@ -1829,121 +1862,13 @@ ops-keycloak-fix-groups-scope:
     url: https://id.vectigal.tech
 
 # =============================================================================
-# VEC-378 — Admin-Release für QA-WebCheck-Order (Re-Scan VEC-376)
-# Genehmigt Target für Order 46ce8dcc-4236-4c15-895a-ad32586d484a und queued
-# den WebCheck-Scan. Einmaliger Ops-Job; wird per API-Pipeline getriggert.
-# Voraussetzung: ADMIN_EMAIL + ADMIN_PASSWORD als CI-Variablen gesetzt.
+# VEC-378 — die beiden auftragsgebundenen Ops-Jobs (ops-admin-release-vec378,
+# ops-check-order-status-vec378) sind mit S6 entfernt. Sie trugen
+# `when: always` fuer `$CI_PIPELINE_SOURCE == "api"` und riefen damit auf
+# jeder API-Pipeline `POST /api/admin/orders/<fester Auftrag>/release` auf der
+# Produktion auf. Ein Ops-Job, der eine Kundenorder anfasst, gehoert nicht in
+# eine automatisch laufende Stage.
 # =============================================================================
-ops-admin-release-vec378:
-  stage: ops
-  tags: [vectigal]
-  needs: []
-  allow_failure: true
-  variables:
-    ORDER_ID: "46ce8dcc-4236-4c15-895a-ad32586d484a"
-    TARGET_ID: "b46a509a-a061-4464-8896-d0bb13ce49dc"
-    API_BASE: "https://scan-api.vectigal.tech"
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "api"
-      when: always
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
-    - if: $CI_PIPELINE_SOURCE == "web"
-      when: manual
-  script:
-    - 'echo "=== VEC-378 Admin-Release: ${ORDER_ID} ==="'
-    - |
-      if [ -z "${ADMIN_EMAIL}" ] || [ -z "${ADMIN_PASSWORD}" ]; then
-        echo "FATAL: ADMIN_EMAIL oder ADMIN_PASSWORD nicht gesetzt (CI-Variable fehlt)"
-        exit 1
-      fi
-    - |
-      TOKEN=$(curl -sf -X POST "${API_BASE}/api/auth/login" \
-        -H "Content-Type: application/json" \
-        -d "{\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASSWORD}\"}" \
-        | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
-      if [ -z "$TOKEN" ]; then
-        echo "FATAL: Admin-Login fehlgeschlagen (kein Token in Response)"
-        exit 1
-      fi
-      echo "OK: Admin-Token erhalten (Länge=${#TOKEN})"
-    - |
-      REVIEW=$(curl -sf -X GET "${API_BASE}/api/admin/review/order/${ORDER_ID}" \
-        -H "Authorization: Bearer ${TOKEN}")
-      echo "Review-Response (gekürzt): $(echo "$REVIEW" | head -c 500)"
-      echo "OK: Target-ID=${TARGET_ID} (hardcoded aus Job-Run-Trace)"
-    - |
-      APPROVE=$(curl -sf -X POST "${API_BASE}/api/admin/targets/${TARGET_ID}/approve" \
-        -H "Authorization: Bearer ${TOKEN}" \
-        -H "Content-Type: application/json" \
-        -d '{"notes":"VEC-378 QA-Re-Scan, board-vetted target dortmund-beach.com"}')
-      echo "Approve-Response: ${APPROVE}"
-      if echo "$APPROVE" | grep -q '"success":true'; then
-        echo "OK: Target approved"
-      else
-        echo "WARN: Approve-Response enthält kein success:true — manuell prüfen"
-      fi
-    - |
-      RELEASE=$(curl -sf -X POST "${API_BASE}/api/admin/orders/${ORDER_ID}/release" \
-        -H "Authorization: Bearer ${TOKEN}" \
-        -H "Content-Type: application/json")
-      echo "Release-Response: ${RELEASE}"
-      if echo "$RELEASE" | grep -q '"success":true'; then
-        echo "=== RELEASE ERFOLGREICH: Order gequeued, WebCheck startet ==="
-      else
-        echo "FATAL: Release fehlgeschlagen — Response: ${RELEASE}"
-        exit 1
-      fi
-    - 'echo "=== VEC-378 DONE: Scan queued, ~15-20 Min bis report_complete ==="'
-
-# =============================================================================
-# VEC-378 Ops-Job: Order-Status prüfen (report_complete?)
-# Einmaliger Check-Job; per API-Pipeline triggerbar.
-# =============================================================================
-ops-check-order-status-vec378:
-  stage: ops
-  tags: [vectigal]
-  needs: []
-  allow_failure: true
-  variables:
-    ORDER_ID: "46ce8dcc-4236-4c15-895a-ad32586d484a"
-    API_BASE: "https://scan-api.vectigal.tech"
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "api"
-      when: always
-    - if: $CI_COMMIT_BRANCH == "main"
-      when: manual
-    - if: $CI_PIPELINE_SOURCE == "web"
-      when: manual
-  script:
-    - 'echo "=== VEC-378 Order-Status-Check: ${ORDER_ID} ==="'
-    - |
-      if [ -z "${ADMIN_EMAIL}" ] || [ -z "${ADMIN_PASSWORD}" ]; then
-        echo "FATAL: ADMIN_EMAIL oder ADMIN_PASSWORD nicht gesetzt"
-        exit 1
-      fi
-    - |
-      TOKEN=$(curl -sf -X POST "${API_BASE}/api/auth/login" \
-        -H "Content-Type: application/json" \
-        -d "{\"email\":\"${ADMIN_EMAIL}\",\"password\":\"${ADMIN_PASSWORD}\"}" \
-        | grep -o '"token":"[^"]*"' | cut -d'"' -f4)
-      if [ -z "$TOKEN" ]; then
-        echo "FATAL: Admin-Login fehlgeschlagen"
-        exit 1
-      fi
-    - |
-      STATUS_RESP=$(curl -sf -X GET "${API_BASE}/api/orders/${ORDER_ID}" \
-        -H "Authorization: Bearer ${TOKEN}")
-      ORDER_STATUS=$(echo "$STATUS_RESP" | grep -o '"status":"[^"]*"' | head -1 | cut -d'"' -f4)
-      echo "ORDER_STATUS=${ORDER_STATUS}"
-      if [ "${ORDER_STATUS}" = "report_complete" ]; then
-        echo "=== SCAN_DONE: report_complete — Mitnick kann QA starten ==="
-      elif [ "${ORDER_STATUS}" = "scan_running" ] || [ "${ORDER_STATUS}" = "queued" ] || [ "${ORDER_STATUS}" = "scan_pending" ]; then
-        echo "=== SCAN_RUNNING: Noch nicht fertig, Status=${ORDER_STATUS} ==="
-      else
-        echo "=== STATUS=${ORDER_STATUS} — evtl. pending_review oder anderer Zwischenstatus ==="
-      fi
-
 
 # =============================================================================
 ops-provision-turnstile:

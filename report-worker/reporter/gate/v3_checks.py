@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Die vier Gate-Pruefungen aus S5, die ueber das Datenmodell hinausgehen.
+"""Die Gate-Pruefungen, die ueber das Datenmodell hinausgehen.
 
 ``reporter/v3/selfcheck`` prueft Eigenschaften der Reportdaten allein. Die
 Pruefungen hier brauchen zusaetzlich die Fakten oder das Katalogergebnis und
@@ -12,15 +12,13 @@ import re
 from typing import Any, Iterable, Optional
 
 from reporter.gate.defects import ENGINE_V3, SEVERITY_ERROR, SEVERITY_WARNING, Defect
+from reporter.v3.report_data import DEFAULT_CUSTOMER as CUSTOMER_PLACEHOLDER
 
 # Zielwert aus spec/06: unter fuenf Beobachtungen ohne Regel je Auftrag. Die
 # Zaehlung selbst macht der Katalog (CatalogOutput.summary.unprocessed), hier
 # steht nur die Schwelle. tests/catalog/test_snapshot_orders.py liest sie von
 # hier, damit es die Zahl nicht ein zweites Mal gibt.
 UNPROCESSED_WARN_THRESHOLD = 5
-
-# Platzhalter aus reporter/v3/report_data.py, wenn kein Firmenname bekannt ist.
-CUSTOMER_PLACEHOLDER = "Auftraggeber"
 
 _IP = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b|\b(?:[0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}\b")
 _VERSION = r"v?(\d+(?:\.\d+)*)"
@@ -214,25 +212,68 @@ def abdeckungskapitel_leer(data: Any) -> list[Defect]:
     )]
 
 
-def auftraggeber_fehlt(data: Any) -> list[Defect]:
-    """Kein Firmenname im Kundenkontext: Warnung, der Bericht bleibt lesbar."""
+def auftraggeber_fehlt(data: Any, *, strict: bool = False) -> list[Defect]:
+    """Kein Firmenname im Kundenkontext.
+
+    Bis S6 eine Warnung, weil der Bericht auch ohne Namen lesbar ist. Der
+    WebCheck-Bericht 75338c97 trug deshalb 39-mal "Auftraggeber" auf dem
+    Deckblatt, in jeder Kopf- und jeder Fusszeile und ging mit 0 Fehlern durch
+    das Gate (spec/08 Punkt 8). Im strict-Modus ist das jetzt ein Fehler: ein
+    Bericht ohne Auftraggeber wird nicht ausgeliefert, der Rueckweg ist das
+    Kundenkontext-Feld im Admin.
+    """
     customer = str(getattr(getattr(data, "meta", None), "customer", "") or "")
     if customer and customer != CUSTOMER_PLACEHOLDER:
         return []
     return [Defect(
         engine=ENGINE_V3,
         check="auftraggeber_fehlt",
-        severity=SEVERITY_WARNING,
+        severity=SEVERITY_ERROR if strict else SEVERITY_WARNING,
         message=("Der Bericht nennt den Auftraggeber generisch. Firmenname im "
                  "Kundenkontext nachtragen (Reiter Kunde im Admin-Review)."),
     )]
 
 
-def run_all(data: Any, facts: Any, output: Any) -> list[Defect]:
-    """Alle vier Pruefungen in fester Reihenfolge."""
+# Zustaende einer Abdeckungszeile, die kein Ergebnis bedeuten. ``skipped`` steht
+# nicht darin: ein uebersprungenes Werkzeug hat einen Grund (kein TLS-Dienst,
+# nicht im Paket) und ist keine Stoerung.
+OHNE_ERGEBNIS = ("empty", "unknown", "failed", "blocked")
+
+
+def abdeckung_ohne_ergebnis(facts: Any) -> list[Defect]:
+    """Kein einziger Werkzeuglauf ueber alle Hosts hat etwas geliefert.
+
+    Offener Punkt 1 nach S5b: faellt der Lader aus, stehen alle Zeilen auf
+    ``empty`` oder ``unknown``, jede Pruefung wird nicht pruefbar, und der
+    Bericht liest sich wie eine unauffaellige Pruefung. ``abdeckungskapitel_leer``
+    greift dabei nicht, weil ein Abdeckungstext auch aus ``empty``-Zeilen
+    entsteht. Ohne jede Abdeckungszeile meldet bereits die andere Pruefung.
+    """
+    rows = list(getattr(facts, "coverage", []) or [])
+    if not rows:
+        return []
+    mit_ergebnis = [c for c in rows if getattr(c, "status", "") == "ok"]
+    if mit_ergebnis:
+        return []
+    ohne = [c for c in rows if getattr(c, "status", "") in OHNE_ERGEBNIS]
+    if not ohne:
+        return []
+    return [Defect(
+        engine=ENGINE_V3,
+        check="abdeckung_ohne_ergebnis",
+        severity=SEVERITY_ERROR,
+        message=(f"Keiner der {len(rows)} Werkzeuglaeufe hat ein Ergebnis geliefert. "
+                 "Der Bericht haette keine belegte Aussage. Rohdaten und Lader pruefen."),
+        detail={"zeilen": len(rows), "ohne_ergebnis": len(ohne)},
+    )]
+
+
+def run_all(data: Any, facts: Any, output: Any, *, strict: bool = False) -> list[Defect]:
+    """Alle Pruefungen in fester Reihenfolge."""
     defects: list[Defect] = []
     defects.extend(abdeckungskapitel_leer(data))
+    defects.extend(abdeckung_ohne_ergebnis(facts))
     defects.extend(tech_widerspricht_befund(data, facts))
     defects.extend(unprocessed_ueber_schwelle(output))
-    defects.extend(auftraggeber_fehlt(data))
+    defects.extend(auftraggeber_fehlt(data, strict=strict))
     return defects

@@ -277,7 +277,7 @@ tr{break-inside:avoid;}
 
  <h3>3.2 Service-Karte</h3>
  {% for h in a.services %}
- <div class="svc"><div class="h">{{ h.host }} <span>· {{ h.label }}</span></div>
+ <div class="svc"><div class="h">{{ h.host }}{% if h.label %} <span>· {{ h.label }}</span>{% endif %}</div>
   {% if h.ports %}{% for p in h.ports %}<span class="chip c-{{ p.st }}"><b>{{ p.p }}</b>{{ p.s }}</span>{% endfor %}{% else %}<span class="chip c-gruen">keine erreichbaren Ports</span>{% endif %}
  </div>
  {% endfor %}
@@ -317,7 +317,7 @@ tr{break-inside:avoid;}
   <tr><th style="width:22mm">Priorität</th><th style="width:84mm">Maßnahme</th><th style="width:26mm">Befunde</th><th style="width:36mm">Erwarteter Effekt</th></tr>
   {% for p in plan %}<tr><td><span class="pill p-{{ p.st }}">{{ p.prio }}</span></td><td>{{ p.action }}</td><td class="mono" style="font-size:7.6pt">{% for r in p.refs %}{{ r }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td class="small">{{ p.effect }}</td></tr>{% endfor %}
  </table>
- <div class="box info"><div class="t">Zeitstufen</div><b>Unverzüglich</b> innerhalb von 24 bis 72 Stunden · <b>In Kürze</b> innerhalb von 1 bis 2 Wochen · <b>Mittelfristig</b> im nächsten Wartungs- oder Release-Zyklus · <b>Strategisch</b> als Architektur- oder Planungsentscheidung im laufenden Quartal.</div>
+ <div class="box info"><div class="t">Zeitstufen</div>{{ stage_box }}</div>
 </section>
 
 <!-- ===================== 6 BEFUND-DETAILS ===================== -->
@@ -328,7 +328,7 @@ tr{break-inside:avoid;}
   <div style="break-inside:avoid">
   <div class="hd"><span class="id">{{ f.id }}</span><span class="ti">{{ f.title }}</span></div>
   <div class="meta"><span class="pill p-{{ f.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU'}[f.status] }}</span><span><b>{{ f.urgency }}</b></span><span>· Kategorie {{ f.cat }}</span>
-   <span class="sc">{% if f.scale == 'exposure' %}Exposition: {{ f.level }}{% else %}Hygiene: {{ f.level }}{% endif %}</span></div>
+   <span class="sc">{% if f.scale == 'exposure' %}Exposition: {{ f.level_label or f.level }}{% else %}Hygiene: {{ f.level_label or f.level }}{% endif %}</span></div>
   <div class="bd" style="padding-bottom:0">
    <div class="lab">Betroffen</div><p>{{ f.affected }}<br><span class="small">Quelle: {{ f.source }}</span></p>
   </div></div>
@@ -337,9 +337,9 @@ tr{break-inside:avoid;}
    <div class="lab">Nachweis</div><div class="ev">{{ f.evidence }}</div>
    {% if f.threat %}<div class="lab">Threat Intelligence</div><p>{% for c in f.threat.cves %}{{ c }}{% if not loop.last %}; {% endif %}{% endfor %}{% if f.threat.kev %} · CISA KEV: {{ f.threat.kev }}{% endif %}{% if f.threat.note %} · {{ f.threat.note }}{% endif %}</p>{% endif %}
    <div class="lab">Auswirkung</div><p>{{ f.impact }}</p>
-   <div class="lab">Empfehlung</div><div class="rec">{% for u,t in f.recommendation %}<div><span class="u">{{ u }}</span>{{ t }}</div>{% endfor %}</div>
+   <div class="lab">Empfehlung</div><div class="rec">{% for u,t in f.recommendation %}<div><span class="u">{{ u }}:</span> {{ t }}</div>{% endfor %}</div>
    <div class="lab">Verifikation nach Umsetzung</div><div class="ev">{{ f.verify }}</div>
-   <div class="ref">Interne Referenz: Policy {{ f.policy }} · VectiScan-Severity-Policy {{ m.policy_version }}</div>
+   <div class="ref">Prüfkatalog{% if m.catalog_version %} {{ m.catalog_version }}{% endif %}, Regel {{ f.policy }}</div>
   </div>
  </div>
 {%- endmacro %}
@@ -371,10 +371,14 @@ tr{break-inside:avoid;}
  <table><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Hygiene</th></tr>
  {% for h in ap.hygiene_scale %}<tr><td><b>{{ h.l }}</b></td><td>{{ h.t }}</td></tr>{% endfor %}</table>
  <table><tr><th style="width:24mm">ID</th><th style="width:96mm">Titel</th><th style="width:24mm">Einstufung</th><th style="width:24mm">Dringlichkeit</th></tr>
- {% for f in findings %}<tr><td class="mono">{{ f.id }}</td><td>{{ f.title }}</td><td>{{ 'Exposition' if f.scale == 'exposure' else 'Hygiene' }} {{ f.level }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td></tr>{% endfor %}</table>
+ {% for f in findings %}<tr><td class="mono">{{ f.id }}</td><td>{{ f.title }}</td><td>{{ 'Exposition' if f.scale == 'exposure' else 'Hygiene' }} {{ f.level_label or f.level }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td></tr>{% endfor %}</table>
  <h3>A.3 CVE-Referenzen</h3>
+ {% if ap.cve_refs %}
  <table><tr><th style="width:28mm">CVE</th><th style="width:34mm">Bezeichnung</th><th style="width:14mm">Basiswert</th><th style="width:16mm">Quelle</th><th style="width:34mm">Befund</th><th style="width:42mm">Hinweis</th></tr>
  {% for c in ap.cve_refs %}<tr><td class="mono">{{ c.cve }}</td><td>{{ c.name }}</td><td class="mono">{{ c.score }}</td><td>{{ c.src }}</td><td class="mono">{{ c.ref }}</td><td class="small">{{ c.note }}</td></tr>{% endfor %}</table>
+ {% else %}
+ <p>Keine CVE-Referenzen in diesem Bericht.</p>
+ {% endif %}
  {% if show_inventory %}
  <div class="sec-head" style="margin-top:6mm"><div class="kicker">Anhang {{ ltr.inventory }}</div><h2>Service-Inventar</h2></div>
  <p>Alle erkannten Dienste je Host, als Nachschlagewerk für den Maßnahmenplan. Einträge aus Passivquellen sind gekennzeichnet.</p>
@@ -410,7 +414,7 @@ tr{break-inside:avoid;}
   <div><div class="h">Verantwortlich</div>{{ m.provider_responsible }}<br>Produkt: VectiScan</div>
   <div style="text-align:right;opacity:0.55;margin-top:-9mm"><span style="display:inline-block">{{ shield(30, '#2DD4BF', '0.35') }}</span></div>
  </div>
- <p class="small" style="margin-top:4mm">Bericht {{ m.report_id }} · Version {{ m.report_version }} · Stand {{ m.report_date }} · Scan-Orders {% for o in m.orders %}{{ o.id[:8] }}{% if not loop.last %}, {% endif %}{% endfor %} · Severity-Policy {{ m.policy_version }}</p>
+ <p class="small" style="margin-top:4mm">Bericht {{ m.report_id }} · Version {{ m.report_version }} · Stand {{ m.report_date }} · Scan-Orders {% for o in m.orders %}{{ o.id[:8] }}{% if not loop.last %}, {% endif %}{% endfor %} {% if m.catalog_version %} · Prüfkatalog {{ m.catalog_version }}{% endif %}{% if m.facts_schema_version %} · Faktenschema {{ m.facts_schema_version }}{% endif %}</p>
  </div>
 </section>
 </body></html>

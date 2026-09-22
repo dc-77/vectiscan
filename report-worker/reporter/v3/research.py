@@ -51,10 +51,28 @@ WEB_SEARCH_TOOL: dict[str, Any] = {
 # Felder, die die Recherche befuellen darf, mit Laengengrenze.
 TEXT_LIMITS: dict[str, int] = {
     "firmenname": 120,
+    "kurzname": 60,
     "branche": 80,
     "mitarbeiter": 40,
     "zweck": 120,
 }
+
+# S6 (spec/08 Punkt 8): Der Bericht nennt als Auftraggeber die Firma, nicht die
+# Person dahinter. Der Recherche-Lauf gegen dortmund-beach lieferte
+# "Dortmund Beach Design, Inhaber Christian Tacke" aus dem Impressum, und das
+# stand danach auf dem Deckblatt, in jeder Kopfzeile und im PDF-Titel.
+PERSONENZUSATZ = re.compile(
+    r"\s*[,;(]?\s*\b(inh\.?|inhaber(in)?|gesch[äa]ftsf[üu]hrer(in)?|gf|"
+    r"vertreten\s+durch|e\.?\s?K\.?\s*,)\b.*$", re.I)
+
+# Rechtsformen, die im Kurznamen nichts verloren haben. Der Kurzname steht in der
+# Fusszeile und im PDF-Titel; vorher war es das erste Wort des Firmennamens, und
+# "Dortmund Beach Design" wurde zu "Dortmund" und las sich wie ein Ortsname.
+RECHTSFORMEN = (
+    "gmbh & co. kg", "gmbh & co kg", "ag & co. kg", "gmbh", "mbh", "ug (haftungsbeschränkt)",
+    "ug", "aktiengesellschaft", "ag", "kgaa", "kg", "ohg", "gbr", "e.k.", "e. k.", "ek",
+    "e.v.", "e. v.", "gemeinnützige gmbh", "ggmbh", "se", "partg", "mbb",
+)
 
 # Quellen, die ein Vorschlag nicht anfassen darf.
 PROTECTED_SOURCES = frozenset({"kunde", "admin"})
@@ -84,8 +102,30 @@ laesst du weg:
  "mitarbeiter": {"wert": "...", "quelle": "https://..."},
  "systeme": [{"fqdn": "...", "zweck": "...", "quelle": "https://..."}]}
 
-firmenname ist die vollstaendige Firmierung mit Rechtsform. mitarbeiter ist eine
-Zahl oder eine Spanne, ohne Zusatz. systeme nennt nur Hostnamen aus der Eingabe."""
+firmenname ist die Firmierung mit Rechtsform, aber ohne Personenzusatz: kein
+"Inhaber ...", kein "Geschaeftsfuehrer ...", kein "vertreten durch ...". Im Bericht
+steht die Firma, nicht die Person. mitarbeiter ist eine Zahl oder eine Spanne, ohne
+Zusatz. systeme nennt nur Hostnamen aus der Eingabe."""
+
+
+def firmenname_ohne_person(text: str) -> str:
+    """Personenzusatz aus einer Firmierung entfernen."""
+    return PERSONENZUSATZ.sub("", (text or "").strip()).strip(" ,;·-").strip()
+
+
+def kurzname_aus(firmenname: str) -> str:
+    """Firmenname ohne Rechtsform; nie nur das erste Wort.
+
+    Bleibt nach dem Kuerzen nichts uebrig (eine Firmierung, die nur aus der
+    Rechtsform besteht), steht der volle Name da.
+    """
+    text = firmenname_ohne_person(firmenname)
+    low = text.lower()
+    for form in RECHTSFORMEN:
+        if low.endswith(" " + form):
+            gekuerzt = text[: len(text) - len(form)].strip(" ,-·")
+            return gekuerzt or text
+    return text
 
 
 # ---------------------------------------------------------------- Eingabe
@@ -248,6 +288,20 @@ def apply_suggestion(context: dict[str, Any] | None, suggestion: dict[str, Any],
     for field in ("firmenname", "branche", "mitarbeiter"):
         if field in suggestion:
             take(field, suggestion.get(field))
+
+    # S6: Personenzusatz faellt weg, auch wenn die KI ihn entgegen dem Prompt
+    # liefert; der Kurzname fuer Fusszeile und PDF-Titel ist ein eigenes Feld.
+    if result.get("firmenname") and _source_of(result, "firmenname") not in PROTECTED_SOURCES:
+        bereinigt = firmenname_ohne_person(str(result["firmenname"]))
+        if bereinigt and bereinigt != result["firmenname"]:
+            rejected.append("firmenname: Personenzusatz entfernt")
+            result["firmenname"] = bereinigt
+    if not result.get("kurzname") and result.get("firmenname"):
+        kurz = kurzname_aus(str(result["firmenname"]))
+        if kurz:
+            result["kurzname"] = kurz
+            sources["kurzname"] = {"source": _source_of(result, "firmenname") or SOURCE_RESEARCH,
+                                   "url": ((result.get("sources") or {}).get("firmenname") or {}).get("url", "")}
 
     systeme = suggestion.get("systeme")
     if isinstance(systeme, list) and not result.get("systeme") \

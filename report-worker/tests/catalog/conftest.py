@@ -220,6 +220,8 @@ def assert_expect(result: CheckResult, expect: dict[str, Any], where: str = "") 
             assert any(needle in a for a in result.affected), f"{where}: {needle!r} nicht in {result.affected}"
     if "positive" in expect:
         assert result.positive is expect["positive"], f"{where}: positive {result.positive} != {expect['positive']}"
+    if "active_proof" in expect:
+        assert result.active_proof is expect["active_proof"], f"{where}: active_proof {result.active_proof} != {expect['active_proof']}"
     if "reason_code" in expect:
         assert result.reason_code == expect["reason_code"], f"{where}: reason_code {result.reason_code} != {expect['reason_code']}"
     if "notes" in expect:

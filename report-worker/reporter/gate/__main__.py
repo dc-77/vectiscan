@@ -161,7 +161,10 @@ def main(argv: list[str] | None = None) -> int:
     beschreibung = _damage(data, facts, args.damage)
 
     liste = GD.from_selfcheck(check_report_data_detailed(data))
-    liste.extend(v3_checks.run_all(data, facts, output))
+    # Der Ops-Weg faehrt die Pruefungen so scharf wie die Produktion.
+    from reporter import engine as _engine
+    liste.extend(v3_checks.run_all(
+        data, facts, output, strict=_engine.validation_level() == "strict"))
     payload = GD.payload(liste, engine="v3", level="strict", facts=facts,
                          output=output, blocked=any(d.is_error for d in liste))
 

@@ -99,7 +99,8 @@ def test_erzaehltexte_sind_sauber():
 
 def test_stammdaten_tabellen_sind_sauber():
     texte = [t for _, t in T.EXPOSURE_SCALE] + [t for _, t in T.HYGIENE_SCALE]
-    texte += [t for _, _, t in T.TRIAGE]
+    texte += [t for _, _, t in T.triage_rows()]
+    texte += [T.stage_box()]
     texte += [u for _, u, _, _ in T.TOOL_ROWS] + [t for t, _, _, _ in T.TOOL_ROWS]
     texte += list(T.TECH_NOTE_MAP.values())
     texte += [T.ROLE_FALLBACK]

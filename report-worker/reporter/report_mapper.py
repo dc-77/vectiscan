@@ -1804,10 +1804,11 @@ def map_to_report_data(
 
         log.info("tr03116_compliance_added", hosts=len(tr03116_results))
 
-    # M3: V2-Renderer-Augmentierung. ENV-Flag-gesteuert.
-    # Default ist v1 (Legacy). Big-Bang-Cutover erst in M6.
-    import os as _os
-    if _os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower() == "v2":
+    # M3: V2-Renderer-Augmentierung, nur fuer den ReportLab-Renderer v2.
+    # Seit S6 ist v3 die Vorgabe; dieser Zweig laeuft nur noch unter
+    # VECTISCAN_REPORT_ENGINE=legacy mit VECTISCAN_REPORT_LAYOUT=v2.
+    from reporter import engine as _engine
+    if _engine.layout() == "v2":
         _augment_for_v2(
             report_data, claude_output, host_inventory, package, scan_meta,
             headers_by_host=headers_by_host,

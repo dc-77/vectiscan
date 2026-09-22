@@ -13,13 +13,21 @@ Bump-Historie:
                   eingefuehrt und das Feld bundle je Pruefung gefuellt.
     2026-09-20.1  S2b: Rueckbau der sieben Gruppenregeln `zap_no_alerts`. Die
                   Abdeckung traegt den Fall seit Issue #13 selbst.
+    2026-09-22.1  S6 (spec/08): `web_vulnerability_active` wird erst ab
+                  ZAP-Konfidenz High ein Befund, darunter uebernimmt die neue
+                  Pruefung `web_vulnerability_reported` als Werkzeugmeldung im
+                  Anhang (Issue #15). Neues Feld `active_proof_when` fuer den
+                  aktiven Nachweis (rot und unverzueglich) in
+                  `web_vulnerability_active` und `tls_known_vulnerability`.
+                  Neues Feld `evidence_detail` und befundspezifische Nachweise.
+                  `wordpress_plugin_vulnerable` zaehlt ohne Singular-Fehler.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-20.1"
+CATALOG_VERSION = "2026-09-22.1"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

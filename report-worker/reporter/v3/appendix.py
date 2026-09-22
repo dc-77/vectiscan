@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from reporter.catalog.schema import CatalogOutput
 from reporter.facts import schema as FS
+from reporter.v3 import chapters as C
 from reporter.v3 import narrative as N
 from reporter.v3 import tables as T
 from reporter.v3.models import (Appendix, CveRef, Finding, InventoryRow, ScaleRow, ToolFinding,
@@ -93,11 +94,14 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
                    cve_refs: list[CveRef], tool_findings: list[ToolFinding],
                    counts: N.Counts, scan_date: str, provider: str) -> Appendix:
     has_red = any(f.status == "rot" for f in findings)
-    has_gaps = any(c.status in ("failed", "blocked") for c in facts.coverage)
+    # S6 (spec/08 Punkt 9): Die Freischaltung der Scanner-Adresse wird nur
+    # empfohlen, wenn eine Blockade belegt ist. Vorher stand der Satz in jedem
+    # Bericht mit irgendeinem Werkzeug ohne Ergebnis.
+    has_gaps = C.blockade_belegt(facts)
     return Appendix(
         exposure_scale=[ScaleRow(l=label, t=text) for label, text in T.EXPOSURE_SCALE],
         hygiene_scale=[ScaleRow(l=label, t=text) for label, text in T.HYGIENE_SCALE],
-        triage=[TriageRow(l=label, st=status, t=text) for label, status, text in T.TRIAGE],
+        triage=[TriageRow(l=label, st=status, t=text) for label, status, text in T.triage_rows()],
         cve_refs=cve_refs,
         inventory=build_inventory(facts, findings),
         tools=build_tools(facts),

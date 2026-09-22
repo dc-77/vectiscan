@@ -1670,9 +1670,19 @@ export async function orderRoutes(server: FastifyInstance): Promise<void> {
   );
 
   // POST /api/orders/:id/regenerate-report — regenerate report with excluded findings
+  //
+  // S6 (Sicherheitsnetz): Bis hierher stand nur `requireAuth` davor, und der
+  // Endpunkt schickte vorhandene finding_exclusions als `excludedFindings` mit,
+  // ohne `approved` zu setzen. Der Worker wertete eine nicht leere
+  // Ausschlussliste aber als Freigabe (`report_complete`), und dieser Status
+  // loest ueber lib/ws-manager.ts die Fertig-Mail mit Download-Verweis aus.
+  // Ein Kunde konnte seinen Bericht damit selbst ausliefern. Der Knopf im
+  // Frontend war immer schon nur fuer Admins sichtbar (app/scan/[orderId]),
+  // also steht das jetzt auch am Endpunkt; die Freigabe selbst haengt im Worker
+  // ausschliesslich an `approved`.
   server.post<{ Params: OrderParams }>(
     '/api/orders/:id/regenerate-report',
-    { preHandler: [requireAuth] },
+    { preHandler: [requireAuth, requireAdmin] },
     async (request, reply) => {
       const { id } = request.params;
       const user = request.user!;

@@ -17,6 +17,7 @@ from reporter.v3.models import ReportData
 
 from reporter.pdf.v3 import text as T
 from reporter.pdf.v3.variants import Variant
+from reporter.v3 import tables as V3T
 
 # Darstellungsregel (Entscheidung DC, S4): bis zu dieser Zahl stehen alle Befunde im
 # Hauptteil. Darueber stehen die dringendsten TOP_N_HAUPTTEIL dort und der Rest
@@ -158,4 +159,7 @@ def build_context(data: ReportData | dict, *, variant: Variant,
         "ltr": letters,
         "ap_tail_range": f"{tail[0]} bis {tail[-1]}",
         "txt": T,
+        # Zeitstufen unter dem Massnahmenplan kommen aus derselben Tabelle wie
+        # die Dringlichkeiten der Befunde (S6, reporter/v3/levels.py).
+        "stage_box": V3T.stage_box(),
     }

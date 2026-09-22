@@ -2490,7 +2490,7 @@
    "confidence": 0.8,
    "evidence": [
     {
-     "excerpt": "cms=TYPO3 cms_version=None cms_confidence=0.95",
+     "excerpt": "cms=TYPO3 cms_confidence=0.95",
      "ref": "hosts/212.227.60.78/phase1/tech_profile.json",
      "tool": "tech_profile"
     }
@@ -2514,7 +2514,7 @@
    "confidence": 0.8,
    "evidence": [
     {
-     "excerpt": "cms=Roundcube cms_version=None cms_confidence=0.85",
+     "excerpt": "cms=Roundcube cms_confidence=0.85",
      "ref": "hosts/85.22.47.39/phase1/tech_profile.json",
      "tool": "tech_profile"
     }
@@ -2912,7 +2912,7 @@
      "tool": "dns_records"
     },
     {
-     "excerpt": "dnssec_signed=False caa=False mta_sts=False",
+     "excerpt": "dnssec_signiert=nein caa=nein mta_sts=nein",
      "ref": "phase0a/dns_security.json",
      "tool": "dns_security"
     }
@@ -2960,7 +2960,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "apache01.securess.de: status=None title=None final_url=None",
+     "excerpt": "apache01.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -2977,7 +2977,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -2985,7 +2986,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "autodiscover.securess.de: status=None title=None final_url=None",
+     "excerpt": "autodiscover.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3002,7 +3003,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3010,7 +3012,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "connect.securess.de: status=None title=None final_url=None",
+     "excerpt": "connect.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3031,7 +3033,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3039,7 +3042,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "eset.securess.de: status=None title=None final_url=None",
+     "excerpt": "eset.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3060,7 +3063,8 @@
     "manufacturer": null,
     "name": "Generic"
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3068,7 +3072,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "ftp.securess.de: status=None title=None final_url=None",
+     "excerpt": "ftp.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3089,7 +3093,8 @@
     "manufacturer": "NinTechNet",
     "name": "NinjaFirewall"
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3097,7 +3102,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "imap.securess.de: status=None title=None final_url=None",
+     "excerpt": "imap.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3114,7 +3119,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3122,7 +3128,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "login-kundenportal.securess.de: status=None title=None final_url=None",
+     "excerpt": "login-kundenportal.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3143,7 +3149,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3151,7 +3158,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mailcleaner.securess.de: status=None title=None final_url=None",
+     "excerpt": "mailcleaner.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3172,7 +3179,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3180,7 +3188,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mailin.securess.de: status=None title=None final_url=None",
+     "excerpt": "mailin.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3201,7 +3209,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3209,7 +3218,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mailout.securess.de: status=None title=None final_url=None",
+     "excerpt": "mailout.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3230,7 +3239,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3238,7 +3248,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mailstore.securess.de: status=None title=None final_url=None",
+     "excerpt": "mailstore.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3255,7 +3265,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3263,7 +3274,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "mx1.securess.de: status=None title=None final_url=None",
+     "excerpt": "mx1.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3284,7 +3295,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3292,7 +3304,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "openotp.securess.de: status=None title=None final_url=None",
+     "excerpt": "openotp.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3313,7 +3325,8 @@
     "manufacturer": "Unknown",
     "name": "Generic"
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3321,7 +3334,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "owa.securess.de: status=None title=None final_url=None",
+     "excerpt": "owa.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3338,7 +3351,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3346,7 +3360,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "partner.securess.de: status=None title=None final_url=None",
+     "excerpt": "partner.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3367,7 +3381,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3375,7 +3390,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "portal.securess.de: status=None title=None final_url=None",
+     "excerpt": "portal.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3392,7 +3407,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3400,7 +3416,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "rdgw-2016.securess.de: status=None title=None final_url=None",
+     "excerpt": "rdgw-2016.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3417,7 +3433,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3425,7 +3442,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "rdgw.securess.de: status=None title=None final_url=None",
+     "excerpt": "rdgw.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3442,7 +3459,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3450,7 +3468,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "securess.de: status=None title=None final_url=None",
+     "excerpt": "securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3471,7 +3489,8 @@
     "manufacturer": null,
     "name": "NinjaFirewall (NinTechNet)"
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3479,7 +3498,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "sma.securess.de: status=None title=None final_url=None",
+     "excerpt": "sma.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3496,7 +3515,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3504,7 +3524,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "ssi.securess.de: status=None title=None final_url=None",
+     "excerpt": "ssi.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3521,7 +3541,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3529,7 +3550,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "starface.securess.de: status=None title=None final_url=None",
+     "excerpt": "starface.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3546,7 +3567,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3554,7 +3576,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "vermittler.securess.de: status=None title=None final_url=None",
+     "excerpt": "vermittler.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3575,7 +3597,8 @@
     "manufacturer": null,
     "name": null
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3583,7 +3606,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "vpn01.securess.de: status=None title=None final_url=None",
+     "excerpt": "vpn01.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3600,7 +3623,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3608,7 +3632,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "webmail.securess.de: status=None title=None final_url=None",
+     "excerpt": "webmail.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3625,7 +3649,8 @@
    "source": "web_probe",
    "title": null,
    "waf": null,
-   "web_probe_reachable": null
+   "web_probe_reachable": null,
+   "wildcard": false
   },
   {
    "aliases": [],
@@ -3633,7 +3658,7 @@
    "confidence": 1.0,
    "evidence": [
     {
-     "excerpt": "www.securess.de: status=None title=None final_url=None",
+     "excerpt": "www.securess.de:",
      "ref": "phase0/host_inventory.json",
      "tool": "web_probe"
     }
@@ -3654,7 +3679,8 @@
     "manufacturer": null,
     "name": "NinjaFirewall (NinTechNet)"
    },
-   "web_probe_reachable": false
+   "web_probe_reachable": false,
+   "wildcard": false
   }
  ],
  "generator": {
@@ -3695,7 +3721,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=212.227.60.78 rdns= fqdns=connect.securess.de,partner.securess.de,vermittler.securess.de",
+     "excerpt": "ip=212.227.60.78 fqdns=connect.securess.de, partner.securess.de, vermittler.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3748,7 +3774,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=51.116.154.224 rdns= fqdns=login-kundenportal.securess.de",
+     "excerpt": "ip=51.116.154.224 fqdns=login-kundenportal.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3794,7 +3820,7 @@
    "edge_ips": [],
    "evidence": [
     {
-     "excerpt": "ip=85.22.47.36 rdns= fqdns=vpn01.securess.de",
+     "excerpt": "ip=85.22.47.36 fqdns=vpn01.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3845,7 +3871,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=85.22.47.38 rdns=85-22-47-38.ip.dokom21.de fqdns=eset.securess.de,openotp.securess.de",
+     "excerpt": "ip=85.22.47.38 rdns=85-22-47-38.ip.dokom21.de fqdns=eset.securess.de, openotp.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3897,7 +3923,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=85.22.47.39 rdns=85-22-47-39.ip.dokom21.de fqdns=mailcleaner.securess.de,mailin.securess.de,mailout.securess.de,mailstore.securess.de,mx1.securess.de,imap.securess.de,webmail.securess.de",
+     "excerpt": "ip=85.22.47.39 rdns=85-22-47-39.ip.dokom21.de fqdns=mailcleaner.securess.de, mailin.securess.de, mailout.securess.de, mailstore.securess.de, mx1.securess.de, imap.securess.de, webmail.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -3949,7 +3975,7 @@
    "edge_ips": [],
    "evidence": [
     {
-     "excerpt": "ip=85.22.47.40 rdns= fqdns=apache01.securess.de,portal.securess.de,ssi.securess.de",
+     "excerpt": "ip=85.22.47.40 fqdns=apache01.securess.de, portal.securess.de, ssi.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4002,7 +4028,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=85.22.47.41 rdns=85-22-47-41.ip.dokom21.de fqdns=securess.de,www.securess.de,ftp.securess.de",
+     "excerpt": "ip=85.22.47.41 rdns=85-22-47-41.ip.dokom21.de fqdns=securess.de, www.securess.de, ftp.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4096,7 +4122,7 @@
    "edge_ips": [],
    "evidence": [
     {
-     "excerpt": "ip=85.22.47.43 rdns= fqdns=owa.securess.de,autodiscover.securess.de",
+     "excerpt": "ip=85.22.47.43 fqdns=owa.securess.de, autodiscover.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4194,7 +4220,7 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "ip=85.22.47.46 rdns= fqdns=rdgw.securess.de",
+     "excerpt": "ip=85.22.47.46 fqdns=rdgw.securess.de",
      "ref": "phase0/host_inventory.json",
      "tool": "host_inventory"
     }
@@ -4292,12 +4318,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "connect.securess.de: reachable=None score=2/7 server=Apache x-feserver=None",
+     "excerpt": "connect.securess.de: score=2/7 server=Apache",
      "ref": "scan_results:header_check:212.227.60.78",
      "tool": "header_check"
     },
     {
-     "excerpt": "connect.securess.de: status=200 title=SECURESS|connect: SECURESS webserver=Apache tech=['Apache HTTP Server', 'Bootstrap:1771057841', 'DataTables', 'HSTS', 'PHP:8.3.32', 'jQuery']",
+     "excerpt": "connect.securess.de: status=200 titel=SECURESS|connect: SECURESS webserver=Apache tech=Apache HTTP Server, Bootstrap:1771057841, DataTables, HSTS, PHP:8.3.32, jQuery",
      "ref": "hosts/212.227.60.78/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4413,12 +4439,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "eset.securess.de: reachable=None score=6/7 server=Apache x-feserver=None",
+     "excerpt": "eset.securess.de: score=6/7 server=Apache",
      "ref": "scan_results:header_check:85.22.47.38",
      "tool": "header_check"
     },
     {
-     "excerpt": "eset.securess.de: status=200 title=Securess Versicherungsmakler GmbH Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']",
+     "excerpt": "eset.securess.de: status=200 titel=Securess Versicherungsmakler GmbH Web Applications Portal webserver=Apache tech=Apache HTTP Server, HSTS",
      "ref": "hosts/85.22.47.38/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4509,12 +4535,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "ftp.securess.de: reachable=None score=0/7 server=nginx/1.22.1 x-feserver=None",
+     "excerpt": "ftp.securess.de: score=0/7 server=nginx/1.22.1",
      "ref": "scan_results:header_check:85.22.47.41",
      "tool": "header_check"
     },
     {
-     "excerpt": "ftp.securess.de: status=200 title=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=['Elementor:4.1.3', 'MySQL', 'Nginx:1.22.1', 'PHP', 'Swiper', 'WP Rocket', 'WordPress:7.0.2', 'Yoast SEO:28.0'...",
+     "excerpt": "ftp.securess.de: status=200 titel=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=Elementor:4.1.3, MySQL, Nginx:1.22.1, PHP, Swiper, WP Rocket, WordPress:7.0.2, Yoast SEO:28.0, jQuery, jQuery...",
      "ref": "hosts/85.22.47.41/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4633,12 +4659,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "login-kundenportal.securess.de: reachable=None score=3/7 server=None x-feserver=None",
+     "excerpt": "login-kundenportal.securess.de: score=3/7",
      "ref": "scan_results:header_check:51.116.154.224",
      "tool": "header_check"
     },
     {
-     "excerpt": "login-kundenportal.securess.de: status=200 title=Login Kundenportal webserver=None tech=['Blazor', 'Bootstrap', 'HSTS', 'Microsoft ASP.NET', 'jQuery']",
+     "excerpt": "login-kundenportal.securess.de: status=200 titel=Login Kundenportal tech=Blazor, Bootstrap, HSTS, Microsoft ASP.NET, jQuery",
      "ref": "hosts/51.116.154.224/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4745,12 +4771,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mailcleaner.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None",
+     "excerpt": "mailcleaner.securess.de: score=1/7 server=nginx/1.31.2",
      "ref": "scan_results:header_check:85.22.47.39",
      "tool": "header_check"
     },
     {
-     "excerpt": "mailcleaner.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']",
+     "excerpt": "mailcleaner.securess.de: status=200 titel=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=Bootstrap, Nginx:1.31.2, PHP:8.4.22, jQuery, jQuery UI",
      "ref": "hosts/85.22.47.39/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4856,12 +4882,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mailin.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None",
+     "excerpt": "mailin.securess.de: score=1/7 server=nginx/1.31.2",
      "ref": "scan_results:header_check:85.22.47.39",
      "tool": "header_check"
     },
     {
-     "excerpt": "mailin.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']",
+     "excerpt": "mailin.securess.de: status=200 titel=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=Bootstrap, Nginx:1.31.2, PHP:8.4.22, jQuery, jQuery UI",
      "ref": "hosts/85.22.47.39/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -4967,12 +4993,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mailout.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None",
+     "excerpt": "mailout.securess.de: score=1/7 server=nginx/1.31.2",
      "ref": "scan_results:header_check:85.22.47.39",
      "tool": "header_check"
     },
     {
-     "excerpt": "mailout.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']",
+     "excerpt": "mailout.securess.de: status=200 titel=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=Bootstrap, Nginx:1.31.2, PHP:8.4.22, jQuery, jQuery UI",
      "ref": "hosts/85.22.47.39/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5078,12 +5104,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "mx1.securess.de: reachable=None score=1/7 server=nginx/1.31.2 x-feserver=None",
+     "excerpt": "mx1.securess.de: score=1/7 server=nginx/1.31.2",
      "ref": "scan_results:header_check:85.22.47.39",
      "tool": "header_check"
     },
     {
-     "excerpt": "mx1.securess.de: status=200 title=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=['Bootstrap', 'Nginx:1.31.2', 'PHP:8.4.22', 'jQuery', 'jQuery UI']",
+     "excerpt": "mx1.securess.de: status=200 titel=Securess - WebMail (N3) :: Welcome to Securess - WebMail (N3) webserver=nginx/1.31.2 tech=Bootstrap, Nginx:1.31.2, PHP:8.4.22, jQuery, jQuery UI",
      "ref": "hosts/85.22.47.39/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5188,12 +5214,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "openotp.securess.de: reachable=None score=6/7 server=Apache x-feserver=None",
+     "excerpt": "openotp.securess.de: score=6/7 server=Apache",
      "ref": "scan_results:header_check:85.22.47.38",
      "tool": "header_check"
     },
     {
-     "excerpt": "openotp.securess.de: status=200 title=Securess Versicherungsmakler GmbH Web Applications Portal webserver=Apache tech=['Apache HTTP Server', 'HSTS']",
+     "excerpt": "openotp.securess.de: status=200 titel=Securess Versicherungsmakler GmbH Web Applications Portal webserver=Apache tech=Apache HTTP Server, HSTS",
      "ref": "hosts/85.22.47.38/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5284,12 +5310,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "partner.securess.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "partner.securess.de: score=0/7",
      "ref": "scan_results:header_check:212.227.60.78",
      "tool": "header_check"
     },
     {
-     "excerpt": "partner.securess.de: status=404 title=Page Not Found webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'PHP:8.3.32']",
+     "excerpt": "partner.securess.de: status=404 titel=Page Not Found webserver=Apache tech=Apache HTTP Server, HSTS, PHP:8.3.32",
      "ref": "hosts/212.227.60.78/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5367,7 +5393,7 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "rdgw.securess.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "rdgw.securess.de: score=0/7",
      "ref": "scan_results:header_check:85.22.47.46",
      "tool": "header_check"
     }
@@ -5432,12 +5458,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "securess.de: reachable=None score=0/7 server=nginx/1.22.1 x-feserver=None",
+     "excerpt": "securess.de: score=0/7 server=nginx/1.22.1",
      "ref": "scan_results:header_check:85.22.47.41",
      "tool": "header_check"
     },
     {
-     "excerpt": "securess.de: status=200 title=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=['Elementor:4.1.3', 'MySQL', 'Nginx:1.22.1', 'PHP', 'Swiper', 'WP Rocket', 'WordPress:7.0.2', 'Yoast SEO:28.0', 'j...",
+     "excerpt": "securess.de: status=200 titel=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=Elementor:4.1.3, MySQL, Nginx:1.22.1, PHP, Swiper, WP Rocket, WordPress:7.0.2, Yoast SEO:28.0, jQuery, jQuery Migr...",
      "ref": "hosts/85.22.47.41/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5550,12 +5576,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "vermittler.securess.de: reachable=None score=0/7 server=None x-feserver=None",
+     "excerpt": "vermittler.securess.de: score=0/7",
      "ref": "scan_results:header_check:212.227.60.78",
      "tool": "header_check"
     },
     {
-     "excerpt": "vermittler.securess.de: status=404 title=Page Not Found webserver=Apache tech=['Apache HTTP Server', 'HSTS', 'PHP:8.3.32']",
+     "excerpt": "vermittler.securess.de: status=404 titel=Page Not Found webserver=Apache tech=Apache HTTP Server, HSTS, PHP:8.3.32",
      "ref": "hosts/212.227.60.78/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5633,12 +5659,12 @@
    "duplicate_headers": [],
    "evidence": [
     {
-     "excerpt": "www.securess.de: reachable=None score=0/7 server=nginx/1.22.1 x-feserver=None",
+     "excerpt": "www.securess.de: score=0/7 server=nginx/1.22.1",
      "ref": "scan_results:header_check:85.22.47.41",
      "tool": "header_check"
     },
     {
-     "excerpt": "www.securess.de: status=200 title=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=['Elementor:4.1.3', 'MySQL', 'Nginx:1.22.1', 'PHP', 'Swiper', 'WP Rocket', 'WordPress:7.0.2', 'Yoast SEO:28.0'...",
+     "excerpt": "www.securess.de: status=200 titel=Securess Versicherungsmakler | Seit 1996 Ihr Versicherungsmakler webserver=nginx/1.22.1 tech=Elementor:4.1.3, MySQL, Nginx:1.22.1, PHP, Swiper, WP Rocket, WordPress:7.0.2, Yoast SEO:28.0, jQuery, jQuery...",
      "ref": "hosts/85.22.47.41/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -5797,7 +5823,7 @@
    "domain": "securess.de",
    "evidence": [
     {
-     "excerpt": "{'a_records': ['85.22.47.41'], 'mx_records': ['mx04.hornetsecurity.com', 'mx03.hornetsecurity.com', 'mx02.hornetsecurity.com', 'mx01.hornetsecurity.com'], 'ns_records': ['ns2a.dodns.net', 'ns1a.dod...",
+     "excerpt": "a_records=85.22.47.41 mx_records=mx04.hornetsecurity.com, mx03.hornetsecurity.com, mx02.hornetsecurity.com, mx01.hornetsecurity.com ns_records=ns2a.dodns.net, ns1a.dodns.net txt_records=v=spf1 a mx...",
      "ref": "phase0a/securitytrails.json",
      "tool": "securitytrails"
     }
@@ -5822,7 +5848,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:21 | 220 ProFTPD Server (ProFTPD) [212.227.60.78] 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPRT EPS...",
+     "excerpt": "212.227.60.78:21 banner=220 ProFTPD Server (ProFTPD) [212.227.60.78] 550 SSL/TLS required on the control channel 550 SSL/TLS required on the control channel 211-Features: AUTH TLS CCC CLNT CSID EPR...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5849,7 +5875,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:22 OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 | SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.16 Key type: ecdsa-sha2-nistp256 Key: AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOkyM1FJM1NEFKA...",
+     "excerpt": "212.227.60.78:22 OpenSSH 9.6p1 Ubuntu 3ubuntu13.16 banner=SSH-2.0-OpenSSH_9.6p1 Ubuntu-3ubuntu13.16 Key type: ecdsa-sha2-nistp256 Key: AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBOkyM1FJM1...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5876,7 +5902,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:25 Postfix smtpd | 220 cool-khorana.212-227-60-78.plesk.page ESMTP Postfix (Ubuntu) 250-cool-khorana.212-227-60-78.plesk.page 250-PIPELINING 250-SIZE 10240000 250-ETRN 250-STARTTLS 25...",
+     "excerpt": "212.227.60.78:25 Postfix smtpd banner=220 cool-khorana.212-227-60-78.plesk.page ESMTP Postfix (Ubuntu) 250-cool-khorana.212-227-60-78.plesk.page 250-PIPELINING 250-SIZE 10240000 250-ETRN 250-STARTT...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5903,7 +5929,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:80 Apache httpd | HTTP/1.1 301 Moved Permanently Date: Fri, 17 Jul 2026 23:32:14 GMT Server: Apache Location: https://212.227.60.78/ Content-Length: 293 Content-Type: text/html; chars...",
+     "excerpt": "212.227.60.78:80 Apache httpd banner=HTTP/1.1 301 Moved Permanently Date: Fri, 17 Jul 2026 23:32:14 GMT Server: Apache Location: https://212.227.60.78/ Content-Length: 293 Content-Type: text/html;...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5930,7 +5956,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:106 |",
+     "excerpt": "212.227.60.78:106",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5957,7 +5983,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:110 | +OK Dovecot ready. <b0a1c.1.6a575d3e.uM/wElib36RDMRMSVF2C4A==@cool-khorana.212-227-60-78.plesk.page> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL PLAIN...",
+     "excerpt": "212.227.60.78:110 banner=+OK Dovecot ready. <b0a1c.1.6a575d3e.uM/wElib36RDMRMSVF2C4A==@cool-khorana.212-227-60-78.plesk.page> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE STLS USER SASL P...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -5984,7 +6010,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:143 | * OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID...",
+     "excerpt": "212.227.60.78:143 banner=* OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ STARTTLS AUTH=PLAIN AUTH=LOGIN AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LOGIN-REFERRA...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6011,7 +6037,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:443 Apache httpd | HTTP/1.1 404 Not Found Date: Sun, 12 Jul 2026 07:03:43 GMT Server: Apache X-Powered-By: PHP/8.3.32 Strict-Transport-Security: max-age=63072000 X-Powered-By: PleskLi...",
+     "excerpt": "212.227.60.78:443 Apache httpd banner=HTTP/1.1 404 Not Found Date: Sun, 12 Jul 2026 07:03:43 GMT Server: Apache X-Powered-By: PHP/8.3.32 Strict-Transport-Security: max-age=63072000 X-Powered-By: Pl...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6038,7 +6064,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:465 Postfix smtpd | 220 cool-khorana.212-227-60-78.plesk.page ESMTP Postfix (Ubuntu) 250-cool-khorana.212-227-60-78.plesk.page 250-PIPELINING 250-SIZE 10240000 250-ETRN 250-AUTH DIGES...",
+     "excerpt": "212.227.60.78:465 Postfix smtpd banner=220 cool-khorana.212-227-60-78.plesk.page ESMTP Postfix (Ubuntu) 250-cool-khorana.212-227-60-78.plesk.page 250-PIPELINING 250-SIZE 10240000 250-ETRN 250-AUTH...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6065,7 +6091,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:993 | * OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ AUTH=PLAIN AUTH=LOGIN AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE I...",
+     "excerpt": "212.227.60.78:993 banner=* OK [CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENABLE IDLE SASL-IR LITERAL+ AUTH=PLAIN AUTH=LOGIN AUTH=CRAM-MD5] Dovecot ready. * CAPABILITY IMAP4rev1 LOGIN-REFERRALS ID ENA...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6092,7 +6118,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:995 | +OK Dovecot ready. <125aa.1.6a476cd0.Hyrv+502hJUaKHGXrq1RmQ==@cool-khorana.212-227-60-78.plesk.page> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN LOGIN...",
+     "excerpt": "212.227.60.78:995 banner=+OK Dovecot ready. <125aa.1.6a476cd0.Hyrv+502hJUaKHGXrq1RmQ==@cool-khorana.212-227-60-78.plesk.page> +OK CAPA TOP UIDL RESP-CODES PIPELINING AUTH-RESP-CODE USER SASL PLAIN...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6119,7 +6145,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:8443 | HTTP/1.1 200 OK Server: sw-cp-server Date: Tue, 14 Jul 2026 22:36:57 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires: Fri,...",
+     "excerpt": "212.227.60.78:8443 banner=HTTP/1.1 200 OK Server: sw-cp-server Date: Tue, 14 Jul 2026 22:36:57 GMT Content-Type: text/html; charset=utf-8 Transfer-Encoding: chunked Connection: keep-alive Expires:...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6146,7 +6172,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:8880 | HTTP/1.1 303 See Other Server: sw-cp-server Date: Fri, 03 Jul 2026 05:08:45 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Expires...",
+     "excerpt": "212.227.60.78:8880 banner=HTTP/1.1 303 See Other Server: sw-cp-server Date: Fri, 03 Jul 2026 05:08:45 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Ex...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6173,7 +6199,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "212.227.60.78:18018 | HTTP/1.1 404 Not Found Content-Length: 15 Server: Crow/1.0 Date: Sat, 18 Jul 2026 15:23:41 GMT Connection: Keep-Alive",
+     "excerpt": "212.227.60.78:18018 banner=HTTP/1.1 404 Not Found Content-Length: 15 Server: Crow/1.0 Date: Sat, 18 Jul 2026 15:23:41 GMT Connection: Keep-Alive",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6200,7 +6226,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "51.116.154.224:80 | HTTP/1.1 301 Moved Permanently Content-Length: 0 Date: Sun, 19 Jul 2026 17:31:30 GMT Location: https://login.tegut.com/",
+     "excerpt": "51.116.154.224:80 banner=HTTP/1.1 301 Moved Permanently Content-Length: 0 Date: Sun, 19 Jul 2026 17:31:30 GMT Location: https://login.tegut.com/",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6227,7 +6253,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "51.116.154.224:443 | HTTP/1.1 302 Found Content-Length: 0 Date: Sun, 19 Jul 2026 19:12:35 GMT Server: Microsoft-IIS/10.0 Location: https://tegut.com Set-Cookie: ARRAffinity=df88e252adc4b6a7f1e02bfe...",
+     "excerpt": "51.116.154.224:443 banner=HTTP/1.1 302 Found Content-Length: 0 Date: Sun, 19 Jul 2026 19:12:35 GMT Server: Microsoft-IIS/10.0 Location: https://tegut.com Set-Cookie: ARRAffinity=df88e252adc4b6a7f1e...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6254,7 +6280,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.22.47.38:443 Apache httpd | HTTP/1.1 200 OK Date: Fri, 10 Jul 2026 21:17:21 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosniff Referre...",
+     "excerpt": "85.22.47.38:443 Apache httpd banner=HTTP/1.1 200 OK Date: Fri, 10 Jul 2026 21:17:21 GMT Server: Apache X-Frame-Options: sameorigin X-XSS-Protection: 1; mode=block X-Content-Type-Options: nosniff Re...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6281,7 +6307,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.22.47.41:80 | HTTP/1.1 301 Moved Permanently Server: nginx/1.22.1 Date: Sun, 19 Jul 2026 18:27:52 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive X-R...",
+     "excerpt": "85.22.47.41:80 banner=HTTP/1.1 301 Moved Permanently Server: nginx/1.22.1 Date: Sun, 19 Jul 2026 18:27:52 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-aliv...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6308,7 +6334,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.22.47.41:443 | HTTP/1.1 200 OK Server: nginx/1.22.1 Date: Sun, 19 Jul 2026 18:27:55 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Last-Modified: Su...",
+     "excerpt": "85.22.47.41:443 banner=HTTP/1.1 200 OK Server: nginx/1.22.1 Date: Sun, 19 Jul 2026 18:27:55 GMT Content-Type: text/html; charset=UTF-8 Transfer-Encoding: chunked Connection: keep-alive Last-Modifie...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6335,7 +6361,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.22.47.42:80 | HTTP/1.0 403 Forbidden Content-Type: text/html; charset=utf-8 Window-target: _top Connection: close",
+     "excerpt": "85.22.47.42:80 banner=HTTP/1.0 403 Forbidden Content-Type: text/html; charset=utf-8 Window-target: _top Connection: close",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6362,7 +6388,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.22.47.42:443 | HTTP/1.1 200 Cache-Control: private X-Frame-Options: SAMEORIGIN X-Content-Type-Options: nosniff X-XSS-Protection: 1; mode=block Referrer-Policy: origin-when-cross-origin, strict-o...",
+     "excerpt": "85.22.47.42:443 banner=HTTP/1.1 200 Cache-Control: private X-Frame-Options: SAMEORIGIN X-Content-Type-Options: nosniff X-XSS-Protection: 1; mode=block Referrer-Policy: origin-when-cross-origin, str...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6389,7 +6415,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.22.47.42:5060 STARFACE PBX | SIP/2.0 200 OK Via: SIP/2.0/UDP nm;branch=foo;received=224.72.95.243;rport=26810 From: <sip:nm@nm>;tag=root To: <sip:nm2@nm2>;tag=as209ca65c Call-ID: 50000 CSeq: 42...",
+     "excerpt": "85.22.47.42:5060 STARFACE PBX banner=SIP/2.0 200 OK Via: SIP/2.0/UDP nm;branch=foo;received=224.72.95.243;rport=26810 From: <sip:nm@nm>;tag=root To: <sip:nm2@nm2>;tag=as209ca65c Call-ID: 50000 CSeq...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6416,7 +6442,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.22.47.43:443 Outlook Web App | HTTP/1.1 200 OK Cache-Control: no-cache, no-store Pragma: no-cache Content-Type: text/html; charset=utf-8 Expires: -1 Server: Microsoft-IIS/10.0 request-id: 32df19...",
+     "excerpt": "85.22.47.43:443 Outlook Web App banner=HTTP/1.1 200 OK Cache-Control: no-cache, no-store Pragma: no-cache Content-Type: text/html; charset=utf-8 Expires: -1 Server: Microsoft-IIS/10.0 request-id: 3...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6444,7 +6470,7 @@
    "domain": null,
    "evidence": [
     {
-     "excerpt": "85.22.47.46:443 Microsoft IIS httpd 10.0 | HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Tue, 29 Jul 2025 13:46:08 GMT Accept-Ranges: bytes ETag: \"eebe5c238f0dc1:0\" Server: Microsoft-IIS/1...",
+     "excerpt": "85.22.47.46:443 Microsoft IIS httpd 10.0 banner=HTTP/1.1 200 OK Content-Type: text/html Last-Modified: Tue, 29 Jul 2025 13:46:08 GMT Accept-Ranges: bytes ETag: \"eebe5c238f0dc1:0\" Server: Microsoft-...",
      "ref": "phase0a/shodan_hosts.json",
      "tool": "shodan"
     }
@@ -6479,7 +6505,7 @@
   ],
   "evidence": [
    {
-    "excerpt": "startedAt=2026-07-19T21:05:03.440010+00:00 finishedAt=2026-07-19T21:31:37.567684+00:00",
+    "excerpt": "Beginn=2026-07-19T21:05:03.440010+00:00 Ende=2026-07-19T21:31:37.567684+00:00",
     "ref": "meta.json",
     "tool": "meta"
    }
@@ -6543,7 +6569,7 @@
    }
   ]
  },
- "schema_version": "1.0.2",
+ "schema_version": "1.0.3",
  "services": [
   {
    "auth_mechanisms": [],
@@ -11643,6 +11669,9 @@
    "entries": [
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "potentially VULNERABLE, gzip deflate HTTP compression detected  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "MEDIUM"
@@ -11650,7 +11679,7 @@
    ],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:212.227.60.78",
      "tool": "testssl"
     },
@@ -11713,7 +11742,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "vermittler.securess.de:443 tls=tls13 cn=portal.premium-finance.net not_after=2026-10-14T13:16:37Z mismatched=True",
+     "excerpt": "vermittler.securess.de:443 tls=tls13 cn=portal.premium-finance.net gueltig_bis=2026-10-14T13:16:37Z namensabweichung=ja",
      "ref": "hosts/212.227.60.78/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -11763,18 +11792,21 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "expires < 60 days (55)",
      "id": "cert_expirationStatus",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2026-09-12 23:59",
      "id": "cert_notAfter",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "max-age too short. 1 days (=86400 seconds) < 15552000 seconds",
      "id": "HSTS_time",
      "severity": "MEDIUM"
@@ -11782,12 +11814,12 @@
    ],
    "evidence": [
     {
-     "excerpt": "login-kundenportal.securess.de:443 tls=tls13 cn=*.securess.de not_after=2026-09-12T23:59:59Z mismatched=None",
+     "excerpt": "login-kundenportal.securess.de:443 tls=tls13 cn=*.securess.de gueltig_bis=2026-09-12T23:59:59Z",
      "ref": "hosts/51.116.154.224/phase2/httpx.json",
      "tool": "httpx"
     },
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:51.116.154.224",
      "tool": "testssl"
     },
@@ -11854,54 +11886,65 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "offered",
      "id": "cipherlist_3DES_IDEA",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   xc012   ECDHE-RSA-DES-CBC3-SHA            ECDH 253   3DES        168      TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_xc012",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x16     EDH-RSA-DES-CBC3-SHA              DH 4096    3DES        168      TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_x16",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "TLSv1.2   x0a     DES-CBC3-SHA                      RSA        3DES        168      TLS_RSA_WITH_3DES_EDE_CBC_SHA",
      "id": "cipher-tls1_2_x0a",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "expires < 60 days (55)",
      "id": "cert_expirationStatus",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2026-09-12 23:59",
      "id": "cert_notAfter",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Multiple X-Frame-Options headers. Using first header: sameorigin",
      "id": "X-Frame-Options_multiple",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "Multiple Cache-Control headers. Using first header: no-store, no-cache, must-revalidate",
      "id": "Cache-Control_multiple",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "potentially VULNERABLE, gzip HTTP compression detected  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "MEDIUM"
@@ -11909,7 +11952,7 @@
    ],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=False",
+     "excerpt": "angeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3",
      "ref": "scan_results:testssl:85.22.47.38",
      "tool": "testssl"
     },
@@ -11981,7 +12024,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "openotp.securess.de:443 tls=tls12 cn=*.securess.de not_after=2026-09-12T23:59:59Z mismatched=None",
+     "excerpt": "openotp.securess.de:443 tls=tls12 cn=*.securess.de gueltig_bis=2026-09-12T23:59:59Z",
      "ref": "hosts/85.22.47.38/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -12031,18 +12074,23 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "expires < 60 days (55)",
      "id": "cert_expirationStatus",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2026-09-12 23:59",
      "id": "cert_notAfter",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2013-3587",
+     "cves": [
+      "CVE-2013-3587"
+     ],
      "finding": "potentially VULNERABLE, gzip HTTP compression detected  - only supplied '/' tested",
      "id": "BREACH",
      "severity": "MEDIUM"
@@ -12050,7 +12098,7 @@
    ],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:85.22.47.39",
      "tool": "testssl"
     },
@@ -12118,7 +12166,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "mx1.securess.de:443 tls=tls13 cn=*.securess.de not_after=2026-09-12T23:59:59Z mismatched=None",
+     "excerpt": "mx1.securess.de:443 tls=tls13 cn=*.securess.de gueltig_bis=2026-09-12T23:59:59Z",
      "ref": "hosts/85.22.47.39/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -12166,7 +12214,7 @@
    "entries": [],
    "evidence": [
     {
-     "excerpt": "ftp.securess.de:443 tls=tls13 cn=*.securess.de not_after=2026-09-12T23:59:59Z mismatched=None",
+     "excerpt": "ftp.securess.de:443 tls=tls13 cn=*.securess.de gueltig_bis=2026-09-12T23:59:59Z",
      "ref": "hosts/85.22.47.41/phase2/httpx.json",
      "tool": "httpx"
     }
@@ -12216,18 +12264,21 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "expires < 60 days (55)",
      "id": "cert_expirationStatus",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2026-09-12 23:59",
      "id": "cert_notAfter",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "--",
      "id": "security_headers",
      "severity": "MEDIUM"
@@ -12235,7 +12286,7 @@
    ],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=False TLS1.1=False TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1",
      "ref": "scan_results:testssl:85.22.47.41",
      "tool": "testssl"
     },
@@ -12301,36 +12352,44 @@
    "entries": [
     {
      "cve": null,
+     "cves": [],
      "finding": "Couldn't determine service, skipping all HTTP checks",
      "id": "service",
      "severity": "DEBUG"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "expires < 60 days (55)",
      "id": "cert_expirationStatus",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "2026-09-12 23:59",
      "id": "cert_notAfter",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "NOT supported",
      "id": "fallback_SCSV",
      "severity": "MEDIUM"
     },
     {
      "cve": "CVE-2011-3389",
+     "cves": [
+      "CVE-2011-3389"
+     ],
      "finding": "ECDHE-RSA-AES256-SHA ECDHE-RSA-AES128-SHA AES256-SHA AES128-SHA",
      "id": "BEAST_CBC_TLS1",
      "severity": "MEDIUM"
     },
     {
      "cve": null,
+     "cves": [],
      "finding": "B",
      "id": "overall_grade",
      "severity": "MEDIUM"
@@ -12338,7 +12397,7 @@
    ],
    "evidence": [
     {
-     "excerpt": "protocols SSLv2=False SSLv3=False TLS1.0=True TLS1.1=True TLS1.2=True TLS1.3=True",
+     "excerpt": "angeboten=TLS1.0, TLS1.1, TLS1.2, TLS1.3 nicht angeboten=SSLv2, SSLv3",
      "ref": "scan_results:testssl:85.22.47.46",
      "tool": "testssl"
     },

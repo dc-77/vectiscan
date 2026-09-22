@@ -37,6 +37,32 @@ def excerpt(text: str | None, limit: int = EXCERPT_MAX) -> str:
     return cleaned
 
 
+def kv(pairs: list[tuple[str, Any]], limit: int = EXCERPT_MAX) -> str:
+    """Nachweiszeile aus Schluessel-Wert-Paaren, ohne Python-Darstellungen.
+
+    Bis S6 wurden diese Zeilen mit f-Strings gebaut, und damit standen
+    ``None``, ``True`` und Listen in eckigen Klammern im Kundentext
+    (``x-feserver=None``, ``reachable=True``, ``dkim=False``, spec/08 Punkt 3).
+    Hier gilt: ein leerer Wert faellt weg, Wahrheitswerte werden ``ja`` und
+    ``nein``, eine Liste wird zur Aufzaehlung mit Komma.
+    """
+    parts: list[str] = []
+    for name, value in pairs:
+        if value is None or value == "" or value == [] or value == {}:
+            continue
+        if isinstance(value, bool):
+            text = "ja" if value else "nein"
+        elif isinstance(value, (list, tuple, set)):
+            items = [str(v) for v in value if v not in (None, "")]
+            if not items:
+                continue
+            text = ", ".join(items)
+        else:
+            text = str(value)
+        parts.append(f"{name}={text}" if name else text)
+    return excerpt(" ".join(parts), limit)
+
+
 def iso_utc(value: Any) -> str | None:
     """Beliebigen Zeitwert auf ``YYYY-MM-DDTHH:MM:SSZ`` normalisieren.
 

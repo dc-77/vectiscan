@@ -25,11 +25,21 @@ def _action(item: Consolidated, stage: str) -> str:
     return item.texts.recommendation[0].text
 
 
+def _stage_of(item: Consolidated) -> str:
+    """Wirksame Stufe eines Sachverhalts, gedeckelt durch die Abbildungstabelle."""
+    return L.stage_for(item.scale, item.level,
+                       [rec.stage for rec in item.texts.recommendation],
+                       item.active_proof)
+
+
 def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
+    # S6: Gruppiert wird nach der wirksamen Stufe, nicht nach der dringlichsten
+    # Empfehlung des Katalogs. Sonst traegt die Planzeile eines gelben Befunds
+    # "Unverzueglich" und eine rote Farbe (spec/08 Punkt 1). Der Massnahmentext
+    # bleibt der der dringlichsten Katalogstufe, das ist die konkrete Handlung.
     groups: dict[tuple[str, str], list[tuple[Consolidated, Finding]]] = {}
     for item, finding in pairs:
-        stage = L.top_stage([rec.stage for rec in item.texts.recommendation])
-        groups.setdefault((stage, item.merge_key), []).append((item, finding))
+        groups.setdefault((_stage_of(item), item.merge_key), []).append((item, finding))
 
     rows: list[tuple[tuple, PlanRow]] = []
     for (stage, merge_key), members in groups.items():
@@ -37,7 +47,7 @@ def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
         lead_item, lead_finding = members[0]
         actions: list[str] = []
         for item, _ in members:
-            text = _action(item, stage)
+            text = _action(item, L.top_stage([rec.stage for rec in item.texts.recommendation]))
             if text not in actions:
                 actions.append(text)
         rows.append((
@@ -45,7 +55,7 @@ def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
              lead_finding.cat, merge_key),
             PlanRow(
                 prio=L.URGENCY_BY_STAGE[stage],
-                st=L.STATUS_BY_STAGE[stage],
+                st=lead_finding.status,
                 action=" ".join(actions),
                 refs=[f.id for _, f in members],
                 effect=N.PLAN_EFFECT.get(lead_finding.cat, ""),

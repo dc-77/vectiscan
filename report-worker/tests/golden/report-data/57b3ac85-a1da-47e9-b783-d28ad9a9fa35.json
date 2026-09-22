@@ -162,7 +162,7 @@
    {
     "l": "Rot",
     "st": "rot",
-    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist oder einen kritischen Dienst exponiert. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
    },
    {
     "l": "Gelb",
@@ -172,7 +172,7 @@
    {
     "l": "Blau",
     "st": "blau",
-    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig oder Strategisch (laufendes Quartal)."
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
    },
    {
     "l": "Grün",
@@ -184,7 +184,7 @@
  "architecture": {
   "lead": "Die geprüfte Angriffsfläche verteilt sich auf 1 Host mit folgenden Aufgaben: Mail- und Kalenderplattform und Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
   "notes": [
-   "2 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie sind kein Befund und wurden intern zur Nachbearbeitung vorgemerkt."
+   "2 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen wiederkehrende Fälle in den Katalog auf."
   ],
   "posture": [
    {
@@ -453,12 +453,13 @@
   {
    "affected": "116.202.77.64:3306 (MariaDB), 116.202.77.64:5432 (PostgreSQL)",
    "cat": "A",
-   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 880965 Capabilities flags: 65534 Some Capabilities: LongColumnFlag, SwitchToSSLAfterHandshake, FoundRows, IgnoreSpaceBeforeParenthesis, SupportsTransactions, O...\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.5-10.11.18-MariaDB-0+deb12u1 Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 880965 Capabilities flags: 65534 Some Capabilities: LongColumnFlag, SwitchToSSLAfterHandshake, FoundRows, IgnoreSpaceBeforeParenthesis, SupportsTransactions, O...\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:5432/tcp Dienst=postgresql Produkt=PostgreSQL DB Version=9.6.0 or later Zustand=open\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
    "found": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) beantwortet Verbindungen auf Datenbankports aus dem gesamten Internet: 116.202.77.64:3306 (MariaDB), 116.202.77.64:5432 (PostgreSQL). Ein Datenbankdienst gehört nicht an das öffentliche Interface.",
    "id": "VS-2026-001",
    "impact": "Ein von außen erreichbarer Datenbankdienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht jede künftige Schwachstelle im Datenbankserver sofort ausnutzbar. Betroffen wären die gespeicherten Inhalte, typischerweise Seiteninhalte, Formulareingaben und Kontaktdaten.",
    "level": "kritisch",
-   "policy": "SP-DB-001",
+   "level_label": "kritisch",
+   "policy": "db_exposed",
    "recommendation": [
     [
      "Unverzüglich",
@@ -484,12 +485,13 @@
   {
    "affected": "lumbeck-wolter.de, lumbeck-wolter.de (~all)",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nlumbeck-wolter.de: SPF=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.horn...",
    "found": "Für lumbeck-wolter.de sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: lumbeck-wolter.de, lumbeck-wolter.de (~all).",
    "id": "VS-2026-002",
    "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
    "level": "hoch",
-   "policy": "SP-DNS-006, SP-DNS-005",
+   "level_label": "hoch",
+   "policy": "dmarc_missing, spf_softfail",
    "recommendation": [
     [
      "In Kürze",
@@ -501,7 +503,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "gelb",
    "threat": null,
    "title": "Richtlinie zur Absender-Authentizität für lumbeck-wolter.de nicht durchsetzend",
@@ -511,12 +513,13 @@
   {
    "affected": "116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP)",
    "cat": "A",
-   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n110/tcp open pop3 Courier pop3d\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\npop3-capabilities: TOP UIDL CAPA SASL AUTH-RESP-CODE PIPELINING RESP-CODES STLS\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n143/tcp open imap Dovecot imapd\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nimap-capabilities: LOGIN-REFERRALS LOGINDISABLEDA0001 LITERAL+ post-login listed OK Pre-login ID SASL-IR IMAP4rev1 more ENABLE IDLE STARTTLS capabilities have",
+   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open TLS erzwungen=ja\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:110/tcp Dienst=pop3 Produkt=Courier pop3d Zustand=open STARTTLS=ja Capabilities=TOP, UIDL, CAPA, SASL\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n110/tcp open pop3 Courier pop3d\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\npop3-capabilities: TOP UIDL CAPA SASL AUTH-RESP-CODE PIPELINING RESP-CODES STLS\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=ja STARTTLS=ja Anmeldung gesperrt=ja Capabilities=LOGIN-REFERRALS, LOGINDISABLEDA0001, LITERAL+, post-login\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n143/tcp open imap Dovecot imapd\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nimap-capabilities: LOGIN-REFERRALS LOGINDISABLEDA0001 LITERAL+ post-login listed OK Pre-login ID SASL-IR IMAP4rev1 more ENABLE IDLE STARTTLS capabilities have",
    "found": "Der Host 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 116.202.77.64:110 (POP3), 116.202.77.64:143 (IMAP), 116.202.77.64:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
    "id": "VS-2026-003",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
-   "policy": "Prototyp VS-005",
+   "level_label": "niedrig",
+   "policy": "legacy_protocols_present",
    "recommendation": [
     [
      "In Kürze",
@@ -532,18 +535,19 @@
    "status": "blau",
    "threat": null,
    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
-   "urgency": "In Kürze",
+   "urgency": "Mittelfristig",
    "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
   },
   {
    "affected": "lumbeck-wolter.de",
    "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nlumbeck-wolter.de: SPF=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.horn...",
    "found": "Für lumbeck-wolter.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: lumbeck-wolter.de.",
    "id": "VS-2026-004",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
-   "policy": "Prototyp VS-008, SP-DNS-009, SP-DNS-011",
+   "level_label": "niedrig",
+   "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -551,7 +555,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "Transportverschlüsselung im Mailversand für lumbeck-wolter.de nicht erzwungen",
@@ -561,12 +565,13 @@
   {
    "affected": "116.202.77.64:222 (OpenSSH 9.2p1), 116.202.77.64:3306 (MariaDB 10.11.18), 116.202.77.64:5432 (PostgreSQL unbekannt)",
    "cat": "E",
-   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 880965 Capabilities flags: 65534 Some Capabilities: LongColumnFlag, SwitchToSSLAfterHandshake, FoundRows, IgnoreSpaceBeforeParenthesis, SupportsTransactions, O...\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
+   "evidence": "nmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:222/tcp Dienst=ssh Produkt=OpenSSH Version=9.2p1 Zustand=open\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.5-10.11.18-MariaDB-0+deb12u1 Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.5-10.11.18-MariaDB-0+deb12u1 Thread ID: 880965 Capabilities flags: 65534 Some Capabilities: LongColumnFlag, SwitchToSSLAfterHandshake, FoundRows, IgnoreSpaceBeforeParenthesis, SupportsTransactions, O...\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n116.202.77.64:5432/tcp Dienst=postgresql Produkt=PostgreSQL DB Version=9.6.0 or later Zustand=open\n\nnmap · hosts/116.202.77.64/phase1/nmap.xml\n5432/tcp open postgresql PostgreSQL DB 9.6.0 or later",
    "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 116.202.77.64:222 (OpenSSH 9.2p1), 116.202.77.64:3306 (MariaDB 10.11.18), 116.202.77.64:5432 (PostgreSQL unbekannt).",
    "id": "VS-2026-005",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
-   "policy": "SP-DISC-001",
+   "level_label": "niedrig",
+   "policy": "service_banner_version",
    "recommendation": [
     [
      "Mittelfristig",
@@ -588,12 +593,13 @@
   {
    "affected": "lumbeck-wolter.de",
    "cat": "E",
-   "evidence": "dns_records · phase0/dns_records.json\nspf=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.hornetsecurity.com ~all...\n\ndns_security · phase0a/dns_security.json\ndnssec_signed=False caa=False mta_sts=False",
+   "evidence": "dns_records · phase0/dns_records.json\nlumbeck-wolter.de: SPF=v=spf1 include:spf.mailjet.com mx ip4:194.36.62.220 ip4:85.22.176.0/24 include:_spf-eu.ionos.com include:spf.mailout.iprs.de include:spf.protection.outlook.com include:spf-de.emailsignatures365.com include:spf.horn...",
    "found": "Für lumbeck-wolter.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: lumbeck-wolter.de.",
    "id": "VS-2026-006",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
-   "policy": "SP-DNS-003, SP-DNS-001",
+   "level_label": "niedrig",
+   "policy": "caa_missing, dnssec_missing",
    "recommendation": [
     [
      "Strategisch",
@@ -601,7 +607,7 @@
     ]
    ],
    "scale": "hygiene",
-   "source": "aktiv (dns_records, dns_security)",
+   "source": "aktiv (dns_records)",
    "status": "blau",
    "threat": null,
    "title": "DNS-Absicherung für lumbeck-wolter.de nicht eingerichtet",
@@ -670,19 +676,20 @@
     "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
     "n": 3,
     "refs": [
-     "VS-2026-003"
+     "VS-2026-003",
+     "VS-2026-005"
     ],
     "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
    }
   ],
   "overall": "HOCH",
   "overall_status": "rot",
-  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die Härtung der erreichbaren Dienste, die Authentizität der E-Mail und die Transportverschlüsselung."
+  "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail sowie die Konfiguration und die preisgegebenen Angaben."
  },
  "landscape_lead": "6 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 10,
-  "catalog_digest": "9b2252bca3ec67c5f3db48c8ce836d13738c53ccdabc9741cf518349d591c9b9",
+  "catalog_digest": "614fdca98b32bd5083dcc23e27537ff4024464818a3921b8a09e652daa8c1976",
   "catalog_version": "2026-09-20.1",
   "classification": "Vertraulich",
   "consolidated": 6,
@@ -691,7 +698,7 @@
   "domains": [
    "lumbeck-wolter.de"
   ],
-  "facts_schema_version": "1.0.2",
+  "facts_schema_version": "1.0.3",
   "fqdns_total": 2,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
@@ -740,19 +747,11 @@
    "st": "gelb"
   },
   {
-   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren.",
+   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
-   "prio": "In Kürze",
-   "refs": [
-    "VS-2026-003"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
-   "effect": "Nimmt Angreifern Vorbereitungswissen",
    "prio": "Mittelfristig",
    "refs": [
+    "VS-2026-003",
     "VS-2026-005"
    ],
    "st": "blau"
@@ -828,11 +827,11 @@
   "lead": "Der Scan hat 1 IP-Adresse mit 2 Hostnamen erfasst. Für 1 Host war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
   "limitations": [
    {
-    "detail": "Betroffen: gobuster_dns auf lumbeck-wolter.de.",
+    "detail": "Betroffen: lumbeck-wolter.de.",
     "what": "Das Werkzeug gobuster_dns hat kein Ergebnis geliefert"
    },
    {
-    "detail": "Betroffen: ffuf_sensitive auf 116.202.77.64, header_check auf www.lumbeck-wolter.de, httpx auf 116.202.77.64, testssl auf 116.202.77.64, webtech auf 116.202.77.64, www.lumbeck-wolter.de (+lumbeck-wolter.de) und weitere.",
+    "detail": "Betroffen: www.lumbeck-wolter.de (+lumbeck-wolter.de).",
     "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
    },
    {
@@ -848,7 +847,7 @@
    {
     "n": "0",
     "name": "Aufklärung (passiv)",
-    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 2 Hostnamen auf 1 IP-Adressen."
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 2 Hostnamen auf 1 IP-Adresse."
    },
    {
     "n": "1",

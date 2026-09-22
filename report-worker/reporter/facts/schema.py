@@ -15,6 +15,9 @@ Historie:
 - 1.0.1 (S2b, Issue #13): ``zap`` mit Status ``ok`` und null Alerts wird als
   ``empty`` mit Grund ``zap_no_alerts`` gefuehrt. Kein Feld geaendert, aber die
   Bedeutung einer Coverage-Zeile praeziser; Golden-Facts neu gebaut.
+- 1.0.3 (S6, spec/08 Punkt 18): ``TlsEntry.cves`` fuehrt alle Kennungen eines
+  testssl-Tests; ``cve`` bleibt die erste. Dazu Nachweiszeilen ohne
+  Python-Darstellungen (spec/08 Punkt 3), was Auszuege aendert, keine Felder.
 """
 from __future__ import annotations
 
@@ -22,7 +25,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.0.2"
+FACTS_SCHEMA_VERSION = "1.0.3"
 
 Mode = Literal["active", "passive"]
 
@@ -166,6 +169,10 @@ class Waf(Base):
 class FqdnFact(Fact):
     name: str
     host_ip: str
+    # S6 (spec/08 Punkt 13): ein Wildcard-Eintrag ``*.domain`` ist kein
+    # Hostname. Er wird nicht gezaehlt, steht in keiner Betroffenenliste und
+    # bekommt kein Bild; Kapitel 2.1 nennt ihn als Hinweis.
+    wildcard: bool = False
     http_status: Optional[int] = None
     title: Optional[str] = None
     final_url: Optional[str] = None
@@ -238,6 +245,9 @@ class TlsEntry(Base):
     severity: str
     finding: str
     cve: Optional[str] = None
+    # Alle Kennungen desselben Tests. ``cve`` bleibt die erste, damit aeltere
+    # Fakten weiter lesbar sind (S6, spec/08 Punkt 18).
+    cves: list[str] = Field(default_factory=list)
 
 
 class HstsInfo(Base):

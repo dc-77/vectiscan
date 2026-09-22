@@ -630,6 +630,12 @@ def _update_order_status(
     fertig, nur der Bericht darf so nicht raus.
     """
     is_terminal = status in ("report_complete", "failed", "report_blocked")
+    # Issue #25: Nach dem Endstatus blieb `progress.currentTool` auf dem letzten
+    # Wert des Scan-Workers stehen (meist "uploading"), und das Dashboard zeigte
+    # weiter ein laufendes Werkzeug. Geschrieben wird das Feld sonst nur in
+    # scan-worker/scanner/progress.py.
+    ende = is_terminal or status in ("pending_review", "delivered")
+    leeren = "current_tool = NULL, current_host = NULL," if ende else ""
     with conn.cursor() as cur:
         if error_message is not None:
             cur.execute(
@@ -637,6 +643,7 @@ def _update_order_status(
                 UPDATE orders
                    SET status = %s, error_message = %s,
                        {'scan_finished_at = NOW(),' if is_terminal else ''}
+                       {leeren}
                        updated_at = NOW()
                  WHERE id = %s
                 """,
@@ -648,6 +655,7 @@ def _update_order_status(
                 UPDATE orders
                    SET status = %s,
                        {'scan_finished_at = NOW(),' if is_terminal else ''}
+                       {leeren}
                        updated_at = NOW()
                  WHERE id = %s
                 """,
@@ -956,8 +964,33 @@ def process_job(job_data: dict) -> None:
         _started_at = str((parsed.get("meta", {}) or {}).get("startedAt") or "")
         scan_date_iso = _started_at[:10] or datetime.now().date().isoformat()
 
-        # -- 4. Call Claude API for analysis ----------------------------------
-        if package == "tlscompliance":
+        # -- 3b. Engine und Layout (S6) ---------------------------------------
+        # Der Katalogweg baut seine Befunde aus Fakten und Pruefkatalog und
+        # braucht die alte Kette nicht. Sie lief bis S6 trotzdem bei jedem Lauf
+        # mit und kostete rund 1,85 USD, deren Ergebnis danach verworfen wurde.
+        from reporter import engine as _engine
+
+        report_engine, layout = _engine.resolve()
+        uses_legacy = report_engine == _engine.ENGINE_LEGACY
+        log.info("report_engine_resolved", engine=report_engine, layout=layout)
+
+        # Einmal laden, zweimal genutzt: der v2-Kanal bekommt die schlanke Form
+        # (siehe _ohne_rohtext), die Faktenschicht im v3-Zweig die vollen Zeilen.
+        tool_runs = _load_tool_runs(conn, order_id)
+
+        claude_output: dict = {}
+        report_data: dict = {}
+
+        # -- 4. Call Claude API for analysis (nur Engine legacy) --------------
+        if not uses_legacy:
+            # S6: Der Katalogweg laesst die KI-Befunderzeugung, die
+            # Reparaturkette und die Severity-Policy vollstaendig aus. Ein
+            # Ausschluss einzelner Befunde wirkt auf diesem Weg noch nicht; das
+            # Datenmodell v3 kennt keine Ausschlussliste (offener Punkt nach S6).
+            if excluded:
+                log.warning("excluded_findings_ignored_by_catalog_engine",
+                            order_id=order_id, count=len(excluded), ids=excluded)
+        elif package == "tlscompliance":
             # TLS-Compliance: build TR summary as findings text for Haiku
             from reporter.tr03116_checker import check_tr03116_compliance
             testssl_raw = parsed.get("testssl_raw_by_host", {})
@@ -1116,10 +1149,7 @@ def process_job(job_data: dict) -> None:
             # -- 4e. Recalculate overall_risk after QA + Policy corrections ---
             _recalculate_overall_risk(claude_output)
 
-        # -- 5. Map Claude output to report_data ------------------------------
-        # Einmal laden, zweimal genutzt: der v2-Kanal bekommt die schlanke Form
-        # (siehe _ohne_rohtext), die Faktenschicht im v3-Zweig die vollen Zeilen.
-        tool_runs = _load_tool_runs(conn, order_id)
+        # -- 5. Map Claude output to report_data (nur Engine legacy) ----------
         parsed_meta = parsed.get("meta", {})
         scan_meta = {
             "domain": domain,
@@ -1139,19 +1169,20 @@ def process_job(job_data: dict) -> None:
             "toolRuns": _ohne_rohtext(tool_runs),
             "hostStrategy": parsed.get("host_strategy") or {},
         }
-        report_data = map_to_report_data(
-            claude_output=claude_output,
-            scan_meta=scan_meta,
-            host_inventory=effective_inventory,
-            package=package,
-            host_screenshots=host_screenshots,
-            testssl_raw_by_host=parsed.get("testssl_raw_by_host"),
-            headers_by_host=parsed.get("headers_by_host"),
-        )
-        log.info("report_data_mapped")
+        if uses_legacy:
+            report_data = map_to_report_data(
+                claude_output=claude_output,
+                scan_meta=scan_meta,
+                host_inventory=effective_inventory,
+                package=package,
+                host_screenshots=host_screenshots,
+                testssl_raw_by_host=parsed.get("testssl_raw_by_host"),
+                headers_by_host=parsed.get("headers_by_host"),
+            )
+            log.info("report_data_mapped")
 
         # -- 5b. Filter excluded findings -------------------------------------
-        if excluded:
+        if excluded and uses_legacy:
             log.info("filtering_excluded_findings", count=len(excluded), ids=excluded)
             report_data["findings"] = [f for f in report_data.get("findings", [])
                                         if f.get("id") not in excluded]
@@ -1205,38 +1236,43 @@ def process_job(job_data: dict) -> None:
             ValidationGate,
             ValidationLevel,
         )
-        findings_data_for_validation = _build_findings_data(
-            claude_output, package, report_data,
-        )
-        # Migration 029 (Mai 2026): Admin-Overrides auf einzelne Findings
-        # (cvss_score, severity, title, _ignored) — werden VOR der Gate
-        # appliziert, damit korrigierte Werte direkt validiert werden.
-        overrides_applied = _apply_finding_overrides(
-            findings_data_for_validation, conn, order_id,
-        )
-        if overrides_applied:
-            report_data["_finding_overrides_applied"] = overrides_applied
-
         gate = ValidationGate.from_env()
-        gate_result = gate.run(
-            findings_data_for_validation,
-            report_data=report_data,
-            context={
-                "package": package,
-                "order_id": order_id,
-                "domain": domain,
-                # M1: raw tech_profiles fuer consistency/tech_table/eol checks
-                # (im report_data sind die Tech-Daten nur als Paragraph-
-                # Objekte unter scope.subsections[*].host_tech_blocks vorhanden,
-                # nicht direkt validierbar).
-                "tech_profiles": effective_profiles or [],
-            },
-        )
-        # Persist validation_warnings unabhaengig vom Level (auch
-        # passed=True wird dokumentiert — checks_run/skipped sind Audit).
-        validation_warnings_payload = gate_result.to_json()
-        report_data["_validation_warnings"] = validation_warnings_payload
-        if not gate_result.passed:
+        gate_result = None
+        validation_warnings_payload = None
+
+        if uses_legacy:
+            findings_data_for_validation = _build_findings_data(
+                claude_output, package, report_data,
+            )
+            # Migration 029 (Mai 2026): Admin-Overrides auf einzelne Findings
+            # (cvss_score, severity, title, _ignored) — werden VOR der Gate
+            # appliziert, damit korrigierte Werte direkt validiert werden.
+            overrides_applied = _apply_finding_overrides(
+                findings_data_for_validation, conn, order_id,
+            )
+            if overrides_applied:
+                report_data["_finding_overrides_applied"] = overrides_applied
+
+            gate_result = gate.run(
+                findings_data_for_validation,
+                report_data=report_data,
+                context={
+                    "package": package,
+                    "order_id": order_id,
+                    "domain": domain,
+                    # M1: raw tech_profiles fuer consistency/tech_table/eol checks
+                    # (im report_data sind die Tech-Daten nur als Paragraph-
+                    # Objekte unter scope.subsections[*].host_tech_blocks vorhanden,
+                    # nicht direkt validierbar).
+                    "tech_profiles": effective_profiles or [],
+                },
+            )
+            # Persist validation_warnings unabhaengig vom Level (auch
+            # passed=True wird dokumentiert — checks_run/skipped sind Audit).
+            validation_warnings_payload = gate_result.to_json()
+            report_data["_validation_warnings"] = validation_warnings_payload
+
+        if gate_result is not None and not gate_result.passed:
             log.warning(
                 "validation_gate_failed",
                 order_id=order_id,
@@ -1268,23 +1304,20 @@ def process_job(job_data: dict) -> None:
                 raise ValidationFailedError(gate_result)
 
         # -- 6. Generate PDF --------------------------------------------------
-        # M3: V2-Renderer ueber ENV-Flag aktivierbar. Default bleibt
-        # Legacy v1 -- Big-Bang-Cutover erst in M6.
+        # S6: Der Renderer folgt VECTISCAN_REPORT_LAYOUT, Vorgabe v3. Die
+        # Auswahl steht schon oben in `layout` (reporter.engine).
         pdf_path = work_dir / f"{order_id}.pdf"
-        layout = os.environ.get("VECTISCAN_REPORT_LAYOUT", "v1").lower()
         # S5: Die Defekte des alten Gates gehen in dieselbe Liste wie die des
         # v3-Strangs, unterschieden nur durch die Engine am Eintrag.
         report_defects_payload: dict | None = None
+        v3_data = None
+        v3_output = None
         if layout == "v3":
             # S4: Renderer v3 (Jinja2 + WeasyPrint). Er liest nicht `report_data`,
-            # sondern baut sein eigenes Modell aus Fakten und Pruefkatalog. Bis zur
-            # Umschaltung in S6 laeuft die alte Kette davor trotzdem durch; ihr
-            # Ergebnis wird hier verworfen. Das kostet einen KI-Aufruf je Lauf und
-            # ist bewusst so, damit v2 jederzeit wieder greift.
+            # sondern baut sein eigenes Modell aus Fakten und Pruefkatalog.
             #
             # Kein stiller Rueckfall auf v2 bei einem Fehler: sonst laege ein
             # v2-PDF im Bucket und niemand saehe, dass v3 nicht lief.
-            # VECTISCAN_REPORT_LAYOUT=v3 ist eine ausdrueckliche Entscheidung.
             from reporter.gate import v3_checks
             from reporter.pdf.v3 import render_report_v3
             from reporter.pdf.v3.pipeline import (
@@ -1313,9 +1346,12 @@ def process_job(job_data: dict) -> None:
             # Ausnahmebehandlung bleibt (kein stiller Rueckfall auf v2).
             export_facts_if_enabled(minio_client, order_id, v3_facts, v3_output)
 
-            v3_defects = GD.from_validation_result(gate_result)
+            v3_defects = (GD.from_validation_result(gate_result)
+                          if gate_result is not None else [])
             v3_defects.extend(GD.from_selfcheck(check_report_data_detailed(v3_data)))
-            v3_defects.extend(v3_checks.run_all(v3_data, v3_facts, v3_output))
+            v3_defects.extend(v3_checks.run_all(
+                v3_data, v3_facts, v3_output,
+                strict=gate.level == ValidationLevel.STRICT))
 
             result = render_report_v3(v3_data, str(pdf_path),
                                       resolver=MinioScreenshots(minio_client),
@@ -1370,7 +1406,8 @@ def process_job(job_data: dict) -> None:
         # die Befunde des alten Gates, im v3-Layout beide Engines zusammen.
         if report_defects_payload is None:
             report_defects_payload = GD.payload(
-                GD.from_validation_result(gate_result),
+                GD.from_validation_result(gate_result)
+                if gate_result is not None else [],
                 engine=layout, level=gate.level.value,
             )
         _store_report_defects(conn, order_id, report_defects_payload)
@@ -1379,11 +1416,24 @@ def process_job(job_data: dict) -> None:
         file_size = _upload_report(minio_client, pdf_path, minio_pdf_path)
 
         # -- 8. Build findings_data and create report record in DB ---------------
-        findings_data = _build_findings_data(claude_output, package, report_data)
-        # Audit-Felder aus deterministischer Pipeline
-        policy_version = claude_output.get("policy_version")
-        policy_ids_raw = claude_output.get("policy_id_distinct") or []
-        policy_id_distinct = [pid for pid in policy_ids_raw if pid] or None
+        if uses_legacy or v3_data is None:
+            findings_data = _build_findings_data(claude_output, package, report_data)
+            # Audit-Felder aus deterministischer Pipeline
+            policy_version = claude_output.get("policy_version")
+            policy_ids_raw = claude_output.get("policy_id_distinct") or []
+            policy_id_distinct = [pid for pid in policy_ids_raw if pid] or None
+        else:
+            # S6: Die Dashboard-Befundliste kommt aus denselben Katalogbefunden
+            # wie der Bericht. Vorher fuellte sie die alte KI-Kette, und nur
+            # dafuer lief sie bei jedem Lauf mit (rund 1,85 USD je Bericht).
+            from reporter.v3.dashboard import findings_data_from_v3, policy_ids
+
+            findings_data = findings_data_from_v3(v3_data, package)
+            # Teil A Punkt 3: die Versionen, gegen die dieser Bericht entstanden
+            # ist, stehen in der Audit-Spalte und im Impressum des PDF.
+            policy_version = (f"Katalog {v3_data.meta.catalog_version} / "
+                              f"Fakten {v3_data.meta.facts_schema_version}")
+            policy_id_distinct = policy_ids(v3_data) or None
         # Migration 027: tech_profiles (1:1 aus Phase 1, mit pre-computed tech_rows
         # via tech_table_builder als Single Source of Truth — Frontend nutzt diese
         # statt eigener Klassifikation) + additional_findings (Voll-Body).
@@ -1395,6 +1445,10 @@ def process_job(job_data: dict) -> None:
                 tech_rows = build_tech_table_for_host(p)
                 enriched_profiles.append({**p, "tech_rows": tech_rows})
         additional_findings = claude_output.get("additional_findings_summary") or None
+        if not uses_legacy:
+            # Der Katalogweg kappt keine Befunde fuer den Bericht; es gibt
+            # deshalb keine "weiteren Sachverhalte" als eigenen Datensatz.
+            additional_findings = None
         report_id, download_token = _create_report_record(
             conn, order_id, minio_pdf_path, file_size, findings_data,
             # Audit-Spalte behaelt den Roh-Payload inkl. Begruendungen.
@@ -1469,9 +1523,16 @@ def process_job(job_data: dict) -> None:
                 conn = _get_db_connection()
 
         # -- 9. Update order status -----------------------------------------------
-        # If admin approved (approved flag) or regeneration → report_complete.
-        # First run after scan (no approval) → pending_review for admin to review.
-        final_status = "report_complete" if (is_approved or bool(excluded)) else "pending_review"
+        # S6 (Sicherheitsnetz, Teil A Punkt 6): Freigabe ist ausschliesslich ein
+        # ausdrueckliches `approved` aus POST /api/admin/orders/:id/approve.
+        #
+        # Bis S6 galt auch eine nicht leere Ausschlussliste als Freigabe. Eine
+        # Order, zu der irgendwann einmal Befunde ausgeschlossen wurden, ging
+        # damit beim naechsten Regenerate ohne zweiten Blick auf
+        # `report_complete`, und `report_complete` loest ueber
+        # api/src/lib/ws-manager.ts ungebremst die Fertig-Mail mit
+        # Download-Verweis aus. `regenerate-report` trug dazu nur `requireAuth`.
+        final_status = "report_complete" if is_approved else "pending_review"
         _update_order_status(conn, order_id, final_status)
         log.info("job_completed", order_id=order_id, package=package, status=final_status)
 

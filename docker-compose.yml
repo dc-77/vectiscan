@@ -546,31 +546,34 @@ services:
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      # M2-Ende (2026-06-01): Validation-Gate STRICT. Defekte blockieren PDF-Build,
-      # Order geht auf failed mit Begruendung in error_message. Per ENV-Override
-      # auf "warn" oder "off" zurueckfallbar bei Prod-Incidents (siehe
-      # report-worker/reporter/validation/gate.py:ValidationLevel).
-      # POLICY_VERSION-Default kommt aus severity_policy.py:30 (2026-06-01.1) —
-      # bei Bedarf hier per VECTISCAN_POLICY_VERSION ENV-Var ueberschreiben.
-      # M6.7 (2026-05-14): zurueck auf STRICT — der Pilot mit den 2 alten
-      # Orders ist abgeschlossen, alle bekannten Mapper-Bugs (M6.18 URLhaus-
-      # Fehlklassifikation) sind gefixt. Defekte blockieren ab jetzt wieder
-      # den PDF-Build (Order -> failed), damit ein neuer Frischscan auf
-      # heuel.com sauber durchgeht.
-      # Zielbild Juli 2026: 'warn' statt 'strict'. Das Tool hat einen expliziten
-      # Admin-Review-Schritt (pending_review) — der Report soll IMMER erzeugt werden und
-      # dort landen, statt bei EINEM Validation-Defekt hart auf 'failed' zu kippen (dann
-      # gibt es keinen Report und keinen Review). Defekte erscheinen als Warnung im Review;
-      # der Admin entscheidet bei der Freigabe. (Der Code-Default in gate.py ist ohnehin 'warn'.)
-      VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-warn}
-      # M6 Cutover-Flag (Doc 02 Master-Plan):
-      #   - "v2" (Default seit 2026-05-13): 3-Schichten-Architektur aktiv
-      #     (Frontpage / Strategie / Befund-Details + Anhaenge A-F).
-      #     Big-Bang-Flip da noch keine echten Customer betroffen.
-      #   - "v1": Legacy-Renderer (bleibt im Code als Fallback bis nach
-      #     mehrwoechiger Pilot-Phase, dann separate Removal-PR).
-      #   Override per .env wenn ein Pilot-Reset noetig ist.
-      VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v2}
+      # ---------------------------------------------------------------
+      # S6 (22.09.2026): Umschaltung auf den Pruefkatalog. Die drei Schalter
+      # stehen zusammen, weil sie zusammengehoeren; gelesen werden sie an
+      # genau einer Stelle (report-worker/reporter/engine.py).
+      #
+      #   VECTISCAN_REPORT_ENGINE     woher die Befunde kommen
+      #     catalog  Fakten -> Pruefkatalog -> Reportdaten v3 (Vorgabe)
+      #     legacy   die alte Kette (KI#5 mit Reparaturkette, Severity-Policy);
+      #              bleibt eine Release lang erreichbar und verschwindet dann
+      #   VECTISCAN_REPORT_LAYOUT     welcher Renderer setzt
+      #     v3       Jinja2 und WeasyPrint (Vorgabe)
+      #     v2/v1    ReportLab; braucht ENGINE=legacy, sonst Startfehler
+      #   VECTISCAN_VALIDATION_LEVEL  wie scharf das Gate ist
+      #     strict   Fehler halten den Bericht auf, Order -> report_blocked (Vorgabe)
+      #     warn     Defekte werden nur geschrieben
+      #     off      nur fuer lokale Tests
+      #
+      # Der Rueckweg bei einem Vorfall ist ein Satz in der .env:
+      #   VECTISCAN_REPORT_ENGINE=legacy
+      #   VECTISCAN_REPORT_LAYOUT=v2
+      #   VECTISCAN_VALIDATION_LEVEL=warn
+      # ---------------------------------------------------------------
+      VECTISCAN_REPORT_ENGINE: ${VECTISCAN_REPORT_ENGINE:-catalog}
+      VECTISCAN_REPORT_LAYOUT: ${VECTISCAN_REPORT_LAYOUT:-v3}
+      VECTISCAN_VALIDATION_LEVEL: ${VECTISCAN_VALIDATION_LEVEL:-strict}
+      # POLICY_VERSION-Default kommt aus severity_policy.py (2026-06-01.1) und
+      # gilt nur noch im Legacy-Weg; unter catalog stehen Katalog- und
+      # Faktenversion im Impressum und in reports.policy_version.
       # S5b: legt facts.json und catalog.json neben das Roh-Tar
       # (scan-rawdata/<order_id>/), damit Admin-Review, Fehlersuche und der
       # Export in S7 sie haben. Vorgabe leer, dann aendert sich nichts; greift

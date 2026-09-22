@@ -18,10 +18,14 @@ from reporter.v3 import findings as F
 from reporter.v3 import ids as IDS
 from reporter.v3 import narrative as N
 from reporter.v3 import plan as P
+from reporter.v3 import research as RESEARCH
 from reporter.v3 import tables as T
 from reporter.v3.appendix import build_appendix
 from reporter.v3.bundles import consolidate
 from reporter.v3.models import Meta, OrderRef, ReportData
+
+# Platzhalter, solange kein Kundenname vorliegt; das Gate meldet ihn (S5/S6).
+DEFAULT_CUSTOMER = "Auftraggeber"
 
 
 def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives: int,
@@ -37,7 +41,7 @@ def _counts(facts: FS.Facts, output: CatalogOutput, n_findings: int, n_positives
         hosts_total=len(facts.hosts),
         hosts_ipv4=sum(1 for h in facts.hosts if h.family == 4),
         hosts_ipv6=sum(1 for h in facts.hosts if h.family == 6),
-        fqdns_total=len(facts.fqdns),
+        fqdns_total=sum(1 for f in facts.fqdns if not f.wildcard),
         runs=runs,
         tool_runs=len(facts.coverage),
         raw_findings=raw,
@@ -100,7 +104,10 @@ def build_report_data(
     plan = P.build_plan(pairs)
     levers = P.build_levers(plan, finding_list)
 
-    gap_hosts = [ip for ip, (cov, _) in sorted(coverage.items()) if cov != "voll"]
+    # S6 (spec/08 Punkt 10): Der Hinweis auf Seite 3 haengt an den
+    # Leitwerkzeugen des Pakets, nicht an jeder Luecke. Die Abdeckungstabelle
+    # in Kapitel 2 zeigt weiterhin jede Luecke.
+    gap_hosts = C.hosts_ohne_leitwerkzeug(facts)
     glance = C.build_glance(finding_items, finding_list, counts, gap_hosts)
     glance.levers = levers
     business = C.build_business(facts, C.observed_systems(facts))
@@ -113,8 +120,15 @@ def build_report_data(
     # und das Gate meldet es als Warnung. "customer" bleibt als Schluessel
     # bestehen, weil die Golden-Testdaten den Auftraggeber so mitgeben.
     customer = str(order.get("customer") or context.get("firmenname")
-                   or context.get("customer") or "Auftraggeber")
-    customer_short = str(order.get("customer_short") or kuerzel or customer.split()[0])
+                   or context.get("customer") or DEFAULT_CUSTOMER)
+    # S6 (spec/08 Punkt 8): Der Kurzname fuer Fusszeile und PDF-Titel ist ein
+    # eigenes Feld, sonst der Firmenname ohne Rechtsform. Er war vorher das erste
+    # Wort, und "Dortmund Beach Design" wurde damit zu "Dortmund".
+    customer_short = str(order.get("customer_short") or context.get("kurzname") or "").strip()
+    if not customer_short and customer != DEFAULT_CUSTOMER:
+        customer_short = RESEARCH.kurzname_aus(customer)
+    if not customer_short:
+        customer_short = kuerzel or customer
     month_day = "".join(reversed(scan_date.split(".")[:2])) if scan_date != C.UNKNOWN else "0000"
     meta = Meta(
         customer=customer,
