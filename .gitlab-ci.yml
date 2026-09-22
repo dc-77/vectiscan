@@ -1143,6 +1143,58 @@ ops-gate-blocked:
         "SELECT status FROM orders WHERE id = '${GATE_ORDER_ID}'"
 
 # =============================================================================
+# OPS-UPDATE-PAGES (S6) — Seitenerwartungen neu schreiben.
+#
+# tests/golden/render/expected-pages.json haelt je Golden-Auftrag die Seitenzahl
+# und die bekannten halbleeren Seiten (S4). Jede inhaltliche Aenderung am
+# Bericht verschiebt diese Zahlen, und `python -m reporter.pdf.v3 --update-pages`
+# braucht WeasyPrint samt Pango. Das liegt weder auf dem Runner (Shell-Executor)
+# noch unter Windows, sondern nur im report-worker-Abbild.
+#
+# Bis S6 gab es deshalb keinen Weg, die Datei ohne eine eigene Linux-Umgebung
+# neu zu schreiben; die Zahlen wurden aus dem Fehlertext des Selbsttests
+# abgetippt. Dieser Job rendert alle Golden-Auftraege im Abbild des Commits und
+# legt die Datei in die Artefakte. Von dort nach tests/golden/render/ kopieren,
+# die Abweichung im Commit begruenden, fertig.
+#
+# Manuell, weil er nur bei einer gewollten Layout- oder Textaenderung gebraucht
+# wird, und `needs: [build-report-worker]`, damit er nicht auf Trivy und die
+# Testphase wartet.
+# =============================================================================
+ops-update-pages:
+  stage: ops
+  tags: [vectigal]
+  needs: [build-report-worker]
+  when: manual
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - render-pages/
+  script:
+    - mkdir -p ${CI_PROJECT_DIR}/render-pages
+    # --update-pages schreibt in den Abbild-Pfad; der Container ist ein
+    # Wegwerfcontainer, deshalb danach herauskopieren.
+    # --user root, weil /app dem Abbild-Root gehoert und --update-pages in
+    # tests/golden/render/ schreibt (wie der pytest-Schritt in
+    # test-report-worker-pdf).
+    - CID=$(docker create --user root -e VECTISCAN_REQUIRE_WEASYPRINT=1
+        ${BASE_IMAGE}/report-worker:${CI_COMMIT_SHORT_SHA}
+        python3 -m reporter.pdf.v3 --update-pages)
+    - docker start -a "${CID}" 2>&1 | tee ${CI_PROJECT_DIR}/render-pages/update-pages.log
+    - docker cp "${CID}:/app/tests/golden/render/expected-pages.json"
+        ${CI_PROJECT_DIR}/render-pages/expected-pages.json
+    - docker rm -f "${CID}" >/dev/null
+    - echo "=== expected-pages.json ==="
+    - cat ${CI_PROJECT_DIR}/render-pages/expected-pages.json
+
+# =============================================================================
 # OPS-FACTS-PROD (S5b) — kommt die Faktenschicht im Produktionspfad an?
 #
 # Zwei Betriebsarten, beide gegen die echte Datenbank und das echte Roh-Tar:
