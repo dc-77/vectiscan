@@ -171,3 +171,15 @@ Entscheidungen DC:
 - **E4** Der Prüfstand geht mit 62.217.52.174 ins Internet, die vier unerreichten BS-Adressen liegen teils im selben Netz (62.217.52.162, .166, .171). Verdacht: kein Hairpin oder Firewall-Regel zwischen DMZ und eigenem Netz; 79.140.188.181 ist ein anderer Anschluss. Bitte prüfen; bis dahin sind eigene Ziele in diesem Netz vom Prüfstand aus nicht prüfbar und gehören als solche in den Bericht.
 - **E5** Ausgehend Port 25 am Prüfstand: freischalten lassen (Firewall der DMZ oder Provider) oder als feste Einschränkung „SMTP auf Port 25 vom Prüfstand aus nicht prüfbar" in jeden Bericht.
 - **E6** Freigabe: keinen der sieben Berichte freigeben. Die Aufträge bleiben in `pending_review` bis zum `requeue-report` nach S6b.
+
+## Teil 7: Entscheidungen DC (23.09.2026)
+
+DC folgt den Vorschlägen aus Teil 6.
+- **E1** Verwaltungsoberfläche mit Anmeldung ohne vorgelagerten Schutz auf einem System des Kunden (Webmin, Panel): Exposition kritisch, Rot, Unverzüglich. Hosting-Panels des Hosters auf geteilten Systemen: erhöht, Empfehlung an den Hoster. A.2 wird entsprechend gefasst.
+- **E2** Zertifikat mit Restlaufzeit bis sieben Tage: Unverzüglich (Ausnahme in `levels.py` und A.1); acht bis 14 Tage: Hygiene hoch, In Kürze; darüber mittelfristig.
+- **E3** Geteiltes Hosting und CDN: Befunde, die der Kunde nicht selbst beheben kann, stehen als „beim Hoster oder Plattformbetreiber"; aktive Prüfungen nur gegen die VHosts des Kunden. Die Umsetzung im Scanner ist nicht Teil von S6a2, S6b-1 und S6b-2.
+- **E4** DC prüft den Netzweg vom Prüfstand (62.217.52.174) zu den eigenen Adressen; bis dahin stehen solche Hosts als „vom Prüfstand aus nicht erreichbar".
+- **E5** DC klärt die Freischaltung von Port 25 ausgehend; bis dahin feste Einschränkung „SMTP auf Port 25 vom Prüfstand aus nicht prüfbar", wenn eine Passivquelle den Port meldet.
+- **E6** Keiner der sieben Berichte wird freigegeben; nach S6b-1 und S6b-2 `requeue-report`, Gegenlesen als spec/10.
+
+Zuschnitt: S6a2 (Dashboard-Techniktabelle aus den Fakten, KI #1 „or later", sieben Golden-Fixtures), danach S6b-1 (Q2, Q3 Berichtsteil, Q9, Q10, Q15, Q16 Berichtsteil, Teil 3, E4, E5), danach S6b-2 (Q4 bis Q7, Q12 bis Q14, Q18, spec/08 Teil 2, offene Punkte nach S6a). Startprompts in `spec/prompts/S6a2.md`, `S6b1.md`, `S6b2.md`. Die Scanner-Punkte (Q1, Q8, Q16 Scannerteil, Q17, E3 im Scanner) folgen als eigene Session.
