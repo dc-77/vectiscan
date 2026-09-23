@@ -1248,7 +1248,8 @@
     "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
     "n": 3,
     "refs": [
-     "VS-2026-003"
+     "VS-2026-003",
+     "VS-2026-005"
     ],
     "title": "Sicherheits-Header und Formularschutz auf online.heuel.com unvollständig"
    }
@@ -1322,7 +1323,8 @@
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-003"
+    "VS-2026-003",
+    "VS-2026-005"
    ],
    "st": "gelb"
   },
@@ -1333,15 +1335,6 @@
    "refs": [
     "VS-2026-004",
     "VS-2026-007"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-005"
    ],
    "st": "gelb"
   },

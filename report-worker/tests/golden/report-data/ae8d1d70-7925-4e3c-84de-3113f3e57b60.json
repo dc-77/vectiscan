@@ -1995,7 +1995,11 @@
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-006",
-    "VS-2026-008"
+    "VS-2026-008",
+    "VS-2026-013",
+    "VS-2026-016",
+    "VS-2026-015",
+    "VS-2026-017"
    ],
    "st": "gelb"
   },
@@ -2020,39 +2024,11 @@
    "st": "blau"
   },
   {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-013",
-    "VS-2026-016"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-015",
-    "VS-2026-017"
-   ],
-   "st": "blau"
-  },
-  {
    "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-018"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
+    "VS-2026-018",
     "VS-2026-019"
    ],
    "st": "blau"

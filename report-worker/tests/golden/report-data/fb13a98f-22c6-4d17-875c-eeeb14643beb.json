@@ -1348,7 +1348,8 @@
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-007"
+    "VS-2026-007",
+    "VS-2026-011"
    ],
    "st": "gelb"
   },
@@ -1359,15 +1360,6 @@
    "refs": [
     "VS-2026-008",
     "VS-2026-013"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-011"
    ],
    "st": "blau"
   },

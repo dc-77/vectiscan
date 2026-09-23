@@ -1226,7 +1226,8 @@
     "effect": "Schützt die Authentizität der eigenen E-Mail",
     "n": 3,
     "refs": [
-     "VS-2026-003"
+     "VS-2026-003",
+     "VS-2026-004"
     ],
     "title": "Richtlinie zur Absender-Authentizität für junkerwerk.de nicht durchsetzend"
    }
@@ -1301,15 +1302,7 @@
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "In Kürze",
    "refs": [
-    "VS-2026-003"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
-   "prio": "In Kürze",
-   "refs": [
+    "VS-2026-003",
     "VS-2026-004"
    ],
    "st": "gelb"
@@ -1359,15 +1352,7 @@
    "prio": "Strategisch",
    "refs": [
     "VS-2026-011",
-    "VS-2026-014"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
-   "prio": "Strategisch",
-   "refs": [
+    "VS-2026-014",
     "VS-2026-012",
     "VS-2026-015"
    ],

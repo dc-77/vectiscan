@@ -158,6 +158,11 @@ bleibt als Gegenprobe "gleiche Daten, anderes Paket" bestehen.
   behalten ihn mit neuem Titel. Positivbefunde nennen je Host hoechstens drei virtuelle
   Hosts ("und weitere", Rest von spec/08 Punkt 13): 75338c97, 2572eebc, fb13a98f.
   Regressionssperre ohne Golden-Tar: `tests/v3/fixtures/huendgen_62c1e866.json`.
+- S6a, Massnahmenplan: Zeilen mit gleichem Massnahmentext laufen zu einer Zeile mit
+  beiden Befundlisten und beiden Effekten zusammen (`reporter/v3/plan.py`). Planzeilen
+  176db198 8->7, 2d2d4f39 16->12, 4e6b6883 16->10, 860d0d5a 10->8, ae8d1d70 12->9,
+  f77ccff2 16->10, fb13a98f 10->9; die Hebel auf Seite 2 folgen den ersten drei Zeilen.
+  Die uebrigen sieben Auftraege hatten keine Doppelnennung.
 
 ## Golden-Facts (S1)
 

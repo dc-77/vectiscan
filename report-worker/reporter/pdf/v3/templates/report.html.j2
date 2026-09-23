@@ -199,7 +199,7 @@ tr{break-inside:avoid;}
  </table>
  <h3>Die drei wichtigsten Hebel</h3>
  {% for l in g.levers %}
- <div class="lever"><div class="n">HEBEL {{ l.n }}</div><div class="ti">{{ l.title }}</div><div class="ef">{{ l.effect }}</div><div class="rf">Adressiert: {{ l.refs|join(', ') }}</div></div>
+ <div class="lever"><div class="n">HEBEL {{ l.n }}</div><div class="ti">{{ l.title }}</div><div class="ef">{{ l.effect|dot_br }}</div><div class="rf">Adressiert: {{ l.refs|join(', ') }}</div></div>
  {% endfor %}
  <div class="wrapup">
  <p class="small">{{ distribution_line }}</p>
@@ -320,7 +320,7 @@ tr{break-inside:avoid;}
  <p class="lead">Priorisiert nach Dringlichkeit und Wirkung. Der Plan nennt bewusst keine Aufwände oder Kosten: Diese hängen von Umgebung, Verträgen und Dienstleistern ab und gehören in die Planung des Umsetzers. Die technischen Details je Maßnahme stehen im jeweiligen Befund in Kapitel 6.</p>
  <table>
   <tr><th style="width:22mm">Priorität</th><th style="width:84mm">Maßnahme</th><th style="width:26mm">Befunde</th><th style="width:36mm">Erwarteter Effekt</th></tr>
-  {% for p in plan %}<tr><td><span class="pill p-{{ p.st }}">{{ p.prio }}</span></td><td>{{ p.action }}</td><td class="mono" style="font-size:7.6pt">{% for r in p.refs %}{{ r }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td class="small">{{ p.effect }}</td></tr>{% endfor %}
+  {% for p in plan %}<tr><td><span class="pill p-{{ p.st }}">{{ p.prio }}</span></td><td>{{ p.action }}</td><td class="mono" style="font-size:7.6pt">{% for r in p.refs %}{{ r }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td class="small">{{ p.effect|dot_br }}</td></tr>{% endfor %}
  </table>
  <div class="box info"><div class="t">Zeitstufen</div>{{ stage_box }}</div>
 </section>

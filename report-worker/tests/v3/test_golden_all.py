@@ -48,6 +48,14 @@ def test_jeder_befund_steht_genau_einmal_im_plan(order_id):
 
 
 @pytest.mark.parametrize("order_id", ORDERS)
+def test_keine_massnahme_steht_zweimal_im_plan(order_id):
+    """S6a: gleicher Massnahmentext, eine Zeile (Huendgen Seite 11)."""
+    texte = [" ".join(row.action.split()) for row in data_for(order_id).plan]
+    doppelt = sorted({t[:60] for t in texte if texte.count(t) > 1})
+    assert not doppelt, doppelt
+
+
+@pytest.mark.parametrize("order_id", ORDERS)
 def test_pflichtteile_des_berichts_sind_gefuellt(order_id):
     data = data_for(order_id)
     assert data.meta.domains and data.meta.scan_date
