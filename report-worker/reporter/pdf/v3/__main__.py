@@ -125,6 +125,7 @@ def _kennzahlen(order_id: str | None, *, tar: bool) -> int:
     except ImportError:  # pragma: no cover - Windows
         resource = None  # type: ignore[assignment]
 
+    from reporter import engine as _engine
     from reporter.gate import v3_checks
     from reporter.gate.defects import Defect  # noqa: F401  (Typ fuer die Lesbarkeit)
     from reporter.pdf.v3 import pipeline as P
@@ -146,7 +147,12 @@ def _kennzahlen(order_id: str | None, *, tar: bool) -> int:
         zeilen = results_path(order_id)
 
     facts, output, data = P.report_bundle_from_source(quelle, tool_runs=zeilen)
-    defekte = [d for d in v3_checks.run_all(data, facts, output)]
+    # Dieselbe Strenge wie der Worker. Ohne das meldet die Diagnose einen
+    # fehlenden Auftraggeber als Warnung und "fehler": 0, waehrend derselbe
+    # Bericht in der Produktion unter strict auf report_blocked laeuft. Ein
+    # gruenes --kennzahlen muss heissen, dass der Bericht durchgeht.
+    streng = _engine.validation_level() == "strict"
+    defekte = [d for d in v3_checks.run_all(data, facts, output, strict=streng)]
     defekte += list(check_report_data_detailed(data))
 
     stati: dict[str, int] = {}
