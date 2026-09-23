@@ -2251,8 +2251,8 @@
  "landscape_lead": "29 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 70,
-  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
-  "catalog_version": "2026-09-22.1",
+  "catalog_digest": "3e6c5321c769c4c6349df90e7d40c20ebeeaf1281cfb3628bbfec0b639bcf900",
+  "catalog_version": "2026-09-23.1",
   "classification": "Vertraulich",
   "consolidated": 29,
   "customer": "Auftraggeber",
@@ -2273,7 +2273,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-22.1",
+  "policy_version": "2026-09-23.1",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2461,8 +2461,8 @@
   },
   {
    "cat": "A",
-   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
-   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
+   "text": "Auf den geprüften Hosts außer 92.205.163.53 antwortet weder die Windows-Fernwartung (RDP) noch die Windows-Dateifreigabe (SMB) auf Verbindungen von außen. Andere Zugänge wie FTP, SSH oder Verwaltungsoberflächen umfasst diese Aussage nicht.",
+   "title": "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar"
   },
   {
    "cat": "B",

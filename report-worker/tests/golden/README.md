@@ -149,6 +149,15 @@ bleibt als Gegenprobe "gleiche Daten, anderes Paket" bestehen.
   leitet sie ab (`s6a_report_id`), Grund in `reporter/v3/deltas.md` Punkt 14. Alle
   14 `report-data/*.json` und der HTML-Snapshot tragen die neue Nummer
   (`meta.report_id`); vorher kollidierten 0831 dreimal, 0920 dreimal und 0722 zweimal.
+- S6a, Issue #30: Der Positivbefund von `remote_admin_closed` heisst "Keine
+  Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet
+  erreichbar", und ein Host mit FTP auf 21, Verwaltungsoberflaeche oder SSH ausserhalb
+  Port 22 mit Befund faellt heraus (`positive_conflicts`). In den Reportdaten entfaellt
+  er deshalb fuer 14272c00, 45bb234c und 57b3ac85 (je ein Host mit Konflikt), bei
+  2d2d4f39 und f77ccff2 steht "ausser 92.205.163.53"; 75338c97, 860d0d5a und a6df9d9d
+  behalten ihn mit neuem Titel. Positivbefunde nennen je Host hoechstens drei virtuelle
+  Hosts ("und weitere", Rest von spec/08 Punkt 13): 75338c97, 2572eebc, fb13a98f.
+  Regressionssperre ohne Golden-Tar: `tests/v3/fixtures/huendgen_62c1e866.json`.
 
 ## Golden-Facts (S1)
 

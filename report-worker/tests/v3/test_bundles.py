@@ -7,11 +7,16 @@ Mitglied, Positivbefund nur ohne Fehlschlag in derselben Gruppe.
 """
 from __future__ import annotations
 
+import copy
+import json
+from pathlib import Path
+
 import pytest
 
 from reporter.catalog import evaluate
 from reporter.catalog.engine import load_catalog
 from reporter.v3.bundles import GLOBAL_KEY, consolidate
+from reporter.v3.findings import build_positives
 from tests.catalog.conftest import make_facts
 
 
@@ -126,3 +131,116 @@ def test_jedes_buendel_hat_texte_und_mitglieder(bundle_id):
     assert bundle.texts.recommendation
     if bundle.target == "findings":
         assert bundle.texts.positive is not None, "ein Buendel im Bericht braucht auch den Positivfall"
+
+
+# ---------------------------------------------------------------- Issue #30 (S6a)
+# Der Positivbefund des Buendels remote_admin_closed prueft nur RDP und SMB. Neben FTP,
+# einer Verwaltungsoberflaeche oder SSH ausserhalb Port 22 mit Befund las er sich wie
+# eine Entwarnung fuer den ganzen Host. Der betroffene Host faellt heraus.
+
+HUENDGEN = json.loads((Path(__file__).parent / "fixtures" / "huendgen_62c1e866.json")
+                      .read_text(encoding="utf-8"))
+HUENDGEN_FTP_HOST = "217.160.231.238"
+NEUER_TITEL = ("Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) "
+               "aus dem Internet erreichbar")
+
+
+def _huendgen(**aenderung) -> dict:
+    partial = copy.deepcopy({k: v for k, v in HUENDGEN.items() if not k.startswith("_")})
+    partial.update(aenderung)
+    return partial
+
+
+def _fernwartung(positives):
+    treffer = _by_key(positives, "remote_admin_closed")
+    assert len(treffer) <= 1
+    return treffer[0] if treffer else None
+
+
+def _hosts(item) -> set[str]:
+    return {str(r.vars.get("host_ip")) for r in item.results}
+
+
+def test_huendgen_ftp_host_faellt_aus_dem_positivbefund():
+    """Regressionssperre #30: FTP auf 217.160.231.238:21 steht als Befund."""
+    findings, positives = _run(_huendgen())
+    assert any(i.key == "plaintext_services" and i.merge_key == HUENDGEN_FTP_HOST
+               for i in findings), "der FTP-Befund selbst muss bleiben"
+    item = _fernwartung(positives)
+    assert item is not None, "die zwei Hosts ohne Konflikt behalten den Positivbefund"
+    assert item.title == NEUER_TITEL
+    assert _hosts(item) == {"18.197.248.23", "80.90.145.166"}
+    assert item.excluded_hosts == [HUENDGEN_FTP_HOST]
+    (positiv,) = build_positives([item])
+    assert positiv.title == NEUER_TITEL
+    assert HUENDGEN_FTP_HOST not in positiv.text
+    assert "18.197.248.23" in positiv.text and "80.90.145.166" in positiv.text
+
+
+def test_huendgen_ohne_ftp_behaelt_der_host_den_positivbefund():
+    services = [s for s in HUENDGEN["services"]
+                if not (s["host_ip"] == HUENDGEN_FTP_HOST and s["port"] == 21)]
+    _, positives = _run(_huendgen(services=services))
+    item = _fernwartung(positives)
+    assert HUENDGEN_FTP_HOST in _hosts(item)
+    assert item.excluded_hosts == []
+
+
+def test_ein_host_mit_ftp_ohne_rest_kein_positivbefund():
+    """Wie dortmund-beach: ein einziger Host, FTP darauf, kein Positivbefund."""
+    partial = {"services": [
+        {"host_ip": "10.0.0.1", "port": 21, "service": "ftp", "product": "Pure-FTPd"},
+        {"host_ip": "10.0.0.1", "port": 443, "service": "https", "tls_required": True},
+    ]}
+    _, positives = _run(partial)
+    assert _fernwartung(positives) is None
+
+
+def test_verwaltungsoberflaeche_als_befund_nimmt_den_host_heraus():
+    partial = {"services": [
+        {"host_ip": "10.0.0.1", "port": 10000, "service": "snet-sensor-mgmt", "tunnel_ssl": True},
+        {"host_ip": "10.0.0.2", "port": 443, "service": "https", "tls_required": True},
+    ]}
+    findings, positives = _run(partial)
+    assert any(r.check_id == "admin_service_exposed" and r.status == "fail"
+               for i in findings for r in i.results)
+    item = _fernwartung(positives)
+    assert _hosts(item) == {"10.0.0.2"}
+    assert item.excluded_hosts == ["10.0.0.1"]
+
+
+def test_ssh_ausserhalb_22_nur_mit_befund():
+    mit_banner = {"host_ip": "10.0.0.1", "port": 30000, "service": "ssh", "product": "OpenSSH",
+                  "version_raw": "8.4p1", "version_norm": "8.4p1", "family": "openssh"}
+    ohne_befund = {"host_ip": "10.0.0.1", "port": 30000, "service": "ssh"}
+    https = {"host_ip": "10.0.0.1", "port": 443, "service": "https", "tls_required": True}
+
+    findings, positives = _run({"services": [mit_banner, https]})
+    assert any(r.check_id == "service_banner_version" and r.status == "fail"
+               for i in findings for r in i.results)
+    assert _fernwartung(positives) is None
+
+    findings, positives = _run({"services": [ohne_befund, https]})
+    fails_30000 = [m for i in findings for r in i.results for m in r.members
+                   if m.status == "fail" and m.port == 30000]
+    assert not fails_30000, "Vorbedingung: SSH auf 30000 ohne eigenen Befund"
+    assert _hosts(_fernwartung(positives)) == {"10.0.0.1"}
+
+
+def test_viele_hosts_nennen_den_herausgenommenen():
+    """Ab vier Hosts steht die Sammelbezeichnung; sie darf den FTP-Host nicht mitmeinen."""
+    services = [{"host_ip": f"10.0.0.{n}", "port": 443, "service": "https", "tls_required": True}
+                for n in range(1, 6)]
+    services.append({"host_ip": "10.0.0.3", "port": 21, "service": "ftp", "product": "vsftpd"})
+    _, positives = _run({"services": services})
+    item = _fernwartung(positives)
+    assert item.excluded_hosts == ["10.0.0.3"]
+    (positiv,) = build_positives([item])
+    assert "außer 10.0.0.3" in positiv.text
+
+
+def test_positive_conflicts_greifen_nur_beim_eigenen_buendel():
+    """Andere Positivbefunde bleiben fuer den FTP-Host unberuehrt."""
+    _, positives = _run(_huendgen())
+    andere = [p for p in positives if p.key != "remote_admin_closed"]
+    assert andere and all(not p.excluded_hosts for p in andere)

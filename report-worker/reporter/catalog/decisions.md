@@ -150,20 +150,27 @@ haelt das Buendel aus der Befundliste heraus (Anhang "Werkzeugbefunde ohne Bewer
 spec/06 Abschnitt 4 Stufe 2). Der Test `tests/catalog/test_schema_and_table.py` erzwingt
 Tabelle == YAML.
 
-| bundle | category | merge_by | target | Mitglieder |
-|---|---|---|---|---|
-| access_portals_exposed | A | global | findings | login_portal_exposed, admin_portal_exposed |
-| banner_disclosure | E | global | findings | service_banner_version, http_header_disclosure, http_trace_enabled |
-| cert_health | D | host | findings | cert_expired, cert_expiring, cert_chain_incomplete, cert_hostname_mismatch, cert_self_signed |
-| dns_hygiene | E | domain | findings | dnssec_missing, caa_missing |
-| dns_integrity | C | domain | findings | dns_zone_transfer, dns_dangling_cname |
-| mail_policy | C | domain | findings | dmarc_missing, dmarc_none, dmarc_quarantine, spf_softfail, spf_permissive |
-| mail_records | C | domain | findings | spf_missing, dkim_missing |
-| mail_transport_enforcement | C | domain | findings | mta_sts_missing, tls_rpt_missing, dane_missing |
-| plaintext_services | A | host | findings | ftp_plaintext, mail_plaintext |
-| remote_admin_closed | A | global | findings | rdp_exposed, smb_exposed |
-| reputation_clean | E | global | findings | ip_reputation, urlhaus_compromise |
-| tls_hardening | D | host | findings | tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness, hsts_short |
-| tool_findings_unrated | E | global | appendix | info_disclosure, js_library_outdated, web_vulnerability_reported |
-| web_header_hygiene | D | host | findings | csp_missing, csp_weak, hsts_missing, security_headers_incomplete, header_duplicate, csrf_token_missing, cookie_flags, sri_missing, cors_misconfiguration, session_in_url |
-| windows_edge_exposure | A | host | findings | default_page_exposed, http_alt_port |
+`positive_conflicts` (S6a, Issue #30, Spalte "Positiv entfaellt je Host bei"): Steht auf
+einem Host einer dieser Befunde, faellt der Host aus dem Positivbefund des Buendels heraus;
+ohne verbleibenden Host entfaellt der Positivbefund. `remote_admin_closed` prueft nur RDP
+und SMB und hiess frueher "Keine Fernwartung und keine Dateifreigabe"; neben FTP auf
+Port 21, einer Verwaltungsoberflaeche oder SSH ausserhalb Port 22 mit Befund las sich das
+wie eine Entwarnung fuer den ganzen Host (Huendgen 62c1e866, dortmund-beach 14272c00).
+
+| bundle | category | merge_by | target | Mitglieder | Positiv entfaellt je Host bei |
+|---|---|---|---|---|---|
+| access_portals_exposed | A | global | findings | login_portal_exposed, admin_portal_exposed | - |
+| banner_disclosure | E | global | findings | service_banner_version, http_header_disclosure, http_trace_enabled | - |
+| cert_health | D | host | findings | cert_expired, cert_expiring, cert_chain_incomplete, cert_hostname_mismatch, cert_self_signed | - |
+| dns_hygiene | E | domain | findings | dnssec_missing, caa_missing | - |
+| dns_integrity | C | domain | findings | dns_zone_transfer, dns_dangling_cname | - |
+| mail_policy | C | domain | findings | dmarc_missing, dmarc_none, dmarc_quarantine, spf_softfail, spf_permissive | - |
+| mail_records | C | domain | findings | spf_missing, dkim_missing | - |
+| mail_transport_enforcement | C | domain | findings | mta_sts_missing, tls_rpt_missing, dane_missing | - |
+| plaintext_services | A | host | findings | ftp_plaintext, mail_plaintext | - |
+| remote_admin_closed | A | global | findings | rdp_exposed, smb_exposed | ftp_plaintext, legacy_protocols_present (Port 21); admin_service_exposed, admin_portal_exposed, admin_service_exposed_passive; ssh_alt_port mit Befund |
+| reputation_clean | E | global | findings | ip_reputation, urlhaus_compromise | - |
+| tls_hardening | D | host | findings | tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness, hsts_short | - |
+| tool_findings_unrated | E | global | appendix | info_disclosure, js_library_outdated, web_vulnerability_reported | - |
+| web_header_hygiene | D | host | findings | csp_missing, csp_weak, hsts_missing, security_headers_incomplete, header_duplicate, csrf_token_missing, cookie_flags, sri_missing, cors_misconfiguration, session_in_url | - |
+| windows_edge_exposure | A | host | findings | default_page_exposed, http_alt_port | - |

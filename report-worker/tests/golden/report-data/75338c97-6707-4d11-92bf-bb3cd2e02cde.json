@@ -654,8 +654,8 @@
  "landscape_lead": "9 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 23,
-  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
-  "catalog_version": "2026-09-22.1",
+  "catalog_digest": "3e6c5321c769c4c6349df90e7d40c20ebeeaf1281cfb3628bbfec0b639bcf900",
+  "catalog_version": "2026-09-23.1",
   "classification": "Vertraulich",
   "consolidated": 9,
   "customer": "Auftraggeber",
@@ -677,7 +677,7 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-22.1",
+  "policy_version": "2026-09-23.1",
   "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -763,18 +763,18 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Auf 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech) antwortet kein Datenbankdienst auf Verbindungen von außen.",
+   "text": "Auf 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) antwortet kein Datenbankdienst auf Verbindungen von außen.",
    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
   },
   {
    "cat": "A",
-   "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech) bietet seinen Webdienst über HTTPS an.",
+   "text": "Der Host 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
    "cat": "A",
-   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
-   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
+   "text": "Auf 62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech und weitere) antwortet weder die Windows-Fernwartung (RDP) noch die Windows-Dateifreigabe (SMB) auf Verbindungen von außen. Andere Zugänge wie FTP, SSH oder Verwaltungsoberflächen umfasst diese Aussage nicht.",
+   "title": "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar"
   },
   {
    "cat": "E",

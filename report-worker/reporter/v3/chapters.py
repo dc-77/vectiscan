@@ -21,6 +21,7 @@ from reporter.v3 import levels as L
 from reporter.v3 import narrative as N
 from reporter.v3 import tables as T
 from reporter.v3.bundles import Consolidated
+from reporter.v3.findings import kurz_label
 from reporter.v3.orthography import clean_foreign_text
 from reporter.v3.models import (Architecture, Business, CanCannot, Finding, Glance, GlanceCategory,
                                 Limitation, MethodPhase, NumberTile, ObservedSystem, PostureBlock,
@@ -279,19 +280,8 @@ def limitations(facts: FS.Facts, output: CatalogOutput) -> list[Limitation]:
 # Betroffenenliste einer Einschraenkung ist das eine Wand aus Namen: bei
 # vectigal.tech sind es 31 hinter einer einzigen IP. Die Kuerzung der Liste
 # selbst (sechs Eintraege) greift dort nicht, weil das Ganze ein Eintrag ist.
-_GRUPPE_MIT_VHOSTS = re.compile(r"^(?P<kopf>[^(]+) \((?P<namen>[^()]+)\)$")
-_VHOSTS_IM_NAMEN = 3
-
-
-def _kurz(label: str) -> str:
-    treffer = _GRUPPE_MIT_VHOSTS.match(label)
-    if not treffer:
-        return label
-    namen = [n.strip() for n in treffer.group("namen").split(",") if n.strip()]
-    if len(namen) <= _VHOSTS_IM_NAMEN:
-        return label
-    return (f"{treffer.group('kopf')} ("
-            f"{', '.join(namen[:_VHOSTS_IM_NAMEN])} und weitere)")
+# S6a: dieselbe Kuerzung gilt fuer Positivbefunde, deshalb liegt sie in findings.
+_kurz = kurz_label
 
 
 # ---------------------------------------------------------------- Kapitel 1

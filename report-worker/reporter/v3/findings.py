@@ -11,6 +11,7 @@ zitiert; damit bleibt Anhang A.3 leer statt unbelegt (spec/03 Regel 2).
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Any, Optional
 
@@ -37,18 +38,40 @@ PASSIVE_TOOLS: frozenset[str] = frozenset({
 
 MANY_GROUPS = "den geprüften Hosts"
 
+# Ein Host mit vielen VHosts traegt sie alle im Gruppennamen, bei vectigal.tech 31 hinter
+# einer einzigen IP (spec/08 Punkt 13). In Einschraenkungen (chapters) und Positivbefunden
+# stehen deshalb drei Namen und "und weitere".
+_GRUPPE_MIT_VHOSTS = re.compile(r"^(?P<kopf>[^(]+) \((?P<namen>[^()]+)\)$")
+_VHOSTS_IM_NAMEN = 3
 
-def _group_label(results: list[CheckResult], groups: list[str], merge_key: str) -> str:
+
+def kurz_label(label: str) -> str:
+    treffer = _GRUPPE_MIT_VHOSTS.match(label)
+    if not treffer:
+        return label
+    namen = [n.strip() for n in treffer.group("namen").split(",") if n.strip()]
+    if len(namen) <= _VHOSTS_IM_NAMEN:
+        return label
+    return (f"{treffer.group('kopf')} ("
+            f"{', '.join(namen[:_VHOSTS_IM_NAMEN])} und weitere)")
+
+
+def _group_label(results: list[CheckResult], groups: list[str], merge_key: str,
+                 kurz: bool = False) -> str:
     """Wie der Sachverhalt im Text benannt wird.
 
     Eine einzelne Gruppe behaelt ihre ausfuehrliche Bezeichnung aus dem Katalog (IP mit
     Hostnamen, virtueller Host). Laufen mehrere Gruppen zusammen, steht der
     Zusammenfuehrungsschluessel da, also die Host-Adresse oder die Domain; die Namen
     stehen ohnehin in der Betroffenenliste. Ein Sachverhalt ueber den ganzen Auftrag
-    bekommt eine Sammelbezeichnung.
+    bekommt eine Sammelbezeichnung. Mit ``kurz`` (Positivbefunde, S6a) nennt jede
+    Gruppe hoechstens drei ihrer virtuellen Hosts.
     """
+    if kurz:
+        groups = [kurz_label(g) for g in groups]
     if len(results) == 1:
-        return results[0].group_label or merge_key
+        label = results[0].group_label or merge_key
+        return kurz_label(label) if kurz else label
     if merge_key and merge_key != GLOBAL_KEY:
         return merge_key
     if 0 < len(groups) <= 3:
@@ -56,7 +79,8 @@ def _group_label(results: list[CheckResult], groups: list[str], merge_key: str) 
     return MANY_GROUPS
 
 
-def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY) -> dict[str, Any]:
+def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY,
+                kurz: bool = False) -> dict[str, Any]:
     """Platzhalterwerte fuer den zusammengefuehrten Sachverhalt."""
     affected: list[str] = []
     groups: list[str] = []
@@ -84,7 +108,7 @@ def merged_vars(results: list[CheckResult], merge_key: str = GLOBAL_KEY) -> dict
     return {
         "affected": affected,
         "count": len(affected),
-        "group": _group_label(results, groups, merge_key),
+        "group": _group_label(results, groups, merge_key, kurz=kurz),
         "fqdn_names": fqdns,
         "domain": domain,
         "host_ip": host_ip,
@@ -404,9 +428,14 @@ def build_positives(items: list[Consolidated]) -> list[Positive]:
     for item in items:
         if item.texts.positive is None:
             continue
-        values = merged_vars(item.results, item.merge_key)
+        # S6a (spec/08 Punkt 13): bis zu drei VHosts je Host, sonst "und weitere".
+        values = merged_vars(item.results, item.merge_key, kurz=True)
         if not values["group"]:
             values["group"] = MANY_GROUPS
+        if item.excluded_hosts and values["group"] == MANY_GROUPS:
+            # S6a (#30): die Sammelbezeichnung wuerde die herausgenommenen Hosts
+            # mitmeinen; bis zu drei verbleibende Hosts stehen ohnehin namentlich da.
+            values["group"] = f"{MANY_GROUPS} außer {', '.join(item.excluded_hosts)}"
         where = f"{item.key}/{GLOBAL_KEY}"
         out.append(Positive(
             cat=item.category,

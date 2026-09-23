@@ -23,13 +23,18 @@ Bump-Historie:
                   `wordpress_plugin_vulnerable` zaehlt ohne Singular-Fehler.
                   COVERAGE_REASONS in Kundensprache (spec/08 Punkt 11);
                   `package_<paket>` zaehlt als `not_in_package` (Punkt 9).
+    2026-09-23.1  S6a (Issue #30): Positivbefund von `remote_admin_closed` heisst
+                  "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe
+                  (SMB)"; neues Buendelfeld `positive_conflicts`, damit ein Host mit
+                  FTP, Verwaltungsoberflaeche oder SSH ausserhalb Port 22 mit Befund
+                  aus dem Positivbefund herausfaellt.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-22.1"
+CATALOG_VERSION = "2026-09-23.1"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

@@ -94,11 +94,29 @@ def test_buendeltabelle_ist_verbindlich(catalog):
     for bid, bundle in sorted(catalog.bundle_by_id.items()):
         row = rows[bid]
         got = {"category": bundle.category, "merge_by": bundle.merge_by, "target": bundle.target,
-               "Mitglieder": ", ".join(bundle.members)}
+               "Mitglieder": ", ".join(bundle.members),
+               "Positiv entfaellt je Host bei": bundle.conflicts_label()}
         for key, val in got.items():
             if row[key] != val:
                 diffs.append(f"{bid}.{key}: YAML {val!r} != Tabelle {row[key]!r}")
     assert not diffs, "\n".join(diffs)
+
+
+def test_positive_conflicts_nennen_nur_vorhandene_pruefungen():
+    """Im vollstaendigen Katalog muss jede in positive_conflicts genannte Pruefung
+    existieren; der Lader verwirft unbekannte IDs still (verkleinerte Testkataloge),
+    ein Tippfehler faellt deshalb nur hier auf."""
+    from reporter.catalog.engine import load_bundle
+    from reporter.catalog.version import BUNDLES_DIR, CHECKS_DIR
+    known = {p.stem for p in CHECKS_DIR.glob("*.yaml")}
+    fehlend = []
+    for path in sorted(BUNDLES_DIR.glob("*.yaml")):
+        bundle = load_bundle(path)
+        for conflict in bundle.positive_conflicts:
+            for cid in conflict.checks + ([conflict.noted_by] if conflict.noted_by else []):
+                if cid not in known:
+                    fehlend.append(f"{bundle.id}: {cid}")
+    assert not fehlend, fehlend
 
 
 def test_jede_pruefung_hoechstens_in_einem_buendel(catalog):

@@ -1335,8 +1335,8 @@
  "landscape_lead": "16 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 47,
-  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
-  "catalog_version": "2026-09-22.1",
+  "catalog_digest": "3e6c5321c769c4c6349df90e7d40c20ebeeaf1281cfb3628bbfec0b639bcf900",
+  "catalog_version": "2026-09-23.1",
   "classification": "Vertraulich",
   "consolidated": 16,
   "customer": "Auftraggeber",
@@ -1357,7 +1357,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-22.1",
+  "policy_version": "2026-09-23.1",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1466,7 +1466,7 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Der Host 217.243.248.28 (autodiscover.junkerwerk.de, mail.junkerwerk.de, outlook.junkerwerk.de), 217.243.248.29 (cloud.junkerwerk.de, rdgw-2016.junkerwerk.de, rdgw.junkerwerk.de, team.junkerwerk.de), 217.243.248.30 (openotp.junkerwerk.de) bietet seinen Webdienst über HTTPS an.",
+   "text": "Der Host 217.243.248.28 (autodiscover.junkerwerk.de, mail.junkerwerk.de, outlook.junkerwerk.de), 217.243.248.29 (cloud.junkerwerk.de, rdgw-2016.junkerwerk.de, rdgw.junkerwerk.de und weitere), 217.243.248.30 (openotp.junkerwerk.de) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
