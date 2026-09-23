@@ -218,6 +218,46 @@ def blockade_belegt(facts: FS.Facts) -> bool:
 OUT_OF_PRODUCT_TOOLS: frozenset[str] = frozenset({"virustotal"})
 
 
+# S6a (#15 Teil 2): DKIM ohne gefundenen Selektor ist nicht pruefbar. Die Einschraenkung
+# nennt Anzahl und sechs Beispiele der abgefragten Selektoren, die volle Liste steht im
+# Anhang bei den eingesetzten Werkzeugen (Entscheidung DC). Belegt der Lauf die Liste
+# nicht (Dkim.probed leer), bleibt der allgemeine Text aus COVERAGE_REASONS.
+DKIM_CODE = "dkim_selector_unknown"
+DKIM_BEISPIELE = ("default", "selector1", "selector2", "google", "k1", "s1")
+
+
+def dkim_probed(facts: FS.Facts, domain: str) -> list[str]:
+    for dns in facts.dns:
+        if dns.domain == domain and dns.dkim is not None and dns.dkim.probed:
+            return list(dns.dkim.probed)
+    return []
+
+
+def dkim_beispiele(probed: list[str], anzahl: int = 6) -> list[str]:
+    out = [s for s in DKIM_BEISPIELE if s in probed]
+    out += [s for s in sorted(probed) if s not in out]
+    return out[:anzahl]
+
+
+def dkim_limitation_text(probed: list[str]) -> str:
+    return (f"DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter {len(probed)} "
+            f"abgefragten gängigen Selektoren, darunter {', '.join(dkim_beispiele(probed))}, war "
+            "kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten "
+            "Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail "
+            "(DKIM-Signature, Angabe s=).")
+
+
+def dkim_selectors_for_appendix(facts: FS.Facts, output: CatalogOutput) -> list[str]:
+    """Abgefragte Selektoren fuer den Anhang, nur wenn eine Einschraenkung darauf verweist."""
+    out: set[str] = set()
+    for result in output.results:
+        if result.status != "not_testable" or not result.reason_code:
+            continue
+        if result.reason_code.split(":", 1)[-1] == DKIM_CODE:
+            out.update(dkim_probed(facts, str(result.vars.get("domain") or result.group_key)))
+    return sorted(out)
+
+
 def limitations(facts: FS.Facts, output: CatalogOutput) -> list[Limitation]:
     """Einschraenkungen aus Abdeckungszeilen und nicht pruefbaren Pruefungen.
 
@@ -264,6 +304,10 @@ def limitations(facts: FS.Facts, output: CatalogOutput) -> list[Limitation]:
         status, text = CT.COVERAGE_REASONS.get(code, ("not_testable", ""))
         if status != "not_testable" or not text:
             continue
+        if code == DKIM_CODE:
+            probed = dkim_probed(facts, str(result.vars.get("domain") or result.group_key))
+            if probed:
+                text = dkim_limitation_text(probed)
         schluessel = (str(result.vars.get("host_ip") or "")
                       or str(result.vars.get("domain") or "")
                       or result.group_key)

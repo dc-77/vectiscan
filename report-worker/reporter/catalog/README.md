@@ -319,7 +319,8 @@ Bump-Historie mit Begruendung im Modul-Docstring von `version.py`; Kurzfassung:
 `2026-09-19.1` Erstversion (S2), `2026-09-19.2` echte Umlaute in allen Kundentexten und
 Befund-Buendel (S3), `2026-09-20.1` Rueckbau `zap_no_alerts` (S2b), `2026-09-22.1`
 Pflichtkorrekturen aus spec/08 (S6), `2026-09-23.1` `positive_conflicts` und der
-geschaerfte Positivbefund von `remote_admin_closed` (S6a, Issue #30).
+geschaerfte Positivbefund von `remote_admin_closed` (S6a, Issue #30), `2026-09-23.2`
+`dkim_missing` ohne gefundenen Selektor nicht pruefbar (S6a, #15 Teil 2).
 
 ## Texte
 

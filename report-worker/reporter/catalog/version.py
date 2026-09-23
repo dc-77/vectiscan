@@ -28,13 +28,16 @@ Bump-Historie:
                   (SMB)"; neues Buendelfeld `positive_conflicts`, damit ein Host mit
                   FTP, Verwaltungsoberflaeche oder SSH ausserhalb Port 22 mit Befund
                   aus dem Positivbefund herausfaellt.
+    2026-09-23.2  S6a (#15 Teil 2): `dkim_missing` meldet ohne gefundenen Selektor
+                  nicht mehr "fehlt", sondern not_testable mit dem neuen Grund
+                  `dkim_selector_unknown`; die Pruefung hat kein `when` mehr.
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-23.1"
+CATALOG_VERSION = "2026-09-23.2"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

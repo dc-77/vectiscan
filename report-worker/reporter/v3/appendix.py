@@ -106,6 +106,7 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
         inventory=build_inventory(facts, findings),
         tools=build_tools(facts),
         tool_findings=tool_findings,
+        dkim_selectors=C.dkim_selectors_for_appendix(facts, output),
         filtering=N.filtering(counts),
         repeat=N.repeat(counts, has_red, has_gaps),
         disclaimer=N.disclaimer(scan_date, provider),

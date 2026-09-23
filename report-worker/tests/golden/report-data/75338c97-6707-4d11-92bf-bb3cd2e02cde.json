@@ -2,6 +2,70 @@
  "appendix": {
   "cve_refs": [],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 20.09.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [
+   "1und1",
+   "amazonses",
+   "brevo",
+   "default",
+   "dkim",
+   "dkim-1",
+   "dkim-2",
+   "dkim01",
+   "dkim1",
+   "dkim2",
+   "email",
+   "fd",
+   "fd2",
+   "gmx",
+   "google",
+   "googledomains",
+   "hse1",
+   "hse2",
+   "ionos1",
+   "ionos2",
+   "k1",
+   "k2",
+   "key1",
+   "key2",
+   "mail",
+   "mailgun",
+   "mailin",
+   "mailjet",
+   "mailo",
+   "mandrill",
+   "mg",
+   "mj",
+   "mta",
+   "mta1",
+   "mta2",
+   "mxvault",
+   "pf2014",
+   "pm",
+   "postmark",
+   "primary",
+   "s1",
+   "s1024",
+   "s2",
+   "s2048",
+   "scph",
+   "scph0123",
+   "scph0124",
+   "secondary",
+   "selector",
+   "selector1",
+   "selector2",
+   "sendinblue",
+   "sib",
+   "sig1",
+   "sig2",
+   "smtp",
+   "smtpapi",
+   "strato1",
+   "strato2",
+   "t-online",
+   "zmail",
+   "zoho"
+  ],
   "exposure_scale": [
    {
     "l": "kritisch",
@@ -12,7 +76,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 23 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 9 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 22 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen und Bündelung nach Sachverhalt verbleiben 9 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -114,8 +178,8 @@
      },
      {
       "l": "DKIM",
-      "ok": false,
-      "v": "Handlungsbedarf"
+      "ok": null,
+      "v": "nicht prüfbar"
      },
      {
       "l": "DMARC",
@@ -404,7 +468,7 @@
    "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
    "level": "hoch",
    "level_label": "hoch",
-   "policy": "dkim_missing, spf_missing",
+   "policy": "spf_missing",
    "recommendation": [
     [
      "In Kürze",
@@ -653,9 +717,9 @@
  },
  "landscape_lead": "9 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 23,
-  "catalog_digest": "3e6c5321c769c4c6349df90e7d40c20ebeeaf1281cfb3628bbfec0b639bcf900",
-  "catalog_version": "2026-09-23.1",
+  "after_fp": 22,
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
   "classification": "Vertraulich",
   "consolidated": 9,
   "customer": "Auftraggeber",
@@ -664,7 +728,7 @@
    "vectigal.tech",
    "vectiscan.de"
   ],
-  "facts_schema_version": "1.0.3",
+  "facts_schema_version": "1.0.4",
   "fqdns_total": 31,
   "hosts_ipv4": 2,
   "hosts_ipv6": 0,
@@ -677,7 +741,7 @@
   ],
   "package": "WebCheck",
   "package_label": "WEBCHECK",
-  "policy_version": "2026-09-23.1",
+  "policy_version": "2026-09-23.2",
   "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -685,7 +749,7 @@
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 23,
+  "raw_findings": 22,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0920-7533",
   "report_version": "1.0",
@@ -826,6 +890,10 @@
     "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
    },
    {
+    "detail": "Betroffen: vectiscan.de.",
+    "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=)"
+   },
+   {
     "detail": "Betroffen: 62.217.52.177.",
     "what": "Das Werkzeug httpx hat kein Ergebnis geliefert"
    },
@@ -891,7 +959,7 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "23"
+    "v": "22"
    },
    {
     "l": "Befunde im Bericht",

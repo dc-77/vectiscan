@@ -765,6 +765,10 @@ def collect_dns_records(domain: str, scan_dir: str, order_id: str,
     found_selectors = sorted(set(found_selectors))
     records["dkim"] = bool(found_selectors)
     records["dkim_selectors"] = found_selectors
+    # S6a (#15 Teil 2): die abgefragten Selektoren gehoeren in die Fakten. Ohne
+    # gefundenen Selektor ist DKIM nicht "fehlend", sondern nicht pruefbar, und der
+    # Bericht nennt, wonach gesucht wurde. Bis hierher stand nur die Anzahl im Log.
+    records["dkim_selectors_probed"] = list(DKIM_SELECTORS)
     if found_selectors:
         log.info("dkim_selectors_found", domain=domain, selectors=found_selectors)
     else:

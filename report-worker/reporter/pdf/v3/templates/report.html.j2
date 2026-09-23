@@ -396,6 +396,11 @@ tr{break-inside:avoid;}
  <h3>Anhang {{ ltr.tools }} · Eingesetzte Werkzeuge</h3>
  <table><tr><th style="width:44mm">Werkzeug</th><th style="width:84mm">Einsatz</th><th style="width:40mm">Konfidenz</th></tr>
  {% for t in ap.tools %}<tr><td>{{ t.t }}</td><td>{{ t.u }}</td><td class="small">{{ t.c }}</td></tr>{% endfor %}</table>
+ {% if ap.dkim_selectors %}
+ <h4>Abgefragte DKIM-Selektoren</h4>
+ <p class="small">Ohne Selektor aus einer echten E-Mail lässt sich ein DKIM-Schlüssel nur unter bekannten Selektornamen suchen. Abgefragt wurden {{ ap.dkim_selectors|length }} Selektoren:</p>
+ <p class="mono" style="font-size:7.6pt">{{ ap.dkim_selectors|join(', ') }}</p>
+ {% endif %}
  {% if show_tool_findings %}
  <h4>{{ txt.TOOL_FINDINGS_TITLE }}</h4>
  <p class="small">{{ txt.TOOL_FINDINGS_LEAD }}</p>

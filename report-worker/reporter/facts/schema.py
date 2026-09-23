@@ -18,6 +18,11 @@ Historie:
 - 1.0.3 (S6, spec/08 Punkt 18): ``TlsEntry.cves`` fuehrt alle Kennungen eines
   testssl-Tests; ``cve`` bleibt die erste. Dazu Nachweiszeilen ohne
   Python-Darstellungen (spec/08 Punkt 3), was Auszuege aendert, keine Felder.
+- 1.0.4 (S6a, #15 Teil 2): ``Dkim.probed`` nennt die abgefragten Selektoren,
+  ``Dkim.probed_basis`` woher die Liste kommt (``scan``: aus dns_records;
+  ``scanner_stand``: die feste Liste des Scanners ab ae5fa74, nur wenn der Tar
+  diesen Stand belegt). Ohne gefundenen Selektor ist DKIM nicht pruefbar, und
+  der Bericht nennt, wonach gesucht wurde.
 """
 from __future__ import annotations
 
@@ -25,7 +30,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.0.3"
+FACTS_SCHEMA_VERSION = "1.0.4"
 
 Mode = Literal["active", "passive"]
 
@@ -373,6 +378,9 @@ class Dmarc(Base):
 class Dkim(Base):
     present: Optional[bool] = None
     selectors: list[str] = Field(default_factory=list)
+    # S6a: abgefragte Selektoren; None heisst, der Lauf belegt die Liste nicht.
+    probed: Optional[list[str]] = None
+    probed_basis: Optional[Literal["scan", "scanner_stand"]] = None
 
 
 class Dnssec(Base):

@@ -32,100 +32,95 @@
   },
   "VS-2026-006": {
    "checks": [
-    "dkim_missing"
+    "dmarc_none"
    ]
   },
   "VS-2026-007": {
    "checks": [
-    "dmarc_none"
+    "dnssec_missing"
    ]
   },
   "VS-2026-008": {
    "checks": [
-    "dnssec_missing"
+    "ftp_plaintext"
    ]
   },
   "VS-2026-009": {
    "checks": [
-    "ftp_plaintext"
+    "hsts_short"
    ]
   },
   "VS-2026-010": {
    "checks": [
-    "hsts_short"
+    "http_header_disclosure"
    ]
   },
   "VS-2026-011": {
    "checks": [
-    "http_header_disclosure"
+    "info_disclosure"
    ]
   },
   "VS-2026-012": {
    "checks": [
-    "info_disclosure"
+    "legacy_protocols_present"
    ]
   },
   "VS-2026-013": {
    "checks": [
-    "legacy_protocols_present"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-014": {
    "checks": [
-    "mta_sts_missing"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-015": {
    "checks": [
-    "security_headers_incomplete"
+    "service_banner_version"
    ]
   },
   "VS-2026-016": {
    "checks": [
-    "service_banner_version"
+    "software_eol_runtime"
    ]
   },
   "VS-2026-017": {
    "checks": [
-    "software_eol_runtime"
+    "spf_softfail"
    ]
   },
   "VS-2026-018": {
    "checks": [
-    "spf_softfail"
+    "tls_no_13"
    ]
   },
   "VS-2026-019": {
    "checks": [
-    "tls_no_13"
+    "tls_rpt_missing"
    ]
   },
   "VS-2026-020": {
    "checks": [
-    "tls_rpt_missing"
+    "tls_weakness"
    ]
   },
   "VS-2026-021": {
    "checks": [
-    "tls_weakness"
+    "web_vulnerability_reported"
    ]
   },
   "VS-2026-022": {
    "checks": [
-    "web_vulnerability_reported"
+    "wordpress_core_outdated"
    ]
   },
   "VS-2026-023": {
    "checks": [
-    "wordpress_core_outdated"
-   ]
-  },
-  "VS-2026-024": {
-   "checks": [
     "wordpress_plugin_vulnerable"
    ]
   },
-  "VS-2026-025": {
+  "VS-2026-024": {
    "checks": [
     "wordpress_user_enumeration"
    ]

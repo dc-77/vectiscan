@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-20.1 auf tests/golden/facts/75338c97-6707-4d11-92bf-bb3cd2e02cde.json",
+ "source": "reporter.catalog 2026-09-23.1 auf tests/golden/facts/75338c97-6707-4d11-92bf-bb3cd2e02cde.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -130,19 +130,6 @@
   },
   {
    "id": "VS-2026-010",
-   "check": "dkim_missing",
-   "family": "dkim_missing",
-   "cat": "C",
-   "scale": "hygiene",
-   "level": "mittel",
-   "group": "vectiscan.de",
-   "affected": [
-    "vectiscan.de"
-   ],
-   "title": "DKIM-Signatur fehlt"
-  },
-  {
-   "id": "VS-2026-011",
    "check": "dmarc_missing",
    "family": "dmarc_missing",
    "cat": "C",
@@ -155,7 +142,7 @@
    "title": "DMARC-Richtlinie fehlt"
   },
   {
-   "id": "VS-2026-012",
+   "id": "VS-2026-011",
    "check": "dmarc_none",
    "family": "dmarc_none",
    "cat": "C",
@@ -168,7 +155,7 @@
    "title": "DMARC-Richtlinie ohne Durchsetzung"
   },
   {
-   "id": "VS-2026-013",
+   "id": "VS-2026-012",
    "check": "dnssec_missing",
    "family": "dnssec_missing",
    "cat": "E",
@@ -181,7 +168,7 @@
    "title": "DNS-Zone ohne DNSSEC-Signatur"
   },
   {
-   "id": "VS-2026-014",
+   "id": "VS-2026-013",
    "check": "dnssec_missing",
    "family": "dnssec_missing",
    "cat": "E",
@@ -194,7 +181,7 @@
    "title": "DNS-Zone ohne DNSSEC-Signatur"
   },
   {
-   "id": "VS-2026-015",
+   "id": "VS-2026-014",
    "check": "mta_sts_missing",
    "family": "mta_sts_missing",
    "cat": "C",
@@ -207,7 +194,7 @@
    "title": "MTA-STS nicht wirksam veröffentlicht"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-015",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -220,7 +207,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-016",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -233,7 +220,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-018",
+   "id": "VS-2026-017",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -246,7 +233,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-019",
+   "id": "VS-2026-018",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -259,7 +246,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-020",
+   "id": "VS-2026-019",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -272,7 +259,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-021",
+   "id": "VS-2026-020",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -285,7 +272,7 @@
    "title": "SPF-Eintrag fehlt"
   },
   {
-   "id": "VS-2026-022",
+   "id": "VS-2026-021",
    "check": "spf_missing",
    "family": "spf_missing",
    "cat": "C",
@@ -298,7 +285,7 @@
    "title": "SPF-Eintrag fehlt"
   },
   {
-   "id": "VS-2026-023",
+   "id": "VS-2026-022",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",

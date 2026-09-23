@@ -2,6 +2,70 @@
  "appendix": {
   "cve_refs": [],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 26.05.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [
+   "1und1",
+   "amazonses",
+   "brevo",
+   "default",
+   "dkim",
+   "dkim-1",
+   "dkim-2",
+   "dkim01",
+   "dkim1",
+   "dkim2",
+   "email",
+   "fd",
+   "fd2",
+   "gmx",
+   "google",
+   "googledomains",
+   "hse1",
+   "hse2",
+   "ionos1",
+   "ionos2",
+   "k1",
+   "k2",
+   "key1",
+   "key2",
+   "mail",
+   "mailgun",
+   "mailin",
+   "mailjet",
+   "mailo",
+   "mandrill",
+   "mg",
+   "mj",
+   "mta",
+   "mta1",
+   "mta2",
+   "mxvault",
+   "pf2014",
+   "pm",
+   "postmark",
+   "primary",
+   "s1",
+   "s1024",
+   "s2",
+   "s2048",
+   "scph",
+   "scph0123",
+   "scph0124",
+   "secondary",
+   "selector",
+   "selector1",
+   "selector2",
+   "sendinblue",
+   "sib",
+   "sig1",
+   "sig2",
+   "smtp",
+   "smtpapi",
+   "strato1",
+   "strato2",
+   "t-online",
+   "zmail",
+   "zoho"
+  ],
   "exposure_scale": [
    {
     "l": "kritisch",
@@ -12,7 +76,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 38 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (11 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 14 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 37 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (11 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 13 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -31,7 +95,7 @@
    {
     "host": "37.114.55.171",
     "port": "22",
-    "ref": "VS-2026-013",
+    "ref": "VS-2026-012",
     "svc": "OpenSSH 10.0p2"
    },
    {
@@ -67,7 +131,7 @@
    {
     "host": "37.114.55.171",
     "port": "987",
-    "ref": "VS-2026-013",
+    "ref": "VS-2026-012",
     "svc": "OpenSSH 10.0p2"
    },
    {
@@ -85,7 +149,7 @@
    {
     "host": "85.13.167.158",
     "port": "22",
-    "ref": "VS-2026-013",
+    "ref": "VS-2026-012",
     "svc": "OpenSSH 9.6p1"
    },
    {
@@ -103,7 +167,7 @@
    {
     "host": "85.13.167.158",
     "port": "110",
-    "ref": "VS-2026-008",
+    "ref": "VS-2026-007",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
@@ -115,7 +179,7 @@
    {
     "host": "85.13.167.158",
     "port": "143",
-    "ref": "VS-2026-008",
+    "ref": "VS-2026-007",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
@@ -175,7 +239,7 @@
    {
     "host": "87.79.190.79",
     "port": "987",
-    "ref": "VS-2026-013",
+    "ref": "VS-2026-012",
     "svc": "OpenSSH 10.0p2"
    },
    {
@@ -251,8 +315,8 @@
      },
      {
       "l": "DKIM",
-      "ok": false,
-      "v": "Handlungsbedarf"
+      "ok": null,
+      "v": "nicht prüfbar"
      },
      {
       "l": "DMARC",
@@ -936,39 +1000,11 @@
    "verify": "Eine verschlüsselte Verbindung zu den genannten Diensten aufbauen; erwartet wird ein gültiges Zertifikat mit vollständiger Kette und passendem Namen."
   },
   {
-   "affected": "krause-computer.de",
-   "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\nkrause-computer.de: SPF=v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all DMARC=v=DMARC1; p=reject; adkim=r; aspf=r DKIM-Selektoren=keiner bekannt MX=krause.skclient.de, mail.krause-computer.de, mx.krause-comput...",
-   "found": "Für krause-computer.de fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können: krause-computer.de.",
-   "id": "VS-2026-006",
-   "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
-   "level": "mittel",
-   "level_label": "mittel",
-   "policy": "dkim_missing",
-   "recommendation": [
-    [
-     "In Kürze",
-     "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden."
-    ],
-    [
-     "Mittelfristig",
-     "Die Einträge nach jeder Änderung an den Versandwegen prüfen und die Signatur der ausgehenden Nachrichten überwachen."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (dns_records)",
-   "status": "gelb",
-   "threat": null,
-   "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für krause-computer.de",
-   "urgency": "Mittelfristig",
-   "verify": "DNS-Abfrage für die genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
-  },
-  {
    "affected": "nextcloud.krause-computer.de (unsafe-inline, Wildcard), filebrowser.krause-computer.de (fehlend: x-frame-options, referrer-policy, permissions-policy), navidrome.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), youtube.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
    "cat": "D",
    "evidence": "header_check · scan_results:header_check:87.79.190.79\nnextcloud.krause-computer.de: URL=https://nextcloud.krause-computer.de gesetzte Header=content-security-policy: default-src 'self'; script-src 'self' 'nonce-4/PkloggYHvRSAzt+2IB9Os6vo1pNJ6SDq9y3W8LwkQ='; style-src 'self' 'unsafe-inline';...\n\nheader_check · scan_results:header_check:87.79.190.79\nfilebrowser.krause-computer.de: URL=https://filebrowser.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-frame-options, x-xss-protection gesetzte Header=x-conte...\n\nheader_check · scan_results:header_check:87.79.190.79\nnavidrome.krause-computer.de: URL=https://navidrome.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Ser...\n\nheader_check · scan_results:header_check:87.79.190.79\nyoutube.krause-computer.de: URL=https://youtube.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=...",
    "found": "Die Webdienste auf 87.79.190.79 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: nextcloud.krause-computer.de (unsafe-inline, Wildcard), filebrowser.krause-computer.de (fehlend: x-frame-options, referrer-policy, permissions-policy), navidrome.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), youtube.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
-   "id": "VS-2026-007",
+   "id": "VS-2026-006",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "mittel",
    "level_label": "mittel",
@@ -996,7 +1032,7 @@
    "cat": "A",
    "evidence": "nmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:21/tcp Dienst=nagios-nsca Produkt=Nagios NSCA Zustand=open\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=USER, PIPELINING, UIDL, STLS\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\npop3-capabilities: USER PIPELINING UIDL STLS TOP SASL(PLAIN LOGIN) RESP-CODES AUTH-RESP-CODE CAPA\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=LOGIN, PLAIN Capabilities=AUTH=LOGINA0001, capabilities, STARTTLS, ID\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\nimap-capabilities: AUTH=LOGINA0001 capabilities STARTTLS ID IMAP4rev1 AUTH=PLAIN post-login OK ENABLE XLIST LOGIN-REFERRALS more IDLE have listed LITERAL+ Pre-login SASL-IR",
    "found": "Der Host 85.13.167.158 (krause-computer.de, www.krause-computer.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 85.13.167.158:110 (POP3), 85.13.167.158:143 (IMAP), 85.13.167.158:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
-   "id": "VS-2026-008",
+   "id": "VS-2026-007",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1024,7 +1060,7 @@
    "cat": "C",
    "evidence": "dns_records · phase0/dns_records.json\nkrause-computer.de: SPF=v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all DMARC=v=DMARC1; p=reject; adkim=r; aspf=r DKIM-Selektoren=keiner bekannt MX=krause.skclient.de, mail.krause-computer.de, mx.krause-comput...",
    "found": "Für krause-computer.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: krause-computer.de.",
-   "id": "VS-2026-009",
+   "id": "VS-2026-008",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1048,7 +1084,7 @@
    "cat": "D",
    "evidence": "header_check · scan_results:header_check:85.13.167.158\nkrause-computer.de: URL=https://krause-computer.de fehlende Header=content-security-policy, permissions-policy, x-xss-protection gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=600000,...\n\nheader_check · scan_results:header_check:85.13.167.158\nwww.krause-computer.de: URL=https://www.krause-computer.de fehlende Header=content-security-policy, permissions-policy, x-xss-protection gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age...",
    "found": "Die Transportverschlüsselung auf 85.13.167.158 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: krause-computer.de (max-age 600000), www.krause-computer.de (max-age 600000).",
-   "id": "VS-2026-010",
+   "id": "VS-2026-009",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1080,7 +1116,7 @@
    "cat": "D",
    "evidence": "header_check · scan_results:header_check:37.114.55.171\njitsi.krause-computer.de: URL=https://jitsi.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-secur...\n\nheader_check · scan_results:header_check:37.114.55.171\nmx.krause-computer.de: URL=https://mx.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:37.114.55.171\nnospamproxy.krause-computer.de: URL=https://nospamproxy.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:37.114.55.171\nrustdesk.krause-computer.de: URL=https://rustdesk.krause-computer.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection",
    "found": "Die Webdienste auf 37.114.55.171 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: jitsi.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), mx.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), nospamproxy.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), rustdesk.krause-computer.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
-   "id": "VS-2026-011",
+   "id": "VS-2026-010",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1108,7 +1144,7 @@
    "cat": "D",
    "evidence": "header_check · scan_results:header_check:85.13.167.158\nkrause-computer.de: URL=https://krause-computer.de fehlende Header=content-security-policy, permissions-policy, x-xss-protection gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age=600000,...\n\nheader_check · scan_results:header_check:85.13.167.158\nwww.krause-computer.de: URL=https://www.krause-computer.de fehlende Header=content-security-policy, permissions-policy, x-xss-protection gesetzte Header=referrer-policy: strict-origin-when-cross-origin, strict-transport-security: max-age...",
    "found": "Die Webdienste auf 85.13.167.158 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: krause-computer.de (fehlend: permissions-policy), www.krause-computer.de (fehlend: permissions-policy).",
-   "id": "VS-2026-012",
+   "id": "VS-2026-011",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1136,7 +1172,7 @@
    "cat": "E",
    "evidence": "nmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:22/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u4 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n22/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u4 (protocol 2.0)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:987/tcp Dienst=ssh Produkt=OpenSSH Version=10.0p2 Debian 7+deb13u2 Zustand=open\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n987/tcp open ssh OpenSSH 10.0p2 Debian 7+deb13u2 (protocol 2.0)\n\nnmap · hosts/37.114.55.171/phase1/nmap.xml\n37.114.55.171:3128/tcp Dienst=http Produkt=Proxmox Virtual Environment REST API Version=3.0 Zustand=open\n\nnmap · hosts/85.13.167.158/phase1/nmap.xml\n85.13.167.158:22/tcp Dienst=ssh Produkt=OpenSSH Version=9.6p1 Ubuntu 3ubuntu13.16 Zustand=open\n\nund 7 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 37.114.55.171:22 (OpenSSH 10.0p2), 37.114.55.171:3128 (Proxmox Virtual Environment REST API 3.0), 37.114.55.171:987 (OpenSSH 10.0p2), 85.13.167.158:139 (Samba smbd 4.6.2), 85.13.167.158:22 (OpenSSH 9.6p1), 85.13.167.158:3306 (MariaDB 10.11.14), 85.13.167.158:445 (Samba smbd 4.6.2), 87.79.190.79:987 (OpenSSH 10.0p2).",
-   "id": "VS-2026-013",
+   "id": "VS-2026-012",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1164,7 +1200,7 @@
    "cat": "E",
    "evidence": "dns_records · phase0/dns_records.json\nkrause-computer.de: SPF=v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all DMARC=v=DMARC1; p=reject; adkim=r; aspf=r DKIM-Selektoren=keiner bekannt MX=krause.skclient.de, mail.krause-computer.de, mx.krause-comput...",
    "found": "Für krause-computer.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: krause-computer.de.",
-   "id": "VS-2026-014",
+   "id": "VS-2026-013",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1202,10 +1238,10 @@
    },
    {
     "key": "C",
-    "level": 2,
+    "level": 1,
     "name": "E-Mail-Authentizität",
-    "note": "Grundlegende Einträge zur Absender-Authentizität fehlen für krause-computer.de; Transportverschlüsselung im Mailversand für krause-computer.de nicht erzwungen",
-    "status": "gelb"
+    "note": "Transportverschlüsselung im Mailversand für krause-computer.de nicht erzwungen",
+    "status": "blau"
    },
    {
     "key": "D",
@@ -1255,19 +1291,19 @@
   "overall_status": "rot",
   "overall_text": "2 Befunde erfordern unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "13 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 27,
-  "catalog_digest": "3e6c5321c769c4c6349df90e7d40c20ebeeaf1281cfb3628bbfec0b639bcf900",
-  "catalog_version": "2026-09-23.1",
+  "after_fp": 26,
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
   "classification": "Vertraulich",
-  "consolidated": 14,
+  "consolidated": 13,
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
   "domains": [
    "krause-computer.de"
   ],
-  "facts_schema_version": "1.0.3",
+  "facts_schema_version": "1.0.4",
   "fqdns_total": 11,
   "hosts_ipv4": 3,
   "hosts_ipv6": 0,
@@ -1280,7 +1316,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-23.1",
+  "policy_version": "2026-09-23.2",
   "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1288,7 +1324,7 @@
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 38,
+  "raw_findings": 37,
   "report_date": "19.09.2026",
   "report_id": "VS-2026-0526-fb13",
   "report_version": "1.0",
@@ -1335,21 +1371,12 @@
    "st": "gelb"
   },
   {
-   "action": "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden.",
-   "effect": "Schützt die Authentizität der eigenen E-Mail",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-006"
-   ],
-   "st": "gelb"
-  },
-  {
    "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-007",
-    "VS-2026-011"
+    "VS-2026-006",
+    "VS-2026-010"
    ],
    "st": "gelb"
   },
@@ -1358,8 +1385,8 @@
    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-008",
-    "VS-2026-013"
+    "VS-2026-007",
+    "VS-2026-012"
    ],
    "st": "blau"
   },
@@ -1368,8 +1395,8 @@
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-010",
-    "VS-2026-012"
+    "VS-2026-009",
+    "VS-2026-011"
    ],
    "st": "blau"
   },
@@ -1378,8 +1405,8 @@
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-009",
-    "VS-2026-014"
+    "VS-2026-008",
+    "VS-2026-013"
    ],
    "st": "blau"
   }
@@ -1454,6 +1481,10 @@
     "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
    },
    {
+    "detail": "Betroffen: krause-computer.de.",
+    "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=)"
+   },
+   {
     "detail": "Betroffen: mx.krause-computer.de, www.krause-computer.de, youtube.krause-computer.de.",
     "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
    },
@@ -1501,7 +1532,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 14 Befunde und 4 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 13 Befunde und 4 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -1515,11 +1546,11 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "38"
+    "v": "37"
    },
    {
     "l": "Befunde im Bericht",
-    "v": "14"
+    "v": "13"
    }
   ],
   "out_of_scope": [

@@ -19,6 +19,7 @@
    }
   ],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 19.07.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [],
   "exposure_scale": [
    {
     "l": "kritisch",
@@ -1911,8 +1912,8 @@
  "landscape_lead": "21 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 52,
-  "catalog_digest": "3e6c5321c769c4c6349df90e7d40c20ebeeaf1281cfb3628bbfec0b639bcf900",
-  "catalog_version": "2026-09-23.1",
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
   "classification": "Vertraulich",
   "consolidated": 21,
   "customer": "Auftraggeber",
@@ -1920,7 +1921,7 @@
   "domains": [
    "securess.de"
   ],
-  "facts_schema_version": "1.0.3",
+  "facts_schema_version": "1.0.4",
   "fqdns_total": 26,
   "hosts_ipv4": 12,
   "hosts_ipv6": 0,
@@ -1933,7 +1934,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-23.1",
+  "policy_version": "2026-09-23.2",
   "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",

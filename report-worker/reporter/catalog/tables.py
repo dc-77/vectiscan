@@ -139,6 +139,10 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     "no_enrichment": ("not_testable", "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor."),
     "whois_unavailable": ("not_testable", "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis."),
     "insufficient_facts": ("not_testable", "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus."),
+    # S6a (#15 Teil 2): ohne Selektor ist DKIM nicht pruefbar, nie "fehlt". Mit bekannter
+    # Liste der abgefragten Selektoren ersetzt reporter/v3/chapters.py den Text durch
+    # einen, der Anzahl und Beispiele nennt.
+    "dkim_selector_unknown": ("not_testable", "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter den gängigen Selektoren war kein Schlüssel veröffentlicht. Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=)."),
     "precondition_not_met": ("not_applicable", "Voraussetzung der Prüfung nicht gegeben."),
     "coverage_unknown": ("not_testable", "Ob dieses Werkzeug gelaufen ist, geht aus den Protokollen nicht hervor."),
     "rohtext_nicht_geladen": ("not_testable", "Die Werkzeugausgabe war zu groß und wurde nicht geladen; Ergebnis nicht belastbar."),

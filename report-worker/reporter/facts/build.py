@@ -1237,6 +1237,47 @@ def _build_dns(ctx: _Ctx, domains: list[Optional[str]]) -> list[S.DnsFact]:
     return out
 
 
+# S6a (#15 Teil 2): die DKIM-Selektoren, die der Scanner seit ae5fa74 (07.05.2026)
+# abfragt, eingefroren. Bis S6a stand nur die Anzahl im Scanner-Log; dns_records.json
+# nannte die gefundenen, nicht die abgefragten. Neue Scans schreiben die Liste selbst
+# (`dkim_selectors_probed`); diese Konstante gilt nur fuer aeltere Laeufe, deren Tar
+# den Scanner-Stand belegt (siehe _dkim_probed). Aenderungen an der Scanner-Liste
+# gehoeren NICHT hierher: fuer neue Laeufe steht die Liste im Tar.
+DKIM_SELECTORS_AE5FA74: tuple[str, ...] = (
+    "1und1", "amazonses", "brevo", "default", "dkim", "dkim-1", "dkim-2", "dkim01", "dkim1",
+    "dkim2", "email", "fd", "fd2", "gmx", "google", "googledomains", "hse1", "hse2", "ionos1",
+    "ionos2", "k1", "k2", "key1", "key2", "mail", "mailgun", "mailin", "mailjet", "mailo",
+    "mandrill", "mg", "mj", "mta", "mta1", "mta2", "mxvault", "pf2014", "pm", "postmark",
+    "primary", "s1", "s1024", "s2", "s2048", "scph", "scph0123", "scph0124", "secondary",
+    "selector", "selector1", "selector2", "sendinblue", "sib", "sig1", "sig2", "smtp",
+    "smtpapi", "strato1", "strato2", "t-online", "zmail", "zoho",
+)
+
+
+def _scanner_stand_ae5fa74(ds: dict) -> bool:
+    """Belegt die dns_security-Ausgabe desselben Laufs den Scanner-Stand ab ae5fa74?
+
+    Mit ae5fa74 kamen zugleich die parallele DKIM-Abfrage ueber die 62 Selektoren und
+    in dns_security die Schluessel ``tls_rpt`` und ``dnssec.nsec3param_present``.
+    Beides laeuft im selben Scanner-Abbild. Fehlt das Merkmal, bleibt die Liste
+    unbekannt; aeltere Staende fragten 25 Selektoren oder nur ``default``.
+    """
+    if not isinstance(ds, dict):
+        return False
+    dnssec = ds.get("dnssec") if isinstance(ds.get("dnssec"), dict) else {}
+    return isinstance(ds.get("tls_rpt"), dict) or "nsec3param_present" in dnssec
+
+
+def _dkim_probed(dr: dict, ds: dict) -> tuple[Optional[list[str]], Optional[str]]:
+    """(abgefragte Selektoren, Herkunft) oder (None, None), wenn der Lauf es nicht belegt."""
+    liste = dr.get("dkim_selectors_probed")
+    if isinstance(liste, list) and liste:
+        return sorted({str(s) for s in liste}), "scan"
+    if _scanner_stand_ae5fa74(ds):
+        return list(DKIM_SELECTORS_AE5FA74), "scanner_stand"
+    return None, None
+
+
 def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
               zone_txt: Optional[str], ref_dr: str, ref_ds: str) -> Optional[S.DnsFact]:
     b = ctx.b
@@ -1251,7 +1292,9 @@ def _dns_fact(ctx: _Ctx, domain: str, *, dr: dict, ds: dict, dnsf: dict,
                    dr.get("dmarc") if dr.get("dmarc") is not None else dnsf.get("dmarc"),
                    ds.get("dmarc") if isinstance(ds.get("dmarc"), dict) else None)
     dkim_present = dr.get("dkim") if isinstance(dr.get("dkim"), bool) else _bool_or_none(dnsf.get("dkim"))
-    dkim = S.Dkim(present=dkim_present, selectors=sorted(str(s) for s in (dr.get("dkim_selectors") or []))) \
+    probed, probed_basis = _dkim_probed(dr, ds)
+    dkim = S.Dkim(present=dkim_present, selectors=sorted(str(s) for s in (dr.get("dkim_selectors") or [])),
+                  probed=probed, probed_basis=probed_basis) \
         if dkim_present is not None or dr.get("dkim_selectors") else None
     dnssec = caa = mta = tlsrpt = dane = bimi = None
     if isinstance(ds.get("dnssec"), dict):
