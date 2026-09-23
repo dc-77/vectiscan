@@ -19,7 +19,7 @@
 *{box-sizing:border-box;}
 @page{size:A4;margin:22mm 18mm 20mm 18mm;
  @top-left{content:element(rhead);vertical-align:bottom;}
- @bottom-left{content:"VectiScan · {{ variant.assessment|css_string }} · {{ m.customer_short|css_string }} · {{ m.classification|css_string }}";font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
+ @bottom-left{content:"VectiScan · {{ variant.assessment|css_string }} · {{ m.customer_short|css_string }} · {{ m.report_id|css_string }} · {{ m.classification|css_string }}";font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
  @bottom-right{content:"Seite " counter(page) " von " counter(pages);font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
 }
 @page:first{margin:0;@top-left{content:none;}@bottom-left{content:none;}@bottom-right{content:none;}}
@@ -199,7 +199,7 @@ tr{break-inside:avoid;}
  </table>
  <h3>Die drei wichtigsten Hebel</h3>
  {% for l in g.levers %}
- <div class="lever"><div class="n">HEBEL {{ l.n }}</div><div class="ti">{{ l.title }}</div><div class="ef">{{ l.effect }}</div><div class="rf">Adressiert: {{ l.refs|join(', ') }}</div></div>
+ <div class="lever"><div class="n">HEBEL {{ l.n }}</div><div class="ti">{{ l.title }}</div><div class="ef">{{ l.effect|dot_br }}</div><div class="rf">Adressiert: {{ l.refs|join(', ') }}</div></div>
  {% endfor %}
  <div class="wrapup">
  <p class="small">{{ distribution_line }}</p>
@@ -320,7 +320,7 @@ tr{break-inside:avoid;}
  <p class="lead">Priorisiert nach Dringlichkeit und Wirkung. Der Plan nennt bewusst keine Aufwände oder Kosten: Diese hängen von Umgebung, Verträgen und Dienstleistern ab und gehören in die Planung des Umsetzers. Die technischen Details je Maßnahme stehen im jeweiligen Befund in Kapitel 6.</p>
  <table>
   <tr><th style="width:22mm">Priorität</th><th style="width:84mm">Maßnahme</th><th style="width:26mm">Befunde</th><th style="width:36mm">Erwarteter Effekt</th></tr>
-  {% for p in plan %}<tr><td><span class="pill p-{{ p.st }}">{{ p.prio }}</span></td><td>{{ p.action }}</td><td class="mono" style="font-size:7.6pt">{% for r in p.refs %}{{ r }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td class="small">{{ p.effect }}</td></tr>{% endfor %}
+  {% for p in plan %}<tr><td><span class="pill p-{{ p.st }}">{{ p.prio }}</span></td><td>{{ p.action }}</td><td class="mono" style="font-size:7.6pt">{% for r in p.refs %}{{ r }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td class="small">{{ p.effect|dot_br }}</td></tr>{% endfor %}
  </table>
  <div class="box info"><div class="t">Zeitstufen</div>{{ stage_box }}</div>
 </section>
@@ -396,6 +396,11 @@ tr{break-inside:avoid;}
  <h3>Anhang {{ ltr.tools }} · Eingesetzte Werkzeuge</h3>
  <table><tr><th style="width:44mm">Werkzeug</th><th style="width:84mm">Einsatz</th><th style="width:40mm">Konfidenz</th></tr>
  {% for t in ap.tools %}<tr><td>{{ t.t }}</td><td>{{ t.u }}</td><td class="small">{{ t.c }}</td></tr>{% endfor %}</table>
+ {% if ap.dkim_selectors %}
+ <h4>Abgefragte DKIM-Selektoren</h4>
+ <p class="small">Ohne Selektor aus einer echten E-Mail lässt sich ein DKIM-Schlüssel nur unter bekannten Selektornamen suchen. Abgefragt wurden {{ ap.dkim_selectors|length }} Selektoren:</p>
+ <p class="mono" style="font-size:7.6pt">{{ ap.dkim_selectors|join(', ') }}</p>
+ {% endif %}
  {% if show_tool_findings %}
  <h4>{{ txt.TOOL_FINDINGS_TITLE }}</h4>
  <p class="small">{{ txt.TOOL_FINDINGS_LEAD }}</p>

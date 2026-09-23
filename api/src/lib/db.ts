@@ -53,6 +53,7 @@ const MIGRATION_043_PATH = path.join(__dirname, '..', 'migrations', '043_reports
 const MIGRATION_044_PATH = path.join(__dirname, '..', 'migrations', '044_scan_results_run_status.sql');
 const MIGRATION_045_PATH = path.join(__dirname, '..', 'migrations', '045_customer_context.sql');
 const MIGRATION_046_PATH = path.join(__dirname, '..', 'migrations', '046_report_defects.sql');
+const MIGRATION_047_PATH = path.join(__dirname, '..', 'migrations', '047_report_number.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -757,6 +758,26 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 046 FAILED (continuing without it):', err);
+  }
+
+  // Migration 047 (S6a, Sep 2026): reports.report_number. Fehlt die Spalte,
+  // schreibt der report-worker die Zeile ohne Nummer (Laufzeitpruefung in
+  // _create_report_record), die API startet trotzdem.
+  try {
+    const number047Check = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns
+        WHERE table_name = 'reports' AND column_name = 'report_number'
+      ) AS exists
+    `);
+    if (!number047Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 047: reports.report_number');
+      const migrationSql = fs.readFileSync(MIGRATION_047_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 047 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 047 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

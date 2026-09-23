@@ -297,6 +297,12 @@ Regeln:
   Mitglied; die im Buendel eingetragene `category` gilt fuer den Positivbefund.
 - `target: appendix` haelt das Buendel aus der Befundliste heraus und schreibt es in den
   Anhang "Werkzeugbefunde ohne Bewertung" (spec/06 Abschnitt 4, Stufe 2).
+- `positive_conflicts` (S6a, Issue #30) nennt Befunde anderer Pruefungen, bei denen ein Host
+  aus dem Positivbefund des Buendels herausfaellt: `checks` (optional mit `ports`, dann
+  zaehlt nur ein fehlgeschlagenes Mitglied auf diesen Ports) oder `noted_by` (eine
+  Notiz-Pruefung nennt `ip:port`, und irgendeine Pruefung ist auf genau diesem Dienst
+  fehlgeschlagen). Bleibt kein Host uebrig, entfaellt der Positivbefund; bei mehr als drei
+  Hosts nennt der Text die herausgenommenen ("den geprueften Hosts ausser ...").
 - Die Buendeltabelle in `decisions.md` ist verbindlich und wird per Test erzwungen; die
   Texte laufen durch denselben Textlint wie die Pruefungstexte.
 
@@ -309,8 +315,12 @@ Ausgabe `catalog_digest` (sha256 ueber dieselben Dateien, CRLF-normalisiert, ohn
 eine Aenderung ohne Bump im Audit auffaellt. Textkorrekturen ohne Aenderung von Bedingung oder
 Einstufung sind ein Patch (`.n`), neue oder veraenderte Pruefungen ein neues Datum.
 
-Bump-Historie: `2026-09-19.1` Erstversion (S2), `2026-09-19.2` echte Umlaute in allen
-Kundentexten und Befund-Buendel (S3).
+Bump-Historie mit Begruendung im Modul-Docstring von `version.py`; Kurzfassung:
+`2026-09-19.1` Erstversion (S2), `2026-09-19.2` echte Umlaute in allen Kundentexten und
+Befund-Buendel (S3), `2026-09-20.1` Rueckbau `zap_no_alerts` (S2b), `2026-09-22.1`
+Pflichtkorrekturen aus spec/08 (S6), `2026-09-23.1` `positive_conflicts` und der
+geschaerfte Positivbefund von `remote_admin_closed` (S6a, Issue #30), `2026-09-23.2`
+`dkim_missing` ohne gefundenen Selektor nicht pruefbar (S6a, #15 Teil 2).
 
 ## Texte
 

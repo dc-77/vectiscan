@@ -224,6 +224,16 @@ def test_nicht_beauftragt_nur_ausserhalb_aller_listen(order, daten):
         assert not any(name in a for a in genannt), (order, name)
 
 
+@pytest.mark.parametrize("order", ORDERS)
+def test_positivbefunde_ohne_wand_aus_hostnamen(order, daten):
+    """spec/08 Punkt 13, zweite Haelfte (S6a): vectigal.tech schrieb alle 31 VHosts
+    einer IP in die Positivbefunde; die Kuerzung aus S5b galt nur in Einschraenkungen."""
+    for positiv in daten[order].positives:
+        for klammer in re.findall(r"\(([^()]*)\)", positiv.text):
+            namen = [n for n in klammer.split(",") if "." in n]
+            assert len(namen) <= 3, (order, positiv.title, klammer[:120])
+
+
 # --------------------------------------------------------------- Punkte 18, 19
 
 @pytest.mark.parametrize("order", ORDERS)

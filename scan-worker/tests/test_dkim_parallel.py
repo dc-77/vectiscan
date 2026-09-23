@@ -131,3 +131,38 @@ def test_dkim_selectors_deduplicated_and_sorted() -> None:
     assert sels == sorted(sels), "DKIM-Selektor-Liste muss sortiert sein"
     assert len(sels) == len(set(sels)), "DKIM-Selektor-Liste muss dedupliziert sein"
     assert "google" in sels and "selector1" in sels and "selector2" in sels
+
+    # S6a (#15 Teil 2): die abgefragte Liste steht in den Rohdaten.
+    probed = records["dkim_selectors_probed"]
+    assert probed == sorted(set(probed))
+    assert set(sels) <= set(probed)
+    assert {"default", "selector1", "selector2", "google", "k1", "s1"} <= set(probed)
+
+
+def test_dkim_probed_list_is_written_without_hit(tmp_path: Path) -> None:
+    """Ohne Treffer steht dkim False, und die Liste der abgefragten Selektoren
+    liegt trotzdem in dns_records.json; nur so kann der Bericht sie nennen."""
+    import json
+
+    class _Empty:
+        stdout = ""
+        stderr = ""
+        returncode = 0
+
+    (tmp_path / "phase0").mkdir()
+    with patch("subprocess.run", return_value=_Empty()), \
+         patch.object(phase0, "run_tool", return_value=("", 0, 0.0)), \
+         patch.object(phase0, "record_tool_run"), \
+         patch("scanner.passive.mail_security_parsers.check_dmarc_policy",
+               return_value={"dmarc_present": False, "raw": None,
+                             "p": None, "sp": None, "pct": 100,
+                             "rua": [], "ruf": [],
+                             "aspf": "r", "adkim": "r", "fo": None,
+                             "issues": []}):
+        records = phase0.collect_dns_records(
+            domain="example.com", scan_dir=str(tmp_path), order_id="t3",
+        )
+    saved = json.loads((tmp_path / "phase0" / "dns_records.json").read_text())
+    assert records["dkim"] is False and records["dkim_selectors"] == []
+    assert saved["dkim_selectors_probed"] == records["dkim_selectors_probed"]
+    assert len(saved["dkim_selectors_probed"]) >= 60

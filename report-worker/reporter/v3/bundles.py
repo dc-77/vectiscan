@@ -17,6 +17,11 @@ Regeln:
   bleiben ebenfalls draussen, weil "kein Datenbankdienst" auf einem Host ohne jeden
   Dienst keine Aussage ist. Seit S6 genuegt eine einzige nicht pruefbare Gruppe, um den
   Positivbefund der ganzen Pruefung zu unterdruecken: nicht pruefbar ist nicht bestanden.
+* S6a (Issue #30): Ein Buendel kann ``positive_conflicts`` tragen. Steht auf einem Host
+  einer dieser Befunde, faellt dieser Host aus dem Positivbefund heraus; bleibt kein
+  Host uebrig, entfaellt der Positivbefund. "Keine Windows-Fernwartung (RDP) und keine
+  Windows-Dateifreigabe (SMB)" neben FTP auf demselben Host liest sich sonst wie eine
+  Entwarnung fuer den ganzen Host.
 * Ein aktiv nachgewiesenes Mitglied (``active_proof``) faerbt den Sachverhalt rot,
   unabhaengig von seiner Einstufung; die Abbildung dazu steht in ``levels.py``.
 * Skala, Einstufung und Kategorie eines Buendelbefunds kommen vom schwersten
@@ -50,6 +55,8 @@ class Consolidated:
     positive: bool
     active_proof: bool = False     # aktiv nachgewiesen (S6, siehe levels.py)
     results: list[CheckResult] = field(default_factory=list)
+    # S6a: Hosts, die wegen positive_conflicts aus dem Positivbefund herausfallen.
+    excluded_hosts: list[str] = field(default_factory=list)
 
     @property
     def sort_key(self) -> tuple:
@@ -67,6 +74,40 @@ def _merge_key(result: CheckResult, merge_by: str) -> str:
         host = result.vars.get("host_ip") or (result.group_key if result.group_by == "host" else "")
         return str(host) or result.group_key
     return result.group_key
+
+
+def _host_of(result: CheckResult) -> str:
+    host = result.vars.get("host_ip") or (result.group_key if result.group_by == "host" else "")
+    return str(host or "")
+
+
+def _conflict_hosts(output: CatalogOutput, bundle: BundleSpec) -> set[str]:
+    """Hosts, auf denen ein Befund aus ``positive_conflicts`` des Buendels steht."""
+    if not bundle.positive_conflicts:
+        return set()
+    fehlgeschlagen: set[str] = set()  # Mitgliedsschluessel ip:port mit Fehlschlag
+    for r in output.results:
+        if r.kind == "check" and r.status == "fail":
+            fehlgeschlagen.update(m.key for m in r.members if m.status == "fail")
+    hosts: set[str] = set()
+    for conflict in bundle.positive_conflicts:
+        for r in output.results:
+            if conflict.noted_by:
+                if r.check_id != conflict.noted_by:
+                    continue
+                hosts.update(m.host_ip or _host_of(r) for m in r.members
+                             if m.key in fehlgeschlagen)
+                continue
+            if r.kind != "check" or r.status != "fail" or r.check_id not in conflict.checks:
+                continue
+            fails = [m for m in r.members if m.status == "fail"]
+            if conflict.ports:
+                hosts.update(m.host_ip or _host_of(r) for m in fails if m.port in conflict.ports)
+            else:
+                hosts.update(m.host_ip for m in fails if m.host_ip)
+                hosts.add(_host_of(r))
+    hosts.discard("")
+    return hosts
 
 
 def _worst(results: Iterable[CheckResult]) -> tuple[str, str, str]:
@@ -124,6 +165,10 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
     positives: list[Consolidated] = []
     failed_groups = set(fails)
     by_owner: dict[str, list[CheckResult]] = {}
+    konflikt: dict[str, set[str]] = {
+        bid: _conflict_hosts(output, bundle) for bid, bundle in bundles.items()
+        if bundle.positive_conflicts}
+    ausgeschlossen: dict[str, set[str]] = {}
     for (owner, merge_key), results in passes.items():
         if (owner, merge_key) in failed_groups or owner in unpruefbar:
             continue
@@ -131,6 +176,9 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
             info = by_check[result.check_id]
             if result.items_seen == 0 and info.positive_mode == "absent":
                 # "Kein solcher Dienst" auf einem Host ohne jeden Dienst ist keine Aussage.
+                continue
+            if _host_of(result) in konflikt.get(owner, ()):
+                ausgeschlossen.setdefault(owner, set()).add(_host_of(result))
                 continue
             by_owner.setdefault(owner, []).append(result)
     for owner, results in by_owner.items():
@@ -142,7 +190,8 @@ def consolidate(output: CatalogOutput) -> tuple[list[Consolidated], list[Consoli
             positives.append(Consolidated(
                 key=owner, is_bundle=True, merge_key=GLOBAL_KEY, category=bundle.category,
                 scale="hygiene", level="niedrig", title=bundle.texts.positive.title,
-                texts=bundle.texts, target=bundle.target, positive=True, results=results))
+                texts=bundle.texts, target=bundle.target, positive=True, results=results,
+                excluded_hosts=sorted(ausgeschlossen.get(owner, ()), key=sort_key)))
         else:
             info = by_check[owner]
             if info.texts.positive is None:

@@ -144,6 +144,40 @@ bleibt als Gegenprobe "gleiche Daten, anderes Paket" bestehen.
   spec/06 genannten fuenf Eintraege. Der Grund steht in der Datei unter
   `abweichungen`. Ebenfalls dort: der Defekt dieses Musters sitzt in der
   Versionsableitung, nicht im Befundtext.
+- `expected/junkerwerk.json` fuehrt die Berichtsnummer seit S6a im Produktformat
+  `VS-2026-0831-0bf1` statt der Prototyp-Nummer `VS-JW-2026-0831`; der Generator
+  leitet sie ab (`s6a_report_id`), Grund in `reporter/v3/deltas.md` Punkt 14. Alle
+  14 `report-data/*.json` und der HTML-Snapshot tragen die neue Nummer
+  (`meta.report_id`); vorher kollidierten 0831 dreimal, 0920 dreimal und 0722 zweimal.
+- S6a, Issue #30: Der Positivbefund von `remote_admin_closed` heisst "Keine
+  Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet
+  erreichbar", und ein Host mit FTP auf 21, Verwaltungsoberflaeche oder SSH ausserhalb
+  Port 22 mit Befund faellt heraus (`positive_conflicts`). In den Reportdaten entfaellt
+  er deshalb fuer 14272c00, 45bb234c und 57b3ac85 (je ein Host mit Konflikt), bei
+  2d2d4f39 und f77ccff2 steht "ausser 92.205.163.53"; 75338c97, 860d0d5a und a6df9d9d
+  behalten ihn mit neuem Titel. Positivbefunde nennen je Host hoechstens drei virtuelle
+  Hosts ("und weitere", Rest von spec/08 Punkt 13): 75338c97, 2572eebc, fb13a98f.
+  Regressionssperre ohne Golden-Tar: `tests/v3/fixtures/huendgen_62c1e866.json`.
+- S6a, Massnahmenplan: Zeilen mit gleichem Massnahmentext laufen zu einer Zeile mit
+  beiden Befundlisten und beiden Effekten zusammen (`reporter/v3/plan.py`). Planzeilen
+  176db198 8->7, 2d2d4f39 16->12, 4e6b6883 16->10, 860d0d5a 10->8, ae8d1d70 12->9,
+  f77ccff2 16->10, fb13a98f 10->9; die Hebel auf Seite 2 folgen den ersten drei Zeilen.
+  Die uebrigen sieben Auftraege hatten keine Doppelnennung.
+- S6a, #15 Teil 2: `dkim_missing` ist ohne gefundenen Selektor nicht pruefbar
+  (`dkim_selector_unknown`), nie "fehlt". Golden-Facts (Schema 1.0.4) tragen
+  `dns[].dkim.probed` und `probed_basis`; alle vierzehn Tars belegen den Scanner-Stand ab
+  ae5fa74 (`dns_security` mit `tls_rpt`), deshalb `scanner_stand` mit 62 Selektoren. In
+  den Reportdaten entfaellt der Befund "Grundlegende Eintraege zur
+  Absender-Authentizitaet fehlen" fuer 14272c00, 45bb234c und fb13a98f (DKIM war das
+  einzige Mitglied), die IDs ruecken nach; bei 75338c97 bleibt er fuer vectiscan.de mit
+  dem SPF-Mitglied. Die Einschraenkung nennt Anzahl und sechs Beispiele, Anhang
+  "Eingesetzte Werkzeuge" die volle Liste. Soll-Listen `expected/dortmund-beach.json` und
+  `expected/vectigal-tech.json` neu erzeugt (DKIM-Eintrag weg, IDs nachgerueckt).
+  Regressionssperre an sieben echten Berichten mit "DKIM fehlt":
+  `tests/catalog/test_dkim_missing.py`. `negative.json` ist bewusst nicht neu erzeugt:
+  der Generator faende im inzwischen gewachsenen Snapshot auch fuer andere Muster mehr
+  Eintraege (SPF 8 statt 7, MariaDB 8 statt 6, FTP 3 statt 2, Titel 6 statt 5); das ist
+  eine eigene Pruefung.
 
 ## Golden-Facts (S1)
 

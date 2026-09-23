@@ -19,6 +19,7 @@
    }
   ],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 31.08.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [],
   "exposure_scale": [
    {
     "l": "kritisch",
@@ -1390,8 +1391,8 @@
  "landscape_lead": "16 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 52,
-  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
-  "catalog_version": "2026-09-22.1",
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
   "classification": "Vertraulich",
   "consolidated": 16,
   "customer": "Auftraggeber",
@@ -1400,7 +1401,7 @@
    "junkerwerk.de",
    "junkerwerk.hu"
   ],
-  "facts_schema_version": "1.0.3",
+  "facts_schema_version": "1.0.4",
   "fqdns_total": 13,
   "hosts_ipv4": 5,
   "hosts_ipv6": 1,
@@ -1413,7 +1414,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-22.1",
+  "policy_version": "2026-09-23.2",
   "positives": 3,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -1423,7 +1424,7 @@
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
   "raw_findings": 217,
   "report_date": "19.09.2026",
-  "report_id": "VS-2026-0831",
+  "report_id": "VS-2026-0831-0bf1",
   "report_version": "1.0",
   "scan_date": "31.08.2026",
   "scan_window": "31.08.2026, 16:10 bis 16:41 Uhr (CEST)",

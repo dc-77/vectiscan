@@ -1,0 +1,221 @@
+{
+ "_comment": "Issue #30 (S6a), Regressionssperre: Huendgen 62c1e866, huendgen-entsorgung.de, Scan 17.09.2026. Dienste und FQDNs der drei per nmap geprueften Hosts aus dem API-Snapshot (tests/golden/api-snapshot/62c1e866-.../results.json, gebaut mit reporter.facts.golden.build_snapshot_facts). Im Produktionsbericht stand 'Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar' neben dem FTP-Befund auf 217.160.231.238:21.",
+ "scan": {
+  "order_id": "62c1e866-1eae-451a-8b52-7bff591aad31",
+  "domain": "huendgen-entsorgung.de",
+  "domains": [
+   "huendgen-entsorgung.de"
+  ]
+ },
+ "hosts": [
+  {
+   "ip": "18.197.248.23",
+   "family": 4,
+   "reverse": "eu-staticip.multiscreensite.com"
+  },
+  {
+   "ip": "217.160.231.238",
+   "family": 4,
+   "reverse": "clienthosting.eu"
+  },
+  {
+   "ip": "80.90.145.166",
+   "family": 4,
+   "reverse": "gw-huendgen.bn-online.net"
+  }
+ ],
+ "services": [
+  {
+   "host_ip": "18.197.248.23",
+   "port": 80,
+   "proto": "tcp",
+   "state": "open",
+   "service": "http",
+   "product": "nginx",
+   "family": "nginx",
+   "tunnel_ssl": false,
+   "method": "text"
+  },
+  {
+   "host_ip": "18.197.248.23",
+   "port": 443,
+   "proto": "tcp",
+   "state": "open",
+   "service": "https",
+   "tunnel_ssl": false,
+   "tls_required": true,
+   "nmap_conf": 3,
+   "method": "table"
+  },
+  {
+   "host_ip": "18.197.248.23",
+   "port": 8443,
+   "proto": "tcp",
+   "state": "open",
+   "service": "http",
+   "product": "nginx",
+   "family": "nginx",
+   "tunnel_ssl": true,
+   "tls_required": true,
+   "cert": {
+    "cn": "multiscreensite.com",
+    "san": [
+     "*.cdn-website.com",
+     "*.editor-sandbox.multiscreensite.com",
+     "*.editor.multiscreensite.com",
+     "*.eu.partnerwebsitedns.com",
+     "*.multiscreensite.com",
+     "*.partnerwebsitedns.com",
+     "*.website.thryv.com",
+     "multiscreensite.com"
+    ],
+    "not_after": "2026-12-08T03:54:34Z"
+   },
+   "method": "text"
+  },
+  {
+   "host_ip": "217.160.231.238",
+   "port": 21,
+   "proto": "tcp",
+   "state": "open",
+   "service": "ftp",
+   "product": "ProFTPD or KnFTPD",
+   "family": "proftpd",
+   "tunnel_ssl": false,
+   "method": "text"
+  },
+  {
+   "host_ip": "217.160.231.238",
+   "port": 22,
+   "proto": "tcp",
+   "state": "open",
+   "service": "ssh",
+   "product": "OpenSSH",
+   "version_raw": "10.0p2",
+   "version_norm": "10.0p2",
+   "family": "openssh",
+   "tunnel_ssl": false,
+   "method": "text"
+  },
+  {
+   "host_ip": "217.160.231.238",
+   "port": 80,
+   "proto": "tcp",
+   "state": "open",
+   "service": "http",
+   "product": "Apache httpd",
+   "family": "apache",
+   "tunnel_ssl": false,
+   "method": "text"
+  },
+  {
+   "host_ip": "217.160.231.238",
+   "port": 443,
+   "proto": "tcp",
+   "state": "open",
+   "service": "https",
+   "product": "nginx",
+   "family": "nginx",
+   "tunnel_ssl": true,
+   "tls_required": true,
+   "method": "text"
+  },
+  {
+   "host_ip": "80.90.145.166",
+   "port": 443,
+   "proto": "tcp",
+   "state": "open",
+   "service": "https",
+   "tunnel_ssl": true,
+   "tls_required": true,
+   "cert": {
+    "cn": "*.huendgen-entsorgung.de",
+    "san": [
+     "*.huendgen-entsorgung.de",
+     "huendgen-entsorgung.de"
+    ],
+    "not_after": "2027-01-03T23:59:59Z"
+   }
+  },
+  {
+   "host_ip": "80.90.145.166",
+   "port": 444,
+   "proto": "tcp",
+   "state": "open",
+   "service": "http",
+   "product": "Apache httpd",
+   "family": "apache",
+   "tunnel_ssl": true,
+   "tls_required": true,
+   "cert": {
+    "cn": "*.huendgen-entsorgung.de",
+    "san": [
+     "*.huendgen-entsorgung.de",
+     "huendgen-entsorgung.de"
+    ],
+    "not_after": "2027-01-03T23:59:59Z"
+   },
+   "method": "text"
+  },
+  {
+   "host_ip": "80.90.145.166",
+   "port": 1000,
+   "proto": "tcp",
+   "state": "open",
+   "service": "cadlock",
+   "tunnel_ssl": false,
+   "nmap_conf": 3,
+   "method": "table"
+  },
+  {
+   "host_ip": "80.90.145.166",
+   "port": 1001,
+   "proto": "tcp",
+   "state": "open",
+   "service": "webpush",
+   "tunnel_ssl": false,
+   "nmap_conf": 3,
+   "method": "table"
+  },
+  {
+   "host_ip": "80.90.145.166",
+   "port": 1002,
+   "proto": "tcp",
+   "state": "open",
+   "service": "windows-icfw",
+   "tunnel_ssl": false,
+   "nmap_conf": 3,
+   "method": "table"
+  }
+ ],
+ "fqdns": [
+  {
+   "name": "exchange.huendgen-entsorgung.de",
+   "host_ip": "80.90.145.166"
+  },
+  {
+   "name": "ftp.mail.huendgen-entsorgung.de",
+   "host_ip": "217.160.231.238"
+  },
+  {
+   "name": "huendgen-entsorgung.de",
+   "host_ip": "18.197.248.23"
+  },
+  {
+   "name": "mail.huendgen-entsorgung.de",
+   "host_ip": "80.90.145.166"
+  },
+  {
+   "name": "openotp.huendgen-entsorgung.de",
+   "host_ip": "80.90.145.166"
+  },
+  {
+   "name": "vpn.huendgen-entsorgung.de",
+   "host_ip": "80.90.145.166"
+  },
+  {
+   "name": "www.huendgen-entsorgung.de",
+   "host_ip": "18.197.248.23"
+  }
+ ]
+}

@@ -305,6 +305,8 @@ class Appendix(Base):
     inventory: list[InventoryRow] = Field(default_factory=list)
     tools: list[ToolRow] = Field(default_factory=list)
     tool_findings: list[ToolFinding] = Field(default_factory=list)
+    # S6a (#15 Teil 2): abgefragte DKIM-Selektoren, nur wenn DKIM nicht pruefbar war.
+    dkim_selectors: list[str] = Field(default_factory=list)
     filtering: str = ""
     repeat: list[str] = Field(default_factory=list)
     disclaimer: str = ""

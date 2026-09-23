@@ -1,0 +1,59 @@
+{
+  "_comment": "Fixture-Abo fuer den Statusbericht (Issue #29, S6a). Synthetisch; die Sonderzeichen in Firmenname, Titel und Begruendung sind Absicht, sie brachen den ReportLab-Parser.",
+  "subscription": {
+    "id": "5ab0c0de-0000-4000-8000-000000000029",
+    "package": "perimeter",
+    "scan_interval": "monthly",
+    "started_at": "2026-06-01T08:00:00+00:00",
+    "expires_at": "2027-06-01T08:00:00+00:00",
+    "customer_email": "it@beispiel-gmbh.de",
+    "company_name": "Müller & Söhne <Beispiel> GmbH"
+  },
+  "posture": {
+    "subscription_id": "5ab0c0de-0000-4000-8000-000000000029",
+    "posture_score": 72.4,
+    "trend_direction": "improving",
+    "severity_counts": {
+      "total_open": 3,
+      "open": {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 1, "LOW": 1},
+      "resolved_total": 2,
+      "regressed_total": 1,
+      "accepted_total": 1
+    }
+  },
+  "findings": [
+    {"id": "cf-1", "host_ip": "203.0.113.10", "vhost": "", "finding_type": "ftp_exposed", "port_or_path": "21",
+     "status": "open", "severity": "HIGH", "cvss_score": null,
+     "title": "FTP ohne TLS-Zwang auf 203.0.113.10:21", "description": "",
+     "first_seen_at": "2026-06-02T09:00:00+00:00", "last_seen_at": "2026-09-01T09:00:00+00:00",
+     "resolved_at": null, "risk_accepted_at": null, "risk_accepted_reason": null},
+    {"id": "cf-2", "host_ip": "203.0.113.10", "vhost": "www.beispiel.de", "finding_type": "header_reflection", "port_or_path": "/",
+     "status": "regressed", "severity": "MEDIUM", "cvss_score": null,
+     "title": "Header <script> reflektiert & ungefiltert", "description": "",
+     "first_seen_at": "2026-06-02T09:00:00+00:00", "last_seen_at": "2026-09-01T09:00:00+00:00",
+     "resolved_at": null, "risk_accepted_at": null, "risk_accepted_reason": null},
+    {"id": "cf-3", "host_ip": "203.0.113.11", "vhost": "", "finding_type": "csp_missing", "port_or_path": "/",
+     "status": "open", "severity": "LOW", "cvss_score": null,
+     "title": "Content-Security-Policy fehlt", "description": "",
+     "first_seen_at": "2026-07-01T09:00:00+00:00", "last_seen_at": "2026-09-01T09:00:00+00:00",
+     "resolved_at": null, "risk_accepted_at": null, "risk_accepted_reason": null},
+    {"id": "cf-4", "host_ip": "203.0.113.11", "vhost": "", "finding_type": "hsts_missing", "port_or_path": "/",
+     "status": "resolved", "severity": "LOW", "cvss_score": null,
+     "title": "HSTS & Co fehlen", "description": "",
+     "first_seen_at": "2026-06-02T09:00:00+00:00", "last_seen_at": "2026-08-01T09:00:00+00:00",
+     "resolved_at": "2026-08-15T09:00:00+00:00", "risk_accepted_at": null, "risk_accepted_reason": null},
+    {"id": "cf-5", "host_ip": "203.0.113.12", "vhost": "", "finding_type": "admin_service_exposed", "port_or_path": "8443",
+     "status": "risk_accepted", "severity": "MEDIUM", "cvss_score": null,
+     "title": "Verwaltungsoberfläche erreichbar", "description": "",
+     "first_seen_at": "2026-06-02T09:00:00+00:00", "last_seen_at": "2026-09-01T09:00:00+00:00",
+     "resolved_at": null, "risk_accepted_at": "2026-07-10T09:00:00+00:00",
+     "risk_accepted_reason": "Nur über VPN & IP-Filter <intern> erreichbar"}
+  ],
+  "history": [
+    {"snapshot_at": "2026-07-01T09:00:00+00:00", "posture_score": 61.0, "severity_counts": {},
+     "new_findings": 4, "resolved_findings": 0, "regressed_findings": 0},
+    {"snapshot_at": "2026-09-01T09:00:00+00:00", "posture_score": 72.4, "severity_counts": {},
+     "new_findings": 1, "resolved_findings": 1, "regressed_findings": 1}
+  ],
+  "targets": ["beispiel.de", "203.0.113.12"]
+}

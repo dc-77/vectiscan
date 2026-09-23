@@ -2,6 +2,7 @@
  "appendix": {
   "cve_refs": [],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 20.09.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [],
   "exposure_scale": [
    {
     "l": "kritisch",
@@ -12,7 +13,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 17 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (7 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 6 Befunde und 6 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 17 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (7 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 6 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -689,8 +690,8 @@
  "landscape_lead": "6 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 10,
-  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
-  "catalog_version": "2026-09-22.1",
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
   "classification": "Vertraulich",
   "consolidated": 6,
   "customer": "Auftraggeber",
@@ -698,7 +699,7 @@
   "domains": [
    "lumbeck-wolter.de"
   ],
-  "facts_schema_version": "1.0.3",
+  "facts_schema_version": "1.0.4",
   "fqdns_total": 2,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
@@ -711,8 +712,8 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-22.1",
-  "positives": 6,
+  "policy_version": "2026-09-23.2",
+  "positives": 5,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
@@ -721,7 +722,7 @@
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
   "raw_findings": 17,
   "report_date": "19.09.2026",
-  "report_id": "VS-2026-0920",
+  "report_id": "VS-2026-0920-57b3",
   "report_version": "1.0",
   "scan_date": "20.09.2026",
   "scan_window": "20.09.2026, 12:44 bis 12:58 Uhr (CEST)",
@@ -777,11 +778,6 @@
    "cat": "A",
    "text": "Auf 116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de) lehnen die Datei- und Mailzugänge eine Anmeldung ohne aufgebaute Transportverschlüsselung ab.",
    "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
-  },
-  {
-   "cat": "A",
-   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
-   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
   },
   {
    "cat": "C",
@@ -862,7 +858,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 6 Befunde und 6 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 6 Befunde und 5 positive Feststellungen."
    }
   ],
   "numbers": [

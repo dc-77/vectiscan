@@ -18,7 +18,9 @@ import pytest
 
 from reporter.facts.serialize import load_json
 from reporter.v3.bundles import consolidate
-from tests.v3.conftest import GOLDEN, JUNKERWERK, data_for, junkerwerk_data, output_for
+from reporter.v3.report_data import build_report_data
+from tests.v3.conftest import (GOLDEN, JUNKERWERK, JUNKERWERK_CONTEXT, data_for, facts_for,
+                               junkerwerk_data, output_for)
 
 EXPECTED_MAP = GOLDEN.parent / "catalog" / "expected_map.json"
 SOLL = GOLDEN / "expected" / "junkerwerk.json"
@@ -150,10 +152,24 @@ def test_kein_fehlgeschlagener_check_verschwindet():
 
 def test_ids_tragen_das_kuerzel_aus_dem_kundenkontext():
     data = junkerwerk_data()
-    assert data.meta.report_id == "VS-JW-2026-0831"
+    # S6a: die Berichtsnummer traegt kein Kuerzel, sondern den Auftrag; die
+    # Befund-IDs behalten das Kuerzel.
+    assert data.meta.report_id == "VS-2026-0831-0bf1"
     assert data.findings[0].id == "VS-JW-2026-001"
     assert [f.id for f in data.findings] == [
         f"VS-JW-2026-{n:03d}" for n in range(1, len(data.findings) + 1)]
+
+
+def test_berichtsnummer_stabil_ueber_versionen_und_kuerzel():
+    # Ein im Admin-Review nachgetragenes Kuerzel, eine neue Version oder ein
+    # anderer Erstellungstag aendern die Nummer nicht.
+    order_id = JUNKERWERK["multi"]
+    ohne = data_for(order_id)
+    mit = build_report_data(facts_for(order_id), output_for(order_id),
+                            customer_context=JUNKERWERK_CONTEXT, report_version="7.0",
+                            report_date="23.09.2026")
+    assert ohne.meta.report_id == mit.meta.report_id == "VS-2026-0831-0bf1"
+    assert mit.findings[0].id.startswith("VS-JW-2026-")
 
 
 def test_kopf_und_zahlen_stimmen_mit_der_soll_liste(soll):

@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import runpy
 import sys
 from pathlib import Path
@@ -70,6 +71,20 @@ POSITIVE_FAMILIES: list[list[str]] = [
 
 SCALES = {"exposure", "hygiene"}
 LEVELS = {"kritisch", "hoch", "mittel", "niedrig"}
+
+
+def s6a_report_id(meta: dict) -> str:
+    """Berichtsnummer im Format ab S6a: VS-<Jahr>-<MMTT>-<Order[:4]>.
+
+    Der Prototyp traegt noch VS-JW-2026-0831 (Kuerzel und Scantag). Seit S6a
+    steht das Kuerzel nicht mehr in der Berichtsnummer, dafuer die ersten vier
+    Zeichen der Order-ID des ersten Laufs (reporter/v3/ids.report_id). Die
+    Soll-Liste folgt dem Produkt, nicht dem Prototyp.
+    """
+    m = re.fullmatch(r"VS-(?:[A-Za-z0-9]{2,8}-)?(\d{4})-(\d{4})", meta["report_id"])
+    if not m:
+        raise SystemExit(f"unerwartete Berichtsnummer im Prototyp: {meta['report_id']}")
+    return f"VS-{m.group(1)}-{m.group(2)}-{meta['orders'][0]['id'][:4].lower()}"
 
 
 def main() -> int:
@@ -145,7 +160,7 @@ def main() -> int:
 
     out = {
         "source": "report-prototype/build/report_data.py (Stand 17.09.2026)",
-        "report_id": data["meta"]["report_id"],
+        "report_id": s6a_report_id(data["meta"]),
         "customer": data["meta"]["customer"],
         "domains": data["meta"]["domains"],
         "package": data["meta"]["package"].lower(),
@@ -155,6 +170,10 @@ def main() -> int:
             "report-prototype/build/catalog_sim.py apply_rules; Namen ohne Vorbild dort "
             "sind im Generator markiert. affected der Positivbefunde ist null, weil die "
             "Quelle keines fuehrt."
+        ),
+        "hinweis_report_id": (
+            "Berichtsnummer im Format ab S6a (VS-<Jahr>-<MMTT>-<Order[:4]>); der "
+            "Prototyp traegt noch VS-JW-2026-0831."
         ),
         "hinweis_positive_ids": (
             "Positivbefunde tragen in report_data.py keine ID. VS-2026-P01 bis P08 in "

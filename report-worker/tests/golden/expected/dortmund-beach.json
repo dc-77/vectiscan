@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-20.1 auf tests/golden/facts/14272c00-1145-4675-9b4c-19ce2ead403b.json",
+ "source": "reporter.catalog 2026-09-23.1 auf tests/golden/facts/14272c00-1145-4675-9b4c-19ce2ead403b.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -77,19 +77,6 @@
   },
   {
    "id": "VS-2026-006",
-   "check": "dkim_missing",
-   "family": "dkim_missing",
-   "cat": "C",
-   "scale": "hygiene",
-   "level": "mittel",
-   "group": "dortmund-beach.com",
-   "affected": [
-    "dortmund-beach.com"
-   ],
-   "title": "DKIM-Signatur fehlt"
-  },
-  {
-   "id": "VS-2026-007",
    "check": "dmarc_none",
    "family": "dmarc_none",
    "cat": "C",
@@ -102,7 +89,7 @@
    "title": "DMARC-Richtlinie ohne Durchsetzung"
   },
   {
-   "id": "VS-2026-008",
+   "id": "VS-2026-007",
    "check": "dnssec_missing",
    "family": "dnssec_missing",
    "cat": "E",
@@ -115,7 +102,7 @@
    "title": "DNS-Zone ohne DNSSEC-Signatur"
   },
   {
-   "id": "VS-2026-009",
+   "id": "VS-2026-008",
    "check": "ftp_plaintext",
    "family": "ftp_exposed",
    "cat": "A",
@@ -128,7 +115,7 @@
    "title": "FTP-Dienst ohne erzwungene Transportverschlüsselung"
   },
   {
-   "id": "VS-2026-010",
+   "id": "VS-2026-009",
    "check": "hsts_short",
    "family": "hsts_short",
    "cat": "D",
@@ -141,7 +128,7 @@
    "title": "HTTP Strict Transport Security mit zu kurzer Gültigkeitsdauer"
   },
   {
-   "id": "VS-2026-011",
+   "id": "VS-2026-010",
    "check": "http_header_disclosure",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -154,7 +141,7 @@
    "title": "Webdienst gibt Versionskennung preis"
   },
   {
-   "id": "VS-2026-012",
+   "id": "VS-2026-011",
    "check": "info_disclosure",
    "family": "info_disclosure",
    "cat": "E",
@@ -170,7 +157,7 @@
    "title": "Technische Informationen aus der Webanwendung offengelegt"
   },
   {
-   "id": "VS-2026-013",
+   "id": "VS-2026-012",
    "check": "legacy_protocols_present",
    "family": "legacy_protocols_present",
    "cat": "A",
@@ -185,7 +172,7 @@
    "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
   },
   {
-   "id": "VS-2026-014",
+   "id": "VS-2026-013",
    "check": "mta_sts_missing",
    "family": "mta_sts_missing",
    "cat": "C",
@@ -198,7 +185,7 @@
    "title": "MTA-STS nicht wirksam veröffentlicht"
   },
   {
-   "id": "VS-2026-015",
+   "id": "VS-2026-014",
    "check": "security_headers_incomplete",
    "family": "security_headers_incomplete",
    "cat": "D",
@@ -211,7 +198,7 @@
    "title": "Sicherheits-Header unvollständig"
   },
   {
-   "id": "VS-2026-016",
+   "id": "VS-2026-015",
    "check": "service_banner_version",
    "family": "banner_version_disclosure",
    "cat": "E",
@@ -224,7 +211,7 @@
    "title": "Dienst gibt Versionskennung preis"
   },
   {
-   "id": "VS-2026-017",
+   "id": "VS-2026-016",
    "check": "software_eol_runtime",
    "family": "software_eol",
    "cat": "B",
@@ -237,7 +224,7 @@
    "title": "Anwendungsnahe Software ohne Herstellerpflege"
   },
   {
-   "id": "VS-2026-018",
+   "id": "VS-2026-017",
    "check": "spf_softfail",
    "family": "spf_softfail",
    "cat": "C",
@@ -250,7 +237,7 @@
    "title": "SPF-Eintrag ohne konsequente Durchsetzung"
   },
   {
-   "id": "VS-2026-019",
+   "id": "VS-2026-018",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -263,7 +250,7 @@
    "title": "TLS 1.3 nicht verfügbar"
   },
   {
-   "id": "VS-2026-020",
+   "id": "VS-2026-019",
    "check": "tls_rpt_missing",
    "family": "tls_rpt_missing",
    "cat": "C",
@@ -276,7 +263,7 @@
    "title": "TLS-RPT nicht eingerichtet"
   },
   {
-   "id": "VS-2026-021",
+   "id": "VS-2026-020",
    "check": "tls_weakness",
    "family": "tls_weakness",
    "cat": "D",
@@ -289,7 +276,7 @@
    "title": "TLS-Verschlüsselung anfällig für bekannte Angriffe"
   },
   {
-   "id": "VS-2026-022",
+   "id": "VS-2026-021",
    "check": "web_vulnerability_reported",
    "family": "web_vulnerability_reported",
    "cat": "E",
@@ -302,7 +289,7 @@
    "title": "Werkzeugmeldung der aktiven Prüfung ohne eigene Einstufung"
   },
   {
-   "id": "VS-2026-023",
+   "id": "VS-2026-022",
    "check": "wordpress_core_outdated",
    "family": "wordpress_core_outdated",
    "cat": "B",
@@ -315,7 +302,7 @@
    "title": "WordPress-Kernversion veraltet oder unsicher"
   },
   {
-   "id": "VS-2026-024",
+   "id": "VS-2026-023",
    "check": "wordpress_plugin_vulnerable",
    "family": "wordpress_plugin_vulnerable",
    "cat": "B",
@@ -331,7 +318,7 @@
    "title": "WordPress-Erweiterung mit bekannten Schwachstellen"
   },
   {
-   "id": "VS-2026-025",
+   "id": "VS-2026-024",
    "check": "wordpress_user_enumeration",
    "family": "user_enumeration",
    "cat": "E",

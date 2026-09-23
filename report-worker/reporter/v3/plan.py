@@ -6,6 +6,11 @@ derselben dringlichsten Stufe und demselben Zusammenführungsschlüssel werden z
 Zeile. Jeder Befund steht damit in genau einer Zeile, was der Selbstcheck erzwingt
 (spec/03 Regel 7).
 
+S6a: Tragen zwei Zeilen denselben Maßnahmentext (zwei Befundgruppen auf verschiedenen
+Hosts oder mit verschiedenen Kategorien), wird daraus eine Zeile mit beiden
+Befundlisten und beiden Effekten. Vorher stand dieselbe Maßnahme zweimal im Plan
+(Hündgen Seite 11, VS-004/007 gegen VS-006/010).
+
 Die Hebel auf Seite 2 sind die drei gewichtigsten Planzeilen.
 """
 from __future__ import annotations
@@ -16,6 +21,9 @@ from reporter.v3.bundles import Consolidated
 from reporter.v3.models import Finding, Lever, PlanRow
 
 MAX_LEVERS = 3
+# Trenner mehrerer Effekte einer zusammengeführten Planzeile; die Vorlage setzt daraus
+# Zeilenumbrüche (Filter dot_br).
+PLAN_EFFECT_SEP = " · "
 
 
 def _action(item: Consolidated, stage: str) -> str:
@@ -62,9 +70,33 @@ def build_plan(pairs: list[tuple[Consolidated, Finding]]) -> list[PlanRow]:
             ),
         ))
     rows.sort(key=lambda t: t[0])
-    out = [row for _, row in rows]
+    # S6a: gleicher Maßnahmentext, eine Zeile. Die erste Zeile ist nach der Sortierung
+    # die dringlichste und schwerste; sie behält Stufe und Farbe, die übrigen geben
+    # ihre Befunde und Effekte ab.
+    out: list[PlanRow] = []
+    effects: list[list[str]] = []
+    by_action: dict[str, int] = {}
+    for _, row in rows:
+        key = " ".join(row.action.split())
+        index = by_action.get(key)
+        if index is None:
+            by_action[key] = len(out)
+            out.append(row)
+            effects.append([row.effect] if row.effect else [])
+            continue
+        first = out[index]
+        first.refs.extend(ref for ref in row.refs if ref not in first.refs)
+        if row.effect and row.effect not in effects[index]:
+            effects[index].append(row.effect)
     if out and out[0].st == "rot":
-        out[0].effect = N.PLAN_EFFECT_TOP
+        # Der Spitzensatz ersetzt nur den Effekt der Leitgruppe.
+        effects[0][:1] = [N.PLAN_EFFECT_TOP]
+    for row, row_effects in zip(out, effects):
+        unique: list[str] = []
+        for effect in row_effects:
+            if effect not in unique:
+                unique.append(effect)
+        row.effect = PLAN_EFFECT_SEP.join(unique)
     return out
 
 

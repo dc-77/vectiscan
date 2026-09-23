@@ -35,6 +35,16 @@ def positive_id(kuerzel: str | None, year: int, index: int) -> str:
     return f"{prefix(kuerzel, year)}-P{index:02d}"
 
 
-def report_id(kuerzel: str | None, year: int, month_day: str) -> str:
-    """Berichtsnummer auf dem Deckblatt, z. B. ``VS-JW-2026-0831``."""
-    return f"{prefix(kuerzel, year)}-{month_day}"
+def report_id(order_id: str | None, year: int, month_day: str) -> str:
+    """Berichtsnummer ``VS-<Jahr>-<MMTT>-<Order>``, z. B. ``VS-2026-0831-0bf1``.
+
+    S6a: bis dahin nur Kuerzel, Jahr und Scantag; ohne Kuerzel trugen zwei Kunden
+    mit demselben Scantag dieselbe Nummer (Huendgen und castenow, VS-2026-0917).
+    Die ersten vier Zeichen der Order-ID machen sie eindeutig. Das Kuerzel steht
+    bewusst nicht darin: es kann im Admin-Review nachgetragen werden, und die
+    Nummer muss ueber alle Versionen desselben Auftrags gleich bleiben. Scantag
+    und Order-ID kommen aus den Fakten, nicht aus dem Erstellungsdatum.
+    """
+    order_part = re.sub(r"[^0-9a-f]", "", str(order_id or "").lower())[:4]
+    base = f"VS-{year}-{month_day}"
+    return f"{base}-{order_part}" if order_part else base

@@ -52,17 +52,17 @@
   },
   "VS-2026-010": {
    "checks": [
-    "dkim_missing"
+    "dmarc_missing"
    ]
   },
   "VS-2026-011": {
    "checks": [
-    "dmarc_missing"
+    "dmarc_none"
    ]
   },
   "VS-2026-012": {
    "checks": [
-    "dmarc_none"
+    "dnssec_missing"
    ]
   },
   "VS-2026-013": {
@@ -72,12 +72,12 @@
   },
   "VS-2026-014": {
    "checks": [
-    "dnssec_missing"
+    "mta_sts_missing"
    ]
   },
   "VS-2026-015": {
    "checks": [
-    "mta_sts_missing"
+    "security_headers_incomplete"
    ]
   },
   "VS-2026-016": {
@@ -102,7 +102,7 @@
   },
   "VS-2026-020": {
    "checks": [
-    "security_headers_incomplete"
+    "spf_missing"
    ]
   },
   "VS-2026-021": {
@@ -111,11 +111,6 @@
    ]
   },
   "VS-2026-022": {
-   "checks": [
-    "spf_missing"
-   ]
-  },
-  "VS-2026-023": {
    "checks": [
     "tls_rpt_missing"
    ]

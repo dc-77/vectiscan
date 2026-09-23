@@ -69,7 +69,7 @@ heisst: in den Golden-Daten nie pruefbar, Nachweis nur ueber Fixtures.
 | dmarc_missing | dmarc_missing | C | hygiene | hoch | domain | dns | expr | not_testable | mail_policy | - | SP-DNS-006 MEDIUM | Erledigt (Hauptsession). W: dns.dmarc is None or dns.dmarc.present is False. P: dns.dmarc.present is True. R: dns_records. |
 | dmarc_none | dmarc_none | C | hygiene | mittel | domain | dns | never | not_testable | mail_policy | - | SP-DNS-007 LOW | A: dns.dmarc is not None and dns.dmarc.present is True. W: dns.dmarc.p == "none". R: dns_records. T: "{domain} (p={dmarc_p})". Abweichung: catalog_sim mittel, weil keine Durchsetzung. |
 | dmarc_quarantine | dmarc_quarantine | C | hygiene | niedrig | domain | dns | expr | not_testable | mail_policy | - | SP-DNS-010 LOW | A: dns.dmarc is not None and dns.dmarc.present is True. W: dns.dmarc.p == "quarantine". P: dns.dmarc.p == "reject". R: dns_records. T: "{domain} (p={dmarc_p})". Positiv: DMARC reject. |
-| dkim_missing | dkim_missing | C | hygiene | mittel | domain | dns | expr | not_testable | mail_records | - | SP-DNS-008 LOW | A: len(dns.mx) > 0. W: dns.dkim is not None and dns.dkim.present is False. P: dns.dkim is not None and dns.dkim.present is True. NT item: dns.dkim is None or dns.dkim.present is None -> insufficient_facts. R: dns_records. T: "{domain}". Abweichung: catalog_sim mittel. Positiv: DKIM vorhanden (P04). |
+| dkim_missing | dkim_missing | C | hygiene | mittel | domain | dns | expr | not_testable | mail_records | - | SP-DNS-008 LOW | A: len(dns.mx) > 0. W: keins (S6a, #15 Teil 2: ohne Selektor aus einer echten E-Mail nicht pruefbar, nie fehlt). P: dns.dkim is not None and dns.dkim.present is True. NT item: dns.dkim is None or dns.dkim.present is None -> insufficient_facts; dns.dkim.present is False -> dkim_selector_unknown. R: dns_records. T: "{domain}". Abweichung: catalog_sim mittel. Positiv: DKIM vorhanden (P04). |
 | mta_sts_missing | mta_sts_missing | C | hygiene | niedrig | domain | dns | expr | not_testable | mail_transport_enforcement | - | SP-DNS-009 INFO | A: len(dns.mx) > 0. W: dns.mta_sts is not None and dns.mta_sts.dns_record is False and dns.mta_sts.policy is False. P: dns.mta_sts is not None and dns.mta_sts.policy is True. NT item: dns.mta_sts is None -> insufficient_facts. R: dns_security. T: "{domain}". Faellt in fast jedem Auftrag; S3 buendelt ueber bundle. |
 | tls_rpt_missing | tls_rpt_missing | C | hygiene | niedrig | domain | dns | expr | not_testable | mail_transport_enforcement | - | SP-DNS-011 LOW | A: len(dns.mx) > 0. W: dns.tls_rpt is not None and dns.tls_rpt.present is False. P: dns.tls_rpt is not None and dns.tls_rpt.present is True. NT item: dns.tls_rpt is None -> insufficient_facts. R: dns_security. T: "{domain}". |
 | dane_missing | dane_missing | C | hygiene | niedrig | domain | dns | expr | not_testable | mail_transport_enforcement | - | neu (Prototyp VS-008) | A: len(dns.mx) > 0. W: dns.dane is not None and dns.dane.smtp is False. P: dns.dane is not None and dns.dane.smtp is True. NT item: dns.dane is None or dns.dane.smtp is None -> insufficient_facts. R: dns_security. T: "{domain}". |
@@ -150,20 +150,27 @@ haelt das Buendel aus der Befundliste heraus (Anhang "Werkzeugbefunde ohne Bewer
 spec/06 Abschnitt 4 Stufe 2). Der Test `tests/catalog/test_schema_and_table.py` erzwingt
 Tabelle == YAML.
 
-| bundle | category | merge_by | target | Mitglieder |
-|---|---|---|---|---|
-| access_portals_exposed | A | global | findings | login_portal_exposed, admin_portal_exposed |
-| banner_disclosure | E | global | findings | service_banner_version, http_header_disclosure, http_trace_enabled |
-| cert_health | D | host | findings | cert_expired, cert_expiring, cert_chain_incomplete, cert_hostname_mismatch, cert_self_signed |
-| dns_hygiene | E | domain | findings | dnssec_missing, caa_missing |
-| dns_integrity | C | domain | findings | dns_zone_transfer, dns_dangling_cname |
-| mail_policy | C | domain | findings | dmarc_missing, dmarc_none, dmarc_quarantine, spf_softfail, spf_permissive |
-| mail_records | C | domain | findings | spf_missing, dkim_missing |
-| mail_transport_enforcement | C | domain | findings | mta_sts_missing, tls_rpt_missing, dane_missing |
-| plaintext_services | A | host | findings | ftp_plaintext, mail_plaintext |
-| remote_admin_closed | A | global | findings | rdp_exposed, smb_exposed |
-| reputation_clean | E | global | findings | ip_reputation, urlhaus_compromise |
-| tls_hardening | D | host | findings | tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness, hsts_short |
-| tool_findings_unrated | E | global | appendix | info_disclosure, js_library_outdated, web_vulnerability_reported |
-| web_header_hygiene | D | host | findings | csp_missing, csp_weak, hsts_missing, security_headers_incomplete, header_duplicate, csrf_token_missing, cookie_flags, sri_missing, cors_misconfiguration, session_in_url |
-| windows_edge_exposure | A | host | findings | default_page_exposed, http_alt_port |
+`positive_conflicts` (S6a, Issue #30, Spalte "Positiv entfaellt je Host bei"): Steht auf
+einem Host einer dieser Befunde, faellt der Host aus dem Positivbefund des Buendels heraus;
+ohne verbleibenden Host entfaellt der Positivbefund. `remote_admin_closed` prueft nur RDP
+und SMB und hiess frueher "Keine Fernwartung und keine Dateifreigabe"; neben FTP auf
+Port 21, einer Verwaltungsoberflaeche oder SSH ausserhalb Port 22 mit Befund las sich das
+wie eine Entwarnung fuer den ganzen Host (Huendgen 62c1e866, dortmund-beach 14272c00).
+
+| bundle | category | merge_by | target | Mitglieder | Positiv entfaellt je Host bei |
+|---|---|---|---|---|---|
+| access_portals_exposed | A | global | findings | login_portal_exposed, admin_portal_exposed | - |
+| banner_disclosure | E | global | findings | service_banner_version, http_header_disclosure, http_trace_enabled | - |
+| cert_health | D | host | findings | cert_expired, cert_expiring, cert_chain_incomplete, cert_hostname_mismatch, cert_self_signed | - |
+| dns_hygiene | E | domain | findings | dnssec_missing, caa_missing | - |
+| dns_integrity | C | domain | findings | dns_zone_transfer, dns_dangling_cname | - |
+| mail_policy | C | domain | findings | dmarc_missing, dmarc_none, dmarc_quarantine, spf_softfail, spf_permissive | - |
+| mail_records | C | domain | findings | spf_missing, dkim_missing | - |
+| mail_transport_enforcement | C | domain | findings | mta_sts_missing, tls_rpt_missing, dane_missing | - |
+| plaintext_services | A | host | findings | ftp_plaintext, mail_plaintext | - |
+| remote_admin_closed | A | global | findings | rdp_exposed, smb_exposed | ftp_plaintext, legacy_protocols_present (Port 21); admin_service_exposed, admin_portal_exposed, admin_service_exposed_passive; ssh_alt_port mit Befund |
+| reputation_clean | E | global | findings | ip_reputation, urlhaus_compromise | - |
+| tls_hardening | D | host | findings | tls_legacy_protocols, tls_no_13, tls_no_fallback_scsv, tls_weak_ciphers, tls_weakness, hsts_short | - |
+| tool_findings_unrated | E | global | appendix | info_disclosure, js_library_outdated, web_vulnerability_reported | - |
+| web_header_hygiene | D | host | findings | csp_missing, csp_weak, hsts_missing, security_headers_incomplete, header_duplicate, csrf_token_missing, cookie_flags, sri_missing, cors_misconfiguration, session_in_url | - |
+| windows_edge_exposure | A | host | findings | default_page_exposed, http_alt_port | - |

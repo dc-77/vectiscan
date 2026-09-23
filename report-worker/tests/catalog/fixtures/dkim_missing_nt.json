@@ -2,13 +2,16 @@
  "facts": {
   "dns": [
    {"domain": "example.test", "mx": ["mx1.example.test"],
-    "spf": {"raw": "v=spf1 mx -all", "all_qualifier": "-all"}}
+    "spf": {"raw": "v=spf1 mx -all", "all_qualifier": "-all"},
+    "dkim": {"present": false, "selectors": [],
+             "probed": ["default", "google", "k1", "s1", "selector1", "selector2", "zoho"],
+             "probed_basis": "scan"}}
   ]
  },
  "coverage_default": "ok",
  "expect": {
   "status": "not_testable",
   "group_key": "example.test",
-  "reason_code": "insufficient_facts"
+  "reason_code": "dkim_selector_unknown"
  }
 }

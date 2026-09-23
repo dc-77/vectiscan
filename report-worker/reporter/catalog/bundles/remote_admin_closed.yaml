@@ -32,7 +32,18 @@ texts:
     Portscan der betroffenen Ports von einer externen Adresse wiederholen; erwartet wird der
     Zustand gefiltert oder geschlossen.
   positive:
-    title: Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar
+    title: Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar
     text: >-
-      Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf
-      Verbindungen von außen.
+      Auf {group} antwortet weder die Windows-Fernwartung (RDP) noch die Windows-Dateifreigabe
+      (SMB) auf Verbindungen von außen. Andere Zugänge wie FTP, SSH oder Verwaltungsoberflächen
+      umfasst diese Aussage nicht.
+# S6a (Issue #30): Der Positivbefund prueft nur RDP und SMB. Steht auf einem Host FTP,
+# ein SSH-Dienst ausserhalb Port 22 mit Befund oder eine Verwaltungsoberflaeche als
+# Befund, faellt dieser Host aus dem Positivbefund heraus; ohne verbleibenden Host
+# entfaellt er. Regressionssperre: Huendgen 62c1e866 (FTP auf 21),
+# tests/v3/test_bundles.py.
+positive_conflicts:
+  - checks: [ftp_plaintext, legacy_protocols_present]
+    ports: [21]
+  - checks: [admin_service_exposed, admin_portal_exposed, admin_service_exposed_passive]
+  - noted_by: ssh_alt_port

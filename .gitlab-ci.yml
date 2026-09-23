@@ -1321,6 +1321,138 @@ ops-facts-prod:
         "SELECT count(*) FROM reports WHERE order_id = '${FACTS_ORDER_ID}'"
     - ls -l ${CI_PROJECT_DIR}/facts-prod/ || true
 
+# =============================================================================
+# Abo-Statusbericht (Issue #29, S6a)
+# =============================================================================
+# Der Statusbericht-Job ist seit seiner Einfuehrung (cecd662, 03.05.2026) nie
+# durchgelaufen. Der Scheduler (api/src/lib/scheduler.ts) stellt ihn trotzdem
+# jede Minute je faelligem Abo ein; ein Fehlschlag steht nur im Worker-Log,
+# nicht in der Datenbank.
+#
+#   diag (Vorgabe)  nur lesend: aktive Abos mit Kunde, Intervall und
+#       last_status_report_at, erzeugte Berichte je Abo, Anforderungen aus dem
+#       Kundenportal (audit_log), Queue-Tiefe, Fehlschlaege im Worker-Log und
+#       Einreihungen im API-Log. Laeuft auch in der MR-Pipeline, damit der
+#       Stand vor dem Deploy des Fixes festgehalten wird (das Worker-Log endet
+#       mit dem Neustart des Containers).
+#
+#   erzeugen  python -m reporter.status_report_generator --subscription <id>
+#       Derselbe Weg wie der Queue-Job: PDF nach MinIO, Zeile in
+#       subscription_status_reports, last_status_report_at gesetzt. Das PDF
+#       liegt zusaetzlich im Job-Artefakt. Zugestellt wird nichts; einen
+#       Kundenweg fuer den Statusbericht gibt es noch nicht.
+#
+# Pipeline-Variablen:
+#   STATUS_MODE             diag | erzeugen    (Vorgabe: diag)
+#   STATUS_SUBSCRIPTION_ID  subscriptions.id    (nur fuer erzeugen)
+# =============================================================================
+ops-status-report:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+      allow_failure: true
+  artifacts:
+    when: always
+    expire_in: 7 days
+    paths:
+      - status-report/
+  script:
+    - mkdir -p ${CI_PROJECT_DIR}/status-report
+    - test -n "${DEPLOY_PATH}" || { echo "DEPLOY_PATH fehlt in dieser Pipeline (geschuetzte Variable?)"; exit 1; }
+    - cd ${DEPLOY_PATH}
+    - MODE="${STATUS_MODE:-diag}"
+    - echo "Betriebsart ${MODE}"
+    - |
+      if [ "${MODE}" = "diag" ]; then
+        docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -A -X -F ' | ' \
+          <<'SQL' | tee ${CI_PROJECT_DIR}/status-report/diag-db.txt
+      \echo === Abos (alle Status) mit Statusbericht-Stand ===
+      SELECT s.id, s.status, s.package, s.scan_interval,
+             to_char(s.created_at, 'YYYY-MM-DD') AS angelegt,
+             to_char(s.started_at, 'YYYY-MM-DD') AS gestartet,
+             to_char(s.expires_at, 'YYYY-MM-DD') AS endet,
+             s.last_status_report_at,
+             c.company_name, c.email
+        FROM subscriptions s JOIN customers c ON c.id = s.customer_id
+       ORDER BY s.status, s.started_at NULLS LAST;
+      \echo
+      \echo === Vom Scheduler erfasst (aktiv, Intervall gesetzt): Anzahl ===
+      SELECT count(*) FROM subscriptions
+       WHERE status = 'active' AND scan_interval IN ('weekly','monthly','quarterly');
+      \echo
+      \echo === Erzeugte Statusberichte je Abo ===
+      SELECT subscription_id, count(*), min(generated_at), max(generated_at)
+        FROM subscription_status_reports GROUP BY subscription_id;
+      SELECT count(*) AS statusberichte_gesamt FROM subscription_status_reports;
+      \echo
+      \echo === Anforderungen aus dem Kundenportal (audit_log) ===
+      SELECT a.created_at, a.details->>'subscriptionId' AS abo, c.company_name, c.email
+        FROM audit_log a
+        LEFT JOIN subscriptions s ON s.id::text = a.details->>'subscriptionId'
+        LEFT JOIN customers c ON c.id = s.customer_id
+       WHERE a.action = 'subscription.status_report_requested'
+       ORDER BY a.created_at;
+      \echo
+      \echo === Posture je aktivem Abo ===
+      SELECT s.id, s.status, sp.posture_score, sp.last_aggregated_at
+        FROM subscriptions s LEFT JOIN subscription_posture sp ON sp.subscription_id = s.id
+       WHERE s.status = 'active';
+      SQL
+        echo
+        echo "=== Queue report-pending ==="
+        docker compose exec -T redis redis-cli LLEN report-pending || true
+        echo
+        echo "=== report-worker: Container gestartet ==="
+        docker inspect -f '{{.State.StartedAt}}' "$(docker compose ps -q report-worker)" || true
+        echo "=== report-worker: Statusbericht-Ereignisse seit Containerstart ==="
+        docker compose logs --no-color --timestamps report-worker 2>&1 \
+          | grep -E 'subscription_status_report_(failed|done)|status_report_(generated|not_due|subscription_not_found|enqueued|enqueue_failed)' \
+          > ${CI_PROJECT_DIR}/status-report/worker-events.txt || true
+        for ev in subscription_status_report_failed subscription_status_report_done status_report_enqueued; do
+          n=$(grep -c "${ev}" ${CI_PROJECT_DIR}/status-report/worker-events.txt || true)
+          echo "  ${ev}: ${n}"
+        done
+        echo "  erster Treffer:"; head -1 ${CI_PROJECT_DIR}/status-report/worker-events.txt | cut -c1-400 || true
+        echo "  letzter Treffer:"; tail -1 ${CI_PROJECT_DIR}/status-report/worker-events.txt | cut -c1-400 || true
+        echo "  Abos mit Fehlschlag (subscription_id, Anzahl):"
+        grep 'subscription_status_report_failed' ${CI_PROJECT_DIR}/status-report/worker-events.txt \
+          | grep -oE 'subscription_id[^0-9a-f]*[0-9a-f-]{36}' | grep -oE '[0-9a-f-]{36}' | sort | uniq -c || true
+        echo
+        echo "=== api: Einreihungen durch den Scheduler seit Containerstart ==="
+        docker inspect -f '{{.State.StartedAt}}' "$(docker compose ps -q api)" || true
+        docker compose logs --no-color --timestamps api 2>&1 | grep 'Status-Report enqueued' \
+          > ${CI_PROJECT_DIR}/status-report/api-enqueued.txt || true
+        echo "  Einreihungen: $(wc -l < ${CI_PROJECT_DIR}/status-report/api-enqueued.txt)"
+        head -1 ${CI_PROJECT_DIR}/status-report/api-enqueued.txt || true
+        tail -1 ${CI_PROJECT_DIR}/status-report/api-enqueued.txt || true
+        grep -oE 'subscription [0-9a-f-]{36}' ${CI_PROJECT_DIR}/status-report/api-enqueued.txt | sort | uniq -c || true
+      elif [ "${MODE}" = "erzeugen" ]; then
+        echo "${STATUS_SUBSCRIPTION_ID}" | grep -qE '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' \
+          || { echo "STATUS_SUBSCRIPTION_ID fehlt oder ist keine UUID"; exit 1; }
+        docker compose exec -T report-worker python3 -m reporter.status_report_generator \
+          --subscription "${STATUS_SUBSCRIPTION_ID}" \
+          --pdf "/tmp/status-${STATUS_SUBSCRIPTION_ID}.pdf" \
+          2>&1 | tee ${CI_PROJECT_DIR}/status-report/erzeugen.log
+        docker compose cp \
+          "report-worker:/tmp/status-${STATUS_SUBSCRIPTION_ID}.pdf" \
+          "${CI_PROJECT_DIR}/status-report/status-${STATUS_SUBSCRIPTION_ID}.pdf" || true
+        docker compose exec -T report-worker rm -f "/tmp/status-${STATUS_SUBSCRIPTION_ID}.pdf" || true
+        docker compose exec -T postgres psql -U "${DB_USER:-vectiscan}" -d "${DB_NAME:-vectiscan}" -A -X -c \
+          "SELECT id, generated_at, trigger_reason, posture_score, findings_open, pdf_minio_key, pdf_size_bytes
+             FROM subscription_status_reports
+            WHERE subscription_id = '${STATUS_SUBSCRIPTION_ID}' ORDER BY generated_at DESC LIMIT 3"
+        ls -l ${CI_PROJECT_DIR}/status-report/
+      else
+        echo "STATUS_MODE unbekannt: ${MODE} (diag | erzeugen)"; exit 1
+      fi
+
 # Rollback: Compose-Snapshot + .env.bak zurueckspielen + Container hochfahren.
 rollback:
   extends: .ops-base

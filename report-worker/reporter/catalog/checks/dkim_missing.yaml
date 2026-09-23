@@ -7,11 +7,19 @@ level: mittel
 group_by: domain
 scope: dns
 applicable_when: len(dns.mx) > 0
-when: dns.dkim is not None and dns.dkim.present is False
+# S6a (#15 Teil 2): Ohne Selektor aus einer echten E-Mail ist DKIM nicht pruefbar, nie
+# "fehlt". Der Scanner fragt eine Liste gaengiger Selektoren ab; findet er keinen, belegt
+# das kein fehlendes DKIM, weil der Selektor frei waehlbar ist. Ein Fehlschlag waere erst
+# mit einem echten Selektor ohne Schluessel belegt, und diesen Fakt gibt es noch nicht;
+# deshalb kein `when`. Die Texte fuer den Befund bleiben fuer diesen Fall stehen.
+when: null
 positive_when: dns.dkim is not None and dns.dkim.present is True
 not_testable_when:
   - when: dns.dkim is None or dns.dkim.present is None
     reason_code: insufficient_facts
+    context: item
+  - when: dns.dkim.present is False
+    reason_code: dkim_selector_unknown
     context: item
 undetermined: not_testable
 requires:

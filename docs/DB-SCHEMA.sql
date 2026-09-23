@@ -258,6 +258,11 @@ CREATE INDEX idx_reports_order_version ON reports(order_id, version DESC);
 -- Hinweis: UNIQUE-Constraint auf reports.order_id wurde in 011 entfernt,
 -- damit mehrere Versionen pro Order existieren können.
 
+-- S6a (Sep 2026), Migration 047 — additiv, nullable, ohne UNIQUE:
+--   reports.report_number  VARCHAR(40)  Berichtsnummer wie auf Deckblatt und
+--       Fusszeile, VS-<Jahr>-<MMTT>-<erste vier Zeichen der Order-ID>. Gleich
+--       fuer alle Versionen eines Auftrags; nur im Katalogweg gesetzt.
+
 -- ============================================================
 -- Manuelle Finding-Ausschlüsse (Admin-Review) — 011
 -- ============================================================

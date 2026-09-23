@@ -27,6 +27,7 @@
    }
   ],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 20.07.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [],
   "exposure_scale": [
    {
     "l": "kritisch",
@@ -2239,7 +2240,8 @@
     "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
     "n": 3,
     "refs": [
-     "VS-2026-005"
+     "VS-2026-005",
+     "VS-2026-006"
     ],
     "title": "Transportverschlüsselung auf 195.50.179.2 mit veralteten Verfahren"
    }
@@ -2251,8 +2253,8 @@
  "landscape_lead": "29 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
   "after_fp": 70,
-  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
-  "catalog_version": "2026-09-22.1",
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
   "classification": "Vertraulich",
   "consolidated": 29,
   "customer": "Auftraggeber",
@@ -2260,7 +2262,7 @@
   "domains": [
    "castenow.de"
   ],
-  "facts_schema_version": "1.0.3",
+  "facts_schema_version": "1.0.4",
   "fqdns_total": 14,
   "hosts_ipv4": 9,
   "hosts_ipv6": 0,
@@ -2273,7 +2275,7 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-22.1",
+  "policy_version": "2026-09-23.2",
   "positives": 7,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
@@ -2283,7 +2285,7 @@
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
   "raw_findings": 471,
   "report_date": "19.09.2026",
-  "report_id": "VS-2026-0720",
+  "report_id": "VS-2026-0720-f77c",
   "report_version": "1.0",
   "scan_date": "20.07.2026",
   "scan_window": "20.07.2026, 01:40 bis 02:25 Uhr (CEST)",
@@ -2315,15 +2317,7 @@
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "In Kürze",
    "refs": [
-    "VS-2026-005"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "In Kürze",
-   "refs": [
+    "VS-2026-005",
     "VS-2026-006"
    ],
    "st": "gelb"
@@ -2354,16 +2348,9 @@
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-011"
-   ],
-   "st": "gelb"
-  },
-  {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-012"
+    "VS-2026-011",
+    "VS-2026-012",
+    "VS-2026-021"
    ],
    "st": "gelb"
   },
@@ -2384,7 +2371,11 @@
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-010",
-    "VS-2026-013"
+    "VS-2026-013",
+    "VS-2026-018",
+    "VS-2026-022",
+    "VS-2026-020",
+    "VS-2026-025"
    ],
    "st": "gelb"
   },
@@ -2394,46 +2385,9 @@
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-015",
-    "VS-2026-024"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
-   "prio": "Mittelfristig",
-   "refs": [
+    "VS-2026-024",
     "VS-2026-016",
     "VS-2026-026"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-021"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-018",
-    "VS-2026-022"
-   ],
-   "st": "blau"
-  },
-  {
-   "action": "Veraltete Protokolle und schwache Verfahren am Dienst abschalten. Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
-   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
-   "prio": "Mittelfristig",
-   "refs": [
-    "VS-2026-020",
-    "VS-2026-025"
    ],
    "st": "blau"
   },
@@ -2461,8 +2415,8 @@
   },
   {
    "cat": "A",
-   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
-   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
+   "text": "Auf den geprüften Hosts außer 92.205.163.53 antwortet weder die Windows-Fernwartung (RDP) noch die Windows-Dateifreigabe (SMB) auf Verbindungen von außen. Andere Zugänge wie FTP, SSH oder Verwaltungsoberflächen umfasst diese Aussage nicht.",
+   "title": "Keine Windows-Fernwartung (RDP) und keine Windows-Dateifreigabe (SMB) aus dem Internet erreichbar"
   },
   {
    "cat": "B",

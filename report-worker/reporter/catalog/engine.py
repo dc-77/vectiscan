@@ -134,7 +134,20 @@ def _link_bundles(compiled: list[CompiledCheck], bundles: list[BundleSpec]) -> l
                     f"{member}: bundle {spec.bundle!r} passt nicht zu bundles/{bundle.id}.yaml")
             members.append(member)
         if members:
-            linked.append(bundle.model_copy(update={"members": members}))
+            # S6a: Konflikte auf Pruefungen, die in diesem Katalog nicht liegen, fallen
+            # wie Mitglieder still weg (Testaufbau). Im vollstaendigen Katalog prueft
+            # tests/catalog/test_schema_and_table.py, dass jede genannte ID existiert.
+            conflicts = []
+            for conflict in bundle.positive_conflicts:
+                if conflict.noted_by:
+                    if conflict.noted_by in by_id:
+                        conflicts.append(conflict)
+                    continue
+                known_checks = [c for c in conflict.checks if c in by_id]
+                if known_checks:
+                    conflicts.append(conflict.model_copy(update={"checks": known_checks}))
+            linked.append(bundle.model_copy(
+                update={"members": members, "positive_conflicts": conflicts}))
     for spec in by_id.values():
         if not spec.bundle:
             continue

@@ -223,9 +223,9 @@ class TestCreateReportRecordExpiry:
     def _mock_conn(self) -> MagicMock:
         conn = MagicMock()
         cur = conn.cursor.return_value.__enter__.return_value
-        # 1. fetchone(): validation_warnings-Spalten-Check -> existiert.
+        # 1. fetchone(): Spalten-Check validation_warnings, report_number -> existieren.
         # 2. fetchone(): RETURNING id des INSERT.
-        cur.fetchone.side_effect = [(True,), ("report-id-xyz",)]
+        cur.fetchone.side_effect = [(True, True), ("report-id-xyz",)]
         return conn
 
     def _insert_params(self, conn: MagicMock) -> tuple:
@@ -256,6 +256,31 @@ class TestCreateReportRecordExpiry:
         # ~30 Tage, grosszuegige Toleranz fuer Laufzeit/CI-Jitter.
         assert timedelta(days=29, hours=23) < delta < timedelta(days=30, minutes=5), \
             f"expires_at muss ~30 Tage in der Zukunft liegen, war {delta}"
+
+    def test_report_number_landet_in_der_spalte(self) -> None:
+        # S6a: die Berichtsnummer vom Deckblatt steht auch in reports (Migration 047).
+        from reporter.worker import _create_report_record
+        conn = self._mock_conn()
+        _create_report_record(conn, "o", "scan-reports/r.pdf", 1,
+                              report_number="VS-2026-0918-1427")
+        cur = conn.cursor.return_value.__enter__.return_value
+        sql, params = next(c.args for c in cur.execute.call_args_list
+                           if "INSERT INTO reports" in c.args[0])
+        cols = sql.split("(", 1)[1].split(")", 1)[0].split(", ")
+        assert cols[-1] == "report_number" and params[-1] == "VS-2026-0918-1427"
+        assert cols[-2] == "validation_warnings"
+        assert sql.count("%s") == len(params) == len(cols)
+
+    def test_ohne_migration_047_bleibt_die_spalte_weg(self) -> None:
+        from reporter.worker import _create_report_record
+        conn = MagicMock()
+        cur = conn.cursor.return_value.__enter__.return_value
+        cur.fetchone.side_effect = [(True, False), ("rid",)]
+        _create_report_record(conn, "o", "scan-reports/r.pdf", 1,
+                              report_number="VS-2026-0918-1427")
+        sql = next(c.args[0] for c in cur.execute.call_args_list
+                   if "INSERT INTO reports" in c.args[0])
+        assert "report_number" not in sql and "validation_warnings" in sql
 
 
 class TestBuildFindingsDataGuardStats:

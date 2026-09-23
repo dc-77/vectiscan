@@ -5,12 +5,76 @@
     "cve": "CVE-2013-3587",
     "name": "BREACH (HTTP-Kompression)",
     "note": "Werkzeugbefund, keine Fremdbewertung.",
-    "ref": "VS-2026-010",
+    "ref": "VS-2026-009",
     "score": "",
     "src": "testssl"
    }
   ],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 18.09.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [
+   "1und1",
+   "amazonses",
+   "brevo",
+   "default",
+   "dkim",
+   "dkim-1",
+   "dkim-2",
+   "dkim01",
+   "dkim1",
+   "dkim2",
+   "email",
+   "fd",
+   "fd2",
+   "gmx",
+   "google",
+   "googledomains",
+   "hse1",
+   "hse2",
+   "ionos1",
+   "ionos2",
+   "k1",
+   "k2",
+   "key1",
+   "key2",
+   "mail",
+   "mailgun",
+   "mailin",
+   "mailjet",
+   "mailo",
+   "mandrill",
+   "mg",
+   "mj",
+   "mta",
+   "mta1",
+   "mta2",
+   "mxvault",
+   "pf2014",
+   "pm",
+   "postmark",
+   "primary",
+   "s1",
+   "s1024",
+   "s2",
+   "s2048",
+   "scph",
+   "scph0123",
+   "scph0124",
+   "secondary",
+   "selector",
+   "selector1",
+   "selector2",
+   "sendinblue",
+   "sib",
+   "sig1",
+   "sig2",
+   "smtp",
+   "smtpapi",
+   "strato1",
+   "strato2",
+   "t-online",
+   "zmail",
+   "zoho"
+  ],
   "exposure_scale": [
    {
     "l": "kritisch",
@@ -21,7 +85,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 1107 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (1082 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 14 Befunde und 5 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 1106 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (1082 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 13 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -52,13 +116,13 @@
    {
     "host": "88.99.35.112",
     "port": "110",
-    "ref": "VS-2026-008",
+    "ref": "VS-2026-007",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
     "host": "88.99.35.112",
     "port": "143",
-    "ref": "VS-2026-008",
+    "ref": "VS-2026-007",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
@@ -100,7 +164,7 @@
    {
     "host": "88.99.35.112",
     "port": "30000",
-    "ref": "VS-2026-012",
+    "ref": "VS-2026-011",
     "svc": "OpenSSH 8.4p1"
    },
    {
@@ -231,8 +295,8 @@
      },
      {
       "l": "DKIM",
-      "ok": false,
-      "v": "Handlungsbedarf"
+      "ok": null,
+      "v": "nicht prüfbar"
      },
      {
       "l": "DMARC",
@@ -810,39 +874,11 @@
    "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
   },
   {
-   "affected": "dortmund-beach.com",
-   "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\ndortmund-beach.com: SPF=v=spf1 a mx ip4:78.46.161.114 ~all DMARC=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; DKIM-Selektoren=keiner bekannt MX=mail1.spacekoelnsrv1.de, out DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nich...",
-   "found": "Für dortmund-beach.com fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können: dortmund-beach.com.",
-   "id": "VS-2026-007",
-   "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
-   "level": "mittel",
-   "level_label": "mittel",
-   "policy": "dkim_missing",
-   "recommendation": [
-    [
-     "In Kürze",
-     "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden."
-    ],
-    [
-     "Mittelfristig",
-     "Die Einträge nach jeder Änderung an den Versandwegen prüfen und die Signatur der ausgehenden Nachrichten überwachen."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (dns_records)",
-   "status": "gelb",
-   "threat": null,
-   "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für dortmund-beach.com",
-   "urgency": "Mittelfristig",
-   "verify": "DNS-Abfrage für die genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
-  },
-  {
    "affected": "88.99.35.112:110 (POP3), 88.99.35.112:143 (IMAP), 88.99.35.112:21 (FTP)",
    "cat": "A",
    "evidence": "nmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:21/tcp Dienst=ftp Produkt=Pure-FTPd Zustand=open\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=USER, CAPA, TOP, UIDL\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\npop3-capabilities: USER CAPA TOP UIDL SASL(PLAIN LOGIN) RESP-CODES STLS PIPELINING AUTH-RESP-CODE\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=LOGIN, PLAIN Capabilities=LOGIN-REFERRALS, LITERAL+, capabilities, more\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\nimap-capabilities: LOGIN-REFERRALS LITERAL+ capabilities more Pre-login post-login IDLE OK ENABLE SASL-IR listed have STARTTLS IMAP4rev1 AUTH=PLAIN AUTH=LOGINA0001 ID",
    "found": "Der Host 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 88.99.35.112:110 (POP3), 88.99.35.112:143 (IMAP), 88.99.35.112:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
-   "id": "VS-2026-008",
+   "id": "VS-2026-007",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -870,7 +906,7 @@
    "cat": "C",
    "evidence": "dns_records · phase0/dns_records.json\ndortmund-beach.com: SPF=v=spf1 a mx ip4:78.46.161.114 ~all DMARC=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; DKIM-Selektoren=keiner bekannt MX=mail1.spacekoelnsrv1.de, out DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nich...",
    "found": "Für dortmund-beach.com fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: dortmund-beach.com.",
-   "id": "VS-2026-009",
+   "id": "VS-2026-008",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -894,7 +930,7 @@
    "cat": "D",
    "evidence": "header_check · scan_results:header_check:88.99.35.112\ndortmund-beach.com: URL=https://dortmund-beach.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-age...\n\nhttpx · hosts/88.99.35.112/phase2/httpx.json\ndortmund-beach.com:443 CN=dortmund-beach.com SAN=dortmund-beach.com, www.dortmund-beach.com Aussteller=YR1 gueltig_bis=2026-10-30T21:06:36Z abgelaufen=nein Resttage=42 Namensabweichung=nein Kette vollstaendig=ja Protokolle=TLS1.2 schwach...\n\nhttpx · hosts/88.99.35.112/phase2/httpx.json\ndortmund-beach.com:443 tls=tls12 cn=dortmund-beach.com gueltig_bis=2026-10-30T21:06:36Z\n\ntestssl · scan_results:testssl:88.99.35.112\nangeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3\n\ntestssl · hosts/88.99.35.112/phase2/testssl.json\nHSTS_time=misconfiguration, specified not a number for max-age; BREACH=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested\n\ntestssl\ndortmund-beach.com:443 Pruefung=BREACH Urteil=potential CVE=CVE-2013-3587 Ausgabe=potentially VULNERABLE, gzip HTTP compression detected - only supplied '/' tested",
    "found": "Die Transportverschlüsselung auf 88.99.35.112 lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: dortmund-beach.com (max-age 0), dortmund-beach.com:443, dortmund-beach.com:443 (BREACH).",
-   "id": "VS-2026-010",
+   "id": "VS-2026-009",
    "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -932,7 +968,7 @@
    "cat": "D",
    "evidence": "header_check · scan_results:header_check:88.99.35.112\ndortmund-beach.com: URL=https://dortmund-beach.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-age...\n\nzap_active\nAbsence of Anti-CSRF Tokens ZAP-Kennung=10202 Risiko=Medium Konfidenz=Low Adresse=https://dortmund-beach.com/wp-login.php Beleg=<form name=\"loginform\" id=\"loginform\" action=\"https://dortmund-beach.com/wp-login.php\" method=\"post\"> CWE=CWE...",
    "found": "Die Webdienste auf 88.99.35.112 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: dortmund-beach.com, dortmund-beach.com (/wp-login.php), dortmund-beach.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
-   "id": "VS-2026-011",
+   "id": "VS-2026-010",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -960,7 +996,7 @@
    "cat": "E",
    "evidence": "header_check · scan_results:header_check:88.99.35.112\ndortmund-beach.com: URL=https://dortmund-beach.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, x-content-type-options, x-frame-options, x-xss-protection gesetzte Header=strict-transport-security: max-age...\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n88.99.35.112:30000/tcp Dienst=ssh Produkt=OpenSSH Version=8.4p1 Debian 5+deb11u7 Zustand=open\n\nnmap · hosts/88.99.35.112/phase1/nmap.xml\n30000/tcp open ssh OpenSSH 8.4p1 Debian 5+deb11u7 (protocol 2.0)",
    "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: dortmund-beach.com (Server: Apache/2.4.67 (Debian)), 88.99.35.112:30000 (OpenSSH 8.4p1).",
-   "id": "VS-2026-012",
+   "id": "VS-2026-011",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -988,7 +1024,7 @@
    "cat": "E",
    "evidence": "dns_records · phase0/dns_records.json\ndortmund-beach.com: SPF=v=spf1 a mx ip4:78.46.161.114 ~all DMARC=v=DMARC1; p=none; rua=mailto:postmaster@spacekoeln.de; DKIM-Selektoren=keiner bekannt MX=mail1.spacekoelnsrv1.de, out DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nich...",
    "found": "Für dortmund-beach.com fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: dortmund-beach.com.",
-   "id": "VS-2026-013",
+   "id": "VS-2026-012",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1012,7 +1048,7 @@
    "cat": "E",
    "evidence": "wpscan\ndortmund-beach.com: Benutzernamen unter=https://dortmund-beach.com/wp-json/wp/v2/users gefunden=badmin Kernstand=outdated",
    "found": "Auf dortmund-beach.com (+www.dortmund-beach.com) lassen sich über WordPress-Schnittstellen gültige Benutzernamen ermitteln: dortmund-beach.com (badmin).",
-   "id": "VS-2026-014",
+   "id": "VS-2026-013",
    "impact": "Bekannte Benutzernamen erleichtern Passwort-Rateangriffe und gezieltes Phishing, weil ein Angreifer sich nicht mehr auf Vermutungen verlassen muss, sondern echte Anmeldenamen kennt.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -1056,7 +1092,7 @@
     "key": "C",
     "level": 2,
     "name": "E-Mail-Authentizität",
-    "note": "Richtlinie zur Absender-Authentizität für dortmund-beach.com nicht durchsetzend; Grundlegende Einträge zur Absender-Authentizität fehlen für dortmund-beach.com",
+    "note": "Richtlinie zur Absender-Authentizität für dortmund-beach.com nicht durchsetzend; Transportverschlüsselung im Mailversand für dortmund-beach.com nicht erzwungen",
     "status": "gelb"
    },
    {
@@ -1100,9 +1136,9 @@
     "n": 3,
     "refs": [
      "VS-2026-005",
-     "VS-2026-008",
-     "VS-2026-012",
-     "VS-2026-014"
+     "VS-2026-007",
+     "VS-2026-011",
+     "VS-2026-013"
     ],
     "title": "Anwendungsnahe Software ohne Herstellerpflege"
    }
@@ -1111,19 +1147,19 @@
   "overall_status": "gelb",
   "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "13 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 25,
-  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
-  "catalog_version": "2026-09-22.1",
+  "after_fp": 24,
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
   "classification": "Vertraulich",
-  "consolidated": 14,
+  "consolidated": 13,
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
   "domains": [
    "dortmund-beach.com"
   ],
-  "facts_schema_version": "1.0.3",
+  "facts_schema_version": "1.0.4",
   "fqdns_total": 3,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
@@ -1136,17 +1172,17 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-22.1",
-  "positives": 5,
+  "policy_version": "2026-09-23.2",
+  "positives": 4,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 1107,
+  "raw_findings": 1106,
   "report_date": "19.09.2026",
-  "report_id": "VS-2026-0918",
+  "report_id": "VS-2026-0918-1427",
   "report_version": "1.0",
   "scan_date": "18.09.2026",
   "scan_window": "18.09.2026, 00:41 bis 01:09 Uhr (CEST)",
@@ -1179,19 +1215,18 @@
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-005",
-    "VS-2026-008",
-    "VS-2026-012",
-    "VS-2026-014"
+    "VS-2026-007",
+    "VS-2026-011",
+    "VS-2026-013"
    ],
    "st": "gelb"
   },
   {
-   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten. Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden.",
+   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-006",
-    "VS-2026-007"
+    "VS-2026-006"
    ],
    "st": "gelb"
   },
@@ -1200,8 +1235,8 @@
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-010",
-    "VS-2026-011"
+    "VS-2026-009",
+    "VS-2026-010"
    ],
    "st": "blau"
   },
@@ -1210,8 +1245,8 @@
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-009",
-    "VS-2026-013"
+    "VS-2026-008",
+    "VS-2026-012"
    ],
    "st": "blau"
   }
@@ -1219,18 +1254,13 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) antwortet kein Datenbankdienst auf Verbindungen von außen.",
+   "text": "Auf 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com und weitere) antwortet kein Datenbankdienst auf Verbindungen von außen.",
    "title": "Keine Datenbankdienste aus dem Internet erreichbar"
   },
   {
    "cat": "A",
-   "text": "Der Host 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com, www.dortmund-beach.com) bietet seinen Webdienst über HTTPS an.",
+   "text": "Der Host 88.99.35.112 (*.dortmund-beach.com, dortmund-beach.com, pflege.dortmund-beach.com und weitere) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
-  },
-  {
-   "cat": "A",
-   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
-   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
   },
   {
    "cat": "C",
@@ -1276,6 +1306,10 @@
    },
    {
     "detail": "Betroffen: dortmund-beach.com.",
+    "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=)"
+   },
+   {
+    "detail": "Betroffen: dortmund-beach.com.",
     "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
    },
    {
@@ -1306,7 +1340,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 14 Befunde und 5 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 13 Befunde und 4 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -1320,11 +1354,11 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "1107"
+    "v": "1106"
    },
    {
     "l": "Befunde im Bericht",
-    "v": "14"
+    "v": "13"
    }
   ],
   "out_of_scope": [

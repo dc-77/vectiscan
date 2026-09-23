@@ -9,7 +9,12 @@ __pycache__/
 *.tsbuildinfo
 
 # Local working artefacts (nicht ins Repo) — Stand 2026-05-20
-docs/
+# S6a: frueher stand hier `docs/` im Ganzen. Das verschluckte neue Doku still (Dateien
+# darunter waren nur mit -f versioniert). Ignoriert bleiben nur die lokalen Arbeitsstaende:
+# Kunden-PDFs und API-Dumps (Mailadressen, gescrapte Zugangsdaten) sowie Seitenbilder.
+docs/analyse/_*
+docs/analyse/*.pdf
+docs/report-erstellung/assets/
 .claude/settings.local.json
 .playwright-mcp/
 screenshots/

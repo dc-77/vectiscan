@@ -2,6 +2,70 @@
  "appendix": {
   "cve_refs": [],
   "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 11.05.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [
+   "1und1",
+   "amazonses",
+   "brevo",
+   "default",
+   "dkim",
+   "dkim-1",
+   "dkim-2",
+   "dkim01",
+   "dkim1",
+   "dkim2",
+   "email",
+   "fd",
+   "fd2",
+   "gmx",
+   "google",
+   "googledomains",
+   "hse1",
+   "hse2",
+   "ionos1",
+   "ionos2",
+   "k1",
+   "k2",
+   "key1",
+   "key2",
+   "mail",
+   "mailgun",
+   "mailin",
+   "mailjet",
+   "mailo",
+   "mandrill",
+   "mg",
+   "mj",
+   "mta",
+   "mta1",
+   "mta2",
+   "mxvault",
+   "pf2014",
+   "pm",
+   "postmark",
+   "primary",
+   "s1",
+   "s1024",
+   "s2",
+   "s2048",
+   "scph",
+   "scph0123",
+   "scph0124",
+   "secondary",
+   "selector",
+   "selector1",
+   "selector2",
+   "sendinblue",
+   "sib",
+   "sig1",
+   "sig2",
+   "smtp",
+   "smtpapi",
+   "strato1",
+   "strato2",
+   "t-online",
+   "zmail",
+   "zoho"
+  ],
   "exposure_scale": [
    {
     "l": "kritisch",
@@ -12,7 +76,7 @@
     "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
    }
   ],
-  "filtering": "Die Werkzeuge haben in diesem Auftrag 25 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (4 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 14 Befunde und 4 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 24 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (4 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 13 Befunde und 3 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
   "hygiene_scale": [
    {
     "l": "hoch",
@@ -37,7 +101,7 @@
    {
     "host": "5.199.141.24",
     "port": "22",
-    "ref": "VS-2026-013",
+    "ref": "VS-2026-012",
     "svc": "OpenSSH 7.4"
    },
    {
@@ -55,13 +119,13 @@
    {
     "host": "5.199.141.24",
     "port": "110",
-    "ref": "VS-2026-010",
+    "ref": "VS-2026-009",
     "svc": "Dovecot pop3d, STARTTLS"
    },
    {
     "host": "5.199.141.24",
     "port": "143",
-    "ref": "VS-2026-010",
+    "ref": "VS-2026-009",
     "svc": "Dovecot imapd, STARTTLS"
    },
    {
@@ -182,8 +246,8 @@
      },
      {
       "l": "DKIM",
-      "ok": false,
-      "v": "Handlungsbedarf"
+      "ok": null,
+      "v": "nicht prüfbar"
      },
      {
       "l": "DMARC",
@@ -753,39 +817,11 @@
    "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
   },
   {
-   "affected": "trunk-immobilien.de",
-   "cat": "C",
-   "evidence": "dns_records · phase0/dns_records.json\ntrunk-immobilien.de: SPF=v=spf1 mx -all DMARC=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; DKIM-Selektoren=keiner bekannt MX=mx.publishsoft.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
-   "found": "Für trunk-immobilien.de fehlen Einträge, mit denen Empfangssysteme einen Absender prüfen können: trunk-immobilien.de.",
-   "id": "VS-2026-009",
-   "impact": "Ohne diese Einträge kann ein Empfangssystem nicht unterscheiden, ob eine Nachricht wirklich aus Ihrer Domain stammt. Gefälschte Absender im Namen des Unternehmens sind damit ohne besonderen Aufwand möglich.",
-   "level": "mittel",
-   "level_label": "mittel",
-   "policy": "dkim_missing",
-   "recommendation": [
-    [
-     "In Kürze",
-     "Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden."
-    ],
-    [
-     "Mittelfristig",
-     "Die Einträge nach jeder Änderung an den Versandwegen prüfen und die Signatur der ausgehenden Nachrichten überwachen."
-    ]
-   ],
-   "scale": "hygiene",
-   "source": "aktiv (dns_records)",
-   "status": "gelb",
-   "threat": null,
-   "title": "Grundlegende Einträge zur Absender-Authentizität fehlen für trunk-immobilien.de",
-   "urgency": "Mittelfristig",
-   "verify": "DNS-Abfrage für die genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
-  },
-  {
    "affected": "5.199.141.24:110 (POP3), 5.199.141.24:143 (IMAP), 5.199.141.24:21 (FTP)",
    "cat": "A",
    "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:110/tcp Dienst=pop3 Produkt=Dovecot pop3d Zustand=open STARTTLS=ja Capabilities=APOP, AUTH-RESP-CODE, USER, SASL(PLAIN\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\npop3-capabilities: APOP AUTH-RESP-CODE USER SASL(PLAIN LOGIN DIGEST-MD5 CRAM-MD5) STLS UIDL TOP RESP-CODES PIPELINING CAPA\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:143/tcp Dienst=imap Produkt=Dovecot imapd Zustand=open TLS erzwungen=nein STARTTLS=ja Anmeldung gesperrt=nein Verfahren=CRAM-MD5, DIGEST-MD5, LOGIN, PLAIN Capabilities=OK, listed, IDLE, AUTH=LOGIN\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\nimap-capabilities: OK listed IDLE AUTH=LOGIN capabilities ID post-login SASL-IR more have LITERAL+ AUTH=CRAM-MD5A0001 Pre-login IMAP4rev1 AUTH=PLAIN ENABLE AUTH=DIGEST-MD5 STARTTLS LOGIN-REFERRALS",
    "found": "Der Host 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 5.199.141.24:110 (POP3), 5.199.141.24:143 (IMAP), 5.199.141.24:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
-   "id": "VS-2026-010",
+   "id": "VS-2026-009",
    "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -813,7 +849,7 @@
    "cat": "C",
    "evidence": "dns_records · phase0/dns_records.json\ntrunk-immobilien.de: SPF=v=spf1 mx -all DMARC=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; DKIM-Selektoren=keiner bekannt MX=mx.publishsoft.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für trunk-immobilien.de fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: trunk-immobilien.de.",
-   "id": "VS-2026-011",
+   "id": "VS-2026-010",
    "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -837,7 +873,7 @@
    "cat": "D",
    "evidence": "header_check · scan_results:header_check:5.199.141.24\ndev.trunk-immobilien.de: URL=https://dev.trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx...\n\nheader_check · scan_results:header_check:5.199.141.24\nftp.trunk-immobilien.de: URL=https://ftp.trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:5.199.141.24\ntrunk-immobilien.de: URL=https://trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx\n\nheader_check · scan_results:header_check:5.199.141.24\nwebmail.trunk-immobilien.de: URL=https://webmail.trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection\n\nheader_check · scan_results:header_check:5.199.141.24\nwww.trunk-immobilien.de: URL=https://www.trunk-immobilien.de fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=nginx...",
    "found": "Die Webdienste auf 5.199.141.24 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: dev.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ftp.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), webmail.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), www.trunk-immobilien.de (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
-   "id": "VS-2026-012",
+   "id": "VS-2026-011",
    "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -865,7 +901,7 @@
    "cat": "E",
    "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:22/tcp Dienst=ssh Produkt=OpenSSH Version=7.4 Zustand=open\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n22/tcp open ssh OpenSSH 7.4 (protocol 2.0)\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24:3306/tcp Dienst=mysql Produkt=MySQL Version=5.5.68-MariaDB Zustand=open Verfahren=mysql_native_password\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\nmysql-info: Protocol: 10 Version: 5.5.68-MariaDB Thread ID: 9607553 Capabilities flags: 63487 Some Capabilities: LongColumnFlag, Support41Auth, Speaks41ProtocolOld, InteractiveClient, SupportsLoadDataLocal, FoundRows, SupportsTransaction...",
    "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 5.199.141.24:22 (OpenSSH 7.4), 5.199.141.24:3306 (MariaDB 5.5.68).",
-   "id": "VS-2026-013",
+   "id": "VS-2026-012",
    "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -893,7 +929,7 @@
    "cat": "E",
    "evidence": "dns_records · phase0/dns_records.json\ntrunk-immobilien.de: SPF=v=spf1 mx -all DMARC=v=DMARC1;p=none;pct=100;aspf=r;adkim=r; DKIM-Selektoren=keiner bekannt MX=mx.publishsoft.de DNSSEC=nicht signiert CAA=nicht vorhanden MTA-STS=nicht vorhanden TLS-RPT=nicht vorhanden",
    "found": "Für trunk-immobilien.de fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: trunk-immobilien.de.",
-   "id": "VS-2026-014",
+   "id": "VS-2026-013",
    "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
    "level": "niedrig",
    "level_label": "niedrig",
@@ -933,7 +969,7 @@
     "key": "C",
     "level": 2,
     "name": "E-Mail-Authentizität",
-    "note": "Richtlinie zur Absender-Authentizität für trunk-immobilien.de nicht durchsetzend; Grundlegende Einträge zur Absender-Authentizität fehlen für trunk-immobilien.de",
+    "note": "Richtlinie zur Absender-Authentizität für trunk-immobilien.de nicht durchsetzend; Transportverschlüsselung im Mailversand für trunk-immobilien.de nicht erzwungen",
     "status": "gelb"
    },
    {
@@ -986,19 +1022,19 @@
   "overall_status": "rot",
   "overall_text": "Ein Befund erfordert unverzügliches Handeln. Die übrigen Befunde betreffen die aus dem Internet erreichbaren Dienste, den Softwarestand der erkannten Systeme, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
  },
- "landscape_lead": "14 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "landscape_lead": "13 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
  "meta": {
-  "after_fp": 21,
-  "catalog_digest": "ae7b847f483b2fa9d3bb0f3aca60ba2e16ea54b3c1bf25d8b44eae78db925378",
-  "catalog_version": "2026-09-22.1",
+  "after_fp": 20,
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
   "classification": "Vertraulich",
-  "consolidated": 14,
+  "consolidated": 13,
   "customer": "Auftraggeber",
   "customer_short": "Auftraggeber",
   "domains": [
    "trunk-immobilien.de"
   ],
-  "facts_schema_version": "1.0.3",
+  "facts_schema_version": "1.0.4",
   "fqdns_total": 5,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,
@@ -1011,17 +1047,17 @@
   ],
   "package": "Perimeter",
   "package_label": "PERIMETERSCAN",
-  "policy_version": "2026-09-22.1",
-  "positives": 4,
+  "policy_version": "2026-09-23.2",
+  "positives": 3,
   "prose_rejected": [],
   "provider": "Vectigal GmbH",
   "provider_address": "Olpe 31-33 · 44135 Dortmund",
   "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
   "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
   "provider_responsible": "Daniel Czischke, Geschäftsführer",
-  "raw_findings": 25,
+  "raw_findings": 24,
   "report_date": "19.09.2026",
-  "report_id": "VS-2026-0511",
+  "report_id": "VS-2026-0511-45bb",
   "report_version": "1.0",
   "scan_date": "11.05.2026",
   "scan_window": "11.05.2026, 00:25 bis 00:35 Uhr (CEST)",
@@ -1064,18 +1100,17 @@
    "prio": "Mittelfristig",
    "refs": [
     "VS-2026-007",
-    "VS-2026-010",
-    "VS-2026-013"
+    "VS-2026-009",
+    "VS-2026-012"
    ],
    "st": "gelb"
   },
   {
-   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten. Die fehlenden Einträge im DNS anlegen und darin alle Versandquellen aufführen, die im Namen der Domain senden.",
+   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-008",
-    "VS-2026-009"
+    "VS-2026-008"
    ],
    "st": "gelb"
   },
@@ -1084,7 +1119,7 @@
    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
    "prio": "Mittelfristig",
    "refs": [
-    "VS-2026-012"
+    "VS-2026-011"
    ],
    "st": "blau"
   },
@@ -1093,8 +1128,8 @@
    "effect": "Schützt die Authentizität der eigenen E-Mail",
    "prio": "Strategisch",
    "refs": [
-    "VS-2026-011",
-    "VS-2026-014"
+    "VS-2026-010",
+    "VS-2026-013"
    ],
    "st": "blau"
   }
@@ -1102,13 +1137,8 @@
  "positives": [
   {
    "cat": "A",
-   "text": "Der Host 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) bietet seinen Webdienst über HTTPS an.",
+   "text": "Der Host 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de und weitere) bietet seinen Webdienst über HTTPS an.",
    "title": "Webdienst mit Transportverschlüsselung"
-  },
-  {
-   "cat": "A",
-   "text": "Auf den geprüften Hosts antwortet kein Dienst für Fernwartung oder für Dateifreigaben auf Verbindungen von außen.",
-   "title": "Keine Fernwartung und keine Dateifreigabe aus dem Internet erreichbar"
   },
   {
    "cat": "C",
@@ -1151,6 +1181,10 @@
    {
     "detail": "Betroffen: 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de und weitere).",
     "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
+    "detail": "Betroffen: trunk-immobilien.de.",
+    "what": "DKIM ohne Selektor aus einer echten E-Mail nicht prüfbar: unter 62 abgefragten gängigen Selektoren, darunter default, selector1, selector2, google, k1, s1, war kein Schlüssel veröffentlicht (vollständige Liste im Anhang bei den eingesetzten Werkzeugen). Ob die Domain signiert, zeigt der Kopf einer echten E-Mail (DKIM-Signature, Angabe s=)"
    },
    {
     "detail": "Betroffen: webmail.trunk-immobilien.de.",
@@ -1204,7 +1238,7 @@
    {
     "n": "3",
     "name": "Auswertung",
-    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 14 Befunde und 4 positive Feststellungen."
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 13 Befunde und 3 positive Feststellungen."
    }
   ],
   "numbers": [
@@ -1218,11 +1252,11 @@
    },
    {
     "l": "Einzelbeobachtungen",
-    "v": "25"
+    "v": "24"
    },
    {
     "l": "Befunde im Bericht",
-    "v": "14"
+    "v": "13"
    }
   ],
   "out_of_scope": [

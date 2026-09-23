@@ -166,6 +166,11 @@ class BundleSpec(Base):
 
     ``target: appendix`` haelt ein Buendel aus der Befundliste heraus und schreibt es in
     den Anhang "Werkzeugbefunde ohne Bewertung" (spec/06 Abschnitt 4, Stufe 2).
+
+    ``positive_conflicts`` (S6a, Issue #30): Befunde anderer Pruefungen, bei denen der
+    Positivbefund dieses Buendels fuer denselben Host entfaellt. Die Pruefung selbst
+    bleibt bestanden; nur die Aussage im Kundenreport wuerde neben dem anderen Befund
+    mehr behaupten, als sie prueft.
     """
 
     id: str = Field(pattern=r"^[a-z][a-z0-9_]{2,63}$")
@@ -177,12 +182,56 @@ class BundleSpec(Base):
     references: list[str] = Field(default_factory=list)
     frameworks: Frameworks = Field(default_factory=Frameworks)
     texts: Texts
+    positive_conflicts: list["PositiveConflict"] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _members_unique(self) -> "BundleSpec":
         if len(set(self.members)) != len(self.members):
             raise ValueError(f"{self.id}: doppelte Mitglieder")
         return self
+
+    def conflicts_label(self) -> str:
+        """Kurzform fuer die Buendeltabelle in decisions.md."""
+        if not self.positive_conflicts:
+            return "-"
+        return "; ".join(c.label() for c in self.positive_conflicts)
+
+
+class PositiveConflict(Base):
+    """Ein Befund, bei dem der Positivbefund eines Buendels je Host entfaellt.
+
+    Zwei Formen, genau eine je Eintrag:
+
+    * ``checks`` (optional mit ``ports``): eine dieser Pruefungen ist auf dem Host
+      fehlgeschlagen; mit ``ports`` zaehlt nur ein fehlgeschlagenes Mitglied auf einem
+      dieser Ports.
+    * ``noted_by``: eine Notiz-Pruefung (``kind: note``) nennt einen Dienst ``ip:port``,
+      und irgendeine Pruefung ist auf genau diesem Dienst fehlgeschlagen, etwa SSH
+      ausserhalb von Port 22 mit Bannerbefund.
+    """
+
+    checks: list[str] = Field(default_factory=list)
+    ports: list[int] = Field(default_factory=list)
+    noted_by: Optional[str] = None
+
+    @model_validator(mode="after")
+    def _one_form(self) -> "PositiveConflict":
+        if bool(self.checks) == bool(self.noted_by):
+            raise ValueError("positive_conflicts: genau eines von checks oder noted_by")
+        if self.ports and not self.checks:
+            raise ValueError("positive_conflicts: ports nur zusammen mit checks")
+        return self
+
+    def label(self) -> str:
+        if self.noted_by:
+            return f"{self.noted_by} mit Befund"
+        text = ", ".join(self.checks)
+        if self.ports:
+            text += " (Port " + ", ".join(str(p) for p in self.ports) + ")"
+        return text
+
+
+BundleSpec.model_rebuild()
 
 
 # ---------------------------------------------------------------- Ignorierliste
