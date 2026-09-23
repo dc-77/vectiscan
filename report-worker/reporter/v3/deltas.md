@@ -83,6 +83,16 @@ Alle 15 Soll-Befunde und alle 8 Soll-Positivbefunde sind abgedeckt.
     Zeitzonendatenbank im Image, bleibt es bei UTC, und der Bericht schreibt das an die
     Uhrzeit. `tzdata` steht deshalb in `requirements.txt`.
 
+14. **Berichtsnummer mit Auftragsanteil (S6a).** Der Prototyp nummeriert
+    `VS-JW-2026-0831` (Kuerzel, Jahr, Scantag). Ohne Kuerzel trugen zwei Kunden mit
+    demselben Scantag dieselbe Nummer (Huendgen und castenow, VS-2026-0917; in den
+    Golden-Daten 0831 dreimal, 0920 dreimal, 0722 zweimal). v3 nummeriert
+    `VS-<Jahr>-<MMTT>-<Order[:4]>`, fuer Junkerwerk Lauf 1 `VS-2026-0831-0bf1`. Das
+    Kuerzel steht nicht mehr darin, weil es im Admin-Review nachgetragen werden kann
+    und die Nummer ueber alle Versionen eines Auftrags gleich bleiben muss; die
+    Befund-IDs tragen es weiter. Die Nummer steht auf Deckblatt, Impressum, in der
+    Fusszeile jeder Seite und in `reports.report_number` (Migration 047).
+
 ## Bewusst nicht uebernommen
 
 - **Top-N-Auswahl je Paket.** Die alte Selection kappt auf 15 Befunde je Perimeter-

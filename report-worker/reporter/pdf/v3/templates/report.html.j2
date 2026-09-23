@@ -19,7 +19,7 @@
 *{box-sizing:border-box;}
 @page{size:A4;margin:22mm 18mm 20mm 18mm;
  @top-left{content:element(rhead);vertical-align:bottom;}
- @bottom-left{content:"VectiScan · {{ variant.assessment|css_string }} · {{ m.customer_short|css_string }} · {{ m.classification|css_string }}";font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
+ @bottom-left{content:"VectiScan · {{ variant.assessment|css_string }} · {{ m.customer_short|css_string }} · {{ m.report_id|css_string }} · {{ m.classification|css_string }}";font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
  @bottom-right{content:"Seite " counter(page) " von " counter(pages);font-family:Inter;font-weight:400;font-size:7.5pt;color:#94A3B8;vertical-align:top;padding-top:2.5mm;}
 }
 @page:first{margin:0;@top-left{content:none;}@bottom-left{content:none;}@bottom-right{content:none;}}

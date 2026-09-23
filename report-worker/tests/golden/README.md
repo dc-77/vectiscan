@@ -144,6 +144,11 @@ bleibt als Gegenprobe "gleiche Daten, anderes Paket" bestehen.
   spec/06 genannten fuenf Eintraege. Der Grund steht in der Datei unter
   `abweichungen`. Ebenfalls dort: der Defekt dieses Musters sitzt in der
   Versionsableitung, nicht im Befundtext.
+- `expected/junkerwerk.json` fuehrt die Berichtsnummer seit S6a im Produktformat
+  `VS-2026-0831-0bf1` statt der Prototyp-Nummer `VS-JW-2026-0831`; der Generator
+  leitet sie ab (`s6a_report_id`), Grund in `reporter/v3/deltas.md` Punkt 14. Alle
+  14 `report-data/*.json` und der HTML-Snapshot tragen die neue Nummer
+  (`meta.report_id`); vorher kollidierten 0831 dreimal, 0920 dreimal und 0722 zweimal.
 
 ## Golden-Facts (S1)
 

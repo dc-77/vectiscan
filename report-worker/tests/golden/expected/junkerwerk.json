@@ -1,6 +1,6 @@
 {
  "source": "report-prototype/build/report_data.py (Stand 17.09.2026)",
- "report_id": "VS-JW-2026-0831",
+ "report_id": "VS-2026-0831-0bf1",
  "customer": "Junkerwerk Linder GmbH & Co. KG",
  "domains": [
   "junkerwerk.de",
@@ -13,6 +13,7 @@
   "a6df9d9d-eccd-49d1-8dd3-b00a5e005108"
  ],
  "hinweis_family": "family und families stammen aus dem Vokabular von report-prototype/build/catalog_sim.py apply_rules; Namen ohne Vorbild dort sind im Generator markiert. affected der Positivbefunde ist null, weil die Quelle keines fuehrt.",
+ "hinweis_report_id": "Berichtsnummer im Format ab S6a (VS-<Jahr>-<MMTT>-<Order[:4]>); der Prototyp traegt noch VS-JW-2026-0831.",
  "hinweis_positive_ids": "Positivbefunde tragen in report_data.py keine ID. VS-2026-P01 bis P08 in Quellreihenfolge vergeben.",
  "findings": [
   {

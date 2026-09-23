@@ -103,6 +103,15 @@ def test_ids_sind_dreistellig_und_lueckenlos_formatiert():
     assert IDS.positive_id(None, 2026, 3) == "VS-2026-P03"
 
 
-def test_berichtsnummer_traegt_datum():
-    assert IDS.report_id("JW", 2026, "0831") == "VS-JW-2026-0831"
+def test_berichtsnummer_traegt_datum_und_auftrag():
+    # S6a: Scantag allein war nicht eindeutig (Huendgen und castenow trugen
+    # beide VS-2026-0917); die ersten vier Zeichen der Order-ID gehoeren dazu.
+    oid = "0bf16342-ed96-4b0e-a596-05aee3a62cb5"
+    assert IDS.report_id(oid, 2026, "0831") == "VS-2026-0831-0bf1"
+    assert IDS.report_id(oid.upper(), 2026, "0831") == "VS-2026-0831-0bf1"
+    assert IDS.report_id("62c1e866-1eae-451a-8b52-7bff591aad31", 2026, "0917")         != IDS.report_id("e6df3135-0000-4000-8000-000000000000", 2026, "0917")
+
+
+def test_berichtsnummer_ohne_order_id_bleibt_lesbar():
     assert IDS.report_id(None, 2026, "0831") == "VS-2026-0831"
+    assert IDS.report_id("", 2026, "0831") == "VS-2026-0831"

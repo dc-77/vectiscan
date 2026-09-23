@@ -114,6 +114,9 @@ def test_dashboard_liste_und_versionen_kommen_aus_v3(tmp_path, monkeypatch) -> N
         f"Katalog {m.daten.meta.catalog_version} / "
         f"Fakten {m.daten.meta.facts_schema_version}")
     assert kwargs["policy_id_distinct"]
+    # S6a: die Berichtsnummer vom Deckblatt geht in reports.report_number.
+    assert kwargs["report_number"] == m.daten.meta.report_id
+    assert kwargs["report_number"].startswith("VS-")
 
 
 def test_legacy_ruft_die_alte_kette_weiterhin(tmp_path, monkeypatch) -> None:

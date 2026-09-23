@@ -140,7 +140,7 @@ def build_report_data(
         scan_window=C.format_window(facts.scan.started_at, facts.scan.finished_at),
         report_date=report_date or C.today(),
         report_version=report_version,
-        report_id=IDS.report_id(kuerzel, year, month_day),
+        report_id=IDS.report_id(facts.scan.order_id or orders[0].get("id"), year, month_day),
         orders=[OrderRef(label=str(o.get("label", "Lauf")), id=str(o.get("id", ""))) for o in orders],
         hosts_total=counts.hosts_total,
         hosts_ipv4=counts.hosts_ipv4,
