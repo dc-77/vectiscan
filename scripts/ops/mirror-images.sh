@@ -86,6 +86,14 @@ while IFS='|' read -r SRC TARGET; do
     continue
   fi
   echo "${SRC}|${DEST}/${TARGET}|${DIGEST}" | tee -a "${OUT}"
+  # Spiegel sind oeffentlich (Entscheidung DC, 24.09.2026). Ein neues Paket ist auf
+  # ghcr.io zunaechst privat, und die API kann das nicht aendern: dann auf github.com
+  # umstellen (docs/report-erstellung/M6-DEPLOY-STATUS.md, Nachtrag S6a2).
+  if ! curl -fsS "https://ghcr.io/token?service=ghcr.io&scope=repository:dc-77/vectiscan/${NAME}:pull" \
+      >/dev/null 2>&1; then
+    echo "WARN: ${DEST}/${NAME} ist nicht anonym ziehbar (privat). Auf github.com auf Public stellen:"
+    echo "      https://github.com/users/dc-77/packages/container/vectiscan%2F${NAME}/settings"
+  fi
   if [ "${NAME}" = "minio" ]; then
     echo "Labels: $(docker image inspect --format '{{json .Config.Labels}}' "${SRC}")"
   fi
