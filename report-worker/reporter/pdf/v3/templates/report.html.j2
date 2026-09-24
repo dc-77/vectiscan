@@ -161,8 +161,8 @@ tr{break-inside:avoid;}
 /* ---- Appendix ---- */
 /* S6b-1 (spec/09 Teil 3): kein erzwungener Umbruch vor Anhang D bis F; der Block samt
    Impressum bricht nur um, wenn er auf der laufenden Seite keinen Platz mehr hat. */
-.lastpage{break-inside:avoid;margin-top:8mm;}
-.lastpage .impblock{margin-top:6mm;}
+.lastpage{margin-top:8mm;}
+.lastpage .impblock{margin-top:6mm;break-inside:avoid;}
 .impblock{border-top:0.6pt solid var(--line2);padding-top:3mm;}
 .imprint{display:flex;gap:8mm;font-size:8.6pt;margin-top:2mm;}
 .imprint>div{flex:1;} .imprint .h{font-weight:600;color:var(--navy);margin-bottom:1.5mm;}
