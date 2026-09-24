@@ -4004,7 +4004,7 @@
    }
   ]
  },
- "schema_version": "1.0.4",
+ "schema_version": "1.0.5",
  "services": [
   {
    "auth_mechanisms": [],
@@ -5117,7 +5117,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -5132,7 +5132,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -5143,9 +5143,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-05-26T12:27:20Z",
+   "observed_at": "2026-05-26T12:37:04Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -5154,7 +5154,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -5169,7 +5169,7 @@
     {
      "excerpt": "technologies: Jitsi",
      "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "jitsi",
@@ -5180,9 +5180,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-05-26T12:27:20Z",
+   "observed_at": "2026-05-26T12:37:04Z",
    "product": "Jitsi",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -5191,6 +5191,8 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "header_check",
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -5217,12 +5219,12 @@
     {
      "excerpt": "server: nginx",
      "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: nginx",
      "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "nginx",
@@ -5244,8 +5246,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": "debian",
    "edition": null,
@@ -5270,7 +5271,7 @@
     {
      "excerpt": "technologies: OpenSSH 10.0p2 Debian 7+deb13u4",
      "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "openssh",
@@ -5292,8 +5293,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -5313,7 +5313,7 @@
     {
      "excerpt": "technologies: Postfix smtpd",
      "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "postfix",
@@ -5335,8 +5335,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -5356,7 +5355,7 @@
     {
      "excerpt": "technologies: Proxmox Virtual Environment REST API 3.0",
      "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "proxmox_virtual_environment_rest_api",
@@ -5695,6 +5694,8 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "header_check",
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -5709,6 +5710,11 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: Apache HTTP Server",
+     "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "443/tcp open http Apache httpd tunnel=ssl",
      "ref": "hosts/85.13.167.158/phase1/nmap.xml",
      "tool": "nmap"
@@ -5719,17 +5725,12 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "technologies: Apache",
-     "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Apache HTTP Server",
-     "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
      "excerpt": "technologies: Apache httpd",
+     "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "technologies: Apache",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -5753,8 +5754,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -5779,12 +5779,12 @@
     {
      "excerpt": "technologies: Dovecot imapd",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Dovecot pop3d",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "dovecot",
@@ -5806,7 +5806,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -5821,7 +5821,7 @@
     {
      "excerpt": "technologies: HSTS",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "hsts",
@@ -5832,9 +5832,9 @@
    "kind": "component",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-05-26T12:28:06Z",
+   "observed_at": "2026-05-26T12:36:34Z",
    "product": "HSTS",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -5844,6 +5844,7 @@
    "confidence": 0.9,
    "detection_sources": [
     "cms_fingerprint",
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -5864,7 +5865,7 @@
     {
      "excerpt": "technologies: Joomla",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     },
     {
      "excerpt": "technologies: Joomla! - Open Source Content Management",
@@ -5891,8 +5892,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": "ubuntu",
    "edition": null,
@@ -5912,7 +5912,7 @@
     {
      "excerpt": "technologies: MySQL 5.5.5-10.11.14-MariaDB-0ubuntu0.24.04.1-log",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "mariadb",
@@ -5934,8 +5934,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -5955,7 +5954,7 @@
     {
      "excerpt": "technologies: Nagios NSCA",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "nagios_nsca",
@@ -5977,8 +5976,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": "ubuntu",
    "edition": null,
@@ -5998,7 +5996,7 @@
     {
      "excerpt": "technologies: OpenSSH 9.6p1 Ubuntu 3ubuntu13.16",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "openssh",
@@ -6020,7 +6018,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -6035,7 +6033,7 @@
     {
      "excerpt": "technologies: PHP",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "php",
@@ -6046,9 +6044,9 @@
    "kind": "language",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-05-26T12:28:06Z",
+   "observed_at": "2026-05-26T12:36:34Z",
    "product": "PHP",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -6057,8 +6055,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -6088,7 +6085,7 @@
     {
      "excerpt": "technologies: Postfix smtpd",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "postfix",
@@ -6110,8 +6107,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -6136,7 +6132,7 @@
     {
      "excerpt": "technologies: Samba smbd 4.6.2",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "samba_smbd",
@@ -6392,6 +6388,8 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "header_check",
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -6418,12 +6416,12 @@
     {
      "excerpt": "server: nginx",
      "ref": "hosts/87.79.190.79/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: nginx",
      "ref": "hosts/87.79.190.79/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "nginx",
@@ -6445,8 +6443,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": "debian",
    "edition": null,
@@ -6466,7 +6463,7 @@
     {
      "excerpt": "technologies: OpenSSH 10.0p2 Debian 7+deb13u4",
      "ref": "hosts/87.79.190.79/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "openssh",

@@ -803,7 +803,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -812,7 +812,7 @@
       "c": "Plesk",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -821,7 +821,7 @@
       "c": "ProFTPD",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -830,7 +830,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "8.3.32"
@@ -857,7 +857,7 @@
       "c": "Dovecot",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -866,7 +866,7 @@
       "c": "Postfix",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -875,7 +875,7 @@
       "c": "OpenSSH",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "9.6p1 (ubuntu)"
@@ -884,7 +884,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -898,7 +898,7 @@
       "c": "Blazor",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -907,7 +907,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -916,7 +916,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -925,7 +925,7 @@
       "c": "Bootstrap",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -934,7 +934,7 @@
       "c": "jQuery",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -948,7 +948,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -957,7 +957,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -968,10 +968,19 @@
     "host": "85.22.47.39 (85-22-47-39.ip.dokom21.de)",
     "rows": [
      {
+      "c": "jQuery UI",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "header_check, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "8.4.22"
@@ -980,7 +989,7 @@
       "c": "Bootstrap",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -989,7 +998,7 @@
       "c": "jQuery",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -998,7 +1007,7 @@
       "c": "Dovecot",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1007,7 +1016,7 @@
       "c": "Postfix",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1016,7 +1025,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "2.4.67"
@@ -1025,7 +1034,7 @@
       "c": "nginx",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "header_check, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "1.31.2"
@@ -1039,7 +1048,7 @@
       "c": "WordPress",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, webtech",
+      "src": "cms_fingerprint, httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "7.0.2"
@@ -1048,16 +1057,25 @@
       "c": "Swiper",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
      },
      {
+      "c": "jQuery Migrate",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "3.4.1"
+     },
+     {
       "c": "MySQL",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1066,7 +1084,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1075,16 +1093,16 @@
       "c": "jQuery",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
-      "v": "3.4.1"
+      "v": "unbekannt"
      },
      {
       "c": "Elementor",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "4.1.3"
@@ -1093,7 +1111,7 @@
       "c": "WP Rocket",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1102,7 +1120,7 @@
       "c": "Yoast SEO",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "28.0"
@@ -1111,7 +1129,7 @@
       "c": "OpenSSH",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "9.2p1 (debian)"
@@ -1120,7 +1138,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "Herstellerpflege endete am 2023-04-11",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "rot",
       "status": "veraltet",
       "v": "1.22.1"
@@ -1134,7 +1152,7 @@
       "c": "Microsoft HTTPAPI httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "2.0"
@@ -1233,7 +1251,7 @@
   {
    "affected": "85.22.47.41: nginx 1.22.1 (Support beendet 2023-04-11)",
    "cat": "B",
-   "evidence": "nmap · hosts/85.22.47.41/phase1/nmap.xml\n85.22.47.41: Produkt=nginx Familie=nginx Version=1.22.1 Pflegestatus=eol Pflegeende=2023-04-11 Quelle=endoflife_date\n\nnmap · hosts/85.22.47.41/phase1/nmap.xml\n443/tcp open http nginx 1.22.1 tunnel=ssl\n\nnmap · hosts/85.22.47.41/phase1/nmap.xml\n80/tcp open http nginx 1.22.1\n\nwebtech · hosts/85.22.47.41/phase1/tech_profile.json\nserver: nginx/1.22.1\n\nwebtech · hosts/85.22.47.41/phase1/tech_profile.json\ntechnologies: nginx 1.22.1\n\nheader_check · scan_results:header_check:85.22.47.41\n85.22.47.41: Produkt=nginx Familie=nginx Version=1.22.1 Pflegestatus=eol Pflegeende=2023-04-11 Quelle=endoflife_date\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
+   "evidence": "nmap · hosts/85.22.47.41/phase1/nmap.xml\n85.22.47.41: Produkt=nginx Familie=nginx Version=1.22.1 Pflegestatus=eol Pflegeende=2023-04-11 Quelle=endoflife_date\n\nnmap · hosts/85.22.47.41/phase1/nmap.xml\n443/tcp open http nginx 1.22.1 tunnel=ssl\n\nnmap · hosts/85.22.47.41/phase1/nmap.xml\n80/tcp open http nginx 1.22.1\n\nnmap · hosts/85.22.47.41/phase1/tech_profile.json\nserver: nginx/1.22.1\n\nnmap · hosts/85.22.47.41/phase1/tech_profile.json\ntechnologies: nginx 1.22.1\n\nheader_check · scan_results:header_check:85.22.47.41\n85.22.47.41: Produkt=nginx Familie=nginx Version=1.22.1 Pflegestatus=eol Pflegeende=2023-04-11 Quelle=endoflife_date\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Auf 85.22.47.41 (ftp.securess.de, securess.de, www.securess.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 85.22.47.41: nginx 1.22.1 (Support beendet 2023-04-11).",
    "id": "VS-2026-002",
    "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist.",
@@ -1251,7 +1269,7 @@
     ]
    ],
    "scale": "exposure",
-   "source": "aktiv (header_check, httpx, nmap, webtech)",
+   "source": "aktiv (header_check, httpx, nmap)",
    "status": "gelb",
    "threat": null,
    "title": "Serversoftware ohne Herstellerpflege",
@@ -1921,7 +1939,7 @@
   "domains": [
    "securess.de"
   ],
-  "facts_schema_version": "1.0.4",
+  "facts_schema_version": "1.0.5",
   "fqdns_total": 26,
   "hosts_ipv4": 12,
   "hosts_ipv6": 0,

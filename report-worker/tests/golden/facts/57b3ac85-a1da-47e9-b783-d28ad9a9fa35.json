@@ -2010,7 +2010,7 @@
    }
   ]
  },
- "schema_version": "1.0.4",
+ "schema_version": "1.0.5",
  "services": [
   {
    "auth_mechanisms": [],
@@ -2632,8 +2632,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2658,12 +2657,12 @@
     {
      "excerpt": "server: Apache httpd",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Apache httpd",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "apache",
@@ -2685,8 +2684,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2706,7 +2704,7 @@
     {
      "excerpt": "technologies: Courier pop3d",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "courier",
@@ -2728,8 +2726,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2749,7 +2746,7 @@
     {
      "excerpt": "technologies: Dovecot imapd",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "dovecot",
@@ -2771,8 +2768,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": "debian",
    "edition": null,
@@ -2792,7 +2788,7 @@
     {
      "excerpt": "technologies: MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "mariadb",
@@ -2814,8 +2810,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2835,7 +2830,7 @@
     {
      "excerpt": "technologies: OpenSSH 9.2p1",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "openssh",
@@ -2857,8 +2852,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2878,7 +2872,7 @@
     {
      "excerpt": "technologies: PostgreSQL DB 9.6.0 or later",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "postgresql",
@@ -2902,8 +2896,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2923,7 +2916,7 @@
     {
      "excerpt": "technologies: ProFTPD",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "proftpd",
@@ -2945,8 +2938,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2966,7 +2958,7 @@
     {
      "excerpt": "technologies: ProFTPD mod_sftp",
      "ref": "hosts/116.202.77.64/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "proftpd_sftp",

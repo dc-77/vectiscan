@@ -27,7 +27,7 @@ from reporter.facts.testssl_parse import (
     VULN_SEVERITIES as TESTSSL_VULN_SEVERITIES, TestsslResult, parse_testssl,
 )
 from reporter.facts.tool_coverage import WEB_PORTS, HostSignals, build_coverage, derive_blocked
-from reporter.facts.versions import Normalized, lookup_eol, normalize
+from reporter.facts.versions import Normalized, lookup_eol, normalize, split_name_version
 
 GENERATOR_NAME = "reporter.facts"
 GENERATOR_VERSION = "1.0.0"
@@ -639,6 +639,79 @@ def _add_software(ctx: _Ctx, ip: str, fqdn: Optional[str], product_raw: Optional
     return existing
 
 
+# Reihenfolge, in der der Scanner tech_profile.technologies[] fuellt (phase1.py:
+# nmap, webtech, CMS; tech_enricher.py: Header, zap_spider, httpx). Die Liste traegt
+# keine Herkunft, sie wird hier aus den Rohdaten desselben Hosts zurueckgewonnen.
+PROFILE_TECH_TOOLS = ("nmap", "webtech", "httpx", "header_check", "cms_fingerprint", "zap_spider")
+# Kein Werkzeug belegt den Eintrag: die Zeile stammt nachweislich nur aus der Profildatei.
+PROFILE_FALLBACK_TOOL = "tech_profile"
+
+
+def _tech_key(name: Any) -> str:
+    return split_name_version(str(name or ""))[0].strip().lower()
+
+
+def _profile_tech_sources(ctx: _Ctx, ip: str, h: Any) -> dict[str, set[str]]:
+    """Je Werkzeug die Namen, die es fuer diesen Host geliefert hat (spec/09 Q11:
+    als Quelle steht das Werkzeug, das die Zeile geliefert hat, nicht pauschal webtech)."""
+    src: dict[str, set[str]] = {t: set() for t in PROFILE_TECH_TOOLS}
+    nh = ctx.nmap_hosts.get(ip)
+    for p in (nh.ports if nh else []):
+        if p.product:
+            src["nmap"].add(_tech_key(p.product))
+    if isinstance(h.webtech, dict):
+        for t in h.webtech.get("tech") or []:
+            name = t.get("name") if isinstance(t, dict) else t
+            if name:
+                src["webtech"].add(_tech_key(name))
+    lines = [ln for lns in h.httpx_by_vhost_tar.values() for ln in lns] + list(h.httpx_lines) \
+        + list(h.httpx_rows.values())
+    for line in lines:
+        if not isinstance(line, dict):
+            continue
+        for t in line.get("tech") or []:
+            # tech_enricher trennt jedes "Name:Wert" am Doppelpunkt ("Neos Flow:neos"),
+            # _split_httpx_tech nur vor einer Ziffer; beide Lesarten sind derselbe Eintrag.
+            src["httpx"].add(_tech_key(_split_httpx_tech(str(t))[0]))
+            src["httpx"].add(_tech_key(str(t).partition(":")[0]))
+        if line.get("webserver"):
+            src["httpx"].add(_tech_key(line["webserver"]))
+    for res in _headers_by_vhost(ctx, ip).values():
+        if not isinstance(res, dict):
+            continue
+        hdrs = {str(k).lower(): str(v) for k, v in (res.get("headers") or {}).items()}
+        if hdrs.get("server"):
+            src["header_check"].add(_tech_key(hdrs["server"]))
+        for part in re.split(r"[,;]\s*|\n", hdrs.get("x-powered-by") or ""):
+            if part.strip():
+                src["header_check"].add(_tech_key(part))
+        if hdrs.get("x-aspnet-version"):
+            src["header_check"].add("asp.net")
+        if hdrs.get("x-owa-version") or hdrs.get("x-feserver"):
+            src["header_check"].add("microsoft exchange")
+    tp = h.tech_profile if isinstance(h.tech_profile, dict) else {}
+    details = tp.get("cms_details") if isinstance(tp.get("cms_details"), dict) else {}
+    raw = details.get("details", {}).get("raw") if isinstance(details.get("details"), dict) else None
+    cms_names = [tp.get("cms"), details.get("cms"), raw.get("name") if isinstance(raw, dict) else None]
+    cms_names += [v.get("cms") for v in (tp.get("vhost_results") or {}).values() if isinstance(v, dict)]
+    src["cms_fingerprint"].update(_tech_key(n) for n in cms_names if n)
+    if any(_OWA_BUILD_RE.search(str(u)) for u in h.zap_spider_urls or []):
+        src["zap_spider"].add("microsoft exchange")
+    return src
+
+
+def _profile_tools(sources: dict[str, set[str]], name: Any) -> list[str]:
+    key = _tech_key(name)
+    tools = [t for t in PROFILE_TECH_TOOLS if key and key in sources[t]]
+    return tools or [PROFILE_FALLBACK_TOOL]
+
+
+def _add_profile_software(ctx: _Ctx, ip: str, sources: dict[str, set[str]], name: Any, version: Any,
+                          ref: str, evidence_text: str) -> None:
+    for tool in _profile_tools(sources, name):
+        _add_software(ctx, ip, None, name, version, tool, ref, evidence_text, S.CONFIDENCE_DERIVED)
+
+
 def _software_from_profiles(ctx: _Ctx, ips: list[str]) -> None:
     b = ctx.b
     for ip in ips:
@@ -648,6 +721,7 @@ def _software_from_profiles(ctx: _Ctx, ips: list[str]) -> None:
         tp = h.tech_profile
         ref = h.refs.get("tech_profile.json", "")
         if isinstance(tp, dict):
+            sources = _profile_tech_sources(ctx, ip, h)
             details = tp.get("cms_details") if isinstance(tp.get("cms_details"), dict) else {}
             raw = details.get("details", {}).get("raw") if isinstance(details.get("details"), dict) else None
             if isinstance(raw, dict) and raw.get("name"):
@@ -660,11 +734,11 @@ def _software_from_profiles(ctx: _Ctx, ips: list[str]) -> None:
                               float(details.get("confidence") or S.CONFIDENCE_DERIVED))
             for t in tp.get("technologies") or []:
                 if isinstance(t, dict) and t.get("name"):
-                    _add_software(ctx, ip, None, t.get("name"), t.get("version"), "webtech", ref,
-                                  f"technologies: {t.get('name')} {t.get('version') or ''}", S.CONFIDENCE_DERIVED)
+                    _add_profile_software(ctx, ip, sources, t.get("name"), t.get("version"), ref,
+                                          f"technologies: {t.get('name')} {t.get('version') or ''}")
             server = tp.get("server")
             if isinstance(server, str) and server:
-                _add_software(ctx, ip, None, server, None, "webtech", ref, f"server: {server}", S.CONFIDENCE_DERIVED)
+                _add_profile_software(ctx, ip, sources, server, None, ref, f"server: {server}")
             for fq, rd in (tp.get("redirect_data") or {}).items():
                 if not isinstance(rd, dict):
                     continue

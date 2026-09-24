@@ -23,6 +23,11 @@ Historie:
   ``scanner_stand``: die feste Liste des Scanners ab ae5fa74, nur wenn der Tar
   diesen Stand belegt). Ohne gefundenen Selektor ist DKIM nicht pruefbar, und
   der Bericht nennt, wonach gesucht wurde.
+- 1.0.5 (S6a2, spec/09 Q11): ``SoftwareFact.detection_sources`` nennt das Werkzeug,
+  das den Eintrag geliefert hat; Eintraege aus ``tech_profile.technologies`` hiessen
+  bisher pauschal ``webtech``, auch wenn webtech nichts lieferte. Die Familie wird
+  nie ueber Namensgrenzen vergeben (``jQuery Migrate`` ist ``jquery_migrate``, nicht
+  ``jquery``). Kein Feld geaendert, Bedeutung praeziser; Golden-Facts neu gebaut.
 """
 from __future__ import annotations
 
@@ -30,7 +35,7 @@ from typing import Any, ClassVar, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-FACTS_SCHEMA_VERSION = "1.0.4"
+FACTS_SCHEMA_VERSION = "1.0.5"
 
 Mode = Literal["active", "passive"]
 

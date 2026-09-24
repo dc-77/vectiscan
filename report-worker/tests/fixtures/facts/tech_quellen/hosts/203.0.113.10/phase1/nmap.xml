@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -Pn -n -sV -sC --top-ports 1000 --open -oX out.xml 203.0.113.10" start="1788185718" version="7.93" xmloutputversion="1.05">
+<host starttime="1788185718" endtime="1788185800"><status state="up" reason="user-set"/>
+<address addr="203.0.113.10" addrtype="ipv4"/>
+<ports><extraports state="filtered" count="990"><extrareasons reason="no-responses" count="990"/></extraports>
+<extraports state="closed" count="3"/>
+<port protocol="tcp" portid="21"><state state="open" reason="syn-ack"/><service name="ftp" product="ProFTPD" extrainfo="requires SSL" method="probed" conf="10"/><script id="ssl-cert" output="Subject: commonName=*.example.test/organizationName=Example&#xa;Subject Alternative Name: DNS:*.example.test, DNS:example.test&#xa;Not valid before: 2025-10-10T00:00:00&#xa;Not valid after:  2026-11-02T23:59:59"/></port>
+<port protocol="tcp" portid="80"><state state="open" reason="syn-ack"/><service name="http" product="nginx" version="1.24.0" extrainfo="Ubuntu" method="probed" conf="10"/></port>
+<port protocol="tcp" portid="110"><state state="open" reason="syn-ack"/><service name="pop3" product="Courier pop3d" method="probed" conf="10"/><script id="pop3-capabilities" output="STLS SASL PIPELINING AUTH-RESP-CODE CAPA UIDL RESP-CODES TOP"/></port>
+<port protocol="tcp" portid="143"><state state="open" reason="syn-ack"/><service name="imap" product="Dovecot imapd" method="probed" conf="10"/><script id="imap-capabilities" output="OK LOGIN-REFERRALS more have post-login LITERAL+ IMAP4rev1 listed capabilities STARTTLS Pre-login LOGINDISABLEDA0001 ENABLE ID SASL-IR IDLE"/></port>
+<port protocol="tcp" portid="443"><state state="open" reason="syn-ack"/><service name="http" product="Apache httpd" tunnel="ssl" method="probed" conf="10"/></port>
+<port protocol="tcp" portid="465"><state state="open" reason="syn-ack"/><service name="smtp" servicefp="SF-Port465-TCP:V=7.93%T=SSL%I=7" method="table" conf="3"/><script id="smtp-commands" output="mail.example.test Hello nmap.scanme.org [198.51.100.7], SIZE 104857600, 8BITMIME, PIPELINING, AUTH LOGIN PLAIN, CHUNKING, HELP&#xa; Commands supported: AUTH HELO EHLO MAIL RCPT DATA NOOP QUIT RSET HELP"/></port>
+<port protocol="tcp" portid="587"><state state="open" reason="syn-ack"/><service name="smtp" product="Exim smtpd" version="4.96" method="probed" conf="10"/><script id="smtp-commands" output="mail.example.test Hello nmap.scanme.org [198.51.100.7], SIZE 104857600, 8BITMIME, PIPELINING, CHUNKING, STARTTLS, HELP&#xa; Commands supported: AUTH STARTTLS HELO EHLO MAIL RCPT DATA NOOP QUIT RSET HELP"/></port>
+<port protocol="tcp" portid="993"><state state="open" reason="syn-ack"/><service name="imaps" method="table" conf="3"/><script id="imap-capabilities" output="OK LOGIN-REFERRALS more have LITERAL+ IMAP4rev1 post-login listed capabilities Pre-login AUTH=PLAINA0001 ENABLE ID SASL-IR IDLE"/></port>
+<port protocol="tcp" portid="3306"><state state="open" reason="syn-ack"/><service name="mysql" product="MySQL" version="5.5.5-10.11.18-MariaDB-0+deb12u1" method="probed" conf="10"/><script id="mysql-info" output="&#xa;  Protocol: 10&#xa;  Version: 5.5.5-10.11.18-MariaDB-0+deb12u1&#xa;  Auth Plugin Name: mysql_native_password"/></port>
+<port protocol="tcp" portid="5432"><state state="open" reason="syn-ack"/><service name="postgresql" product="PostgreSQL DB" version="9.6.0 or later" method="probed" conf="10"/></port>
+<port protocol="tcp" portid="8443"><state state="open" reason="syn-ack"/><service name="http" product="Microsoft IIS httpd" version="10.0" tunnel="ssl" method="probed" conf="10"/><script id="http-methods" output="&#xa;  Supported Methods: OPTIONS TRACE GET HEAD POST&#xa;  Potentially risky methods: TRACE"/></port>
+</ports>
+</host>
+<runstats><finished time="1788185800" timestr="Mon Aug 31 14:16:40 2026" summary="Nmap done at Mon Aug 31 14:16:40 2026; 1 IP address (1 host up) scanned in 82.00 seconds" elapsed="82.00" exit="success"/><hosts up="1" down="0" total="1"/>
+</runstats>
+</nmaprun>

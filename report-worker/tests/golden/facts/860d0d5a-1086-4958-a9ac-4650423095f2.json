@@ -6051,7 +6051,7 @@
    }
   ]
  },
- "schema_version": "1.0.4",
+ "schema_version": "1.0.5",
  "services": [
   {
    "auth_mechanisms": [],
@@ -6807,8 +6807,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -6833,12 +6832,12 @@
     {
      "excerpt": "server: Apache httpd",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Apache httpd",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "apache",
@@ -6860,8 +6859,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -6881,7 +6879,7 @@
     {
      "excerpt": "technologies: Courier pop3d",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "courier",
@@ -6903,8 +6901,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -6924,7 +6921,7 @@
     {
      "excerpt": "technologies: Dovecot imapd",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "dovecot",
@@ -6946,8 +6943,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": "debian",
    "edition": null,
@@ -6967,7 +6963,7 @@
     {
      "excerpt": "technologies: MySQL 5.5.5-10.11.18-MariaDB-0+deb12u1",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "mariadb",
@@ -6989,8 +6985,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -7010,7 +7005,7 @@
     {
      "excerpt": "technologies: OpenSSH 9.2p1",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "openssh",
@@ -7032,8 +7027,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -7053,7 +7047,7 @@
     {
      "excerpt": "technologies: PostgreSQL DB 9.6.0 or later",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "postgresql",
@@ -7077,8 +7071,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -7098,7 +7091,7 @@
     {
      "excerpt": "technologies: ProFTPD",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "proftpd",
@@ -7120,8 +7113,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -7141,7 +7133,7 @@
     {
      "excerpt": "technologies: ProFTPD mod_sftp",
      "ref": "hosts/188.40.3.130/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "proftpd_sftp",
@@ -7163,6 +7155,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -7176,12 +7169,12 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: ASP.NET",
+     "excerpt": "technologies: Microsoft ASP.NET 4.0.30319",
      "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     },
     {
-     "excerpt": "technologies: Microsoft ASP.NET 4.0.30319",
+     "excerpt": "technologies: ASP.NET",
      "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -7194,9 +7187,9 @@
    "kind": "language",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-20T10:49:21Z",
+   "observed_at": "2026-09-20T11:05:18Z",
    "product": "ASP.NET",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": "4.0.30319",
    "version_raw": "4.0.30319",
    "vulnerabilities_count": null
@@ -7205,8 +7198,10 @@
    "build": "15.2.2562",
    "confidence": 0.8,
    "detection_sources": [
+    "cms_fingerprint",
+    "header_check",
+    "httpx",
     "redirect_probe",
-    "webtech",
     "zap_spider"
    ],
    "distro": null,
@@ -7220,6 +7215,16 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: Microsoft Exchange EXCHANGE-SE",
+     "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
+     "tool": "header_check"
+    },
+    {
+     "excerpt": "technologies: Outlook Web App 15.2.2562",
+     "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "redirect_chain: https://autodiscover.junkerwerk.de/owa/auth/15.2.2562/themes/resources/segoeui-regular.ttf",
      "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
      "tool": "redirect_probe"
@@ -7228,16 +7233,6 @@
      "excerpt": "redirect_chain: https://outlook.junkerwerk.de/owa/auth/15.2.2562/themes/resources/segoeui-regular.ttf",
      "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
      "tool": "redirect_probe"
-    },
-    {
-     "excerpt": "technologies: Microsoft Exchange EXCHANGE-SE",
-     "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
-     "excerpt": "technologies: Outlook Web App 15.2.2562",
-     "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
-     "tool": "webtech"
     },
     {
      "excerpt": "spider url: https://autodiscover.junkerwerk.de/owa/auth/15.2.2562/themes/resources/favicon.ico",
@@ -7257,9 +7252,9 @@
    "kind": "mail",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-20T10:49:21Z",
+   "observed_at": "2026-09-20T11:05:17Z",
    "product": "Microsoft Exchange",
-   "source": "webtech",
+   "source": "header_check",
    "version_norm": "SE",
    "version_raw": "15.2.2562",
    "vulnerabilities_count": null
@@ -7268,6 +7263,8 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
+    "header_check",
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -7283,7 +7280,7 @@
     {
      "excerpt": "technologies: IIS 10.0",
      "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     },
     {
      "excerpt": "technologies: Microsoft-IIS 10.0",
@@ -7310,7 +7307,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -7325,7 +7322,7 @@
     {
      "excerpt": "technologies: Windows Server",
      "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "windows_server",
@@ -7336,9 +7333,9 @@
    "kind": "os",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-20T10:49:21Z",
+   "observed_at": "2026-09-20T11:05:18Z",
    "product": "Windows Server",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -7661,6 +7658,8 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
+    "header_check",
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -7674,12 +7673,12 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: ASP.NET",
+     "excerpt": "technologies: Microsoft ASP.NET",
      "ref": "hosts/217.243.248.29/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     },
     {
-     "excerpt": "technologies: Microsoft ASP.NET",
+     "excerpt": "technologies: ASP.NET",
      "ref": "hosts/217.243.248.29/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -7703,6 +7702,8 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "header_check",
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -7717,6 +7718,11 @@
    },
    "evidence": [
     {
+     "excerpt": "technologies: IIS 10.0",
+     "ref": "hosts/217.243.248.29/phase1/tech_profile.json",
+     "tool": "httpx"
+    },
+    {
      "excerpt": "443/tcp open http Microsoft IIS httpd 10.0 tunnel=ssl",
      "ref": "hosts/217.243.248.29/phase1/nmap.xml",
      "tool": "nmap"
@@ -7727,14 +7733,9 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "technologies: IIS 10.0",
-     "ref": "hosts/217.243.248.29/phase1/tech_profile.json",
-     "tool": "webtech"
-    },
-    {
      "excerpt": "technologies: Microsoft IIS httpd 10.0",
      "ref": "hosts/217.243.248.29/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: Microsoft-IIS 10.0",
@@ -7761,7 +7762,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "webtech"
+    "httpx"
    ],
    "distro": null,
    "edition": null,
@@ -7776,7 +7777,7 @@
     {
      "excerpt": "technologies: Windows Server",
      "ref": "hosts/217.243.248.29/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "httpx"
     }
    ],
    "family": "windows_server",
@@ -7787,9 +7788,9 @@
    "kind": "os",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-20T10:49:19Z",
+   "observed_at": "2026-09-20T11:08:11Z",
    "product": "Windows Server",
-   "source": "webtech",
+   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null

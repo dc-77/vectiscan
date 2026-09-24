@@ -412,7 +412,7 @@
       "c": "WordPress",
       "conf": "mittel",
       "note": "Herstellerpflege endete am 2024-04-02",
-      "src": "cms_fingerprint, webtech",
+      "src": "cms_fingerprint, httpx, webtech",
       "st": "rot",
       "status": "veraltet",
       "v": "6.4.2"
@@ -427,10 +427,19 @@
       "v": "unbekannt"
      },
      {
+      "c": "jQuery Migrate",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "3.4.1"
+     },
+     {
       "c": "Plesk",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -439,7 +448,7 @@
       "c": "MariaDB",
       "conf": "hoch",
       "note": "Herstellerpflege endete am 2020-04-11",
-      "src": "nmap, webtech",
+      "src": "httpx, nmap",
       "st": "rot",
       "status": "veraltet",
       "v": "5.5.68"
@@ -457,7 +466,7 @@
       "c": "ProFTPD",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -466,7 +475,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "8.2.30"
@@ -487,13 +496,13 @@
       "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
-      "v": "3.4.1"
+      "v": "unbekannt"
      },
      {
       "c": "Dovecot",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -502,7 +511,7 @@
       "c": "Postfix",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -529,7 +538,7 @@
       "c": "OpenSSH",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "7.4"
@@ -556,7 +565,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -675,7 +684,7 @@
   {
    "affected": "5.199.141.24: MariaDB 5.5.68 (Support beendet 2020-04-11)",
    "cat": "B",
-   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24: Produkt=MariaDB Familie=mariadb Version=5.5.68 Pflegestatus=eol Pflegeende=2020-04-11 Quelle=endoflife_date\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.68-MariaDB\n\nwebtech · hosts/5.199.141.24/phase1/tech_profile.json\ntechnologies: MySQL 5.5.68-MariaDB",
+   "evidence": "nmap · hosts/5.199.141.24/phase1/nmap.xml\n5.199.141.24: Produkt=MariaDB Familie=mariadb Version=5.5.68 Pflegestatus=eol Pflegeende=2020-04-11 Quelle=endoflife_date\n\nnmap · hosts/5.199.141.24/phase1/nmap.xml\n3306/tcp open mysql MySQL 5.5.68-MariaDB\n\nnmap · hosts/5.199.141.24/phase1/tech_profile.json\ntechnologies: MySQL 5.5.68-MariaDB",
    "found": "Auf 5.199.141.24 (dev.trunk-immobilien.de, ftp.trunk-immobilien.de, trunk-immobilien.de, webmail.trunk-immobilien.de, www.trunk-immobilien.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 5.199.141.24: MariaDB 5.5.68 (Support beendet 2020-04-11).",
    "id": "VS-2026-004",
    "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist.",
@@ -693,7 +702,7 @@
     ]
    ],
    "scale": "exposure",
-   "source": "aktiv (nmap, webtech)",
+   "source": "aktiv (nmap)",
    "status": "gelb",
    "threat": null,
    "title": "Serversoftware ohne Herstellerpflege",
@@ -1034,7 +1043,7 @@
   "domains": [
    "trunk-immobilien.de"
   ],
-  "facts_schema_version": "1.0.4",
+  "facts_schema_version": "1.0.5",
   "fqdns_total": 5,
   "hosts_ipv4": 1,
   "hosts_ipv6": 0,

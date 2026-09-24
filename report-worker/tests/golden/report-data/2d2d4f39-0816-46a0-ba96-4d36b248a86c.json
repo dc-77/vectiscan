@@ -836,7 +836,7 @@
       "c": "Drupal",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, webtech",
+      "src": "cms_fingerprint, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "11"
@@ -845,7 +845,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -854,7 +854,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -863,7 +863,7 @@
       "c": "jQuery",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -872,7 +872,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -886,7 +886,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -895,7 +895,7 @@
       "c": "Web Server",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -904,7 +904,7 @@
       "c": "jQuery",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -918,7 +918,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "4.0.30319"
@@ -927,7 +927,7 @@
       "c": "Microsoft Exchange",
       "conf": "mittel",
       "note": "Herstellerpflege endete am 2025-10-14",
-      "src": "redirect_probe, webtech, zap_spider",
+      "src": "header_check, httpx, redirect_probe, zap_spider",
       "st": "rot",
       "status": "veraltet",
       "v": "2016 (Build 15.1.2507)"
@@ -936,7 +936,7 @@
       "c": "Postfix",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -945,7 +945,7 @@
       "c": "Windows Server",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -954,7 +954,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -968,7 +968,7 @@
       "c": "Nextcloud",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "cms_fingerprint, httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -977,7 +977,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -986,7 +986,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -995,7 +995,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1009,7 +1009,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1018,7 +1018,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1032,7 +1032,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "header_check, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1041,7 +1041,7 @@
       "c": "Windows Server",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1050,7 +1050,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -1064,7 +1064,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1073,7 +1073,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1087,7 +1087,7 @@
       "c": "Drupal",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, webtech",
+      "src": "cms_fingerprint, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "11"
@@ -1096,7 +1096,7 @@
       "c": "Amazon CloudFront httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1105,7 +1105,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1114,7 +1114,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1123,7 +1123,7 @@
       "c": "jQuery",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1132,7 +1132,7 @@
       "c": "Apache httpd",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "header_check, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1155,7 +1155,7 @@
       "c": "Icecast",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "2.4.4"
@@ -1164,7 +1164,7 @@
       "c": "WordPress",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, webtech",
+      "src": "cms_fingerprint, httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "7.0.2"
@@ -1173,7 +1173,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1182,7 +1182,7 @@
       "c": "HTTP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "3"
@@ -1191,16 +1191,25 @@
       "c": "Underscore.js",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "1.13.8"
      },
      {
+      "c": "jQuery Migrate",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "3.4.1"
+     },
+     {
       "c": "Plesk",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1209,7 +1218,7 @@
       "c": "MySQL",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1218,7 +1227,7 @@
       "c": "ProFTPD",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1227,7 +1236,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "8.4.23"
@@ -1236,16 +1245,16 @@
       "c": "jQuery",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
-      "v": "3.4.1"
+      "v": "unbekannt"
      },
      {
       "c": "Dovecot",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1254,7 +1263,7 @@
       "c": "Postfix",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1272,7 +1281,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1395,7 +1404,7 @@
   {
    "affected": "195.50.179.4: Microsoft Exchange 2016 (Support beendet 2025-10-14)",
    "cat": "B",
-   "evidence": "redirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\n195.50.179.4: Produkt=Microsoft Exchange Familie=exchange Version=2016 Build=15.1.2507 Pflegestatus=eol Pflegeende=2025-10-14 Quelle=manual\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://autodiscover.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://owa.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nwebtech · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Microsoft Exchange EXCHANGE01\n\nwebtech · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Outlook Web App 15.1.2507\n\nzap_spider · hosts/195.50.179.4/phase2/zap_spider_urls.json\nspider url: https://autodiscover.castenow.de/owa/auth/15.1.2507/themes/resources/favicon.ico\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
+   "evidence": "header_check · hosts/195.50.179.4/phase1/tech_profile.json\n195.50.179.4: Produkt=Microsoft Exchange Familie=exchange Version=2016 Build=15.1.2507 Pflegestatus=eol Pflegeende=2025-10-14 Quelle=manual\n\nheader_check · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Microsoft Exchange EXCHANGE01\n\nhttpx · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Outlook Web App 15.1.2507\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://autodiscover.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://owa.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nzap_spider · hosts/195.50.179.4/phase2/zap_spider_urls.json\nspider url: https://autodiscover.castenow.de/owa/auth/15.1.2507/themes/resources/favicon.ico\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Auf 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de, owa.castenow.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 195.50.179.4: Microsoft Exchange 2016 (Support beendet 2025-10-14).",
    "id": "VS-2026-003",
    "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist.",
@@ -1413,7 +1422,7 @@
     ]
    ],
    "scale": "exposure",
-   "source": "aktiv (httpx, redirect_probe, webtech, zap_spider)",
+   "source": "aktiv (header_check, httpx, redirect_probe, zap_spider)",
    "status": "gelb",
    "threat": null,
    "title": "Serversoftware ohne Herstellerpflege",
@@ -2257,7 +2266,7 @@
   "domains": [
    "castenow.de"
   ],
-  "facts_schema_version": "1.0.4",
+  "facts_schema_version": "1.0.5",
   "fqdns_total": 15,
   "hosts_ipv4": 10,
   "hosts_ipv6": 0,

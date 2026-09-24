@@ -722,7 +722,7 @@
       "c": "Cloudflare",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "header_check, httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -731,7 +731,7 @@
       "c": "Cloudflare Bot Management",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -749,7 +749,7 @@
       "c": "Cloudflare http proxy",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -763,7 +763,7 @@
       "c": "FortiSSH",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -781,7 +781,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "header_check, httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -813,7 +813,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -822,7 +822,7 @@
       "c": "NEOS",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, webtech",
+      "src": "cms_fingerprint",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -831,7 +831,7 @@
       "c": "Neos CMS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -840,7 +840,7 @@
       "c": "Neos Flow",
       "conf": "mittel",
       "note": "Version von außen nicht genau bestimmbar",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -858,7 +858,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -867,7 +867,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1271,7 +1271,7 @@
   "domains": [
    "heuel.com"
   ],
-  "facts_schema_version": "1.0.4",
+  "facts_schema_version": "1.0.5",
   "fqdns_total": 12,
   "hosts_ipv4": 5,
   "hosts_ipv6": 1,

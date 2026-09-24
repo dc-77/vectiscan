@@ -325,7 +325,7 @@
       "c": "Golang net/http server",
       "conf": "hoch",
       "note": "",
-      "src": "nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -334,7 +334,7 @@
       "c": "HSTS",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -343,7 +343,7 @@
       "c": "Nuxt.js",
       "conf": "mittel",
       "note": "",
-      "src": "webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -728,7 +728,7 @@
    "vectigal.tech",
    "vectiscan.de"
   ],
-  "facts_schema_version": "1.0.4",
+  "facts_schema_version": "1.0.5",
   "fqdns_total": 31,
   "hosts_ipv4": 2,
   "hosts_ipv6": 0,

@@ -2216,7 +2216,7 @@
    }
   ]
  },
- "schema_version": "1.0.4",
+ "schema_version": "1.0.5",
  "services": [
   {
    "auth_mechanisms": [],
@@ -2872,8 +2872,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2908,7 +2907,7 @@
     {
      "excerpt": "technologies: Dovecot pop3d",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "dovecot",
@@ -2930,8 +2929,8 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "httpx",
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -2951,7 +2950,7 @@
     {
      "excerpt": "technologies: MySQL 5.5.68-MariaDB",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "mariadb",
@@ -2973,6 +2972,8 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "header_check",
+    "httpx",
     "nmap",
     "webtech"
    ],
@@ -2999,12 +3000,12 @@
     {
      "excerpt": "server: nginx",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
      "excerpt": "technologies: nginx",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "nginx",
@@ -3026,8 +3027,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -3047,7 +3047,7 @@
     {
      "excerpt": "technologies: OpenSSH 7.4",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "openssh",
@@ -3069,6 +3069,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -3106,6 +3107,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
+    "header_check",
     "nmap",
     "webtech"
    ],
@@ -3125,12 +3127,12 @@
      "tool": "nmap"
     },
     {
-     "excerpt": "technologies: PleskLin",
+     "excerpt": "technologies: sw-cp-server",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     },
     {
-     "excerpt": "technologies: sw-cp-server",
+     "excerpt": "technologies: PleskLin",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
      "tool": "webtech"
     }
@@ -3154,8 +3156,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -3185,7 +3186,7 @@
     {
      "excerpt": "technologies: Postfix smtpd",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "postfix",
@@ -3207,8 +3208,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -3228,7 +3228,7 @@
     {
      "excerpt": "technologies: ProFTPD",
      "ref": "hosts/5.199.141.24/phase1/tech_profile.json",
-     "tool": "webtech"
+     "tool": "nmap"
     }
    ],
    "family": "proftpd",
@@ -3251,6 +3251,7 @@
    "confidence": 0.8,
    "detection_sources": [
     "cms_fingerprint",
+    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -3383,23 +3384,55 @@
      "excerpt": "tech: jQuery",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
-    },
-    {
-     "excerpt": "tech: jQuery Migrate:3.4.1",
-     "ref": "hosts/5.199.141.24/phase2/httpx.json",
-     "tool": "httpx"
     }
    ],
    "family": "jquery",
    "fqdn": "dev.trunk-immobilien.de",
    "hints": [],
    "host_ip": "5.199.141.24",
-   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:jquery:3.4.1",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:jquery:unknown",
    "kind": "library",
    "mode": "active",
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": "dev.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:dev.trunk-immobilien.de:jquery_migrate:3.4.1",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "jQuery Migrate",
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
@@ -3775,23 +3808,55 @@
      "excerpt": "tech: jQuery",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
-    },
-    {
-     "excerpt": "tech: jQuery Migrate:3.4.1",
-     "ref": "hosts/5.199.141.24/phase2/httpx.json",
-     "tool": "httpx"
     }
    ],
    "family": "jquery",
    "fqdn": "trunk-immobilien.de",
    "hints": [],
    "host_ip": "5.199.141.24",
-   "id": "sw:5.199.141.24:trunk-immobilien.de:jquery:3.4.1",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:jquery:unknown",
    "kind": "library",
    "mode": "active",
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": "trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:trunk-immobilien.de:jquery_migrate:3.4.1",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "jQuery Migrate",
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
@@ -4124,23 +4189,55 @@
      "excerpt": "tech: jQuery",
      "ref": "hosts/5.199.141.24/phase2/httpx.json",
      "tool": "httpx"
-    },
-    {
-     "excerpt": "tech: jQuery Migrate:3.4.1",
-     "ref": "hosts/5.199.141.24/phase2/httpx.json",
-     "tool": "httpx"
     }
    ],
    "family": "jquery",
    "fqdn": "www.trunk-immobilien.de",
    "hints": [],
    "host_ip": "5.199.141.24",
-   "id": "sw:5.199.141.24:www.trunk-immobilien.de:jquery:3.4.1",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:jquery:unknown",
    "kind": "library",
    "mode": "active",
    "note": null,
    "observed_at": "2026-05-10T22:35:20Z",
    "product": "jQuery",
+   "source": "httpx",
+   "version_norm": null,
+   "version_raw": null,
+   "vulnerabilities_count": null
+  },
+  {
+   "build": null,
+   "confidence": 0.8,
+   "detection_sources": [
+    "httpx"
+   ],
+   "distro": null,
+   "edition": null,
+   "eol": {
+    "date": null,
+    "latest_patch": null,
+    "source": null,
+    "status": "unknown",
+    "upstream_eol_date": null
+   },
+   "evidence": [
+    {
+     "excerpt": "tech: jQuery Migrate:3.4.1",
+     "ref": "hosts/5.199.141.24/phase2/httpx.json",
+     "tool": "httpx"
+    }
+   ],
+   "family": "jquery_migrate",
+   "fqdn": "www.trunk-immobilien.de",
+   "hints": [],
+   "host_ip": "5.199.141.24",
+   "id": "sw:5.199.141.24:www.trunk-immobilien.de:jquery_migrate:3.4.1",
+   "kind": "component",
+   "mode": "active",
+   "note": null,
+   "observed_at": "2026-05-10T22:35:20Z",
+   "product": "jQuery Migrate",
    "source": "httpx",
    "version_norm": "3.4.1",
    "version_raw": "3.4.1",
