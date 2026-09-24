@@ -33,7 +33,7 @@ policy:
     ohnehin als CRITICAL ein.
 texts:
   observation: >-
-    Der Host {group} beantwortet Verbindungen auf dem RDP-Port aus dem gesamten Internet:
+    {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Verbindungen auf dem RDP-Port aus dem gesamten Internet:
     {affected}. Ein Fernwartungsdienst gehört nicht an das öffentliche Interface.
   meaning: >-
     Ein von außen erreichbarer RDP-Dienst erlaubt Passwort-Rateangriffe rund um die Uhr und macht

@@ -63,6 +63,8 @@ class Meta(Base):
     catalog_digest: str = ""
     facts_schema_version: str = ""
     prose_rejected: list[str] = Field(default_factory=list)
+    # S6b-1 (spec/09 Q15): Herkunft je Feld des Kundenkontexts (kunde, recherche, admin).
+    context_sources: dict[str, str] = Field(default_factory=dict)
 
 
 # ---------------------------------------------------------------- Schicht 1
@@ -95,6 +97,10 @@ class Glance(Base):
 class ObservedSystem(Base):
     system: str
     meaning: str = ""
+    # S6b-1 (spec/09 Q2): belegte Rollen und ihre Belege. Die Prosa-KI bekommt nur
+    # belegte Rollen; ein Rollenwort ohne Rolle ist ein Gate-Fehler.
+    role_keys: list[str] = Field(default_factory=list)
+    evidence: list[str] = Field(default_factory=list)
 
 
 class Business(Base):
@@ -112,11 +118,20 @@ class ScopeHost(Base):
     role: str = ""
     coverage: str = ""
     cov: str = "keine"
+    # S6b-1 (spec/09 Q16): weitere Adressen desselben Systems (IPv6 mit gleichem rDNS).
+    more_ips: list[str] = Field(default_factory=list)
 
 
 class Limitation(Base):
     what: str
     detail: str
+    # S6b-1 (spec/09 Q10): Pruefungen in Kundensprache, die diese Ursache betrifft.
+    checks: list[str] = Field(default_factory=list)
+
+
+class DomainScope(Base):
+    domain: str
+    text: str
 
 
 class MethodPhase(Base):
@@ -139,6 +154,7 @@ class CanCannot(Base):
 class Scope(Base):
     lead: str = ""
     hosts: list[ScopeHost] = Field(default_factory=list)
+    domains: list[DomainScope] = Field(default_factory=list)
     out_of_scope: list[str] = Field(default_factory=list)
     limitations: list[Limitation] = Field(default_factory=list)
     method_phases: list[MethodPhase] = Field(default_factory=list)
@@ -191,6 +207,9 @@ class Screenshot(Base):
     file: str
     host: str
     what: str = ""
+    # S6b-1 (spec/09 Teil 3): weitere Namen mit derselben Seite (gleicher Inhalt oder
+    # gleiches Weiterleitungsziel); das Bild steht nur einmal.
+    also: list[str] = Field(default_factory=list)
     # Vollstaendiger MinIO-Schluessel (<order_id>/<ip>__<vhost>.png). ``file`` ist nur
     # der Basisname; bei Berichten ueber mehrere Laeufe laesst sich der Schluessel
     # daraus nicht rekonstruieren, und der Renderer (S4) braucht ihn zum Laden.
@@ -254,6 +273,10 @@ class Finding(Base):
     recommendation: list[list[str]] = Field(default_factory=list)
     verify: str = ""
     policy: str = ""
+    # S6b-1 (spec/09 Q3): Befund auf einem geteilten System, den der Kunde nicht selbst
+    # beheben kann: "beim Hoster" oder "beim Plattformbetreiber", dazu der Satz dazu.
+    operator: str = ""
+    operator_note: str = ""
 
 
 # ---------------------------------------------------------------- Anhang

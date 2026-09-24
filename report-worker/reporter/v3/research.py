@@ -65,15 +65,6 @@ PERSONENZUSATZ = re.compile(
     r"\s*[,;(]?\s*\b(inh\.?|inhaber(in)?|gesch[äa]ftsf[üu]hrer(in)?|gf|"
     r"vertreten\s+durch|e\.?\s?K\.?\s*,)\b.*$", re.I)
 
-# Rechtsformen, die im Kurznamen nichts verloren haben. Der Kurzname steht in der
-# Fusszeile und im PDF-Titel; vorher war es das erste Wort des Firmennamens, und
-# "Dortmund Beach Design" wurde zu "Dortmund" und las sich wie ein Ortsname.
-RECHTSFORMEN = (
-    "gmbh & co. kg", "gmbh & co kg", "ag & co. kg", "gmbh", "mbh", "ug (haftungsbeschränkt)",
-    "ug", "aktiengesellschaft", "ag", "kgaa", "kg", "ohg", "gbr", "e.k.", "e. k.", "ek",
-    "e.v.", "e. v.", "gemeinnützige gmbh", "ggmbh", "se", "partg", "mbb",
-)
-
 # Quellen, die ein Vorschlag nicht anfassen darf.
 PROTECTED_SOURCES = frozenset({"kunde", "admin"})
 
@@ -113,19 +104,33 @@ def firmenname_ohne_person(text: str) -> str:
     return PERSONENZUSATZ.sub("", (text or "").strip()).strip(" ,;·-").strip()
 
 
+# Rechtsformen, die im Kurznamen nichts verloren haben. Der Kurzname steht in der
+# Fusszeile und im PDF-Titel; vorher war es das erste Wort des Firmennamens, und
+# "Dortmund Beach Design" wurde zu "Dortmund" und las sich wie ein Ortsname.
+# S6b-1 (spec/09 Q15): "Junkerwerk Linder GmbH + Co. KG" wurde zu "Junkerwerk Linder
+# GmbH + Co.", weil die Liste nur "&" kannte. Die Form mit "Co." steht deshalb als
+# Muster da: "&", "+", "u." oder "und" vor "Co.", mit oder ohne Leerzeichen und KG.
+_RECHTSFORM_CO = re.compile(
+    r"[\s,]+(?:(?:gmbh|ag|ug|se)\s*)?(?:&|\+|u\.|und)\s*co\.?(?:\s*(?:kgaa|kg|ohg))?\.?\s*$", re.I)
+_RECHTSFORM_EINFACH = re.compile(
+    r"[\s,]+(?:gemeinnützige\s+gmbh|ggmbh|gmbh|mbh|ug\s*\(haftungsbeschränkt\)|ug|aktiengesellschaft|"
+    r"ag|kgaa|kg|ohg|gbr|e\.\s?k\.|ek|e\.\s?v\.|se|partg(?:\s*mbb)?|mbb)\.?\s*$", re.I)
+
+
 def kurzname_aus(firmenname: str) -> str:
     """Firmenname ohne Rechtsform; nie nur das erste Wort.
 
     Bleibt nach dem Kuerzen nichts uebrig (eine Firmierung, die nur aus der
-    Rechtsform besteht), steht der volle Name da.
+    Rechtsform besteht), steht der volle Name da. Der Kurzname laesst sich im
+    Kundenkontext eigens setzen (Feld ``kurzname``); das hier ist nur der Vorschlag.
     """
     text = firmenname_ohne_person(firmenname)
-    low = text.lower()
-    for form in RECHTSFORMEN:
-        if low.endswith(" " + form):
-            gekuerzt = text[: len(text) - len(form)].strip(" ,-·")
-            return gekuerzt or text
-    return text
+    gekuerzt = text
+    for muster in (_RECHTSFORM_CO, _RECHTSFORM_EINFACH):
+        treffer = muster.search(gekuerzt)
+        if treffer:
+            gekuerzt = gekuerzt[: treffer.start()].strip(" ,-·")
+    return gekuerzt or text
 
 
 # ---------------------------------------------------------------- Eingabe

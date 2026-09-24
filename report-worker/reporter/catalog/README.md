@@ -37,7 +37,7 @@ Ausgabe ist UTF-8 mit LF und deterministisch (sortierte Schluessel ueber
 | `version.py` | `CATALOG_VERSION` (Konstante, Bump-Regel unten) und `catalog_digest()` |
 | `schema.py` | pydantic-Modelle: `CheckSpec` (YAML), `IgnoreList`, Ergebnisse (`CheckResult`, `Member`, `CatalogOutput`) |
 | `expr.py` | Ausdruckssprache (ast-Whitelist, kein eval), Funktionen, statische Pfadpruefung |
-| `tables.py` | Ports, Produkt- und Titelmuster, TLS-Listen, ZAP-Paare, `COVERAGE_REASONS`, `FAMILIES` |
+| `tables.py` | Ports, Produkt- und Titelmuster, TLS-Listen, ZAP-Paare, `COVERAGE_REASONS`, `FAMILIES`, `SHARED_OPERATOR_CHECKS` |
 | `scope.py` | Index ueber die Fakten, Gruppen, Bindungen, Schluesselschema |
 | `render.py` | `affected_template` und Texte sicher rendern, Variablen je Scope |
 | `engine.py` | laden, kompilieren, auswerten |
@@ -234,6 +234,42 @@ Felder vom Typ `Optional[bool]` duerfen nur mit `is True`, `is False`, `is not T
 8. Ist der Host als blockiert bekannt (`host.blocked.detected`), ersetzt der Blockade-Grund
    die generischen Gruende `unreachable` und `insufficient_facts`.
 
+Seit S6b-1 (spec/09 Q9, Q10, E4):
+
+- `no_open_ports` und `unreachable_from_scanner` sind `not_testable`: ein Portscan ohne
+  offenen Port ist kein Messergebnis. Nach der S6-Regel entfaellt der Positivbefund des
+  Auftrags dann ganz (Entscheidung DC 24.09.).
+- Drittanbieter-Hosts (`hosts[].third_party`) und alle ihre Entitaeten fallen vor der
+  Auswertung weg (`scope.without_third_party`).
+- `tls_protocols_partial` (bei `tls_legacy_protocols`, `tls_no_13`) und
+  `tls_ciphers_partial` (`tls_weak_ciphers`): nur httpx hat den Dienst gesehen, testssl
+  weder direkt noch ueber einen VHost desselben IP:Port mit passendem Zertifikat
+  (`tls.assigned_from`). "Nicht verfuegbar" gilt nur, wenn weder testssl noch httpx ihn
+  sahen.
+- `catchall.explained_passive`: `passive_port_unverified` fuer Port 25 (E5) und fuer Hosts
+  mit Wurzelursache (nicht erreichbar, kein offener Port, IPv6 ohne Route) ist erklaert
+  und landet in `ignored`; die Einschraenkung dazu steht in Kapitel 2.2.
+
+### Zustaendigkeit auf geteilten Systemen (S6b-1, spec/09 Q3)
+
+`tables.SHARED_OPERATOR_CHECKS` nennt die Pruefungen, deren Befund auf einem geteilten
+Server (`shared.kind = hoster`) beim Hoster liegt: Verwaltungsoberflaechen (aktiv und
+passiv), FTP, POP3/IMAP/SMTP, Dienstbanner und Fremddienste auf Zusatzports.
+Datenbankports, TLS-Konfiguration, Zertifikat, Sicherheits-Header, Inhalte und
+Webanwendung bleiben beim Kunden. Auf einer Plattform (`kind = platform`) liegt alles
+Hostbezogene beim Plattformbetreiber, nur die Scopes aus `PLATFORM_CUSTOMER_SCOPES`
+(DNS- und Mail-Eintraege der Domain) bleiben beim Kunden. Die Einstufung aendert sich
+nicht; die Zuordnung setzt `reporter/v3/operators.py`, die Soll-Listen tragen sie als
+`zustaendig`.
+
+### Numerus in Texten (S6b-1, spec/09 Teil 3)
+
+`observation` und `positive` kennen die Form `{n:Einzahl|Mehrzahl}`; `n` ist die Zahl der
+Gruppen bzw. Items (`render.Numerus`). Beispiel: `{n:Der Host|Die Hosts} {group}
+{n:bietet seinen Webdienst|bieten ihre Webdienste} ...`. Der Textlint
+(`test_host_satz_mit_numerus`) lehnt einen festen Numerus wie "Der Host {group}" ab.
+`cert_expiring` nennt die Restlaufzeit ueber `days_left_text` ("1 Tag", "12 Tage").
+
 ## Ergebnisformat
 
 `CatalogOutput`: `catalog_version`, `catalog_digest`, `facts_schema_version`, `order_id`,
@@ -320,7 +356,8 @@ Bump-Historie mit Begruendung im Modul-Docstring von `version.py`; Kurzfassung:
 Befund-Buendel (S3), `2026-09-20.1` Rueckbau `zap_no_alerts` (S2b), `2026-09-22.1`
 Pflichtkorrekturen aus spec/08 (S6), `2026-09-23.1` `positive_conflicts` und der
 geschaerfte Positivbefund von `remote_admin_closed` (S6a, Issue #30), `2026-09-23.2`
-`dkim_missing` ohne gefundenen Selektor nicht pruefbar (S6a, #15 Teil 2).
+`dkim_missing` ohne gefundenen Selektor nicht pruefbar (S6a, #15 Teil 2), `2026-09-25.1`
+Abdeckung ohne offenen Port, TLS teilweise, Drittanbieter, Numerus (S6b-1).
 
 ## Texte
 

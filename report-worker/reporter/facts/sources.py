@@ -207,6 +207,8 @@ class ScanBundle:
     dns_security_by_domain: dict[str, dict[str, Any]] = field(default_factory=dict)
     zone_transfer_by_domain: dict[str, str] = field(default_factory=dict)
     passive_by_domain: dict[str, dict[str, Any]] = field(default_factory=dict)
+    # S6b-1 (spec/09 Q3): CNAME-Ketten aus phase0/dnsx_validation.json, je Name.
+    dns_cnames: dict[str, list[str]] = field(default_factory=dict)
     host_strategy: Optional[dict[str, Any]] = None
     ai_prioritization: Optional[dict[str, Any]] = None
     # Bilanz der Phase-3-Korrelation (Zeile ``phase3_correlation``): wie viele
@@ -370,6 +372,17 @@ def _load_bundle_from_reader(reader: _Reader, order_id_hint: str, source_kind: s
         b.dns_security = _without_domain_label(ds)
         b.refs["dns_security"] = "phase0a/dns_security.json"
     b.zone_transfer_txt = reader.text("phase0/zone_transfer.txt")
+    # dnsx schreibt eine JSON-Zeile je aufgeloestem Namen. Bis S6b-1 las nur der
+    # Scanner selbst daraus (verwaiste CNAMEs); der Bericht braucht die Ketten, um
+    # Namen auf fremden Plattformen zu erkennen (spec/09 Q3).
+    for line in jsonl(reader.text("phase0/dnsx_validation.json")):
+        if not isinstance(line, dict):
+            continue
+        name = str(line.get("host") or "").strip().lower().rstrip(".")
+        chain = [str(c).strip().lower().rstrip(".") for c in (line.get("cname") or []) if c]
+        if name and chain:
+            b.dns_cnames.setdefault(name, chain)
+            b.refs.setdefault("dnsx_validation", "phase0/dnsx_validation.json")
     hs = reader.json("phase0/host_strategy.json")
     if isinstance(hs, dict):
         b.host_strategy = hs

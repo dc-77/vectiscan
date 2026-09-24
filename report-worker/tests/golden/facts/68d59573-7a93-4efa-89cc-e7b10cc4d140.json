@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -669,10 +670,10 @@
    "observed_at": "2026-09-23T19:56:57Z",
    "phase": 1,
    "raw_status": "ok",
-   "reason": "no_open_ports",
+   "reason": "unreachable_from_scanner",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "nmap"
   },
   {
@@ -694,10 +695,10 @@
    "observed_at": "2026-09-23T19:57:43Z",
    "phase": 1,
    "raw_status": "ok",
-   "reason": "no_open_ports",
+   "reason": "unreachable_from_scanner",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "nmap"
   },
   {
@@ -719,10 +720,10 @@
    "observed_at": "2026-09-23T19:58:35Z",
    "phase": 1,
    "raw_status": "ok",
-   "reason": "no_open_ports",
+   "reason": "unreachable_from_scanner",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "nmap"
   },
   {
@@ -747,7 +748,7 @@
    "reason": "no_open_ports",
    "scope": "host",
    "source": "scan_results",
-   "status": "ok",
+   "status": "empty",
    "tool": "nmap"
   },
   {
@@ -3713,6 +3714,33 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": null,
+    "mechanisms": [
+     {
+      "kind": "a",
+      "qualifier": "+",
+      "value": "mail.bergersysteme.com"
+     },
+     {
+      "kind": "ip4",
+      "qualifier": "+",
+      "value": "62.217.52.167"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.protection.outlook.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf-de.emailsignatures365.com"
+     },
+     {
+      "kind": "redirect",
+      "qualifier": "+",
+      "value": "bergersysteme.com.spf.hornetdmarc.com"
+     }
+    ],
     "raw": "v=spf1 a:mail.bergersysteme.com ip4:62.217.52.167 include:spf.protection.outlook.com include:spf-de.emailsignatures365.com redirect=bergersysteme.com.spf.hornetdmarc.com"
    },
    "tls_rpt": {
@@ -3732,6 +3760,13 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [
+    "autodiscover.outlook.com",
+    "autodiscover.outlook.cloud.microsoft",
+    "acdcatm.autodiscover.mira.tm.svc.cloud.microsoft",
+    "autod.ms-acdc-autod.office.com",
+    "atm.autodiscover.mira.tm.svc.cloud.microsoft"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3764,6 +3799,7 @@
     }
    ],
    "body_hash": "e686a3eec01b60dbfc909107cf915083716639dd0bd34bf98a74fe006acd2dc6",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3794,6 +3830,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3820,6 +3857,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3846,6 +3884,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3872,6 +3911,7 @@
   {
    "aliases": [],
    "body_hash": "57559551c35735c4acd1ede5a7d3df31a3f9b55acc087fdbb0811813b13d63d3",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3902,6 +3942,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3928,6 +3969,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3954,6 +3996,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -3980,6 +4023,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4006,6 +4050,9 @@
   {
    "aliases": [],
    "body_hash": "e686a3eec01b60dbfc909107cf915083716639dd0bd34bf98a74fe006acd2dc6",
+   "cname": [
+    "cdn.webflow.com"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -4096,6 +4143,7 @@
     "isp": "Webflow, Inc",
     "usage_type": "Content Delivery Network"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4105,7 +4153,23 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "www.bergersysteme.com CNAME cdn.webflow.com",
+      "ref": "phase0/dnsx_validation.json",
+      "tool": "dnsx"
+     }
+    ],
+    "foreign_names": [],
+    "kind": "platform",
+    "operator": "webflow.com",
+    "signals": [
+     "cname_fremd"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4142,6 +4206,7 @@
     "isp": "Microsoft Corporation",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": null,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4151,7 +4216,38 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "host_inventory"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "autodiscover.bergersysteme.com CNAME autodiscover.outlook.com > autodiscover.outlook.cloud.microsoft > acdcatm.autodiscover.mira.tm.svc.cloud.microsoft > autod.ms-acdc-autod.office.com",
+      "ref": "phase0/dnsx_validation.json",
+      "tool": "dnsx"
+     }
+    ],
+    "foreign_names": [],
+    "kind": "platform",
+    "operator": "outlook.com",
+    "signals": [
+     "cname_fremd"
+    ]
+   },
+   "source": "host_inventory",
+   "third_party": {
+    "evidence": [
+     {
+      "excerpt": "autodiscover.bergersysteme.com CNAME autodiscover.outlook.com > autodiscover.outlook.cloud.microsoft > acdcatm.autodiscover.mira.tm.svc.cloud.microsoft",
+      "ref": "phase0/dnsx_validation.json",
+      "tool": "dnsx"
+     },
+     {
+      "excerpt": "SKIP: autodiscover.bergersysteme.com ist reine Exchange-Autodiscover-Konfiguration (Microsoft-gehostet), kein eigener Content → Out-of-Scope.",
+      "ref": "scan_results:ai_host_skip:40.99.150.120",
+      "tool": "ai_host_skip"
+     }
+    ],
+    "operator": "Microsoft Corporation",
+    "reason": "ai_host_skip_cname"
+   }
   },
   {
    "blocked": {
@@ -4194,6 +4290,15 @@
     "isp": "Berger EDV-Systemberatungs GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": {
+    "passive_ports": [
+     80,
+     443
+    ],
+    "passive_seen_at": "2026-09-23T18:35:39Z",
+    "passive_source": "shodan",
+    "status": "unreachable_from_scanner"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4203,7 +4308,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4246,6 +4353,15 @@
     "isp": "Berger EDV-Systemberatungs GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": {
+    "passive_ports": [
+     25,
+     443
+    ],
+    "passive_seen_at": "2026-09-23T08:43:38Z",
+    "passive_source": "shodan",
+    "status": "unreachable_from_scanner"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4255,7 +4371,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "mail.bergersysteme.com",
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4297,6 +4415,14 @@
     "isp": "Berger EDV-Systemberatungs GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": {
+    "passive_ports": [
+     443
+    ],
+    "passive_seen_at": "2026-09-21T20:16:30Z",
+    "passive_source": "shodan",
+    "status": "unreachable_from_scanner"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4306,7 +4432,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4348,6 +4476,12 @@
     "isp": "ecotel communication ag",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": {
+    "passive_ports": [],
+    "passive_seen_at": null,
+    "passive_source": null,
+    "status": "no_open_ports"
+   },
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4357,7 +4491,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "mail2.bergersysteme.com",
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -4401,6 +4537,7 @@
     "isp": "Host Europe GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -4410,7 +4547,37 @@
     "urlhaus_compromised": null
    },
    "reverse": "174.224.205.92.host.secureserver.net",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 92.205.224.174: 174.224.205.92.host.secureserver.net, dirak.de, www.dirak.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "rDNS 174.224.205.92.host.secureserver.net",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart data center/web hosting/transit",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "dirak.de",
+     "www.dirak.de"
+    ],
+    "kind": "hoster",
+    "operator": "Host Europe GmbH",
+    "signals": [
+     "fremde_namen_shodan",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -6987,6 +7154,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -7015,6 +7183,7 @@
    "port": 80,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7043,6 +7212,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7071,6 +7241,7 @@
    "port": 2052,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7099,6 +7270,7 @@
    "port": 2053,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7127,6 +7299,7 @@
    "port": 2082,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7155,6 +7328,7 @@
    "port": 2083,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7183,6 +7357,7 @@
    "port": 2086,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7211,6 +7386,7 @@
    "port": 2087,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7239,6 +7415,7 @@
    "port": 2095,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7267,6 +7444,7 @@
    "port": 2096,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7295,6 +7473,7 @@
    "port": 8080,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7323,6 +7502,7 @@
    "port": 8443,
    "product": "CloudFlare",
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7351,6 +7531,7 @@
    "port": 8880,
    "product": null,
    "seen_at": "2026-09-23T12:57:05Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7376,6 +7557,7 @@
    "port": 80,
    "product": null,
    "seen_at": "2026-09-23T13:37:46Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": null,
@@ -7403,6 +7585,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-09-23T18:35:39Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7430,6 +7613,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-09-23T18:35:39Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7458,6 +7642,7 @@
    "port": 25,
    "product": null,
    "seen_at": "2026-09-23T08:43:38Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7486,6 +7671,7 @@
    "port": 443,
    "product": "Microsoft IIS httpd",
    "seen_at": "2026-09-23T08:43:38Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7513,6 +7699,7 @@
    "port": 443,
    "product": "nginx",
    "seen_at": "2026-09-21T20:16:30Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7542,6 +7729,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "ftp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7571,6 +7759,7 @@
    "port": 22,
    "product": "OpenSSH",
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "ssh",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7600,6 +7789,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7629,6 +7819,7 @@
    "port": 53,
    "product": null,
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "dns-udp",
    "source": "shodan",
    "transport": "udp",
    "verified": true,
@@ -7658,6 +7849,7 @@
    "port": 80,
    "product": "nginx",
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7687,6 +7879,7 @@
    "port": 110,
    "product": null,
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "pop3",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7716,6 +7909,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7745,6 +7939,7 @@
    "port": 443,
    "product": "nginx",
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7774,6 +7969,7 @@
    "port": 465,
    "product": "Postfix smtpd",
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "smtps",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7803,6 +7999,7 @@
    "port": 993,
    "product": null,
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "imap-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7832,6 +8029,7 @@
    "port": 995,
    "product": null,
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "pop3-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7861,6 +8059,7 @@
    "port": 8443,
    "product": null,
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -7890,6 +8089,7 @@
    "port": 8880,
    "product": null,
    "seen_at": "2026-09-23T19:09:51Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -7917,6 +8117,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -8000,7 +8201,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -8768,80 +8969,6 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/198.202.211.1/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "198.202.211.1",
-   "id": "sw:198.202.211.1:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:14:14Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HTTP/3",
-     "ref": "hosts/198.202.211.1/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "http",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "198.202.211.1",
-   "id": "sw:198.202.211.1:-:http:3",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:14:14Z",
-   "product": "HTTP",
-   "source": "httpx",
-   "version_norm": "3",
-   "version_raw": "HTTP/3",
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
      "excerpt": "technologies: jQuery",
      "ref": "hosts/198.202.211.1/phase1/tech_profile.json",
      "tool": "httpx"
@@ -9024,43 +9151,6 @@
   },
   {
    "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "webtech"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: cloudflare",
-     "ref": "hosts/92.205.224.174/phase1/tech_profile.json",
-     "tool": "webtech"
-    }
-   ],
-   "family": "cloudflare",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:-:cloudflare:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T19:57:21Z",
-   "product": "cloudflare",
-   "source": "webtech",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
    "confidence": 1.0,
    "detection_sources": [
     "nmap"
@@ -9112,117 +9202,6 @@
    "observed_at": "2026-09-23T19:57:08Z",
    "product": "Dovecot",
    "source": "nmap",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/92.205.224.174/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:08:02Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HTTP/3",
-     "ref": "hosts/92.205.224.174/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "http",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:-:http:3",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:08:02Z",
-   "product": "HTTP",
-   "source": "httpx",
-   "version_norm": "3",
-   "version_raw": "HTTP/3",
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: jQuery",
-     "ref": "hosts/92.205.224.174/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "jquery",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:-:jquery:unknown",
-   "kind": "library",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:08:02Z",
-   "product": "jQuery",
-   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -9338,6 +9317,16 @@
    },
    "evidence": [
     {
+     "excerpt": "443/tcp http-title: Plesk Obsidian 18.0.80",
+     "ref": "hosts/92.205.224.174/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
+     "excerpt": "8443/tcp http-title: Plesk Obsidian 18.0.80",
+     "ref": "hosts/92.205.224.174/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
      "excerpt": "8443/tcp open https-alt sw-cp-server tunnel=ssl",
      "ref": "hosts/92.205.224.174/phase1/nmap.xml",
      "tool": "nmap"
@@ -9352,15 +9341,15 @@
    "fqdn": null,
    "hints": [],
    "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:-:plesk:unknown",
+   "id": "sw:92.205.224.174:-:plesk:18.0.80",
    "kind": "control_panel",
    "mode": "active",
    "note": null,
    "observed_at": "2026-09-23T19:57:08Z",
    "product": "Plesk",
    "source": "nmap",
-   "version_norm": null,
-   "version_raw": null,
+   "version_norm": "18.0.80",
+   "version_raw": "18.0.80",
    "vulnerabilities_count": null
   },
   {
@@ -9449,123 +9438,6 @@
   },
   {
    "build": null,
-   "confidence": 0.95,
-   "detection_sources": [
-    "cms_fingerprint",
-    "webtech"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "cms_details.raw: Webflow",
-     "ref": "hosts/92.205.224.174/phase1/tech_profile.json",
-     "tool": "cms_fingerprint"
-    },
-    {
-     "excerpt": "technologies: Webflow",
-     "ref": "hosts/92.205.224.174/phase1/tech_profile.json",
-     "tool": "webtech"
-    }
-   ],
-   "family": "webflow",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:-:webflow:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:19:37Z",
-   "product": "Webflow",
-   "source": "cms_fingerprint",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "tech: Cloudflare",
-     "ref": "hosts/92.205.224.174/phase2/httpx_bergersysteme.com.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "cloudflare",
-   "fqdn": "bergersysteme.com",
-   "hints": [],
-   "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:bergersysteme.com:cloudflare:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:08:02Z",
-   "product": "Cloudflare",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "tech: jQuery",
-     "ref": "hosts/92.205.224.174/phase2/httpx_bergersysteme.com.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "jquery",
-   "fqdn": "bergersysteme.com",
-   "hints": [],
-   "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:bergersysteme.com:jquery:unknown",
-   "kind": "library",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:08:02Z",
-   "product": "jQuery",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
    "confidence": 1.0,
    "detection_sources": [
     "header_check"
@@ -9597,43 +9469,6 @@
    "observed_at": "2026-09-23T20:07:54Z",
    "product": "nginx",
    "source": "header_check",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "tech: Webflow",
-     "ref": "hosts/92.205.224.174/phase2/httpx_bergersysteme.com.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "webflow",
-   "fqdn": "bergersysteme.com",
-   "hints": [],
-   "host_ip": "92.205.224.174",
-   "id": "sw:92.205.224.174:bergersysteme.com:webflow:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-09-23T20:08:02Z",
-   "product": "Webflow",
-   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -9746,6 +9581,7 @@
  ],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "www.bergersysteme.com",
@@ -11352,6 +11188,7 @@
    ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "www.bergersysteme.com",
@@ -12603,6 +12440,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "ftp.bergersysteme.com",

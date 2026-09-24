@@ -29,7 +29,7 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} beantwortet Anfragen an einen Webdienst auf einem Port außerhalb der
+    {n:Der Host|Die Hosts} {group} {n:beantwortet|beantworten} Anfragen an einen Webdienst auf einem Port außerhalb der
     üblichen Web- und Verwaltungsports: {affected}. Der Zweck dieses Dienstes ist von außen
     nicht erkennbar.
   meaning: >-

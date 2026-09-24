@@ -73,6 +73,12 @@ ERLAUBT: tuple[tuple[str, str], ...] = (
     # statt der Severity-Policy; die alte Kette liefert sie nicht mehr.
     ("Severity-Policy", "Impressum nennt jetzt Pruefkatalog und Faktenschema"),
     ("Scan-Orders", "Impressum nennt jetzt Pruefkatalog und Faktenschema"),
+    # S6b-1 (spec/09 Q15): die Spalte nennt den Netzbetreiber laut Reputationsquelle,
+    # nie den Kunden; (Q10) die Einschraenkungstabelle nennt die betroffenen Pruefungen.
+    ("IP-Adresse Hostnamen Betrieb / Rolle", "Spalte heisst jetzt Netzbetreiber / Rolle"),
+    ("IP-Adresse Hostnamen Netzbetreiber / Rolle", "Spalte heisst jetzt Netzbetreiber / Rolle"),
+    ("Einschränkung Auswirkung auf die Ergebnisse", "neue Spalte Betroffene Pruefungen"),
+    ("Einschränkung Betroffene Prüfungen Auswirkung", "neue Spalte Betroffene Pruefungen"),
 )
 
 

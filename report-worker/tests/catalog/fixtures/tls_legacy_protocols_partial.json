@@ -1,0 +1,27 @@
+{
+ "facts": {
+  "tls": [
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "www.example.test",
+    "port": 443,
+    "protocols": {
+     "SSLv2": null,
+     "SSLv3": null,
+     "TLS1.0": null,
+     "TLS1.1": null,
+     "TLS1.2": null,
+     "TLS1.3": true
+    },
+    "source": "httpx"
+   }
+  ]
+ },
+ "coverage_default": "ok",
+ "expect": {
+  "status": "not_testable",
+  "group_key": "www.example.test@10.0.0.1",
+  "reason_code": "tls_protocols_partial",
+  "positive": false
+ }
+}

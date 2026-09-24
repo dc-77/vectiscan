@@ -29,7 +29,7 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} bietet einen Webdienst nur über unverschlüsseltes HTTP an; ein HTTPS-Dienst
+    {n:Der Host|Die Hosts} {group} {n:bietet|bieten} einen Webdienst nur über unverschlüsseltes HTTP an; ein HTTPS-Dienst
     auf Port 443 fehlt: {affected}.
   meaning: >-
     Alle Inhalte und Eingaben laufen im Klartext über das Netz. In fremden Netzen kann jeder
@@ -49,4 +49,4 @@ texts:
   positive:
     title: Webdienst mit Transportverschlüsselung
     text: >-
-      Der Host {group} bietet seinen Webdienst über HTTPS an.
+      {n:Der Host|Die Hosts} {group} {n:bietet seinen Webdienst|bieten ihre Webdienste} über HTTPS an.

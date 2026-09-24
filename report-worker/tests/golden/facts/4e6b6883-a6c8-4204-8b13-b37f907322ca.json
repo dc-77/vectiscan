@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -5545,6 +5546,33 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "~all",
+    "mechanisms": [
+     {
+      "kind": "a",
+      "qualifier": "+",
+      "value": null
+     },
+     {
+      "kind": "mx",
+      "qualifier": "+",
+      "value": null
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.hornetsecurity.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf.protection.outlook.com"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "spf-de.emailsignatures365.com"
+     }
+    ],
     "raw": "v=spf1 a mx include:spf.hornetsecurity.com include:spf.protection.outlook.com include:spf-de.emailsignatures365.com ~all"
    },
    "tls_rpt": {
@@ -5564,6 +5592,9 @@
   {
    "aliases": [],
    "body_hash": "d9859d28175a3fea10082d865982575492fded6f3c863272dd62c02aaa8b3490",
+   "cname": [
+    "owa.castenow.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5594,6 +5625,7 @@
   {
    "aliases": [],
    "body_hash": "cbf4735996ad45e3cb11a2d86ad78c3377b46d840d3e776c7d5c667f74728bad",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5624,6 +5656,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5650,6 +5683,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5676,6 +5710,7 @@
   {
    "aliases": [],
    "body_hash": "b8bccd809105faf44e3e3e330d3306a52bdcc497e69cda6f508cb23ede207863",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5706,6 +5741,7 @@
   {
    "aliases": [],
    "body_hash": "c68721c143ec674606bcc158a3d7d6bf99b730ed40046e8ee050cf78a4bcf776",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5736,6 +5772,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5762,6 +5799,7 @@
   {
    "aliases": [],
    "body_hash": "59d56c6d890398d7cd35b73d589d1d8943442b3e9e7870545f82ddf3aa5f6567",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5792,6 +5830,7 @@
   {
    "aliases": [],
    "body_hash": "0c0df7bc7e4838fc0c50d67731d42f48232797cd9d84b777f0710c47c1c9ba52",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5822,6 +5861,7 @@
   {
    "aliases": [],
    "body_hash": "32f05182fa87a65408888efd0bad86c912fb0d504701dfb5d2189ce88f53ffe2",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5852,6 +5892,7 @@
   {
    "aliases": [],
    "body_hash": "557b5e9015b4963a130c7039e077b3ec0306d401b6ee13d631721d5d969d2917",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5882,6 +5923,7 @@
   {
    "aliases": [],
    "body_hash": "fc73117dbaf055b4209a5e95a98ad12b75daf070eb38f56934e935b0ce36bc1c",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5912,6 +5954,9 @@
   {
    "aliases": [],
    "body_hash": "ec115b0e7f0e01ec02d0795e7fc902d69b9b4a3914f8258d5c0753f164b3b23a",
+   "cname": [
+    "umfrage-castenow-de.umfrageonline.com"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5942,6 +5987,7 @@
   {
    "aliases": [],
    "body_hash": "7604047d8453b25fabd157052f6f581694109a0532a5576fa4683af545d95a6d",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -5978,6 +6024,7 @@
     }
    ],
    "body_hash": "89ba94524643c97e3eda7a00125d7e7f9b9b29825cbfee0f482a2a50101ada79",
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -6069,6 +6116,7 @@
     "isp": "Hetzner Online GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6078,7 +6126,37 @@
     "urlhaus_compromised": null
    },
    "reverse": "yak.planwerk6.de",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 159.69.143.80: epos-services.com, timeline.eisenfuhr.com, yak.planwerk6.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "rDNS yak.planwerk6.de",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart data center/web hosting/transit",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "epos-services.com",
+     "timeline.eisenfuhr.com"
+    ],
+    "kind": "hoster",
+    "operator": "Hetzner Online GmbH",
+    "signals": [
+     "fremde_namen_shodan",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6120,6 +6198,7 @@
     "isp": "Castenow GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6129,7 +6208,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6174,6 +6255,7 @@
     "isp": "Castenow GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6183,7 +6265,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6226,6 +6310,7 @@
     "isp": "Castenow GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6235,7 +6320,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6277,6 +6364,7 @@
     "isp": "Castenow GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6286,7 +6374,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6328,6 +6418,7 @@
     "isp": "Castenow GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6337,7 +6428,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6379,6 +6472,7 @@
     "isp": "Castenow GmbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6388,7 +6482,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6425,6 +6521,7 @@
     "isp": "BESS Vermögensverwaltung GmbH & Co. KG",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": null,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6434,7 +6531,9 @@
     "urlhaus_compromised": null
    },
    "reverse": null,
-   "source": "host_inventory"
+   "shared": null,
+   "source": "host_inventory",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6476,6 +6575,7 @@
     "isp": "Amazon.com, Inc.",
     "usage_type": "Content Delivery Network"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6485,7 +6585,23 @@
     "urlhaus_compromised": null
    },
    "reverse": "server-54-230-172-14.dus51.r.cloudfront.net",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "umfrage.castenow.de CNAME umfrage-castenow-de.umfrageonline.com",
+      "ref": "phase0/dnsx_validation.json",
+      "tool": "dnsx"
+     }
+    ],
+    "foreign_names": [],
+    "kind": "platform",
+    "operator": "umfrageonline.com",
+    "signals": [
+     "cname_fremd"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -6527,6 +6643,7 @@
     "isp": "Host Europe GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -6536,7 +6653,40 @@
     "urlhaus_compromised": null
    },
    "reverse": "53.163.205.92.host.secureserver.net",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "Shodan-Hostnamen 92.205.163.53: 53.163.205.92.host.secureserver.net, club.jaguar.com, mail.netscope-media.de, netscope-media.de, webmail.netscope-media.de, www.netscope-media.de",
+      "ref": "phase0a/shodan_hosts.json",
+      "tool": "shodan"
+     },
+     {
+      "excerpt": "rDNS 53.163.205.92.host.secureserver.net",
+      "ref": "phase0/host_inventory.json",
+      "tool": "host_inventory"
+     },
+     {
+      "excerpt": "Nutzungsart data center/web hosting/transit",
+      "ref": "phase0a/abuseipdb.json",
+      "tool": "abuseipdb"
+     }
+    ],
+    "foreign_names": [
+     "club.jaguar.com",
+     "mail.netscope-media.de",
+     "netscope-media.de",
+     "webmail.netscope-media.de",
+     "www.netscope-media.de"
+    ],
+    "kind": "hoster",
+    "operator": "Host Europe GmbH",
+    "signals": [
+     "fremde_namen_shodan",
+     "rdns_betreiber"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -9316,6 +9466,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -9364,6 +9515,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "securitytrails",
    "transport": null,
    "verified": null,
@@ -9393,6 +9545,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-07-22T07:29:19Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9422,6 +9575,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-07-22T07:29:19Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9447,6 +9601,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-07-19T10:25:40Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9472,6 +9627,7 @@
    "port": 25,
    "product": null,
    "seen_at": "2026-07-22T01:06:11Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9497,6 +9653,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-07-22T01:06:11Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9522,6 +9679,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-07-22T02:51:54Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9547,6 +9705,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-07-21T08:32:00Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9572,6 +9731,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-07-22T02:39:09Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9597,6 +9757,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-07-22T03:00:04Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9624,6 +9785,7 @@
    "port": 80,
    "product": null,
    "seen_at": "2026-07-21T06:28:05Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9656,6 +9818,7 @@
    "port": 21,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "ftp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9688,6 +9851,7 @@
    "port": 25,
    "product": "Postfix smtpd",
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9720,6 +9884,7 @@
    "port": 53,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "dns-udp",
    "source": "shodan",
    "transport": "udp",
    "verified": true,
@@ -9752,6 +9917,7 @@
    "port": 80,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9784,6 +9950,7 @@
    "port": 106,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9816,6 +9983,7 @@
    "port": 110,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "pop3",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9848,6 +10016,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9880,6 +10049,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9912,6 +10082,7 @@
    "port": 465,
    "product": "Postfix smtpd",
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "smtps",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9944,6 +10115,7 @@
    "port": 587,
    "product": "Postfix smtpd",
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -9976,6 +10148,7 @@
    "port": 993,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "imap-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -10008,6 +10181,7 @@
    "port": 995,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "pop3-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -10040,6 +10214,7 @@
    "port": 8000,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -10072,6 +10247,7 @@
    "port": 8001,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -10104,6 +10280,7 @@
    "port": 8443,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -10136,6 +10313,7 @@
    "port": 8800,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -10168,6 +10346,7 @@
    "port": 8880,
    "product": null,
    "seen_at": "2026-07-21T10:37:04Z",
+   "service": "https-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": false,
@@ -10195,6 +10374,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "urlhaus",
    "transport": null,
    "verified": null,
@@ -10278,7 +10458,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -11608,43 +11788,6 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "159.69.143.80",
-   "id": "sw:159.69.143.80:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:29:28Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
      "excerpt": "technologies: jQuery",
      "ref": "hosts/159.69.143.80/phase1/tech_profile.json",
      "tool": "httpx"
@@ -11873,43 +12016,6 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/195.50.179.2/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "195.50.179.2",
-   "id": "sw:195.50.179.2:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:44:22Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
      "excerpt": "technologies: jQuery",
      "ref": "hosts/195.50.179.2/phase1/tech_profile.json",
      "tool": "httpx"
@@ -11949,16 +12055,6 @@
     {
      "excerpt": "443/tcp open https Web Server tunnel=ssl",
      "ref": "hosts/195.50.179.2/phase1/nmap.xml",
-     "tool": "nmap"
-    },
-    {
-     "excerpt": "server: Web Server",
-     "ref": "hosts/195.50.179.2/phase1/tech_profile.json",
-     "tool": "nmap"
-    },
-    {
-     "excerpt": "technologies: Web Server",
-     "ref": "hosts/195.50.179.2/phase1/tech_profile.json",
      "tool": "nmap"
     }
    ],
@@ -12997,43 +13093,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "195.50.179.5",
-   "id": "sw:195.50.179.5:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:40:15Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
     "cms_fingerprint"
    ],
    "distro": null,
@@ -13216,43 +13275,6 @@
    "note": null,
    "observed_at": "2026-07-22T08:40:15Z",
    "product": "PHP",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/195.50.179.6/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "195.50.179.6",
-   "id": "sw:195.50.179.6:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:46:10Z",
-   "product": "HSTS",
    "source": "httpx",
    "version_norm": null,
    "version_raw": null,
@@ -13670,43 +13692,6 @@
   },
   {
    "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/195.50.179.9/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "195.50.179.9",
-   "id": "sw:195.50.179.9:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:52:15Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
    "confidence": 1.0,
    "detection_sources": [
     "header_check",
@@ -13799,7 +13784,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -13812,11 +13796,6 @@
     "upstream_eol_date": null
    },
    "evidence": [
-    {
-     "excerpt": "technologies: Apache HTTP Server",
-     "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "httpx"
-    },
     {
      "excerpt": "technologies: Apache",
      "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
@@ -13840,164 +13819,9 @@
   },
   {
    "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "cms_fingerprint",
-    "webtech"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "cms_details.raw: Drupal",
-     "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "cms_fingerprint"
-    },
-    {
-     "excerpt": "technologies: Drupal 11",
-     "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "webtech"
-    }
-   ],
-   "family": "drupal",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "54.230.172.14",
-   "id": "sw:54.230.172.14:-:drupal:11",
-   "kind": "cms_core",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:20:41Z",
-   "product": "Drupal",
-   "source": "webtech",
-   "version_norm": "11",
-   "version_raw": "11",
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "54.230.172.14",
-   "id": "sw:54.230.172.14:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:53:47Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: jQuery",
-     "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "jquery",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "54.230.172.14",
-   "id": "sw:54.230.172.14:-:jquery:unknown",
-   "kind": "library",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:53:47Z",
-   "product": "jQuery",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: PHP",
-     "ref": "hosts/54.230.172.14/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "php",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "54.230.172.14",
-   "id": "sw:54.230.172.14:-:php:unknown",
-   "kind": "language",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:53:47Z",
-   "product": "PHP",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx"
+    "header_check"
    ],
    "distro": null,
    "edition": null,
@@ -14013,11 +13837,6 @@
      "excerpt": "server: Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5",
      "ref": "scan_results:header_check:54.230.172.14",
      "tool": "header_check"
-    },
-    {
-     "excerpt": "tech: Apache HTTP Server",
-     "ref": "hosts/54.230.172.14/phase2/httpx.json",
-     "tool": "httpx"
     }
    ],
    "family": "apache",
@@ -14033,117 +13852,6 @@
    "source": "header_check",
    "version_norm": "2.4.68",
    "version_raw": "Apache/2.4.68 (Amazon Linux) OpenSSL/3.5.5",
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "tech: Drupal:11",
-     "ref": "hosts/54.230.172.14/phase2/httpx.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "drupal",
-   "fqdn": "umfrage.castenow.de",
-   "hints": [],
-   "host_ip": "54.230.172.14",
-   "id": "sw:54.230.172.14:umfrage.castenow.de:drupal:11",
-   "kind": "cms_core",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:53:47Z",
-   "product": "Drupal",
-   "source": "httpx",
-   "version_norm": "11",
-   "version_raw": "11",
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "tech: jQuery",
-     "ref": "hosts/54.230.172.14/phase2/httpx.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "jquery",
-   "fqdn": "umfrage.castenow.de",
-   "hints": [],
-   "host_ip": "54.230.172.14",
-   "id": "sw:54.230.172.14:umfrage.castenow.de:jquery:unknown",
-   "kind": "library",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:53:47Z",
-   "product": "jQuery",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "tech: PHP",
-     "ref": "hosts/54.230.172.14/phase2/httpx.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "php",
-   "fqdn": "umfrage.castenow.de",
-   "hints": [],
-   "host_ip": "54.230.172.14",
-   "id": "sw:54.230.172.14:umfrage.castenow.de:php:unknown",
-   "kind": "language",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:53:47Z",
-   "product": "PHP",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
    "vulnerabilities_count": null
   },
   {
@@ -14201,80 +13909,6 @@
    "source": "nmap",
    "version_norm": null,
    "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "92.205.163.53",
-   "id": "sw:92.205.163.53:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:30:39Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HTTP/3",
-     "ref": "hosts/92.205.163.53/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "http",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "92.205.163.53",
-   "id": "sw:92.205.163.53:-:http:3",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-07-22T08:30:39Z",
-   "product": "HTTP",
-   "source": "httpx",
-   "version_norm": "3",
-   "version_raw": "HTTP/3",
    "vulnerabilities_count": null
   },
   {
@@ -14547,6 +14181,11 @@
      "tool": "header_check"
     },
     {
+     "excerpt": "8443/tcp http-title: Plesk Obsidian 18.0.79",
+     "ref": "hosts/92.205.163.53/phase1/nmap.xml",
+     "tool": "nmap"
+    },
+    {
      "excerpt": "8443/tcp open https-alt sw-cp-server tunnel=ssl",
      "ref": "hosts/92.205.163.53/phase1/nmap.xml",
      "tool": "nmap"
@@ -14561,15 +14200,15 @@
    "fqdn": null,
    "hints": [],
    "host_ip": "92.205.163.53",
-   "id": "sw:92.205.163.53:-:plesk:unknown",
+   "id": "sw:92.205.163.53:-:plesk:18.0.79",
    "kind": "control_panel",
    "mode": "active",
    "note": null,
    "observed_at": "2026-07-22T08:16:19Z",
    "product": "Plesk",
    "source": "nmap",
-   "version_norm": null,
-   "version_raw": null,
+   "version_norm": "18.0.79",
+   "version_raw": "18.0.79",
    "vulnerabilities_count": null
   },
   {
@@ -15248,6 +14887,7 @@
  ],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "castenow.de  (CN in response to request w/o SNI: *.planwerk6.de )",
@@ -15302,6 +14942,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "castenow.de",
@@ -15353,6 +14994,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.castenow.de",
@@ -15432,6 +15074,7 @@
    ]
   },
   {
+   "assigned_from": "mail2.castenow.de:443",
    "cert": {
     "chain_ok": null,
     "cn": "*.castenow.de",
@@ -15448,17 +15091,24 @@
     "self_signed": null,
     "wildcard": true
    },
-   "ciphers_weak": [],
+   "ciphers_weak": [
+    "cbc"
+   ],
    "confidence": 1.0,
    "entries": [],
    "evidence": [
+    {
+     "excerpt": "autodiscover.castenow.de:443 geprüft über mail2.castenow.de:443, dessen Zertifikat autodiscover.castenow.de abdeckt; angeboten: TLS1.2",
+     "ref": "scan_results:testssl:195.50.179.4",
+     "tool": "testssl"
+    },
     {
      "excerpt": "autodiscover.castenow.de:443 tls=tls12 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z",
      "ref": "hosts/195.50.179.4/phase2/httpx.json",
      "tool": "httpx"
     }
    ],
-   "fallback_scsv": null,
+   "fallback_scsv": true,
    "fqdn": "autodiscover.castenow.de",
    "grade": null,
    "host_ip": "195.50.179.4",
@@ -15469,17 +15119,23 @@
    "observed_at": "2026-07-22T08:39:22Z",
    "port": 443,
    "protocols": {
-    "SSLv2": null,
-    "SSLv3": null,
-    "TLS1.0": null,
-    "TLS1.1": null,
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
     "TLS1.2": true,
-    "TLS1.3": null
+    "TLS1.3": false
    },
    "source": "httpx",
-   "vulns": []
+   "vulns": [
+    {
+     "name": "LUCKY13",
+     "status": "potential"
+    }
+   ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.castenow.de",
@@ -15541,6 +15197,7 @@
    ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.castenow.de",
@@ -15595,6 +15252,7 @@
    "vulns": []
   },
   {
+   "assigned_from": "mailstore.castenow.de:443",
    "cert": {
     "chain_ok": null,
     "cn": "*.castenow.de",
@@ -15616,12 +15274,17 @@
    "entries": [],
    "evidence": [
     {
+     "excerpt": "nextcloud.castenow.de:443 geprüft über mailstore.castenow.de:443, dessen Zertifikat nextcloud.castenow.de abdeckt; angeboten: TLS1.2, TLS1.3",
+     "ref": "scan_results:testssl:195.50.179.5",
+     "tool": "testssl"
+    },
+    {
      "excerpt": "nextcloud.castenow.de:443 tls=tls13 cn=*.castenow.de gueltig_bis=2026-09-24T23:59:59Z",
      "ref": "hosts/195.50.179.5/phase2/httpx.json",
      "tool": "httpx"
     }
    ],
-   "fallback_scsv": null,
+   "fallback_scsv": true,
    "fqdn": "nextcloud.castenow.de",
    "grade": null,
    "host_ip": "195.50.179.5",
@@ -15632,17 +15295,18 @@
    "observed_at": "2026-07-22T08:40:15Z",
    "port": 443,
    "protocols": {
-    "SSLv2": null,
-    "SSLv3": null,
-    "TLS1.0": null,
-    "TLS1.1": null,
-    "TLS1.2": null,
+    "SSLv2": false,
+    "SSLv3": false,
+    "TLS1.0": false,
+    "TLS1.1": false,
+    "TLS1.2": true,
     "TLS1.3": true
    },
    "source": "httpx",
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": false,
     "cn": "*.castenow.de",
@@ -15736,6 +15400,7 @@
    ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.castenow.de",
@@ -15939,6 +15604,7 @@
    ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "*.castenow.de",
@@ -16071,6 +15737,7 @@
    ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "castenow.de",
@@ -16153,6 +15820,7 @@
    ]
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": true,
     "cn": "ubb-wiki.castenow.de",

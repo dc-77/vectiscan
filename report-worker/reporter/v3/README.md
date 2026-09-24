@@ -41,15 +41,53 @@ sondern der Normalfall in Tests und Entwicklung.
 | `ids.py` | `VS-<Kuerzel>-<Jahr>-<lfd>` bzw. `VS-<Jahr>-<lfd>` |
 | `plan.py` | Massnahmenplan und die drei Hebel |
 | `chapters.py` | meta, glance, business, scope, architecture |
+| `coverage.py` | Abdeckungsmodell je Host und System (2.1, 2.2, Hinweis Seite 3, Zaehlungen, Posture), Einschraenkungen je Ursache, Pruefumfang je Zieldomain (S6b-1) |
+| `roles.py` | Rollen nur mit Beleg (MX, SPF-Mechanismus, Autodiscover, Exchange-Fakt, Titel, Software, Dienst) und die Rollenwoerter fuer Prosa-Gate und `rolle_ohne_fakt` (S6b-1) |
+| `operators.py` | Zustaendigkeit eines Befunds auf geteilten Systemen: Hoster oder Plattformbetreiber (S6b-1) |
 | `appendix.py` | Anhaenge A bis F |
 | `narrative.py` | Erzaehltexte als Vorlage mit Zahlen-Slots |
-| `tables.py` | Impressum, Pakete, Werkzeugliste, Skalen, Posture-Bloecke |
+| `tables.py` | Impressum, Pakete, Werkzeugliste, Skalen, Posture-Bloecke, Pruefungsnamen je Werkzeug und Familie (`TOOL_CHECKS`, `FAMILY_CHECKS`), Rollen (`ROLE_DEFS`, `ROLE_WORDS`) |
 | `orthography.py` | echte Umlaute statt Umschrift, Fremdtext glaetten |
 | `prose.py` | ein KI-Aufruf fuer vier Felder, mit Cache und Kostenprotokoll |
 | `gate.py` | Ausgabepruefung dieser vier Felder |
 | `selfcheck.py` | `check_report_data`, portiert aus dem Gate des Prototyps |
 | `golden.py` | Golden-Reportdaten bauen und gegen Drift pruefen |
 | `deltas.md` | begruendete Abweichungen vom Prototyp |
+
+## Abdeckung, Rollen und Zustaendigkeit (S6b-1, spec/09)
+
+- **Ein Modell** (`coverage.build_model`) liefert den Status je Host: voll (Portscan mit
+  offenem Port und alle Leitwerkzeuge des Pakets aus `tables.LEAD_TOOLS`), teil, keine,
+  unerreichbar, extern (Drittanbieter). Kapitel 2.1, 2.2, der Hinweis auf Seite 3, die
+  Zaehlungen in `meta` und die Posture-Bloecke lesen daraus; vorher galten in 2.1 und im
+  Hinweis zwei verschiedene Regeln. IPv4 und IPv6 mit gleichem rDNS sind ein System
+  (eine Zeile, `more_ips`); der Status des Systems ist voll nur, wenn alle Adressen voll
+  sind.
+- **Einschraenkungen** (`coverage.limitations`): eine Zeile je Ursache mit den
+  betroffenen Pruefungen in Kundensprache (`Limitation.checks`, Namen aus
+  `TOOL_CHECKS`/`FAMILY_CHECKS`). Eine Wurzelursache des Hosts (Drittanbieter, nicht
+  erreichbar, kein offener Port, IPv6 ohne Route, Blockade, Scan-Steuerung) unterdrueckt
+  alle Folgezeilen dieses Hosts; die ZAP-Kette zaehlt als eine Ursache. E5 (Port 25 laut
+  Passivquelle, vom Portscan nicht gesehen) ist eine feste Zeile. Werkzeugnamen stehen
+  hier nie (Gate `werkzeugname_im_kundentext`), eine Zeile ohne Pruefung ist ein
+  Gate-Fehler (`einschraenkung_ohne_pruefung`).
+- **Rollen** (`roles.host_roles`, hoechstens drei je System): E-Mail nur ueber MX-Namen,
+  SPF-Mechanismus (`ip4`, `a`, `a:name`, `mx`), Autodiscover; Kalender nur mit Exchange-Fakt
+  am eigenen Host; Website, Webmail, Passwortverwaltung, Kollaboration, Anmeldeportal ueber
+  Titel oder Software des eigenen VHosts; Fernzugang, Datenbank, Dateiaustausch ueber
+  Dienstfakten. Nie ueber eine Portnummer allein. Auf geteilten Systemen nur Rollen aus den
+  VHosts und DNS-Eintraegen des Kunden. Die Prosa-KI sieht nur Systeme mit Rolle und deren
+  Belege; ein Rollenwort ohne Rolle lehnt `gate.check_field` ab, im Endtext meldet es
+  `rolle_ohne_fakt`.
+- **Zustaendigkeit** (`operators.operator_for`): Befunde auf geteilten Systemen nach
+  `catalog/tables.SHARED_OPERATOR_CHECKS` bzw. alles Hostbezogene auf Plattformen tragen
+  "beim Hoster X" oder "beim Plattformbetreiber X" im Titel und einen Satz dazu; Buendel
+  (`bundles.consolidate`) und Planzeilen (`plan.py`, "Beim Hoster einfordern: ...") werden
+  nach Zustaendigkeit getrennt. Die Einstufung aendert sich dadurch nicht.
+- **Darstellung**: Betroffen-Listen ein Eintrag je Name (`findings.merge_affected`), mehr
+  als drei Gruppen als "drei Namen (insgesamt N Hosts)", Bildschirmfotos ohne Dubletten
+  (gleicher Bildschluessel, Body-Hash oder `final_url`; Namen ohne eigenen Abruf erben kein
+  Bild), Service-Karte und Anhang B aus derselben Zuordnung Befund zu Host und Port.
 
 ## Vom Pruefergebnis zum Befund
 

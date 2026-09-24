@@ -154,12 +154,12 @@
   },
   "VS-2026-P08": {
    "checks": [
-    "db_exposed"
+    "dmarc_missing"
    ]
   },
   "VS-2026-P09": {
    "checks": [
-    "dmarc_missing"
+    "dns_dangling_cname"
    ]
   },
   "VS-2026-P10": {
@@ -169,12 +169,12 @@
   },
   "VS-2026-P11": {
    "checks": [
-    "dns_dangling_cname"
+    "dns_zone_transfer"
    ]
   },
   "VS-2026-P12": {
    "checks": [
-    "dns_zone_transfer"
+    "hsts_missing"
    ]
   },
   "VS-2026-P13": {
@@ -199,7 +199,7 @@
   },
   "VS-2026-P17": {
    "checks": [
-    "hsts_missing"
+    "hsts_short"
    ]
   },
   "VS-2026-P18": {
@@ -224,37 +224,37 @@
   },
   "VS-2026-P22": {
    "checks": [
-    "hsts_short"
+    "http_no_tls"
    ]
   },
   "VS-2026-P23": {
    "checks": [
-    "http_no_tls"
+    "rdp_exposed"
    ]
   },
   "VS-2026-P24": {
    "checks": [
-    "rdp_exposed"
+    "smb_exposed"
    ]
   },
   "VS-2026-P25": {
    "checks": [
-    "rdp_exposed"
+    "tls_legacy_protocols"
    ]
   },
   "VS-2026-P26": {
    "checks": [
-    "smb_exposed"
+    "tls_no_13"
    ]
   },
   "VS-2026-P27": {
    "checks": [
-    "smb_exposed"
+    "tls_no_13"
    ]
   },
   "VS-2026-P28": {
    "checks": [
-    "tls_legacy_protocols"
+    "tls_no_13"
    ]
   },
   "VS-2026-P29": {
@@ -274,25 +274,10 @@
   },
   "VS-2026-P32": {
    "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-P33": {
-   "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-P34": {
-   "checks": [
-    "tls_no_13"
-   ]
-  },
-  "VS-2026-P35": {
-   "checks": [
     "tls_weak_ciphers"
    ]
   },
-  "VS-2026-P36": {
+  "VS-2026-P33": {
    "checks": [
     "urlhaus_compromise"
    ]

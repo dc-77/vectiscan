@@ -12,7 +12,7 @@ import os
 
 import pytest
 
-from reporter.pdf.v3.checks import REQUIRED_FONTS, sparse_pages
+from reporter.pdf.v3.checks import REQUIRED_FONTS, sparse_from_fill
 from tests.pdf_v3.conftest import (CASTENOW, JUNKERWERK_MULTI, RENDER_GOLDEN,
                                    fake_screenshots, weasyprint_or_skip)
 
@@ -54,7 +54,7 @@ def test_referenzauftrag_ohne_halbleere_seite(weasy, tmp_path):
     """
     result = _render(tmp_path, JUNKERWERK_MULTI)
     assert result.sparse_pages == (), f"halbleere Seiten {result.sparse_pages}"
-    assert sparse_pages(result.words_per_page) == result.sparse_pages
+    assert sparse_from_fill(result.fill) == result.sparse_pages
 
 
 def test_schriften_sind_eingebettet(weasy, tmp_path):

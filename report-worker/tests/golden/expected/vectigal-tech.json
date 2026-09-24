@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-23.1 auf tests/golden/facts/75338c97-6707-4d11-92bf-bb3cd2e02cde.json",
+ "source": "reporter.catalog 2026-09-25.1 auf tests/golden/facts/75338c97-6707-4d11-92bf-bb3cd2e02cde.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -357,14 +357,6 @@
   },
   {
    "id": "VS-2026-P08",
-   "check": "db_exposed",
-   "family": "db_exposed",
-   "cat": "A",
-   "group": "62.217.52.177 (test.vectigal.tech)",
-   "title": "Keine Datenbankdienste aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P09",
    "check": "dmarc_missing",
    "family": "dmarc_missing",
    "cat": "C",
@@ -372,7 +364,7 @@
    "title": "DMARC-Richtlinie vorhanden"
   },
   {
-   "id": "VS-2026-P10",
+   "id": "VS-2026-P09",
    "check": "dns_dangling_cname",
    "family": "dns_dangling",
    "cat": "C",
@@ -380,7 +372,7 @@
    "title": "Keine verwaisten CNAME-Einträge"
   },
   {
-   "id": "VS-2026-P11",
+   "id": "VS-2026-P10",
    "check": "dns_dangling_cname",
    "family": "dns_dangling",
    "cat": "C",
@@ -388,7 +380,7 @@
    "title": "Keine verwaisten CNAME-Einträge"
   },
   {
-   "id": "VS-2026-P12",
+   "id": "VS-2026-P11",
    "check": "dns_zone_transfer",
    "family": "dns_axfr",
    "cat": "C",
@@ -396,11 +388,19 @@
    "title": "Zonentransfer abgewiesen"
   },
   {
-   "id": "VS-2026-P13",
+   "id": "VS-2026-P12",
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
    "group": "10finance.vectigal.tech",
+   "title": "HTTP Strict Transport Security gesetzt"
+  },
+  {
+   "id": "VS-2026-P13",
+   "check": "hsts_missing",
+   "family": "hsts_missing",
+   "cat": "D",
+   "group": "board.vectigal.tech",
    "title": "HTTP Strict Transport Security gesetzt"
   },
   {
@@ -408,7 +408,7 @@
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
-   "group": "board.vectigal.tech",
+   "group": "crm.vectigal.tech",
    "title": "HTTP Strict Transport Security gesetzt"
   },
   {
@@ -416,7 +416,7 @@
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
-   "group": "crm.vectigal.tech",
+   "group": "crmviewer.vectigal.tech",
    "title": "HTTP Strict Transport Security gesetzt"
   },
   {
@@ -424,23 +424,23 @@
    "check": "hsts_missing",
    "family": "hsts_missing",
    "cat": "D",
-   "group": "crmviewer.vectigal.tech",
+   "group": "gutachter.vectigal.tech",
    "title": "HTTP Strict Transport Security gesetzt"
   },
   {
    "id": "VS-2026-P17",
-   "check": "hsts_missing",
-   "family": "hsts_missing",
+   "check": "hsts_short",
+   "family": "hsts_short",
    "cat": "D",
-   "group": "gutachter.vectigal.tech",
-   "title": "HTTP Strict Transport Security gesetzt"
+   "group": "10finance.vectigal.tech",
+   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
    "id": "VS-2026-P18",
    "check": "hsts_short",
    "family": "hsts_short",
    "cat": "D",
-   "group": "10finance.vectigal.tech",
+   "group": "board.vectigal.tech",
    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
@@ -448,7 +448,7 @@
    "check": "hsts_short",
    "family": "hsts_short",
    "cat": "D",
-   "group": "board.vectigal.tech",
+   "group": "crm.vectigal.tech",
    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
@@ -456,7 +456,7 @@
    "check": "hsts_short",
    "family": "hsts_short",
    "cat": "D",
-   "group": "crm.vectigal.tech",
+   "group": "crmviewer.vectigal.tech",
    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
@@ -464,19 +464,11 @@
    "check": "hsts_short",
    "family": "hsts_short",
    "cat": "D",
-   "group": "crmviewer.vectigal.tech",
-   "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
-  },
-  {
-   "id": "VS-2026-P22",
-   "check": "hsts_short",
-   "family": "hsts_short",
-   "cat": "D",
    "group": "gutachter.vectigal.tech",
    "title": "HTTP Strict Transport Security mit ausreichender Gültigkeitsdauer"
   },
   {
-   "id": "VS-2026-P23",
+   "id": "VS-2026-P22",
    "check": "http_no_tls",
    "family": "http_no_tls",
    "cat": "A",
@@ -484,39 +476,23 @@
    "title": "Webdienst mit Transportverschlüsselung"
   },
   {
-   "id": "VS-2026-P24",
+   "id": "VS-2026-P23",
    "check": "rdp_exposed",
    "family": "rdp_exposed",
    "cat": "A",
    "group": "62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech)",
    "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P24",
+   "check": "smb_exposed",
+   "family": "smb_exposed",
+   "cat": "A",
+   "group": "62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech)",
+   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
   },
   {
    "id": "VS-2026-P25",
-   "check": "rdp_exposed",
-   "family": "rdp_exposed",
-   "cat": "A",
-   "group": "62.217.52.177 (test.vectigal.tech)",
-   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P26",
-   "check": "smb_exposed",
-   "family": "smb_exposed",
-   "cat": "A",
-   "group": "62.217.52.165 (10finance.vectigal.tech, agent.vectigal.tech, auth.vectigal.tech, board.vectigal.tech, crm.vectigal.tech, crmviewer.vectigal.tech, feedgenerator.vectigal.tech, gutachter-api.vectigal.tech, gutachter.vectigal.tech, id.vectigal.tech, ki-check-10finance.vectigal.tech, ki-check.vectigal.tech, logs.vectigal.tech, mcp-test.vectigal.tech, monitoring.vectigal.tech, page.vectigal.tech, protokoll-assist.vectigal.tech, rankingcoach.vectigal.tech, saferouter-admin.vectigal.tech, saferouter-api.vectigal.tech, saferouter-app.vectigal.tech, saferouter-auth.vectigal.tech, saferouter-www.vectigal.tech, scan-api.vectigal.tech, scan.vectigal.tech, shopify.vectigal.tech, status.vectigal.tech, traefik.vectigal.tech, vectigal.tech, webcheck.vectigal.tech)",
-   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P27",
-   "check": "smb_exposed",
-   "family": "smb_exposed",
-   "cat": "A",
-   "group": "62.217.52.177 (test.vectigal.tech)",
-   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
-  },
-  {
-   "id": "VS-2026-P28",
    "check": "tls_legacy_protocols",
    "family": "tls_legacy_protocols",
    "cat": "D",
@@ -524,7 +500,7 @@
    "title": "Nur aktuelle TLS-Protokolle"
   },
   {
-   "id": "VS-2026-P29",
+   "id": "VS-2026-P26",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -532,7 +508,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P30",
+   "id": "VS-2026-P27",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -540,7 +516,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P31",
+   "id": "VS-2026-P28",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -548,7 +524,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P32",
+   "id": "VS-2026-P29",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -556,7 +532,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P33",
+   "id": "VS-2026-P30",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -564,7 +540,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P34",
+   "id": "VS-2026-P31",
    "check": "tls_no_13",
    "family": "tls_no_13",
    "cat": "D",
@@ -572,7 +548,7 @@
    "title": "TLS 1.3 verfügbar"
   },
   {
-   "id": "VS-2026-P35",
+   "id": "VS-2026-P32",
    "check": "tls_weak_ciphers",
    "family": "tls_weak_ciphers",
    "cat": "D",
@@ -580,7 +556,7 @@
    "title": "Keine schwachen TLS-Cipher"
   },
   {
-   "id": "VS-2026-P36",
+   "id": "VS-2026-P33",
    "check": "urlhaus_compromise",
    "family": "urlhaus_compromise",
    "cat": "A",

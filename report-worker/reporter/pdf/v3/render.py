@@ -59,6 +59,13 @@ class RenderResult:
     defects: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     html: str = ""
+    # S6b-1 (spec/09 Teil 3): Fuellhoehe je Seite und die Layoutbefunde. ``layout_ok``
+    # ist False, wenn die Seitenboxen nicht lesbar waren; dann fehlt die Pruefung.
+    fill: tuple[float, ...] = ()
+    kicker_pages: tuple[int, ...] = ()
+    heading_pages: tuple[int, ...] = ()
+    overflow: tuple[str, ...] = ()
+    layout_ok: bool = False
 
 
 # ----------------------------------------------------------------- Jinja-Filter
@@ -171,14 +178,32 @@ def render_report_v3(data: ReportData | dict, output_path: str | Path, *,
     document.write_pdf(str(out))
 
     words = checks.words_per_page(out)
-    sparse = checks.sparse_pages(words)
+    layout = checks.layout_scan(document)
+    if layout is not None:
+        # S6b-1: halbleer nach Fuellhoehe statt Wortzahl; jede solche Seite wird gemeldet.
+        sparse = checks.sparse_from_fill(layout.fill)
+    else:
+        sparse = checks.sparse_pages(words)
+        warnings.append("Layoutpruefung nicht verfuegbar (Seitenboxen nicht lesbar)")
     warnings.extend(checks.font_check(out))
     if sparse:
         warnings.append(f"halbleere Seiten {list(sparse)}")
+    if layout is not None:
+        for page in layout.kicker_pages:
+            warnings.append(f"Kicker ohne Überschrift auf Seite {page}")
+        for page in layout.heading_pages:
+            warnings.append(f"Überschrift am Seitenende auf Seite {page}")
+        for where in layout.overflow:
+            warnings.append(f"außerhalb des Satzspiegels: {where}")
 
     result = RenderResult(pdf_path=out, pages=len(document.pages),
                           words_per_page=words, sparse_pages=sparse,
-                          defects=defects, warnings=warnings, html=html)
+                          defects=defects, warnings=warnings, html=html,
+                          fill=layout.fill if layout else (),
+                          kicker_pages=layout.kicker_pages if layout else (),
+                          heading_pages=layout.heading_pages if layout else (),
+                          overflow=layout.overflow if layout else (),
+                          layout_ok=layout is not None)
     log.info("pdf_v3_rendered", path=str(out), pages=result.pages,
              package=variant.key, defects=len(defects), warnings=len(warnings),
              sparse=list(sparse))

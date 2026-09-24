@@ -49,11 +49,15 @@ def report_bundle_from_source(source: str | Path,
     """
     from reporter.catalog import evaluate
     from reporter.facts import build_facts
+    from reporter.facts.build import context_from_customer_context
     from reporter.v3 import build_report_data
 
     facts = build_facts(str(source), host_inventory, tech_profiles,
                         correlated_findings, job_payload,
                         tool_runs=tool_runs, orders_json=orders_json, order=order)
+    # S6b-1 (spec/09 Q15): woher Firmenname, Kurzname, Branche und Mitarbeiterzahl
+    # stammen, steht in den exportierten Fakten, nicht nur in der Datenbank.
+    facts.context = context_from_customer_context(customer_context)
     output = evaluate(facts)
     data = build_report_data(facts, output, order=order,
                              customer_context=customer_context,

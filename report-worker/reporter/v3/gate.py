@@ -61,8 +61,15 @@ def _unknown(values: Iterable[str], haystack: str) -> list[str]:
     return sorted({v for v in values if v.lower() not in haystack})
 
 
-def check_field(name: str, text: str, haystack: str) -> Verdict:
-    """Prueft einen einzelnen Prosa-Text gegen die Eingabedaten."""
+def check_field(name: str, text: str, haystack: str, *, role_keys=None,
+                reference: str = "") -> Verdict:
+    """Prueft einen einzelnen Prosa-Text gegen die Eingabedaten.
+
+    S6b-1 (spec/09 Q2): mit ``role_keys`` faellt ein Text durch, der einem System eine
+    Aufgabe zuschreibt (Kalender, Korrespondenz, Datenbank ...), ohne dass eine Rolle
+    dieser Art belegt ist. Woerter aus dem deterministischen Bezugstext ``reference``
+    gelten nicht als neue Aussage.
+    """
     reasons: list[str] = []
     if not text or not text.strip():
         return Verdict(False, ["leer"])
@@ -104,5 +111,11 @@ def check_field(name: str, text: str, haystack: str) -> Verdict:
     umlauts = find_transliterations(text, haystack)
     if umlauts:
         reasons.append(f"Umschrift statt Umlaut: {sorted(set(umlauts))}")
+    if role_keys is not None:
+        from reporter.v3.roles import role_words_without_fact
+
+        ohne = role_words_without_fact(text, role_keys, reference)
+        if ohne:
+            reasons.append(f"Rolle ohne Fakt: {ohne}")
 
     return Verdict(not reasons, reasons)

@@ -1,9 +1,21 @@
 {
  "facts": {
   "tls": [
-   {"host_ip": "10.0.0.1", "fqdn": "www.example.test", "port": 443,
-    "protocols": {"SSLv2": null, "SSLv3": null, "TLS1.0": null, "TLS1.1": null, "TLS1.2": null, "TLS1.3": true},
-    "source": "httpx"}
+   {
+    "host_ip": "10.0.0.1",
+    "fqdn": "www.example.test",
+    "port": 443,
+    "protocols": {
+     "SSLv2": null,
+     "SSLv3": null,
+     "TLS1.0": null,
+     "TLS1.1": null,
+     "TLS1.2": null,
+     "TLS1.3": null
+    },
+    "source": "testssl",
+    "json_filtered": true
+   }
   ]
  },
  "coverage_default": "ok",

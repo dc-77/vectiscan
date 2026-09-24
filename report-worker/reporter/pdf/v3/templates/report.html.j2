@@ -50,11 +50,14 @@ p{margin:0 0 5pt;} b,strong{font-weight:600;color:var(--ink);}
 
 /* ---- Sections ---- */
 .sec{break-before:page;padding-top:2mm;}
-.sec-head{border-bottom:1.4pt solid var(--cyan-line);padding-bottom:2.5mm;margin:0 0 4.5mm;}
+.sec-head{border-bottom:1.4pt solid var(--cyan-line);padding-bottom:2.5mm;margin:0 0 4.5mm;break-inside:avoid;break-after:avoid;}
 .kicker{font-size:7.8pt;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--cyan-deep);}
 h2{font-size:17pt;font-weight:700;color:var(--navy);letter-spacing:-0.012em;margin:1.5mm 0 0;line-height:1.15;}
 h3{font-size:11pt;font-weight:600;color:var(--navy);margin:4mm 0 1.8mm;} h3:first-child{margin-top:0;}
 h4{font-size:9.4pt;font-weight:600;color:var(--navy2);margin:2.5mm 0 1mm;}
+/* S6b-1 (spec/09 Teil 3): Kicker, Ueberschrift und Tabellenkopf bleiben beim Folgeinhalt. */
+h3,h4{break-after:avoid;} thead{display:table-header-group;} thead tr{break-after:avoid;}
+.wrap{overflow-wrap:anywhere;}
 .lead{font-size:10.4pt;color:var(--ink);margin:0 0 4mm;}
 .small{font-size:8.4pt;color:var(--muted);}
 ul{margin:0 0 5pt;padding-left:0;list-style:none;} li{position:relative;padding-left:5mm;margin-bottom:2.5pt;}
@@ -110,17 +113,17 @@ tr{break-inside:avoid;}
 .c-blau{border-left-color:var(--blau);background:var(--blau-bg);} .c-gruen{border-left-color:var(--gruen);background:#fff;} .c-grau{border-left-color:var(--grau);background:var(--grau-bg);color:var(--muted);}
 
 /* ---- Posture ---- */
-.post{width:100%;border-collapse:separate;border-spacing:2.5mm 0;margin:1.5mm -2.5mm 2mm;}
+.post{width:100%;border-collapse:separate;border-spacing:2mm 0;margin:1.5mm 0 2mm;table-layout:fixed;}
 .post{break-inside:avoid;} .post tr{break-inside:avoid;}
-.post td{border:0.6pt solid var(--line2);border-radius:3px;padding:1.8mm 2.4mm;width:25%;vertical-align:top;break-inside:avoid;}
+.post td{border:0.6pt solid var(--line2);border-radius:3px;padding:1.8mm 2.4mm;vertical-align:top;break-inside:avoid;overflow-wrap:anywhere;}
 .post .h{font-size:7.4pt;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--navy);margin-bottom:1.2mm;}
 .post .it{font-size:7.9pt;padding:0.4mm 0;border-bottom:0.4pt dotted var(--line);line-height:1.3;}
 .post .it:last-child{border-bottom:none;}
 .ok{color:#16A34A;font-weight:700;} .nok{color:#DC2626;font-weight:700;} .na{color:var(--muted2);font-weight:700;}
 
 /* ---- Screens ---- */
-.shots{width:100%;border-collapse:separate;border-spacing:3mm 0;margin:1.5mm -3mm 1mm;table-layout:fixed;}
-.shots td{width:33.33%;vertical-align:top;border:none;padding:0 0 3mm;}
+.shots{width:100%;border-collapse:separate;border-spacing:3mm 0;margin:1.5mm 0 1mm;table-layout:fixed;}
+.shots td{vertical-align:top;border:none;padding:0 0 3mm;}
 .shots img{width:100%;height:auto;display:block;border:0.5pt solid var(--line2);border-radius:2px;}
 .shots .cap{font-size:7.6pt;color:var(--muted);line-height:1.3;margin-top:1mm;}
 .shots .cap b{color:var(--navy);font-weight:600;}
@@ -140,6 +143,7 @@ tr{break-inside:avoid;}
 .fd .hd .ti{font-size:10.2pt;font-weight:600;color:var(--navy);line-height:1.3;flex:1;}
 .fd .meta{display:flex;flex-wrap:nowrap;gap:2.5mm;padding:2mm 4mm;border-bottom:0.5pt solid var(--line);font-size:8pt;color:var(--muted);align-items:center;}
 .fd .meta .sc{margin-left:auto;font-family:"DejaVu Sans Mono",monospace;color:var(--ink);white-space:nowrap;}
+.fd .op{background:var(--grau-bg);border-radius:2px;padding:1.4mm 2.4mm;margin:0 0 2mm;font-size:8.6pt;}
 .fd .bd{padding:2.5mm 4mm 1mm;}
 .fd .lab{font-size:7.2pt;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--cyan-deep);margin:1.8mm 0 0.6mm;break-after:avoid;}
 .ev{break-inside:avoid;}
@@ -155,7 +159,10 @@ tr{break-inside:avoid;}
 .wrapup{margin-top:2mm;break-before:avoid;break-inside:avoid;}
 
 /* ---- Appendix ---- */
-.lastpage{display:flex;flex-direction:column;justify-content:space-between;height:252mm;}
+/* S6b-1 (spec/09 Teil 3): kein erzwungener Umbruch vor Anhang D bis F; der Block samt
+   Impressum bricht nur um, wenn er auf der laufenden Seite keinen Platz mehr hat. */
+.lastpage{break-inside:avoid;margin-top:8mm;}
+.lastpage .impblock{margin-top:6mm;}
 .impblock{border-top:0.6pt solid var(--line2);padding-top:3mm;}
 .imprint{display:flex;gap:8mm;font-size:8.6pt;margin-top:2mm;}
 .imprint>div{flex:1;} .imprint .h{font-weight:600;color:var(--navy);margin-bottom:1.5mm;}
@@ -216,11 +223,11 @@ tr{break-inside:avoid;}
 <section>
  <div class="sec-head" style="margin-top:7mm"><div class="kicker">Kapitel 1 · Für die Geschäftsführung</div><h2>Kontext und Bedeutung für Ihr Unternehmen</h2></div>
  <p>{{ g.context }}</p>
- <div class="box warn"><div class="t">Hinweis zur Abdeckung</div>{{ g.coverage_warning }}</div>
+ {% if g.coverage_warning %}<div class="box warn"><div class="t">Hinweis zur Abdeckung</div>{{ g.coverage_warning }}</div>{% endif %}
  <h3>Was der Scan über Ihr Unternehmen zeigt</h3>
  <p>{{ b.lead }}</p>
  <table>
-  <tr><th style="width:54mm">Beobachtetes System</th><th style="width:114mm">Bedeutung für das Risiko</th></tr>
+  <thead><tr><th style="width:54mm">Beobachtetes System</th><th style="width:114mm">Bedeutung für das Risiko</th></tr></thead>
   {% for o in b.observed %}<tr><td><b>{{ o.system }}</b></td><td>{{ o.meaning }}</td></tr>{% endfor %}
  </table>
  <h3>Was das für Sie bedeutet</h3>
@@ -233,19 +240,23 @@ tr{break-inside:avoid;}
  <p class="lead">{{ s.lead }}</p>
  <h3>2.1 Prüfungsumfang</h3>
  <table>
-  <tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">Betrieb / Rolle</th><th style="width:44mm">Abdeckung</th></tr>
+  <thead><tr><th style="width:28mm">IP-Adresse</th><th style="width:54mm">Hostnamen</th><th style="width:42mm">Netzbetreiber / Rolle</th><th style="width:44mm">Abdeckung</th></tr></thead>
   {% for h in s.hosts %}
-  <tr><td class="mono">{{ h.ip }}</td><td>{{ h.fqdns }}</td><td>{{ h.operator }}<br><span class="small">{{ h.role }}</span></td>
-      <td><span class="dot d-{{ {'voll':'gruen','teil':'gelb','keine':'rot'}[h.cov] }}"></span>{{ h.coverage }}</td></tr>
+  <tr><td class="mono">{{ h.ip }}{% for a in h.more_ips %}<br>{{ a }}{% endfor %}</td><td class="wrap">{{ h.fqdns }}</td><td class="wrap">{{ h.operator }}<br><span class="small">{{ h.role }}</span></td>
+      <td class="wrap"><span class="dot d-{{ {'voll':'gruen','teil':'gelb','keine':'rot','unerreichbar':'rot','extern':'grau'}[h.cov] }}"></span>{{ h.coverage }}</td></tr>
   {% endfor %}
  </table>
+ {% if s.domains %}
+ <h4>Prüfumfang je Zieldomain</h4>
+ <ul>{% for d in s.domains %}<li><b>{{ d.domain }}:</b> {{ d.text }}</li>{% endfor %}</ul>
+ {% endif %}
  <p><b>Prüfzeitraum:</b> {{ period_note }}</p>
  <h4>Nicht Bestandteil dieser Prüfung</h4>
  <ul>{% for o in s.out_of_scope %}<li>{{ o }}</li>{% endfor %}</ul>
  <h3>2.2 Einschränkungen dieses Laufs</h3>
  <table>
-  <tr><th style="width:38mm">Einschränkung</th><th style="width:130mm">Auswirkung auf die Ergebnisse</th></tr>
-  {% for l in s.limitations %}<tr><td><b>{{ l.what }}</b></td><td>{{ l.detail }}</td></tr>{% endfor %}
+  <thead><tr><th style="width:42mm">Einschränkung</th><th style="width:44mm">Betroffene Prüfungen</th><th style="width:82mm">Auswirkung auf die Ergebnisse</th></tr></thead>
+  {% for l in s.limitations %}<tr><td><b>{{ l.what }}</b></td><td class="small">{{ l.checks|join(', ') }}</td><td class="wrap">{{ l.detail }}</td></tr>{% endfor %}
  </table>
 <div style="margin-top:2mm"></div>
  <div class="nums">{% for n in s.numbers %}<div><div class="v">{{ n.v }}</div><div class="l">{{ n.l }}</div></div>{% endfor %}</div>
@@ -274,7 +285,7 @@ tr{break-inside:avoid;}
  {% for h in a.tech %}
  <h4>{{ h.host }}</h4>
  <table style="margin-top:0.5mm;margin-bottom:2.5mm;font-size:8.2pt">
-  <tr><th style="width:40mm">Komponente</th><th style="width:30mm">Version</th><th style="width:36mm">Erkennung (Quelle, Konfidenz)</th><th style="width:26mm">Patch-Status</th><th style="width:36mm">Hinweis</th></tr>
+  <thead><tr><th style="width:40mm">Komponente</th><th style="width:30mm">Version</th><th style="width:36mm">Erkennung (Quelle, Konfidenz)</th><th style="width:26mm">Patch-Status</th><th style="width:36mm">Hinweis</th></tr></thead>
   {% for r in h.rows %}<tr><td>{{ r.c }}</td><td class="mono">{{ r.v }}</td><td class="small">{{ r.src }}, {{ r.conf }}</td><td><span class="pill p-{{ r.st }}">{{ r.status }}</span></td><td class="small">{{ r.note }}</td></tr>{% endfor %}
  </table>
  {% endfor %}
@@ -297,7 +308,7 @@ tr{break-inside:avoid;}
  <h3>3.4 Gesichtete Web-Oberflächen</h3>
  <p>{{ a.screens_lead }}</p>
  <table class="shots">
-  {% for row in a.screens|batch(3) %}<tr>{% for sc in row %}<td><img src="vectiscan-screenshot:{{ sc.key or sc.file }}" alt="{{ sc.host }}"><div class="cap"><b>{{ sc.host }}</b><br>{{ sc.what }}</div></td>{% endfor %}</tr>{% endfor %}
+  {% for row in a.screens|batch(3) %}<tr>{% for sc in row %}<td><img src="vectiscan-screenshot:{{ sc.key or sc.file }}" alt="{{ sc.host }}"><div class="cap"><b>{{ sc.host }}</b>{% if sc.also %} <span>(auch {{ sc.also|join(', ') }})</span>{% endif %}<br>{{ sc.what }}</div></td>{% endfor %}</tr>{% endfor %}
  </table>
  {% endif %}
 
@@ -319,7 +330,7 @@ tr{break-inside:avoid;}
  <div class="sec-head" style="margin-top:6mm"><div class="kicker">Kapitel 5 · Für IT-Leitung und Umsetzung</div><h2>Maßnahmenplan</h2></div>
  <p class="lead">Priorisiert nach Dringlichkeit und Wirkung. Der Plan nennt bewusst keine Aufwände oder Kosten: Diese hängen von Umgebung, Verträgen und Dienstleistern ab und gehören in die Planung des Umsetzers. Die technischen Details je Maßnahme stehen im jeweiligen Befund in Kapitel 6.</p>
  <table>
-  <tr><th style="width:22mm">Priorität</th><th style="width:84mm">Maßnahme</th><th style="width:26mm">Befunde</th><th style="width:36mm">Erwarteter Effekt</th></tr>
+  <thead><tr><th style="width:22mm">Priorität</th><th style="width:84mm">Maßnahme</th><th style="width:26mm">Befunde</th><th style="width:36mm">Erwarteter Effekt</th></tr></thead>
   {% for p in plan %}<tr><td><span class="pill p-{{ p.st }}">{{ p.prio }}</span></td><td>{{ p.action }}</td><td class="mono" style="font-size:7.6pt">{% for r in p.refs %}{{ r }}{% if not loop.last %}<br>{% endif %}{% endfor %}</td><td class="small">{{ p.effect|dot_br }}</td></tr>{% endfor %}
  </table>
  <div class="box info"><div class="t">Zeitstufen</div>{{ stage_box }}</div>
@@ -332,10 +343,11 @@ tr{break-inside:avoid;}
  <div class="fd s-{{ f.status }}">
   <div style="break-inside:avoid">
   <div class="hd"><span class="id">{{ f.id }}</span><span class="ti">{{ f.title }}</span></div>
-  <div class="meta"><span class="pill p-{{ f.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU'}[f.status] }}</span><span><b>{{ f.urgency }}</b></span><span>· Kategorie {{ f.cat }}</span>
+  <div class="meta"><span class="pill p-{{ f.status }}">{{ {'rot':'ROT','gelb':'GELB','blau':'BLAU'}[f.status] }}</span><span><b>{{ f.urgency }}</b></span><span>· Kategorie {{ f.cat }}</span>{% if f.operator %}<span class="pill p-grau">{{ f.operator }}</span>{% endif %}
    <span class="sc">{% if f.scale == 'exposure' %}Exposition: {{ f.level_label or f.level }}{% else %}Hygiene: {{ f.level_label or f.level }}{% endif %}</span></div>
   <div class="bd" style="padding-bottom:0">
    <div class="lab">Betroffen</div><p>{{ f.affected }}<br><span class="small">Quelle: {{ f.source }}</span></p>
+   {% if f.operator_note %}<div class="lab">Zuständigkeit</div><div class="op">{{ f.operator_note }}</div>{% endif %}
   </div></div>
   <div class="bd" style="padding-top:0">
    <div class="lab">Was wurde gefunden</div><p>{{ f.found }}</p>
@@ -370,19 +382,19 @@ tr{break-inside:avoid;}
 <!-- ===================== ANHÄNGE ===================== -->
  <div class="sec-head" style="margin-top:8mm"><div class="kicker">Anhang {{ ltr.scales }}</div><h2>Bewertungsmaßstäbe</h2></div>
  <h3>A.1 Triage-Modell dieses Berichts</h3>
- <table><tr><th style="width:18mm">Status</th><th style="width:150mm">Bedeutung</th></tr>
+ <table><thead><tr><th style="width:18mm">Status</th><th style="width:150mm">Bedeutung</th></tr></thead>
  {% for t in ap.triage %}<tr><td><span class="pill p-{{ t.st }}">{{ t.l }}</span></td><td>{{ t.t }}</td></tr>{% endfor %}</table>
  <h3>A.2 Eigene Einstufung: Exposition und Hygiene</h3>
  <p>Der Bericht vergibt keine eigenen CVSS-Werte. Erreichbare Dienste werden nach Exposition eingestuft, Konfigurations- und Best-Practice-Abweichungen nach der VectiScan-Hygiene-Skala. Ein CVSS-Basiswert erscheint nur dort, wo eine Fremdbewertung zu einer zitierten CVE vorliegt (A.3); fehlt er, stammt die Schwachstellennummer aus dem Prüfwerkzeug und die Einstufung aus dem zugehörigen Befund.</p>
- <table><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Exposition</th></tr>
+ <table><thead><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Exposition</th></tr></thead>
  {% for h in ap.exposure_scale %}<tr><td><b>{{ h.l }}</b></td><td>{{ h.t }}</td></tr>{% endfor %}</table>
- <table><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Hygiene</th></tr>
+ <table><thead><tr><th style="width:18mm">Stufe</th><th style="width:150mm">Hygiene</th></tr></thead>
  {% for h in ap.hygiene_scale %}<tr><td><b>{{ h.l }}</b></td><td>{{ h.t }}</td></tr>{% endfor %}</table>
- <table><tr><th style="width:24mm">ID</th><th style="width:96mm">Titel</th><th style="width:24mm">Einstufung</th><th style="width:24mm">Dringlichkeit</th></tr>
+ <table><thead><tr><th style="width:24mm">ID</th><th style="width:96mm">Titel</th><th style="width:24mm">Einstufung</th><th style="width:24mm">Dringlichkeit</th></tr></thead>
  {% for f in findings %}<tr><td class="mono">{{ f.id }}</td><td>{{ f.title }}</td><td>{{ 'Exposition' if f.scale == 'exposure' else 'Hygiene' }} {{ f.level_label or f.level }}</td><td><span class="pill p-{{ f.status }}">{{ f.urgency }}</span></td></tr>{% endfor %}</table>
  <h3>A.3 CVE-Referenzen</h3>
  {% if ap.cve_refs %}
- <table><tr><th style="width:28mm">CVE</th><th style="width:34mm">Bezeichnung</th><th style="width:14mm">Basiswert</th><th style="width:16mm">Quelle</th><th style="width:34mm">Befund</th><th style="width:42mm">Hinweis</th></tr>
+ <table><thead><tr><th style="width:28mm">CVE</th><th style="width:34mm">Bezeichnung</th><th style="width:14mm">Basiswert</th><th style="width:16mm">Quelle</th><th style="width:34mm">Befund</th><th style="width:42mm">Hinweis</th></tr></thead>
  {% for c in ap.cve_refs %}<tr><td class="mono">{{ c.cve }}</td><td>{{ c.name }}</td><td class="mono">{{ c.score }}</td><td>{{ c.src }}</td><td class="mono">{{ c.ref }}</td><td class="small">{{ c.note }}</td></tr>{% endfor %}</table>
  {% else %}
  <p>Keine CVE-Referenzen in diesem Bericht.</p>
@@ -390,11 +402,11 @@ tr{break-inside:avoid;}
  {% if show_inventory %}
  <div class="sec-head" style="margin-top:6mm"><div class="kicker">Anhang {{ ltr.inventory }}</div><h2>Service-Inventar</h2></div>
  <p>Alle erkannten Dienste je Host, als Nachschlagewerk für den Maßnahmenplan. Einträge aus Passivquellen sind gekennzeichnet.</p>
- <table><tr><th style="width:36mm">Host</th><th style="width:14mm">Port</th><th style="width:82mm">Dienst</th><th style="width:36mm">Befund</th></tr>
- {% for r in ap.inventory %}<tr><td class="mono">{{ r.host }}</td><td class="mono">{{ r.port }}</td><td>{{ r.svc }}</td><td class="mono" style="font-size:7.6pt">{{ r.ref }}</td></tr>{% endfor %}</table>
+ <table><thead><tr><th style="width:36mm">Host</th><th style="width:14mm">Port</th><th style="width:82mm">Dienst</th><th style="width:36mm">Befund</th></tr></thead>
+ {% for r in ap.inventory %}<tr><td class="mono wrap">{{ r.host }}</td><td class="mono">{{ r.port }}</td><td>{{ r.svc }}</td><td class="mono" style="font-size:7.6pt">{{ r.ref }}</td></tr>{% endfor %}</table>
  {% endif %}
  <h3>Anhang {{ ltr.tools }} · Eingesetzte Werkzeuge</h3>
- <table><tr><th style="width:44mm">Werkzeug</th><th style="width:84mm">Einsatz</th><th style="width:40mm">Konfidenz</th></tr>
+ <table><thead><tr><th style="width:44mm">Werkzeug</th><th style="width:84mm">Einsatz</th><th style="width:40mm">Konfidenz</th></tr></thead>
  {% for t in ap.tools %}<tr><td>{{ t.t }}</td><td>{{ t.u }}</td><td class="small">{{ t.c }}</td></tr>{% endfor %}</table>
  {% if ap.dkim_selectors %}
  <h4>Abgefragte DKIM-Selektoren</h4>
@@ -404,12 +416,12 @@ tr{break-inside:avoid;}
  {% if show_tool_findings %}
  <h4>{{ txt.TOOL_FINDINGS_TITLE }}</h4>
  <p class="small">{{ txt.TOOL_FINDINGS_LEAD }}</p>
- <table><tr><th style="width:104mm">Meldung</th><th style="width:34mm">Betrifft</th><th style="width:30mm">Hinweis</th></tr>
+ <table><thead><tr><th style="width:104mm">Meldung</th><th style="width:34mm">Betrifft</th><th style="width:30mm">Hinweis</th></tr></thead>
  {% for t in ap.tool_findings %}<tr><td>{{ t.what }}</td><td class="small">{{ t.where }}</td><td class="small">{{ t.note }}</td></tr>{% endfor %}</table>
  {% endif %}
 
 </section>
-<section class="sec lastpage">
+<section class="lastpage">
  <div>
  <div class="sec-head"><div class="kicker">Anhang {{ ap_tail_range }}</div><h2>Methodische Filterung, Wiederholung, Haftung</h2></div>
  <h3>Anhang {{ ltr.filtering }} · Methodische Filterung</h3>

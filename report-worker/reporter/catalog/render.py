@@ -32,7 +32,7 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
     "http.paths": ("fqdn", "host_ip", "url_path", "status", "host_label"),
     "http.cookies": ("fqdn", "host_ip", "name", "flags_missing", "host_label"),
     "tls": ("fqdn", "host_ip", "port", "legacy_protocols", "ciphers_weak", "vulns", "cert_cn", "days_left", "not_after",
-            "issuer", "grade", "hsts_max_age", "host_label", "target"),
+            "issuer", "grade", "hsts_max_age", "host_label", "target", "days_left_text"),
     "tls.vulns": ("fqdn", "host_ip", "port", "name", "status", "host_label", "target"),
     "dns": ("domain", "spf_raw", "spf_qualifier", "dmarc_p", "dmarc_raw", "mx", "mx_count", "ns", "dkim_selectors"),
     "dns.dangling_cnames": ("domain", "fqdn", "cname_target", "takeover_risk"),
@@ -44,10 +44,38 @@ ITEM_VARS: dict[str, tuple[str, ...]] = {
 }
 
 # Variablen fuer texts.observation (Gruppenebene).
-OBSERVATION_VARS: tuple[str, ...] = ("affected", "count", "group", "fqdn_names", "domain", "host_ip", "notes")
+OBSERVATION_VARS: tuple[str, ...] = ("affected", "count", "group", "fqdn_names", "domain", "host_ip", "notes",
+                                     "n")
 
 
-def _s(value: Any) -> str:
+class Numerus:
+    """Einzahl oder Mehrzahl nach der Zahl der benannten Hosts (S6b-1, spec/09 Teil 3).
+
+    In Texten steht ``{n:Der Host|Die Hosts} {group} {n:bietet|bieten}``: vor dem
+    senkrechten Strich die Einzahl, dahinter die Mehrzahl. Ohne Formatangabe steht
+    die Zahl selbst da. Bis S6b-1 hiess es "Der Host A, B, C bietet" und bei mehr als
+    drei Hosts "Der Host den geprueften Hosts bietet".
+    """
+
+    def __init__(self, count: int):
+        self.count = int(count)
+
+    def __format__(self, spec: str) -> str:
+        if "|" in spec:
+            one, many = spec.split("|", 1)
+            return one if self.count == 1 else many
+        return str(self.count)
+
+    def __str__(self) -> str:
+        return str(self.count)
+
+    def __repr__(self) -> str:  # pragma: no cover - Anzeige in Fehlermeldungen
+        return f"Numerus({self.count})"
+
+
+def _s(value: Any) -> Any:
+    if isinstance(value, Numerus):
+        return value
     if value is None:
         return UNKNOWN
     if isinstance(value, bool):
@@ -162,7 +190,11 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
         cert = o.cert
         v.update({"legacy_protocols": [p.replace("TLS1.", "TLS 1.") for p in legacy], "ciphers_weak": sorted(o.ciphers_weak),
                   "vulns": [x.name for x in o.vulns], "cert_cn": cert.cn if cert else None,
-                  "days_left": cert.days_left if cert else None, "not_after": (cert.not_after or "")[:10] if cert and cert.not_after else None,
+                  "days_left": cert.days_left if cert else None,
+                  # S6b-1 (spec/09 Teil 3): "1 Tag", nicht "1 Tage"
+                  "days_left_text": (None if not cert or cert.days_left is None
+                                     else f"{cert.days_left} {'Tag' if cert.days_left == 1 else 'Tage'}"),
+                  "not_after": (cert.not_after or "")[:10] if cert and cert.not_after else None,
                   "issuer": cert.issuer if cert else None, "grade": o.grade,
                   "hsts_max_age": o.hsts.max_age if o.hsts else None, "target": f"{o.fqdn or ip}:{o.port}"})
     elif scope == "tls.vulns":
@@ -197,8 +229,9 @@ def item_vars(scope: str, item: Item, group: Group, index: FactsIndex) -> dict[s
 
 def group_vars(group: Group, labels: list[str], notes: list[str]) -> dict[str, Any]:
     return {"affected": labels, "count": len(labels), "group": group.label, "fqdn_names": group.fqdn_names,
-            "domain": group.domain or "", "host_ip": group.host.ip if group.host else "", "notes": notes}
+            "domain": group.domain or "", "host_ip": group.host.ip if group.host else "", "notes": notes,
+            "n": Numerus(1)}
 
 
-__all__ = ["ITEM_VARS", "OBSERVATION_VARS", "UNKNOWN", "validate_template", "format_strict", "template_fields",
+__all__ = ["ITEM_VARS", "OBSERVATION_VARS", "UNKNOWN", "Numerus", "validate_template", "format_strict", "template_fields",
            "item_vars", "group_vars"]

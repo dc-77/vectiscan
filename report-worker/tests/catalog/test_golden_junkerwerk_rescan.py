@@ -157,10 +157,15 @@ def test_ipv6_portscan_bleibt_ohne_ergebnis(facts):
     nach 23 Sekunden echtem Scan). Deshalb prueft seit S2c der Scanner selbst
     die Route und meldet ``no_ipv6_route``; dieses Fixture ist aelter als die
     Aenderung und zeigt den alten Stand.
+
+    S6b-1 (spec/09 Q9): ein Portscan ohne offenen Port ist kein Messergebnis mehr.
+    Shodan meldet an dieser Adresse Dienste, gesehen hoechstens sieben Tage vor dem
+    Scanende; die Abdeckung sagt deshalb "vom Pruefstand aus nicht erreichbar" statt
+    "ok". Issue #8 (Scanner) bleibt offen.
     """
     nmap_v6 = [c for c in facts.coverage if c.tool == "nmap" and c.host_ip == IPV6]
     assert len(nmap_v6) == 1, [c.id for c in nmap_v6]
-    assert (nmap_v6[0].status, nmap_v6[0].reason) == ("ok", "no_open_ports"), (
+    assert (nmap_v6[0].status, nmap_v6[0].reason) == ("empty", "unreachable_from_scanner"), (
         f"Abdeckung des IPv6-Hosts ist jetzt {nmap_v6[0].status}/{nmap_v6[0].reason}. "
         "Wenn das eine Verbesserung ist, diesen Test nachziehen und Issue #8 "
         "neu bewerten.")

@@ -1,5 +1,5 @@
 {
- "source": "reporter.catalog 2026-09-23.2 auf tests/golden/facts/c3d5724c-bdbf-4da8-982f-4f1a52210e28.json",
+ "source": "reporter.catalog 2026-09-25.1 auf tests/golden/facts/c3d5724c-bdbf-4da8-982f-4f1a52210e28.json",
  "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
  "customer": null,
  "domains": [
@@ -89,7 +89,8 @@
     "116.202.77.64:143 (IMAP)",
     "116.202.77.64:21 (FTP)"
    ],
-   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+   "zustaendig": "hoster"
   },
   {
    "id": "VS-2026-007",
@@ -117,7 +118,8 @@
     "116.202.77.64:3306 (MariaDB 10.11.18)",
     "116.202.77.64:5432 (PostgreSQL unbekannt)"
    ],
-   "title": "Dienst gibt Versionskennung preis"
+   "title": "Dienst gibt Versionskennung preis",
+   "zustaendig": "hoster"
   },
   {
    "id": "VS-2026-009",

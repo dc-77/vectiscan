@@ -79,11 +79,13 @@ def test_planbezuege_zeigen_auf_bekannte_befunde(order_id):
 def test_castenow_teilt_auf_und_laesst_nichts_weg():
     html = html_for(CASTENOW)
     assert "Weitere Sachverhalte" in html
-    assert "Dieses Kapitel zeigt die 15 dringendsten der 29 Befunde" in text_of(html)
+    # S6b-1: 31 statt 29, weil Sachverhalte beim Hoster oder Plattformbetreiber eigene
+    # Befunde sind (spec/09 Q3).
+    assert "Dieses Kapitel zeigt die 15 dringendsten der 31 Befunde" in text_of(html)
     haupt = _abschnitt(html, "Befunde im Detail", "Weitere Sachverhalte")
     anhang = _abschnitt(html, "Weitere Sachverhalte", "ANHÄNGE")
     assert haupt.count('<span class="id">') == TOP_N_HAUPTTEIL
-    assert anhang.count('<span class="id">') == 29 - TOP_N_HAUPTTEIL
+    assert anhang.count('<span class="id">') == 31 - TOP_N_HAUPTTEIL
 
 
 def test_junkerwerk_braucht_keinen_anhang_zu_kapitel_6():

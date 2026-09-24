@@ -376,6 +376,16 @@
    "check_prefix": "cve_",
    "reason_code": "no_enrichment",
    "note": "S5b: die Phase-3-Anreicherung liefert in keinem Lauf einen Fremdwert (cves_enriched 0). Die CVE-Pruefungen sind damit in allen vier Laeufen nicht pruefbar statt still bestanden"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "no_open_ports",
+   "note": "S6b-1 (spec/09 Q9): ein Portscan ohne offenen Port ist kein Messergebnis; 217.243.248.27 hatte in einem Lauf keinen offenen Port"
+  },
+  {
+   "check_prefix": "",
+   "reason_code": "unreachable_from_scanner",
+   "note": "S6b-1 (spec/09 Q9, E4): IPv6-Host im Rescan ohne offenen Port, Shodan meldet dort Dienste"
   }
  ],
  "expected_member_differences": [
@@ -433,10 +443,9 @@
    "bundle": "tls_hardening",
    "reason_codes": [
     "insufficient_facts",
-    "tls_protocols_unknown",
     "web_unreachable_after_portscan"
    ],
-   "warum": "Genau der Fall aus spec/08 Punkt 7: der Bericht nannte die Transportverschluesselung unauffaellig, waehrend Kapitel 2 fuer mehrere Hosts 'Protokollliste nicht verfuegbar' meldete."
+   "warum": "Genau der Fall aus spec/08 Punkt 7: der Bericht nannte die Transportverschluesselung unauffaellig, waehrend Kapitel 2 fuer mehrere Hosts 'Protokollliste nicht verfuegbar' meldete. S6b-1 (spec/09 Q10): testssl-Ergebnisse gelten ueber das Zertifikat auch fuer die uebrigen VHosts desselben IP:Port; tls_protocols_unknown entfaellt, die Unterdrueckung bleibt wegen der uebrigen Gruende."
   }
  }
 }

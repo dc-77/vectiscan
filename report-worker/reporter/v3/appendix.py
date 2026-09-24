@@ -19,18 +19,24 @@ from reporter.v3.models import (Appendix, CveRef, Finding, InventoryRow, ScaleRo
 UNKNOWN = "unbekannt"
 
 
-def build_inventory(facts: FS.Facts, findings: list[Finding]) -> list[InventoryRow]:
-    """Jeder erreichbare Dienst mit Querverweis auf den Befund, der ihn nennt."""
-    ref_by_hostport: dict[tuple[str, int], str] = {}
-    for f in findings:
-        for token in f.affected.split(", "):
-            host, _, rest = token.partition(":")
-            port = rest.split(" ", 1)[0]
-            if port.isdigit():
-                ref_by_hostport.setdefault((host, int(port)), f.id)
+def build_inventory(facts: FS.Facts,
+                    port_refs: dict[tuple[str, int], list[Finding]] | None = None) -> list[InventoryRow]:
+    """Jeder erreichbare Dienst mit Querverweis auf alle Befunde, die ihn nennen.
+
+    S6b-1 (spec/09 Teil 3): dieselbe Zuordnung wie die Farbe der Service-Karte
+    (``chapters.finding_ports``), auch fuer Befunde an einem virtuellen Host. Vorher
+    wurde die Betroffenenliste am Doppelpunkt zerlegt; IPv6 und VHost-Befunde fielen
+    heraus, und je Port stand nur der erste Befund.
+    """
+    refs = port_refs or {}
+
+    def ref(host: str, port: int) -> str:
+        return ", ".join(f.id for f in refs.get((host, port), []))
+
+    fremd = {h.ip for h in facts.hosts if h.third_party is not None}
     rows: list[InventoryRow] = []
     for svc in sorted(facts.services, key=lambda s: (s.host_ip, s.port)):
-        if svc.state != "open":
+        if svc.state != "open" or svc.host_ip in fremd:
             continue
         name = svc.product or (svc.service or "").upper() or UNKNOWN
         if svc.version_norm:
@@ -40,18 +46,19 @@ def build_inventory(facts: FS.Facts, findings: list[Finding]) -> list[InventoryR
         elif svc.starttls:
             name = f"{name}, STARTTLS"
         rows.append(InventoryRow(host=svc.host_ip, port=str(svc.port), svc=name,
-                                 ref=ref_by_hostport.get((svc.host_ip, svc.port), "")))
+                                 ref=ref(svc.host_ip, svc.port)))
     for pv in sorted(facts.passive, key=lambda p: (p.host_ip or "", p.port or 0)):
-        if not pv.host_ip or not pv.port:
+        if not pv.host_ip or not pv.port or pv.host_ip in fremd:
             continue
         if any(r.host == pv.host_ip and r.port == str(pv.port) for r in rows):
             continue
-        name = pv.product or UNKNOWN
+        # E5: Dienstname aus dem Passivmodul ("SMTP") statt "unbekannt".
+        name = C.passive_service_label(pv)
         if pv.version:
             name = f"{name} {pv.version}"
         rows.append(InventoryRow(host=pv.host_ip, port=str(pv.port),
                                  svc=f"{name}, laut Passivquelle",
-                                 ref=ref_by_hostport.get((pv.host_ip, pv.port), "")))
+                                 ref=ref(pv.host_ip, pv.port)))
     return rows
 
 
@@ -92,7 +99,8 @@ def _anreicherung_gelaufen(facts: FS.Facts) -> bool:
 
 def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Finding],
                    cve_refs: list[CveRef], tool_findings: list[ToolFinding],
-                   counts: N.Counts, scan_date: str, provider: str) -> Appendix:
+                   counts: N.Counts, scan_date: str, provider: str,
+                   port_refs: dict[tuple[str, int], list[Finding]] | None = None) -> Appendix:
     has_red = any(f.status == "rot" for f in findings)
     # S6 (spec/08 Punkt 9): Die Freischaltung der Scanner-Adresse wird nur
     # empfohlen, wenn eine Blockade belegt ist. Vorher stand der Satz in jedem
@@ -103,7 +111,7 @@ def build_appendix(facts: FS.Facts, output: CatalogOutput, findings: list[Findin
         hygiene_scale=[ScaleRow(l=label, t=text) for label, text in T.HYGIENE_SCALE],
         triage=[TriageRow(l=label, st=status, t=text) for label, status, text in T.triage_rows()],
         cve_refs=cve_refs,
-        inventory=build_inventory(facts, findings),
+        inventory=build_inventory(facts, port_refs),
         tools=build_tools(facts),
         tool_findings=tool_findings,
         dkim_selectors=C.dkim_selectors_for_appendix(facts, output),

@@ -1,4 +1,5 @@
 {
+ "context": null,
  "coverage": [
   {
    "confidence": 1.0,
@@ -1917,6 +1918,23 @@
    "source": "dns_records",
    "spf": {
     "all_qualifier": "-all",
+    "mechanisms": [
+     {
+      "kind": "mx",
+      "qualifier": "+",
+      "value": null
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "mx.krause-computer.de"
+     },
+     {
+      "kind": "include",
+      "qualifier": "+",
+      "value": "w020687e.kasserver.com"
+     }
+    ],
     "raw": "v=spf1 mx include:mx.krause-computer.de include:w020687e.kasserver.com -all"
    },
    "tls_rpt": {
@@ -1936,6 +1954,9 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [
+    "krause.skclient.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1966,6 +1987,9 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [
+    "mx.krause-computer.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -1996,6 +2020,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2026,6 +2051,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2056,6 +2082,9 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [
+    "krause.skclient.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2086,6 +2115,9 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [
+    "krause.skclient.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2116,6 +2148,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2146,6 +2179,9 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [
+    "mx.krause-computer.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2176,6 +2212,9 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [
+    "krause.skclient.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2202,6 +2241,7 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2232,6 +2272,9 @@
   {
    "aliases": [],
    "body_hash": null,
+   "cname": [
+    "krause.skclient.de"
+   ],
    "confidence": 1.0,
    "evidence": [
     {
@@ -2325,6 +2368,7 @@
     "isp": "intercolo GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2334,7 +2378,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "mx.krause-computer.de",
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -2377,6 +2423,7 @@
     "isp": "Neue Medien Muennich GmbH",
     "usage_type": "Data Center/Web Hosting/Transit"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2386,7 +2433,9 @@
     "urlhaus_compromised": null
    },
    "reverse": "dd55420.kasserver.com",
-   "source": "nmap"
+   "shared": null,
+   "source": "nmap",
+   "third_party": null
   },
   {
    "blocked": {
@@ -2432,6 +2481,7 @@
     "isp": "NetCologne Gesellschaft fur Telekommunikation mbH",
     "usage_type": "Fixed Line ISP"
    },
+   "reach": null,
    "reachable": true,
    "reputation": {
     "abuseipdb_score": 0,
@@ -2441,7 +2491,23 @@
     "urlhaus_compromised": null
    },
    "reverse": "xdsl-87-79-190-79.nc.de",
-   "source": "nmap"
+   "shared": {
+    "evidence": [
+     {
+      "excerpt": "filebrowser.krause-computer.de CNAME krause.skclient.de",
+      "ref": "phase0/dnsx_validation.json",
+      "tool": "dnsx"
+     }
+    ],
+    "foreign_names": [],
+    "kind": "platform",
+    "operator": "skclient.de",
+    "signals": [
+     "cname_fremd"
+    ]
+   },
+   "source": "nmap",
+   "third_party": null
   }
  ],
  "http": [
@@ -3412,6 +3478,7 @@
    "port": null,
    "product": null,
    "seen_at": null,
+   "service": null,
    "source": "otx",
    "transport": null,
    "verified": null,
@@ -3440,6 +3507,7 @@
    "port": 22,
    "product": "OpenSSH",
    "seen_at": "2026-05-26T04:56:33Z",
+   "service": "ssh",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3468,6 +3536,7 @@
    "port": 25,
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3496,6 +3565,7 @@
    "port": 26,
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
+   "service": "auto",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3524,6 +3594,7 @@
    "port": 80,
    "product": "nginx",
    "seen_at": "2026-05-26T04:56:33Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3552,6 +3623,7 @@
    "port": 111,
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
+   "service": "portmap-udp",
    "source": "shodan",
    "transport": "udp",
    "verified": true,
@@ -3580,6 +3652,7 @@
    "port": 443,
    "product": "nginx",
    "seen_at": "2026-05-26T04:56:33Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3608,6 +3681,7 @@
    "port": 3128,
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
+   "service": "http-simple-new",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3636,6 +3710,7 @@
    "port": 3478,
    "product": null,
    "seen_at": "2026-05-26T04:56:33Z",
+   "service": "stun",
    "source": "shodan",
    "transport": "udp",
    "verified": false,
@@ -3664,6 +3739,7 @@
    "port": 22,
    "product": "OpenSSH",
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "ssh",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3692,6 +3768,7 @@
    "port": 25,
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3720,6 +3797,7 @@
    "port": 80,
    "product": "Apache httpd",
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "http",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3748,6 +3826,7 @@
    "port": 143,
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "imap",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3776,6 +3855,7 @@
    "port": 443,
    "product": "Apache httpd",
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3804,6 +3884,7 @@
    "port": 465,
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "smtps",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3832,6 +3913,7 @@
    "port": 587,
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "smtp",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3860,6 +3942,7 @@
    "port": 993,
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "imap-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3888,6 +3971,7 @@
    "port": 995,
    "product": null,
    "seen_at": "2026-05-24T02:18:54Z",
+   "service": "pop3-ssl",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -3921,6 +4005,7 @@
    "port": 443,
    "product": null,
    "seen_at": "2026-04-26T17:29:20Z",
+   "service": "https",
    "source": "shodan",
    "transport": "tcp",
    "verified": true,
@@ -4004,7 +4089,7 @@
    }
   ]
  },
- "schema_version": "1.0.5",
+ "schema_version": "1.0.6",
  "services": [
   {
    "auth_mechanisms": [],
@@ -5130,43 +5215,6 @@
    },
    "evidence": [
     {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "37.114.55.171",
-   "id": "sw:37.114.55.171:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-05-26T12:37:04Z",
-   "product": "HSTS",
-   "source": "httpx",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
      "excerpt": "technologies: Jitsi",
      "ref": "hosts/37.114.55.171/phase1/tech_profile.json",
      "tool": "httpx"
@@ -5794,43 +5842,6 @@
    "observed_at": "2026-05-26T12:27:49Z",
    "product": "Dovecot",
    "source": "nmap",
-   "version_norm": null,
-   "version_raw": null,
-   "vulnerabilities_count": null
-  },
-  {
-   "build": null,
-   "confidence": 0.8,
-   "detection_sources": [
-    "httpx"
-   ],
-   "distro": null,
-   "edition": null,
-   "eol": {
-    "date": null,
-    "latest_patch": null,
-    "source": null,
-    "status": "unknown",
-    "upstream_eol_date": null
-   },
-   "evidence": [
-    {
-     "excerpt": "technologies: HSTS",
-     "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "httpx"
-    }
-   ],
-   "family": "hsts",
-   "fqdn": null,
-   "hints": [],
-   "host_ip": "85.13.167.158",
-   "id": "sw:85.13.167.158:-:hsts:unknown",
-   "kind": "component",
-   "mode": "active",
-   "note": null,
-   "observed_at": "2026-05-26T12:36:34Z",
-   "product": "HSTS",
-   "source": "httpx",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -6762,6 +6773,7 @@
  "threats": [],
  "tls": [
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "jitsi.krause-computer.de",
@@ -6809,6 +6821,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "krause-computer.de",
@@ -6857,6 +6870,7 @@
    "vulns": []
   },
   {
+   "assigned_from": null,
    "cert": {
     "chain_ok": null,
     "cn": "jitsi.krause-computer.de",

@@ -59,6 +59,20 @@ KNOWN_PORTS: frozenset[int] = frozenset(
     {21, 22, 25, 53, 80, 106, 110, 139, 143, 443, 445, 465, 587, 993, 995, 3389, 8000, 8080, 8443, 2222}
     | set(DB_PORTS) | set(ADMIN_PORTS) | set(MAIL_PORTS))
 
+# ---------------------------------------------------------------- Geteilte Systeme
+# S6b-1 (spec/09 Q3, Entscheidung DC 24.09.2026, Umfang wie in spec/09 markiert): auf
+# einem geteilten Server (Hoster) liegen diese Pruefungen beim Betreiber, weil der
+# Kunde den Dienst nicht selbst aendern kann: Verwaltungsoberflaechen, FTP, POP3, IMAP
+# und SMTP, das Banner eines Dienstes und fremde Dienste auf Zusatzports. Datenbankports,
+# TLS-Konfiguration, Zertifikat, Sicherheits-Header, Inhalte und Webanwendung bleiben
+# beim Kunden. Auf einer Plattform (SaaS, Baukasten, CDN) liegt alles Hostbezogene beim
+# Plattformbetreiber; nur DNS- und Mail-Eintraege der Domain bleiben beim Kunden.
+SHARED_OPERATOR_CHECKS: frozenset[str] = frozenset({
+    "admin_service_exposed", "admin_service_exposed_passive", "ftp_plaintext", "legacy_protocols_present",
+    "mail_plaintext", "service_banner_version", "http_alt_port", "ssh_alt_port",
+})
+PLATFORM_CUSTOMER_SCOPES: frozenset[str] = frozenset({"dns", "dns.dangling_cnames", "target", "scan"})
+
 # ---------------------------------------------------------------- TLS
 
 TLS_LEGACY = ("SSLv2", "SSLv3", "TLS1.0", "TLS1.1")
@@ -105,7 +119,10 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     "no_zap_context": ("not_applicable", "Kein Web-Kontext für die passive Webanalyse, Prüfung entfällt."),
     "not_in_package": ("not_applicable", "Nicht Bestandteil des gebuchten Pakets."),
     "passive_only_policy": ("not_applicable", "Nur passive Webanalyse vorgesehen."),
-    "no_open_ports": ("ok", "Keine offenen Ports."),
+    # S6b-1 (spec/09 Q9): ein Portscan ohne offenen Port ist kein Messergebnis. Die
+    # Abwesenheit eines Dienstes ist damit nicht belegt; bis S6b-1 galt er als "ok".
+    "no_open_ports": ("not_testable", "Der Portscan fand keinen offenen Port; ob dort Dienste erreichbar sind, ist damit nicht belegt."),
+    "unreachable_from_scanner": ("not_testable", "Vom Prüfstand aus nicht erreichbar: der Portscan fand keinen offenen Port, eine Passivquelle meldet dort jedoch Dienste."),
     "no_data": ("ok", "Abfrage ohne Treffer."),
     "wordlist_missing": ("not_testable", "Wortliste im Scanner fehlte, Verzeichnis-Prüfung nicht durchgeführt."),
     "does_not_exist": ("not_testable", "Aktive Webanalyse ist im Scanner fehlgeschlagen."),
@@ -133,10 +150,14 @@ COVERAGE_REASONS: dict[str, tuple[str, str]] = {
     "mail_capabilities_unknown": ("not_testable", "Der Maildienst nannte keine Fähigkeiten; STARTTLS-Angebot manuell prüfen."),
     "tls_protocols_unknown": ("not_testable", "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor."),
     "tls_ciphers_unknown": ("not_testable", "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor."),
+    # S6b-1 (spec/09 Q10): httpx hat den Dienst gesehen, testssl nicht. "Nicht verfuegbar"
+    # waere falsch; bekannt ist die ausgehandelte Verbindung, nicht die ganze Liste.
+    "tls_protocols_partial": ("not_testable", "Die Transportverschlüsselung ist nur über die ausgehandelte Verbindung belegt; die vollständige Liste der angebotenen Protokolle lag nicht vor."),
+    "tls_ciphers_partial": ("not_testable", "Die Transportverschlüsselung ist nur über die ausgehandelte Verbindung belegt; die vollständige Liste der angebotenen Verfahren lag nicht vor."),
     "wordpress_unknown": ("not_testable", "Zur WordPress-Installation lagen keine Angaben zu Kern, Erweiterungen und Benutzern vor."),
     "cert_unknown": ("not_testable", "Zertifikatsdetails nicht verfügbar."),
     "version_unknown": ("not_testable", "Version von außen nicht bestimmbar."),
-    "no_enrichment": ("not_testable", "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor."),
+    "no_enrichment": ("not_testable", "Zu den erkannten Versionen lag keine Fremdbewertung aus Schwachstellendatenbanken vor."),
     "whois_unavailable": ("not_testable", "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis."),
     "insufficient_facts": ("not_testable", "Die Werkzeugdaten reichen für eine Aussage zu dieser Prüfung nicht aus."),
     # S6a (#15 Teil 2): ohne Selektor ist DKIM nicht pruefbar, nie "fehlt". Mit bekannter

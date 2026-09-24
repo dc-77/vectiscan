@@ -59,6 +59,25 @@ def passive_ignored(port: int | None, is_cdn: bool, entries: list[IgnoreEntry]) 
     return None
 
 
+# S6b-1 (spec/09 Teil 4, E4, E5): Passivports, die eine Einschraenkung im Bericht
+# erklaert, sind keine offene Beobachtung mehr.
+PASSIVE_EXPLAINED = {
+    "unreachable_from_scanner": "Host vom Pruefstand aus nicht erreichbar; steht als Einschraenkung im Bericht (E4).",
+    "no_ipv6_route": "IPv6-Adresse ohne Route vom Pruefstand; steht als Einschraenkung im Bericht (Q16).",
+    "smtp_25": "SMTP auf Port 25 vom Pruefstand aus nicht pruefbar; feste Einschraenkung im Bericht (E5).",
+}
+
+
+def explained_passive(index: FactsIndex, p) -> str | None:
+    host = index.hosts_by_ip.get(p.host_ip or "")
+    reach = host.reach.status if host is not None and host.reach is not None else None
+    if reach in ("unreachable_from_scanner", "no_ipv6_route"):
+        return PASSIVE_EXPLAINED[reach]
+    if p.port == 25 and p.verified is False:
+        return PASSIVE_EXPLAINED["smtp_25"]
+    return None
+
+
 def run_catchalls(index: FactsIndex, claimed: set[str], ignore: IgnoreList) -> tuple[list[Unprocessed], list[IgnoredItem]]:
     f = index.facts
     entries = ignore.entries
@@ -121,6 +140,10 @@ def run_catchalls(index: FactsIndex, claimed: set[str], ignore: IgnoreList) -> t
         if entry is not None:
             add_ignored("passive_port", what, entry.reason, host_ip=p.host_ip)
             continue
+        explained = explained_passive(index, p)
+        if explained is not None:
+            add_ignored("passive_port", what, explained, host_ip=p.host_ip)
+            continue
         note = ("Laut Passivquelle gemeldet, vom Portscan nicht bestaetigt." if p.verified is False
                 else "Laut Passivquelle gemeldet; Host wurde nicht aktiv gescannt.")
         add_unprocessed("passive_port_unverified", what, host_ip=p.host_ip, port=p.port, fact_id=p.id, note=note)
@@ -128,4 +151,4 @@ def run_catchalls(index: FactsIndex, claimed: set[str], ignore: IgnoreList) -> t
     return list(unprocessed.values()), list(ignored.values())
 
 
-__all__ = ["run_catchalls", "alert_ignored", "passive_ignored"]
+__all__ = ["run_catchalls", "alert_ignored", "passive_ignored", "explained_passive", "PASSIVE_EXPLAINED"]

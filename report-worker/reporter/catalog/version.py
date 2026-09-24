@@ -31,13 +31,20 @@ Bump-Historie:
     2026-09-23.2  S6a (#15 Teil 2): `dkim_missing` meldet ohne gefundenen Selektor
                   nicht mehr "fehlt", sondern not_testable mit dem neuen Grund
                   `dkim_selector_unknown`; die Pruefung hat kein `when` mehr.
+    2026-09-25.1  S6b-1 (spec/09 Q3, Q9, Q10, Teil 3): `no_open_ports` ist nicht
+                  pruefbar statt "ok", neu `unreachable_from_scanner`,
+                  `tls_protocols_partial` und `tls_ciphers_partial`; Drittanbieter-
+                  Adressen fallen aus dem Katalog; Passivports, die eine Einschraenkung
+                  traegt, sind keine unverarbeitete Beobachtung mehr; Numerus
+                  `{n:Einzahl|Mehrzahl}` in den Texten; Zustaendigkeit auf geteilten
+                  Systemen je Pruefung (`SHARED_OPERATOR_CHECKS`).
 """
 from __future__ import annotations
 
 import hashlib
 from pathlib import Path
 
-CATALOG_VERSION = "2026-09-23.2"
+CATALOG_VERSION = "2026-09-25.1"
 
 CATALOG_DIR = Path(__file__).resolve().parent
 CHECKS_DIR = CATALOG_DIR / "checks"

@@ -30,7 +30,7 @@ from reporter.catalog.expr import CatalogSpecError, Expr, compile_expr
 from reporter.catalog.schema import (CATEGORY_NAMES, LEVEL_LABELS, BundleSpec, CatalogOutput, CheckInfo,
                                      CheckResult, CheckRollup, CheckSpec, EvidenceRef, IgnoreList, Member,
                                      NotTestableRule, RenderedTexts, Summary)
-from reporter.catalog.scope import FactsIndex, Group, Item, build_groups, binding_types
+from reporter.catalog.scope import FactsIndex, Group, Item, build_groups, binding_types, without_third_party
 from reporter.catalog.version import CATALOG_DIR, CATALOG_VERSION, catalog_digest
 from reporter.facts import schema as FS
 from reporter.facts.serialize import sort_key
@@ -468,7 +468,8 @@ class _Eval:
             verified=verified, source_mode=source_mode,
             affected=labels, affected_fact_ids=fact_ids, members=members, items_seen=seen + len(members), evidence=ev,
             reason_code=reason_code, reason=reason_text, notes=sorted(set(notes), key=sort_key),
-            vars={k: (v if isinstance(v, (int, list)) else render._s(v)) for k, v in gvars.items()},
+            vars={k: (v if isinstance(v, (int, list)) else render._s(v)) for k, v in gvars.items()
+                  if not isinstance(v, render.Numerus)},
             texts=RenderedTexts(observation=observation, positive=pos),
         )
 
@@ -504,6 +505,7 @@ def evaluate(facts: FS.Facts | dict[str, Any], catalog: Catalog | None = None) -
     if isinstance(facts, dict):
         facts = FS.Facts.from_dict(facts)
     cat = catalog or default_catalog()
+    facts = without_third_party(facts)
     index = FactsIndex(facts)
     claimed: set[str] = set()
     results: list[CheckResult] = []

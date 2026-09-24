@@ -96,6 +96,14 @@ def pruefe(order_id: str, result, soll: dict | None) -> list[str]:
         fehler.append(f"{order_id[:8]} keine Wortzahl je Seite (pypdf fehlt?)")
     fehler += [f"{order_id[:8]} {w}" for w in result.warnings
                if "Schrift nicht eingebettet" in w]
+    # S6b-1 (spec/09 Teil 3, Entscheidung DC): in der Golden-Render-Suite ist ein Kicker
+    # ohne Ueberschrift auf derselben Seite ein Fehler, im Produktionsgate eine Warnung.
+    # Dasselbe gilt fuer Boxen ausserhalb des Satzspiegels. Ohne lesbare Seitenboxen
+    # waere die Pruefung stumm, deshalb ist auch das ein Fehler.
+    if not result.layout_ok:
+        fehler.append(f"{order_id[:8]} Layoutpruefung nicht verfuegbar")
+    fehler += [f"{order_id[:8]} Kicker ohne Überschrift auf Seite {p}" for p in result.kicker_pages]
+    fehler += [f"{order_id[:8]} außerhalb des Satzspiegels: {w}" for w in result.overflow]
     if order_id == REFERENZ_ORDER and result.sparse_pages:
         fehler.append(f"{order_id[:8]} halbleere Seiten {list(result.sparse_pages)} "
                       "im Referenzauftrag")

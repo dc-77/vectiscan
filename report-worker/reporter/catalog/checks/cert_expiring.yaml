@@ -15,7 +15,7 @@ requires:
   tools: [testssl]
 kind: check
 bundle: cert_health
-affected_template: "{target} ({days_left} Tage)"
+affected_template: "{target} ({days_left_text})"
 evidence: [tls]
 references: [CWE-298]
 frameworks:

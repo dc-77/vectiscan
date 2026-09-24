@@ -10,8 +10,8 @@ applicable_when: null
 when: any_in(tls.ciphers_weak, TLS_WEAK_CIPHER_KEYS)
 positive_when: not any_in(tls.ciphers_weak, TLS_WEAK_CIPHER_KEYS)
 not_testable_when:
-  - when: 'tls.source != "testssl"'
-    reason_code: tls_ciphers_unknown
+  - when: 'tls.source != "testssl" and tls.assigned_from is None'
+    reason_code: tls_ciphers_partial
     context: item
 undetermined: not_testable
 requires:

@@ -36,6 +36,7 @@ sys.path.insert(0, str(REPORT_WORKER))
 
 from reporter.catalog import evaluate, load_catalog  # noqa: E402
 from reporter.facts.schema import Facts  # noqa: E402
+from reporter.v3.operators import hosts_by_ip, operator_for  # noqa: E402
 
 GOLDEN = REPORT_WORKER / "tests" / "golden"
 
@@ -84,10 +85,15 @@ def main() -> int:
 
     findings: list[dict] = []
     positives: list[dict] = []
+    # S6b-1 (spec/09 Q3): Zustaendigkeit auf geteilten Systemen, "hoster" oder
+    # "platform"; fehlt der Schluessel, liegt der Befund beim Kunden.
+    scopes = {c.id: c.scope for c in out.checks}
+    hosts = hosts_by_ip(facts)
     for r in sorted(out.results, key=lambda r: (r.check_id, r.group_key)):
         if r.kind != "check":
             continue
         if r.status == "fail":
+            op = operator_for(r, scopes[r.check_id], hosts)
             findings.append({
                 "id": f"VS-2026-{len(findings) + 1:03d}",
                 "check": r.check_id,
@@ -98,6 +104,7 @@ def main() -> int:
                 "group": r.group_label,
                 "affected": list(r.affected),
                 "title": r.title,
+                **({"zustaendig": op.kind} if op else {}),
             })
         elif r.status == "pass" and r.positive:
             positives.append({

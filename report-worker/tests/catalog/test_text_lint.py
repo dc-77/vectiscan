@@ -45,10 +45,32 @@ def test_keine_gedankenstriche(spec):
         assert not any(d in text for d in DASHES), f"{spec.id}.{name}: Gedankenstrich"
 
 
+# S6b-1 (spec/09 Teil 3): Einzahl und Mehrzahl nach der Zahl der Hosts, {n:Einzahl|Mehrzahl}.
+NUMERUS = re.compile(r"\{n:([^{}|]+)\|([^{}|]+)\}")
+
+
+@pytest.mark.parametrize("spec", _params())
+def test_numerus_formen_vollstaendig(spec):
+    for name, text in _texts(spec):
+        for one, many in NUMERUS.findall(text):
+            assert one.strip() and many.strip() and one != many, f"{spec.id}.{name}: Numerus {one!r}|{many!r}"
+
+
+FESTER_NUMERUS = re.compile(r"\b(Der|Die|Den|Dem) Hosts? \{(group|affected)\}")
+
+
+@pytest.mark.parametrize("spec", _params())
+def test_host_satz_mit_numerus(spec):
+    # "Der Host {group}" stand auch vor drei Hosts (spec/09 Teil 3).
+    for name, text in _texts(spec):
+        assert not FESTER_NUMERUS.search(text), f"{spec.id}.{name}: Numerus fest, {{n:...|...}} verwenden"
+
+
 @pytest.mark.parametrize("spec", _params())
 def test_keine_platzhalter_oder_fragezeichen(spec):
     for name, text in _texts(spec):
-        stripped = re.sub(r"\{(affected|count|group|fqdn_names|domain|host_ip|notes)\}", "", text)
+        stripped = NUMERUS.sub("", text)
+        stripped = re.sub(r"\{(affected|count|group|fqdn_names|domain|host_ip|notes)\}", "", stripped)
         assert "{" not in stripped and "}" not in stripped, f"{spec.id}.{name}: unbekannter Platzhalter"
         assert "?" not in text, f"{spec.id}.{name}: Fragezeichen"
         assert "[Hinweis" not in text and "TODO" not in text, f"{spec.id}.{name}: interner Hinweis"

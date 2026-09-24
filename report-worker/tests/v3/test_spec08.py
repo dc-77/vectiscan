@@ -210,7 +210,10 @@ def test_wildcard_ist_kein_hostname(order, daten, berichte):
         for finding in data.findings:
             assert name not in finding.affected, (finding.id, name)
         assert any(name in zeile for zeile in data.scope.out_of_scope), name
-    assert data.meta.fqdns_total == sum(1 for f in facts.fqdns if not f.wildcard)
+    # S6b-1 (spec/09 Q16): Hostnamen eindeutig, ohne Drittanbieter-Adressen.
+    eigene = {h.ip for h in facts.hosts if h.third_party is None}
+    assert data.meta.fqdns_total == len({f.name.lower() for f in facts.fqdns
+                                         if not f.wildcard and f.host_ip in eigene})
 
 
 @pytest.mark.parametrize("order", ORDERS)

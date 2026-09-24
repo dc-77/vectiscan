@@ -29,7 +29,7 @@ policy:
   deviation: null
 texts:
   observation: >-
-    Der Host {group} bietet eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten
+    {n:Der Host|Die Hosts} {group} {n:bietet|bieten} eine Verwaltungs- oder Firewall-Oberfläche an, die aus dem gesamten
     Internet erreichbar ist: {affected}. Eine Zugriffsbeschränkung auf bestimmte Quellnetze ist
     von außen nicht erkennbar.
   meaning: >-

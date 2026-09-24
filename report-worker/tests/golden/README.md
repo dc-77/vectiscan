@@ -150,15 +150,19 @@ Perimeter-Auftraege vom 23.09.2026 bei Pilotkunden mit schriftlichem Einverstaen
 Engine catalog, Layout v3, Gate strict, gegengelesen in
 `report-prototype/spec/09-gegenlesen-scanrunde.md`. Domains stehen im Repo, Bilder nicht.
 
-| Auftrag | Ziel | Soll-Liste | Befunde / Positive | Markiert |
-|---|---|---|---|---|
-| 1fbc92b9 | dortmund-beach.com | `dortmund-beach-0923` | 24 / 17 | 6 |
-| c3d5724c | lumbeck-wolter.de | `lumbeck-wolter-0923` | 10 / 11 | 4 |
-| 31d67a02 | junkerwerk.de, junkerwerk.hu | `junkerwerk-0923` | 41 / 40 | 8 |
-| 3cf01f8d | huendgen-entsorgung.de | `huendgen-0923` | 15 / 29 | 5 |
-| 68d59573 | bergersysteme.com | `bergersysteme-0923` | 22 / 52 | 30 |
-| 1f8bc977 | castenow.de | `castenow-0923` | 52 / 86 | 25 |
-| 2e56abe1 | heuel.com | `heuel-0923` | 29 / 53 | 17 |
+| Auftrag | Ziel | Soll-Liste | Befunde / Positive | Markiert | Zustaendig |
+|---|---|---|---|---|---|
+| 1fbc92b9 | dortmund-beach.com | `dortmund-beach-0923` | 24 / 17 | 6 | 0 |
+| c3d5724c | lumbeck-wolter.de | `lumbeck-wolter-0923` | 10 / 11 | 3 | 2 |
+| 31d67a02 | junkerwerk.de, junkerwerk.hu | `junkerwerk-0923` | 41 / 41 | 7 | 2 |
+| 3cf01f8d | huendgen-entsorgung.de | `huendgen-0923` | 15 / 31 | 4 | 3 |
+| 68d59573 | bergersysteme.com | `bergersysteme-0923` | 22 / 39 | 14 | 9 |
+| 1f8bc977 | castenow.de | `castenow-0923` | 52 / 92 | 13 | 10 |
+| 2e56abe1 | heuel.com | `heuel-0923` | 30 / 52 | 13 | 6 |
+
+Stand S6b-1 (25.09.2026). Vor S6b-1 standen dort 41/40, 15/29, 22/52, 52/86 und 29/53
+Eintraege sowie 95 Markierungen; die Aenderungen stehen unter "Bekannte Abweichungen".
+"Zustaendig" zaehlt die Eintraege mit `zustaendig` (hoster oder platform).
 
 Die Soll-Listen sind wie bei dortmund-beach und lumbeck-wolter aus dem Katalogergebnis
 abgeleitet (`strict: false`), je Pruefung und Gruppe, also feiner als die gebuendelten
@@ -172,11 +176,15 @@ Q13 Einstufung der Verwaltungsoberflaechen (E1), Q14 ZAP unter Konfidenz High, Q
 Lebenszyklus (WordPress 6.5.12, Zertifikatslaufzeiten nach E2). S6b aendert diese
 Eintraege bewusst; `build-expected-order.py` erhaelt die Markierungen beim Neuerzeugen und
 meldet jede, deren Eintrag wegfaellt. Reine Textmaengel stehen nicht an den Eintraegen.
+S6b-1 hat Q3, Q9 und den Teil-2-Eintrag zu 40.99.150.120 aufgeloest (Erlaeuterung unter
+`hinweis_s6b1`); offen sind 60 Markierungen: Q4 15, Q8 18, Q12 10, Q13 7, Q14 5, Q18 4 und
+Teil 2 1 (Exchange-Patchstand bei castenow).
 
 Was die Listen nicht zeigen, weil es fehlt: die Discovery verliert Hostnamen (spec/09 Q1:
 eset und ftp bei lumbeck-wolter, archiv bei Junkerwerk, ftp und ftp.mail bei Hündgen,
 24 Namen bei bergersysteme, as2 und control bei heuel), Exchange 2019 bei Hündgen ohne
-Lebenszyklus-Befund (Q18), Port 25 sieht nmap nirgends (E5).
+Lebenszyklus-Befund (Q18), Port 25 sieht nmap nirgends (E5; seit S6b-1 steht das als
+Einschraenkung "SMTP auf Port 25 vom Pruefstand aus nicht pruefbar" in Kapitel 2.2).
 
 Regressionsfaelle der Dashboard-Techniktabelle (spec/09 Q11): c3d5724c und 31d67a02
 (MariaDB mit Praefix 5.5.5-, PostgreSQL "9.6.0 or later"), 1fbc92b9 und 1f8bc977
@@ -251,6 +259,66 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
   geschrieben (Quelle, Faktenschema im Impressum). (3) `reports.tech_profiles[].tech_rows`
   entstehen im Katalogweg aus denselben Zeilen (`reporter/v3/dashboard.py`);
   Paritaetstest `tests/v3/test_tech_rows_paritaet.py`.
+- S6b-1 (spec/09 Q2, Q3, Q9, Q10, Q15, Q16, Teil 3, E4, E5, Issue #33): Faktenschema
+  1.0.6, Katalog 2026-09-25.1, Golden-Facts, Reportdaten aller 21 Auftraege, Soll-Listen
+  der sieben Scan-Runden-Auftraege und von dortmund-beach, lumbeck-wolter,
+  junkerwerk-rescan und vectigal-tech sowie der HTML-Schnappschuss neu gebaut. Je Q-Nummer:
+  - Q3 (geteilte Systeme): `hosts[].shared` (hoster, platform) aus fremden Namen, rDNS und
+    Nutzungsart bzw. CNAME auf eine Plattform. Befunde der Pruefungen in
+    `catalog/tables.SHARED_OPERATOR_CHECKS` auf einem geteilten Server und alles
+    Hostbezogene auf einer Plattform tragen "beim Hoster X" bzw. "beim
+    Plattformbetreiber X" im Titel, einen Zustaendigkeitssatz und im Plan "Beim Hoster
+    einfordern:". Buendel werden nach Zustaendigkeit getrennt; daher mehr Befunde:
+    castenow 20->22, heuel 11->12, junkerwerk 15->16, bergersysteme 12->13 (Vorlaeufe
+    ebenso: 2d2d4f39 28->30, 4e6b6883 und f77ccff2 29->31, 0bf16342, 2572eebc und
+    860d0d5a je plus eins, fb13a98f 13->14). Alle 19 Q3-Markierungen getroffen, dazu 13
+    weitere Eintraege (Soll-Feld `zustaendig`). Gegenproben ohne Zustaendigkeit:
+    Junkerwerk 217.243.248.28 (eigene Leitung) und heuel 20.79.218.75 (Azure).
+    Netzbetreibernamen ohne Zusatz nach einem Strich ("Hetzner Online AG").
+  - Q9 und E4 (Abdeckung): nmap ohne offenen Port ist kein Messergebnis mehr
+    (`no_open_ports` bzw. `unreachable_from_scanner`, wenn eine Passivquelle den Host
+    innerhalb von sieben Tagen vor Scanende mit Diensten sah). Dienstpruefungen dieser
+    Hosts sind nicht pruefbar, der Positivbefund des Auftrags entfaellt ganz (Entscheidung
+    DC). Positivbefunde: bergersysteme-0923 52->39, heuel-0923 53->52; in den Reportdaten
+    entfallen "Keine Datenbankdienste" und "Keine Windows-Fernwartung" bei 2d2d4f39 und
+    75338c97, bei 860d0d5a zusaetzlich "Serversoftware mit laufender Herstellerpflege".
+    Sechs Q9-Markierungen bei castenow waren falsch begruendet (bitwarden und umfrage haben
+    offene Ports) und sind aufgehoben. "Vollstaendig" setzt die Leitwerkzeuge des Pakets
+    voraus (`tables.LEAD_TOOLS`); aeltere Perimeter-Laeufe ohne `zap_active` stehen deshalb
+    als "teilweise" (ae8d1d70, f77ccff2, 2d2d4f39, fb13a98f, 176db198, 0bf16342), wie der
+    Hinweis auf Seite 3 sie schon vorher nannte. Drittanbieter (`hosts[].third_party`:
+    von der Scan-Steuerung ausgelassen und alle Kundennamen per CNAME fremd) fallen aus dem
+    Katalog und stehen in 2.1 als "Drittanbieter, nicht geprueft" (40.99.150.120 bei
+    bergersysteme; loest den Teil-2-Eintrag P23).
+  - Q10 (Einschraenkungen): eine Zeile je Ursache mit den betroffenen Pruefungen in
+    Kundensprache, kein Werkzeugname (Gate `einschraenkung_ohne_pruefung`,
+    `werkzeugname_im_kundentext`). testssl-Daten gelten fuer jeden VHost desselben
+    IP:Port, dessen Name das Zertifikat abdeckt (`tls.assigned_from`); nur von httpx
+    gesehene Dienste sind `tls_protocols_partial` bzw. `tls_ciphers_partial`. Folge:
+    castenow und huendgen erhalten den Positivbefund "Transportverschluesselung ohne
+    veraltete Protokolle und Verfahren" fuer die Namen, auf denen er gilt; bei heuel
+    kommt `tls_no_13` auf ose.heuel.com dazu (heuel-0923 29->30 Befunde). Die Zahl der
+    Einschraenkungszeilen sinkt, weil Folgezeilen eines Hosts mit Wurzelursache
+    entfallen (bergersysteme 16->11, heuel 14->8, junkerwerk 15->9).
+  - E5: Port 25 laut Passivquelle, vom Portscan nicht gesehen, ist eine feste
+    Einschraenkung mit dem Dienstnamen aus dem Passivmodul (castenow, dortmund-beach,
+    junkerwerk, bergersysteme); `passive_port_unverified` fuer Port 25 und fuer Hosts mit
+    Wurzelursache ist erklaert und kein unverarbeiteter Eintrag mehr.
+  - Q16 (Umfang): Hostnamen eindeutig gezaehlt (junkerwerk 8->7, heuel 12->11,
+    bergersysteme 11->10 ohne den Drittanbieter). IPv4 und IPv6 mit gleichem rDNS sind eine
+    Zeile in 2.1 (`more_ips`); IPv6 ohne Route hat keine Technologietabelle. Neue Liste
+    "Pruefumfang je Zieldomain" (junkerwerk.hu: nur DNS- und E-Mail-Eintraege).
+  - Q2 (Rollen): Rollen nur mit Beleg (`reporter/v3/roles.py`); keine Mail- oder
+    Kalenderrolle ohne MX, SPF-Mechanismus, Autodiscover oder Exchange-Fakt am Host.
+  - Q15: Feld `kurzname` im Kundenkontext, Herkunft je Feld in `meta.context_sources`.
+  - Teil 3: Betroffen-Listen ein Eintrag je Name, Numerus im Katalogtext, keine
+    Platzhalter, Bildschirmfotos ohne Dubletten (dortmund-beach 3->1, heuel 8->4,
+    junkerwerk 4->3); Namen ohne eigenen Abruf erben kein Bild. Service-Karte nach Ampel.
+  - Issue #33: Technik eines weiterleitenden VHosts gehoert dem Ziel (bergersysteme
+    92.205.224.174 ohne Webflow, castenow umfrage ohne Drupal); OWA-Build aus einer
+    Spider-URL nur am genannten Host (Exchange SE nicht mehr an 188.40.3.130); Plesk-Version
+    aus dem nmap-Titel (18.0.80 bzw. 18.0.81); Schreibvarianten eines Produkts sind eine
+    Zeile ("cloudflare" und "Cloudflare").
 
 ## Golden-Facts (S1)
 

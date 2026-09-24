@@ -30,7 +30,8 @@ auf; eine Adapterfunktion in der Aufrufform von v2 gibt es bewusst nicht, weil v
 anderes Datenmodell liest.
 
 `RenderResult` traegt `pages`, `words_per_page`, `sparse_pages`, `defects` und
-`warnings`. Der Renderer blockiert nicht: `defects` kommen aus
+`warnings`, seit S6b-1 auch `fill`, `kicker_pages`, `heading_pages`, `overflow` und
+`layout_ok`. Der Renderer blockiert nicht: `defects` kommen aus
 `reporter.v3.selfcheck.check_report_data` und werden gemeldet, nicht durchgesetzt. Ob
 eine Order deswegen nicht ausgeliefert wird, entscheidet das Gate in Session S5.
 `strict=True` wirft stattdessen `RenderGateError`; das nutzen CLI und Selbsttest.
@@ -43,7 +44,7 @@ eine Order deswegen nicht ausgeliefert wird, entscheidet das Gate in Session S5.
 | `context.py` | Datenmodell zu Vorlagenvariablen: Aufteilung von Kapitel 6, Verteilung, Anhangsbuchstaben |
 | `variants.py` | Paketvariante: Titel, Fusszeile, welche Kapitel erscheinen |
 | `screenshots.py` | Aufloesung der Bildnachweise gegen MinIO, Platzhalter |
-| `checks.py` | Render-Pruefungen: halbleere Seiten, eingebettete Schriften, Gedankenstriche |
+| `checks.py` | Render-Pruefungen: halbleere Seiten, eingebettete Schriften, Gedankenstriche, Layout-Boxen (S6b-1) |
 | `text.py` | die wenigen Saetze, die dem Renderer gehoeren |
 | `pipeline.py` | Auftrag zu Reportdaten (Fakten, Katalog, v3) fuer Worker und Ops-Job |
 | `templates/report.html.j2` | die Vorlage |
@@ -102,6 +103,18 @@ nicht auf eine Seite und liess zwei Zeilen auf der naechsten stehen. Ueber die e
 Golden-Auftraege halbiert das die halbleeren Seiten von 14 auf 7, sechs Auftraege
 haben gar keine mehr (Entscheidung DC, 20.09.). Die verbleibenden sieben sind
 Ausklaenge langer Abschnitte und haengen an der Datenmenge, nicht an der Gestaltung.
+
+Seit S6b-1 (spec/09 Teil 3) liest `checks.layout_scan` die Layout-Boxen von WeasyPrint
+statt der Wortzahl: halbleer ist eine Seite mit weniger als 50 % Fuellhoehe
+(`FILL_MIN`, ohne Deckblatt und letzte Seite), jede wird als Warnung gemeldet. Dazu
+kommen ein Kicker ohne Ueberschrift auf derselben Seite, eine Ueberschrift als letztes
+Element einer Seite und eine Box ausserhalb des Satzspiegels (`OVERFLOW_TOLERANCE`). Im
+Produktionslauf sind das Warnungen; in der Golden-Render-Suite (`pruefe`, Entscheidung
+DC) sind Kicker ohne Ueberschrift und Boxen ausserhalb des Satzspiegels Fehler. Die
+Boxen sind keine oeffentliche API: fehlt ein Attribut, meldet der Renderer das als
+Warnung, die Golden-Suite als Fehler. Die Vorlage haelt Kicker, Ueberschrift und
+Tabellenkopf zusammen (`break-after: avoid`, `<thead>`), der Block Anhang D bis F steht
+ohne erzwungenen Umbruch davor.
 
 Neu festschreiben nach einer gewollten Aenderung:
 
