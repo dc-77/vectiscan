@@ -42,6 +42,22 @@ quay.io/oauth2-proxy/oauth2-proxy:v7.7.1|oauth2-proxy:v7.7.1
 python:3.12-slim|python:3.12-slim
 "
 
+# Digest, den ghcr.io fuer <name>:<tag> tatsaechlich ausliefert. Die lokale Image-ID
+# taugt dafuer nicht: im containerd-Store des Hosts ist sie der Digest des
+# Multi-Plattform-Index, gepusht wird aber nur die lokal vorhandene Plattform. Der
+# erste Lauf (Pipeline 3183) pinnte deshalb Digests, die ghcr.io nicht kannte, und
+# der Deploy in Pipeline 3186 scheiterte mit "not found".
+registry_digest() {
+  local name="$1" tag="$2" tok
+  tok=$(curl -fsS -u "dc-77:${GHCR_TOKEN}" \
+    "https://ghcr.io/token?service=ghcr.io&scope=repository:dc-77/vectiscan/${name}:pull" \
+    | python3 -c 'import json, sys; print(json.load(sys.stdin)["token"])')
+  curl -fsSI -H "Authorization: Bearer ${tok}" \
+    -H "Accept: application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.docker.distribution.manifest.v2+json" \
+    "https://ghcr.io/v2/dc-77/vectiscan/${name}/manifests/${tag}" \
+    | tr -d '\r' | awk -F': ' 'tolower($1) == "docker-content-digest" {print $2}'
+}
+
 FEHLER=0
 while IFS='|' read -r SRC TARGET; do
   [ -z "${SRC}" ] && continue
@@ -56,10 +72,16 @@ while IFS='|' read -r SRC TARGET; do
   docker tag "${SRC}" "${DEST}/${TARGET}"
   docker push "${DEST}/${TARGET}" >/dev/null
   NAME="${TARGET%%:*}"
-  DIGEST=$(docker image inspect --format '{{range .RepoDigests}}{{println .}}{{end}}' "${DEST}/${TARGET}" \
-    | grep "^${DEST}/${NAME}@" | head -1 | cut -d@ -f2)
+  TAG="${TARGET#*:}"
+  DIGEST=$(registry_digest "${NAME}" "${TAG}" || true)
   if [ -z "${DIGEST}" ]; then
-    echo "FEHLER: kein Digest fuer ${DEST}/${TARGET}"
+    echo "FEHLER: ghcr.io nennt keinen Digest fuer ${DEST}/${TARGET}"
+    FEHLER=1
+    continue
+  fi
+  # Probe mit genau dem Schritt, den der Deploy macht: per Digest ziehen.
+  if ! docker pull "${DEST}/${NAME}@${DIGEST}" >/dev/null; then
+    echo "FEHLER: ${DEST}/${NAME}@${DIGEST} laesst sich nicht ziehen"
     FEHLER=1
     continue
   fi

@@ -187,7 +187,7 @@ services:
   # KEIN proxy-net — ausschließlich über die /api/live-check/*-Fassade der
   # API erreichbar. Keys/Tokens als ENV (leer = Modul degradiert sauber).
   webcheck-core:
-    image: ghcr.io/dc-77/vectiscan/web-check:2.1.9@sha256:fa26f4dc781a187fb3f9e4958c7faee29af628e2fc78a335930e0c3ad28d5acd
+    image: ghcr.io/dc-77/vectiscan/web-check:2.1.9@sha256:91d8f872ea4c038a2b6d3915d90b9869423d0122aaba94ae2025f70c76700e06
     restart: unless-stopped
     environment:
       PORT: "3000"
@@ -293,7 +293,7 @@ services:
   # api.incerrordetails=true: ohne das liefert ZAP nur {"code":"does_not_exist"}
   # ohne Angabe, welcher Parameter gemeint war.
   zap-1:
-    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:781a2bdaea47324e7bab583e2263f21d257b0aee61ed51521a5be45f5f5081ef
+    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa
     restart: unless-stopped
     command: >
       zap.sh -daemon
@@ -410,7 +410,7 @@ services:
       - vectiscan-internal
 
   zap-2:
-    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:781a2bdaea47324e7bab583e2263f21d257b0aee61ed51521a5be45f5f5081ef
+    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa
     restart: unless-stopped
     command: >
       zap.sh -daemon
@@ -440,7 +440,7 @@ services:
   # Pool-Expansion: zap-3 + zap-4 treten dem ZAP-Pool bei. Erst nach
   # ZAP_POOL_ENABLED=true auf den Workern werden sie genutzt.
   zap-3:
-    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:781a2bdaea47324e7bab583e2263f21d257b0aee61ed51521a5be45f5f5081ef
+    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa
     restart: unless-stopped
     command: >
       zap.sh -daemon
@@ -468,7 +468,7 @@ services:
       - vectiscan-internal
 
   zap-4:
-    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:781a2bdaea47324e7bab583e2263f21d257b0aee61ed51521a5be45f5f5081ef
+    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:71db37cd5b75663b35758d10aaec05bf6fbac23f5020e3046c70e628a5f84efa
     restart: unless-stopped
     command: >
       zap.sh -daemon
@@ -601,7 +601,7 @@ services:
       - vectiscan-internal
 
   postgres:
-    image: ghcr.io/dc-77/vectiscan/postgres:16.4-alpine@sha256:5660c2cbfea50c7a9127d17dc4e48543eedd3d7a41a595a2dfa572471e37e64c
+    image: ghcr.io/dc-77/vectiscan/postgres:16.4-alpine@sha256:f5aa7cac1dc299a77761ada5a5cf9c6ef4064bc85c89fed49c587dd2381d6f05
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME}
@@ -623,7 +623,7 @@ services:
       - vectiscan-internal
 
   redis:
-    image: ghcr.io/dc-77/vectiscan/redis:7.4-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
+    image: ghcr.io/dc-77/vectiscan/redis:7.4-alpine@sha256:ca0acbb137c1dc3339c8b147a58fd6f42775d4599327b50e7b116c23de501af2
     restart: unless-stopped
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
@@ -655,9 +655,10 @@ services:
     #
     # S6a2 (24.09.2026): quay.io liefert minio/minio nur noch mit Anmeldung
     # (401), der Deploy brach daran ab. Das laufende Abbild ist nach
-    # ghcr.io/dc-77/vectiscan/minio gespiegelt, derselbe Digest
-    # (scripts/ops/mirror-images.sh, Job ops-mirror-images).
-    image: ghcr.io/dc-77/vectiscan/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    # ghcr.io/dc-77/vectiscan/minio gespiegelt (scripts/ops/mirror-images.sh,
+    # Job ops-mirror-images). Gleiche Schichten; der Digest ist der des
+    # amd64-Manifests, das ghcr.io ausliefert, nicht der des quay.io-Index.
+    image: ghcr.io/dc-77/vectiscan/minio:RELEASE.2025-09-07T16-13-09Z@sha256:a1a8bd4ac40ad7881a245bab97323e18f971e4d4cba2c2007ec1bedd21cbaba2
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
@@ -685,7 +686,7 @@ services:
   # Health-Feld als gesund → ein langsamer Monitoring-Start blockt kein Deploy.
   # ===========================================================================
   uptime-kuma:
-    image: ghcr.io/dc-77/vectiscan/uptime-kuma:1.23.16@sha256:431fee3be822b04861cf0e35daf4beef6b7cb37391c5f26c3ad6e12ce280fe18
+    image: ghcr.io/dc-77/vectiscan/uptime-kuma:1.23.16@sha256:b4c3a4d186b4612b3a7bbb39c56a634626276615c21871c837a86e4a43d8e047
     restart: unless-stopped
     volumes:
       - vectiscan-kuma-data:/app/data
@@ -707,7 +708,7 @@ services:
       - vectiscan-internal
 
   loki:
-    image: ghcr.io/dc-77/vectiscan/loki:2.9.8@sha256:8b5bd7748d0e4da66cd741ac276e485517514af0bea32167e27c0e1a95bcf8aa
+    image: ghcr.io/dc-77/vectiscan/loki:2.9.8@sha256:101829cadac82fe8caef54319f46c2e72812834e7e934e830f729fdcc120cbf3
     restart: unless-stopped
     command: -config.file=/etc/loki/loki-config.yml
     volumes:
@@ -722,7 +723,7 @@ services:
       - vectiscan-internal
 
   promtail:
-    image: ghcr.io/dc-77/vectiscan/promtail:2.9.8@sha256:45d54f0ebd7a19acbcd4693a3227d84d27d98abe1dc7ea3068d31d5d02dbe696
+    image: ghcr.io/dc-77/vectiscan/promtail:2.9.8@sha256:0a818ddc2a6f8404d1f85dfee007618247fbe2b8cc34b4062de4f0867e241984
     restart: unless-stopped
     command: -config.file=/etc/promtail/promtail-config.yml
     volumes:
@@ -739,7 +740,7 @@ services:
       - vectiscan-internal
 
   grafana:
-    image: ghcr.io/dc-77/vectiscan/grafana:11.1.0@sha256:079600c9517b678c10cda6006b4487d3174512fd4c6cface37df7822756ed7a5
+    image: ghcr.io/dc-77/vectiscan/grafana:11.1.0@sha256:83c197f05ad57b51f5186ca902f0c95fcce45810e7fe738a84cc38f481a2227a
     restart: unless-stopped
     environment:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
@@ -822,7 +823,7 @@ services:
   # Aktivieren der CRM: Secrets als CI-Variablen setzen + COMPOSE_PROFILES=crm
   # bzw. `--profile crm` im Deploy ergänzen (Owner: VEC-304-Folge-Issue).
   twenty-db:
-    image: ghcr.io/dc-77/vectiscan/postgres:16@sha256:4b7183ac05f8ef417db21fd72d71047a4238340c261d3cc3ddb6d579ab5071ae
+    image: ghcr.io/dc-77/vectiscan/postgres:16@sha256:adac386a3163424d8397b51b950187eaa661013020a1b9e0d5437a9752040f80
     profiles: ["crm"]
     restart: unless-stopped
     environment:
@@ -835,14 +836,14 @@ services:
       - twenty-internal
 
   twenty-redis:
-    image: ghcr.io/dc-77/vectiscan/redis:7@sha256:d3be87a1060455213a204d2b0a7f04d45d19a16a98e85b3c37b7c33b5f0c489e
+    image: ghcr.io/dc-77/vectiscan/redis:7@sha256:d7fcf65186e011faaa401b5e6edf5147e9dd01353984c795e515f6fee7dfbe6e
     profiles: ["crm"]
     restart: unless-stopped
     networks:
       - twenty-internal
 
   twenty-server:
-    image: ghcr.io/dc-77/vectiscan/twenty:v2.9.0@sha256:0afdba1494ea50bad6eb278a20ae35933317483f23501157c2ed866b74d4bc4a
+    image: ghcr.io/dc-77/vectiscan/twenty:v2.9.0@sha256:bc7f4b8bf3ea451e206c681c9278991c5e2f5ccde4b460b6058375deff867595
     profiles: ["crm"]
     restart: unless-stopped
     environment:
@@ -892,7 +893,7 @@ services:
       - "traefik.http.services.twenty-api.loadbalancer.server.port=3000"
 
   twenty-worker:
-    image: ghcr.io/dc-77/vectiscan/twenty:v2.9.0@sha256:0afdba1494ea50bad6eb278a20ae35933317483f23501157c2ed866b74d4bc4a
+    image: ghcr.io/dc-77/vectiscan/twenty:v2.9.0@sha256:bc7f4b8bf3ea451e206c681c9278991c5e2f5ccde4b460b6058375deff867595
     profiles: ["crm"]
     restart: unless-stopped
     command: ["yarn", "worker:prod"]
@@ -924,7 +925,7 @@ services:
   # daher KEIN eigenes Multi-Stage-Dockerfile (nur unsere 4 App-Services bauen wir).
   # NAT/iptables/ens192-MASQUERADE des Scan-Workers: NICHT beruehrt.
   keycloak-db:
-    image: ghcr.io/dc-77/vectiscan/postgres:16@sha256:4b7183ac05f8ef417db21fd72d71047a4238340c261d3cc3ddb6d579ab5071ae
+    image: ghcr.io/dc-77/vectiscan/postgres:16@sha256:adac386a3163424d8397b51b950187eaa661013020a1b9e0d5437a9752040f80
     profiles: ["sso"]
     restart: unless-stopped
     environment:
@@ -947,7 +948,7 @@ services:
       - keycloak-internal
 
   keycloak:
-    image: ghcr.io/dc-77/vectiscan/keycloak:26.1@sha256:be6a86215213145bfb4fb3e2b3ab982a806d00262655abdcf3ffa6a38d241c7c
+    image: ghcr.io/dc-77/vectiscan/keycloak:26.1@sha256:dc23dd938a5dc5dfaabc71e44d014928284fafff9122e0395659f1cdcf534da8
     profiles: ["sso"]
     restart: unless-stopped
     # start (Prod-Modus) + Realm-Import beim ersten Start. --optimized=false laesst
@@ -1014,7 +1015,7 @@ services:
   # X-Forwarded-Headern abgeleitet (reverse-proxy=true), beide /oauth2/callback-
   # URIs sind im Realm registriert.
   oauth2-proxy:
-    image: ghcr.io/dc-77/vectiscan/oauth2-proxy:v7.7.1@sha256:f6a4aa83a27e316114bf79664302b1ffb2cc8ce697fb479273af4feb3fb16fe3
+    image: ghcr.io/dc-77/vectiscan/oauth2-proxy:v7.7.1@sha256:95f2002754cb0f1c1553aed56f4d6564a5b860e01baccb4e1b8311ffa25c167c
     profiles: ["sso"]
     restart: unless-stopped
     command:
