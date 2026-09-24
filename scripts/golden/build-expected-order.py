@@ -12,6 +12,13 @@ Sie beweist nicht, dass die Befunde richtig sind — das prueft DC vor dem Merge
 Sie haelt nur fest, dass sie stabil bleiben. Deshalb steht in der erzeugten
 Zuordnung ``strict: false``: sie behauptet keine Vollstaendigkeit.
 
+Markierungen (S6a2): Eintraege, die ein Gegenlesen als falsch belegt, tragen in
+``expected_map_<name>.json`` zusaetzliche Schluessel neben ``checks``, etwa
+``"spec09": "Q4", "warum": "..."``. Beim Neuerzeugen bleiben sie am Eintrag mit
+derselben Pruefung und Gruppe stehen, auch wenn sich die ID verschiebt. Faellt ein
+markierter Eintrag weg, meldet das Skript es ("Markierung entfaellt"): genau das
+ist der Nachweis, dass eine Korrektur den Eintrag bewusst geaendert hat.
+
 Aufruf:
     python3 scripts/golden/build-expected-order.py <orderId> --name dortmund-beach
 """
@@ -36,6 +43,23 @@ GOLDEN = REPORT_WORKER / "tests" / "golden"
 def write_json(path: Path, data: object) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n",
                     encoding="utf-8", newline="\n")
+
+
+def _read_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+
+
+def old_marks(expected_path: Path, map_path: Path) -> dict[tuple[str, str, str], dict]:
+    """Markierungen der bisherigen Zuordnung, je (Liste, Pruefung, Gruppe)."""
+    expected, mapping = _read_json(expected_path), _read_json(map_path)
+    marks: dict[tuple[str, str, str], dict] = {}
+    for liste in ("findings", "positives"):
+        by_id = {e["id"]: e for e in expected.get(liste) or []}
+        for eid, entry in (mapping.get(liste) or {}).items():
+            extra = {k: v for k, v in entry.items() if k != "checks"}
+            if extra and eid in by_id:
+                marks[(liste, by_id[eid]["check"], by_id[eid]["group"])] = extra
+    return marks
 
 
 def main() -> int:
@@ -99,22 +123,32 @@ def main() -> int:
         "findings": findings,
         "positives": positives,
     }
-    write_json(GOLDEN / "expected" / f"{args.name}.json", expected)
+    expected_path = GOLDEN / "expected" / f"{args.name}.json"
+    map_path = REPORT_WORKER / "tests" / "catalog" / f"expected_map_{args.name}.json"
+    marks = old_marks(expected_path, map_path)
+    previous = _read_json(map_path)
+    write_json(expected_path, expected)
+
+    def entry(liste: str, e: dict) -> dict:
+        return {"checks": [e["check"]], **marks.pop((liste, e["check"], e["group"]), {})}
 
     mapping = {
         "hinweis": f"Zuordnung der Soll-Liste tests/golden/expected/{args.name}.json. "
                    "strict bleibt false, solange die Liste abgeleitet und nicht "
                    "unabhaengig erarbeitet ist.",
+        # Freitext-Hinweise der bisherigen Zuordnung (z.B. hinweis_spec09) bleiben stehen.
+        **{k: v for k, v in previous.items() if k.startswith("hinweis_")},
         "strict": False,
         "orders": {"main": args.order_id},
-        "findings": {f["id"]: {"checks": [f["check"]]} for f in findings},
-        "positives": {p["id"]: {"checks": [p["check"]]} for p in positives},
+        "findings": {f["id"]: entry("findings", f) for f in findings},
+        "positives": {p["id"]: entry("positives", p) for p in positives},
         "subsumed": {},
         "expected_coverage_differences": [],
         "expected_member_differences": [],
     }
-    write_json(REPORT_WORKER / "tests" / "catalog"
-               / f"expected_map_{args.name}.json", mapping)
+    write_json(map_path, mapping)
+    for (liste, check, group), extra in sorted(marks.items()):
+        print(f"Markierung entfaellt: {liste} {check} / {group}: {extra}")
 
     print(f"{len(findings)} Befunde, {len(positives)} Positivaussagen "
           f"-> tests/golden/expected/{args.name}.json")

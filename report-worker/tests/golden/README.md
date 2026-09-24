@@ -64,14 +64,25 @@ python3 scripts/golden/build-negative-fixtures.py
 #   Das Skript kuerzt einen etwaigen Kundenkontext auf den Firmennamen und
 #   entfernt Admin-Felder (Auflage S5b).
 
-# 4 Roh-Tars: API-Pipeline auf dem Branch ausloesen, die zehn Matrix-Jobs
-#   ops-export-golden-tars starten, die Artefakte golden-tars/ nach tars/ entpacken.
+# 4 Roh-Tars: API-Pipeline auf dem Branch ausloesen, die Matrix-Jobs
+#   ops-export-golden-tars der neuen Auftraege starten (einer je Auftrag),
+#   die Artefakte golden-tars/ nach tars/ entpacken.
 #   Ein Auftrag je Job, weil der Artefakt-Upload dieser GitLab-Instanz schon bei
 #   wenigen hundert Kilobyte mit 413 abbricht. Dieselbe Grenze trifft git push
 #   ueber HTTPS; der Branch geht ueber SSH raus.
 
 # 5 Manifest neu schreiben (liest tars/ und negative.json)
 python3 scripts/golden/build-manifest.py
+
+# 6 Fakten und Reportdaten aller Auftraege (Tars werden gelesen, nicht entpackt)
+cd report-worker && python -m reporter.facts --golden && python -m reporter.v3 --golden-all
+
+# 7 Soll-Liste je neuem Auftrag, abgeleitet (strict false). Markierungen neben
+#   "checks" in expected_map_<slug>.json bleiben beim Neuerzeugen erhalten.
+python3 scripts/golden/build-expected-order.py <uuid> --name <slug>
+
+# 8 Seitenerwartung: ops-update-pages in der MR-Pipeline starten (nicht auf einer
+#   API-Pipeline), render-pages/expected-pages.json nach render/ uebernehmen.
 ```
 
 ## Tests
@@ -133,6 +144,48 @@ Beide Ziele sind eigene Domains hinter derselben Traefik-Instanz mit Rate-Limit;
 ist ein interner Nachweis aus S2b und wird nicht ausgeliefert. Die synthetische Pruefung
 bleibt als Gegenprobe "gleiche Daten, anderes Paket" bestehen.
 
+## Die sieben Fixtures der Scan-Runde (S6a2)
+
+Perimeter-Auftraege vom 23.09.2026 bei Pilotkunden mit schriftlichem Einverstaendnis,
+Engine catalog, Layout v3, Gate strict, gegengelesen in
+`report-prototype/spec/09-gegenlesen-scanrunde.md`. Domains stehen im Repo, Bilder nicht.
+
+| Auftrag | Ziel | Soll-Liste | Befunde / Positive | Markiert |
+|---|---|---|---|---|
+| 1fbc92b9 | dortmund-beach.com | `dortmund-beach-0923` | 24 / 17 | 6 |
+| c3d5724c | lumbeck-wolter.de | `lumbeck-wolter-0923` | 10 / 11 | 4 |
+| 31d67a02 | junkerwerk.de, junkerwerk.hu | `junkerwerk-0923` | 41 / 40 | 8 |
+| 3cf01f8d | huendgen-entsorgung.de | `huendgen-0923` | 15 / 29 | 5 |
+| 68d59573 | bergersysteme.com | `bergersysteme-0923` | 22 / 52 | 30 |
+| 1f8bc977 | castenow.de | `castenow-0923` | 52 / 86 | 25 |
+| 2e56abe1 | heuel.com | `heuel-0923` | 29 / 53 | 17 |
+
+Die Soll-Listen sind wie bei dortmund-beach und lumbeck-wolter aus dem Katalogergebnis
+abgeleitet (`strict: false`), je Pruefung und Gruppe, also feiner als die gebuendelten
+Befunde im Bericht. Getestet werden alle sieben in `tests/catalog/test_golden_scanrunde.py`.
+Was spec/09 als falsch belegt, steht trotzdem in der Liste, aber markiert
+(`spec09`, `warum` in `expected_map_<slug>.json`, Erlaeuterung unter `hinweis_spec09`):
+Q3 geteilte Systeme und Plattformen, Q4 Vorbedingungen (`dane_missing` in allen sieben,
+Banner, TRACE, BREACH), Q8 Header an Weiterleitung, 403, 400 oder Vercel-Challenge, Q9
+Positivbefunde ueber Hosts ohne Messergebnis, Q12 Positivbefunde ohne tragfaehigen Fakt,
+Q13 Einstufung der Verwaltungsoberflaechen (E1), Q14 ZAP unter Konfidenz High, Q18
+Lebenszyklus (WordPress 6.5.12, Zertifikatslaufzeiten nach E2). S6b aendert diese
+Eintraege bewusst; `build-expected-order.py` erhaelt die Markierungen beim Neuerzeugen und
+meldet jede, deren Eintrag wegfaellt. Reine Textmaengel stehen nicht an den Eintraegen.
+
+Was die Listen nicht zeigen, weil es fehlt: die Discovery verliert Hostnamen (spec/09 Q1:
+eset und ftp bei lumbeck-wolter, archiv bei Junkerwerk, ftp und ftp.mail bei Hündgen,
+24 Namen bei bergersysteme, as2 und control bei heuel), Exchange 2019 bei Hündgen ohne
+Lebenszyklus-Befund (Q18), Port 25 sieht nmap nirgends (E5).
+
+Regressionsfaelle der Dashboard-Techniktabelle (spec/09 Q11): c3d5724c und 31d67a02
+(MariaDB mit Praefix 5.5.5-, PostgreSQL "9.6.0 or later"), 1fbc92b9 und 1f8bc977
+(jQuery Migrate), `tests/v3/test_tech_rows_paritaet.py`. Die API-Snapshots halten den
+Stand vor S6a2 fest, also die alten `tech_rows` mit EOL fuer MariaDB und PostgreSQL.
+
+Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, castenow
+0,89 MB); der Export lief ueber Pipeline 3176, Jobs 22798 bis 22804.
+
 ## Bekannte Abweichungen
 
 - `expected/junkerwerk.json` fuehrt `family` und `families`. Das Feld gibt es in
@@ -178,6 +231,21 @@ bleibt als Gegenprobe "gleiche Daten, anderes Paket" bestehen.
   der Generator faende im inzwischen gewachsenen Snapshot auch fuer andere Muster mehr
   Eintraege (SPF 8 statt 7, MariaDB 8 statt 6, FTP 3 statt 2, Titel 6 statt 5); das ist
   eine eigene Pruefung.
+- S6a2, spec/09 Q11: Faktenschema 1.0.5, Golden-Facts und Reportdaten aller Auftraege
+  neu gebaut. (1) Namensgrenzen: `versions.classify` vergibt eine Familie nur, wenn der
+  Name ausserhalb des Treffers nur neutrale Zusaetze traegt. In den Technologietabellen
+  wird "jQuery 3.4.1" zu "jQuery Migrate 3.4.1" plus "jQuery" ohne Version (14272c00,
+  2d2d4f39, 45bb234c, 4e6b6883, ae8d1d70 auf 85.22.47.41, f77ccff2), bei ae8d1d70 kommt
+  auf 85.22.47.39 "jQuery UI" als eigene Zeile hinzu. Kalibriert an allen 121 Rohnamen
+  der Tars und Snapshots; sonst aendert sich nur "ProFTPD or KnFTPD" (eigenes Produkt,
+  in keinem Golden-Tar). (2) Quelle: die Spalte "Erkennung" nennt das liefernde Werkzeug
+  statt pauschal webtech ("nmap, webtech" wird bei lumbeck-wolter und Junkerwerk zu
+  "nmap"); Konfidenz und Patch-Status keiner Zeile aendern sich. Befunde unveraendert,
+  nur die Quellenangabe verliert "webtech" (Exchange bei 2d2d4f39, 4e6b6883, f77ccff2,
+  MariaDB bei 45bb234c, nginx bei ae8d1d70). HTML-Schnappschuss 0bf16342 neu
+  geschrieben (Quelle, Faktenschema im Impressum). (3) `reports.tech_profiles[].tech_rows`
+  entstehen im Katalogweg aus denselben Zeilen (`reporter/v3/dashboard.py`);
+  Paritaetstest `tests/v3/test_tech_rows_paritaet.py`.
 
 ## Golden-Facts (S1)
 

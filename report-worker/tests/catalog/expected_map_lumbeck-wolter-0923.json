@@ -1,0 +1,128 @@
+{
+ "hinweis": "Zuordnung der Soll-Liste tests/golden/expected/lumbeck-wolter-0923.json. strict bleibt false, solange die Liste abgeleitet und nicht unabhaengig erarbeitet ist.",
+ "hinweis_spec09": "S6a2: Eintraege, deren Bestehen, Einstufung oder Zuordnung report-prototype/spec/09-gegenlesen-scanrunde.md widerlegt, tragen spec09 (Q-Nummer, mehrere mit Komma) und warum. S6b aendert sie bewusst; build-expected-order.py meldet eine entfallene Markierung. Reine Textmaengel (Q4 Textteil, Q5 bis Q7, Q10, Q15, Teil 3) betreffen den Kundentext, nicht die Eintraege, und sind nicht markiert. Fehlende Eintraege (Q1 Discovery, Q17) stehen im README der Golden-Fixtures.",
+ "strict": false,
+ "orders": {
+  "main": "c3d5724c-bdbf-4da8-982f-4f1a52210e28"
+ },
+ "findings": {
+  "VS-2026-001": {
+   "checks": [
+    "caa_missing"
+   ]
+  },
+  "VS-2026-002": {
+   "checks": [
+    "dane_missing"
+   ],
+   "spec09": "Q4",
+   "warum": "Der MX liegt bei Hornetsecurity in einer fremden Zone, die Kundenzone ist nicht signiert; DANE kann der Kunde nicht umsetzen."
+  },
+  "VS-2026-003": {
+   "checks": [
+    "db_exposed"
+   ]
+  },
+  "VS-2026-004": {
+   "checks": [
+    "dmarc_missing"
+   ]
+  },
+  "VS-2026-005": {
+   "checks": [
+    "dnssec_missing"
+   ]
+  },
+  "VS-2026-006": {
+   "checks": [
+    "legacy_protocols_present"
+   ],
+   "spec09": "Q3",
+   "warum": "116.202.77.64 ist ein Hetzner Managed Server (dedi5705, auch flott.de); POP3, IMAP und FTP sind Dienste des Hosters, die der Kunde nicht abschalten kann."
+  },
+  "VS-2026-007": {
+   "checks": [
+    "mta_sts_missing"
+   ]
+  },
+  "VS-2026-008": {
+   "checks": [
+    "service_banner_version"
+   ],
+   "spec09": "Q4",
+   "warum": "SSH-Banner und MariaDB-Handshake gehören zum Protokoll und lassen sich nicht entfernen; „PostgreSQL unbekannt“ ist keine Versionspreisgabe."
+  },
+  "VS-2026-009": {
+   "checks": [
+    "spf_softfail"
+   ]
+  },
+  "VS-2026-010": {
+   "checks": [
+    "tls_rpt_missing"
+   ]
+  }
+ },
+ "positives": {
+  "VS-2026-P01": {
+   "checks": [
+    "dkim_missing"
+   ]
+  },
+  "VS-2026-P02": {
+   "checks": [
+    "dns_dangling_cname"
+   ],
+   "spec09": "Q12",
+   "warum": "Die Prüfung auf verwaiste Einträge entfällt (Posture „entfällt“); eine entfallene Prüfung zählt nicht als bestanden."
+  },
+  "VS-2026-P03": {
+   "checks": [
+    "dns_zone_transfer"
+   ]
+  },
+  "VS-2026-P04": {
+   "checks": [
+    "ftp_plaintext"
+   ]
+  },
+  "VS-2026-P05": {
+   "checks": [
+    "http_no_tls"
+   ]
+  },
+  "VS-2026-P06": {
+   "checks": [
+    "ip_reputation"
+   ]
+  },
+  "VS-2026-P07": {
+   "checks": [
+    "mail_plaintext"
+   ]
+  },
+  "VS-2026-P08": {
+   "checks": [
+    "rdp_exposed"
+   ]
+  },
+  "VS-2026-P09": {
+   "checks": [
+    "smb_exposed"
+   ]
+  },
+  "VS-2026-P10": {
+   "checks": [
+    "spf_missing"
+   ]
+  },
+  "VS-2026-P11": {
+   "checks": [
+    "urlhaus_compromise"
+   ]
+  }
+ },
+ "subsumed": {},
+ "expected_coverage_differences": [],
+ "expected_member_differences": []
+}

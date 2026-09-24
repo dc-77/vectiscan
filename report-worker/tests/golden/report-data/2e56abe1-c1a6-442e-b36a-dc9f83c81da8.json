@@ -1,0 +1,1593 @@
+{
+ "appendix": {
+  "cve_refs": [
+   {
+    "cve": "CVE-2013-0169",
+    "name": "Lucky 13 (CBC-Zeitangriff)",
+    "note": "Werkzeugbefund, keine Fremdbewertung.",
+    "ref": "VS-2026-009",
+    "score": "",
+    "src": "testssl"
+   }
+  ],
+  "disclaimer": "Dieser Bericht bildet den von außen sichtbaren Zustand der genannten Systeme am 23.09.2026 ab. Er beruht auf automatisierten Prüfungen ohne Zugangsdaten und ersetzt weder einen manuellen Penetrationstest noch eine Konfigurationsprüfung mit administrativen Rechten. Bereits am Folgetag können neue Schwachstellen bekannt werden oder Konfigurationen sich ändern. Aussagen aus Passivquellen sind als solche gekennzeichnet und nicht durch eine eigene Messung bestätigt. Die Vectigal GmbH übernimmt keine Gewähr dafür, dass jede vorhandene Schwäche erfasst wurde; die Umsetzung der Empfehlungen liegt in der Verantwortung des Auftraggebers und seiner Dienstleister. Der Bericht ist vertraulich und ausschließlich für den Auftraggeber bestimmt.",
+  "dkim_selectors": [],
+  "exposure_scale": [
+   {
+    "l": "kritisch",
+    "t": "Dienst, der nicht an das öffentliche Interface gehört (Datenbanken, Verwaltungsoberflächen, Fernwartung) und aus dem Internet erreichbar ist."
+   },
+   {
+    "l": "erhöht",
+    "t": "Dienst mit legitimem Zweck, aber ohne erkennbare Zugriffsbeschränkung oder mit ungeklärter Funktion."
+   }
+  ],
+  "filtering": "Die Werkzeuge haben in diesem Auftrag 1839 Einzelbeobachtungen erzeugt. Nach Zusammenführung gleicher Meldungen mehrerer Werkzeuge und Durchgänge (1810 Doppelmeldungen) und Bündelung nach Sachverhalt verbleiben 11 Befunde und 6 positive Feststellungen. Beobachtungen ohne Regeltreffer erscheinen nicht als Befund; sie stehen im Anhang oder in der internen Nachbearbeitung. Die vollständigen Werkzeugausgaben liegen vor und werden auf Anfrage bereitgestellt.",
+  "hygiene_scale": [
+   {
+    "l": "hoch",
+    "t": "Abweichung mit direktem Bezug zu Anmeldedaten, Authentizität oder Zugangswegen; zeitnah beheben."
+   },
+   {
+    "l": "mittel",
+    "t": "Abweichung, die Angriffe erleichtert oder Schutzmechanismen aushebelt; im nächsten Wartungszyklus beheben."
+   },
+   {
+    "l": "niedrig",
+    "t": "Best-Practice-Abweichung ohne unmittelbare Auswirkung; bei Gelegenheit beheben."
+   }
+  ],
+  "inventory": [
+   {
+    "host": "20.79.218.75",
+    "port": "21",
+    "ref": "VS-2026-005",
+    "svc": "Wing FTP Server, TLS erzwungen"
+   },
+   {
+    "host": "20.79.218.75",
+    "port": "22",
+    "ref": "",
+    "svc": "FortiSSH"
+   },
+   {
+    "host": "20.79.218.75",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd"
+   },
+   {
+    "host": "20.79.218.75",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, TLS erzwungen"
+   },
+   {
+    "host": "20.79.218.75",
+    "port": "8443",
+    "ref": "VS-2026-006",
+    "svc": "HTTPS-ALT"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "21",
+    "ref": "VS-2026-005",
+    "svc": "ProFTPD, TLS erzwungen"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "22",
+    "ref": "",
+    "svc": "ProFTPD mod_sftp"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "110",
+    "ref": "VS-2026-005",
+    "svc": "Courier pop3d, STARTTLS"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "143",
+    "ref": "VS-2026-005",
+    "svc": "Dovecot imapd, TLS erzwungen"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "222",
+    "ref": "VS-2026-010",
+    "svc": "OpenSSH 9.2p1"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, TLS erzwungen"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "465",
+    "ref": "",
+    "svc": "SMTP, TLS erzwungen"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "587",
+    "ref": "",
+    "svc": "SMTP, TLS erzwungen"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "993",
+    "ref": "",
+    "svc": "IMAPS, TLS erzwungen"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "995",
+    "ref": "",
+    "svc": "POP3S, TLS erzwungen"
+   },
+   {
+    "host": "216.150.1.65",
+    "port": "80",
+    "ref": "",
+    "svc": "Vercel"
+   },
+   {
+    "host": "216.150.1.65",
+    "port": "443",
+    "ref": "",
+    "svc": "Vercel, TLS erzwungen"
+   },
+   {
+    "host": "217.72.203.132",
+    "port": "80",
+    "ref": "",
+    "svc": "nginx"
+   },
+   {
+    "host": "217.72.203.132",
+    "port": "443",
+    "ref": "",
+    "svc": "nginx, TLS erzwungen"
+   },
+   {
+    "host": "20.79.218.75",
+    "port": "4433",
+    "ref": "VS-2026-001",
+    "svc": "unbekannt, laut Passivquelle"
+   },
+   {
+    "host": "213.133.104.51",
+    "port": "25",
+    "ref": "",
+    "svc": "unbekannt, laut Passivquelle"
+   },
+   {
+    "host": "2a01:4f8:d0a:2757::2",
+    "port": "80",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   },
+   {
+    "host": "2a01:4f8:d0a:2757::2",
+    "port": "443",
+    "ref": "",
+    "svc": "Apache httpd, laut Passivquelle"
+   }
+  ],
+  "repeat": [
+   "Wiederholung des Scans nach Abschluss der Maßnahmen der Stufe In Kürze, spätestens in zwölf Monaten.",
+   "Zusätzlich nach jeder größeren Änderung an der Zugangs-Infrastruktur und bei jedem Verdacht auf einen Vorfall.",
+   "Freischaltung der Scanner-Adresse beim Betreiber der blockierenden Systeme, damit die offenen Prüfungen im nächsten Durchgang nachgeholt werden können."
+  ],
+  "tool_findings": [
+   {
+    "note": "Werkzeugmeldung ohne eigene Einstufung.",
+    "what": "online.heuel.com (Timestamp Disclosure - Unix)",
+    "where": "online.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com)"
+   },
+   {
+    "note": "Werkzeugmeldung ohne eigene Einstufung.",
+    "what": "www.heuel.com (Cross-Domain JavaScript Source File Inclusion)",
+    "where": "online.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com)"
+   },
+   {
+    "note": "Werkzeugmeldung ohne eigene Einstufung.",
+    "what": "www.heuel.com (Timestamp Disclosure - Unix)",
+    "where": "online.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com)"
+   }
+  ],
+  "tools": [
+   {
+    "c": "hoch (Dienste), mittel (Versionen)",
+    "t": "nmap",
+    "u": "Portscan der häufigsten TCP-Ports, Dienst- und Versionserkennung"
+   },
+   {
+    "c": "hoch",
+    "t": "testssl.sh",
+    "u": "Protokolle, Verfahren, Zertifikate und bekannte Schwächen der Transportverschlüsselung"
+   },
+   {
+    "c": "hoch",
+    "t": "httpx, header_check",
+    "u": "HTTP-Antworten, Technologien und Sicherheits-Header je virtuellem Host"
+   },
+   {
+    "c": "mittel",
+    "t": "OWASP ZAP (passiv, Spider)",
+    "u": "Passive Analyse von Antworten, Formularen und Headern"
+   },
+   {
+    "c": "mittel",
+    "t": "OWASP ZAP (Active Scan)",
+    "u": "Aktive Prüfung der Webanwendung auf gängige Schwachstellenklassen"
+   },
+   {
+    "c": "mittel",
+    "t": "feroxbuster",
+    "u": "Verzeichnis- und Datei-Enumeration"
+   },
+   {
+    "c": "mittel",
+    "t": "webtech, wafw00f",
+    "u": "Web-Technologien und vorgelagerte Schutzsysteme"
+   },
+   {
+    "c": "hoch",
+    "t": "dnsx, subfinder, gobuster, Certspotter, SecurityTrails",
+    "u": "Ermittlung der Hostnamen, DNS-Auflösung und DNS-Sicherheitseinträge"
+   },
+   {
+    "c": "mittel (Passivquelle, Zeitversatz)",
+    "t": "Shodan, AbuseIPDB, OTX, URLhaus",
+    "u": "Passive Dienst- und Reputationsdaten"
+   }
+  ],
+  "triage": [
+   {
+    "l": "Rot",
+    "st": "rot",
+    "t": "Akutes Risiko, das ohne Vorbedingungen ausnutzbar ist, einen kritischen Dienst exponiert oder von einem Werkzeug aktiv nachgewiesen wurde. Dringlichkeit: Unverzüglich (24 bis 72 Stunden)."
+   },
+   {
+    "l": "Gelb",
+    "st": "gelb",
+    "t": "Handlungsbedarf mit erkennbarem Angriffsweg. Dringlichkeit: In Kürze (1 bis 2 Wochen) oder Mittelfristig (nächster Wartungszyklus)."
+   },
+   {
+    "l": "Blau",
+    "st": "blau",
+    "t": "Verbesserung ohne akutes Risiko. Dringlichkeit: Mittelfristig (nächster Wartungszyklus) oder Strategisch (laufendes Quartal)."
+   },
+   {
+    "l": "Grün",
+    "st": "gruen",
+    "t": "Positiver Befund: Schutzmaßnahme vorhanden und wirksam."
+   }
+  ]
+ },
+ "architecture": {
+  "lead": "Die geprüfte Angriffsfläche verteilt sich auf 6 Hosts mit folgenden Aufgaben: Fernzugang und Verwaltung, Mail- und Kalenderplattform und Website und Datenbanken. Die Tabellen dieses Kapitels zeigen je Host die erkannte Software, die erreichbaren Dienste und den Stand der wichtigsten Schutzmaßnahmen.",
+  "notes": [
+   "3 Beobachtungen der Werkzeuge haben keine Regel des Prüfkatalogs getroffen. Sie erscheinen nicht als Befund; wir prüfen sie und nehmen wiederkehrende Fälle in den Katalog auf."
+  ],
+  "posture": [
+   {
+    "items": [
+     {
+      "l": "SPF",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "DKIM",
+      "ok": true,
+      "v": "unauffällig"
+     },
+     {
+      "l": "DMARC",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "MTA-STS",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "TLS-RPT, DANE",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     }
+    ],
+    "name": "E-Mail-Authentizität",
+    "short": "E-Mail-Authentizität"
+   },
+   {
+    "items": [
+     {
+      "l": "DNSSEC",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "CAA",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "Abruf der gesamten Zone",
+      "ok": true,
+      "v": "unauffällig"
+     },
+     {
+      "l": "Verwaiste Einträge",
+      "ok": null,
+      "v": "entfällt"
+     }
+    ],
+    "name": "DNS-Hygiene",
+    "short": "DNS-Hygiene"
+   },
+   {
+    "items": [
+     {
+      "l": "195.225.241.75",
+      "ok": null,
+      "v": "entfällt"
+     },
+     {
+      "l": "20.79.218.75",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "213.133.104.51",
+      "ok": null,
+      "v": "nicht prüfbar"
+     },
+     {
+      "l": "216.150.1.65",
+      "ok": true,
+      "v": "unauffällig"
+     },
+     {
+      "l": "217.72.203.132",
+      "ok": null,
+      "v": "nicht prüfbar"
+     },
+     {
+      "l": "2a01:4f8:d0a:2757::2",
+      "ok": null,
+      "v": "entfällt"
+     },
+     {
+      "l": "Zertifikate",
+      "ok": true,
+      "v": "unauffällig"
+     }
+    ],
+    "name": "Transportverschlüsselung",
+    "short": "Transportverschlüsselung"
+   },
+   {
+    "items": [
+     {
+      "l": "195.225.241.75",
+      "ok": null,
+      "v": "nicht prüfbar"
+     },
+     {
+      "l": "20.79.218.75",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "213.133.104.51",
+      "ok": null,
+      "v": "nicht prüfbar"
+     },
+     {
+      "l": "216.150.1.65",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "217.72.203.132",
+      "ok": false,
+      "v": "Handlungsbedarf"
+     },
+     {
+      "l": "2a01:4f8:d0a:2757::2",
+      "ok": null,
+      "v": "nicht prüfbar"
+     }
+    ],
+    "name": "Sicherheits-Header",
+    "short": "Sicherheits-Header"
+   }
+  ],
+  "reputation": "Reputation: keine Einträge zu den geprüften Adressen in AbuseIPDB, OTX und URLhaus.",
+  "screens": [
+   {
+    "file": "20.79.218.75__edi.heuel.com.png",
+    "host": "edi.heuel.com",
+    "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__edi.heuel.com.png",
+    "what": "403 Forbidden"
+   },
+   {
+    "file": "217.72.203.132__www.heuel.com.png",
+    "host": "heuel.com",
+    "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/217.72.203.132__www.heuel.com.png",
+    "what": "Antwort von heuel.com"
+   },
+   {
+    "file": "217.72.203.132__www.heuel.com.png",
+    "host": "jobs.heuel.com",
+    "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/217.72.203.132__www.heuel.com.png",
+    "what": "Antwort von jobs.heuel.com"
+   },
+   {
+    "file": "216.150.1.65__online.heuel.com.png",
+    "host": "online.heuel.com",
+    "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/216.150.1.65__online.heuel.com.png",
+    "what": "Vercel Security Checkpoint"
+   },
+   {
+    "file": "20.79.218.75__ose.heuel.com.png",
+    "host": "ose.heuel.com",
+    "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/20.79.218.75__ose.heuel.com.png",
+    "what": "Redirector"
+   },
+   {
+    "file": "2a01:4f8:d0a:2757::2__webportal.heuel.com.png",
+    "host": "webportal.heuel.com",
+    "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/2a01:4f8:d0a:2757::2__webportal.heuel.com.png",
+    "what": "Redirector"
+   },
+   {
+    "file": "2a01:4f8:d0a:2757::2__webportal.heuel.com.png",
+    "host": "webportal.heuel.com",
+    "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/2a01:4f8:d0a:2757::2__webportal.heuel.com.png",
+    "what": "Redirector"
+   },
+   {
+    "file": "217.72.203.132__www.heuel.com.png",
+    "host": "www.heuel.com",
+    "key": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8/217.72.203.132__www.heuel.com.png",
+    "what": "Spedition für Stückguttransporte, LTL/FTL in Deutschland und Europa | HEUEL LOGISTICS"
+   }
+  ],
+  "screens_lead": "Sichtprüfung der erreichbaren Web-Oberflächen der geprüften Hosts.",
+  "services": [
+   {
+    "host": "20.79.218.75",
+    "label": "",
+    "ports": [
+     {
+      "p": "21",
+      "s": "Wing FTP Server",
+      "st": "blau"
+     },
+     {
+      "p": "22",
+      "s": "FortiSSH",
+      "st": "gruen"
+     },
+     {
+      "p": "80",
+      "s": "Apache httpd",
+      "st": "gruen"
+     },
+     {
+      "p": "443",
+      "s": "Apache httpd",
+      "st": "blau"
+     },
+     {
+      "p": "8443",
+      "s": "HTTPS-ALT",
+      "st": "blau"
+     },
+     {
+      "p": "4433",
+      "s": "unbekannt",
+      "st": "grau"
+     }
+    ]
+   },
+   {
+    "host": "213.133.104.51",
+    "label": "www51.your-server.de",
+    "ports": [
+     {
+      "p": "21",
+      "s": "ProFTPD",
+      "st": "blau"
+     },
+     {
+      "p": "22",
+      "s": "ProFTPD mod_sftp",
+      "st": "gruen"
+     },
+     {
+      "p": "80",
+      "s": "Apache httpd",
+      "st": "gruen"
+     },
+     {
+      "p": "110",
+      "s": "Courier pop3d",
+      "st": "blau"
+     },
+     {
+      "p": "143",
+      "s": "Dovecot imapd",
+      "st": "blau"
+     },
+     {
+      "p": "222",
+      "s": "OpenSSH",
+      "st": "blau"
+     },
+     {
+      "p": "443",
+      "s": "Apache httpd",
+      "st": "gruen"
+     },
+     {
+      "p": "465",
+      "s": "SMTP",
+      "st": "gruen"
+     },
+     {
+      "p": "587",
+      "s": "SMTP",
+      "st": "gruen"
+     },
+     {
+      "p": "993",
+      "s": "IMAPS",
+      "st": "gruen"
+     },
+     {
+      "p": "995",
+      "s": "POP3S",
+      "st": "gruen"
+     },
+     {
+      "p": "25",
+      "s": "unbekannt",
+      "st": "grau"
+     }
+    ]
+   },
+   {
+    "host": "216.150.1.65",
+    "label": "",
+    "ports": [
+     {
+      "p": "80",
+      "s": "Vercel",
+      "st": "gruen"
+     },
+     {
+      "p": "443",
+      "s": "Vercel",
+      "st": "gruen"
+     }
+    ]
+   },
+   {
+    "host": "217.72.203.132",
+    "label": "ip217-72-203-132.pbiaas.com",
+    "ports": [
+     {
+      "p": "80",
+      "s": "nginx",
+      "st": "gruen"
+     },
+     {
+      "p": "443",
+      "s": "nginx",
+      "st": "gruen"
+     }
+    ]
+   },
+   {
+    "host": "2a01:4f8:d0a:2757::2",
+    "label": "www51.your-server.de",
+    "ports": [
+     {
+      "p": "80",
+      "s": "Apache httpd",
+      "st": "grau"
+     },
+     {
+      "p": "443",
+      "s": "Apache httpd",
+      "st": "grau"
+     }
+    ]
+   }
+  ],
+  "services_note": "Rot: Dienst mit kritischem Befund · Gelb: Dienst mit Befund · Blau: Altprotokoll · Grün: unauffällig · Grau: nur aus einer Passivquelle bekannt.",
+  "tech": [
+   {
+    "host": "20.79.218.75",
+    "rows": [
+     {
+      "c": "FortiSSH",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Java/Servlet",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Wing FTP Server",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Apache httpd",
+      "conf": "hoch",
+      "note": "",
+      "src": "header_check, httpx, nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     }
+    ]
+   },
+   {
+    "host": "213.133.104.51 (www51.your-server.de)",
+    "rows": [
+     {
+      "c": "Java/Servlet",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "ProFTPD",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Courier",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Dovecot",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "OpenSSH",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "9.2p1"
+     },
+     {
+      "c": "ProFTPD mod_sftp",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Apache httpd",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     }
+    ]
+   },
+   {
+    "host": "216.150.1.65",
+    "rows": [
+     {
+      "c": "Facebook Pixel",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Google Tag Manager",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Vercel",
+      "conf": "hoch",
+      "note": "",
+      "src": "header_check, httpx, nmap, webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     }
+    ]
+   },
+   {
+    "host": "217.72.203.132 (ip217-72-203-132.pbiaas.com)",
+    "rows": [
+     {
+      "c": "Google Tag Manager",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "HSTS",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "NEOS",
+      "conf": "hoch",
+      "note": "",
+      "src": "cms_fingerprint",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Neos CMS",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Neos Flow",
+      "conf": "mittel",
+      "note": "Version von außen nicht genau bestimmbar",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Neos Flow:neos",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "PHP",
+      "conf": "mittel",
+      "note": "",
+      "src": "httpx",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "nginx",
+      "conf": "hoch",
+      "note": "",
+      "src": "nmap",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     }
+    ]
+   },
+   {
+    "host": "2a01:4f8:d0a:2757::2 (www51.your-server.de)",
+    "rows": [
+     {
+      "c": "Java/Servlet",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     },
+     {
+      "c": "Apache httpd",
+      "conf": "mittel",
+      "note": "",
+      "src": "webtech",
+      "st": "grau",
+      "status": "unbekannt",
+      "v": "unbekannt"
+     }
+    ]
+   }
+  ]
+ },
+ "business": {
+  "implication": "Die Befunde dieses Berichts sind danach geordnet, wie nah sie an den Zugangswegen in das Unternehmensnetz liegen. Ein Dienst, über den sich jemand anmelden kann, wiegt schwerer als eine Abweichung an einer reinen Auslieferungsseite. Bei einem Vorfall mit personenbezogenen Daten gilt die Meldepflicht nach Art. 33 DSGVO innerhalb von 72 Stunden.",
+  "lead": "Was der Scan über das Unternehmen sichtbar macht, bestimmt, welche Befunde wirklich zählen. Maßgeblich ist nicht die Zahl der Meldungen, sondern welche Systeme am Perimeter stehen und wofür sie gebraucht werden.",
+  "observed": [
+   {
+    "meaning": "Die Aufgabe dieses Systems ist von außen nicht eindeutig erkennbar; sie sollte intern geklärt werden.",
+    "system": "Nicht näher bestimmbar (mails.heuel.com, smtp.heuel.com)"
+   },
+   {
+    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
+    "system": "Website und Datenbanken, Fernzugang und Verwaltung (edi.heuel.com, mail.heuel.com, ose.heuel.com)"
+   },
+   {
+    "meaning": "Über dieses System läuft die geschäftliche Korrespondenz. Ein Zugriff darauf trifft Vertraulichkeit und Arbeitsfähigkeit zugleich.",
+    "system": "Mail- und Kalenderplattform, Website und Datenbanken (dl.heuel.com, webportal.heuel.com)"
+   },
+   {
+    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
+    "system": "Website und Datenbanken (online.heuel.com)"
+   },
+   {
+    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
+    "system": "Website und Datenbanken (heuel.com, jobs.heuel.com, www.heuel.com)"
+   },
+   {
+    "meaning": "Außendarstellung und die dahinterliegenden Datenbestände. Betroffen wären vor allem Seiteninhalte, Formulareingaben und Kontaktdaten.",
+    "system": "Website und Datenbanken (webportal.heuel.com)"
+   }
+  ]
+ },
+ "findings": [
+  {
+   "affected": "20.79.218.75:4433 (unbekannt, laut Passivquelle)",
+   "cat": "A",
+   "evidence": "shodan · phase0a/shodan_hosts.json\nQuelle=shodan 20.79.218.75:4433 gesehen am=2026-09-23T09:11:19Z Banner=HTTP/1.1 200 OK Date: Fri, 11 Sep 2026 17:52:16 GMT Server: xxxx X-Frame-Options: SAMEORIGIN Strict-Transport-Security: max-age=31536000 X-Content-Type-Optio...\n\nshodan · phase0a/shodan_hosts.json\n20.79.218.75:4433 banner=HTTP/1.1 200 OK Date: Fri, 11 Sep 2026 17:52:16 GMT Server: xxxx X-Frame-Options: SAMEORIGIN Strict-Transport-Security: max-age=31536000 X-Content-Type-Options: nosniff Ref...",
+   "found": "Eine Passivquelle meldet für 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) eine Verwaltungs- oder Firewall-Oberfläche, die der Portscan nicht bestätigen konnte: 20.79.218.75:4433 (unbekannt, laut Passivquelle). Der Port liegt außerhalb der geprüften Ports oder war vom Scanner aus gefiltert.",
+   "id": "VS-2026-001",
+   "impact": "Eine exponierte Verwaltungsoberfläche ist ein hochwertiges Ziel: Eine Übernahme betrifft den gesamten Anschluss inklusive der dahinter liegenden Systeme. Ob es sich um ein Anmeldeportal oder die Administrationsoberfläche handelt, ist von außen nicht erkennbar.",
+   "level": "hoch",
+   "level_label": "hoch",
+   "policy": "admin_service_exposed_passive",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Firmware gegen die Sicherheitshinweise des Herstellers abgleichen; lokale Benutzerkonten und Standardkonten prüfen."
+    ],
+    [
+     "In Kürze",
+     "Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand."
+    ],
+    [
+     "Mittelfristig",
+     "Zugriff auf benötigte Quellnetze beschränken und Anmeldeversuche überwachen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "passiv (shodan)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Verwaltungsoberfläche laut Passivquelle erreichbar",
+   "urgency": "In Kürze",
+   "verify": "Verbindungsversuch auf den gemeldeten Port von einer externen Adresse; erwartet wird keine Verwaltungsanmeldung ohne Zugriffsbeschränkung."
+  },
+  {
+   "affected": "ose.heuel.com (Cross-Domain Misconfiguration), edi.heuel.com, ose.heuel.com, ose.heuel.com (/webmodule-ee/login.seam), edi.heuel.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ose.heuel.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+   "cat": "D",
+   "evidence": "zap_active\nCross-Domain Misconfiguration ZAP-Kennung=10098 Risiko=Medium Konfidenz=Medium Adresse=https://ose.heuel.com/webmodule-ee/ Beleg=Access-Control-Allow-Origin: * CWE=CWE-264 betroffene Adressen=2\n\nheader_check · hosts/20.79.218.75/phase2/headers_edi.heuel.com.json\nedi.heuel.com: URL=https://edi.heuel.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Apache\n\nheader_check · hosts/20.79.218.75/phase2/headers_ose.heuel.com.json\nose.heuel.com: URL=https://ose.heuel.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Apache\n\nzap_active\nAbsence of Anti-CSRF Tokens ZAP-Kennung=10202 Risiko=Medium Konfidenz=Low Adresse=https://ose.heuel.com/webmodule-ee/login.seam Beleg=<form id=\"gridForm\" name=\"gridForm\" method=\"post\" action=\"/webmodule-ee/login.seam;jsessionid=Cqy9cPfNo...",
+   "found": "Die Webdienste auf 20.79.218.75 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: ose.heuel.com (Cross-Domain Misconfiguration), edi.heuel.com, ose.heuel.com, ose.heuel.com (/webmodule-ee/login.seam), edi.heuel.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy), ose.heuel.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+   "id": "VS-2026-002",
+   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+   "level": "mittel",
+   "level_label": "mittel",
+   "policy": "cors_misconfiguration, csp_missing, csrf_token_missing, hsts_missing, security_headers_incomplete",
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
+    ],
+    [
+     "Strategisch",
+     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (header_check, zap_active)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Sicherheits-Header und Formularschutz auf 20.79.218.75 unvollständig",
+   "urgency": "Mittelfristig",
+   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+  },
+  {
+   "affected": "online.heuel.com, online.heuel.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy)",
+   "cat": "D",
+   "evidence": "header_check · hosts/216.150.1.65/phase2/headers_online.heuel.com.json\nonline.heuel.com: URL=https://online.heuel.com fehlende Header=content-security-policy, permissions-policy, referrer-policy, strict-transport-security, x-content-type-options, x-frame-options, x-xss-protection Server=Vercel",
+   "found": "Die Webdienste auf 216.150.1.65 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: online.heuel.com, online.heuel.com (fehlend: x-frame-options, x-content-type-options, referrer-policy, permissions-policy).",
+   "id": "VS-2026-003",
+   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+   "level": "mittel",
+   "level_label": "mittel",
+   "policy": "csp_missing, hsts_missing, security_headers_incomplete",
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
+    ],
+    [
+     "Strategisch",
+     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (header_check)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Sicherheits-Header und Formularschutz auf 216.150.1.65 unvollständig",
+   "urgency": "Mittelfristig",
+   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+  },
+  {
+   "affected": "www.heuel.com (unsafe-inline, unsafe-eval), www.heuel.com (/en/kontakt-heuel-logistics.html), www.heuel.com (/en/freight-inquiry.html)",
+   "cat": "D",
+   "evidence": "header_check · hosts/217.72.203.132/phase2/headers_www.heuel.com.json\nwww.heuel.com: URL=https://www.heuel.com gesetzte Header=content-security-policy: default-src 'self' https://*; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*; style-src 'self' 'unsafe-inline' https://*; img-src 'self' data: b...\n\nzap_active\nAbsence of Anti-CSRF Tokens ZAP-Kennung=10202 Risiko=Medium Konfidenz=Low Adresse=https://www.heuel.com/en/kontakt-heuel-logistics.html Beleg=<form method=\"post\" enctype=\"multipart/form-data\" id=\"Heuel\" action=\"https://www.heuel.com/logi...\n\nzap_active\nSub Resource Integrity Attribute Missing ZAP-Kennung=90003 Risiko=Medium Konfidenz=High Adresse=https://www.heuel.com/en/freight-inquiry.html Beleg=<script src='https://cdn.jotfor.ms/s/umd/latest/for-form-embed-handler.js'></script> CWE=...",
+   "found": "Die Webdienste auf 217.72.203.132 liefern Sicherheits-Header unvollständig, widersprüchlich oder ohne wirksame Einschränkung aus: www.heuel.com (unsafe-inline, unsafe-eval), www.heuel.com (/en/kontakt-heuel-logistics.html), www.heuel.com (/en/freight-inquiry.html).",
+   "id": "VS-2026-004",
+   "impact": "Sicherheits-Header weisen den Browser an, eingeschleuste Inhalte, fremde Einbettung und unverschlüsselte Aufrufe abzulehnen. Fehlen sie, muss die Anwendung jeden dieser Fälle selbst abfangen; ein einzelner Fehler in der Anwendung wirkt dann sofort nach außen.",
+   "level": "mittel",
+   "level_label": "mittel",
+   "policy": "csp_weak, csrf_token_missing, sri_missing",
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren."
+    ],
+    [
+     "Strategisch",
+     "Die Vorgabe für Sicherheits-Header an einer Stelle pflegen und nach jeder Änderung an einem Webdienst prüfen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (header_check, zap_active)",
+   "status": "gelb",
+   "threat": null,
+   "title": "Sicherheits-Header und Formularschutz auf 217.72.203.132 unvollständig",
+   "urgency": "Mittelfristig",
+   "verify": "Die Antwort-Header der genannten Adressen erneut abrufen; erwartet werden vollständige und eindeutige Sicherheits-Header."
+  },
+  {
+   "affected": "20.79.218.75:21 (FTP), 213.133.104.51:110 (POP3), 213.133.104.51:143 (IMAP), 213.133.104.51:21 (FTP)",
+   "cat": "A",
+   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:21/tcp Dienst=ftp Produkt=Wing FTP Server Zustand=open TLS erzwungen=ja\n\nnmap · hosts/20.79.218.75/phase1/nmap.xml\n21/tcp open ftp Wing FTP Server tunnel=ssl\n\nnmap · hosts/213.133.104.51/phase1/nmap.xml\n213.133.104.51:21/tcp Dienst=ftp Produkt=ProFTPD Zustand=open TLS erzwungen=ja\n\nnmap · hosts/213.133.104.51/phase1/nmap.xml\n21/tcp open ftp ProFTPD (requires SSL)\n\nnmap · hosts/213.133.104.51/phase1/nmap.xml\n213.133.104.51:110/tcp Dienst=pop3 Produkt=Courier pop3d Zustand=open STARTTLS=ja Capabilities=STLS, CAPA, AUTH-RESP-CODE, SASL\n\nnmap · hosts/213.133.104.51/phase1/nmap.xml\npop3-capabilities: STLS CAPA AUTH-RESP-CODE SASL PIPELINING UIDL TOP RESP-CODES\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
+   "found": "Der Host 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com), 213.133.104.51 (dl.heuel.com, webportal.heuel.com) bietet ein älteres Übertragungsprotokoll an, das zur Angriffsfläche des Anschlusses zählt: 20.79.218.75:21 (FTP), 213.133.104.51:110 (POP3), 213.133.104.51:143 (IMAP), 213.133.104.51:21 (FTP). Ob eine Verschlüsselung erzwungen wird, zeigt diese Prüfung nicht.",
+   "id": "VS-2026-005",
+   "impact": "Jeder zusätzlich erreichbare Dienst vergrößert die Angriffsfläche des Anschlusses, unabhängig davon, ob er eine Verschlüsselung anbietet oder erzwingt. Altprotokolle bringen zudem eigene, seltener gepflegte Serverkomponenten mit.",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "policy": "legacy_protocols_present",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren."
+    ],
+    [
+     "Mittelfristig",
+     "Falls der Dienst benötigt wird, den Zugriff auf feste Quelladressen beschränken und eine erzwungene Verschlüsselung sicherstellen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "blau",
+   "threat": null,
+   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+   "urgency": "Mittelfristig",
+   "verify": "Portscan des betroffenen Ports von einer externen Adresse aus wiederholen; erwartet wird der Zustand gefiltert oder geschlossen, sofern der Dienst nicht mehr benötigt wird."
+  },
+  {
+   "affected": "20.79.218.75:8443 (https-alt)",
+   "cat": "A",
+   "evidence": "nmap · hosts/20.79.218.75/phase1/nmap.xml\n20.79.218.75:8443/tcp Dienst=https-alt Zustand=open",
+   "found": "Auf 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com) beantwortet ein Webdienst Anfragen mit der unveränderten Auslieferungsseite des Herstellers, teils auf einem zusätzlichen Port: 20.79.218.75:8443 (https-alt).",
+   "id": "VS-2026-006",
+   "impact": "Eine unveränderte Auslieferungsseite verrät, dass hier ein Webserver ohne eigene Anwendung antwortet, und lädt zum Ausprobieren bekannter Pfade ein. Ein zusätzlicher Webport vergrößert die Angriffsfläche, ohne dass sein Zweck von außen erkennbar ist.",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "policy": "http_alt_port",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen."
+    ],
+    [
+     "Mittelfristig",
+     "Die Auslieferungsseite durch eine leere Antwort oder eine gezielte Weiterleitung ersetzen, damit der Dienst keinen Rückschluss auf das eingesetzte Produkt zulässt."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "blau",
+   "threat": null,
+   "title": "Unveränderte Auslieferungsseite und zusätzlicher Webport auf 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com)",
+   "urgency": "Mittelfristig",
+   "verify": "Die genannten Adressen von außen erneut aufrufen; erwartet wird keine Auslieferungsseite des Herstellers und kein zusätzlicher Webport."
+  },
+  {
+   "affected": "heuel.com (p=quarantine), heuel.com (~all)",
+   "cat": "C",
+   "evidence": "dns_records · phase0/dns_records.json\nheuel.com: SPF=v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crse...",
+   "found": "Für heuel.com sind die Richtlinien zur Absender-Authentizität nicht scharf gestellt: heuel.com (p=quarantine), heuel.com (~all).",
+   "id": "VS-2026-007",
+   "impact": "Ohne durchsetzende Richtlinie erfährt ein Empfangssystem zwar, welche Server senden dürfen, weist gefälschte Nachrichten aber nicht ab. Der Schutz vor Absenderfälschung bleibt damit wirkungslos, und Rückmeldungen über Missbrauch erreichen Sie nicht.",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "policy": "dmarc_quarantine, spf_softfail",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten."
+    ],
+    [
+     "Mittelfristig",
+     "Die Richtlinie stufenweise auf Zurückweisung stellen, sobald alle Versandquellen erfasst sind, und den Abgleich der Absender scharf schalten."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records)",
+   "status": "blau",
+   "threat": null,
+   "title": "Richtlinie zur Absender-Authentizität für heuel.com nicht durchsetzend",
+   "urgency": "Mittelfristig",
+   "verify": "DNS-Abfrage der Richtlinie wiederholen; erwartet wird eine Richtlinie, die gefälschte Nachrichten zurückweist."
+  },
+  {
+   "affected": "heuel.com",
+   "cat": "C",
+   "evidence": "dns_records · phase0/dns_records.json\nheuel.com: SPF=v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crse...",
+   "found": "Für heuel.com fehlen die Einträge, mit denen ein Absender eine verschlüsselte Zustellung erzwingen und Fehler zurückmelden kann: heuel.com.",
+   "id": "VS-2026-008",
+   "impact": "Ohne diese Einträge darf ein sendendes System auf eine unverschlüsselte Verbindung ausweichen, wenn die verschlüsselte scheitert. Ein Angreifer auf dem Übertragungsweg kann genau das erzwingen und die Nachrichten mitlesen.",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "policy": "dane_missing, mta_sts_missing, tls_rpt_missing",
+   "recommendation": [
+    [
+     "Strategisch",
+     "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records)",
+   "status": "blau",
+   "threat": null,
+   "title": "Transportverschlüsselung im Mailversand für heuel.com nicht erzwungen",
+   "urgency": "Strategisch",
+   "verify": "DNS-Abfrage der genannten Einträge wiederholen; erwartet wird je ein gültiger Eintrag."
+  },
+  {
+   "affected": "edi.heuel.com:443",
+   "cat": "D",
+   "evidence": "httpx · hosts/20.79.218.75/phase2/httpx.json\nedi.heuel.com:443 CN=*.heuel.com SAN=*.heuel.com, heuel.com Aussteller=GlobalSign GCC R6 AlphaSSL CA 2025 gueltig_bis=2027-04-14T14:45:26Z abgelaufen=nein Resttage=202 Namensabweichung=nein Kette vollstaendig=ja Protokolle=TLS1.2 schwach...\n\nhttpx · hosts/20.79.218.75/phase2/httpx.json\nedi.heuel.com:443 tls=tls12 cn=*.heuel.com gueltig_bis=2027-04-14T14:45:26Z\n\ntestssl · scan_results:testssl:20.79.218.75\nangeboten=TLS1.2 nicht angeboten=SSLv2, SSLv3, TLS1.0, TLS1.1, TLS1.3\n\ntestssl · hosts/20.79.218.75/phase2/testssl.json\nservice=HTTP; pre_128cipher=No 128 cipher limit bug; SSLv2=not offered; SSLv3=not offered; TLS1=not offered; TLS1_1=not offered",
+   "found": "Die Transportverschlüsselung auf edi.heuel.com (+mail.heuel.com) lässt veraltete Protokolle oder Verfahren zu oder verzichtet auf verfügbare Absicherungen: edi.heuel.com:443.",
+   "id": "VS-2026-009",
+   "impact": "Veraltete Protokolle und Verfahren sind gegen bekannte Angriffe auf den Übertragungsweg anfällig. Ein Angreifer zwischen Nutzer und Dienst kann eine schwächere Verbindung erzwingen und Teile der übertragenen Daten entschlüsseln.",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "policy": "tls_no_13",
+   "recommendation": [
+    [
+     "In Kürze",
+     "Veraltete Protokolle und schwache Verfahren am Dienst abschalten."
+    ],
+    [
+     "Mittelfristig",
+     "Das aktuelle Protokoll aktivieren, den Schutz gegen eine erzwungene Rückstufung einschalten und die Gültigkeitsdauer der Transportsicherheits-Vorgabe auf mindestens ein Jahr setzen."
+    ],
+    [
+     "Strategisch",
+     "Die Konfiguration aller verschlüsselten Dienste an einer gemeinsamen Vorgabe ausrichten und regelmäßig prüfen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (httpx, testssl)",
+   "status": "blau",
+   "threat": {
+    "cves": [
+     "CVE-2013-0169 (von testssl genannt, keine Fremdbewertung vorhanden)"
+    ],
+    "kev": "",
+    "note": "Vom Prüfwerkzeug genannt, ohne Fremdbewertung; die Einstufung dieses Befunds stammt aus dem Prüfkatalog."
+   },
+   "title": "Transportverschlüsselung auf edi.heuel.com (+mail.heuel.com) mit veralteten Verfahren",
+   "urgency": "Mittelfristig",
+   "verify": "Die Prüfung der Transportverschlüsselung gegen die genannten Dienste wiederholen; erwartet werden nur aktuelle Protokolle und Verfahren."
+  },
+  {
+   "affected": "213.133.104.51:222 (OpenSSH 9.2p1)",
+   "cat": "E",
+   "evidence": "nmap · hosts/213.133.104.51/phase1/nmap.xml\n213.133.104.51:222/tcp Dienst=ssh Produkt=OpenSSH Version=9.2p1 Zustand=open\n\nnmap · hosts/213.133.104.51/phase1/nmap.xml\n222/tcp open ssh OpenSSH 9.2p1 (protocol 2.0)",
+   "found": "Dienste geben ihre genaue Version preis oder beantworten Methoden, die im Betrieb nicht gebraucht werden: 213.133.104.51:222 (OpenSSH 9.2p1).",
+   "id": "VS-2026-010",
+   "impact": "Eine genaue Versionsangabe erspart einem Angreifer die Suche nach dem passenden Angriff, weil er bekannte Schwachstellen direkt zuordnen kann. Nicht benötigte Methoden spiegeln Anfragen zurück und helfen bei der Vorbereitung.",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "policy": "service_banner_version",
+   "recommendation": [
+    [
+     "Mittelfristig",
+     "Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten."
+    ],
+    [
+     "Strategisch",
+     "Die Vorgabe für Antwort-Header und erlaubte Methoden an einer Stelle pflegen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (nmap)",
+   "status": "blau",
+   "threat": null,
+   "title": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste",
+   "urgency": "Mittelfristig",
+   "verify": "Die Antworten der genannten Dienste erneut abrufen; erwartet werden Antworten ohne genaue Versionsangabe und ohne die zusätzlichen Methoden."
+  },
+  {
+   "affected": "heuel.com",
+   "cat": "E",
+   "evidence": "dns_records · phase0/dns_records.json\nheuel.com: SPF=v=spf1 ip4:20.52.130.35 ip4:168.245.40.44 ip4:167.89.99.179 ip4:149.72.147.186 ip4:167.89.101.239 ip4:88.99.138.97 ip6:2a01:4f8:10a:22a2::2 include:spf.protection.outlook.com include:spf.hornetsecurity.com include:spf.crse...",
+   "found": "Für heuel.com fehlen Einträge, die DNS-Antworten absichern und die Ausstellung von Zertifikaten eingrenzen: heuel.com.",
+   "id": "VS-2026-011",
+   "impact": "Ohne Signatur der DNS-Antworten kann ein Angreifer auf dem Übertragungsweg Antworten verändern und Besucher auf ein fremdes Ziel umleiten. Ohne Eingrenzung der Ausstellung darf jede Zertifizierungsstelle ein Zertifikat für die Domain ausstellen.",
+   "level": "niedrig",
+   "level_label": "niedrig",
+   "policy": "caa_missing, dnssec_missing",
+   "recommendation": [
+    [
+     "Strategisch",
+     "Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen."
+    ]
+   ],
+   "scale": "hygiene",
+   "source": "aktiv (dns_records)",
+   "status": "blau",
+   "threat": null,
+   "title": "DNS-Absicherung für heuel.com nicht eingerichtet",
+   "urgency": "Strategisch",
+   "verify": "DNS-Abfrage der Signatur und der Ausstellungseingrenzung wiederholen; erwartet wird je ein gültiger Eintrag."
+  }
+ ],
+ "glance": {
+  "categories": [
+   {
+    "key": "A",
+    "level": 2,
+    "name": "Perimeter-Exposition",
+    "note": "Verwaltungsoberfläche laut Passivquelle erreichbar; Veraltetes Übertragungsprotokoll aus dem Internet erreichbar",
+    "status": "gelb"
+   },
+   {
+    "key": "B",
+    "level": 0,
+    "name": "Patch- und EOL-Status",
+    "note": "Keine Befunde in dieser Kategorie",
+    "status": "gruen"
+   },
+   {
+    "key": "C",
+    "level": 1,
+    "name": "E-Mail-Authentizität",
+    "note": "Richtlinie zur Absender-Authentizität für heuel.com nicht durchsetzend; Transportverschlüsselung im Mailversand für heuel.com nicht erzwungen",
+    "status": "blau"
+   },
+   {
+    "key": "D",
+    "level": 2,
+    "name": "Web- und Transport-Hygiene",
+    "note": "Sicherheits-Header und Formularschutz auf 20.79.218.75 unvollständig; Sicherheits-Header und Formularschutz auf 216.150.1.65 unvollständig",
+    "status": "gelb"
+   },
+   {
+    "key": "E",
+    "level": 1,
+    "name": "Konfiguration und Informations-Hygiene",
+    "note": "Versionsangaben und nicht benötigte Methoden in den Antworten der Dienste; DNS-Absicherung für heuel.com nicht eingerichtet",
+    "status": "blau"
+   }
+  ],
+  "context": "Geprüft wurde die von außen erreichbare Angriffsfläche von heuel.com am 23.09.2026: 12 Hostnamen auf 6 IP-Adressen. Die Innenperspektive, Mitarbeiterszenarien und Social Engineering sind nicht Teil dieser Prüfung.",
+  "coverage_warning": "Für 213.133.104.51 und 2a01:4f8:d0a:2757::2 liegt keine oder nur eine teilweise aktive Prüfung vor. Die Einschränkungen und ihre Gründe stehen in Kapitel 2; die Ergebnisse dieses Berichts sind entsprechend zu lesen.",
+  "levers": [
+   {
+    "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+    "n": 1,
+    "refs": [
+     "VS-2026-001"
+    ],
+    "title": "Verwaltungsoberfläche laut Passivquelle erreichbar"
+   },
+   {
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "n": 2,
+    "refs": [
+     "VS-2026-002",
+     "VS-2026-006",
+     "VS-2026-009"
+    ],
+    "title": "Sicherheits-Header und Formularschutz auf 20.79.218.75 unvollständig"
+   },
+   {
+    "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+    "n": 3,
+    "refs": [
+     "VS-2026-003",
+     "VS-2026-004"
+    ],
+    "title": "Sicherheits-Header und Formularschutz auf 216.150.1.65 unvollständig"
+   }
+  ],
+  "overall": "MITTEL",
+  "overall_status": "gelb",
+  "overall_text": "Kein Befund erfordert sofortiges Handeln, es besteht aber Handlungsbedarf mit erkennbarem Angriffsweg. Die Befunde betreffen die aus dem Internet erreichbaren Dienste, die Authentizität der E-Mail, die Transportverschlüsselung und die Sicherheits-Header sowie die Konfiguration und die preisgegebenen Angaben."
+ },
+ "landscape_lead": "11 Befunde in 5 Kategorien. Die Kategorien entsprechen der Ampel auf Seite 2; die Reihenfolge folgt der Einstufung, nicht der Reihenfolge der Entdeckung.",
+ "meta": {
+  "after_fp": 29,
+  "catalog_digest": "4e255169a28aea349450a125668c81504736ef052bd84894978cd0a9e8800dab",
+  "catalog_version": "2026-09-23.2",
+  "classification": "Vertraulich",
+  "consolidated": 11,
+  "customer": "Auftraggeber",
+  "customer_short": "Auftraggeber",
+  "domains": [
+   "heuel.com"
+  ],
+  "facts_schema_version": "1.0.5",
+  "fqdns_total": 12,
+  "hosts_ipv4": 5,
+  "hosts_ipv6": 1,
+  "hosts_total": 6,
+  "orders": [
+   {
+    "id": "2e56abe1-c1a6-442e-b36a-dc9f83c81da8",
+    "label": "Lauf 1"
+   }
+  ],
+  "package": "Perimeter",
+  "package_label": "PERIMETERSCAN",
+  "policy_version": "2026-09-23.2",
+  "positives": 6,
+  "prose_rejected": [],
+  "provider": "Vectigal GmbH",
+  "provider_address": "Olpe 31-33 · 44135 Dortmund",
+  "provider_contact": "kontakt@vectigal.ai · vectigal.ai",
+  "provider_register": "Amtsgericht Dortmund HRB 38214 · USt-IdNr. DE462853393",
+  "provider_responsible": "Daniel Czischke, Geschäftsführer",
+  "raw_findings": 1839,
+  "report_date": "19.09.2026",
+  "report_id": "VS-2026-0923-2e56",
+  "report_version": "1.0",
+  "scan_date": "23.09.2026",
+  "scan_window": "23.09.2026, 21:48 bis 22:39 Uhr (CEST)",
+  "tool_runs": 113
+ },
+ "plan": [
+  {
+   "action": "Klären, welche Funktion auf dem gemeldeten Port läuft. Verwaltungsoberflächen dürfen nicht aus dem Internet erreichbar sein; Anmeldeportale nur mit Zwei-Faktor-Anmeldung und aktuellem Firmwarestand.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "In Kürze",
+   "refs": [
+    "VS-2026-001"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren. Den Zweck jedes erreichbaren Webports klären und nicht benötigte Ports schließen. Veraltete Protokolle und schwache Verfahren am Dienst abschalten.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-002",
+    "VS-2026-006",
+    "VS-2026-009"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Die fehlenden Sicherheits-Header am Webserver ergänzen, doppelte Header bereinigen und die Inhaltsrichtlinie ohne pauschale Freigaben formulieren.",
+   "effect": "Härtet Transportverschlüsselung und Web-Oberflächen",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-003",
+    "VS-2026-004"
+   ],
+   "st": "gelb"
+  },
+  {
+   "action": "Prüfen, ob der Dienst noch benötigt wird, und ihn andernfalls deaktivieren. Versionsangaben aus den Antworten entfernen und nicht benötigte Methoden am Dienst abschalten.",
+   "effect": "Verkleinert die von außen erreichbare Angriffsfläche",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-005",
+    "VS-2026-010"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Eine Richtlinie mit Meldeadresse veröffentlichen und die eingehenden Berichte auswerten.",
+   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "prio": "Mittelfristig",
+   "refs": [
+    "VS-2026-007"
+   ],
+   "st": "blau"
+  },
+  {
+   "action": "Die Einträge für erzwungene Transportverschlüsselung und für Fehlerberichte im DNS veröffentlichen; Voraussetzung sind gültige Zertifikate auf allen Mailservern der Domain. Die Signatur der DNS-Zone beim Registrar aktivieren und die zugelassenen Zertifizierungsstellen im DNS eingrenzen.",
+   "effect": "Schützt die Authentizität der eigenen E-Mail",
+   "prio": "Strategisch",
+   "refs": [
+    "VS-2026-008",
+    "VS-2026-011"
+   ],
+   "st": "blau"
+  }
+ ],
+ "positives": [
+  {
+   "cat": "A",
+   "text": "Der Host den geprüften Hosts bietet seinen Webdienst über HTTPS an.",
+   "title": "Webdienst mit Transportverschlüsselung"
+  },
+  {
+   "cat": "A",
+   "text": "Auf 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com), 213.133.104.51 (dl.heuel.com, webportal.heuel.com) lehnen die Datei- und Mailzugänge eine Anmeldung ohne aufgebaute Transportverschlüsselung ab.",
+   "title": "Datei- und Mailzugänge erzwingen TLS vor der Anmeldung"
+  },
+  {
+   "cat": "C",
+   "text": "Für heuel.com lehnen die Nameserver den Abruf der gesamten Zone ab, und kein Eintrag zeigt auf ein aufgegebenes Ziel.",
+   "title": "Kein Abruf der gesamten Zone möglich, keine verwaisten Einträge"
+  },
+  {
+   "cat": "C",
+   "text": "Für heuel.com sind die grundlegenden Einträge zur Absender-Authentizität vorhanden.",
+   "title": "Absender-Authentizität mit SPF und DKIM hinterlegt"
+  },
+  {
+   "cat": "D",
+   "text": "Vor online.heuel.com ist eine Web Application Firewall aktiv, die Angriffe auf Anwendungsebene filtert, bevor sie den Webdienst erreichen.",
+   "title": "Web Application Firewall vorhanden"
+  },
+  {
+   "cat": "E",
+   "text": "Zu den geprüften Adressen und zur Domain liegt in den abgefragten Reputationsquellen kein Eintrag vor.",
+   "title": "Keine Einträge in Reputationsquellen"
+  }
+ ],
+ "scope": {
+  "ai_note": "Die Befunde dieses Berichts entstehen regelbasiert aus den Ausgaben der eingesetzten Werkzeuge: ein Prüfkatalog wertet die erhobenen Fakten aus, jede Einstufung folgt einer hinterlegten Regel. Ein Sprachmodell formuliert einzelne erläuternde Absätze und steuert im Scanner die Reihenfolge und die Konfiguration der Werkzeuge. Es entscheidet weder über Befunde noch über deren Einstufung.",
+  "can_cannot": {
+   "advice": "Für die Zugangs-Infrastruktur empfehlen wir ergänzend eine Konfigurationsprüfung mit administrativem Zugang.",
+   "can": [
+    "erreichbare Dienste, Versionen und Konfigurationsschwächen aus Angreifersicht",
+    "E-Mail- und DNS-Authentizität, Transportverschlüsselung, Sicherheits-Header",
+    "bekannte Schwachstellenmuster ohne Anmeldung"
+   ],
+   "cannot": [
+    "Schwachstellen hinter einer Anmeldung",
+    "Versionsstände, die sich nicht in der Antwort eines Dienstes zeigen",
+    "Fehlkonfigurationen im Inneren, Berechtigungen, Sicherungen, Notfallprozesse"
+   ]
+  },
+  "hosts": [
+   {
+    "cov": "voll",
+    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "fqdns": "mails.heuel.com, smtp.heuel.com",
+    "ip": "195.225.241.75",
+    "operator": "comtrance service GmbH",
+    "role": "Nicht näher bestimmbar"
+   },
+   {
+    "cov": "voll",
+    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "fqdns": "edi.heuel.com, mail.heuel.com, ose.heuel.com",
+    "ip": "20.79.218.75",
+    "operator": "Microsoft Corporation",
+    "role": "Website und Datenbanken, Fernzugang und Verwaltung"
+   },
+   {
+    "cov": "teil",
+    "coverage": "Portscan vollständig; Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich.",
+    "fqdns": "dl.heuel.com, webportal.heuel.com",
+    "ip": "213.133.104.51",
+    "operator": "Hetzner Online AG (www51.your-server.de)",
+    "role": "Mail- und Kalenderplattform, Website und Datenbanken"
+   },
+   {
+    "cov": "voll",
+    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "fqdns": "online.heuel.com",
+    "ip": "216.150.1.65",
+    "operator": "Vercel, Inc",
+    "role": "Website und Datenbanken"
+   },
+   {
+    "cov": "voll",
+    "coverage": "Portscan und Tiefenprüfung vollständig",
+    "fqdns": "heuel.com, jobs.heuel.com, www.heuel.com",
+    "ip": "217.72.203.132",
+    "operator": "IONOS SE (ip217-72-203-132.pbiaas.com)",
+    "role": "Website und Datenbanken"
+   },
+   {
+    "cov": "keine",
+    "coverage": "Der Prüfstand hatte keine IPv6-Verbindung zu dieser Adresse; über IPv6 erreichbare Dienste konnten nicht geprüft werden.",
+    "fqdns": "webportal.heuel.com",
+    "ip": "2a01:4f8:d0a:2757::2",
+    "operator": "Hetzner Online GmbH (www51.your-server.de)",
+    "role": "Website und Datenbanken"
+   }
+  ],
+  "lead": "Der Scan hat 6 IP-Adressen mit 12 Hostnamen erfasst. Für 2 Hosts war die aktive Prüfung nur teilweise oder gar nicht möglich; diese Lücken sind unten benannt, damit die Ergebnisse nicht vollständiger wirken, als sie sind.",
+  "limitations": [
+   {
+    "detail": "Betroffen: 195.225.241.75 (mails.heuel.com, smtp.heuel.com), 20.79.218.75 (edi.heuel.com, mail.heuel.com, ose.heuel.com), 213.133.104.51 (dl.heuel.com, webportal.heuel.com), 216.150.1.65 (online.heuel.com), 217.72.203.132 (heuel.com, jobs.heuel.com, www.heuel.com), 2a01:4f8:d0a:2757::2 (webportal.heuel.com).",
+    "what": "Abgleich mit den Schwachstellendatenbanken ohne Ergebnis; zu den erkannten Versionen lag keine Fremdbewertung vor"
+   },
+   {
+    "detail": "Betroffen: 2a01:4f8:d0a:2757::2.",
+    "what": "Aktive Webanalyse ist im Scanner fehlgeschlagen"
+   },
+   {
+    "detail": "Betroffen: 195.225.241.75, 2a01:4f8:d0a:2757::2.",
+    "what": "Das Werkzeug httpx hat kein Ergebnis geliefert"
+   },
+   {
+    "detail": "Betroffen: webportal.heuel.com, webportal.heuel.com.",
+    "what": "Der Host hat nach dem Portscan weitere Verbindungen abgewiesen; Web-Prüfungen nicht möglich"
+   },
+   {
+    "detail": "Betroffen: 2a01:4f8:d0a:2757::2 (webportal.heuel.com).",
+    "what": "Der Prüfstand hatte keine IPv6-Verbindung zu dieser Adresse; über IPv6 erreichbare Dienste konnten nicht geprüft werden"
+   },
+   {
+    "detail": "Betroffen: heuel.com.",
+    "what": "Die Abfrage der Domain-Registrierungsdaten lieferte kein Ergebnis"
+   },
+   {
+    "detail": "Betroffen: ose.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com).",
+    "what": "Die Liste der angebotenen TLS-Protokolle lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: ose.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com).",
+    "what": "Die Liste der angebotenen Verschlüsselungsverfahren lag für diesen Dienst nicht vor"
+   },
+   {
+    "detail": "Betroffen: 2a01:4f8:d0a:2757::2.",
+    "what": "Die passive Webanalyse lieferte keine Meldungen; Ergebnis nicht belastbar"
+   },
+   {
+    "detail": "Betroffen: 195.225.241.75 (mails.heuel.com, smtp.heuel.com).",
+    "what": "Keine Technologie-Signale erkannt"
+   },
+   {
+    "detail": "Betroffen: mails.heuel.com, webportal.heuel.com.",
+    "what": "Virtueller Host war über HTTP nicht erreichbar"
+   },
+   {
+    "detail": "Betroffen: 2a01:4f8:d0a:2757::2, heuel.com.",
+    "what": "Werkzeug lief in einen Timeout"
+   },
+   {
+    "detail": "Betroffen: mails.heuel.com.",
+    "what": "Werkzeug wurde von der Scan-Steuerung übersprungen"
+   },
+   {
+    "detail": "Betroffen: ose.heuel.com, www.heuel.com (+heuel.com, jobs.heuel.com).",
+    "what": "Zertifikatsdetails nicht verfügbar"
+   }
+  ],
+  "method_phases": [
+   {
+    "n": "0",
+    "name": "Aufklärung (passiv)",
+    "text": "Ermittlung der Hostnamen aus öffentlichen Quellen, DNS- und E-Mail-Einträge, Reputationsdienste. Ergebnis: 12 Hostnamen auf 6 IP-Adressen."
+   },
+   {
+    "n": "1",
+    "name": "Technologie-Erkennung",
+    "text": "Portscan der häufigsten TCP-Ports mit Versionserkennung, Erkennung der Web-Technologien und vorgelagerter Schutzsysteme."
+   },
+   {
+    "n": "2",
+    "name": "Tiefenprüfung",
+    "text": "Analyse der Transportverschlüsselung, der Sicherheits-Header und der HTTP-Antworten je virtuellem Host, Verzeichnis-Enumeration und passive Webanalyse."
+   },
+   {
+    "n": "3",
+    "name": "Auswertung",
+    "text": "Zusammenführung über Werkzeuge und Durchgänge, Abgleich mit Fremdquellen zu Schwachstellen, Auswertung des Prüfkatalogs. Ergebnis: 11 Befunde und 6 positive Feststellungen."
+   }
+  ],
+  "numbers": [
+   {
+    "l": "Scandurchgang",
+    "v": "1"
+   },
+   {
+    "l": "Werkzeugläufe",
+    "v": "113"
+   },
+   {
+    "l": "Einzelbeobachtungen",
+    "v": "1839"
+   },
+   {
+    "l": "Befunde im Bericht",
+    "v": "11"
+   }
+  ],
+  "out_of_scope": [
+   "Interne Netzsegmente, Arbeitsplätze und mobile Geräte hinter der Firewall.",
+   "Prüfungen mit Anmeldung (kein Login in Portale oder Verwaltungsoberflächen).",
+   "Social Engineering, Phishing-Simulationen, physische Sicherheit."
+  ],
+  "standard_note": "Einordnung: automatisierte externe Schwachstellenanalyse, angelehnt an die Prüfphasen Aufklärung, Schwachstellenanalyse und Bericht. Kein Penetrationstest, keine Ausnutzung gefundener Schwachstellen, keine Prüfung mit Zugangsdaten."
+ }
+}
+

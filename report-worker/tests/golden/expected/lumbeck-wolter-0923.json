@@ -1,0 +1,239 @@
+{
+ "source": "reporter.catalog 2026-09-23.2 auf tests/golden/facts/c3d5724c-bdbf-4da8-982f-4f1a52210e28.json",
+ "hinweis": "Abgeleitet aus dem Katalogergebnis, nicht unabhaengig erarbeitet. Die Liste ist eine Regressionssperre; die inhaltliche Pruefung liegt bei DC (Issue #14).",
+ "customer": null,
+ "domains": [
+  "lumbeck-wolter.de"
+ ],
+ "package": "perimeter",
+ "order_ids": [
+  "c3d5724c-bdbf-4da8-982f-4f1a52210e28"
+ ],
+ "findings": [
+  {
+   "id": "VS-2026-001",
+   "check": "caa_missing",
+   "family": "caa_missing",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "lumbeck-wolter.de",
+   "affected": [
+    "lumbeck-wolter.de"
+   ],
+   "title": "CAA-Eintrag fehlt"
+  },
+  {
+   "id": "VS-2026-002",
+   "check": "dane_missing",
+   "family": "dane_missing",
+   "cat": "C",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "lumbeck-wolter.de",
+   "affected": [
+    "lumbeck-wolter.de"
+   ],
+   "title": "DANE für SMTP nicht eingerichtet"
+  },
+  {
+   "id": "VS-2026-003",
+   "check": "db_exposed",
+   "family": "db_exposed",
+   "cat": "A",
+   "scale": "exposure",
+   "level": "kritisch",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "affected": [
+    "116.202.77.64:3306 (MariaDB)",
+    "116.202.77.64:5432 (PostgreSQL)"
+   ],
+   "title": "Datenbankdienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-004",
+   "check": "dmarc_missing",
+   "family": "dmarc_missing",
+   "cat": "C",
+   "scale": "hygiene",
+   "level": "hoch",
+   "group": "lumbeck-wolter.de",
+   "affected": [
+    "lumbeck-wolter.de"
+   ],
+   "title": "DMARC-Richtlinie fehlt"
+  },
+  {
+   "id": "VS-2026-005",
+   "check": "dnssec_missing",
+   "family": "dnssec_missing",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "lumbeck-wolter.de",
+   "affected": [
+    "lumbeck-wolter.de"
+   ],
+   "title": "DNS-Zone ohne DNSSEC-Signatur"
+  },
+  {
+   "id": "VS-2026-006",
+   "check": "legacy_protocols_present",
+   "family": "legacy_protocols_present",
+   "cat": "A",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "affected": [
+    "116.202.77.64:110 (POP3)",
+    "116.202.77.64:143 (IMAP)",
+    "116.202.77.64:21 (FTP)"
+   ],
+   "title": "Veraltetes Übertragungsprotokoll aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-007",
+   "check": "mta_sts_missing",
+   "family": "mta_sts_missing",
+   "cat": "C",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "lumbeck-wolter.de",
+   "affected": [
+    "lumbeck-wolter.de"
+   ],
+   "title": "MTA-STS nicht wirksam veröffentlicht"
+  },
+  {
+   "id": "VS-2026-008",
+   "check": "service_banner_version",
+   "family": "banner_version_disclosure",
+   "cat": "E",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "affected": [
+    "116.202.77.64:222 (OpenSSH 9.2p1)",
+    "116.202.77.64:3306 (MariaDB 10.11.18)",
+    "116.202.77.64:5432 (PostgreSQL unbekannt)"
+   ],
+   "title": "Dienst gibt Versionskennung preis"
+  },
+  {
+   "id": "VS-2026-009",
+   "check": "spf_softfail",
+   "family": "spf_softfail",
+   "cat": "C",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "lumbeck-wolter.de",
+   "affected": [
+    "lumbeck-wolter.de (~all)"
+   ],
+   "title": "SPF-Eintrag ohne konsequente Durchsetzung"
+  },
+  {
+   "id": "VS-2026-010",
+   "check": "tls_rpt_missing",
+   "family": "tls_rpt_missing",
+   "cat": "C",
+   "scale": "hygiene",
+   "level": "niedrig",
+   "group": "lumbeck-wolter.de",
+   "affected": [
+    "lumbeck-wolter.de"
+   ],
+   "title": "TLS-RPT nicht eingerichtet"
+  }
+ ],
+ "positives": [
+  {
+   "id": "VS-2026-P01",
+   "check": "dkim_missing",
+   "family": "dkim_missing",
+   "cat": "C",
+   "group": "lumbeck-wolter.de",
+   "title": "DKIM vorhanden"
+  },
+  {
+   "id": "VS-2026-P02",
+   "check": "dns_dangling_cname",
+   "family": "dns_dangling",
+   "cat": "C",
+   "group": "lumbeck-wolter.de",
+   "title": "Keine verwaisten CNAME-Einträge"
+  },
+  {
+   "id": "VS-2026-P03",
+   "check": "dns_zone_transfer",
+   "family": "dns_axfr",
+   "cat": "C",
+   "group": "lumbeck-wolter.de",
+   "title": "Zonentransfer abgewiesen"
+  },
+  {
+   "id": "VS-2026-P04",
+   "check": "ftp_plaintext",
+   "family": "ftp_exposed",
+   "cat": "A",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "title": "FTP erzwingt TLS vor der Anmeldung"
+  },
+  {
+   "id": "VS-2026-P05",
+   "check": "http_no_tls",
+   "family": "http_no_tls",
+   "cat": "A",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "title": "Webdienst mit Transportverschlüsselung"
+  },
+  {
+   "id": "VS-2026-P06",
+   "check": "ip_reputation",
+   "family": "ip_reputation",
+   "cat": "E",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "title": "Keine Einträge in Reputationsquellen"
+  },
+  {
+   "id": "VS-2026-P07",
+   "check": "mail_plaintext",
+   "family": "mail_plaintext",
+   "cat": "A",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "title": "POP3 und IMAP erzwingen TLS vor der Anmeldung"
+  },
+  {
+   "id": "VS-2026-P08",
+   "check": "rdp_exposed",
+   "family": "rdp_exposed",
+   "cat": "A",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "title": "Kein RDP-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P09",
+   "check": "smb_exposed",
+   "family": "smb_exposed",
+   "cat": "A",
+   "group": "116.202.77.64 (lumbeck-wolter.de, www.lumbeck-wolter.de)",
+   "title": "Kein SMB-Dienst aus dem Internet erreichbar"
+  },
+  {
+   "id": "VS-2026-P10",
+   "check": "spf_missing",
+   "family": "spf_missing",
+   "cat": "C",
+   "group": "lumbeck-wolter.de",
+   "title": "SPF-Eintrag vorhanden"
+  },
+  {
+   "id": "VS-2026-P11",
+   "check": "urlhaus_compromise",
+   "family": "urlhaus_compromise",
+   "cat": "A",
+   "group": "lumbeck-wolter.de",
+   "title": "Keine Einträge in Malware-Feeds"
+  }
+ ]
+}
