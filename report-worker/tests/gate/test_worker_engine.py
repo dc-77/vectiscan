@@ -19,6 +19,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from reporter.facts import schema as FS
+from reporter.facts.golden import facts_path
+from reporter.facts.serialize import load_json
 from reporter.v3.golden import build_golden_report_data
 
 COLLABORATORS = (
@@ -63,8 +66,12 @@ def _lauf(stack: ExitStack, tmp_path: Path, monkeypatch, **job) -> SimpleNamespa
     m._research_customer_context.return_value = None
 
     daten = build_golden_report_data(ORDER)
+    # S6a2: echte Fakten, weil die Dashboard-Technikzeilen im Katalogweg daraus entstehen.
+    fakten = FS.Facts.from_dict(load_json(facts_path(ORDER)))
+    m.build_tech_table_for_host = stack.enter_context(
+        patch("reporter.tech_table_builder.build_tech_table_for_host", return_value=[]))
     stack.enter_context(patch("reporter.pdf.v3.pipeline.report_bundle_from_source",
-                              return_value=(MagicMock(), MagicMock(), daten)))
+                              return_value=(fakten, MagicMock(), daten)))
     stack.enter_context(patch("reporter.v3.selfcheck.check_report_data_detailed",
                               return_value=[]))
     stack.enter_context(patch("reporter.gate.v3_checks.run_all", return_value=[]))
@@ -119,6 +126,21 @@ def test_dashboard_liste_und_versionen_kommen_aus_v3(tmp_path, monkeypatch) -> N
     assert kwargs["report_number"].startswith("VS-")
 
 
+def test_technikzeilen_kommen_im_katalogweg_aus_den_fakten(tmp_path, monkeypatch) -> None:
+    """S6a2 (spec/09 Q11): Hostkarte und Bericht zeigen dieselben Zeilen."""
+    monkeypatch.delenv("VECTISCAN_REPORT_ENGINE", raising=False)
+    with ExitStack() as stack:
+        m = _lauf(stack, tmp_path, monkeypatch)
+
+    m.build_tech_table_for_host.assert_not_called()
+    profile = {p["ip"]: p for p in m._create_report_record.call_args.kwargs["tech_profiles"]}
+    # Das Profil aus parse_scan_data bleibt, ohne Zeilen, weil die Fakten den Host nicht kennen.
+    assert profile["1.2.3.4"]["tech_rows"] == []
+    rows = profile["88.99.35.112"]["tech_rows"]
+    (block,) = m.daten.architecture.tech
+    assert [(r["name"], r["version"] or "unbekannt") for r in rows] == [(r.c, r.v) for r in block.rows]
+
+
 def test_legacy_ruft_die_alte_kette_weiterhin(tmp_path, monkeypatch) -> None:
     """Der Rueckweg muss funktionieren, solange er dokumentiert ist."""
     monkeypatch.setenv("VECTISCAN_REPORT_ENGINE", "legacy")
@@ -129,6 +151,8 @@ def test_legacy_ruft_die_alte_kette_weiterhin(tmp_path, monkeypatch) -> None:
     m.call_claude.assert_called_once()
     m.map_to_report_data.assert_called_once()
     m._build_findings_data.assert_called()
+    # Unter legacy baut weiterhin der alte Builder die Dashboard-Zeilen.
+    m.build_tech_table_for_host.assert_called()
 
 
 @pytest.mark.parametrize("approved,excluded,erwartet", [
