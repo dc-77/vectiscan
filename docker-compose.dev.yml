@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16.4-alpine
+    image: ghcr.io/dc-77/vectiscan/postgres:16.4-alpine@sha256:5660c2cbfea50c7a9127d17dc4e48543eedd3d7a41a595a2dfa572471e37e64c
     environment:
       POSTGRES_DB: vectiscan
       POSTGRES_USER: vectiscan
@@ -17,7 +17,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:7.4-alpine
+    image: ghcr.io/dc-77/vectiscan/redis:7.4-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
     ports:
       - "6379:6379"
     healthcheck:
@@ -28,9 +28,11 @@ services:
 
   minio:
     # S0a: siehe docker-compose.yml -- Docker Hub liefert minio/minio nicht
-    # mehr aus. Derselbe Digest wie in Produktion, damit lokal und Prod
-    # dieselbe MinIO-Version laufen (RELEASE.2025-09-07T16-13-09Z).
-    image: quay.io/minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    # mehr aus, quay.io seit dem 24.09.2026 nur mit Anmeldung. Derselbe Digest
+    # wie in Produktion aus dem eigenen Registry, damit lokal und Prod dieselbe
+    # MinIO-Version laufen (RELEASE.2025-09-07T16-13-09Z). Alle Abbilder hier
+    # liegen unter ghcr.io/dc-77/vectiscan/ (privat): vorher docker login ghcr.io.
+    image: ghcr.io/dc-77/vectiscan/minio:RELEASE.2025-09-07T16-13-09Z@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
