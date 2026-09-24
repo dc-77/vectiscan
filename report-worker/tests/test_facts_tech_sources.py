@@ -96,9 +96,10 @@ def test_quelle_ist_das_liefernde_werkzeug(facts):
     by_family = {s.family: s for s in facts.software if s.host_ip == IP and not s.fqdn}
     for fam in ("mariadb", "postgresql", "proftpd", "courier", "dovecot", "exim", "iis"):
         assert by_family[fam].detection_sources == ["nmap"], fam
-    # nginx meldet nmap auf Port 80 und httpx als webserver: beide haben geliefert.
-    assert by_family["nginx"].detection_sources == ["httpx", "nmap"]
-    assert "httpx" in by_family["jquery_migrate"].detection_sources
+    # nginx meldet auch httpx als webserver; geliefert hat den Profileintrag aber nmap,
+    # das in der Scanner-Reihenfolge zuerst kommt (phase1 vor tech_enricher).
+    assert by_family["nginx"].detection_sources == ["nmap"]
+    assert by_family["jquery_migrate"].detection_sources == ["httpx"]
 
 
 def test_webtech_ohne_ergebnis_ist_nie_quelle(facts):
@@ -112,7 +113,8 @@ def test_webtech_mit_ergebnis_bleibt_quelle(tmp_path):
         json.dumps({"tech": [{"name": "jQuery", "version": ""}]}), encoding="utf-8")
     facts = build_facts(scan)
     jq = [s for s in facts.software if s.host_ip == IP and s.family == "jquery" and not s.fqdn]
-    assert jq and "webtech" in jq[0].detection_sources
+    # webtech kommt in phase1 vor httpx (tech_enricher); beide melden jQuery.
+    assert jq and jq[0].detection_sources == ["webtech"]
     maria = [s for s in facts.software if s.family == "mariadb" and not s.fqdn]
     assert maria[0].detection_sources == ["nmap"]
 

@@ -7065,7 +7065,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
     "httpx",
     "webtech"
    ],
@@ -7620,7 +7619,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
     "httpx",
     "webtech"
    ],
@@ -7664,7 +7662,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -7884,7 +7881,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"

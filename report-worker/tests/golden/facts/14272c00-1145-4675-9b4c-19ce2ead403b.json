@@ -3003,7 +3003,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -3728,7 +3727,6 @@
    "confidence": 0.95,
    "detection_sources": [
     "cms_fingerprint",
-    "httpx",
     "webtech"
    ],
    "distro": null,

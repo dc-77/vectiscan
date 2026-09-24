@@ -660,7 +660,7 @@
       "c": "Microsoft Exchange",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, header_check, httpx, redirect_probe, zap_spider",
+      "src": "cms_fingerprint, httpx, redirect_probe, zap_spider",
       "st": "grau",
       "status": "unbekannt",
       "v": "SE (Build 15.2.2562)"
@@ -678,7 +678,7 @@
       "c": "Microsoft IIS",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -692,7 +692,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -710,7 +710,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"

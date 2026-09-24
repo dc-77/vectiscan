@@ -718,7 +718,7 @@
       "c": "Webflow",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -727,7 +727,7 @@
       "c": "cloudflare",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -777,7 +777,7 @@
       "c": "Webflow",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -786,7 +786,7 @@
       "c": "cloudflare",
       "conf": "mittel",
       "note": "",
-      "src": "httpx, webtech",
+      "src": "webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -849,7 +849,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"

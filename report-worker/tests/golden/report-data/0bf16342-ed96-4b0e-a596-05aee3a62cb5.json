@@ -754,7 +754,7 @@
       "c": "Microsoft IIS",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -768,7 +768,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -786,7 +786,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -809,7 +809,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"

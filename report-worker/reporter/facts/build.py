@@ -640,9 +640,11 @@ def _add_software(ctx: _Ctx, ip: str, fqdn: Optional[str], product_raw: Optional
 
 
 # Reihenfolge, in der der Scanner tech_profile.technologies[] fuellt (phase1.py:
-# nmap, webtech, CMS; tech_enricher.py: Header, zap_spider, httpx). Die Liste traegt
-# keine Herkunft, sie wird hier aus den Rohdaten desselben Hosts zurueckgewonnen.
-PROFILE_TECH_TOOLS = ("nmap", "webtech", "httpx", "header_check", "cms_fingerprint", "zap_spider")
+# nmap, webtech, CMS; tech_enricher.py: Header, zap_spider, httpx). Beide
+# deduplizieren ueber den Namen in Kleinschreibung, jeder Eintrag entsteht also beim
+# ersten Werkzeug dieser Reihenfolge, das ihn meldet. Die Liste traegt keine Herkunft;
+# sie wird hier aus den Rohdaten desselben Hosts zurueckgewonnen.
+PROFILE_TECH_TOOLS = ("nmap", "webtech", "cms_fingerprint", "header_check", "zap_spider", "httpx")
 # Kein Werkzeug belegt den Eintrag: die Zeile stammt nachweislich nur aus der Profildatei.
 PROFILE_FALLBACK_TOOL = "tech_profile"
 
@@ -700,16 +702,18 @@ def _profile_tech_sources(ctx: _Ctx, ip: str, h: Any) -> dict[str, set[str]]:
     return src
 
 
-def _profile_tools(sources: dict[str, set[str]], name: Any) -> list[str]:
+def _profile_tool(sources: dict[str, set[str]], name: Any) -> str:
+    """Das Werkzeug, das den Eintrag geliefert hat: das erste der Scanner-Reihenfolge,
+    dessen Rohdaten den Namen tragen. Spaetere Werkzeuge mit demselben Namen hat der
+    Scanner verworfen; sie stehen hier nicht als Quelle."""
     key = _tech_key(name)
-    tools = [t for t in PROFILE_TECH_TOOLS if key and key in sources[t]]
-    return tools or [PROFILE_FALLBACK_TOOL]
+    return next((t for t in PROFILE_TECH_TOOLS if key and key in sources[t]), PROFILE_FALLBACK_TOOL)
 
 
 def _add_profile_software(ctx: _Ctx, ip: str, sources: dict[str, set[str]], name: Any, version: Any,
                           ref: str, evidence_text: str) -> None:
-    for tool in _profile_tools(sources, name):
-        _add_software(ctx, ip, None, name, version, tool, ref, evidence_text, S.CONFIDENCE_DERIVED)
+    _add_software(ctx, ip, None, name, version, _profile_tool(sources, name), ref, evidence_text,
+                  S.CONFIDENCE_DERIVED)
 
 
 def _software_from_profiles(ctx: _Ctx, ips: list[str]) -> None:

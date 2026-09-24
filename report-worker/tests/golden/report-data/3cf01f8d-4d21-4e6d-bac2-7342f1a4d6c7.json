@@ -375,7 +375,7 @@
       "c": "Cookiebot",
       "conf": "mittel",
       "note": "",
-      "src": "httpx, webtech",
+      "src": "webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -384,7 +384,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -407,7 +407,7 @@
       "c": "Microsoft Exchange",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, header_check, httpx, redirect_probe, zap_spider",
+      "src": "cms_fingerprint, httpx, redirect_probe, zap_spider",
       "st": "grau",
       "status": "unbekannt",
       "v": "2019 (Build 15.2.1748)"
@@ -434,7 +434,7 @@
       "c": "Microsoft IIS",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"

@@ -3807,7 +3807,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -3993,10 +3992,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -4330,7 +4326,6 @@
    "confidence": 0.8,
    "detection_sources": [
     "cms_fingerprint",
-    "header_check",
     "httpx",
     "redirect_probe",
     "zap_spider"
@@ -4348,7 +4343,7 @@
     {
      "excerpt": "technologies: Microsoft Exchange 2019",
      "ref": "hosts/80.90.145.166/phase1/tech_profile.json",
-     "tool": "header_check"
+     "tool": "cms_fingerprint"
     },
     {
      "excerpt": "technologies: Outlook Web App 15.2.1748",
@@ -4377,9 +4372,9 @@
    "kind": "mail",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-23T19:45:24Z",
+   "observed_at": "2026-09-23T19:51:42Z",
    "product": "Microsoft Exchange",
-   "source": "header_check",
+   "source": "cms_fingerprint",
    "version_norm": "2019",
    "version_raw": "15.2.1748",
    "vulnerabilities_count": null
@@ -4388,7 +4383,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
     "httpx",
     "webtech"
    ],

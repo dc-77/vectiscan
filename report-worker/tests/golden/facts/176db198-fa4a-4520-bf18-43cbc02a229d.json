@@ -4740,8 +4740,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
-    "httpx"
+    "header_check"
    ],
    "distro": null,
    "edition": null,
@@ -4756,7 +4755,7 @@
     {
      "excerpt": "technologies: Cloudflare",
      "ref": "hosts/104.16.10.6/phase1/tech_profile.json",
-     "tool": "httpx"
+     "tool": "header_check"
     }
    ],
    "family": "cloudflare",
@@ -4769,7 +4768,7 @@
    "note": null,
    "observed_at": "2026-05-22T00:11:23Z",
    "product": "Cloudflare",
-   "source": "httpx",
+   "source": "header_check",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -4989,7 +4988,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"

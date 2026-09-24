@@ -239,10 +239,15 @@ Tar-Groessen nach dem Entfernen der Bilder 28 KB bis 989 KB (heuel 0,94 MB, cast
   auf 85.22.47.39 "jQuery UI" als eigene Zeile hinzu. Kalibriert an allen 121 Rohnamen
   der Tars und Snapshots; sonst aendert sich nur "ProFTPD or KnFTPD" (eigenes Produkt,
   in keinem Golden-Tar). (2) Quelle: die Spalte "Erkennung" nennt das liefernde Werkzeug
-  statt pauschal webtech ("nmap, webtech" wird bei lumbeck-wolter und Junkerwerk zu
-  "nmap"); Konfidenz und Patch-Status keiner Zeile aendern sich. Befunde unveraendert,
-  nur die Quellenangabe verliert "webtech" (Exchange bei 2d2d4f39, 4e6b6883, f77ccff2,
-  MariaDB bei 45bb234c, nginx bei ae8d1d70). HTML-Schnappschuss 0bf16342 neu
+  statt pauschal webtech. Ein Eintrag aus `tech_profile.technologies` gehoert dem ersten
+  Werkzeug der Scanner-Reihenfolge, das ihn meldet (phase1: nmap, webtech, CMS;
+  tech_enricher: Header, zap_spider, httpx; beide deduplizieren ueber den Namen).
+  "nmap, webtech" wird bei lumbeck-wolter und Junkerwerk zu "nmap"; mehrere Werkzeuge
+  stehen nur, wo verschiedene Eintraege denselben Fakt ergeben (IIS: "Microsoft IIS
+  httpd" von nmap, "Microsoft-IIS" von webtech, "IIS" von httpx). Konfidenz und
+  Patch-Status keiner Zeile aendern sich. Befunde unveraendert, nur die Quellenangabe
+  (Exchange bei 2d2d4f39, 4e6b6883, f77ccff2 mit cms_fingerprint statt webtech, MariaDB
+  bei 45bb234c, nginx bei ae8d1d70 ohne webtech). HTML-Schnappschuss 0bf16342 neu
   geschrieben (Quelle, Faktenschema im Impressum). (3) `reports.tech_profiles[].tech_rows`
   entstehen im Katalogweg aus denselben Zeilen (`reporter/v3/dashboard.py`);
   Paritaetstest `tests/v3/test_tech_rows_paritaet.py`.

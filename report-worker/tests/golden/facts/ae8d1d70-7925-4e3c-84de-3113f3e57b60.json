@@ -7837,7 +7837,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -8033,7 +8032,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -8969,7 +8967,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -9352,8 +9349,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -9391,8 +9386,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -10408,10 +10401,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -10579,8 +10569,7 @@
    "build": null,
    "confidence": 0.9,
    "detection_sources": [
-    "cms_fingerprint",
-    "httpx"
+    "cms_fingerprint"
    ],
    "distro": null,
    "edition": null,
@@ -10600,7 +10589,7 @@
     {
      "excerpt": "technologies: WordPress 7.0.2",
      "ref": "hosts/85.22.47.41/phase1/tech_profile.json",
-     "tool": "httpx"
+     "tool": "cms_fingerprint"
     }
    ],
    "family": "wordpress",

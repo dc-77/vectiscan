@@ -808,7 +808,7 @@
       "c": "Drupal",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "11"
@@ -844,7 +844,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -867,7 +867,7 @@
       "c": "Web Server",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -908,7 +908,7 @@
       "c": "Microsoft Exchange",
       "conf": "mittel",
       "note": "Herstellerpflege endete am 2025-10-14",
-      "src": "cms_fingerprint, header_check, httpx, redirect_probe",
+      "src": "cms_fingerprint, httpx, redirect_probe",
       "st": "rot",
       "status": "veraltet",
       "v": "2016 (Build 15.1.2507)"
@@ -935,7 +935,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -949,7 +949,7 @@
       "c": "Nextcloud",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, httpx",
+      "src": "cms_fingerprint",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -976,7 +976,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -999,7 +999,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1013,7 +1013,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1031,7 +1031,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -1054,7 +1054,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1068,7 +1068,7 @@
       "c": "Drupal",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "11"
@@ -1113,7 +1113,7 @@
       "c": "Apache httpd",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1145,7 +1145,7 @@
       "c": "WordPress",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "7.0.2"
@@ -1217,7 +1217,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "httpx, webtech",
+      "src": "webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "8.4.23"
@@ -1262,7 +1262,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1381,7 +1381,7 @@
   {
    "affected": "195.50.179.4: Microsoft Exchange 2016 (Support beendet 2025-10-14)",
    "cat": "B",
-   "evidence": "header_check · hosts/195.50.179.4/phase1/tech_profile.json\n195.50.179.4: Produkt=Microsoft Exchange Familie=exchange Version=2016 Build=15.1.2507 Pflegestatus=eol Pflegeende=2025-10-14 Quelle=manual\n\nheader_check · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Microsoft Exchange EXCHANGE01\n\nhttpx · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Outlook Web App 15.1.2507\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://mail.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://mail2.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://owa.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
+   "evidence": "cms_fingerprint · hosts/195.50.179.4/phase1/tech_profile.json\n195.50.179.4: Produkt=Microsoft Exchange Familie=exchange Version=2016 Build=15.1.2507 Pflegestatus=eol Pflegeende=2025-10-14 Quelle=manual\n\ncms_fingerprint · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Microsoft Exchange EXCHANGE01\n\nhttpx · hosts/195.50.179.4/phase1/tech_profile.json\ntechnologies: Outlook Web App 15.1.2507\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://mail.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://mail2.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nredirect_probe · hosts/195.50.179.4/phase1/tech_profile.json\nredirect_chain: https://owa.castenow.de/owa/auth/15.1.2507/themes/resources/segoeui-regular.ttf\n\nund 2 weitere Fundstellen gleicher Art; die betroffenen Namen stehen vollständig unter Betroffen.",
    "found": "Auf 195.50.179.4 (autodiscover.castenow.de, mail.castenow.de, mail2.castenow.de, owa.castenow.de) läuft Serversoftware, deren Herstellerpflege laut Lebenszyklusdaten beendet ist: 195.50.179.4: Microsoft Exchange 2016 (Support beendet 2025-10-14).",
    "id": "VS-2026-003",
    "impact": "Für Software ohne Herstellerpflege erscheinen keine Sicherheitsupdates mehr. Bekannte Schwachstellen bleiben dauerhaft offen, und Angreifer können auf veröffentlichte Exploits zurückgreifen. Bei Distributionspaketen kann ein Sicherheits-Backport vorliegen, das am Banner nicht erkennbar ist.",
@@ -1399,7 +1399,7 @@
     ]
    ],
    "scale": "exposure",
-   "source": "aktiv (header_check, httpx, redirect_probe)",
+   "source": "aktiv (cms_fingerprint, httpx, redirect_probe)",
    "status": "gelb",
    "threat": null,
    "title": "Serversoftware ohne Herstellerpflege",

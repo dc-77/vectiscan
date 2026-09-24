@@ -8065,7 +8065,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -8711,10 +8710,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,

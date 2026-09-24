@@ -412,7 +412,7 @@
       "c": "WordPress",
       "conf": "mittel",
       "note": "Herstellerpflege endete am 2024-04-02",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "rot",
       "status": "veraltet",
       "v": "6.4.2"
@@ -439,7 +439,7 @@
       "c": "Plesk",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, nmap, webtech",
+      "src": "nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -448,7 +448,7 @@
       "c": "MariaDB",
       "conf": "hoch",
       "note": "Herstellerpflege endete am 2020-04-11",
-      "src": "httpx, nmap",
+      "src": "nmap",
       "st": "rot",
       "status": "veraltet",
       "v": "5.5.68"
@@ -475,7 +475,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "httpx, webtech",
+      "src": "webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "8.2.30"
@@ -565,7 +565,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"

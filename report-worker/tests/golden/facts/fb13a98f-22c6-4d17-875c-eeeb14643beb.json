@@ -5191,10 +5191,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -5694,7 +5691,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -5844,7 +5840,6 @@
    "confidence": 0.9,
    "detection_sources": [
     "cms_fingerprint",
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -5865,7 +5860,7 @@
     {
      "excerpt": "technologies: Joomla",
      "ref": "hosts/85.13.167.158/phase1/tech_profile.json",
-     "tool": "httpx"
+     "tool": "cms_fingerprint"
     },
     {
      "excerpt": "technologies: Joomla! - Open Source Content Management",
@@ -6388,10 +6383,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,

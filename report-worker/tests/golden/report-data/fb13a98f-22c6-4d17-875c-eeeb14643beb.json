@@ -679,7 +679,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -693,7 +693,7 @@
       "c": "Joomla",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -774,7 +774,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -815,7 +815,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"

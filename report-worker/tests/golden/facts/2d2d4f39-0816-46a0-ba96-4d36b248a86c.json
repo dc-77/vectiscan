@@ -11212,7 +11212,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -11273,7 +11272,6 @@
    "confidence": 0.8,
    "detection_sources": [
     "cms_fingerprint",
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -11655,10 +11653,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -11886,7 +11881,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -12339,7 +12333,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -12436,8 +12429,7 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "cms_fingerprint",
-    "httpx"
+    "cms_fingerprint"
    ],
    "distro": null,
    "edition": null,
@@ -12452,7 +12444,7 @@
     {
      "excerpt": "technologies: Nextcloud",
      "ref": "hosts/195.50.179.5/phase1/tech_profile.json",
-     "tool": "httpx"
+     "tool": "cms_fingerprint"
     }
    ],
    "family": "nextcloud",
@@ -12463,9 +12455,9 @@
    "kind": "application",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-07-22T16:08:08Z",
+   "observed_at": "2026-07-22T16:33:50Z",
    "product": "Nextcloud",
-   "source": "httpx",
+   "source": "cms_fingerprint",
    "version_norm": null,
    "version_raw": null,
    "vulnerabilities_count": null
@@ -12782,9 +12774,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -12873,7 +12863,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
     "httpx",
     "webtech"
    ],
@@ -12917,7 +12906,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -13137,7 +13125,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"
@@ -13324,7 +13311,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
     "httpx",
     "webtech"
    ],
@@ -13369,7 +13355,6 @@
    "confidence": 0.8,
    "detection_sources": [
     "cms_fingerprint",
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -13961,10 +13946,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -14016,7 +13998,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -14239,7 +14220,6 @@
    "confidence": 0.95,
    "detection_sources": [
     "cms_fingerprint",
-    "httpx",
     "webtech"
    ],
    "distro": null,

@@ -478,7 +478,7 @@
       "c": "WordPress",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -694,7 +694,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "2.4.67 (debian)"

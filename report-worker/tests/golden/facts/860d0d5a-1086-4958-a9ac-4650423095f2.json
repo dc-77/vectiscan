@@ -7199,7 +7199,6 @@
    "confidence": 0.8,
    "detection_sources": [
     "cms_fingerprint",
-    "header_check",
     "httpx",
     "redirect_probe",
     "zap_spider"
@@ -7217,7 +7216,7 @@
     {
      "excerpt": "technologies: Microsoft Exchange EXCHANGE-SE",
      "ref": "hosts/217.243.248.28/phase1/tech_profile.json",
-     "tool": "header_check"
+     "tool": "cms_fingerprint"
     },
     {
      "excerpt": "technologies: Outlook Web App 15.2.2562",
@@ -7252,9 +7251,9 @@
    "kind": "mail",
    "mode": "active",
    "note": null,
-   "observed_at": "2026-09-20T11:05:17Z",
+   "observed_at": "2026-09-20T11:18:54Z",
    "product": "Microsoft Exchange",
-   "source": "header_check",
+   "source": "cms_fingerprint",
    "version_norm": "SE",
    "version_raw": "15.2.2562",
    "vulnerabilities_count": null
@@ -7263,7 +7262,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
     "httpx",
     "webtech"
    ],
@@ -7658,7 +7656,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "header_check",
     "httpx",
     "webtech"
    ],
@@ -7702,7 +7699,6 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
     "httpx",
     "nmap",
     "webtech"

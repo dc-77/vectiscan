@@ -4279,7 +4279,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "httpx",
     "webtech"
    ],
    "distro": null,

@@ -8656,10 +8656,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -8870,7 +8867,6 @@
    "confidence": 0.95,
    "detection_sources": [
     "cms_fingerprint",
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -9030,7 +9026,6 @@
    "build": null,
    "confidence": 0.8,
    "detection_sources": [
-    "httpx",
     "webtech"
    ],
    "distro": null,
@@ -9236,10 +9231,7 @@
    "build": null,
    "confidence": 1.0,
    "detection_sources": [
-    "header_check",
-    "httpx",
-    "nmap",
-    "webtech"
+    "nmap"
    ],
    "distro": null,
    "edition": null,
@@ -9460,7 +9452,6 @@
    "confidence": 0.95,
    "detection_sources": [
     "cms_fingerprint",
-    "httpx",
     "webtech"
    ],
    "distro": null,

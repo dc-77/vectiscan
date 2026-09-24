@@ -836,7 +836,7 @@
       "c": "Drupal",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "11"
@@ -872,7 +872,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -895,7 +895,7 @@
       "c": "Web Server",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -954,7 +954,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -968,7 +968,7 @@
       "c": "Nextcloud",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, httpx",
+      "src": "cms_fingerprint",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -995,7 +995,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1018,7 +1018,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1032,7 +1032,7 @@
       "c": "ASP.NET",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1050,7 +1050,7 @@
       "c": "Microsoft IIS",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "10.0"
@@ -1073,7 +1073,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1087,7 +1087,7 @@
       "c": "Drupal",
       "conf": "mittel",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "11"
@@ -1132,7 +1132,7 @@
       "c": "Apache httpd",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx, webtech",
+      "src": "httpx, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -1164,7 +1164,7 @@
       "c": "WordPress",
       "conf": "hoch",
       "note": "",
-      "src": "cms_fingerprint, httpx, webtech",
+      "src": "cms_fingerprint, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "7.0.2"
@@ -1236,7 +1236,7 @@
       "c": "PHP",
       "conf": "mittel",
       "note": "",
-      "src": "httpx, webtech",
+      "src": "webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "8.4.23"
@@ -1281,7 +1281,7 @@
       "c": "nginx",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "nmap",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"

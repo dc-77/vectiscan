@@ -722,7 +722,7 @@
       "c": "Cloudflare",
       "conf": "mittel",
       "note": "",
-      "src": "header_check, httpx",
+      "src": "header_check",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
@@ -781,7 +781,7 @@
       "c": "Apache httpd",
       "conf": "hoch",
       "note": "",
-      "src": "header_check, httpx, nmap, webtech",
+      "src": "httpx, nmap, webtech",
       "st": "grau",
       "status": "unbekannt",
       "v": "unbekannt"
