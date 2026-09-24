@@ -237,7 +237,7 @@ test-edge:
   script:
     # Runner ist Shell-Executor (image: wird ignoriert); System-Python ist PEP-668
     # externally-managed → venv wie bei test-scan-worker/test-report-worker.
-    - python3 -m venv .venv && . .venv/bin/activate && pip install pyyaml pytest && pytest tests/test_edge_admin_guard.py -v
+    - python3 -m venv .venv && . .venv/bin/activate && pip install pyyaml pytest && pytest tests/test_edge_admin_guard.py tests/test_compose_images.py -v
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -429,7 +429,13 @@ test-edge:
     #    CI-Var-Zustand (Twenty bypasst Traefik via proxy-net, kein 401). Sobald
     #    Maintainer die CI-Var loescht/auf intern korrigiert, kann der Override weg.
     - export CRM_WEBHOOK_URL='http://vectiscan-twenty-server-1:3000/rest/people'
-    - docker compose pull
+    # ── Nur Abbilder aus der eigenen Registry ziehen (Entscheidung DC, 24.09.2026).
+    #    Ein pauschales `docker compose pull` riss am 24.09. den ganzen Deploy mit,
+    #    weil quay.io minio/minio nur noch mit Anmeldung ausliefert (Pipeline 3181,
+    #    401). Fremdabbilder liegen gespiegelt unter ghcr.io/dc-77/vectiscan/ und sind
+    #    per Digest gepinnt (ops-mirror-images, tests/test_compose_images.py). Kein
+    #    --ignore-pull-failures: ein Fehler beim Ziehen bleibt ein Fehler.
+    - COMPOSE_PROFILES=crm bash ${CI_PROJECT_DIR}/scripts/ops/pull-own-images.sh
     # VEC-320: COMPOSE_PROFILES=crm stellt sicher dass Twenty-CRM-Container
     # bei jedem Deploy mitgestartet werden (nicht nur beim ersten manuellen Start).
     - COMPOSE_PROFILES=crm TAG=${TAG} docker compose up -d --remove-orphans
@@ -995,6 +1001,32 @@ ops-diag-scanner-ipv6:
       echo "=== nmap -6 direkt gegen das Ziel, nur die Bilanz ==="
       docker compose exec -T scan-worker sh -c "nmap -6 -Pn -n --top-ports 20 --open ${IPV6_TARGET} 2>&1 | tail -20" || true
 
+# Fremdabbilder nach ghcr.io/dc-77/vectiscan/ spiegeln (Entscheidung DC, 24.09.2026).
+# quay.io liefert minio/minio seit dem 24.09. nur mit Anmeldung; jedes Fremdabbild
+# kann so verschwinden. Der Job spiegelt, was auf dem Host laeuft (lokal vorhanden)
+# oder zieht fehlende Abbilder von der Quelle, pusht nach ghcr.io und schreibt die
+# Digests ins Artefakt. Die Digests gehoeren danach in die Compose-Dateien
+# (tests/test_compose_images.py prueft die Zuordnung). Neues Fremdabbild: Zeile in
+# scripts/ops/mirror-images.sh, Job laufen lassen, Digest eintragen.
+ops-mirror-images:
+  extends: .ops-base
+  needs: []
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+      when: manual
+      allow_failure: true
+  before_script:
+    - echo "${GHCR_TOKEN}" | docker login ghcr.io -u dc-77 --password-stdin
+  artifacts:
+    when: always
+    expire_in: 30 days
+    paths:
+      - mirror-images/
+  script:
+    - bash scripts/ops/mirror-images.sh mirror-images/digests.txt
+
 ops-export-golden-tars:
   extends: .ops-base
   needs: []
@@ -1467,7 +1499,9 @@ rollback:
     - cd ${DEPLOY_PATH}
     - cp docker-compose.yml.bak docker-compose.yml
     - cp .env.bak .env
-    - docker compose pull
+    # Dieselbe Regel wie im Deploy: nur Abbilder aus der eigenen Registry ziehen.
+    - echo "${GHCR_TOKEN}" | docker login ghcr.io -u dc-77 --password-stdin
+    - COMPOSE_PROFILES=crm bash ${CI_PROJECT_DIR}/scripts/ops/pull-own-images.sh
     - docker compose up -d --remove-orphans
     - sleep 30
     - docker compose ps

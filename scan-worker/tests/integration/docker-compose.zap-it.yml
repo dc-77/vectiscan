@@ -22,7 +22,7 @@ name: vectiscan-zap-it
 
 services:
   redis:
-    image: redis:7.4-alpine
+    image: ghcr.io/dc-77/vectiscan/redis:7.4-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
     ports:
       - "16379:6379"
     healthcheck:
@@ -33,7 +33,7 @@ services:
 
   # Testziel: absichtlich angreifbar, nur in diesem Netz erreichbar.
   target:
-    image: python:3.12-slim
+    image: ghcr.io/dc-77/vectiscan/python:3.12-slim@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9
     working_dir: /app
     volumes:
       - ./target_app.py:/app/target_app.py:ro
@@ -51,7 +51,7 @@ services:
   # Flags identisch zur Produktion (docker-compose.yml), damit der Test das
   # Verhalten der Produktionsinstanzen abbildet.
   zap-a:
-    image: zaproxy/zap-stable:${ZAP_VERSION:-2.17.0}
+    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:781a2bdaea47324e7bab583e2263f21d257b0aee61ed51521a5be45f5f5081ef
     command: >
       zap.sh -daemon
       -port 8090
@@ -75,7 +75,7 @@ services:
   # Testlaeufer im Netz: sieht zap-a/zap-b unter ihren Containernamen, so wie
   # der scan-worker in Produktion zap-1..zap-4 sieht.
   runner:
-    image: python:3.12-slim
+    image: ghcr.io/dc-77/vectiscan/python:3.12-slim@sha256:2f17fc044b579bab302c2e8054d3a686e2cb9a83de48e70534b94cd8ebbe06a9
     # Profil, damit "up -d" nur die Infrastruktur hochfaehrt. Der Laeufer
     # wird per "run --rm runner" gestartet und beendet sich danach.
     profiles: ["test"]
@@ -106,7 +106,7 @@ services:
         condition: service_healthy
 
   zap-b:
-    image: zaproxy/zap-stable:${ZAP_VERSION:-2.17.0}
+    image: ghcr.io/dc-77/vectiscan/zap-stable:2.17.0@sha256:781a2bdaea47324e7bab583e2263f21d257b0aee61ed51521a5be45f5f5081ef
     command: >
       zap.sh -daemon
       -port 8090
