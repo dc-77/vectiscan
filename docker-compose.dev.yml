@@ -31,7 +31,9 @@ services:
     # mehr aus, quay.io seit dem 24.09.2026 nur mit Anmeldung. Derselbe Digest
     # wie in Produktion aus dem eigenen Registry, damit lokal und Prod dieselbe
     # MinIO-Version laufen (RELEASE.2025-09-07T16-13-09Z). Alle Abbilder hier
-    # liegen unter ghcr.io/dc-77/vectiscan/ (privat): vorher docker login ghcr.io.
+    # sind gespiegelte Fremdabbilder unter ghcr.io/dc-77/vectiscan/ und
+    # oeffentlich, ein docker login ist nicht noetig (docs/report-erstellung/
+    # M6-DEPLOY-STATUS.md, Nachtrag S6a2).
     image: ghcr.io/dc-77/vectiscan/minio:RELEASE.2025-09-07T16-13-09Z@sha256:a1a8bd4ac40ad7881a245bab97323e18f971e4d4cba2c2007ec1bedd21cbaba2
     command: server /data --console-address ":9001"
     environment:

@@ -160,3 +160,45 @@ Scan noch einmal aus. Erst wenn das nicht weiterhilft, ist
 Auslieferung weiter an der Admin-Freigabe.
 
 Einzelheiten zur Pipeline: `docs/report-pipeline/`.
+
+---
+
+## Nachtrag S6a2 (2026-09-24): Abbilder nur aus der eigenen Registry
+
+Am 24.09.2026 lieferte quay.io `minio/minio` nur noch mit Anmeldung (401), und
+das pauschale `docker compose pull` in `deploy-auto` riss den ganzen Deploy mit
+(Pipeline 3181). Seitdem gilt (Entscheidung DC, MR !93 und !94):
+
+- **Jedes Abbild** in `docker-compose.yml`, `docker-compose.dev.yml` und
+  `scan-worker/tests/integration/docker-compose.zap-it.yml` liegt unter
+  `ghcr.io/dc-77/vectiscan/`.
+- **Eigene Abbilder** (frontend, api, scan-worker, report-worker) sind
+  **privat** und stehen mit `${TAG}` (Commit-SHA) in der Compose-Datei.
+- **Fremdabbilder** (MinIO, postgres, redis, ZAP, web-check, uptime-kuma, loki,
+  promtail, grafana, twenty, keycloak, oauth2-proxy, python) sind dorthin
+  gespiegelt, per Digest gepinnt und **öffentlich**. `docker-compose.dev.yml`
+  und der ZAP-Integrationstest brauchen damit kein `docker login`.
+- **Deploy und Rollback** ziehen nur über `scripts/ops/pull-own-images.sh`,
+  nie pauschal und nie mit `--ignore-pull-failures`. `tests/test_compose_images.py`
+  (Job `test-edge`) hält die Regel fest.
+
+### Neues Fremdabbild oder neue Version
+
+1. Zeile in `scripts/ops/mirror-images.sh` eintragen (Quelle und Ziel
+   `<name>:<tag>`).
+2. Job `ops-mirror-images` auf einer API-Pipeline starten. Er spiegelt, was auf
+   dem Host läuft, zieht nur Fehlendes, liest den Digest bei ghcr.io und prüft
+   ihn mit `docker pull <name>@<digest>`. Ergebnis im Artefakt
+   `mirror-images/digests.txt`.
+3. **Ein neues Paket ist auf ghcr.io zunächst privat.** Die Sichtbarkeit lässt
+   sich nicht per API ändern: auf github.com unter
+   `https://github.com/users/dc-77/packages/container/vectiscan%2F<name>/settings`,
+   Danger Zone, "Change visibility", Public. Nur für Fremdabbilder, nie für die
+   vier eigenen. Ein öffentliches Paket lässt sich auf GitHub nicht wieder
+   privat stellen. Der Job warnt, solange ein Spiegel nicht anonym ziehbar ist.
+4. Digest in die Compose-Datei(en) eintragen, `pytest tests/test_compose_images.py`.
+
+Falle: Der Host nutzt den containerd-Store. Dort ist die lokale Image-ID der
+Digest des Multi-Plattform-Index, gepusht wird aber nur amd64. Nie die Image-ID
+als Digest pinnen; der erste Versuch (Pipeline 3186) scheiterte daran mit
+"not found".
