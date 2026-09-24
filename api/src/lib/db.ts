@@ -54,6 +54,7 @@ const MIGRATION_044_PATH = path.join(__dirname, '..', 'migrations', '044_scan_re
 const MIGRATION_045_PATH = path.join(__dirname, '..', 'migrations', '045_customer_context.sql');
 const MIGRATION_046_PATH = path.join(__dirname, '..', 'migrations', '046_report_defects.sql');
 const MIGRATION_047_PATH = path.join(__dirname, '..', 'migrations', '047_report_number.sql');
+const MIGRATION_048_PATH = path.join(__dirname, '..', 'migrations', '048_customer_context_kurzname.sql');
 
 export async function initDb(): Promise<void> {
   // Check if MVP migration has been applied (orders table exists)
@@ -778,6 +779,24 @@ export async function initDb(): Promise<void> {
     }
   } catch (err) {
     console.error('[initDb] Migration 047 FAILED (continuing without it):', err);
+  }
+
+  // Migration 048 (S6b-1, Sep 2026): Kurzname im Kundenkontext. Nur der
+  // Spaltenkommentar, idempotent; angewendet, solange er "kurzname" nicht nennt.
+  try {
+    const comment048Check = await pool.query(`
+      SELECT COALESCE(col_description('orders'::regclass, a.attnum), '') LIKE '%kurzname%' AS exists
+      FROM pg_attribute a
+      WHERE a.attrelid = 'orders'::regclass AND a.attname = 'customer_context' AND NOT a.attisdropped
+    `);
+    if (comment048Check.rows.length > 0 && !comment048Check.rows[0].exists) {
+      console.log('[initDb] Applying Migration 048: customer_context.kurzname (Kommentar)');
+      const migrationSql = fs.readFileSync(MIGRATION_048_PATH, 'utf-8');
+      await pool.query(migrationSql);
+      console.log('[initDb] Migration 048 applied');
+    }
+  } catch (err) {
+    console.error('[initDb] Migration 048 FAILED (continuing without it):', err);
   }
 
   // Seed admin account if configured and not yet created

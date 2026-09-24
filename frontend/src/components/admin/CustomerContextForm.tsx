@@ -43,6 +43,7 @@ export default function CustomerContextForm({
   onSaved: () => void;
 }) {
   const [firmenname, setFirmenname] = useState(context?.firmenname ?? '');
+  const [kurzname, setKurzname] = useState(context?.kurzname ?? '');
   const [kuerzel, setKuerzel] = useState(context?.kuerzel ?? '');
   const [branche, setBranche] = useState(context?.branche ?? '');
   const [mitarbeiter, setMitarbeiter] = useState(context?.mitarbeiter ?? '');
@@ -58,18 +59,19 @@ export default function CustomerContextForm({
     const altSysteme = JSON.stringify(alt.systeme ?? []);
     const neuSysteme = JSON.stringify(systeme.filter(s => s.fqdn.trim() && s.zweck.trim()));
     return (alt.firmenname ?? '') !== firmenname
+      || (alt.kurzname ?? '') !== kurzname
       || (alt.kuerzel ?? '') !== kuerzel
       || (alt.branche ?? '') !== branche
       || (alt.mitarbeiter ?? '') !== mitarbeiter
       || altSysteme !== neuSysteme;
-  }, [context, firmenname, kuerzel, branche, mitarbeiter, systeme]);
+  }, [context, firmenname, kurzname, kuerzel, branche, mitarbeiter, systeme]);
 
   const handleSave = async () => {
     setBusy(true);
     setError(null);
     setMessage(null);
     const res = await updateCustomerContext(orderId, {
-      firmenname, kuerzel, branche, mitarbeiter,
+      firmenname, kurzname, kuerzel, branche, mitarbeiter,
       systeme: systeme.filter(s => s.fqdn.trim() && s.zweck.trim()),
     });
     setBusy(false);
@@ -88,8 +90,9 @@ export default function CustomerContextForm({
   return (
     <section className="space-y-4">
       <div className="bg-[#1e293b] rounded-lg border border-gray-800 p-4 text-xs text-slate-400">
-        Diese Angaben stehen im Bericht: der Firmenname auf dem Deckblatt, das Kürzel in
-        den Befund-Nummern, Branche und Größe im Kontextabsatz. Pflicht ist nichts.
+        Diese Angaben stehen im Bericht: der Firmenname auf dem Deckblatt, der Kurzname in
+        Fußzeile und PDF-Titel, das Kürzel in den Befund-Nummern, Branche und Größe im
+        Kontextabsatz. Pflicht ist nichts. Ohne Kurzname steht der Firmenname ohne Rechtsform da.
         Was hier gespeichert wird, überschreibt die automatische Recherche dauerhaft.
       </div>
 
@@ -102,6 +105,13 @@ export default function CustomerContextForm({
             <input id="ctx-firmenname" className={INPUT_CLASS} value={firmenname}
                    onChange={e => setFirmenname(e.target.value)}
                    placeholder="Beispiel Maschinenbau GmbH" />
+          </div>
+          <div>
+            <label htmlFor="ctx-kurzname" className={LABEL_CLASS}>
+              Kurzname (Fußzeile, PDF-Titel)<Herkunft context={context} field="kurzname" />
+            </label>
+            <input id="ctx-kurzname" className={INPUT_CLASS} value={kurzname}
+                   onChange={e => setKurzname(e.target.value)} placeholder="Beispiel Maschinenbau" />
           </div>
           <div>
             <label htmlFor="ctx-kuerzel" className={LABEL_CLASS}>

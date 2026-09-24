@@ -114,6 +114,9 @@ CREATE INDEX idx_orders_status_review  ON orders(status) WHERE status = 'pending
 --       mit source in kunde, recherche, admin.
 --   orders.report_defects    JSONB  Defektliste des letzten Berichtslaufs:
 --       engine, level, blocked_at, defects[], unprocessed[], counts.
+-- S6b-1 (Sep 2026), Migration 048 — nur Spaltenkommentar: customer_context
+--   fuehrt zusaetzlich "kurzname" (Fusszeile, PDF-Titel), Herkunft wie die
+--   uebrigen Felder.
 
 -- ============================================================
 -- Persistente Domain-Verifizierungen (90 Tage gültig) — 010

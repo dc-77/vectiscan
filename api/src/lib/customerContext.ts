@@ -14,6 +14,9 @@ export type ContextSource = 'kunde' | 'recherche' | 'admin';
 
 export interface CustomerContext {
   firmenname?: string;
+  // S6b-1 (spec/09 Q15): Kurzname fuer Fusszeile und PDF-Titel, eigenes Feld statt
+  // der Ableitung aus dem Firmennamen.
+  kurzname?: string;
   kuerzel?: string;
   branche?: string;
   mitarbeiter?: string;
@@ -24,7 +27,7 @@ export interface CustomerContext {
 // Felder, die von aussen gesetzt werden duerfen. Alles andere wird verworfen;
 // `sources` verwaltet der Server selbst.
 export const CUSTOMER_CONTEXT_TEXT_FIELDS = [
-  'firmenname', 'kuerzel', 'branche', 'mitarbeiter',
+  'firmenname', 'kurzname', 'kuerzel', 'branche', 'mitarbeiter',
 ] as const;
 export const CUSTOMER_CONTEXT_FIELD_LIMIT = 200;
 export const CUSTOMER_CONTEXT_MAX_SYSTEME = 50;
